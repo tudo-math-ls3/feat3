@@ -12,7 +12,7 @@
 #  define _GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
 // define FEAST_COMPILER_GCC
-#  define FEAST_COMPILER_MSC _GCC_VER
+#  define FEAST_COMPILER_GCC _GCC_VER
 
 #  define FEAST_COMPILER "GNU C++ compiler"
 
