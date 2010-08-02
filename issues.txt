@@ -1,3 +1,4 @@
 NEWEST: 00000
 ID        |TYPE            |STATUS        |AUTHOR    |ASSIGNED TO     |SEVERITY    |SHORT DESCRIPTION
 00000     |feature_request |unassigned    |markus    |                |high        |implement_test_system
+00001     |feature_request |unassigned    |markus    |                |low         |implement_compiler_detection_icc_gcc
