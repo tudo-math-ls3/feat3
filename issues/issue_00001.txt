@@ -6,6 +6,6 @@ ASSIGNED TO
 SEVERITY     low
 
 FULL TEXT
-Implementation of gcc/icc compiler detection required.
+Implementation of icc compiler detection required.
 
 SOLUTION
