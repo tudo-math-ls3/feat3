@@ -1,0 +1,28 @@
+# Ignore compiled files
+*.o
+*.lo
+*.a
+*.so
+*.so.*
+*.la
+*.pch
+
+# Ignore backup files
+*~
+*.bak
+
+# Ignore linkinfo files
+*.linkinfo
+
+# Ignore patch remains
+*.orig
+*.rej
+
+# Ignore vim swap files
+*.swo
+*.swp
+
+#Ignore build system files
+CMakeCache.txt
+cmake_install.cmake
+Makefile
