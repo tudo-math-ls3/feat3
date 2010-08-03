@@ -6,6 +6,12 @@
 *.so.*
 *.la
 *.pch
+*.obj
+*.exe
+*.lib
+*.dll
+*.ilk
+*.pdb
 
 # Ignore backup files
 *~
@@ -22,7 +28,12 @@
 *.swo
 *.swp
 
-#Ignore build system files
+# Ignore build system files
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+
+# Ignore Visual Studio files
+*.sdf
+*.opensdf
+*.ipch
