@@ -8,7 +8,7 @@ SEVERITY     medium
 FULL TEXT
 The kernel subsystem for geometry issues including
  * grid processing: creation, subdivision, fusion, alteration (adaptivity)
- * macro processing
+ * matrix patch processing
  * interrface to parallel subsystem
 
 SOLUTION
