@@ -1,0 +1,11 @@
+ID           00006
+TYPE         milestone
+STATUS       unassigned
+AUTHOR       markus
+ASSIGNED TO
+SEVERITY     medium
+
+FULL TEXT
+The kernel subsystem for load balancing.
+
+SOLUTION

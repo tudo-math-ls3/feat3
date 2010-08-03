@@ -1,0 +1,16 @@
+ID           00003
+TYPE         milestone
+STATUS       unassigned
+AUTHOR       markus
+ASSIGNED TO
+SEVERITY     medium
+
+FULL TEXT
+The kernel subsystem formerly known as the 'MPI prototype' has to be provided including
+ * MPI wrappers
+ * communication infrastructure
+ * interface to load-balancer
+ * interface to geometry subsystem
+ * interface to 'solvers' subsystem
+
+SOLUTION
