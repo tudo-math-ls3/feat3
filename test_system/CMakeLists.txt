@@ -6,8 +6,11 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 #top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
 
-#list of kernel tests
-SET ( test_list base_header_TEST )
+#our test_system basic library
+ADD_LIBRARY( test_system SHARED test_system )
+
+#list of test_system tests
+SET ( test_list test_system_TEST )
 
 #create all tests
 FOREACH (test ${test_list} )
@@ -15,7 +18,7 @@ FOREACH (test ${test_list} )
   TARGET_LINK_LIBRARIES(${test} test_system)
 ENDFOREACH(test)
 
-#add all tests to kernel_tests
-ADD_CUSTOM_TARGET(kernel_tests DEPENDS ${test_list})
+#add all tests to test_system_tests
+ADD_CUSTOM_TARGET(test_system_tests DEPENDS ${test_list})
 #build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests kernel_tests)
+ADD_DEPENDENCIES(tests test_system_tests)

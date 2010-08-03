@@ -16,5 +16,5 @@ INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake OPTIONAL )
 ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doc/doxygen_config )
 
 ADD_SUBDIRECTORY( kernel )
-#ADD_SUBDIRECTORY( test_system )
+ADD_SUBDIRECTORY( test_system )
 #ADD_SUBDIRECTORY( applications )
