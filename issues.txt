@@ -1,6 +1,6 @@
 NEWEST: 00006
 ID        |TYPE            |STATUS        |AUTHOR    |ASSIGNED TO     |SEVERITY    |SHORT DESCRIPTION
-00002     |feature_request |unassigned    |markus    |                |critical    |build_system_essentials
+00002     |feature_request |assigned      |markus    |Dirk            |critical    |build_system_essentials
 00000     |feature_request |unassigned    |markus    |                |high        |implement_test_system
 00003     |milestone       |unassigned    |markus    |                |medium      |kernel_subsystem_parallel_infrastructure
 00004     |milestone       |unassigned    |markus    |                |medium      |kernel_subsystem_linear_algebra_and_solvers
