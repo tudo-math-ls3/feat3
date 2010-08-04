@@ -7,7 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
 
 #list of kernel tests
-SET ( test_list base_header_TEST )
+SET ( test_list base_header-test )
 
 #create all tests
 FOREACH (test ${test_list} )

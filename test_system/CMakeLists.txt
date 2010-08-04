@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
 ADD_LIBRARY( test_system SHARED test_system )
 
 #list of test_system tests
-SET ( test_list test_system_TEST )
+SET ( test_list test_system-test )
 
 #create all tests
 FOREACH (test ${test_list} )
