@@ -80,7 +80,7 @@ namespace Feast
     /// Feast minor version number
     version_minor = 0,
     /// Feast patch version number
-    version_patch = 0,
+    version_patch = 0
   };
 
   /**
