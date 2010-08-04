@@ -125,8 +125,11 @@ class DoxygenExample
      * \brief computes incredibly complicated stuff
      *
      * This is a long description of what the function does.
-     * @param[in] useless_string input parameter to be ignored
-     * @return a useful result
+     *
+     * \param[in] useless_string
+     * input parameter to be ignored
+     *
+     * \return a useful result
      * \sa answer_to_everything()
      */
     int _do_extremely_complicated_computation(std::string& useless_string)
@@ -162,8 +165,12 @@ class DoxygenExample
      * \brief simple constructor
      *
      * When using this constructor, then something happens.
-     * @param[in] i some input parameter
-     * @param[in] f another input parameter
+     *
+     * \param[in] i
+     * some input parameter
+     *
+     * \param[in] f
+     * another input parameter
      */
     DoxygenExample(int i, float f)
     {
@@ -192,10 +199,18 @@ class DoxygenExample
      * \brief gives the answer to everything
      *
      * This is a long description of what the function does.
-     * @param[in] argc argument count passed to the main() method
-     * @param[in] argv arguments passed to the main() method
-     * @param[in] question arbitrary question
-     * @return answer to the given question
+     *
+     * \param[in] argc
+     * argument count passed to the main() method
+     *
+     * \param[in] argv
+     * arguments passed to the main() method
+     *
+     * \param[in] question
+     * arbitrary question
+     *
+     * \return answer to the given question
+     *
      * \sa _do_extremely_complicated_computation()
      * \todo The detailed description needs to be improved.
      * \warning The computation takes roughly 10,000 years!
