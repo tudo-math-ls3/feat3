@@ -1,0 +1,66 @@
+# HowTo Start Using the FEAST Git Repository
+
+# Step 1
+# Ensure you are member of the group "feastgit", numeric id is 3001
+ssh -p 22122 <own account>@<some host in our network>.mathematik.tu-dortmund.de
+groups | grep feastgit
+# => output should be non-empty. If empty and you did re-login, ask Christian
+#    to add you to the feastgit gorup
+
+# Step 2
+# Ensure git is available
+which git
+# => should not return an error. Git is currently available on most
+#    Linux based hosts at the Faculty of Mathematics, i.e. all Ubuntu 9.10
+#    64bit and openSuSE 11.1 32bit hosts.
+
+# Step 3
+# Checkout FEAST Git repository
+mkdir feast.git.working.copy
+cd feast.git.working.copy
+git clone ssh://<own account>@<some Linux host in our network>.mathematik.tu-dortmund.de:22122/home/user/gitlsiii/feast.git .
+
+# Step 4
+# Get and install commit template to avoid having to reword commit messages
+# because they are rejected by the master repository on push. Unlike in CVS,
+# the template is not automatically installed, but has to be configure for
+# every cloned repository anew.
+cp /home/user/gitlsiii/feast.git/commit-template .git
+git config commit.template .git/commit-template
+
+# Step 5
+# The FEAST Git repository enforces a style guide on commits and commit
+# messages. To avoid situations where commits that were successfully made
+# locally are rejected when pushed to the server because they violate the style
+# guide, it is recommended to set one's local git repository up such that the
+# same style guide is enforced there, too. Otherwise, when rejected by the
+# server, one would have to reword every commit prior to being able to push it
+# (How to do that: git rebase -i HEAD~20, mark all commits to be pushed to be
+# reworded, reword them, then push them.)
+cd .git/hooks
+git init
+git pull .. remotes/origin/hooks
+cd ../..
+
+# Step 6
+# Set your user name and email address. When you use the "-s" option (signed-off-by)
+# when committing (which is recommended), then your name is automatically appended to the
+# commit message.
+git config --global user.name "Your Name"
+git config --global user.email you@yourdomain.example.com
+
+# Step 7
+# Edit files, commit them locally
+# e.g.:
+#   touch foo bar
+#   git add foo bar
+#   git commit -s foo bar
+
+# Step 8
+# Update and rebase local copy prior to pushing (short version of the two commands: "git pull")
+git fetch -v
+git rebase -v origin/master
+
+# Step 9
+# Publish them by pushing them to the main repository
+git push
