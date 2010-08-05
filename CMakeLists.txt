@@ -15,7 +15,8 @@ ADD_DEPENDENCIES( check tests )
 # our custom target to wipe out all cmake generated files
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake OPTIONAL )
 # our custom target to build the documentation via doxygen
-ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doc/doxygen_config )
+# TODO Redirect doxygen output to BUILD_DIR/doc
+ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doc/doxygen_config WORKING_DIRECTORY ${FEAST_SOURCE_DIR} )
 
 ADD_SUBDIRECTORY( kernel )
 ADD_SUBDIRECTORY( test_system )
