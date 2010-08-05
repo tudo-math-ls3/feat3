@@ -80,7 +80,7 @@ git push
 #         menu "Edit --> Trim Trailing Space"
 #     - Unix, vi(m):
 #         Use ":%s/\s\+$//" to remove all trailing whitespaces.
-#         For details on how to detect and avoid them, refer to#
+#         For details on how to detect and avoid them, refer to
 #         http://vim.wikia.com/wiki/Remove_unwanted_spaces
 #     - Unix, (x)emacs:
 #         ... (missing)
@@ -110,8 +110,44 @@ git push
 #
 #       ENH: implemented new feature
 #
-#       When using bla it was not possible to blub. The now implemented feature allows to blub
-#       and bla so that one can bla blub bla blub bla blub.
+#       When using bla it was not possible to blub. The now implemented
+#       feature allows to blub and bla so that one can bla blub bla blub.
 #
 #   - Commit must be signed (option "-s"): git commit -s foo.hpp
-#   - If any of the above rules is violated, the commit is automatically rejected!
+#   - If any of the above rules is violated, the commit is automatically
+#     rejected!
+
+# Useful git commands and tricks:
+#
+# - Add file to local(!) repository:
+#     git add foo.hpp
+#     git commit
+# - Remove file from local(!) repository:
+#     git rm foo.hpp
+#     git commit
+# - Push local commits to the remote repository:
+#     git push
+#   ("git commit" *plus* "git push" is equivalent to "cvs commit"/"svn commit".)
+# - Update local copy prior to pushing, eventually resolve conflicts:
+#     git fetch
+#     git rebase origin/master
+#   Short version (equivalent to "cvs update" or "svn update"):
+#     git pull
+# - Let git be more verbose: option -v. Examples:
+#     git pull -v
+# - Let git tell you what *would* happen if you ran a command:
+#   option --dry-run or -n (not available for all commands). Examples:
+#     git push -n
+#     git commit --dry-run
+# - See detailed changes that are not yet committed:
+#     git diff
+# - See only the files that contain changes not yet committed:
+#     git diff --name-status
+# - Set aliases for git. Examples:
+#     git config alias.remove rm
+#        --> type "git remove" instead of "git rm"
+#     git config alias.changes "diff --name-status"
+#        --> type "git changes" to list all files that contain changes not yet committed.
+# - See git configuration (aliases, user name, email, ...):
+#     git config --list
+# ... (to be continued)
