@@ -43,24 +43,73 @@ git pull .. remotes/origin/hooks
 cd ../..
 
 # Step 6
-# Set your user name and email address. When you use the "-s" option (signed-off-by)
-# when committing (which is recommended), then your name is automatically appended to the
-# commit message.
+# Set your user name and email address. When you use the "-s" option
+# (signed-off-by) when committing (which is recommended), then your name is
+# automatically appended to the commit message.
 git config --global user.name "Your Name"
 git config --global user.email you@yourdomain.example.com
 
 # Step 7
-# Edit files, commit them locally
-# e.g.:
-#   touch foo bar
-#   git add foo bar
-#   git commit -s foo bar
+# Edit files, commit them locally (see also "Commit Rules" below), e.g.:
+#   touch foo.hpp bar.cpp
+#   git add foo.hpp bar.cpp
+#   git commit -s foo.hpp bar-cpp
 
 # Step 8
-# Update and rebase local copy prior to pushing (short version of the two commands: "git pull")
+# Update and rebase local copy prior to pushing, eventually resolve conflicts
+# (short version of the two commands: "git pull")
 git fetch -v
 git rebase -v origin/master
 
 # Step 9
 # Publish them by pushing them to the main repository
 git push
+
+# Commit Rules:
+# - File format:
+#   - All text files have to be in plain ASCII format.
+#   - The line endings of ASCII files must be of UNIX-format ('\n').
+#   - There must not be any trailing white space and no blank line at the end
+#     of the file.
+#   - If your editor is not able to automatically meet the two previous
+#     conditions, then you have to use another editor to modify the files.
+#     Examples:
+#     - Windows, notepad++ v5.7 (http://www.notepad-plus-plus.org):
+#         select all (CTRL+a)
+#         menu "Edit --> EOL conversion --> UNIX-Format"
+#         menu "Edit --> Trim Trailing Space"
+#     - Unix, vi(m):
+#         ... (missing)
+#     - Unix, (x)emacs:
+#         ... (missing)
+#     - Mac, (missing):
+#         ... (missing)
+#     - all platforms, jedit v4.3:
+#         select all (CTRL+a)
+#         menu "Utilities --> Buffer options... --> Line separator --> Unix (\n)"
+#         menu "Edit --> Indent --> Remove Trailing Whitespace"
+# - Commit message:
+#   - The commit messages must not be empty.
+#   - Summarise your commit in one leading line with up to 78 characters, using
+#     one of the following prefixes:
+#
+#       BUG:   Bug fix
+#       COMP:  Fixed compiler error or warning
+#       DOC:   Changed a comment
+#       ENH:   Feature Implementation
+#       STYLE: Coding style change (indenting, braces, non-bug or feature change)
+#
+#   - If you want to provide details about your changes (which is HIGHLY
+#     RECOMMENDED!), use an empty line as separator and then describe your
+#     changes as detailed as appropriate.
+#     Golden rule: As long as necessary, as brief as possible!
+#     (German: So lang wie noetig, so kurz wie moeglich!)
+#   - Example:
+#
+#       ENH: implemented new feature
+#
+#       When using bla it was not possible to blub. The now implemented feature allows to blub
+#       and bla so that one can bla blub bla blub bla blub.
+#
+#   - Commit must be signed (option "-s"): git commit -s foo.hpp
+#   - If any of the above rules is violated, the commit is automatically rejected!
