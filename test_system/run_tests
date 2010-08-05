@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Usage: checkfiles file [files...]
+#        if "file" is a directory, will check all *.[hc] files recursively
+
+
+
+# check usage
+
+usage() {
+
+    echo "Usage: runtests file [files...]"
+    echo "(if \"file\" is a directory, run recursively all tests)"
+    exit 1
+
+}
+
+#if test -z "" ; then
+#    usage
+#fi
+
+find "$@" -type f -name '*-test' | \
+while read f ; do
+  echo $f:
+  $f
+done
