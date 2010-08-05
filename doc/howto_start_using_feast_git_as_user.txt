@@ -79,7 +79,9 @@ git push
 #         menu "Edit --> EOL conversion --> UNIX-Format"
 #         menu "Edit --> Trim Trailing Space"
 #     - Unix, vi(m):
-#         ... (missing)
+#         Use ":%s/\s\+$//" to remove all trailing whitespaces.
+#         For details on how to detect and avoid them, refer to#
+#         http://vim.wikia.com/wiki/Remove_unwanted_spaces
 #     - Unix, (x)emacs:
 #         ... (missing)
 #     - Mac, (missing):
