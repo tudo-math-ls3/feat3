@@ -5,54 +5,20 @@
 #include <string>
 #include <tr1/memory>
 
+/**
+ * \file stringify.hpp
+ * \brief Methods to stringify different datatypes
+ *
+ * \author Dirk Ribbrock
+ */
 namespace Feast
 {
-    /**
-     * For use by stringify.
-     */
-    namespace stringify_internals
-    {
-        /**
-         * Check that T_ is a sane type to be stringified.
-         */
-        template <typename T_>
-        struct CheckType
-        {
-            /// Yes, we are a sane type.
-            enum { value = 0 } Value;
-        };
-
-        /**
-         * Check that T_ is a sane type to be stringified.
-         */
-        template <typename T_>
-        struct CheckType<T_ *>
-        {
-            /// Yes, we are a sane type.
-            enum { value = 0 } Value;
-        };
-
-        /**
-         * Check that T_ is a sane type to be stringified, which it isn't
-         * if it's a shared_ptr.
-         */
-        template <typename T_>
-        struct CheckType<std::tr1::shared_ptr<T_> >
-        {
-        };
-    }
-
     /**
      * Convert item to a string.
      */
     template <typename T_>
     std::string stringify(const T_ & item)
     {
-        /* check that we're not trying to stringify a pointer or somesuch */
-
-        /// \todo Evaluate check_for_stringify_silly_things.
-        //int check_for_stringifying_silly_things = stringify_internals::CheckType<T_>::value;
-
         std::ostringstream s;
         s << item;
         return s.str();

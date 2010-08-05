@@ -3,8 +3,10 @@
 using namespace TestSystem;
 using namespace Feast;
 
-/*
- * Test class for the unittest framework itself
+/**
+ * \brief Test class for the unittest framework itself
+ *
+ * \author Dirk Ribbrock
  */
 class UnitTest :
   public BaseTest
@@ -28,6 +30,11 @@ class UnitTest :
     }
 } unittest("UnitTest-test");
 
+/**
+ * \brief Tagged-Test class for the unittest framework itself
+ *
+ * \author Dirk Ribbrock
+ */
 template <typename Tag_, typename DT_>
 class TaggedUnitTest :
   public TaggedTest<Tag_, DT_>

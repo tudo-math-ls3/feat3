@@ -108,7 +108,9 @@ namespace TestSystem
   };
 
   /**
-   * Baseclass for all Tests
+   * \brief Baseclass for all Tests
+   *
+   * \author Dirk Ribbrock
    */
   class BaseTest
   {
@@ -149,7 +151,7 @@ namespace TestSystem
       }
 
       /**
-       * Runs the test case.
+       * \brief Runs the test case.
        *
        * Called by unittest framework only.
        */
@@ -253,8 +255,9 @@ namespace TestSystem
   };
 
   /**
-   * Abstract Baseclass for all tagged test classes.
-   * \ingroup tests
+   * \brief Abstract Baseclass for all tagged test classes.
+   *
+   * \author Dirk Ribbrock
    */
   template <typename Tag_, typename DataType_>
     class TaggedTest : public BaseTest
