@@ -48,6 +48,11 @@ cd ../..
 # automatically appended to the commit message.
 git config --global user.name "Your Name"
 git config --global user.email you@yourdomain.example.com
+# The option "--global" means that these settings are used for *all* your
+# local git repositories (i.e., it is stored in "~/.gitconfig"). If you
+# want to store these settings *per local git repository* then omit the
+# --global option. Then the settings are stored in
+# "~/<some git project>/.git/config").
 
 # Step 7
 # Edit files, commit them locally (see also "Commit Rules" below), e.g.:
@@ -119,6 +124,8 @@ git push
 
 # Useful git commands and tricks:
 #
+# - Get help
+#     git help [command]
 # - Add file to local(!) repository:
 #     git add foo.hpp
 #     git commit
@@ -141,13 +148,45 @@ git push
 #     git commit --dry-run
 # - See detailed changes that are not yet committed:
 #     git diff
+#   Equivalent to
+#     git diff HEAD
+#   (i.e. HEAD is, what you have committed locally via "git commit")
+# - See detailed changes, that are not yet committed, compared to the remote
+#   master branch:
+#     git diff origin/master
+# - See detailed changes between your "committed status" (=HEAD) and the remote
+#   master branch:
+#     git diff HEAD origin/master
+# - See changes between your working copy and the remote master branch
+#     git diff HEAD origin/master
 # - See only the files that contain changes not yet committed:
 #     git diff --name-status
+# - Show untracked and modified (not committed) files:
+#     git status
+# - Show commit logs:
+#     git log [file]
+#
+# Customise git:
+#
+# - Use some diff tool (like tkdiff) instead of standard diff:
+#     git difftool --no-prompt [file]
+#   If [file] is omitted, the diff tool is invoked for each changed file.
+#   Type "git help difftool" for details.
+# - Use colorful git:
+#     git config --global color.status auto
+#     git config --global color.diff auto
+#     git config --global color.log auto
 # - Set aliases for git. Examples:
-#     git config alias.remove rm
+#     git config --global alias.remove rm
 #        --> type "git remove" instead of "git rm"
-#     git config alias.changes "diff --name-status"
-#        --> type "git changes" to list all files that contain changes not yet committed.
-# - See git configuration (aliases, user name, email, ...):
+#     git config --global alias.changes "diff --name-status"
+#        --> type "git changes" to list all files that contain changes not yet
+#            committed.
+#     git config --global alias.tkdiff "difftool --no-prompt"
+#        --> type "git tkdiff [file]" (default diff tool) for invoking tkdiff
+#     git config --global alias.commit "commit -s"
+#        --> useful if you tend to forget to sign your commits
+# - Browse git configuration (aliases, user name, email, ...):
 #     git config --list
+#
 # ... (to be continued)
