@@ -3,7 +3,8 @@
 #define KERNEL_BASE_HEADER_HPP 1
 
 /**
- * \file Feast Kernel base header.
+ * \file base_header.hpp
+ * \brief Feast Kernel base header.
  * \details
  * This file is the base header for the Feast kernel, which is included by all other
  * Feast header and source files.
@@ -27,13 +28,13 @@
 #include <kernel/compiler_msc.hpp>  // Microsoft(R) (Visual) C/C++ compiler
 
 // If the compiler doesn't support the C++0x nullptr, we have to define it via pre-processor.
-#ifndef HAVE_CPP0X_NULLPTR
+#if !defined(HAVE_CPP0X_NULLPTR) && !defined(DOXYGEN)
 #  define nullptr 0
 #endif
 
 // If the compiler doesn't support the C++0x static_assert statement, we will define an
 // empty pre-processor macro for it.
-#ifndef HAVE_CPP0X_STATIC_ASSERT
+#if !defined(HAVE_CPP0X_STATIC_ASSERT) && !defined(DOXYGEN)
 #  define static_assert(const_expr, err_msg)
 #endif
 
@@ -53,14 +54,14 @@
 #  define WINDOWS 1
 #endif
 
-// If the NDEBUG macro is defined, ASSERT will be defined as an empty macro, otherwise
-// the C header assert.h is included, which defines the ASSERT macro.
+// Include the C header assert.h, so that the assert() function will always be defined.
+#include <assert.h>
+
+// If the NDEBUG macro is defined, ASSERT(x) will be redefined as an empty macro, otherwise
+// the ASSERT(x) definition of the assert.h header will be used.
 #ifdef NDEBUG
 #  undef ASSERT
 #  define ASSERT(x)
-#else
-#  include <assert.h>
-#  define ASSERT(x) assert(x)
 #endif // NDEBUG
 
 // include STL string header
@@ -86,6 +87,30 @@ namespace Feast
    * \brief Feast String type.
    */
   typedef std::string String;
+
+  /// signed 8-bit integer
+  typedef signed char int8;
+
+  /// unsigned 8-bit integer
+  typedef unsigned char uint8;
+
+  /// signed 16-bit integer
+  typedef signed short int16;
+
+  /// unsigned 16-bit integer
+  typedef unsigned short uint16;
+
+  /// signed 32-bit integer
+  typedef signed int int32;
+
+  /// unsigned 32-bit integer
+  typedef unsigned int uint32;
+
+  /// signed 64-bit integer
+  typedef signed long long int64;
+
+  /// unsigned 64-bit integer
+  typedef unsigned long long uint64;
 
   /**
    * \brief Nil class definition.
