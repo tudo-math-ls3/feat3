@@ -3,7 +3,6 @@
 
 #include <sstream>
 #include <string>
-#include <tr1/memory>
 
 /**
  * \file stringify.hpp
