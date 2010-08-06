@@ -11,6 +11,7 @@
  *
  * \author Dirk Ribbrock
  */
+
 namespace Feast
 {
     /**

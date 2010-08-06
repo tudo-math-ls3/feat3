@@ -2,9 +2,13 @@
 #ifndef KERNEL_COMPILER_GCC_HPP
 #define KERNEL_COMPILER_GCC_HPP 1
 
-// Compiler detection header for GNU C++ compiler.
-
-/// \todo detect implement compiler detection for GCC
+/**
+ * \file compiler_gcc.hpp
+ *
+ * \brief Compiler detection header for GNU C++ compiler.
+ *
+ * \author Dirk Ribbrock
+ */
 
 #if !defined(FEAST_COMPILER) && defined(__GNUC__)
 

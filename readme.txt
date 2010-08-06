@@ -1,4 +1,6 @@
-FEAST README
+**************
+*FEAST README*
+**************
 
 How to build feast:
 
@@ -37,3 +39,8 @@ done is adding
 ADD_EXECUTABLE(myappbin myapp.cpp)
 to the CMakeLists.txt file.
 Here myappbin is the executable's name and myapp is the sourcefile's name.
+
+****************************
+
+Apps that are considerd stable and may be usefull to have a look at are:
+NONE

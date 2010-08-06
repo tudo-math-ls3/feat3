@@ -4,9 +4,11 @@ using namespace TestSystem;
 using namespace Feast;
 
 /**
+ *
  * \brief Test class for the unittest framework itself
  *
  * \author Dirk Ribbrock
+ * \test
  */
 class UnitTest :
   public BaseTest
@@ -34,6 +36,7 @@ class UnitTest :
  * \brief Tagged-Test class for the unittest framework itself
  *
  * \author Dirk Ribbrock
+ * \test
  */
 template <typename Tag_, typename DT_>
 class TaggedUnitTest :

@@ -23,9 +23,9 @@
 #endif // defined(DEBUG) && defined(NDEBUG)
 
 // include compiler detection headers
-#include <kernel/compiler_gcc.hpp>  // GNU C/C++ compiler
-#include <kernel/compiler_icc.hpp>  // Intel(R) C/C++ compiler
-#include <kernel/compiler_msc.hpp>  // Microsoft(R) (Visual) C/C++ compiler
+#include <kernel/util/compiler_gcc.hpp>  // GNU C/C++ compiler
+#include <kernel/util/compiler_icc.hpp>  // Intel(R) C/C++ compiler
+#include <kernel/util/compiler_msc.hpp>  // Microsoft(R) (Visual) C/C++ compiler
 
 // If the compiler doesn't support the C++0x nullptr, we have to define it via pre-processor.
 #if !defined(HAVE_CPP0X_NULLPTR) && !defined(DOXYGEN)
