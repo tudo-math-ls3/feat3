@@ -54,19 +54,6 @@
 #  define WINDOWS 1
 #endif
 
-// Include the C header assert.h, so that the assert() function will always be defined.
-#include <assert.h>
-
-// If the NDEBUG macro is defined, ASSERT(x) will be redefined as an empty macro, otherwise
-// the ASSERT(x) definition of the assert.h header will be used.
-#ifdef NDEBUG
-#  undef ASSERT
-#  define ASSERT(x)
-#endif // NDEBUG
-
-// include STL string header
-#include <string>
-
 /**
  * \brief Feast namespace.
  */
@@ -82,35 +69,6 @@ namespace Feast
     /// Feast patch version number
     version_patch = 0
   };
-
-  /**
-   * \brief Feast String type.
-   */
-  typedef std::string String;
-
-  /// signed 8-bit integer
-  typedef signed char int8;
-
-  /// unsigned 8-bit integer
-  typedef unsigned char uint8;
-
-  /// signed 16-bit integer
-  typedef signed short int16;
-
-  /// unsigned 16-bit integer
-  typedef unsigned short uint16;
-
-  /// signed 32-bit integer
-  typedef signed int int32;
-
-  /// unsigned 32-bit integer
-  typedef unsigned int uint32;
-
-  /// signed 64-bit integer
-  typedef signed long long int64;
-
-  /// unsigned 64-bit integer
-  typedef unsigned long long uint64;
 
   /**
    * \brief Nil class definition.
