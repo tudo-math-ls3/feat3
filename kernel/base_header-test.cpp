@@ -16,6 +16,7 @@ class BaseHeaderTest :
   public TaggedTest<Tag_, DT_>
 {
   public:
+    /// Constructor
     BaseHeaderTest(const std::string & id) :
       TaggedTest<Tag_, DT_>(id)
     {

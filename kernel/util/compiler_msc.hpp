@@ -1,5 +1,6 @@
 #pragma once
 #ifndef KERNEL_COMPILER_MSC_HPP
+/// Header guard
 #define KERNEL_COMPILER_MSC_HPP 1
 
 // Compiler detection header for Microsoft Visual C++ compiler.

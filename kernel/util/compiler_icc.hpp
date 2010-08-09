@@ -1,5 +1,6 @@
 #pragma once
 #ifndef KERNEL_COMPILER_ICC_HPP
+/// Header guard
 #define KERNEL_COMPILER_ICC_HPP 1
 
 // Compiler detection header for Intel C++ compiler.

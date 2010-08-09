@@ -1,5 +1,6 @@
 #pragma once
 #ifndef TEST_SYSTEM_TEST_SYSTEM_HPP
+/// Header guard
 #define TEST_SYSTEM_TEST_SYSTEM_HPP 1
 
 #include <kernel/base_header.hpp>
@@ -31,11 +32,24 @@ namespace TestSystem
     public std::exception
   {
     private:
+      /// Our failure message
       const std::string _message;
 
     public:
       /**
        * Constructor.
+       *
+       * \param[in] function
+       * The function that trows the exception.
+       *
+       * \param[in] file
+       * The file the exception was thrown in.
+       *
+       * \param[in] line
+       * The line the exception was thrown in.
+       *
+       * \param[in] message
+       * A message describing the exception.
        */
       TestFailedException(const char* const function, const char* const file,
           const long line, const std::string & message) throw ()
@@ -64,6 +78,7 @@ namespace TestSystem
   class TestList
   {
     private:
+      /// Internal STL list representation of TestList
       static std::list<BaseTest*> _tests;
 
       TestList()
@@ -71,8 +86,10 @@ namespace TestSystem
       }
 
     public:
+      /// TestList forward iterator.
       typedef std::list<BaseTest*>::iterator Iterator;
 
+      /// Return the instance of the TestList
       static TestList* instance()
       {
         static TestList result;
@@ -80,31 +97,40 @@ namespace TestSystem
         return &result;
       }
 
+      /**
+       * \brief Add a test to the TestList
+       *
+       * \param[in] test
+       * The test that will be added.
+       */
       void register_test(BaseTest* const test)
       {
         _tests.push_back(test);
       }
 
+      /// Return an iterator to the front of the TestList
       Iterator begin_tests() const
       {
         return _tests.begin();
       }
 
+      /// Return an iterator beyond the last element of the TestList
       Iterator end_tests() const
       {
         return _tests.end();
       }
 
+      /// Return the size of the TestList
       unsigned long size()
       {
         return _tests.size();
       }
 
+      /// Remove iterator target from the TestList
       Iterator erase (Iterator i)
       {
         return _tests.erase(i);
       }
-
   };
 
   /**
@@ -115,15 +141,19 @@ namespace TestSystem
   class BaseTest
   {
     protected:
+      /// Test description String
       const std::string _id;
+      /// Architecture description String
       std::string _tag_name;
+      /// Precisioni description String
       std::string _prec_name;
 
     public:
       /**
        * Constructor.
        *
-       * \param id The testcase's id string.
+       * \param[in] id
+       * The testcase's id string.
        */
       BaseTest(const std::string& id) :
         _id(id),
@@ -174,15 +204,25 @@ namespace TestSystem
        */
       struct TwoVarHolder
       {
+        /// Result of comparison
         bool result;
+        /// String representation of first parameter
         std::string s_a;
+        /// String representation of second parameter
         std::string s_b;
 
+        /**
+         * Constructor
+         * \param[in] a
+         * First value to compare
+         * \param[in] b
+         * Second value to compare
+         */
         template <typename T1_, typename T2_>
-          TwoVarHolder(T1_ a, T2_ b) :
-            result(a == b),
-            s_a(),
-            s_b()
+        TwoVarHolder(T1_ a, T2_ b) :
+          result(a == b),
+          s_a(),
+          s_b()
         {
           if (!result)
           {
@@ -197,10 +237,20 @@ namespace TestSystem
        */
       struct TwoVarHolder2
       {
+        /// Result of comparison
         bool result;
+        /// String representation of first parameter
         std::string s_a;
+        /// String representation of second parameter
         std::string s_b;
 
+        /**
+         * Constructor
+         * \param[in] a
+         * First value to compare
+         * \param[in] b
+         * Second value to compare
+         */
         template <typename T1_, typename T2_>
           TwoVarHolder2(T1_ a, T2_ b) :
             result(a == b),
@@ -220,11 +270,24 @@ namespace TestSystem
        */
       struct WithinEpsCalculator
       {
+        /// Result of comparison
         bool result;
+        /// String representation of first parameter
         std::string s_a;
+        /// String representation of second parameter
         std::string s_b;
+        /// String representation of eps
         std::string s_diff;
 
+        /**
+         * Constructor
+         * \param[in] a
+         * First value to compare
+         * \param[in] b
+         * Second value to compare
+         * \param[in] c
+         * Maximum epsilon the values a and b are allowed to differ from each other
+         */
         template <typename T1_, typename T2_, typename T3_>
           WithinEpsCalculator(T1_ a, T2_ b, T3_ c) :
             s_a(),
@@ -266,7 +329,8 @@ namespace TestSystem
       /**
        * Constructor.
        *
-       * \param id The testcase's id string.
+       * \param[in] id
+       * The testcase's id string.
        */
       TaggedTest(const std::string & id):
         BaseTest(id)
@@ -283,7 +347,7 @@ namespace TestSystem
 }
 
 /**
- * Check that a == b.
+ * \brief Check that a == b.
  */
 #define TEST_CHECK_EQUAL(a, b) \
   do { \
@@ -305,7 +369,7 @@ namespace TestSystem
   } while (false)
 
 /**
- * Check that a != b.
+ * \brief Check that a != b.
  */
 #define TEST_CHECK_NOT_EQUAL(a, b) \
   do { \
@@ -327,7 +391,7 @@ namespace TestSystem
   } while (false)
 
 /**
- * Check that stringify(a) == stringify(b).
+ * \brief Check that stringify(a) == stringify(b).
  */
 #define TEST_CHECK_STRINGIFY_EQUAL(a, b) \
   do { \
@@ -350,7 +414,7 @@ namespace TestSystem
   } while (false)
 
 /**
- * Check that a is true.
+ * \brief Check that a is true.
  */
 #define TEST_CHECK(a) \
   do { \
@@ -370,7 +434,7 @@ namespace TestSystem
   } while (false)
 
 /**
- * Check that a throws an exception of type b.
+ * \brief Check that a throws an exception of type b.
  */
 #define TEST_CHECK_THROWS(a, b) \
   do { \
@@ -395,7 +459,7 @@ namespace TestSystem
   } while (false)
 
 /**
- * Check that a - b < epsilon.
+ * \brief Check that a - b < epsilon.
  */
 #define TEST_CHECK_EQUAL_WITHIN_EPS(a, b, eps) \
   do { \
@@ -417,7 +481,7 @@ namespace TestSystem
   } while (false)
 
 /**
- * Run the given test with pre- and postprocessing
+ * \brief Run the given test with pre- and postprocessing
  */
 #define TEST(pre, test, post) \
   do { \

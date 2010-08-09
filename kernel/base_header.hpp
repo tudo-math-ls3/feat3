@@ -1,5 +1,6 @@
 #pragma once
 #ifndef KERNEL_BASE_HEADER_HPP
+/// Header guard
 #define KERNEL_BASE_HEADER_HPP 1
 
 /**
@@ -41,12 +42,14 @@
 // If the compiler doesn't support the 'extern template' specifier or its usage is
 // disabled by defining the FEAST_NO_EXPL_TEMPL_INST macro, both the DEF_EXPL_TEMPL_INST
 // and DECL_EXPL_TEMPL_INST macros are defined as empty macros.
-#if !defined(HAVE_CPP0X_EXTERN_TEMPLATE) || defined(FEAST_NO_EXPL_TEMPL_INST)
-#  define DEF_EXPL_TEMPL_INST(expr)
-#  define DECL_EXPL_TEMPL_INST(expr)
-#else
-#  define DEF_EXPL_TEMPL_INST(expr) template<> expr
-#  define DECL_EXPL_TEMPL_INST(expr) extern template<> expr
+#if !defined(DOXYGEN)
+#  if !defined(HAVE_CPP0X_EXTERN_TEMPLATE) || defined(FEAST_NO_EXPL_TEMPL_INST)
+#    define DEF_EXPL_TEMPL_INST(expr)
+#    define DECL_EXPL_TEMPL_INST(expr)
+#  else
+#    define DEF_EXPL_TEMPL_INST(expr) template<> expr
+#    define DECL_EXPL_TEMPL_INST(expr) extern template<> expr
+#  endif
 #endif
 
 // define WINDOWS macro on windows platform

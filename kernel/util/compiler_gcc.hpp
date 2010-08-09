@@ -1,5 +1,6 @@
 #pragma once
 #ifndef KERNEL_COMPILER_GCC_HPP
+/// Header guard
 #define KERNEL_COMPILER_GCC_HPP 1
 
 /**
