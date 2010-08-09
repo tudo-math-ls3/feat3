@@ -28,14 +28,18 @@ which git
 # => [QUESTION] If git is not available, install it:
 #    - On OpenSUSE systems or any system which has a built-in package manager, install [TODO DOM]
 #    - On Windows, install [TODO PETER AND MICHAEL]
-#    - On any other system, grab the Git installer from here: [TODO]
+#    - On any other system, grab the Git installer from here: http://git-scm.com/
 
 
 # [QUESTION] Step 2.5
 # Since Git tunnels ssh:
 #    - Set up ssh agenting to prevent typing passwords all the time
 #    - [TODO] on Windows
-#    - [TODO] on Linux
+#    On Linux:
+#    Add your publickey in ~./ssh/authorized_keys
+#    Set up key authorization in your ~/.ssh/config file by adding
+Host <some host in our network>.mathematik.tu-dortmund.de
+IdentityFile ~/.ssh/myprivatekey
 
 
 # Step 3
