@@ -33,7 +33,7 @@ int main(int argc, char** argv)
         }
         catch (TestFailedException & e)
         {
-            std::cout << "FAILED: bla" << std::endl << stringify(e.what()) << std::endl;
+            std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
             result = EXIT_FAILURE;
         }
         i = TestList::instance()->erase(i);
