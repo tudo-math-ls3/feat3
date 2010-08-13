@@ -21,6 +21,15 @@
 #  error The DEBUG and NDEBUG macros must not be defined at the same time.
 #endif // defined(DEBUG) && defined(NDEBUG)
 
+// Assure that DEBUG or NDEBUG is defined
+// In consequence, if DEBUG and NDEBUG are note defined, NDEBUG is defined.
+#if not defined (DEBUG)
+#  define NDEBUG 1
+#endif
+#if not defined (NDEBUG)
+#  define DEBUG 1
+#endif
+
 // include compiler detection headers
 #include <kernel/util/compiler_gcc.hpp>  // GNU C/C++ compiler
 #include <kernel/util/compiler_icc.hpp>  // Intel(R) C/C++ compiler
