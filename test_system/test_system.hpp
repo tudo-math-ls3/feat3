@@ -5,6 +5,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/stringify.hpp>
+#include <kernel/util/instantiation_policy.hpp>
 
 #include <string>
 #include <exception>
@@ -75,7 +76,8 @@ namespace TestSystem
   /**
    * \brief List of all instantiated tests
    */
-  class TestList
+  class TestList :
+    public InstantiationPolicy<TestList, Singleton>
   {
     private:
       /// Internal STL list representation of TestList
@@ -86,16 +88,10 @@ namespace TestSystem
       }
 
     public:
+      friend class InstantiationPolicy<TestList, Singleton>;
+
       /// TestList forward iterator.
       typedef std::list<BaseTest*>::iterator Iterator;
-
-      /// Return the instance of the TestList
-      static TestList* instance()
-      {
-        static TestList result;
-
-        return &result;
-      }
 
       /**
        * \brief Add a test to the TestList
