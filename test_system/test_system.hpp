@@ -26,7 +26,7 @@ namespace TestSystem
   class BaseTest;
 
   /**
-   * Exception thrown by the check method in BaseTest
+   * \brief Exception thrown by the check method in BaseTest
    */
   class TestFailedException :
     public std::exception
@@ -73,7 +73,7 @@ namespace TestSystem
   };
 
   /**
-   * List of all instantiated tests
+   * \brief List of all instantiated tests
    */
   class TestList
   {
@@ -200,7 +200,7 @@ namespace TestSystem
       }
 
       /**
-       * Utility class used by TEST_CHECK_EQUAL.
+       * \brief Utility class used by TEST_CHECK_EQUAL.
        */
       struct TwoVarHolder
       {
@@ -233,7 +233,7 @@ namespace TestSystem
       };
 
       /**
-       * Utility class used by TEST_CHECK_NOT_EQUAL.
+       * \brief Utility class used by TEST_CHECK_NOT_EQUAL.
        */
       struct TwoVarHolder2
       {
@@ -266,7 +266,7 @@ namespace TestSystem
       };
 
       /**
-       * Utility class used by TEST_CHECK_EQUAL_WITHIN_EPS.
+       * \brief Utility class used by TEST_CHECK_EQUAL_WITHIN_EPS.
        */
       struct WithinEpsCalculator
       {
