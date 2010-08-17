@@ -1,7 +1,7 @@
 #pragma once
-#ifndef KERNEL_COMPILER_MSC_HPP
+#ifndef UTIL_COMPILER_MSC_HPP
 /// Header guard
-#define KERNEL_COMPILER_MSC_HPP 1
+#define UTIL_COMPILER_MSC_HPP 1
 
 // Compiler detection header for Microsoft Visual C++ compiler.
 
@@ -48,4 +48,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(_MSC_VER)
 
-#endif // KERNEL_COMPILER_MSC_HPP
+#endif // UTIL_COMPILER_MSC_HPP

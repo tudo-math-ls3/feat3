@@ -1,7 +1,7 @@
 #pragma once
-#ifndef KERNEL_COMPILER_GCC_HPP
+#ifndef UTIL_COMPILER_GCC_HPP
 /// Header guard
-#define KERNEL_COMPILER_GCC_HPP 1
+#define UTIL_COMPILER_GCC_HPP 1
 
 /**
  * \file compiler_gcc.hpp
@@ -34,4 +34,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__GNUC__)
 
-#endif // KERNEL_COMPILER_GCC_HPP
+#endif // UTIL_COMPILER_GCC_HPP

@@ -1,7 +1,7 @@
 #pragma once
-#ifndef KERNEL_COMPILER_ICC_HPP
+#ifndef UTIL_COMPILER_ICC_HPP
 /// Header guard
-#define KERNEL_COMPILER_ICC_HPP 1
+#define UTIL_COMPILER_ICC_HPP 1
 
 // Compiler detection header for Intel C++ compiler.
 
@@ -16,4 +16,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__INTEL_COMPILER)
 
-#endif // KERNEL_COMPILER_ICC_HPP
+#endif // UTIL_COMPILER_ICC_HPP
