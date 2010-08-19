@@ -53,7 +53,9 @@ namespace TestSystem
        * A message describing the exception.
        */
       TestFailedException(const char* const function, const char* const file,
-          const long line, const std::string & message) throw ()
+          const long line, const std::string & message) throw () :
+        _message(stringify(file) + ":" + stringify(line) + ": in " +
+            stringify(function) + ": " + message )
       {
       }
 
