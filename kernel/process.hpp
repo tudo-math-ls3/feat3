@@ -1,4 +1,4 @@
-// BRAL: In dieser Datei werden erstmal einige Klassen gesammelt. Es macht später bestimmt Sinn, einige davon
+// BRAL: In dieser Datei werden erstmal einige Klassen gesammelt. Es macht spaeter bestimmt Sinn, einige davon
 // auszulagern.
 
 #pragma once
@@ -95,11 +95,11 @@ class Master
 
 /* class defining a group process
  * BRAL: Was ist ein GroupProcess?
- * Am Anfang des Programms werden die verfügbaren Prozesse vom User in Gruppen eingeteilt (z.B. für Multiphysics-
- * Aufgaben). Zu jeder Gruppe gehört ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
- * einteilt, machen diese Prozesse also erstmal nix außer darauf zu warten, eingeteilt zu werden. Dieses Zwischenstadium
+ * Am Anfang des Programms werden die verfuegbaren Prozesse vom User in Gruppen eingeteilt (z.B. fuer Multiphysics-
+ * Aufgaben). Zu jeder Gruppe gehï¿½rt ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
+ * einteilt, machen diese Prozesse also erstmal nix ausser darauf zu warten, eingeteilt zu werden. Dieses Zwischenstadium
  * wird durch die Klasse GroupProcess beschrieben. Jeder Prozess, der also nicht load balancer oder master ist, wird
- * also zunächst mal als GroupProcess angesehen und in eine Warteschleife versetzt.
+ * also zunaechst mal als GroupProcess angesehen und in eine Warteschleife versetzt.
  * Wenn der load balancer dann entschieden hat, wie er seine Prozesse einteilen will, schickt er den GroupProcesses
  * entsprechende Nachrichten, sie sollen entsprechende Worker Prozesse erstellen.
  */
@@ -164,6 +164,9 @@ class GroupProcess
 
 
 // class defining a remote worker process
+// @Hilmar: Was ist das? Das "Gegenstueck", quasi die Leichtgewichtige Repraesentation eines WorkerProcess, der vom
+// Master/Lastverteiler/Sonstwas verwendet wird? ... Ah ja, ist so, habe ich beim Lesen der Klasse weiter unten
+// dann verstanden.
 class RemoteWorker
   : public Process
 {
@@ -242,18 +245,18 @@ class Worker
  *       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+2)
  *       B <--> D (external, ranks 1+3) B <--> E (external, ranks 1+4)
  *
- *    Zunächst mal zur Begrifflichkeit: In case a sind es tatsächlich 3 Worker (A,B,D) auf Process 0 (und nicht etwa
- *    *ein* worker, der zu drei WorkGroups gehört). Das heißt: ein Worker gehört zu genau *einer* WorkGroup.
+ *    Zunï¿½chst mal zur Begrifflichkeit: In case a sind es tatsï¿½chlich 3 Worker (A,B,D) auf Process 0 (und nicht etwa
+ *    *ein* worker, der zu drei WorkGroups gehï¿½rt). Das heiï¿½t: ein Worker gehï¿½rt zu genau *einer* WorkGroup.
  *
  *    Die _finer RemoteWorker zu B in case a sind D und E, die zu zu C sind F und G. Der _coarser RemoteWorker zu
  *    B und C ist A. Man beachte, dass A, B und D auf dem selben Prozess "leben" (es handelt sich also eigentlich gar
- *    nicht um *Remote*Worker), während B und E auf verschiedenen Prozessen leben. Dies muss noch irgendwie
+ *    nicht um *Remote*Worker), wï¿½hrend B und E auf verschiedenen Prozessen leben. Dies muss noch irgendwie
  *    verwurschtelt werden.
  */
 
     // pointer to the GroupProcess, this worker corresponds to
     // (note, that more than one Worker can "belong" to one GroupProcess)
-    // BRAL: über diesesn pointer lässt sich Verbindung zum load balancer aufnehmen, falls nötig
+    // BRAL: ï¿½ber diesesn pointer lï¿½sst sich Verbindung zum load balancer aufnehmen, falls nï¿½tig
     GroupProcess* _group_process;
 
 // BRAL: Nicht noetig! Siehe Kommentar zur class Coordinator

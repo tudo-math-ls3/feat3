@@ -29,8 +29,15 @@ using namespace Feast;
  *
  * At the beginning of the program exactly one object of this class has to be created. The destruction of this object
  * will also end the program. The universe object creates and manages all MPI processes.
+ * @Hilmar: Waere es nicht vielleicht schlau, diese Klasse gleich aus Prinzip statisch zu machen, so dass sie nur einmal
+ *          existiert und beim Programmstart automatisch schon da ist? Dann kann man von ueberall per
+ *          Universe::bral() Funktionen aufrufen, der Benutzer braucht diese Klasse nicht zu instantiieren, und der
+ *          automatisch ausgefuehrte Konstruktor baut dann Prozessgruppen usw. basierend auf Konfigurationsdateien.
+ *          So koennte man immer noch dem Benutzer volle Kontrolle ueber "mehr als eine Physik" geben, denn dafuer muss
+ *          man das Universum nicht explizit erschaffen (Ich liebe diese MPI-Sprache nebenbei...)
  *
  * @author Hilmar Wobker
+ * @author Dominik Goeddeke
  */
 class Universe
 {
@@ -119,6 +126,8 @@ class Universe
 
     /**
      * \brief evaluates the return value of MPI routines
+     * @Hilmar: Ich wuerde das vielleicht nicht ins Universum packen, sondern irgendwo hin, wo man bequem von ueberall
+     *          aus auf zugreifen kann. Oder kennt jedes Objekt in FEAST2 (bzw in diesem Prototypen) das Universum?
      *
      * \param[in] error_code
      * MPI error code
@@ -207,7 +216,7 @@ class Universe
       // the master needs one process
       _num_processes_needed = 1;
 
-      // add number of processes of the process groups
+      // add number of processes in each of the process groups
       for (int i(0) ; i < _num_process_groups ; ++i)
       {
         _num_processes_needed += _num_processes_in_group[i];
