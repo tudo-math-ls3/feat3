@@ -152,6 +152,7 @@ class GroupProcess
       while (true)
       {
         sleep(2);
+        // @Hilmar: Diese Ausgabe erscheint nie!
         cout << "GroupProcess with world rank " << _rank_world <<" is waiting..." << endl;
       }
     }
@@ -256,7 +257,7 @@ class Worker
 
     // pointer to the GroupProcess, this worker corresponds to
     // (note, that more than one Worker can "belong" to one GroupProcess)
-    // BRAL: �ber diesesn pointer l�sst sich Verbindung zum load balancer aufnehmen, falls n�tig
+    // BRAL: Ueber diesen pointer laesst sich Verbindung zum load balancer aufnehmen, falls noetig
     GroupProcess* _group_process;
 
 // BRAL: Nicht noetig! Siehe Kommentar zur class Coordinator

@@ -271,12 +271,12 @@ class Universe
         for(int j(0) ; j < _num_processes_in_group[igroup]+1 ; ++j)
         {
           ranks[j] = iter_MPC_rank;
-//          cout << my_rank << ": igroup=" << igroup << ", j=" << j << ", ranks[j]=" << ranks[j] << endl;
+          cout << my_rank << ": igroup=" << igroup << ", j=" << j << ", ranks[j]=" << ranks[j] << endl;
           ++iter_MPC_rank;
           // inquire whether this process belongs to the current group
           if (my_rank == ranks[j])
           {
-//            cout << my_rank << " belongs to group " << igroup << endl;
+            cout << my_rank << " belongs to group " << igroup << endl;
             belongs_to_group = true;
           }
         }
@@ -292,12 +292,14 @@ class Universe
           {
             // create load balancer object for the last rank in the current group
             _load_balancer = new LoadBalancer(my_rank, rank_master, comm_group, rank_local, igroup, ranks);
+            // @hilmar: Debug-Ausgabe in diesem Konstruktor erscheint nie auf dem Bildschirm
           }
           else
           {
             // create group process object for all the other ranks in the current group
             _group_process = new GroupProcess(my_rank, rank_master, rank_load_bal, comm_group, rank_local);
             _group_process->wait();
+            // @hilmar: Debug-Ausgabe in dieser Endlosschleife erscheint nie auf dem Bildschirm
           }
         }
       }
@@ -310,7 +312,18 @@ class Universe
 
         // start some infinite loop in the Master object, which waits for messages
         _master->wait();
+        // @hilmar: Nur diese Bildschirmausgabe erscheint
       }
+    }
+
+    /**
+     * \brief cleanup counterpart for _init().
+     *
+     * Deletes all dynamically allocated memory in _init().
+     */
+    void _cleanup()
+    {
+      // TODO: implement
     }
 
   /* ****************
@@ -323,7 +336,7 @@ class Universe
      ****************/
 
     /**
-     * \brief simple constructor for creating one work group of processes
+     * \brief simple constructor for creating a universe with exactly one work group of processes
      *
      * When using this constructor, only the master process and one work group without load balancer is created.
      * The constructor may only be called once.
@@ -334,9 +347,12 @@ class Universe
      * \param[in] argv
      * arguments passed to the main() method
      */
+     // @Hilmar: Hab irgendwo gelesen, dass moeglichst alle elementaren member so initialisiert werden sollen, hab aber
+     //          vergessen warum. Code entsprechend geaendert
     Universe(
       int& argc,
       char* argv[])
+      : _num_process_groups(1)
     {
       if (_universe_created)
       {
@@ -345,14 +361,13 @@ class Universe
       _universe_created = true;
       cout << "Universe created!" << endl;
       _init_mpi(argc, argv);
-      _num_process_groups = 1;
       _num_processes_in_group = new int[_num_process_groups];
       _num_processes_in_group[0] = _num_processes - 1;
       _init();
     }
 
     /**
-     * \brief constructor for creating several work groups
+     * \brief constructor for creating a universe with several work groups
      *
      * When using this constructor, one can choose how many process groups are created. Additionally, one load balancer
      * per process group and one master process is created. The caller has to ensure that sufficient MPI processes are
@@ -397,6 +412,10 @@ class Universe
      */
     ~Universe()
     {
+      // clean up dynamically allocated memory
+      _cleanup();
+
+      // shut down MPI
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);
       if (mpi_is_initialised)

@@ -111,6 +111,7 @@ class WorkGroup
 
 // BRAL: Instead of the array of RemoteWorker objects one could also simply store the ranks of the participating
 // processes (with respect to the process group ranks). Not sure yet which is more appropriate.
+// @Hilmar: Let's stick with these wrapper objects for now, who knows what else they need to store
 // int* _ranks_local;
 
 };
@@ -158,6 +159,7 @@ class LoadBalancer
         _group_id(group_id),
         _ranks_group(ranks_group)
     {
+      cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << endl;
     }
 
     int get_group_id()

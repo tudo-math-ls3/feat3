@@ -23,7 +23,12 @@ int main(int argc, char* argv[])
   // Universe universe(argc, argv);
 
   // constructor for creating more than one process group
+  // @Hilmar: So lebt das ganze Universum auf dem Stack und nicht auf dem Heap. Absicht?
   Universe universe(argc, argv, num_process_groups, num_processes_in_group);
+
+  //@Hilmar: ab hier scheint nichts mehr ausgefuehrt zu werden. Ich vermute das liegt daran, dass MPI_Init() nicht der
+  //         erste Befehl ist der ausgefuehrt wird.
+  cout << "Das hier erscheint nicht auf dem Bildschirm" << endl;
 
   // Get process objects. Note that on each process only one of the following three exists (the other two are
   // null pointers).
@@ -32,8 +37,8 @@ int main(int argc, char* argv[])
   Master* master = universe.get_master();
 
 //  // rank of this process
-//  int my_rank;
-//  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  int my_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 //
 //  cout << "Hi! I'm rank " << my_rank << endl;
 
@@ -48,7 +53,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      // the second process groups does something else...
+      // the second process group does something else...
     }
   }
   else if (group_process != nullptr)
@@ -56,9 +61,14 @@ int main(int argc, char* argv[])
     // not sure yet if it makes sense to let the user control the group processes
     cout << "Process with world rank "<< group_process->get_rank_world() << " is a group process!" << endl;
   }
-  else
+  else if (master != nullptr)
   {
     // not sure yet if it makes sense to let the user control the master process
     cout << "Process with world rank "<< master->get_rank_world() << " is the MASTER OF THE UNIVERSE!" << endl;
+  }
+  else
+  {
+    // dom-debug
+    cout << "Process with rank " << my_rank << " has no particular role, this should not happen." << endl;
   }
 }
