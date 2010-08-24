@@ -1,17 +1,25 @@
-// BRAL: In dieser Datei werden erstmal einige Klassen gesammelt. Es macht spaeter bestimmt Sinn, einige davon
+// Hilmar: BRAL: In dieser Datei werden erstmal einige Klassen gesammelt. Es macht spaeter bestimmt Sinn, einige davon
 // auszulagern.
+// Dom: FORTYTWO: zustimm
 
 #pragma once
 #ifndef KERNEL_PROCESS_HPP
 #define KERNEL_PROCESS_HPP 1
 
+// includes, system
 #include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
+
+// includes, Feast
 #include <kernel/base_header.hpp>
 
-// class defining an MPI process
-// BRAL: grundlegende
+/**
+ * \brief Abstract base class encapsulating an MPI process
+ *
+ * @author Hilmar Wobker
+ * @author Dominik Goeddeke
+ */
 class Process
 {
   /* *******************
