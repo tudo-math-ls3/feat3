@@ -1,0 +1,10 @@
+ID           00007
+TYPE         bug_report
+STATUS       unassigned
+AUTHOR       markus
+ASSIGNED TO
+SEVERITY     critical
+
+FULL TEXT    Test system is error prone after push by Peter: Does not compile on Linux machines due to bad const specifier.
+
+SOLUTION

@@ -1,5 +1,6 @@
-NEWEST: 00006
+NEWEST: 00007
 ID        |TYPE            |STATUS        |AUTHOR    |ASSIGNED TO     |SEVERITY    |SHORT DESCRIPTION
+00007     |bug_report      |unassigned    |markus    |                |critical    |test_system_is_error_prone
 00002     |feature_request |assigned      |markus    |Dirk            |critical    |build_system_essentials
 00000     |feature_request |unassigned    |markus    |                |high        |implement_test_system
 00003     |milestone       |unassigned    |markus    |                |medium      |kernel_subsystem_parallel_infrastructure
