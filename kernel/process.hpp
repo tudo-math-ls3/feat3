@@ -45,8 +45,8 @@ class Process
      * \brief constructor requiring two parameters
      */
     Process(
-      int& rank_world,
-      int& rank_master)
+      int rank_world,
+      int rank_master)
       : _rank_world(rank_world),
         _rank_master(rank_master)
     {
@@ -75,7 +75,7 @@ class Master
     /**
      * \brief constructor requiring one parameter
      */
-    Master(int& rank_world)
+    Master(int rank_world)
       : Process(rank_world, rank_world)
     {
     }
@@ -132,11 +132,11 @@ class GroupProcess
      * \brief constructor requiring four parameters
      */
     GroupProcess(
-      int& rank_world,
-      int& rank_master,
-      int& rank_load_bal,
-      MPI_Comm& comm_local,
-      int& rank_local)
+      int rank_world,
+      int rank_master,
+      int rank_load_bal,
+      MPI_Comm comm_local,
+      int rank_local)
       : Process(rank_world, rank_master),
         _rank_load_bal(rank_load_bal),
         _comm_local(comm_local),
