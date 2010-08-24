@@ -7,12 +7,10 @@
 using namespace Feast;
 using namespace TestSystem;
 
-std::list<BaseTest *> TestList::_tests;
-
 int main(int argc, char** argv)
 {
     int result(EXIT_SUCCESS);
-    unsigned long list_size(0);
+    size_t list_size(0);
 
     /*for (TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
             i != i_end ; )

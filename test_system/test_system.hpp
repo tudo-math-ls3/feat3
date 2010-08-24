@@ -79,7 +79,7 @@ namespace TestSystem
   {
     private:
       /// Internal STL list representation of TestList
-      static std::list<BaseTest*> _tests;
+      std::list<BaseTest*> _tests;
 
       TestList()
       {
@@ -87,7 +87,7 @@ namespace TestSystem
 
     public:
       /// TestList forward iterator.
-      typedef std::list<BaseTest*>::iterator Iterator;
+      typedef std::list<BaseTest*>::const_iterator Iterator;
 
       /// Return the instance of the TestList
       static TestList* instance()
@@ -121,7 +121,7 @@ namespace TestSystem
       }
 
       /// Return the size of the TestList
-      unsigned long size()
+      size_t size()
       {
         return _tests.size();
       }
@@ -345,6 +345,11 @@ namespace TestSystem
       virtual ~TaggedTest() {}
   };
 }
+
+// define __PRETTY_FUNCTION if not defined
+#ifndef __PRETTY_FUNCTION__
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
 
 /**
  * \brief Check that a == b.
