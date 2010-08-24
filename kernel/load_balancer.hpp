@@ -101,7 +101,7 @@
 class WorkGroup
 {
   // number of workers in the group
-  int _num_workers;
+  const int _num_workers;
 
   // array of workers in the work group. Here, RemoteWorker objects are used (instead of Worker objects) since they
   // exist on remote processes.
@@ -126,10 +126,10 @@ class LoadBalancer
     /* ******************
      * member variables *
      ********************/
-    MPI_Comm _comm_local;
-    int _rank_local;
-    int _group_id;
-    int* _ranks_group;
+    const MPI_Comm _comm_local;
+    const int _rank_local;
+    const int _group_id;
+    const int* _ranks_group;
 
     // array of work groups the load balancer manages
     WorkGroup* _work_groups;
@@ -145,12 +145,12 @@ class LoadBalancer
      * \brief constructor requiring six parameters
      */
     LoadBalancer(
-      int& rank_world,
-      int& rank_master,
-      MPI_Comm& comm_local,
-      int& rank_local,
-      int& group_id,
-      int ranks_group[])
+      const int rank_world,
+      const int rank_master,
+      const MPI_Comm comm_local,
+      const int rank_local,
+      const int group_id,
+      const int ranks_group[])
       : Process(rank_world, rank_master),
         _comm_local(comm_local),
         _rank_local(rank_local),
@@ -160,12 +160,12 @@ class LoadBalancer
       std::cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << std::endl;
     }
 
-    int get_group_id()
+    inline int get_group_id() const
     {
       return _group_id;
     }
 
-    int get_rank_local()
+    inline int get_rank_local() const
     {
       return _rank_local;
     }

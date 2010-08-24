@@ -24,26 +24,23 @@ int main(int argc, char* argv[])
   // @Hilmar: So lebt das ganze Universum auf dem Stack und nicht auf dem Heap. Absicht?
   Universe universe(argc, argv, num_process_groups, num_processes_in_group);
 
-  //@Hilmar: ab hier scheint nichts mehr ausgefuehrt zu werden. Ich vermute das liegt daran, dass MPI_Init() nicht der
-  //         erste Befehl ist der ausgefuehrt wird.
-  std::cout << "Das hier erscheint nicht auf dem Bildschirm" << std::endl;
-
   // Get process objects. Note that on each process only one of the following three exists (the other two are
-  // null pointers).
+  // null pointers.).
   LoadBalancer* load_balancer = universe.get_load_balancer();
   GroupProcess* group_process = universe.get_group_process();
   Master* master = universe.get_master();
 
-//  // rank of this process
+  // rank of this process
   int my_rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-//
-//  cout << "Hi! I'm rank " << my_rank << endl;
 
   if (load_balancer != nullptr)
   {
-    std::cout << "process with world rank "<< load_balancer->get_rank_world() << " is the load balancer with id "
-         << load_balancer->get_group_id() << " and local rank " << load_balancer->get_rank_local() << std::endl;
+    int rw = load_balancer->get_rank_world();
+    int gid = load_balancer->get_group_id();
+    int rl = load_balancer->get_rank_local();
+    std::cout << "process with world rank " << rw << " is the load balancer with id "
+              << gid << " and local rank " << rl << std::endl;
     if (load_balancer->get_group_id() == 0)
     {
       load_balancer->read_mesh();
@@ -54,15 +51,18 @@ int main(int argc, char* argv[])
       // the second process group does something else...
     }
   }
-  else if (group_process != nullptr)
+  else if (group_process != nullptr) // BUG: group_processes and masters are already in their infinite loop,
+                                     // and thus this output never shows
   {
     // not sure yet if it makes sense to let the user control the group processes
-    std::cout << "Process with world rank "<< group_process->get_rank_world() << " is a group process!" << std::endl;
+    int rw = group_process->get_rank_world();
+    std::cout << "Process with world rank "<< rw << " is a group process!" << std::endl;
   }
   else if (master != nullptr)
   {
     // not sure yet if it makes sense to let the user control the master process
-    std::cout << "Process with world rank "<< master->get_rank_world() << " is the MASTER OF THE UNIVERSE!" << std::endl;
+    int rw = group_process->get_rank_world();
+    std::cout << "Process with world rank "<< rw << " is the MASTER OF THE UNIVERSE!" << std::endl;
   }
   else
   {

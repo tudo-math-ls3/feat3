@@ -24,7 +24,7 @@ class Process
     /**
      * \brief rank of the process within MPI_COMM_WORLD
      */
-    int _rank_world;
+    const int _rank_world;
     /**
      * \brief rank of the master process within MPI_COMM_WORLD
      *
@@ -32,7 +32,7 @@ class Process
      * be mainly done by some coordinator processes).
      */
     //
-    int _rank_master;
+    const int _rank_master;
 
   /* ****************
    * public members *
@@ -45,8 +45,8 @@ class Process
      * \brief constructor requiring two parameters
      */
     Process(
-      int rank_world,
-      int rank_master)
+      const int rank_world,
+      const int rank_master)
       : _rank_world(rank_world),
         _rank_master(rank_master)
     {
@@ -55,7 +55,7 @@ class Process
     /**
      * \brief getter for the MPI_COMM_WORLD rank
      */
-    int get_rank_world()
+    inline int get_rank_world() const
     {
       return _rank_world;
     }
@@ -75,7 +75,7 @@ class Master
     /**
      * \brief constructor requiring one parameter
      */
-    Master(int rank_world)
+    Master(const int rank_world)
       : Process(rank_world, rank_world)
     {
     }
@@ -112,14 +112,15 @@ class GroupProcess
      * member variables *
      ********************/
 
-    // communicator shared by the load balancer and all processes of the corresponding group
-    MPI_Comm _comm_local;
+    // rank of the load balancer responsible for this GroupProcess (with respect to the local communicator)
+    const int _rank_load_bal;
 
     // rank of this process within the local communicator
-    int _rank_local;
+    const int _rank_local;
 
-    // rank of the load balancer responsible for this GroupProcess (with respect to the local communicator)
-    int _rank_load_bal;
+
+    // communicator shared by the load balancer and all processes of the corresponding group
+    const MPI_Comm _comm_local;
 
   /* ****************
    * public members *
@@ -132,15 +133,15 @@ class GroupProcess
      * \brief constructor requiring four parameters
      */
     GroupProcess(
-      int rank_world,
-      int rank_master,
-      int rank_load_bal,
-      MPI_Comm comm_local,
-      int rank_local)
+      const int rank_world,
+      const int rank_master,
+      const int rank_load_bal,
+      const int rank_local,
+      const MPI_Comm comm_local)
       : Process(rank_world, rank_master),
         _rank_load_bal(rank_load_bal),
-        _comm_local(comm_local),
-        _rank_local(rank_local)
+        _rank_local(rank_local),
+        _comm_local(comm_local)
     {
     }
 
@@ -150,7 +151,6 @@ class GroupProcess
       while (true)
       {
         sleep(2);
-        // @Hilmar: Diese Ausgabe erscheint nie!
         std::cout << "GroupProcess with world rank " << _rank_world <<" is waiting..." << std::endl;
       }
     }
@@ -182,10 +182,10 @@ class Worker
 {
   private:
     // communicator used by the work group this worker belongs to
-    MPI_Comm _comm_work_group;
+    const MPI_Comm _comm_work_group;
 
     // rank of this process within the local communicator
-    int _rank_work_group;
+    const int _rank_work_group;
 
     // workers treating the neighbour subdomains
     RemoteWorker* _neighbours;
