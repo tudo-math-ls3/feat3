@@ -1,6 +1,5 @@
 NEWEST: 00007
 ID        |TYPE            |STATUS        |AUTHOR    |ASSIGNED TO     |SEVERITY    |SHORT DESCRIPTION
-00007     |bug_report      |unassigned    |markus    |                |critical    |test_system_is_error_prone
 00002     |feature_request |assigned      |markus    |Dirk            |critical    |build_system_essentials
 00000     |feature_request |unassigned    |markus    |                |high        |implement_test_system
 00003     |milestone       |unassigned    |markus    |                |medium      |kernel_subsystem_parallel_infrastructure
@@ -8,3 +7,4 @@ ID        |TYPE            |STATUS        |AUTHOR    |ASSIGNED TO     |SEVERITY 
 00005     |milestone       |unassigned    |markus    |                |medium      |kernel_subsystem_geometry
 00006     |milestone       |unassigned    |markus    |                |medium      |kernel_subsystem_load_balancing
 00001     |feature_request |unassigned    |markus    |                |low         |implement_compiler_detection_icc
+00007     |bug_report      |resolved      |markus    |peter           |critical    |test_system_is_error_prone

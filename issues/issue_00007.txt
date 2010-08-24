@@ -1,10 +1,10 @@
 ID           00007
 TYPE         bug_report
-STATUS       unassigned
+STATUS       resolved
 AUTHOR       markus
-ASSIGNED TO
+ASSIGNED TO  peter
 SEVERITY     critical
 
 FULL TEXT    Test system is error prone after push by Peter: Does not compile on Linux machines due to bad const specifier.
 
-SOLUTION
+SOLUTION     Set back const specifier.
