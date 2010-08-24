@@ -87,7 +87,7 @@ namespace TestSystem
 
     public:
       /// TestList forward iterator.
-      typedef std::list<BaseTest*>::const_iterator Iterator;
+      typedef std::list<BaseTest*>::iterator Iterator;
 
       /// Return the instance of the TestList
       static TestList* instance()
@@ -109,13 +109,13 @@ namespace TestSystem
       }
 
       /// Return an iterator to the front of the TestList
-      Iterator begin_tests() const
+      Iterator begin_tests()
       {
         return _tests.begin();
       }
 
       /// Return an iterator beyond the last element of the TestList
-      Iterator end_tests() const
+      Iterator end_tests()
       {
         return _tests.end();
       }
