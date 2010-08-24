@@ -69,7 +69,12 @@ class Process
     }
 };
 
-// class defining the master process
+/**
+ * \brief class defining the master process
+ *
+ * @author Hilmar Wobker
+ * @author Dominik Goeddeke
+ */
 class Master
   : public Process
 {
@@ -99,7 +104,13 @@ class Master
     }
 };
 
-/* class defining a group process
+/**
+ * \brief class defining the master process
+ *
+ * @author Hilmar Wobker
+ * @author Dominik Goeddeke
+ *
+ * class defining a group process
  * BRAL: Was ist ein GroupProcess?
  * Am Anfang des Programms werden die verfuegbaren Prozesse vom User in Gruppen eingeteilt (z.B. fuer Multiphysics-
  * Aufgaben). Zu jeder Gruppe geh�rt ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
@@ -164,16 +175,17 @@ class GroupProcess
     }
 };
 
-
-
-
-
-
-
-// class defining a remote worker process
-// @Hilmar: Was ist das? Das "Gegenstueck", quasi die Leichtgewichtige Repraesentation eines WorkerProcess, der vom
-// Master/Lastverteiler/Sonstwas verwendet wird? ... Ah ja, ist so, habe ich beim Lesen der Klasse weiter unten
-// dann verstanden.
+/**
+ * \brief class defining defining a remote worker process
+ *
+ * @author Hilmar Wobker
+ * @author Dominik Goeddeke
+ *
+ * class defining a remote worker process
+ * @Hilmar: Was ist das? Das "Gegenstueck", quasi die Leichtgewichtige Repraesentation eines WorkerProcess, der vom
+ * Master/Lastverteiler/Sonstwas verwendet wird? ... Ah ja, ist so, habe ich beim Lesen der Klasse weiter unten
+ * dann verstanden.
+ */
 class RemoteWorker
   : public Process
 {
