@@ -10,8 +10,6 @@
 #include <stdlib.h>
 #include <kernel/base_header.hpp>
 
-using namespace std;
-
 // class defining an MPI process
 // BRAL: grundlegende
 class Process
@@ -88,7 +86,7 @@ class Master
       while (true)
       {
         sleep(3.3);
-        cout << "Master process with world rank " << _rank_world <<" is waiting..." << endl;
+        std::cout << "Master process with world rank " << _rank_world <<" is waiting..." << std::endl;
       }
     }
 };
@@ -153,7 +151,7 @@ class GroupProcess
       {
         sleep(2);
         // @Hilmar: Diese Ausgabe erscheint nie!
-        cout << "GroupProcess with world rank " << _rank_world <<" is waiting..." << endl;
+        std::cout << "GroupProcess with world rank " << _rank_world <<" is waiting..." << std::endl;
       }
     }
 };

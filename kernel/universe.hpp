@@ -11,7 +11,6 @@
 #include <kernel/process.hpp>
 #include <kernel/load_balancer.hpp>
 
-using namespace std;
 using namespace Feast;
 
 // In order to increase performance one can ignore the status object in some MPI functions
@@ -137,11 +136,11 @@ class Universe
      */
     void _validate_mpi_error_code(
       int error_code,
-      string mpi_function_name)
+      std::string mpi_function_name)
     {
       if (error_code != MPI_SUCCESS)
       {
-        cerr << mpi_function_name << " failed with error code " << error_code <<". Aborting." << endl;
+        std::cerr << mpi_function_name << " failed with error code " << error_code <<". Aborting." << std::endl;
         int mpi_is_initialised;
         MPI_Initialized(&mpi_is_initialised);
         if (mpi_is_initialised)
@@ -160,9 +159,9 @@ class Universe
      * \param[in] msg
      * message explaining the reason for the abortion
      */
-    void _abort(string msg)
+    void _abort(std::string msg)
     {
-      cerr << msg << " Aborting program..." << endl;
+      std::cerr << msg << " Aborting program..." << std::endl;
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);
       if (mpi_is_initialised)
@@ -234,16 +233,16 @@ class Universe
       {
         if (my_rank == 0)
         {
-          cout << "Warning! "<< _num_processes << " processes available, but only " << _num_processes_needed
-               << " processes needed!" << endl;
+          std::cout << "Warning! "<< _num_processes << " processes available, but only " << _num_processes_needed
+               << " processes needed!" << std::endl;
         }
       }
       else
       {
         if (my_rank == 0)
         {
-          cout << _num_processes << " processes available and " << _num_processes_needed
-               << " needed." << endl;
+          std::cout << _num_processes << " processes available and " << _num_processes_needed
+               << " needed." << std::endl;
         }
       }
 
@@ -271,12 +270,12 @@ class Universe
         for(int j(0) ; j < _num_processes_in_group[igroup]+1 ; ++j)
         {
           ranks[j] = iter_MPC_rank;
-          cout << my_rank << ": igroup=" << igroup << ", j=" << j << ", ranks[j]=" << ranks[j] << endl;
+          std::cout << my_rank << ": igroup=" << igroup << ", j=" << j << ", ranks[j]=" << ranks[j] << std::endl;
           ++iter_MPC_rank;
           // inquire whether this process belongs to the current group
           if (my_rank == ranks[j])
           {
-            cout << my_rank << " belongs to group " << igroup << endl;
+            std::cout << my_rank << " belongs to group " << igroup << std::endl;
             belongs_to_group = true;
           }
         }
@@ -359,7 +358,7 @@ class Universe
         _abort("Only *one* universe can be created!");
       }
       _universe_created = true;
-      cout << "Universe created!" << endl;
+      std::cout << "Universe created!" << std::endl;
       _init_mpi(argc, argv);
       _num_processes_in_group = new int[_num_process_groups];
       _num_processes_in_group[0] = _num_processes - 1;
@@ -398,7 +397,7 @@ class Universe
         _abort("Only *one* universe can be created!");
       }
       _universe_created = true;
-      cout << "Universe created!" << endl;
+      std::cout << "Universe created!" << std::endl;
       _init_mpi(argc, argv);
 
       _init();
@@ -422,7 +421,7 @@ class Universe
       {
         MPI_Finalize();
       }
-      cout << "Universe destroyed!" << endl;
+      std::cout << "Universe destroyed!" << std::endl;
     }
 
 

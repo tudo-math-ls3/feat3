@@ -2,8 +2,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/universe.hpp>
 
-using namespace std;
-
 int main(int argc, char* argv[])
 {
   // the following information will be read from some dat file
@@ -28,7 +26,7 @@ int main(int argc, char* argv[])
 
   //@Hilmar: ab hier scheint nichts mehr ausgefuehrt zu werden. Ich vermute das liegt daran, dass MPI_Init() nicht der
   //         erste Befehl ist der ausgefuehrt wird.
-  cout << "Das hier erscheint nicht auf dem Bildschirm" << endl;
+  std::cout << "Das hier erscheint nicht auf dem Bildschirm" << std::endl;
 
   // Get process objects. Note that on each process only one of the following three exists (the other two are
   // null pointers).
@@ -44,8 +42,8 @@ int main(int argc, char* argv[])
 
   if (load_balancer != nullptr)
   {
-    cout << "process with world rank "<< load_balancer->get_rank_world() << " is the load balancer with id "
-         << load_balancer->get_group_id() << " and local rank " << load_balancer->get_rank_local() << endl;
+    std::cout << "process with world rank "<< load_balancer->get_rank_world() << " is the load balancer with id "
+         << load_balancer->get_group_id() << " and local rank " << load_balancer->get_rank_local() << std::endl;
     if (load_balancer->get_group_id() == 0)
     {
       load_balancer->read_mesh();
@@ -59,16 +57,16 @@ int main(int argc, char* argv[])
   else if (group_process != nullptr)
   {
     // not sure yet if it makes sense to let the user control the group processes
-    cout << "Process with world rank "<< group_process->get_rank_world() << " is a group process!" << endl;
+    std::cout << "Process with world rank "<< group_process->get_rank_world() << " is a group process!" << std::endl;
   }
   else if (master != nullptr)
   {
     // not sure yet if it makes sense to let the user control the master process
-    cout << "Process with world rank "<< master->get_rank_world() << " is the MASTER OF THE UNIVERSE!" << endl;
+    std::cout << "Process with world rank "<< master->get_rank_world() << " is the MASTER OF THE UNIVERSE!" << std::endl;
   }
   else
   {
     // dom-debug
-    cout << "Process with rank " << my_rank << " has no particular role, this should not happen." << endl;
+    std::cout << "Process with rank " << my_rank << " has no particular role, this should not happen." << std::endl;
   }
 }

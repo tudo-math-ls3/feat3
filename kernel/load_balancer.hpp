@@ -8,8 +8,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
 
-using namespace std;
-
 /*
  * Note that only the load bal. processes are directly available to the user! All other processes are in an infinite
  * loop waiting for messages.
@@ -159,7 +157,7 @@ class LoadBalancer
         _group_id(group_id),
         _ranks_group(ranks_group)
     {
-      cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << endl;
+      std::cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << std::endl;
     }
 
     int get_group_id()
