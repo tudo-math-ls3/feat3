@@ -15,8 +15,7 @@ int main(int argc, char* argv[])
   // the following information will be read from some dat file
 
   // number of process groups (if not provided, then 1)
-  const int num_process_groups;
-  num_process_groups = 2;
+  const int num_process_groups(2);
   // number of processes in process groups (must be provided when num_process_groups > 1)
   int num_processes_in_group[num_process_groups];
 
