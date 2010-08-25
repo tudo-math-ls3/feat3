@@ -259,16 +259,15 @@ class Universe
       if (_num_processes < _num_processes_needed)
       {
         _abort("Error! Only " + StringUtils::stringify(_num_processes) + " processes available, but "
-               + StringUtils::stringify(_num_processes_needed) + " processes needed!");
+               + StringUtils::stringify(_num_processes_needed) + " processes needed!\n");
       }
       else if (_num_processes > _num_processes_needed)
       {
         if (my_rank == 0)
         {
-          std::cout << "Warning! "<< _num_processes << " processes available, but only " << _num_processes_needed
-                    << " processes needed! \n"
-                    << "Continuing with " << _num_processes-_num_processes_needed << " idle orphaned processes."
-                    << std::endl;
+          _abort("Error!  " + StringUtils::stringify(_num_processes) + " processes available, and only "
+               + StringUtils::stringify(_num_processes_needed) + " processes needed!. Since Feast does not "
+               + "support trailing orphaned processes, this is an error.\n");
         }
       }
       else
@@ -316,7 +315,6 @@ class Universe
         }
       }
       // final sanity check
-      // TODO: This assert fails if more processes that needed are used [dom 25.10.2010]
       assert(iter_MPC_rank == _num_processes-1);
 
       // create MPI groups (exclude the master because it is only a member of COMM_WORLD and not
