@@ -90,8 +90,10 @@
  *   - sends corresponding parts of the mesh to the Worker objects
  */
 
-/* Class describing a work group, i.e. a set of worker processes sharing the same MPI communicator. Only the load
- * balancer creates objects of this class to maintain its work groups. Example:
+/**
+ * \brief Class describing a work group, i.e. a set of worker processes sharing the same MPI communicator.
+ *
+ * Only the load balancer creates objects of this class to maintain its work groups. Example:
  * The process group of the load balancer consists of 6 processes. The load balancer reads the mesh and the solver
  * configuration and decides that the coarse grid problem is to be treated by two processes (local ranks 0 and 1) and
  * the fine grid problems by all six processes. Then it creates two work groups: one consisting of the two processes
@@ -100,6 +102,10 @@
  * balancer will only communicate to these processes via the ProcessGroup communicator, *not* via the WorkGroup
  * communicator since it is simply not part of this communicator. So, the WorkGroup class doesn't define this
  * work group communicator, only the worker processes do this!
+ *
+ * @author Hilmar Wobker
+ * @author Dominik Goeddeke
+ *
  */
 class WorkGroup
 {
@@ -118,7 +124,12 @@ class WorkGroup
 };
 
 
-// class defining a load balancer process
+/**
+ * \brief class defining a load balancer process
+ *
+ * @author Hilmar Wobker
+ * @author Dominik Goeddeke
+*/
 class LoadBalancer
   : public Process
 {

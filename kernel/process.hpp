@@ -30,11 +30,11 @@ class Process
      * member variables *
      ********************/
     /**
-     * \brief rank of the process within MPI_COMM_WORLD
+     * \brief rank of the process within MPI_COMM_WORLD, set once via constructor and never changed again
      */
     const int _rank_world;
     /**
-     * \brief rank of the master process within MPI_COMM_WORLD
+     * \brief rank of the master process within MPI_COMM_WORLD, set once via constructor and never changed again
      *
      * Every process has to know the rank of the master process in order to trigger screen output (although this will
      * be mainly done by some coordinator processes).
@@ -105,20 +105,19 @@ class Master
 };
 
 /**
- * \brief class defining the master process
+ * \brief class defining a group process
+ *
+ * Was ist ein GroupProcess?
+ * Am Anfang des Programms werden die verfuegbaren Prozesse vom User in Gruppen eingeteilt (z.B. fuer Multiphysics-
+ * Aufgaben). Zu jeder Gruppe geh�rt ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
+ * einteilt, machen diese Prozesse also erstmal nix ausser darauf zu warten, eingeteilt zu werden. Dieses
+ * Zwischenstadium wird durch die Klasse GroupProcess beschrieben. Jeder Prozess, der also nicht load balancer oder
+ * master ist, wird also zunaechst mal als GroupProcess angesehen und in eine Warteschleife versetzt.
+ * Wenn der load balancer dann entschieden hat, wie er seine Prozesse einteilen will, schickt er den GroupProcesses
+ * entsprechende Nachrichten, sie sollen entsprechende Worker Prozesse erstellen.
  *
  * @author Hilmar Wobker
  * @author Dominik Goeddeke
- *
- * class defining a group process
- * BRAL: Was ist ein GroupProcess?
- * Am Anfang des Programms werden die verfuegbaren Prozesse vom User in Gruppen eingeteilt (z.B. fuer Multiphysics-
- * Aufgaben). Zu jeder Gruppe geh�rt ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
- * einteilt, machen diese Prozesse also erstmal nix ausser darauf zu warten, eingeteilt zu werden. Dieses Zwischenstadium
- * wird durch die Klasse GroupProcess beschrieben. Jeder Prozess, der also nicht load balancer oder master ist, wird
- * also zunaechst mal als GroupProcess angesehen und in eine Warteschleife versetzt.
- * Wenn der load balancer dann entschieden hat, wie er seine Prozesse einteilen will, schickt er den GroupProcesses
- * entsprechende Nachrichten, sie sollen entsprechende Worker Prozesse erstellen.
  */
 class GroupProcess
   : public Process
@@ -135,8 +134,9 @@ class GroupProcess
     const int _rank_load_bal;
 
     // rank of this process within the local communicator
+    // TODO: Probably not very clever to make this const, but I have no idea yet how re-grouping will be done, i.e.,
+    // by changing existing group processes, or by re-creating entire groups
     const int _rank_local;
-
 
     // communicator shared by the load balancer and all processes of the corresponding group
     const MPI_Comm _comm_local;
@@ -181,7 +181,6 @@ class GroupProcess
  * @author Hilmar Wobker
  * @author Dominik Goeddeke
  *
- * class defining a remote worker process
  * @Hilmar: Was ist das? Das "Gegenstueck", quasi die Leichtgewichtige Repraesentation eines WorkerProcess, der vom
  * Master/Lastverteiler/Sonstwas verwendet wird? ... Ah ja, ist so, habe ich beim Lesen der Klasse weiter unten
  * dann verstanden.
@@ -191,12 +190,17 @@ class RemoteWorker
 {
   private:
     // rank of the remote worker within the corresponding communicator
-    int _rank_local;
+    const int _rank_local;
 };
 
 
 
-// class defining a worker process
+/**
+ * \brief class defining a worker process
+ *
+ * @author Hilmar Wobker
+ * @author Dominik Goeddeke
+*/
 class Worker
   : public Process
 {

@@ -415,7 +415,7 @@ class Universe
      * arguments passed to the main() method
      */
     Universe(
-      int& argc,
+      int argc,
       char* argv[])
       : _num_process_groups(1)
     {
@@ -451,9 +451,9 @@ class Universe
      * array of numbers of processes in each work group (dimension [#num_process_groups])
      */
     Universe(
-      int& argc,
+      int argc,
       char* argv[],
-      int& num_process_groups,
+      int num_process_groups,
       int num_processes_in_group[])
       : _num_process_groups(num_process_groups),
         _num_processes_in_group(num_processes_in_group)

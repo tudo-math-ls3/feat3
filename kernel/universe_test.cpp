@@ -1,13 +1,21 @@
+// Test driver for universe
+
+// includes, system
 #include <iostream>
+
+// includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/universe.hpp>
 
+// main routine
+// @author Hilmar Wobker
+// @author Dominik Goeddeke
 int main(int argc, char* argv[])
 {
   // the following information will be read from some dat file
 
   // number of process groups (if not provided, then 1)
-  int num_process_groups;
+  const int num_process_groups;
   num_process_groups = 2;
   // number of processes in process groups (must be provided when num_process_groups > 1)
   int num_processes_in_group[num_process_groups];
@@ -48,7 +56,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      // the second process group does something else...
+      // the second process group does something else, programmed by the application outside the kernel...
     }
   }
   else if (group_process != nullptr) // BUG: group_processes and masters are already in their infinite loop,
