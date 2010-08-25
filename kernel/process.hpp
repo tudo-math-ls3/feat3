@@ -135,7 +135,7 @@ class GroupProcess
 
     // rank of this process within the local communicator
     // TODO: Probably not very clever to make this const, but I have no idea yet how re-grouping will be done, i.e.,
-    // by changing existing group processes, or by re-creating entire groups
+    // by changing existing group processes, or by re-creating entire groups [dom 25.8.2010]
     const int _rank_local;
 
     // communicator shared by the load balancer and all processes of the corresponding group
