@@ -5,6 +5,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/stringify.hpp>
+#include <kernel/util/type_traits.hpp>
 #include <kernel/util/instantiation_policy.hpp>
 
 #include <string>
@@ -336,7 +337,8 @@ namespace TestSystem
       /// \todo Use tag provided name.
       //_tag_name = Tag_::name;
       _tag_name = stringify(typeid(Tag_).name());
-      _prec_name = stringify(typeid(DataType_).name());
+      //_prec_name = stringify(typeid(DataType_).name());
+      _prec_name = TypeTraits<DataType_>::name();
     };
 
       /// Destructor.

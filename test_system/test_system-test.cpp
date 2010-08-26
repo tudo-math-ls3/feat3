@@ -63,3 +63,4 @@ class TaggedUnitTest :
 TaggedUnitTest<Nil, float> taggedunittestf ("TaggedUnitTest-test float");
 TaggedUnitTest<Nil, double> taggedunittestd ("TaggedUnitTest-test double");
 TaggedUnitTest<Nil, unsigned long> taggedunittestul ("TaggedUnitTest-test unsigned long");
+TaggedUnitTest<Nil, int> taggedunittesti ("TaggedUnitTest-test int");
