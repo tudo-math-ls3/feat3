@@ -44,6 +44,9 @@ class AssertionTest :
         no_exception_thrown = false;
       }
       TEST_CHECK(no_exception_thrown);
+
+      STATIC_ASSERT(0<1, eek);
+      //STATIC_ASSERT(false, eek);
     }
 };
 AssertionTest<Nil, Nil> assertion_test;

@@ -32,6 +32,15 @@ namespace Feast
             }
     };
 
+    template <bool>
+    struct CompileTimeChecker
+    {
+        CompileTimeChecker(...){};
+    };
+    template <> struct CompileTimeChecker<false>
+    {
+    };
+
 
 /**
  * \def ASSERT
@@ -50,7 +59,7 @@ namespace Feast
 #define ASSERT(expr, msg) \
     do { \
         if (! (expr)) \
-            throw Assertion(__PRETTY_FUNCTION__, __FILE__, __LINE__, msg); \
+            throw Feast::Assertion(__PRETTY_FUNCTION__, __FILE__, __LINE__, msg); \
     } while (false)
 #else
 #define ASSERT(expr, msg)
@@ -71,10 +80,11 @@ namespace Feast
  */
 #if defined (DEBUG)
 #define STATIC_ASSERT(const_expr, msg) \
-    do { \
-        if (! (const_expr)) \
-            throw Assertion(__PRETTY_FUNCTION__, __FILE__, __LINE__, msg); \
-    } while (false)
+    {\
+      class ERROR_##msg {}; \
+      (void) (new Feast::CompileTimeChecker<\
+        (const_expr) != 0>((ERROR_##msg())));\
+    }
 #else
 #define STATIC_ASSERT(const_expr, msg)
 #endif
