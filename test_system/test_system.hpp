@@ -334,10 +334,7 @@ namespace TestSystem
       TaggedTest(const std::string & id):
         BaseTest(id)
     {
-      /// \todo Use tag provided name.
-      //_tag_name = Tag_::name;
-      _tag_name = stringify(typeid(Tag_).name());
-      //_prec_name = stringify(typeid(DataType_).name());
+      _tag_name = TypeTraits<Tag_>::name();
       _prec_name = TypeTraits<DataType_>::name();
     };
 

@@ -67,6 +67,21 @@ namespace Feast
       return "unsigned long";
     }
   };
+
+  /**
+   * \brief TypeTraits specialisation for Nil tag class
+   *
+   * \author Dirk Ribbrock
+   */
+  template <>
+  struct TypeTraits<Nil>
+  {
+    /// Return a string idetifying the Datatype
+    static std::string name()
+    {
+      return "Nil";
+    }
+  };
 }
 
 #endif //UTIL_TYPE_TRAITS_HHP
