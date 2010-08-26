@@ -12,7 +12,6 @@
 // includes, Feast
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/string_utils.hpp>
-#include <kernel/util/exception.hpp>
 #include <kernel/base_header.hpp>
 
 /// FEAST namespace
@@ -130,6 +129,7 @@ namespace FEAST
       if (_what_str.empty())
       {
         _what_str = StringUtils::stringify(std::exception::what());
+//BRAL: das folgende muss wieder raus:
         _what_str += " (" + message() + ")";
       }
       return _what_str.c_str();
@@ -152,7 +152,8 @@ namespace FEAST
     /**
     * \brief Constructor.
     *
-    * \param message A short error message.
+    * \param message
+    * A short error message.
     */
     InternalError(const std::string & message) throw () :
       Exception("Internal error: " + message)
@@ -173,9 +174,12 @@ namespace FEAST
     /**
     * \brief Constructor.
     *
-    * \param file Name of the source file that contains the context.
-    * \param line Line number of the context.
-    * \param context A sentence that describes this context.
+    * \param file
+    * name of the source file that contains the context
+    * \param line
+    * line number of the context
+    * \param context
+    * description of the context
     */
     Context(const char * const file, const long line, const std::string & context)
     {

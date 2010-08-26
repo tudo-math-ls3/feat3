@@ -40,10 +40,11 @@
 #  define nullptr 0
 #endif
 
-// If the compiler doesn't support the C++0x static_assert statement, we will define an
-// empty pre-processor macro for it.
-#if !defined(HAVE_CPP0X_STATIC_ASSERT) && !defined(DOXYGEN)
-#  define static_assert(const_expr, err_msg)
+// define __PRETTY_FUNCTION if not defined
+#ifndef __PRETTY_FUNCTION__
+#  ifndef DOXYGEN
+#  define __PRETTY_FUNCTION__ __FUNCTION__
+#  endif
 #endif
 
 // If the compiler doesn't support the 'extern template' specifier or its usage is

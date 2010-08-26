@@ -1,5 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/stringify.hpp>
+#include <kernel/util/exception.hpp>
 
 #include <cstdlib>
 #include <iostream>
@@ -23,7 +24,7 @@ int main(int /*argc*/, char** /*argv*/)
     for (TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
             i != i_end ; )
     {
-        //CONTEXT("When running test case '" + (*i)->id() + "':");
+        CONTEXT("When running test case '" + (*i)->id() + "':");
         try
         {
             std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Backend: "
