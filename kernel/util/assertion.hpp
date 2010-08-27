@@ -10,7 +10,8 @@
 namespace Feast
 {
     /**
-     * Assertion is thrown when a critical condition is not fulfilled.
+     * \brief Assertion is thrown when a critical condition is not fulfilled.
+     * \author Dirk Ribbrock
      */
     class Assertion :
         public Exception
@@ -32,11 +33,21 @@ namespace Feast
             }
     };
 
+    /**
+     *  \brief Simple struct to catch compile time assertions
+     * \author Dirk Ribbrock
+     */
     template <bool>
     struct CompileTimeChecker
     {
-        CompileTimeChecker(...){};
+      /// Constructor accepting any kind of arguments:
+      CompileTimeChecker(...){};
     };
+
+    /**
+     * \brief 'False' version of CompileTimeChecker struct to catch compile time assertions.
+     * \author Dirk Ribbrock
+     */
     template <> struct CompileTimeChecker<false>
     {
     };
@@ -68,7 +79,7 @@ namespace Feast
 /**
  * \def STATIC_ASSERT
  *
- * \brief Convenience definition that provides a way to throw compile-time Assertion exceptions.
+ * \brief Convenience definition that provides a way to throw compile-time errors.
  *
  * The thrown Assertion will be automatically provided with the correct filename,
  * line number and function name.
