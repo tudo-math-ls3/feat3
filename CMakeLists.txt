@@ -7,6 +7,9 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 PROJECT( FEAST )
 
+#enable DEBUG define on debug builds
+set (CMAKE_CXX_FLAGS_DEBUG "-DDEBUG")
+
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 #our custom target to execute all compiled tests

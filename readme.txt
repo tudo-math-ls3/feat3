@@ -8,6 +8,9 @@ In the top-lvl directory run:
 cmake .
 make
 
+To enable debug support, run "configure" command with
+cmake -DCMAKE_BUILD_TYPE=debug .
+You can switch the build type in the graphical cmake user interfaces like ccmake, too
 
 If you want to use out-of-source builds:
 Delete (if it exists) the CMakeCache.txt file in $(PATH_TO_FEAST_SRC_TOP_LVL_DIR).
