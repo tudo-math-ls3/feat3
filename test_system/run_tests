@@ -25,14 +25,20 @@ rv=0
 tests=$(find "$1" -type f -name '*-test')
 
 for tst in $tests; do
-  echo $tst:
-  $tst
+  path=`echo "$tst" | sed s!/[^/]*-test!!g`;
+  tst_bin=`echo "$tst" | sed s!.*/!!g`;
+  grep -q -s "$tst_bin" $path/CMakeLists.txt
   rv=$?
-  all=$(( $all + 1 ));
-  if [ "$rv" -ne 0 ]; then
-    failed=$(( $failed + 1 ));
-    fnames="$fnames $tst"
-  fi
+  if [ "$rv" -eq 0 ]; then
+    echo $tst:
+    $tst
+    rv=$?
+    all=$(( $all + 1 ));
+    if [ "$rv" -ne 0 ]; then
+      failed=$(( $failed + 1 ));
+      fnames="$fnames $tst"
+    fi
+fi
 done
 
 if [ "$failed" -eq 0 ]; then
