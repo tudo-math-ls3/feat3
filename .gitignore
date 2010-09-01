@@ -34,6 +34,10 @@ cmake_install.cmake
 Makefile
 
 # Ignore Visual Studio files
-*.sdf
-*.opensdf
-*.ipch
+bin32/*
+bin64/*
+lib32/*
+lib64/*
+obj32/*
+obj64/*
+visual_studio/*
