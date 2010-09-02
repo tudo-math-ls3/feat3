@@ -23,10 +23,10 @@
 
 // Assure that DEBUG or NDEBUG is defined
 // In consequence, if DEBUG and NDEBUG are note defined, NDEBUG is defined.
-#if not defined (DEBUG)
+#ifndef DEBUG
 #  define NDEBUG 1
 #endif
-#if not defined (NDEBUG)
+#ifndef NDEBUG
 #  define DEBUG 1
 #endif
 
@@ -43,7 +43,7 @@
 // define __PRETTY_FUNCTION if not defined
 #ifndef __PRETTY_FUNCTION__
 #  ifndef DOXYGEN
-#  define __PRETTY_FUNCTION__ __FUNCTION__
+#    define __PRETTY_FUNCTION__ __FUNCTION__
 #  endif
 #endif
 
