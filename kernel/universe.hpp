@@ -17,23 +17,6 @@
 // TODO: All classes in this file/compilation unit should be namespace Feast.
 using namespace Feast;
 
-// In order to increase performance one can ignore the status object in some MPI functions
-// (see Section 3.2.6 in the MPI 2.2 standard). In debug mode, we use a real status object, otherwise
-// the special MPI status MPI_STATUS_IGNORE. Requires that the MPI_Status object *always* has the name 'status'.
-// How to use this feature?
-// Whenever a status object is required, define it like this:
-//   #ifndef NDEBUG
-//     MPI_Status status;
-//   #endif
-// Within the corresponding MPI routines, then use "FEAST_MPI_STATUS" instead of "&status", e.g.
-//   MPI_Recv(..., some_source, some_tag, some_comm, FEAST_MPI_STATUS);
-#ifdef NDEBUG
-#  define FEAST_MPI_STATUS MPI_STATUS_IGNORE
-#else
-#  define FEAST_MPI_STATUS &status
-#endif
-
-
 /**
  * \brief creates and manages the parallel universe
  *
