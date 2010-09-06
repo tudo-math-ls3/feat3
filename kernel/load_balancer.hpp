@@ -121,6 +121,20 @@ class WorkGroup
 // @Hilmar: Let's stick with these wrapper objects for now, who knows what else they need to store
 // int* _ranks_local;
 
+  /* ****************
+   * public members *
+   ******************/
+  public:
+    /* **************
+     * constructors *
+     ****************/
+    /**
+     * \brief constructor requiring one parameter
+     */
+    WorkGroup(const int num_workers)
+      : _num_workers(num_workers)
+    {
+    }
 };
 
 

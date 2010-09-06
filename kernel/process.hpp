@@ -14,6 +14,7 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 
+
 /**
  * \brief Abstract base class encapsulating an MPI process
  *
@@ -69,6 +70,7 @@ class Process
     }
 };
 
+
 /**
  * \brief class defining the master process
  *
@@ -104,17 +106,18 @@ class Master
     }
 };
 
+
 /**
  * \brief class defining a group process
  *
  * Was ist ein GroupProcess?
  * Am Anfang des Programms werden die verfuegbaren Prozesse vom User in Gruppen eingeteilt (z.B. fuer Multiphysics-
- * Aufgaben). Zu jeder Gruppe geh�rt ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
+ * Aufgaben). Zu jeder Gruppe gehoert ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
  * einteilt, machen diese Prozesse also erstmal nix ausser darauf zu warten, eingeteilt zu werden. Dieses
- * Zwischenstadium wird durch die Klasse GroupProcess beschrieben. Jeder Prozess, der also nicht load balancer oder
+ * Zwischenstadium wird durch die Klasse GroupProcess beschrieben. Jeder Prozess, der nicht load balancer oder
  * master ist, wird also zunaechst mal als GroupProcess angesehen und in eine Warteschleife versetzt.
  * Wenn der load balancer dann entschieden hat, wie er seine Prozesse einteilen will, schickt er den GroupProcesses
- * entsprechende Nachrichten, sie sollen entsprechende Worker Prozesse erstellen.
+ * entsprechende Nachrichten, sie sollen entsprechende WorkerProcesses erstellen.
  *
  * @author Hilmar Wobker
  * @author Dominik Goeddeke
@@ -149,7 +152,7 @@ class GroupProcess
      * constructors *
      ****************/
     /**
-     * \brief constructor requiring four parameters
+     * \brief constructor requiring five parameters
      */
     GroupProcess(
       const int rank_world,
@@ -175,6 +178,7 @@ class GroupProcess
     }
 };
 
+
 /**
  * \brief class defining defining a remote worker process
  *
@@ -189,10 +193,28 @@ class RemoteWorker
   : public Process
 {
   private:
-    // rank of the remote worker within the corresponding communicator
-    const int _rank_local;
-};
+    // rank of the remote worker within the communicator of the corresponding work group
+    const int _rank_work_group;
 
+  /* ****************
+   * public members *
+   ******************/
+  public:
+    /* **************
+     * constructors *
+     ****************/
+    /**
+     * \brief constructor requiring four parameters
+     */
+    RemoteWorker(
+      const int rank_world,
+      const int rank_master,
+      const int rank_work_group)
+      : Process(rank_world, rank_master),
+        _rank_work_group(rank_work_group)
+    {
+    }
+};
 
 
 /**
@@ -205,20 +227,20 @@ class Worker
   : public Process
 {
   private:
-    // communicator used by the work group this worker belongs to
-    const MPI_Comm _comm_work_group;
-
     // rank of this process within the local communicator
     const int _rank_work_group;
 
-    // workers treating the neighbour subdomains
-    RemoteWorker* _neighbours;
+    // communicator used by the work group this worker belongs to
+    const MPI_Comm _comm_work_group;
+
+    // array of workers treating the neighbour subdomains
+    RemoteWorker** _neighbours;
 
     // array of workers in the "next finer" work group this worker has to communicate with
-    RemoteWorker* _finer; // besseren Namen finden!
+    RemoteWorker** _finer; // besseren Namen finden!
 
     // worker in the "next coarser" work group this worker has to communicate with (this is always only one!)
-    RemoteWorker _coarser; // besseren Namen finden!
+    RemoteWorker* _coarser; // besseren Namen finden!
 
 /*
  * BRAL: zu _finer und _coarser: Dasselbe Beispiel wie in load_balancer.hpp:
@@ -268,12 +290,12 @@ class Worker
  *       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+2)
  *       B <--> D (external, ranks 1+3) B <--> E (external, ranks 1+4)
  *
- *    Zun�chst mal zur Begrifflichkeit: In case a sind es tats�chlich 3 Worker (A,B,D) auf Process 0 (und nicht etwa
- *    *ein* worker, der zu drei WorkGroups geh�rt). Das hei�t: ein Worker geh�rt zu genau *einer* WorkGroup.
+ *    Zunaechst mal zur Begrifflichkeit: In case a sind es tatsaechlich 3 Worker (A,B,D) auf Process 0 (und nicht etwa
+ *    *ein* worker, der zu drei WorkGroups gehoert). Das heisst: ein Worker gehoert zu genau *einer* WorkGroup.
  *
  *    Die _finer RemoteWorker zu B in case a sind D und E, die zu zu C sind F und G. Der _coarser RemoteWorker zu
  *    B und C ist A. Man beachte, dass A, B und D auf dem selben Prozess "leben" (es handelt sich also eigentlich gar
- *    nicht um *Remote*Worker), w�hrend B und E auf verschiedenen Prozessen leben. Dies muss noch irgendwie
+ *    nicht um *Remote*Worker), waehrend B und E auf verschiedenen Prozessen leben. Dies muss noch irgendwie
  *    verwurschtelt werden.
  */
 
@@ -288,6 +310,25 @@ class Worker
 //  int _rank_coordinator;
 //    or
 //  RemoteWorker _coordinator;
+
+  public:
+    /* **************
+     * constructors *
+     ****************/
+    /**
+     * \brief constructor requiring four parameters
+     */
+    Worker(
+      const int rank_world,
+      const int rank_master,
+      const int rank_work_group,
+      const MPI_Comm comm_work_group)
+      : Process(rank_world, rank_master),
+        _rank_work_group(rank_work_group),
+        _comm_work_group(comm_work_group)
+    {
+    }
+
 };
 
 
