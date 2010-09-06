@@ -6,7 +6,7 @@
 /**
  * \file base_header.hpp
  * \brief Feast Kernel base header.
- * \details
+ *
  * This file is the base header for the Feast kernel, which is included by all other
  * Feast header and source files.
  * This file defines macros and data types which are frequently used in other files.
@@ -91,7 +91,7 @@ namespace Feast
 
   /**
    * \brief Nil class definition.
-   * \details
+   *
    * This is an empty tag class which may be used for templates with optional parameters.
    */
   class Nil
