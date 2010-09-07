@@ -188,14 +188,14 @@ class LoadBalancer
       std::cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << std::endl;
     }
 
-    inline int get_group_id() const
-    {
-      return _group_id;
-    }
-
     inline int get_rank_local() const
     {
       return _rank_local;
+    }
+
+    inline int get_group_id() const
+    {
+      return _group_id;
     }
 
     // dummy routine
