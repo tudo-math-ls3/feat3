@@ -95,12 +95,15 @@ class Master
     {
     }
 
+    /* ******************
+     * member functions *
+     ********************/
     // dummy routine
     void wait()
     {
-      while (true)
+      for (int i(0) ; i<1 ; ++i)
       {
-        sleep(3.3);
+        sleep(1.0);
         std::cout << "Master process with world rank " << _rank_world <<" is waiting..." << std::endl;
       }
     }
@@ -133,16 +136,19 @@ class GroupProcess
      * member variables *
      ********************/
 
-    // rank of the load balancer responsible for this GroupProcess (with respect to the local communicator)
-    const int _rank_load_bal;
+    // communicator shared by the load balancer and all processes of the corresponding group
+    const MPI_Comm _comm_local;
 
     // rank of this process within the local communicator
     // TODO: Probably not very clever to make this const, but I have no idea yet how re-grouping will be done, i.e.,
     // by changing existing group processes, or by re-creating entire groups [dom 25.8.2010]
     const int _rank_local;
 
-    // communicator shared by the load balancer and all processes of the corresponding group
-    const MPI_Comm _comm_local;
+    // id of the group this process belongs to
+    const int _group_id;
+
+    // rank of the load balancer responsible for this GroupProcess (with respect to the local communicator)
+    const int _rank_load_bal;
 
   /* ****************
    * public members *
@@ -157,20 +163,40 @@ class GroupProcess
     GroupProcess(
       const int rank_world,
       const int rank_master,
-      const int rank_load_bal,
+      const MPI_Comm comm_local,
       const int rank_local,
-      const MPI_Comm comm_local)
+      const int group_id,
+      const int rank_load_bal
+      )
       : Process(rank_world, rank_master),
-        _rank_load_bal(rank_load_bal),
+        _comm_local(comm_local),
         _rank_local(rank_local),
-        _comm_local(comm_local)
+        _group_id(group_id),
+        _rank_load_bal(rank_load_bal)
     {
+    }
+
+    /* ******************
+     * member functions *
+     ********************/
+
+    /**
+     * \brief getter for the rank in the group communicator this process belongs to
+     */
+    inline int get_rank_local() const
+    {
+      return _rank_local;
+    }
+
+    inline int get_group_id() const
+    {
+      return _group_id;
     }
 
     // dummy routine
     void wait()
     {
-      while (true)
+      for (int i(0) ; i<1 ; ++i)
       {
         sleep(2);
         std::cout << "GroupProcess with world rank " << _rank_world <<" is waiting..." << std::endl;
