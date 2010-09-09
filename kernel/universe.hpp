@@ -169,7 +169,6 @@ class Universe
     /* ******************
      * member functions *
      ********************/
-
     /**
      * \brief initialises MPI, returns the total number of processes and the rank of this processor
      *
@@ -502,8 +501,11 @@ class Universe
     }
 
 
+    /* ***********
+     * accessors *
+     *************/
     /**
-     * \brief getter function for the load balancer object
+     * \brief accessor for the load balancer object
      */
     inline LoadBalancer* get_load_balancer() const
     {
@@ -511,7 +513,7 @@ class Universe
     }
 
     /**
-     * \brief getter function for the group process object
+     * \brief accessor for the group process object
      */
     inline GroupProcess* get_group_process() const
     {
@@ -519,7 +521,7 @@ class Universe
     }
 
     /**
-     * \brief getter function for the master process object
+     * \brief accessor for the master process object
      */
     inline Master* get_master() const
     {

@@ -160,7 +160,7 @@ class LoadBalancer
     const int* _ranks_group;
 
     // array of work groups the load balancer manages
-    WorkGroup* _work_groups;
+    std::vector<WorkGroup*> _work_groups;
 
   /* ****************
    * public members *
@@ -188,22 +188,34 @@ class LoadBalancer
       std::cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << std::endl;
     }
 
+    /* ***********
+     * accessors *
+     *************/
+    /**
+     * \brief accessor for the rank in the group communicator this load balancer manages
+     */
     inline int get_rank_local() const
     {
       return _rank_local;
     }
 
+    /**
+     * \brief accessor for the group id
+     */
     inline int get_group_id() const
     {
       return _group_id;
     }
 
-    // dummy routine
+    /* ******************
+     * member functions *
+     ********************/
+    // dummy function
     void read_mesh()
     {
     }
 
-    // dummy routine
+    // dummy function
     void create_work_groups()
     {
     }

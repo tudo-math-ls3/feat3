@@ -61,8 +61,11 @@ class Process
     {
     }
 
+    /* ***********
+     * accessors *
+     *************/
     /**
-     * \brief getter for the MPI_COMM_WORLD rank
+     * \brief accessor for the MPI_COMM_WORLD rank
      */
     inline int get_rank_world() const
     {
@@ -98,7 +101,7 @@ class Master
     /* ******************
      * member functions *
      ********************/
-    // dummy routine
+    // dummy function
     void wait()
     {
       for (int i(0) ; i<1 ; ++i)
@@ -176,24 +179,29 @@ class GroupProcess
     {
     }
 
-    /* ******************
-     * member functions *
-     ********************/
-
+    /* ***********
+     * accessors *
+     *************/
     /**
-     * \brief getter for the rank in the group communicator this process belongs to
+     * \brief accessor for the rank in the group communicator this process belongs to
      */
     inline int get_rank_local() const
     {
       return _rank_local;
     }
 
+    /**
+     * \brief accessor for the group id
+     */
     inline int get_group_id() const
     {
       return _group_id;
     }
 
-    // dummy routine
+    /* ******************
+     * member functions *
+     ********************/
+    // dummy function
     void wait()
     {
       for (int i(0) ; i<1 ; ++i)
