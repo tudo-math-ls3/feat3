@@ -6,10 +6,12 @@
 #include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
+#include <kernel/process_group.hpp>
 
 /*
  * Note that only the load bal. processes are directly available to the user! All other processes are in an infinite
@@ -91,58 +93,10 @@
  */
 
 /**
- * \brief Class describing a work group, i.e. a set of worker processes sharing the same MPI communicator.
- *
- * Only the load balancer creates objects of this class to maintain its work groups. Example:
- * The process group of the load balancer consists of 6 processes. The load balancer reads the mesh and the solver
- * configuration and decides that the coarse grid problem is to be treated by two processes (local ranks 0 and 1) and
- * the fine grid problems by all six processes. Then it creates two work groups: one consisting of the two processes
- * with local ranks 0 and 1, and one consisting of all six processes. The load balancer tells the waiting GroupProcess
- * objects to create Worker objects. These worker objects then create their own communicator and store it. (The load
- * balancer will only communicate to these processes via the ProcessGroup communicator, *not* via the WorkGroup
- * communicator since it is simply not part of this communicator. So, the WorkGroup class doesn't define this
- * work group communicator, only the worker processes do this!
- *
- * @author Hilmar Wobker
- * @author Dominik Goeddeke
- *
- */
-class WorkGroup
-{
-  // number of workers in the group
-  const int _num_workers;
-
-  // array of workers in the work group. Here, RemoteWorker objects are used (instead of Worker objects) since they
-  // exist on remote processes.
-  RemoteWorker* _workers;
-
-// BRAL: Instead of the array of RemoteWorker objects one could also simply store the ranks of the participating
-// processes (with respect to the process group ranks). Not sure yet which is more appropriate.
-// @Hilmar: Let's stick with these wrapper objects for now, who knows what else they need to store
-// int* _ranks_local;
-
-  /* ****************
-   * public members *
-   ******************/
-  public:
-    /* **************
-     * constructors *
-     ****************/
-    /**
-     * \brief constructor requiring one parameter
-     */
-    WorkGroup(const int num_workers)
-      : _num_workers(num_workers)
-    {
-    }
-};
-
-
-/**
- * \brief class defining a load balancer process
- *
- * @author Hilmar Wobker
- * @author Dominik Goeddeke
+* \brief class defining a load balancer process
+*
+* @author Hilmar Wobker
+* @author Dominik Goeddeke
 */
 class LoadBalancer
   : public Process
@@ -151,16 +105,26 @@ class LoadBalancer
    * private members *
    *******************/
   private:
+
     /* ******************
      * member variables *
      ********************/
-    const MPI_Comm _comm_local;
-    const int _rank_local;
-    const int _group_id;
-    const int* _ranks_group;
+    /**
+    * \brief process group the load balancer manages
+    */
+    ProcessGroup* _process_group;
 
-    // array of work groups the load balancer manages
-    std::vector<WorkGroup*> _work_groups;
+    /**
+    * \brief vector of work groups the load balancer manages
+    */
+    std::vector<WorkGroup> _work_groups;
+
+    /**
+    * \brief flag whether this process is a dedicated load balancer process
+    *
+    *
+    */
+    bool _dedicated_load_bal_process;
 
   /* ****************
    * public members *
@@ -170,54 +134,115 @@ class LoadBalancer
      * constructors *
      ****************/
     /**
-     * \brief constructor requiring six parameters
-     */
+    * \brief constructor requiring six parameters
+    */
     LoadBalancer(
       const int rank_world,
       const int rank_master,
-      const MPI_Comm comm_local,
-      const int rank_local,
-      const int group_id,
-      const int ranks_group[])
+      ProcessGroup* process_group,
+      bool dedicated_load_bal_process)
       : Process(rank_world, rank_master),
-        _comm_local(comm_local),
-        _rank_local(rank_local),
-        _group_id(group_id),
-        _ranks_group(ranks_group)
+        _process_group(process_group),
+        _dedicated_load_bal_process(dedicated_load_bal_process)
     {
-      std::cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << std::endl;
+//      std::cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << std::endl;
     }
 
-    /* ***********
-     * accessors *
-     *************/
+    /* *******************
+     * getters & setters *
+     *********************/
     /**
-     * \brief accessor for the rank in the group communicator this load balancer manages
-     */
-    inline int get_rank_local() const
+    * \brief getter for the process group
+    */
+    inline ProcessGroup* process_group() const
     {
-      return _rank_local;
+      return _process_group;
     }
 
     /**
-     * \brief accessor for the group id
-     */
-    inline int get_group_id() const
+    * \brief getter for the flag whether this a dedicated load balancer process
+    */
+    inline bool dedicated_load_bal_process() const
     {
-      return _group_id;
+      return _dedicated_load_bal_process;
     }
 
     /* ******************
      * member functions *
      ********************/
-    // dummy function
+    /**
+    * \brief dummy function in preparation of a function reading in a mesh file
+    */
     void read_mesh()
     {
     }
 
-    // dummy function
+    /**
+    * \brief dummy function in preparation of a function for managing work groups
+    *
+    * This dummy function creates two work groups: one consisting of two workers responsible for the coarse grid
+    * problem and one consisting of all the other workers responsible for the fine grid problem. Currently, everything
+    * is hard-coded. Later, the user must be able to control the creation of work groups and even later the load
+    * balancer has to apply clever strategies to create these work groups automatically so that the user doesn't have
+    * to do anything.
+    */
     void create_work_groups()
     {
+      int num_processes = _process_group->num_processes();
+      // set number of work groups manually to 2
+      int num_work_groups = 2;
+      // set number of workers manually to 2 and _num_processes - 3
+      int num_workers_in_group[] = {2, num_processes - 3};
+
+      // Partition the ranks of the process group communicator into groups, by simply enumerating the process
+      // group ranks and assigning them consecutively to the requested number of processes. Note that the load
+      // balancer is the last rank in the process group, i.e. _num_processes - 1.
+
+      // 2-dim. array for storing the process group ranks building the work groups
+      int** work_group_ranks;
+      work_group_ranks = new int*[num_work_groups];
+      // array for storing the work group id of each group process
+      int work_group_id[num_processes - 1];
+      // iterator for process group ranks, used to split them among the groups
+      int iter_group_rank(-1);
+      for(int igroup(0) ; igroup < num_work_groups ; ++igroup)
+      {
+        work_group_ranks[igroup] = new int[num_workers_in_group[igroup]];
+        for(int j(0) ; j < num_workers_in_group[igroup] ; ++j)
+        {
+          // increase group rank
+          ++iter_group_rank;
+          // set group rank
+          work_group_ranks[igroup][j] = iter_group_rank;
+          // set group id for the current group rank
+          work_group_id[iter_group_rank] = igroup;
+        }
+      }
+      // final sanity check (rank assigned last (=sum of workers - 1) must be smaller than group rank of the load bal.
+      assert(iter_group_rank < num_processes - 1);
+
+      // - send work group id to each group process
+      // - tell each group process to call
+      //
+//        mpi_error_code = MPI_Group_incl(_mpi_group, num_workers_in_group[igroup],
+//                                        work_group_ranks[my_group], &process_group);
+//        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+//
+      //   while the load balancer sets
+//
+//        // this is a special valid handle for an empty group that can be passed to operations like
+//        // MPI_Comm_create that expect *all* processes in the parent communicator to participate.
+//        process_group = MPI_GROUP_EMPTY;
+//
+      // - then tell each group process to call
+
+//      mpi_error_code = MPI_Comm_create(MPI_COMM_WORLD, process_group, &group_comm);
+//      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+
+      // create work group for coarse grid problems with id 0
+//      _work_groups[0] = new WorkGroup(0, 2);
+      // create work group for fine grid problems with id 1
+//      _work_groups[1] = new WorkGroup(1, );
     }
 };
 

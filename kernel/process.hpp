@@ -16,11 +16,11 @@
 
 
 /**
- * \brief Abstract base class encapsulating an MPI process
- *
- * @author Hilmar Wobker
- * @author Dominik Goeddeke
- */
+* \brief Abstract base class encapsulating an MPI process
+*
+* @author Hilmar Wobker
+* @author Dominik Goeddeke
+*/
 class Process
 {
   /* *******************
@@ -31,16 +31,15 @@ class Process
      * member variables *
      ********************/
     /**
-     * \brief rank of the process within MPI_COMM_WORLD, set once via constructor and never changed again
-     */
+    * \brief rank of the process within MPI_COMM_WORLD, set once via constructor and never changed again
+    */
     const int _rank_world;
     /**
-     * \brief rank of the master process within MPI_COMM_WORLD, set once via constructor and never changed again
-     *
-     * Every process has to know the rank of the master process in order to trigger screen output (although this will
-     * be mainly done by some coordinator processes).
-     */
-    //
+    * \brief rank of the master process within MPI_COMM_WORLD, set once via constructor and never changed again
+    *
+    * Every process has to know the rank of the master process in order to trigger screen output (although this will
+    * be mainly done by some coordinator processes).
+    */
     const int _rank_master;
 
   /* ****************
@@ -51,8 +50,8 @@ class Process
      * constructors *
      ****************/
     /**
-     * \brief constructor requiring two parameters
-     */
+    * \brief constructor requiring two parameters
+    */
     Process(
       const int rank_world,
       const int rank_master)
@@ -61,25 +60,25 @@ class Process
     {
     }
 
-    /* ***********
-     * accessors *
-     *************/
+    /* *******************
+     * getters & setters *
+     *********************/
     /**
-     * \brief accessor for the MPI_COMM_WORLD rank
-     */
-    inline int get_rank_world() const
+    * \brief getter for the MPI_COMM_WORLD rank
+    */
+    inline int rank_world() const
     {
       return _rank_world;
     }
-};
+}; // class Process
 
 
 /**
- * \brief class defining the master process
- *
- * @author Hilmar Wobker
- * @author Dominik Goeddeke
- */
+* \brief class defining the master process
+*
+* @author Hilmar Wobker
+* @author Dominik Goeddeke
+*/
 class Master
   : public Process
 {
@@ -91,8 +90,8 @@ class Master
      * constructors *
      ****************/
     /**
-     * \brief constructor requiring one parameter
-     */
+    * \brief constructor requiring one parameter
+    */
     Master(const int rank_world)
       : Process(rank_world, rank_world)
     {
@@ -110,119 +109,15 @@ class Master
         std::cout << "Master process with world rank " << _rank_world <<" is waiting..." << std::endl;
       }
     }
-};
+}; // class Master
 
 
 /**
- * \brief class defining a group process
- *
- * Was ist ein GroupProcess?
- * Am Anfang des Programms werden die verfuegbaren Prozesse vom User in Gruppen eingeteilt (z.B. fuer Multiphysics-
- * Aufgaben). Zu jeder Gruppe gehoert ein load balancer. Da erst der load balancer entscheidet, wie er "seine" Prozesse
- * einteilt, machen diese Prozesse also erstmal nix ausser darauf zu warten, eingeteilt zu werden. Dieses
- * Zwischenstadium wird durch die Klasse GroupProcess beschrieben. Jeder Prozess, der nicht load balancer oder
- * master ist, wird also zunaechst mal als GroupProcess angesehen und in eine Warteschleife versetzt.
- * Wenn der load balancer dann entschieden hat, wie er seine Prozesse einteilen will, schickt er den GroupProcesses
- * entsprechende Nachrichten, sie sollen entsprechende WorkerProcesses erstellen.
- *
- * @author Hilmar Wobker
- * @author Dominik Goeddeke
- */
-class GroupProcess
-  : public Process
-{
-  /* *****************
-   * private members *
-   *******************/
-  private:
-    /* ******************
-     * member variables *
-     ********************/
-
-    // communicator shared by the load balancer and all processes of the corresponding group
-    const MPI_Comm _comm_local;
-
-    // rank of this process within the local communicator
-    // TODO: Probably not very clever to make this const, but I have no idea yet how re-grouping will be done, i.e.,
-    // by changing existing group processes, or by re-creating entire groups [dom 25.8.2010]
-    const int _rank_local;
-
-    // id of the group this process belongs to
-    const int _group_id;
-
-    // rank of the load balancer responsible for this GroupProcess (with respect to the local communicator)
-    const int _rank_load_bal;
-
-  /* ****************
-   * public members *
-   ******************/
-  public:
-    /* **************
-     * constructors *
-     ****************/
-    /**
-     * \brief constructor requiring five parameters
-     */
-    GroupProcess(
-      const int rank_world,
-      const int rank_master,
-      const MPI_Comm comm_local,
-      const int rank_local,
-      const int group_id,
-      const int rank_load_bal
-      )
-      : Process(rank_world, rank_master),
-        _comm_local(comm_local),
-        _rank_local(rank_local),
-        _group_id(group_id),
-        _rank_load_bal(rank_load_bal)
-    {
-    }
-
-    /* ***********
-     * accessors *
-     *************/
-    /**
-     * \brief accessor for the rank in the group communicator this process belongs to
-     */
-    inline int get_rank_local() const
-    {
-      return _rank_local;
-    }
-
-    /**
-     * \brief accessor for the group id
-     */
-    inline int get_group_id() const
-    {
-      return _group_id;
-    }
-
-    /* ******************
-     * member functions *
-     ********************/
-    // dummy function
-    void wait()
-    {
-      for (int i(0) ; i<1 ; ++i)
-      {
-        sleep(2);
-        std::cout << "GroupProcess with world rank " << _rank_world <<" is waiting..." << std::endl;
-      }
-    }
-};
-
-
-/**
- * \brief class defining defining a remote worker process
- *
- * @author Hilmar Wobker
- * @author Dominik Goeddeke
- *
- * @Hilmar: Was ist das? Das "Gegenstueck", quasi die Leichtgewichtige Repraesentation eines WorkerProcess, der vom
- * Master/Lastverteiler/Sonstwas verwendet wird? ... Ah ja, ist so, habe ich beim Lesen der Klasse weiter unten
- * dann verstanden.
- */
+* \brief class defining defining a remote worker process
+*
+* @author Hilmar Wobker
+* @author Dominik Goeddeke
+*/
 class RemoteWorker
   : public Process
 {
@@ -238,8 +133,8 @@ class RemoteWorker
      * constructors *
      ****************/
     /**
-     * \brief constructor requiring four parameters
-     */
+    * \brief constructor requiring four parameters
+    */
     RemoteWorker(
       const int rank_world,
       const int rank_master,
@@ -248,14 +143,14 @@ class RemoteWorker
         _rank_work_group(rank_work_group)
     {
     }
-};
+}; // class RemoteWorker
 
 
 /**
- * \brief class defining a worker process
- *
- * @author Hilmar Wobker
- * @author Dominik Goeddeke
+* \brief class defining a worker process
+*
+* @author Hilmar Wobker
+* @author Dominik Goeddeke
 */
 class Worker
   : public Process
@@ -333,11 +228,6 @@ class Worker
  *    verwurschtelt werden.
  */
 
-    // pointer to the GroupProcess, this worker corresponds to
-    // (note, that more than one Worker can "belong" to one GroupProcess)
-    // BRAL: Ueber diesen pointer laesst sich Verbindung zum load balancer aufnehmen, falls noetig
-    GroupProcess* _group_process;
-
 // BRAL: Nicht noetig! Siehe Kommentar zur class Coordinator
 //  // rank of the coordinator process in this work group
 //  // (MPI_PROC_NULL if the process is the coordinator)
@@ -350,8 +240,8 @@ class Worker
      * constructors *
      ****************/
     /**
-     * \brief constructor requiring four parameters
-     */
+    * \brief constructor requiring four parameters
+    */
     Worker(
       const int rank_world,
       const int rank_master,
@@ -363,7 +253,7 @@ class Worker
     {
     }
 
-};
+}; // class worker
 
 
 // BRAL: In einer Coordinator Klasse sehe ich im Moment noch keinen Sinn. Es ist nichts anderes als der Worker mit rank
