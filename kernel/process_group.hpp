@@ -36,21 +36,28 @@ class ProcessGroup
     /**
     * \brief number of processes in this group
     */
-    const int _num_processes;
+    int _num_processes;
 
     /**
     * \brief array of ranks the processes of this group have in the parent group
+    *
+    * <em>Dimension:</em> [#_num_processes]
     */
+    // COMMENT_HILMAR, 15.9.2010:
+    // Currently, this is simply a pointer to the part of the corresponding array
+    // _group_ranks_world[my_group] in universe.hpp. Maybe it makes sense to copy the array and delete the one in
+    // universe.hpp.
     int* _ranks_group_parent;
 
     /**
-    * \brief process group from which this process group has been spawned
+    * \brief pointer to the process group from which this process group has been spawned
     */
     ProcessGroup* _process_group_parent;
 
 //    /**
 //    * \brief process groups spawned from this process group
 //    */
+// COMMENT_HILMAR, 15.9.2010: not sure yet if this is needed
 //    ProcessGroup** _process_group_child;
 
     /**
@@ -121,32 +128,31 @@ class ProcessGroup
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
     }
 
-    /**
-    * \brief constructor for the case the MPI_Group and the communicator have to be created, but this process does
-    *        not belong to any of the MPI subgroups to be created
-    *
-    * This constructor is necessary, since *all* processes of the parent process group have to call the
-    * MPI_Comm_create routine, even those that will not belong to any of the MPI subgroups to be created. For these
-    * processes the special MPI_GROUP_EMPTY value is used for the MPI_Group object.
-    */
-    ProcessGroup(
-      ProcessGroup* process_group_parent)
-      : _group(MPI_GROUP_EMPTY),
-        _num_processes(0),
-        _ranks_group_parent(nullptr),
-        _process_group_parent(process_group_parent),
-        _group_id(-1)
-    {
-      // Create the group communicator for, among others, collective operations.
-      // It is essential that *all* processes in MPI_COMM_WORLD participate since MPI_COMM_WORLD
-      // is a parent sub-universe, i.e., something to spawn from
-      int mpi_error_code = MPI_Comm_create(_process_group_parent->_comm, _group, &_comm);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
-    }
-
     /* *******************
      * getters & setters *
      *********************/
+    /**
+    * \brief getter for the MPI group
+    *
+    * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
+    * cannot change the object.
+    */
+    inline const MPI_Group& group() const
+    {
+      return _group;
+    }
+
+    /**
+    * \brief getter for the MPI communicator
+    *
+    * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
+    * cannot change the object.
+    */
+    inline const MPI_Comm& comm() const
+    {
+      return _comm;
+    }
+
     /**
     * \brief getter for the number of processes
     */
@@ -156,7 +162,7 @@ class ProcessGroup
     }
 
     /**
-    * \brief getter for the number of processes
+    * \brief getter for the pointer to the parent process group
     */
     inline ProcessGroup* process_group_parent() const
     {
@@ -203,26 +209,12 @@ class WorkGroup
 {
   private:
 //    /**
-//    * \brief array of ranks with respect to the process group
-//    *
-//    * Work groups are always a subgroup of a process group. The ranks of work group's processes with respect to this
-//    * process group are stored in this array.
-//    */
-//    int* _ranks_process_group;
-
-//    /**
 //    * \brief array of workers in the work group
 //    *
 //    * Here, RemoteWorker objects are used (instead of Worker objects) since they exist on remote processes.
 //    * (Note, that WorkGroup objects are only instantiated on load balancer processes.)
 //    */
 //    RemoteWorker* _workers;
-
-// BRAL: Instead of the array of RemoteWorker objects one could also simply store the ranks of the participating
-// processes (with respect to the process group ranks). Not sure yet which is more appropriate.
-// @Hilmar: Let's stick with these wrapper objects for now, who knows what else they need to store
-// @Dom: To keep things simple, we should only use int arrays at the beginning. Not too many confusing classes...
-// int* _ranks_local;
 
   /* ****************
    * public members *
@@ -231,15 +223,18 @@ class WorkGroup
     /* **************
      * constructors *
      ****************/
-// BRAL: temporarily deactivated
-//    /**
-//    * \brief constructor requiring one parameter
-//    */
-//    WorkGroup(const int work_group_id, const int num_workers)
-//      : _work_group_id(work_group_id),
-//        _num_workers(num_workers)
-//    {
-//    }
+    /**
+    * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
+    */
+    WorkGroup(
+      const int num_processes,
+      int ranks_group_parent[],
+      ProcessGroup* process_group_parent,
+      const int group_id)
+      : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id)
+    {
+
+    }
 };
 
 #endif // guard KERNEL_PROCESS_GROUP_HPP

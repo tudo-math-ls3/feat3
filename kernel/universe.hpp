@@ -79,7 +79,7 @@ class Universe
     const int _num_process_groups;
 
     /**
-    * \brief array of number of processes in each process groups (including eventual dedicated load balancer process)
+    * \brief array of number of processes in each process group (including eventual dedicated load balancer process)
     *
     * This array must be provided when more than one process group is used.
     * <em>Dimension:</em> [#_num_process_groups]
@@ -100,23 +100,24 @@ class Universe
     int _num_processes_needed;
 
     /**
-    * \brief array of MPI_COMM_WORLD ranks in top-level process group that each process unambigously belongs to
+    * \brief 2-dim. array of MPI_COMM_WORLD ranks in top-level process group that each process unambigously belongs to
     *
-    * <em>Dimension:</em> [#_num_process_groups][#_num_processes_in_group[group_id]+1]
+    * <em>Dimension:</em> [#_num_process_groups][#_num_processes_in_group[group_id]]
     */
     int** _group_ranks_world;
 
     /**
     * \brief master process responsible for screen output and initial file IO
     *
-    * Will be nullptr if not living on this process.
+    * Will be nullptr if not living on this process. The MPI_COMM_WORLD rank of the master process is the
+    * last available one, i.e. _num_processes-1.
     */
     Master* _master;
 
     /**
     * \brief load balancer process
     *
-    * Will be nullptr if not living on this process which implicitly includes top-level group membership
+    * Will be nullptr if not living on this process
     */
     LoadBalancer* _load_balancer;
 
@@ -304,7 +305,6 @@ class Universe
           if (_my_rank == _group_ranks_world[igroup][j])
           {
             my_group = igroup;
-            // std::cout << _my_rank << " belongs to group " << igroup << std::endl;
           }
         }
       }
@@ -312,12 +312,11 @@ class Universe
       assert(iter_MPC_rank == _num_processes-2);
 
       // set MPI_COMM_WORLD rank of the master process
-      // TODO include in doxygen: Master is the very last available process
       int rank_master = _num_processes-1;
 
-      // create MPI groups and MPI communicators (exclude the master because it is only a member of COMM_WORLD and not
-      // of any group we set up, so a special group is needed since otherwise the forking call below
-      // will deadlock)
+      // create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
+      // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
+      // of any group we set up.
       if (_my_rank != rank_master)
       {
         _process_group = new ProcessGroup(_num_processes_in_group[my_group], _group_ranks_world[my_group], _world_group,
@@ -325,16 +324,11 @@ class Universe
       }
       else
       {
-        // call special constructor for the master process which is not part of any process group but also has to call
-        // the MPI_Comm_create routine
-        _process_group = new ProcessGroup(_world_group);
-      }
-
-      // delete the process_group object on the master process again
-      if (_my_rank == rank_master)
-      {
-        delete _process_group;
-        _process_group = nullptr;
+        // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
+        // will deadlock), so let the master call it with special MPI_GROUP_EMPTY and dummy communicator.
+        MPI_Comm dummy_comm;
+        int mpi_error_code = MPI_Comm_create(_world_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
       }
 
       // all ok, now decide if this process is a regular one or the group's load-balancer or even the master
@@ -353,13 +347,9 @@ class Universe
       }
       else
       {
-        // Inquire whether this process is a dedicated load balancer process. This is the case when the process group
-        // includes a dedicated load bal. and when this process is the last in the process group.
-        bool dedicated_load_bal_process(_includes_dedicated_load_bal[my_group] &&
-           _my_rank == _group_ranks_world[my_group][_num_processes_in_group[my_group]-1]);
         // create load balancer object in each process of the process group
         _load_balancer = new LoadBalancer(_world_group->my_rank(), rank_master, _process_group,
-                                          dedicated_load_bal_process);
+                                          _includes_dedicated_load_bal[my_group]);
       }
     } // _init()
 

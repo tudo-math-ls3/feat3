@@ -24,18 +24,17 @@ int main(int argc, char* argv[])
   // number of process groups (if not provided, then 1)
   int num_process_groups(2);
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
-  int num_processes_in_group[] = {2, 3};
+  int num_processes_in_group[] = {4, 2};
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
-  bool includes_dedicated_load_bal[] = {false, true};
-
+  bool includes_dedicated_load_bal[] = {true, false};
 
   // create universe with several process groups
   Universe* universe = Universe::create(argc, argv, num_process_groups, num_processes_in_group,
                                         includes_dedicated_load_bal);
 
-  // Get process objects. Note that on each process only one of the following three exists (the other two are
-  // null pointers.).
+  // Get process objects. Note that on each process only one of the following two exists (the other one is the
+  // null pointer).
   LoadBalancer* load_balancer = universe->load_balancer();
   Master* master = universe->master();
 
@@ -46,7 +45,7 @@ int main(int argc, char* argv[])
     int group_id = process_group->group_id();
     int rank_process_group = process_group->my_rank();
     std::string s("Process " + StringUtils::stringify(rank_world) + " is the ");
-    if (load_balancer->dedicated_load_bal_process())
+    if (load_balancer->is_dedicated_load_bal())
     {
       s += "DEDICATED ";
     }
@@ -58,8 +57,7 @@ int main(int argc, char* argv[])
     if (group_id == 0)
     {
       load_balancer->read_mesh();
-// BRAL: temporarily deactivated
-//      load_balancer->create_work_groups();
+      load_balancer->create_work_groups();
     }
     else
     {

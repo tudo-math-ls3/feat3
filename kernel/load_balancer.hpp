@@ -6,7 +6,6 @@
 #include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
-#include <vector>
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -14,8 +13,6 @@
 #include <kernel/process_group.hpp>
 
 /*
- * Note that only the load bal. processes are directly available to the user! All other processes are in an infinite
- * loop waiting for messages.
  * The user knows what his load balancers should do. He calls, e.g.,
  * if (load_bal.group_id == 0)
  * {
@@ -30,17 +27,18 @@
  * The load bal. with id 0 in the example above then
  *   - reads in the mesh
  *   - builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
- *     coarse mesh problem)
- *   - tells each member of the work groups to create a Worker object
- *   - lets the workers of one work group build their own communicator
- *     (the worker with rank 0 in this communicator is automatically the coordinator who communicates with the master)
- *   - creates corresponding RemoteWorker objects (as members of the WorkGroup objects) representing the remote Worker
+ *     coarse mesh problem) and creates corresponding MPI communicators ((the worker with rank 0 in this communicator
+ *     is automatically the coordinator who communicates with the master)
+ *   - tells each member of the work groups to create a Worker object (representing the Worker on this process itself)
+*      and corresponding RemoteWorker objects (as members of the WorkGroup objects) representing the remote Worker
  *     objects
  *   - tells each Worker which (Remote)Worker objects he has to communicate with *in other workgroups* via the
- *     communicator the load balancer shares. E.g., the fine mesh workers have to send the restricted defect vector to
- *     a certain coarse mesh worker, while the coarse mesh worker has to send the coarse mesh correction to one or more
- *     fine mesh workers. Two such communicating workers in different work groups live either on the same process
- *     (internal communication = copy) or on different processes (external communication = MPI send/recv)!
+ *     communicator they all share within the parent process group. E.g., the fine mesh workers have to send the
+ *     restricted defect vector to a certain coarse mesh worker, while the coarse mesh worker has to send the coarse
+ *     mesh correction to one or more fine mesh workers. Two such communicating workers in different work groups live
+ *     either on the same process (internal communication = copy) or on different processes (external communication
+ *     = MPI send/recv)!
+ *
  *     Example:
  *
  *     distribution of submeshes to workers A-G on different levels:
@@ -110,22 +108,43 @@ class LoadBalancer
      * member variables *
      ********************/
     /**
-    * \brief process group the load balancer manages
+    * \brief pointer to the process group the load balancer manages
     */
     ProcessGroup* _process_group;
 
     /**
-    * \brief vector of work groups the load balancer manages
+    * \brief flag whether the load balancer's process group uses a dedicated load balancer process
     */
-    std::vector<WorkGroup> _work_groups;
+    bool _group_uses_dedicated_load_bal;
 
     /**
-    * \brief flag whether this process is a dedicated load balancer process
-    *
-    *
+    * \brief flag whether this process is the dedicated load balancer process (if there is one)
     */
-    bool _dedicated_load_bal_process;
+    bool _is_dedicated_load_bal;
 
+    /**
+    * \brief vector of work groups the load balancer manages
+    */
+    std::vector<WorkGroup*> _work_groups;
+
+    /**
+    * \brief number of work groups
+    */
+    int _num_work_groups;
+
+    /**
+    * \brief array of number of workers in each work group
+    *
+    * <em>Dimension:</em> [#_num_work_groups]
+    */
+    int* _num_workers_in_group;
+
+    /**
+    * \brief 2-dim. array for storing the process group ranks building the work groups
+    *
+    * <em>Dimension:</em> [#_num_work_groups][#_num_workers_in_group[group_id]]
+    */
+    int** _work_group_ranks;
   /* ****************
    * public members *
    ******************/
@@ -140,12 +159,15 @@ class LoadBalancer
       const int rank_world,
       const int rank_master,
       ProcessGroup* process_group,
-      bool dedicated_load_bal_process)
+      bool group_uses_dedicated_load_bal)
       : Process(rank_world, rank_master),
         _process_group(process_group),
-        _dedicated_load_bal_process(dedicated_load_bal_process)
+        _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal)
     {
-//      std::cout << "Loadbalancer = user entry point tut jetzt mal so als ob er was machen wuerde." << std::endl;
+        // Inquire whether this process is a dedicated load balancer process. This is the case when the process group
+        // uses a dedicated load bal. and when this process is the last in the process group.
+        _is_dedicated_load_bal = _group_uses_dedicated_load_bal &&
+                                 _process_group->my_rank() == _process_group->num_processes()-1;
     }
 
     /* *******************
@@ -160,11 +182,11 @@ class LoadBalancer
     }
 
     /**
-    * \brief getter for the flag whether this a dedicated load balancer process
+    * \brief getter for the flag whether this process is a dedicated load balancer process
     */
-    inline bool dedicated_load_bal_process() const
+    inline bool is_dedicated_load_bal() const
     {
-      return _dedicated_load_bal_process;
+      return _is_dedicated_load_bal;
     }
 
     /* ******************
@@ -188,61 +210,89 @@ class LoadBalancer
     */
     void create_work_groups()
     {
+      // shortcut to the number processes in the load balancer's process group
       int num_processes = _process_group->num_processes();
-      // set number of work groups manually to 2
-      int num_work_groups = 2;
-      // set number of workers manually to 2 and _num_processes - 3
-      int num_workers_in_group[] = {2, num_processes - 3};
+      // shortcut to the process group rank of this process
+      int my_rank = _process_group->my_rank();
+
+      // number of work groups, manually set to 2
+      _num_work_groups = 2;
+      // array of numbers of workers per work group
+      _num_workers_in_group = new int[2];
+      // set number of workers manually to 2 and remaining processes, resp.
+      _num_workers_in_group[0] = 2;
+      _num_workers_in_group[1] = num_processes - _num_workers_in_group[0];
+      // if a dedicated load balancer process is used, decrease the number of workers in the second work group by 1
+      if (_group_uses_dedicated_load_bal)
+      {
+        --_num_workers_in_group[1];
+      }
+      // assert that the number of processes in the second group is positive, i.e. that enough processes are available
+      assert(_num_workers_in_group[1] > 0);
 
       // Partition the ranks of the process group communicator into groups, by simply enumerating the process
-      // group ranks and assigning them consecutively to the requested number of processes. Note that the load
-      // balancer is the last rank in the process group, i.e. _num_processes - 1.
+      // group ranks and assigning them consecutively to the requested number of processes. Note that the dedicated
+      // load balancer, if required, is the last rank in the process group, i.e. _num_processes - 1.
 
-      // 2-dim. array for storing the process group ranks building the work groups
-      int** work_group_ranks;
-      work_group_ranks = new int*[num_work_groups];
-      // array for storing the work group id of each group process
-      int work_group_id[num_processes - 1];
+      _work_group_ranks = new int*[_num_work_groups];
+      // group id of this process
+      int my_group(-1);
       // iterator for process group ranks, used to split them among the groups
       int iter_group_rank(-1);
-      for(int igroup(0) ; igroup < num_work_groups ; ++igroup)
+      // now partition the ranks
+      for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
       {
-        work_group_ranks[igroup] = new int[num_workers_in_group[igroup]];
-        for(int j(0) ; j < num_workers_in_group[igroup] ; ++j)
+        _work_group_ranks[igroup] = new int[_num_workers_in_group[igroup]];
+        for(int j(0) ; j < _num_workers_in_group[igroup] ; ++j)
         {
           // increase group rank
           ++iter_group_rank;
           // set group rank
-          work_group_ranks[igroup][j] = iter_group_rank;
-          // set group id for the current group rank
-          work_group_id[iter_group_rank] = igroup;
+          _work_group_ranks[igroup][j] = iter_group_rank;
+          // inquire whether this process belongs to the current group
+          if (my_rank == _work_group_ranks[igroup][j])
+          {
+            my_group = igroup;
+          }
         }
       }
-      // final sanity check (rank assigned last (=sum of workers - 1) must be smaller than group rank of the load bal.
-      assert(iter_group_rank < num_processes - 1);
+      // sanity check for the rank assigned last
+      if (_group_uses_dedicated_load_bal)
+      {
+        // the dedicated load balancer has the last rank num_processes - 1
+        assert(iter_group_rank == num_processes - 2);
+      }
+      else
+      {
+        assert(iter_group_rank == num_processes - 1);
+      }
 
-      // - send work group id to each group process
-      // - tell each group process to call
-      //
-//        mpi_error_code = MPI_Group_incl(_mpi_group, num_workers_in_group[igroup],
-//                                        work_group_ranks[my_group], &process_group);
-//        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
-//
-      //   while the load balancer sets
-//
-//        // this is a special valid handle for an empty group that can be passed to operations like
-//        // MPI_Comm_create that expect *all* processes in the parent communicator to participate.
-//        process_group = MPI_GROUP_EMPTY;
-//
-      // - then tell each group process to call
-
-//      mpi_error_code = MPI_Comm_create(MPI_COMM_WORLD, process_group, &group_comm);
-//      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
-
-      // create work group for coarse grid problems with id 0
-//      _work_groups[0] = new WorkGroup(0, 2);
-      // create work group for fine grid problems with id 1
-//      _work_groups[1] = new WorkGroup(1, );
+      // create WorkGroup objects including MPI groups and MPI communicators
+      // (Exclude the dedicated load balancer process if there is one because it is only a member of the process group
+      // but not of any work group we set up. So a special group is needed since otherwise the forking call below will
+      // deadlock)
+      // It is not possible to set up all WorkGroups in one call, since the processes building the WorkGroups might
+      // not be disjunct (see case a and case b in the example above). Hence, there as many calls as there are
+      // WorkGroups. All processes not belonging to the WorkGroup currently created call the MPI_Comm_create() function
+      // with a dummy communicator.
+      _work_groups.resize(_num_work_groups, nullptr);
+      for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+      {
+        if (my_group == igroup)
+        {
+          _work_groups[igroup] = new WorkGroup(_num_workers_in_group[my_group], _work_group_ranks[my_group],
+                                               _process_group, my_group);
+        }
+        else
+        {
+          // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
+          // will deadlock), so let all processes that are not part of the current work group call it with special
+          // MPI_GROUP_EMPTY and dummy communicator.
+          MPI_Comm dummy_comm;
+          int mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+        }
+      }
     }
 };
 
