@@ -6,6 +6,7 @@
 #include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -97,7 +98,6 @@
 * @author Dominik Goeddeke
 */
 class LoadBalancer
-  : public Process
 {
   /* *****************
    * private members *
@@ -156,18 +156,15 @@ class LoadBalancer
     * \brief constructor requiring six parameters
     */
     LoadBalancer(
-      const int rank_world,
-      const int rank_master,
       ProcessGroup* process_group,
       bool group_uses_dedicated_load_bal)
-      : Process(rank_world, rank_master),
-        _process_group(process_group),
-        _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal)
+       : _process_group(process_group),
+         _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal)
     {
         // Inquire whether this process is a dedicated load balancer process. This is the case when the process group
         // uses a dedicated load bal. and when this process is the last in the process group.
         _is_dedicated_load_bal = _group_uses_dedicated_load_bal &&
-                                 _process_group->my_rank() == _process_group->num_processes()-1;
+                                 _process_group->rank() == _process_group->num_processes()-1;
     }
 
     /* *******************
@@ -213,7 +210,7 @@ class LoadBalancer
       // shortcut to the number processes in the load balancer's process group
       int num_processes = _process_group->num_processes();
       // shortcut to the process group rank of this process
-      int my_rank = _process_group->my_rank();
+      int my_rank = _process_group->rank();
 
       // number of work groups, manually set to 2
       _num_work_groups = 2;
@@ -270,9 +267,9 @@ class LoadBalancer
       // create WorkGroup objects including MPI groups and MPI communicators
       // (Exclude the dedicated load balancer process if there is one because it is only a member of the process group
       // but not of any work group we set up. So a special group is needed since otherwise the forking call below will
-      // deadlock)
+      // deadlock.)
       // It is not possible to set up all WorkGroups in one call, since the processes building the WorkGroups might
-      // not be disjunct (see case a and case b in the example above). Hence, there as many calls as there are
+      // not be disjunct (see case a and case b in the example above). Hence, there are as many calls as there are
       // WorkGroups. All processes not belonging to the WorkGroup currently created call the MPI_Comm_create() function
       // with a dummy communicator.
       _work_groups.resize(_num_work_groups, nullptr);

@@ -5,6 +5,7 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/process.hpp>
 #include <kernel/universe.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
@@ -17,7 +18,6 @@ int main(int argc, char* argv[])
 
   // create universe with one process group
 //  Universe* universe = Universe::create(argc, argv);
-//  Universe::destroy();
 
   // the following information will be read from some dat file
 
@@ -38,12 +38,13 @@ int main(int argc, char* argv[])
   LoadBalancer* load_balancer = universe->load_balancer();
   Master* master = universe->master();
 
+  int rank_world = Process::rank;
+
   if (load_balancer != nullptr)
   {
     ProcessGroup* process_group = load_balancer->process_group();
-    int rank_world = load_balancer->rank_world();
     int group_id = process_group->group_id();
-    int rank_process_group = process_group->my_rank();
+    int rank_process_group = process_group->rank();
     std::string s("Process " + StringUtils::stringify(rank_world) + " is the ");
     if (load_balancer->is_dedicated_load_bal())
     {
@@ -67,15 +68,11 @@ int main(int argc, char* argv[])
   else if (master != nullptr)
   {
     // not sure yet if it makes sense to let the user control the master process
-    int rank_world = master->rank_world();
     std::cout << "Process " << rank_world << " is the MASTER OF THE UNIVERSE!" << std::endl;
   }
   else
   {
-    // rank of this process
-    int my_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-    MPIUtils::abort("Process with rank " + StringUtils::stringify(my_rank)
+    MPIUtils::abort("Process with rank " + StringUtils::stringify(rank_world)
                     + " has no particular role, this should not happen.");
   }
 

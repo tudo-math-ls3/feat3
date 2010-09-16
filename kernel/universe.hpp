@@ -13,6 +13,7 @@
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
+#include <kernel/master.hpp>
 #include <kernel/load_balancer.hpp>
 
 // TODO: All classes in this file/compilation unit should be namespace Feast.
@@ -69,11 +70,6 @@ class Universe
     ProcessGroup* _process_group;
 
     /**
-    * \brief MPI_COMM_WORLD rank of this process
-    */
-    int _my_rank;
-
-    /**
     * \brief number of process groups requested by the user via some top-level configuration file
     */
     const int _num_process_groups;
@@ -84,7 +80,7 @@ class Universe
     * This array must be provided when more than one process group is used.
     * <em>Dimension:</em> [#_num_process_groups]
     */
-    const int* _num_processes_in_group;
+    int const * _num_processes_in_group;
 
     /**
     * \brief array of flags whether a dedicated load balancer process is needed in process group
@@ -92,7 +88,7 @@ class Universe
     * This array must be provided when more than one process group is used.
     * <em>Dimension:</em> [#_num_process_groups]
     */
-    const bool* _includes_dedicated_load_bal;
+    bool const * _includes_dedicated_load_bal;
 
     /**
     * \brief number of processes actually needed by the user, based on some top-level configuration file
@@ -104,7 +100,7 @@ class Universe
     *
     * <em>Dimension:</em> [#_num_process_groups][#_num_processes_in_group[group_id]]
     */
-    int** _group_ranks_world;
+    int ** _group_ranks_world;
 
     /**
     * \brief master process responsible for screen output and initial file IO
@@ -142,18 +138,16 @@ class Universe
     */
     Universe(
       const int num_processes,
-      const int my_rank,
       const int num_process_groups,
       const int num_processes_in_group[],
       const bool includes_dedicated_load_bal[])
       : _num_processes(num_processes),
-        _my_rank(my_rank),
         _num_process_groups(num_process_groups),
         _num_processes_in_group(num_processes_in_group),
         _includes_dedicated_load_bal(includes_dedicated_load_bal)
     {
       _init();
-      std::cout << "Process " << _my_rank << " created its part of the Universe!" << std::endl;
+      std::cout << "Process " << Process::rank << " created its part of the Universe!" << std::endl;
     }
 
 
@@ -169,7 +163,7 @@ class Universe
     {
       // clean up dynamically allocated memory
       _cleanup();
-      std::cout << "Process " << _my_rank << " now destroys its part of the Universe!" << std::endl;
+      std::cout << "Process " << Process::rank << " now destroys its part of the Universe!" << std::endl;
     }
 
     /* *********************************
@@ -189,7 +183,7 @@ class Universe
      * member functions *
      ********************/
     /**
-    * \brief initialises MPI, returns the total number of processes and the rank of this processor
+    * \brief initialises MPI, returns the total number of processes
     *
     * \param[in] argc
     * argument count passed to the main() method
@@ -199,15 +193,11 @@ class Universe
     *
     * \param[out] num_processes
     * number p of available MPI processes as specified via 'mpirun -np p ...'
-    *
-    * \param[out] my_rank
-    * MPI_COMM_WORLD rank of this MPI process
     */
     static void _init_mpi(
       int& argc,
       char* argv[],
-      int& num_processes,
-      int& my_rank)
+      int& num_processes)
     {
       // init MPI
       int mpi_error_code = MPI_Init(&argc, &argv);
@@ -216,10 +206,6 @@ class Universe
       // get total number of processes
       mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
-
-      // rank of this process
-      mpi_error_code = MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_rank");
     }
 
 
@@ -245,6 +231,19 @@ class Universe
     */
     void _init()
     {
+      // get MPI_COMM_WORLD rank of this process
+      int my_rank;
+      int mpi_error_code = MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_rank");
+
+      // set MPI_COMM_WORLD rank of the master process
+      int rank_master = _num_processes-1;
+
+      // set static Process class variables for this MPI_COMM_WORLD process
+      Process::rank = my_rank;
+      Process::rank_master = rank_master;
+      Process::is_master = (Process::rank == Process::rank_master);
+
       // calculate the number of processes needed; and check whether there are enough MPI processes available:
 
       // (1) the master needs one process
@@ -272,7 +271,7 @@ class Universe
       else
       {
         // all ok, let only one process comment on this
-        if (_my_rank == 0)
+        if (Process::is_master)
         {
           std::cout << _num_processes << " processes available and " << _num_processes_needed
                     << " needed." << std::endl;
@@ -302,7 +301,7 @@ class Universe
           ++iter_MPC_rank;
           _group_ranks_world[igroup][j] = iter_MPC_rank;
           // inquire whether this process belongs to the current group
-          if (_my_rank == _group_ranks_world[igroup][j])
+          if (Process::rank == _group_ranks_world[igroup][j])
           {
             my_group = igroup;
           }
@@ -311,16 +310,13 @@ class Universe
       // final sanity check (rank assigned last must be master rank minus 1)
       assert(iter_MPC_rank == _num_processes-2);
 
-      // set MPI_COMM_WORLD rank of the master process
-      int rank_master = _num_processes-1;
-
       // create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
       // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
       // of any group we set up.
-      if (_my_rank != rank_master)
+      if (!Process::is_master)
       {
-        _process_group = new ProcessGroup(_num_processes_in_group[my_group], _group_ranks_world[my_group], _world_group,
-                                          my_group);
+        _process_group = new ProcessGroup(_num_processes_in_group[my_group], _group_ranks_world[my_group],
+                                          _world_group, my_group);
       }
       else
       {
@@ -337,10 +333,10 @@ class Universe
       _load_balancer = nullptr;
       _master = nullptr;
 
-      if (_my_rank == rank_master)
+      if (Process::is_master)
       {
         // for the last rank (_num_processes-1) create master process object (responsible for screen output)
-        _master = new Master(_my_rank);
+        _master = new Master();
 
         // start some infinite loop in the Master object, which waits for messages
         _master->wait();
@@ -348,10 +344,10 @@ class Universe
       else
       {
         // create load balancer object in each process of the process group
-        _load_balancer = new LoadBalancer(_world_group->my_rank(), rank_master, _process_group,
-                                          _includes_dedicated_load_bal[my_group]);
+        _load_balancer = new LoadBalancer(_process_group, _includes_dedicated_load_bal[my_group]);
       }
     } // _init()
+
 
     /**
     * \brief cleanup counterpart for _init().
@@ -366,14 +362,14 @@ class Universe
         delete [] _group_ranks_world[igroup];
       }
       delete [] _group_ranks_world;
-      if (_my_rank != _num_processes-1)
+      if (Process::is_master)
       {
-        delete _process_group;
-        delete _load_balancer;
+        delete _master;
       }
       else
       {
-        delete _master;
+        delete _process_group;
+        delete _load_balancer;
       }
     }
 
@@ -406,9 +402,7 @@ class Universe
       if (_universe == nullptr)
       {
         int num_processes;
-        int my_rank;
-        // init MPI and get number of available processes and the rank of this processor
-        _init_mpi(argc, argv, num_processes, my_rank);
+        _init_mpi(argc, argv, num_processes);
 
         // Assume that one process group is needed using all available processes (minus one master process).
         // The dedicated load balancer process is included in this number.
@@ -417,7 +411,7 @@ class Universe
         bool includes_dedicated_load_bal[1] = {true};
 
         // create the one and only instance of the Universe class
-        _universe = new Universe(num_processes, my_rank, num_process_groups, num_processes_in_group,
+        _universe = new Universe(num_processes, num_process_groups, num_processes_in_group,
                                  includes_dedicated_load_bal);
         return _universe;
       }
@@ -462,11 +456,10 @@ class Universe
       if (_universe == nullptr)
       {
         int num_processes;
-        int my_rank;
         // init MPI and get number of available processes and the rank of this processor
-        _init_mpi(argc, argv, num_processes, my_rank);
+        _init_mpi(argc, argv, num_processes);
         // create the one and only instance of the Universe class
-        _universe = new Universe(num_processes, my_rank, num_process_groups, num_processes_in_group,
+        _universe = new Universe(num_processes, num_process_groups, num_processes_in_group,
                                  includes_dedicated_load_bal);
         return _universe;
       }
@@ -521,7 +514,6 @@ class Universe
     {
       return _master;
     }
-
 };
 // initialise static member
 Universe* Universe::_universe = nullptr;

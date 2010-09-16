@@ -6,10 +6,12 @@
 #include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
 
 // includes, Feast
 #include <kernel/base_header.hpp>
-
+#include <kernel/process.hpp>
+#include <kernel/worker.hpp>
 
 /**
 * \brief group of processes sharing an MPI communicator
@@ -17,9 +19,9 @@
 class ProcessGroup
 {
   /* *****************
-   * private members *
+   * protected members *
    *******************/
-  private:
+  protected:
     /* ******************
      * member variables *
      ********************/
@@ -37,6 +39,11 @@ class ProcessGroup
     * \brief number of processes in this group
     */
     int _num_processes;
+
+    /**
+    * \brief rank of this process with respect to the ProcessGroup's communicator
+    */
+    int _rank;
 
     /**
     * \brief array of ranks the processes of this group have in the parent group
@@ -65,11 +72,6 @@ class ProcessGroup
     */
     const int _group_id;
 
-    /**
-    * \brief rank of this process within this process group
-    */
-    int _my_rank;
-
   /* ****************
    * public members *
    ******************/
@@ -83,8 +85,8 @@ class ProcessGroup
     * This constructor is intended for creating a process group object containing all COMM_WORLD processes.
     */
     ProcessGroup(
-      const MPI_Comm comm,
-      const int num_processes)
+      MPI_Comm comm,
+      int num_processes)
       : _comm(comm),
         _num_processes(num_processes),
         _ranks_group_parent(nullptr),
@@ -95,16 +97,19 @@ class ProcessGroup
       int mpi_error_code = MPI_Comm_group(_comm, &_group);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_group");
 
-      // and finally look up the local rank of this process within the group
-      mpi_error_code = MPI_Group_rank(_group, &_my_rank);
+      // and finally look up the local rank of this process w.r.t. the group's communicator
+      mpi_error_code = MPI_Group_rank(_group, &_rank);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
+
+      // since this is the world group of processes, the local and the global rank should be equal
+      assert(Process::rank == _rank);
     }
 
     /**
     * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
     */
     ProcessGroup(
-      const int num_processes,
+      int num_processes,
       int ranks_group_parent[],
       ProcessGroup* process_group_parent,
       const int group_id)
@@ -114,7 +119,7 @@ class ProcessGroup
         _group_id(group_id)
     {
       int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
-                                      _ranks_group_parent, &_group);
+                                          _ranks_group_parent, &_group);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
 
       // Create the group communicator for, among others, collective operations.
@@ -123,8 +128,8 @@ class ProcessGroup
       mpi_error_code = MPI_Comm_create(_process_group_parent->_comm, _group, &_comm);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
 
-      // and finally look up the local rank of this process within the group
-      mpi_error_code = MPI_Group_rank(_group, &_my_rank);
+      // and finally look up the local rank of this process w.r.t. the group's communicator
+      mpi_error_code = MPI_Group_rank(_group, &_rank);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
     }
 
@@ -180,25 +185,26 @@ class ProcessGroup
     /**
     * \brief getter for the rank in the group communicator this process belongs to
     */
-    inline int my_rank() const
+    inline int rank() const
     {
-      return _my_rank;
+      return _rank;
     }
 }; // class ProcessGroup
 
 
 /**
-* \brief Class describing a work group, i.e. a set of worker processes sharing the same MPI communicator.
+* \brief class describing a work group, i.e. a set of worker processes sharing the same MPI communicator and performing
+*        the same task
 *
-* Only the load balancer creates objects of this class to maintain its work groups. Example:
-* The process group of the load balancer consists of 6 processes. The load balancer reads the mesh and the solver
-* configuration and decides that the coarse grid problem is to be treated by two processes (local ranks 0 and 1) and
-* the fine grid problems by all six processes. Then it creates two work groups: one consisting of the two processes
-* with local ranks 0 and 1, and one consisting of all six processes. The load balancer tells the waiting GroupProcess
-* objects to create Worker objects. These worker objects then create their own communicator and store it. (The load
-* balancer will only communicate to these processes via the ProcessGroup communicator, *not* via the WorkGroup
-* communicator since it is simply not part of this communicator. So, the WorkGroup class doesn't define this
-* work group communicator, only the worker processes do this!
+* A WorkGroup object managing n processes typically consists of one Worker object (living on this process) and n-1
+* RemoteProcess objects. WorkGroup objects are created by the load balancer. Example:
+* The process group of a load balancer consists of 6 processes. One process (either that with local rank 0 or the
+* dedicated one) reads the mesh and the solver configuration and decides that the coarse grid problem is to be
+* treated by 2 processes (local ranks 0 and 1) and the fine grid problems by all 6 processes. Then 2 work
+* groups are created: one consisting of the 2 processes with local ranks 0 and 1, and one consisting of all 6
+* processes, each of the work groups having its own MPI communicator. In building the work groups, also the
+* corresponding (Remote)Worker objects are created. Communication between different work groups or with the dedicated
+* load balancer process is done via the enclosing ProcessGroup communicator.
 *
 * @author Hilmar Wobker
 * @author Dominik Goeddeke
@@ -208,13 +214,17 @@ class WorkGroup
   : public ProcessGroup
 {
   private:
-//    /**
-//    * \brief array of workers in the work group
-//    *
-//    * Here, RemoteWorker objects are used (instead of Worker objects) since they exist on remote processes.
-//    * (Note, that WorkGroup objects are only instantiated on load balancer processes.)
-//    */
-//    RemoteWorker* _workers;
+    /**
+    * \brief worker object living on this process
+    */
+    Worker* _worker;
+
+    /**
+    * \brief vector of remote workers in the work group
+    *
+    * Here, RemoteWorker objects are used (instead of Worker objects) since they exist on remote processes.
+    */
+    std::vector<RemoteWorker*> _remote_workers;
 
   /* ****************
    * public members *
@@ -233,7 +243,7 @@ class WorkGroup
       const int group_id)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id)
     {
-
+      _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
     }
 };
 
