@@ -156,8 +156,8 @@ public:
   LoadBalancer(
     ProcessGroup* process_group,
     bool group_uses_dedicated_load_bal)
-     : _process_group(process_group),
-       _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal)
+    : _process_group(process_group),
+      _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal)
   {
       // Inquire whether this process is a dedicated load balancer process. This is the case when the process group
       // uses a dedicated load bal. and when this process is the last in the process group.

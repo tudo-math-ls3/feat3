@@ -22,7 +22,13 @@ class Master
 {
 
 private:
-
+  /* *****************
+  * member variables *
+  *******************/
+  /**
+  * \brief constructor
+  */
+  bool _service_finish;
 
 public:
 
@@ -33,6 +39,7 @@ public:
   * \brief constructor
   */
   Master()
+   : _service_finish(false);
   {
   }
 
@@ -48,6 +55,24 @@ public:
     {
       sleep(1.0);
       std::cout << "Master process with world rank " << Process::rank <<" is waiting..." << std::endl;
+    }
+  }
+
+  /**
+  * \brief infinite service loop waiting for messages
+  */
+  void service()
+  {
+    while (true)
+    {
+      mpi_recv(buf, PAR_BUFFERSIZE_BYTES, MPI_PACKED, MPI_ANY_SOURCE, &
+               MPI_ANY_TAG, MPI_COMM_WORLD, statuss)
+
+      // exit the loop if there is some stop signal
+      if (_bmasterFinish)
+      {
+        break;
+      }
     }
   }
 }; // class Master
