@@ -20,37 +20,36 @@
 */
 class Master
 {
+
+private:
+
+
+public:
+
+  /* *************
+  * constructors *
+  ***************/
+  /**
+  * \brief constructor
+  */
+  Master()
+  {
+  }
+
   /* *****************
-   * private members *
-   *******************/
-  private:
-
-  /* ****************
-   * public members *
-   ******************/
-  public:
-    /* **************
-     * constructors *
-     ****************/
-    /**
-    * \brief constructor
-    */
-    Master()
+  * member functions *
+  *******************/
+  /**
+  * \brief dummy wait function
+  */
+  void wait()
+  {
+    for (int i(0) ; i<1 ; ++i)
     {
+      sleep(1.0);
+      std::cout << "Master process with world rank " << Process::rank <<" is waiting..." << std::endl;
     }
-
-    /* ******************
-     * member functions *
-     ********************/
-    // dummy function
-    void wait()
-    {
-      for (int i(0) ; i<1 ; ++i)
-      {
-        sleep(1.0);
-        std::cout << "Master process with world rank " << Process::rank <<" is waiting..." << std::endl;
-      }
-    }
+  }
 }; // class Master
 
 #endif // guard KERNEL_MASTER_HPP

@@ -25,38 +25,40 @@
 */
 class Process
 {
-  /* ***************
-  * public members *
-  *****************/
-  public:
-    /* *****************
-    * member variables *
-    *******************/
-    /**
-    * \brief rank of the process within MPI_COMM_WORLD, set once via constructor and never changed again
-    */
-    static int rank;
 
-    /**
-    * \brief rank of the master process within MPI_COMM_WORLD, set once via constructor and never changed again
-    *
-    * Every process has to know the rank of the master process in order to trigger screen output (although this will
-    * be mainly done by some coordinator processes).
-    */
-    static int rank_master;
+private:
 
-    /**
-    * \brief flag whether this process is the master process
-    */
-    static bool is_master;
 
-    /* *************
-    * constructors *
-    ***************/
-    /**
-    * \brief empty constructor
-    */
-    Process();
+public:
+
+  /* *****************
+  * member variables *
+  *******************/
+  /**
+  * \brief rank of the process within MPI_COMM_WORLD, set once via constructor and never changed again
+  */
+  static int rank;
+
+  /**
+  * \brief rank of the master process within MPI_COMM_WORLD, set once via constructor and never changed again
+  *
+  * Every process has to know the rank of the master process in order to trigger screen output (although this will
+  * be mainly done by some coordinator processes).
+  */
+  static int rank_master;
+
+  /**
+  * \brief flag whether this process is the master process
+  */
+  static bool is_master;
+
+  /* *************
+  * constructors *
+  ***************/
+  /**
+  * \brief empty constructor
+  */
+  Process();
 
 }; // class Process
 
@@ -178,6 +180,5 @@ bool Process::is_master = false;
 //    {
 //    }
 //}; // class RemoteProcess
-
 
 #endif // guard KERNEL_PROCESS_HPP
