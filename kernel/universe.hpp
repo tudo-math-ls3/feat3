@@ -33,8 +33,8 @@ using namespace Feast;
 * Idea: The soon-to-be-implemented global Feast_init() routine encapsulates the entire universe and makes physics-level
 *       subgroups available to the programmer.
 *
-* @author Hilmar Wobker
-* @author Dominik Goeddeke
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
 */
 class Universe
 {
@@ -51,24 +51,16 @@ private:
   */
   static Universe* _universe;
 
-  /**
-  * \brief total number of processes in MPI_COMM_WORLD
-  */
+  /// total number of processes in MPI_COMM_WORLD
   int _num_processes;
 
-  /**
-  * \brief process group consisting of all processes
-  */
+  /// process group consisting of all processes
   ProcessGroup* _world_group;
 
-  /**
-  * \brief process group responsible for one problem
-  */
+  /// process group responsible for one problem
   ProcessGroup* _process_group;
 
-  /**
-  * \brief number of process groups requested by the user via some top-level configuration file
-  */
+  /// number of process groups requested by the user via some top-level configuration file
   const int _num_process_groups;
 
   /**
@@ -87,9 +79,7 @@ private:
   */
   bool const * _includes_dedicated_load_bal;
 
-  /**
-  * \brief number of processes actually needed by the user, based on some top-level configuration file
-  */
+  /// number of processes actually needed by the user, based on some top-level configuration file
   int _num_processes_needed;
 
   /**
@@ -115,9 +105,9 @@ private:
   LoadBalancer* _load_balancer;
 
 
-  /* ************
-  * constructor *
-  **************/
+  /* *************************
+  * constructor & destructor *
+  ***************************/
   /**
   * \brief constructor for creating the one and only instance of the Universe class
   *
@@ -144,13 +134,11 @@ private:
       _includes_dedicated_load_bal(includes_dedicated_load_bal)
   {
     _init();
-    std::cout << "Process " << Process::rank << " created its part of the Universe!" << std::endl;
+//    // debug output
+//    std::cout << "Process " << Process::rank << " created its part of the Universe!" << std::endl;
   }
 
 
-  /* ***********
-  * destructor *
-  *************/
   /**
   * \brief destructor which automatically finalizes the MPI environment
   *
@@ -160,21 +148,16 @@ private:
   {
     // clean up dynamically allocated memory
     _cleanup();
-    std::cout << "Process " << Process::rank << " now destroys its part of the Universe!" << std::endl;
+//    // debug output
+//    std::cout << "Process " << Process::rank << " now destroys its part of the Universe!" << std::endl;
   }
 
-  /* ********************************
-  * copy and assignment constructor *
-  **********************************/
-  /**
-  * \brief copy constructor, intentionally undefined to prevent object instantiation
-  */
+  /// copy constructor, intentionally undefined to prevent object instantiation
   Universe(const Universe &);
 
-  /**
-  * \brief assignment constructor, intentionally undefined to prevent object instantiation
-  */
+  /// assignment constructor, intentionally undefined to prevent object instantiation
   Universe & operator=(const Universe &);
+
 
   /* *****************
   * member functions *
@@ -246,7 +229,7 @@ private:
     // (1) the master needs one process
     _num_processes_needed = 1;
 
-    for (int igroup(0) ; igroup < _num_process_groups ; ++igroup)
+    for(int igroup(0) ; igroup < _num_process_groups ; ++igroup)
     {
       // (2) add number of processes in each of the process groups (eventually including a dedicated load
       // balancer process)
@@ -254,12 +237,12 @@ private:
     }
 
     // now check whether the number of available processes is sufficient
-    if (_num_processes < _num_processes_needed)
+    if(_num_processes < _num_processes_needed)
     {
       MPIUtils::abort("Error! Only " + StringUtils::stringify(_num_processes) + " processes available, but "
         + StringUtils::stringify(_num_processes_needed) + " processes needed!");
     }
-    else if (_num_processes > _num_processes_needed)
+    else if(_num_processes > _num_processes_needed)
     {
       MPIUtils::abort("Error!  " + StringUtils::stringify(_num_processes) + " processes available, and only "
         + StringUtils::stringify(_num_processes_needed) + " processes needed!. Since Feast does not "
@@ -268,7 +251,7 @@ private:
     else
     {
       // all ok, let only one process comment on this
-      if (Process::is_master)
+      if(Process::is_master)
       {
         std::cout << _num_processes << " processes available and " << _num_processes_needed
                   << " needed." << std::endl;
@@ -298,7 +281,7 @@ private:
         ++iter_MPC_rank;
         _group_ranks_world[igroup][j] = iter_MPC_rank;
         // inquire whether this process belongs to the current group
-        if (Process::rank == _group_ranks_world[igroup][j])
+        if(Process::rank == _group_ranks_world[igroup][j])
         {
           my_group = igroup;
         }
@@ -310,7 +293,7 @@ private:
     // create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
     // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
     // of any group we set up.
-    if (!Process::is_master)
+    if(!Process::is_master)
     {
       _process_group = new ProcessGroup(_num_processes_in_group[my_group], _group_ranks_world[my_group],
                                         _world_group, my_group);
@@ -330,13 +313,18 @@ private:
     _load_balancer = nullptr;
     _master = nullptr;
 
-    if (Process::is_master)
+    if(Process::is_master)
     {
       // for the last rank (_num_processes-1) create master process object (responsible for screen output)
       _master = new Master();
 
-      // start some infinite loop in the Master object, which waits for messages
-      _master->wait();
+      std::cout << "Process " << Process::rank << " is the MASTER OF THE UNIVERSE!" << std::endl;
+
+      // start some dummy wait routine on the master
+//      _master->wait();
+
+      // start the infinite service loop on the master, which waits for messages
+      _master->service();
     }
     else
     {
@@ -359,7 +347,7 @@ private:
       delete [] _group_ranks_world[igroup];
     }
     delete [] _group_ranks_world;
-    if (Process::is_master)
+    if(Process::is_master)
     {
       delete _master;
     }
@@ -387,12 +375,14 @@ public:
   *
   * \param[in] argv
   * arguments passed to the main() method
+  *
+  * \return Universe pointer #_universe
   */
   static Universe* create(
     int argc,
     char* argv[])
   {
-    if (_universe == nullptr)
+    if(_universe == nullptr)
     {
       int num_processes;
       _init_mpi(argc, argv, num_processes);
@@ -438,6 +428,8 @@ public:
   * \param[in] includes_dedicated_load_bal
   * array of flags whether a dedicated load balancer process is needed in process group
   * (dimension [#num_process_groups])
+  *
+  * \return Universe pointer #_universe
   */
   static Universe* create(
     int argc,
@@ -446,7 +438,7 @@ public:
     const int num_processes_in_group[],
     const bool includes_dedicated_load_bal[])
   {
-    if (_universe == nullptr)
+    if(_universe == nullptr)
     {
       int num_processes;
       // init MPI and get number of available processes and the rank of this processor
@@ -464,12 +456,10 @@ public:
   }
 
 
-  /**
-  * \brief function for destroying the universe and finalizing MPI at the end of the program
-  */
+  /// function for destroying the universe and finalizing MPI at the end of the program
   static void destroy()
   {
-    if (_universe != nullptr)
+    if(_universe != nullptr)
     {
       // delete the one and only instance of Universe
       delete _universe;
@@ -477,7 +467,7 @@ public:
       // shut down MPI
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);
-      if (mpi_is_initialised)
+      if(mpi_is_initialised)
       {
         MPI_Finalize();
       }
@@ -494,6 +484,8 @@ public:
   ********************/
   /**
   * \brief getter for the load balancer object
+  *
+  * \return pointer to LoadBalancer #_load_balancer
   */
   inline LoadBalancer* load_balancer() const
   {
@@ -502,6 +494,8 @@ public:
 
   /**
   * \brief getter for the master process object
+  *
+  * \return pointer to Master #_master
   */
   inline Master* master() const
   {

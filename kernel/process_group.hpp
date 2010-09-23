@@ -7,14 +7,18 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
+#include <math.h>
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/logger.hpp>
 #include <kernel/process.hpp>
 #include <kernel/worker.hpp>
 
 /**
 * \brief group of processes sharing an MPI communicator
+*
+* \author Hilmar Wobker
 */
 class ProcessGroup
 {
@@ -25,24 +29,16 @@ protected:
   /* *****************
   * member variables *
   *******************/
-  /**
-  * \brief MPI group representing the processes of the group
-  */
+  /// MPI group representing the processes of the group
   MPI_Group _group;
 
-  /**
-  * \brief communicator shared by all processes of the group
-  */
+  /// communicator shared by all processes of the group
   MPI_Comm _comm;
 
-  /**
-  * \brief number of processes in this group
-  */
+  /// number of processes in this group
   int _num_processes;
 
-  /**
-  * \brief rank of this process with respect to the ProcessGroup's communicator
-  */
+  /// rank of this process with respect to the ProcessGroup's communicator
   int _rank;
 
   /**
@@ -56,27 +52,29 @@ protected:
   // universe.hpp.
   int* _ranks_group_parent;
 
-  /**
-  * \brief pointer to the process group from which this process group has been spawned
-  */
+  /// pointer to the process group from which this process group has been spawned
   ProcessGroup* _process_group_parent;
 
-//    /**
-//    * \brief process groups spawned from this process group
-//    */
+//    /// process groups spawned from this process group
 // COMMENT_HILMAR, 15.9.2010: not sure yet if this is needed
 //    ProcessGroup** _process_group_child;
 
-  /**
-  * \brief id of the process group
-  */
-  const int _group_id;
+  /// id of the process group
+  int const _group_id;
+
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//  /// buffer size
+//  static int BUFFERSIZE_BYTES;
+//
+//  /// buffer for MPI communication
+//  char* _buffer;
 
 
 public:
-  /* *************
-  * constructors *
-  ***************/
+
+  /* *************************
+  * constructor & destructor *
+  ***************************/
   /**
   * \brief constructor for the case the MPI_Group and the MPI_Comm already exist
   *
@@ -101,11 +99,13 @@ public:
 
     // since this is the world group of processes, the local and the global rank should be equal
     assert(Process::rank == _rank);
+
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//    // in the world group buffers are not needed
+//    _buffer = nullptr;
   }
 
-  /**
-  * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
-  */
+  /// constructor for the case the MPI_Group and the corresponding communicator have to be created
   ProcessGroup(
     int num_processes,
     int ranks_group_parent[],
@@ -129,8 +129,41 @@ public:
     // and finally look up the local rank of this process w.r.t. the group's communicator
     mpi_error_code = MPI_Group_rank(_group, &_rank);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
+
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//    // allocate communication buffers
+//    int size_of_char;
+//    mpi_error_code = MPI_Pack_size(1, MPI_CHAR, MPI_COMM_WORLD, &size_of_char);
+//    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack_size");
+//
+//    if (size_of_char != 1)
+//    {
+//      // In the unlikely case that a char is not 1 byte, determine the size of the buffer. The -0.001 is a precaution
+//      // for the case the division results in 42.00000000001 instead of 42.0.
+//      int buffer_size = ceil(BUFFERSIZE_BYTES/size_of_char - 0.001);
+// //    std::cout << "buffer size: " << StringUtils::stringify(buffer_size) <<  std::endl;
+//      _buffer = new char[buffer_size];
+//    }
+//    else
+//    {
+//      // otherwise, array size (in bytes) and number of array entries are equal
+//      _buffer = new char[BUFFERSIZE_BYTES];
+//    }
+
   }
 
+  /* ***********
+  * destructor *
+  *************/
+  /// destructor
+  ~ProcessGroup()
+  {
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//    if (_buffer != nullptr)
+//    {
+//      delete [] _buffer;
+//    }
+  }
   /* ******************
   * getters & setters *
   ********************/
@@ -139,6 +172,8 @@ public:
   *
   * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
   * cannot change the object.
+  *
+  * \return reference to MPI_Group #_group
   */
   inline const MPI_Group& group() const
   {
@@ -150,6 +185,8 @@ public:
   *
   * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
   * cannot change the object.
+  *
+  * \return reference to MPI_Comm #_comm
   */
   inline const MPI_Comm& comm() const
   {
@@ -158,6 +195,8 @@ public:
 
   /**
   * \brief getter for the number of processes
+  *
+  * \return number of processes #_num_processes
   */
   inline int num_processes() const
   {
@@ -166,6 +205,8 @@ public:
 
   /**
   * \brief getter for the pointer to the parent process group
+  *
+  * \return parent process group pointer #_process_group_parent
   */
   inline ProcessGroup* process_group_parent() const
   {
@@ -173,7 +214,9 @@ public:
   }
 
   /**
-  * \brief getter for the rank in the group communicator this process belongs to
+  * \brief getter for group ID
+  *
+  * \return group ID #_group_id
   */
   inline int group_id() const
   {
@@ -181,13 +224,117 @@ public:
   }
 
   /**
-  * \brief getter for the rank in the group communicator this process belongs to
+  * \brief getter for the rank w.r.t. the group communicator this process belongs to
+  *
+  * \return rank #_rank w.r.t. process group communicator
   */
   inline int rank() const
   {
     return _rank;
   }
+
+  /* *****************
+  * member functions *
+  *******************/
+  // - function for sending individual messages in a process group
+  // - has to be called by all processes of the process group
+  // - triggers function _receive_array() in the master's service loop
+  // - all processes call MPI_Gather to send the messages to the coordinator process (rank 0 within the process group),
+  //   which collects them in an array
+  // - send output_target SCREEN_FILE (use SCREEN_FILE as default, if no target is provided)
+  // - send message array
+  void log_indiv_master(std::string message, Logger::target target = Logger::SCREEN_FILE)
+  {
+
+    // rank of the coordinator process which gathers the information from the other processes
+    int coord = 0;
+
+    // add 1 to the message length since string::c_str() adds the null termination symbol to the resulting char array
+    int length = message.length() + 1;
+
+    if (_rank != coord)
+    {
+      /* ***************************************
+      * code for all non-coordinator processes *
+      *****************************************/
+
+      // coordinator process gathers the lengths of the messages
+      MPI_Gather(&length, 1, MPI_INT, nullptr, 0, MPI_DATATYPE_NULL, coord, _comm);
+
+      // coordinator process gathers the messages
+      // (Here, it is necessary to cast away the const'ness of string::c_str() since the MPI routine expects a
+      // non-const send buffer.)
+      MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, nullptr, nullptr, nullptr,
+                  MPI_DATATYPE_NULL, coord, _comm);
+// COMMENT_HILMAR: not sure, if it is actually legitimate to simply cast the const away or if one has to manually copy
+// the string like this:
+//    char bla[length];
+//    strcpy(bla, message.c_str());
+//    MPI_Gatherv(bla, length, MPI_CHAR, nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, coord, _comm);
+// With gcc 4.4.0 and intel 11.1 it works for tiny test problems. (If the function call is changed, then also
+// change the call on coordinator side some lines below.)
+    }
+    else
+    {
+      /* ********************************
+      * code on the coordinator process *
+      **********************************/
+
+      // receive buffer for storing the lengths of the messages
+      int msg_lengths[_num_processes];
+      // array for storing the start positions of the single messages in the receive buffer
+      int msg_start_pos[_num_processes];
+
+      // gather the lengths of the messages from the other processes
+      MPI_Gather(&length, 1, MPI_INT, msg_lengths, 1, MPI_INT, coord, _comm);
+
+      // set start positions of the single messages in the receive buffer
+      msg_start_pos[0] = 0;
+      for(int i(1) ; i < _num_processes ; ++i)
+      {
+        msg_start_pos[i] = msg_start_pos[i-1] + msg_lengths[i-1];
+      }
+
+      // determine total length of the messages and allocate receive buffer accordingly
+      int total_length(msg_start_pos[_num_processes-1] + msg_lengths[_num_processes-1]);
+
+      // receive buffer for (consecutively) storing the messages
+      char messages[total_length];
+
+//      // debug output
+//      for(int i(0) ; i < _num_processes ; ++i)
+//      {
+//        std::cout << "local process " << StringUtils::stringify(i) << ": length of string = "
+//                  << StringUtils::stringify(msg_lengths[i]) << std::endl;
+//      }
+//      std::cout << "Total length: " << StringUtils::stringify(total_length) << std::endl;
+
+      // gather the messages from the other processes.
+      MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages, msg_lengths, msg_start_pos,
+                  MPI_CHAR, 0, _comm);
+
+//      // debug output
+//      // output the strings collected from all processes by using corresponding offsets in the
+//      // char array (pointer arithmetic)
+//      for(int i(0) ; i < _num_processes ; ++i)
+//      {
+//        std::cout << "Process " << Process::rank << " writes: "
+//                  << std::string(messages + msg_start_pos[i], msg_lengths[i]) << std::endl;
+//      }
+
+      // now send everything to the master
+      Logger::log_master_array(_num_processes, msg_lengths, total_length, messages, target);
+
+    }
+  } // log_indiv_master
 }; // class ProcessGroup
+
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+// // initialisation of static members
+// COMMENT_HILMAR: Use some arbitrary size for the time being. This has to be parameterised somehow...
+//int ProcessGroup::BUFFERSIZE_BYTES = 4194304;
+
+
 
 
 /**
@@ -204,8 +351,8 @@ public:
 * corresponding (Remote)Worker objects are created. Communication between different work groups or with the dedicated
 * load balancer process is done via the enclosing ProcessGroup communicator.
 *
-* @author Hilmar Wobker
-* @author Dominik Goeddeke
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
 *
 */
 class WorkGroup
@@ -217,9 +364,7 @@ private:
   /* *****************
   * member variables *
   *******************/
-  /**
-  * \brief worker object living on this process
-  */
+  /// worker object living on this process
   Worker* _worker;
 
   /**
@@ -232,20 +377,60 @@ private:
 
 public:
 
-  /* *************
-  * constructors *
-  ***************/
-  /**
-  * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
-  */
+  /* *************************
+  * constructor & destructor *
+  ***************************/
+  /// constructor
   WorkGroup(
     const int num_processes,
     int ranks_group_parent[],
     ProcessGroup* process_group_parent,
     const int group_id)
-    : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id)
+    : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
+      _worker(nullptr),
+      _remote_workers(nullptr)
   {
     _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
+
+
+    /* ******************************
+    * test the logger functionality *
+    ********************************/
+
+    // let the coordinator of the work group (rank = 0) trigger some common messages
+    if(_rank == 0)
+    {
+      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
+                    + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));
+      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
+      Logger::log_master("Hello, master file! " + s, Logger::FILE);
+      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+      Logger::log_master("Hello, default master screen and file! " + s);
+    }
+
+    // write some individual messages to screen and file
+    std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
+                  + " and group rank " + StringUtils::stringify(_rank)
+                  + " in work group " + StringUtils::stringify(_group_id));
+    // vary the lengths of the messages a little bit
+    for(int i(0) ; i < _rank+1 ; ++i)
+    {
+      s += " RANK";
+    }
+    for(int i(0) ; i < _group_id+1 ; ++i)
+    {
+      s += " GROUP";
+    }
+    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
+    log_indiv_master("Hello, master file! " + s, Logger::FILE);
+    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+    log_indiv_master("Hello, master default screen and file! " + s);
+  }
+
+  /// destructor
+  ~WorkGroup()
+  {
+    delete _worker;
   }
 };
 

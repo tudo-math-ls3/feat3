@@ -67,156 +67,150 @@
  */
 class DoxygenExample
 {
-  /* *********************************************************************************************
-   * Eye-catching comments that are *not* to be included by doxygen should be written like this. *
-   * Note the white space in the opening line '/* ***...' !!                                     *
-   ***********************************************************************************************/
+  /* ********************************************************************************************
+  * Eye-catching comments that are *not* to be included by doxygen should be written like this. *
+  * Note the white space in the opening line '/* ***...' !!                                     *
+  **********************************************************************************************/
 
   /* other non-doxygen comments can be written like this */
 
   // or like this
 
   /*
-   * or like this
-   */
+  * or like this
+  */
+
+
+private:
+
+  /* ***********
+  * attributes *
+  *************/
+
+  /// some private attribute
+  int _some_private_attribute;
+
+  /**
+  * \brief specifier for some array size
+  *
+  * I really can't think of a useful detailed description right now.
+  */
+  int _size;
+
+  /**
+  * \brief some useful integer array
+  *
+  * This is an array of length #_size. (Note the linking feature.)
+  * The array dimension has to be provided in the last line of the description. Examples:
+  *
+  * \li <em>Dimension:</em> [size]     (1D array with known size)
+  * \li <em>Dimension:</em> [xsize][ysize]   (2D array with known size)
+  * \li <em>Dimension:</em> [][]  (2D array with unknown size)
+  * \li <em>Dimension:</em> [xsize][]   (2D array with partially known size)
+  *
+  * And now, as the last line, the actual dimension of this array.
+  *
+  * <em>Dimension:</em> [#_size]
+  */
+  int* _my_array;
 
   /* *****************
-   * private members *
-   *******************/
+  * member functions *
+  *******************/
 
-  private:
+  /**
+  * \brief computes incredibly complicated stuff
+  *
+  * This is a long description of what the function does.
+  *
+  * \param[in] useless_string
+  * input parameter to be ignored
+  *
+  * \return a useful result
+  * \sa answer_to_everything()
+  */
+  int _do_extremely_complicated_computation(std::string& useless_string)
+  {
+    return 42;
+  }
 
-    /* ************
-     * attributes *
-     **************/
 
-    /// some private attribute
-    int _some_private_attribute;
+public:
 
-    /**
-     * \brief specifier for some array size
-     *
-     * I really can't think of a useful detailed description right now.
-     */
-    int _size;
+  /* ***********
+  * attributes *
+  *************/
 
-    /**
-     * \brief some useful integer array
-     *
-     * This is an array of length #_size. (Note the linking feature.)
-     * The array dimension has to be provided in the last line of the description. Examples:
-     *
-     * \li <em>Dimension:</em> [size]     (1D array with known size)
-     * \li <em>Dimension:</em> [xsize][ysize]   (2D array with known size)
-     * \li <em>Dimension:</em> [][]  (2D array with unknown size)
-     * \li <em>Dimension:</em> [xsize][]   (2D array with partially known size)
-     *
-     * And now, as the last line, the actual dimension of this array.
-     *
-     * <em>Dimension:</em> [#_size]
-     */
-    int* _my_array;
+  /// for storing some useful information
+  int i_am_public;
 
-    /* ******************
-     * member functions *
-     ********************/
+  /**
+  * \brief for storing even more useful information
+  *
+  * This variable stores information that is even more useful than that of #i_am_public (note the linking feature).
+  */
+  int i_am_public_too;
 
-    /**
-     * \brief computes incredibly complicated stuff
-     *
-     * This is a long description of what the function does.
-     *
-     * \param[in] useless_string
-     * input parameter to be ignored
-     *
-     * \return a useful result
-     * \sa answer_to_everything()
-     */
-    int _do_extremely_complicated_computation(std::string& useless_string)
-    {
-      return 42;
-    }
+  /* *************
+  * constructors *
+  ***************/
 
-  /* ****************
-   * public members *
-   ******************/
+  /**
+  * \brief simple constructor
+  *
+  * When using this constructor, then something happens.
+  *
+  * \param[in] i
+  * some input parameter
+  *
+  * \param[in] f
+  * another input parameter
+  */
+  DoxygenExample(int i, float f)
+  {
+    std::cout << "Constructor called with " << i << " and " << f << "." << std::endl;
+  }
 
-  public:
+  /* ***********
+  * destructor *
+  *************/
 
-    /* ************
-     * attributes *
-     **************/
+  /**
+  * \brief simple destructor
+  *
+  * This is a simple destructor that annoys the user with some screen output.
+  */
+  ~DoxygenExample()
+  {
+    std::cout << "Object destroyed!" << std::endl;
+  }
 
-    /// for storing some useful information
-    int i_am_public;
+  /* *****************
+  * members functions*
+  *******************/
 
-    /**
-    * \brief for storing even more useful information
-    *
-    * This variable stores information that is even more useful than that of #i_am_public (note the linking feature).
-    */
-    int i_am_public_too;
-
-    /* **************
-     * constructors *
-     ****************/
-
-    /**
-     * \brief simple constructor
-     *
-     * When using this constructor, then something happens.
-     *
-     * \param[in] i
-     * some input parameter
-     *
-     * \param[in] f
-     * another input parameter
-     */
-    DoxygenExample(int i, float f)
-    {
-      std::cout << "Constructor called with " << i << " and " << f << "." << std::endl;
-    }
-
-    /* ************
-     * destructor *
-     **************/
-
-    /**
-    * \brief simple destructor
-    *
-    * This is a simple destructor that annoys the user with some screen output.
-    */
-    ~DoxygenExample()
-    {
-      std::cout << "Object destroyed!" << std::endl;
-    }
-
-    /* ******************
-     * members functions*
-     ********************/
-
-    /**
-     * \brief gives the answer to everything
-     *
-     * This is a long description of what the function does.
-     *
-     * \param[in] argc
-     * argument count passed to the main() method
-     *
-     * \param[in] argv
-     * arguments passed to the main() method
-     *
-     * \param[in] question
-     * arbitrary question
-     *
-     * \return answer to the given question
-     *
-     * \sa _do_extremely_complicated_computation()
-     * \todo The detailed description needs to be improved.
-     * \warning The computation takes roughly 10,000 years!
-     */
-    int answer_to_everything(int& argc, char* argv[], std::string& question)
-    {
-      return _do_extremely_complicated_computation(question);
-    }
+  /**
+  * \brief gives the answer to everything
+  *
+  * This is a long description of what the function does.
+  *
+  * \param[in] argc
+  * argument count passed to the main() method
+  *
+  * \param[in] argv
+  * arguments passed to the main() method
+  *
+  * \param[in] question
+  * arbitrary question
+  *
+  * \return answer to the given question
+  *
+  * \sa _do_extremely_complicated_computation()
+  * \todo The detailed description needs to be improved.
+  * \warning The computation takes roughly 10,000 years!
+  */
+  int answer_to_everything(int& argc, char* argv[], std::string& question)
+  {
+    return _do_extremely_complicated_computation(question);
+  }
 };

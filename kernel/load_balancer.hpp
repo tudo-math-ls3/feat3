@@ -15,7 +15,7 @@
 
 /*
  * The user knows what his load balancers should do. He calls, e.g.,
- * if (load_bal.group_id == 0)
+ * if(load_bal.group_id == 0)
  * {
  *   load_bal.readMesh();
  *   ...
@@ -31,7 +31,7 @@
  *     coarse mesh problem) and creates corresponding MPI communicators ((the worker with rank 0 in this communicator
  *     is automatically the coordinator who communicates with the master)
  *   - tells each member of the work groups to create a Worker object (representing the Worker on this process itself)
-*      and corresponding RemoteWorker objects (as members of the WorkGroup objects) representing the remote Worker
+ *      and corresponding RemoteWorker objects (as members of the WorkGroup objects) representing the remote Worker
  *     objects
  *   - tells each Worker which (Remote)Worker objects he has to communicate with *in other workgroups* via the
  *     communicator they all share within the parent process group. E.g., the fine mesh workers have to send the
@@ -94,8 +94,8 @@
 /**
 * \brief class defining a load balancer process
 *
-* @author Hilmar Wobker
-* @author Dominik Goeddeke
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
 */
 class LoadBalancer
 {
@@ -105,29 +105,19 @@ private:
   /* *****************
   * member variables *
   *******************/
-  /**
-  * \brief pointer to the process group the load balancer manages
-  */
+  /// pointer to the process group the load balancer manages
   ProcessGroup* _process_group;
 
-  /**
-  * \brief flag whether the load balancer's process group uses a dedicated load balancer process
-  */
+  /// flag whether the load balancer's process group uses a dedicated load balancer process
   bool _group_uses_dedicated_load_bal;
 
-  /**
-  * \brief flag whether this process is the dedicated load balancer process (if there is one)
-  */
+  /// flag whether this process is the dedicated load balancer process (if there is one)
   bool _is_dedicated_load_bal;
 
-  /**
-  * \brief vector of work groups the load balancer manages
-  */
+  /// vector of work groups the load balancer manages
   std::vector<WorkGroup*> _work_groups;
 
-  /**
-  * \brief number of work groups
-  */
+  /// number of work groups
   int _num_work_groups;
 
   /**
@@ -147,17 +137,17 @@ private:
 
 public:
 
-  /* *************
-  * constructors *
-  ***************/
-  /**
-  * \brief constructor requiring six parameters
-  */
+  /* *************************
+  * constructor & destructor *
+  ***************************/
+  /// constructor
   LoadBalancer(
     ProcessGroup* process_group,
     bool group_uses_dedicated_load_bal)
     : _process_group(process_group),
-      _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal)
+      _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal),
+      _num_workers_in_group(nullptr),
+      _work_group_ranks(nullptr)
   {
       // Inquire whether this process is a dedicated load balancer process. This is the case when the process group
       // uses a dedicated load bal. and when this process is the last in the process group.
@@ -165,11 +155,34 @@ public:
                                _process_group->rank() == _process_group->num_processes()-1;
   }
 
+  /// destructor
+  ~LoadBalancer()
+  {
+    if (_work_group_ranks != nullptr)
+    {
+      for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+      {
+        delete [] _work_group_ranks[igroup];
+      }
+      delete [] _work_group_ranks;
+    }
+    for(unsigned int igroup(0) ; igroup < _work_groups.size() ; ++igroup)
+    {
+      delete _work_groups[igroup];
+    }
+    if (_num_workers_in_group != nullptr)
+    {
+      delete [] _num_workers_in_group;
+    }
+  }
+
   /* ******************
   * getters & setters *
   ********************/
   /**
   * \brief getter for the process group
+  *
+  * \return ProcessGroup pointer #_process_group
   */
   inline ProcessGroup* process_group() const
   {
@@ -178,6 +191,8 @@ public:
 
   /**
   * \brief getter for the flag whether this process is a dedicated load balancer process
+  *
+  * \return boolean flag #_is_dedicated_load_bal
   */
   inline bool is_dedicated_load_bal() const
   {
@@ -187,9 +202,7 @@ public:
   /* *****************
   * member functions *
   *******************/
-  /**
-  * \brief dummy function in preparation of a function reading in a mesh file
-  */
+  /// dummy function in preparation of a function reading in a mesh file
   void read_mesh()
   {
   }
@@ -218,7 +231,7 @@ public:
     _num_workers_in_group[0] = 2;
     _num_workers_in_group[1] = num_processes - _num_workers_in_group[0];
     // if a dedicated load balancer process is used, decrease the number of workers in the second work group by 1
-    if (_group_uses_dedicated_load_bal)
+    if(_group_uses_dedicated_load_bal)
     {
       --_num_workers_in_group[1];
     }
@@ -245,14 +258,15 @@ public:
         // set group rank
         _work_group_ranks[igroup][j] = iter_group_rank;
         // inquire whether this process belongs to the current group
-        if (my_rank == _work_group_ranks[igroup][j])
+        if(my_rank == _work_group_ranks[igroup][j])
         {
           my_group = igroup;
         }
       }
-    }
+    } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+
     // sanity check for the rank assigned last
-    if (_group_uses_dedicated_load_bal)
+    if(_group_uses_dedicated_load_bal)
     {
       // the dedicated load balancer has the last rank num_processes - 1
       assert(iter_group_rank == num_processes - 2);
@@ -273,7 +287,7 @@ public:
     _work_groups.resize(_num_work_groups, nullptr);
     for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
     {
-      if (my_group == igroup)
+      if(my_group == igroup)
       {
         _work_groups[igroup] = new WorkGroup(_num_workers_in_group[my_group], _work_group_ranks[my_group],
                                              _process_group, my_group);
@@ -287,8 +301,8 @@ public:
         int mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
       }
-    }
-  }
+    } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+  } // create_work_groups()
 };
 
 #endif // guard KERNEL_LOAD_BAL_HPP

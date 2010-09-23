@@ -18,29 +18,23 @@
 * A RemoteWorker is simply a Worker that lives on a remote process. So, a WorkGroup object managing n processes
 * typically consists of one Worker object and n-1 RemoteWorker objects.
 *
-* @author Hilmar Wobker
-* @author Dominik Goeddeke
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
 */
 class RemoteWorker
 {
 private:
-  /**
-  * \brief pointer to the MPI communicator to the RemoteWorker
-  */
+  /// pointer to the MPI communicator to the RemoteWorker
   MPI_Comm* const _comm;
 
-  /**
-  * \brief rank of the remote worker with respect to the communicator #_comm
-  */
+  /// rank of the remote worker with respect to the communicator #_comm
   const int _rank;
 
 public:
-  /* *************
-  * constructors *
-  ***************/
-  /**
-  * \brief constructor
-  */
+  /* *************************
+  * constructor & destructor *
+  ***************************/
+  /// constructor
   RemoteWorker(
     MPI_Comm* const comm,
     const int rank)
@@ -51,16 +45,14 @@ public:
 }; // class RemoteWorker
 
 
-///**
-//* \brief forward declaration of WorkGroup class
-//*/
-//class WorkGroup;
+// /// forward declaration of WorkGroup class
+// class WorkGroup;
 
 /**
 * \brief class defining a worker
 *
-* @author Hilmar Wobker
-* @author Dominik Goeddeke
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
 */
 class Worker
 {
@@ -70,24 +62,16 @@ private:
   /* *****************
   * member variables *
   *******************/
-  /**
-  * \brief communicator of the work group this worker belongs to
-  */
+  /// communicator of the work group this worker belongs to
   MPI_Comm _comm_work_group;
 
-  /**
-  * \brief this worker's rank w.r.t. the communicator #_comm_work_group
-  */
+  /// this worker's rank w.r.t. the communicator #_comm_work_group
   int _rank_work_group;
 
-  /**
-  * \brief communicator of the process group this worker belongs to
-  */
+  /// communicator of the process group this worker belongs to
   MPI_Comm _comm_process_group;
 
-  /**
-  * \brief this worker's rank w.r.t. the communicator #_comm_process_group
-  */
+  /// this worker's rank w.r.t. the communicator #_comm_process_group
   int _rank_process_group;
 
 // COMMENT_HILMAR, 22.9.2010:
@@ -200,12 +184,10 @@ private:
 
 public:
 
-  /* *************
-  * constructors *
-  ***************/
-  /**
-  * \brief constructor
-  */
+  /* *************************
+  * constructor & destructor *
+  ***************************/
+  /// constructor
   Worker(
     MPI_Comm comm_work_group,
     int rank_work_group,
