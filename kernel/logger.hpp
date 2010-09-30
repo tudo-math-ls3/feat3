@@ -151,7 +151,7 @@ public:
   * \param[in] targ
   * output target SCREEN, FILE or SCREEN_FILE (default if not given: SCREEN_FILE)
   *
-  * \sa receive
+  * \sa #receive
   *
   * \author Hilmar Wobker
   */

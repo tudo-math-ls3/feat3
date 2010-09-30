@@ -236,13 +236,26 @@ public:
   /* *****************
   * member functions *
   *******************/
-  // - function for sending individual messages in a process group
-  // - has to be called by all processes of the process group
-  // - triggers function _receive_array() in the master's service loop
-  // - all processes call MPI_Gather to send the messages to the coordinator process (rank 0 within the process group),
-  //   which collects them in an array
-  // - send output_target SCREEN_FILE (use SCREEN_FILE as default, if no target is provided)
-  // - send message array
+  /**
+  * \brief sending individual messages to the master
+  *
+  * With this function the processes of the process group can send individual log messages to the master. The
+  * coordinator of the process group collects all these log messages in the order of process group ranks and sends
+  * them as one MPI message to the master. Depending on the target the master then displays these messages on the
+  * screen or writes them to the log file (one line per message). This function has to be called by \em all processes
+  * of the process group! Note no further information will be appended to the messages (like rank of the process from
+  * which the messages comes). Such infomration has to be coded directly into the message string.
+  *
+  * \param[in] message
+  * string representing the log message
+  *
+  * \param[in] targ
+  * output target Logger::SCREEN, Logger::FILE or Logger::SCREEN_FILE (default if not given: Logger::SCREEN_FILE)
+  *
+  * \sa Logger::#log_master_array
+  *
+  * \author Hilmar Wobker
+  */
   void log_indiv_master(std::string message, Logger::target target = Logger::SCREEN_FILE)
   {
 
