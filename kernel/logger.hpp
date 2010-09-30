@@ -17,108 +17,130 @@
 /**
 * \brief class providing logging mechanisms
 *
-* - Each process is connected to a single log file. The log directory \c logdir, as well as the base name \c basename
-*   of the log files is set in some basic configuration file. The name of the log file is '\c logdir/basename<n>.log'
+* <ul>
+*   <li>
+*   Each process is connected to a single log file. The log directory \c logdir, as well as the base name \c basename
+*   of the log files is set in some basic configuration file. The name of the log file is '\c logdir/basename\<n\>\c.log'
 *   where \c n is the MPI_COMM_WORLD rank of the process. \c n is displayed with at least three digits using leading
 *   zeros. When 1000 or more MPI processes are used, the number of digits is automatically increased. The basename is
 *   empty by default, and the log directory is \c ./log by default.
-*
-* - Only the master process is allowed to produce screen log.
-*
-* - The master file log and the screen log are basically independent of each other, i.e. there are three functions
-*     \c log_master(..., LOGGER::SCREEN)       (--> message only appears on the screen)
-*     \c log_master(..., LOGGER::FILE)         (--> message only appears in the master log file)
-*     \c log_master(..., LOGGER::SCREEN_FILE)  (--> message appears on the screen and in the master log file)
+*   <li>
+*   Only the master process is allowed to produce screen log.
+*   <li>
+*   The master file log and the screen log are basically independent of each other, i.e. there are three functions
+*     \code log_master(..., LOGGER::SCREEN)       (--> message only appears on the screen)\endcode
+*     \code log_master(..., LOGGER::FILE)         (--> message only appears in the master log file)\endcode
+*     \code log_master(..., LOGGER::SCREEN_FILE)  (--> message appears on the screen and in the master log file)\endcode
 *   which can be called by every process. When a non-master process calls them, communication is involved (sending the
 *   message to the master).
-* - When a group of processes wants to trigger individual messages (see logging scenario 6), there are the three
+*   <li>
+*   When a group of processes wants to trigger individual messages (see logging scenario 6), there are the three
 *   variants
-*     \c log_indiv_master(..., LOGGER::SCREEN)
-*     \c log_indiv_master(..., LOGGER::FILE)
-*     \c log_indiv_master(..., LOGGER::SCREEN_FILE)
+*     \code log_indiv_master(..., LOGGER::SCREEN) \endcode
+*     \code log_indiv_master(..., LOGGER::FILE) \endcode
+*     \code log_indiv_master(..., LOGGER::SCREEN_FILE) \endcode
 *   Since this can only be done within process groups, these functions are part of the class ProcessGroup.
-* - The user has the option to \em globally synchronise master file log and screen log in four variants:
-*     a) All messages sent to the master file log automatically appear on the screen.
-*     b) All messages sent to the screen automatically appear in the master file log.
-*     c) a) + b)
-*     d) no synchronisation
-*   The default is d).
+*   <li>
+*   The user has the option to \em globally synchronise master file log and screen log in four variants:
+*   <ol>
+*     <li> All messages sent to the master file log automatically appear on the screen.
+*     <li> All messages sent to the screen automatically appear in the master file log.
+*     <li> 1. + 2.
+*     <li> no synchronisation
+*   </ol>
+*   The default is 4.
 *   COMMENT_HILMAR: This feature is not implemented yet.
-*
-* - Each process can write messages to its log file via the function
+*   <li>
+*   Each process can write messages to its log file via the function
 *     \c log(...)
 *   (i.e., on the master process the functions log(...) and log_master(..., LOGGER::FILE) are equivalent)
-*
-* - What sort of logging scenarios are there?
-*     1) single process writes a message to its log file:
-*          call (on the writing process): \code log("point (x,y) found in element 17"); \endcode
-*          result in 002.log: \code point (x,y) found in element 17 \endcode
-*
-*     2) single process triggers a message on screen and/or in master log file:
-*          call (on the triggering process): \code log_master("point (x,y) found in element 17"); \endcode
-*          result in 010.log (assuming that the master has rank 10) and on screen:
-*            \code point (x,y) found in element 17 \endcode
-*
-*     3) group of processes writes a common message to the log files:
-*          call (on all writing processes): \code log("global solver: starting iter 23"); \endcode
-*          output in 000.log: \code global solver: starting iter 23 \endcode
-*          output in 001.log: \code global solver: starting iter 23 \endcode
-*                     ...
-*          output in 009.log: \code global solver: starting iter 23 \endcode
-*
-*     4) group of processes triggers a common message on screen and/or in master log file:
-*          call (on all writing processes):
-*            if(i_am_coordinator)
-*            {
-*              \code log_master("global solver: starting iter 23"); \endcode
-*            }
-*          output in 010.log: \code global solver: starting iter 23 \endcode
-*          output on screen:  \code global solver: starting iter 23 \endcode
-*        In this case, not every process sends its message but only one 'coordinator' process. The logic whether
-*        this is one common message from a group of processes has to be provided by the user (see if clause). There is
-*        no special routine for this case.
-*
-*     5) group of processes writes individual messages to their log files:
-*          call on process 0: \code log("local solver: conv. rate: 0.042"); \endcode
-*          call on process 1: \code log("local solver: conv. rate: 0.023"); \endcode
-*               ...
-*          call on process 9: \code log("local solver: conv. rate: 0.666"); \endcode
-*          output in 000.log: \code local solver: conv. rate: 0.042 \endcode
-*          output in 001.log: \code local solver: conv. rate: 0.023 \endcode
-*                     ...
-*          output in 009.log: \code local solver: conv. rate: 0.666 \endcode
-
-*     6) group of processes triggers individual messages on screen and/or in master log file:
-*          call on process 0: \code log_indiv_master("process 0: local solver: conv. rate: 0.042");
-*          call on process 1: \code log_indiv_master("process 1: local solver: conv. rate: 0.023");
-*                                ...
-*          call on process 9: \code log_indiv_master("process 9: local solver: conv. rate: 0.666");
-*          output in 010.log: \code process 0: local solver: conv. rate: 0.042 \endcode
-*                             \code process 1: local solver: conv. rate: 0.023 \endcode
-*                                ...
-*                             \code process 9: local solver: conv. rate: 0.666 \endcode
-*          output on screen:  \code process 0: local solver: conv. rate: 0.042 \endcode
-*                             \code process 1: local solver: conv. rate: 0.023 \endcode
-*                                ...
-*                             \code process 9: local solver: conv. rate: 0.666 \endcode
-*        Since this can only be done within process groups, these functions are part of the class ProcessGroup.
-*        Two possibilities how to transfer the messages to the master:
-*          i) All processes of the group send their message to the coordinator process of the group (via MPI_Gather),
+*   <li>
+*   What sort of logging scenarios are there?
+*   <ol>
+*     <li>
+*     <em> single process writes a message to its log file:</em>\n
+*       call (on the writing process):
+*       \code log("point (x,y) found in element 17"); \endcode
+*       result in 002.log:
+*       \code point (x,y) found in element 17 \endcode
+*     <li>
+*     <em>single process triggers a message on screen and/or in master log file:</em>\n
+*       call (on the triggering process):
+*       \code log_master("point (x,y) found in element 17"); \endcode
+*       result in 010.log (assuming that the master has rank 10) and on screen:
+*       \code point (x,y) found in element 17 \endcode
+*     <li>
+*     <em>group of processes writes a common message to the log files:</em>\n
+*       call (on all writing processes):
+*       \code log("global solver: starting iter 23"); \endcode
+*       output in 000.log, 001.log, ..., 009.log:
+*       \code  global solver: starting iter 23 \endcode
+*       \code  global solver: starting iter 23 \endcode
+*       \code    ... \endcode
+*       \code  global solver: starting iter 23 \endcode
+*     <li>
+*     <em>group of processes triggers a common message on screen and/or in master log file:</em>\n
+*       call (on all writing processes):
+*         \code if(i_am_coordinator) \endcode
+*         \code { \endcode
+*         \code   log_master("global solver: starting iter 23"); \endcode
+*         \code } \endcode
+*       output in 010.log:
+*       \code global solver: starting iter 23 \endcode
+*       output on screen:
+*       \code global solver: starting iter 23 \endcode
+*       In this case, not every process sends its message but only one 'coordinator' process. The logic whether
+*       this is one common message from a group of processes has to be provided by the user (see if clause). There is
+*       no special routine for this case.
+*     <li>
+*     <em>group of processes writes individual messages to their log files:</em>\n
+*       call on process 0, process 1, ..., process 9:
+*       \code log("local solver: conv. rate: 0.042"); \endcode
+*       \code log("local solver: conv. rate: 0.023"); \endcode
+*       \code    ...\endcode
+*       \code log("local solver: conv. rate: 0.666"); \endcode
+*       output in 000.log, 001.log, ..., 009.log:
+*       \code local solver: conv. rate: 0.042 \endcode
+*       \code local solver: conv. rate: 0.023 \endcode
+*       \code    ...\endcode
+*       \code local solver: conv. rate: 0.666 \endcode
+*     <li>
+*     <em>group of processes triggers individual messages on screen and/or in master log file:</em>\n
+*       call on process 0, process 1, ..., process 9:
+*       \code ProcessGroup::log_indiv_master("process 0: local solver: conv. rate: 0.042"); \endcode
+*       \code ProcessGroup::log_indiv_master("process 1: local solver: conv. rate: 0.023"); \endcode
+*       \code    ...\endcode
+*       \code ProcessGroup::log_indiv_master("process 9: local solver: conv. rate: 0.666");\endcode
+*       output in 010.log:
+*       \code process 0: local solver: conv. rate: 0.042 \endcode
+*       \code process 1: local solver: conv. rate: 0.023 \endcode
+*       \code    ...\endcode
+*       \code process 9: local solver: conv. rate: 0.666 \endcode
+*       output on screen:
+*       \code process 0: local solver: conv. rate: 0.042 \endcode
+*       \code process 1: local solver: conv. rate: 0.023 \endcode
+*       \code    ...\endcode
+*       \code process 9: local solver: conv. rate: 0.666 \endcode
+*      Since this can only be done within process groups, these functions are part of the class ProcessGroup.
+*      Two possibilities how to transfer the messages to the master:
+*      <ol>
+*        <li> All processes of the group send their message to the coordinator process of the group (via MPI_Gather),
 *             which collects them in some array structure and sends them to the master.
-*         ii) All processes of the group send their message directly to the master, which collects them in some
+*        <li> All processes of the group send their message directly to the master, which collects them in some
 *             array structure and displays/writes them.
-*
-*             COMMENT_HILMAR: I'm not sure how to implement this version... When two process groups
-*             send indiv. messages then the master should group them accordingly. The master can only
-*             communicate via the COMM_WORLD communicator to the two process groups, so one has to distinguish them
-*             via MPI tags. Imagine the first process group contains 3 processes using tag 0 and the second process
-*             group 5 processes using tag 1. When the request of the first group arrives first, then the master creates
-*             an array of length 3 to store three strings and starts a loop calling two further receives of strings
-*             (the first one it alreday got) listening to tag 0 only. But what happens now with the requests of
-*             the second process group, which can (and must not) accepted in that loop (due to the wrong tag)? Are
-*             they automatically postponed? Or does the process deadlock?
-*             Due to the uncertainties with the second approach, I implemented the first one.
-*
+*      </ol>
+*      COMMENT_HILMAR: I'm not sure how to implement this version... When two process groups
+*      send indiv. messages then the master should group them accordingly. The master can only
+*      communicate via the COMM_WORLD communicator to the two process groups, so one has to distinguish them
+*      via MPI tags. Imagine the first process group contains 3 processes using tag 0 and the second process
+*      group 5 processes using tag 1. When the request of the first group arrives first, then the master creates
+*      an array of length 3 to store three strings and starts a loop calling two further receives of strings
+*      (the first one it alreday got) listening to tag 0 only. But what happens now with the requests of
+*      the second process group, which can (and must not) accepted in that loop (due to the wrong tag)? Are
+*      they automatically postponed? Or does the process deadlock?
+*      Due to the uncertainties with the second approach, I implemented the first one.
+*  </ol>
+* </ul>
 * \todo everything concerning file output still has to be implemented
 *
 * \author Hilmar Wobker
@@ -266,18 +288,18 @@ public:
   * screen and/or log file.
   *
   * \param[in] num_messages
-  * the number of messages the char array #messages contains
+  * the number of messages the char array Logger::log_master_array#messages contains
   *
   * \param[in] msg_lengths
   * array of lengths of the single messages
-  * <em>Dimension:</em> [#num_messages]
+  * <em>Dimension:</em> [Logger::log_master_array#num_messages]
   *
   * \param[in] total_length
   * total length of all messages (could also be computed in this function, but is often already available outside)
   *
   * \param[in] messages
   * char array containing the messages (each message terminated by null symbol)
-  * <em>Dimension:</em> [#total_length]
+  * <em>Dimension:</em> [Logger::log_master_array#total_length]
   *
   * \param[in] targ
   * output target SCREEN, FILE or SCREEN_FILE (default if not given: SCREEN_FILE)

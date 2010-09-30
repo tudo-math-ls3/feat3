@@ -18,6 +18,7 @@ class ServiceIDs
 
 public:
 
+  /// enumeration of service IDs for the master service loop
   enum service_id
   {
     // receive single log message (see class Logger)

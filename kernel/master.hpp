@@ -32,6 +32,7 @@ private:
   /// flag for finishing the infinite service loop
   bool _finish_service;
 
+  /// MPI status object needed in MPI_Recv call
   MPI_Status status;
 
 public:

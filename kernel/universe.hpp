@@ -121,7 +121,12 @@ private:
   * number of process groups
   *
   * \param[in] num_processes_in_group
-  * array of numbers of processes in each work group (dimension [#num_process_groups])
+  * array of numbers of processes in work groups
+  * (\em dimension [Universe::Universe#num_process_groups])
+  *
+  * \param[in] includes_dedicated_load_bal
+  * array of flags whether dedicated load balancer required in work groups
+  * (\em dimension [Universe::Universe#num_process_groups])
   */
   Universe(
     const int num_processes,
@@ -423,11 +428,11 @@ public:
   * number of process groups
   *
   * \param[in] num_processes_in_group
-  * array of numbers of processes in each process group (dimension [#num_process_groups])
+  * array of numbers of processes in each process group (\em dimension [Universe::create#num_process_groups])
   *
   * \param[in] includes_dedicated_load_bal
   * array of flags whether a dedicated load balancer process is needed in process group
-  * (dimension [#num_process_groups])
+  * (\em dimension [Universe::create#num_process_groups])
   *
   * \return Universe pointer #_universe
   */

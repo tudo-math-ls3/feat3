@@ -13,12 +13,14 @@ class MPIUtils
   /* *****************
   * member variables *
   *******************/
-// COMMENT_HILMAR: JUST TEMPORARILY
-  // global buffer used for COMM_WORLD communication
-  // only temporarily stored in this class until a more suitable place has been found
-  static int BUFFERSIZE_BYTES;
+// COMMENT_HILMAR: JUST TEMPORARILY stored in this class until a more suitable place has been found
+  /// global buffer used for COMM_WORLD communication
   static char* buffer;
+  /// size of global buffer #MPIUtils::buffer
+  static int BUFFERSIZE_BYTES;
+  /// current position in global buffer #MPIUtils::buffer
   static int buffer_pos;
+  /// current size of global buffer #MPIUtils::buffer
   static int received_bytes;
 // COMMENT_HILMAR: JUST TEMPORARILY
 

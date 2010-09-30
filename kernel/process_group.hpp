@@ -79,6 +79,12 @@ public:
   * \brief constructor for the case the MPI_Group and the MPI_Comm already exist
   *
   * This constructor is intended for creating a process group object containing all COMM_WORLD processes.
+  *
+  * \param[in] comm
+  * communicator shared by the group processes
+  *
+  * \param[in] num_processes
+  * number of processes in the group
   */
   ProcessGroup(
     MPI_Comm comm,
@@ -249,10 +255,10 @@ public:
   * \param[in] message
   * string representing the log message
   *
-  * \param[in] targ
+  * \param[in] target
   * output target Logger::SCREEN, Logger::FILE or Logger::SCREEN_FILE (default if not given: Logger::SCREEN_FILE)
   *
-  * \sa Logger::#log_master_array
+  * \sa #Logger::log_master_array
   *
   * \author Hilmar Wobker
   */
