@@ -7,7 +7,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
-#include <kernel/communication.hpp>
+#include <kernel/comm.hpp>
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
 
