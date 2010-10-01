@@ -27,7 +27,7 @@ private:
   /// pointer to the MPI communicator to the RemoteWorker
   MPI_Comm* const _comm;
 
-  /// rank of the remote worker with respect to the communicator #_comm
+  /// rank of the remote worker with respect to the communicator RemoteWorker::_comm
   const int _rank;
 
 public:
@@ -65,13 +65,13 @@ private:
   /// communicator of the work group this worker belongs to
   MPI_Comm _comm_work_group;
 
-  /// this worker's rank w.r.t. the communicator #_comm_work_group
+  /// this worker's rank w.r.t. the communicator Worker::_comm_work_group
   int _rank_work_group;
 
   /// communicator of the process group this worker belongs to
   MPI_Comm _comm_process_group;
 
-  /// this worker's rank w.r.t. the communicator #_comm_process_group
+  /// this worker's rank w.r.t. the communicator Worker::_comm_process_group
   int _rank_process_group;
 
 // COMMENT_HILMAR, 22.9.2010:

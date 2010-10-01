@@ -10,6 +10,7 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/service_ids.hpp>
 
 
 /**
@@ -32,27 +33,40 @@ public:
   *******************/
   /// global buffer used for MPI_COMM_WORLD (MCW) communication
   static char* MCW_buffer;
-  /// size of buffer #buffer in bytes
+  /// size of buffer Comm::MCW_buffer in bytes
   static int MCW_BUFFERSIZE;
-  /// current position in buffer #buffer
+  /// current position in buffer Comm::MCW_buffer
   static int MCW_buffer_pos;
-  /// current size of buffer #buffer
+  /// current size of buffer Comm::MCW_buffer
   static int MCW_received_bytes;
 
   /* *************************
   * constructor & destructor *
   ***************************/
+
   /* *****************
   * member functions *
   *******************/
 
-  // init message buffer
-//  static void init_msg(int id, MPI_Comm& comm, void* buffer, int buffersize_bytes, int pos_bytes)
-//  {
-//    int mpi_error_code = mpi_pack(id, 1, MPI_INTEGER, buffer, buffersize_bytes, pos_bytes, comm)
-//  }
+  /**
+  * \brief init a new MPI_COMM_WORLD message
+  *
+  * This function resets the MPI_COMM_WORLD buffer #MCW_buffer and writes the message ID to its first position.
+  *
+  * \param[in] service_id
+  * ID of the message, where only values of the enumeration ServiceIDs::service_id are accepted.
+  */
+  static void init_msg(ServiceIDs::service_id service_id)
+  {
+    // reset buffer
+    Comm::MCW_buffer_pos = 0;
+    // write the message id to the buffer
+    int mpi_error_code = MPI_Pack(&service_id, 1, MPI_INTEGER, Comm::MCW_buffer,
+                                  Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
+    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+  }
 
-}; // class Communication
+}; // class Comm
 
 // COMMENT_HILMAR: JUST TEMPORARILY
 // initialisation of static members

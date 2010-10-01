@@ -75,15 +75,11 @@ int main(int argc, char* argv[])
       if (process_group->rank() == 0)
       {
         // the first MPI process of the process group tells the master to stop its service loop
-        // reset buffer
-        Comm::MCW_buffer_pos = 0;
-        // write the message id to the buffer
-        int id = ServiceIDs::MASTER_FINISH_SERVICE;
-        int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, Comm::MCW_buffer, Comm::MCW_BUFFERSIZE,
-                                      &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+        // init a new message with corresponding ID
+        Comm::init_msg(ServiceIDs::MASTER_FINISH_SERVICE);
+
         // send message
-        mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
+        int mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
                                   MPI_COMM_WORLD);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
       }

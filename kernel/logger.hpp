@@ -190,15 +190,10 @@ public:
     std::string const message,
     target targ = SCREEN_FILE)
   {
+    // init a new message with corresponding ID
+    Comm::init_msg(ServiceIDs::LOG_RECEIVE);
 
 // TODO: write some simple wrapper routine for the following MPI calls (like in FEAST1): init_msg, write_msg, send_msg
-    // reset buffer
-    Comm::MCW_buffer_pos = 0;
-    // write the message id to the buffer
-    int id = ServiceIDs::LOG_RECEIVE;
-    int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, Comm::MCW_buffer,
-                                  Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
 // TODO: define specific MPI_Datatype for the following data (see example on p. 125f in MPI2.2 standard)
 
@@ -206,7 +201,7 @@ public:
     int msg_length(message.size()+1);
 
     // write length of the message to the buffer
-    mpi_error_code = MPI_Pack(&msg_length, 1, MPI_INTEGER, Comm::MCW_buffer,
+    int mpi_error_code = MPI_Pack(&msg_length, 1, MPI_INTEGER, Comm::MCW_buffer,
                               Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
@@ -322,19 +317,15 @@ public:
     char* const messages,
     target targ = SCREEN_FILE)
   {
+    // init a new message with corresponding ID
+    Comm::init_msg(ServiceIDs::LOG_RECEIVE_ARRAY);
+
 // TODO: write some simple wrapper routine for the following MPI calls (like in FEAST1): init_msg, write_msg, send_msg
-    // reset buffer
-    Comm::MCW_buffer_pos = 0;
-    // write the message id to the buffer
-    int id = ServiceIDs::LOG_RECEIVE_ARRAY;
-    int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, Comm::MCW_buffer,
-                                  Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
 // TODO: define specific MPI_Datatype for the following data (see example on p. 125f in MPI2.2 standard)
 
     // write number of messages the char array consists of to the buffer
-    mpi_error_code = MPI_Pack(&num_messages, 1, MPI_INTEGER, Comm::MCW_buffer,
+    int mpi_error_code = MPI_Pack(&num_messages, 1, MPI_INTEGER, Comm::MCW_buffer,
                               Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
