@@ -3,7 +3,6 @@
 #define KERNEL_UNIVERSE_HPP 1
 
 // includes, system
-#include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
 #include <cassert>

@@ -3,10 +3,10 @@
 #define KERNEL_PROCESS_GROUP_HPP 1
 
 // includes, system
-#include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
+#include <mpi.h>
 #include <math.h>
 
 // includes, Feast

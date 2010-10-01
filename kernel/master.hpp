@@ -3,9 +3,9 @@
 #define KERNEL_MASTER_HPP 1
 
 // includes, system
-#include <mpi.h>
 #include <iostream>
 #include <stdlib.h>
+#include <mpi.h>
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -33,7 +33,7 @@ private:
   bool _finish_service;
 
   /// MPI status object needed in MPI_Recv call
-  MPI_Status status;
+  MPI_Status _status;
 
 public:
 
@@ -72,10 +72,10 @@ public:
       // (Warning! Don't replace the status object by MPI_STATUS_IGNORE! It is needed in the following call
       // of MPI_get_count().)
       MPI_Recv(MPIUtils::buffer, MPIUtils::BUFFERSIZE_BYTES, MPI_PACKED, MPI_ANY_SOURCE,
-               MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+               MPI_ANY_TAG, MPI_COMM_WORLD, &_status);
 
       // read the size of the received message (in bytes) from the status object
-      MPI_Get_count(&status, MPI_PACKED, &MPIUtils::received_bytes);
+      MPI_Get_count(&_status, MPI_PACKED, &MPIUtils::received_bytes);
 // COMMENT_HILMAR:
 // Is the actual size of the message really needed? Or can it be replaced by MPIUtils::BUFFERSIZE_BYTES in the
 // following calls of MPI_Unpack? I think we only lose the functionality that the MPI_Unpack routine automatically
@@ -83,6 +83,8 @@ public:
 // (MPIUtils::buffer_pos > MPIUtils::received_bytes). But this error would be so critical that it will crash the
 // program anyway, hence this check is not really necessary, is it? (BTW: Does the routine *really* check? I think so,
 // but actually I'm not sure...)
+
+BRAL: Test whether there is some checking!!
 
       // reset buffer content pointer
       MPIUtils::buffer_pos = 0;

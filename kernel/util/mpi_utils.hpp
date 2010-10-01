@@ -3,6 +3,7 @@
 #define MPI_UTILS_HPP
 
 #include <string>
+#include <mpi.h>
 
 /// collection of various MPI utilities
 class MPIUtils
