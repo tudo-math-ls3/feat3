@@ -17,11 +17,11 @@ class MPIUtils
 // COMMENT_HILMAR: JUST TEMPORARILY stored in this class until a more suitable place has been found
   /// global buffer used for COMM_WORLD communication
   static char* buffer;
-  /// size of global buffer #MPIUtils::buffer
+  /// size of buffer #buffer
   static int BUFFERSIZE_BYTES;
-  /// current position in global buffer #MPIUtils::buffer
+  /// current position in buffer #buffer
   static int buffer_pos;
-  /// current size of global buffer #MPIUtils::buffer
+  /// current size of buffer #buffer
   static int received_bytes;
 // COMMENT_HILMAR: JUST TEMPORARILY
 

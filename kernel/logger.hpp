@@ -20,7 +20,7 @@
 * <ul>
 *   <li>
 *   Each process is connected to a single log file. The log directory \c logdir, as well as the base name \c basename
-*   of the log files is set in some basic configuration file. The name of the log file is '\c logdir/basename\<n\>\c.log'
+*   of the log files is set in some basic configuration file. The name of the log file is '\c logdir/basename\<n\>\c .log'
 *   where \c n is the MPI_COMM_WORLD rank of the process. \c n is displayed with at least three digits using leading
 *   zeros. When 1000 or more MPI processes are used, the number of digits is automatically increased. The basename is
 *   empty by default, and the log directory is \c ./log by default.
@@ -158,7 +158,15 @@ public:
   * Log targets are either the screen (target SCREEN), a log file (target FILE), or both (target SCREEN_FILE).
   * Only the master process is allowed to write to the screen.
   */
-  enum target {SCREEN, FILE, SCREEN_FILE};
+  enum target
+  {
+    /// only write to screen
+    SCREEN,
+    /// only write to the log file
+    FILE,
+    /// write to screen and log file
+    SCREEN_FILE
+  };
 
 
   /**
@@ -171,9 +179,9 @@ public:
   * string representing the log message
   *
   * \param[in] targ
-  * output target SCREEN, FILE or SCREEN_FILE (default if not given: SCREEN_FILE)
+  * output target SCREEN, FILE or SCREEN_FILE (default: SCREEN_FILE)
   *
-  * \sa #receive
+  * \sa receive()
   *
   * \author Hilmar Wobker
   */
@@ -288,21 +296,19 @@ public:
   * screen and/or log file.
   *
   * \param[in] num_messages
-  * the number of messages the char array Logger::log_master_array#messages contains
+  * the number of messages the char array \a messages contains
   *
   * \param[in] msg_lengths
-  * array of lengths of the single messages
-  * <em>Dimension:</em> [Logger::log_master_array#num_messages]
+  * array of lengths of the single messages, dimension: [\a num_messages]
   *
   * \param[in] total_length
   * total length of all messages (could also be computed in this function, but is often already available outside)
   *
   * \param[in] messages
-  * char array containing the messages (each message terminated by null symbol)
-  * <em>Dimension:</em> [Logger::log_master_array#total_length]
+  * char array containing the messages (each message terminated by null symbol), dimension: [\a total_length]
   *
   * \param[in] targ
-  * output target SCREEN, FILE or SCREEN_FILE (default if not given: SCREEN_FILE)
+  * output target SCREEN, FILE or SCREEN_FILE (default: SCREEN_FILE)
   *
   * \sa log_master_array(std::vector<std::string> const,target), receive_array
   *
@@ -364,7 +370,7 @@ public:
   * vector of strings representing the distinct messages
   *
   * \param[in] targ
-  * output target SCREEN, FILE or SCREEN_FILE (default if not given: SCREEN_FILE)
+  * output target SCREEN, FILE or SCREEN_FILE (default: SCREEN_FILE)
   *
   * \sa log_master_array(int, int*, int, char*, target), receive_array
   *
@@ -429,6 +435,7 @@ public:
 
     // read number of messages the char array consists of from to the buffer
     int num_messages(0);
+
     int mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, &num_messages,
                                     1, MPI_INTEGER, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");

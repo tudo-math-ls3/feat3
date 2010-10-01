@@ -123,14 +123,14 @@ private:
   /**
   * \brief array of number of workers in each work group
   *
-  * <em>Dimension:</em> [#_num_work_groups]
+  * Dimension: [#_num_work_groups]
   */
   int* _num_workers_in_group;
 
   /**
   * \brief 2-dim. array for storing the process group ranks building the work groups
   *
-  * <em>Dimension:</em> [#_num_work_groups][#_num_workers_in_group[group_id]]
+  * Dimension: [#_num_work_groups][#_num_workers_in_group[\a group_id]]
   */
   int** _work_group_ranks;
 

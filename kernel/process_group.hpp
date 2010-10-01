@@ -44,7 +44,7 @@ protected:
   /**
   * \brief array of ranks the processes of this group have in the parent group
   *
-  * <em>Dimension:</em> [#_num_processes]
+  * Dimension: [#_num_processes]
   */
   // COMMENT_HILMAR, 15.9.2010:
   // Currently, this is simply a pointer to the part of the corresponding array
@@ -256,9 +256,9 @@ public:
   * string representing the log message
   *
   * \param[in] target
-  * output target Logger::SCREEN, Logger::FILE or Logger::SCREEN_FILE (default if not given: Logger::SCREEN_FILE)
+  * output target Logger::SCREEN, Logger::FILE or Logger::SCREEN_FILE (default: Logger::SCREEN_FILE)
   *
-  * \sa #Logger::log_master_array
+  * \sa Logger::log_master_array()
   *
   * \author Hilmar Wobker
   */

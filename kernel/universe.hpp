@@ -56,7 +56,14 @@ private:
   /// process group consisting of all processes
   ProcessGroup* _world_group;
 
-  /// process group responsible for one problem
+  /**
+  * \brief process group responsible for one problem
+  *
+  * When the user wants to solve to independent problems simultaneously (for example in some multiphysics application),
+  * he can create process groups. The distribution of processes to such process groups cannot be changed in the course
+  * of the program, i.e. the number of process groups and the number of processes per group is fixed. Hence, there
+  * also will be no automatic load balancing across such process groups, only within each of groups.
+  */
   ProcessGroup* _process_group;
 
   /// number of process groups requested by the user via some top-level configuration file
@@ -65,16 +72,16 @@ private:
   /**
   * \brief array of number of processes in each process group (including eventual dedicated load balancer process)
   *
-  * This array must be provided when more than one process group is used.
-  * <em>Dimension:</em> [#_num_process_groups]
+  * This array must be provided when more than one process group is used.\n
+  * Dimension: [#_num_process_groups]
   */
   int const * _num_processes_in_group;
 
   /**
   * \brief array of flags whether a dedicated load balancer process is needed in process group
   *
-  * This array must be provided when more than one process group is used.
-  * <em>Dimension:</em> [#_num_process_groups]
+  * This array must be provided when more than one process group is used.\n
+  * Dimension: [#_num_process_groups]
   */
   bool const * _includes_dedicated_load_bal;
 
@@ -84,7 +91,7 @@ private:
   /**
   * \brief 2-dim. array of MPI_COMM_WORLD ranks in top-level process group that each process unambigously belongs to
   *
-  * <em>Dimension:</em> [#_num_process_groups][#_num_processes_in_group[group_id]]
+  * Dimension: [#_num_process_groups][#_num_processes_in_group[group_id]]
   */
   int ** _group_ranks_world;
 
@@ -120,12 +127,10 @@ private:
   * number of process groups
   *
   * \param[in] num_processes_in_group
-  * array of numbers of processes in work groups
-  * (\em dimension [Universe::Universe#num_process_groups])
+  * array of numbers of processes in work groups, dimension [\a num_process_groups]
   *
   * \param[in] includes_dedicated_load_bal
-  * array of flags whether dedicated load balancer required in work groups
-  * (\em dimension [Universe::Universe#num_process_groups])
+  * array of flags whether dedicated load balancer required in work groups,  dimension [\a num_process_groups]
   */
   Universe(
     const int num_processes,
@@ -427,11 +432,11 @@ public:
   * number of process groups
   *
   * \param[in] num_processes_in_group
-  * array of numbers of processes in each process group (\em dimension [Universe::create#num_process_groups])
+  * array of numbers of processes in each process group, dimension [\a num_process_groups]
   *
   * \param[in] includes_dedicated_load_bal
-  * array of flags whether a dedicated load balancer process is needed in process group
-  * (\em dimension [Universe::create#num_process_groups])
+  * array of flags whether a dedicated load balancer process is needed in process group,
+  * dimension [\a num_process_groups]
   *
   * \return Universe pointer #_universe
   */

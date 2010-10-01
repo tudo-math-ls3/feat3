@@ -21,11 +21,11 @@ public:
   /// enumeration of service IDs for the master service loop
   enum service_id
   {
-    // receive single log message (see class Logger)
+    /// receive single log message (see class Logger)
     LOG_RECEIVE,
-    // receive array of log messages (see class Logger)
+    /// receive array of log messages (see class Logger)
     LOG_RECEIVE_ARRAY,
-    // finish the master's service loop
+    /// finish the master's service loop
     MASTER_FINISH_SERVICE
   };
 
