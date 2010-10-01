@@ -32,8 +32,10 @@ private:
   /// flag for finishing the infinite service loop
   bool _finish_service;
 
+#ifndef NDEBUG
   /// MPI status object needed in MPI_Recv call
-  MPI_Status _status;
+  MPI_Status status;
+#endif
 
 public:
 
@@ -72,19 +74,24 @@ public:
       // (Warning! Don't replace the status object by MPI_STATUS_IGNORE! It is needed in the following call
       // of MPI_get_count().)
       MPI_Recv(MPIUtils::buffer, MPIUtils::BUFFERSIZE_BYTES, MPI_PACKED, MPI_ANY_SOURCE,
-               MPI_ANY_TAG, MPI_COMM_WORLD, &_status);
+               MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_MACRO);
 
-      // read the size of the received message (in bytes) from the status object
-      MPI_Get_count(&_status, MPI_PACKED, &MPIUtils::received_bytes);
-// COMMENT_HILMAR:
-// Is the actual size of the message really needed? Or can it be replaced by MPIUtils::BUFFERSIZE_BYTES in the
-// following calls of MPI_Unpack? I think we only lose the functionality that the MPI_Unpack routine automatically
-// checks whether the buffer position exceeds the length of the sent message
-// (MPIUtils::buffer_pos > MPIUtils::received_bytes). But this error would be so critical that it will crash the
-// program anyway, hence this check is not really necessary, is it? (BTW: Does the routine *really* check? I think so,
-// but actually I'm not sure...)
-
-BRAL: Test whether there is some checking!!
+#ifndef NDEBUG
+      // Read the size of the received message (in bytes) from the status object.
+      // The actual size of the message is not really needed, so we only read it when not in NDEBUG mode.
+      // If the correct size is available, then the MPI_Unpack routine automatically checks whether the buffer position
+      // exceeds the length of the sent message (MPIUtils::buffer_pos > MPIUtils::received_bytes) and throws an error
+      // like this:
+      //   *** An error occurred in MPI_Unpack
+      //   *** on communicator MPI_COMM_WORLD
+      //   *** MPI_ERR_TRUNCATE: message truncated
+      MPI_Get_count(&status, MPI_PACKED, &MPIUtils::received_bytes);
+#else
+      // In NDEBUG mode the actual size of the sent message is not read. Instead, the size of the buffer array is
+      // used. Hence, it may happen that the MPI_Unpack routine reads rubbish from the buffer without throwing an
+      // truncation error.
+      MPIUtils::received_bytes = MPIUtils::BUFFERSIZE_BYTES;
+#endif
 
       // reset buffer content pointer
       MPIUtils::buffer_pos = 0;
