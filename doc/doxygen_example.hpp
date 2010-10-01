@@ -103,14 +103,13 @@ private:
   * This is an array of length #_size. (Note the linking feature.)
   * The array dimension has to be provided in the last line of the description. Examples:
   *
-  * \li <em>Dimension:</em> [size]     (1D array with known size)
-  * \li <em>Dimension:</em> [xsize][ysize]   (2D array with known size)
-  * \li <em>Dimension:</em> [][]  (2D array with unknown size)
-  * \li <em>Dimension:</em> [xsize][]   (2D array with partially known size)
+  * \li Dimension: [size]   (1D array with known size size)
+  * \li Dimension: [xsize][ysize]   (2D array with known size)
+  * \li Dimension: [][]   (2D array with unknown size)
+  * \li Dimension: [xsize][]   (2D array with partially known size)
   *
-  * And now, as the last line, the actual dimension of this array.
-  *
-  * <em>Dimension:</em> [#_size]
+  * And now, as the last line, the actual dimension of this array.\n
+  * Dimension: [#_size]
   */
   int* _my_array;
 
