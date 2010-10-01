@@ -2,6 +2,7 @@
 #ifndef MPI_UTILS_HPP
 #define MPI_UTILS_HPP
 
+#include <stdlib.h>
 #include <string>
 #include <mpi.h>
 
@@ -10,20 +11,6 @@ class MPIUtils
 {
 
  public:
-
-  /* *****************
-  * member variables *
-  *******************/
-// COMMENT_HILMAR: JUST TEMPORARILY stored in this class until a more suitable place has been found
-  /// global buffer used for COMM_WORLD communication
-  static char* buffer;
-  /// size of buffer #buffer
-  static int BUFFERSIZE_BYTES;
-  /// current position in buffer #buffer
-  static int buffer_pos;
-  /// current size of buffer #buffer
-  static int received_bytes;
-// COMMENT_HILMAR: JUST TEMPORARILY
 
   /* *****************
   * member functions *
@@ -73,20 +60,6 @@ class MPIUtils
     }
   }
 
-  // init message buffer
-//  static void init_msg(int id, MPI_Comm& comm, void* buffer, int buffersize_bytes, int pos_bytes)
-//  {
-//    int mpi_error_code = mpi_pack(id, 1, MPI_INTEGER, buffer, buffersize_bytes, pos_bytes, comm)
-//  }
 }; // class MPIUtils
-
-// COMMENT_HILMAR: JUST TEMPORARILY
-// initialisation of static members
-// COMMENT_HILMAR: Use some arbitrary size for the time being. This has to be parameterised somehow...
-int MPIUtils::BUFFERSIZE_BYTES = 4194304;
-char* MPIUtils::buffer = new char[BUFFERSIZE_BYTES];
-int MPIUtils::buffer_pos = 0;
-int MPIUtils::received_bytes = 0;
-// COMMENT_HILMAR: JUST TEMPORARILY
 
 #endif //  #ifndef MPI_UTILS_HPP

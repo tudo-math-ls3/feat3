@@ -10,6 +10,7 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/communication.hpp>
 #include <kernel/service_ids.hpp>
 #include <kernel/process_group.hpp>
 #include <kernel/logger.hpp>
@@ -73,36 +74,36 @@ public:
       // receive messages with any tag and from any source
       // (Warning! Don't replace the status object by MPI_STATUS_IGNORE! It is needed in the following call
       // of MPI_get_count().)
-      MPI_Recv(MPIUtils::buffer, MPIUtils::BUFFERSIZE_BYTES, MPI_PACKED, MPI_ANY_SOURCE,
+      MPI_Recv(Comm::MCW_buffer, Comm::MCW_BUFFERSIZE, MPI_PACKED, MPI_ANY_SOURCE,
                MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_MACRO);
 
 #ifndef NDEBUG
       // Read the size of the received message (in bytes) from the status object.
       // The actual size of the message is not really needed, so we only read it when not in NDEBUG mode.
       // If the correct size is available, then the MPI_Unpack routine automatically checks whether the buffer position
-      // exceeds the length of the sent message (MPIUtils::buffer_pos > MPIUtils::received_bytes) and throws an error
+      // exceeds the length of the sent message (Comm::MCW_buffer_pos > Comm::MCW_received_bytes) and throws an error
       // like this:
       //   *** An error occurred in MPI_Unpack
       //   *** on communicator MPI_COMM_WORLD
       //   *** MPI_ERR_TRUNCATE: message truncated
-      MPI_Get_count(&status, MPI_PACKED, &MPIUtils::received_bytes);
+      MPI_Get_count(&status, MPI_PACKED, &Comm::MCW_received_bytes);
 #else
       // In NDEBUG mode the actual size of the sent message is not read. Instead, the size of the buffer array is
       // used. Hence, it may happen that the MPI_Unpack routine reads rubbish from the buffer without throwing an
       // truncation error.
-      MPIUtils::received_bytes = MPIUtils::BUFFERSIZE_BYTES;
+      Comm::MCW_received_bytes = Comm::MCW_BUFFERSIZE;
 #endif
 
       // reset buffer content pointer
-      MPIUtils::buffer_pos = 0;
+      Comm::MCW_buffer_pos = 0;
 
       // read first integer which is the ID of the message
-      MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, &id, 1,
+      MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &id, 1,
                  MPI_INTEGER, MPI_COMM_WORLD);
 
 //      // debug output
 //      std::cout << "Master " << Process::rank << " received message with ID "
-//                << id << " and size " << MPIUtils::received_bytes << "." << std::endl;
+//                << id << " and size " << Comm::MCW_received_bytes << "." << std::endl;
 
       switch(id)
       {

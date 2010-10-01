@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/service_ids.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/communication.hpp>
 #include <kernel/process_group.hpp>
 
 
@@ -192,11 +193,11 @@ public:
 
 // TODO: write some simple wrapper routine for the following MPI calls (like in FEAST1): init_msg, write_msg, send_msg
     // reset buffer
-    MPIUtils::buffer_pos = 0;
+    Comm::MCW_buffer_pos = 0;
     // write the message id to the buffer
     int id = ServiceIDs::LOG_RECEIVE;
-    int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, MPIUtils::buffer,
-                                  MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, Comm::MCW_buffer,
+                                  Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
 // TODO: define specific MPI_Datatype for the following data (see example on p. 125f in MPI2.2 standard)
@@ -205,23 +206,23 @@ public:
     int msg_length(message.size()+1);
 
     // write length of the message to the buffer
-    mpi_error_code = MPI_Pack(&msg_length, 1, MPI_INTEGER, MPIUtils::buffer,
-                              MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    mpi_error_code = MPI_Pack(&msg_length, 1, MPI_INTEGER, Comm::MCW_buffer,
+                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
     // write char array itself to the buffer
-    mpi_error_code = MPI_Pack(const_cast<char *>(message.c_str()), msg_length, MPI_CHARACTER, MPIUtils::buffer,
-                              MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    mpi_error_code = MPI_Pack(const_cast<char *>(message.c_str()), msg_length, MPI_CHARACTER, Comm::MCW_buffer,
+                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 // COMMENT_HILMAR: Legitimate to simply cast the const away? (see comment in process_group.hpp)
 
     // write log target to the buffer
-    mpi_error_code = MPI_Pack(&targ, 1, MPI_INTEGER, MPIUtils::buffer,
-                              MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    mpi_error_code = MPI_Pack(&targ, 1, MPI_INTEGER, Comm::MCW_buffer,
+                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
     // send message
-    mpi_error_code = MPI_Send(MPIUtils::buffer, MPIUtils::buffer_pos, MPI_PACKED, Process::rank_master, 0,
+    mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
                               MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
   }
@@ -249,7 +250,7 @@ public:
   {
     // read length of the messages from the buffer
     int msg_length;
-    int mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, &msg_length,
+    int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg_length,
                                 1, MPI_INTEGER, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
 
@@ -259,13 +260,13 @@ public:
     // char array for storing the message
     char message[msg_length];
     // read char array from the buffer
-    mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, message,
+    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, message,
                                 msg_length, MPI_CHAR, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
 
     // read log target from the buffer
     int target(0);
-    mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, &target, 1,
+    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &target, 1,
                                 MPI_INTEGER, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
 
@@ -323,37 +324,37 @@ public:
   {
 // TODO: write some simple wrapper routine for the following MPI calls (like in FEAST1): init_msg, write_msg, send_msg
     // reset buffer
-    MPIUtils::buffer_pos = 0;
+    Comm::MCW_buffer_pos = 0;
     // write the message id to the buffer
     int id = ServiceIDs::LOG_RECEIVE_ARRAY;
-    int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, MPIUtils::buffer,
-                                  MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, Comm::MCW_buffer,
+                                  Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
 // TODO: define specific MPI_Datatype for the following data (see example on p. 125f in MPI2.2 standard)
 
     // write number of messages the char array consists of to the buffer
-    mpi_error_code = MPI_Pack(&num_messages, 1, MPI_INTEGER, MPIUtils::buffer,
-                              MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    mpi_error_code = MPI_Pack(&num_messages, 1, MPI_INTEGER, Comm::MCW_buffer,
+                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
     // write lengths of the messages to the buffer
-    mpi_error_code = MPI_Pack(msg_lengths, num_messages, MPI_INTEGER, MPIUtils::buffer,
-                              MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    mpi_error_code = MPI_Pack(msg_lengths, num_messages, MPI_INTEGER, Comm::MCW_buffer,
+                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
     // write char array itself to the buffer
-    mpi_error_code = MPI_Pack(messages, total_length, MPI_CHARACTER, MPIUtils::buffer,
-                              MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    mpi_error_code = MPI_Pack(messages, total_length, MPI_CHARACTER, Comm::MCW_buffer,
+                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
     // write log target to the buffer
-    mpi_error_code = MPI_Pack(&targ, 1, MPI_INTEGER, MPIUtils::buffer,
-                              MPIUtils::BUFFERSIZE_BYTES, &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+    mpi_error_code = MPI_Pack(&targ, 1, MPI_INTEGER, Comm::MCW_buffer,
+                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
 
     // send message
-    mpi_error_code = MPI_Send(MPIUtils::buffer, MPIUtils::buffer_pos, MPI_PACKED, Process::rank_master, 0,
+    mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
                               MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
   }
@@ -436,7 +437,7 @@ public:
     // read number of messages the char array consists of from to the buffer
     int num_messages(0);
 
-    int mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, &num_messages,
+    int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &num_messages,
                                     1, MPI_INTEGER, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
 
@@ -446,7 +447,7 @@ public:
     // allocate array for sotring message lengths
     int msg_lengths[num_messages];
     // read message lengths from the buffer
-    mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, msg_lengths,
+    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg_lengths,
                                 num_messages, MPI_INTEGER, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
 
@@ -473,13 +474,13 @@ public:
     // allocate char array for (consecutively) storing the messages
     char messages[total_length];
     // read char array itself from the buffer
-    mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, messages,
+    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, messages,
                                 total_length, MPI_CHAR, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
 
     // read log target from the buffer
     int target(0);
-    mpi_error_code = MPI_Unpack(MPIUtils::buffer, MPIUtils::received_bytes, &MPIUtils::buffer_pos, &target,
+    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &target,
                                     1, MPI_INTEGER, MPI_COMM_WORLD);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
 

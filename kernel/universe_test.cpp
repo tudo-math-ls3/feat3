@@ -5,10 +5,11 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
-#include <kernel/process.hpp>
-#include <kernel/universe.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/communication.hpp>
+#include <kernel/process.hpp>
+#include <kernel/universe.hpp>
 
 // main routine
 // \author Hilmar Wobker
@@ -75,14 +76,14 @@ int main(int argc, char* argv[])
       {
         // the first MPI process of the process group tells the master to stop its service loop
         // reset buffer
-        MPIUtils::buffer_pos = 0;
+        Comm::MCW_buffer_pos = 0;
         // write the message id to the buffer
         int id = ServiceIDs::MASTER_FINISH_SERVICE;
-        int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, MPIUtils::buffer, MPIUtils::BUFFERSIZE_BYTES,
-                                      &MPIUtils::buffer_pos, MPI_COMM_WORLD);
+        int mpi_error_code = MPI_Pack(&id, 1, MPI_INTEGER, Comm::MCW_buffer, Comm::MCW_BUFFERSIZE,
+                                      &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
         // send message
-        mpi_error_code = MPI_Send(MPIUtils::buffer, MPIUtils::buffer_pos, MPI_PACKED, Process::rank_master, 0,
+        mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
                                   MPI_COMM_WORLD);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
       }
