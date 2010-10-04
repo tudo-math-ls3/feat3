@@ -129,17 +129,17 @@
 *             which collects them in some array structure and sends them to the master.
 *        <li> All processes of the group send their message directly to the master, which collects them in some
 *             array structure and displays/writes them.
+*             COMMENT_HILMAR: I'm not sure how to implement this version... When two process groups
+*             send indiv. messages then the master should group them accordingly. The master can only
+*             communicate via the COMM_WORLD communicator to the two process groups, so one has to distinguish them
+*             via MPI tags. Imagine the first process group contains 3 processes using tag 0 and the second process
+*             group 5 processes using tag 1. When the request of the first group arrives first, then the master creates
+*             an array of length 3 to store three strings and starts a loop calling two further receives of strings
+*             (the first one it alreday got) listening to tag 0 only. But what happens now with the requests of
+*             the second process group, which can (and must not) accepted in that loop (due to the wrong tag)? Are
+*             they automatically postponed?
+*             Due to the uncertainties with the second approach, I implemented the first one.
 *      </ol>
-*      COMMENT_HILMAR: I'm not sure how to implement this version... When two process groups
-*      send indiv. messages then the master should group them accordingly. The master can only
-*      communicate via the COMM_WORLD communicator to the two process groups, so one has to distinguish them
-*      via MPI tags. Imagine the first process group contains 3 processes using tag 0 and the second process
-*      group 5 processes using tag 1. When the request of the first group arrives first, then the master creates
-*      an array of length 3 to store three strings and starts a loop calling two further receives of strings
-*      (the first one it alreday got) listening to tag 0 only. But what happens now with the requests of
-*      the second process group, which can (and must not) accepted in that loop (due to the wrong tag)? Are
-*      they automatically postponed? Or does the process deadlock?
-*      Due to the uncertainties with the second approach, I implemented the first one.
 *  </ol>
 * </ul>
 * \todo everything concerning file output still has to be implemented
@@ -191,40 +191,27 @@ public:
     target targ = SCREEN_FILE)
   {
     // init a new message with corresponding ID
-    Comm::init_msg(ServiceIDs::LOG_RECEIVE);
+    Comm::init(ServiceIDs::LOG_RECEIVE);
 
-// TODO: write some simple wrapper routine for the following MPI calls (like in FEAST1): init_msg, write_msg, send_msg
+// TODO: define specific MPI_Datatype for the following data? (see example on p. 125f in MPI2.2 standard)
 
-// TODO: define specific MPI_Datatype for the following data (see example on p. 125f in MPI2.2 standard)
+    // write length of the log message to the buffer (add 1 to the length since string::c_str() adds null termination
+    // symbol)
+    Comm::write((int)message.size()+1);
 
-    // add 1 to the message length
-    int msg_length(message.size()+1);
-
-    // write length of the message to the buffer
-    int mpi_error_code = MPI_Pack(&msg_length, 1, MPI_INTEGER, Comm::MCW_buffer,
-                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-
-    // write char array itself to the buffer
-    mpi_error_code = MPI_Pack(const_cast<char *>(message.c_str()), msg_length, MPI_CHARACTER, Comm::MCW_buffer,
-                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-// COMMENT_HILMAR: Legitimate to simply cast the const away? (see comment in process_group.hpp)
+    // write string itself to the buffer
+    Comm::write(message);
 
     // write log target to the buffer
-    mpi_error_code = MPI_Pack(&targ, 1, MPI_INTEGER, Comm::MCW_buffer,
-                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+    Comm::write(targ);
 
     // send message
-    mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
-                              MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
+    Comm::send();
   }
 
 
   /**
-  * \brief writing a messages to the screen and/or to the master's log file
+  * \brief receiving a log message and writing it to the screen and/or to the master's log file
   *
   * This function runs on the master and is triggered by the function log_master(). It receives one MPI message
   * consisting of a char array representing one log message. Depending on the sent output target the function then
@@ -245,9 +232,7 @@ public:
   {
     // read length of the messages from the buffer
     int msg_length;
-    int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg_length,
-                                1, MPI_INTEGER, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    Comm::read(msg_length);
 
 //    // debug output
 //    std::cout << "read length of message: " << msg_length << std::endl;
@@ -255,15 +240,11 @@ public:
     // char array for storing the message
     char message[msg_length];
     // read char array from the buffer
-    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, message,
-                                msg_length, MPI_CHAR, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    Comm::read(msg_length, message);
 
     // read log target from the buffer
-    int target(0);
-    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &target, 1,
-                                MPI_INTEGER, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    int target;
+    Comm::read(target);
 
     // display message on screen if requested
     if (target == SCREEN || target == SCREEN_FILE)
@@ -318,36 +299,24 @@ public:
     target targ = SCREEN_FILE)
   {
     // init a new message with corresponding ID
-    Comm::init_msg(ServiceIDs::LOG_RECEIVE_ARRAY);
+    Comm::init(ServiceIDs::LOG_RECEIVE_ARRAY);
 
-// TODO: write some simple wrapper routine for the following MPI calls (like in FEAST1): init_msg, write_msg, send_msg
+// TODO: define specific MPI_Datatype for the following data? (see example on p. 125f in MPI2.2 standard)
 
-// TODO: define specific MPI_Datatype for the following data (see example on p. 125f in MPI2.2 standard)
+    // write number of log messages the char array consists of to the buffer
+    Comm::write(num_messages);
 
-    // write number of messages the char array consists of to the buffer
-    int mpi_error_code = MPI_Pack(&num_messages, 1, MPI_INTEGER, Comm::MCW_buffer,
-                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-
-    // write lengths of the messages to the buffer
-    mpi_error_code = MPI_Pack(msg_lengths, num_messages, MPI_INTEGER, Comm::MCW_buffer,
-                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+    // write lengths of the log messages to the buffer
+    Comm::write(msg_lengths, num_messages);
 
     // write char array itself to the buffer
-    mpi_error_code = MPI_Pack(messages, total_length, MPI_CHARACTER, Comm::MCW_buffer,
-                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+    Comm::write(messages, total_length);
 
     // write log target to the buffer
-    mpi_error_code = MPI_Pack(&targ, 1, MPI_INTEGER, Comm::MCW_buffer,
-                              Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+    Comm::write(targ);
 
     // send message
-    mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
-                              MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
+    Comm::send();
   }
 
 
@@ -374,7 +343,7 @@ public:
   {
 
 // COMMENT_HILMAR: Maybe it is more efficient to *not* realise this via the first version of log_master_array(), but
-// to trigger an extra receive routine on master side...
+// to trigger an extra service receive routine on master side...
 
     // convert the vector of strings into one long char array and determine further information needed by
     // the other version of the function log_master_array(...).
@@ -403,7 +372,7 @@ public:
 
 
   /**
-  * \brief writing a number of distinct messages to the screen and/or to the master's log file
+  * \brief receiving a number of distinct messages and writing them to the screen and/or to the master's log file
   *
   * This function runs on the master and is triggered by the (overloaded) function log_master_array(). It receives one
   * MPI message consisting of one long char array representing an array of distinct log messages, plus further
@@ -426,11 +395,8 @@ public:
 // "pre-allocated" storage...
 
     // read number of messages the char array consists of from to the buffer
-    int num_messages(0);
-
-    int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &num_messages,
-                                    1, MPI_INTEGER, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    int num_messages;
+    Comm::read(num_messages);
 
 //    // debug output
 //    std::cout << "read num_messages: " << num_messages << std::endl;
@@ -438,9 +404,7 @@ public:
     // allocate array for sotring message lengths
     int msg_lengths[num_messages];
     // read message lengths from the buffer
-    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg_lengths,
-                                num_messages, MPI_INTEGER, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    Comm::read(num_messages, msg_lengths);
 
 //    // debug output
 //    for (int i(0) ; i < num_messages ; ++i)
@@ -465,15 +429,11 @@ public:
     // allocate char array for (consecutively) storing the messages
     char messages[total_length];
     // read char array itself from the buffer
-    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, messages,
-                                total_length, MPI_CHAR, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    Comm::read(total_length, messages);
 
     // read log target from the buffer
-    int target(0);
-    mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &target,
-                                    1, MPI_INTEGER, MPI_COMM_WORLD);
-    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    int target;
+    Comm::read(target);
 
     // display messages on screen if requested
     if (target == SCREEN || target == SCREEN_FILE)

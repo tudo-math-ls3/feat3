@@ -76,12 +76,10 @@ int main(int argc, char* argv[])
       {
         // the first MPI process of the process group tells the master to stop its service loop
         // init a new message with corresponding ID
-        Comm::init_msg(ServiceIDs::MASTER_FINISH_SERVICE);
+        Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
 
         // send message
-        int mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
-                                  MPI_COMM_WORLD);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
+        Comm::send();
       }
 // COMMENT_HILMAR: end of TEMPORARY HACK
 

@@ -68,7 +68,8 @@ public:
     std::cout << "Master at your service... " << std::endl;
     sleep(2.0);
 
-    ServiceIDs::service_id id;
+    // service ID read from the sent messages
+    int id;
     while(true)
     {
       // receive messages with any tag and from any source
@@ -98,8 +99,7 @@ public:
       Comm::MCW_buffer_pos = 0;
 
       // read first integer which is the ID of the message
-      MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &id, 1,
-                 MPI_INTEGER, MPI_COMM_WORLD);
+      Comm::read(id);
 
 //      // debug output
 //      std::cout << "Master " << Process::rank << " received message with ID "
