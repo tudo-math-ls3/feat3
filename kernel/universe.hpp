@@ -12,6 +12,7 @@
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
+//#include <kernel/logger.hpp>
 #include <kernel/master.hpp>
 #include <kernel/load_balancer.hpp>
 
@@ -267,6 +268,9 @@ private:
       }
     }
 
+    // open log files
+    Logger::open_log_file();
+
     // create ProcessGroup object representing the group of all COMM_WORLD processes
     _world_group = new ProcessGroup(MPI_COMM_WORLD, _num_processes);
 
@@ -350,6 +354,9 @@ private:
   */
   void _cleanup()
   {
+    // open log files
+    Logger::close_log_file();
+
     delete _world_group;
     for(int igroup(0) ; igroup < _num_process_groups ; ++igroup)
     {

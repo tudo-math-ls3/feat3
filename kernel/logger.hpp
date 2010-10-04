@@ -5,6 +5,7 @@
 // includes, system
 #include <mpi.h>
 #include <iostream>
+#include <fstream>
 #include <stdlib.h>
 
 // includes, Feast
@@ -153,6 +154,18 @@ private:
 
 public:
 
+  /// variable storing the base name of the log file
+  static std::string file_base_name;
+
+  /// default base name of the log file
+  static std::string file_base_name_default;
+
+  /// variable storing the complete name of the log file
+  static std::string file_name;
+
+  /// log file stream
+  static std::ofstream file;
+
   /**
   * \brief log targets used in various logging routines
   *
@@ -171,6 +184,68 @@ public:
 
 
   /**
+  * \brief opens the log file
+  *
+  * This function receives a string representing a log message and writes it to the log file attached to this process.
+  *
+  * \param[in] base_name
+  * The base name of the file (default #file_base_name_default)
+  *
+  * \author Hilmar Wobker
+  */
+  static void open_log_file(std::string const &base_name = file_base_name_default)
+  {
+    // set file name
+    file_base_name = base_name;
+    file_name = file_base_name + StringUtils::stringify(Process::rank) + ".log";
+
+    if (!file.is_open())
+    {
+      file.open(file_name.c_str());
+      // catch file opening error
+      if (file.fail())
+      {
+        MPIUtils::abort("Error! Could not open log file " + file_name + ".");
+      }
+    }
+    else
+    {
+      MPIUtils::abort("Error! Log file " + file_name + " is already opened!");
+    }
+  }
+
+  /**
+  * \brief closes the log file
+  *
+  * \author Hilmar Wobker
+  */
+  static void close_log_file()
+  {
+    if (file.is_open())
+    {
+      file.close();
+    }
+    else
+    {
+      std::cerr << "Error! Log file cannot be closed since it seems not have been openend before..." << std::endl;
+    }
+  }
+
+  /**
+  * \brief writes a message to the log file of this process
+  *
+  * This function receives a string representing a log message and writes it to the log file attached to this process.
+  *
+  * \param[in] message
+  * string representing the log message
+  *
+  * \author Hilmar Wobker
+  */
+  static void log(std::string const &message)
+  {
+  }
+
+  /**
   * \brief triggers logging of a message (given as string) on the master process
   *
   * This function receives a string representing a log message. It triggers the function receive() in the master's
@@ -187,7 +262,7 @@ public:
   * \author Hilmar Wobker
   */
   static void log_master(
-    std::string const message,
+    std::string const &message,
     target targ = SCREEN_FILE)
   {
     // init a new message with corresponding ID
@@ -256,11 +331,7 @@ public:
     // write messages to master's log file if requested
     if (target == FILE || target == SCREEN_FILE)
     {
-      // use corresponding offsets in the char array (pointer arithmetic)
-      //bla_write_to_file_blub(std::string(message, msg_length));
-
-      // as long as not file output is implemented, write messages to the screen
-      std::cout << "FILE OUTPUT: " << message << std::endl;
+      file << message << std::endl;
     }
   }
 
@@ -450,14 +521,15 @@ public:
     {
       for(int i(0) ; i < num_messages ; ++i)
       {
-        // use corresponding offsets in the char array (pointer arithmetic)
-        //bla_write_to_file_blub(messages + msg_start_pos[i]));
-
-        // as long as not file output is implemented, write messages to the screen
-        std::cout << "FILE OUTPUT: " << messages + msg_start_pos[i] << std::endl;
+        file << messages + msg_start_pos[i] << std::endl;
       }
     }
   }
 }; // class Logger
+
+std::string Logger::file_base_name_default("feast");
+std::string Logger::file_name;
+std::string Logger::file_base_name;
+std::ofstream Logger::file;
 
 #endif // guard KERNEL_LOGGER_HPP
