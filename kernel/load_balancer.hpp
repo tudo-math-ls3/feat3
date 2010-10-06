@@ -12,6 +12,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
+#include <kernel/base_mesh.hpp>
 
 /*
  * The user knows what his load balancers should do. He calls, e.g.,
@@ -92,7 +93,7 @@
  */
 
 /**
-* \brief class defining a load balancer process
+* \brief class defining a load balancer
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
@@ -109,7 +110,7 @@ private:
   ProcessGroup* _process_group;
 
   /// flag whether the load balancer's process group uses a dedicated load balancer process
-  bool _group_uses_dedicated_load_bal;
+  bool _group_has_dedicated_load_bal;
 
   /// flag whether this process is the dedicated load balancer process (if there is one)
   bool _is_dedicated_load_bal;
@@ -134,6 +135,12 @@ private:
   */
   int** _work_group_ranks;
 
+  /**
+  * \brief base mesh the load balancer works with
+  *
+  * bla bla
+  */
+  BaseMesh* _base_mesh;
 
 public:
 
@@ -143,15 +150,16 @@ public:
   /// constructor
   LoadBalancer(
     ProcessGroup* process_group,
-    bool group_uses_dedicated_load_bal)
+    bool group_has_dedicated_load_bal)
     : _process_group(process_group),
-      _group_uses_dedicated_load_bal(group_uses_dedicated_load_bal),
+      _group_has_dedicated_load_bal(group_has_dedicated_load_bal),
       _num_workers_in_group(nullptr),
-      _work_group_ranks(nullptr)
+      _work_group_ranks(nullptr),
+      _base_mesh(nullptr)
   {
       // Inquire whether this process is a dedicated load balancer process. This is the case when the process group
       // uses a dedicated load bal. and when this process is the last in the process group.
-      _is_dedicated_load_bal = _group_uses_dedicated_load_bal &&
+      _is_dedicated_load_bal = _group_has_dedicated_load_bal &&
                                _process_group->rank() == _process_group->num_processes()-1;
   }
 
@@ -165,6 +173,7 @@ public:
         delete [] _work_group_ranks[igroup];
       }
       delete [] _work_group_ranks;
+      _work_group_ranks = nullptr;
     }
     for(unsigned int igroup(0) ; igroup < _work_groups.size() ; ++igroup)
     {
@@ -173,6 +182,10 @@ public:
     if (_num_workers_in_group != nullptr)
     {
       delete [] _num_workers_in_group;
+    }
+    if (_base_mesh != nullptr)
+    {
+      delete _base_mesh;
     }
   }
 
@@ -205,6 +218,12 @@ public:
   /// dummy function in preparation of a function reading in a mesh file
   void read_mesh()
   {
+    // the mesh is read by the dedicated load balancer if there is one, otherwise by the group coordinator
+    if(_is_dedicated_load_bal || (!_group_has_dedicated_load_bal && _process_group->is_coordinator()))
+    {
+      _base_mesh = new BaseMesh();
+      _base_mesh->read_mesh();
+    }
   }
 
   /**
@@ -231,7 +250,7 @@ public:
     _num_workers_in_group[0] = 2;
     _num_workers_in_group[1] = num_processes - _num_workers_in_group[0];
     // if a dedicated load balancer process is used, decrease the number of workers in the second work group by 1
-    if(_group_uses_dedicated_load_bal)
+    if(_group_has_dedicated_load_bal)
     {
       --_num_workers_in_group[1];
     }
@@ -266,7 +285,7 @@ public:
     } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
 
     // sanity check for the rank assigned last
-    if(_group_uses_dedicated_load_bal)
+    if(_group_has_dedicated_load_bal)
     {
       // the dedicated load balancer has the last rank num_processes - 1
       assert(iter_group_rank == num_processes - 2);

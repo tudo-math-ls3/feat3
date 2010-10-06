@@ -62,6 +62,9 @@ protected:
   /// id of the process group
   int const _group_id;
 
+  /// rank of the coordinator process within the group
+  int const _rank_coord;
+
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
 //  /// buffer size
 //  static int BUFFERSIZE_BYTES;
@@ -78,7 +81,8 @@ public:
   /**
   * \brief constructor for the case the MPI_Group and the MPI_Comm already exist
   *
-  * This constructor is intended for creating a process group object containing all COMM_WORLD processes.
+  * This constructor is intended for creating a process group object containing all COMM_WORLD processes. The
+  * coordinator is set to rank 0.
   *
   * \param[in] comm
   * communicator shared by the group processes
@@ -93,7 +97,8 @@ public:
       _num_processes(num_processes),
       _ranks_group_parent(nullptr),
       _process_group_parent(nullptr),
-      _group_id(-1)
+      _group_id(-1),
+      _rank_coord(0)
   {
     // get MPI_Group object for the given communicator
     int mpi_error_code = MPI_Comm_group(_comm, &_group);
@@ -106,21 +111,30 @@ public:
     // since this is the world group of processes, the local and the global rank should be equal
     assert(Process::rank == _rank);
 
+
+
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
 //    // in the world group buffers are not needed
 //    _buffer = nullptr;
   }
 
-  /// constructor for the case the MPI_Group and the corresponding communicator have to be created
+  /**
+  * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
+  *
+  * This constructor can be used for splitting the complete set of COMM_WORLD processes into subgroups for performing
+  * two completely seperated tasks (e.g., for multiphysics).
+  * The coordinator of this process group is set to rank 0.
+  */
   ProcessGroup(
     int num_processes,
     int ranks_group_parent[],
     ProcessGroup* process_group_parent,
-    const int group_id)
+    int const group_id)
     : _num_processes(num_processes),
       _ranks_group_parent(ranks_group_parent),
       _process_group_parent(process_group_parent),
-      _group_id(group_id)
+      _group_id(group_id),
+      _rank_coord(0)
   {
     int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
                                         _ranks_group_parent, &_group);
@@ -243,6 +257,16 @@ public:
   * member functions *
   *******************/
   /**
+  * \brief checks whether this process is the coordinator of the process group
+  *
+  * \return true if this process is the coordinator of the process group, otherwise false
+  */
+  inline bool is_coordinator() const
+  {
+    return _rank == _rank_coord;
+  }
+
+  /**
   * \brief sending individual messages to the master
   *
   * With this function the processes of the process group can send individual log messages to the master. The
@@ -265,31 +289,28 @@ public:
   void log_indiv_master(std::string message, Logger::target target = Logger::SCREEN_FILE)
   {
 
-    // rank of the coordinator process which gathers the information from the other processes
-    int coord = 0;
-
     // add 1 to the message length since string::c_str() adds the null termination symbol to the resulting char array
     int length = message.length() + 1;
 
-    if (_rank != coord)
+    if (!is_coordinator())
     {
       /* ***************************************
       * code for all non-coordinator processes *
       *****************************************/
 
       // coordinator process gathers the lengths of the messages
-      MPI_Gather(&length, 1, MPI_INT, nullptr, 0, MPI_DATATYPE_NULL, coord, _comm);
+      MPI_Gather(&length, 1, MPI_INT, nullptr, 0, MPI_DATATYPE_NULL, _rank_coord, _comm);
 
       // coordinator process gathers the messages
       // (Here, it is necessary to cast away the const'ness of string::c_str() since the MPI routine expects a
       // non-const send buffer.)
       MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, nullptr, nullptr, nullptr,
-                  MPI_DATATYPE_NULL, coord, _comm);
+                  MPI_DATATYPE_NULL, _rank_coord, _comm);
 // COMMENT_HILMAR: not sure, if it is actually legitimate to simply cast the const away or if one has to manually copy
 // the string like this:
 //    char bla[length];
 //    strcpy(bla, message.c_str());
-//    MPI_Gatherv(bla, length, MPI_CHAR, nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, coord, _comm);
+//    MPI_Gatherv(bla, length, MPI_CHAR, nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, _rank_coord, _comm);
 // With gcc 4.4.0 and intel 11.1 it works for tiny test problems. (If the function call is changed, then also
 // change the call on coordinator side some lines below.)
     }
@@ -305,7 +326,7 @@ public:
       int msg_start_pos[_num_processes];
 
       // gather the lengths of the messages from the other processes
-      MPI_Gather(&length, 1, MPI_INT, msg_lengths, 1, MPI_INT, coord, _comm);
+      MPI_Gather(&length, 1, MPI_INT, msg_lengths, 1, MPI_INT, _rank_coord, _comm);
 
       // set start positions of the single messages in the receive buffer
       msg_start_pos[0] = 0;
@@ -417,7 +438,7 @@ public:
     ********************************/
 
     // let the coordinator of the work group (rank = 0) trigger some common messages
-    if(_rank == 0)
+    if(is_coordinator())
     {
       std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
                     + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));

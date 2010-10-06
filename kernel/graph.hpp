@@ -24,10 +24,13 @@
 * The data structure can also be used to create distributed graph data structures via the MPI routine
 * MPI_DIST_GRAPH_CREATE(...), (see MPI-2.2 standard, example 7.3 on page 256).
 *
-* COMMENT_HILMAR: Maybe a clever procedure: coordinator process creates global graph structure, distributes it to
-* all the other processes of the process group via MPI_Dist_graph_create(...). Then, each process creates its local
-* graph structure by inquiring corresponding information. (MPI_Topo_test, MPI_Graph_dims_get, MPI_Graph_get,
-* MPI_Graph_neighbors_count, MPI_Graph_neighbors, MPI_Dist_graph_neighbors_count, MPI_Dist_graph_neighbors,
+* COMMENT_HILMAR: rough description of the procedure: coordinator or dedicated load balancer process creates global
+* graph structure, distributes it to all the other processes of the process group via MPI_Dist_graph_create(...). Then,
+* each process creates its local graph structure by inquiring corresponding information, i.e. using
+*   MPI_Dist_graph_neighbors_count(...)
+* to get number of neighbours and then
+*   MPI_Dist_graph_neighbors(...)
+* to get the ranks of the neighbours.
 *
 * COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
 *
@@ -42,7 +45,7 @@ private:
   * member variables *
   *******************/
   /// number of nodes in the graph, which are numbered from 0 to num_nodes-1
-  int _num_nodes;
+  int const _num_nodes;
 
   /**
   * \brief access information for the array edges
@@ -61,7 +64,8 @@ private:
   /**
   * \brief edges of the graph, represented as a list of node numbers
   *
-  * The neighbours of node i are stored in the subarray _edges[#_index[i]], ..., _edges[#_index[i+1]-1].
+  * The neighbours of node i are stored in the subarray _edges[#_index[i]], ..., _edges[#_index[i+1]-1]. The order
+  * of the neighbours within the subarrays is arbitrary.
   *
   * Example: domain consisting of 7 subdomains, each subdomain is a node in the graph. Edges represent neighbouring
   * subdomains, including diagonal neighbours.
@@ -98,10 +102,103 @@ public:
   /* *************************
   * constructor & destructor *
   ***************************/
+  /// constructor
+  Graph(
+    int const num_nodes,
+    int* index,
+    int* edges
+    )
+    : _num_nodes(num_nodes),
+      _index(index),
+      _edges(edges)
+  {
+  }
+  /// destructor
+  ~Graph()
+  {
+    delete [] _index;
+    _index = nullptr;
+    delete [] _edges;
+    _edges = nullptr;
+  }
 
   /* *****************
   * member functions *
   *******************/
+  /// print the graph
+  void print()
+  {
+    std::cout << "number of nodes: " << _num_nodes << std::endl;
+    if (_num_nodes > 0)
+    {
+      std::cout << "node | degree | neighbours: " << std::endl;
+      for(int i(0) ; i < _num_nodes ; ++i)
+      {
+        std::cout << i << " | " << _index[i+1] - _index[i];
+        if (_index[i+1] - _index[i] > 0)
+        {
+          std::cout << " | " << _edges[_index[i]];
+          for(int j(_index[i]+1) ; j < _index[i+1] ; ++j)
+          {
+            std::cout << ", " << _edges[j];
+          }
+        }
+        std::cout << std::endl;
+      }
+    }
+  }
 }; // class Graph
+
+
+
+/**
+* \brief class providing a distributed graph data structure for defining connectivity of subdomains / matrix patches /
+*        processes
+*
+* This data structure represents the part of the global graph this process is associated with. It basically stores the
+* number of neighbours and the ranks of the neighbours. The data structure can be constructed from a global graph with
+* the help of the MPI functions
+*   MPI_Dist_graph_neighbors_count(...)
+* to get the number of neighbours and
+*   MPI_Dist_graph_neighbors(...)
+* to get the ranks of the neighbours.
+*
+* COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
+*
+* \author Hilmar Wobker
+*/
+class GraphDistributed
+{
+
+private:
+
+  /* *****************
+  * member variables *
+  *******************/
+  /// number of neighbours
+  int _num_neighbours;
+
+  /**
+  * \brief ranks of the neighbours
+  *
+  * Dimension: [#_num_neighbours]
+  */
+  int* _neighbours;
+
+
+public:
+
+  /* *****************
+  * member variables *
+  *******************/
+
+  /* *************************
+  * constructor & destructor *
+  ***************************/
+
+  /* *****************
+  * member functions *
+  *******************/
+}; // class GraphDistributed
 
 #endif // guard KERNEL_GRAPH_HPP
