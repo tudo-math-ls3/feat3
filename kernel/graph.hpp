@@ -24,14 +24,6 @@
 * The data structure can also be used to create distributed graph data structures via the MPI routine
 * MPI_DIST_GRAPH_CREATE(...), (see MPI-2.2 standard, example 7.3 on page 256).
 *
-* COMMENT_HILMAR: rough description of the procedure: coordinator or dedicated load balancer process creates global
-* graph structure, distributes it to all the other processes of the process group via MPI_Dist_graph_create(...). Then,
-* each process creates its local graph structure by inquiring corresponding information, i.e. using
-*   MPI_Dist_graph_neighbors_count(...)
-* to get number of neighbours and then
-*   MPI_Dist_graph_neighbors(...)
-* to get the ranks of the neighbours.
-*
 * COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
 *
 * \author Hilmar Wobker

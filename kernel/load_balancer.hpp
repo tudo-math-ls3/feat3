@@ -14,86 +14,104 @@
 #include <kernel/process_group.hpp>
 #include <kernel/base_mesh.hpp>
 
-/*
- * The user knows what his load balancers should do. He calls, e.g.,
- * if(load_bal.group_id == 0)
- * {
- *   load_bal.readMesh();
- *   ...
- * }
- * else
- * {
- *   do something else
- * }
- *
- * The load bal. with id 0 in the example above then
- *   - reads in the mesh
- *   - builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
- *     coarse mesh problem) and creates corresponding MPI communicators ((the worker with rank 0 in this communicator
- *     is automatically the coordinator who communicates with the master)
- *   - tells each member of the work groups to create a Worker object (representing the Worker on this process itself)
- *      and corresponding RemoteWorker objects (as members of the WorkGroup objects) representing the remote Worker
- *     objects
- *   - tells each Worker which (Remote)Worker objects he has to communicate with *in other workgroups* via the
- *     communicator they all share within the parent process group. E.g., the fine mesh workers have to send the
- *     restricted defect vector to a certain coarse mesh worker, while the coarse mesh worker has to send the coarse
- *     mesh correction to one or more fine mesh workers. Two such communicating workers in different work groups live
- *     either on the same process (internal communication = copy) or on different processes (external communication
- *     = MPI send/recv)!
- *
- *     Example:
- *
- *     distribution of submeshes to workers A-G on different levels:
- *
- *     ---------------      ---------------      ---------------
- *     |             |      |      |      |      |      |      |
- *     |             |      |      |      |      |  D   |  G   |
- *     |             |      |      |      |      |      |      |
- *     |      A      |      |  B   |  C   |      ---------------
- *     |             |      |      |      |      |      |      |
- *     |             |      |      |      |      |  E   |  F   |
- *     |             |      |      |      |      |      |      |
- *     ---------------      ---------------      ---------------
- *       level 0               level 1              levels 2-L
- *
- *     * case a:
- *       process group rank:  0  1  2  3
- *             work group 2:  D  E  F  G         (four workers for the problems on level 2-L)
- *             work group 1:  B     C            (two workers for the problem on level 1)
- *             work group 0:  A                  (one worker for the coarse mesh problem on level 0)
- *
- *       Communications:
- *       A <--> B (internal, rank 0) A <--> C (external, ranks 0+2)
- *       B <--> D (internal, rank 0) B <--> E (external, ranks 0+1)
- *       C <--> F (internal, rank 2) C <--> G (external, ranks 2+3)
- *
- *     * case b:
- *       process group rank:  0  1  2  3  4
- *             work group 2:     D  E  F  G
- *             work group 1:     B     C
- *             work group 0:  A
- *
- *       Communications:
- *       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+3)
- *       B <--> D (internal, rank 1) B <--> E (external, ranks 1+2)
- *       C <--> F (internal, rank 3) C <--> G (external, ranks 3+4)
- *
- *     * case c:
- *       process group rank:  0  1  2  3  4  5  6
- *             work group 2:           D  E  F  G
- *             work group 1:     B  C
- *             work group 0:  A
- *
- *       Communications:
- *       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+2)
- *       B <--> D (external, ranks 1+3) B <--> E (external, ranks 1+4)
- *       C <--> F (external, ranks 2+5) C <--> G (external, ranks 2+6)
- *
- *   - sends corresponding parts of the mesh to the Worker objects
- */
-
 /**
 * \brief class defining a load balancer
+*
+* Each initial process group is organised by a load balancer. It runs on all processes of the process group, which
+* eases work flow organisation significantly. The user can choose to use a dedicated load balancer process which does
+* not solve any linear algebra problem, but only performs organisation and scheduling tasks (reading the mesh, building
+* graph structures, ...). The dedicated load balancer process is the last rank within its process group. If there is no
+* such dedicated process, the coordinator of the process group (usually that with rank 0) performs these tasks.
+*
+* The user knows what each process group and its respective load balancer should do. He calls, e.g.,
+* if(load_bal->group_id() == 0)
+* {
+*   load_bal->readMesh();
+*   ...
+* }
+* else
+* {
+*   coffee_machine.start();
+* }
+*
+* The load bal. with id 0 in the example above then
+* 1) reads in the mesh (this is only done by the dedicated load balancer process or the coordinator, resp.)
+* 2) builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
+*    coarse mesh problem) and creates corresponding MPI communicators. The worker with rank 0 in this communicator
+*    is usually the coordinator which communicates with the master or the dedicated load balancer. The process
+*    topologies of the work groups are then optimised by building corresponding graph structures. There are two cases:
+*    a) There is a dedicated load balancer: The dedicated load balancer reads the mesh, creates work groups and and a
+*       global graph structure for each work group. Then it distributes the relevant parts of the global graph to all
+*       processes of the work groups, which then create their local graph structure and call MPI_Dist_graph_create(...)
+*       to build the new MPI process topology in a distributed fashion.
+*    b) There is no dedicated load balancer: Same as case a), but instead of the dedicated load balancer the coordinator
+*       builds the global graph structure.
+*    COMMENT_HILMAR: It might be more clever to also let the MPI implementation decide on which physical process the
+*    dedicated load balancer should reside (instead of pinning it to the last rank in the process group). To improve
+*    this is task of the ITMC.
+*
+* 3) tells each member of the work groups to create a Worker object (representing the Worker on this process itself)
+*    and corresponding RemoteWorker objects (as members of the WorkGroup objects) representing the remote Worker
+*    objects
+* COMMENT_HILMAR: Probably, step 3) is skipped, i.e., there will be no extra Worker objects. Instead "the part of
+* the WorkGroup living on this process" represents such a worker.
+*
+* 4) tells each work group which other work groups it has to communicate with via the communicator they all share
+*    within the parent process group. E.g., the fine mesh work group has to send the restricted defect vector to the
+*    coarse mesh work group, while the coarse mesh work group has to send the coarse mesh correction to the fine mesh
+*    work group. Two such communicating work groups live either on the same process (internal communication = copy) or
+*    on different processes (external communication = MPI send/recv). (See example below.)
+*
+* 5) sends corresponding parts of the mesh to the work groups
+*
+*     Example:
+*
+*     Distribution of submeshes to processes A-G on different levels (note that processes A-G are not necessarily
+*     disjunct, i.e., several of them can refer to the same physical process, see cases a and b):
+*
+*     ---------------      ---------------      ---------------
+*     |             |      |      |      |      |      |      |
+*     |             |      |      |      |      |  D   |  G   |
+*     |             |      |      |      |      |      |      |
+*     |      A      |      |  B   |  C   |      ---------------
+*     |             |      |      |      |      |      |      |
+*     |             |      |      |      |      |  E   |  F   |
+*     |             |      |      |      |      |      |      |
+*     ---------------      ---------------      ---------------
+*       level 0               level 1              levels 2-L
+*
+*     * case a, four physical processes:
+*       process group rank:  0  1  2  3
+*              WorkGroup 2:  D  E  F  G         (four WorkGroup processes for the problems on level 2-L)
+*              WorkGroup 1:  B     C            (two WorkGroup processes for the problem on level 1)
+*              WorkGroup 0:  A                  (one WorkGroup process for the coarse mesh problem on level 0)
+*
+*       Communication:
+*       A <--> B (internal, rank 0) A <--> C (external, ranks 0+2)
+*       B <--> D (internal, rank 0) B <--> E (external, ranks 0+1)
+*       C <--> F (internal, rank 2) C <--> G (external, ranks 2+3)
+*
+*     * case b, five physical processes::
+*       process group rank:  0  1  2  3  4
+*              WorkGroup 2:     D  E  F  G
+*              WorkGroup 1:     B     C
+*              WorkGroup 0:  A
+*
+*       Communication:
+*       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+3)
+*       B <--> D (internal, rank 1) B <--> E (external, ranks 1+2)
+*       C <--> F (internal, rank 3) C <--> G (external, ranks 3+4)
+*
+*     * case c, seven physical processes:
+*       process group rank:  0  1  2  3  4  5  6
+*              WorkGroup 2:           D  E  F  G
+*              WorkGroup 1:     B  C
+*              WorkGroup 0:  A
+*
+*       Communication:
+*       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+2)
+*       B <--> D (external, ranks 1+3) B <--> E (external, ranks 1+4)
+*       C <--> F (external, ranks 2+5) C <--> G (external, ranks 2+6)
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
@@ -202,6 +220,9 @@ public:
     return _process_group;
   }
 
+  /* *****************
+  * member functions *
+  *******************/
   /**
   * \brief getter for the flag whether this process is a dedicated load balancer process
   *
@@ -212,9 +233,6 @@ public:
     return _is_dedicated_load_bal;
   }
 
-  /* *****************
-  * member functions *
-  *******************/
   /// dummy function in preparation of a function reading in a mesh file
   void read_mesh()
   {
@@ -237,6 +255,12 @@ public:
   */
   void create_work_groups()
   {
+    // create process topology (either the dedicated load balancer if there is one, otherwise the group coordinator)
+    if(_is_dedicated_load_bal || (!_group_has_dedicated_load_bal && _process_group->is_coordinator()))
+    {
+      // ...
+    }
+
     // shortcut to the number processes in the load balancer's process group
     int num_processes = _process_group->num_processes();
     // shortcut to the process group rank of this process

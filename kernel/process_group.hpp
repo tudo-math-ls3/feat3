@@ -404,15 +404,15 @@ private:
   /* *****************
   * member variables *
   *******************/
-  /// worker object living on this process
-  Worker* _worker;
+//  /// worker object living on this process
+//  Worker* _worker;
 
-  /**
-  * \brief vector of remote workers in the work group
-  *
-  * Here, RemoteWorker objects are used (instead of Worker objects) since they exist on remote processes.
-  */
-  std::vector<RemoteWorker*> _remote_workers;
+//  /**
+//  * \brief vector of remote workers in the work group
+//  *
+//  * Here, RemoteWorker objects are used (instead of Worker objects) since they exist on remote processes.
+//  */
+//  std::vector<RemoteWorker*> _remote_workers;
 
 
 public:
@@ -426,11 +426,11 @@ public:
     int ranks_group_parent[],
     ProcessGroup* process_group_parent,
     const int group_id)
-    : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
-      _worker(nullptr),
-      _remote_workers(nullptr)
+    : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id)
+//      _worker(nullptr),
+//      _remote_workers(nullptr)
   {
-    _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
+//    _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
 
 
     /* ******************************
@@ -470,7 +470,7 @@ public:
   /// destructor
   ~WorkGroup()
   {
-    delete _worker;
+//    delete _worker;
   }
 };
 
