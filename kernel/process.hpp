@@ -44,6 +44,9 @@ public:
   */
   static int rank_master;
 
+  /// total number of MPI_COMM_WORLD processes spawned at program start
+  static int num_processes;
+
   /// flag whether this process is the master process
   static bool is_master;
 
@@ -58,6 +61,7 @@ public:
 // define static member variables
 int Process::rank = MPI_PROC_NULL;
 int Process::rank_master = MPI_PROC_NULL;
+int Process::num_processes = -1;
 bool Process::is_master = false;
 
 #endif // guard KERNEL_PROCESS_HPP

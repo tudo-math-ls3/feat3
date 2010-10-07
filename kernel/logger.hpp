@@ -195,9 +195,20 @@ public:
   */
   static void open_log_file(std::string const &base_name = file_base_name_default)
   {
-    // set file name
+    // set base name of the log file
     file_base_name = base_name;
-    file_name = file_base_name + StringUtils::stringify(Process::rank) + ".log";
+    // add the MPI_COMM_WORLD rank of this process to the base name
+    // inquire how many digits are needed (depending on the number of processes)
+    int num_digits((int)log10(Process::num_processes) + 1);
+    // use at least 3 digits
+    num_digits = std::max(3, num_digits);
+// COMMENT_HILMAR: lassen sich die naechsten vier Code-Zeilen auch einfacher realisieren?
+    // set format string for printf function, use leading zeros
+    std::string format("%0"+StringUtils::stringify(num_digits)+"i");
+    char s[num_digits];
+    sprintf(s, format.c_str(), Process::rank);
+    // set full filename
+    file_name = file_base_name + s + ".log";
 
     if (!file.is_open())
     {
@@ -243,6 +254,42 @@ public:
   */
   static void log(std::string const &message)
   {
+    file << message << std::endl;
+  }
+
+  /**
+  * \brief writes a message to the log file of this process
+  *
+  * This function receives a char array representing a log message and writes it to the log file attached to this
+  * process.
+  *
+  * \param[in] message
+  * char array representing the log message
+  *
+  * \author Hilmar Wobker
+  */
+  static void log(char message[])
+  {
+    file << message << std::endl;
+  }
+
+  /**
+  * \brief writes a number of messages to the log file of this process
+  *
+  * This function receives a vector of strings representing a number of log message and writes them line by line to
+  * the log file attached to this process.
+  *
+  * \param[in] messages
+  * vector of strings representing the messages
+  *
+  * \author Hilmar Wobker
+  */
+  static void log(std::vector<std::string> const &messages)
+  {
+    for(int i(0) ; i<messages.size() ; ++i)
+    {
+      file << messages[i] << std::endl;
+    }
   }
 
   /**
@@ -331,7 +378,7 @@ public:
     // write messages to master's log file if requested
     if (target == FILE || target == SCREEN_FILE)
     {
-      file << message << std::endl;
+      log(message);
     }
   }
 
@@ -521,7 +568,7 @@ public:
     {
       for(int i(0) ; i < num_messages ; ++i)
       {
-        file << messages + msg_start_pos[i] << std::endl;
+        log(messages + msg_start_pos[i]);
       }
     }
   }

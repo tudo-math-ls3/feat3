@@ -49,6 +49,19 @@ public:
     }
   }
 
+  /* ******************
+  * getters & setters *
+  ********************/
+  /**
+  * \brief getter for the graph
+  *
+  * \return Graph pointer #_graph
+  */
+  inline Graph* graph() const
+  {
+    return _graph;
+  }
+
   /* *****************
   * member functions *
   *******************/
@@ -134,6 +147,8 @@ public:
       delete _graph;
       _graph = nullptr;
     }
+    // create graph object
+    // temporarily, do not distinguish edge neighbours and diagonal neighbours
     _graph = new Graph(num_base_cells, index, edges);
     _graph->print();
   }

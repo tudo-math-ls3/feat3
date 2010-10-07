@@ -232,6 +232,7 @@ private:
     // set static Process class variables for this MPI_COMM_WORLD process
     Process::rank = my_rank;
     Process::rank_master = rank_master;
+    Process::num_processes = _num_processes;
     Process::is_master = (Process::rank == Process::rank_master);
 
     // calculate the number of processes needed; and check whether there are enough MPI processes available:

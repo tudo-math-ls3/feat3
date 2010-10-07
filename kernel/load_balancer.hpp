@@ -258,10 +258,13 @@ public:
     // create process topology (either the dedicated load balancer if there is one, otherwise the group coordinator)
     if(_is_dedicated_load_bal || (!_group_has_dedicated_load_bal && _process_group->is_coordinator()))
     {
+      // get connectivity graph
+      Graph* graph = _base_mesh->graph();
+
       // ...
     }
 
-    // shortcut to the number processes in the load balancer's process group
+    // shortcut to the number of processes in the load balancer's process group
     int num_processes = _process_group->num_processes();
     // shortcut to the process group rank of this process
     int my_rank = _process_group->rank();
@@ -270,7 +273,7 @@ public:
     _num_work_groups = 2;
     // array of numbers of workers per work group
     _num_workers_in_group = new int[2];
-    // set number of workers manually to 2 and remaining processes, resp.
+    // set number of worker processes manually to 2 and remaining processes, resp.
     _num_workers_in_group[0] = 2;
     _num_workers_in_group[1] = num_processes - _num_workers_in_group[0];
     // if a dedicated load balancer process is used, decrease the number of workers in the second work group by 1
@@ -278,8 +281,10 @@ public:
     {
       --_num_workers_in_group[1];
     }
-    // assert that the number of processes in the second group is positive, i.e. that enough processes are available
-    assert(_num_workers_in_group[1] > 0);
+//    // assert that the number of processes in the second group is positive, i.e. that enough processes are available
+//    assert(_num_workers_in_group[1] > 0);
+    // assert that the number of processes in the second group is 16 in order to treat the hard coded example mesh
+    assert(_num_workers_in_group[1] == 16);
 
     // Partition the ranks of the process group communicator into groups, by simply enumerating the process
     // group ranks and assigning them consecutively to the requested number of processes. Note that the dedicated

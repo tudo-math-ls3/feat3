@@ -24,8 +24,12 @@ int main(int argc, char* argv[])
 
   // number of process groups (if not provided, then 1)
   int num_process_groups(2);
+
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
-  int num_processes_in_group[] = {6, 2};
+  // For the hard-coded example mesh we need 16 processes for the fine grid work group, 2 processes for the coarse grid
+  // work group and 1 process for the dedicated load balancer, i.e. 19 processes.
+  int num_processes_in_group[] = {19, 2};
+
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
   bool includes_dedicated_load_bal[] = {true, false};
@@ -60,14 +64,17 @@ int main(int argc, char* argv[])
       load_balancer->read_mesh();
       load_balancer->create_work_groups();
 
-      // let all process with even world rank test the vector version of the function log_master_array()
+      // let all process with even world rank test the vector version of the function log_master_array() and the
+      // standard file logging functions
       if (Process::rank % 2 == 0)
       {
         std::vector<std::string> messages(3);
         messages[0] = StringUtils::stringify(Process::rank) + ". process is testing...";
         messages[1] = "... this vector ...";
         messages[2] = "... logging feature!";
-        Logger::log_master_array(messages, Logger::SCREEN);
+        Logger::log_master_array(messages, Logger::FILE);
+        Logger::log(messages);
+        Logger::log("BRAL");
       }
 
 // COMMENT_HILMAR: TEMPORARY HACK to stop the infinite service loop of the master

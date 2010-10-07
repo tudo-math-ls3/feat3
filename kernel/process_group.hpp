@@ -437,15 +437,16 @@ public:
     * test the logger functionality *
     ********************************/
 
+    // debugging output
     // let the coordinator of the work group (rank = 0) trigger some common messages
     if(is_coordinator())
     {
       std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
                     + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));
-      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
+//      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
       Logger::log_master("Hello, master file! " + s, Logger::FILE);
-      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-      Logger::log_master("Hello, default master screen and file! " + s);
+//      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+//      Logger::log_master("Hello, default master screen and file! " + s);
     }
 
     // write some individual messages to screen and file
@@ -455,16 +456,16 @@ public:
     // vary the lengths of the messages a little bit
     for(int i(0) ; i < _rank+1 ; ++i)
     {
-      s += " RANK";
+      s += " R";
     }
     for(int i(0) ; i < _group_id+1 ; ++i)
     {
-      s += " GROUP";
+      s += " G";
     }
-    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
+//    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
     log_indiv_master("Hello, master file! " + s, Logger::FILE);
-    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-    log_indiv_master("Hello, master default screen and file! " + s);
+//    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+//    log_indiv_master("Hello, master default screen and file! " + s);
   }
 
   /// destructor
