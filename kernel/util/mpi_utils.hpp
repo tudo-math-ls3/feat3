@@ -62,4 +62,44 @@ class MPIUtils
 
 }; // class MPIUtils
 
+//wird im code dann aufgerufen per MPIType<DT_>::value()
+//mit DT_ halt grad der DataType nachdem du deine Funktion templatisierst hast.
+//
+//Hm für ohne internet einfach mal ausgeschnitten:
+//
+//template <typename DT_>
+//      class MPIType
+//      {
+//      };
+//
+//      template <>
+//      class MPIType<float>
+//      {
+//          public:
+//              static inline MPI_Datatype value()
+//              {
+//                  return MPI_FLOAT;
+//              }
+//      };
+//
+//      template <>
+//      class MPIType<double>
+//      {
+//          public:
+//              static inline MPI_Datatype value()
+//              {
+//                  return MPI_DOUBLE;
+//              }
+//      };
+//
+//      template <>
+//      class MPIType<unsigned long>
+//      {
+//          public:
+//              static inline MPI_Datatype value()
+//              {
+//                  return MPI_UNSIGNED_LONG;
+//              }
+//      };
+
 #endif //  #ifndef MPI_UTILS_HPP

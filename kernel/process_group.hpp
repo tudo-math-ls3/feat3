@@ -82,7 +82,7 @@ public:
   * \brief constructor for the case the MPI_Group and the MPI_Comm already exist
   *
   * This constructor is intended for creating a process group object containing all COMM_WORLD processes. The
-  * coordinator is set to rank 0.
+  * coordinator is set to rank #_num_processes-1, i.e. the last rank in the process group.
   *
   * \param[in] comm
   * communicator shared by the group processes
@@ -98,7 +98,7 @@ public:
       _ranks_group_parent(nullptr),
       _process_group_parent(nullptr),
       _group_id(-1),
-      _rank_coord(0)
+      _rank_coord(num_processes-1)
   {
     // get MPI_Group object for the given communicator
     int mpi_error_code = MPI_Comm_group(_comm, &_group);
@@ -111,10 +111,7 @@ public:
     // since this is the world group of processes, the local and the global rank should be equal
     assert(Process::rank == _rank);
 
-
-
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
-//    // in the world group buffers are not needed
 //    _buffer = nullptr;
   }
 
@@ -122,8 +119,8 @@ public:
   * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
   *
   * This constructor can be used for splitting the complete set of COMM_WORLD processes into subgroups for performing
-  * two completely seperated tasks (e.g., for multiphysics).
-  * The coordinator of this process group is set to rank 0.
+  * two or more completely separated tasks (e.g., for multiphysics).
+  * The coordinator of this process group is set to rank #_num_processes-1, i.e. the last rank in the process group.
   */
   ProcessGroup(
     int num_processes,
@@ -134,7 +131,7 @@ public:
       _ranks_group_parent(ranks_group_parent),
       _process_group_parent(process_group_parent),
       _group_id(group_id),
-      _rank_coord(0)
+      _rank_coord(num_processes-1)
   {
     int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
                                         _ranks_group_parent, &_group);
@@ -253,6 +250,16 @@ public:
     return _rank;
   }
 
+  /**
+  * \brief getter for the rank w.r.t. the group communicator this process belongs to
+  *
+  * \return rank #_rank w.r.t. process group communicator
+  */
+  inline int rank_coord() const
+  {
+    return _rank_coord;
+  }
+
   /* *****************
   * member functions *
   *******************/
@@ -317,7 +324,7 @@ public:
     else
     {
       /* ********************************
-      * code on the coordinator process *
+      * code for the coordinator process *
       **********************************/
 
       // receive buffer for storing the lengths of the messages
@@ -351,7 +358,7 @@ public:
 
       // gather the messages from the other processes.
       MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages, msg_lengths, msg_start_pos,
-                  MPI_CHAR, 0, _comm);
+                  MPI_CHAR, _rank_coord, _comm);
 
 //      // debug output
 //      // output the strings collected from all processes by using corresponding offsets in the
@@ -404,9 +411,19 @@ private:
   /* *****************
   * member variables *
   *******************/
+  /// flag whether this group contains the coordinator as an extra process, not being a compute process of this group
+  bool _contains_extra_coord;
+
+  /**
+  * \brief subgroup of this work group containing only the real compute processes
+  *
+  * This is either a pointer to the work group itself if #_contains_extra_coord == false, otherwise it is a subgroup of
+  * the work group containing all processes except the extra coordinator process, i.e. only the real compute processes.
+  */
+  WorkGroup* _work_group_compute;
+
 //  /// worker object living on this process
 //  Worker* _worker;
-
 //  /**
 //  * \brief vector of remote workers in the work group
 //  *
@@ -425,18 +442,28 @@ public:
     const int num_processes,
     int ranks_group_parent[],
     ProcessGroup* process_group_parent,
-    const int group_id)
-    : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id)
+    const int group_id,
+    bool contains_extra_coord)
+    : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
+      _contains_extra_coord(contains_extra_coord)
 //      _worker(nullptr),
 //      _remote_workers(nullptr)
   {
-//    _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
-
+    if (!_contains_extra_coord)
+    {
+      // in the case there is no extra coordinator process, the subgroup of compute processes is equal to the work
+      // group itself
+      _work_group_compute = this;
+    }
+    else
+    {
+      // otherwise, create a subgroup only consisting of the real compute proesses
+// COMMENT_HILMAR: TODO!
+    }
 
     /* ******************************
     * test the logger functionality *
     ********************************/
-
     // debugging output
     // let the coordinator of the work group (rank = 0) trigger some common messages
     if(is_coordinator())
@@ -466,6 +493,8 @@ public:
     log_indiv_master("Hello, master file! " + s, Logger::FILE);
 //    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
 //    log_indiv_master("Hello, master default screen and file! " + s);
+
+//    _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
   }
 
   /// destructor

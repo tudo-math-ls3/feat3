@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
   // For the hard-coded example mesh we need 16 processes for the fine grid work group, 2 processes for the coarse grid
   // work group and 1 process for the dedicated load balancer, i.e. 19 processes.
-  int num_processes_in_group[] = {19, 2};
+  int num_processes_in_group[] = {18, 2};
 
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)

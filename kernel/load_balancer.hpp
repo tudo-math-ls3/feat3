@@ -18,10 +18,14 @@
 * \brief class defining a load balancer
 *
 * Each initial process group is organised by a load balancer. It runs on all processes of the process group, which
-* eases work flow organisation significantly. The user can choose to use a dedicated load balancer process which does
-* not solve any linear algebra problem, but only performs organisation and scheduling tasks (reading the mesh, building
-* graph structures, ...). The dedicated load balancer process is the last rank within its process group. If there is no
-* such dedicated process, the coordinator of the process group (usually that with rank 0) performs these tasks.
+* eases work flow organisation significantly. There is one coordinator process which is the only one knowing the
+* complete computational mesh. It is responsible for reading and distributing the mesh to the other processes, and for
+* organising partitioning and load balancing (collect and process matrix patch statistics, ...). This coordinator is
+* always the process with the largest rank within the process group.
+*
+* The user can choose if this coordinator process should also perform compute tasks (solving linear systems etc),
+* or if it should be a dedicated load balancing / coordinator process doing nothing else. This means, the coordinator
+* process and the dedicated load balancer process, if the latter exists, coincide.
 *
 * The user knows what each process group and its respective load balancer should do. He calls, e.g.,
 * if(load_bal->group_id() == 0)
@@ -41,11 +45,12 @@
 *    is usually the coordinator which communicates with the master or the dedicated load balancer. The process
 *    topologies of the work groups are then optimised by building corresponding graph structures. There are two cases:
 *    a) There is a dedicated load balancer: The dedicated load balancer reads the mesh, creates work groups and and a
-*       global graph structure for each work group. Then it distributes the relevant parts of the global graph to all
-*       processes of the work groups, which then create their local graph structure and call MPI_Dist_graph_create(...)
-*       to build the new MPI process topology in a distributed fashion.
+*       global graph structure for each work group. Then it distributes to each process of the work group the relevant
+*       parts of the global graph. Each work group process then creates its local graph structure and calls
+*       MPI_Dist_graph_create(...) to build the new MPI process topology in a distributed fashion.
 *    b) There is no dedicated load balancer: Same as case a), but instead of the dedicated load balancer the coordinator
-*       builds the global graph structure.
+*       of the process group builds the global graph structure. In this case, it must be distinguished whether the
+*       coordinator is part of the work group or not.
 *    COMMENT_HILMAR: It might be more clever to also let the MPI implementation decide on which physical process the
 *    dedicated load balancer should reside (instead of pinning it to the last rank in the process group). To improve
 *    this is task of the ITMC.
@@ -130,11 +135,11 @@ private:
   /// flag whether the load balancer's process group uses a dedicated load balancer process
   bool _group_has_dedicated_load_bal;
 
-  /// flag whether this process is the dedicated load balancer process (if there is one)
-  bool _is_dedicated_load_bal;
-
   /// vector of work groups the load balancer manages
   std::vector<WorkGroup*> _work_groups;
+
+  /// vector of graph structures representing the process topology within the work groups
+  std::vector<Graph*> _graphs;
 
   /// number of work groups
   int _num_work_groups;
@@ -144,12 +149,12 @@ private:
   *
   * Dimension: [#_num_work_groups]
   */
-  int* _num_workers_in_group;
+  int* _num_proc_in_group;
 
   /**
   * \brief 2-dim. array for storing the process group ranks building the work groups
   *
-  * Dimension: [#_num_work_groups][#_num_workers_in_group[\a group_id]]
+  * Dimension: [#_num_work_groups][#_num_proc_in_group[\a group_id]]
   */
   int** _work_group_ranks;
 
@@ -171,14 +176,10 @@ public:
     bool group_has_dedicated_load_bal)
     : _process_group(process_group),
       _group_has_dedicated_load_bal(group_has_dedicated_load_bal),
-      _num_workers_in_group(nullptr),
+      _num_proc_in_group(nullptr),
       _work_group_ranks(nullptr),
       _base_mesh(nullptr)
   {
-      // Inquire whether this process is a dedicated load balancer process. This is the case when the process group
-      // uses a dedicated load bal. and when this process is the last in the process group.
-      _is_dedicated_load_bal = _group_has_dedicated_load_bal &&
-                               _process_group->rank() == _process_group->num_processes()-1;
   }
 
   /// destructor
@@ -193,14 +194,17 @@ public:
       delete [] _work_group_ranks;
       _work_group_ranks = nullptr;
     }
+
     for(unsigned int igroup(0) ; igroup < _work_groups.size() ; ++igroup)
     {
       delete _work_groups[igroup];
     }
-    if (_num_workers_in_group != nullptr)
+
+    if (_num_proc_in_group != nullptr)
     {
-      delete [] _num_workers_in_group;
+      delete [] _num_proc_in_group;
     }
+
     if (_base_mesh != nullptr)
     {
       delete _base_mesh;
@@ -220,24 +224,15 @@ public:
     return _process_group;
   }
 
+
   /* *****************
   * member functions *
   *******************/
-  /**
-  * \brief getter for the flag whether this process is a dedicated load balancer process
-  *
-  * \return boolean flag #_is_dedicated_load_bal
-  */
-  inline bool is_dedicated_load_bal() const
-  {
-    return _is_dedicated_load_bal;
-  }
-
   /// dummy function in preparation of a function reading in a mesh file
   void read_mesh()
   {
-    // the mesh is read by the dedicated load balancer if there is one, otherwise by the group coordinator
-    if(_is_dedicated_load_bal || (!_group_has_dedicated_load_bal && _process_group->is_coordinator()))
+    // the mesh is read by the process group coordinator
+    if(_process_group->is_coordinator())
     {
       _base_mesh = new BaseMesh();
       _base_mesh->read_mesh();
@@ -252,93 +247,178 @@ public:
   * is hard-coded. Later, the user must be able to control the creation of work groups and even later the load
   * balancer has to apply clever strategies to create these work groups automatically so that the user doesn't have
   * to do anything.
+  *
+  * To optimise the communication between the coordinator of the main process group and the work groups, we add the
+  * this coordinator to a work group if it is not a compute process of this work group anyway. Hence, for each work
+  * group, there are three different possibilities:
+  * 1) There is a dedicated load balancer process, which is automatically the coordinator of the main process group
+  *    and belongs to no work group:
+  *    --> work group adds the coordinator as extra process
+  * 2) There is no dedicated load balancer process, and the coordinator of the main process group ...
+  *   a) ... is not part of the work group:
+  *     --> work group adds the coordinator as extra process
+  *   b) ... is part of the work group:
+  *     --> work group does not have to add the coordinator
+  * Thus the 1-to-n or n-to-1 communication between coordinator and n work group processes can be performed via
+  * MPI_Scatter() and MPI_Gather() (which always have to be called by all members of an MPI process group).
+  * This is more efficient then using n calls of MPI_send() / MPI_recv() via the communicator of the main process group.
   */
   void create_work_groups()
   {
-    // create process topology (either the dedicated load balancer if there is one, otherwise the group coordinator)
-    if(_is_dedicated_load_bal || (!_group_has_dedicated_load_bal && _process_group->is_coordinator()))
-    {
-      // get connectivity graph
-      Graph* graph = _base_mesh->graph();
-
-      // ...
-    }
-
     // shortcut to the number of processes in the load balancer's process group
     int num_processes = _process_group->num_processes();
-    // shortcut to the process group rank of this process
-    int my_rank = _process_group->rank();
+
+/* **************************************************************************************
+* The following code is completely hard-wired with respect to one special example mesh. *
+* Later, this has to be done in some auto-magically way.                                *
+****************************************************************************************/
+
+    // two tests:
+    // 1) with dedicated load balancer process
+    //    - work group for coarse grid: 2 processes: {0, 1}
+    //    - work group for fine grid: 15 processes: {1, ..., 16}
+    //    - i.e. process 1 is in both work groups
+    //    - dedicated load balancer and coordinator process: 17
+    // 2) without dedicated load balancer process
+    //    - work group for coarse grid: 2 processes: {0, 1}
+    //    - work group for fine grid: 15 processes: {2, ..., 17}
+    //    - i.e. the two work groups are disjunct
+    //    - coordinator process: 17
+    // both tests need 18 processes in total
+    // assert that the number of processes is 18
+    assert(num_processes == 18);
+
+
+    // set up the two test cases
 
     // number of work groups, manually set to 2
     _num_work_groups = 2;
-    // array of numbers of workers per work group
-    _num_workers_in_group = new int[2];
-    // set number of worker processes manually to 2 and remaining processes, resp.
-    _num_workers_in_group[0] = 2;
-    _num_workers_in_group[1] = num_processes - _num_workers_in_group[0];
-    // if a dedicated load balancer process is used, decrease the number of workers in the second work group by 1
+    // array of numbers of processes per work group
+    _num_proc_in_group = new int[2];
+
+    // Boolean array indicating whether the work groups contain an extra process for the coordinator (which will then
+    // not be a compute process in this work group)
+    bool group_contains_extra_coord[_num_work_groups];
+
+    // allocate first dimension of the array for rank partitioning
+    _work_group_ranks = new int*[_num_work_groups];
+
     if(_group_has_dedicated_load_bal)
     {
-      --_num_workers_in_group[1];
+      // test case 1
+      // with dedicated load balancer process
+      //  - work group for coarse grid: 2 processes: {0, 1}
+      //  - work group for fine grid: 15 processes: {1, ..., 16}
+      //  - i.e. process 1 is in both work groups
+      //  - dedicated load balancer and coordinator process: 17
+
+      // since there is a dedicated load balancer process, this has to be added to both work groups as extra coordinator
+      // process
+      group_contains_extra_coord[0] = true;
+      group_contains_extra_coord[1] = true;
+
+      // set number of processes per group
+      _num_proc_in_group[0] = 2 + 1;
+      _num_proc_in_group[1] = 16 + 1;
+
+      // partition the process group ranks into work groups
+      _work_group_ranks[0] = new int[_num_proc_in_group[0]];
+      _work_group_ranks[0][0] = 0;
+      _work_group_ranks[0][1] = 1;
+      _work_group_ranks[0][2] = 17;
+
+      _work_group_ranks[1] = new int[_num_proc_in_group[1]];
+      // set entries to {1, ..., 16}
+      for(int i(0) ; i < _num_proc_in_group[1] ; ++i)
+      {
+        _work_group_ranks[1][i] = i+1;
+      }
     }
-//    // assert that the number of processes in the second group is positive, i.e. that enough processes are available
-//    assert(_num_workers_in_group[1] > 0);
-    // assert that the number of processes in the second group is 16 in order to treat the hard coded example mesh
-    assert(_num_workers_in_group[1] == 16);
+    else
+    {
+      // test case 2
+      // without dedicated load balancer process
+      //  - work group for coarse grid: 2 processes: {0, 1}
+      //  - work group for fine grid: 15 processes: {2, ..., 17}
+      //  - i.e. the two work groups are disjunct
+      //  - coordinator process: 17
 
-    // Partition the ranks of the process group communicator into groups, by simply enumerating the process
-    // group ranks and assigning them consecutively to the requested number of processes. Note that the dedicated
-    // load balancer, if required, is the last rank in the process group, i.e. _num_processes - 1.
+      // the coordinator is at the same time a compute process of the second work group, so only the first work group
+      // has to add an extra process
+      group_contains_extra_coord[0] = true;
+      group_contains_extra_coord[1] = false;
 
-    _work_group_ranks = new int*[_num_work_groups];
-    // group id of this process
-    int my_group(-1);
-    // iterator for process group ranks, used to split them among the groups
-    int iter_group_rank(-1);
-    // now partition the ranks
+      // set number of processes per group
+      _num_proc_in_group[0] = 2 + 1;
+      _num_proc_in_group[1] = 16;
+
+      // partition the process group ranks into work groups
+      _work_group_ranks[0] = new int[_num_proc_in_group[0]];
+      _work_group_ranks[0][0] = 0;
+      _work_group_ranks[0][1] = 1;
+      _work_group_ranks[0][2] = 17;
+      _work_group_ranks[1] = new int[_num_proc_in_group[1]];
+      // set entries to {2, ..., 17}
+      for(int i(0) ; i < _num_proc_in_group[1] ; ++i)
+      {
+        _work_group_ranks[1][i] = i+2;
+      }
+    }
+
+// COMMENT_HILMAR: Old code that performs the stuff above at least partially automatically (however, not considering
+// the group_contains_extra_coord array)
+//
+//    // Partition the ranks of the process group communicator into groups, by simply enumerating the process
+//    // group ranks and assigning them consecutively to the requested number of processes.
+//
+//    // iterator for process group ranks, used to split them among the groups
+//    int iter_group_rank(-1);
+//    // now partition the ranks
+//    for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+//    {
+//      _work_group_ranks[igroup] = new int[_num_proc_in_group[igroup]];
+//      for(int j(0) ; j < _num_proc_in_group[igroup] ; ++j)
+//      {
+//        // increase group rank
+//        ++iter_group_rank;
+//        // set group rank
+//        _work_group_ranks[igroup][j] = iter_group_rank;
+//      }
+//    } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+// COMMENT_HILMAR: end of old code
+
+/* ************************
+* End of hard-wired code. *
+**************************/
+
+    // boolean array indicating to which work groups this process belongs
+    bool belongs_to_group[_num_work_groups];
     for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
     {
-      _work_group_ranks[igroup] = new int[_num_workers_in_group[igroup]];
-      for(int j(0) ; j < _num_workers_in_group[igroup] ; ++j)
+      // intialise with false
+      belongs_to_group[igroup] = false;
+      for(int j(0) ; j < _num_proc_in_group[igroup] ; ++j)
       {
-        // increase group rank
-        ++iter_group_rank;
-        // set group rank
-        _work_group_ranks[igroup][j] = iter_group_rank;
-        // inquire whether this process belongs to the current group
-        if(my_rank == _work_group_ranks[igroup][j])
+        if(_process_group->rank() == _work_group_ranks[igroup][j])
         {
-          my_group = igroup;
+          belongs_to_group[igroup] = true;
         }
       }
     } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
 
-    // sanity check for the rank assigned last
-    if(_group_has_dedicated_load_bal)
-    {
-      // the dedicated load balancer has the last rank num_processes - 1
-      assert(iter_group_rank == num_processes - 2);
-    }
-    else
-    {
-      assert(iter_group_rank == num_processes - 1);
-    }
-
     // create WorkGroup objects including MPI groups and MPI communicators
-    // (Exclude the dedicated load balancer process if there is one because it is only a member of the process group
-    // but not of any work group we set up. So a special group is needed since otherwise the forking call below will
-    // deadlock.)
-    // It is not possible to set up all WorkGroups in one call, since the processes building the WorkGroups might
-    // not be disjunct (see case a and case b in the example above). Hence, there are as many calls as there are
-    // WorkGroups. All processes not belonging to the WorkGroup currently created call the MPI_Comm_create() function
-    // with a dummy communicator.
+    // It is not possible to set up all WorkGroups in one call, since the processes building the WorkGroups are
+    // not necessarily disjunct. Hence, there are as many calls as there are WorkGroups. All processes not belonging
+    // to the WorkGroup currently created call the MPI_Comm_create() function with a dummy communicator and the
+    // special group MPI_GROUP_EMPTY.
+
     _work_groups.resize(_num_work_groups, nullptr);
     for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
     {
-      if(my_group == igroup)
+      if(belongs_to_group[igroup])
       {
-        _work_groups[igroup] = new WorkGroup(_num_workers_in_group[my_group], _work_group_ranks[my_group],
-                                             _process_group, my_group);
+        _work_groups[igroup] = new WorkGroup(_num_proc_in_group[igroup], _work_group_ranks[igroup],
+                                             _process_group, igroup, group_contains_extra_coord[igroup]);
       }
       else
       {
@@ -350,6 +430,73 @@ public:
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
       }
     } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+
+
+    /* *********************************************************
+    * create graph structures corresponding to the work groups *
+    ***********************************************************/
+
+    // let the coordinator create the process topology
+    if(_process_group->is_coordinator())
+    {
+      _graphs.resize(_num_work_groups, nullptr);
+
+      // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
+      // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
+      // be used for the coarse grid work group
+      int* index = new int[3];
+      int* edges = new int[2];
+      index[0] = 0;
+      index[1] = 1;
+      index[2] = 2;
+      edges[0] = 1;
+      edges[1] = 0;
+      _graphs[0] = new Graph(2, index, edges);
+      _graphs[0]->print();
+
+      // get connectivity graph of the base mesh; this one will be used for the fine grid work group
+      _graphs[1] = _base_mesh->graph();
+    }
+
+//    /* ***************************************************************************
+//    * now let the coordinator send the relevant parts of the global graph to the *
+//    * corresponding work group members                                           *
+//    *****************************************************************************/
+//
+// COMMENT_HILMAR: TODO
+//
+//    for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+//    {
+//
+////      int root = _work_groups[igroup]->rank_coord();
+//      if(_process_group->is_coordinator())
+//      {
+//        /* **********************************
+//        * code for the sending root process *
+//        ************************************/
+//
+//        // send the graph index to the non-root processes
+//        MPI_Scatter(graph[igroup]->index(), graph[igroup]->num_nodes, MPI_INT, void* recvbuf, int recvcount,
+//                    MPI_Datatype recvtype, root, _extended_work_groups[igroup]->comm())
+// at root, use MPI_IN_PLACE instead of recvbuf --> recvbuf and recvcount ignored, root doesn't send data to itself
+// still, the scattered vector has to contain n segments of data, where n is the number processes in the group
+//
+//      }
+//      else
+//      {
+//        /* **************************************
+//        * code for receiving non-root processes *
+//        ****************************************/
+//
+//// at receiver only the last five are significant
+//
+////int MPI_Scatter(void* sendbuf, int sendcount, MPI_Datatype sendtype,
+////void* recvbuf, int recvcount, MPI_Datatype recvtype, int root,
+////MPI_Comm comm)
+//
+//      }
+//    }
+
   } // create_work_groups()
 };
 

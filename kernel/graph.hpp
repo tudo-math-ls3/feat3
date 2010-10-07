@@ -80,7 +80,7 @@ private:
   * _index = [0,        3,           7,      10, 11,          15,          20,    22]
   * _edges = [4, 5, 1,  0, 4, 5, 2,  1, 5, 3, 2,  0, 1, 5, 6,  0, 1, 2, 4,  6, 4,  5]
   *
-  * Dimension: [total number of neighbours] = [number of edges] = [#_index[i+1]]
+  * Dimension: [total number of neighbours] = [number of edges] = [#_index[#_num_nodes]]
   */
   int* _edges;
 
@@ -112,6 +112,39 @@ public:
     _index = nullptr;
     delete [] _edges;
     _edges = nullptr;
+  }
+
+  /* ******************
+  * getters & setters *
+  ********************/
+  /**
+  * \brief getter for the number of nodes
+  *
+  * \return number of nodes #_num_nodes
+  */
+  inline int num_nodes() const
+  {
+    return _num_nodes;
+  }
+
+  /**
+  * \brief getter for the index array
+  *
+  * \return pointer to the index array #_index
+  */
+  inline int* index() const
+  {
+    return _index;
+  }
+
+  /**
+  * \brief getter for the edge array
+  *
+  * \return pointer to the edge array #_edges
+  */
+  inline int* edges() const
+  {
+    return _edges;
   }
 
   /* *****************

@@ -252,26 +252,31 @@ public:
   *
   * \author Hilmar Wobker
   */
-  static void log(std::string const &message)
+  static void log(std::string const message)
   {
     file << message << std::endl;
   }
 
-  /**
-  * \brief writes a message to the log file of this process
-  *
-  * This function receives a char array representing a log message and writes it to the log file attached to this
-  * process.
-  *
-  * \param[in] message
-  * char array representing the log message
-  *
-  * \author Hilmar Wobker
-  */
-  static void log(char message[])
-  {
-    file << message << std::endl;
-  }
+// COMMENT_HILMAR: This version seems not to be necessary. The above function log(std::string const &message) is also
+// able to process char pointers (see for example the call in Logger::receive_array())
+// Using this version here additionally triggers the gcc compiler to throw a warning when passing a constant string
+// to the log(...) function, e.g. 'log("BRAL")'.
+//   ...: warning: deprecated conversion from string constant to 'char*'
+//  /**
+//  * \brief writes a message to the log file of this process
+//  *
+//  * This function receives a char array representing a log message and writes it to the log file attached to this
+//  * process.
+//  *
+//  * \param[in] message
+//  * char array representing the log message
+//  *
+//  * \author Hilmar Wobker
+//  */
+//  static void log(char message[])
+//  {
+//    file << message << std::endl;
+//  }
 
   /**
   * \brief writes a number of messages to the log file of this process
@@ -286,7 +291,7 @@ public:
   */
   static void log(std::vector<std::string> const &messages)
   {
-    for(int i(0) ; i<messages.size() ; ++i)
+    for(unsigned int i(0) ; i<messages.size() ; ++i)
     {
       file << messages[i] << std::endl;
     }
@@ -371,7 +376,6 @@ public:
     // display message on screen if requested
     if (target == SCREEN || target == SCREEN_FILE)
     {
-      // use corresponding offsets in the char array (pointer arithmetic)
       std::cout << message << std::endl;
     }
 
@@ -568,10 +572,11 @@ public:
     {
       for(int i(0) ; i < num_messages ; ++i)
       {
+        // use corresponding offsets in the char array (pointer arithmetic)
         log(messages + msg_start_pos[i]);
       }
     }
-  }
+  } // receive_array()
 }; // class Logger
 
 std::string Logger::file_base_name_default("feast");
