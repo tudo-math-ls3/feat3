@@ -59,7 +59,13 @@ protected:
 // COMMENT_HILMAR, 15.9.2010: not sure yet if this is needed
 //    ProcessGroup** _process_group_child;
 
-  /// id of the process group
+  /**
+  * \brief ID of the process group
+  *
+  * When several process groups are "spawned" from one parent process group, then these process groups can be
+  * distinguished via this group ID. It has to be passed to the process group constructor, it is not incremented
+  * automatically.
+  */
   int const _group_id;
 
   /// rank of the coordinator process within the group
@@ -388,15 +394,22 @@ public:
 * \brief class describing a work group, i.e. a set of worker processes sharing the same MPI communicator and performing
 *        the same task
 *
-* A WorkGroup object managing n processes typically consists of one Worker object (living on this process) and n-1
-* RemoteProcess objects. WorkGroup objects are created by the load balancer. Example:
-* The process group of a load balancer consists of 6 processes. One process (either that with local rank 0 or the
-* dedicated one) reads the mesh and the solver configuration and decides that the coarse grid problem is to be
-* treated by 2 processes (local ranks 0 and 1) and the fine grid problems by all 6 processes. Then 2 work
-* groups are created: one consisting of the 2 processes with local ranks 0 and 1, and one consisting of all 6
-* processes, each of the work groups having its own MPI communicator. In building the work groups, also the
-* corresponding (Remote)Worker objects are created. Communication between different work groups or with the dedicated
-* load balancer process is done via the enclosing ProcessGroup communicator.
+* WorkGroup objects are created by the load balancer. They consist of n compute process and eventually one extra
+* process which is the coordinator of the parent process group. The latter is only the case if this coordinator is not
+* part of the compute processes of this work group anyway. Communication between different work groups is done via the
+* enclosing ProcessGroup communicator.
+* Example:
+* The process group of a load balancer consists of 6 processes, the sixth one being the coordinator of the process
+* group. There is no dedicated load balancing process. The coordinator process reads the mesh and the solver
+* configuration and decides that the coarse grid problem is to be treated by two processes (process group ranks 0 and 1)
+* and the fine grid problems by all six processes. Then two work groups are created: one consisting of the two processes
+* with local ranks 0 and 1, and one consisting of all six processes. The coordinator of the parent process group is
+* already part of the fine grid work group, so it is only added to the coarse grid work group. So, the latter actually
+* consists of three processes. Each work group has its own MPI communicator. Since the coordinator of the parent
+* process group is part of these communicators, all necessary information (mesh, graph, ...) can be transferred
+* efficiently via collective communication routines. In the coarse grid work group, however, this parent group
+* coordinator is not a compute process, hence this work group creates a subgroup consisting of the two compute processes
+* only.
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
@@ -411,7 +424,7 @@ private:
   /* *****************
   * member variables *
   *******************/
-  /// flag whether this group contains the coordinator as an extra process, not being a compute process of this group
+  /// flag whether this group contains the coordinator of the parent process group as an extra process
   bool _contains_extra_coord;
 
   /**
@@ -449,18 +462,6 @@ public:
 //      _worker(nullptr),
 //      _remote_workers(nullptr)
   {
-    if (!_contains_extra_coord)
-    {
-      // in the case there is no extra coordinator process, the subgroup of compute processes is equal to the work
-      // group itself
-      _work_group_compute = this;
-    }
-    else
-    {
-      // otherwise, create a subgroup only consisting of the real compute proesses
-// COMMENT_HILMAR: TODO!
-    }
-
     /* ******************************
     * test the logger functionality *
     ********************************/
@@ -494,13 +495,48 @@ public:
 //    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
 //    log_indiv_master("Hello, master default screen and file! " + s);
 
+    // end of debugging output
+
+    // create sub work group consisting of the real compute processes only
+    if (!_contains_extra_coord)
+    {
+      // in the case there is no extra coordinator process, the subgroup of compute processes is equal to the work
+      // group itself
+      _work_group_compute = this;
+    }
+    else
+    {
+      // otherwise, the subgroup contains all processes of this work group except the last one (the extra coordinator)
+      int* subgroup_ranks = new int[_num_processes-1];
+      for(int i(0) ; i < _num_processes - 1 ; ++i)
+      {
+        subgroup_ranks[i] = i;
+      }
+      if(!is_coordinator())
+      {
+        _work_group_compute = new WorkGroup(_num_processes - 1, subgroup_ranks, this, 0, false);
+      }
+      else
+      {
+        // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
+        // will deadlock), so let the coordinator call the routine with MPI_GROUP_EMPTY and dummy communicator.
+        MPI_Comm dummy_comm;
+        int mpi_error_code = MPI_Comm_create(_comm, MPI_GROUP_EMPTY, &dummy_comm);
+        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+        _work_group_compute = nullptr;
+      }
+    }
 //    _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
-  }
+  } // constructor
 
   /// destructor
   ~WorkGroup()
   {
 //    delete _worker;
+    if(_work_group_compute != this && _work_group_compute != nullptr)
+    {
+      delete _work_group_compute;
+    }
   }
 };
 
