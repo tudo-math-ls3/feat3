@@ -14,6 +14,7 @@
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
 #include <kernel/worker.hpp>
+#include <kernel/graph.hpp>
 
 /**
 * \brief group of processes sharing an MPI communicator
@@ -187,6 +188,7 @@ public:
 //      delete [] _buffer;
 //    }
   }
+
   /* ******************
   * getters & setters *
   ********************/
@@ -265,6 +267,7 @@ public:
   {
     return _rank_coord;
   }
+
 
   /* *****************
   * member functions *
@@ -432,8 +435,30 @@ private:
   *
   * This is either a pointer to the work group itself if #_contains_extra_coord == false, otherwise it is a subgroup of
   * the work group containing all processes except the extra coordinator process, i.e. only the real compute processes.
+  *
+  * COMMENT_HILMAR: This "recursive appearance" of the WorkGroup class is a little bit strange, but I didn't want to
+  * define yet another class describing this group of compute workers. Maybe we have to do this... let's see when we
+  * get into the details what these compute workers actually do and how they have to communicate...
   */
   WorkGroup* _work_group_compute;
+
+//  /**
+//  * \brief additional communicator representing an optimised process topology
+//  *
+//  * This communicator results from a call to MPI_Dist_graph_create(...), which remaps the processes of this work group
+//  * to optimise communication patterns.
+//  */
+// COMMENT_HILMAR: Everything that has to do with comm_opt is deactivated for the time being (see comment in routine
+//    set_graph_distributed.
+//  MPI_Comm _comm_opt;
+
+  /**
+  * \brief local portions of a distributed graph
+  *
+  * This object is sent to this process by the coordinator of the parent process group. It can be used to create an
+  * MPI topology graph via MPI_Dist_graph_create().
+  */
+  GraphDistributed* _graph_distributed;
 
 //  /// worker object living on this process
 //  Worker* _worker;
@@ -458,7 +483,10 @@ public:
     const int group_id,
     bool contains_extra_coord)
     : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
-      _contains_extra_coord(contains_extra_coord)
+      _contains_extra_coord(contains_extra_coord),
+      _work_group_compute(nullptr),
+//      _comm_opt(MPI_COMM_NULL),
+      _graph_distributed(nullptr)
 //      _worker(nullptr),
 //      _remote_workers(nullptr)
   {
@@ -537,6 +565,79 @@ public:
     {
       delete _work_group_compute;
     }
+    if(_graph_distributed != nullptr)
+    {
+      delete _graph_distributed;
+    }
+  }
+
+
+  /* ******************
+  * getters & setters *
+  ********************/
+//  /**
+//  * \brief getter for the optimised MPI communicator
+//  *
+//  * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
+//  * cannot change the object.
+//  *
+//  * \return reference to MPI_Comm #_comm
+//  */
+//  inline const MPI_Comm& comm_opt() const
+//  {
+//    return _comm_opt;
+//  }
+
+  /**
+  * \brief getter for the flag whether this group contains an extra coordinator process
+  *
+  * \return pointer the flag #_contains_extra_coord
+  */
+  inline bool contains_extra_coord() const
+  {
+    return _contains_extra_coord;
+  }
+
+  /**
+  * \brief getter for the compute work group
+  *
+  * \return pointer to the work group #_work_group_compute
+  */
+  inline WorkGroup* work_group_compute() const
+  {
+    return _work_group_compute;
+  }
+
+
+  /* *****************
+  * member functions *
+  *******************/
+  /**
+  * \brief sets local graph portions of a distributed graph
+  *
+  * COMMENT_HILMAR: By now, the weights and info objects are empty. Does it make sense to, e.g., use different weights
+  * for edge neighbours on the one hand and diagonal neighbours on the other hand? Should diagonal neighbours appear
+  * in the graph topology at all? Or should we only take the edge neighbours here?
+  */
+  void set_graph_distributed(
+    int const num_neighbours,
+    int* edges)
+  {
+    _graph_distributed = new GraphDistributed(num_neighbours, edges);
+
+// COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
+//   Unfortunately, this function has only been introduced with MPI-2.2 and is not yet implemented in OpenMPI yet.
+//   The only alternative that already exists, MPI_Graph_create(...), requires that all processes know the complete
+//   graph (and not only the coordinator process). IMHO, it doesn't make sense to further pursue this MPI process
+//   topology topic in the moment. Let us stick with the standard MPI communicators and let us see what the ITMC
+//   will say.
+//
+//    int sources[1];
+//    int degrees[1];
+//    sources[0] = _work_group_compute->rank();
+//    degrees[0] = _graph_distributed->num_neighbours();
+//    MPI_Dist_graph_create(_work_group_compute->comm(), 1, sources, degrees, _graph_distributed->neighbours(), nullptr,
+//                          MPI_INFO_NULL, true, _work_group_compute->comm_opt());
   }
 };
 

@@ -22,9 +22,12 @@
 * (see description of the array #_index).
 *
 * The data structure can also be used to create distributed graph data structures via the MPI routine
-* MPI_DIST_GRAPH_CREATE(...), (see MPI-2.2 standard, example 7.3 on page 256).
+* MPI_Dist_graph_create(...), (see MPI-2.2 standard, example 7.3 on page 256).
 *
 * COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
+*
+* COMMENT_HILMAR: This graph structure is the most general one. When it comes to MPI communication, we surely have to
+*   distinguish edge neighbours and diagonal neighbours.
 *
 * \author Hilmar Wobker
 */
@@ -186,7 +189,8 @@ public:
 *   MPI_Dist_graph_neighbors_count(...)
 * to get the number of neighbours and
 *   MPI_Dist_graph_neighbors(...)
-* to get the ranks of the neighbours.
+* to get the ranks of the neighbours. With the help of this data structure the global MPI topology graph can be
+* created via the function MPI_Dist_graph_create(...).
 *
 * COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
 *
@@ -213,13 +217,48 @@ private:
 
 public:
 
-  /* *****************
-  * member variables *
-  *******************/
-
   /* *************************
   * constructor & destructor *
   ***************************/
+  /// constructor
+  GraphDistributed(
+    int const num_neighbours,
+    int* neighbours
+    )
+    : _num_neighbours(num_neighbours),
+      _neighbours(neighbours)
+  {
+  }
+
+  /// destructor
+  ~GraphDistributed()
+  {
+    delete [] _neighbours;
+    _neighbours = nullptr;
+  }
+
+  /* ******************
+  * getters & setters *
+  ********************/
+  /**
+  * \brief getter for the number of neighbours
+  *
+  * \return number of neighbours #_num_neighbours
+  */
+  inline int num_neighbours() const
+  {
+    return _num_neighbours;
+  }
+
+  /**
+  * \brief getter for the neighbour array
+  *
+  * \return pointer to the neibhbour array #_neighbours
+  */
+  inline int* neighbours() const
+  {
+    return _neighbours;
+  }
 
   /* *****************
   * member functions *
