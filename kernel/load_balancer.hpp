@@ -262,7 +262,7 @@ public:
   * balancer has to apply clever strategies to create these work groups automatically so that the user doesn't have
   * to do anything.
   *
-  * To optimise the communication between the coordinator of the main process group and the work groups, we add the
+  * To optimise the communication between the coordinator of the main process group and the work groups, we add
   * this coordinator to a work group if it is not a compute process of this work group anyway. Hence, for each work
   * group, there are three different possibilities:
   * 1) There is a dedicated load balancer process, which is automatically the coordinator of the main process group
