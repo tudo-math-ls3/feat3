@@ -32,6 +32,9 @@ int main(int argc, char* argv[])
 
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
+
+// COMMENT_HILMAR: The first entry can be set to true or false without changing the number of processes in the first
+// group.
   bool includes_dedicated_load_bal[] = {true, false};
 
   // create universe with several process groups
