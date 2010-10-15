@@ -490,53 +490,46 @@ public:
           * code for the sending root process *
           ************************************/
 
+          int count = _graphs[igroup]->num_nodes();
           if(_work_groups[igroup]->contains_extra_coord())
           {
             // MPI_Scatter() counts the extra coordinator process as well (which only sends data). Arrays have to
             // be prepared with n+1 segments although only n processes receive data.
+            ++count;
+          }
+          int num_neighbours[count];
+          int* index = _graphs[igroup]->index();
+          for(int i(0) ; i < _graphs[igroup]->num_nodes() ; ++i)
+          {
+            num_neighbours[i] = index[i+1] - index[i];
+          }
 
-            int count = _graphs[igroup]->num_nodes() + 1;
-            int num_neighbours[count];
-            int* index = _graphs[igroup]->index();
-            for(int i(0) ; i < _graphs[igroup]->num_nodes() ; ++i)
-            {
-              num_neighbours[i] = index[i+1] - index[i];
-            }
-            // the extra coordinator process is the last in the work rank, so set the last entry of the array to a
-            // dummy value
+          if(_work_groups[igroup]->contains_extra_coord())
+          {
+            // the extra coordinator process is the last in the work rank, so set the last entry of the array to zero
             num_neighbours[count-1] = 0;
 
-            // send the number of neighbours to the non-root processes
+            // send the number of neighbours to the non-root processes (use MPI_IN_PLACE to indicate that the root
+            // does not receive/store any data)
             MPI_Scatter(num_neighbours, 1, MPI_INT, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
                         _work_groups[igroup]->comm());
-            // send the edges to the non-root processes
+            // send the edges to the non-root processes (usually the edges array must also have n+1 segments, but
+            // since num_neighbours[count-1] == 0, the last segment is empty)
             MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, MPI_IN_PLACE, 0,
                          MPI_DATATYPE_NULL, root, _work_groups[igroup]->comm());
           }
           else
           {
-            // When there is no extra coordinator process, then the root also sends data to itself.
-            int count = _graphs[igroup]->num_nodes();
-            int num_neighbours[count];
-            int* index = _graphs[igroup]->index();
-            for(int i(0) ; i < _graphs[igroup]->num_nodes() ; ++i)
-            {
-              num_neighbours[i] = index[i+1] - index[i];
-            }
-            // send the number of neighbours to the non-root processes and to the root process itself
+            // When there is no extra coordinator process, then the root is part of the compute work group and
+            // also sends data to itself.
+
+            // scatter the number of neighbours to the non-root processes and to the root process itself
             MPI_Scatter(num_neighbours, 1, MPI_INT, &num_neighbours_local, 1, MPI_INT, root,
                         _work_groups[igroup]->comm());
             edges_local = new int[num_neighbours_local];
-            // send the edges to the non-root processes and to the root process itself
+            // scatter the edges to the non-root processes and to the root process itself
             MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, edges_local, num_neighbours_local,
                          MPI_INT, root, _work_groups[igroup]->comm());
-            // debug output
-            std::cout << "Proc " << Process::rank << " 'received' edges: ";
-            for(int i(0) ; i < num_neighbours_local ; ++i)
-            {
-              std::cout << edges_local[i] << " ";
-            }
-            std::cout << std::endl;
           }
         }
         else
@@ -553,17 +546,22 @@ public:
           MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, edges_local, num_neighbours_local, MPI_INT, root,
                        _work_groups[igroup]->comm());
 
-          // debug output
+        }
+
+        // debug output
+        if (!(_work_groups[igroup]->is_coordinator() && _work_groups[igroup]->contains_extra_coord()))
+        {
           std::cout << "Proc " << Process::rank << " received edges: ";
           for(int i(0) ; i < num_neighbours_local ; ++i)
           {
             std::cout << edges_local[i] << " ";
           }
           std::cout << std::endl;
-        }
 
-        // now create distributed graph structure within the work groups
-//        _work_groups[igroup]->set_graph_distributed(num_neighbours_local, edges_local);
+          // now create distributed graph structure within the compute work groups (the array edges_local will be
+          // deallocated in the destructor of the distributed graph object)
+          _work_groups[igroup]->work_group_compute()->set_graph_distributed(num_neighbours_local, edges_local);
+        }
       } // if(_belongs_to_group[igroup])
     } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
   } // create_work_groups()
