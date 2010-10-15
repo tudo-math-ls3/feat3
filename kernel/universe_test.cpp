@@ -26,15 +26,14 @@ int main(int argc, char* argv[])
   int num_process_groups(2);
 
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
-  // For the hard-coded example mesh we need 16 processes for the fine grid work group, 2 processes for the coarse grid
-  // work group and 1 process for the dedicated load balancer, i.e. 19 processes.
+  // For the hard-coded example mesh we need 18 processes. (See description of the example in routine
+  // LoadBalancer::create_work_groups().)
   int num_processes_in_group[] = {18, 2};
 
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
-
-// COMMENT_HILMAR: The first entry can be set to true or false without changing the number of processes in the first
-// group.
+  // Set the first entry either to false or to true to test two different configurations. (You don't have to change
+  // the number of processes for that.) (See description of the example in routine LoadBalancer::create_work_groups().)
   bool includes_dedicated_load_bal[] = {true, false};
 
   // create universe with several process groups

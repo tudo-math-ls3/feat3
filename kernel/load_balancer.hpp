@@ -290,12 +290,12 @@ public:
     // two tests:
     // 1) with dedicated load balancer process
     //    - work group for coarse grid: 2 processes: {0, 1}
-    //    - work group for fine grid: 15 processes: {1, ..., 16}
+    //    - work group for fine grid: 16 processes: {1, ..., 16}
     //    - i.e. process 1 is in both work groups
     //    - dedicated load balancer and coordinator process: 17
     // 2) without dedicated load balancer process
     //    - work group for coarse grid: 2 processes: {0, 1}
-    //    - work group for fine grid: 15 processes: {2, ..., 17}
+    //    - work group for fine grid: 16 processes: {2, ..., 17}
     //    - i.e. the two work groups are disjunct
     //    - coordinator process: 17
     // both tests need 18 processes in total
@@ -322,7 +322,7 @@ public:
       // test case 1
       // with dedicated load balancer process
       //  - work group for coarse grid: 2 processes: {0, 1}
-      //  - work group for fine grid: 15 processes: {1, ..., 16}
+      //  - work group for fine grid: 16 processes: {1, ..., 16}
       //  - i.e. process 1 is in both work groups
       //  - dedicated load balancer and coordinator process: 17
 
@@ -353,7 +353,7 @@ public:
       // test case 2
       // without dedicated load balancer process
       //  - work group for coarse grid: 2 processes: {0, 1}
-      //  - work group for fine grid: 15 processes: {2, ..., 17}
+      //  - work group for fine grid: 16 processes: {2, ..., 17}
       //  - i.e. the two work groups are disjunct
       //  - coordinator process: 17
 
@@ -512,7 +512,6 @@ public:
             // send the edges to the non-root processes
             MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, MPI_IN_PLACE, 0,
                          MPI_DATATYPE_NULL, root, _work_groups[igroup]->comm());
-
           }
           else
           {
@@ -528,9 +527,16 @@ public:
             MPI_Scatter(num_neighbours, 1, MPI_INT, &num_neighbours_local, 1, MPI_INT, root,
                         _work_groups[igroup]->comm());
             edges_local = new int[num_neighbours_local];
-            // send the edges to the non-root processes
+            // send the edges to the non-root processes and to the root process itself
             MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, edges_local, num_neighbours_local,
                          MPI_INT, root, _work_groups[igroup]->comm());
+            // debug output
+            std::cout << "Proc " << Process::rank << " 'received' edges: ";
+            for(int i(0) ; i < num_neighbours_local ; ++i)
+            {
+              std::cout << edges_local[i] << " ";
+            }
+            std::cout << std::endl;
           }
         }
         else
@@ -543,6 +549,7 @@ public:
                       _work_groups[igroup]->comm());
 
           // receive the edges
+          edges_local = new int[num_neighbours_local];
           MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, edges_local, num_neighbours_local, MPI_INT, root,
                        _work_groups[igroup]->comm());
 
