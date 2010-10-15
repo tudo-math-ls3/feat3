@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   int num_process_groups(2);
 
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
-  // For the hard-coded example mesh we need 18 processes. (See description of the example in routine
+  // For the hard-coded example mesh we need 21 processes. (See description of the example in routine
   // LoadBalancer::create_work_groups().)
   int num_processes_in_group[] = {18, 2};
 
