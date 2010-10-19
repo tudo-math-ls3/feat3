@@ -37,6 +37,11 @@ int main(int /*argc*/, char** /*argv*/)
             std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
             result = EXIT_FAILURE;
         }
+        catch (InternalError & e)
+        {
+            std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl << stringify(e.message()) << std::endl;
+            result = EXIT_FAILURE;
+        }
         i = TestList::instance()->erase(i);
         iterator_index++;
     }
