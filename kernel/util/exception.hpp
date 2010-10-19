@@ -129,7 +129,6 @@ namespace FEAST
       if (_what_str.empty())
       {
         _what_str = StringUtils::stringify(std::exception::what());
-//BRAL: das folgende muss wieder raus:
         _what_str += " (" + message() + ")";
       }
       return _what_str.c_str();
