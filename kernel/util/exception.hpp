@@ -8,6 +8,7 @@
 #include <kernel/base_header.hpp>
 #include <string>
 #include <cstdlib>
+#include <iostream>
 #include <list>
 
 namespace
@@ -111,7 +112,7 @@ namespace Feast
       /// Return a descriptive error message.
       const std::string & message() const throw ()
       {
-        return _message;
+        return "\nTODO PRETTYPRINT\n" + _message + "TODO PRETTYPRINT\n";
       }
 
       /// Return a backtrace.

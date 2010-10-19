@@ -71,7 +71,8 @@ int main(int argc, char* argv[])
       if (Process::rank % 2 == 0)
       {
         std::vector<std::string> messages(3);
-        messages[0] = StringUtils::stringify(Process::rank) + ". process is testing...";
+        std::string s(StringUtils::stringify(Process::rank) + ". process is testing...");
+        messages[0] = s;
         messages[1] = "... this vector ...";
         messages[2] = "... logging feature!";
         Logger::log_master_array(messages, Logger::FILE);

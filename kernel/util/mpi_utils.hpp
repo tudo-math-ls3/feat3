@@ -26,7 +26,13 @@ class MPIUtils
   */
   static void abort(std::string msg)
   {
+    // flush cout and cerr...
+    std::cout.flush();
+    std::cerr.flush();
+    // ... print error message to stderr ...
     std::cerr << msg << " Aborting program..." << std::endl;
+    std::cerr.flush();
+    // ... and shut down
     int mpi_is_initialised;
     MPI_Initialized(&mpi_is_initialised);
     if (mpi_is_initialised)
@@ -65,7 +71,7 @@ class MPIUtils
 //wird im code dann aufgerufen per MPIType<DT_>::value()
 //mit DT_ halt grad der DataType nachdem du deine Funktion templatisierst hast.
 //
-//Hm für ohne internet einfach mal ausgeschnitten:
+//Hm fuer ohne internet einfach mal ausgeschnitten:
 //
 //template <typename DT_>
 //      class MPIType

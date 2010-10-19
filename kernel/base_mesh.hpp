@@ -4,30 +4,632 @@
 
 // includes, system
 #include <iostream>
-#include <stdlib.h>
+#include <vector>
 
 // includes, Feast
 #include <kernel/graph.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/util/file_reader_ascii.hpp>
+
+
+
+// HACK UNTIL EVERYTHING IS NAMESPACED
+using namespace Feast;
+
 
 /**
-* \brief class describing a base mesh
+* \brief abstract class describing a base mesh cell
+*
+* Concrete extensions are available for 2D and 3D etc.
+*
+* COMMENT_DOMINIK: This is <em>very</em> preliminary, and only serves as a container to be able to implement
+*                  mesh I/O. Actual data structures need to be changed later on.
+*
+* \author Dominik Goeddeke
+*/
+class BaseMeshCell
+{
+
+protected:
+  /* *****************
+  * member variables *
+  *******************/
+  /// global number of this cell
+  unsigned int _number;
+
+  /// dimension of this cell
+  unsigned int _dimension;
+
+  /// type of this cell, TODO: Add proper types later, when they become necessary
+  unsigned int _type;
+
+  /// parallel block (= rank within process group) that this cell is supposed to reside on
+  unsigned int _parallel_block;
+
+  /// matrix block this cell is supposed to contribute to
+  unsigned int _matrix_block;
+
+
+public:
+  /* ******
+  * enums *
+  ********/
+  /// ID for 2D cells, Q1 elements and tensor product structure
+  static const unsigned int TYPE_2D_Q1_TP = 0;
+
+
+  /* ***************************
+  * constructors & destructors *
+  *****************************/
+  /**
+  * \brief Default CTOR
+  *
+  * \param[in] number
+  * Number of this cell. Uniqueness must be ensured by BaseMesh class.
+  *
+  * \param[in] dimension
+  * Dimension of this cell (1,2,3).
+  */
+  BaseMeshCell(unsigned int number, unsigned int dimension)
+    : _number(number),
+      _dimension(dimension),
+      _type(0),
+      _parallel_block(0),
+      _matrix_block(0)
+  {
+  }
+
+  /**
+  * \brief Set-all CTOR
+  */
+  BaseMeshCell(unsigned int number,
+               unsigned int dimension,
+               unsigned int type,
+               unsigned int parallel_block,
+               unsigned int matrix_block)
+    : _number(number),
+      _dimension(dimension),
+      _type(type),
+      _parallel_block(parallel_block),
+      _matrix_block(matrix_block)
+  {
+  }
+
+  // TODO: CTOR WITH NEIGHBOURS //DG, Oct19,2010
+  // TODO: (SHALLOW) COPY CTOR //DG, Oct19,2010
+
+  /// default DTOR
+  ~BaseMeshCell()
+  {
+  }
+
+  /* ******************
+  * getters & setters *
+  ********************/
+  inline unsigned int number() const
+  {
+    return _number;
+  }
+  inline unsigned int dimension() const
+  {
+    return _dimension;
+  }
+  inline unsigned int type() const
+  {
+    return _type;
+  }
+  inline void set_type(const unsigned int type)
+  {
+    _type = type;
+  }
+  inline unsigned int parallel_block() const
+  {
+    return _parallel_block;
+  }
+  inline void set_parallel_block(const unsigned int parallel_block)
+  {
+    _parallel_block = parallel_block;
+  }
+  inline unsigned int matrix_block() const
+  {
+    return _matrix_block;
+  }
+  inline void set_matrix_block(const unsigned int matrix_block)
+  {
+    _matrix_block = matrix_block;
+  }
+
+
+  /* *************************
+  * virtual member functions *
+  ***************************/
+  /// prints this cell into a single line in std::cout (note: this routine must be extended in derived classes)
+  virtual void print()
+  {
+    std::cout << _number << ": ";
+    switch (_type)
+    {
+      case TYPE_2D_Q1_TP:
+        std::cout << "2D-Q1-TP";
+        break;
+      default:
+        std::cout << "unknown";
+    }
+    std::cout << ", ParallelBlock " << _parallel_block << ", MatrixBlock " << _matrix_block;
+  }
+
+
+  /* ******************************
+  * pure virtual member functions *
+  ********************************/
+  /// returns number of neighbours of given dimension (point neighbours are dimension-0 neighbours etc.)
+  virtual inline unsigned int num_neighbours(const unsigned int dimension) const = 0;
+
+  /// adds given cell to list of given-dimension neighbours
+  virtual inline void add_neighbour(const unsigned int dimension, BaseMeshCell * neighbour) = 0;
+
+  /**
+  * \brief Returns given neighbour of given dimension
+  *
+  * TODO: Ich wollte das hier mit nem Iterator machen, aber ich habe es nicht hinbekommen. So muss man jetzt
+  * aussenrum ne Schleife ueber alle Nachbarn der gewuenschten Dimension machen (Ende der Schleife kennt man
+  * ueber num_neighbours()) damit man in diese Routine den entsprechenden Index stopfen kann.
+  */
+  virtual inline BaseMeshCell * get_neighbour(const unsigned int dimension, const unsigned int index) const = 0;
+
+}; // class BaseMeshCell
+
+
+/**
+* \brief Base mesh cell in two dimensions
+*
+* COMMENT_DOMINIK: This is <em>very</em> preliminary, and only serves as a container to be able to implement
+*                  grid I/O. Actual data structures need to be changed later on.
+*
+* \author Dominik Goeddeke
+*/
+class BaseMeshCell2D : public BaseMeshCell
+{
+
+private:
+  /* *****************
+  * member variables *
+  *******************/
+  /// edge neighbours (dimension-1 neighbours)
+  std::vector<BaseMeshCell*> _edge_neighbours;
+
+  /// point neighbours (dimension-0 neighbours)
+  std::vector<BaseMeshCell*> _point_neighbours;
+
+
+public:
+  /* *************************
+  * constructor & destructor *
+  ***************************/
+  /// Default CTOR
+  BaseMeshCell2D(unsigned int number)
+    : BaseMeshCell(number, 2)
+  {
+  }
+
+  ~BaseMeshCell2D()
+  {
+    // IMPORTANT: Do not deleteneighbour arrays
+  }
+
+  /* *****************
+  * member functions *
+  *******************/
+  /// returns number of neighbours of given dimension (point neighbours are dimension-0 neighbours etc.)
+  inline unsigned int num_neighbours(const unsigned int dimension) const
+  {
+    switch (dimension)
+    {
+      case 0:
+        return _point_neighbours.size();
+      case 1:
+        return _edge_neighbours.size();
+      default:
+        throw InternalError("2D cells do not have dimension-2 neighbours (ie, faces are not connected by faces to other faces");
+    }
+  }
+
+  /// adds given cell to list of given-dimension neighbours
+  inline void add_neighbour(const unsigned int dimension, BaseMeshCell * neighbour)
+  {
+    switch (dimension)
+    {
+      case 0:
+        _point_neighbours.push_back(neighbour);
+        break;
+      case 1:
+        _edge_neighbours.push_back(neighbour);
+        break;
+      default:
+        throw InternalError("2D cells do not have dimension-2 neighbours");
+    }
+  }
+
+  /**
+  * \brief Returns given neighbour of given dimension
+  *
+  * TODO: Ich wollte das hier mit nem Iterator machen, aber ich habe es nicht hinbekommen. So muss man jetzt
+  * aussenrum ne Schleife ueber alle Nachbarn der gewuenschten Dimension machen (Ende der Schleife kennt man
+  * ueber num_neighbours()) damit man in diese Routine den entsprechenden Index stopfen kann.
+  */
+  inline BaseMeshCell * get_neighbour(const unsigned int dimension, const unsigned int index) const
+  {
+    switch (dimension)
+    {
+      case 0:
+        assert(index < _point_neighbours.size());
+        return _point_neighbours.at(index);
+      case 1:
+        assert(index < _edge_neighbours.size());
+        return _edge_neighbours.at(index);
+      default:
+        throw InternalError("2D cells do not have dimension-2 neighbours");
+    }
+  }
+
+  /// simple debugging routine: prints this cell to std::cout
+  virtual void print()
+  {
+    BaseMeshCell::print();
+    // TODO Mit Iteratoren habe ich das nicht hinbekommen
+    std::cout << ". EdgeNeighbours: ";
+    for (unsigned int i=0; i<_edge_neighbours.size(); ++i)
+      std::cout << _edge_neighbours.at(i)->number() << " ";
+    std::cout << ". PointNeighbours: ";
+    for (unsigned int i=0; i<_point_neighbours.size(); ++i)
+      std::cout << _point_neighbours.at(i)->number() << " ";
+    std::cout << std::endl;
+  }
+
+}; // class BaseMeshCell2D
+
+
+
+
+/**
+* \brief Class describing a base mesh
 *
 * \author Hilmar Wobker
+* \author Dominik Goeddeke
 */
 class BaseMesh
 {
 
 private:
-
   /* *****************
   * member variables *
   *******************/
-  /// graph describing the connectivity of the base mesh
+  /// description of this base mesh
+  std::string _description;
+
+  /// number of base mesh cells
+  unsigned int _num_cells;
+
+  /// actual mesh, stored temporarily as a fixed-length array of pointers to mesh cells
+  std::vector<BaseMeshCell*> _cells;
+
+  /// number of partitions
+  unsigned int _num_partitions;
+
+  /// graph describing the connectivity of the base mesh (derived from _cells)
   Graph* _graph;
 
 
-public:
+  /* *****************
+  * member functions *
+  *******************/
+  /// reads (currently, basically skips) FEAST_GEOM and FEAST_FGEOM parts
+  void parse_geom(FileReaderASCII * meshfile)
+  {
+    for (unsigned int i = 0 ; i < 2 ; ++i)
+    {
+      // header
+      if (i==0)
+        meshfile->read("FEAST_GEOM");
+      else
+        meshfile->read("FEAST_FGEOM");
+      meshfile->read("2D");
+      int version_major;
+      meshfile->read(version_major);
+      int version_minor;
+      meshfile->read(version_minor);
 
+      // number of boundary components
+      int num_boundaries;
+      meshfile->read(num_boundaries);
+
+      // loop over boundary components
+      for (unsigned int ibc=0; ibc<num_boundaries; ++ibc)
+      {
+        int num_segments;
+        meshfile->read(num_segments);
+        for (unsigned int iseg = 0 ; iseg < num_segments ; ++iseg)
+        {
+          int seg_type;
+          meshfile->read(seg_type);
+          switch (seg_type)
+          {
+            case 0: // line: skip three lines
+              meshfile->skip_line();
+              meshfile->skip_line();
+              meshfile->skip_line();
+              break;
+            case 1: // circle: skip four lines
+              meshfile->skip_line();
+              meshfile->skip_line();
+              meshfile->skip_line();
+              meshfile->skip_line();
+              break;
+            default:
+              throw InternalError("Unknown boundary type found.");
+              break;
+          }
+        }
+      }
+    }
+  } // parse_geom()
+
+  /// reads MESH portion of FEAST files into this BaseMesh
+  void parse_mesh(FileReaderASCII * meshfile)
+  {
+    // header
+    meshfile->read("FEAST_MESH");
+    meshfile->read("2D");
+    int version_major;
+    meshfile->read(version_major);
+    int version_minor;
+    meshfile->read(version_minor);
+    int type;
+    meshfile->read(type);
+    // number of entities
+    unsigned int num_nodes;
+    meshfile->read(num_nodes);
+    meshfile->read(_num_cells);
+    unsigned int num_edges;
+    meshfile->read(num_edges);
+    // std::cout << num_nodes << " " << num_edges << " " << _num_cells << std::endl;
+
+    // nodes
+    for (unsigned int inode = 0 ; inode < num_nodes ; ++inode)
+    {
+      double x, y;
+      unsigned int type;
+      meshfile->read(x,y,type);
+      //std::cout << "skipping node " << x << " " << y << " " << type << std::endl;
+    }
+
+    // edges
+    for (unsigned int iedge = 0 ; iedge < num_edges ; ++iedge)
+    {
+      unsigned int n1,n2;
+      meshfile->read(n1,n2);
+      //std::cout << "skipping edge " << n1 << " " << n2 << std::endl;
+    }
+
+    // cells. Idea: First allocate everything ...
+    for (unsigned int icell = 0 ; icell < _num_cells ; ++icell)
+    {
+      BaseMeshCell * c = new BaseMeshCell2D(icell);
+      _cells.push_back(c);
+    }
+    // ... and then fill with actual data
+    for (unsigned int icell = 0 ; icell < _num_cells ; ++icell)
+    {
+      // type of this cell
+      unsigned int type;
+      meshfile->read(type);
+      switch(type)
+      {
+        case BaseMeshCell::TYPE_2D_Q1_TP:
+        {
+          _cells.at(icell)->set_type(type);
+          // skip node indices
+          unsigned int n1,n2,n3,n4;
+          meshfile->read(n1,n2,n3,n4);
+          //std::cout << "Nodes: " << n1 << " "<< n2 << " " << n3 << " " << n4 << std::endl;
+          // skip edge indices
+          unsigned int e1,e2,e3,e4;
+          meshfile->read(e1,e2,e3,e4);
+          // read edge neighbours (note the special case, only in preparation for 3D)
+          int en[4];
+          meshfile->read(en[0], en[1], en[2], en[3]);
+          //std::cout << "EN: " << en[0] << " "<< en[1] << " " << en[2] << " " << en[3] << std::endl;
+          for (unsigned int i = 0 ; i < 4 ; ++i)
+          {
+            if (en[i] > 0)
+            {
+              _cells.at(icell)->add_neighbour(1, _cells.at(en[i]-1));
+            }
+            else
+            {
+              int num_extra = abs(en[i]);
+              switch(num_extra)
+              {
+                case 1:
+                {
+                  int i1;
+                  meshfile->read(i1);
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+                  break;
+                }
+                case 2:
+                {
+                  int i1,i2;
+                  meshfile->read(i1, i2);
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
+                  break;
+                }
+                case 3:
+                {
+                  int i1,i2, i3;
+                  meshfile->read(i1, i2, i3);
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i3-1));
+                  break;
+                }
+                case 4:
+                {
+                  int i1,i2,i3,i4;
+                  meshfile->read(i1, i2, i3, i4);
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i3-1));
+                  _cells.at(icell)->add_neighbour(1, _cells.at(i4-1));
+                  break;
+                }
+              }
+            } // switch (num_extra)
+          } // for-loop over edge neighbours
+
+          // read point neighbours (note the special case)
+          int pn[4];
+          meshfile->read(pn[0], pn[1], pn[2], pn[3]);
+          for (unsigned int i = 0 ; i < 4 ; ++i)
+          {
+            if (pn[i] > 0)
+              _cells.at(icell)->add_neighbour(0, _cells.at(pn[i]-1));
+            else
+            {
+              int num_extra = abs(pn[i]);
+              switch(num_extra)
+              {
+                case 1:
+                {
+                  int i1;
+                  meshfile->read(i1);
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+                  break;
+                }
+                case 2:
+                {
+                  int i1,i2;
+                  meshfile->read(i1, i2);
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
+                  break;
+                }
+                case 3:
+                {
+                  int i1,i2, i3;
+                  meshfile->read(i1, i2, i3);
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i3-1));
+                  break;
+                }
+                case 4:
+                {
+                  int i1,i2,i3,i4;
+                  meshfile->read(i1, i2, i3, i4);
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i3-1));
+                  _cells.at(icell)->add_neighbour(0, _cells.at(i4-1));
+                  break;
+                }
+              }
+            }
+          } // loop over point neighbours
+          // finally, skip the line with refinement level etc.
+          int ref_level, ref_mode;
+          double ref_factor1, ref_factor2, ref_factor3;
+          meshfile->read(ref_level, ref_mode, ref_factor1, ref_factor2, ref_factor3);
+          // and continue with next cell
+          break;
+        }
+        default:
+          throw InternalError("Unknown cell type <" + StringUtils::stringify(type) + "> found.");
+      }
+    }
+  } // parse_mesh
+
+  /// parses partition part of FEAST files
+  void parse_partition(FileReaderASCII * meshfile)
+  {
+    // header
+    meshfile->read("FEAST_PART");
+    meshfile->read("2D");
+    int version_major;
+    meshfile->read(version_major);
+    int version_minor;
+    meshfile->read(version_minor);
+    // number of entities
+    unsigned int num_cells;
+    meshfile->read(num_cells);
+    if (num_cells != _num_cells)
+      throw InternalError("Number of BaseMeshCells from mesh file does not match that of partition file.");
+    meshfile->read(_num_partitions);
+    // TODO: THIS IS A HACK UNTIL HILMAR AND I DECIDE WHAT DTO DO WITH THE BASEMESH
+    if (_num_cells != _num_partitions)
+      throw InternalError("Sorry. Hilmar and Dominik currently only support one basemeshcell per process.");
+
+    // cells
+    for (unsigned int icell = 0 ; icell < _num_cells; ++icell)
+    {
+      unsigned int pb, mb;
+      meshfile->read(pb, mb);
+      _cells.at(icell)->set_parallel_block(pb-1);
+      _cells.at(icell)->set_matrix_block(mb-1);
+    }
+  }
+
+  /// creates connectivity graph from information stored in this BaseMesh
+  void create_graph()
+  {
+    // allocate index array
+    int* index = new int[_num_cells+1];
+
+    // graph data structure is filled by two sweeps through the cell list
+    // first sweep: count neighbours of each cell, and maintain running total to fill index array
+    // treat last index entry separately because cell array has one less entry than index array
+    unsigned int num_neighbours_so_far = 0;
+    for (unsigned int icell=0 ; icell < _num_cells ; ++icell)
+    {
+      // set neighbours counted so far to current cell
+      index[icell] = num_neighbours_so_far;
+      //std::cout << "Setting index[" << icell << "] = " << num_neighbours_so_far << std::endl;
+      // count neighbours (dimension-1 downto dimension=0 aka point-neighbours)
+      for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
+      {
+        num_neighbours_so_far += (_cells.at(icell)->num_neighbours(dim));
+      }
+    }
+    index[_num_cells] = num_neighbours_so_far;
+    //std::cout << "Setting index[" << _num_cells << "] = " << num_neighbours_so_far << std::endl;
+
+    // second sweep through data structure
+    // second sweep adds actual neighbour cell numbers in the appropriate placces into array edges
+    // again, treat last loop instance separately
+    int* edges = new int[index[_num_cells]];
+    num_neighbours_so_far = 0;
+    for (unsigned int icell=0 ; icell < _num_cells ; icell++)
+      for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
+        for (unsigned int neigh = 0 ; neigh < _cells.at(icell)->num_neighbours(dim) ; ++neigh)
+        {
+          edges[num_neighbours_so_far] = _cells.at(icell)->get_neighbour(dim,neigh)->number();
+          //std::cout << "edges[" << num_neighbours_so_far << "] = " << edges[num_neighbours_so_far] << std::endl;
+          ++num_neighbours_so_far;
+        }
+
+    // now, create graph object
+    // temporarily, do not distinguish edge neighbours and diagonal neighbours
+    if (_graph != nullptr)
+    {
+      delete _graph;
+      _graph = nullptr;
+    }
+    _graph = new Graph(_num_cells, index, edges);
+  }
+
+
+public:
   /* *****************
   * member variables *
   *******************/
@@ -36,12 +638,20 @@ public:
   * constructor & destructor *
   ***************************/
   BaseMesh()
-    : _graph(nullptr)
+    : _num_cells(0), _graph(nullptr)
   {
   }
 
   ~BaseMesh()
   {
+    // delete actual cells
+    while (!_cells.empty())
+    {
+      // note that pop_back calls the removed element's destructor
+      _cells.pop_back();
+    }
+
+    // delete graph derived from cells
     if (_graph != nullptr)
     {
       delete _graph;
@@ -49,9 +659,15 @@ public:
     }
   }
 
+
   /* ******************
   * getters & setters *
   ********************/
+  inline unsigned int num_cells() const
+  {
+    return _num_cells;
+  }
+
   /**
   * \brief getter for the graph
   *
@@ -62,10 +678,53 @@ public:
     return _graph;
   }
 
+
   /* *****************
   * member functions *
   *******************/
-  void read_mesh()
+  /// prints this base mesh to std::cout
+  void print()
+  {
+    for (unsigned int i=0; i<_cells.size(); ++i)
+      _cells.at(i)->print();
+  }
+
+  /// Reads given FEAST-V3-inline file and parses its contents into this BaseMesh
+  void read_mesh(const std::string& filename)
+  {
+    FileReaderASCII * meshfile = new FileReaderASCII(filename, '#', true);
+
+    // file header
+    meshfile->read("FEAST");
+    meshfile->read("2D");
+    int version_major;
+    meshfile->read(version_major);
+    int version_minor;
+    meshfile->read(version_minor);
+    if (version_major != 3 && version_minor != 0)
+      throw InternalError("Only file format 3.0 (inline) is currently supported");
+    meshfile->read(_description);
+
+    // remaining parts of this file
+    parse_geom(meshfile);
+    parse_mesh(meshfile);
+    parse_partition(meshfile);
+    // HACK: do not read in FEAST_BC and FEAST_PROP, instead, just close the file and get on with life
+
+    // clean up file reader
+    delete meshfile;
+
+    // debug
+    print();
+
+    // and convert to Graph structure
+    create_graph();
+  }
+
+  /**
+  * \brief Hilmar's debug utility routine
+  */
+  void dummy_read_mesh()
   {
     // read mesh
     // ...

@@ -246,7 +246,17 @@ public:
     if(_process_group->is_coordinator())
     {
       _base_mesh = new BaseMesh();
-      _base_mesh->read_mesh();
+      // Hilmar's dummy routine
+      //_base_mesh->dummy_read_mesh();
+      // or Dominik's 'real' one
+      try
+      {
+        _base_mesh->read_mesh("../grids/testgrid_16m.feast");
+      }
+      catch (InternalError& e)
+      {
+        MPIUtils::abort(e.message());
+      }
     }
   }
 
