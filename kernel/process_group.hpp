@@ -13,7 +13,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
-#include <kernel/worker.hpp>
 #include <kernel/graph.hpp>
 
 /**
@@ -397,22 +396,28 @@ public:
 * \brief class describing a work group, i.e. a set of worker processes sharing the same MPI communicator and performing
 *        the same task
 *
-* WorkGroup objects are created by the load balancer. They consist of n compute process and eventually one extra
-* process which is the coordinator of the parent process group. The latter is only the case if this coordinator is not
-* part of the compute processes of this work group anyway. Communication between different work groups is done via the
-* enclosing ProcessGroup communicator.
+* WorkGroup objects are created by the load balancer. They consist of n compute processes and eventually one extra
+* process which is the coordinator of the parent process group. The latter is only the case if the coordinator is not
+* part of the compute processes of this work group anyway. In both cases (containing an extra coordinator process or
+* not), a work group contains a sub-work-group, which is either the work group itself (in the case there is no extra
+* coordinator process) or the work group without the extra coordinator process.
+*
+* The member of the work group living on this process is called "worker" (which is not realised via an extra class.)
+*
+* Communication between different work groups is done via the enclosing ProcessGroup communicator.
+*
 * Example:
-* The process group of a load balancer consists of 6 processes, the sixth one being the coordinator of the process
+* The process group of a load balancer consists of six processes, the sixth one being the coordinator of the process
 * group. There is no dedicated load balancing process. The coordinator process reads the mesh and the solver
 * configuration and decides that the coarse grid problem is to be treated by two processes (process group ranks 0 and 1)
-* and the fine grid problems by all six processes. Then two work groups are created: one consisting of the two processes
-* with local ranks 0 and 1, and one consisting of all six processes. The coordinator of the parent process group is
-* already part of the fine grid work group, so it is only added to the coarse grid work group. So, the latter actually
-* consists of three processes. Each work group has its own MPI communicator. Since the coordinator of the parent
-* process group is part of these communicators, all necessary information (mesh, graph, ...) can be transferred
-* efficiently via collective communication routines. In the coarse grid work group, however, this parent group
-* coordinator is not a compute process, hence this work group creates a subgroup consisting of the two compute processes
-* only.
+* and the fine grid problems by all six processes (ranks 0-5). Then two work groups are created: one consisting of the
+* two processes with ranks 0 and 1, and one consisting of all six processes (ranks 0-5). The coordinator of the parent
+* process group (rank 5) is already part of the fine grid work group, so it is only added to the coarse grid work group
+* as an extra process. So, the latter actually consists of three processes (ranks 0,1 and 5). Each work group has its
+* own MPI communicator. Since the coordinator of the parent process group is part of these communicators, all necessary
+* information (mesh, graph, ...) can be transferred efficiently via collective communication routines. In the coarse
+* grid work group, however, this parent group coordinator is not a compute process, hence this work group creates a
+* subgroup consisting of the two compute processes (ranks 0 and 1) only.
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
@@ -455,20 +460,42 @@ private:
   /**
   * \brief local portions of a distributed graph
   *
-  * This object is sent to this process by the coordinator of the parent process group. It can be used to create an
-  * MPI topology graph via MPI_Dist_graph_create().
+  * This object is sent to this process by the coordinator of the parent process group. It contains the parent process
+  * group ranks of the neighbours of this worker. It can be used to create an MPI topology graph via
+  * MPI_Dist_graph_create().
   */
   GraphDistributed* _graph_distributed;
 
-//  /// worker object living on this process
-//  Worker* _worker;
-//  /**
-//  * \brief vector of remote workers in the work group
-//  *
-//  * Here, RemoteWorker objects are used (instead of Worker objects) since they exist on remote processes.
-//  */
-//  std::vector<RemoteWorker*> _remote_workers;
+  /**
+  * \brief vector of process group ranks of members of the "next finer" work group this worker has to exchange
+  *        data with
+  *
+  * Since those workers live in a different work group, this worker has to communicate with them via the
+  * process group communicator. Note that one of those workers may have the same process group rank (i.e., live on the
+  * same MPI_COMM_WORLD process) as this worker (hence, no MPI communication is necessary in this case).
+  */
+  std::vector<int> _ranks_finer; // COMMENT_HILMAR: find a better variable name!
 
+  /**
+  * \brief process group rank of the worker in the "next coarser" work group this worker has to exchange data with
+  *        (this is always only one!)
+  *
+  * Since the worker lives in a different work group, this worker has to communicate with it via the process
+  * group communicator. Note that the worker may have the same process group rank (i.e., live on the same
+  * MPI_COMM_WORLD process) as this worker (hence, no MPI communication is necessary in this case).
+  */
+  int _rank_coarser; // COMMENT_HILMAR: find a better variable name!
+
+// COMMENT_HILMAR, 20.10.2010:
+// Bei den letzten beiden Variablen muss man abfragen, ob der entsprechende worker auf demselben Prozess lebt,
+// denn MPI_send/recv mit source=destination ist unsafe. Dazuein  Zitat aus dem MPI2.2-Standard, Seite 31:
+//   Source = destination is allowed, that is, a process can send a message to itself.
+//   (However, it is unsafe to do so with the blocking send and receive operations described above,
+//   since this may lead to deadlock. See Section 3.5.)
+// Fuer den Fall, dass source und destination worker auf dem selben Prozess leben, muss kopiert anstatt kommuniziert
+// werden. Dafuer muss eine entsprechende Funktion vorgesehen werden, und die beiden muessen sich
+// datenstruktur-technisch "kennen". Das heisst, man wird in diesem Fall wohl noch einen Pointer auf die entsprechende
+// WorkGroup abspeichern muessen... na, mal sehen, wenn's an die Details geht.
 
 public:
 
@@ -487,8 +514,6 @@ public:
       _work_group_compute(nullptr),
 //      _comm_opt(MPI_COMM_NULL),
       _graph_distributed(nullptr)
-//      _worker(nullptr),
-//      _remote_workers(nullptr)
   {
     /* ******************************
     * test the logger functionality *
@@ -554,13 +579,11 @@ public:
         _work_group_compute = nullptr;
       }
     }
-//    _worker = new Worker(_comm, _rank, process_group_parent->comm(), _process_group_parent->rank());
   } // constructor
 
   /// destructor
   ~WorkGroup()
   {
-//    delete _worker;
     if(_work_group_compute != this && _work_group_compute != nullptr)
     {
       delete _work_group_compute;

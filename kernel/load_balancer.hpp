@@ -534,9 +534,9 @@ public:
         }
         else
         {
-          /* **************************************
-          * code for receiving non-root processes *
-          ****************************************/
+          /* ******************************************
+          * code for the receiving non-root processes *
+          ********************************************/
           // receive the number of edges from the root process
           MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_INT, root,
                       _work_groups[igroup]->comm());
@@ -548,9 +548,9 @@ public:
 
         }
 
-        // debug output
         if (!(_work_groups[igroup]->is_coordinator() && _work_groups[igroup]->contains_extra_coord()))
         {
+          // debug output
           std::cout << "Proc " << Process::rank << " received edges: ";
           for(int i(0) ; i < num_neighbours_local ; ++i)
           {
