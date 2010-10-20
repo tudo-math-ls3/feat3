@@ -50,6 +50,9 @@ protected:
   // Currently, this is simply a pointer to the part of the corresponding array
   // _group_ranks_world[my_group] in universe.hpp. Maybe it makes sense to copy the array and delete the one in
   // universe.hpp.
+
+// COMMENT_HILMAR: Muessen wir das abspeichern? Kann man es nicht an die MPI Routine uebergeben und dann wieder
+// wegschmeissen?
   int* _ranks_group_parent;
 
   /// pointer to the process group from which this process group has been spawned
@@ -140,7 +143,7 @@ public:
       _rank_coord(num_processes-1)
   {
     int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
-                                        _ranks_group_parent, &_group);
+                                        ranks_group_parent, &_group);
     MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
 
     // Create the group communicator for, among others, collective operations.
@@ -392,32 +395,18 @@ public:
 
 
 
+
 /**
 * \brief class describing a work group, i.e. a set of worker processes sharing the same MPI communicator and performing
-*        the same task
+*        the same compute task
 *
-* WorkGroup objects are created by the load balancer. They consist of n compute processes and eventually one extra
-* process which is the coordinator of the parent process group. The latter is only the case if the coordinator is not
-* part of the compute processes of this work group anyway. In both cases (containing an extra coordinator process or
-* not), a work group contains a sub-work-group, which is either the work group itself (in the case there is no extra
-* coordinator process) or the work group without the extra coordinator process.
+* A WorkGroup object is part of a ProcessSubgroup. It describes a set of compute processes sharing the MPI communicator.
 *
 * The member of the work group living on this process is called "worker" (which is not realised via an extra class.)
 *
 * Communication between different work groups is done via the enclosing ProcessGroup communicator.
 *
-* Example:
-* The process group of a load balancer consists of six processes, the sixth one being the coordinator of the process
-* group. There is no dedicated load balancing process. The coordinator process reads the mesh and the solver
-* configuration and decides that the coarse grid problem is to be treated by two processes (process group ranks 0 and 1)
-* and the fine grid problems by all six processes (ranks 0-5). Then two work groups are created: one consisting of the
-* two processes with ranks 0 and 1, and one consisting of all six processes (ranks 0-5). The coordinator of the parent
-* process group (rank 5) is already part of the fine grid work group, so it is only added to the coarse grid work group
-* as an extra process. So, the latter actually consists of three processes (ranks 0,1 and 5). Each work group has its
-* own MPI communicator. Since the coordinator of the parent process group is part of these communicators, all necessary
-* information (mesh, graph, ...) can be transferred efficiently via collective communication routines. In the coarse
-* grid work group, however, this parent group coordinator is not a compute process, hence this work group creates a
-* subgroup consisting of the two compute processes (ranks 0 and 1) only.
+* For an example concerning WorkGroup and ProcessSubgroup creation, see the description of class ProcessSubgroup.
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
@@ -432,21 +421,6 @@ private:
   /* *****************
   * member variables *
   *******************/
-  /// flag whether this group contains the coordinator of the parent process group as an extra process
-  bool _contains_extra_coord;
-
-  /**
-  * \brief subgroup of this work group containing only the real compute processes
-  *
-  * This is either a pointer to the work group itself if #_contains_extra_coord == false, otherwise it is a subgroup of
-  * the work group containing all processes except the extra coordinator process, i.e. only the real compute processes.
-  *
-  * COMMENT_HILMAR: This "recursive appearance" of the WorkGroup class is a little bit strange, but I didn't want to
-  * define yet another class describing this group of compute workers. Maybe we have to do this... let's see when we
-  * get into the details what these compute workers actually do and how they have to communicate...
-  */
-  WorkGroup* _work_group_compute;
-
 //  /**
 //  * \brief additional communicator representing an optimised process topology
 //  *
@@ -507,41 +481,33 @@ public:
     const int num_processes,
     int ranks_group_parent[],
     ProcessGroup* process_group_parent,
-    const int group_id,
-    bool contains_extra_coord)
+    const int group_id)
     : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
-      _contains_extra_coord(contains_extra_coord),
-      _work_group_compute(nullptr),
 //      _comm_opt(MPI_COMM_NULL),
-      _graph_distributed(nullptr)
+      _graph_distributed(nullptr),
+      _ranks_finer(nullptr)
   {
+    // debugging output
     /* ******************************
     * test the logger functionality *
     ********************************/
-    // debugging output
-    // let the coordinator of the work group (rank = 0) trigger some common messages
-    if(is_coordinator())
-    {
-      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
-                    + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));
-//      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
-      Logger::log_master("Hello, master file! " + s, Logger::FILE);
-//      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-//      Logger::log_master("Hello, default master screen and file! " + s);
-    }
-
+//    // let the coordinator of the subgroup trigger some common messages
+//    if(is_coordinator())
+//    {
+//      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
+//                    + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));
+// //      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
+//      Logger::log_master("Hello, master file! " + s, Logger::FILE);
+// //      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+// //      Logger::log_master("Hello, default master screen and file! " + s);
+//    }
     // write some individual messages to screen and file
     std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
                   + " and group rank " + StringUtils::stringify(_rank)
-                  + " in work group " + StringUtils::stringify(_group_id));
-    // vary the lengths of the messages a little bit
-    for(int i(0) ; i < _rank+1 ; ++i)
+                  + " in work group " + StringUtils::stringify(_group_id) + ".");
+    if(is_coordinator())
     {
-      s += " R";
-    }
-    for(int i(0) ; i < _group_id+1 ; ++i)
-    {
-      s += " G";
+      s += " I am the coordinator!";
     }
 //    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
     log_indiv_master("Hello, master file! " + s, Logger::FILE);
@@ -549,45 +515,12 @@ public:
 //    log_indiv_master("Hello, master default screen and file! " + s);
 
     // end of debugging output
-
-    // create sub work group consisting of the real compute processes only
-    if (!_contains_extra_coord)
-    {
-      // in the case there is no extra coordinator process, the subgroup of compute processes is equal to the work
-      // group itself
-      _work_group_compute = this;
-    }
-    else
-    {
-      // otherwise, the subgroup contains all processes of this work group except the last one (the extra coordinator)
-      int* subgroup_ranks = new int[_num_processes-1];
-      for(int i(0) ; i < _num_processes - 1 ; ++i)
-      {
-        subgroup_ranks[i] = i;
-      }
-      if(!is_coordinator())
-      {
-        _work_group_compute = new WorkGroup(_num_processes - 1, subgroup_ranks, this, 0, false);
-      }
-      else
-      {
-        // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
-        // will deadlock), so let the coordinator call the routine with MPI_GROUP_EMPTY and dummy communicator.
-        MPI_Comm dummy_comm;
-        int mpi_error_code = MPI_Comm_create(_comm, MPI_GROUP_EMPTY, &dummy_comm);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
-        _work_group_compute = nullptr;
-      }
-    }
   } // constructor
+
 
   /// destructor
   ~WorkGroup()
   {
-    if(_work_group_compute != this && _work_group_compute != nullptr)
-    {
-      delete _work_group_compute;
-    }
     if(_graph_distributed != nullptr)
     {
       delete _graph_distributed;
@@ -610,27 +543,6 @@ public:
 //  {
 //    return _comm_opt;
 //  }
-
-  /**
-  * \brief getter for the flag whether this group contains an extra coordinator process
-  *
-  * \return pointer the flag #_contains_extra_coord
-  */
-  inline bool contains_extra_coord() const
-  {
-    return _contains_extra_coord;
-  }
-
-  /**
-  * \brief getter for the compute work group
-  *
-  * \return pointer to the work group #_work_group_compute
-  */
-  inline WorkGroup* work_group_compute() const
-  {
-    return _work_group_compute;
-  }
-
 
   /* *****************
   * member functions *
@@ -657,10 +569,206 @@ public:
 //
 //    int sources[1];
 //    int degrees[1];
-//    sources[0] = _work_group_compute->rank();
+//    sources[0] = _rank;
 //    degrees[0] = _graph_distributed->num_neighbours();
-//    MPI_Dist_graph_create(_work_group_compute->comm(), 1, sources, degrees, _graph_distributed->neighbours(), nullptr,
-//                          MPI_INFO_NULL, true, _work_group_compute->comm_opt());
+//    MPI_Dist_graph_create(_comm, 1, sources, degrees, _graph_distributed->neighbours(), nullptr,
+//                          MPI_INFO_NULL, true, _comm_opt());
+  }
+};
+
+
+
+
+/**
+* \brief class describing a subgroup of a process group, consisting of some compute processes and eventually one
+*        extra coordinator process, sharing the same MPI communicator
+*
+* ProcessSubgroup objects are created by the load balancer. They consist of n compute processes and eventually one extra
+* process which is the coordinator of the parent process group. The latter is only the case if the coordinator is not
+* part of the compute processes anyway. In both cases (containing an extra coordinator process or not), a
+* ProcessSubgroup creates a WorkGroup object, which either consists of exactly the same processes as this
+* ProcessSubgroup (in the case there is no extra coordinator process) or of the n compute processes only (excluding the
+* extra coordinator process). Each ProcessSubgroup has its own MPI communicator. Since the coordinator of the parent
+* process group is part of this communicator, all necessary information (mesh, graph, ...) can be transferred
+* efficiently via collective communication routines. The extra WorkGroup object (excluding the eventual coordinator
+* process) with its own communicator is necessary to efficiently perform collective communication during the actual
+* computation (scalar products, norms, etc).
+*
+* Example:
+* The process group of a load balancer consists of six processes, the sixth one being the coordinator of the process
+* group. There is no dedicated load balancing process. The coordinator process (rank 5) reads the mesh and the solver
+* configuration and decides that the coarse grid problem is to be treated by two compute processes (process group ranks
+* 0 and 1) and the fine grid problems by six compute processes (ranks 0-5). Then two ProcessSubgroup objects are
+* created: The first one (for the coarse grid problem) consists of the two compute processes with ranks 0 and 1 and the
+* coordinator of the parent process group (rank 5). The other ProcessSubgroup (for the fine grid problem) object
+* consists of all six processes (ranks 0-5). Here, the coordinator of the parent process group (rank 5) is also a
+* compute process. Both ProcessSubgroups then create a WorkGroup object. The coarse grid work group consists of the
+* two compute process (ranks 0 and 1) and thus differs from its ProcessSubgroup, while the fine grid work group contains
+* exactly the same six processes as its ProcessSubgroup.
+*
+*    processes parent ProcessGroup:   0 1 2 3 4 5
+*    coarse grid ProcessSubgroup:     x x       x
+*    coarse grid WorkGroup:           x x
+*    fine grid ProcessSubgroup:       x x x x x x
+*    fine grid WorkGroup:             x x x x x x
+*
+* If the parent ProcessGroup contains seven processes with the seventh process being a dedicated load balancer and the
+* coordinator at the same time, the ProcessSubgroups and WorkGroups look like this:
+*
+*    processes parent ProcessGroup:   0 1 2 3 4 5 6
+*    coarse grid ProcessSubgroup:     x x         x
+*    coarse grid WorkGroup:           x x
+*    fine grid ProcessSubgroup:       x x x x x x x
+*    fine grid WorkGroup:             x x x x x x
+*
+*
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
+*
+*/
+class ProcessSubgroup
+  : public ProcessGroup
+{
+
+private:
+
+  /* *****************
+  * member variables *
+  *******************/
+  /// flag whether this group contains the coordinator of the parent process group as an extra process
+  bool _contains_extra_coord;
+
+  /**
+  * \brief work group containing the containing only the real compute processes of this ProcessSubgroup
+  *
+  * If #_contains_extra_coord == false, then the work group contains all processes of this ProcessGroup, otherwise it
+  * it contains only the compute processes excluding the the extra coordinator process.
+  */
+  WorkGroup* _work_group;
+
+public:
+
+  /* *************************
+  * constructor & destructor *
+  ***************************/
+  /// constructor
+  ProcessSubgroup(
+    const int num_processes,
+    int ranks_group_parent[],
+    ProcessGroup* process_group_parent,
+    const int group_id,
+    bool contains_extra_coord)
+    : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
+      _contains_extra_coord(contains_extra_coord),
+      _work_group(nullptr)
+  {
+    /* ******************************
+    * test the logger functionality *
+    ********************************/
+    // debugging output
+//    // let the coordinator of the subgroup trigger some common messages
+//    if(is_coordinator())
+//    {
+//      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
+//                    + " and I am the coordinator of process subgroup " + StringUtils::stringify(_group_id));
+// //      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
+//      Logger::log_master("Hello, master file! " + s, Logger::FILE);
+// //      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+// //      Logger::log_master("Hello, default master screen and file! " + s);
+//    }
+
+    // write some individual messages to screen and file
+    std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
+                  + " and group rank " + StringUtils::stringify(_rank)
+                  + " in process subgroup " + StringUtils::stringify(_group_id) + ".");
+    if(is_coordinator())
+    {
+      s += " I am the coordinator!";
+    }
+    // vary the lengths of the messages a little bit
+    for(int i(0) ; i < _rank+1 ; ++i)
+    {
+      s += " R";
+    }
+    for(int i(0) ; i < _group_id+1 ; ++i)
+    {
+      s += " G";
+    }
+//    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
+    log_indiv_master("Hello, master file! " + s, Logger::FILE);
+//    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+//    log_indiv_master("Hello, master default screen and file! " + s);
+
+    // end of debugging output
+
+    // create work group consisting of the real compute processes only
+    if (!_contains_extra_coord)
+    {
+      // in the case there is no extra coordinator process, the work group of compute processes contains all processes
+      // of this subgroup
+// BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
+// kopieren!
+      int* work_group_ranks = new int[_num_processes];
+      for(int i(0) ; i < _num_processes ; ++i)
+      {
+        work_group_ranks[i] = ranks_group_parent[i];
+      }
+      _work_group = new WorkGroup(_num_processes, work_group_ranks, _process_group_parent, _group_id + 42);
+    }
+    else
+    {
+      // otherwise, the work group contains all processes of this subgroup except the last one (the extra coordinator)
+// BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
+// kopieren. Die Methode MPI_Group_incl(...) bekommt dann das Array ranks_group_parent[] durchgereicht, und
+// wegen _num_processes-1 wird nur auf die ersten _num_processes-1 Positionen zugegriffen.
+      int* work_group_ranks = new int[_num_processes-1];
+      for(int i(0) ; i < _num_processes - 1 ; ++i)
+      {
+        work_group_ranks[i] = ranks_group_parent[i];
+      }
+      if(!is_coordinator())
+      {
+        _work_group = new WorkGroup(_num_processes - 1, work_group_ranks, _process_group_parent, _group_id + 666);
+      }
+      else
+      {
+        // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
+        // will deadlock), so let the coordinator call the routine with MPI_GROUP_EMPTY and dummy communicator.
+        MPI_Comm dummy_comm;
+        int mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+        _work_group = nullptr;
+      }
+    }
+  } // constructor
+
+  /// destructor
+  ~ProcessSubgroup()
+  {
+    if(_work_group != nullptr)
+    {
+      delete _work_group;
+    }
+  }
+
+  /**
+  * \brief getter for the flag whether this subgroup contains an extra coordinator process
+  *
+  * \return pointer the flag #_contains_extra_coord
+  */
+  inline bool contains_extra_coord() const
+  {
+    return _contains_extra_coord;
+  }
+
+  /**
+  * \brief getter for the compute work group
+  *
+  * \return pointer to the work group #_work_group
+  */
+  inline WorkGroup* work_group() const
+  {
+    return _work_group;
   }
 };
 

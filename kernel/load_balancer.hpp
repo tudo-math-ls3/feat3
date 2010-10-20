@@ -38,12 +38,13 @@
 *   coffee_machine.start();
 * }
 *
-* The load bal. with id 0 in the example above then
-* 1) reads in the mesh (this is only done by the dedicated load balancer process or the coordinator, resp.)
-* 2) builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
-*    coarse mesh problem) and creates corresponding MPI communicators. The worker with rank 0 in this communicator
-*    is usually the coordinator which communicates with the master or the dedicated load balancer. The process
-*    topologies of the work groups are then optimised by building corresponding graph structures. There are two cases:
+* The load bal. with id 0 in the example above then...
+* 1) ...reads in the mesh (this is only done by the dedicated load balancer process or the coordinator, resp.)
+* 2) ...builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
+*    coarse mesh problem) and creates corresponding MPI communicators. The workers with the highest work group ranks
+*    are the coordinators of these work groups, which communicate with the master or the dedicated load balancer. The
+*    process topologies of the work groups are then optimised by building corresponding graph structures. There are two
+*    cases:
 *    a) There is a dedicated load balancer: The dedicated load balancer reads the mesh, creates work groups and and a
 *       global graph structure for each work group. Then it distributes to each process of the work group the relevant
 *       parts of the global graph. Each work group process then creates its local graph structure and calls
@@ -51,23 +52,19 @@
 *    b) There is no dedicated load balancer: Same as case a), but instead of the dedicated load balancer the coordinator
 *       of the process group builds the global graph structure. In this case, it must be distinguished whether the
 *       coordinator is part of the work group or not.
+*    The load balancer does not create the work group objects directly, but "intermediate" groups, the so called
+*    ProcessSubgroup objects. These objects then contain the actual work groups. (See the description of class
+*    ProcessSubgroup.)
 *    COMMENT_HILMAR: It might be more clever to also let the MPI implementation decide on which physical process the
 *    dedicated load balancer should reside (instead of pinning it to the last rank in the process group). To improve
 *    this is task of the ITMC.
-*
-* 3) tells each member of the work groups to create a Worker object (representing the Worker on this process itself)
-*    and corresponding RemoteWorker objects (as members of the WorkGroup objects) representing the remote Worker
-*    objects
-* COMMENT_HILMAR: Probably, step 3) is skipped, i.e., there will be no extra Worker objects. Instead "the part of
-* the WorkGroup living on this process" represents such a worker.
-*
-* 4) tells each work group which other work groups it has to communicate with via the communicator they all share
-*    within the parent process group. E.g., the fine mesh work group has to send the restricted defect vector to the
+* 3) ...tells each work group which other work groups it has to communicate with (via the communicator they all share
+*    within the parent process group). E.g., the fine mesh work group has to send the restricted defect vector to the
 *    coarse mesh work group, while the coarse mesh work group has to send the coarse mesh correction to the fine mesh
-*    work group. Two such communicating work groups live either on the same process (internal communication = copy) or
+*    work group. Two such communicating workers live either on the same process (internal communication = copy) or
 *    on different processes (external communication = MPI send/recv). (See example below.)
 *
-* 5) sends corresponding parts of the mesh to the work groups
+* 4) ...sends corresponding parts of the mesh to the work groups
 *
 *     Example:
 *
@@ -135,33 +132,33 @@ private:
   /// flag whether the load balancer's process group uses a dedicated load balancer process
   bool _group_has_dedicated_load_bal;
 
-  /// vector of work groups the load balancer manages
-  std::vector<WorkGroup*> _work_groups;
+  /// vector of work process subgroups the load balancer manages
+  std::vector<ProcessSubgroup*> _subgroups;
 
   /// vector of graph structures representing the process topology within the work groups
   std::vector<Graph*> _graphs;
 
   /// number of work groups
-  int _num_work_groups;
+  int _num_subgroups;
 
   /**
   * \brief array of number of workers in each work group
   *
-  * Dimension: [#_num_work_groups]
+  * Dimension: [#_num_subgroups]
   */
   int* _num_proc_in_group;
 
   /**
-  * \brief 2-dim. array for storing the process group ranks building the work groups
+  * \brief 2-dim. array for storing the process group ranks building the subgroups
   *
-  * Dimension: [#_num_work_groups][#_num_proc_in_group[\a group_id]]
+  * Dimension: [#_num_subgroups][#_num_proc_in_group[\a group_id]]
   */
-  int** _work_group_ranks;
+  int** _subgroup_ranks;
 
   /**
   * \brief boolean array indicating to which work groups this process belongs
   *
-  * Dimension: [#_num_work_groups]
+  * Dimension: [#_num_subgroups]
   */
   bool* _belongs_to_group;
 
@@ -184,7 +181,7 @@ public:
     : _process_group(process_group),
       _group_has_dedicated_load_bal(group_has_dedicated_load_bal),
       _num_proc_in_group(nullptr),
-      _work_group_ranks(nullptr),
+      _subgroup_ranks(nullptr),
       _belongs_to_group(nullptr),
       _base_mesh(nullptr)
   {
@@ -193,14 +190,14 @@ public:
   /// destructor
   ~LoadBalancer()
   {
-    if (_work_group_ranks != nullptr)
+    if (_subgroup_ranks != nullptr)
     {
-      for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+      for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
-        delete [] _work_group_ranks[igroup];
+        delete [] _subgroup_ranks[igroup];
       }
-      delete [] _work_group_ranks;
-      _work_group_ranks = nullptr;
+      delete [] _subgroup_ranks;
+      _subgroup_ranks = nullptr;
     }
 
     if (_belongs_to_group != nullptr)
@@ -209,9 +206,9 @@ public:
       _belongs_to_group = nullptr;
     }
 
-    for(unsigned int igroup(0) ; igroup < _work_groups.size() ; ++igroup)
+    for(unsigned int igroup(0) ; igroup < _subgroups.size() ; ++igroup)
     {
-      delete _work_groups[igroup];
+      delete _subgroups[igroup];
     }
 
     if (_num_proc_in_group != nullptr)
@@ -277,7 +274,7 @@ public:
   * MPI_Scatter() and MPI_Gather() (which always have to be called by all members of an MPI process group).
   * This is more efficient then using n calls of MPI_send() / MPI_recv() via the communicator of the main process group.
   */
-  void create_work_groups()
+  void create_subgroups()
   {
     // shortcut to the number of processes in the load balancer's process group
     int num_processes = _process_group->num_processes();
@@ -306,16 +303,16 @@ public:
     // set up the two test cases
 
     // number of work groups, manually set to 2
-    _num_work_groups = 2;
+    _num_subgroups = 2;
     // array of numbers of processes per work group
     _num_proc_in_group = new int[2];
 
     // Boolean array indicating whether the work groups contain an extra process for the coordinator (which will then
     // not be a compute process in this work group)
-    bool group_contains_extra_coord[_num_work_groups];
+    bool group_contains_extra_coord[_num_subgroups];
 
     // allocate first dimension of the array for rank partitioning
-    _work_group_ranks = new int*[_num_work_groups];
+    _subgroup_ranks = new int*[_num_subgroups];
 
     if(_group_has_dedicated_load_bal)
     {
@@ -336,16 +333,16 @@ public:
       _num_proc_in_group[1] = 16 + 1;
 
       // partition the process group ranks into work groups
-      _work_group_ranks[0] = new int[_num_proc_in_group[0]];
-      _work_group_ranks[0][0] = 0;
-      _work_group_ranks[0][1] = 1;
-      _work_group_ranks[0][2] = 17;
+      _subgroup_ranks[0] = new int[_num_proc_in_group[0]];
+      _subgroup_ranks[0][0] = 0;
+      _subgroup_ranks[0][1] = 1;
+      _subgroup_ranks[0][2] = 17;
 
-      _work_group_ranks[1] = new int[_num_proc_in_group[1]];
+      _subgroup_ranks[1] = new int[_num_proc_in_group[1]];
       // set entries to {1, ..., 16}
       for(int i(0) ; i < _num_proc_in_group[1] ; ++i)
       {
-        _work_group_ranks[1][i] = i+1;
+        _subgroup_ranks[1][i] = i+1;
       }
     }
     else
@@ -367,15 +364,15 @@ public:
       _num_proc_in_group[1] = 16;
 
       // partition the process group ranks into work groups
-      _work_group_ranks[0] = new int[_num_proc_in_group[0]];
-      _work_group_ranks[0][0] = 0;
-      _work_group_ranks[0][1] = 1;
-      _work_group_ranks[0][2] = 17;
-      _work_group_ranks[1] = new int[_num_proc_in_group[1]];
+      _subgroup_ranks[0] = new int[_num_proc_in_group[0]];
+      _subgroup_ranks[0][0] = 0;
+      _subgroup_ranks[0][1] = 1;
+      _subgroup_ranks[0][2] = 17;
+      _subgroup_ranks[1] = new int[_num_proc_in_group[1]];
       // set entries to {2, ..., 17}
       for(int i(0) ; i < _num_proc_in_group[1] ; ++i)
       {
-        _work_group_ranks[1][i] = i+2;
+        _subgroup_ranks[1][i] = i+2;
       }
     }
 
@@ -388,17 +385,17 @@ public:
 //    // iterator for process group ranks, used to split them among the groups
 //    int iter_group_rank(-1);
 //    // now partition the ranks
-//    for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+//    for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 //    {
-//      _work_group_ranks[igroup] = new int[_num_proc_in_group[igroup]];
+//      _subgroup_ranks[igroup] = new int[_num_proc_in_group[igroup]];
 //      for(int j(0) ; j < _num_proc_in_group[igroup] ; ++j)
 //      {
 //        // increase group rank
 //        ++iter_group_rank;
 //        // set group rank
-//        _work_group_ranks[igroup][j] = iter_group_rank;
+//        _subgroup_ranks[igroup][j] = iter_group_rank;
 //      }
-//    } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+//    } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 // COMMENT_HILMAR: end of old code
 
 /* ************************
@@ -406,33 +403,33 @@ public:
 **************************/
 
     // boolean array indicating to which work groups this process belongs
-    _belongs_to_group = new bool[_num_work_groups];
-    for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+    _belongs_to_group = new bool[_num_subgroups];
+    for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
     {
       // intialise with false
       _belongs_to_group[igroup] = false;
       for(int j(0) ; j < _num_proc_in_group[igroup] ; ++j)
       {
-        if(_process_group->rank() == _work_group_ranks[igroup][j])
+        if(_process_group->rank() == _subgroup_ranks[igroup][j])
         {
           _belongs_to_group[igroup] = true;
         }
       }
-    } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+    } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
-    // create WorkGroup objects including MPI groups and MPI communicators
-    // It is not possible to set up all WorkGroups in one call, since the processes building the WorkGroups are
-    // not necessarily disjunct. Hence, there are as many calls as there are WorkGroups. All processes not belonging
-    // to the WorkGroup currently created call the MPI_Comm_create() function with a dummy communicator and the
+    // create ProcessSubgroup objects including MPI groups and MPI communicators
+    // It is not possible to set up all subgroups in one call, since the processes building the subgroups are
+    // not necessarily disjunct. Hence, there are as many calls as there are subgroups. All processes not belonging
+    // to the subgroup currently created call the MPI_Comm_create() function with a dummy communicator and the
     // special group MPI_GROUP_EMPTY.
 
-    _work_groups.resize(_num_work_groups, nullptr);
-    for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+    _subgroups.resize(_num_subgroups, nullptr);
+    for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
     {
       if(_belongs_to_group[igroup])
       {
-        _work_groups[igroup] = new WorkGroup(_num_proc_in_group[igroup], _work_group_ranks[igroup],
-                                             _process_group, igroup, group_contains_extra_coord[igroup]);
+        _subgroups[igroup] = new ProcessSubgroup(_num_proc_in_group[igroup], _subgroup_ranks[igroup],
+                                                 _process_group, igroup, group_contains_extra_coord[igroup]);
       }
       else
       {
@@ -442,8 +439,12 @@ public:
         MPI_Comm dummy_comm;
         int mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+
+        // Within the ProcessSubgroup constructor, another MPI communicator is created. So, do another dummy call.
+        mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
       }
-    } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+    } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
 
     /* *********************************************************
@@ -453,7 +454,7 @@ public:
     // let the coordinator create the process topology
     if(_process_group->is_coordinator())
     {
-      _graphs.resize(_num_work_groups, nullptr);
+      _graphs.resize(_num_subgroups, nullptr);
 
       // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
       // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
@@ -477,21 +478,21 @@ public:
     * corresponding work group members                                           *
     *****************************************************************************/
 
-    for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
+    for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
     {
       if(_belongs_to_group[igroup])
       {
         int num_neighbours_local;
         int* edges_local;
-        int root = _work_groups[igroup]->rank_coord();
-        if(_work_groups[igroup]->is_coordinator())
+        int root = _subgroups[igroup]->rank_coord();
+        if(_subgroups[igroup]->is_coordinator())
         {
           /* **********************************
           * code for the sending root process *
           ************************************/
 
           int count = _graphs[igroup]->num_nodes();
-          if(_work_groups[igroup]->contains_extra_coord())
+          if(_subgroups[igroup]->contains_extra_coord())
           {
             // MPI_Scatter() counts the extra coordinator process as well (which only sends data). Arrays have to
             // be prepared with n+1 segments although only n processes receive data.
@@ -504,7 +505,7 @@ public:
             num_neighbours[i] = index[i+1] - index[i];
           }
 
-          if(_work_groups[igroup]->contains_extra_coord())
+          if(_subgroups[igroup]->contains_extra_coord())
           {
             // the extra coordinator process is the last in the work rank, so set the last entry of the array to zero
             num_neighbours[count-1] = 0;
@@ -512,11 +513,11 @@ public:
             // send the number of neighbours to the non-root processes (use MPI_IN_PLACE to indicate that the root
             // does not receive/store any data)
             MPI_Scatter(num_neighbours, 1, MPI_INT, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
-                        _work_groups[igroup]->comm());
+                        _subgroups[igroup]->comm());
             // send the edges to the non-root processes (usually the edges array must also have n+1 segments, but
             // since num_neighbours[count-1] == 0, the last segment is empty)
             MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, MPI_IN_PLACE, 0,
-                         MPI_DATATYPE_NULL, root, _work_groups[igroup]->comm());
+                         MPI_DATATYPE_NULL, root, _subgroups[igroup]->comm());
           }
           else
           {
@@ -525,11 +526,11 @@ public:
 
             // scatter the number of neighbours to the non-root processes and to the root process itself
             MPI_Scatter(num_neighbours, 1, MPI_INT, &num_neighbours_local, 1, MPI_INT, root,
-                        _work_groups[igroup]->comm());
+                        _subgroups[igroup]->comm());
             edges_local = new int[num_neighbours_local];
             // scatter the edges to the non-root processes and to the root process itself
             MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, edges_local, num_neighbours_local,
-                         MPI_INT, root, _work_groups[igroup]->comm());
+                         MPI_INT, root, _subgroups[igroup]->comm());
           }
         }
         else
@@ -539,16 +540,16 @@ public:
           ********************************************/
           // receive the number of edges from the root process
           MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_INT, root,
-                      _work_groups[igroup]->comm());
+                      _subgroups[igroup]->comm());
 
           // receive the edges
           edges_local = new int[num_neighbours_local];
           MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, edges_local, num_neighbours_local, MPI_INT, root,
-                       _work_groups[igroup]->comm());
+                       _subgroups[igroup]->comm());
 
         }
 
-        if (!(_work_groups[igroup]->is_coordinator() && _work_groups[igroup]->contains_extra_coord()))
+        if (!(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
         {
           // debug output
           std::cout << "Proc " << Process::rank << " received edges: ";
@@ -560,11 +561,11 @@ public:
 
           // now create distributed graph structure within the compute work groups (the array edges_local will be
           // deallocated in the destructor of the distributed graph object)
-          _work_groups[igroup]->work_group_compute()->set_graph_distributed(num_neighbours_local, edges_local);
+          _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, edges_local);
         }
       } // if(_belongs_to_group[igroup])
-    } // for(int igroup(0) ; igroup < _num_work_groups ; ++igroup)
-  } // create_work_groups()
+    } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+  } // create_subgroups()
 };
 
 #endif // guard KERNEL_LOAD_BAL_HPP

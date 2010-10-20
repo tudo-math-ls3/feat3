@@ -27,13 +27,13 @@ int main(int argc, char* argv[])
 
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
   // For the hard-coded example mesh we need 21 processes. (See description of the example in routine
-  // LoadBalancer::create_work_groups().)
+  // LoadBalancer::create_subgroups().)
   int num_processes_in_group[] = {18, 2};
 
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
   // Set the first entry either to false or to true to test two different configurations. (You don't have to change
-  // the number of processes for that.) (See description of the example in routine LoadBalancer::create_work_groups().)
+  // the number of processes for that.) (See description of the example in routine LoadBalancer::create_subgroups().)
   bool includes_dedicated_load_bal[] = {true, false};
 
   // create universe with several process groups
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     if(group_id == 0)
     {
       load_balancer->read_mesh();
-      load_balancer->create_work_groups();
+      load_balancer->create_subgroups();
 
       // let all process with even world rank test the vector version of the function log_master_array() and the
       // standard file logging functions
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
   else if(master != nullptr)
   {
     // This branch should only be entered when the infinite service loop of the master has been finished.
-    // This, however, usually happens only program end.
+    // This, however, usually happens only at program end.
   }
   else
   {
