@@ -642,7 +642,10 @@ private:
   * \brief work group containing the containing only the real compute processes of this ProcessSubgroup
   *
   * If #_contains_extra_coord == false, then the work group contains all processes of this ProcessGroup, otherwise it
-  * it contains only the compute processes excluding the the extra coordinator process.
+  * it contains only the compute processes excluding the the extra coordinator process. The parent process group of
+  * the work group is not this ProcessSubgroup, but the parent group of this ProcessSubgroup. That is why, when
+  * creating the work group, the dummy calls of MPI_Comm_create(...) by the remaining processes of the parent process
+  * group are performed in the load balancer class and not here.
   */
   WorkGroup* _work_group;
 
@@ -701,7 +704,8 @@ public:
 
     // end of debugging output
 
-    // create work group consisting of the real compute processes only
+    // create work group consisting of the real compute processes only (the dummy calls of MPI_Comm_create(...) by the
+    // remaining processes of the parent process group are performed in the load balancer class and not here)
     if (!_contains_extra_coord)
     {
       // in the case there is no extra coordinator process, the work group of compute processes contains all processes
