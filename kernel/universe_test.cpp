@@ -78,36 +78,26 @@ int main(int argc, char* argv[])
         Logger::log(messages);
         Logger::log("BRAL");
       }
-
-// COMMENT_HILMAR: TEMPORARY HACK to stop the infinite service loop of the master
-      sleep(5);
-      if (process_group->rank() == 0)
-      {
-        // the first MPI process of the process group tells the master to stop its service loop
-        // init a new message with corresponding ID
-        Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
-
-        // send message
-        Comm::send();
-      }
-// COMMENT_HILMAR: end of TEMPORARY HACK
-
+      // everything done, destroy the universe
+      Universe::destroy();
     }
     else
     {
       // the second process group does something else, programmed by the application outside the kernel...
+      // ...
+      // everything done, destroy the universe
+      Universe::destroy();
     }
   }
   else if(master != nullptr)
   {
-    // This branch should only be entered when the infinite service loop of the master has been finished.
-    // This, however, usually happens only at program end.
+    // This branch is entered when the infinite service loop of the master has been finished.
+    // This, however, usually happens only at program end. Hence, destroy the universe.
+    Universe::destroy();
   }
   else
   {
     MPIUtils::abort("Process with rank " + StringUtils::stringify(rank_world)
                     + " has no particular role, this should not happen.");
   }
-
-  Universe::destroy();
 }

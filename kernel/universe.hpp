@@ -57,6 +57,9 @@ private:
   /// process group consisting of all processes
   ProcessGroup* _world_group;
 
+  /// process group consisting of all processes but the master process (needed to cleanly finish the program)
+  ProcessGroup* _world_group_without_master;
+
   /**
   * \brief process group responsible for one problem
   *
@@ -156,10 +159,24 @@ private:
   */
   ~Universe()
   {
+    // the destructor has to be called by all COMM_WORLD processes
+    if(!Process::is_master)
+    {
+      // wait for all non-master processes (the master is still in its infinite service loop)
+      MPI_Barrier(_world_group_without_master->comm());
+
+      // the coordinator of the process group _world_group_without_master tells the master to stop its service loop
+      if(_world_group_without_master->is_coordinator())
+      {
+        // the coordinator inits a new message with corresponding ID
+        Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
+        // send message
+        Comm::send();
+        // now the master ends its service loops and automatically calls Universe::destroy()
+      }
+    }
     // clean up dynamically allocated memory
     _cleanup();
-//    // debug output
-//    std::cout << "Process " << Process::rank << " now destroys its part of the Universe!" << std::endl;
   }
 
   /// copy constructor, intentionally undefined to prevent object instantiation
@@ -274,6 +291,27 @@ private:
 
     // create ProcessGroup object representing the group of all COMM_WORLD processes
     _world_group = new ProcessGroup(MPI_COMM_WORLD, _num_processes);
+
+    // create ProcessGroup object representing the group of all COMM_WORLD processes excluding the master process
+    if(!Process::is_master)
+    {
+      MPI_Group gr_without_master;
+      MPI_Comm gr_comm;
+      MPI_Group_excl(_world_group->group(), 1, &rank_master, &gr_without_master);
+      int mpi_error_code = MPI_Comm_create(_world_group->comm(), gr_without_master, &gr_comm);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+      _world_group_without_master = new ProcessGroup(gr_comm, _num_processes-1);
+    }
+    else
+    {
+      // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
+      // will deadlock), so let the master call it with special MPI_GROUP_EMPTY and dummy communicator.
+      MPI_Comm dummy_comm;
+      int mpi_error_code = MPI_Comm_create(_world_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+    }
+
+    // create ProcessGroup object representing the group of all COMM_WORLD processes
 
     // iterator for MPI_COMM_WORLD ranks, used to split them among the groups
     int iter_MPC_rank(-1);
@@ -481,6 +519,7 @@ public:
       // delete the one and only instance of Universe
       delete _universe;
       _universe = nullptr;
+
       // shut down MPI
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);
