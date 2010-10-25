@@ -110,7 +110,7 @@ namespace Feast
       }
 
       /// Return a descriptive error message.
-      const std::string & message() const throw ()
+      const std::string message() const throw ()
       {
         return "\nTODO PRETTYPRINT\n" + _message + "TODO PRETTYPRINT\n";
       }

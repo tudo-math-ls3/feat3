@@ -24,7 +24,7 @@ class MPIUtils
   * \param[in] msg
   * message explaining the reason for the abortion
   */
-  static void abort(std::string msg)
+  static void abort(const std::string& msg)
   {
     // flush cout and cerr...
     std::cout.flush();

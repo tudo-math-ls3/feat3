@@ -29,16 +29,16 @@ private:
   static const char ENDL = '\n';
 
   /// filename associated with this reader
-  std::string _filename;
+  const std::string& _filename;
 
   /// stream associated with this reader
   std::ifstream myfile;
 
-  /// skip empty lines?
-  bool _skip_empty_lines;
-
   /// leading comment char indicating lines (and remainder of lines) to be ignored
   char _comment_char;
+
+  /// skip empty lines?
+  bool _skip_empty_lines;
 
   /// main util function (returns false if end of file is reached, true otherwise)
   inline bool get_next_line(std::string& sbuf)
@@ -74,10 +74,9 @@ private:
 public:
 
   /// CTOR
-  FileReaderASCII(const std::string& filename, char comment_char, bool skip_empty_lines)
-    : _comment_char(comment_char), _skip_empty_lines(skip_empty_lines)
+  FileReaderASCII(const std::string& filename, const char comment_char, const bool skip_empty_lines)
+    : _filename(filename), _comment_char(comment_char), _skip_empty_lines(skip_empty_lines)
   {
-    _filename = filename;
     myfile.open(filename.c_str(), std::ios::in);
   }
 

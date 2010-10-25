@@ -98,8 +98,8 @@ public:
   // TODO: CTOR WITH NEIGHBOURS //DG, Oct19,2010
   // TODO: (SHALLOW) COPY CTOR //DG, Oct19,2010
 
-  /// default DTOR
-  ~BaseMeshCell()
+  /// default DTOR (must be virtual)
+  virtual ~BaseMeshCell()
   {
   }
 
@@ -144,7 +144,7 @@ public:
   * virtual member functions *
   ***************************/
   /// prints this cell into a single line in std::cout (note: this routine must be extended in derived classes)
-  virtual void print()
+  virtual inline void print()
   {
     std::cout << _number << ": ";
     switch (_type)
@@ -163,10 +163,10 @@ public:
   * pure virtual member functions *
   ********************************/
   /// returns number of neighbours of given dimension (point neighbours are dimension-0 neighbours etc.)
-  virtual inline unsigned int num_neighbours(const unsigned int dimension) const = 0;
+  virtual unsigned int num_neighbours(const unsigned int dimension) const = 0;
 
   /// adds given cell to list of given-dimension neighbours
-  virtual inline void add_neighbour(const unsigned int dimension, BaseMeshCell * neighbour) = 0;
+  virtual void add_neighbour(const unsigned int dimension, BaseMeshCell * neighbour) = 0;
 
   /**
   * \brief Returns given neighbour of given dimension
@@ -175,7 +175,7 @@ public:
   * aussenrum ne Schleife ueber alle Nachbarn der gewuenschten Dimension machen (Ende der Schleife kennt man
   * ueber num_neighbours()) damit man in diese Routine den entsprechenden Index stopfen kann.
   */
-  virtual inline BaseMeshCell * get_neighbour(const unsigned int dimension, const unsigned int index) const = 0;
+  virtual BaseMeshCell * get_neighbour(const unsigned int dimension, const unsigned int index) const = 0;
 
 }; // class BaseMeshCell
 
@@ -214,7 +214,7 @@ public:
 
   ~BaseMeshCell2D()
   {
-    // IMPORTANT: Do not deleteneighbour arrays
+    // IMPORTANT: Do not delete neighbour arrays
   }
 
   /* *****************
@@ -340,13 +340,13 @@ private:
       meshfile->read(version_minor);
 
       // number of boundary components
-      int num_boundaries;
+      unsigned int num_boundaries;
       meshfile->read(num_boundaries);
 
       // loop over boundary components
       for (unsigned int ibc=0; ibc<num_boundaries; ++ibc)
       {
-        int num_segments;
+        unsigned int num_segments;
         meshfile->read(num_segments);
         for (unsigned int iseg = 0 ; iseg < num_segments ; ++iseg)
         {
@@ -683,7 +683,7 @@ public:
   * member functions *
   *******************/
   /// prints this base mesh to std::cout
-  void print()
+  void print() const
   {
     for (unsigned int i=0; i<_cells.size(); ++i)
       _cells.at(i)->print();
