@@ -205,7 +205,7 @@ private:
   * member variables *
   *******************/
   /// number of neighbours
-  int _num_neighbours;
+  unsigned int _num_neighbours;
 
   /**
   * \brief ranks of the neighbours
@@ -245,7 +245,7 @@ public:
   *
   * \return number of neighbours #_num_neighbours
   */
-  inline int num_neighbours() const
+  inline unsigned int num_neighbours() const
   {
     return _num_neighbours;
   }
@@ -263,6 +263,15 @@ public:
   /* *****************
   * member functions *
   *******************/
+  void print(std::ostream& stream)
+  {
+    stream << "distributed graph: ";
+    for(unsigned int i(0) ; i < _num_neighbours ; ++i)
+    {
+      stream << _neighbours[i] << " ";
+    }
+    stream << std::endl;
+  }
 }; // class GraphDistributed
 
 #endif // guard KERNEL_GRAPH_HPP

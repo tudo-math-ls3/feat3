@@ -71,13 +71,13 @@ int main(int argc, char* argv[])
       if (Process::rank % 2 == 0)
       {
         std::vector<std::string> messages(3);
-        std::string s(StringUtils::stringify(Process::rank) + ". process is testing...");
+        std::string s(StringUtils::stringify(Process::rank) + ". process is testing...\n");
         messages[0] = s;
-        messages[1] = "... this vector ...";
-        messages[2] = "... logging feature!";
+        messages[1] = "... this vector ...\n";
+        messages[2] = "... logging feature!\n";
         Logger::log_master_array(messages, Logger::FILE);
         Logger::log(messages);
-        Logger::log("BRAL");
+        Logger::log("BRAL\n");
       }
       // everything done, destroy the universe
       Universe::destroy();

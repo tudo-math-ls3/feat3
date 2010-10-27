@@ -246,6 +246,7 @@ public:
   * \brief writes a message to the log file of this process
   *
   * This function receives a string representing a log message and writes it to the log file attached to this process.
+  * Note that no line break is performed.
   *
   * \param[in] message
   * string representing the log message
@@ -254,7 +255,7 @@ public:
   */
   static void log(std::string const message)
   {
-    file << message << std::endl;
+    file << message;
   }
 
 // COMMENT_HILMAR: This version seems not to be necessary. The above function log(std::string const &message) is also
@@ -281,8 +282,8 @@ public:
   /**
   * \brief writes a number of messages to the log file of this process
   *
-  * This function receives a vector of strings representing a number of log message and writes them line by line to
-  * the log file attached to this process.
+  * This function receives a vector of strings representing a number of log message and writes them to the log file
+  * attached to this process. Note that no line break is performed.
   *
   * \param[in] messages
   * vector of strings representing the messages
@@ -293,7 +294,7 @@ public:
   {
     for(unsigned int i(0) ; i<messages.size() ; ++i)
     {
-      file << messages[i] << std::endl;
+      file << messages[i];
     }
   }
 
@@ -301,7 +302,8 @@ public:
   * \brief triggers logging of a message (given as string) on the master process
   *
   * This function receives a string representing a log message. It triggers the function receive() in the master's
-  * service loop and sends the message to the master, which writes them to screen and/or log file.
+  * service loop and sends the message to the master, which writes them to screen and/or log file. Note that no line
+  * break is performed.
   *
   * \param[in] message
   * string representing the log message
@@ -342,7 +344,7 @@ public:
   *
   * This function runs on the master and is triggered by the function log_master(). It receives one MPI message
   * consisting of a char array representing one log message. Depending on the sent output target the function then
-  * writes the message to the screen and/or to the log file.
+  * writes the message to the screen and/or to the log file. Note that no line break is performed.
   *
   * \note Of course, one could realise this via the function receive_array(). But since single messages are sent much
   * more often then arrays of messages, it is justified to use a specially tailored function for this.
@@ -376,7 +378,7 @@ public:
     // display message on screen if requested
     if (target == SCREEN || target == SCREEN_FILE)
     {
-      std::cout << message << std::endl;
+      std::cout << message;
     }
 
     // write messages to master's log file if requested
@@ -392,7 +394,7 @@ public:
   *
   * This function receives one large char array which contains a number of distinct messages. It triggers the function
   * receive_array() in the master's service loop and sends the messages to the master, which writes them to
-  * screen and/or log file.
+  * screen and/or log file. Note that no line break is performed.
   *
   * \param[in] num_messages
   * the number of messages the char array \a messages contains
@@ -447,7 +449,7 @@ public:
   *
   * This function receives a vector of strings representing distinct messages. It converts the messages to one large
   * char array and calls the first version of the routine log_master_array(), which then triggers logging of these
-  * messages on the master process.
+  * messages on the master process. Note that no line break is performed.
   *
   * \param[in] messages
   * vector of strings representing the distinct messages
@@ -499,7 +501,8 @@ public:
   * This function runs on the master and is triggered by the (overloaded) function log_master_array(). It receives one
   * MPI message consisting of one long char array representing an array of distinct log messages, plus further
   * information how to partition this char array into the single messages. Depending on the sent output target the
-  * function then writes one line per message to the screen and/or to the log file.
+  * function then writes one line per message to the screen and/or to the log file. Note that no line break is
+  * performed.
   *
   * \note There is no way to know in which order the master receives messages concurrently sent from different
   * processes. But when the master reacts to one request, then it will complete it before doing something else.
@@ -563,7 +566,7 @@ public:
       for(int i(0) ; i < num_messages ; ++i)
       {
         // use corresponding offsets in the char array (pointer arithmetic)
-        std::cout << messages + msg_start_pos[i] << std::endl;
+        std::cout << messages + msg_start_pos[i];
       }
     }
 

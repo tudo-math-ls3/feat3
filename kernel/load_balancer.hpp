@@ -561,14 +561,6 @@ public:
 
         if (!(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
         {
-          // debug output
-          std::cout << "Proc " << Process::rank << " received edges: ";
-          for(int i(0) ; i < num_neighbours_local ; ++i)
-          {
-            std::cout << edges_local[i] << " ";
-          }
-          std::cout << std::endl;
-
           // now create distributed graph structure within the compute work groups (the array edges_local will be
           // deallocated in the destructor of the distributed graph object)
           _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, edges_local);

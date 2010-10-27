@@ -509,6 +509,7 @@ public:
     {
       s += " I am the coordinator!";
     }
+    s += "\n";
 //    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
     log_indiv_master("Hello, master file! " + s, Logger::FILE);
 //    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
@@ -544,6 +545,16 @@ public:
 //    return _comm_opt;
 //  }
 
+  /**
+  * \brief getter for the distributed graph object
+  *
+  * \return pointer to GraphDistributed #_graph_distributed
+  */
+  inline GraphDistributed* graph_distributed() const
+  {
+    return _graph_distributed;
+  }
+
   /* *****************
   * member functions *
   *******************/
@@ -559,6 +570,17 @@ public:
     int* edges)
   {
     _graph_distributed = new GraphDistributed(num_neighbours, edges);
+
+    // debug output (demonstrating how to use the SomeClass::print(std::ostream) methods)
+
+    // log into process-own log file
+    _graph_distributed->print(Logger::file);
+
+    // let the master log to screen and to the master log file
+    std::stringstream ss;
+    ss << "Proc " << Process::rank << ": ";
+    _graph_distributed->print(ss);
+    log_indiv_master(ss.str());
 
 // COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
 //   Unfortunately, this function has only been introduced with MPI-2.2 and is not yet implemented in OpenMPI yet.
@@ -697,6 +719,7 @@ public:
     {
       s += " G";
     }
+    s += "\n";
 //    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
     log_indiv_master("Hello, master file! " + s, Logger::FILE);
 //    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
