@@ -2,15 +2,19 @@
 #ifndef MPI_UTILS_HPP
 #define MPI_UTILS_HPP
 
+// includes, system
 #include <stdlib.h>
 #include <string>
 #include <mpi.h>
+
+// includes, Feast
+#include <kernel/util/string_utils.hpp>
 
 /// collection of various MPI utilities
 class MPIUtils
 {
 
- public:
+public:
 
   /* *****************
   * member functions *

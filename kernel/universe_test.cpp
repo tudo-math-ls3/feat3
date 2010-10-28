@@ -66,17 +66,37 @@ int main(int argc, char* argv[])
       load_balancer->read_mesh();
       load_balancer->create_subgroups();
 
-      // let all process with even world rank test the vector version of the function log_master_array() and the
+      // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
       // standard file logging functions
-      if (Process::rank % 2 == 0)
+      if (Process::rank % 7 == 0)
       {
+        // test the PrettyPrinter
+        std::string prefix(std::string("Proc"+StringUtils::stringify(Process::rank)));
+        PrettyPrinter pp(40, '#', prefix);
+        pp.add_line_sep();
+        pp.add_line_centered("Testing pp and logging!");
+        pp.add_line_sep();
+        pp.add_line("left bla blub");
+        pp.add_line("too long too long too long too long too long too long");
+        pp.add_line_no_right_delim("also too long too long too long too long too long too long");
+        pp.add_line("left bla blub");
+        pp.add_line_sep();
+        // print it like this...
+        Logger::log(pp.block());
+        // ... or like this...
+        pp.print(Logger::file);
+        // send it to the master for file output
+        Logger::log_master(pp.block(), Logger::FILE);
+
+        // test vector version of log_master_array()
         std::vector<std::string> messages(3);
-        std::string s(StringUtils::stringify(Process::rank) + ". process is testing...\n");
-        messages[0] = s;
-        messages[1] = "... this vector ...\n";
-        messages[2] = "... logging feature!\n";
+        messages[0] = prefix + ": Testing this...\n";
+        messages[1] = prefix + ": ...vector logging...\n";
+        messages[2] = prefix + ": ...feature!\n";
         Logger::log_master_array(messages, Logger::FILE);
         Logger::log(messages);
+
+        // test standard log feature
         Logger::log("BRAL\n");
       }
       // everything done, destroy the universe

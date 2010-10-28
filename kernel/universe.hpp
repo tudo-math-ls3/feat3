@@ -12,8 +12,8 @@
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
-//#include <kernel/logger.hpp>
 #include <kernel/master.hpp>
+#include <kernel/logger.hpp>
 #include <kernel/load_balancer.hpp>
 
 // TODO: All classes in this file/compilation unit should be namespace Feast.

@@ -3,36 +3,16 @@
 /// Header guard
 #define UTIL_EXCEPTION_HHP 1
 
-#include <kernel/util/instantiation_policy.hpp>
-#include <kernel/util/string_utils.hpp>
-#include <kernel/base_header.hpp>
+// includes, system
 #include <string>
 #include <cstdlib>
 #include <iostream>
 #include <list>
 
-namespace
-{
-  /// Concatenate strings between begin and end.
-  std::string join(std::list<std::string>::const_iterator begin, std::list<std::string>::const_iterator end,
-      const std::string & delimiter)
-  {
-    std::string result;
-
-    if (begin != end)
-      while (true)
-      {
-        result += *begin;
-        if (++begin == end)
-          break;
-
-        result += delimiter;
-      }
-    result +="\n";
-
-    return result;
-  }
-}
+// includes, Feast
+#include <kernel/util/instantiation_policy.hpp>
+#include <kernel/util/string_utils.hpp>
+#include <kernel/base_header.hpp>
 
 namespace Feast
 {
@@ -58,9 +38,9 @@ namespace Feast
     }
 
     /// Return a full context stack aka backtrace.
-    std::string backtrace(const std::string & delimiter) const
+    std::string backtrace(const std::string& delimiter) const
     {
-      return join(local_context_stack.begin(), local_context_stack.end(), delimiter);
+      return StringUtils::join(local_context_stack.begin(), local_context_stack.end(), delimiter);
     }
   };
 
@@ -217,7 +197,7 @@ namespace Feast
         if (! context_stack)
           return "";
 
-        return join(context_stack->begin(), context_stack->end(), delimiter);
+        return StringUtils::join(context_stack->begin(), context_stack->end(), delimiter);
       }
   };
 

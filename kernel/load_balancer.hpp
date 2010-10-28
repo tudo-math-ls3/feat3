@@ -556,7 +556,6 @@ public:
           edges_local = new int[num_neighbours_local];
           MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, edges_local, num_neighbours_local, MPI_INT, root,
                        _subgroups[igroup]->comm());
-
         }
 
         if (!(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))

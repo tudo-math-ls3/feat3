@@ -150,8 +150,6 @@
 class Logger
 {
 
-private:
-
 public:
 
   /// variable storing the base name of the log file
@@ -276,7 +274,7 @@ public:
 //  */
 //  static void log(char message[])
 //  {
-//    file << message << std::endl;
+//    file << message;
 //  }
 
   /**
@@ -362,9 +360,6 @@ public:
     // read length of the messages from the buffer
     int msg_length;
     Comm::read(msg_length);
-
-//    // debug output
-//    std::cout << "read length of message: " << msg_length << std::endl;
 
     // char array for storing the message
     char message[msg_length];
@@ -523,19 +518,10 @@ public:
     int num_messages;
     Comm::read(num_messages);
 
-//    // debug output
-//    std::cout << "read num_messages: " << num_messages << std::endl;
-
     // allocate array for sotring message lengths
     int msg_lengths[num_messages];
     // read message lengths from the buffer
     Comm::read(num_messages, msg_lengths);
-
-//    // debug output
-//    for (int i(0) ; i < num_messages ; ++i)
-//    {
-//      std::cout << "read length of message " << i << ": " << msg_lengths[i] << std::endl;
-//    }
 
     // allocate array for storing the start positions of the single messages in the receive buffer
     int msg_start_pos[num_messages];
@@ -547,9 +533,6 @@ public:
       msg_start_pos[i] = msg_start_pos[i-1] + msg_lengths[i-1];
     }
     int total_length(msg_start_pos[num_messages-1] + msg_lengths[num_messages-1]);
-
-//    // debug output
-//    std::cout << "total length of message " << total_length << std::endl;
 
     // allocate char array for (consecutively) storing the messages
     char messages[total_length];
@@ -586,5 +569,4 @@ std::string Logger::file_base_name_default("feast");
 std::string Logger::file_name;
 std::string Logger::file_base_name;
 std::ofstream Logger::file;
-
 #endif // guard KERNEL_LOGGER_HPP
