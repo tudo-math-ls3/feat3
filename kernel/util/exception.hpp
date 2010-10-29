@@ -14,7 +14,7 @@
 #include <kernel/util/string_utils.hpp>
 #include <kernel/base_header.hpp>
 
-namespace Feast
+namespace FEAST
 {
   /// The global context stack.
   /// \todo Ist der stack global oder compile-unit lokal?
@@ -168,7 +168,8 @@ namespace Feast
           context_stack = new std::list<std::string>;
         }
 
-        context_stack->push_back(context + " (" + StringUtils::stringify(file) + ":" + StringUtils::stringify(line) +")");
+        context_stack->push_back(context + " (" + StringUtils::stringify(file) + ":"
+                                 + StringUtils::stringify(line) +")");
       }
 
       /// Desctructor.
@@ -204,13 +205,12 @@ namespace Feast
   /**
    * \def CONTEXT
    *
-   * \brief Convenience definition that provides a way to declare uniquely-named
-   * instances of class Context.
+   * \brief Convenience definition that provides a way to declare uniquely-named instances of class Context.
    *
-   * The created Context will be automatically provided with the correct filename and
-   * line number.
+   * The created Context will be automatically provided with the correct filename and line number.
    *
-   * \param s Context message that can be display by an exception-triggered backtrace.
+   * \param s
+   * Context message that can be display by an exception-triggered backtrace.
    *
    * \warning Will only be compiled in when debug support is enabled.
    */
@@ -224,6 +224,6 @@ namespace Feast
 #define CONTEXT(s)
 #endif
 
-}
+} // namespace FEAST
 
 #endif //UTIL_EXCEPTION_HPP

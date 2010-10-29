@@ -10,37 +10,42 @@
 #include <kernel/base_header.hpp>
 #include <kernel/logger.hpp>
 
-/**
- * \brief class providing some functions for handling warnings, exceptions and errors
- *
- * \todo This class is not finished and not tested yet!
- *
- * \author Hilmar Wobker
- */
-class ErrorHandler
+namespace FEAST
 {
-private:
 
-public:
-  /// function reacting to an exception
-  void exception_occured(Exception e, bool critical, bool send_to_master) const
+  /**
+   * \brief class providing some functions for handling warnings, exceptions and errors
+   *
+   * \todo This class is not finished and not tested yet!
+   *
+   * \author Hilmar Wobker
+   */
+  class ErrorHandler
   {
-    PrettyPrinter pp(40, '#');
-    pp.add_line_sep();
-    if(critical)
+  private:
+
+  public:
+    /// function reacting to an exception
+    void exception_occured(Exception e, bool critical, bool send_to_master) const
     {
-      pp.add_line_centered("CRITICAL exception occured!");
+      PrettyPrinter pp(40, '#');
+      pp.add_line_sep();
+      if(critical)
+      {
+        pp.add_line_centered("CRITICAL exception occured!");
+        // ... further stuff
+      }
+      else
+      {
+        pp.add_line_centered("NON-CRITICAL exception occured!");
+        // ... further stuff
+      }
+      pp.add_line_sep();
       // ... further stuff
+      pp.print(Logger::file);
     }
-    else
-    {
-      pp.add_line_centered("NON-CRITICAL exception occured!");
-      // ... further stuff
-    }
-    pp.add_line_sep();
-    // ... further stuff
-    pp.print(Logger::file);
-  }
-};
+  };
+
+} // namespace FEAST
 
 #endif //UTIL_ERROR_HANDLER_HPP

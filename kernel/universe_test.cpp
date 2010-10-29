@@ -11,9 +11,14 @@
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
 
-// main routine
-// \author Hilmar Wobker
-// \author Dominik Goeddeke
+using namespace FEAST;
+
+/**
+* \brief main routine
+*
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
+*/
 int main(int argc, char* argv[])
 {
 

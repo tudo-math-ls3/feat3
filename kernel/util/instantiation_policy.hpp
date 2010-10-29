@@ -3,7 +3,7 @@
 /// Header guard
 #define UTIL_INSTANTIATION_POLICY_HPP 1
 
-namespace Feast
+namespace FEAST
 {
   /**
    * \{
@@ -164,6 +164,7 @@ namespace Feast
         *_ptr = 0;
       }
   };
-}
+
+} // namespace FEAST
 
 #endif // UTIL_INSTANTIATION_POLICY_HPP
