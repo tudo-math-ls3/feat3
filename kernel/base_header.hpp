@@ -74,11 +74,11 @@
 #endif
 
 /**
- * \brief Feast namespace.
+ * \brief FEAST namespace.
  */
-namespace Feast
+namespace FEAST
 {
-  // Feast version
+  // FEAST version
   enum
   {
     /// Feast major version number
@@ -90,14 +90,30 @@ namespace Feast
   };
 
   /**
+   * \brief Index data type.
+   * \details
+   * This type is used for indexing entities on a single matrix patch like e.g. vertice indices, degrees of freedom
+   * or column indices in a sparse matrix implementation.
+   */
+  typedef unsigned long index_t;
+
+  /**
+   * \brief Global index data type.
+   * \details
+   * This type is used for indexing entities in a global parallel simulation.
+   */
+  typedef unsigned long global_index_t;
+
+  /**
    * \brief Nil class definition.
-   *
-   * This is an empty tag class which may be used for templates with optional parameters.
+   * \details
+   * This is an empty tag class which may be used for templates with optional parameters.\n
+   * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
    */
   class Nil
   {
   }; // class Nil
 
-} // namespace Feast
+} // namespace FEAST
 
 #endif // KERNEL_BASE_HEADER_HPP

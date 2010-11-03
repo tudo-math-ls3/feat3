@@ -3,7 +3,7 @@
 #include <string>
 
 using namespace TestSystem;
-using namespace Feast;
+using namespace FEAST;
 
 /**
  * \brief Test class for the base_header.
