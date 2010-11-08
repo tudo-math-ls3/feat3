@@ -155,9 +155,9 @@ namespace FEAST
   * The width of the block, the delimiter symbol, and the prefix are set by the user. The strings to be written can be
   * centered or left aligned. For too long strings, the right delimiter can be omitted (is omitted automatically, resp.).
   *
-  * Some construction rules: A blank is appended to the prefix. One blank is inserted between left delimiter and the
-  * string. Between the string and the right delimiter there must be at least one blank, otherwise the right delimiter is
-  * omitted.
+  * Some construction rules: No blank is appended to the prefix (i.e., in the example above the prefix is "PRE ", and
+  * not "PRE"). One blank is inserted between left delimiter and the string. Between the string and the right delimiter
+  * there must be at least one blank, otherwise the right delimiter is omitted.
   *
   * \todo add functionalities for producing tabular output like this:
   * \verbatim
@@ -336,7 +336,7 @@ namespace FEAST
     */
     void add_line_sep()
     {
-      _block += _prefix + " " + std::string(_width, _delim) + "\n";
+      _block += _prefix + std::string(_width, _delim) + "\n";
     }
 
 
@@ -364,7 +364,7 @@ namespace FEAST
         unsigned int num_blanks_left(num_blanks_total / 2);
         unsigned int num_blanks_right(num_blanks_total%2 == 0 ? num_blanks_left : num_blanks_left + 1);
         // add the line to the pretty printed block
-        _block +=   _prefix + " " + StringUtils::stringify(_delim) + std::string(num_blanks_left, ' ') + s
+        _block +=   _prefix + StringUtils::stringify(_delim) + std::string(num_blanks_left, ' ') + s
                   + std::string(num_blanks_right, ' ') + StringUtils::stringify(_delim) + "\n";
       }
     }
@@ -391,7 +391,7 @@ namespace FEAST
       else
       {
         // add the line to the pretty printed block
-        _block +=   _prefix + " " + StringUtils::stringify(_delim) + " " + s + std::string(num_blanks - 1, ' ')
+        _block +=   _prefix + StringUtils::stringify(_delim) + " " + s + std::string(num_blanks - 1, ' ')
                   + StringUtils::stringify(_delim) + "\n";
       }
     }
@@ -407,7 +407,7 @@ namespace FEAST
     */
     void add_line_no_right_delim(const std::string& s)
     {
-      _block += _prefix + " " + StringUtils::stringify(_delim) + " " + s + "\n";
+      _block += _prefix + StringUtils::stringify(_delim) + " " + s + "\n";
     }
 
     /**

@@ -56,7 +56,7 @@ namespace FEAST
       /// Our (local) context data.
       ContextData * const _context_data;
 
-      /// Our message.
+      /// descriptive error message
       const std::string _message;
 
       /// Our what string (for std::exception).
@@ -89,10 +89,10 @@ namespace FEAST
         delete _context_data;
       }
 
-      /// Return a descriptive error message.
+      /// returns error message
       const std::string message() const throw ()
       {
-        return "\nTODO PRETTYPRINT\n" + _message + "TODO PRETTYPRINT\n";
+        return _message;
       }
 
       /// Return a backtrace.
@@ -127,7 +127,11 @@ namespace FEAST
   };
 
   /**
-   * \brief InternalError is an Exception that is thrown if something that is never supposed to happen happens.
+   * \brief exception that is thrown if something that is never supposed to happen happens
+   *
+   * It simply prefixes the exception message with "Internal error: ", otherwise it does not differ from its
+   * parent class Exception.
+   *
    * \author Dirk Ribbrock
    */
   class InternalError :

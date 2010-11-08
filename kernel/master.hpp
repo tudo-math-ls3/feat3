@@ -36,10 +36,10 @@ namespace FEAST
     /// flag for finishing the infinite service loop
     bool _finish_service;
 
-  #ifndef NDEBUG
+#ifndef NDEBUG
     /// MPI status object needed in MPI_Recv call
     MPI_Status status;
-  #endif
+#endif
 
   public:
 
@@ -55,16 +55,6 @@ namespace FEAST
     /* *****************
     * member functions *
     *******************/
-    /// dummy wait function
-    void wait()
-    {
-      for(int i(0) ; i<1 ; ++i)
-      {
-        sleep(1.0);
-        std::cout << "Master process with world rank " << Process::rank <<" is waiting..." << std::endl;
-      }
-    }
-
     /// infinite service loop waiting for messages
     void service()
     {
@@ -81,7 +71,7 @@ namespace FEAST
         MPI_Recv(Comm::MCW_buffer, Comm::MCW_BUFFERSIZE, MPI_PACKED, MPI_ANY_SOURCE,
                  MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_MACRO);
 
-  #ifndef NDEBUG
+#ifndef NDEBUG
         // Read the size of the received message (in bytes) from the status object.
         // The actual size of the message is not really needed, so we only read it when not in NDEBUG mode.
         // If the correct size is available, then the MPI_Unpack routine automatically checks whether the buffer position
@@ -91,12 +81,12 @@ namespace FEAST
         //   *** on communicator MPI_COMM_WORLD
         //   *** MPI_ERR_TRUNCATE: message truncated
         MPI_Get_count(&status, MPI_PACKED, &Comm::MCW_received_bytes);
-  #else
+#else
         // In NDEBUG mode the actual size of the sent message is not read. Instead, the size of the buffer array is
         // used. Hence, it may happen that the MPI_Unpack routine reads rubbish from the buffer without throwing an
         // truncation error.
         Comm::MCW_received_bytes = Comm::MCW_BUFFERSIZE;
-  #endif
+#endif
 
         // reset buffer content pointer
         Comm::MCW_buffer_pos = 0;

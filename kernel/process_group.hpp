@@ -54,16 +54,16 @@ namespace FEAST
     // _group_ranks_world[my_group] in universe.hpp. Maybe it makes sense to copy the array and delete the one in
     // universe.hpp.
 
-  // COMMENT_HILMAR: Muessen wir das abspeichern? Kann man es nicht an die MPI Routine uebergeben und dann wieder
-  // wegschmeissen?
+// COMMENT_HILMAR: Muessen wir das abspeichern? Kann man es nicht an die MPI Routine uebergeben und dann wieder
+// wegschmeissen?
     int* _ranks_group_parent;
 
     /// pointer to the process group from which this process group has been spawned
     ProcessGroup* _process_group_parent;
 
-  //    /// process groups spawned from this process group
-  // COMMENT_HILMAR, 15.9.2010: not sure yet if this is needed
-  //    ProcessGroup** _process_group_child;
+//    /// process groups spawned from this process group
+//  COMMENT_HILMAR, 15.9.2010: not sure yet if this is needed
+//    ProcessGroup** _process_group_child;
 
     /**
     * \brief ID of the process group
@@ -77,12 +77,12 @@ namespace FEAST
     /// rank of the coordinator process within the group
     int const _rank_coord;
 
-  // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
-  //  /// buffer size
-  //  static int BUFFERSIZE_BYTES;
-  //
-  //  /// buffer for MPI communication
-  //  char* _buffer;
+//   COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//    /// buffer size
+//    static int BUFFERSIZE_BYTES;
+//
+//    /// buffer for MPI communication
+//    char* _buffer;
 
 
   public:
@@ -123,8 +123,8 @@ namespace FEAST
       // since this is the world group of processes, the local and the global rank should be equal
       assert(Process::rank == _rank);
 
-  // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
-  //    _buffer = nullptr;
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//      _buffer = nullptr;
     }
 
     /**
@@ -159,25 +159,25 @@ namespace FEAST
       mpi_error_code = MPI_Group_rank(_group, &_rank);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
 
-  // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
-  //    // allocate communication buffers
-  //    int size_of_char;
-  //    mpi_error_code = MPI_Pack_size(1, MPI_CHAR, MPI_COMM_WORLD, &size_of_char);
-  //    MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack_size");
-  //
-  //    if (size_of_char != 1)
-  //    {
-  //      // In the unlikely case that a char is not 1 byte, determine the size of the buffer. The -0.001 is a precaution
-  //      // for the case the division results in 42.00000000001 instead of 42.0.
-  //      int buffer_size = ceil(BUFFERSIZE_BYTES/size_of_char - 0.001);
-  // //    std::cout << "buffer size: " << StringUtils::stringify(buffer_size) <<  std::endl;
-  //      _buffer = new char[buffer_size];
-  //    }
-  //    else
-  //    {
-  //      // otherwise, array size (in bytes) and number of array entries are equal
-  //      _buffer = new char[BUFFERSIZE_BYTES];
-  //    }
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//      // allocate communication buffers
+//      int size_of_char;
+//      mpi_error_code = MPI_Pack_size(1, MPI_CHAR, MPI_COMM_WORLD, &size_of_char);
+//      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack_size");
+//
+//      if (size_of_char != 1)
+//      {
+//        // In the unlikely case that a char is not 1 byte, determine the size of the buffer. The -0.001 is a precaution
+//        // for the case the division results in 42.00000000001 instead of 42.0.
+//        int buffer_size = ceil(BUFFERSIZE_BYTES/size_of_char - 0.001);
+// //       std::cout << "buffer size: " << StringUtils::stringify(buffer_size) <<  std::endl;
+//        _buffer = new char[buffer_size];
+//      }
+//      else
+//      {
+//        // otherwise, array size (in bytes) and number of array entries are equal
+//        _buffer = new char[BUFFERSIZE_BYTES];
+//      }
 
     }
 
@@ -327,13 +327,13 @@ namespace FEAST
         // non-const send buffer.)
         MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, nullptr, nullptr, nullptr,
                     MPI_DATATYPE_NULL, _rank_coord, _comm);
-  // COMMENT_HILMAR: not sure, if it is actually legitimate to simply cast the const away or if one has to manually copy
-  // the string like this:
-  //    char bla[length];
-  //    strcpy(bla, message.c_str());
-  //    MPI_Gatherv(bla, length, MPI_CHAR, nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, _rank_coord, _comm);
-  // With gcc 4.4.0 and intel 11.1 it works for tiny test problems. (If the function call is changed, then also
-  // change the call on coordinator side some lines below.)
+// COMMENT_HILMAR: not sure, if it is actually legitimate to simply cast the const away or if one has to manually copy
+// the string like this:
+//    char bla[length];
+//    strcpy(bla, message.c_str());
+//    MPI_Gatherv(bla, length, MPI_CHAR, nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, _rank_coord, _comm);
+// With gcc 4.4.0 and intel 11.1 it works for tiny test problems. (If the function call is changed, then also
+// change the call on coordinator side some lines below.)
       }
       else
       {
@@ -362,26 +362,26 @@ namespace FEAST
         // receive buffer for (consecutively) storing the messages
         char messages[total_length];
 
-  //      // debug output
-  //      for(int i(0) ; i < _num_processes ; ++i)
-  //      {
-  //        std::cout << "local process " << StringUtils::stringify(i) << ": length of string = "
-  //                  << StringUtils::stringify(msg_lengths[i]) << std::endl;
-  //      }
-  //      std::cout << "Total length: " << StringUtils::stringify(total_length) << std::endl;
+//        // debug output
+//        for(int i(0) ; i < _num_processes ; ++i)
+//        {
+//          std::cout << "local process " << StringUtils::stringify(i) << ": length of string = "
+//                    << StringUtils::stringify(msg_lengths[i]) << std::endl;
+//        }
+//        std::cout << "Total length: " << StringUtils::stringify(total_length) << std::endl;
 
         // gather the messages from the other processes.
         MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages, msg_lengths, msg_start_pos,
                     MPI_CHAR, _rank_coord, _comm);
 
-  //      // debug output
-  //      // output the strings collected from all processes by using corresponding offsets in the
-  //      // char array (pointer arithmetic)
-  //      for(int i(0) ; i < _num_processes ; ++i)
-  //      {
-  //        std::cout << "Process " << Process::rank << " writes: "
-  //                  << std::string(messages + msg_start_pos[i], msg_lengths[i]) << std::endl;
-  //      }
+//        // debug output
+//        // output the strings collected from all processes by using corresponding offsets in the
+//        // char array (pointer arithmetic)
+//        for(int i(0) ; i < _num_processes ; ++i)
+//        {
+//          std::cout << "Process " << Process::rank << " writes: "
+//                    << std::string(messages + msg_start_pos[i], msg_lengths[i]) << std::endl;
+//        }
 
         // now send everything to the master
         Logger::log_master_array(_num_processes, msg_lengths, total_length, messages, target);
@@ -390,10 +390,10 @@ namespace FEAST
     } // log_indiv_master
   }; // class ProcessGroup
 
-  // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
-  // // initialisation of static members
-  // COMMENT_HILMAR: Use some arbitrary size for the time being. This has to be parameterised somehow...
-  //int ProcessGroup::BUFFERSIZE_BYTES = 4194304;
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+// // initialisation of static members
+// COMMENT_HILMAR: Use some arbitrary size for the time being. This has to be parameterised somehow...
+//int ProcessGroup::BUFFERSIZE_BYTES = 4194304;
 
 
 
@@ -424,15 +424,15 @@ namespace FEAST
     /* *****************
     * member variables *
     *******************/
-  //  /**
-  //  * \brief additional communicator representing an optimised process topology
-  //  *
-  //  * This communicator results from a call to MPI_Dist_graph_create(...), which remaps the processes of this work group
-  //  * to optimise communication patterns.
-  //  */
-  // COMMENT_HILMAR: Everything that has to do with comm_opt is deactivated for the time being (see comment in routine
-  //    set_graph_distributed.
-  //  MPI_Comm _comm_opt;
+//    /**
+//    * \brief additional communicator representing an optimised process topology
+//    *
+//    * This communicator results from a call to MPI_Dist_graph_create(...), which remaps the processes of this work group
+//    * to optimise communication patterns.
+//    */
+//   COMMENT_HILMAR: Everything that has to do with comm_opt is deactivated for the time being (see comment in routine
+//      set_graph_distributed.
+//    MPI_Comm _comm_opt;
 
     /**
     * \brief local portions of a distributed graph
@@ -463,16 +463,16 @@ namespace FEAST
     */
     int _rank_coarser; // COMMENT_HILMAR: find a better variable name!
 
-  // COMMENT_HILMAR, 20.10.2010:
-  // Bei den letzten beiden Variablen muss man abfragen, ob der entsprechende worker auf demselben Prozess lebt,
-  // denn MPI_send/recv mit source=destination ist unsafe. Dazuein  Zitat aus dem MPI2.2-Standard, Seite 31:
-  //   Source = destination is allowed, that is, a process can send a message to itself.
-  //   (However, it is unsafe to do so with the blocking send and receive operations described above,
-  //   since this may lead to deadlock. See Section 3.5.)
-  // Fuer den Fall, dass source und destination worker auf dem selben Prozess leben, muss kopiert anstatt kommuniziert
-  // werden. Dafuer muss eine entsprechende Funktion vorgesehen werden, und die beiden muessen sich
-  // datenstruktur-technisch "kennen". Das heisst, man wird in diesem Fall wohl noch einen Pointer auf die entsprechende
-  // WorkGroup abspeichern muessen... na, mal sehen, wenn's an die Details geht.
+// COMMENT_HILMAR, 20.10.2010:
+// Bei den letzten beiden Variablen muss man abfragen, ob der entsprechende worker auf demselben Prozess lebt,
+// denn MPI_send/recv mit source=destination ist unsafe. Dazuein  Zitat aus dem MPI2.2-Standard, Seite 31:
+//   Source = destination is allowed, that is, a process can send a message to itself.
+//   (However, it is unsafe to do so with the blocking send and receive operations described above,
+//   since this may lead to deadlock. See Section 3.5.)
+// Fuer den Fall, dass source und destination worker auf dem selben Prozess leben, muss kopiert anstatt kommuniziert
+// werden. Dafuer muss eine entsprechende Funktion vorgesehen werden, und die beiden muessen sich
+// datenstruktur-technisch "kennen". Das heisst, man wird in diesem Fall wohl noch einen Pointer auf die entsprechende
+// WorkGroup abspeichern muessen... na, mal sehen, wenn's an die Details geht.
 
   public:
 
@@ -486,7 +486,7 @@ namespace FEAST
       ProcessGroup* process_group_parent,
       const int group_id)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
-  //      _comm_opt(MPI_COMM_NULL),
+//        _comm_opt(MPI_COMM_NULL),
         _graph_distributed(nullptr),
         _ranks_finer(nullptr)
     {
@@ -494,16 +494,16 @@ namespace FEAST
       /* ******************************
       * test the logger functionality *
       ********************************/
-  //    // let the coordinator of the subgroup trigger some common messages
-  //    if(is_coordinator())
-  //    {
-  //      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
-  //                    + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));
-  // //      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
-  //      Logger::log_master("Hello, master file! " + s, Logger::FILE);
-  // //      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-  // //      Logger::log_master("Hello, default master screen and file! " + s);
-  //    }
+//      // let the coordinator of the subgroup trigger some common messages
+//      if(is_coordinator())
+//      {
+//        std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
+//                      + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));
+// //        Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
+//        Logger::log_master("Hello, master file! " + s, Logger::FILE);
+// //        Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+// //        Logger::log_master("Hello, default master screen and file! " + s);
+//      }
       // write some individual messages to screen and file
       std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
                     + " and group rank " + StringUtils::stringify(_rank)
@@ -513,10 +513,10 @@ namespace FEAST
         s += " I am the coordinator!";
       }
       s += "\n";
-  //    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
+//      log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
       log_indiv_master("Hello, master file! " + s, Logger::FILE);
-  //    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-  //    log_indiv_master("Hello, master default screen and file! " + s);
+//      log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+//      log_indiv_master("Hello, master default screen and file! " + s);
 
       // end of debugging output
     } // constructor
@@ -535,18 +535,18 @@ namespace FEAST
     /* ******************
     * getters & setters *
     ********************/
-  //  /**
-  //  * \brief getter for the optimised MPI communicator
-  //  *
-  //  * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
-  //  * cannot change the object.
-  //  *
-  //  * \return reference to MPI_Comm #_comm
-  //  */
-  //  inline const MPI_Comm& comm_opt() const
-  //  {
-  //    return _comm_opt;
-  //  }
+//  /**
+//  * \brief getter for the optimised MPI communicator
+//  *
+//  * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
+//  * cannot change the object.
+//  *
+//  * \return reference to MPI_Comm #_comm
+//  */
+//  inline const MPI_Comm& comm_opt() const
+//  {
+//    return _comm_opt;
+//  }
 
     /**
     * \brief getter for the distributed graph object
@@ -570,9 +570,9 @@ namespace FEAST
     */
     void set_graph_distributed(
       int const num_neighbours,
-      int* edges)
+      int* neighbours)
     {
-      _graph_distributed = new GraphDistributed(num_neighbours, edges);
+      _graph_distributed = new GraphDistributed(num_neighbours, neighbours);
 
       // debug output (demonstrating how to use the SomeClass::print(std::ostream) methods)
 
@@ -585,19 +585,57 @@ namespace FEAST
       _graph_distributed->print(ss);
       log_indiv_master(ss.str());
 
-  // COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
-  //   Unfortunately, this function has only been introduced with MPI-2.2 and is not yet implemented in OpenMPI yet.
-  //   The only alternative that already exists, MPI_Graph_create(...), requires that all processes know the complete
-  //   graph (and not only the coordinator process). IMHO, it doesn't make sense to further pursue this MPI process
-  //   topology topic in the moment. Let us stick with the standard MPI communicators and let us see what the ITMC
-  //   will say.
-  //
-  //    int sources[1];
-  //    int degrees[1];
-  //    sources[0] = _rank;
-  //    degrees[0] = _graph_distributed->num_neighbours();
-  //    MPI_Dist_graph_create(_comm, 1, sources, degrees, _graph_distributed->neighbours(), nullptr,
-  //                          MPI_INFO_NULL, true, _comm_opt());
+// COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
+//   Unfortunately, this function has only been introduced with MPI-2.2 and is not yet implemented in OpenMPI yet.
+//   The only alternative that already exists, MPI_Graph_create(...), requires that all processes know the complete
+//   graph (and not only the coordinator process). IMHO, it doesn't make sense to further pursue this MPI process
+//   topology topic in the moment. Let us stick with the standard MPI communicators and let us see what the ITMC
+//   will say.
+//
+//    int sources[1];
+//    int degrees[1];
+//    sources[0] = _rank;
+//    degrees[0] = _graph_distributed->num_neighbours();
+//    MPI_Dist_graph_create(_comm, 1, sources, degrees, _graph_distributed->neighbours(), nullptr,
+//                          MPI_INFO_NULL, true, _comm_opt());
+    }
+
+    /**
+    * \brief sets local graph portions of a distributed graph
+    *
+    * COMMENT_HILMAR: By now, the weights and info objects are empty. Does it make sense to, e.g., use different weights
+    * for edge neighbours on the one hand and diagonal neighbours on the other hand? Should diagonal neighbours appear
+    * in the graph topology at all? Or should we only take the edge neighbours here?
+    */
+    void do_exchange()
+    {
+//      int n = 10;
+//      double x[n];
+//      double x_recv[n];
+//      MPI_Request requests[4];
+//      MPI_Status statuses[4];
+//
+//      for(int i(0) ; i < n; ++i)
+//      {
+//        x[i] = Process::rank*n + i;
+//      }
+//      int* neighbours = _graph_distributed.neighbours();
+//      for(int i(0) ; i < _graph_distributed.num_neighbours(); ++i)
+//      {
+//        MPI_Irecv(x_recv, n, MPI_REAL, neighbours[i], 0, _comm, requests[i]);
+//      }
+//      for(int i(0) ; i < _graph_distributed.num_neighbours(); ++i)
+//      {
+//        MPI_Isend(x, n, MPI_REAL, neighbours[i], 0, _comm, requests[i]);
+//      }
+//      MPI_Waitall(4, requests, statuses);
+//
+//      String s("");
+//      for(int i(0) ; i < n; ++i)
+//      {
+//        s += StringUtils::stringify(x_recv[i]) + " ";
+//      }
+//      s += "\n";
     }
   };
 
@@ -628,8 +666,8 @@ namespace FEAST
   * coordinator of the parent process group (rank 5). The other ProcessSubgroup (for the fine grid problem) object
   * consists of all six processes (ranks 0-5). Here, the coordinator of the parent process group (rank 5) is also a
   * compute process. Both ProcessSubgroups then create a WorkGroup object. The coarse grid work group consists of the
-  * two compute process (ranks 0 and 1) and thus differs from its ProcessSubgroup, while the fine grid work group contains
-  * exactly the same six processes as its ProcessSubgroup.
+  * two compute process (ranks 0 and 1) and thus differs from its ProcessSubgroup, while the fine grid work group
+  * contains exactly the same six processes as its ProcessSubgroup.
   *
   *    processes parent ProcessGroup:   0 1 2 3 4 5
   *    coarse grid ProcessSubgroup:     x x       x
@@ -694,16 +732,16 @@ namespace FEAST
       * test the logger functionality *
       ********************************/
       // debugging output
-  //    // let the coordinator of the subgroup trigger some common messages
-  //    if(is_coordinator())
-  //    {
-  //      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
-  //                    + " and I am the coordinator of process subgroup " + StringUtils::stringify(_group_id));
-  // //      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
-  //      Logger::log_master("Hello, master file! " + s, Logger::FILE);
-  // //      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-  // //      Logger::log_master("Hello, default master screen and file! " + s);
-  //    }
+    // let the coordinator of the subgroup trigger some common messages
+//      if(is_coordinator())
+//      {
+//        std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
+//                      + " and I am the coordinator of process subgroup " + StringUtils::stringify(_group_id));
+//   //      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
+//        Logger::log_master("Hello, master file! " + s, Logger::FILE);
+//   //      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+//   //      Logger::log_master("Hello, default master screen and file! " + s);
+//      }
 
       // write some individual messages to screen and file
       std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
@@ -723,10 +761,10 @@ namespace FEAST
         s += " G";
       }
       s += "\n";
-  //    log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
+//      log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
       log_indiv_master("Hello, master file! " + s, Logger::FILE);
-  //    log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-  //    log_indiv_master("Hello, master default screen and file! " + s);
+//      log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
+//      log_indiv_master("Hello, master default screen and file! " + s);
 
       // end of debugging output
 
@@ -736,8 +774,8 @@ namespace FEAST
       {
         // in the case there is no extra coordinator process, the work group of compute processes contains all processes
         // of this subgroup
-  // BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
-  // kopieren!
+// BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
+// kopieren!
         int* work_group_ranks = new int[_num_processes];
         for(int i(0) ; i < _num_processes ; ++i)
         {
@@ -748,9 +786,9 @@ namespace FEAST
       else
       {
         // otherwise, the work group contains all processes of this subgroup except the last one (the extra coordinator)
-  // BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
-  // kopieren. Die Methode MPI_Group_incl(...) bekommt dann das Array ranks_group_parent[] durchgereicht, und
-  // wegen _num_processes-1 wird nur auf die ersten _num_processes-1 Positionen zugegriffen.
+// BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
+// kopieren. Die Methode MPI_Group_incl(...) bekommt dann das Array ranks_group_parent[] durchgereicht, und
+// wegen _num_processes-1 wird nur auf die ersten _num_processes-1 Positionen zugegriffen.
         int* work_group_ranks = new int[_num_processes-1];
         for(int i(0) ; i < _num_processes - 1 ; ++i)
         {

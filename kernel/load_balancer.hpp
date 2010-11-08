@@ -256,9 +256,9 @@ namespace FEAST
         {
           _base_mesh->read_mesh("../grids/testgrid_16m.feast");
         }
-        catch (InternalError& e)
+        catch (Exception& e)
         {
-          MPIUtils::abort(e.message());
+          ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
         }
       }
     }
@@ -496,7 +496,7 @@ namespace FEAST
         if(_belongs_to_group[igroup])
         {
           int num_neighbours_local;
-          int* edges_local;
+          int* neighbours_local;
           int root = _subgroups[igroup]->rank_coord();
           if(_subgroups[igroup]->is_coordinator())
           {
@@ -540,10 +540,10 @@ namespace FEAST
               // scatter the number of neighbours to the non-root processes and to the root process itself
               MPI_Scatter(num_neighbours, 1, MPI_INT, &num_neighbours_local, 1, MPI_INT, root,
                           _subgroups[igroup]->comm());
-              edges_local = new int[num_neighbours_local];
+              neighbours_local = new int[num_neighbours_local];
               // scatter the edges to the non-root processes and to the root process itself
-              MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, edges_local, num_neighbours_local,
-                           MPI_INT, root, _subgroups[igroup]->comm());
+              MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, neighbours_local,
+                           num_neighbours_local, MPI_INT, root, _subgroups[igroup]->comm());
             }
           }
           else
@@ -556,16 +556,17 @@ namespace FEAST
                         _subgroups[igroup]->comm());
 
             // receive the edges
-            edges_local = new int[num_neighbours_local];
-            MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, edges_local, num_neighbours_local, MPI_INT, root,
+            neighbours_local = new int[num_neighbours_local];
+            MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, neighbours_local, num_neighbours_local, MPI_INT, root,
                          _subgroups[igroup]->comm());
           }
 
           if (!(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
           {
-            // now create distributed graph structure within the compute work groups (the array edges_local will be
+            // now create distributed graph structure within the compute work groups (the array neighbours_local will be
             // deallocated in the destructor of the distributed graph object)
-            _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, edges_local);
+            _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, neighbours_local);
+            _subgroups[igroup]->work_group()->do_exchange();
           }
         } // if(_belongs_to_group[igroup])
       } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)

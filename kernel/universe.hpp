@@ -8,12 +8,12 @@
 #include <cassert>
 
 // includes, Feast
+#include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
-#include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
 #include <kernel/master.hpp>
-#include <kernel/logger.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/load_balancer.hpp>
 
 namespace FEAST
@@ -265,25 +265,34 @@ namespace FEAST
       }
 
       // now check whether the number of available processes is sufficient
-      if(_num_processes < _num_processes_needed)
+      try
       {
-        MPIUtils::abort("Error! Only " + StringUtils::stringify(_num_processes) + " processes available, but "
-          + StringUtils::stringify(_num_processes_needed) + " processes needed!");
-      }
-      else if(_num_processes > _num_processes_needed)
-      {
-        MPIUtils::abort("Error!  " + StringUtils::stringify(_num_processes) + " processes available, and only "
-          + StringUtils::stringify(_num_processes_needed) + " processes needed!. Since Feast does not "
-          + "support trailing orphaned processes, this is an error.");
-      }
-      else
-      {
-        // all ok, let only one process comment on this
-        if(Process::is_master)
+        if(_num_processes < _num_processes_needed)
         {
-          std::cout << _num_processes << " processes available and " << _num_processes_needed
-                    << " needed." << std::endl;
+          throw InternalError("Only " + StringUtils::stringify(_num_processes) + " processes available, but "
+            + StringUtils::stringify(_num_processes_needed) + " processes needed!");
         }
+        else if(_num_processes > _num_processes_needed)
+        {
+          throw InternalError(StringUtils::stringify(_num_processes) + " processes available, and only "
+            + StringUtils::stringify(_num_processes_needed) + " processes needed! FEAST does not "
+            + "support trailing orphaned processes.");
+        }
+        else
+        {
+          // all ok, let only one process comment on this
+          if(Process::is_master)
+          {
+            Logger::log(StringUtils::stringify(_num_processes) + " processes available and "
+              + StringUtils::stringify(_num_processes_needed));
+            std::cout << _num_processes << " processes available and " << _num_processes_needed
+                      << " needed." << std::endl;
+          }
+        }
+      }
+      catch (Exception& e)
+      {
+        ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
       }
 
       // open log files
@@ -372,9 +381,6 @@ namespace FEAST
 
         std::cout << "Process " << Process::rank << " is the MASTER OF THE UNIVERSE!" << std::endl;
 
-        // start some dummy wait routine on the master
-  //      _master->wait();
-
         // start the infinite service loop on the master, which waits for messages
         _master->service();
       }
@@ -455,8 +461,7 @@ namespace FEAST
       }
       else
       {
-        MPIUtils::abort("Universe can be created only once!");
-        return nullptr;
+        throw InternalError("Universe can be created only once!");
       }
     }
 
@@ -505,8 +510,7 @@ namespace FEAST
       }
       else
       {
-        MPIUtils::abort("Universe can be created only once!");
-        return nullptr;
+        throw InternalError("Universe can be created only once!");
       }
     }
 
@@ -530,7 +534,7 @@ namespace FEAST
       }
       else
       {
-        MPIUtils::abort("There is no universe to destroy!");
+        throw InternalError("There is no universe to destroy!");
       }
     }
 

@@ -42,8 +42,34 @@ int main(int argc, char* argv[])
   bool includes_dedicated_load_bal[] = {true, false};
 
   // create universe with several process groups
-  Universe* universe = Universe::create(argc, argv, num_process_groups, num_processes_in_group,
-                                        includes_dedicated_load_bal);
+  Universe* universe;
+  try
+  {
+    universe = Universe::create(argc, argv, num_process_groups, num_processes_in_group,
+                                includes_dedicated_load_bal);
+  }
+  catch (Exception& e)
+  {
+    // Assume that all critical errors are already caught within the Universe class.
+    // Since it is not clear whether the communication system has already been set up, do not forward the error message
+    // to the master
+    ErrorHandler::exception_occured(e, ErrorHandler::NON_CRITICAL);
+  }
+
+  // create a second universe to test the error handler
+  Universe* universe2;
+  try
+  {
+    universe2 = Universe::create(argc, argv, num_process_groups, num_processes_in_group,
+                                includes_dedicated_load_bal);
+  }
+  catch (Exception& e)
+  {
+    // Assume that all critical errors are already caught within the Universe class.
+    // Since it is not clear whether the communication system has already been set up, do not forward the error message
+    // to the master
+    ErrorHandler::exception_occured(e, ErrorHandler::NON_CRITICAL);
+  }
 
   // Get process objects. Note that on each process only one of the following two exists (the other one is the
   // null pointer).
@@ -76,8 +102,8 @@ int main(int argc, char* argv[])
       if (Process::rank % 7 == 0)
       {
         // test the PrettyPrinter
-        std::string prefix(std::string("Proc"+StringUtils::stringify(Process::rank)));
-        PrettyPrinter pp(40, '#', prefix);
+        std::string prefix(std::string("Proc" + StringUtils::stringify(Process::rank)));
+        PrettyPrinter pp(40, '#', prefix + " ");
         pp.add_line_sep();
         pp.add_line_centered("Testing pp and logging!");
         pp.add_line_sep();

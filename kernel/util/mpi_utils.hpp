@@ -29,17 +29,29 @@ namespace FEAST
     * This function aborts the program and especially blackholes the MPI universe.
     *
     * \param[in] msg
-    * message explaining the reason for the abortion
+    * message explaining the reason for the abortion (default "")
     */
-    static void abort(const std::string& msg)
+    static void abort(const std::string& msg = "")
     {
-      // flush cout and cerr...
+      // flush cout and cerr
       std::cout.flush();
       std::cerr.flush();
-      // ... print error message to stderr ...
-      std::cerr << msg << " Aborting program..." << std::endl;
+      // print error message to logfile and stderr
+      PrettyPrinter pp(40, '#');
+      pp.add_line_sep();
+      if(msg.size() > 0)
+      {
+        pp.add_line_no_right_delim(msg);
+        pp.add_line_sep();
+      }
+      else
+      {
+        pp.add_line_centered("Aborting the MPI universe...");
+      }
+      pp.add_line_sep();
+      pp.print(std::cerr);
       std::cerr.flush();
-      // ... and shut down
+      // shut down
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);
       if (mpi_is_initialised)

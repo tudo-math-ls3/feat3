@@ -3,9 +3,7 @@
 #define KERNEL_PROCESS_HPP 1
 
 // includes, system
-#include <iostream>
 #include <stdlib.h>
-#include <vector>
 #include <mpi.h>
 
 // includes, Feast
