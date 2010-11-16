@@ -473,17 +473,20 @@ namespace FEAST
         // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
         // be used for the coarse grid work group
         int* index = new int[3];
-        int* edges = new int[2];
+        int* neighbours = new int[2];
         index[0] = 0;
         index[1] = 1;
         index[2] = 2;
-        edges[0] = 1;
-        edges[1] = 0;
-        _graphs[0] = new Graph(2, index, edges);
+        neighbours[0] = 1;
+        neighbours[1] = 0;
+        _graphs[0] = new Graph(2, index, neighbours);
         _graphs[0]->print();
 
         // get connectivity graph of the base mesh; this one will be used for the fine grid work group
         _graphs[1] = _base_mesh->graph();
+// COMMENT_HILMAR:
+// We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
+// equals the local rank within the work group.
       }
 
       /* ***************************************************************************
@@ -527,9 +530,9 @@ namespace FEAST
               // does not receive/store any data)
               MPI_Scatter(num_neighbours, 1, MPI_INT, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
                           _subgroups[igroup]->comm());
-              // send the edges to the non-root processes (usually the edges array must also have n+1 segments, but
-              // since num_neighbours[count-1] == 0, the last segment is empty)
-              MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, MPI_IN_PLACE, 0,
+              // send the neighbours to the non-root processes (usually the neighbours array must also have n+1
+              // segments, but since num_neighbours[count-1] == 0, the last segment is empty)
+              MPI_Scatterv(_graphs[igroup]->neighbours(), num_neighbours, index, MPI_INT, MPI_IN_PLACE, 0,
                            MPI_DATATYPE_NULL, root, _subgroups[igroup]->comm());
             }
             else
@@ -541,8 +544,8 @@ namespace FEAST
               MPI_Scatter(num_neighbours, 1, MPI_INT, &num_neighbours_local, 1, MPI_INT, root,
                           _subgroups[igroup]->comm());
               neighbours_local = new int[num_neighbours_local];
-              // scatter the edges to the non-root processes and to the root process itself
-              MPI_Scatterv(_graphs[igroup]->edges(), num_neighbours, index, MPI_INT, neighbours_local,
+              // scatter the neighbours to the non-root processes and to the root process itself
+              MPI_Scatterv(_graphs[igroup]->neighbours(), num_neighbours, index, MPI_INT, neighbours_local,
                            num_neighbours_local, MPI_INT, root, _subgroups[igroup]->comm());
             }
           }
@@ -551,11 +554,11 @@ namespace FEAST
             /* ******************************************
             * code for the receiving non-root processes *
             ********************************************/
-            // receive the number of edges from the root process
+            // receive the number of neighbours from the root process
             MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_INT, root,
                         _subgroups[igroup]->comm());
 
-            // receive the edges
+            // receive the neighbours
             neighbours_local = new int[num_neighbours_local];
             MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, neighbours_local, num_neighbours_local, MPI_INT, root,
                          _subgroups[igroup]->comm());
@@ -566,10 +569,20 @@ namespace FEAST
             // now create distributed graph structure within the compute work groups (the array neighbours_local will be
             // deallocated in the destructor of the distributed graph object)
             _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, neighbours_local);
-            _subgroups[igroup]->work_group()->do_exchange();
           }
         } // if(_belongs_to_group[igroup])
       } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+
+      // test local neighbourhood communication
+      for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      {
+        if (_belongs_to_group[igroup] &&
+            !(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
+        {
+          _subgroups[igroup]->work_group()->do_exchange();
+        }
+      }
+
     } // create_subgroups()
   };
 

@@ -564,9 +564,8 @@ namespace FEAST
     /**
     * \brief sets local graph portions of a distributed graph
     *
-    * COMMENT_HILMAR: By now, the weights and info objects are empty. Does it make sense to, e.g., use different weights
-    * for edge neighbours on the one hand and diagonal neighbours on the other hand? Should diagonal neighbours appear
-    * in the graph topology at all? Or should we only take the edge neighbours here?
+    * \note Currently, we do not distinguis between face-, edge- and vertex-neighbours. The graph structure
+    *       simply contains all neighbours.
     */
     void set_graph_distributed(
       int const num_neighbours,
@@ -591,6 +590,9 @@ namespace FEAST
 //   graph (and not only the coordinator process). IMHO, it doesn't make sense to further pursue this MPI process
 //   topology topic in the moment. Let us stick with the standard MPI communicators and let us see what the ITMC
 //   will say.
+// COMMENT_HILMAR: By now, the weights and info objects are empty. Does it make sense to, e.g., use different weights
+//   for edge neighbours on the one hand and diagonal neighbours on the other hand? Should diagonal neighbours appear
+//   in the graph topology at all? Or should we only take the edge neighbours here?
 //
 //    int sources[1];
 //    int degrees[1];
@@ -600,42 +602,80 @@ namespace FEAST
 //                          MPI_INFO_NULL, true, _comm_opt());
     }
 
+
     /**
-    * \brief sets local graph portions of a distributed graph
+    * \brief dummy function for testing local neighbour communication via non-blocking sends/receives
     *
-    * COMMENT_HILMAR: By now, the weights and info objects are empty. Does it make sense to, e.g., use different weights
-    * for edge neighbours on the one hand and diagonal neighbours on the other hand? Should diagonal neighbours appear
-    * in the graph topology at all? Or should we only take the edge neighbours here?
+    * The function simply performs an exchange of integer arrays between neighouring processes. The aim is to
+    * demonstrate that this is quite easy when using non-blocking send and receive calls.
     */
     void do_exchange()
     {
-//      int n = 10;
-//      double x[n];
-//      double x_recv[n];
-//      MPI_Request requests[4];
-//      MPI_Status statuses[4];
-//
-//      for(int i(0) ; i < n; ++i)
-//      {
-//        x[i] = Process::rank*n + i;
-//      }
-//      int* neighbours = _graph_distributed.neighbours();
-//      for(int i(0) ; i < _graph_distributed.num_neighbours(); ++i)
-//      {
-//        MPI_Irecv(x_recv, n, MPI_REAL, neighbours[i], 0, _comm, requests[i]);
-//      }
-//      for(int i(0) ; i < _graph_distributed.num_neighbours(); ++i)
-//      {
-//        MPI_Isend(x, n, MPI_REAL, neighbours[i], 0, _comm, requests[i]);
-//      }
-//      MPI_Waitall(4, requests, statuses);
-//
-//      String s("");
-//      for(int i(0) ; i < n; ++i)
-//      {
-//        s += StringUtils::stringify(x_recv[i]) + " ";
-//      }
-//      s += "\n";
+      // length of the integer arrays to be exchanged
+      unsigned int n = 10;
+
+      unsigned int num_neighbours = _graph_distributed->num_neighbours();
+      int* neighbours = _graph_distributed->neighbours();
+
+      // arrays for sending and receiving
+      // (The MPI standard says that the send buffer given to MPI_Isend(...) should neither be overwritten nor read(!)
+      // until the communication has been completed. Hence, we cannot send the same array to all neighbours, but we
+      // have to send num_neighbours different arrays.)
+      unsigned long a[num_neighbours][n];
+      unsigned long a_recv[num_neighbours][n];
+
+      // fill the array to be sent
+      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      {
+        for(unsigned int j(0) ; j < n; ++j)
+        {
+          a[i][j] = 100000*_rank + 100*neighbours[i] + j;
+        }
+      }
+
+      // debugging output
+      std::string s;
+      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      {
+        s = StringUtils::stringify(a[i][0]);
+        for(unsigned int j(1) ; j < n; ++j)
+        {
+          s +=  " " + StringUtils::stringify(a[i][j]);
+        }
+        std::cout << "Process " << _rank << " sends [" << s << "] to neighbour "
+                  << StringUtils::stringify(neighbours[i]) << "." << std::endl;
+      }
+
+      // request and status objects necessary for communication
+      MPI_Request requests[num_neighbours];
+      MPI_Status statuses[num_neighbours];
+
+      // post sends to all neighbours
+      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      {
+        MPI_Isend(a[i], n, MPI_UNSIGNED_LONG, neighbours[i], 0, _comm, &requests[i]);
+        // request objects are not needed
+        MPI_Request_free(&requests[i]);
+      }
+      // post receives from all neighbours
+      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      {
+        MPI_Irecv(a_recv[i], n, MPI_UNSIGNED_LONG, neighbours[i], 0, _comm, &requests[i]);
+      }
+      // wait for all receives to complete
+      MPI_Waitall(num_neighbours, requests, statuses);
+
+      // debugging output
+      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      {
+        s = StringUtils::stringify(a_recv[i][0]);
+        for(unsigned int j(1) ; j < n; ++j)
+        {
+          s += " " + StringUtils::stringify(a_recv[i][j]);
+        }
+        std::cout << "Process " << _rank << " received [" << s << "] from neighbour "
+                  << neighbours[i] << "." << std::endl;
+      }
     }
   };
 

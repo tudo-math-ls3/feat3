@@ -18,7 +18,8 @@ namespace FEAST
   * In the case this data structure is used for storing the MPI communication graph, it is a \em global representation,
   * i.e. a process storing this graph knows the \em complete communication graph. (For a distributed representation, see
   * data structure GraphDistributed.) To construct a corresponding MPI communicator, one can use the function
-  *   int MPI_Graph_create(MPI_Comm comm_old, int num_nodes, int *index, int *edges, int reorder, MPI_Comm *comm_graph)
+  *   int MPI_Graph_create(MPI_Comm comm_old, int num_nodes, int *_index, int *_neighbours, int reorder,
+  *                        MPI_Comm *comm_graph)
   * (see MPI-2.2 standard, p. 250). When passing the array #_index to this routine, remember to omit the first entry
   * (see description of the array #_index).
   *
@@ -44,27 +45,27 @@ namespace FEAST
     int const _num_nodes;
 
     /**
-    * \brief access information for the array edges
+    * \brief access information for the array #_neighbours
     *
     * The i-th entry of this array stores the total number of neighbours of the graph nodes 0, ..., i-1, where
-    * index[0] = 0. So, the i-th entry gives the position in the array #_edges, in which the subarray storing the node
-    * neighbours of node i starts. The degree (=number of neighbours) of node i is given by _index[i+1] - _index[i].
-    * (Difference to the data structure described in the MPI-2.2 standard: There, the 0-th entry is omitted. However,
-    * adding this entry eases array access since the first node does not have to be handled in a special way.)
-    * For an example see #_edges.
+    * index[0] = 0. So, the i-th entry gives the position in the array #_neighbours, in which the subarray storing the
+    * node neighbours of node i starts. The degree (=number of neighbours) of node i is given by
+    * _index[i+1] - _index[i]. (Difference to the data structure described in the MPI-2.2 standard: There, the 0-th
+    * entry is omitted. However, adding this entry eases array access since the first node does not have to be handled
+    * in a special way.) For an example see #_neighbours.
     *
     * Dimension: [#_num_nodes+1]
     */
     int* _index;
 
     /**
-    * \brief edges of the graph, represented as a list of node numbers
+    * \brief node neighbours within the graph (i.e. edges of the graph), represented as a list of node numbers
     *
-    * The neighbours of node i are stored in the subarray _edges[#_index[i]], ..., _edges[#_index[i+1]-1]. The order
-    * of the neighbours within the subarrays is arbitrary.
+    * The neighbours of node i are stored in the subarray _neighbours[#_index[i]], ..., _neighbours[#_index[i+1]-1].
+    * The order of the neighbours within the subarrays is arbitrary.
     *
-    * Example: domain consisting of 7 subdomains, each subdomain is a node in the graph. Edges represent neighbouring
-    * subdomains, including diagonal neighbours.
+    * Example: domain consisting of 7 subdomains, each subdomain is a node in the graph. Graph edges represent
+    * neighbouring subdomains, including diagonal neighbours.
     *   -----------------
     *   | 0 | 1 | 2 | 3 |
     *   -----------------
@@ -81,12 +82,12 @@ namespace FEAST
     *   5         0,1,2,4,6
     *   6         4,5
     * _num_nodes = 7
-    * _index = [0,        3,           7,      10, 11,          15,          20,    22]
-    * _edges = [4, 5, 1,  0, 4, 5, 2,  1, 5, 3, 2,  0, 1, 5, 6,  0, 1, 2, 4,  6, 4,  5]
+    * _index      = [0,        3,           7,      10, 11,          15,          20,    22]
+    * _neighbours = [4, 5, 1,  0, 4, 5, 2,  1, 5, 3, 2,  0, 1, 5, 6,  0, 1, 2, 4,  6, 4,  5]
     *
     * Dimension: [total number of neighbours] = [number of edges] = [#_index[#_num_nodes]]
     */
-    int* _edges;
+    int* _neighbours;
 
 
   public:
@@ -102,11 +103,11 @@ namespace FEAST
     Graph(
       int const num_nodes,
       int* index,
-      int* edges
+      int* neighbours
       )
       : _num_nodes(num_nodes),
         _index(index),
-        _edges(edges)
+        _neighbours(neighbours)
     {
     }
     /// destructor
@@ -114,8 +115,8 @@ namespace FEAST
     {
       delete [] _index;
       _index = nullptr;
-      delete [] _edges;
-      _edges = nullptr;
+      delete [] _neighbours;
+      _neighbours = nullptr;
     }
 
     /* ******************
@@ -142,13 +143,13 @@ namespace FEAST
     }
 
     /**
-    * \brief getter for the edge array
+    * \brief getter for the neighbours array
     *
-    * \return pointer to the edge array #_edges
+    * \return pointer to the edge array #_neighbours
     */
-    inline int* edges() const
+    inline int* neighbours() const
     {
-      return _edges;
+      return _neighbours;
     }
 
     /* *****************
@@ -166,10 +167,10 @@ namespace FEAST
           std::cout << i << " | " << _index[i+1] - _index[i];
           if (_index[i+1] - _index[i] > 0)
           {
-            std::cout << " | " << _edges[_index[i]];
+            std::cout << " | " << _neighbours[_index[i]];
             for(int j(_index[i]+1) ; j < _index[i+1] ; ++j)
             {
-              std::cout << ", " << _edges[j];
+              std::cout << ", " << _neighbours[j];
             }
           }
           std::cout << std::endl;

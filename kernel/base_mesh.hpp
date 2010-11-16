@@ -602,16 +602,16 @@ namespace FEAST
       //std::cout << "Setting index[" << _num_cells << "] = " << num_neighbours_so_far << std::endl;
 
       // second sweep through data structure
-      // second sweep adds actual neighbour cell numbers in the appropriate placces into array edges
+      // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
       // again, treat last loop instance separately
-      int* edges = new int[index[_num_cells]];
+      int* neighbours = new int[index[_num_cells]];
       num_neighbours_so_far = 0;
       for (unsigned int icell=0 ; icell < _num_cells ; icell++)
         for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
           for (unsigned int neigh = 0 ; neigh < _cells.at(icell)->num_neighbours(dim) ; ++neigh)
           {
-            edges[num_neighbours_so_far] = _cells.at(icell)->get_neighbour(dim,neigh)->number();
-            //std::cout << "edges[" << num_neighbours_so_far << "] = " << edges[num_neighbours_so_far] << std::endl;
+            neighbours[num_neighbours_so_far] = _cells.at(icell)->get_neighbour(dim,neigh)->number();
+            //std::cout << "neighbours[" << num_neighbours_so_far << "] = " << neighbours[num_neighbours_so_far] << std::endl;
             ++num_neighbours_so_far;
           }
 
@@ -622,7 +622,7 @@ namespace FEAST
         delete _graph;
         _graph = nullptr;
       }
-      _graph = new Graph(_num_cells, index, edges);
+      _graph = new Graph(_num_cells, index, neighbours);
     }
 
 
@@ -764,39 +764,39 @@ namespace FEAST
       index[15] = 74;
       index[16] = 78;
 
-      int* edges = new int[index[num_base_cells]];
+      int* neigh = new int[index[num_base_cells]];
       // neighbours of subdomain 0
-      edges[0]  =  3;  edges[1] =  4;  edges[2] =  5;  edges[3] =  1;
+      neigh[0]  =  3;  neigh[1] =  4;  neigh[2] =  5;  neigh[3] =  1;
       // neighbours of subdomain 1
-      edges[4]  =  0;  edges[5] =  3;  edges[6] =  4;  edges[7] =  5;  edges[8] =  6;  edges[9] =  2;
+      neigh[4]  =  0;  neigh[5] =  3;  neigh[6] =  4;  neigh[7] =  5;  neigh[8] =  6;  neigh[9] =  2;
       // neighbours of subdomain 2
-      edges[10] =  1; edges[11] =  5; edges[12] =  6; edges[13] =  7;
+      neigh[10] =  1; neigh[11] =  5; neigh[12] =  6; neigh[13] =  7;
       // neighbours of subdomain 3
-      edges[14] =  8; edges[15] =  9; edges[16] =  4; edges[17] =  5;  edges[18] =  1; edges[19] =  0;
+      neigh[14] =  8; neigh[15] =  9; neigh[16] =  4; neigh[17] =  5;  neigh[18] =  1; neigh[19] =  0;
       // neighbours of subdomain 4
-      edges[20] =  5; edges[21] =  1; edges[22] =  0; edges[23] =  3;  edges[24] =  8; edges[25] =  9;
+      neigh[20] =  5; neigh[21] =  1; neigh[22] =  0; neigh[23] =  3;  neigh[24] =  8; neigh[25] =  9;
       // neighbours of subdomain 5
-      edges[26] =  6; edges[27] =  2; edges[28] =  1; edges[29] =  0;  edges[30] =  3; edges[31] =  4;
+      neigh[26] =  6; neigh[27] =  2; neigh[28] =  1; neigh[29] =  0;  neigh[30] =  3; neigh[31] =  4;
       // neighbours of subdomain 6
-      edges[32] =  7; edges[33] =  2; edges[34] =  1; edges[35] =  5;
+      neigh[32] =  7; neigh[33] =  2; neigh[34] =  1; neigh[35] =  5;
       // neighbours of subdomain 7
-      edges[36] = 12; edges[37] =  2; edges[38] =  6;
+      neigh[36] = 12; neigh[37] =  2; neigh[38] =  6;
       // neighbours of subdomain 8
-      edges[39] = 13; edges[40] = 14; edges[41] = 10; edges[42] =  9;  edges[43] =  4; edges[44] =  3;
+      neigh[39] = 13; neigh[40] = 14; neigh[41] = 10; neigh[42] =  9;  neigh[43] =  4; neigh[44] =  3;
       // neighbours of subdomain 9
-      edges[45] =  4; edges[46] =  3; edges[47] =  8; edges[48] = 13;  edges[49] = 14; edges[50] = 10;
+      neigh[45] =  4; neigh[46] =  3; neigh[47] =  8; neigh[48] = 13;  neigh[49] = 14; neigh[50] = 10;
       // neighbours of subdomain 10
-      edges[51] =  9; edges[52] =  8; edges[53] = 13; edges[54] = 14;  edges[55] = 15; edges[56] = 11;
+      neigh[51] =  9; neigh[52] =  8; neigh[53] = 13; neigh[54] = 14;  neigh[55] = 15; neigh[56] = 11;
       // neighbours of subdomain 11
-      edges[57] = 10; edges[58] = 14; edges[59] = 15; edges[60] = 12;
+      neigh[57] = 10; neigh[58] = 14; neigh[59] = 15; neigh[60] = 12;
       // neighbours of subdomain 12
-      edges[61] = 11; edges[62] = 15; edges[63] =  7;
+      neigh[61] = 11; neigh[62] = 15; neigh[63] =  7;
       // neighbours of subdomain 13
-      edges[64] = 14; edges[65] = 10; edges[66] =  9; edges[67] =  8;
+      neigh[64] = 14; neigh[65] = 10; neigh[66] =  9; neigh[67] =  8;
       // neighbours of subdomain 14
-      edges[68] = 15; edges[69] = 11; edges[70] = 10; edges[71] =  9;  edges[72] =  8; edges[73] = 13;
+      neigh[68] = 15; neigh[69] = 11; neigh[70] = 10; neigh[71] =  9;  neigh[72] =  8; neigh[73] = 13;
       // neighbours of subdomain 15
-      edges[74] = 12; edges[75] = 11; edges[76] = 10; edges[77] = 14;
+      neigh[74] = 12; neigh[75] = 11; neigh[76] = 10; neigh[77] = 14;
 
       if (_graph != nullptr)
       {
@@ -805,7 +805,7 @@ namespace FEAST
       }
       // create graph object
       // temporarily, do not distinguish edge neighbours and diagonal neighbours
-      _graph = new Graph(num_base_cells, index, edges);
+      _graph = new Graph(num_base_cells, index, neigh);
       _graph->print();
     }
   }; // class BaseMesh

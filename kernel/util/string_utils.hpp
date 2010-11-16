@@ -20,7 +20,8 @@ namespace FEAST
   */
   class StringUtils
   {
-    public:
+
+  public:
     /* *****************
     * member functions *
     *******************/
@@ -425,8 +426,7 @@ namespace FEAST
     {
       stream << _block;
     }
-
-  };
+  }; // class PrettyPrinter
 
 
 
@@ -546,7 +546,7 @@ namespace FEAST
     {
       return _s;
     }
-  };
+  }; // class Prefix
 
 } // namespace FEAST
 
