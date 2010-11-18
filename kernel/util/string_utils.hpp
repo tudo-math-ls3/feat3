@@ -92,6 +92,8 @@ namespace FEAST
     /**
     * \brief converting an item to a string (overload for char *, which isn't a screwup like other pointers)
     *
+    * This function is selected when using the syntax \code StringUtils::stringify("some string") \endcode .
+    *
     * \param[in] item
     * The item to stringify
     */
