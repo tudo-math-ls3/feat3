@@ -149,12 +149,12 @@ namespace FEAST
     *
     * Dimension: [#_num_subgroups]
     */
-    int* _num_proc_in_group;
+    int* _num_proc_in_subgroup;
 
     /**
     * \brief 2-dim. array for storing the process group ranks building the subgroups
     *
-    * Dimension: [#_num_subgroups][#_num_proc_in_group[\a group_id]]
+    * Dimension: [#_num_subgroups][#_num_proc_in_subgroup[\a group_id]]
     */
     int** _subgroup_ranks;
 
@@ -183,7 +183,7 @@ namespace FEAST
       bool group_has_dedicated_load_bal)
       : _process_group(process_group),
         _group_has_dedicated_load_bal(group_has_dedicated_load_bal),
-        _num_proc_in_group(nullptr),
+        _num_proc_in_subgroup(nullptr),
         _subgroup_ranks(nullptr),
         _belongs_to_group(nullptr),
         _base_mesh(nullptr)
@@ -214,9 +214,9 @@ namespace FEAST
         delete _subgroups[igroup];
       }
 
-      if (_num_proc_in_group != nullptr)
+      if (_num_proc_in_subgroup != nullptr)
       {
-        delete [] _num_proc_in_group;
+        delete [] _num_proc_in_subgroup;
       }
 
       if (_base_mesh != nullptr)
@@ -243,7 +243,7 @@ namespace FEAST
     * member functions *
     *******************/
     /// dummy function in preparation of a function reading in a mesh file
-    void read_mesh()
+    void read_mesh(std::string const & mesh_file)
     {
       // the mesh is read by the process group coordinator
       if(_process_group->is_coordinator())
@@ -254,7 +254,8 @@ namespace FEAST
         // or Dominik's 'real' one
         try
         {
-          _base_mesh->read_mesh("../grids/testgrid_16m.feast");
+          Logger::log_master("Reading mesh file " + mesh_file + "...\n", Logger::SCREEN_FILE);
+          _base_mesh->read_mesh(mesh_file);
         }
         catch (Exception& e)
         {
@@ -292,128 +293,255 @@ namespace FEAST
       // shortcut to the number of processes in the load balancer's process group
       int num_processes = _process_group->num_processes();
 
-  /* **************************************************************************************
-  * The following code is completely hard-wired with respect to one special example mesh. *
-  * Later, this has to be done in some auto-magically way.                                *
-  ****************************************************************************************/
+      /* ********************************************************************************
+      * The coordinator is the only one knowing the base mesh, so only the coordinator  *
+      * decides over the number of work groups and the process distribution to them.    *
+      **********************************************************************************/
 
-      // two tests:
+      // COMMENT_HILMAR:
+      // The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
+      // Furthermore, two extra processes are required for testing the creation of a second work group and the use
+      // of a dedicated load balancing process.
+      // Later, this has to be all done in some auto-magically way.
+
+      // Two different tests can be performed (n is the number of base mesh cells):
       // 1) with dedicated load balancer process
       //    - work group for coarse grid: 2 processes: {0, 1}
-      //    - work group for fine grid: 16 processes: {1, ..., 16}
+      //    - work group for fine grid: n processes: {1, ..., n}
       //    - i.e. process 1 is in both work groups
-      //    - dedicated load balancer and coordinator process: 17
+      //    - dedicated load balancer and coordinator process: n+1
       // 2) without dedicated load balancer process
       //    - work group for coarse grid: 2 processes: {0, 1}
-      //    - work group for fine grid: 16 processes: {2, ..., 17}
+      //    - work group for fine grid: n processes: {2, ..., n+1}
       //    - i.e. the two work groups are disjunct
-      //    - coordinator process: 17
-      // both tests need 18 processes in total
-      // assert that the number of processes is 18
-      assert(num_processes == 18);
+      //    - coordinator process: n+1
+      // Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
+      // includes_dedicated_load_bal[] in universe_test.cpp.
 
+      bool* group_contains_extra_coord;
 
-      // set up the two test cases
-
-      // number of work groups, manually set to 2
-      _num_subgroups = 2;
-      // array of numbers of processes per work group
-      _num_proc_in_group = new int[2];
-
-      // Boolean array indicating whether the work groups contain an extra process for the coordinator (which will then
-      // not be a compute process in this work group)
-      bool group_contains_extra_coord[_num_subgroups];
-
-      // allocate first dimension of the array for rank partitioning
-      _subgroup_ranks = new int*[_num_subgroups];
-
-      if(_group_has_dedicated_load_bal)
+      if(_process_group->is_coordinator())
       {
-        // test case 1
-        // with dedicated load balancer process
-        //  - work group for coarse grid: 2 processes: {0, 1}
-        //  - work group for fine grid: 16 processes: {1, ..., 16}
-        //  - i.e. process 1 is in both work groups
-        //  - dedicated load balancer and coordinator process: 17
+        int num_cells;
+        num_cells = _base_mesh->num_cells();
+        // debug output
+        Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
+        // assert that the number of processes is n+2
+        assert(num_processes == num_cells + 2);
 
-        // since there is a dedicated load balancer process, this has to be added to both work groups as extra
-        // coordinator process
-        group_contains_extra_coord[0] = true;
-        group_contains_extra_coord[1] = true;
+        // set up the two test cases
 
-        // set number of processes per group
-        _num_proc_in_group[0] = 2 + 1;
-        _num_proc_in_group[1] = 16 + 1;
+        // number of work groups, manually set to 2
+        _num_subgroups = 2;
+        // array of numbers of processes per work group
+        _num_proc_in_subgroup = new int[2];
 
-        // partition the process group ranks into work groups
-        _subgroup_ranks[0] = new int[_num_proc_in_group[0]];
-        _subgroup_ranks[0][0] = 0;
-        _subgroup_ranks[0][1] = 1;
-        _subgroup_ranks[0][2] = 17;
+        // Boolean array indicating whether the work groups contain an extra process for the coordinator (which will then
+        // not be a compute process in this work group)
+        group_contains_extra_coord = new bool[_num_subgroups];
 
-        _subgroup_ranks[1] = new int[_num_proc_in_group[1]];
-        // set entries to {1, ..., 16}
-        for(int i(0) ; i < _num_proc_in_group[1] ; ++i)
+        // allocate first dimension of the array for rank partitioning
+        _subgroup_ranks = new int*[_num_subgroups];
+
+        if(_group_has_dedicated_load_bal)
         {
-          _subgroup_ranks[1][i] = i+1;
+          // test case 1 (n is the number of base mesh cells)
+          // with dedicated load balancer process
+          //  - work group for coarse grid: 2 processes: {0, 1}
+          //  - work group for fine grid: n processes: {1, ..., n}
+          //  - i.e. process 1 is in both work groups
+          //  - dedicated load balancer and coordinator process: n+1
+
+          // since there is a dedicated load balancer process, this has to be added to both work groups as extra
+          // coordinator process
+          group_contains_extra_coord[0] = true;
+          group_contains_extra_coord[1] = true;
+
+          // set number of processes per group
+          _num_proc_in_subgroup[0] = 2 + 1;
+          _num_proc_in_subgroup[1] = num_cells + 1;
+
+          // partition the process group ranks into work groups
+          // coarse grid work group
+          _subgroup_ranks[0] = new int[_num_proc_in_subgroup[0]];
+          _subgroup_ranks[0][0] = 0;
+          _subgroup_ranks[0][1] = 1;
+          _subgroup_ranks[0][2] = num_cells + 1;
+
+          // fine grid work group
+          _subgroup_ranks[1] = new int[_num_proc_in_subgroup[1]];
+          // set entries to {1, ..., n+1}
+          for(int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
+          {
+            _subgroup_ranks[1][i] = i+1;
+          }
+        }
+        else
+        {
+          // test case 2 (n is the number of base mesh cells)
+          // without dedicated load balancer process
+          //  - work group for coarse grid: 2 processes: {0, 1}
+          //  - work group for fine grid: n processes: {2, ..., n+1}
+          //  - i.e. the two work groups are disjunct
+          //  - coordinator process: n+1
+
+          // the coordinator is at the same time a compute process of the second work group, so only the first work group
+          // has to add an extra process
+          group_contains_extra_coord[0] = true;
+          group_contains_extra_coord[1] = false;
+
+          // set number of processes per group
+          _num_proc_in_subgroup[0] = 2 + 1;
+          _num_proc_in_subgroup[1] = num_cells;
+
+          // partition the process group ranks into work groups
+          _subgroup_ranks[0] = new int[_num_proc_in_subgroup[0]];
+          _subgroup_ranks[0][0] = 0;
+          _subgroup_ranks[0][1] = 1;
+          _subgroup_ranks[0][2] = num_cells + 1;
+          _subgroup_ranks[1] = new int[_num_proc_in_subgroup[1]];
+          // set entries to {2, ..., n+1}
+          for(int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
+          {
+            _subgroup_ranks[1][i] = i+2;
+          }
+        }
+      }  // if(_process_group->is_coordinator())
+      /* *****************************
+      * End of semi-hard-wired code. *
+      *******************************/
+
+      // now the coordinator broadcasts the relevant data to the other processes, that is:
+      //   - _num_subgroups
+      //   - _num_proc_in_subgroup
+      //   - group_contains_extra_coord
+      //   - _subgroup_ranks
+
+      int mpi_error_code = MPI_Bcast(&_num_subgroups, 1, MPI_INTEGER, _process_group->rank_coord(),
+                                     _process_group->comm());
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
+
+      if(!_process_group->is_coordinator())
+      {
+        _num_proc_in_subgroup = new int[_num_subgroups];
+        group_contains_extra_coord = new bool[_num_subgroups];
+      }
+
+      mpi_error_code = MPI_Bcast(_num_proc_in_subgroup, _num_subgroups, MPI_INTEGER, _process_group->rank_coord(),
+                                 _process_group->comm());
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
+
+      mpi_error_code = MPI_Bcast(group_contains_extra_coord, _num_subgroups, MPI_LOGICAL, _process_group->rank_coord(),
+                                 _process_group->comm());
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
+
+      // let the non-coordinator processes allocate the array _subgroup_ranks for rank partitioning
+      if(!_process_group->is_coordinator())
+      {
+        // debug output
+//        std::cout << "Process " << _process_group->rank() << "received _num_subgroups=" << _num_subgroups << std::endl;
+
+        _subgroup_ranks = new int*[_num_subgroups];
+        for (int i(0) ; i<_num_subgroups ; ++i)
+        {
+          _subgroup_ranks[i] = new int[_num_proc_in_subgroup[i]];
+          // debug output
+//          std::cout << "Process " << _process_group->rank() << "received _num_proc_in_subgroup[" << i << "] = "
+//                    << _num_proc_in_subgroup[i] << std::endl;
         }
       }
-      else
+
+// COMMENT_HILMAR:
+// The most elegant way to broadcasting the 2D array _subgroup_ranks is by defining a corresponding MPI datatype.
+// The following code should do it, but it doesn't... :-)
+// Until I find the bug, the workaround code below does the trick.
+
+//      // create MPI datatype for sending the 2D array _subgroup_ranks
+//      MPI_Aint base;
+//      MPI_Address(_subgroup_ranks[0], &base);
+//      MPI_Aint displacements[_num_subgroups];
+//      for (int i(0) ; i<_num_subgroups ; ++i)
+//      {
+//        MPI_Address(_subgroup_ranks[i], &displacements[i]);
+//        displacements[i] -= base;
+//      }
+//
+//      MPI_Datatype iarray2D;
+//      MPI_Type_hindexed(_num_subgroups, _num_proc_in_subgroup, displacements, MPI_INTEGER, &iarray2D);
+//      MPI_Type_commit(&iarray2D);
+//
+//      // let the coordinator send the array to all non-coordinator processes
+//      MPI_Bcast(_subgroup_ranks, 1, iarray2D, _process_group->rank_coord(), _process_group->comm());
+//
+//      MPI_Type_free(&iarray2D);
+
+/* ****************
+* workaround code *
+******************/
+
+      // let all processes create a 1D array which will hold a copy of the 2D array to be broadcast
+      int total_length(0);
+      int* _subgroup_ranks_1D;
+      for (int i(0) ; i<_num_subgroups ; ++i)
       {
-        // test case 2
-        // without dedicated load balancer process
-        //  - work group for coarse grid: 2 processes: {0, 1}
-        //  - work group for fine grid: 16 processes: {2, ..., 17}
-        //  - i.e. the two work groups are disjunct
-        //  - coordinator process: 17
+        total_length += _num_proc_in_subgroup[i];
+      }
+      _subgroup_ranks_1D = new int[total_length];
 
-        // the coordinator is at the same time a compute process of the second work group, so only the first work group
-        // has to add an extra process
-        group_contains_extra_coord[0] = true;
-        group_contains_extra_coord[1] = false;
-
-        // set number of processes per group
-        _num_proc_in_group[0] = 2 + 1;
-        _num_proc_in_group[1] = 16;
-
-        // partition the process group ranks into work groups
-        _subgroup_ranks[0] = new int[_num_proc_in_group[0]];
-        _subgroup_ranks[0][0] = 0;
-        _subgroup_ranks[0][1] = 1;
-        _subgroup_ranks[0][2] = 17;
-        _subgroup_ranks[1] = new int[_num_proc_in_group[1]];
-        // set entries to {2, ..., 17}
-        for(int i(0) ; i < _num_proc_in_group[1] ; ++i)
+      // let the coordinator copy the 2D array into a 1D array
+      if(_process_group->is_coordinator())
+      {
+        int pos(0);
+        for (int i(0) ; i<_num_subgroups ; ++i)
         {
-          _subgroup_ranks[1][i] = i+2;
+          for(int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
+          {
+            _subgroup_ranks_1D[pos] = _subgroup_ranks[i][j];
+            ++pos;
+          }
         }
       }
 
-  // COMMENT_HILMAR: Old code that performs the stuff above at least partially automatically (however, not considering
-  // the group_contains_extra_coord array)
-  //
-  //    // Partition the ranks of the process group communicator into groups, by simply enumerating the process
-  //    // group ranks and assigning them consecutively to the requested number of processes.
-  //
-  //    // iterator for process group ranks, used to split them among the groups
-  //    int iter_group_rank(-1);
-  //    // now partition the ranks
-  //    for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
-  //    {
-  //      _subgroup_ranks[igroup] = new int[_num_proc_in_group[igroup]];
-  //      for(int j(0) ; j < _num_proc_in_group[igroup] ; ++j)
-  //      {
-  //        // increase group rank
-  //        ++iter_group_rank;
-  //        // set group rank
-  //        _subgroup_ranks[igroup][j] = iter_group_rank;
-  //      }
-  //    } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
-  // COMMENT_HILMAR: end of old code
+      // broadcast the 1D array
+      mpi_error_code = MPI_Bcast(_subgroup_ranks_1D, total_length, MPI_INTEGER, _process_group->rank_coord(),
+                                 _process_group->comm());
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
 
-  /* ************************
-  * End of hard-wired code. *
-  **************************/
+      // let the non-coordinator processes copy the 1D array into the 2D array
+      if(!_process_group->is_coordinator())
+      {
+        int pos(0);
+        for (int i(0) ; i<_num_subgroups ; ++i)
+        {
+          for(int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
+          {
+            _subgroup_ranks[i][j] = _subgroup_ranks_1D[pos];
+            ++pos;
+          }
+        }
+      }
+      // and delete the temporary 1D array again
+      delete [] _subgroup_ranks_1D;
+
+/* ***********************
+* end of workaround code *
+*************************/
+
+//      // debug output
+//      for (int i(0) ; i<_num_subgroups ; ++i)
+//      {
+//        std::string s = StringUtils::stringify(_subgroup_ranks[i][0]);
+//        for(int j(1) ; j < _num_proc_in_subgroup[i] ; ++j)
+//        {
+//          s +=  " " + StringUtils::stringify(_subgroup_ranks[i][j]);
+//        }
+//        std::cout << "Process " << _process_group->rank() << "received _subgroup_ranks[" << i << "] = "
+//                  << s << std::endl;
+//      }
+
+      /* *********************************
+      * now begin creating the subgroups *
+      ***********************************/
 
       // boolean array indicating to which work groups this process belongs
       _belongs_to_group = new bool[_num_subgroups];
@@ -421,7 +549,7 @@ namespace FEAST
       {
         // intialise with false
         _belongs_to_group[igroup] = false;
-        for(int j(0) ; j < _num_proc_in_group[igroup] ; ++j)
+        for(int j(0) ; j < _num_proc_in_subgroup[igroup] ; ++j)
         {
           if(_process_group->rank() == _subgroup_ranks[igroup][j])
           {
@@ -441,7 +569,7 @@ namespace FEAST
       {
         if(_belongs_to_group[igroup])
         {
-          _subgroups[igroup] = new ProcessSubgroup(_num_proc_in_group[igroup], _subgroup_ranks[igroup],
+          _subgroups[igroup] = new ProcessSubgroup(_num_proc_in_subgroup[igroup], _subgroup_ranks[igroup],
                                                    _process_group, igroup, group_contains_extra_coord[igroup]);
         }
         else
@@ -450,7 +578,7 @@ namespace FEAST
           // will deadlock), so let all processes that are not part of the current work group call it with special
           // MPI_GROUP_EMPTY and dummy communicator.
           MPI_Comm dummy_comm;
-          int mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+          mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
 
           // Within the ProcessSubgroup constructor, another MPI communicator is created. So, do another dummy call.
@@ -458,6 +586,9 @@ namespace FEAST
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
         }
       } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+
+      // delete aux. array
+      delete [] group_contains_extra_coord;
 
 
       /* *********************************************************
@@ -582,7 +713,6 @@ namespace FEAST
           _subgroups[igroup]->work_group()->do_exchange();
         }
       }
-
     } // create_subgroups()
   };
 

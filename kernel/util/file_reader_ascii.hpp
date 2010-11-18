@@ -77,6 +77,10 @@ namespace FEAST
       : _filename(filename), _comment_char(comment_char), _skip_empty_lines(skip_empty_lines)
     {
       myfile.open(filename.c_str(), std::ios::in);
+      if (myfile.fail())
+      {
+        throw InternalError("Problem occured when opening file " + _filename + ".");
+      }
     }
 
     /// DTOR

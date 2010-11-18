@@ -16,11 +16,21 @@ using namespace FEAST;
 /**
 * \brief main routine
 *
+* Call the routine via "mpirun -np n+5 <binary_name> <relative path to base mesh> n" where n is the number of base
+* mesh cells in the mesh.
+*
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
 */
 int main(int argc, char* argv[])
 {
+
+  if (argc < 3)
+  {
+    std::cerr << "Call the program with \"mpirun -np n+5 " << argv[0] << " <relative_path_to_mesh_file> n\", "
+              << "where n is the number of base mesh cells." << std::endl;
+    return 1;
+  }
 
   // create universe with one process group
 //  Universe* universe = Universe::create(argc, argv);
@@ -30,16 +40,34 @@ int main(int argc, char* argv[])
   // number of process groups (if not provided, then 1)
   int num_process_groups(2);
 
+  // For the semi-hard-wired example using a mesh with n base mesh cells we need n+5 processes in total
+  // (n+2 for the first process group, 2 for the second process group and 1 for the master process).
+  // (See description of the example in routine LoadBalancer::create_subgroups().)
+
+  // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
+  // If no argument is provided, then it is assumed that the mesh contains 16 base mesh cells.
+
+  int num_cells;
+  num_cells = atoi(argv[2]);
+  assert(num_cells > 0);
+//  std::cout << "Number of base mesh cells read from command line: " << num_cells << std::endl;
+
+  // The number of processes for the first process group must equal num_cells + 2.
+  int num_processes_in_first_group(num_cells + 2);
+
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
-  // For the hard-coded example mesh we need 21 processes. (See description of the example in routine
-  // LoadBalancer::create_subgroups().)
-  int num_processes_in_group[] = {18, 2};
+  int num_processes_in_group[] = {num_processes_in_first_group, 2};
 
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
   // Set the first entry either to false or to true to test two different configurations. (You don't have to change
   // the number of processes for that.) (See description of the example in routine LoadBalancer::create_subgroups().)
   bool includes_dedicated_load_bal[] = {true, false};
+
+// COMMENT_HILMAR: Is it problematic to define and fill the variables above already *before* MPI_Init() is called?
+// (Until now, no problems occured!) If it turns out to be problematic then the Universe::create(...) routine has to be
+// split in such a way that it first calls MPI_Init() *only*, and then (after setting the variables above) doing
+// all the remaining stuff in a second step.
 
   // create universe with several process groups
   Universe* universe;
@@ -66,8 +94,6 @@ int main(int argc, char* argv[])
   catch (Exception& e)
   {
     // Assume that all critical errors are already caught within the Universe class.
-    // Since it is not clear whether the communication system has already been set up, do not forward the error message
-    // to the master
     ErrorHandler::exception_occured(e, ErrorHandler::NON_CRITICAL);
   }
 
@@ -94,7 +120,9 @@ int main(int argc, char* argv[])
 //    std::cout << s <<  std::endl;
     if(group_id == 0)
     {
-      load_balancer->read_mesh();
+      // get name of the mesh file from the command line
+      std::string mesh_file(argv[1]);
+      load_balancer->read_mesh(mesh_file);
       load_balancer->create_subgroups();
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
