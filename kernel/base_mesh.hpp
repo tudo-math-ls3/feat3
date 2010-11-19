@@ -581,7 +581,7 @@ namespace FEAST
     void create_graph()
     {
       // allocate index array
-      int* index = new int[_num_cells+1];
+      unsigned int* index = new unsigned int[_num_cells+1];
 
       // graph data structure is filled by two sweeps through the cell list
       // first sweep: count neighbours of each cell, and maintain running total to fill index array
@@ -604,7 +604,7 @@ namespace FEAST
       // second sweep through data structure
       // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
       // again, treat last loop instance separately
-      int* neighbours = new int[index[_num_cells]];
+      unsigned int* neighbours = new unsigned int[index[_num_cells]];
       num_neighbours_so_far = 0;
       for (unsigned int icell=0 ; icell < _num_cells ; icell++)
         for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
@@ -744,8 +744,8 @@ namespace FEAST
       //   13          4        14,10,9,8            2        10,9
       //   14          6        15,11,10,9,8,13      3        11,9,8
       //   15          4        12,11,10,14          2        12,10
-      int const num_base_cells = 16;
-      int* index = new int[num_base_cells+1];
+      unsigned int const num_base_cells = 16;
+      unsigned int* index = new unsigned int[num_base_cells+1];
       index[0]  =  0;
       index[1]  =  4;
       index[2]  = 10;
@@ -764,7 +764,7 @@ namespace FEAST
       index[15] = 74;
       index[16] = 78;
 
-      int* neigh = new int[index[num_base_cells]];
+      unsigned int* neigh = new unsigned int[index[num_base_cells]];
       // neighbours of subdomain 0
       neigh[0]  =  3;  neigh[1] =  4;  neigh[2] =  5;  neigh[3] =  1;
       // neighbours of subdomain 1

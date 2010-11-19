@@ -38,7 +38,7 @@ namespace FEAST
     /// global buffer used for MPI_COMM_WORLD (MCW) communication
     static char* MCW_buffer;
     /// size of buffer Comm::MCW_buffer in bytes
-    static int MCW_BUFFERSIZE;
+    static unsigned int MCW_BUFFERSIZE;
     /// current position in buffer Comm::MCW_buffer
     static int MCW_buffer_pos;
     /// current size of buffer Comm::MCW_buffer
@@ -109,6 +109,33 @@ namespace FEAST
     }
 
     /**
+    * \brief write one unsigned integer to the MPI_COMM_WORLD buffer
+    *
+    * \param[in] msg
+    * unsigned integer to be written to the buffer
+    */
+    static void write(unsigned int msg)
+    {
+      // write the integer to the current position of the buffer
+      int mpi_error_code = MPI_Pack(&msg, 1, MPI_UNSIGNED, Comm::MCW_buffer,
+                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+    }
+
+    /**
+    * \brief read one unsigned integer from the MPI_COMM_WORLD buffer
+    *
+    * \param[out] msg
+    * unsigned integer read from the buffer
+    */
+    static void read(unsigned int& msg)
+    {
+      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg,
+                                      1, MPI_UNSIGNED, MPI_COMM_WORLD);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    }
+
+    /**
     * \brief write an array of integers to the MPI_COMM_WORLD buffer
     *
     * \param[in] msg
@@ -138,6 +165,39 @@ namespace FEAST
     {
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
                                   size, MPI_INTEGER, MPI_COMM_WORLD);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    }
+
+    /**
+    * \brief write an array of unsigned integers to the MPI_COMM_WORLD buffer
+    *
+    * \param[in] msg
+    * unsigned integer array to be written to the buffer
+    *
+    * \param[in] size
+    * size of the array
+    */
+    static void write(unsigned int msg[], unsigned int const size)
+    {
+      // write the array to the current position of the buffer
+      int mpi_error_code = MPI_Pack(msg, size, MPI_UNSIGNED, Comm::MCW_buffer,
+                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+    }
+
+    /**
+    * \brief read an array of integers from the MPI_COMM_WORLD buffer
+    *
+    * \param[in] size
+    * size of the array to be read
+    *
+    * \param[out] msg
+    * array of integers read from the buffer (has to be allocated before function call)
+    */
+    static void read(unsigned int const size, unsigned int msg[])
+    {
+      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
+                                  size, MPI_UNSIGNED, MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
     }
 
@@ -177,7 +237,7 @@ namespace FEAST
     * \param[in] size
     * size of the array
     */
-    static void write(char msg[], int const size)
+    static void write(char msg[], unsigned int const size)
     {
       // write the array to the current position of the buffer
       int mpi_error_code = MPI_Pack(msg, size, MPI_CHAR, Comm::MCW_buffer,
@@ -194,7 +254,7 @@ namespace FEAST
     * \param[out] msg
     * array of chars read from the buffer (has to be allocated before function call)
     */
-    static void read(int const size, char msg[])
+    static void read(unsigned int const size, char msg[])
     {
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
                                       size, MPI_CHAR, MPI_COMM_WORLD);
@@ -225,7 +285,7 @@ namespace FEAST
     * \param[out] msg
     * string read from the buffer
     */
-    static void read(int const size, std::string& msg)
+    static void read(unsigned int const size, std::string& msg)
     {
       // create char array for storing the sent message (add 1 to the size since the sent message ends with null
       // termination symbol)
@@ -244,7 +304,7 @@ namespace FEAST
   // COMMENT_HILMAR: JUST TEMPORARILY
   // initialisation of static members
   // COMMENT_HILMAR: Use some arbitrary size for the time being. This has to be parameterised somehow...
-  int Comm::MCW_BUFFERSIZE = 4194304;
+  unsigned int Comm::MCW_BUFFERSIZE = 4194304;
   char* Comm::MCW_buffer = new char[MCW_BUFFERSIZE];
   int Comm::MCW_buffer_pos = 0;
   int Comm::MCW_received_bytes = 0;

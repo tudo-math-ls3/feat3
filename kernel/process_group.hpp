@@ -39,7 +39,7 @@ namespace FEAST
     MPI_Comm _comm;
 
     /// number of processes in this group
-    int _num_processes;
+    unsigned int _num_processes;
 
     /// rank of this process with respect to the ProcessGroup's communicator
     int _rank;
@@ -72,14 +72,14 @@ namespace FEAST
     * distinguished via this group ID. It has to be passed to the process group constructor, it is not incremented
     * automatically.
     */
-    int const _group_id;
+    unsigned int const _group_id;
 
     /// rank of the coordinator process within the group
     int const _rank_coord;
 
 //   COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
 //    /// buffer size
-//    static int BUFFERSIZE_BYTES;
+//    static unsigned int BUFFERSIZE_BYTES;
 //
 //    /// buffer for MPI communication
 //    char* _buffer;
@@ -104,7 +104,7 @@ namespace FEAST
     */
     ProcessGroup(
       MPI_Comm comm,
-      int num_processes)
+      unsigned int num_processes)
       : _comm(comm),
         _num_processes(num_processes),
         _ranks_group_parent(nullptr),
@@ -135,10 +135,10 @@ namespace FEAST
     * The coordinator of this process group is set to rank #_num_processes-1, i.e. the last rank in the process group.
     */
     ProcessGroup(
-      int num_processes,
+      unsigned int num_processes,
       int ranks_group_parent[],
       ProcessGroup* process_group_parent,
-      int const group_id)
+      unsigned int const group_id)
       : _num_processes(num_processes),
         _ranks_group_parent(ranks_group_parent),
         _process_group_parent(process_group_parent),
@@ -146,7 +146,7 @@ namespace FEAST
         _rank_coord(num_processes-1)
     {
       int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
-                                          ranks_group_parent, &_group);
+                                          _ranks_group_parent, &_group);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
 
       // Create the group communicator for, among others, collective operations.
@@ -228,7 +228,7 @@ namespace FEAST
     *
     * \return number of processes #_num_processes
     */
-    inline int num_processes() const
+    inline unsigned int num_processes() const
     {
       return _num_processes;
     }
@@ -248,7 +248,7 @@ namespace FEAST
     *
     * \return group ID #_group_id
     */
-    inline int group_id() const
+    inline unsigned int group_id() const
     {
       return _group_id;
     }
@@ -311,7 +311,7 @@ namespace FEAST
     {
 
       // add 1 to the message length since string::c_str() adds the null termination symbol to the resulting char array
-      int length = message.length() + 1;
+      unsigned int length = message.length() + 1;
 
       if (!is_coordinator())
       {
@@ -320,7 +320,7 @@ namespace FEAST
         *****************************************/
 
         // coordinator process gathers the lengths of the messages
-        MPI_Gather(&length, 1, MPI_INT, nullptr, 0, MPI_DATATYPE_NULL, _rank_coord, _comm);
+        MPI_Gather(&length, 1, MPI_UNSIGNED, nullptr, 0, MPI_DATATYPE_NULL, _rank_coord, _comm);
 
         // coordinator process gathers the messages
         // (Here, it is necessary to cast away the const'ness of string::c_str() since the MPI routine expects a
@@ -342,28 +342,28 @@ namespace FEAST
         **********************************/
 
         // receive buffer for storing the lengths of the messages
-        int msg_lengths[_num_processes];
+        unsigned int msg_lengths[_num_processes];
         // array for storing the start positions of the single messages in the receive buffer
-        int msg_start_pos[_num_processes];
+        unsigned int msg_start_pos[_num_processes];
 
         // gather the lengths of the messages from the other processes
-        MPI_Gather(&length, 1, MPI_INT, msg_lengths, 1, MPI_INT, _rank_coord, _comm);
+        MPI_Gather(&length, 1, MPI_UNSIGNED, msg_lengths, 1, MPI_UNSIGNED, _rank_coord, _comm);
 
         // set start positions of the single messages in the receive buffer
         msg_start_pos[0] = 0;
-        for(int i(1) ; i < _num_processes ; ++i)
+        for(unsigned int i(1) ; i < _num_processes ; ++i)
         {
           msg_start_pos[i] = msg_start_pos[i-1] + msg_lengths[i-1];
         }
 
         // determine total length of the messages and allocate receive buffer accordingly
-        int total_length(msg_start_pos[_num_processes-1] + msg_lengths[_num_processes-1]);
+        unsigned int total_length(msg_start_pos[_num_processes-1] + msg_lengths[_num_processes-1]);
 
         // receive buffer for (consecutively) storing the messages
         char messages[total_length];
 
 //        // debug output
-//        for(int i(0) ; i < _num_processes ; ++i)
+//        for(unsigned int i(0) ; i < _num_processes ; ++i)
 //        {
 //          std::cout << "local process " << StringUtils::stringify(i) << ": length of string = "
 //                    << StringUtils::stringify(msg_lengths[i]) << std::endl;
@@ -371,13 +371,13 @@ namespace FEAST
 //        std::cout << "Total length: " << StringUtils::stringify(total_length) << std::endl;
 
         // gather the messages from the other processes.
-        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages, msg_lengths, msg_start_pos,
-                    MPI_CHAR, _rank_coord, _comm);
+        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages, (int*) msg_lengths,
+                    (int*) msg_start_pos, MPI_CHAR, _rank_coord, _comm);
 
 //        // debug output
 //        // output the strings collected from all processes by using corresponding offsets in the
 //        // char array (pointer arithmetic)
-//        for(int i(0) ; i < _num_processes ; ++i)
+//        for(unsigned int i(0) ; i < _num_processes ; ++i)
 //        {
 //          std::cout << "Process " << Process::rank << " writes: "
 //                    << std::string(messages + msg_start_pos[i], msg_lengths[i]) << std::endl;
@@ -481,10 +481,10 @@ namespace FEAST
     ***************************/
     /// constructor
     WorkGroup(
-      const int num_processes,
+      const unsigned int num_processes,
       int ranks_group_parent[],
       ProcessGroup* process_group_parent,
-      const int group_id)
+      const unsigned int group_id)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
 //        _comm_opt(MPI_COMM_NULL),
         _graph_distributed(nullptr),
@@ -568,8 +568,8 @@ namespace FEAST
     *       simply contains all neighbours.
     */
     void set_graph_distributed(
-      int const num_neighbours,
-      int* neighbours)
+      unsigned int const num_neighbours,
+      unsigned int* neighbours)
     {
       _graph_distributed = new GraphDistributed(num_neighbours, neighbours);
 
@@ -594,8 +594,8 @@ namespace FEAST
 //   for edge neighbours on the one hand and diagonal neighbours on the other hand? Should diagonal neighbours appear
 //   in the graph topology at all? Or should we only take the edge neighbours here?
 //
-//    int sources[1];
-//    int degrees[1];
+//    unsigned int sources[1];
+//    unsigned int degrees[1];
 //    sources[0] = _rank;
 //    degrees[0] = _graph_distributed->num_neighbours();
 //    MPI_Dist_graph_create(_comm, 1, sources, degrees, _graph_distributed->neighbours(), nullptr,
@@ -615,7 +615,7 @@ namespace FEAST
       unsigned int n = 10;
 
       unsigned int num_neighbours = _graph_distributed->num_neighbours();
-      int* neighbours = _graph_distributed->neighbours();
+      unsigned int* neighbours = _graph_distributed->neighbours();
 
       // arrays for sending and receiving
       // (The MPI standard says that the send buffer given to MPI_Isend(...) should neither be overwritten nor read(!)
@@ -759,10 +759,10 @@ namespace FEAST
     ***************************/
     /// constructor
     ProcessSubgroup(
-      const int num_processes,
+      const unsigned int num_processes,
       int ranks_group_parent[],
       ProcessGroup* process_group_parent,
-      const int group_id,
+      const unsigned int group_id,
       bool contains_extra_coord)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
         _contains_extra_coord(contains_extra_coord),
@@ -796,7 +796,7 @@ namespace FEAST
       {
         s += " R";
       }
-      for(int i(0) ; i < _group_id+1 ; ++i)
+      for(unsigned int i(0) ; i < _group_id+1 ; ++i)
       {
         s += " G";
       }
@@ -817,7 +817,7 @@ namespace FEAST
 // BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
 // kopieren!
         int* work_group_ranks = new int[_num_processes];
-        for(int i(0) ; i < _num_processes ; ++i)
+        for(unsigned int i(0) ; i < _num_processes ; ++i)
         {
           work_group_ranks[i] = ranks_group_parent[i];
         }
@@ -830,7 +830,7 @@ namespace FEAST
 // kopieren. Die Methode MPI_Group_incl(...) bekommt dann das Array ranks_group_parent[] durchgereicht, und
 // wegen _num_processes-1 wird nur auf die ersten _num_processes-1 Positionen zugegriffen.
         int* work_group_ranks = new int[_num_processes-1];
-        for(int i(0) ; i < _num_processes - 1 ; ++i)
+        for(unsigned int i(0) ; i < _num_processes - 1 ; ++i)
         {
           work_group_ranks[i] = ranks_group_parent[i];
         }

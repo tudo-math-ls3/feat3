@@ -52,7 +52,7 @@ namespace FEAST
     static Universe* _universe;
 
     /// total number of processes in MPI_COMM_WORLD
-    int _num_processes;
+    unsigned int _num_processes;
 
     /// process group consisting of all processes
     ProcessGroup* _world_group;
@@ -71,7 +71,7 @@ namespace FEAST
     ProcessGroup* _process_group;
 
     /// number of process groups requested by the user via some top-level configuration file
-    const int _num_process_groups;
+    const unsigned int _num_process_groups;
 
     /**
     * \brief array of number of processes in each process group (including eventual dedicated load balancer process)
@@ -79,7 +79,7 @@ namespace FEAST
     * This array must be provided when more than one process group is used.\n
     * Dimension: [#_num_process_groups]
     */
-    int const * _num_processes_in_group;
+    unsigned int const * _num_processes_in_group;
 
     /**
     * \brief array of flags whether a dedicated load balancer process is needed in process group
@@ -90,7 +90,7 @@ namespace FEAST
     bool const * _includes_dedicated_load_bal;
 
     /// number of processes actually needed by the user, based on some top-level configuration file
-    int _num_processes_needed;
+    unsigned int _num_processes_needed;
 
     /**
     * \brief 2-dim. array of MPI_COMM_WORLD ranks in top-level process group that each process unambigously belongs to
@@ -137,9 +137,9 @@ namespace FEAST
     * array of flags whether dedicated load balancer required in work groups,  dimension [\a num_process_groups]
     */
     Universe(
-      const int num_processes,
-      const int num_process_groups,
-      const int num_processes_in_group[],
+      const unsigned int num_processes,
+      const unsigned int num_process_groups,
+      const unsigned int num_processes_in_group[],
       const bool includes_dedicated_load_bal[])
       : _num_processes(num_processes),
         _num_process_groups(num_process_groups),
@@ -204,15 +204,17 @@ namespace FEAST
     static void _init_mpi(
       int& argc,
       char* argv[],
-      int& num_processes)
+      unsigned int& num_processes)
     {
       // init MPI
       int mpi_error_code = MPI_Init(&argc, &argv);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Init");
 
+      int num_proc;
       // get total number of processes
-      mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
+      mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
+      num_processes = (unsigned int) num_proc;
     }
 
 
@@ -257,7 +259,7 @@ namespace FEAST
       // (1) the master needs one process
       _num_processes_needed = 1;
 
-      for(int igroup(0) ; igroup < _num_process_groups ; ++igroup)
+      for(unsigned int igroup(0) ; igroup < _num_process_groups ; ++igroup)
       {
         // (2) add number of processes in each of the process groups (eventually including a dedicated load
         // balancer process)
@@ -330,14 +332,14 @@ namespace FEAST
       _group_ranks_world = new int*[_num_process_groups];
 
       // the group this process belongs to (all processes except the master will belong to a group)
-      int my_group(-1);
+      unsigned int my_group(0);
 
       // loop over all groups
-      for(int igroup(0) ; igroup < _num_process_groups ; ++igroup)
+      for(unsigned int igroup(0) ; igroup < _num_process_groups ; ++igroup)
       {
         // fill the rank array for this group
         _group_ranks_world[igroup] = new int[_num_processes_in_group[igroup]];
-        for(int j(0) ; j < _num_processes_in_group[igroup] ; ++j)
+        for(unsigned int j(0) ; j < _num_processes_in_group[igroup] ; ++j)
         {
           ++iter_MPC_rank;
           _group_ranks_world[igroup][j] = iter_MPC_rank;
@@ -349,7 +351,7 @@ namespace FEAST
         }
       }
       // final sanity check (rank assigned last must be master rank minus 1)
-      assert(iter_MPC_rank == _num_processes-2);
+      assert(iter_MPC_rank == (int)_num_processes-2);
 
       // create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
       // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
@@ -403,7 +405,7 @@ namespace FEAST
       Logger::close_log_file();
 
       delete _world_group;
-      for(int igroup(0) ; igroup < _num_process_groups ; ++igroup)
+      for(unsigned int igroup(0) ; igroup < _num_process_groups ; ++igroup)
       {
         delete [] _group_ranks_world[igroup];
       }
@@ -445,13 +447,13 @@ namespace FEAST
     {
       if(_universe == nullptr)
       {
-        int num_processes;
+        unsigned int num_processes;
         _init_mpi(argc, argv, num_processes);
 
         // Assume that one process group is needed using all available processes (minus one master process).
         // The dedicated load balancer process is included in this number.
-        int num_process_groups = 1;
-        int num_processes_in_group[1] = {num_processes-1};
+        unsigned int num_process_groups = 1;
+        unsigned int num_processes_in_group[1] = {num_processes-1};
         bool includes_dedicated_load_bal[1] = {true};
 
         // create the one and only instance of the Universe class
@@ -494,13 +496,13 @@ namespace FEAST
     static Universe* create(
       int argc,
       char* argv[],
-      const int num_process_groups,
-      const int num_processes_in_group[],
+      const unsigned int num_process_groups,
+      const unsigned int num_processes_in_group[],
       const bool includes_dedicated_load_bal[])
     {
       if(_universe == nullptr)
       {
-        int num_processes;
+        unsigned int num_processes;
         // init MPI and get number of available processes and the rank of this processor
         _init_mpi(argc, argv, num_processes);
         // create the one and only instance of the Universe class

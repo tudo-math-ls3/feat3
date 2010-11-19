@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   // the following information will be read from some dat file
 
   // number of process groups (if not provided, then 1)
-  int num_process_groups(2);
+  unsigned int num_process_groups(2);
 
   // For the semi-hard-wired example using a mesh with n base mesh cells we need n+5 processes in total
   // (n+2 for the first process group, 2 for the second process group and 1 for the master process).
@@ -47,16 +47,16 @@ int main(int argc, char* argv[])
   // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
   // If no argument is provided, then it is assumed that the mesh contains 16 base mesh cells.
 
-  int num_cells;
+  unsigned int num_cells;
   num_cells = atoi(argv[2]);
   assert(num_cells > 0);
 //  std::cout << "Number of base mesh cells read from command line: " << num_cells << std::endl;
 
   // The number of processes for the first process group must equal num_cells + 2.
-  int num_processes_in_first_group(num_cells + 2);
+  unsigned int num_processes_in_first_group(num_cells + 2);
 
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
-  int num_processes_in_group[] = {num_processes_in_first_group, 2};
+  unsigned int num_processes_in_group[] = {num_processes_in_first_group, 2};
 
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
   if(load_balancer != nullptr)
   {
     ProcessGroup* process_group = load_balancer->process_group();
-    int group_id = process_group->group_id();
+    unsigned int group_id = process_group->group_id();
 //    // debug output
 //    int rank_process_group = process_group->rank();
 //    std::string s("Process " + StringUtils::stringify(rank_world) + " is the ");

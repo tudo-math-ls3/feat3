@@ -42,7 +42,7 @@ namespace FEAST
     * member variables *
     *******************/
     /// number of nodes in the graph, which are numbered from 0 to num_nodes-1
-    int const _num_nodes;
+    unsigned int const _num_nodes;
 
     /**
     * \brief access information for the array #_neighbours
@@ -56,7 +56,7 @@ namespace FEAST
     *
     * Dimension: [#_num_nodes+1]
     */
-    int* _index;
+    unsigned int* _index;
 
     /**
     * \brief node neighbours within the graph (i.e. edges of the graph), represented as a list of node numbers
@@ -87,7 +87,7 @@ namespace FEAST
     *
     * Dimension: [total number of neighbours] = [number of edges] = [#_index[#_num_nodes]]
     */
-    int* _neighbours;
+    unsigned int* _neighbours;
 
 
   public:
@@ -101,9 +101,9 @@ namespace FEAST
     ***************************/
     /// constructor
     Graph(
-      int const num_nodes,
-      int* index,
-      int* neighbours
+      unsigned int const num_nodes,
+      unsigned int* index,
+      unsigned int* neighbours
       )
       : _num_nodes(num_nodes),
         _index(index),
@@ -127,7 +127,7 @@ namespace FEAST
     *
     * \return number of nodes #_num_nodes
     */
-    inline int num_nodes() const
+    inline unsigned int num_nodes() const
     {
       return _num_nodes;
     }
@@ -137,7 +137,7 @@ namespace FEAST
     *
     * \return pointer to the index array #_index
     */
-    inline int* index() const
+    inline unsigned int* index() const
     {
       return _index;
     }
@@ -147,7 +147,7 @@ namespace FEAST
     *
     * \return pointer to the edge array #_neighbours
     */
-    inline int* neighbours() const
+    inline unsigned int* neighbours() const
     {
       return _neighbours;
     }
@@ -162,13 +162,13 @@ namespace FEAST
       if (_num_nodes > 0)
       {
         std::cout << "node | degree | neighbours: " << std::endl;
-        for(int i(0) ; i < _num_nodes ; ++i)
+        for(unsigned int i(0) ; i < _num_nodes ; ++i)
         {
           std::cout << i << " | " << _index[i+1] - _index[i];
           if (_index[i+1] - _index[i] > 0)
           {
             std::cout << " | " << _neighbours[_index[i]];
-            for(int j(_index[i]+1) ; j < _index[i+1] ; ++j)
+            for(unsigned int j(_index[i]+1) ; j < _index[i+1] ; ++j)
             {
               std::cout << ", " << _neighbours[j];
             }
@@ -214,7 +214,7 @@ namespace FEAST
     *
     * Dimension: [#_num_neighbours]
     */
-    int* _neighbours;
+    unsigned int* _neighbours;
 
 
   public:
@@ -224,8 +224,8 @@ namespace FEAST
     ***************************/
     /// constructor
     GraphDistributed(
-      int const num_neighbours,
-      int* neighbours
+      unsigned int const num_neighbours,
+      unsigned int* neighbours
       )
       : _num_neighbours(num_neighbours),
         _neighbours(neighbours)
@@ -257,7 +257,7 @@ namespace FEAST
     *
     * \return pointer to the neibhbour array #_neighbours
     */
-    inline int* neighbours() const
+    inline unsigned int* neighbours() const
     {
       return _neighbours;
     }

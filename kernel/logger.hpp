@@ -326,6 +326,7 @@ namespace FEAST
 
       // write length of the log message to the buffer (add 1 to the length since string::c_str() adds null termination
       // symbol)
+// BRAL: Comm::write/read for unsigned int!
       Comm::write((int)message.size()+1);
 
       // write string itself to the buffer
@@ -360,7 +361,7 @@ namespace FEAST
     static void receive()
     {
       // read length of the messages from the buffer
-      int msg_length;
+      unsigned int msg_length;
       Comm::read(msg_length);
 
       // char array for storing the message
@@ -413,9 +414,9 @@ namespace FEAST
     * \author Hilmar Wobker
     */
     static void log_master_array(
-      int num_messages,
-      int* const msg_lengths,
-      int const total_length,
+      unsigned int num_messages,
+      unsigned int* const msg_lengths,
+      unsigned int const total_length,
       char* const messages,
       target targ = SCREEN_FILE)
     {
@@ -454,7 +455,7 @@ namespace FEAST
     * \param[in] targ
     * output target SCREEN, FILE or SCREEN_FILE (default: SCREEN_FILE)
     *
-    * \sa log_master_array(int, int*, int, char*, target), receive_array
+    * \sa log_master_array(unsigned int, unsigned int*, unsigned int, char*, target), receive_array
     *
     * \author Hilmar Wobker
     */
@@ -468,10 +469,10 @@ namespace FEAST
 
       // convert the vector of strings into one long char array and determine further information needed by
       // the other version of the function log_master_array(...).
-      int num_messages(messages.size());
-      int msg_lengths[num_messages];
-      int total_length(0);
-      for(int i(0) ; i < num_messages ; ++i)
+      unsigned int num_messages(messages.size());
+      unsigned int msg_lengths[num_messages];
+      unsigned int total_length(0);
+      for(unsigned int i(0) ; i < num_messages ; ++i)
       {
         // add 1 due to the null termination symbol added by string::c_str()
         msg_lengths[i] = messages[i].size()+1;
@@ -480,7 +481,7 @@ namespace FEAST
       char messages_char[total_length];
       // set pointer to beginning of message
       char* pos = messages_char;
-      for(int i(0) ; i < num_messages ; ++i)
+      for(unsigned int i(0) ; i < num_messages ; ++i)
       {
         // copy message to corresponding part of the char array
         strcpy(pos, messages[i].c_str());
@@ -505,7 +506,8 @@ namespace FEAST
     * processes. But when the master reacts to one request, then it will complete it before doing something else.
     * Hence, these concurrent requests should not be problematic.
     *
-    * \sa log_master_array(int, int*, int, char*, target), log_master_array(std::vector<std::string> const,target)
+    * \sa log_master_array(unsigned int, unsigned int*, unsigned int, char*, target),
+    *     log_master_array(std::vector<std::string> const,target)
     *
     * \author Hilmar Wobker
     */
@@ -517,24 +519,24 @@ namespace FEAST
   // "pre-allocated" storage...
 
       // read number of messages the char array consists of from to the buffer
-      int num_messages;
+      unsigned int num_messages;
       Comm::read(num_messages);
 
       // allocate array for sotring message lengths
-      int msg_lengths[num_messages];
+      unsigned int msg_lengths[num_messages];
       // read message lengths from the buffer
       Comm::read(num_messages, msg_lengths);
 
       // allocate array for storing the start positions of the single messages in the receive buffer
-      int msg_start_pos[num_messages];
+      unsigned int msg_start_pos[num_messages];
 
       // set start positions of the single messages in the receive buffer
       msg_start_pos[0] = 0;
-      for(int i(1) ; i < num_messages ; ++i)
+      for(unsigned int i(1) ; i < num_messages ; ++i)
       {
         msg_start_pos[i] = msg_start_pos[i-1] + msg_lengths[i-1];
       }
-      int total_length(msg_start_pos[num_messages-1] + msg_lengths[num_messages-1]);
+      unsigned int total_length(msg_start_pos[num_messages-1] + msg_lengths[num_messages-1]);
 
       // allocate char array for (consecutively) storing the messages
       char messages[total_length];
@@ -548,7 +550,7 @@ namespace FEAST
       // display messages on screen if requested
       if (target == SCREEN || target == SCREEN_FILE)
       {
-        for(int i(0) ; i < num_messages ; ++i)
+        for(unsigned int i(0) ; i < num_messages ; ++i)
         {
           // use corresponding offsets in the char array (pointer arithmetic)
           std::cout << messages + msg_start_pos[i];
@@ -558,7 +560,7 @@ namespace FEAST
       // write messages to master's log file if requested
       if (target == FILE || target == SCREEN_FILE)
       {
-        for(int i(0) ; i < num_messages ; ++i)
+        for(unsigned int i(0) ; i < num_messages ; ++i)
         {
           // use corresponding offsets in the char array (pointer arithmetic)
           log(messages + msg_start_pos[i]);

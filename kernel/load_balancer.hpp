@@ -142,14 +142,14 @@ namespace FEAST
     std::vector<Graph*> _graphs;
 
     /// number of work groups
-    int _num_subgroups;
+    unsigned int _num_subgroups;
 
     /**
     * \brief array of number of workers in each work group
     *
     * Dimension: [#_num_subgroups]
     */
-    int* _num_proc_in_subgroup;
+    unsigned int* _num_proc_in_subgroup;
 
     /**
     * \brief 2-dim. array for storing the process group ranks building the subgroups
@@ -195,7 +195,7 @@ namespace FEAST
     {
       if (_subgroup_ranks != nullptr)
       {
-        for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+        for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
         {
           delete [] _subgroup_ranks[igroup];
         }
@@ -291,7 +291,7 @@ namespace FEAST
     void create_subgroups()
     {
       // shortcut to the number of processes in the load balancer's process group
-      int num_processes = _process_group->num_processes();
+      unsigned int num_processes = _process_group->num_processes();
 
       /* ********************************************************************************
       * The coordinator is the only one knowing the base mesh, so only the coordinator  *
@@ -322,7 +322,7 @@ namespace FEAST
 
       if(_process_group->is_coordinator())
       {
-        int num_cells;
+        unsigned int num_cells;
         num_cells = _base_mesh->num_cells();
         // debug output
         Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
@@ -334,7 +334,7 @@ namespace FEAST
         // number of work groups, manually set to 2
         _num_subgroups = 2;
         // array of numbers of processes per work group
-        _num_proc_in_subgroup = new int[2];
+        _num_proc_in_subgroup = new unsigned int[2];
 
         // Boolean array indicating whether the work groups contain an extra process for the coordinator (which will then
         // not be a compute process in this work group)
@@ -371,7 +371,7 @@ namespace FEAST
           // fine grid work group
           _subgroup_ranks[1] = new int[_num_proc_in_subgroup[1]];
           // set entries to {1, ..., n+1}
-          for(int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
+          for(unsigned int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
           {
             _subgroup_ranks[1][i] = i+1;
           }
@@ -401,7 +401,7 @@ namespace FEAST
           _subgroup_ranks[0][2] = num_cells + 1;
           _subgroup_ranks[1] = new int[_num_proc_in_subgroup[1]];
           // set entries to {2, ..., n+1}
-          for(int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
+          for(unsigned int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
           {
             _subgroup_ranks[1][i] = i+2;
           }
@@ -417,17 +417,17 @@ namespace FEAST
       //   - group_contains_extra_coord
       //   - _subgroup_ranks
 
-      int mpi_error_code = MPI_Bcast(&_num_subgroups, 1, MPI_INTEGER, _process_group->rank_coord(),
+      int mpi_error_code = MPI_Bcast(&_num_subgroups, 1, MPI_UNSIGNED, _process_group->rank_coord(),
                                      _process_group->comm());
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
 
       if(!_process_group->is_coordinator())
       {
-        _num_proc_in_subgroup = new int[_num_subgroups];
+        _num_proc_in_subgroup = new unsigned int[_num_subgroups];
         group_contains_extra_coord = new bool[_num_subgroups];
       }
 
-      mpi_error_code = MPI_Bcast(_num_proc_in_subgroup, _num_subgroups, MPI_INTEGER, _process_group->rank_coord(),
+      mpi_error_code = MPI_Bcast(_num_proc_in_subgroup, _num_subgroups, MPI_UNSIGNED, _process_group->rank_coord(),
                                  _process_group->comm());
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
 
@@ -442,7 +442,7 @@ namespace FEAST
 //        std::cout << "Process " << _process_group->rank() << "received _num_subgroups=" << _num_subgroups << std::endl;
 
         _subgroup_ranks = new int*[_num_subgroups];
-        for (int i(0) ; i<_num_subgroups ; ++i)
+        for (unsigned int i(0) ; i<_num_subgroups ; ++i)
         {
           _subgroup_ranks[i] = new int[_num_proc_in_subgroup[i]];
           // debug output
@@ -460,14 +460,14 @@ namespace FEAST
 //      MPI_Aint base;
 //      MPI_Address(_subgroup_ranks[0], &base);
 //      MPI_Aint displacements[_num_subgroups];
-//      for (int i(0) ; i<_num_subgroups ; ++i)
+//      for (unsigned int i(0) ; i<_num_subgroups ; ++i)
 //      {
 //        MPI_Address(_subgroup_ranks[i], &displacements[i]);
 //        displacements[i] -= base;
 //      }
 //
 //      MPI_Datatype iarray2D;
-//      MPI_Type_hindexed(_num_subgroups, _num_proc_in_subgroup, displacements, MPI_INTEGER, &iarray2D);
+//      MPI_Type_hindexed(_num_subgroups, _num_proc_in_subgroup, displacements, MPI_UNSIGNED, &iarray2D);
 //      MPI_Type_commit(&iarray2D);
 //
 //      // let the coordinator send the array to all non-coordinator processes
@@ -480,9 +480,9 @@ namespace FEAST
 ******************/
 
       // let all processes create a 1D array which will hold a copy of the 2D array to be broadcast
-      int total_length(0);
+      unsigned int total_length(0);
       int* _subgroup_ranks_1D;
-      for (int i(0) ; i<_num_subgroups ; ++i)
+      for (unsigned int i(0) ; i<_num_subgroups ; ++i)
       {
         total_length += _num_proc_in_subgroup[i];
       }
@@ -491,10 +491,10 @@ namespace FEAST
       // let the coordinator copy the 2D array into a 1D array
       if(_process_group->is_coordinator())
       {
-        int pos(0);
-        for (int i(0) ; i<_num_subgroups ; ++i)
+        unsigned int pos(0);
+        for (unsigned int i(0) ; i<_num_subgroups ; ++i)
         {
-          for(int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
+          for(unsigned int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
           {
             _subgroup_ranks_1D[pos] = _subgroup_ranks[i][j];
             ++pos;
@@ -510,10 +510,10 @@ namespace FEAST
       // let the non-coordinator processes copy the 1D array into the 2D array
       if(!_process_group->is_coordinator())
       {
-        int pos(0);
-        for (int i(0) ; i<_num_subgroups ; ++i)
+        unsigned int pos(0);
+        for (unsigned int i(0) ; i<_num_subgroups ; ++i)
         {
-          for(int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
+          for(unsigned int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
           {
             _subgroup_ranks[i][j] = _subgroup_ranks_1D[pos];
             ++pos;
@@ -528,10 +528,10 @@ namespace FEAST
 *************************/
 
 //      // debug output
-//      for (int i(0) ; i<_num_subgroups ; ++i)
+//      for (unsigned int i(0) ; i<_num_subgroups ; ++i)
 //      {
 //        std::string s = StringUtils::stringify(_subgroup_ranks[i][0]);
-//        for(int j(1) ; j < _num_proc_in_subgroup[i] ; ++j)
+//        for(unsigned int j(1) ; j < _num_proc_in_subgroup[i] ; ++j)
 //        {
 //          s +=  " " + StringUtils::stringify(_subgroup_ranks[i][j]);
 //        }
@@ -545,18 +545,18 @@ namespace FEAST
 
       // boolean array indicating to which work groups this process belongs
       _belongs_to_group = new bool[_num_subgroups];
-      for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
         // intialise with false
         _belongs_to_group[igroup] = false;
-        for(int j(0) ; j < _num_proc_in_subgroup[igroup] ; ++j)
+        for(unsigned int j(0) ; j < _num_proc_in_subgroup[igroup] ; ++j)
         {
           if(_process_group->rank() == _subgroup_ranks[igroup][j])
           {
             _belongs_to_group[igroup] = true;
           }
         }
-      } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      } // for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
       // create ProcessSubgroup objects including MPI groups and MPI communicators
       // It is not possible to set up all subgroups in one call, since the processes building the subgroups are
@@ -565,7 +565,7 @@ namespace FEAST
       // special group MPI_GROUP_EMPTY.
 
       _subgroups.resize(_num_subgroups, nullptr);
-      for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
         if(_belongs_to_group[igroup])
         {
@@ -585,7 +585,7 @@ namespace FEAST
           mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
         }
-      } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      } // for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
       // delete aux. array
       delete [] group_contains_extra_coord;
@@ -603,8 +603,8 @@ namespace FEAST
         // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
         // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
         // be used for the coarse grid work group
-        int* index = new int[3];
-        int* neighbours = new int[2];
+        unsigned int* index = new unsigned int[3];
+        unsigned int* neighbours = new unsigned int[2];
         index[0] = 0;
         index[1] = 1;
         index[2] = 2;
@@ -625,12 +625,12 @@ namespace FEAST
       * corresponding work group members                                           *
       *****************************************************************************/
 
-      for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
         if(_belongs_to_group[igroup])
         {
-          int num_neighbours_local;
-          int* neighbours_local;
+          unsigned int num_neighbours_local;
+          unsigned int* neighbours_local;
           int root = _subgroups[igroup]->rank_coord();
           if(_subgroups[igroup]->is_coordinator())
           {
@@ -638,16 +638,16 @@ namespace FEAST
             * code for the sending root process *
             ************************************/
 
-            int count = _graphs[igroup]->num_nodes();
+            unsigned int count = _graphs[igroup]->num_nodes();
             if(_subgroups[igroup]->contains_extra_coord())
             {
               // MPI_Scatter() counts the extra coordinator process as well (which only sends data). Arrays have to
               // be prepared with n+1 segments although only n processes receive data.
               ++count;
             }
-            int num_neighbours[count];
-            int* index = _graphs[igroup]->index();
-            for(int i(0) ; i < _graphs[igroup]->num_nodes() ; ++i)
+            unsigned int num_neighbours[count];
+            unsigned int* index = _graphs[igroup]->index();
+            for(unsigned int i(0) ; i < _graphs[igroup]->num_nodes() ; ++i)
             {
               num_neighbours[i] = index[i+1] - index[i];
             }
@@ -659,12 +659,16 @@ namespace FEAST
 
               // send the number of neighbours to the non-root processes (use MPI_IN_PLACE to indicate that the root
               // does not receive/store any data)
-              MPI_Scatter(num_neighbours, 1, MPI_INT, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
+              MPI_Scatter(num_neighbours, 1, MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
                           _subgroups[igroup]->comm());
               // send the neighbours to the non-root processes (usually the neighbours array must also have n+1
               // segments, but since num_neighbours[count-1] == 0, the last segment is empty)
-              MPI_Scatterv(_graphs[igroup]->neighbours(), num_neighbours, index, MPI_INT, MPI_IN_PLACE, 0,
-                           MPI_DATATYPE_NULL, root, _subgroups[igroup]->comm());
+              MPI_Scatterv(_graphs[igroup]->neighbours(), (int*) num_neighbours, (int*) index, MPI_UNSIGNED,
+                           MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root, _subgroups[igroup]->comm());
+// COMMENT_HILMAR:
+// Is it problematic to define num_neighbours as unsigned int* and then to cast it to (int*) when passed to
+// MPI_Scatterv()? (This question also applies to other places in the code!)
+// Should we better define it as int* right from the beginning?
             }
             else
             {
@@ -672,12 +676,12 @@ namespace FEAST
               // also sends data to itself.
 
               // scatter the number of neighbours to the non-root processes and to the root process itself
-              MPI_Scatter(num_neighbours, 1, MPI_INT, &num_neighbours_local, 1, MPI_INT, root,
+              MPI_Scatter(num_neighbours, 1, MPI_UNSIGNED, &num_neighbours_local, 1, MPI_UNSIGNED, root,
                           _subgroups[igroup]->comm());
-              neighbours_local = new int[num_neighbours_local];
+              neighbours_local = new unsigned int[num_neighbours_local];
               // scatter the neighbours to the non-root processes and to the root process itself
-              MPI_Scatterv(_graphs[igroup]->neighbours(), num_neighbours, index, MPI_INT, neighbours_local,
-                           num_neighbours_local, MPI_INT, root, _subgroups[igroup]->comm());
+              MPI_Scatterv(_graphs[igroup]->neighbours(), (int*) num_neighbours, (int*) index, MPI_UNSIGNED,
+                           neighbours_local, num_neighbours_local, MPI_UNSIGNED, root, _subgroups[igroup]->comm());
             }
           }
           else
@@ -686,13 +690,13 @@ namespace FEAST
             * code for the receiving non-root processes *
             ********************************************/
             // receive the number of neighbours from the root process
-            MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_INT, root,
+            MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_UNSIGNED, root,
                         _subgroups[igroup]->comm());
 
             // receive the neighbours
-            neighbours_local = new int[num_neighbours_local];
-            MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, neighbours_local, num_neighbours_local, MPI_INT, root,
-                         _subgroups[igroup]->comm());
+            neighbours_local = new unsigned int[num_neighbours_local];
+            MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, neighbours_local, num_neighbours_local, MPI_UNSIGNED,
+                         root, _subgroups[igroup]->comm());
           }
 
           if (!(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
@@ -702,10 +706,10 @@ namespace FEAST
             _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, neighbours_local);
           }
         } // if(_belongs_to_group[igroup])
-      } // for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      } // for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
       // test local neighbourhood communication
-      for(int igroup(0) ; igroup < _num_subgroups ; ++igroup)
+      for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
         if (_belongs_to_group[igroup] &&
             !(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
