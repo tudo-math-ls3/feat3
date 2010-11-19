@@ -5,10 +5,10 @@
 
 /**
  * \file base_header.hpp
- * \brief Feast Kernel base header.
+ * \brief FEAST Kernel base header.
  *
- * This file is the base header for the Feast kernel, which is included by all other
- * Feast header and source files.
+ * This file is the base header for the FEAST kernel, which is included by all other
+ * FEAST header and source files.
  * This file defines macros and data types which are frequently used in other files.
  */
 
@@ -81,11 +81,11 @@ namespace FEAST
   // FEAST version
   enum
   {
-    /// Feast major version number
+    /// FEAST major version number
     version_major = 1,
-    /// Feast minor version number
+    /// FEAST minor version number
     version_minor = 0,
-    /// Feast patch version number
+    /// FEAST patch version number
     version_patch = 0
   };
 
@@ -106,7 +106,7 @@ namespace FEAST
 
   /**
    * \brief Nil class definition.
-   * \details
+   *
    * This is an empty tag class which may be used for templates with optional parameters.\n
    * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
    */
