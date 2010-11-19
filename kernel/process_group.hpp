@@ -642,8 +642,8 @@ namespace FEAST
         {
           s +=  " " + StringUtils::stringify(a[i][j]);
         }
-        std::cout << "Process " << _rank << " sends [" << s << "] to neighbour "
-                  << StringUtils::stringify(neighbours[i]) << "." << std::endl;
+        Logger::log("Process " + StringUtils::stringify(_rank) + " sends [" + s + "] to neighbour "
+                    + StringUtils::stringify(neighbours[i]) + ".\n");
       }
 
       // request and status objects necessary for communication
@@ -673,8 +673,8 @@ namespace FEAST
         {
           s += " " + StringUtils::stringify(a_recv[i][j]);
         }
-        std::cout << "Process " << _rank << " received [" << s << "] from neighbour "
-                  << neighbours[i] << "." << std::endl;
+        Logger::log("Process " + StringUtils::stringify(_rank) + " received [" + s + "] from neighbour "
+                    + StringUtils::stringify(neighbours[i]) + ".\n");
       }
     }
   };
