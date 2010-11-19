@@ -9,13 +9,19 @@ commit_msg="$GIT_DIR/COMMIT_MSG"
 sed -n -e '/^#/d' -e '/^diff --git/q' -e 'p;d' "$1" > "$commit_msg"
 
 die() {
-	echo 'commit-msg hook failure' 1>&2
-	echo '-----------------------' 1>&2
-	echo '' 1>&2
-	echo "$@" 1>&2
-	echo 'To continue editing, run the command
-  git commit -e -F '"$commit_msg"'
-(assuming your working directory is at the top).' 1>&2
+        echo 'commit-msg hook failure' 1>&2
+        echo '-----------------------' 1>&2
+        echo '' 1>&2
+        echo "$@" 1>&2
+        echo 'To continue editing, identify the location of your .git directory to locate and
+re-use the previously typed message by running the command
+
+  git commit -e -F `git rev-parse --git-dir`/COMMIT_MSG
+
+You may want to additionally specify any commit option you used previously,
+e.g. --amend or --signoff.
+
+' 1>&2
 	exit 1
 }
 
