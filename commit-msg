@@ -22,56 +22,56 @@ You may want to additionally specify any commit option you used previously,
 e.g. --amend or --signoff.
 
 ' 1>&2
-	exit 1
+        exit 1
 }
 
 #-----------------------------------------------------------------------------
 # Check the commit message layout with a simple state machine.
 
 msg_first() {
-	len=$(echo -n "$line" | wc -c)
-	if test $len -eq 0; then
-		# not yet first line
-		return
-	elif test $len -lt 8; then
-		die 'The first line must be at least 8 characters:
+        len=$(echo -n "$line" | wc -c)
+        if test $len -eq 0; then
+                # not yet first line
+                return
+        elif test $len -lt 8; then
+                die 'The first line must be at least 8 characters:
 --------
 '"$line"'
 --------
 '
-	elif test $len -gt 78; then
-		die 'The first line may be at most 78 characters:
+        elif test $len -gt 78; then
+                die 'The first line may be at most 78 characters:
 ------------------------------------------------------------------------------
 '"$line"'
 ------------------------------------------------------------------------------
 '
-	elif echo "$line" | grep "^[	 ]\|[	 ]$" >/dev/null 2>&1; then
-		die 'The first line may not have leading or trailing space:
+        elif echo "$line" | grep "^[	 ]\|[	 ]$" >/dev/null 2>&1; then
+                die 'The first line may not have leading or trailing space:
 ['"$line"']
 '
-	else
-		# first line okay
-		state=second
-	fi
+        else
+                # first line okay
+                state=second
+        fi
 }
 
 msg_second() {
-	if test "x$line" != "x"; then
-		die 'The second line must be empty:
+        if test "x$line" != "x"; then
+                die 'The second line must be empty:
 '"$line"
-	else
-		state=rest
-	fi
+        else
+                state=rest
+        fi
 }
 
 msg_rest() {
-	false
+        false
 }
 
 # Pipe commit message into the state machine.
 state=first
 cat "$commit_msg" |
 while IFS='' read line; do
-	msg_$state || break
+        msg_$state || break
 done &&
 rm -f "$commit_msg"
