@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# vim: set filetype=sh tabstop=8 softtabstop=8 shiftwidth=8 expandtab :
+#
 # Copy or link this file as ".git/hooks/pre-commit".
 
 # Prepare a copy of the message:
