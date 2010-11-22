@@ -322,7 +322,7 @@ namespace FEAST
       // init a new message with corresponding ID
       Comm::init(ServiceIDs::LOG_RECEIVE);
 
-  // TODO: define specific MPI_Datatype for the following data? (see example on p. 125f in MPI2.2 standard)
+// TODO: define specific MPI_Datatype for the following data? (see example on p. 125f in MPI2.2 standard)
 
       // write length of the log message to the buffer (add 1 to the length since string::c_str() adds null termination
       // symbol)
@@ -332,7 +332,7 @@ namespace FEAST
       Comm::write(message);
 
       // write log target to the buffer
-      Comm::write(targ);
+      Comm::write((int)targ);
 
       // send message
       Comm::send();
@@ -369,8 +369,8 @@ namespace FEAST
       Comm::read(msg_length, message);
 
       // read log target from the buffer
-      int target;
-      Comm::read(target);
+      Logger::target target;
+      Comm::read((int&)target);
 
       // display message on screen if requested
       if (target == SCREEN || target == SCREEN_FILE)
@@ -422,7 +422,7 @@ namespace FEAST
       // init a new message with corresponding ID
       Comm::init(ServiceIDs::LOG_RECEIVE_ARRAY);
 
-  // TODO: define specific MPI_Datatype for the following data? (see example on p. 125f in MPI2.2 standard)
+// TODO: define specific MPI_Datatype for the following data? (see example on p. 125f in MPI2.2 standard)
 
       // write number of log messages the char array consists of to the buffer
       Comm::write(num_messages);
@@ -434,7 +434,7 @@ namespace FEAST
       Comm::write(messages, total_length);
 
       // write log target to the buffer
-      Comm::write(targ);
+      Comm::write((int)targ);
 
       // send message
       Comm::send();
@@ -543,8 +543,8 @@ namespace FEAST
       Comm::read(total_length, messages);
 
       // read log target from the buffer
-      int target;
-      Comm::read(target);
+      Logger::target target;
+      Comm::read((int&)target);
 
       // display messages on screen if requested
       if (target == SCREEN || target == SCREEN_FILE)

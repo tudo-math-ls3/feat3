@@ -87,146 +87,160 @@ namespace FEAST
 
   }; // class MPIUtils
 
-//wird im code dann aufgerufen per MPIType<DT_>::value()
-//mit DT_ halt grad der DataType nachdem du deine Funktion templatisierst hast.
-//
-//Hm fuer ohne internet einfach mal ausgeschnitten:
-//
-//  template <typename DT_>
-//  class MPIType
-//  {
-//  };
-//
-//  template <>
-//  class MPIType<bool>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_LOGICAL;
-//// Or MPI_C_BOOL?
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<char>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_CHAR;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<short int>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_SHORT;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType< short int>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI__SHORT;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<int>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_INTEGER;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType< int>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<long>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_LONG;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType< long>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI__LONG;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<long long>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_LONG_LONG;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType< long long>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI__LONG_LONG;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<float>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_FLOAT;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<double>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_DOUBLE;
-//    }
-//  };
-//
-//  template <>
-//  class MPIType<long double>
-//  {
-//  public:
-//    static inline MPI_Datatype value()
-//    {
-//      return MPI_LONG_DOUBLE;
-//    }
-//  };
+
+  /**
+  * \brief template class for translating built-in types into MPI types (e.g. int to MPI_INTEGER)
+  *
+  * \author Dirk Ribbrock
+  * \author Hilmar Wobker
+  */
+  template <typename T_>
+  class MPIType
+  {
+  };
+
+  /// template specialisation: bool to MPI_LOGICAL
+  template <>
+  class MPIType<bool>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_LOGICAL;
+    }
+  };
+
+  /// template specialisation: char to MPI_CHAR
+  template <>
+  class MPIType<char>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_CHAR;
+    }
+  };
+
+  /// template specialisation: short int to MPI_SHORT
+  template <>
+  class MPIType<short int>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_SHORT;
+    }
+  };
+
+  /// template specialisation: unsigned short int to MPI_UNSIGNED_SHORT
+  template <>
+  class MPIType<unsigned short int>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_UNSIGNED_SHORT;
+    }
+  };
+
+  /// template specialisation: int to MPI_INTEGER
+  template <>
+  class MPIType<int>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_INTEGER;
+    }
+  };
+
+  /// template specialisation: unsigned int to MPI_UNSIGNED
+  template <>
+  class MPIType<unsigned int>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_UNSIGNED;
+    }
+  };
+
+  /// template specialisation: long to MPI_LONG
+  template <>
+  class MPIType<long>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_LONG;
+    }
+  };
+
+  /// template specialisation: unsigned long to MPI_UNSIGNED_LONG
+  template <>
+  class MPIType<unsigned long>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_UNSIGNED_LONG;
+    }
+  };
+
+  /// template specialisation: long long to MPI_LONG_LONG
+  template <>
+  class MPIType<long long>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_LONG_LONG;
+    }
+  };
+
+  /// template specialisation: unsigned long long to MPI_UNSIGNED_LONG_LONG
+  template <>
+  class MPIType<unsigned long long>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_UNSIGNED_LONG_LONG;
+    }
+  };
+
+  /// template specialisation: float to MPI_FLOAT
+  template <>
+  class MPIType<float>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_FLOAT;
+    }
+  };
+
+  /// template specialisation: double to MPI_DOUBLE
+  template <>
+  class MPIType<double>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_DOUBLE;
+    }
+  };
+
+  /// template specialisation: long double to MPI_LONG_DOUBLE
+  template <>
+  class MPIType<long double>
+  {
+  public:
+    static inline MPI_Datatype value()
+    {
+      return MPI_LONG_DOUBLE;
+    }
+  };
 } // namespace FEAST
 
 #endif //  #ifndef MPI_UTILS_HPP

@@ -79,190 +79,26 @@ namespace FEAST
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
     }
 
-  //TODO: use templates for the following functions?
-
     /**
-    * \brief write one integer to the MPI_COMM_WORLD buffer
+    * \brief write one item of template type T_ to the MPI_COMM_WORLD buffer
     *
     * \param[in] msg
-    * integer to be written to the buffer
+    * item of template type T_ to be written to the buffer
     */
-    static void write(int msg)
+    template <typename T_>
+    static void write(T_ msg)
     {
       // write the integer to the current position of the buffer
-      int mpi_error_code = MPI_Pack(&msg, 1, MPI_INTEGER, Comm::MCW_buffer,
+      int mpi_error_code = MPI_Pack(&msg, 1, MPIType<T_>::value(), Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
     }
 
     /**
-    * \brief read one integer from the MPI_COMM_WORLD buffer
+    * \brief overloaded function for writing a string to the MPI_COMM_WORLD buffer
     *
-    * \param[out] msg
-    * integer read from the buffer
-    */
-    static void read(int& msg)
-    {
-      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg,
-                                      1, MPI_INTEGER, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
-    }
-
-    /**
-    * \brief write one unsigned integer to the MPI_COMM_WORLD buffer
-    *
-    * \param[in] msg
-    * unsigned integer to be written to the buffer
-    */
-    static void write(unsigned int msg)
-    {
-      // write the integer to the current position of the buffer
-      int mpi_error_code = MPI_Pack(&msg, 1, MPI_UNSIGNED, Comm::MCW_buffer, Comm::MCW_BUFFERSIZE,
-                                    &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-    }
-
-    /**
-    * \brief read one unsigned integer from the MPI_COMM_WORLD buffer
-    *
-    * \param[out] msg
-    * unsigned integer read from the buffer
-    */
-    static void read(unsigned int& msg)
-    {
-      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg,
-                                      1, MPI_UNSIGNED, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
-    }
-
-    /**
-    * \brief write an array of integers to the MPI_COMM_WORLD buffer
-    *
-    * \param[in] msg
-    * integer array to be written to the buffer
-    *
-    * \param[in] size
-    * size of the array
-    */
-    static void write(int msg[], int const size)
-    {
-      // write the array to the current position of the buffer
-      int mpi_error_code = MPI_Pack(msg, size, MPI_INTEGER, Comm::MCW_buffer,
-                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-    }
-
-    /**
-    * \brief read an array of integers from the MPI_COMM_WORLD buffer
-    *
-    * \param[in] size
-    * size of the array to be read
-    *
-    * \param[out] msg
-    * array of integers read from the buffer (has to be allocated before function call)
-    */
-    static void read(int const size, int msg[])
-    {
-      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
-                                  size, MPI_INTEGER, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
-    }
-
-    /**
-    * \brief write an array of unsigned integers to the MPI_COMM_WORLD buffer
-    *
-    * \param[in] msg
-    * unsigned integer array to be written to the buffer
-    *
-    * \param[in] size
-    * size of the array
-    */
-    static void write(unsigned int msg[], unsigned int const size)
-    {
-      // write the array to the current position of the buffer
-      int mpi_error_code = MPI_Pack(msg, size, MPI_UNSIGNED, Comm::MCW_buffer,
-                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-    }
-
-    /**
-    * \brief read an array of unsigned integers from the MPI_COMM_WORLD buffer
-    *
-    * \param[in] size
-    * size of the array to be read
-    *
-    * \param[out] msg
-    * array of integers read from the buffer (has to be allocated before function call)
-    */
-    static void read(unsigned int const size, unsigned int msg[])
-    {
-      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
-                                  size, MPI_UNSIGNED, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
-    }
-
-    /**
-    * \brief write one char to the MPI_COMM_WORLD buffer
-    *
-    * \param[in] msg
-    * integer to be written to the buffer
-    */
-    static void write(char msg)
-    {
-      // write the char to the current position of the buffer
-      int mpi_error_code = MPI_Pack(&msg, 1, MPI_CHARACTER, Comm::MCW_buffer,
-                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-    }
-
-    /**
-    * \brief read one char from the MPI_COMM_WORLD buffer
-    *
-    * \param[out] msg
-    * char read from the buffer
-    */
-    static void read(char& msg)
-    {
-      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg,
-                                      1, MPI_CHAR, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
-    }
-
-    /**
-    * \brief write an array of chars to the MPI_COMM_WORLD buffer
-    *
-    * \param[in] msg
-    * char array to be written to the buffer
-    *
-    * \param[in] size
-    * size of the array
-    */
-    static void write(char msg[], unsigned int const size)
-    {
-      // write the array to the current position of the buffer
-      int mpi_error_code = MPI_Pack(msg, size, MPI_CHAR, Comm::MCW_buffer,
-                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
-    }
-
-    /**
-    * \brief read an array of chars from the MPI_COMM_WORLD buffer
-    *
-    * \param[in] size
-    * size of the array to be read
-    *
-    * \param[out] msg
-    * array of chars read from the buffer (has to be allocated before function call)
-    */
-    static void read(unsigned int const size, char msg[])
-    {
-      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
-                                      size, MPI_CHAR, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
-    }
-
-    /**
-    * \brief write a string to the MPI_COMM_WORLD buffer
+    * Since strings are always sent as char arrays, the string variant cannot be realised via the template version
+    * of the write function above.
     *
     * \param[in] msg
     * string to be written to the buffer
@@ -277,7 +113,24 @@ namespace FEAST
     }
 
     /**
+    * \brief read one integer from the MPI_COMM_WORLD buffer
+    *
+    * \param[out] msg
+    * integer read from the buffer
+    */
+    template <typename T_>
+    static void read(T_& msg)
+    {
+      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg,
+                                      1, MPIType<T_>::value(), MPI_COMM_WORLD);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    }
+
+    /**
     * \brief read a string from the MPI_COMM_WORLD buffer
+    *
+    * Since strings are always sent as char arrays, one has to know the size in advance. Hence, the string variant
+    * cannot be realised via the template version of the read function above.
     *
     * \param[in] size
     * size of the string to be read
@@ -297,8 +150,40 @@ namespace FEAST
       msg.assign(msg_char);
     }
 
-  // TODO: implement write(...)/read(...) for single + double
+    /**
+    * \brief write an array of items of template type T_ to the MPI_COMM_WORLD buffer
+    *
+    * \param[in] msg
+    * array of items of template type T_ to be written to the buffer
+    *
+    * \param[in] size
+    * size of the array
+    */
+    template <typename T_>
+    static void write(T_ msg[], int const size)
+    {
+      // write the array to the current position of the buffer
+      int mpi_error_code = MPI_Pack(msg, size, MPIType<T_>::value(), Comm::MCW_buffer,
+                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+    }
 
+    /**
+    * \brief read an array of items of template type T_ from the MPI_COMM_WORLD buffer
+    *
+    * \param[in] size
+    * size of the array to be read
+    *
+    * \param[out] msg
+    * array of items of template type T_ read from the buffer (has to be allocated before function call)
+    */
+    template <typename T_>
+    static void read(int const size, T_ msg[])
+    {
+      int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
+                                      size, MPIType<T_>::value(), MPI_COMM_WORLD);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+    }
   }; // class Comm
 
   // COMMENT_HILMAR: JUST TEMPORARILY
