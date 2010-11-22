@@ -663,10 +663,11 @@ namespace FEAST
                           _subgroups[igroup]->comm());
               // send the neighbours to the non-root processes (usually the neighbours array must also have n+1
               // segments, but since num_neighbours[count-1] == 0, the last segment is empty)
-              MPI_Scatterv(_graphs[igroup]->neighbours(), (int*) num_neighbours, (int*) index, MPI_UNSIGNED,
-                           MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root, _subgroups[igroup]->comm());
+              MPI_Scatterv(_graphs[igroup]->neighbours(), reinterpret_cast<int*>(num_neighbours),
+                           reinterpret_cast<int*>(index), MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
+                           _subgroups[igroup]->comm());
 // COMMENT_HILMAR:
-// Is it problematic to define num_neighbours as unsigned int* and then to cast it to (int*) when passed to
+// Is it problematic to define num_neighbours as unsigned int* and then to cast it to int* when passed to
 // MPI_Scatterv()? (This question also applies to other places in the code!)
 // Should we better define it as int* right from the beginning?
             }
@@ -680,8 +681,9 @@ namespace FEAST
                           _subgroups[igroup]->comm());
               neighbours_local = new unsigned int[num_neighbours_local];
               // scatter the neighbours to the non-root processes and to the root process itself
-              MPI_Scatterv(_graphs[igroup]->neighbours(), (int*) num_neighbours, (int*) index, MPI_UNSIGNED,
-                           neighbours_local, num_neighbours_local, MPI_UNSIGNED, root, _subgroups[igroup]->comm());
+              MPI_Scatterv(_graphs[igroup]->neighbours(), reinterpret_cast<int*>(num_neighbours),
+                           reinterpret_cast<int*>(index), MPI_UNSIGNED,neighbours_local, num_neighbours_local,
+                           MPI_UNSIGNED, root,_subgroups[igroup]->comm());
             }
           }
           else

@@ -117,8 +117,8 @@ namespace FEAST
     static void write(unsigned int msg)
     {
       // write the integer to the current position of the buffer
-      int mpi_error_code = MPI_Pack(&msg, 1, MPI_UNSIGNED, Comm::MCW_buffer,
-                                    Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
+      int mpi_error_code = MPI_Pack(&msg, 1, MPI_UNSIGNED, Comm::MCW_buffer, Comm::MCW_BUFFERSIZE,
+                                    &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
     }
 
@@ -186,7 +186,7 @@ namespace FEAST
     }
 
     /**
-    * \brief read an array of integers from the MPI_COMM_WORLD buffer
+    * \brief read an array of unsigned integers from the MPI_COMM_WORLD buffer
     *
     * \param[in] size
     * size of the array to be read

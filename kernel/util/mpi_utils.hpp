@@ -92,40 +92,141 @@ namespace FEAST
 //
 //Hm fuer ohne internet einfach mal ausgeschnitten:
 //
-//template <typename DT_>
-//      class MPIType
-//      {
-//      };
+//  template <typename DT_>
+//  class MPIType
+//  {
+//  };
 //
-//      template <>
-//      class MPIType<float>
-//      {
-//          public:
-//              static inline MPI_Datatype value()
-//              {
-//                  return MPI_FLOAT;
-//              }
-//      };
+//  template <>
+//  class MPIType<bool>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_LOGICAL;
+//// Or MPI_C_BOOL?
+//    }
+//  };
 //
-//      template <>
-//      class MPIType<double>
-//      {
-//          public:
-//              static inline MPI_Datatype value()
-//              {
-//                  return MPI_DOUBLE;
-//              }
-//      };
+//  template <>
+//  class MPIType<char>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_CHAR;
+//    }
+//  };
 //
-//      template <>
-//      class MPIType<unsigned long>
-//      {
-//          public:
-//              static inline MPI_Datatype value()
-//              {
-//                  return MPI_UNSIGNED_LONG;
-//              }
-//      };
+//  template <>
+//  class MPIType<short int>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_SHORT;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType< short int>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI__SHORT;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType<int>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_INTEGER;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType< int>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType<long>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_LONG;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType< long>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI__LONG;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType<long long>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_LONG_LONG;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType< long long>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI__LONG_LONG;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType<float>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_FLOAT;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType<double>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_DOUBLE;
+//    }
+//  };
+//
+//  template <>
+//  class MPIType<long double>
+//  {
+//  public:
+//    static inline MPI_Datatype value()
+//    {
+//      return MPI_LONG_DOUBLE;
+//    }
+//  };
 } // namespace FEAST
 
 #endif //  #ifndef MPI_UTILS_HPP

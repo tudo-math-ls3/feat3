@@ -371,8 +371,9 @@ namespace FEAST
 //        std::cout << "Total length: " << StringUtils::stringify(total_length) << std::endl;
 
         // gather the messages from the other processes.
-        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages, (int*) msg_lengths,
-                    (int*) msg_start_pos, MPI_CHAR, _rank_coord, _comm);
+        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages,
+                    reinterpret_cast<int*>(msg_lengths), reinterpret_cast<int*>(msg_start_pos), MPI_CHAR, _rank_coord,
+                    _comm);
 
 //        // debug output
 //        // output the strings collected from all processes by using corresponding offsets in the

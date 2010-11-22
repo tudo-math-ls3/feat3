@@ -326,8 +326,7 @@ namespace FEAST
 
       // write length of the log message to the buffer (add 1 to the length since string::c_str() adds null termination
       // symbol)
-// BRAL: Comm::write/read for unsigned int!
-      Comm::write((int)message.size()+1);
+      Comm::write(message.size()+1);
 
       // write string itself to the buffer
       Comm::write(message);
