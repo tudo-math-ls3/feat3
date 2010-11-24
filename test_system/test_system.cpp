@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 
-using namespace Feast;
+using namespace FEAST;
 using namespace TestSystem;
 
 int main(int argc, char** argv)

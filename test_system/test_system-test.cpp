@@ -1,7 +1,7 @@
 #include <test_system/test_system.hpp>
 
 using namespace TestSystem;
-using namespace Feast;
+using namespace FEAST;
 
 /**
  *

@@ -18,7 +18,7 @@
  *
  **/
 
-using namespace Feast;
+using namespace FEAST;
 
 namespace TestSystem
 {
@@ -365,7 +365,7 @@ namespace TestSystem
       throw; \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ Feast::stringify(test_e.what()) + \
+          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_EQUAL block"); \
     } catch (...) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
@@ -387,7 +387,7 @@ namespace TestSystem
       throw; \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ Feast::stringify(test_e.what()) + \
+          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_NOT_EQUAL block"); \
     } catch (...) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
@@ -401,8 +401,8 @@ namespace TestSystem
 #define TEST_CHECK_STRINGIFY_EQUAL(a, b) \
   do { \
     try { \
-      std::string s_a(Feast::stringify(a)); \
-      std::string s_b(Feast::stringify(b)); \
+      std::string s_a(FEAST::stringify(a)); \
+      std::string s_b(FEAST::stringify(b)); \
       check(__PRETTY_FUNCTION__, __FILE__, __LINE__, s_a == s_b, \
           this->_id + "\n" +  "Expected '" #a "' to equal '" + s_b + \
           "'\nbut got\n'" + s_a + "'"); \
@@ -410,7 +410,7 @@ namespace TestSystem
       throw; \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
-          "Test threw unexpected exception  "+ Feast::stringify(test_e.what()) + \
+          "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_STRINGIFY_EQUAL block"); \
     } catch (...) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
@@ -430,7 +430,7 @@ namespace TestSystem
       throw; \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ Feast::stringify(test_e.what()) + \
+          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK block"); \
     } catch (...) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
@@ -455,7 +455,7 @@ namespace TestSystem
       throw; \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ Feast::stringify(test_e.what()) + \
+          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_THROWS block"); \
     } catch (...) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
@@ -477,7 +477,7 @@ namespace TestSystem
       throw;  \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
-          "Test threw unexpected exception  "+ Feast::stringify(test_e.what()) + \
+          "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_EQUAL_WITHIN_EPS block"); \
     } catch (...) { \
       throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
