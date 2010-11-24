@@ -6,7 +6,7 @@
 #include <typeinfo>
 #include <kernel/util/stringify.hpp>
 
-namespace Feast
+namespace FEAST
 {
   /**
    * \brief Basic TypeTraits struct

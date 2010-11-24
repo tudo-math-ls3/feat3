@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 
-namespace Feast
+namespace FEAST
 {
     /**
      * \brief Assertion is thrown when a critical condition is not fulfilled.
@@ -70,7 +70,7 @@ namespace Feast
 #define ASSERT(expr, msg) \
     do { \
         if (! (expr)) \
-            throw Feast::Assertion(__PRETTY_FUNCTION__, __FILE__, __LINE__, msg); \
+            throw FEAST::Assertion(__PRETTY_FUNCTION__, __FILE__, __LINE__, msg); \
     } while (false)
 #else
 #define ASSERT(expr, msg)
@@ -93,7 +93,7 @@ namespace Feast
 #define STATIC_ASSERT(const_expr, msg) \
     {\
       class ERROR_##msg {}; \
-      (void) (new Feast::CompileTimeChecker<\
+      (void) (new FEAST::CompileTimeChecker<\
         (const_expr) != 0>((ERROR_##msg())));\
     }
 #else
