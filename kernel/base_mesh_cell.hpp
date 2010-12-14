@@ -29,11 +29,12 @@ namespace FEAST
     * via the cell dimension. Another advantage: The interface of the function subdivide(...) will never have
     * to be changed again.
     */
+// COMMENT_HILMAR: Wie und wo sollen die SubdivisionData-Objekte gespeichert werden? Als member von Cell<...>?
     template<
       unsigned char cell_dim_,
       unsigned char space_dim_,
       unsigned char world_dim_>
-    class SubdivisionData
+    struct SubdivisionData
     {
     };
 
@@ -41,9 +42,8 @@ namespace FEAST
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
-    class SubdivisionData<1, space_dim_, world_dim_>
+    struct SubdivisionData<1, space_dim_, world_dim_>
     {
-    public:
       /// new vertex created during subdivision
       Vertex<world_dim_>* created_vertex;
 
@@ -57,7 +57,7 @@ namespace FEAST
       std::vector<Cell<1, space_dim_, world_dim_>*> created_cells;
 
       /// clears all vectors of created entities
-      inline void clear()
+      inline void clear_created()
       {
         created_vertex = nullptr;
         created_cells.clear();
@@ -69,9 +69,8 @@ namespace FEAST
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
-    class SubdivisionData<2, space_dim_, world_dim_>
+    struct SubdivisionData<2, space_dim_, world_dim_>
     {
-    public:
       /// new vertices created during subdivision
       std::vector<Vertex<world_dim_>*> created_vertices;
 
@@ -88,7 +87,7 @@ namespace FEAST
       std::vector<Cell<2, space_dim_, world_dim_>*> created_cells;
 
       /// clears all vectors of created entities
-      inline void clear()
+      inline void clear_created()
       {
         created_vertices.clear();
         created_edges.clear();
@@ -101,9 +100,8 @@ namespace FEAST
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
-    class SubdivisionData<3, space_dim_, world_dim_>
+    struct SubdivisionData<3, space_dim_, world_dim_>
     {
-    public:
       /// new vertices created during subdivision
       std::vector<Vertex<world_dim_>*> created_vertices;
 
@@ -123,7 +121,7 @@ namespace FEAST
       std::vector<Cell<3, space_dim_, world_dim_>*> created_cells;
 
       /// clears all vectors of created entities
-      inline void clear()
+      inline void clear_created()
       {
         created_vertices.clear();
         created_edges.clear();
@@ -138,7 +136,10 @@ namespace FEAST
     *
     * While vertices are common to all cell dimensions, edges and faces do not exist in all dimensions. So,
     * getter and setter routines for these entities cannot be provided in the general Cell class.
-    * Alternative would be to specialise the complete Cell class by cell dimension.
+    * The alternative would be to specialise the complete Cell class by cell dimension.
+    * Why do we need this interface already in the Cell class? Since we must be able to do something like
+    *   face(iface)->child(0)->edge(1)
+    * where child(0) is of type Cell<2, ...> (and not, e.g., of type Quad<...>!).
     */
     template<
       unsigned char cell_dim_,
@@ -224,11 +225,12 @@ namespace FEAST
     {
     private:
 
+      /// parent of this cell
       Cell* _parent;
+      /// number of children (when zero, then the cell is called active)
       unsigned char _num_children;
+      /// array of children of this cell
       Cell** _children;
-
-
     protected:
 
       /**

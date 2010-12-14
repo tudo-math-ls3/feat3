@@ -108,11 +108,15 @@ namespace FEAST
       /// subdivision routine splitting a tri and storing parent/child information
       inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>& subdiv_data)
       {
-        if(this->num_children() > 0)
+        // assure that this cell has not been divided yet
+        if(!this->active())
         {
-          std::cerr << "Tri " << this->index() << " cannot be subdivided twice! Aborting program.";
+          std::cerr << "Tri " << this->index() << " is already subdivided! Aborting program.";
           exit(1);
         }
+
+        // clear all vectors of created entities in the SubdivisionData object
+        subdiv_data.clear_created();
 
         std::cerr << "Subdivision for triangles not implemented yet!!" << std::endl;
         // TODO: subdivion code

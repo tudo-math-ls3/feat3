@@ -72,13 +72,15 @@ namespace FEAST
       /// subdivision routine splitting an edge into two and storing parent/child information
       inline void subdivide(SubdivisionData<1, space_dim_, world_dim_>& subdiv_data)
       {
-        subdiv_data.clear();
-
-        if(this->num_children() > 0)
+        // assure that this cell has not been divided yet
+        if(!this->active())
         {
           std::cerr << "Edge " << this->index() << " is already subdivided! Aborting program.";
           exit(1);
         }
+
+        // clear all vectors of created entities in the SubdivisionData object
+        subdiv_data.clear_created();
 
         // create new vertex as mid point of this edge
         double p[world_dim_];

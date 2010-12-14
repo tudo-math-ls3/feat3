@@ -112,19 +112,21 @@ namespace FEAST
 // via the information in the SubdivisionData object.
       inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>& subdiv_data)
       {
-        subdiv_data.clear();
+        // assure that this cell has not been divided yet
+        if(!this->active())
+        {
+          std::cerr << "Quad " << this->index() << " is already subdivided! Aborting program.";
+          exit(1);
+        }
+
+        // clear all vectors of created entities in the SubdivisionData object
+        subdiv_data.clear_created();
 
         /// vertices that this action creates and/or reuses
         Vertex_* new_vertices[5];
 
         /// edges that this action creates and/or reuses
         Cell<1, space_dim_, world_dim_>* new_edges[12];
-
-        if(this->num_children() > 0)
-        {
-          std::cerr << "Quad " << this->index() << " cannot be subdivided twice! Aborting program.";
-          exit(1);
-        }
 
         // local numbering (old and new)
         //         k2                                       e5     e4
