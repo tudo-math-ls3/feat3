@@ -231,6 +231,201 @@ namespace FEAST
       unsigned char _num_children;
       /// array of children of this cell
       Cell** _children;
+
+
+
+
+
+
+
+
+// COMMENT_HILMAR: Das ist 2D-spezifischer Code! Der muss woanders hin!
+// Wohin?
+// Routinen:
+//    void update_edge_neighbours()
+//
+//    void set_edge_neighbours(
+//      BaseMeshItem1D<2>* shared_edge,
+//      BaseMeshCell* neighbour)
+//
+//    void get_cells_along_edge_ccw(vector<Cell*>, Edge shared_edge)
+//       --> Cell2D spezifisch, kein neighbour-Zugriff
+//
+//    void get_children_at_edge_ccw(
+//      unsigned char num_cells_at_edge&,
+//      std::vector<Cell*>& cell_children_at_edge,
+//      std::vector<Edge*>& edge_children_at_edge,
+//      Edge* edge)
+//       --> Cell2D spezifisch, kein neighbour-Zugriff
+
+//    void get_edge_children_ccw(Edge* edge, Edge* children_ordered[])
+//       --> Cell2D-spezifisch, kein neighbour-Zugriff
+
+
+//    void update_edge_neighbours()
+//    {
+//      for(int iedge(0) ; iedge < num_edges() ; ++iedge)
+//      {
+//        if (num_edge_neighbours(iedge) > 0)
+//        {
+//          BaseMeshItem1D<2>* shared_edge = edge(iedge);
+//          // get the parent cell of the neighbour cells that has the same refinement level as this cell
+//          // TODO: get rid of dynamic_cast!
+//          BaseMeshCell* neighbour =
+//            dynamic_cast<BaseMeshCell*>(edge_neighbour(iedge, 0)->parent(refinement_level()));
+//
+//          set_edge_neighbours(shared_edge, neighbour);
+//        }
+//      }
+//    }
+//
+//    void set_edge_neighbours(
+//      BaseMeshItem1D<2>* shared_edge,
+//      BaseMeshCell* neighbour)
+//    {
+//      if (active() && neighbour->active())
+//      {
+//        // none of the two cells has children
+//        // set neighbourhood directly
+//        unsigned char local_index = get_local_edge_index(shared_edge);
+//        edge_neighbours(local_index).clear();
+//        edge_neighbours(local_index).push_back(neighbour);
+//        local_index = neighbour->get_local_edge_index(shared_edge);
+//        neighbour->edge_neighbours(local_index).clear();
+//        neighbour->edge_neighbours(local_index).push_back(this);
+//      }
+//      else if (active())
+//      {
+//        // this cell has no children, the neighbour has children
+//        std::vector<BaseMeshCell*> cells_at_edge;
+//        // Set in all neighbour cells along shared edge this cell as neighbour. While doing this, store all these
+//        // cells in the vector cells_at_edge. This is done in ccw-fashion w.r.t. the orientation of the neighbour cell.
+//        neighbour->set_edge_neighbour(shared_edge, this, cells_at_edge);
+//        // get local index of the edge in this cell
+//        unsigned char local_index = get_local_edge_index(shared_edge);
+//        edge_neighbours(local_index).clear();
+//        // Now store all neighbour cells (stored in cells_at_edge) along shared edge as neighbours. Since they have
+//        // been stored in ccw-fashion (w.r.t. the neigbour cell), the order has to be reversed.
+//        for(int i(cells_at_edge.size()) ; i >= 0 ; --i)
+//        {
+//          edge_neighbours(local_index).push_back(cells_at_edge[i]);
+//        }
+//      }
+//      else if (neighbour->active())
+//      {
+//        // this cell has children, the neighbour has no children
+//      }
+//      else
+//      {
+//        // both cells have children
+//      }
+//    }
+
+
+//    inline void set_edge_neighbour(
+//      std::vector<BaseMeshCell*>& cells_at_edge,
+//      BaseMeshItem1D<2>* shared_edge,
+//      BaseMeshCell* neighbour)
+//    {
+//
+//    }
+
+
+
+//    inline void get_cells_along_edge_ccw(
+//      std::vector<Cell*>& cells_at_edge,
+//      BaseMeshItem1D<2>* shared_edge)
+//    {
+//      assert(contains(shared_edge));
+//      if (active())
+//      {
+//        cells_at_edge.push_back(this);
+//      }
+//      else
+//      {
+////        BaseMeshItem1D<2>* edge_children_ordered[2];
+////        get_edge_children_ccw(cshared_edge, edge_children_ordered);
+//
+//
+//        int num_cells_at_edge;
+//        std::vector<BaseMeshCell*> cell_children_at_edge;
+//        std::vector<BaseMeshItem1D*> edge_children_at_edge;
+//
+//        get_children_at_edge_ccw(num_cells_at_edge, cell_children_at_edge, edge_children_at_edge, shared_edge);
+//        ???.get_cells_along_edge_ccw(edge_children_ordered[0], cells_at_edge);
+//        ???.get_cells_along_edge_ccw(edge_children_ordered[1], cells_at_edge);
+//      }
+//    }
+
+
+//    // collects the direct cell and edge children of the cell along the given edge
+//    // one-to-one correspondence:
+//    // The local edge of i-th cell child, that is a child of the given edge, is stored at the i-th
+//    // position of edge_children_at_edge[]. I.e., in the ASCII art, the two vectors are:
+//    //   cell_children_at_edge = [c0, c1]
+//    //   edge_children_at_edge = [e0, e1]
+//    // (and not, e.g., edge_children_at_edge = [e1, e0]).
+//    // ---------
+//    //  e0 |
+//    //     | c0
+//    // e   -----
+//    //     | c1
+//    //  e1 |
+//    // --------
+//    // In the special case of an edge neighbour that only shares a vertex with the edge
+//    // -----------
+//    //  e0 |c0 / |
+//    //     | /   |
+//    // e   v   c1|
+//    //     | \   |
+//    //  e1 |c2 \ |
+//    // -----------
+//    // a nullptr is stored in the edge array, i.e.
+//    //   cell_children_at_edge = [c0, c1, c2]
+//    //   edge_children_at_edge = [e0,  0, e1]
+//    void get_children_at_edge_ccw(
+//      short num_cells_at_edge&,
+//      std::vector<BaseMeshCell*>& cell_children_at_edge,
+//      std::vector<BaseMeshItem1D*>& edge_children_at_edge,
+//      BaseMeshItem1D<2>* edge)
+//    {
+//      // may only be called when the cell actually has children
+//      assert(!active());
+//
+//    }
+
+//    void get_edge_children_ccw(BaseMeshItem1D<2>* edge, BaseMeshItem1D<2>* children_ordered[])
+//    {
+//      // assumption: edge->child(i) is incident with edge->vertex(i), i = 0,1
+//      assert(!edge->active());
+//      if (edge_orientation_ccw(edge))
+//      {
+//        children_ordered[0] = edge->child(0);
+//        children_ordered[1] = edge->child(1);
+//      }
+//      else
+//      {
+//        children_ordered[0] = edge->child(1);
+//        children_ordered[1] = edge->child(0);
+//      }
+//    }
+//
+//    inline bool edge_orientation_ccw(BaseMeshItem1D<2>* edge)
+//    {
+//      unsigned char local_index = get_local_edge_index(edge);
+//      return (edge->vertex(0) == vertex(local_index));
+//    }
+//
+//    inline bool edge_orientation_ccw(unsigned char iedge)
+//    {
+//      return (edge(iedge)->vertex(0) == vertex(iedge));
+//    }
+
+
+
+
+
+
     protected:
 
       /**
