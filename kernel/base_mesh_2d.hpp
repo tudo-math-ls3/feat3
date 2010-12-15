@@ -1,13 +1,3 @@
-//ENH: some changes
-//
-//- Cells store subcells in an array of the general type, not of the specific one.
-//  Example: We use
-//    Cell<2, space_dim_, world_dim_> _faces[6]
-//  instead of
-//    Quad<space_dim_, world_dim_> _faces[6]
-//  although the faces are actually quads. Thus we can avoid manual downcasts. For 2D cells it
-//  means, that all edges are stored as Cell<1, ...> and not as Edge<...>.
-
 #pragma once
 #ifndef KERNEL_BASE_MESH_2D_HPP
 #define KERNEL_BASE_MESH_2D_HPP 1
