@@ -1,3 +1,13 @@
+//ENH: some changes
+//
+//- Cells store subcells in an array of the general type, not of the specific one.
+//  Example: We use
+//    Cell<2, space_dim_, world_dim_> _faces[6]
+//  instead of
+//    Quad<space_dim_, world_dim_> _faces[6]
+//  although the faces are actually quads. Thus we can avoid manual downcasts. For 2D cells it
+//  means, that all edges are stored as Cell<1, ...> and not as Edge<...>.
+
 #pragma once
 #ifndef KERNEL_BASE_MESH_2D_HPP
 #define KERNEL_BASE_MESH_2D_HPP 1
@@ -6,6 +16,7 @@
 #include <iostream> // for std::ostream
 #include <cassert>  // for assert()
 #include <vector>   // for std::vector
+#include <typeinfo>  // for typeid()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -38,7 +49,7 @@ namespace FEAST
       typedef Edge<2, world_dim_> Edge_;
 
       /// shortcut for type Cell<1, 2, world_dim_>
-      typedef Cell<1, 2, world_dim_> Cell1D_;
+      typedef Cell<1, 2, world_dim_> Cell_1D_;
 
       /// shortcut for type Cell<2, 2, world_dim_>
       typedef Cell<2, 2, world_dim_> Cell_;
@@ -53,7 +64,7 @@ namespace FEAST
       std::vector<Vertex_*> _vertices;
 
       /// array of edges
-      std::vector<Cell1D_*> _edges;
+      std::vector<Cell_1D_*> _edges;
 
       /// array of cells
       std::vector<Cell_*> _cells;
@@ -209,32 +220,26 @@ namespace FEAST
         // create the first quad cell
         Quad<2, world_dim_>* quad =
           new Quad<2, world_dim_>(_vertices[3], _vertices[4], _vertices[1], _vertices[0],
-                                  (Edge_*)_edges[6], (Edge_*)_edges[3], (Edge_*)_edges[0], (Edge_*)_edges[2]);
-    // COMMENT_HILMAR: Die downcasts hier sind nur ein Hack, der nicht wirklich noetig ist. Problem: Das BaseMesh
-    // speichert die edges als Cell<1, 2, world_dim_> ab, waehrend das Quad aber den Typ Edge<2, world_dim_> erwartet.
-    // Eigentlich muesset man also die erzeugten edges in einem Vektor/array von Edge<2, world_dim_> zwischenspeichern
-    // und mit diesem die Quads und Tris bauen. Dazu war ich aber zu faul, da dieser Code hier sowieso wegfliegt, wenn
-    // wir einen echten Datei-Parser schreiben. (Zum Unterschied zwischen Cell<1, space_dim_, world_dim_> und
-    // Edge<space_dim_, world_dim,> siehe Kommentar der Klasse Edge<space_dim_, world_dim_>.)
+                                  _edges[6], _edges[3], _edges[0], _edges[2]);
         add(quad);
 
         // create the second quad cell
         quad = new Quad<2, world_dim_>(_vertices[4], _vertices[5], _vertices[2], _vertices[1],
-                                       (Edge_*)_edges[7], (Edge_*)_edges[4], (Edge_*)_edges[1], (Edge_*)_edges[3]);
+                                       _edges[7], _edges[4], _edges[1], _edges[3]);
         add(quad);
 
         // create the first tri cell
         Tri<2, world_dim_>* tri = new Tri<2, world_dim_>(_vertices[5], _vertices[6], _vertices[2],
-                                                         (Edge_*)_edges[8], (Edge_*)_edges[5], (Edge_*)_edges[4]);
+                                                         _edges[8], _edges[5], _edges[4]);
         add(tri);
         // create the second tri cell
         tri = new Tri<2, world_dim_>(_vertices[7], _vertices[8], _vertices[5],
-                                     (Edge_*)_edges[12], (Edge_*)_edges[10], (Edge_*)_edges[9]);
+                                     _edges[12], _edges[10], _edges[9]);
         add(tri);
 
         // create the third quad cell
         quad = new Quad<2, world_dim_>(_vertices[8], _vertices[9], _vertices[6], _vertices[5],
-                                       (Edge_*)_edges[13], (Edge_*)_edges[11], (Edge_*)_edges[8], (Edge_*)_edges[10]);
+                                       _edges[13], _edges[11], _edges[8], _edges[10]);
         add(quad);
 
         // set neighbourhood information (emulated file parser part 2)
@@ -329,7 +334,7 @@ namespace FEAST
       }
 
       /// returns edge at given index
-      inline Cell1D_* edge(global_index_t const index)
+      inline Cell_1D_* edge(global_index_t const index)
       {
         assert(index < _edges.size());
         return _edges[index];
@@ -350,7 +355,7 @@ namespace FEAST
       }
 
       /// adds given edge to base mesh and sets its index
-      inline void add(Cell1D_* e)
+      inline void add(Cell_1D_* e)
       {
         _edges.push_back(e);
         e->set_index(_edges.size()-1);
@@ -370,9 +375,9 @@ namespace FEAST
       }
 
       /// deletes given edge
-      inline void remove(Cell1D_* e)
+      inline void remove(Cell_1D_* e)
       {
-        remove<Cell1D_*>(_edges, e);
+        remove<Cell_1D_*>(_edges, e);
       }
 
       /// deletes given cell

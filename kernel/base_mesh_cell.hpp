@@ -150,12 +150,19 @@ namespace FEAST
     };
 
 
-    /// function interface for 1D cells (empty since vertex-related functions are already defined in Cell itself)
+    /// function interface for 1D cells
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
     class CellInterface<1, space_dim_, world_dim_>
     {
+    public:
+      /// returns number of vertices
+      virtual unsigned char num_vertices() const = 0;
+
+      /// returns vertex at given index
+// TODO: pointer oder referenz auf pointer zurueckgeben? (ueberall sonst dann ggfls. auch anpassen)
+      virtual Vertex<world_dim_>* vertex(unsigned char const index) const = 0;
     };
 
 
@@ -166,9 +173,14 @@ namespace FEAST
     class CellInterface<2, space_dim_, world_dim_>
     {
     public:
+      /// returns number of vertices
+      virtual unsigned char num_vertices() const = 0;
+
+      /// returns vertex at given index
+      virtual Vertex<world_dim_>* vertex(unsigned char const index) const = 0;
+
       /// returns number of edges
       virtual unsigned char num_edges() const = 0;
-
 
       /// returns edge at given index
       virtual Cell<1, space_dim_, world_dim_>* edge(unsigned char const index) const = 0;
@@ -183,17 +195,20 @@ namespace FEAST
     class CellInterface<3, space_dim_, world_dim_>
     {
     public:
+      /// returns number of vertices
+      virtual unsigned char num_vertices() const = 0;
+
+      /// returns vertex at given index
+      virtual Vertex<world_dim_>* vertex(unsigned char const index) const = 0;
+
       /// returns number of edges
       virtual unsigned char num_edges() const = 0;
-
 
       /// returns edge at given index
       virtual Cell<1, space_dim_, world_dim_>* edge(unsigned char const index) const = 0;
 
-
       /// returns number of faces
       virtual unsigned char num_faces() const = 0;
-
 
       /// returns face at given index
       virtual Cell<2, space_dim_, world_dim_>* face(unsigned char const index) const = 0;
@@ -235,18 +250,16 @@ namespace FEAST
 
 
 
-
-
-
-
 // COMMENT_HILMAR: Das ist 2D-spezifischer Code! Der muss woanders hin!
 // Wohin?
 // Routinen:
 //    void update_edge_neighbours()
+//       --> Cell2D spezifisch, erfordert neighbour-Zugriff
 //
 //    void set_edge_neighbours(
-//      BaseMeshItem1D<2>* shared_edge,
-//      BaseMeshCell* neighbour)
+//      Edge* shared_edge,
+//      Cell* neighbour)
+//       --> Cell2D spezifisch, erfordert neighbour-Zugriff
 //
 //    void get_cells_along_edge_ccw(vector<Cell*>, Edge shared_edge)
 //       --> Cell2D spezifisch, kein neighbour-Zugriff
@@ -420,12 +433,6 @@ namespace FEAST
 //    {
 //      return (edge(iedge)->vertex(0) == vertex(iedge));
 //    }
-
-
-
-
-
-
     protected:
 
       /**
@@ -502,15 +509,6 @@ namespace FEAST
       {
         _parent = nullptr;
       }
-
-
-      /// returns number of vertices
-      virtual unsigned char num_vertices() const = 0;
-
-
-      /// returns vertex at given index
-// TODO: pointer oder referenz auf pointer zurueckgeben?
-      virtual Vertex<world_dim_>* vertex(unsigned char const index) const = 0;
 
 
       /// returns parent

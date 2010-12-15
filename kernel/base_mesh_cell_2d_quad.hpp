@@ -5,6 +5,7 @@
 // includes, system
 #include <iostream> // for std::ostream
 #include <cassert>  // for assert()
+#include <typeinfo>  // for typeid()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -33,18 +34,18 @@ namespace FEAST
     class Quad
       : public Cell<2, space_dim_, world_dim_>
     {
-      /// shortcuts for type Vertex<world_dim_>
+      /// shortcut for type Vertex<world_dim_>
       typedef Vertex<world_dim_> Vertex_;
 
-      /// shortcuts for type Edge<space_dim_, world_dim_>
-      typedef Edge<space_dim_, world_dim_> Edge_;
+      /// shortcut for type Cell<1, space_dim_, world_dim_>
+      typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
     private:
       /// vertices of the quad
       Vertex_* _vertices[4];
 
       /// edges of the quad
-      Edge_* _edges[4];
+      Cell_1D_* _edges[4];
 
 
       /// returns true when edge with local index iedge has the same orientation as the quad
@@ -58,7 +59,7 @@ namespace FEAST
 
     public:
       /// CTOR
-      Quad(Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3, Edge_* e0, Edge_* e1, Edge_* e2, Edge_* e3)
+      Quad(Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3, Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3)
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
@@ -68,9 +69,15 @@ namespace FEAST
         _edges[1] = e1;
         _edges[2] = e2;
         _edges[3] = e3;
+        // assure that the edges are in fact of type Edge<space_dim_, world_dim_>, and not "only"
+        // of type Cell<1, space_dim_, world_dim_>
+        for(int i(0) ; i < 4 ; ++i)
+        {
+          assert(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>));
+        }
 
-        unsigned char temp[2] = {4,4};
-        this->_init_neighbours(2, temp);
+        unsigned char num_subcells_per_subdimension[2] = {4,4};
+        this->_init_neighbours(2, num_subcells_per_subdimension);
 // TODO: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<2, space_dim_, world_dim_>({4,4})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
@@ -100,7 +107,7 @@ namespace FEAST
 
 
       /// returns edge at given index
-      inline Edge_* edge(unsigned char const index) const
+      inline Cell_1D_* edge(unsigned char const index) const
       {
         assert(index < num_edges());
         return _edges[index];
@@ -126,8 +133,7 @@ namespace FEAST
         Vertex_* new_vertices[5];
 
         /// edges that this action creates and/or reuses
-//        Cell<1, space_dim_, world_dim_>* new_edges[12];
-        Edge_* new_edges[12];
+        Cell_1D_* new_edges[12];
 
         // local numbering (old and new)
         //         k2                                       e5     e4
@@ -187,33 +193,14 @@ namespace FEAST
           if(_edge_has_correct_orientation(iedge))
           {
             // if the edge has the orientation of the quad, then child 0 is the first edge
-// COMMENT_HILMAR: Tja... wenn wir new_edges als array von Edge<space_dim_, world_dim_> statt
-// Cell<1, space_dim_, world_dim_> abspeichern, dann sparen wir uns zwar die dynamic_casts bei der Quad-Generierung
-// weiter unten, aber dafür handeln wir sie uns hier ein (da childs von Edge_ nunmal als Cell<1, ...> abgespeichert sind).
-// Ich denke aber, dass das hier ok ist bzw. sogar sein muss. Man stelle sich wieder den 3D-Fall vor: Ein Hexa soll in
-// Hexas zerhackt werden. Man stellt fest, dass die Nachbarzelle schon zerhackt wurde, man kann also die schon
-// vorhandenen Kinder des gemeinsamen Faces (=Quad) wiederverwenden. Die Nachbarzelle kann das gemeinsame Face aber
-// potentiell in Quads *oder* Tris zerhackt haben! Das *muss* hier eh ueberprueft werden! Denn wenn das Face in Tris
-// zerhackt wurde, dann laesst sich das Hexa natuerlich gar nicht in Hexas zerhacken!
-// Tatsaechlich muss man sogar den Typ der Face-Kinder erst abfragen! Denn wenn es sich um den falschen Typ handelt,
-// soll das Programm ja nicht brutal beim dynamic_cast abkacken, sondern es soll entsprechend reagiert werden: Sprich
-// statt Zerhacken in Hexas wird eine andere subdivsion durchgefuehrt (-->non-critical exception!).
-// Oder stellt schon die aufrufende BaseMesh-Routine sicher, dass der richtige subdivision-Typ durchgefuehrt wird?
-// Oder heisst die Anweisung an die subdivide-Routine: "Zerteile dich entsprechend deiner schon zerteilten Nachbarn.",
-// und die subdivide-Routine muss dynamisch abfragen, in welche Zell-Typen ihre faces schon unterteilt wurden und sich
-// entsprechend die subdivision selbst definieren?
-// Keine Ahnung, was davon mal relevant wird; wir können die Zerteilungsstrategie jetzt noch nicht in all ihren
-// Facetten ueberblicken.
-// Meine Bauchmeinung: dynamic_cast ist hier nicht vermeidbar. Ich seh einfach nicht, wie man den allein mit Hilfe
-// von virtuellen Routinen etc. los werden kann.
-            new_edges[2*iedge]   = dynamic_cast<Edge_*>(edge(iedge)->child(0));
-            new_edges[2*iedge+1] = dynamic_cast<Edge_*>(edge(iedge)->child(1));
+            new_edges[2*iedge]   = edge(iedge)->child(0);
+            new_edges[2*iedge+1] = edge(iedge)->child(1);
           }
           else
           {
             // if the edge does not have the orientation of the quad, then child 1 is the first edge.
-            new_edges[2*iedge]   = dynamic_cast<Edge_*>(edge(iedge)->child(1));
-            new_edges[2*iedge+1] = dynamic_cast<Edge_*>(edge(iedge)->child(0));
+            new_edges[2*iedge]   = edge(iedge)->child(1);
+            new_edges[2*iedge+1] = edge(iedge)->child(0);
           }
 // COMMENT_HILMAR: Beachte, dass wir auch in dem Fall, dass eine Kante schon Kinder hatte, *nicht* annehmen koennen,
 // dass sie vom Nachbarelement erstellt worden ist. Beispiel: 2 benachbarte Zellen C0 und C1. C0 zerteilt sich, hat
@@ -244,7 +231,7 @@ namespace FEAST
 
         for (unsigned char i(0) ; i < 4 ; ++i)
         {
-          new_edges[i+8] = new Edge_(new_vertices[i], new_vertices[4]);
+          new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4]);
           subdiv_data.created_edges.push_back(new_edges[i+8]);
         }
 
@@ -252,7 +239,6 @@ namespace FEAST
         this->_set_num_children(4);
 
         // finally, create and add new quads
-        // TODO: get rid of manual downcasts here!
         _set_child(0, new Quad(vertex(0), new_vertices[0], new_vertices[4], new_vertices[3],
                                new_edges[0], new_edges[8], new_edges[11], new_edges[7]));
         _set_child(1, new Quad(new_vertices[0], vertex(1), new_vertices[1], new_vertices[4],
@@ -261,21 +247,6 @@ namespace FEAST
                                new_edges[9], new_edges[3], new_edges[4], new_edges[10]));
         _set_child(3, new Quad(new_vertices[3], new_vertices[4], new_vertices[2], vertex(3),
                                new_edges[11], new_edges[10], new_edges[5], new_edges[6]));
-
-// COMMENT_HILMAR: Version wenn wir new_edges als array von Cell<1, space_dim_, world_dim_> anstatt
-// Edge<space_dim_, world_dim_> abspeichern
-//        _set_child(0, new Quad(vertex(0), new_vertices[0], new_vertices[4], new_vertices[3],
-//                               dynamic_cast<Edge_*>(new_edges[0]), dynamic_cast<Edge_*>(new_edges[8]),
-//                               dynamic_cast<Edge_*>(new_edges[11]), dynamic_cast<Edge_*>(new_edges[7])));
-//        _set_child(1, new Quad(new_vertices[0], vertex(1), new_vertices[1], new_vertices[4],
-//                               dynamic_cast<Edge_*>(new_edges[1]), dynamic_cast<Edge_*>(new_edges[2]),
-//                               dynamic_cast<Edge_*>(new_edges[9]), dynamic_cast<Edge_*>(new_edges[8])));
-//        _set_child(2, new Quad(new_vertices[4], new_vertices[1], vertex(2), new_vertices[2],
-//                               dynamic_cast<Edge_*>(new_edges[9]), dynamic_cast<Edge_*>(new_edges[3]),
-//                               dynamic_cast<Edge_*>(new_edges[4]), dynamic_cast<Edge_*>(new_edges[10])));
-//        _set_child(3, new Quad(new_vertices[3], new_vertices[4], new_vertices[2], vertex(3),
-//                               dynamic_cast<Edge_*>(new_edges[11]), dynamic_cast<Edge_*>(new_edges[10]),
-//                               dynamic_cast<Edge_*>(new_edges[5]), dynamic_cast<Edge_*>(new_edges[6])));
 
         for (unsigned char i(0) ; i < 4 ; ++i)
         {
@@ -292,7 +263,7 @@ namespace FEAST
         Item::print(stream);
         stream << ": [";
 
-        for(int i(0) ; i < 4 ; ++i)
+        for(int i(0) ; i < num_edges() ; ++i)
         {
           stream << "E" << _edges[i]->index();
           if(_edge_has_correct_orientation(i))
@@ -303,7 +274,7 @@ namespace FEAST
           {
             stream << "(-)";
           }
-          if(i<3)
+          if(i < num_edges()-1)
           {
             stream << ", ";
           }

@@ -5,6 +5,7 @@
 // includes, system
 #include <iostream> // for std::ostream
 #include <cassert>  // for assert()
+#include <typeinfo>  // for typeid()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -36,15 +37,15 @@ namespace FEAST
       /// shortcuts for type Vertex<world_dim_>
       typedef Vertex<world_dim_> Vertex_;
 
-      /// shortcuts for type Edge<space_dim_, world_dim_>
-      typedef Edge<space_dim_, world_dim_> Edge_;
+      /// shortcut for type Cell<1, space_dim_, world_dim_>
+      typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
     private:
       /// vertices of the triangle
       Vertex_* _vertices[3];
 
       /// edges of the triangle
-      Edge_* _edges[3];
+      Cell_1D_* _edges[3];
 
 
       /// returns true when edge with local index iedge has the same orientation as the quad
@@ -58,7 +59,7 @@ namespace FEAST
 
     public:
       /// CTOR
-      Tri(Vertex_* v0, Vertex_* v1, Vertex_* v2, Edge_* e0, Edge_* e1, Edge_* e2)
+      Tri(Vertex_* v0, Vertex_* v1, Vertex_* v2, Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2)
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
@@ -66,11 +67,18 @@ namespace FEAST
         _edges[0] = e0;
         _edges[1] = e1;
         _edges[2] = e2;
+        // assure that the edges are in fact of type Edge<space_dim_, world_dim_>, and not "only"
+        // of type Cell<1, space_dim_, world_dim_>
+        for(int i(0) ; i < 3 ; ++i)
+        {
+          assert(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>));
+        }
 
-        unsigned char temp[2] = {3,3};
-        this->_init_neighbours(2, temp);
+        unsigned char num_subcells_per_subdimension[2] = {3,3};
+        this->_init_neighbours(2, num_subcells_per_subdimension);
+
 // TODO: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
-//    : CellData<2, space_dim_, world_dim_>({4,4})
+//    : CellData<2, space_dim_, world_dim_>({3,3})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
       }
 
@@ -98,7 +106,7 @@ namespace FEAST
 
 
       /// returns edge at given index
-      inline Edge_* edge(unsigned char const index) const
+      inline Cell_1D_* edge(unsigned char const index) const
       {
         assert(index < num_edges());
         return _edges[index];
@@ -130,7 +138,7 @@ namespace FEAST
         Item::print(stream);
         stream << ": [";
 
-        for(int i(0) ; i < 3 ; ++i)
+        for(int i(0) ; i < num_edges() ; ++i)
         {
           stream << "E" << _edges[i]->index();
           if(_edge_has_correct_orientation(i))
@@ -141,7 +149,7 @@ namespace FEAST
           {
             stream << "(-)";
           }
-          if(i<3)
+          if(i < num_edges()-1)
           {
             stream << ", ";
           }
