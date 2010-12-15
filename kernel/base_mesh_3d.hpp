@@ -14,14 +14,14 @@
 #include <kernel/base_mesh_cell.hpp>
 #include <kernel/base_mesh_cell_1d_edge.hpp>
 #include <kernel/base_mesh_cell_2d_quad.hpp>
-#include <kernel/base_mesh_cell_2d_tri.hpp>
+#include <kernel/base_mesh_cell_3d_hexa.hpp>
 
 namespace FEAST
 {
   namespace BaseMesh
   {
     /**
-    * \brief 2D base mesh
+    * \brief 3D base mesh
     *
     * \author Dominik Goeddeke
     * \author Hilmar Wobker
@@ -30,20 +30,25 @@ namespace FEAST
 // die als Elternklasse fuer BaseMesh1D/2D/3D dient. Und/Oder (aehnlich wie bei Cell) dimension-abhaengige Interfaces
 // definieren.
     template<unsigned char world_dim_>
-    class BaseMesh2D
+    class BaseMesh3D
     {
       /// shortcut for type Vertex<world_dim_>
       typedef Vertex<world_dim_> Vertex_;
 
       /// shortcut for type Edge<2, world_dim_>
-      typedef Edge<2, world_dim_> Edge_;
+      typedef Edge<3, world_dim_> Edge_;
 
-      /// shortcut for type Cell<1, 2, world_dim_>
-      typedef Cell<1, 2, world_dim_> Cell_1D_;
+      /// shortcut for type Cell<1, 3, world_dim_>
+      typedef Cell<1, 3, world_dim_> Cell_1D_;
 
-      /// shortcut for type Cell<2, 2, world_dim_>
-      typedef Cell<2, 2, world_dim_> Cell_;
+      /// shortcut for type Quad<3, world_dim_>
+      typedef Quad<3, world_dim_> Quad_;
 
+      /// shortcut for type Cell<2, 3, world_dim_>
+      typedef Cell<2, 3, world_dim_> Cell_2D_;
+
+      /// shortcut for type Cell<3, 3, world_dim_>
+      typedef Cell<3, 3, world_dim_> Cell_;
 
     private:
 
@@ -55,6 +60,9 @@ namespace FEAST
 
       /// array of edges
       std::vector<Cell_1D_*> _edges;
+
+      /// array of faces
+      std::vector<Cell_2D_*> _faces;
 
       /// array of cells
       std::vector<Cell_*> _cells;
@@ -86,83 +94,94 @@ namespace FEAST
       * constructors & destructors *
       *****************************/
       /// default CTOR, currently generates a test mesh
-      BaseMesh2D()
+      BaseMesh3D()
       {
-        /* Base mesh example consisting of three quads and two tris:
-        *    v0---e0---v1---e1---v2 \.
-        *    |          |         |    \.
-        *   e2    c0   e3   c1   e4  c2  \ e5
-        *    |          |         |         \.
-        *    v3---e6---v4---e7---v5----e8---v6
-        *                      /  |         |
-        *                  e9/ c3 e10  c4  e11
-        *                /        |         |
-        *              v7---e12--v8---e13---v9
-        */
+        // Base mesh example consisting of one hexa, faces viewed from inside the hexa in direction (0, -1, 0)
+        // bottom face (x3=0) [0,0,0]x[1,1,0]      top face (x3=1) [0,0,1]x[1,1,1]
+        //  (0,1,0)    (1,1,0)                     (0,0,1)     (1,0,1)
+        //    v3---e2---v2                            v4---e6---v7
+        //    |          |                            |          |
+        //   e3    f0   e1                           e7    f1   e5
+        //    |          |                            |          |
+        //    v0---e0---v1                            v5---e4---v6
+        //  (0,0,0)    (1,0,0)                     (0,1,1)     (1,1,1)
+        //
+        // front face (x2=0) [0,0,0]x[1,0,1]      back face (x2=1) [0,1,0]x[1,1,1]
+        //  (1,0,1)    (0,0,1)                     (0,1,1)     (1,1,1)
+        //    v7---e6---v4                            v5---e4---v6
+        //    |          |                            |          |
+        //   e9    f2   e8                           e11   f3   e10
+        //    |          |                            |          |
+        //    v1---e0---v0                            v3---e2---v2
+        //  (1,0,0)    (0,0,0)                     (0,1,0)     (1,1,0)
+        //
+        // right face (x1=0) [0,0,0]x[0,1,1]      left face (x2=1) [0,1,0]x[1,1,1]
+        //  (1,0,1)    (0,0,1)                     (0,1,1)     (1,1,1)
+        //    v4---e7---v5                            v6---e5---v7
+        //    |          |                            |          |
+        //   e8    f4   e11                          e10   f5   e9
+        //    |          |                            |          |
+        //    v0---e3---v3                            v2---e1---v1
+        //  (1,0,0)    (0,0,0)                     (0,1,0)     (1,1,0)
 
-        // create the ten vertices
-        // v0
+        // create the 8 vertices
+        // v0 = (0,0,0)
         Vertex_* v = new Vertex_();
         v->set_coord(0, 0.0);
-        v->set_coord(1, 1.0);
+        v->set_coord(1, 0.0);
+        v->set_coord(2, 0.0);
         add(v);
 
-        // v1
+        // v1 = (1,0,0)
+        v = new Vertex_();
+        v->set_coord(0, 1.0);
+        v->set_coord(1, 0.0);
+        v->set_coord(2, 0.0);
+        add(v);
+
+        // v2 = (1,1,0)
         v = new Vertex_();
         v->set_coord(0, 1.0);
         v->set_coord(1, 1.0);
+        v->set_coord(2, 0.0);
         add(v);
 
-        // v2
-        v = new Vertex_();
-        v->set_coord(0, 2.0);
-        v->set_coord(1, 1.0);
-        add(v);
-
-        // v3
+        // v3 = (0,1,0)
         v = new Vertex_();
         v->set_coord(0, 0.0);
-        v->set_coord(1, 0.0);
+        v->set_coord(1, 1.0);
+        v->set_coord(2, 0.0);
         add(v);
 
-        // v4
+        // v4 = (0,0,1)
+        Vertex_* v = new Vertex_();
+        v->set_coord(0, 0.0);
+        v->set_coord(1, 0.0);
+        v->set_coord(2, 1.0);
+        add(v);
+
+        // v5 = (0,1,1)
+        v = new Vertex_();
+        v->set_coord(0, 0.0);
+        v->set_coord(1, 1.0);
+        v->set_coord(2, 1.0);
+        add(v);
+
+        // v6 = (1,1,1)
+        v = new Vertex_();
+        v->set_coord(0, 1.0);
+        v->set_coord(1, 1.0);
+        v->set_coord(2, 1.0);
+        add(v);
+
+        // v7 = (1,0,1)
         v = new Vertex_();
         v->set_coord(0, 1.0);
         v->set_coord(1, 0.0);
+        v->set_coord(2, 1.0);
         add(v);
 
-        // v5
-        v = new Vertex_();
-        v->set_coord(0, 2.0);
-        v->set_coord(1, 0.0);
-        add(v);
-
-        // v6
-        v = new Vertex_();
-        v->set_coord(0, 3.0);
-        v->set_coord(1, 0.0);
-        add(v);
-
-        // v7
-        v = new Vertex_();
-        v->set_coord(0, 1.0);
-        v->set_coord(1, -1.0);
-        add(v);
-
-        // v8
-        v = new Vertex_();
-        v->set_coord(0, 2.0);
-        v->set_coord(1, -1.0);
-        add(v);
-
-        // v9
-        v = new Vertex_();
-        v->set_coord(0, 3.0);
-        v->set_coord(1, -1.0);
-        add(v);
-
-
-        // create the 14 edges
+        // create the 12 edges
         // e0
         Edge_* e = new Edge_(_vertices[0], _vertices[1]);
         add(e);
@@ -170,90 +189,66 @@ namespace FEAST
         e = new Edge_(_vertices[1], _vertices[2]);
         add(e);
         // e2
-        e = new Edge_(_vertices[3], _vertices[0]);
+        e = new Edge_(_vertices[2], _vertices[3]);
         add(e);
         // e3
-        e = new Edge_(_vertices[1], _vertices[4]);
+        e = new Edge_(_vertices[3], _vertices[0]);
         add(e);
+
         // e4
-        e = new Edge_(_vertices[2], _vertices[5]);
-        add(e);
-        // e5
-        e = new Edge_(_vertices[2], _vertices[6]);
-        add(e);
-        // e6
-        e = new Edge_(_vertices[3], _vertices[4]);
-        add(e);
-        // e7
-        e = new Edge_(_vertices[5], _vertices[4]);
-        add(e);
-        // e8
         e = new Edge_(_vertices[5], _vertices[6]);
         add(e);
+        // e5
+        e = new Edge_(_vertices[6], _vertices[7]);
+        add(e);
+        // e6
+        e = new Edge_(_vertices[7], _vertices[4]);
+        add(e);
+        // e7
+        e = new Edge_(_vertices[4], _vertices[5]);
+        add(e);
+
+        // e8
+        e = new Edge_(_vertices[0], _vertices[4]);
+        add(e);
         // e9
-        e = new Edge_(_vertices[7], _vertices[5]);
+        e = new Edge_(_vertices[7], _vertices[1]);
         add(e);
         // e10
-        e = new Edge_(_vertices[8], _vertices[5]);
+        e = new Edge_(_vertices[2], _vertices[6]);
         add(e);
         // e11
-        e = new Edge_(_vertices[6], _vertices[9]);
-        add(e);
-        // e12
-        e = new Edge_(_vertices[7], _vertices[8]);
-        add(e);
-        // e13
-        e = new Edge_(_vertices[8], _vertices[9]);
+        e = new Edge_(_vertices[5], _vertices[3]);
         add(e);
 
-        // create the first quad cell
-        Quad<2, world_dim_>* quad =
-          new Quad<2, world_dim_>(_vertices[3], _vertices[4], _vertices[1], _vertices[0],
-                                  _edges[6], _edges[3], _edges[0], _edges[2]);
-        add(quad);
-
-        // create the second quad cell
-        quad = new Quad<2, world_dim_>(_vertices[4], _vertices[5], _vertices[2], _vertices[1],
-                                       _edges[7], _edges[4], _edges[1], _edges[3]);
-        add(quad);
-
-        // create the first tri cell
-        Tri<2, world_dim_>* tri = new Tri<2, world_dim_>(_vertices[5], _vertices[6], _vertices[2],
-                                                         _edges[8], _edges[5], _edges[4]);
-        add(tri);
-        // create the second tri cell
-        tri = new Tri<2, world_dim_>(_vertices[7], _vertices[8], _vertices[5],
-                                     _edges[12], _edges[10], _edges[9]);
-        add(tri);
-
-        // create the third quad cell
-        quad = new Quad<2, world_dim_>(_vertices[8], _vertices[9], _vertices[6], _vertices[5],
-                                       _edges[13], _edges[11], _edges[8], _edges[10]);
-        add(quad);
-
-        // set neighbourhood information (emulated file parser part 2)
-        _cells[0]->add_neighbour(1, 1, _cells[1]);
-
-        _cells[1]->add_neighbour(1, 3, _cells[0]);
-        _cells[1]->add_neighbour(1, 1, _cells[2]);
-        _cells[1]->add_neighbour(0, 1, _cells[4]);
-        _cells[1]->add_neighbour(0, 1, _cells[3]);
-
-        _cells[2]->add_neighbour(1, 2, _cells[1]);
-        _cells[2]->add_neighbour(1, 0, _cells[4]);
-        _cells[2]->add_neighbour(0, 0, _cells[3]);
-
-        _cells[3]->add_neighbour(1, 1, _cells[4]);
-        _cells[3]->add_neighbour(0, 2, _cells[2]);
-        _cells[3]->add_neighbour(0, 2, _cells[1]);
-
-        _cells[4]->add_neighbour(1, 2, _cells[2]);
-        _cells[4]->add_neighbour(1, 3, _cells[3]);
-        _cells[4]->add_neighbour(0, 3, _cells[1]);
+        // quad face 0
+        Quad_* f = new Quad_(_vertices[0], _vertices[1], _vertices[2], _vertices[3],
+                             _edges[0], _edges[1], _edges[2], _edges[3]);
+        add(f);
+        // quad face 1
+        f = new Quad_(_vertices[5], _vertices[6], _vertices[7], _vertices[4],
+                      _edges[4], _edges[5], _edges[6], _edges[7]);
+        add(f);
+        // quad face 2
+        f = new Quad_(_vertices[1], _vertices[0], _vertices[4], _vertices[7],
+                      _edges[0], _edges[8], _edges[6], _edges[9]);
+        add(f);
+        // quad face 3
+        f = new Quad_(_vertices[3], _vertices[2], _vertices[6], _vertices[5],
+                      _edges[2], _edges[10], _edges[4], _edges[11]);
+        add(f);
+        // quad face 4
+        f = new Quad_(_vertices[0], _vertices[3], _vertices[5], _vertices[4],
+                      _edges[3], _edges[11], _edges[7], _edges[8]);
+        add(f);
+        // quad face 5
+        f = new Quad_(_vertices[2], _vertices[1], _vertices[7], _vertices[6],
+                      _edges[1], _edges[9], _edges[5], _edges[10]);
+        add(f);
       }
 
       /// default destructor
-      ~BaseMesh2D()
+      ~BaseMesh3D()
       {
         // delete all cells and their associated information
         // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about with
@@ -263,6 +258,13 @@ namespace FEAST
         {
           delete _cells.back();
           _cells.pop_back();
+        }
+
+        // delete all faces and their associated information
+        while (!_faces.empty())
+        {
+          delete _faces.back();
+          _faces.pop_back();
         }
 
         // delete all edges and their associated information
@@ -299,6 +301,14 @@ namespace FEAST
         return _edges.size();
       }
 
+      /// returns number of faces in this mesh
+      inline global_index_t num_faces() const
+      {
+        // TODO: potentiell falsch, auch Faces koennen inaktiv sein und duerfen dann beim Transfer zu den Rechenprozessen
+        // nicht mitgezaehlt werden!
+        return _faces.size();
+      }
+
       /// returns number of cells in this mesh (this is potentially expensive)
       inline global_index_t num_cells() const
       {
@@ -329,6 +339,13 @@ namespace FEAST
         return _edges[index];
       }
 
+      /// returns face at given index
+      inline Cell_2D_* edge(global_index_t const index)
+      {
+        assert(index < _faces.size());
+        return _faces[index];
+      }
+
       /// returns cell at given index
       inline Cell_* cell(global_index_t const index) const
       {
@@ -350,6 +367,13 @@ namespace FEAST
         e->set_index(_edges.size()-1);
       }
 
+      /// adds given face to base mesh and sets its index
+      inline void add(Cell_2D_* f)
+      {
+        _faces.push_back(f);
+        f->set_index(_faces.size()-1);
+      }
+
       /// adds given cell to base mesh and sets its index
       inline void add(Cell_* c)
       {
@@ -369,6 +393,12 @@ namespace FEAST
         remove<Cell_1D_*>(_edges, e);
       }
 
+      /// deletes given face
+      inline void remove(Cell_2D_* f)
+      {
+        remove<Cell_2D_*>(_faces, f);
+      }
+
       /// deletes given cell
       inline void remove(Cell_* c)
       {
@@ -384,6 +414,10 @@ namespace FEAST
         for(unsigned int i(0) ; i < subdiv_data.created_edges.size() ; ++i)
         {
           add(subdiv_data.created_edges[i]);
+        }
+        for(unsigned int i(0) ; i < subdiv_data.created_faces.size() ; ++i)
+        {
+          add(subdiv_data.created_faces[i]);
         }
         for(unsigned int i(0) ; i < subdiv_data.created_cells.size() ; ++i)
         {
@@ -418,6 +452,12 @@ namespace FEAST
           _edges[iedge]->print(stream);
           stream << std::endl;
         }
+        stream << num_faces() << " Faces" << std::endl;
+        for (unsigned int iface(0) ; iface < _faces.size() ; ++iface)
+        {
+          _faces[iface]->print(stream);
+          stream << std::endl;
+        }
         stream << num_cells() << " Cells" << std::endl;
         for (unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
@@ -426,7 +466,7 @@ namespace FEAST
         }
         stream << "---------------------------------------------------" << std::endl;
       }
-    }; // class BaseMesh2D
+    }; // class BaseMesh3D
   } // namespace BaseMesh
 } // namespace FEAST
 
