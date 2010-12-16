@@ -32,16 +32,12 @@ namespace FEAST
     template<unsigned char world_dim_>
     class BaseMesh2D
     {
-      /// shortcut for type Vertex<world_dim_>
+      /// shortcuts various cell types to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
-
-      /// shortcut for type Edge<2, world_dim_>
       typedef Edge<2, world_dim_> Edge_;
-
-      /// shortcut for type Cell<1, 2, world_dim_>
       typedef Cell<1, 2, world_dim_> Cell_1D_;
-
-      /// shortcut for type Cell<2, 2, world_dim_>
+      typedef Tri<2, world_dim_> Tri_;
+      typedef Quad<2, world_dim_> Quad_;
       typedef Cell<2, 2, world_dim_> Cell_;
 
 
@@ -207,27 +203,27 @@ namespace FEAST
         add(e);
 
         // create the first quad cell
-        Quad<2, world_dim_>* quad =
-          new Quad<2, world_dim_>(_vertices[3], _vertices[4], _vertices[1], _vertices[0],
+        Quad_* quad =
+          new Quad_(_vertices[3], _vertices[4], _vertices[1], _vertices[0],
                                   _edges[6], _edges[3], _edges[0], _edges[2]);
         add(quad);
 
         // create the second quad cell
-        quad = new Quad<2, world_dim_>(_vertices[4], _vertices[5], _vertices[2], _vertices[1],
+        quad = new Quad_(_vertices[4], _vertices[5], _vertices[2], _vertices[1],
                                        _edges[7], _edges[4], _edges[1], _edges[3]);
         add(quad);
 
         // create the first tri cell
-        Tri<2, world_dim_>* tri = new Tri<2, world_dim_>(_vertices[5], _vertices[6], _vertices[2],
+        Tri_* tri = new Tri_(_vertices[5], _vertices[6], _vertices[2],
                                                          _edges[8], _edges[5], _edges[4]);
         add(tri);
         // create the second tri cell
-        tri = new Tri<2, world_dim_>(_vertices[7], _vertices[8], _vertices[5],
+        tri = new Tri_(_vertices[7], _vertices[8], _vertices[5],
                                      _edges[12], _edges[10], _edges[9]);
         add(tri);
 
         // create the third quad cell
-        quad = new Quad<2, world_dim_>(_vertices[8], _vertices[9], _vertices[6], _vertices[5],
+        quad = new Quad_(_vertices[8], _vertices[9], _vertices[6], _vertices[5],
                                        _edges[13], _edges[11], _edges[8], _edges[10]);
         add(quad);
 

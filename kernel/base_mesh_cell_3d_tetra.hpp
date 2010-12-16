@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_BASE_MESH_CELL_3D_HEXA_HPP
-#define KERNEL_BASE_MESH_CELL_3D_HEXA_HPP 1
+#ifndef KERNEL_BASE_MESH_CELL_3D_TETRA_HPP
+#define KERNEL_BASE_MESH_CELL_3D_TETRA_HPP 1
 
 // includes, system
 #include <iostream> // for std::ostream
@@ -12,7 +12,7 @@
 #include <kernel/base_mesh_vertex.hpp>
 #include <kernel/base_mesh_cell.hpp>
 #include <kernel/base_mesh_cell_1d_edge.hpp>
-#include <kernel/base_mesh_cell_2d_quad.hpp>
+#include <kernel/base_mesh_cell_2d_tri.hpp>
 
 namespace FEAST
 {
@@ -20,18 +20,18 @@ namespace FEAST
   {
 
     /**
-    * \brief 3D base mesh cell of type hexa
+    * \brief 3D base mesh cell of type tetra
     *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke
     * \author Peter Zajac
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennte wir ueberlegen, eine weitere Klasse Cell3D einzufuehren,
-// die von Cell<3, space_dim_, world_dim_> erbt, und von der dann wieder um Tet und Hexa erben.
+// die von Cell<3, space_dim_, world_dim_> erbt, und von der dann wieder um Tetra und Hexa erben.
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
-    class Hexa
+    class Tetra
       : public Cell<3, space_dim_, world_dim_>
     {
       /// shortcut for type Vertex<world_dim_>
@@ -40,23 +40,23 @@ namespace FEAST
       /// shortcut for type Cell<1, space_dim_, world_dim_>
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
-      /// shortcut for type Quad<space_dim_, world_dim_>
-      typedef Quad<space_dim_, world_dim_> Quad_;
+      /// shortcut for type Tri<space_dim_, world_dim_>
+      typedef Tri<space_dim_, world_dim_> Tri_;
 
       /// shortcut for type Cell<2, space_dim_, world_dim_>
       typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
     private:
-      /// vertices of the hexa
-      Vertex_* _vertices[8];
+      /// vertices of the tetra
+      Vertex_* _vertices[4];
 
-      /// edges of the hexa
-      Cell_1D_* _edges[12];
+      /// edges of the tetra
+      Cell_1D_* _edges[6];
 
-      /// edges of the hexa
-      Cell_2D_* _faces[6];
+      /// edges of the tetra
+      Cell_2D_* _faces[4];
 
-      /// returns true when face with local index iface has the correct orientation within the hexa
+      /// returns true when face with local index iface has the correct orientation within the tetra
       inline bool _face_has_correct_orientation(unsigned char iface)
       {
         //TODO: to be implemented
@@ -66,33 +66,23 @@ namespace FEAST
 
     public:
       /// CTOR
-      Hexa(Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3, Vertex_* v4, Vertex_* v5, Vertex_* v6, Vertex_* v7,
-           Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3, Cell_1D_* e4, Cell_1D_* e5,
-           Cell_1D_* e6, Cell_1D_* e7,Cell_1D_* e8, Cell_1D_* e9, Cell_1D_* e10, Cell_1D_* e11,
-           Cell_2D_* f0, Cell_2D_* f1,Cell_2D_* f2, Cell_2D_* f3, Cell_2D_* f4, Cell_2D_* f5)
+      Tetra(Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3,
+            Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3, Cell_1D_* e4, Cell_1D_* e5,
+            Cell_2D_* f0, Cell_2D_* f1,Cell_2D_* f2, Cell_2D_* f3)
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
         _vertices[2] = v2;
         _vertices[3] = v3;
-        _vertices[4] = v4;
-        _vertices[5] = v5;
-        _vertices[6] = v6;
         _edges[0] = e0;
         _edges[1] = e1;
         _edges[2] = e2;
         _edges[3] = e3;
         _edges[4] = e4;
         _edges[5] = e5;
-        _edges[6] = e6;
-        _edges[7] = e7;
-        _edges[8] = e8;
-        _edges[9] = e9;
-        _edges[10] = e10;
-        _edges[11] = e11;
         // assure that the edges are in fact of type Edge<space_dim_, world_dim_>, and not "only"
         // of type Cell<1, space_dim_, world_dim_>
-        for(int i(0) ; i < 12 ; ++i)
+        for(int i(0) ; i < 6 ; ++i)
         {
           assert(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>));
         }
@@ -100,18 +90,16 @@ namespace FEAST
         _faces[1] = f1;
         _faces[2] = f2;
         _faces[3] = f3;
-        _faces[4] = f4;
-        _faces[5] = f5;
-        // assure that the faces are in fact of type Quad_, and not "only" of type Cell_2D_
-        for(int i(0) ; i < 6 ; ++i)
+        // assure that the faces are in fact of type Tri_, and not "only" of type Cell_2D_
+        for(int i(0) ; i < 4 ; ++i)
         {
-          assert(typeid(*_faces[i]) == typeid(Quad_));
+          assert(typeid(*_faces[i]) == typeid(Tri_));
         }
 
-        unsigned char num_subcells_per_subdimension[3] = {8, 12, 6};
+        unsigned char num_subcells_per_subdimension[3] = {4, 6, 4};
         this->_init_neighbours(3, num_subcells_per_subdimension);
 // COMMENT_HILMAR: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
-//    : CellData<3, space_dim_, world_dim_>({8,12,6})
+//    : CellData<3, space_dim_, world_dim_>({4,6,4})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
       }
 
@@ -119,7 +107,7 @@ namespace FEAST
       /// returns number of vertices
       inline unsigned char num_vertices() const
       {
-        return 8;
+        return 4;
       }
 
 
@@ -134,7 +122,7 @@ namespace FEAST
       /// returns number of edges
       inline unsigned char num_edges() const
       {
-        return 12;
+        return 6;
       }
 
 
@@ -149,7 +137,7 @@ namespace FEAST
       /// returns number of faces
       inline unsigned char num_faces() const
       {
-        return 6;
+        return 4;
       }
 
 
@@ -161,15 +149,15 @@ namespace FEAST
       }
 
 
-      /// subdivision routine splitting a hex and storing parent/child information
-// COMMENT_HILMAR: this is currently hard-wired to splitting the hexa into eight hexas. Later, this is parameterised
+      /// subdivision routine splitting a tetra and storing parent/child information
+// COMMENT_HILMAR: this is currently hard-wired to splitting  the tetra into ??? tetras. Later, this is parameterised
 // via the information in the SubdivisionData object.
       inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>& subdiv_data)
       {
         // assure that this cell has not been divided yet
         if(!this->active())
         {
-          std::cerr << "Hexa " << this->index() << " is already subdivided! Aborting program.";
+          std::cerr << "Tetra " << this->index() << " is already subdivided! Aborting program.";
           exit(1);
         }
 
@@ -308,7 +296,7 @@ namespace FEAST
       /// print information about this quad
       inline void print(std::ostream& stream)
       {
-        stream << "Hexa";
+        stream << "Tetra";
         Item::print(stream);
         stream << ": [";
 
@@ -339,4 +327,4 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BASE_MESH_CELL_3D_HEXA_HPP
+#endif // #define KERNEL_BASE_MESH_CELL_3D_TETRA_HPP
