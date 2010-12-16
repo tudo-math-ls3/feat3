@@ -154,7 +154,8 @@ namespace FEAST
 
       inline void print(std::ostream& stream)
       {
-        stream << "[ N:  ";
+        // print neighbourhood information into the next line
+        stream << std::endl << "    [ N:  ";
         for(unsigned char subdim(0) ; subdim < cell_space_dim_ ; ++subdim)
         {
           if(subdim == 0)

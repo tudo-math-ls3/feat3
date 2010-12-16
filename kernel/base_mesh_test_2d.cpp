@@ -49,5 +49,6 @@ int main (int argc, char **argv)
   bm.print(std::cout);
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
-  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
+  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
+  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
 }

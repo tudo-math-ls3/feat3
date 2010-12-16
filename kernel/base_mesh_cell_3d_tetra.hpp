@@ -150,8 +150,8 @@ namespace FEAST
 
 
       /// subdivision routine splitting a tetra and storing parent/child information
-// COMMENT_HILMAR: this is currently hard-wired to splitting  the tetra into ??? tetras. Later, this is parameterised
-// via the information in the SubdivisionData object.
+// COMMENT_HILMAR: this is currently hard-wired to splitting the tetra into 8 tetras (called 'standard partition' or
+// '3D-Freudenthal-Bey partition'. Later, this is parameterised via the information in the SubdivisionData object.
       inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>& subdiv_data)
       {
         // assure that this cell has not been divided yet
@@ -321,6 +321,7 @@ namespace FEAST
           }
         }
         Cell<3, space_dim_, world_dim_>::print_history(stream);
+        // print neighbourhood information (if there is any)
         CellData<3, space_dim_, world_dim_>::print(stream);
       }
     };

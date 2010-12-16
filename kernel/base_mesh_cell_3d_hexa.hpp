@@ -333,6 +333,7 @@ namespace FEAST
           }
         }
         Cell<3, space_dim_, world_dim_>::print_history(stream);
+        // print neighbourhood information (if there is any)
         CellData<3, space_dim_, world_dim_>::print(stream);
       }
     };

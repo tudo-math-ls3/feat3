@@ -118,6 +118,7 @@ namespace FEAST
         _vertices[1]->print(stream);
         stream << "]";
         Cell<1, space_dim_, world_dim_>::print_history(stream);
+        // print neighbourhood information (if there is any)
         CellData<1, space_dim_, world_dim_>::print(stream);
       }
     };

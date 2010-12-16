@@ -6,7 +6,6 @@
 #include <iostream> // for std::ostream
 #include <cassert>  // for assert()
 #include <vector>   // for std::vector
-#include <typeinfo>  // for typeid()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -66,7 +65,7 @@ namespace FEAST
       * functions *
       ************/
       /**
-      * \brief templated function to remove vertices, edges and cells from the corresponding vector
+      * \brief templated function to remove vertices, edges, faces and cells from the corresponding vector
       *
       * The item is swapped to the end of the list and then deleted and removed.
       * TODO: This code is replicated in all base_mesh_xD classes since there is no generic class to inherit from
@@ -285,16 +284,15 @@ namespace FEAST
         // this is emulated file parser part 2
         // and this is a pain in the lower end of the back *because* local orderings are again causing headaches
 
-//        // the hex has the two tets as neighbours at its "top" face, aka at its local face 5
-//        _cells[0]->face_neighbours(5).push_back(_cells[1]);
-//        _cells[0]->face_neighbours(5).push_back(_cells[2]);
-//        // the first tet sees the hex at its bottom face (local face 0) and the other tet at its "right" face (local 2)
-//        _cells[1]->face_neighbours(0).push_back(_cells[0]);
-//        _cells[1]->face_neighbours(2).push_back(_cells[2]);
-//        // and the second tet sees the hex at its bottom face (local 0) and the other tet at its "left" face (local 3)
-//        _cells[2]->face_neighbours(0).push_back(_cells[0]);
-//        _cells[2]->face_neighbours(3).push_back(_cells[1]);
-
+        // the hex has the two tets as neighbours at its "top" face, aka at its local face 5
+        _cells[0]->add_neighbour(2, 5, _cells[1]);
+        _cells[0]->add_neighbour(2, 5, _cells[2]);
+        // the first tet sees the hex at its bottom face (local face 0) and the other tet at its "right" face (local 2)
+        _cells[1]->add_neighbour(2, 0, _cells[0]);
+        _cells[1]->add_neighbour(2, 2, _cells[2]);
+        // and the second tet sees the hex at its bottom face (local 0) and the other tet at its "left" face (local 3)
+        _cells[2]->add_neighbour(2, 0, _cells[0]);
+        _cells[2]->add_neighbour(2, 3, _cells[1]);
       }
 
       /// default destructor

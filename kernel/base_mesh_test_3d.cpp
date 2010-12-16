@@ -24,4 +24,9 @@ int main (int argc, char **argv)
 //  SubdivisionData<3, WDIM, SDIM> subdiv_data;
 //  bm.cell(0)->subdivide(subdiv_data);
 //  bm.add_created_items(subdiv_data);
+
+//  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
+//  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
+  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
+  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
 }
