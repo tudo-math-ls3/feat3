@@ -25,9 +25,9 @@ namespace FEAST
 
 
     /**
-    * \brief emtpy class definition for cell data
+    * \brief emtpy cell data class definition for cells with dimension smaller than space dimension
     *
-    * Avoid instatiation of cell-specific data in shapes with dimension lower than space dimension.
+    * Avoid instatiation of cell-specific data in shapes with dimension smaller than space dimension.
     * The class is only implemented for cell_dim_ = space_dim_ (see below).
     *
     * \author Hilmar Wobker
@@ -44,8 +44,15 @@ namespace FEAST
     private:
 
     public:
+      /// dummy function called by constructors of cells with dimension smaller than space dimension
+      inline void _init_neighbours(unsigned char array_size, unsigned char num_subcells_per_subdim[])
+      {
+        // do nothing here
+      }
+      /// dummy print function
       inline void print(std::ostream& stream)
       {
+        // do nothing here
       }
     };
 

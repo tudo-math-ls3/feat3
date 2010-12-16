@@ -78,7 +78,7 @@ namespace FEAST
 
         unsigned char num_subcells_per_subdimension[2] = {4,4};
         this->_init_neighbours(2, num_subcells_per_subdimension);
-// TODO: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
+// COMMENT_HILMAR: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<2, space_dim_, world_dim_>({4,4})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
       }

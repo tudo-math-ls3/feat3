@@ -106,12 +106,12 @@ namespace FEAST
         // of type Cell<2, space_dim_, world_dim_>
         for(int i(0) ; i < 6 ; ++i)
         {
-          assert(typeid(*_edges[i]) == typeid(Quad<space_dim_, world_dim_>));
+          assert(typeid(*_faces[i]) == typeid(Quad<space_dim_, world_dim_>));
         }
 
         unsigned char num_subcells_per_subdimension[3] = {8, 12, 6};
         this->_init_neighbours(3, num_subcells_per_subdimension);
-// TODO: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
+// COMMENT_HILMAR: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<3, space_dim_, world_dim_>({8,12,6})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
       }

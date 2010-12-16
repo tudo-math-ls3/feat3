@@ -51,6 +51,9 @@ namespace FEAST
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
+
+        unsigned char num_subcells_per_subdimension[1] = {2};
+        this->_init_neighbours(1, num_subcells_per_subdimension);
       }
 
 

@@ -154,7 +154,7 @@ namespace FEAST
         add(v);
 
         // v4 = (0,0,1)
-        Vertex_* v = new Vertex_();
+        v = new Vertex_();
         v->set_coord(0, 0.0);
         v->set_coord(1, 0.0);
         v->set_coord(2, 1.0);
@@ -245,6 +245,14 @@ namespace FEAST
         f = new Quad_(_vertices[2], _vertices[1], _vertices[7], _vertices[6],
                       _edges[1], _edges[9], _edges[5], _edges[10]);
         add(f);
+
+        // hex 0
+        Hexa<3,3>* h = new Hexa<3,3>(_vertices[0], _vertices[1], _vertices[2], _vertices[3],
+                           _vertices[4], _vertices[5], _vertices[6], _vertices[7],
+                           _edges[0], _edges[1], _edges[2], _edges[3], _edges[4], _edges[5],
+                           _edges[6], _edges[7], _edges[8], _edges[9], _edges[10], _edges[11],
+                           _faces[0], _faces[1], _faces[2], _faces[3], _faces[4], _faces[5]);
+        add(h);
       }
 
       /// default destructor
@@ -340,7 +348,7 @@ namespace FEAST
       }
 
       /// returns face at given index
-      inline Cell_2D_* edge(global_index_t const index)
+      inline Cell_2D_* face(global_index_t const index)
       {
         assert(index < _faces.size());
         return _faces[index];
