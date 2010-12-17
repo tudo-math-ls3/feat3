@@ -37,13 +37,13 @@ int main (int argc, char **argv)
   // TODO: neighbourhood update
 
   std::cout << "Cell 0 should now look like this:" << std::endl;
-  std::cout << "v00---e19---v12---e18---v01" << std::endl;
+  std::cout << "v00---e16---v11---e17---v01" << std::endl;
   std::cout << " |           |           | " << std::endl;
-  std::cout << "e20   c8    e24   c7    e17" << std::endl;
+  std::cout << "e19   c7    e23   c8    e21" << std::endl;
   std::cout << " |           |           | " << std::endl;
-  std::cout << "v13---e25---v14---e23---v11" << std::endl;
+  std::cout << "v12---e24---v14---e25---v13" << std::endl;
   std::cout << " |           |           | " << std::endl;
-  std::cout << "e21   c5    e22   c6    e16" << std::endl;
+  std::cout << "e18   c5    e22   c6    e20" << std::endl;
   std::cout << " |           |           | " << std::endl;
   std::cout << "v03---e14---v10---e15---v04" << std::endl;
   bm.print(std::cout);

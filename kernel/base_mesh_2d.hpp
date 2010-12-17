@@ -158,6 +158,7 @@ namespace FEAST
 
 
         // create the 14 edges
+        // (just to ease manual sanity checks, always use the vertex of smaller global index as start vertex)
         // e0
         Edge_* e = new Edge_(_vertices[0], _vertices[1]);
         add(e);
@@ -165,7 +166,7 @@ namespace FEAST
         e = new Edge_(_vertices[1], _vertices[2]);
         add(e);
         // e2
-        e = new Edge_(_vertices[3], _vertices[0]);
+        e = new Edge_(_vertices[0], _vertices[3]);
         add(e);
         // e3
         e = new Edge_(_vertices[1], _vertices[4]);
@@ -180,16 +181,16 @@ namespace FEAST
         e = new Edge_(_vertices[3], _vertices[4]);
         add(e);
         // e7
-        e = new Edge_(_vertices[5], _vertices[4]);
+        e = new Edge_(_vertices[4], _vertices[5]);
         add(e);
         // e8
         e = new Edge_(_vertices[5], _vertices[6]);
         add(e);
         // e9
-        e = new Edge_(_vertices[7], _vertices[5]);
+        e = new Edge_(_vertices[5], _vertices[7]);
         add(e);
         // e10
-        e = new Edge_(_vertices[8], _vertices[5]);
+        e = new Edge_(_vertices[5], _vertices[8]);
         add(e);
         // e11
         e = new Edge_(_vertices[6], _vertices[9]);
@@ -201,36 +202,36 @@ namespace FEAST
         e = new Edge_(_vertices[8], _vertices[9]);
         add(e);
 
-        // create the first quad cell
+        // create quad cell c0
         Quad_* quad =
-          new Quad_(_vertices[3], _vertices[4], _vertices[1], _vertices[0],
-                                  _edges[6], _edges[3], _edges[0], _edges[2]);
+          new Quad_(_vertices[3], _vertices[4], _vertices[0], _vertices[1],
+                    _edges[6], _edges[0], _edges[2], _edges[3]);
         add(quad);
 
-        // create the second quad cell
-        quad = new Quad_(_vertices[4], _vertices[5], _vertices[2], _vertices[1],
-                                       _edges[7], _edges[4], _edges[1], _edges[3]);
+        // create quad cell c1
+        quad = new Quad_(_vertices[4], _vertices[5], _vertices[1], _vertices[2],
+                         _edges[7], _edges[1], _edges[3], _edges[4]);
         add(quad);
 
-        // create the first tri cell
+        // create tri cell c2
         Tri_* tri = new Tri_(_vertices[5], _vertices[6], _vertices[2],
-                                                         _edges[8], _edges[5], _edges[4]);
+                             _edges[8], _edges[5], _edges[4]);
         add(tri);
-        // create the second tri cell
+        // create tri cell c3
         tri = new Tri_(_vertices[7], _vertices[8], _vertices[5],
-                                     _edges[12], _edges[10], _edges[9]);
+                       _edges[12], _edges[10], _edges[9]);
         add(tri);
 
-        // create the third quad cell
-        quad = new Quad_(_vertices[8], _vertices[9], _vertices[6], _vertices[5],
-                                       _edges[13], _edges[11], _edges[8], _edges[10]);
+        // create quad cell c4
+        quad = new Quad_(_vertices[8], _vertices[9], _vertices[5], _vertices[6],
+                         _edges[13], _edges[8], _edges[10], _edges[11]);
         add(quad);
 
         // set neighbourhood information (emulated file parser part 2)
-        _cells[0]->add_neighbour(1, 1, _cells[1]);
+        _cells[0]->add_neighbour(1, 3, _cells[1]);
 
-        _cells[1]->add_neighbour(1, 3, _cells[0]);
-        _cells[1]->add_neighbour(1, 1, _cells[2]);
+        _cells[1]->add_neighbour(1, 2, _cells[0]);
+        _cells[1]->add_neighbour(1, 3, _cells[2]);
         _cells[1]->add_neighbour(0, 1, _cells[4]);
         _cells[1]->add_neighbour(0, 1, _cells[3]);
 
@@ -242,9 +243,9 @@ namespace FEAST
         _cells[3]->add_neighbour(0, 2, _cells[2]);
         _cells[3]->add_neighbour(0, 2, _cells[1]);
 
-        _cells[4]->add_neighbour(1, 2, _cells[2]);
-        _cells[4]->add_neighbour(1, 3, _cells[3]);
-        _cells[4]->add_neighbour(0, 3, _cells[1]);
+        _cells[4]->add_neighbour(1, 1, _cells[2]);
+        _cells[4]->add_neighbour(1, 2, _cells[3]);
+        _cells[4]->add_neighbour(0, 2, _cells[1]);
       }
 
       /// default destructor

@@ -18,14 +18,50 @@ namespace FEAST
   namespace BaseMesh
   {
 
+    /// stores the fixed numbering schemes
+//COMMENT_HILMAR: just temporarily stored here in this file. Will most likely be moved somewhere else.
+    struct Orderings
+    {
+      // indices of start and end vertex of the four edges in a quad
+      static unsigned char edge_ordering_in_quad[][2];
+    };
+    unsigned char Orderings::edge_ordering_in_quad[4][2] = {{0,1},{2,3},{0,2},{1,3}};
+
     /**
     * \brief 2D base mesh cell of type quad
+    *
+    * numbering scheme:
+    *
+    *           e1
+    *      v2---------v3
+    *      |           |
+    *      |           |
+    *    e2|           |e3
+    *      |           |
+    *      |           |
+    *      v0---------v1
+    *           e0
+    *
+    * vertices of standard quad [0,1]x[0,1]:
+    *   v0: (0, 0)
+    *   v1: (1, 0)
+    *   v2: (0, 1)
+    *   v3: (1, 1)
+    * edges (each edge with ccw orientation):
+    *   e0: (v0,v1)
+    *   e1: (v2,v3)
+    *   e2: (v0,v2)
+    *   e3: (v1,v3)
+    *
+    * When we speak of "orientation in the quad", this means that an edge always starts at the vertex with smaller
+    * local index and ends at the vertex with larger local index. So, this must not be mixed up with the
+    * standard way of defining orientation (i.e., running counter-clockwise through the quad).
     *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke
     * \author Peter Zajac
     */
-// COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennte wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
+// COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennten wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
 // die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wieder um Quad und Tri erben. Darin koennte
 // man zum Beispiel die Funktion _edge_has_correct_orientation() implementieren.
     template<
@@ -47,13 +83,23 @@ namespace FEAST
       /// edges of the quad
       Cell_1D_* _edges[4];
 
+      /// returns index (w.r.t. to quad numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
+      inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
+      {
+        // the index is inquired from the fixed numbering scheme stored in Orderings::edge_ordering_in_quad
+        return Orderings::edge_ordering_in_quad[iedge][iv];
+      }
 
-      /// returns true when edge with local index iedge has the same orientation as the quad
+      /**
+      * \brief returns true when edge with local index iedge has the same orientation as the quad
+      *
+      * Orientation in the quad means that vertex with smaller local vertex is always the start vertex of the edge.
+      */
       inline bool _edge_has_correct_orientation(unsigned char iedge)
       {
         // the orientation of the edge is correct (i.e. the same as that of the quad), when its start vertex within
-        // the quad (i.e. the vertex with the same local index) is local vertex 0 within the edge structure
-        return (vertex(iedge) == edge(iedge)->vertex(0));
+        // the quad is local vertex 0 within the edge structure
+        return (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0));
       }
 
 
@@ -136,12 +182,12 @@ namespace FEAST
         Cell_1D_* new_edges[12];
 
         // local numbering (old and new)
-        //         k2                                       e5     e4
-        //   w3---------w2          -----v2------         -------------
-        //   |           |          |     |     |       e6|    e10    |e3
-        //   |           |          |  q3 | q2  |         |     |     |
-        // k3|           |k1  ---> v3-----v4----v1        --e11----e9--
-        //   |           |          |  q0 | q1  |       e7|     |     |e2
+        //         k1                                       e2     e3
+        //   w2---------w3          -----v1------         -------------
+        //   |           |          |     |     |       e5|    e9     |e7
+        //   |           |          |  q2 | q3  |         |     |     |
+        // k2|           |k3  ---> v2-----v4----v3        --e10---e11--
+        //   |           |          |  q0 | q1  |       e4|     |     |e6
         //   |           |          |     |     |         |     e8    |
         //   w0---------w1          -----v0------         -------------
         //         k0                                        e0    e1
@@ -212,19 +258,30 @@ namespace FEAST
 // In Wirklichkeit war C0 es selbst, hat das aber inzwischen "vergessen".
         } // for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
 
-        // create new midpoint and its incident edges (these are always new, have no children and cannot be reused)
-        double x1 = new_vertices[0]->coords(0);
-        double y1 = new_vertices[0]->coords(1);
+        // create new midpoint v4 and its incident edges (these are always new, have no children and cannot be reused)
+        //   -----v1------
+        //   |     |     |
+        //   |  q2 | q3  |
+        //  v2-----v4----v3
+        //   |  q0 | q1  |
+        //   |     |     |
+        //   -----v0------
+        double x0 = new_vertices[0]->coords(0);
+        double y0 = new_vertices[0]->coords(1);
+        double x1 = new_vertices[1]->coords(0);
+        double y1 = new_vertices[1]->coords(1);
         double x2 = new_vertices[2]->coords(0);
         double y2 = new_vertices[2]->coords(1);
-        double x3 = new_vertices[1]->coords(0);
-        double y3 = new_vertices[1]->coords(1);
-        double x4 = new_vertices[3]->coords(0);
-        double y4 = new_vertices[3]->coords(1);
+        double x3 = new_vertices[3]->coords(0);
+        double y3 = new_vertices[3]->coords(1);
         double p[2];
-        // TODO factor out common subexpressions
-        p[0] = ( (x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );
-        p[1] = ( (x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );
+
+        double denom = (x0-x1)*(y2-y3) - (y0-y1)*(x2-x3);
+        double fac0 = x0*y1-y0*x1;
+        double fac1 = x2*y3-y2*x3;
+
+        p[0] = ( fac0*(x2-x3) - (x0-x1)*fac1 ) / denom;
+        p[1] = ( fac0*(y2-y3) - (y0-y1)*fac1 ) / denom;
         new_vertices[4] = new Vertex<world_dim_>(p);
 
         subdiv_data.created_vertices.push_back(new_vertices[4]);
@@ -238,16 +295,26 @@ namespace FEAST
         // set number of children to 4
         this->_set_num_children(4);
 
-        // finally, create and add new quads
-        _set_child(0, new Quad(vertex(0), new_vertices[0], new_vertices[4], new_vertices[3],
-                               new_edges[0], new_edges[8], new_edges[11], new_edges[7]));
-        _set_child(1, new Quad(new_vertices[0], vertex(1), new_vertices[1], new_vertices[4],
-                               new_edges[1], new_edges[2], new_edges[9], new_edges[8]));
-        _set_child(2, new Quad(new_vertices[4], new_vertices[1], vertex(2), new_vertices[2],
-                               new_edges[9], new_edges[3], new_edges[4], new_edges[10]));
-        _set_child(3, new Quad(new_vertices[3], new_vertices[4], new_vertices[2], vertex(3),
-                               new_edges[11], new_edges[10], new_edges[5], new_edges[6]));
+        // finally, create new quads and add them as children
+        //                          e2     e3
+        // w2----v1-----w3         -------------
+        //  |     |     |       e5|    e9     |e7
+        //  |  q2 | q3  |         |     |     |
+        // v2----v4-----v3        --e10---e11--
+        //  |  q0 | q1  |       e4|     |     |e6
+        //  |     |     |         |     e8    |
+        // w0----v0----w1         -------------
+        //                           e0    e1
+        _set_child(0, new Quad(vertex(0), new_vertices[0], new_vertices[2], new_vertices[4],
+                               new_edges[0], new_edges[10], new_edges[4], new_edges[8]));
+        _set_child(1, new Quad(new_vertices[0], vertex(1), new_vertices[4], new_vertices[3],
+                               new_edges[1], new_edges[11], new_edges[8], new_edges[6]));
+        _set_child(2, new Quad(new_vertices[2], new_vertices[4], vertex(2), new_vertices[1],
+                               new_edges[10], new_edges[2], new_edges[5], new_edges[9]));
+        _set_child(3, new Quad(new_vertices[4], new_vertices[3], new_vertices[1], vertex(3),
+                               new_edges[11], new_edges[3], new_edges[9], new_edges[7]));
 
+        // add the quads to the vector of new created quads
         for (unsigned char i(0) ; i < 4 ; ++i)
         {
           this->child(i)->set_parent(this);
