@@ -91,208 +91,357 @@ namespace FEAST
       BaseMesh3D()
       {
         // first, a bunch of vertices
-        Vertex_* v = new Vertex_();
-        v->set_coord(0, 0.0); v->set_coord(1, 0.0); v->set_coord(2, 0.0);
+        // v0 = (1,0,2)
+        double c[3] = {1,0,2};
+        Vertex_* v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 1.0); v->set_coord(1, 0.0); v->set_coord(2, 0.0);
+        // v1 = (2,0,2)
+        c[0] = 2;
+        v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 1.0); v->set_coord(1, 0.0); v->set_coord(2, 1.0);
+        // v2 = (0,1,2)
+        c[0] = 0;
+        c[1] = 1;
+        v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 0.0); v->set_coord(1, 0.0); v->set_coord(2, 1.0);
+        // v3 = (1,1,2)
+        c[0] = 1;
+        v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 0.0); v->set_coord(1, 1.0); v->set_coord(2, 0.0);
+        // v4 = (2,1,2)
+        c[0] = 2;
+        v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 1.0); v->set_coord(1, 1.0); v->set_coord(2, 0.0);
+        // v5 = (0,2,2)
+        c[0] = 0;
+        c[1] = 2;
+        v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 1.0); v->set_coord(1, 1.0); v->set_coord(2, 1.0);
+        // v6 = (1,2,2)
+        c[0] = 1;
+        v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 0.0); v->set_coord(1, 1.0); v->set_coord(2, 1.0);
+        // v7 = (2,2,2)
+        c[0] = 2;
+        v = new Vertex_(c);
         add(v);
 
-        v = new Vertex_();
-        v->set_coord(0, 0.5); v->set_coord(1, 2.0); v->set_coord(2, 0.5);
+        // v8 = (1,0,1)
+        c[0] = 1;
+        c[1] = 0;
+        c[2] = 1;
+        v = new Vertex_(c);
         add(v);
+
+        // v9 = (2,0,1)
+        c[0] = 2;
+        v = new Vertex_(c);
+        add(v);
+
+        // v10 = (0,1,1)
+        c[0] = 0;
+        c[1] = 1;
+        v = new Vertex_(c);
+        add(v);
+
+        // v11 = (1,1,1)
+        c[0] = 1;
+        v = new Vertex_(c);
+        add(v);
+
+        // v12 = (2,1,1)
+        c[0] = 2;
+        v = new Vertex_(c);
+        add(v);
+
+        // v13 = (0,2,1)
+        c[0] = 0;
+        c[1] = 2;
+        v = new Vertex_(c);
+        add(v);
+
+        // v14 = (1,2,1)
+        c[0] = 1;
+        v = new Vertex_(c);
+        add(v);
+
+        // v15 = (2,2,1)
+        c[0] = 2;
+        v = new Vertex_(c);
+        add(v);
+
+        // v16 = (1,0,0)
+        c[0] = 1;
+        c[1] = 0;
+        c[2] = 0;
+        v = new Vertex_(c);
+        add(v);
+
+        // v17 = (2,0,0)
+        c[0] = 2;
+        v = new Vertex_(c);
+        add(v);
+
+        // v18 = (1,1,0)
+        c[0] = 1;
+        c[1] = 1;
+        v = new Vertex_(c);
+        add(v);
+
+        // v19 = (2,1,0)
+        c[0] = 2;
+        v = new Vertex_(c);
+        add(v);
+
 
         // then, a bunch of edges
         // e0
         Edge_* e = new Edge_(_vertices[0],_vertices[1]);
         add(e);
         // e1
-        e = new Edge_(_vertices[1],_vertices[2]);
+        e = new Edge_(_vertices[0],_vertices[3]);
         add(e);
         // e2
-        e = new Edge_(_vertices[2],_vertices[3]);
+        e = new Edge_(_vertices[1],_vertices[4]);
         add(e);
         // e3
-        e = new Edge_(_vertices[0],_vertices[3]); // deliberately permuted
+        e = new Edge_(_vertices[2],_vertices[3]);
         add(e);
         // e4
-        e = new Edge_(_vertices[0],_vertices[4]);
+        e = new Edge_(_vertices[3],_vertices[4]);
         add(e);
         // e5
-        e = new Edge_(_vertices[1],_vertices[5]);
+        e = new Edge_(_vertices[2],_vertices[5]);
         add(e);
         // e6
-        e = new Edge_(_vertices[2],_vertices[6]);
+        e = new Edge_(_vertices[3],_vertices[6]);
         add(e);
         // e7
-        e = new Edge_(_vertices[3],_vertices[7]);
+        e = new Edge_(_vertices[4],_vertices[7]);
         add(e);
         // e8
-        e = new Edge_(_vertices[4],_vertices[5]);
-        add(e);
-        // e9
         e = new Edge_(_vertices[5],_vertices[6]);
         add(e);
-        // e10
+        // e9
         e = new Edge_(_vertices[6],_vertices[7]);
         add(e);
+        // e10
+        e = new Edge_(_vertices[0],_vertices[8]);
+        add(e);
         // e11
-        e = new Edge_(_vertices[7],_vertices[4]);
+        e = new Edge_(_vertices[1],_vertices[9]);
         add(e);
         // e12
-        e = new Edge_(_vertices[5],_vertices[7]);
+        e = new Edge_(_vertices[2],_vertices[10]);
         add(e);
         // e13
-        e = new Edge_(_vertices[8],_vertices[4]);
+        e = new Edge_(_vertices[3],_vertices[11]);
         add(e);
         // e14
-        e = new Edge_(_vertices[8],_vertices[5]);
+        e = new Edge_(_vertices[4],_vertices[12]);
         add(e);
         // e15
-        e = new Edge_(_vertices[8],_vertices[6]);
+        e = new Edge_(_vertices[5],_vertices[13]);
         add(e);
         // e16
-        e = new Edge_(_vertices[8],_vertices[7]);
+        e = new Edge_(_vertices[6],_vertices[14]);
+        add(e);
+        // e17
+        e = new Edge_(_vertices[7],_vertices[15]);
+        add(e);
+        // e18
+        e = new Edge_(_vertices[8],_vertices[9]);
+        add(e);
+        // e19
+        e = new Edge_(_vertices[8],_vertices[11]);
+        add(e);
+        // e20
+        e = new Edge_(_vertices[9],_vertices[12]);
+        add(e);
+        // e21
+        e = new Edge_(_vertices[10],_vertices[11]);
+        add(e);
+        // e22
+        e = new Edge_(_vertices[11],_vertices[12]);
+        add(e);
+        // e23
+        e = new Edge_(_vertices[10],_vertices[13]);
+        add(e);
+        // e24
+        e = new Edge_(_vertices[11],_vertices[14]);
+        add(e);
+        // e25
+        e = new Edge_(_vertices[12],_vertices[15]);
+        add(e);
+        // e26
+        e = new Edge_(_vertices[13],_vertices[14]);
+        add(e);
+        // e27
+        e = new Edge_(_vertices[14],_vertices[15]);
+        add(e);
+        // e28
+        e = new Edge_(_vertices[8],_vertices[16]);
+        add(e);
+        // e29
+        e = new Edge_(_vertices[9],_vertices[17]);
+        add(e);
+        // e30
+        e = new Edge_(_vertices[11],_vertices[18]);
+        add(e);
+        // e31
+        e = new Edge_(_vertices[12],_vertices[19]);
+        add(e);
+        // e32
+        e = new Edge_(_vertices[16],_vertices[17]);
+        add(e);
+        // e33
+        e = new Edge_(_vertices[16],_vertices[18]);
+        add(e);
+        // e34
+        e = new Edge_(_vertices[17],_vertices[19]);
+        add(e);
+        // e35
+        e = new Edge_(_vertices[18],_vertices[19]);
         add(e);
 
-        // now for faces (this is where the ordering nightmare starts)
-        /*
-        * Local ordering for tets:
-        * Edge 0: 0,1
-        * Edge 1: 1,2
-        * Edge 2: 2,0
-        * Edge 3: 0,3
-        * Edge 4: 1,3
-        * Edge 5: 2,3
-        * Face 0: 0,1,2
-        * Face 1: 0,3,1
-        * Face 2: 1,3,2
-        * Face 3: 2,3,0
-        */
-        // erste Haelfte des Hex-Deckels (nur in cell1, d.h. folgendes global2local-mapping:
-        // vertex4 ist 0, vertex5 ist 1, vertex7 ist 2 und vertex8 ist 3)
-        // im ersten Tet ist das face0
-        Tri_* tri = new Tri_(_vertices[4], _vertices[5], _vertices[7], _edges[8], _edges[12], _edges[11]);
-        add(tri);
-        // Vorderseite des ersten Tets (lokal face 1)
-        tri = new Tri_(_vertices[4], _vertices[8], _vertices[5], _edges[13], _edges[14], _edges[8]);
-        add(tri);
-        // face senkrecht auf Kante 12 (geteilt zwischen den beiden Tets)
-        // im ersten tet lokal face2, im zweiten tet lokal face 3)
-        tri = new Tri_(_vertices[5], _vertices[8], _vertices[7], _edges[14], _edges[16], _edges[12]);
-        add(tri);
-        // "linkes" face des ersten tets (lokal face 3)
-        tri = new Tri_(_vertices[7], _vertices[8], _vertices[4], _edges[16], _edges[13], _edges[11]);
-        add(tri);
+        // now faces
+        // f0
+        Quad_* quad = new Quad_(_vertices[0], _vertices[1], _vertices[3], _vertices[4],
+                                _edges[0], _edges[4], _edges[1], _edges[2]);
+        add(quad);
+        // f1
+        quad = new Quad_(_vertices[2], _vertices[3], _vertices[5], _vertices[6],
+                         _edges[3], _edges[8], _edges[5], _edges[6]);
+        add(quad);
+        // f2
+        quad = new Quad_(_vertices[3], _vertices[4], _vertices[6], _vertices[7],
+                         _edges[4], _edges[9], _edges[6], _edges[7]);
+        add(quad);
+        // f3
+        quad = new Quad_(_vertices[0], _vertices[8], _vertices[3], _vertices[11],
+                         _edges[10], _edges[13], _edges[1], _edges[19]);
+        add(quad);
+        // f4
+        quad = new Quad_(_vertices[1], _vertices[9], _vertices[4], _vertices[12],
+                         _edges[11], _edges[14], _edges[2], _edges[20]);
+        add(quad);
+        // f5
+        quad = new Quad_(_vertices[2], _vertices[3], _vertices[10], _vertices[11],
+                         _edges[3], _edges[21], _edges[12], _edges[13]);
+        add(quad);
+        // f6
+        quad = new Quad_(_vertices[3], _vertices[4], _vertices[11], _vertices[12],
+                         _edges[4], _edges[22], _edges[13], _edges[14]);
+        add(quad);
+        // f7
+        quad = new Quad_(_vertices[2], _vertices[10], _vertices[5], _vertices[13],
+                         _edges[12], _edges[15], _edges[5], _edges[23]);
+        add(quad);
+        // f8
+        quad = new Quad_(_vertices[3], _vertices[11], _vertices[6], _vertices[14],
+                         _edges[13], _edges[16], _edges[6], _edges[24]);
+        add(quad);
+        // f9
+        quad = new Quad_(_vertices[4], _vertices[12], _vertices[7], _vertices[15],
+                         _edges[14], _edges[17], _edges[7], _edges[25]);
+        add(quad);
+        // f10
+        quad = new Quad_(_vertices[5], _vertices[6], _vertices[13], _vertices[14],
+                         _edges[8], _edges[26], _edges[15], _edges[16]);
+        add(quad);
+        // f11
+        quad = new Quad_(_vertices[6], _vertices[7], _vertices[14], _vertices[15],
+                         _edges[9], _edges[27], _edges[16], _edges[17]);
+        add(quad);
+        // f12
+        quad = new Quad_(_vertices[8], _vertices[9], _vertices[11], _vertices[12],
+                         _edges[18], _edges[22], _edges[19], _edges[20]);
+        add(quad);
+        // f13
+        quad = new Quad_(_vertices[10], _vertices[11], _vertices[13], _vertices[14],
+                         _edges[21], _edges[26], _edges[23], _edges[24]);
+        add(quad);
+        // f14
+        quad = new Quad_(_vertices[11], _vertices[12], _vertices[14], _vertices[15],
+                         _edges[22], _edges[27], _edges[24], _edges[25]);
+        add(quad);
+        // f15
+        quad = new Quad_(_vertices[8], _vertices[9], _vertices[16], _vertices[17],
+                         _edges[18], _edges[32], _edges[28], _edges[29]);
+        add(quad);
+        // f16
+        quad = new Quad_(_vertices[8], _vertices[16], _vertices[11], _vertices[18],
+                         _edges[28], _edges[30], _edges[19], _edges[33]);
+        add(quad);
+        // f17
+        quad = new Quad_(_vertices[9], _vertices[17], _vertices[12], _vertices[19],
+                         _edges[29], _edges[31], _edges[20], _edges[34]);
+        add(quad);
+        // f18
+        quad = new Quad_(_vertices[11], _vertices[12], _vertices[18], _vertices[19],
+                         _edges[22], _edges[35], _edges[30], _edges[31]);
+        add(quad);
+        // f19
+        quad = new Quad_(_vertices[16], _vertices[17], _vertices[18], _vertices[19],
+                         _edges[32], _edges[35], _edges[33], _edges[34]);
+        add(quad);
 
-        // zweite Haelfte des Hex-Deckels (nur in cell2, d.h. folgendes global2local-mapping:
-        // vertex5 ist 0, vertex6 ist 1, vertex7 ist 2 und vertex8 ist 3)
-        // im zweiten tet ist das lokal face0
-        tri = new Tri_(_vertices[5], _vertices[6], _vertices[7], _edges[9], _edges[10], _edges[12]);
-        add(tri);
-        // "rechte Seite" des zweiten Tets (lokal face 1)
-        tri = new Tri_(_vertices[5], _vertices[8], _vertices[6], _edges[14], _edges[15], _edges[9]);
-        add(tri);
-        // "Rueckseite" des zweiten tets (lokal face 2)
-        tri = new Tri_(_vertices[6], _vertices[8], _vertices[7], _edges[15], _edges[16], _edges[10]);
-        add(tri);
-
-        /*
-        * local ordering for hexas:
-        * Face 0: 0,1,2,3
-        * Face 1: 0,4,5,1
-        * Face 2: 1,5,6,2
-        * Face 3: 2,6,7,3
-        * Face 4: 0,3,7,4
-        * Face 5: 4,7,6,5
-        *
-        * Edge 0: 0,1
-        * Edge 1: 1,2
-        * Edge 2: 2,3
-        * Edge 3: 3,0
-        * Edge 4: 0,4
-        * Edge 5: 1,5
-        * Edge 6: 2,6
-        * Edge 7: 3,7
-        * Edge 8: 4,5
-        * Edge 9: 5,6
-        * Edge10: 6,7
-        * Edge11: 7,4
-        */
-        Quad_* quad = new Quad_(_vertices[0], _vertices[1], _vertices[2], _vertices[3],
-                                _edges[0], _edges[1], _edges[2], _edges[3]);
-        add(quad);
-        quad = new Quad_(_vertices[0], _vertices[4], _vertices[5], _vertices[1],
-                         _edges[4], _edges[8], _edges[5], _edges[0]);
-        add(quad);
-        quad = new Quad_(_vertices[1], _vertices[5], _vertices[6], _vertices[2],
-                         _edges[5], _edges[9], _edges[6], _edges[1]);
-        add(quad);
-        quad = new Quad_(_vertices[2], _vertices[6], _vertices[7], _vertices[3],
-                         _edges[6], _edges[10], _edges[7], _edges[2]);
-        add(quad);
-        quad = new Quad_(_vertices[0], _vertices[3], _vertices[7], _vertices[4],
-                         _edges[3], _edges[7], _edges[11], _edges[4]);
-        add(quad);
-        quad = new Quad_(_vertices[4], _vertices[7], _vertices[6], _vertices[5],
-                         _edges[11], _edges[10], _edges[9], _edges[8]);
-        add(quad);
-
-        // finally, cells (let's hope I didn't fuck up the local numbering within the faces)
-        Hexa_* hex = new Hexa_(_vertices[0], _vertices[1], _vertices[2], _vertices[3],
-                               _vertices[4], _vertices[5], _vertices[6], _vertices[7],
-                               _edges[0], _edges[1], _edges[2], _edges[3], _edges[4], _edges[5],
-                               _edges[6], _edges[7], _edges[8], _edges[9], _edges[10], _edges[11],
-                               _faces[7], _faces[8], _faces[9], _faces[10], _faces[11], _faces[12]);
+        // finally, cells
+        // c0
+        Hexa_* hex = new Hexa_(_vertices[0], _vertices[1], _vertices[8], _vertices[9],
+                               _vertices[3], _vertices[4], _vertices[11], _vertices[12],
+                               _edges[0], _edges[18], _edges[4], _edges[22], _edges[10], _edges[11],
+                               _edges[13], _edges[14], _edges[1], _edges[2], _edges[19], _edges[20],
+                               _faces[2], _faces[6], _faces[0], _faces[12], _faces[3], _faces[4]);
+        add(hex);
+        // c1
+        hex = new Hexa_(_vertices[2], _vertices[3], _vertices[10], _vertices[11],
+                        _vertices[5], _vertices[6], _vertices[13], _vertices[14],
+                        _edges[3], _edges[21], _edges[8], _edges[26], _edges[12], _edges[13],
+                        _edges[15], _edges[16], _edges[5], _edges[6], _edges[23], _edges[24],
+                        _faces[5], _faces[10], _faces[1], _faces[13], _faces[7], _faces[8]);
+        add(hex);
+        // c2
+        hex = new Hexa_(_vertices[3], _vertices[4], _vertices[11], _vertices[12],
+                        _vertices[6], _vertices[7], _vertices[14], _vertices[15],
+                        _edges[4], _edges[22], _edges[9], _edges[27], _edges[13], _edges[14],
+                        _edges[16], _edges[17], _edges[6], _edges[7], _edges[24], _edges[25],
+                        _faces[6], _faces[11], _faces[2], _faces[14], _faces[8], _faces[9]);
+        add(hex);
+        // c3
+        hex = new Hexa_(_vertices[8], _vertices[9], _vertices[16], _vertices[17],
+                        _vertices[11], _vertices[12], _vertices[18], _vertices[19],
+                        _edges[18], _edges[32], _edges[22], _edges[35], _edges[28], _edges[29],
+                        _edges[30], _edges[31], _edges[19], _edges[20], _edges[33], _edges[34],
+                        _faces[15], _faces[18], _faces[12], _faces[19], _faces[16], _faces[17]);
         add(hex);
 
-        Tetra_* tet = new Tetra_(_vertices[4], _vertices[5], _vertices[7], _vertices[8],
-                                 _edges[8], _edges[12], _edges[11], _edges[13], _edges[14], _edges[16],
-                                 _faces[0], _faces[1], _faces[2], _faces[3]);
-        add(tet);
-        tet = new Tetra_(_vertices[5], _vertices[6], _vertices[7], _vertices[8],
-                         _edges[9], _edges[10], _edges[12], _edges[14], _edges[15], _edges[16],
-                         _faces[4], _faces[5], _faces[6], _faces[2]);
-        add(tet);
 
-        // haha, not finished yet! Now that everything is there, add neighbourhood information
-        // this is emulated file parser part 2
-        // and this is a pain in the lower end of the back *because* local orderings are again causing headaches
-
-        // the hex has the two tets as neighbours at its "top" face, aka at its local face 5
-        _cells[0]->add_neighbour(2, 5, _cells[1]);
-        _cells[0]->add_neighbour(2, 5, _cells[2]);
-        // the first tet sees the hex at its bottom face (local face 0) and the other tet at its "right" face (local 2)
-        _cells[1]->add_neighbour(2, 0, _cells[0]);
-        _cells[1]->add_neighbour(2, 2, _cells[2]);
-        // and the second tet sees the hex at its bottom face (local 0) and the other tet at its "left" face (local 3)
+        // neighbourhood
+        // face neighbours
+        _cells[0]->add_neighbour(2, 1, _cells[2]);
+        _cells[0]->add_neighbour(2, 3, _cells[3]);
+        _cells[1]->add_neighbour(2, 5, _cells[2]);
         _cells[2]->add_neighbour(2, 0, _cells[0]);
-        _cells[2]->add_neighbour(2, 3, _cells[1]);
+        _cells[2]->add_neighbour(2, 4, _cells[1]);
+        _cells[3]->add_neighbour(2, 2, _cells[0]);
+
+        // edge neighbours
+        _cells[0]->add_neighbour(1, 6, _cells[1]);
+        _cells[1]->add_neighbour(1, 5, _cells[0]);
+        _cells[2]->add_neighbour(1, 1, _cells[3]);
+        _cells[3]->add_neighbour(1, 2, _cells[2]);
+
+        // vertex neighbours
+        _cells[1]->add_neighbour(0, 3, _cells[3]);
+        _cells[3]->add_neighbour(0, 4, _cells[1]);
       }
 
       /// default destructor
