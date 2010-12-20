@@ -28,9 +28,8 @@ int main (int argc, char **argv)
   std::cout << "          v7---e12--v8---e13---v9 " << std::endl;
   bm.print(std::cout);
 
-  // create a couple of actions and apply them
+  // subdivide cell 0
   std::cout << "Subdividing cell 0" << std::endl;
-
   SubdivisionData<2, WDIM, SDIM> subdiv_data;
   bm.cell(0)->subdivide(subdiv_data);
   bm.add_created_items(subdiv_data);

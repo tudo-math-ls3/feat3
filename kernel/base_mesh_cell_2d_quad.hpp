@@ -37,15 +37,14 @@ namespace FEAST
     *   v1: (1, 0)
     *   v2: (0, 1)
     *   v3: (1, 1)
-    * edges (each edge with ccw orientation):
+    * edges:
     *   e0: (v0,v1)
     *   e1: (v2,v3)
     *   e2: (v0,v2)
     *   e3: (v1,v3)
     *
-    * When we speak of "orientation in the quad", this means that an edge always starts at the vertex with smaller
-    * local index and ends at the vertex with larger local index. So, this must not be mixed up with the
-    * standard way of defining orientation (i.e., running counter-clockwise through the quad).
+    * "Orientation in the quad" means that edge vertices are traversed by increasing local vertex index. So, this must
+    * not be mixed up with the standard way of defining orientation (i.e., running counter-clockwise through the quad).
     *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke

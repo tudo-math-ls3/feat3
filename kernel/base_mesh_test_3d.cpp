@@ -18,15 +18,14 @@ int main (int argc, char **argv)
   BaseMesh3D<WDIM> bm;
   bm.print(std::cout);
 
-//  // create a couple of actions and apply them
-//  std::cout << "Subdividing cell 0" << std::endl;
-//
-//  SubdivisionData<3, WDIM, SDIM> subdiv_data;
-//  bm.cell(0)->subdivide(subdiv_data);
-//  bm.add_created_items(subdiv_data);
+  // subdivide cell 2
+  std::cout << "Subdividing cell 2" << std::endl;
+  SubdivisionData<3, WDIM, SDIM> subdiv_data;
+  bm.cell(2)->subdivide(subdiv_data);
+  bm.add_created_items(subdiv_data);
 
-//  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
-//  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
+  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
+  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
   std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
 }

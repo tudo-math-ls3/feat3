@@ -650,7 +650,7 @@ namespace FEAST
         remove<Cell_*>(_cells, c);
       }
 
-      inline void add_created_items(SubdivisionData<2, 2, world_dim_>& subdiv_data)
+      inline void add_created_items(SubdivisionData<3, 3, world_dim_>& subdiv_data)
       {
         for(unsigned int i(0) ; i < subdiv_data.created_vertices.size() ; ++i)
         {

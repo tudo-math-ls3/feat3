@@ -22,6 +22,47 @@ namespace FEAST
     /**
     * \brief 3D base mesh cell of type hexa
     *
+    * numbering scheme:
+    *                                                                 back
+    *                             6----03----7                        6----03----7                  6              7
+    *                    top     /         /                          |          |       left    /  |    right  /  |
+    * coord-system            06    1   07                            |          |            06    |        07    |
+    *  z                   /         /                 front          10    3   11          /      10      /      11
+    * /\      y          4----02----5                  4----02----5   |          |        4         |    5         |
+    *  |    /                                          |          |   |          |        |    4    |    |    5    |
+    *  | /                        2----01----3         |          |   2----01----3        |         2    |         3
+    *  o------> x      bottom    /         /           08    2   09                       08     /       09     /
+    *                         04    0   05             |          |                       |   04         |   05
+    *                      /         /                 |          |                       | /            | /
+    *                    0----00----1                  0----00----1                       0              1
+    *
+    * vertex coordinates of standard hexa [0,1]x[0,1]x[0,1]:
+    *   v0: (0, 0, 0)
+    *   v1: (1, 0, 0)
+    *   v2: (0, 1, 0)
+    *   v3: (1, 1, 0)
+    *   v4: (0, 0, 1)
+    *   v5: (1, 0, 1)
+    *   v6: (0, 1, 1)
+    *   v7: (1, 1, 1)
+    *
+    * edges:
+    *   in x-direction    in y-direction    in z-direction
+    *   e0: (v0, v1)      e4: (v0, v2)       e8: (v0, v4)
+    *   e1: (v2, v3)      e5: (v1, v3)       e9: (v1, v5)
+    *   e2: (v4, v5)      e6: (v4, v6)      e10: (v2, v6)
+    *   e3: (v6, v7)      e7: (v5, v7)      e11: (v3, v7)
+    *
+    * faces:
+    *   f0: (v0, v1, v2, v3),  (e0, e1, e4, e5)     (bottom, z=0)
+    *   f1: (v4, v5, v6, v7),  (e2, e3, e6, e7)     (top, z=1)
+    *   f2: (v0, v1, v4, v5),  (e0, e2,  e8,  e9)   (front, y=0)
+    *   f3: (v2, v3, v6, v7),  (e1, e3, e10, e11)   (back, y=1)
+    *   f4: (v0, v2, v4, v6),  (e4, e6, e8, e10)    (left, x=0)
+    *   f5: (v1, v3, v5, v7),  (e5, e7, e9, e11)    (right, x=1)
+    *
+    * "Orientation in the hexa" means that edge and face vertices are traversed by increasing local vertex index.
+    *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke
     * \author Peter Zajac
@@ -56,11 +97,14 @@ namespace FEAST
       /// edges of the hexa
       Cell_2D_* _faces[6];
 
-      /// returns true when face with local index iface has the correct orientation within the hexa
-      inline bool _face_has_correct_orientation(unsigned char iface)
+      /**
+      * \brief inquires how the local face numbering is related to the face numbering withing the hexa
+      *
+      * ...
+      */
+      inline void _face_orientation(bool& same_orientation, unsigned char& rotation, unsigned char iface)
       {
         //TODO: to be implemented
-        return false;
       }
 
 
@@ -335,14 +379,14 @@ namespace FEAST
         for(int i(0) ; i < num_faces() ; ++i)
         {
           stream << "F" << _faces[i]->index();
-          if(_face_has_correct_orientation(i))
-          {
-            stream << "(+)";
-          }
-          else
-          {
-            stream << "(-)";
-          }
+//          if(_face_has_correct_orientation(i))
+//          {
+//            stream << "(+)";
+//          }
+//          else
+//          {
+//            stream << "(-)";
+//          }
           if(i < num_faces()-1)
           {
             stream << ", ";
