@@ -76,8 +76,8 @@ namespace FEAST
       /// returns index (w.r.t. to quad numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
-        // the index is inquired from the fixed numbering scheme stored in Orderings::edge_vertices_in_quad
-        return Orderings::edge_vertices_in_quad[iedge][iv];
+        // the index is inquired from the fixed numbering scheme stored in Numbering::quad_edge_vertices
+        return Numbering::quad_edge_vertices[iedge][iv];
       }
 
       /**

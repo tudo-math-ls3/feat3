@@ -18,12 +18,32 @@ namespace FEAST
   {
 
     /// stores the fixed numbering schemes
-    struct Orderings
+    struct Numbering
     {
       // indices of start and end vertex of the four edges in a quad
-      static unsigned char edge_vertices_in_quad[][2];
+      static unsigned char quad_edge_vertices[][2];
+
+      // indices of start and end vertex of the twelve edges in a hexa
+      static unsigned char hexa_edge_vertices[][2];
+
+      // indices of the four vertices of the six faces in a hexa
+      static unsigned char hexa_face_vertices[][4];
+
+      // indices of the four edges of the six faces in a hexa
+      static unsigned char hexa_face_edges[][4];
     };
-    unsigned char Orderings::edge_vertices_in_quad[4][2] = {{0,1},{2,3},{0,2},{1,3}};
+    unsigned char Numbering::quad_edge_vertices[4][2]
+      = {{0,1}, {2,3}, {0,2}, {1,3}};
+
+    unsigned char Numbering::hexa_edge_vertices[12][2]
+      = {{0,1}, {2,3}, {4,5}, {6,7},   {0,2}, {1,3}, {4,6}, {5,7},   {0,4}, {1,5}, {2,6}, {3,7}};
+
+    unsigned char Numbering::hexa_face_vertices[6][4]
+      = {{0,1,2,3}, {4,5,6,7}, {0,1,4,5}, {2,3,6,7}, {0,2,4,6}, {1,3,5,7}};
+
+    unsigned char Numbering::hexa_face_edges[6][4]
+      = {{0,1,4,5}, {2,3,6,7}, {0,2,8,9}, {1,3,10,11}, {4,6,8,10}, {5,7,9,11}};
+
 
 
     /**
