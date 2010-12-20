@@ -17,6 +17,15 @@ namespace FEAST
   namespace BaseMesh
   {
 
+    /// stores the fixed numbering schemes
+    struct Orderings
+    {
+      // indices of start and end vertex of the four edges in a quad
+      static unsigned char edge_vertices_in_quad[][2];
+    };
+    unsigned char Orderings::edge_vertices_in_quad[4][2] = {{0,1},{2,3},{0,2},{1,3}};
+
+
     /**
     * \brief class containing subdivision specific data (empty definition to be specialised by cell_dim_)
     *

@@ -17,16 +17,6 @@ namespace FEAST
 {
   namespace BaseMesh
   {
-
-    /// stores the fixed numbering schemes
-//COMMENT_HILMAR: just temporarily stored here in this file. Will most likely be moved somewhere else.
-    struct Orderings
-    {
-      // indices of start and end vertex of the four edges in a quad
-      static unsigned char edge_ordering_in_quad[][2];
-    };
-    unsigned char Orderings::edge_ordering_in_quad[4][2] = {{0,1},{2,3},{0,2},{1,3}};
-
     /**
     * \brief 2D base mesh cell of type quad
     *
@@ -86,8 +76,8 @@ namespace FEAST
       /// returns index (w.r.t. to quad numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
-        // the index is inquired from the fixed numbering scheme stored in Orderings::edge_ordering_in_quad
-        return Orderings::edge_ordering_in_quad[iedge][iv];
+        // the index is inquired from the fixed numbering scheme stored in Orderings::edge_vertices_in_quad
+        return Orderings::edge_vertices_in_quad[iedge][iv];
       }
 
       /**
@@ -192,8 +182,10 @@ namespace FEAST
         //   w0---------w1          -----v0------         -------------
         //         k0                                        e0    e1
 
-        // store old active-mask of each edge, because it gets overwritten once edges are getting split below
-        bool old_edge_active_mask[4];
+
+//COMMENT_HILMAR: brauchen wir das ueberhaupt noch?
+//        // store old active-mask of each edge, because it gets overwritten once edges are getting split below
+//        bool old_edge_active_mask[4];
 
         SubdivisionData<1, space_dim_, world_dim_> subdiv_data_edge;
 
@@ -203,8 +195,9 @@ namespace FEAST
           // if edge has no children, create them
           if (edge(iedge)->active())
           {
-            // store old active mask
-            old_edge_active_mask[iedge] = true;
+//            // store old active mask
+//            old_edge_active_mask[iedge] = true;
+
             // create new vertex
 
             // subdivide edge
@@ -228,8 +221,8 @@ namespace FEAST
           }
           else // edge has children, reuse them
           {
-            // store old active mask
-            old_edge_active_mask[iedge] = false;
+//            // store old active mask
+//            old_edge_active_mask[iedge] = false;
           }
 
           // add new vertex to array of new vertices

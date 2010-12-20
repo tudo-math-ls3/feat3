@@ -176,47 +176,64 @@ namespace FEAST
         // clear all vectors of created entities in the SubdivisionData object
         subdiv_data.clear_created();
 
-        /// vertices that this action creates and/or reuses (5 + 9 + 5)
+        /**
+        * \brief vertices that this action creates and/or reuses (12 + 6 + 1)
+        *
+        * numbering scheme: new vertices
+        *   - on existing edges: new_vertex_index = old_edge_index (indices 0-11)
+        *   - in face centres: new_vertex_index = old_face_index (indices 12-17)
+        *   - in centre of the hexa: new_vertex_index = greatest new index (index 18)
+        */
         Vertex_* new_vertices[19];
 
-        /// edges that this action creates and/or reuses (12 + 9 + 12 + 9 + 12)
+        /**
+        * \brief edges that this action creates and/or reuses (12*2 + 6*4 + 6)
+        *
+        * numbering scheme: new edges
+        *   - as children of existing edges: new_edge_index = 2*(old_edge_index) + {0,1}
+        *     (increasing with old_vertex_index) (indices 0 - 23)
+        *   - on faces: new_edge_index = 24 + 4*old_face_index + {0,1,2,3} (indices 24 - 47)
+        *   - towards centre of the hexa: new_edge_index = 48 + old_face_index (indices 48-53)
+        */
         Cell_1D_* new_edges[54];
 
-        /// edges that this action creates and/or reuses (12 + 12 + 12)
+        /**
+        * \brief faces that this action creates and/or reuses (4*6 + 12)
+        *
+        * numbering scheme: new faces
+        *   - as children of existing faces: new_face_index = 4*(old_face_index) + {0,1,2,3}
+        *     (increasing with old_vertex_index) (indices 0 - 23)
+        *   - in the interior: new_face_index = 24 + old_edge_index (indices 24 - 35)
+        *     (each new interior face bisects one old edge)
+        */
         Cell_2D_* new_faces[36];
 
-// this is the copy-and-pasted Quad::subdivid() code which has to be adapted!
-//
-//        // local numbering (old and new)
-//        //         k2                                       e5     e4
-//        //   w2---------w3          -----v1------         -------------
-//        //   |           |          |     |     |       e6|    e10    |e3
-//        //   |           |          |  q2 | q3  |         |     |     |
-//        // k3|           |k1  ---> v2-----v4----v3        --e11----e9--
-//        //   |           |          |  q0 | q1  |       e7|     |     |e2
-//        //   |           |          |     |     |         |     e8    |
-//        //   w0---------w1          -----v0------         -------------
-//        //         k0                                        e0    e1
-//
-//        // store old active-mask of each edge, because it gets overwritten once edges are getting split below
-//        bool old_edge_active_mask[4];
-//
-//        SubdivisionData<1, space_dim_, world_dim_> subdiv_data_edge;
-//
-//        // loop over all edges and split them eventually, creating new vertices and edges on the way
-//        for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
-//        {
-//          // if edge has no children, create them
-//          if (edge(iedge)->active())
-//          {
+        // numbering of 8 new hexas: new_hexa_index = old_vertex_index
+        // (each new hexa can be associated with one vertex of the old hexa)
+
+//COMMENT_HILMAR: brauchen wir das ueberhaupt noch?
+//        // store old active-mask of each edge, because it gets overwritten once edges are subdivided
+//        bool old_edge_active_mask[12];
+//        // store old active-mask of each face, because it gets overwritten once faces are subdivided
+//        bool old_face_active_mask[6];
+
+        SubdivisionData<2, space_dim_, world_dim_> subdiv_data_face;
+
+        // loop over all faces and split them eventually, creating new vertices, edges and faces on the way
+        for(unsigned char iface(0) ; iface < 4 ; ++iface)
+        {
+          // if edge has no children, create them
+          if (face(iface)->active())
+          {
 //            // store old active mask
-//            old_edge_active_mask[iedge] = true;
-//            // create new vertex
-//
-//            // subdivide edge
-//            edge(iedge)->subdivide(subdiv_data_edge);
-//
-//            // add the created vertices/edges to the vector of created vertices/edges
+//            old_face_active_mask[iface] = true;
+
+            // subdivide face
+            face(iface)->subdivide(subdiv_data_face);
+
+// COMMENT_HILMAR: code below not adapted yet!!
+
+//            // add the created vertices, edges and faces to the vector of created vertices/edges/faces
 //            subdiv_data.created_vertices.push_back(subdiv_data_edge.created_vertex);
 //
 //            // COMMENT_HILMAR: Not sure whether the order plays a role here... to be on the safe side, order them
@@ -231,7 +248,7 @@ namespace FEAST
 //              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
 //              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
 //            }
-//          }
+          }
 //          else // edge has children, reuse them
 //          {
 //            // store old active mask
@@ -304,7 +321,7 @@ namespace FEAST
 //        {
 //          this->child(i)->set_parent(this);
 //          subdiv_data.created_cells.push_back(this->child(i));
-//        }
+        }
       } // subdivide()
 
 
