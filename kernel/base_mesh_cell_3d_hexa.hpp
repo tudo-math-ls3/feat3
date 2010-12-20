@@ -173,16 +173,19 @@ namespace FEAST
           exit(1);
         }
 
+        // clear all vectors of created entities in the SubdivisionData object
+        subdiv_data.clear_created();
+
+        /// vertices that this action creates and/or reuses (5 + 9 + 5)
+        Vertex_* new_vertices[19];
+
+        /// edges that this action creates and/or reuses (12 + 9 + 12 + 9 + 12)
+        Cell_1D_* new_edges[54];
+
+        /// edges that this action creates and/or reuses (12 + 12 + 12)
+        Cell_2D_* new_faces[36];
+
 // this is the copy-and-pasted Quad::subdivid() code which has to be adapted!
-//
-//        // clear all vectors of created entities in the SubdivisionData object
-//        subdiv_data.clear_created();
-//
-//        /// vertices that this action creates and/or reuses
-//        Vertex_* new_vertices[5];
-//
-//        /// edges that this action creates and/or reuses
-//        Cell_1D_* new_edges[12];
 //
 //        // local numbering (old and new)
 //        //         k2                                       e5     e4
