@@ -250,14 +250,14 @@ namespace FEAST
 //        } // for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
 //
 //        // create new midpoint and its incident edges (these are always new, have no children and cannot be reused)
-//        double x1 = new_vertices[0]->coords(0);
-//        double y1 = new_vertices[0]->coords(1);
-//        double x2 = new_vertices[2]->coords(0);
-//        double y2 = new_vertices[2]->coords(1);
-//        double x3 = new_vertices[1]->coords(0);
-//        double y3 = new_vertices[1]->coords(1);
-//        double x4 = new_vertices[3]->coords(0);
-//        double y4 = new_vertices[3]->coords(1);
+//        double x1 = new_vertices[0]->coord(0);
+//        double y1 = new_vertices[0]->coord(1);
+//        double x2 = new_vertices[2]->coord(0);
+//        double y2 = new_vertices[2]->coord(1);
+//        double x3 = new_vertices[1]->coord(0);
+//        double y3 = new_vertices[1]->coord(1);
+//        double x4 = new_vertices[3]->coord(0);
+//        double y4 = new_vertices[3]->coord(1);
 //        double p[2];
 //        // TODO factor out common subexpressions
 //        p[0] = ( (x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );

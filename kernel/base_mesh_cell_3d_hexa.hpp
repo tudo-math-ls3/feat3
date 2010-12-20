@@ -97,6 +97,23 @@ namespace FEAST
       /// edges of the hexa
       Cell_2D_* _faces[6];
 
+      /// returns index (w.r.t. to hexa numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
+      inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
+      {
+        assert(iedge < num_edges());
+        assert(iv < 2);
+        // the index is inquired from the fixed numbering scheme stored in Numbering::hexa_edge_vertices
+        return Numbering::hexa_edge_vertices[iedge][iv];
+      }
+
+      /// returns true when the orientation of the edge coincides with its orientation within the hexa
+      inline bool _edge_has_correct_orientation(unsigned char iedge)
+      {
+        assert(iedge < num_edges());
+        // return true when the edge's start vertex within the hexa is local vertex 0 within the edge structure
+        return (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0));
+      }
+
       /**
       * \brief inquires how the local face numbering is related to the face numbering withing the hexa
       *
@@ -264,7 +281,7 @@ namespace FEAST
         SubdivisionData<2, space_dim_, world_dim_> subdiv_data_face;
 
         // loop over all faces and split them eventually, creating new vertices, edges and faces on the way
-        for(unsigned char iface(0) ; iface < 4 ; ++iface)
+        for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
         {
           // if edge has no children, create them
           if (face(iface)->active())
@@ -275,32 +292,48 @@ namespace FEAST
             // subdivide face
             face(iface)->subdivide(subdiv_data_face);
 
-// COMMENT_HILMAR: code below not adapted yet!!
+            // add the created vertices, edges and faces to the vector of created vertices/edges/faces
+// COMMENT_HILMAR: temporarily ignoring orientation here!
+            for(unsigned int i(0) ; i < subdiv_data_face.created_vertices.size() ; ++i)
+            {
+              subdiv_data.created_vertices.push_back(subdiv_data_face.created_vertices[i]);
+            }
 
-//            // add the created vertices, edges and faces to the vector of created vertices/edges/faces
-//            subdiv_data.created_vertices.push_back(subdiv_data_edge.created_vertex);
-//
-//            // COMMENT_HILMAR: Not sure whether the order plays a role here... to be on the safe side, order them
-//            // according to the array new_edges[].
-//            if(_edge_has_correct_orientation(iedge))
-//            {
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
-//            }
-//            else
-//            {
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
-//            }
+            for(unsigned int i(0) ; i < subdiv_data_face.created_edges.size() ; ++i)
+            {
+              subdiv_data.created_edges.push_back(subdiv_data_face.created_edges[i]);
+            }
+
+            for(unsigned int i(0) ; i < subdiv_data_face.created_cells.size() ; ++i)
+            {
+              subdiv_data.created_faces.push_back(subdiv_data_face.created_cells[i]);
+            }
+std::cout << "face " << (int)iface << ":" << std::endl;
+std::cout << subdiv_data_face.created_vertices.size() << " vertices";
+std::cout << ", " << subdiv_data_face.created_edges.size() << " edges";
+std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." << std::endl;
           }
-//          else // edge has children, reuse them
-//          {
+          else // edge has children, reuse them
+          {
 //            // store old active mask
-//            old_edge_active_mask[iedge] = false;
-//          }
-//
-//          // add new vertex to array of new vertices
-//          new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
+//            old_face_active_mask[iface] = false;
+          }
+        } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+
+
+        // add vertices lying in the centres of the old edges to the array of new vertices
+        for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        {
+          // exploit that the vertex shared by the edge children is stored as second vertex within the structure of
+          // both edge children
+          new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
+        }
+
+        // add edges being children of the old edges to the array of new edges
+
+        // ...BRAL
+
+// COMMENT_HILMAR: code below not adapted yet!!
 //
 //          // add new edges to array of new edges, respect the orientation of the edge
 //          if(_edge_has_correct_orientation(iedge))
@@ -315,25 +348,17 @@ namespace FEAST
 //            new_edges[2*iedge]   = edge(iedge)->child(1);
 //            new_edges[2*iedge+1] = edge(iedge)->child(0);
 //          }
-//// COMMENT_HILMAR: Beachte, dass wir auch in dem Fall, dass eine Kante schon Kinder hatte, *nicht* annehmen koennen,
-//// dass sie vom Nachbarelement erstellt worden ist. Beispiel: 2 benachbarte Zellen C0 und C1. C0 zerteilt sich, hat
-//// somit die gemeinsame Kante e zerteilt, sodass die Reihenfolge der Kinder der lokalen Orientierung von C0 entspricht.
-//// Irgendwann später zerteilt sich C1 und nutzt aus, dass die Kinder der Kante e ja von C0 angelegt worden sein
-//// muessen und dreht deren Reihenfolge also einfach um. Hier stimmt die Annahme also noch.
-//// Jetzt vergroebert sich C0 wieder, Kante e bleibt bestehen, da sie ja noch von C1 benutzt wird. Dann irgendwann
-//// verfeinert sich C0 wieder: Nun ist es aber falsch anzunehmen, dass der Nachbar (C1) die Kante angelegt haben muss!
-//// In Wirklichkeit war C0 es selbst, hat das aber inzwischen "vergessen".
-//        } // for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
+//        } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
 //
 //        // create new midpoint and its incident edges (these are always new, have no children and cannot be reused)
-//        double x1 = new_vertices[0]->coords(0);
-//        double y1 = new_vertices[0]->coords(1);
-//        double x2 = new_vertices[2]->coords(0);
-//        double y2 = new_vertices[2]->coords(1);
-//        double x3 = new_vertices[1]->coords(0);
-//        double y3 = new_vertices[1]->coords(1);
-//        double x4 = new_vertices[3]->coords(0);
-//        double y4 = new_vertices[3]->coords(1);
+//        double x1 = new_vertices[0]->coord(0);
+//        double y1 = new_vertices[0]->coord(1);
+//        double x2 = new_vertices[2]->coord(0);
+//        double y2 = new_vertices[2]->coord(1);
+//        double x3 = new_vertices[1]->coord(0);
+//        double y3 = new_vertices[1]->coord(1);
+//        double x4 = new_vertices[3]->coord(0);
+//        double y4 = new_vertices[3]->coord(1);
 //        double p[2];
 //        // TODO factor out common subexpressions
 //        p[0] = ( (x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );
@@ -365,7 +390,7 @@ namespace FEAST
 //        {
 //          this->child(i)->set_parent(this);
 //          subdiv_data.created_cells.push_back(this->child(i));
-        }
+//        }
       } // subdivide()
 
 

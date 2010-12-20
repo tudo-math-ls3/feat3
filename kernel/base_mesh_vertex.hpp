@@ -63,10 +63,17 @@ namespace FEAST
 
 
       /// returns a specific coordinate
-      inline double coords(unsigned char const index) const
+      inline double coord(unsigned char const index) const
       {
         assert(index < world_dim_);
         return _coords[index];
+      }
+
+
+      /// returns a reference to the coordinate array
+      inline double const * coords() const
+      {
+        return _coords;
       }
 
 

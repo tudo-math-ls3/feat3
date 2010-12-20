@@ -75,19 +75,17 @@ namespace FEAST
       /// returns index (w.r.t. to quad numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
+        assert(iedge < num_edges());
+        assert(iv < 2);
         // the index is inquired from the fixed numbering scheme stored in Numbering::quad_edge_vertices
         return Numbering::quad_edge_vertices[iedge][iv];
       }
 
-      /**
-      * \brief returns true when edge with local index iedge has the same orientation as the quad
-      *
-      * Orientation in the quad means that vertex with smaller local vertex is always the start vertex of the edge.
-      */
+      /// returns true when the orientation of the edge coincides with its orientation within the quad
       inline bool _edge_has_correct_orientation(unsigned char iedge)
       {
-        // the orientation of the edge is correct (i.e. the same as that of the quad), when its start vertex within
-        // the quad is local vertex 0 within the edge structure
+        assert(iedge < num_edges());
+        // return true when the edge's start vertex within the quad is local vertex 0 within the edge structure
         return (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0));
       }
 
@@ -224,7 +222,8 @@ namespace FEAST
 //            old_edge_active_mask[iedge] = false;
           }
 
-          // add new vertex to array of new vertices
+          // add new vertex to array of new vertices (exploit that the vertex shared by the edge children is stored
+          // as second vertex within the structure of both edge children)
           new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
 
           // add new edges to array of new edges, respect the orientation of the edge
@@ -258,27 +257,44 @@ namespace FEAST
         //   |  q0 | q1  |
         //   |     |     |
         //   -----v0------
-        double x0 = new_vertices[0]->coords(0);
-        double y0 = new_vertices[0]->coords(1);
-        double x1 = new_vertices[1]->coords(0);
-        double y1 = new_vertices[1]->coords(1);
-        double x2 = new_vertices[2]->coords(0);
-        double y2 = new_vertices[2]->coords(1);
-        double x3 = new_vertices[3]->coords(0);
-        double y3 = new_vertices[3]->coords(1);
+
+/*
+COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
+        double const* x0 = new_vertices[0]->coords();
+        double const* x1 = new_vertices[1]->coords();
+        double const* x2 = new_vertices[2]->coords();
+        double const* x3 = new_vertices[3]->coords();
+
         double p[2];
 
-        double denom = (x0-x1)*(y2-y3) - (y0-y1)*(x2-x3);
-        double fac0 = x0*y1-y0*x1;
-        double fac1 = x2*y3-y2*x3;
+        double denom = (x0[0]-x1[0])*(x2[1]-x3[1]) - (x0[1]-x1[1])*(x2[0]-x3[0]);
+        double fac0 = x0[0]*x1[1]-x0[1]*x1[0];
+        double fac1 = x2[0]*x3[1]-x2[1]*x3[0];
 
-        p[0] = ( fac0*(x2-x3) - (x0-x1)*fac1 ) / denom;
-        p[1] = ( fac0*(y2-y3) - (y0-y1)*fac1 ) / denom;
+        p[0] = ( fac0*(x2[0]-x3[0]) - (x0[0]-x1[0])*fac1 ) / denom;
+        p[1] = ( fac0*(x2[1]-x3[1]) - (x0[1]-x1[1])*fac1 ) / denom;
+*/
+
+// COMMENT_HILMAR: For the time being simply compute the midpoint of the quad as average of the four vertices
+// until we find out, what is the best way of computing this point correctly.
+// Note that in 3D the two lines connecting the edge midpoints do not necessarily intersect!
+// One possible strategy: Find the points on the two lines where they have the smallest distance, take the average
+// of these two points.
+        double p[world_dim_];
+        for(unsigned char i(0) ; i < world_dim_ ; ++i)
+        {
+          p[i] = 0;
+          for(int j(0) ; j < num_vertices() ; ++j)
+          {
+            p[i] += vertex(j)->coord(i);
+          }
+          p[i] /= num_vertices();
+        }
         new_vertices[4] = new Vertex<world_dim_>(p);
 
         subdiv_data.created_vertices.push_back(new_vertices[4]);
 
-        for (unsigned char i(0) ; i < 4 ; ++i)
+        for (unsigned char i(0) ; i < num_edges() ; ++i)
         {
           new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4]);
           subdiv_data.created_edges.push_back(new_edges[i+8]);

@@ -373,70 +373,74 @@ namespace FEAST
                          _edges[4], _edges[9], _edges[6], _edges[7]);
         add(quad);
         // f3
+        quad = new Quad_(_vertices[0], _vertices[1], _vertices[8], _vertices[9],
+                         _edges[0], _edges[18], _edges[10], _edges[11]);
+        add(quad);
+        // f4
         quad = new Quad_(_vertices[0], _vertices[8], _vertices[3], _vertices[11],
                          _edges[10], _edges[13], _edges[1], _edges[19]);
         add(quad);
-        // f4
+        // f5
         quad = new Quad_(_vertices[1], _vertices[9], _vertices[4], _vertices[12],
                          _edges[11], _edges[14], _edges[2], _edges[20]);
         add(quad);
-        // f5
+        // f6
         quad = new Quad_(_vertices[2], _vertices[3], _vertices[10], _vertices[11],
                          _edges[3], _edges[21], _edges[12], _edges[13]);
         add(quad);
-        // f6
+        // f7
         quad = new Quad_(_vertices[3], _vertices[4], _vertices[11], _vertices[12],
                          _edges[4], _edges[22], _edges[13], _edges[14]);
         add(quad);
-        // f7
+        // f8
         quad = new Quad_(_vertices[2], _vertices[10], _vertices[5], _vertices[13],
                          _edges[12], _edges[15], _edges[5], _edges[23]);
         add(quad);
-        // f8
+        // f9
         quad = new Quad_(_vertices[3], _vertices[11], _vertices[6], _vertices[14],
                          _edges[13], _edges[16], _edges[6], _edges[24]);
         add(quad);
-        // f9
+        // f10
         quad = new Quad_(_vertices[4], _vertices[12], _vertices[7], _vertices[15],
                          _edges[14], _edges[17], _edges[7], _edges[25]);
         add(quad);
-        // f10
+        // f11
         quad = new Quad_(_vertices[5], _vertices[6], _vertices[13], _vertices[14],
                          _edges[8], _edges[26], _edges[15], _edges[16]);
         add(quad);
-        // f11
+        // f12
         quad = new Quad_(_vertices[6], _vertices[7], _vertices[14], _vertices[15],
                          _edges[9], _edges[27], _edges[16], _edges[17]);
         add(quad);
-        // f12
+        // f13
         quad = new Quad_(_vertices[8], _vertices[9], _vertices[11], _vertices[12],
                          _edges[18], _edges[22], _edges[19], _edges[20]);
         add(quad);
-        // f13
+        // f14
         quad = new Quad_(_vertices[10], _vertices[11], _vertices[13], _vertices[14],
                          _edges[21], _edges[26], _edges[23], _edges[24]);
         add(quad);
-        // f14
+        // f15
         quad = new Quad_(_vertices[11], _vertices[12], _vertices[14], _vertices[15],
                          _edges[22], _edges[27], _edges[24], _edges[25]);
         add(quad);
-        // f15
+        // f16
         quad = new Quad_(_vertices[8], _vertices[9], _vertices[16], _vertices[17],
                          _edges[18], _edges[32], _edges[28], _edges[29]);
         add(quad);
-        // f16
+        // f17
         quad = new Quad_(_vertices[8], _vertices[16], _vertices[11], _vertices[18],
                          _edges[28], _edges[30], _edges[19], _edges[33]);
         add(quad);
-        // f17
+        // f18
         quad = new Quad_(_vertices[9], _vertices[17], _vertices[12], _vertices[19],
                          _edges[29], _edges[31], _edges[20], _edges[34]);
         add(quad);
-        // f18
+        // f19
         quad = new Quad_(_vertices[11], _vertices[12], _vertices[18], _vertices[19],
                          _edges[22], _edges[35], _edges[30], _edges[31]);
         add(quad);
-        // f19
+        // f20
         quad = new Quad_(_vertices[16], _vertices[17], _vertices[18], _vertices[19],
                          _edges[32], _edges[35], _edges[33], _edges[34]);
         add(quad);
@@ -447,28 +451,28 @@ namespace FEAST
                                _vertices[3], _vertices[4], _vertices[11], _vertices[12],
                                _edges[0], _edges[18], _edges[4], _edges[22], _edges[10], _edges[11],
                                _edges[13], _edges[14], _edges[1], _edges[2], _edges[19], _edges[20],
-                               _faces[2], _faces[6], _faces[0], _faces[12], _faces[3], _faces[4]);
+                               _faces[3], _faces[7], _faces[0], _faces[13], _faces[4], _faces[5]);
         add(hex);
         // c1
         hex = new Hexa_(_vertices[2], _vertices[3], _vertices[10], _vertices[11],
                         _vertices[5], _vertices[6], _vertices[13], _vertices[14],
                         _edges[3], _edges[21], _edges[8], _edges[26], _edges[12], _edges[13],
                         _edges[15], _edges[16], _edges[5], _edges[6], _edges[23], _edges[24],
-                        _faces[5], _faces[10], _faces[1], _faces[13], _faces[7], _faces[8]);
+                        _faces[6], _faces[11], _faces[1], _faces[14], _faces[8], _faces[9]);
         add(hex);
         // c2
         hex = new Hexa_(_vertices[3], _vertices[4], _vertices[11], _vertices[12],
                         _vertices[6], _vertices[7], _vertices[14], _vertices[15],
                         _edges[4], _edges[22], _edges[9], _edges[27], _edges[13], _edges[14],
                         _edges[16], _edges[17], _edges[6], _edges[7], _edges[24], _edges[25],
-                        _faces[6], _faces[11], _faces[2], _faces[14], _faces[8], _faces[9]);
+                        _faces[7], _faces[12], _faces[2], _faces[15], _faces[9], _faces[10]);
         add(hex);
         // c3
         hex = new Hexa_(_vertices[8], _vertices[9], _vertices[16], _vertices[17],
                         _vertices[11], _vertices[12], _vertices[18], _vertices[19],
                         _edges[18], _edges[32], _edges[22], _edges[35], _edges[28], _edges[29],
                         _edges[30], _edges[31], _edges[19], _edges[20], _edges[33], _edges[34],
-                        _faces[15], _faces[18], _faces[12], _faces[19], _faces[16], _faces[17]);
+                        _faces[16], _faces[19], _faces[13], _faces[20], _faces[17], _faces[18]);
         add(hex);
 
 
