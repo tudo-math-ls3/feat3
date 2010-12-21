@@ -70,8 +70,8 @@ namespace FEAST
       }
 
 
-      /// returns a reference to the coordinate array
-      inline double const * coords() const
+      /// returns a pointer to the coordinate array
+      inline double const* coords() const
       {
         return _coords;
       }
