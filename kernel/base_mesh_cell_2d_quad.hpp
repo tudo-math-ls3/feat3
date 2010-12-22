@@ -277,9 +277,16 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 
 // COMMENT_HILMAR: For the time being simply compute the midpoint of the quad as average of the four vertices
 // until we find out, what is the best way of computing this point correctly.
+
 // Note that in 3D the two lines connecting the edge midpoints do not necessarily intersect!
 // One possible strategy: Find the points on the two lines where they have the smallest distance, take the average
 // of these two points.
+// Another strategy: Use FE techniques, i.e. consider the bilinear mapping from the 2D reference element (quad
+// [-1,1] x [-1,1]) to the actual quad, use this mapping to compute the center node. Problem: How to deal with the
+// 3D case, i.e., where the quad is a 2D structure in the 3D space (face of a hexa)? Here, one actually maps from one
+// face of the 3D reference element (cube [-1,1] x [-1,1] x [-1,1]) to the face of the actual hexa (trilinear mapping
+// restricted to one face). So, it might be necessary to compute the coordinates of the new vertex already *outside*
+// this routine...
         double p[world_dim_];
         for(unsigned char i(0) ; i < world_dim_ ; ++i)
         {
@@ -313,6 +320,8 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         //  |     |     |         |     e8    |
         // w0----v0----w1         -------------
         //                           e0    e1
+        // The fact that the centre vertex v4 is the fourth one of child 0 is exploited elsewhere, so this must not
+        // be changed!
         _set_child(0, new Quad(vertex(0), new_vertices[0], new_vertices[2], new_vertices[4],
                                new_edges[0], new_edges[10], new_edges[4], new_edges[8]));
         _set_child(1, new Quad(new_vertices[0], vertex(1), new_vertices[4], new_vertices[3],

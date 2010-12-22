@@ -242,7 +242,7 @@ namespace FEAST
         *
         * numbering scheme: new vertices
         *   - on existing edges: new_vertex_index = old_edge_index (indices 0-11)
-        *   - in face centres: new_vertex_index = old_face_index (indices 12-17)
+        *   - in face centres: new_vertex_index = 12 + old_face_index (indices 12-17)
         *   - in centre of the hexa: new_vertex_index = greatest new index (index 18)
         */
         Vertex_* new_vertices[19];
@@ -321,7 +321,7 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
         } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
 
 
-        // add vertices lying in the centres of the old edges to the array of new vertices
+        // add vertices lying in the centres of the old edges to the array of new vertices (indices 0-11)
         for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
         {
           // exploit that the vertex shared by the edge children is stored as second vertex within the structure of
@@ -329,9 +329,29 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
           new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
         }
 
-        // add edges being children of the old edges to the array of new edges
+        // add vertices lying in the centres of the faces to the array of new vertices (indices 12-17)
+        for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
+        {
+          // exploit that the centre vertex of the face is the fourth one of its first child
+          new_vertices[12 + iface] = face(iface)->child(0)->vertex(3);
+        }
 
-        // ...BRAL
+        // add edges being children of the old edges to the array of new edges
+        for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        {
+          // inquire whether the internal edge orientation equals its orientation within the hexa
+          if (_edge_has_correct_orientation(iedge))
+          {
+            new_edges[2*iedge] = edge(iedge)->child(0);
+            new_edges[2*iedge+1] = edge(iedge)->child(1);
+          }
+          else
+          {
+            new_edges[2*iedge] = edge(iedge)->child(1);
+            new_edges[2*iedge+1] = edge(iedge)->child(0);
+          }
+        }
+
 
 // COMMENT_HILMAR: code below not adapted yet!!
 //
