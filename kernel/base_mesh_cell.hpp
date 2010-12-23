@@ -20,31 +20,83 @@ namespace FEAST
     /// stores the fixed numbering schemes
     struct Numbering
     {
-      // indices of start and end vertex of the four edges in a quad
+      /// indices of start and end vertex of the four edges in a quad
       static unsigned char quad_edge_vertices[][2];
 
-      // indices of start and end vertex of the twelve edges in a hexa
+      /// indices of start and end vertex of the twelve edges in a hexa
       static unsigned char hexa_edge_vertices[][2];
 
-      // indices of the four vertices of the six faces in a hexa
+      /// indices of the four vertices of the six faces in a hexa
       static unsigned char hexa_face_vertices[][4];
 
-      // indices of the four edges of the six faces in a hexa
+      /// indices of the four edges of the six faces in a hexa
       static unsigned char hexa_face_edges[][4];
+
+      /**
+      * \brief quad-to-quad mappings of vertices
+      *
+      * On the one hand a quad face in a 3D cell has a certain numbering w.r.t. the numbering of the 3D cell, i.e.
+      * the numbering of the 3D cell determines which are first, second, ... vertex/edge of the face. On the
+      * other hand the quad is stored as a 2D cell with a certain numbering. These two numberings usually do not
+      * coincide. There are eight possibilities how the two numberings can be related. The first four have the same
+      * orientation as the reference numeration, i.e. they are only rotated, the last four have opposite orientation.
+      * The eight possibilites lead to eight different mappings of vertices and edges, resp., which we denote by, e.g.,
+      *   V1:2031
+      *   (relation 1: vertex 0 (of the reference numbering) is mapped to vert. 2, vert. 1 is mapped to vert. 0, ...)
+      *   E7:3210
+      *   (relation 7: edge 0 (of the reference numbering) is mapped to edge 3, ...).
+      *
+      * same orientation as reference                          opposite orientation
+      *
+      * relation 0   relation 1   relation 2   relation 3      relation 4   relation 5   relation 6   relation 7
+      *
+      * 2---1---3    3---3---1    0---2---2    1---0---0       1---3---3    3---1---2    0---0---1    2---2---0
+      * |       |    |       |    |       |    |       |       |       |    |       |    |       |    |       |
+      * 2       3    1       0    0       1    3       2       0       1    3       2    2       3    1       0
+      * |       |    |       |    |       |    |       |       |       |    |       |    |       |    |       |
+      * 0---0---1    2---2---0    1---3---3    3---1---2       0---2---2    1---0---0    2---1---3    3---3---1
+      *  V0:0123      V1:2031      V2:1302      V3:3210         V4:0213      V5:1032      V6:2301      V7:3120
+      *  E0:0123      E1:2310      E2:3201      E3:1032         E4:2301      E5:0132      E6:1023      E7:3210
+      * (reference)
+      */
+// COMMENT_HILMAR: Sieht hier jemand eine Moeglichkeit, dieses Mapping ohne explizites Abspeichern zu erhalten? Also
+// durch Berechnung in Abhaengigkeit vom Knoten- bzw. Kantenindex? Ich seh's nicht...
+// COMMENT_HILMAR: Mit dem Standard-ccw-Mapping waere das alles einfacher... da koennte man mit sowas ähnlichem wie
+// (ivertex + ishift)%4 arbeiten.
+      static unsigned char quad_to_quad_mappings_vertices[][4];
+      /**
+      * \brief quad-to-quad mappings of edges
+      *
+      * See the description of #quad_to_quad_mappings_vertices.
+      */
+      static unsigned char quad_to_quad_mappings_edges[][4];
     };
+
+    // indices of start and end vertex of the four edges in a quad
     unsigned char Numbering::quad_edge_vertices[4][2]
       = {{0,1}, {2,3}, {0,2}, {1,3}};
 
+    // indices of start and end vertex of the twelve edges in a hexa
     unsigned char Numbering::hexa_edge_vertices[12][2]
       = {{0,1}, {2,3}, {4,5}, {6,7},   {0,2}, {1,3}, {4,6}, {5,7},   {0,4}, {1,5}, {2,6}, {3,7}};
 
+    // indices of the four vertices of the six faces in a hexa
     unsigned char Numbering::hexa_face_vertices[6][4]
       = {{0,1,2,3}, {4,5,6,7}, {0,1,4,5}, {2,3,6,7}, {0,2,4,6}, {1,3,5,7}};
 
+    // indices of the four edges of the six faces in a hexa
     unsigned char Numbering::hexa_face_edges[6][4]
       = {{0,1,4,5}, {2,3,6,7}, {0,2,8,9}, {1,3,10,11}, {4,6,8,10}, {5,7,9,11}};
 
+    // quad-to-quad mappings for vertices
+    // V0:0123    V1:2031    V2:1302    V3:3210    V4:0213    V5:1032    V6:2301    V7:3120
+    unsigned char Numbering::quad_to_quad_mappings_vertices[8][4] =
+      {{0,1,2,3}, {2,0,3,1}, {1,3,0,2}, {3,2,1,0}, {0,2,1,3}, {1,0,3,2}, {2,3,0,1}, {3,1,2,0}};
 
+    // quad-to-quad mappings for edges
+    // E0:0123    E1:2310    E2:3201    E3:1032    E4:2301    E5:0132    E6:1023     E7:3210
+    unsigned char Numbering::quad_to_quad_mappings_edges[8][4] =
+      {{0,1,2,3}, {2,3,1,0}, {3,2,0,1}, {1,0,3,2}, {2,3,0,1}, {0,1,3,2}, {1,0,2,3}, {3,2,1,0}};
 
     /**
     * \brief class containing subdivision specific data (empty definition to be specialised by cell_dim_)

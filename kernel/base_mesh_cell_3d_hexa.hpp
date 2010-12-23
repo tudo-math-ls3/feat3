@@ -79,6 +79,9 @@ namespace FEAST
       typedef Vertex<world_dim_> Vertex_;
 
       /// shortcut for type Cell<1, space_dim_, world_dim_>
+      typedef Edge<space_dim_, world_dim_> Edge_;
+
+      /// shortcut for type Cell<1, space_dim_, world_dim_>
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
       /// shortcut for type Quad<space_dim_, world_dim_>
@@ -322,6 +325,7 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
 
 
         // add vertices lying in the centres of the old edges to the array of new vertices (indices 0-11)
+        // (they have already been pushed to the subdivision data structure)
         for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
         {
           // exploit that the vertex shared by the edge children is stored as second vertex within the structure of
@@ -330,13 +334,32 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
         }
 
         // add vertices lying in the centres of the faces to the array of new vertices (indices 12-17)
+        // (they have already been pushed to the subdivision data structure)
         for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
         {
-          // exploit that the centre vertex of the face is the fourth one of its first child
+          // exploit that the centre vertex of the face is the fourth one of its first child (no matter if it has been
+          // created in this subdivision step or already by the neighbour hex)
           new_vertices[12 + iface] = face(iface)->child(0)->vertex(3);
         }
 
-        // add edges being children of the old edges to the array of new edges
+        // create the centre vertex of the hexa
+// COMMENT_HILMAR: For the time being simply compute the centre vertex of the hexa as average of the eight vertices
+// until we find out, what is the best way of computing this point correctly.
+        double p[world_dim_];
+        for(unsigned char i(0) ; i < world_dim_ ; ++i)
+        {
+          p[i] = 0;
+          for(int j(0) ; j < num_vertices() ; ++j)
+          {
+            p[i] += vertex(j)->coord(i);
+          }
+          p[i] /= num_vertices();
+        }
+        new_vertices[18] = new Vertex<world_dim_>(p);
+        subdiv_data.created_vertices.push_back(new_vertices[18]);
+
+        // add edges being children of the old edges to the array of new edges (indices 0-23)
+        // (they have already been pushed to the subdivision data structure)
         for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
         {
           // inquire whether the internal edge orientation equals its orientation within the hexa
@@ -352,38 +375,27 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
           }
         }
 
+        // add edges lying in the interior of the faces to the array of new edges (indices 24-47)
+        // (they have already been pushed to the subdivision data structure)
+        for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
+        {
+          for (unsigned char iedge(0) ; iedge < 4 ; ++iedge)
+          {
+//            new_edges[4*iface + iedge] = ...
+          }
+        }
+
+        // create edges from face centres to centre vertex of the hexa, add them to the array of new edges
+        // (indices 48-53) and to the subdivision data structure
+        for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
+        {
+          new_edges[48 + iface] = new Edge_(new_vertices[12 + iface], new_vertices[18]);
+          subdiv_data.created_edges.push_back(new_edges[48 + iface]);
+        }
+
 
 // COMMENT_HILMAR: code below not adapted yet!!
 //
-//          // add new edges to array of new edges, respect the orientation of the edge
-//          if(_edge_has_correct_orientation(iedge))
-//          {
-//            // if the edge has the orientation of the quad, then child 0 is the first edge
-//            new_edges[2*iedge]   = edge(iedge)->child(0);
-//            new_edges[2*iedge+1] = edge(iedge)->child(1);
-//          }
-//          else
-//          {
-//            // if the edge does not have the orientation of the quad, then child 1 is the first edge.
-//            new_edges[2*iedge]   = edge(iedge)->child(1);
-//            new_edges[2*iedge+1] = edge(iedge)->child(0);
-//          }
-//        } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
-//
-//        // create new midpoint and its incident edges (these are always new, have no children and cannot be reused)
-//        double x1 = new_vertices[0]->coord(0);
-//        double y1 = new_vertices[0]->coord(1);
-//        double x2 = new_vertices[2]->coord(0);
-//        double y2 = new_vertices[2]->coord(1);
-//        double x3 = new_vertices[1]->coord(0);
-//        double y3 = new_vertices[1]->coord(1);
-//        double x4 = new_vertices[3]->coord(0);
-//        double y4 = new_vertices[3]->coord(1);
-//        double p[2];
-//        // TODO factor out common subexpressions
-//        p[0] = ( (x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );
-//        p[1] = ( (x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );
-//        new_vertices[4] = new Vertex<world_dim_>(p);
 //
 //        subdiv_data.created_vertices.push_back(new_vertices[4]);
 //

@@ -313,7 +313,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         // finally, create new quads and add them as children
         //                          e2     e3
         // w2----v1-----w3         -------------
-        //  |     |     |       e5|    e9     |e7
+        //  |     |     |       e5|     e9    |e7
         //  |  q2 | q3  |         |     |     |
         // v2----v4-----v3        --e10---e11--
         //  |  q0 | q1  |       e4|     |     |e6
