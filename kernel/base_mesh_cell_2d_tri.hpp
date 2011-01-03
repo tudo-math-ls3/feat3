@@ -113,6 +113,42 @@ namespace FEAST
       }
 
 
+      /// returns next vertex of vertex with given index w.r.t. to ccw ordering
+      inline Vertex_* next_vertex_ccw(unsigned char const index) const
+      {
+        assert(index < num_vertices());
+// TODO: to be implemented correctly!
+        return nullptr;
+      }
+
+
+      /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
+      inline Vertex_* previous_vertex_ccw(unsigned char const index) const
+      {
+        assert(index < num_vertices());
+// TODO: to be implemented correctly!
+        return nullptr;
+      }
+
+
+      /// returns next edge of edge with given index w.r.t. to ccw ordering
+      inline Cell_1D_* next_edge_ccw(unsigned char const index) const
+      {
+        assert(index < num_edges());
+// TODO: to be implemented correctly!
+        return nullptr;
+      }
+
+
+      /// returns previous edge of edge with given index w.r.t. to ccw ordering
+      inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
+      {
+        assert(index < num_edges());
+// TODO: to be implemented correctly!
+        return nullptr;
+      }
+
+
       /// subdivision routine splitting a tri and storing parent/child information
       inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>& subdiv_data)
       {

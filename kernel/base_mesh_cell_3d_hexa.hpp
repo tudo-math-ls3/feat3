@@ -97,8 +97,11 @@ namespace FEAST
       /// edges of the hexa
       Cell_1D_* _edges[12];
 
-      /// edges of the hexa
+      /// faces of the hexa
       Cell_2D_* _faces[6];
+
+      /// relation between local quad numbering and face numbering within the hexa for each face (see struct Numbering)
+      unsigned char _face_numbering[6];
 
       /// returns index (w.r.t. to hexa numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
@@ -118,13 +121,53 @@ namespace FEAST
       }
 
       /**
-      * \brief inquires how the local face numbering is related to the face numbering withing the hexa
+      * \brief determines the relation between local face numbering and face numbering within the hexa
       *
-      * ...
+      * This function determines the relation between local face numbering and face numbering within the hexa. It is
+      * called from the constructor of the hexa. The relation between the numberings is stored for each face in the
+      * array _face_numbering. For details see the description inside the struct Numbering.
       */
-      inline void _face_orientation(bool& same_orientation, unsigned char& rotation, unsigned char iface)
+      inline void _determine_face_numbering()
       {
-        //TODO: to be implemented
+        for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+        {
+          // init the array entry
+          _face_numbering[iface] = 42;
+          for(unsigned char ivert(0) ; ivert < face(iface)->num_vertices() ; ++ivert)
+          {
+            // inquire whether the vertex with index ivert within the face structure is the first vertex of this face
+            // within the hex structure
+            if(face(iface)->vertex(ivert) == vertex(Numbering::hexa_face_vertices[iface][0]))
+            {
+              // If so then we either have relation ivert or ivert+4. Determine which of the two by comparing the
+              // orientations. Within the face structure, we have to use the corresponding function next_vertex_ccw(..),
+              // while in the hex structure we know that the vertex with index 1 is the ccw-next of vertex with index 0.
+              if(face(iface)->next_vertex_ccw(ivert) == vertex(Numbering::hexa_face_vertices[iface][1]))
+              {
+                // same orientation
+                _face_numbering[iface] = ivert;
+              }
+              else if(face(iface)->previous_vertex_ccw(ivert) == vertex(Numbering::hexa_face_vertices[iface][1]))
+              {
+                // opposite orientation
+                _face_numbering[iface] = ivert+4;
+              }
+              else
+              {
+                std::cerr << "Something is wrong with the numbering of face " << (int)iface << " in hexa." << std::endl;
+                exit(1);
+              }
+            }
+          } // for(unsigned char ivert(0) ; ivert < face(iface)->num_vertices() ; ++ivert)
+
+          if (_face_numbering[iface] == 42)
+          {
+            std::cerr << "Vertex not found in face " << (int)iface << " in hexa." << std::endl;
+            exit(1);
+          }
+          //std::cout << "face " << (int)iface << "(" << (int)face(iface)->index() << "), numb "
+          //          << (int)_face_numbering[iface] << std::endl;
+        } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
       }
 
 
@@ -142,6 +185,7 @@ namespace FEAST
         _vertices[4] = v4;
         _vertices[5] = v5;
         _vertices[6] = v6;
+        _vertices[7] = v7;
         _edges[0] = e0;
         _edges[1] = e1;
         _edges[2] = e2;
@@ -177,6 +221,9 @@ namespace FEAST
 // COMMENT_HILMAR: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<3, space_dim_, world_dim_>({8,12,6})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
+
+        // determine and store the relation between local face numbering and face numbering within the hexa
+        _determine_face_numbering();
       }
 
 
@@ -337,19 +384,19 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
         // (they have already been pushed to the subdivision data structure)
         for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
         {
-          // exploit that the centre vertex of the face is the fourth one of its first child (no matter if it has been
-          // created in this subdivision step or already by the neighbour hex)
+          // exploit that the centre vertex of the face has index 3 in all its children (no matter if it has been
+          // created in this subdivision step or already by the neighbour hex) (see quad subdivision routine)
           new_vertices[12 + iface] = face(iface)->child(0)->vertex(3);
         }
 
         // create the centre vertex of the hexa
-// COMMENT_HILMAR: For the time being simply compute the centre vertex of the hexa as average of the eight vertices
-// until we find out, what is the best way of computing this point correctly.
+// COMMENT_HILMAR: For the time being simply compute the centre vertex of the hexa as average of the eight corner
+// vertices until we find out, what is the best way of computing this point correctly.
         double p[world_dim_];
         for(unsigned char i(0) ; i < world_dim_ ; ++i)
         {
           p[i] = 0;
-          for(int j(0) ; j < num_vertices() ; ++j)
+          for(int j(0) ; j < num_vertices()-1 ; ++j)
           {
             p[i] += vertex(j)->coord(i);
           }
@@ -362,7 +409,7 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
         // (they have already been pushed to the subdivision data structure)
         for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
         {
-          // inquire whether the internal edge orientation equals its orientation within the hexa
+        // inquire whether the internal edge orientation equals its orientation within the hexa
           if (_edge_has_correct_orientation(iedge))
           {
             new_edges[2*iedge] = edge(iedge)->child(0);
@@ -381,7 +428,13 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
         {
           for (unsigned char iedge(0) ; iedge < 4 ; ++iedge)
           {
-//            new_edges[4*iface + iedge] = ...
+            // Exploit that the edge from edge iedge of the parent face towards the centre vertex of the subdivided
+            // face has index 3 in child iedge (see quad subdivision routine). The face numbering has to be mapped
+            // to the local face structure via the array Numbering::quad_to_quad_mappings_edges[][].
+            new_edges[24 + 4*iface + iedge]
+              = face(iface)->child(Numbering::quad_to_quad_mappings_edges[_face_numbering[iface]][iedge])->edge(3);
+//std::cout << "index = " << 24 + 4*iface + iedge << ", edge hex = " << (int) iedge << ", edge local = "
+//  << (int)Numbering::quad_to_quad_mappings_edges[_face_numbering[iface]][iedge] << std::endl;
           }
         }
 
@@ -394,19 +447,14 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
         }
 
 
+        // now faces
+        // ...
+
+
 // COMMENT_HILMAR: code below not adapted yet!!
+//        // set number of children to 8
+//        this->_set_num_children(8);
 //
-//
-//        subdiv_data.created_vertices.push_back(new_vertices[4]);
-//
-//        for (unsigned char i(0) ; i < 4 ; ++i)
-//        {
-//          new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4]);
-//          subdiv_data.created_edges.push_back(new_edges[i+8]);
-//        }
-//
-//        // set number of children to 4
-//        this->_set_num_children(4);
 //
 //        // finally, create and add new quads
 //        _set_child(0, new Quad_(vertex(0), new_vertices[0], new_vertices[4], new_vertices[3],
@@ -435,15 +483,7 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
 
         for(int i(0) ; i < num_faces() ; ++i)
         {
-          stream << "F" << _faces[i]->index();
-//          if(_face_has_correct_orientation(i))
-//          {
-//            stream << "(+)";
-//          }
-//          else
-//          {
-//            stream << "(-)";
-//          }
+          stream << "F" << _faces[i]->index() << "(" << _face_numbering[i] << ")";
           if(i < num_faces()-1)
           {
             stream << ", ";

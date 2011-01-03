@@ -23,6 +23,40 @@ namespace FEAST
       /// indices of start and end vertex of the four edges in a quad
       static unsigned char quad_edge_vertices[][2];
 
+      /**
+      * \brief index of the next vertex in a quad w.r.t. ccw ordering ([1,3,0,2])
+      *
+      * Due to this numbering scheme of the quad
+      *   2---1---3
+      *   |       |
+      *   2       3
+      *   |       |
+      *   0---0---1
+      * the respectively next vertex w.r.t. ccw ordering is given by the mapping [1,3,0,2]
+      */
+      static unsigned char quad_next_vertex_ccw[];
+
+      /**
+      * \brief  index of the previous vertex in a quad w.r.t. ccw ordering ([2,0,3,1])
+      *
+      * See the detailed description of #quad_next_vertex_ccw.
+      */
+      static unsigned char quad_previous_vertex_ccw[];
+
+      /**
+      * \brief  index of the next edge in a quad w.r.t. ccw ordering ([3,2,0,1])
+      *
+      * See the detailed description of #quad_next_vertex_ccw.
+      */
+      static unsigned char quad_next_edge_ccw[];
+
+      /**
+      * \brief  index of the previous edge in a quad w.r.t. ccw ordering ([2,3,1,0])
+      *
+      * See the detailed description of #quad_next_vertex_ccw.
+      */
+      static unsigned char quad_previous_edge_ccw[];
+
       /// indices of start and end vertex of the twelve edges in a hexa
       static unsigned char hexa_edge_vertices[][2];
 
@@ -42,28 +76,33 @@ namespace FEAST
       * orientation as the reference numeration, i.e. they are only rotated, the last four have opposite orientation.
       * The eight possibilites lead to eight different mappings of vertices and edges, resp., which we denote by, e.g.,
       *   V1:2031
-      *   (relation 1: vertex 0 (of the reference numbering) is mapped to vert. 2, vert. 1 is mapped to vert. 0, ...)
+      *   (relation 2: vertex 0 (of the reference numbering) equals vert. 2 in the different numbering,
+      *                vert. 1 equals vert. 0, ...)
       *   E7:3210
-      *   (relation 7: edge 0 (of the reference numbering) is mapped to edge 3, ...).
+      *   (relation 7: edge 0 (of the reference numbering) equals edge 3 in the different numbering, ...).
       *
       * same orientation as reference                          opposite orientation
       *
       * relation 0   relation 1   relation 2   relation 3      relation 4   relation 5   relation 6   relation 7
       *
-      * 2---1---3    3---3---1    0---2---2    1---0---0       1---3---3    3---1---2    0---0---1    2---2---0
+      * 2---1---3    0---2---2    3---3---1    1---0---0       1---3---3    3---1---2    0---0---1    2---2---0
       * |       |    |       |    |       |    |       |       |       |    |       |    |       |    |       |
-      * 2       3    1       0    0       1    3       2       0       1    3       2    2       3    1       0
+      * 2       3    0       1    1       0    3       2       0       1    3       2    2       3    1       0
       * |       |    |       |    |       |    |       |       |       |    |       |    |       |    |       |
-      * 0---0---1    2---2---0    1---3---3    3---1---2       0---2---2    1---0---0    2---1---3    3---3---1
-      *  V0:0123      V1:2031      V2:1302      V3:3210         V4:0213      V5:1032      V6:2301      V7:3120
-      *  E0:0123      E1:2310      E2:3201      E3:1032         E4:2301      E5:0132      E6:1023      E7:3210
+      * 0---0---1    1---3---3    2---2---0    3---1---2       0---2---2    1---0---0    2---1---3    3---3---1
+      *  V0:0123      V2:1302      V1:2031      V3:3210         V4:0213      V5:1032      V6:2301      V7:3120
+      *  E0:0123      E2:3201      E1:2310      E3:1032         E4:2301      E5:0132      E6:1023      E7:3210
       * (reference)
+      *
+      * When vertex i of the given numbering equals vertex 0 in the reference numbering, then we have either
+      * relation i or relation i+4 (depending on the orientation).
       */
 // COMMENT_HILMAR: Sieht hier jemand eine Moeglichkeit, dieses Mapping ohne explizites Abspeichern zu erhalten? Also
 // durch Berechnung in Abhaengigkeit vom Knoten- bzw. Kantenindex? Ich seh's nicht...
 // COMMENT_HILMAR: Mit dem Standard-ccw-Mapping waere das alles einfacher... da koennte man mit sowas ähnlichem wie
 // (ivertex + ishift)%4 arbeiten.
       static unsigned char quad_to_quad_mappings_vertices[][4];
+
       /**
       * \brief quad-to-quad mappings of edges
       *
@@ -73,8 +112,19 @@ namespace FEAST
     };
 
     // indices of start and end vertex of the four edges in a quad
-    unsigned char Numbering::quad_edge_vertices[4][2]
-      = {{0,1}, {2,3}, {0,2}, {1,3}};
+    unsigned char Numbering::quad_edge_vertices[4][2] = {{0,1}, {2,3}, {0,2}, {1,3}};
+
+    // index of the next vertex in a quad w.r.t. ccw ordering ([1,3,0,2])
+    unsigned char Numbering::quad_next_vertex_ccw[4] = {1,3,0,2};
+
+    // index of the previous vertex in a quad w.r.t. ccw ordering ([2,0,3,1])
+    unsigned char Numbering::quad_previous_vertex_ccw[4] = {2,0,3,1};
+
+    // index of the next edge in a quad w.r.t. ccw ordering ([3,2,0,1])
+    unsigned char Numbering::quad_next_edge_ccw[4] = {3,2,0,1};
+
+    // index of the previous edge in a quad w.r.t. ccw ordering ([2,3,1,0])
+    unsigned char Numbering::quad_previous_edge_ccw[4] = {2,3,1,0};
 
     // indices of start and end vertex of the twelve edges in a hexa
     unsigned char Numbering::hexa_edge_vertices[12][2]
@@ -97,6 +147,8 @@ namespace FEAST
     // E0:0123    E1:2310    E2:3201    E3:1032    E4:2301    E5:0132    E6:1023     E7:3210
     unsigned char Numbering::quad_to_quad_mappings_edges[8][4] =
       {{0,1,2,3}, {2,3,1,0}, {3,2,0,1}, {1,0,3,2}, {2,3,0,1}, {0,1,3,2}, {1,0,2,3}, {3,2,1,0}};
+
+
 
     /**
     * \brief class containing subdivision specific data (empty definition to be specialised by cell_dim_)
@@ -265,6 +317,18 @@ namespace FEAST
 
       /// returns edge at given index
       virtual Cell<1, space_dim_, world_dim_>* edge(unsigned char const index) const = 0;
+
+      /// returns next vertex of vertex with given index w.r.t. to ccw ordering
+      virtual Vertex<world_dim_>* next_vertex_ccw(unsigned char const index) const = 0;
+
+      /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
+      virtual Vertex<world_dim_>* previous_vertex_ccw(unsigned char const index) const = 0;
+
+      /// returns next edge of edge with given index w.r.t. to ccw ordering
+      virtual Cell<1, space_dim_, world_dim_>* next_edge_ccw(unsigned char const index) const = 0;
+
+      /// returns previous edge of edge with given index w.r.t. to ccw ordering
+      virtual Cell<1, space_dim_, world_dim_>* previous_edge_ccw(unsigned char const index) const = 0;
     };
 
 

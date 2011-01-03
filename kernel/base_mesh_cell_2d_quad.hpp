@@ -147,6 +147,38 @@ namespace FEAST
       }
 
 
+      /// returns next vertex of vertex with given index w.r.t. to ccw ordering
+      inline Vertex_* next_vertex_ccw(unsigned char const index) const
+      {
+        assert(index < num_vertices());
+        return _vertices[Numbering::quad_next_vertex_ccw[index]];
+      }
+
+
+      /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
+      inline Vertex_* previous_vertex_ccw(unsigned char const index) const
+      {
+        assert(index < num_vertices());
+        return _vertices[Numbering::quad_previous_vertex_ccw[index]];
+      }
+
+
+      /// returns next edge of edge with given index w.r.t. to ccw ordering
+      inline Cell_1D_* next_edge_ccw(unsigned char const index) const
+      {
+        assert(index < num_edges());
+        return _edges[Numbering::quad_next_edge_ccw[index]];
+      }
+
+
+      /// returns previous edge of edge with given index w.r.t. to ccw ordering
+      inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
+      {
+        assert(index < num_edges());
+        return _edges[Numbering::quad_previous_edge_ccw[index]];
+      }
+
+
       /// subdivision routine splitting a quad and storing parent/child information
 // COMMENT_HILMAR: this is currently hard-wired to splitting the quad into four quads. Later, this is parameterised
 // via the information in the SubdivisionData object.
@@ -320,16 +352,19 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         //  |     |     |         |     e8    |
         // w0----v0----w1         -------------
         //                           e0    e1
-        // The fact that the centre vertex v4 is the fourth one of child 0 is exploited elsewhere, so this must not
-        // be changed!
+        // building rule: vertex i of the parent quad is vertex 0 of child i (e.g., w1 has index 0 in q1)
+        //   ==> the center vertex has index 3 in all child quads
+        //   ==> the edge from edge i of the parent quad towards the center vertex is edge 3 of child i
+        //       (e.g., the edge from v2 (lying on edge 2 of the parent quad) towards v4 has index 3 in q2)
+        // These two facts are exploited, e.g., within the hexa subdivision routine, so don't change this!
         _set_child(0, new Quad(vertex(0), new_vertices[0], new_vertices[2], new_vertices[4],
                                new_edges[0], new_edges[10], new_edges[4], new_edges[8]));
-        _set_child(1, new Quad(new_vertices[0], vertex(1), new_vertices[4], new_vertices[3],
-                               new_edges[1], new_edges[11], new_edges[8], new_edges[6]));
-        _set_child(2, new Quad(new_vertices[2], new_vertices[4], vertex(2), new_vertices[1],
-                               new_edges[10], new_edges[2], new_edges[5], new_edges[9]));
-        _set_child(3, new Quad(new_vertices[4], new_vertices[3], new_vertices[1], vertex(3),
-                               new_edges[11], new_edges[3], new_edges[9], new_edges[7]));
+        _set_child(1, new Quad(vertex(1), new_vertices[3], new_vertices[0], new_vertices[4],
+                               new_edges[6], new_edges[8], new_edges[1], new_edges[11]));
+        _set_child(2, new Quad(vertex(2), new_vertices[2], new_vertices[1], new_vertices[4],
+                               new_edges[5], new_edges[9], new_edges[2], new_edges[10]));
+        _set_child(3, new Quad(vertex(3), new_vertices[1], new_vertices[3], new_vertices[4],
+                               new_edges[3], new_edges[11], new_edges[7], new_edges[9]));
 
         // add the quads to the vector of new created quads
         for (unsigned char i(0) ; i < 4 ; ++i)
