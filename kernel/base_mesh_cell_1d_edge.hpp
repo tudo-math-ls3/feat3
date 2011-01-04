@@ -78,7 +78,9 @@ namespace FEAST
         // assure that this cell has not been divided yet
         if(!this->active())
         {
-          std::cerr << "Edge " << this->index() << " is already subdivided! Aborting program.";
+          std::cerr << "Edge ";
+          this->print_index(std::cerr);
+          std::cerr << " is already subdivided! Aborting program." << std::endl;
           exit(1);
         }
 
@@ -113,7 +115,7 @@ namespace FEAST
       inline void print(std::ostream& stream)
       {
         stream << "E";
-        Item::print(stream);
+        this->print_index(stream);
         stream << ": [";
         _vertices[0]->print(stream);
         stream << ", ";

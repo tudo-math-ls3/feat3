@@ -95,10 +95,10 @@ namespace FEAST
 
 
       /// prints this vertex to the given stream
-      virtual void print(std::ostream& stream)
+      inline void print(std::ostream& stream)
       {
         stream << "V";
-        Item::print(stream);
+        print_index(stream);
 //        stream.precision(3);
 //        stream.setf(std::ios::fixed);
 //        stream << ": (" << std::setw(7) << _coords[0];

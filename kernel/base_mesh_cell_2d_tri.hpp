@@ -155,7 +155,9 @@ namespace FEAST
         // assure that this cell has not been divided yet
         if(!this->active())
         {
-          std::cerr << "Tri " << this->index() << " is already subdivided! Aborting program.";
+          std::cerr << "Tri ";
+          this->print_index(std::cerr);
+          std::cerr << " is already subdivided! Aborting program." << std::endl;
           exit(1);
         }
 
@@ -171,12 +173,31 @@ namespace FEAST
       inline void print(std::ostream& stream)
       {
         stream << "Tri";
-        Item::print(stream);
-        stream << ": [";
+        this->print_index(stream);
 
-        for(int i(0) ; i < num_edges() ; ++i)
+        stream << ": [V ";
+        _vertices[0]->print_index(stream);
+        for(int i(1) ; i < num_vertices() ; ++i)
         {
-          stream << "E" << _edges[i]->index();
+          stream << ", ";
+          _vertices[i]->print_index(stream);
+        }
+        stream << "] [";
+
+        stream << "E ";
+        _edges[0]->print_index(stream);
+        if(_edge_has_correct_orientation(0))
+        {
+          stream << "(+)";
+        }
+        else
+        {
+          stream << "(-)";
+        }
+        for(int i(1) ; i < num_edges() ; ++i)
+        {
+          stream << ", ";
+          _edges[i]->print_index(stream);
           if(_edge_has_correct_orientation(i))
           {
             stream << "(+)";
@@ -185,15 +206,8 @@ namespace FEAST
           {
             stream << "(-)";
           }
-          if(i < num_edges()-1)
-          {
-            stream << ", ";
-          }
-          else
-          {
-            stream << "]";
-          }
         }
+        stream << "] ";
         Cell<2, space_dim_, world_dim_>::print_history(stream);
         // print neighbourhood information (if there is any)
         CellData<2, space_dim_, world_dim_>::print(stream);

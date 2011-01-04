@@ -79,7 +79,7 @@ namespace FEAST
       }
 
       /// prints this item to the given stream
-      inline void print(std::ostream& stream)
+      inline void print_index(std::ostream& stream)
       {
         if (index() != Constants::MAX_INDEX)
         {
@@ -87,16 +87,15 @@ namespace FEAST
         }
         else
         {
-          stream << "-";
+          // for debugging purpose, print the address of the object if no index is set yet
+          stream << (long)this;
+          //stream << "-";
         }
         if (number() != Constants::MAX_NUMBER)
         {
           stream << "/" << number();
         }
       }
-
-//      /// prints this item to the given stream, in human-readable format and possibly much more verbose
-//      virtual void print_long(std::ostream& stream) const = 0;
     };  // class Item
   } // namespace BaseMesh
 } // namespace FEAST

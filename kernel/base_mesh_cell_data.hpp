@@ -155,7 +155,7 @@ namespace FEAST
       inline void print(std::ostream& stream)
       {
         // print neighbourhood information into the next line
-        stream << std::endl << "    [ N:  ";
+        stream << std::endl << "    [N:  ";
         for(unsigned char subdim(0) ; subdim < cell_space_dim_ ; ++subdim)
         {
           if(subdim == 0)
@@ -164,24 +164,25 @@ namespace FEAST
           }
           else if(subdim == 1)
           {
-            stream << "E( ";
+            stream << ", E( ";
           }
           else if(subdim == 2)
           {
-            stream << "F( ";
+            stream << ", F( ";
           }
           else
           {
-            stream << "X( ";
+            stream << ", X( ";
           }
           for(unsigned char item(0) ; item < _num_subcells_per_subdim[subdim] ; ++item)
           {
             if (_neighbours[subdim][item].size() > 0)
             {
-              stream << _neighbours[subdim][item][0]->index();
+              _neighbours[subdim][item][0]->print_index(stream);
               for(unsigned char k(1) ; k < _neighbours[subdim][item].size() ; ++k)
               {
-                stream << ", " << _neighbours[subdim][item][k]->index();
+                stream << ", ";
+                _neighbours[subdim][item][k]->print_index(stream);
               }
               if(item < _num_subcells_per_subdim[subdim]-1)
               {
@@ -204,7 +205,6 @@ namespace FEAST
               }
             }
           }
-          stream << " ";
         }
         stream << "]";
       }

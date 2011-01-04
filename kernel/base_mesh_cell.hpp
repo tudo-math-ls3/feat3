@@ -90,8 +90,8 @@ namespace FEAST
       * 2       3    0       1    1       0    3       2       0       1    3       2    2       3    1       0
       * |       |    |       |    |       |    |       |       |       |    |       |    |       |    |       |
       * 0---0---1    1---3---3    2---2---0    3---1---2       0---2---2    1---0---0    2---1---3    3---3---1
-      *  V0:0123      V2:1302      V1:2031      V3:3210         V4:0213      V5:1032      V6:2301      V7:3120
-      *  E0:0123      E2:3201      E1:2310      E3:1032         E4:2301      E5:0132      E6:1023      E7:3210
+      *  V0:0123      V1:1302      V2:2031      V3:3210         V4:0213      V5:1032      V6:2301      V7:3120
+      *  E0:0123      E1:3201      E2:2310      E3:1032         E4:2301      E5:0132      E6:1023      E7:3210
       * (reference)
       *
       * When vertex i of the given numbering equals vertex 0 in the reference numbering, then we have either
@@ -139,14 +139,14 @@ namespace FEAST
       = {{0,1,4,5}, {2,3,6,7}, {0,2,8,9}, {1,3,10,11}, {4,6,8,10}, {5,7,9,11}};
 
     // quad-to-quad mappings for vertices
-    // V0:0123    V1:2031    V2:1302    V3:3210    V4:0213    V5:1032    V6:2301    V7:3120
+    // V0:0123    V1:1302    V2:2031    V3:3210    V4:0213    V5:1032    V6:2301    V7:3120
     unsigned char Numbering::quad_to_quad_mappings_vertices[8][4] =
-      {{0,1,2,3}, {2,0,3,1}, {1,3,0,2}, {3,2,1,0}, {0,2,1,3}, {1,0,3,2}, {2,3,0,1}, {3,1,2,0}};
+      {{0,1,2,3}, {1,3,0,2}, {2,0,3,1}, {3,2,1,0}, {0,2,1,3}, {1,0,3,2}, {2,3,0,1}, {3,1,2,0}};
 
     // quad-to-quad mappings for edges
-    // E0:0123    E1:2310    E2:3201    E3:1032    E4:2301    E5:0132    E6:1023     E7:3210
+    // E0:0123    E1:3201    E2:2310    E3:1032    E4:2301    E5:0132    E6:1023     E7:3210
     unsigned char Numbering::quad_to_quad_mappings_edges[8][4] =
-      {{0,1,2,3}, {2,3,1,0}, {3,2,0,1}, {1,0,3,2}, {2,3,0,1}, {0,1,3,2}, {1,0,2,3}, {3,2,1,0}};
+      {{0,1,2,3}, {3,2,0,1}, {2,3,1,0}, {1,0,3,2}, {2,3,0,1}, {0,1,3,2}, {1,0,2,3}, {3,2,1,0}};
 
 
 
@@ -702,7 +702,7 @@ namespace FEAST
         stream << "[parent: ";
         if (parent() != nullptr)
         {
-          stream << parent()->index();
+          parent()->print_index(stream);
         }
         else
         {
@@ -710,10 +710,12 @@ namespace FEAST
         }
         if (num_children() > 0)
         {
-          stream << ", children: " << child(0)->index();
+          stream << ", children: ";
+          child(0)->print_index(stream);
           for(int i(1) ; i < num_children() ; ++i)
           {
-            std:: cout << ", " << child(i)->index();
+            std:: cout << ", ";
+            child(i)->print_index(stream);
           }
         }
         else

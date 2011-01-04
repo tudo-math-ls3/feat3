@@ -56,13 +56,6 @@ namespace FEAST
       /// edges of the tetra
       Cell_2D_* _faces[4];
 
-      /// returns true when face with local index iface has the correct orientation within the tetra
-      inline bool _face_has_correct_orientation(unsigned char iface)
-      {
-        //TODO: to be implemented
-        return false;
-      }
-
 
     public:
       /// CTOR
@@ -157,7 +150,9 @@ namespace FEAST
         // assure that this cell has not been divided yet
         if(!this->active())
         {
-          std::cerr << "Tetra " << this->index() << " is already subdivided! Aborting program.";
+          std::cerr << "Tetra ";
+          this->print_index(std::cerr);
+          std::cerr << " is already subdivided! Aborting program." << std::endl;
           exit(1);
         }
 
@@ -297,20 +292,13 @@ namespace FEAST
       inline void print(std::ostream& stream)
       {
         stream << "Tetra";
-        Item::print(stream);
+        this->print_index(stream);
         stream << ": [";
 
         for(int i(0) ; i < num_faces() ; ++i)
         {
-          stream << "F" << _faces[i]->index();
-          if(_face_has_correct_orientation(i))
-          {
-            stream << "(+)";
-          }
-          else
-          {
-            stream << "(-)";
-          }
+          stream << "F";
+          _faces[i]->print_index(stream);
           if(i < num_faces()-1)
           {
             stream << ", ";
@@ -320,6 +308,7 @@ namespace FEAST
             stream << "]";
           }
         }
+        stream << std::endl << "    ";
         Cell<3, space_dim_, world_dim_>::print_history(stream);
         // print neighbourhood information (if there is any)
         CellData<3, space_dim_, world_dim_>::print(stream);
