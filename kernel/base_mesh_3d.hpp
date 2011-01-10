@@ -499,22 +499,22 @@ namespace FEAST
 
         // neighbourhood
         // face neighbours
-        _cells[0]->add_neighbour(2, 1, _cells[2]);
-        _cells[0]->add_neighbour(2, 3, _cells[3]);
-        _cells[1]->add_neighbour(2, 5, _cells[2]);
-        _cells[2]->add_neighbour(2, 0, _cells[0]);
-        _cells[2]->add_neighbour(2, 4, _cells[1]);
-        _cells[3]->add_neighbour(2, 2, _cells[0]);
+        _cells[0]->add_neighbour(SDIM_FACE, 1, _cells[2]);
+        _cells[0]->add_neighbour(SDIM_FACE, 3, _cells[3]);
+        _cells[1]->add_neighbour(SDIM_FACE, 5, _cells[2]);
+        _cells[2]->add_neighbour(SDIM_FACE, 0, _cells[0]);
+        _cells[2]->add_neighbour(SDIM_FACE, 4, _cells[1]);
+        _cells[3]->add_neighbour(SDIM_FACE, 2, _cells[0]);
 
         // edge neighbours
-        _cells[0]->add_neighbour(1, 6, _cells[1]);
-        _cells[1]->add_neighbour(1, 5, _cells[0]);
-        _cells[2]->add_neighbour(1, 1, _cells[3]);
-        _cells[3]->add_neighbour(1, 2, _cells[2]);
+        _cells[0]->add_neighbour(SDIM_EDGE, 6, _cells[1]);
+        _cells[1]->add_neighbour(SDIM_EDGE, 5, _cells[0]);
+        _cells[2]->add_neighbour(SDIM_EDGE, 1, _cells[3]);
+        _cells[3]->add_neighbour(SDIM_EDGE, 2, _cells[2]);
 
         // vertex neighbours
-        _cells[1]->add_neighbour(0, 3, _cells[3]);
-        _cells[3]->add_neighbour(0, 4, _cells[1]);
+        _cells[1]->add_neighbour(SDIM_VERTEX, 3, _cells[3]);
+        _cells[3]->add_neighbour(SDIM_VERTEX, 4, _cells[1]);
       }
 
       /// default destructor

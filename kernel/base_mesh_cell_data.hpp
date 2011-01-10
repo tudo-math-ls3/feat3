@@ -16,6 +16,22 @@ namespace FEAST
   namespace BaseMesh
   {
 
+    /**
+    * \brief keywords for the subdimensions
+    *
+    * See CellData for explanation of the term subdimension.
+    * The values serve as array indics, so must not be changed.
+    */
+    enum subdim
+    {
+      /// subdimension 0 = vertex
+      SDIM_VERTEX = 0,
+      /// subdimension 1 = edge
+      SDIM_EDGE = 1,
+      /// subdimension 2 = face
+      SDIM_FACE = 2
+    };
+
     /// forward declaration of class BaseMesh::Cell
     template<
       unsigned char cell_dim_,
@@ -49,11 +65,22 @@ namespace FEAST
       {
         // do nothing here
       }
+
+      /// dummy add neighbour function
+      inline void add_neighbour(
+        subdim subdim,
+        unsigned char item,
+        Cell<cell_dim_, space_dim_, world_dim_>* neighbour)
+      {
+        // do nothing here
+      }
+
       /// dummy print function
       inline void print(std::ostream& stream)
       {
         // do nothing here
       }
+
     };
 
 
@@ -132,7 +159,7 @@ namespace FEAST
 
 
       inline Cell<cell_space_dim_, cell_space_dim_, world_dim_>* neighbour(
-        unsigned char subdim,
+        subdim subdim,
         unsigned char item,
         unsigned char index) const
       {
@@ -144,7 +171,7 @@ namespace FEAST
 
 
       inline void add_neighbour(
-        unsigned char subdim,
+        subdim subdim,
         unsigned char item,
         Cell<cell_space_dim_, cell_space_dim_, world_dim_>* neighbour)
       {

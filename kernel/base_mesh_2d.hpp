@@ -228,24 +228,24 @@ namespace FEAST
         add(quad);
 
         // set neighbourhood information (emulated file parser part 2)
-        _cells[0]->add_neighbour(1, 3, _cells[1]);
+        _cells[0]->add_neighbour(SDIM_EDGE, 3, _cells[1]);
 
-        _cells[1]->add_neighbour(1, 2, _cells[0]);
-        _cells[1]->add_neighbour(1, 3, _cells[2]);
-        _cells[1]->add_neighbour(0, 1, _cells[4]);
-        _cells[1]->add_neighbour(0, 1, _cells[3]);
+        _cells[1]->add_neighbour(SDIM_EDGE, 2, _cells[0]);
+        _cells[1]->add_neighbour(SDIM_EDGE, 3, _cells[2]);
+        _cells[1]->add_neighbour(SDIM_VERTEX, 1, _cells[4]);
+        _cells[1]->add_neighbour(SDIM_VERTEX, 1, _cells[3]);
 
-        _cells[2]->add_neighbour(1, 2, _cells[1]);
-        _cells[2]->add_neighbour(1, 0, _cells[4]);
-        _cells[2]->add_neighbour(0, 0, _cells[3]);
+        _cells[2]->add_neighbour(SDIM_EDGE, 2, _cells[1]);
+        _cells[2]->add_neighbour(SDIM_EDGE, 0, _cells[4]);
+        _cells[2]->add_neighbour(SDIM_VERTEX, 0, _cells[3]);
 
-        _cells[3]->add_neighbour(1, 1, _cells[4]);
-        _cells[3]->add_neighbour(0, 2, _cells[2]);
-        _cells[3]->add_neighbour(0, 2, _cells[1]);
+        _cells[3]->add_neighbour(SDIM_EDGE, 1, _cells[4]);
+        _cells[3]->add_neighbour(SDIM_VERTEX, 2, _cells[2]);
+        _cells[3]->add_neighbour(SDIM_VERTEX, 2, _cells[1]);
 
-        _cells[4]->add_neighbour(1, 1, _cells[2]);
-        _cells[4]->add_neighbour(1, 2, _cells[3]);
-        _cells[4]->add_neighbour(0, 2, _cells[1]);
+        _cells[4]->add_neighbour(SDIM_EDGE, 1, _cells[2]);
+        _cells[4]->add_neighbour(SDIM_EDGE, 2, _cells[3]);
+        _cells[4]->add_neighbour(SDIM_VERTEX, 2, _cells[1]);
       }
 
       /// default destructor

@@ -112,10 +112,10 @@ namespace FEAST
         add(e);
 
         // set neighbourhood information (emulated file parser part 2)
-        _cells[0]->add_neighbour(0, 1, _cells[1]);
-        _cells[1]->add_neighbour(0, 0, _cells[0]);
-        _cells[1]->add_neighbour(0, 1, _cells[2]);
-        _cells[2]->add_neighbour(0, 0, _cells[1]);
+        _cells[0]->add_neighbour(SDIM_VERTEX, 1, _cells[1]);
+        _cells[1]->add_neighbour(SDIM_VERTEX, 0, _cells[0]);
+        _cells[1]->add_neighbour(SDIM_VERTEX, 1, _cells[2]);
+        _cells[2]->add_neighbour(SDIM_VERTEX, 0, _cells[1]);
       }
 
       /// default destructor

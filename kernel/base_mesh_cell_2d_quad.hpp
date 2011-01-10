@@ -368,12 +368,31 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         _set_child(3, new Quad(vertex(3), new_vertices[1], new_vertices[3], new_vertices[4],
                                new_edges[3], new_edges[11], new_edges[7], new_edges[9]));
 
-        // add the quads to the vector of new created quads
+        // add the quads to the vector of new created cells
         for (unsigned char i(0) ; i < this->num_children() ; ++i)
         {
           this->child(i)->set_parent(this);
           subdiv_data.created_cells.push_back(this->child(i));
         }
+
+        // set internal neighbourhood (external neighbourhood is set outside this function)
+        // (in case space_dim_ > 2, an empty dummy function is called; see CellData)
+// COMMENT_HILMAR: Gibt es einen eleganteren Weg als diesen dummy call von add_neighbour(...) in CellData?
+        // edge neighbours
+        this->child(0)->add_neighbour(SDIM_EDGE, 1, this->child(2));
+        this->child(0)->add_neighbour(SDIM_EDGE, 3, this->child(1));
+        this->child(1)->add_neighbour(SDIM_EDGE, 1, this->child(0));
+        this->child(1)->add_neighbour(SDIM_EDGE, 3, this->child(3));
+        this->child(2)->add_neighbour(SDIM_EDGE, 1, this->child(3));
+        this->child(2)->add_neighbour(SDIM_EDGE, 3, this->child(0));
+        this->child(3)->add_neighbour(SDIM_EDGE, 1, this->child(1));
+        this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(2));
+        // vertex neighbours
+        this->child(0)->add_neighbour(SDIM_VERTEX, 3, this->child(3));
+        this->child(1)->add_neighbour(SDIM_VERTEX, 3, this->child(2));
+        this->child(2)->add_neighbour(SDIM_VERTEX, 3, this->child(1));
+        this->child(3)->add_neighbour(SDIM_VERTEX, 3, this->child(0));
+
       } // subdivide()
 
 

@@ -109,6 +109,13 @@ namespace FEAST
         // add new edges to the vector of created cells
         subdiv_data.created_cells.push_back(this->child(0));
         subdiv_data.created_cells.push_back(this->child(1));
+
+        // set internal neighbourhood (external neighbourhood is set outside this function)
+        // (in case space_dim_ > 1, an empty dummy function is called; see CellData)
+// COMMENT_HILMAR: Gibt es einen eleganteren Weg als diesen dummy call von add_neighbour(...) in CellData?
+        // vertex neighbours
+        this->child(0)->add_neighbour(SDIM_VERTEX, 1, this->child(1));
+        this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(0));
       }
 
       /// print information about this edge

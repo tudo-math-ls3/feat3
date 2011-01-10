@@ -548,14 +548,14 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
                                new_edges[11], new_edges[25], new_edges[47], new_edges[51],
                                new_edges[22], new_edges[36], new_edges[44], new_edges[48],
                                new_faces[3], new_faces[35], new_faces[13], new_faces[29], new_faces[21], new_faces[25]));
-        // child 4 (back, top, right)
+        // child 4 (front, top, left)
         _set_child(4, new Hexa(vertex(4), new_vertices[6], new_vertices[2], new_vertices[13],
                                new_vertices[8], new_vertices[16], new_vertices[14], new_vertices[18],
                                new_edges[12], new_edges[28], new_edges[42], new_edges[50],
                                new_edges[4], new_edges[30], new_edges[34], new_edges[52],
                                new_edges[17], new_edges[41], new_edges[33], new_edges[49],
                                new_faces[4], new_faces[32], new_faces[18], new_faces[26], new_faces[10], new_faces[30]));
-        // child 5 (back, top, right)
+        // child 5 (front, top, right)
         _set_child(5, new Hexa(vertex(5), new_vertices[2], new_vertices[7], new_vertices[13],
                                new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
                                new_edges[5], new_edges[31], new_edges[35], new_edges[53],
@@ -577,11 +577,73 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
                                new_edges[23], new_edges[45], new_edges[37], new_edges[49],
                                new_faces[7], new_faces[35], new_faces[23], new_faces[27], new_faces[15], new_faces[31]));
 
+        // add the hexas to the vector of new created cells
         for (unsigned char i(0) ; i < this->num_children() ; ++i)
         {
           this->child(i)->set_parent(this);
           subdiv_data.created_cells.push_back(this->child(i));
         }
+
+        // set internal neighbourhood (external neighbourhood is set outside this function)
+        // face neighbours
+        this->child(0)->add_neighbour(SDIM_FACE, 1, this->child(4));
+        this->child(0)->add_neighbour(SDIM_FACE, 3, this->child(2));
+        this->child(0)->add_neighbour(SDIM_FACE, 5, this->child(1));
+        this->child(1)->add_neighbour(SDIM_FACE, 1, this->child(5));
+        this->child(1)->add_neighbour(SDIM_FACE, 3, this->child(0));
+        this->child(1)->add_neighbour(SDIM_FACE, 5, this->child(3));
+        this->child(2)->add_neighbour(SDIM_FACE, 1, this->child(6));
+        this->child(2)->add_neighbour(SDIM_FACE, 3, this->child(3));
+        this->child(2)->add_neighbour(SDIM_FACE, 5, this->child(0));
+        this->child(3)->add_neighbour(SDIM_FACE, 1, this->child(7));
+        this->child(3)->add_neighbour(SDIM_FACE, 3, this->child(1));
+        this->child(3)->add_neighbour(SDIM_FACE, 5, this->child(2));
+        this->child(4)->add_neighbour(SDIM_FACE, 1, this->child(0));
+        this->child(4)->add_neighbour(SDIM_FACE, 3, this->child(5));
+        this->child(4)->add_neighbour(SDIM_FACE, 5, this->child(6));
+        this->child(5)->add_neighbour(SDIM_FACE, 1, this->child(1));
+        this->child(5)->add_neighbour(SDIM_FACE, 3, this->child(7));
+        this->child(5)->add_neighbour(SDIM_FACE, 5, this->child(4));
+        this->child(6)->add_neighbour(SDIM_FACE, 1, this->child(2));
+        this->child(6)->add_neighbour(SDIM_FACE, 3, this->child(4));
+        this->child(6)->add_neighbour(SDIM_FACE, 5, this->child(7));
+        this->child(7)->add_neighbour(SDIM_FACE, 1, this->child(3));
+        this->child(7)->add_neighbour(SDIM_FACE, 3, this->child(6));
+        this->child(7)->add_neighbour(SDIM_FACE, 5, this->child(5));
+        // edge neighbours
+        this->child(0)->add_neighbour(SDIM_EDGE, 3, this->child(6));
+        this->child(0)->add_neighbour(SDIM_EDGE, 7, this->child(5));
+        this->child(0)->add_neighbour(SDIM_EDGE, 11, this->child(3));
+        this->child(1)->add_neighbour(SDIM_EDGE, 3, this->child(4));
+        this->child(1)->add_neighbour(SDIM_EDGE, 7, this->child(7));
+        this->child(1)->add_neighbour(SDIM_EDGE, 11, this->child(2));
+        this->child(2)->add_neighbour(SDIM_EDGE, 3, this->child(7));
+        this->child(2)->add_neighbour(SDIM_EDGE, 7, this->child(4));
+        this->child(2)->add_neighbour(SDIM_EDGE, 11, this->child(1));
+        this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(5));
+        this->child(3)->add_neighbour(SDIM_EDGE, 7, this->child(6));
+        this->child(3)->add_neighbour(SDIM_EDGE, 11, this->child(0));
+        this->child(4)->add_neighbour(SDIM_EDGE, 3, this->child(1));
+        this->child(4)->add_neighbour(SDIM_EDGE, 7, this->child(2));
+        this->child(4)->add_neighbour(SDIM_EDGE, 11, this->child(7));
+        this->child(5)->add_neighbour(SDIM_EDGE, 3, this->child(3));
+        this->child(5)->add_neighbour(SDIM_EDGE, 7, this->child(0));
+        this->child(5)->add_neighbour(SDIM_EDGE, 11, this->child(6));
+        this->child(6)->add_neighbour(SDIM_EDGE, 3, this->child(0));
+        this->child(6)->add_neighbour(SDIM_EDGE, 7, this->child(3));
+        this->child(6)->add_neighbour(SDIM_EDGE, 11, this->child(5));
+        this->child(7)->add_neighbour(SDIM_EDGE, 3, this->child(2));
+        this->child(7)->add_neighbour(SDIM_EDGE, 7, this->child(1));
+        this->child(7)->add_neighbour(SDIM_EDGE, 11, this->child(4));
+        // vertex neighbours
+        this->child(0)->add_neighbour(SDIM_VERTEX, 7, this->child(7));
+        this->child(1)->add_neighbour(SDIM_VERTEX, 7, this->child(6));
+        this->child(2)->add_neighbour(SDIM_VERTEX, 7, this->child(5));
+        this->child(3)->add_neighbour(SDIM_VERTEX, 7, this->child(4));
+        this->child(4)->add_neighbour(SDIM_VERTEX, 7, this->child(3));
+        this->child(5)->add_neighbour(SDIM_VERTEX, 7, this->child(2));
+        this->child(6)->add_neighbour(SDIM_VERTEX, 7, this->child(1));
+        this->child(7)->add_neighbour(SDIM_VERTEX, 7, this->child(0));
       } // subdivide()
 
 
