@@ -387,6 +387,21 @@ namespace FEAST
         }
       }
 
+
+      /// validates the base mesh and all of its cells
+      void validate() const
+      {
+        std::cout << "Validating cells..." << std::endl;
+        for (unsigned int icell(0) ; icell < num_cells() ; ++icell)
+        {
+          cell(icell)->validate();
+        }
+        std::cout << "...done!" << std::endl;
+
+        // COMMENT_HILMAR: add further validations...
+      }
+
+
       /**
       * \brief prints this BaseMesh to the given ostream.
       *

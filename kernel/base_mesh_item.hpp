@@ -79,7 +79,7 @@ namespace FEAST
       }
 
       /// prints this item to the given stream
-      inline void print_index(std::ostream& stream)
+      inline void print_index(std::ostream& stream) const
       {
         if (index() != Constants::MAX_INDEX)
         {

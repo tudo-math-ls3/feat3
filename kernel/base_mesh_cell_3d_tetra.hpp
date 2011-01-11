@@ -288,6 +288,12 @@ namespace FEAST
       } // subdivide()
 
 
+      inline void validate() const
+      {
+
+      }
+
+
       /// print information about this quad
       inline void print(std::ostream& stream)
       {

@@ -166,8 +166,12 @@ namespace FEAST
 
         std::cerr << "Subdivision for triangles not implemented yet!!" << std::endl;
         // TODO: subdivion code
-      }
+      } // subdivide()
 
+      inline void validate() const
+      {
+
+      }
 
       /// print information about this tri
       inline void print(std::ostream& stream)

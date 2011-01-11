@@ -26,6 +26,9 @@ int main (int argc, char **argv)
 
   bm.print(std::cout);
 
+  // validate base mesh
+  bm.validate();
+
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;

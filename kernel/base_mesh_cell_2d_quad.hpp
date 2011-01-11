@@ -52,7 +52,7 @@ namespace FEAST
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennten wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
 // die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wieder um Quad und Tri erben. Darin koennte
-// man zum Beispiel die Funktion _edge_has_correct_orientation() implementieren.
+// man zum Beispiel die Funktion _determine_edge_orientation() implementieren.
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
@@ -72,6 +72,9 @@ namespace FEAST
       /// edges of the quad
       Cell_1D_* _edges[4];
 
+      /// stores whether the edge orientations in edge- and quad structure coincide
+      bool _edge_has_correct_orientation[4];
+
       /// returns index (w.r.t. to quad numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
@@ -81,12 +84,51 @@ namespace FEAST
         return Numbering::quad_edge_vertices[iedge][iv];
       }
 
-      /// returns true when the orientation of the edge coincides with its orientation within the quad
-      inline bool _edge_has_correct_orientation(unsigned char iedge)
+      /**
+      * \brief Determines orientation of the edges and tests whether edges are set up correctly.
+      *
+      * This function stores whether the orientation of the edges coincide with their orientation within the quad.
+      * At the same time, it tests whether edge vertices are set correctly.
+      */
+      inline void _determine_edge_orientation()
       {
-        assert(iedge < num_edges());
-        // return true when the edge's start vertex within the quad is local vertex 0 within the edge structure
-        return (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0));
+        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        {
+
+//std::cerr << "quad ";
+//this->print_index(std::cerr);
+//std::cerr << ", " << (int) iedge << "-th edge ";
+//edge(iedge)->print_index(std::cerr);
+//std::cerr << ": ";
+//vertex(_edge_vertex(iedge,0))->print_index(std::cerr);
+//std::cerr << ", ";
+//vertex(_edge_vertex(iedge,1))->print_index(std::cerr);
+//std::cerr << ", ";
+//edge(iedge)->vertex(0)->print_index(std::cerr);  // scheint falsch zu sein! face 25, edge 2
+//std::cerr << ", ";
+//edge(iedge)->vertex(1)->print_index(std::cerr);
+//std::cerr << std::endl;
+
+          if(vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0))
+          {
+            assert(vertex(_edge_vertex(iedge,1)) == edge(iedge)->vertex(1));
+            _edge_has_correct_orientation[iedge] = true;
+          }
+          else if (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(1))
+          {
+            assert(vertex(_edge_vertex(iedge,1)) == edge(iedge)->vertex(0));
+            _edge_has_correct_orientation[iedge] = false;
+          }
+          else
+          {
+            std::cerr << "In quad ";
+            this->print_index(std::cerr);
+            std::cerr << ", there is something wrong with the " << (int) iedge << "-th edge (index ";
+            edge(iedge)->print_index(std::cerr);
+            std::cerr << ")! Aborting program." << std::endl;
+//            exit(1);
+          }
+        }
       }
 
 
@@ -114,6 +156,8 @@ namespace FEAST
 // COMMENT_HILMAR: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<2, space_dim_, world_dim_>({4,4})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
+        // determine the orientation of the four edges
+        _determine_edge_orientation();
       }
 
 
@@ -214,10 +258,6 @@ namespace FEAST
         //         k0                                        e0    e1
 
 
-//COMMENT_HILMAR: brauchen wir das ueberhaupt noch?
-//        // store old active-mask of each edge, because it gets overwritten once edges are getting split below
-//        bool old_edge_active_mask[4];
-
         SubdivisionData<1, space_dim_, world_dim_> subdiv_data_edge;
 
         // loop over all edges and split them eventually, creating new vertices and edges on the way
@@ -226,9 +266,6 @@ namespace FEAST
           // if edge has no children, create them
           if (edge(iedge)->active())
           {
-//            // store old active mask
-//            old_edge_active_mask[iedge] = true;
-
             // create new vertex
 
             // subdivide edge
@@ -239,7 +276,7 @@ namespace FEAST
 
             // COMMENT_HILMAR: Not sure whether the order plays a role here... to be on the safe side, order them
             // according to the array new_edges[].
-            if(_edge_has_correct_orientation(iedge))
+            if(_edge_has_correct_orientation[iedge])
             {
               subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
               subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
@@ -250,18 +287,13 @@ namespace FEAST
               subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
             }
           }
-          else // edge has children, reuse them
-          {
-//            // store old active mask
-//            old_edge_active_mask[iedge] = false;
-          }
 
           // add new vertex to array of new vertices (exploit that the vertex shared by the edge children is stored
           // as second vertex within the structure of both edge children)
           new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
 
           // add new edges to array of new edges, respect the orientation of the edge
-          if(_edge_has_correct_orientation(iedge))
+          if(_edge_has_correct_orientation[iedge])
           {
             // if the edge has the orientation of the quad, then child 0 is the first edge
             new_edges[2*iedge]   = edge(iedge)->child(0);
@@ -345,28 +377,55 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         this->_set_num_children(4);
 
         // finally, create new quads and add them as children
-        //                          e2     e3
-        // w2----v1-----w3         -------------
-        //  |     |     |       e5|     e9    |e7
-        //  |  q2 | q3  |         |     |     |
-        // v2----v4-----v3        --e10---e11--
-        //  |  q0 | q1  |       e4|     |     |e6
-        //  |     |     |         |     e8    |
-        // w0----v0----w1         -------------
-        //                           e0    e1
-        // building rule: vertex i of the parent quad is vertex 0 of child i (e.g., w1 has index 0 in q1)
-        //   ==> the center vertex has index 3 in all child quads
-        //   ==> the edge from edge i of the parent quad towards the center vertex is edge 3 of child i
-        //       (e.g., the edge from v2 (lying on edge 2 of the parent quad) towards v4 has index 3 in q2)
-        // These two facts are exploited, e.g., within the hexa subdivision routine, so don't change this!
-        _set_child(0, new Quad(vertex(0), new_vertices[0], new_vertices[2], new_vertices[4],
-                               new_edges[0], new_edges[10], new_edges[4], new_edges[8]));
-        _set_child(1, new Quad(vertex(1), new_vertices[3], new_vertices[0], new_vertices[4],
-                               new_edges[6], new_edges[8], new_edges[1], new_edges[11]));
-        _set_child(2, new Quad(vertex(2), new_vertices[2], new_vertices[1], new_vertices[4],
-                               new_edges[5], new_edges[9], new_edges[2], new_edges[10]));
-        _set_child(3, new Quad(vertex(3), new_vertices[1], new_vertices[3], new_vertices[4],
-                               new_edges[3], new_edges[11], new_edges[7], new_edges[9]));
+        //
+        // local numbering of the four children:
+        //
+        // w2          e1           w3
+        //    ---------------------
+        //    |1   3   3|2   2   0|
+        //    |         |         |              w2----v1-----w3        --e2-----e3--
+        //    |0   2   1|1   3   0|               |     |     |         |     |     |
+        //    |         |         |               |  q2 | q3  |        e5     e9    e7
+        //    |0   2   2|3   3   1|               |     |     |         |     |     |
+        // e2 --------------------- e3           v2----v4-----v3        --e10---e11--
+        //    |2   2   0|1   3   3|               |     |     |         |     |     |
+        //    |         |         |               |  q0 | q1  |        e4     e8    e6
+        //    |1   0   0|0   1   1|               |     |     |         |     |     |
+        //    |         |         |              w0--x-v0-----w1        --e0----e1---
+        //    |3   3   1|0   2   2|
+        //    ---------------------
+        // w0          e0           w1
+        //
+        // building rule: For each child, the inner edge with local index i builds a 'T' with edge i of the
+        //                parent quad, i.e. it is connected to this edge of the parent quad in its centre.
+        // ==> vertex i of child i is the centre vertex
+        //
+        // These facts are exploited, e.g., within the hexa subdivision routine, so don't change this!
+        _set_child(0, new Quad(new_vertices[4], new_vertices[0], new_vertices[2], vertex(0),
+                               new_edges[8], new_edges[4], new_edges[10], new_edges[0]));
+        _set_child(1, new Quad(new_vertices[0], new_vertices[4], vertex(1), new_vertices[3],
+                               new_edges[8], new_edges[6], new_edges[1], new_edges[11]));
+        _set_child(2, new Quad(new_vertices[2], vertex(2), new_vertices[4], new_vertices[1],
+                               new_edges[5], new_edges[9], new_edges[10], new_edges[2]));
+        _set_child(3, new Quad(vertex(3), new_vertices[3], new_vertices[1], new_vertices[4],
+                               new_edges[7], new_edges[9], new_edges[3], new_edges[11]));
+
+        // Geometric interpretation of this building rule:
+        // To obtain the numbering of the parent quad from the numbering of a child, simply "mirror" the child at the
+        // diagonal displayed in the following figure
+        //   ---------------------
+        //   |        /|\        |
+        //   |      /  |  \      |
+        //   |    /    |    \    |
+        //   |  /      |      \  |
+        //   |/        |        \|
+        //   ---------------------
+        //   |\        |        /|
+        //   |  \      |      /  |
+        //   |    \    |    /    |
+        //   |      \  |  /      |
+        //   |        \|/        |
+        //   ---------------------
 
         // add the quads to the vector of new created cells
         for (unsigned char i(0) ; i < this->num_children() ; ++i)
@@ -377,24 +436,61 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 
         // set internal neighbourhood (external neighbourhood is set outside this function)
         // (in case space_dim_ > 2, an empty dummy function is called; see CellData)
-// COMMENT_HILMAR: Gibt es einen eleganteren Weg als diesen dummy call von add_neighbour(...) in CellData?
         // edge neighbours
-        this->child(0)->add_neighbour(SDIM_EDGE, 1, this->child(2));
-        this->child(0)->add_neighbour(SDIM_EDGE, 3, this->child(1));
-        this->child(1)->add_neighbour(SDIM_EDGE, 1, this->child(0));
+        this->child(0)->add_neighbour(SDIM_EDGE, 0, this->child(1));
+        this->child(0)->add_neighbour(SDIM_EDGE, 2, this->child(2));
+        this->child(1)->add_neighbour(SDIM_EDGE, 0, this->child(0));
         this->child(1)->add_neighbour(SDIM_EDGE, 3, this->child(3));
         this->child(2)->add_neighbour(SDIM_EDGE, 1, this->child(3));
-        this->child(2)->add_neighbour(SDIM_EDGE, 3, this->child(0));
-        this->child(3)->add_neighbour(SDIM_EDGE, 1, this->child(1));
-        this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(2));
+        this->child(2)->add_neighbour(SDIM_EDGE, 2, this->child(0));
+        this->child(3)->add_neighbour(SDIM_EDGE, 1, this->child(2));
+        this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(1));
         // vertex neighbours
-        this->child(0)->add_neighbour(SDIM_VERTEX, 3, this->child(3));
-        this->child(1)->add_neighbour(SDIM_VERTEX, 3, this->child(2));
-        this->child(2)->add_neighbour(SDIM_VERTEX, 3, this->child(1));
+        this->child(0)->add_neighbour(SDIM_VERTEX, 0, this->child(3));
+        this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(2));
+        this->child(2)->add_neighbour(SDIM_VERTEX, 2, this->child(1));
         this->child(3)->add_neighbour(SDIM_VERTEX, 3, this->child(0));
 
       } // subdivide()
 
+
+      /// validates the cell
+// COMMENT_HILMAR: will be done via exceptions
+      inline void validate() const
+      {
+        // validate that all vertices and edges are set
+        for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
+        {
+          if (vertex(ivert) == nullptr)
+          {
+            std::cerr << "Error in Quad ";
+            this->print_index(std::cerr);
+            std::cerr << ": Vertex " << ivert << " is null." << std::endl;
+            exit(1);
+          }
+        }
+        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        {
+          if (edge(iedge) == nullptr)
+          {
+            std::cerr << "Error in Quad ";
+            this->print_index(std::cerr);
+            std::cerr << ": Edge " << iedge << " is null." << std::endl;
+            exit(1);
+          }
+        }
+
+        // validate subitems (here: egdes)
+        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        {
+          edge(iedge)->validate();
+        }
+
+        // validate children
+
+        // validate neighbours
+
+      }
 
       /// print information about this quad
       inline void print(std::ostream& stream)
@@ -413,7 +509,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 
         stream << "E ";
         _edges[0]->print_index(stream);
-        if(_edge_has_correct_orientation(0))
+        if(_edge_has_correct_orientation[0])
         {
           stream << "(+)";
         }
@@ -425,7 +521,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         {
           stream << ", ";
           _edges[i]->print_index(stream);
-          if(_edge_has_correct_orientation(i))
+          if(_edge_has_correct_orientation[i])
           {
             stream << "(+)";
           }

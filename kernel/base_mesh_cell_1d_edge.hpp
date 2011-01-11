@@ -116,7 +116,26 @@ namespace FEAST
         // vertex neighbours
         this->child(0)->add_neighbour(SDIM_VERTEX, 1, this->child(1));
         this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(0));
+      } // subdivide()
+
+
+      void validate() const
+      {
+        // validate that all vertices are set
+        for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
+        {
+          if (vertex(ivert) == nullptr)
+          {
+            std::cerr << "Error in edge ";
+            this->print_index(std::cerr);
+            std::cerr << ": Vertex " << ivert << " is null." << std::endl;
+            exit(1);
+          }
+        }
+
+        // children
       }
+
 
       /// print information about this edge
       inline void print(std::ostream& stream)

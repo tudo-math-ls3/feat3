@@ -206,6 +206,7 @@ namespace FEAST
         remove<Cell_*>(_cells, c);
       }
 
+
       inline void add_created_items(SubdivisionData<1, 1, world_dim_>& subdiv_data)
       {
         add(subdiv_data.created_vertex);
@@ -214,6 +215,21 @@ namespace FEAST
           add(subdiv_data.created_cells[i]);
         }
       }
+
+
+      /// validates the base mesh and all of its cells
+      void validate() const
+      {
+        std::cout << "Validating cells..." << std::endl;
+        for (unsigned int icell(0) ; icell < num_cells() ; ++icell)
+        {
+          cell(icell)->validate();
+        }
+        std::cout << "...done!" << std::endl;
+
+        // COMMENT_HILMAR: add further validations...
+      }
+
 
       /**
       * \brief prints this BaseMesh to the given ostream.

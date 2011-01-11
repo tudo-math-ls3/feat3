@@ -31,6 +31,10 @@ int main (int argc, char **argv)
   std::cout << "Base mesh should now look like this:" << std::endl;
   std::cout << "v0--------e0--------v1---e3---v4---e4---v2--------e2--------v3" << std::endl;
   bm.print(std::cout);
+
+  // validate base mesh
+  bm.validate();
+
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;

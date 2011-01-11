@@ -697,6 +697,9 @@ namespace FEAST
       virtual void print(std::ostream& stream) = 0;
 
 
+      virtual void validate() const = 0;
+
+
       inline void print_history(std::ostream& stream)
       {
         stream << "[parent: ";
