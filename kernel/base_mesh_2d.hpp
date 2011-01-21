@@ -392,7 +392,14 @@ namespace FEAST
       void validate() const
       {
         std::cout << "Validating cells..." << std::endl;
-        for (unsigned int icell(0) ; icell < num_cells() ; ++icell)
+// COMMENT_HILMAR: I thought, iterators were simple to use, i.e. like this:
+//        for (std::vector<Cell_*>::iterator it = _cells.begin() ; it != _cells.end() ; ++it)
+//        {
+//          it->validate();
+//        }
+// But that seems not to be the case... :-(
+// So, I use a standard counter for the for loop.
+        for (unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
           cell(icell)->validate();
         }

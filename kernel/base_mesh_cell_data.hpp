@@ -60,13 +60,13 @@ namespace FEAST
     private:
 
     public:
-      /// dummy function called by constructors of cells with dimension smaller than space dimension
+      /// dummy function called by cells with dimension smaller than space dimension
       inline void _init_neighbours(unsigned char array_size, unsigned char num_subcells_per_subdim[])
       {
         // do nothing here
       }
 
-      /// dummy add neighbour function
+      /// dummy function called by cells with dimension smaller than space dimension
       inline void add_neighbour(
         subdim subdim,
         unsigned char item,
@@ -75,7 +75,12 @@ namespace FEAST
         // do nothing here
       }
 
-      /// dummy print function
+      /// dummy function called by cells with dimension smaller than space dimension
+      inline void check_neighbourhood() const
+      {
+      }
+
+      /// dummy function called by cells with dimension smaller than space dimension
       inline void print(std::ostream& stream)
       {
         // do nothing here
@@ -112,7 +117,7 @@ namespace FEAST
       *    Co-dimension 0 is not needed here. Hence, the number of subdimensions is equal to the space dimension.
       * 2) "subcells" = items of lower dimension in a cell, distinguished by subdimension. Examples:
       *      in 3D: a hexa has 6 subcells of subdimension 2 (=faces), 12 subcells of subdimension 1 (=edges)
-      *             and 8 subcells of subdimension 1 (=vertices)
+      *             and 8 subcells of subdimension 0 (=vertices)
       *      in 2D: a tri has 3 subcells of subdimension 1 (=edges) and 3 subcells of subdimension 0 (=vertices)
       *      in 1D: an edge has 2 subcells of subdimension 0 (=vertices)
       */
@@ -124,40 +129,43 @@ namespace FEAST
       * First dimension: subdimension at which neighbours are regarded
       *    (0 = vertex neighbours, 1 = edge neighbours (only in 2D/3D), 2 = face neighbours (only in 3D))
       * Second dimension: index of the item in the cell (vertices, edges, faces). Examples:
-      * _neighbours[0][1]: vector of vertex neighbours at the vertex 1
-      * _neighbours[1][3]: vector of edge neighbours at the edge 3
-      * _neighbours[2][4]: vector of face neighbours at the face 4
+      * _neighbours[SDIM_VERTEX][1]: vector of vertex neighbours at vertex 1  (SDIM_VERTEX = 0)
+      * _neighbours[SDIM_EDGE][3]: vector of edge neighbours at edge 3  (SDIM_EDGE = 1)
+      * _neighbours[SDIM_FACE][4]: vector of face neighbours at face 4  (SDIM_FACE = 2)
       */
       std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>* _neighbours[cell_space_dim_];
 
+
     protected:
+
+      /// function for initialising the neighbour arrays/vectors
       void _init_neighbours(unsigned char array_size, unsigned char num_subcells_per_subdim[])
       {
         assert(array_size == cell_space_dim_);
         for(int i(0) ; i < cell_space_dim_ ; ++i)
         {
           _num_subcells_per_subdim[i] = num_subcells_per_subdim[i];
-          _neighbours[i] = new std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>[_num_subcells_per_subdim[i]];
+          _neighbours[i]
+            = new std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>[_num_subcells_per_subdim[i]];
           // TODO: Sind die einzelen std::vector damit schon ordentlich initialisiert? Muesste eigentlich...
         }
       }
 
-    public:
 
-//      CellData(unsigned char num_subcells_per_subdim[])
-//      {
-//        for(int i(0) ; i < cell_space_dim_ ; ++i)
-//        {
-//          _neighbours[i] = new std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>[_num_subcells_per_subdim[i]];
-//        }
-//      }
+    public:
 
       ~CellData()
       {
         // TODO: deallocate _neighbours !!!
       }
 
+      inline unsigned char num_subcells_per_subdim(subdim subdim)
+      {
+        assert(subdim < cell_space_dim_);
+        return _num_subcells_per_subdim[subdim];
+      }
 
+      /// returns one specific neighbour for given subdim, item and index
       inline Cell<cell_space_dim_, cell_space_dim_, world_dim_>* neighbour(
         subdim subdim,
         unsigned char item,
@@ -169,7 +177,21 @@ namespace FEAST
         return _neighbours[subdim][item][index];
       }
 
+      /// returns vector of neighbours for given subdimension and given item
+      inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>& neighbours(
+        subdim subdim,
+        unsigned char item) const
+      {
+        return _neighbours[subdim][item];
+      }
 
+      /// returns array of vectors of neighbours for given subdimension
+      inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>* neighbours_subdim(subdim subdim) const
+      {
+        return _neighbours[subdim];
+      }
+
+      /// add neighbour to the vector of neighbours of given subdim and item
       inline void add_neighbour(
         subdim subdim,
         unsigned char item,
@@ -178,7 +200,76 @@ namespace FEAST
         _neighbours[subdim][item].push_back(neighbour);
       }
 
+      /// checks whether neighbours are set correctly
+      inline void check_neighbourhood() const
+      {
+//std::cout << "starting neighbourhood check" << std::endl;
+        for(unsigned char sdim(0) ; sdim < cell_space_dim_; ++sdim)
+        {
+//std::cout << "sdim " <<  (int) sdim << std::endl;
+          for(unsigned char item(0) ; item < _num_subcells_per_subdim[sdim] ; ++item)
+          {
+//std::cout << "item " <<  (int) item << std::endl;
+            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>&
+              neighs = neighbours((subdim)sdim, item);
+            for(unsigned int n = 0 ; n < neighs.size() ; n++)
+            {
+//std::cout << "n " <<  n << std::endl;
+              if(!neighs[n]->active())
+              {
+                std::cerr << "Cell ";
+                neighs[n]->print_index(std::cerr);
+                std::cerr << ", being the subdim-" << (int)sdim << "-neighbour of cell ";
+                this->print_index(std::cerr);
+                std::cerr << " (at item " << (int)item << ", " << n << "-th pos.), has children"
+                          << " which must not be the case!" << std::endl;
+                std::cerr << "It seems the neighbours of cell ";
+                this->print_index(std::cerr);
+                std::cerr << " have not been updated correctly!" << std::endl;
+              }
+              else
+              {
+                std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>*
+                  neighs_of_neigh = neighs[n]->neighbours_subdim((subdim)sdim);
+                bool neighbour_found = false;
+                for(unsigned char item_nn = 0 ; item_nn < neighs[n]->num_subcells_per_subdim((subdim)sdim) ; item_nn++)
+                {
+//std::cout << "item_nn " << item_nn << std::endl;
+                  for(unsigned int nn = 0 ; nn < neighs_of_neigh[item_nn].size() ; nn++)
+                  {
+//std::cout << "nn " << nn << std::endl;
+                    if(neighs_of_neigh[item_nn][nn] == this)
+                    {
+                      std::cout << "subdim-" << (int)sdim << "-neighbourhood between cell ";
+                      this->print_index(std::cout);
+                      std::cout << " (at item " << (int)item << ", " << n << "-th pos.) and cell ";
+                      neighs[n]->print_index(std::cout);
+                      std::cout << " (item = " << (int)item_nn << ", " << nn << "-th pos.)" << std::endl;
+                      neighbour_found = true;
+                      break;
+                    }
+                  }  // for 0 <= nn < neighs_of_neigh[item_nn].size()
+                  if(neighbour_found)
+                  {
+                    break;
+                  }
+                } // for 0 <= item_nn < neighs[n]->num_subcells_per_subdim((subdim)sdim)
+                if(!neighbour_found)
+                {
+                  std::cerr << "No neighbour found!" << std::endl;
+                  std::cerr << "subdim-" << (int)sdim << "-neighbourhood between cell ";
+                  this->print_index(std::cerr);
+                  std::cerr << " (at item " << (int)item << ", " << n << "-th pos.) and cell ";
+                  neighs[n]->print_index(std::cerr);
+                  std::cerr << std::endl;
+                }
+              }
+            } // for 0 <= n < neighs.size()
+          } // for 0 <= item < _num_subcells_per_subdim[sdim]
+        } // for 0 <= sdim < cell_space_dim
+      }
 
+      /// print neighbourhood information
       inline void print(std::ostream& stream)
       {
         // print neighbourhood information into the next line

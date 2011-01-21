@@ -126,7 +126,7 @@ namespace FEAST
             std::cerr << ", there is something wrong with the " << (int) iedge << "-th edge (index ";
             edge(iedge)->print_index(std::cerr);
             std::cerr << ")! Aborting program." << std::endl;
-//            exit(1);
+            exit(1);
           }
         }
       }
@@ -458,6 +458,13 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 // COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
+        if(space_dim_ == 2)
+        {
+          std::cout << "Validating quad ";
+          this->print_index(std::cout);
+          std::cout << std::endl;
+        }
+
         // validate that all vertices and edges are set
         for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
         {
@@ -487,9 +494,13 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         }
 
         // validate children
+        // TODO
 
         // validate neighbours
-
+        if (this->active())
+        {
+          this->check_neighbourhood();
+        }
       }
 
       /// print information about this quad

@@ -692,7 +692,15 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
 // COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
+        if(space_dim_ == 3)
+        {
+          std::cout << "Validating hexa ";
+          this->print_index(std::cout);
+          std::cout << std::endl;
+        }
+
         //...
+
         // validate subitems (here: faces and edges)
         for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
         {
@@ -704,6 +712,11 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
           edge(iedge)->validate();
         }
 
+        // validate neighbours
+        if (this->active())
+        {
+          this->check_neighbourhood();
+        }
       }
 
 

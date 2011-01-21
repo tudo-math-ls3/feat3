@@ -112,7 +112,6 @@ namespace FEAST
 
         // set internal neighbourhood (external neighbourhood is set outside this function)
         // (in case space_dim_ > 1, an empty dummy function is called; see CellData)
-// COMMENT_HILMAR: Gibt es einen eleganteren Weg als diesen dummy call von add_neighbour(...) in CellData?
         // vertex neighbours
         this->child(0)->add_neighbour(SDIM_VERTEX, 1, this->child(1));
         this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(0));
@@ -121,6 +120,13 @@ namespace FEAST
 
       void validate() const
       {
+        if(space_dim_ == 1)
+        {
+          std::cout << "Validating edge ";
+          this->print_index(std::cout);
+          std::cout << std::endl;
+        }
+
         // validate that all vertices are set
         for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
         {
@@ -133,7 +139,40 @@ namespace FEAST
           }
         }
 
-        // children
+        // validate children
+        if(!this->active())
+        {
+          // check whether the common vertex of the two children is set correctly
+          if(this->child(0)->vertex(1) != this->child(1)->vertex(1))
+          {
+            std::cerr << "Error in edge ";
+            this->print_index(std::cerr);
+            std::cerr << ": Shared vertex of the two children is not set correctly!" << std::endl;
+            exit(1);
+          }
+          // check whether the other vertices are set correctly
+          if(this->child(0)->vertex(0) != vertex(0) || this->child(1)->vertex(0) != vertex(1))
+          {
+            std::cerr << "Error in edge ";
+            this->print_index(std::cerr);
+            std::cerr << ": One of the end vertices of the children is not set correctly!" << std::endl;
+            exit(1);
+          }
+          // check whether parent is set correctly
+          if(this->child(0)->parent() != this || this->child(1)->parent() != this)
+          {
+            std::cerr << "Error in edge ";
+            this->print_index(std::cerr);
+            std::cerr << ": Parent of one of the children not correctly set!" << std::endl;
+            exit(1);
+          }
+        }
+
+        if (this->active())
+        {
+          this->check_neighbourhood();
+        }
+
       }
 
 

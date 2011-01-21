@@ -168,9 +168,54 @@ namespace FEAST
         // TODO: subdivion code
       } // subdivide()
 
+
+      /// validates the cell
+// COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
+        if(space_dim_ == 2)
+        {
+          std::cout << "Validating triangle ";
+          this->print_index(std::cout);
+          std::cout << std::endl;
+        }
 
+        // validate that all vertices and edges are set
+        for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
+        {
+          if (vertex(ivert) == nullptr)
+          {
+            std::cerr << "Error in Quad ";
+            this->print_index(std::cerr);
+            std::cerr << ": Vertex " << ivert << " is null." << std::endl;
+            exit(1);
+          }
+        }
+        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        {
+          if (edge(iedge) == nullptr)
+          {
+            std::cerr << "Error in Quad ";
+            this->print_index(std::cerr);
+            std::cerr << ": Edge " << iedge << " is null." << std::endl;
+            exit(1);
+          }
+        }
+
+        // validate subitems (here: egdes)
+        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        {
+          edge(iedge)->validate();
+        }
+
+        // validate children
+        // TODO
+
+        // validate neighbours
+        if (this->active())
+        {
+          this->check_neighbourhood();
+        }
       }
 
       /// print information about this tri
