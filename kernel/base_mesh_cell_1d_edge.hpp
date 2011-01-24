@@ -9,6 +9,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh_cell.hpp>
+#include <kernel/base_mesh_cell_data_checker.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 
 namespace FEAST
@@ -28,8 +29,6 @@ namespace FEAST
     * specialisation of the class Cell<cell_dim_, ...> for cell_dim_ = 1.
     *
     * \author Hilmar Wobker
-    * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
     template<
       unsigned char space_dim_,
@@ -47,13 +46,17 @@ namespace FEAST
 
     public:
       /// CTOR
-      Edge(Vertex_* v0, Vertex_* v1)
+      Edge(
+        Vertex_* v0, Vertex_* v1,
+        unsigned char ref_level)
+        : Cell<1, space_dim_, world_dim_>(ref_level)
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
 
-        unsigned char num_subcells_per_subdimension[1] = {2};
-        this->_init_neighbours(1, num_subcells_per_subdimension);
+        unsigned char num_subitems_per_subdim[1] = {2};
+        this->_set_num_subitems_per_subdim(1, num_subitems_per_subdim);
+        this->_init_neighbours();
       }
 
 
@@ -100,8 +103,8 @@ namespace FEAST
         // Note the numbering of the vertices: the new created vertex is the second one within the structure of both
         // edge children. This is exploited at some places and must not be changed.
         this->_set_num_children(2);
-        _set_child(0, new Edge(vertex(0), subdiv_data.created_vertex));
-        _set_child(1, new Edge(vertex(1), subdiv_data.created_vertex));
+        _set_child(0, new Edge(vertex(0), subdiv_data.created_vertex, this->refinement_level()+1));
+        _set_child(1, new Edge(vertex(1), subdiv_data.created_vertex, this->refinement_level()+1));
         // update the parent relationship
         this->child(0)->set_parent(this);
         this->child(1)->set_parent(this);
@@ -170,7 +173,7 @@ namespace FEAST
 
         if (this->active())
         {
-          this->check_neighbourhood();
+          CellDataChecker<1, space_dim_, world_dim_>::check_neighbourhood(this);
         }
 
       }

@@ -20,7 +20,6 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
     template<unsigned char world_dim_>
     class Vertex

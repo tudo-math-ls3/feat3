@@ -1,0 +1,412 @@
+#pragma once
+#ifndef KERNEL_BM_CELL_DATA_CHECKER_HPP
+#define KERNEL_BM_CELL_DATA_CHECKER_HPP 1
+
+// includes, system
+#include <iostream> // for std::ostream
+#include <cassert>  // for assert()
+#include <vector>   // for std::vector
+
+// includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/base_mesh_cell_data.hpp>
+#include <kernel/base_mesh_cell.hpp>
+#include <kernel/base_mesh_vertex.hpp>
+
+namespace FEAST
+{
+  namespace BaseMesh
+  {
+    /**
+    * \brief class for checking vertex neighbours
+    *
+    * \author Hilmar Wobker
+    */
+    template<
+      unsigned char cell_space_dim_,
+      unsigned char world_dim_>
+    class CellDataCheckerVertexNeighbours
+    {
+    private:
+    public:
+      /// checks whether vertex neighbours are set correctly
+      static void check(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c)
+      {
+        assert(cell_space_dim_ >= 1);
+        for(unsigned char ivertex(0) ; ivertex < c->num_vertices() ; ++ivertex)
+        {
+          // get vertex neighbours at vertex ivertex
+          std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs = c->neighbours(SDIM_VERTEX, ivertex);
+          for(unsigned int ineigh = 0 ; ineigh < neighs.size() ; ineigh++)
+          {
+            // check whether ineigh-th neighbour is active
+            if(!neighs[ineigh]->active())
+            {
+              // if not, throw an error
+              std::cerr << "Cell ";
+              neighs[ineigh]->print_index(std::cerr);
+              std::cerr << ", being the vertex-neighbour of cell ";
+              c->print_index(std::cerr);
+              std::cerr << " (at vertex " << (int)ivertex << ", " << ineigh << "-th pos.), has children"
+                        << " which must not be the case!" << std::endl;
+              std::cerr << "It seems the neighbours of cell ";
+              c->print_index(std::cerr);
+              std::cerr << " have not been updated correctly!" << std::endl;
+            }
+            else // neighs[ineigh]->active()
+            {
+              // Get the vertex neighbours of the current neighbour.
+              // This is an array of vectors, where the ivertex_in_neigh-th entry of the array is the vector of
+              // neighbours at the ivertex_in_neigh-th vertex.
+              std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>*
+                neighs_of_neigh = neighs[ineigh]->neighbours_subdim(SDIM_VERTEX);
+
+              // init flag indicating whether neighbour has been found
+              bool neighbour_found = false;
+              for(unsigned char ivertex_in_neigh = 0 ; ivertex_in_neigh < neighs[ineigh]->num_vertices() ;
+                  ivertex_in_neigh++)
+              {
+                for(unsigned int nn = 0 ; nn < neighs_of_neigh[ivertex_in_neigh].size() ; nn++)
+                {
+                  if(neighs_of_neigh[ivertex_in_neigh][nn] == c)
+                  {
+                    std::cout << "Vertex-neighbourhood between cell ";
+                    c->print_index(std::cout);
+                    std::cout << " (at vertex " << (int)ivertex << ", " << ineigh << "-th pos.) and cell ";
+                    neighs[ineigh]->print_index(std::cout);
+                    std::cout << " (vertex = " << (int)ivertex_in_neigh << ", " << nn << "-th pos.) found!"
+                              << std::endl;
+                    neighbour_found = true;
+
+                    // check whether the two neighbours really share the same vertex
+                    if (c->vertex(ivertex) != neighs[ineigh]->vertex(ivertex_in_neigh))
+                    {
+                      std::cerr << "Neighbours do not share the same vertex! Aborting program!" << std::endl;
+                      exit(1);
+                    }
+                    break;
+                  }
+                }  // for 0 <= nn < neighs_of_neigh[ivertex_in_neigh].size()
+                if(neighbour_found)
+                {
+                  break;
+                }
+              } // for 0 <= ivertex_in_neigh < neighs[ineigh]->num_vertices()
+              if(!neighbour_found)
+              {
+                std::cerr << "No vertex-neighbour between cell ";
+                c->print_index(std::cerr);
+                std::cerr << " (at vertex " << (int)ivertex << ", " << ineigh << "-th pos.) and cell ";
+                neighs[ineigh]->print_index(std::cerr);
+                std::cerr << " found! Aborting program!" << std::endl;
+                exit(1);
+              }
+            }
+          } // for 0 <= ineigh < neighs.size()
+        } // for 0 <= ivertex < c->num_vertices()
+      } // check(...)
+    }; // class CellDataCheckerVertexNeighbours
+
+
+    /**
+    * \brief class for checking edge neighbours
+    *
+    * \author Hilmar Wobker
+    */
+    template<
+      unsigned char cell_space_dim_,
+      unsigned char world_dim_>
+    class CellDataCheckerEdgeNeighbours
+    {
+    private:
+    public:
+      /// checks whether edge neighbours are set correctly
+      static void check(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c)
+      {
+        assert(cell_space_dim_ >= 2);
+        for(unsigned char iedge(0) ; iedge < c->num_edges() ; ++iedge)
+        {
+          // get edge neighbours at edge iedge
+          std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs = c->neighbours(SDIM_EDGE, iedge);
+          for(unsigned int ineigh = 0 ; ineigh < neighs.size() ; ineigh++)
+          {
+            // check whether ineigh-th neighbour is active
+            if(!neighs[ineigh]->active())
+            {
+              // if not, throw an error
+              std::cerr << "Cell ";
+              neighs[ineigh]->print_index(std::cerr);
+              std::cerr << ", being the edge-neighbour of cell ";
+              c->print_index(std::cerr);
+              std::cerr << " (at edge " << (int)iedge << ", " << ineigh << "-th pos.), has children"
+                        << " which must not be the case!" << std::endl;
+              std::cerr << "It seems the neighbours of cell ";
+              c->print_index(std::cerr);
+              std::cerr << " have not been updated correctly!" << std::endl;
+            }
+            else // neighs[ineigh]->active()
+            {
+              // Get the edge neighbours of the current neighbour.
+              // This is an array of vectors, where the iedge_in_neigh-th entry of the array is the vector of
+              // neighbours at the iedge_in_neigh-th edge.
+              std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>*
+                neighs_of_neigh = neighs[ineigh]->neighbours_subdim(SDIM_EDGE);
+
+              // init flag indicating whether neighbour has been found
+              bool neighbour_found = false;
+              for(unsigned char iedge_in_neigh = 0 ; iedge_in_neigh < neighs[ineigh]->num_edges() ; iedge_in_neigh++)
+              {
+                for(unsigned int nn = 0 ; nn < neighs_of_neigh[iedge_in_neigh].size() ; nn++)
+                {
+                  if(neighs_of_neigh[iedge_in_neigh][nn] == c)
+                  {
+                    std::cout << "Edge-neighbourhood between cell ";
+                    c->print_index(std::cout);
+                    std::cout << " (at edge " << (int)iedge << ", " << ineigh << "-th pos.) and cell ";
+                    neighs[ineigh]->print_index(std::cout);
+                    std::cout << " (edge = " << (int)iedge_in_neigh << ", " << nn << "-th pos.) found!" << std::endl;
+                    neighbour_found = true;
+
+                    // We have to check whether the refinement levels of the two edges differ (which means, that the
+                    // one with the smaller ref. level is the parent of the other one). If this is the case, then we
+                    // have to "go up" in the hierarchy of the edge with the greater ref. level until the levels (and
+                    // the edges) are equal.
+                    Cell<1, cell_space_dim_, world_dim_>* edge_c = c->edge(iedge);
+                    Cell<1, cell_space_dim_, world_dim_>* edge_neigh = neighs[ineigh]->edge(iedge_in_neigh);
+                    char level_diff = edge_c->refinement_level() - edge_neigh->refinement_level();
+                    while(level_diff < 0)
+                    {
+                      // Ref. level of c's edge is smaller than that of the neighbour's edge.
+                      // Get parent of the latter.
+                      edge_neigh = edge_neigh->parent();
+                      level_diff++;
+                    }
+                    while(level_diff > 0)
+                    {
+                      // Ref. level of c's edge is greater than that of the neighbour's edge.
+                      // Get parent of the former.
+                      edge_c = edge_c->parent();
+                      level_diff--;
+                    }
+                    assert(level_diff == 0);
+                    assert(edge_c->refinement_level() == edge_neigh->refinement_level());
+                    // check whether the two neighbours really share the same edge
+                    if (edge_c != edge_neigh)
+                    {
+                      std::cerr << "Neighbours do not share the same edge! Aborting program!" << std::endl;
+                      exit(1);
+                    }
+                    break;
+                  }
+                }  // for 0 <= nn < neighs_of_neigh[iedge_in_neigh].size()
+                if(neighbour_found)
+                {
+                  break;
+                }
+              } // for 0 <= iedge_in_neigh < neighs[ineigh]->num_edges()
+              if(!neighbour_found)
+              {
+                std::cerr << "No edge-neighbour between cell ";
+                c->print_index(std::cerr);
+                std::cerr << " (at edge " << (int)iedge << ", " << ineigh << "-th pos.) and cell ";
+                neighs[ineigh]->print_index(std::cerr);
+                std::cerr << " found! Aborting program!" << std::endl;
+                exit(1);
+              }
+            }
+          } // for 0 <= ineigh < neighs.size()
+        } // for 0 <= iedge < c->num_edges()
+      } // check(...)
+    }; // class CellDataCheckerEdgeNeighbours
+
+
+    /**
+    * \brief class for checking face neighbours
+    *
+    * \author Hilmar Wobker
+    */
+    template<
+      unsigned char cell_space_dim_,
+      unsigned char world_dim_>
+    class CellDataCheckerFaceNeighbours
+    {
+    private:
+    public:
+      /// checks whether face neighbours are set correctly
+      static void check(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c)
+      {
+        assert(cell_space_dim_ >= 3);
+        for(unsigned char iface(0) ; iface < c->num_faces() ; ++iface)
+        {
+          // get face neighbours at face iface
+          std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs = c->neighbours(SDIM_FACE, iface);
+          for(unsigned int ineigh = 0 ; ineigh < neighs.size() ; ineigh++)
+          {
+            // check whether ineigh-th neighbour is active
+            if(!neighs[ineigh]->active())
+            {
+              // if not, throw an error
+              std::cerr << "Cell ";
+              neighs[ineigh]->print_index(std::cerr);
+              std::cerr << ", being the face-neighbour of cell ";
+              c->print_index(std::cerr);
+              std::cerr << " (at face " << (int)iface << ", " << ineigh << "-th pos.), has children"
+                        << " which must not be the case!" << std::endl;
+              std::cerr << "It seems the neighbours of cell ";
+              c->print_index(std::cerr);
+              std::cerr << " have not been updated correctly!" << std::endl;
+            }
+            else // neighs[ineigh]->active()
+            {
+              // Get the face neighbours of the current neighbour.
+              // This is an array of vectors, where the iface_in_neigh-th entry of the array is the vector of
+              // neighbours at the iface_in_neigh-th face.
+              std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>*
+                neighs_of_neigh = neighs[ineigh]->neighbours_subdim(SDIM_FACE);
+
+              // init flag indicating whether neighbour has been found
+              bool neighbour_found = false;
+              for(unsigned char iface_in_neigh = 0 ; iface_in_neigh < neighs[ineigh]->num_faces() ; iface_in_neigh++)
+              {
+                for(unsigned int nn = 0 ; nn < neighs_of_neigh[iface_in_neigh].size() ; nn++)
+                {
+                  if(neighs_of_neigh[iface_in_neigh][nn] == c)
+                  {
+                    std::cout << "Face-neighbourhood between cell ";
+                    c->print_index(std::cout);
+                    std::cout << " (at face " << (int)iface << ", " << ineigh << "-th pos.) and cell ";
+                    neighs[ineigh]->print_index(std::cout);
+                    std::cout << " (face = " << (int)iface_in_neigh << ", " << nn << "-th pos.) found!" << std::endl;
+                    neighbour_found = true;
+
+                    // We have to check whether the refinement levels of the two faces differ (which means, that the
+                    // one with the smaller ref. level is the parent of the other one). If this is the case, then we
+                    // have to "go up" in the hierarchy of the face with the greater ref. level until the levels (and
+                    // the faces) are equal.
+                    Cell<2, cell_space_dim_, world_dim_>* face_c = c->face(iface);
+                    Cell<2, cell_space_dim_, world_dim_>* face_neigh = neighs[ineigh]->face(iface_in_neigh);
+                    char level_diff = face_c->refinement_level() - face_neigh->refinement_level();
+                    while(level_diff < 0)
+                    {
+                      // Ref. level of c's face is smaller than that of the neighbour's face.
+                      // Get parent of the latter.
+                      face_neigh = face_neigh->parent();
+                      level_diff++;
+                    }
+                    while(level_diff > 0)
+                    {
+                      // Ref. level of c's face is greater than that of the neighbour's face.
+                      // Get parent of the former.
+                      face_c = face_c->parent();
+                      level_diff--;
+                    }
+                    assert(level_diff == 0);
+                    assert(face_c->refinement_level() == face_neigh->refinement_level());
+                    // check whether the two neighbours really share the same face
+                    if (face_c != face_neigh)
+                    {
+                      std::cerr << "Neighbours do not share the same face! Aborting program!" << std::endl;
+                      exit(1);
+                    }
+                    break;
+                  }
+                }  // for 0 <= nn < neighs_of_neigh[iface_in_neigh].size()
+                if(neighbour_found)
+                {
+                  break;
+                }
+              } // for 0 <= iface_in_neigh < neighs[ineigh]->num_faces()
+              if(!neighbour_found)
+              {
+                std::cerr << "No face-neighbour between cell ";
+                c->print_index(std::cerr);
+                std::cerr << " (at face " << (int)iface << ", " << ineigh << "-th pos.) and cell ";
+                neighs[ineigh]->print_index(std::cerr);
+                std::cerr << " found! Aborting program!" << std::endl;
+                exit(1);
+              }
+            }
+          } // for 0 <= ineigh < neighs.size()
+        } // for 0 <= iface < c->num_faces()
+      } // check(...)
+    }; // class CellDataCheckerFaceNeighbours
+
+
+    /**
+    * \brief class for checking cell-specific data like neighbourhood information
+    *
+    * This general class is empty, only specialisations for cell_dim_ = space_dim_ are implemented.
+    *
+    * \author Hilmar Wobker
+    */
+    template<
+      unsigned char cell_dim_,
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class CellDataChecker
+    {
+    private:
+    public:
+      /// dummy function called by cells with dimension smaller than space dimension
+      static void check_neighbourhood(Cell<cell_dim_, space_dim_, world_dim_> const * c)
+      {
+      }
+    };
+
+
+    /**
+    * \brief specialisation of class CellDataChecker for cell_dim_ = space_dim_ = 3
+    *
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class CellDataChecker<3, 3, world_dim_>
+    {
+    private:
+    public:
+      static void check_neighbourhood(Cell<3, 3, world_dim_> const * c)
+      {
+        CellDataCheckerVertexNeighbours<3, world_dim_>::check(c);
+        CellDataCheckerEdgeNeighbours<3, world_dim_>::check(c);
+        CellDataCheckerFaceNeighbours<3, world_dim_>::check(c);
+      }
+    };
+
+
+    /**
+    * \brief specialisation of class CellDataChecker for cell_dim_ = space_dim_ = 2
+    *
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class CellDataChecker<2, 2, world_dim_>
+    {
+    private:
+    public:
+      static void check_neighbourhood(Cell<2, 2, world_dim_> const * c)
+      {
+        CellDataCheckerVertexNeighbours<2, world_dim_>::check(c);
+        CellDataCheckerEdgeNeighbours<2, world_dim_>::check(c);
+      }
+    };
+
+
+    /**
+    * \brief specialisation of class CellDataChecker for cell_dim_ = space_dim_ = 1
+    *
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class CellDataChecker<1, 1, world_dim_>
+    {
+    private:
+    public:
+      static void check_neighbourhood(Cell<1, 1, world_dim_> const * c)
+      {
+        CellDataCheckerVertexNeighbours<1, world_dim_>::check(c);
+      }
+    };
+  } // namespace BaseMesh
+} // namespace FEAST
+
+#endif // #define KERNEL_BM_CELL_DATA_CHECKER_HPP

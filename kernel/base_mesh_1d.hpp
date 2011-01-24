@@ -102,13 +102,13 @@ namespace FEAST
 
         // create the three edges (=cells)
         // e0
-        Edge_* e = new Edge_(_vertices[0], _vertices[1]);
+        Edge_* e = new Edge_(_vertices[0], _vertices[1], 0);
         add(e);
         // e1
-        e = new Edge_(_vertices[1], _vertices[2]);
+        e = new Edge_(_vertices[1], _vertices[2], 0);
         add(e);
         // e2
-        e = new Edge_(_vertices[2], _vertices[3]);
+        e = new Edge_(_vertices[2], _vertices[3], 0);
         add(e);
 
         // set neighbourhood information (emulated file parser part 2)

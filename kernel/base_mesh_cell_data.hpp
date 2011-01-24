@@ -32,6 +32,70 @@ namespace FEAST
       SDIM_FACE = 2
     };
 
+
+
+    /**
+    * \brief general cell information which is needed by Cell and CellData class
+    *
+    * \author Hilmar Wobker
+    */
+// COMMENT_HILMAR: Das erscheint irgendwie maechtig umstaendlich, ist aber leider aufgrund der Besonderheit der
+//   "dazwischen geschobenen" Klasse CellData<...> (die fuer cell_dim_ != space_dim_ leer ist) noetig.
+
+// COMMENT_HILMAR: Im Moment gibt es hier nur das array _num_subitems_per_subdim[], eventuell kommt aber noch mehr
+//   dazu. Sollte sich herausstellen, dass doch nix mehr dazu kommt, dann kann man diese Klasse hier auch wieder
+//   wieder abschaffen und das einzige per Code-Verdopplung in die beiden Varianten der Klasse CellData verschieben.
+    template<
+      unsigned char cell_dim_,
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class CellInfo
+      : public Item
+    {
+    private:
+      /**
+      * \brief array of number of subitems per subdimension
+      *
+      * Definitions of two terms we use:
+      * 1) "subdimension" = space dimension minus co-dimension where
+      *      in 3D: codim 1 -> faces, codim 2 -> edges, codim 3 -> vertices
+      *      in 2D: codim 1 -> edges, codim 2 -> vertices
+      *      in 1D: codim 1 -> vertices
+      *    Co-dimension 0 is not needed here. Hence, the number of subdimensions is equal to the space dimension.
+      * 2) "subitems" = items of lower dimension in a cell, distinguished by subdimension. Examples:
+      *      in 3D: a hexa has 6 subitems of subdimension 2 (=faces), 12 subitems of subdimension 1 (=edges)
+      *             and 8 subitems of subdimension 0 (=vertices)
+      *      in 2D: a tri has 3 subitems of subdimension 1 (=edges) and 3 subitems of subdimension 0 (=vertices)
+      *      in 1D: an edge has 2 subitems of subdimension 0 (=vertices)
+      */
+      unsigned char _num_subitems_per_subdim[cell_dim_];
+// COMMENT_HILMAR: Eigentlich ganz schoener overkill, das fuer jede Zelle extra abzuspeichern. Besser waere evtl.,
+//   die Informationen irgendwo statisch pro Zelltyp 1x abzuspeichern und dann mit einer Art Zelltyp-ID abzufragen.
+
+    protected:
+
+      /// setter for the number of subitems per subdimension
+      void _set_num_subitems_per_subdim(unsigned char array_size, unsigned char num_subitems_per_subdim[])
+      {
+        assert(array_size == cell_dim_);
+        for(int i(0) ; i < cell_dim_ ; ++i)
+        {
+          _num_subitems_per_subdim[i] = num_subitems_per_subdim[i];
+        }
+      }
+
+    public:
+
+      inline unsigned char num_subitems_per_subdim(subdim subdim) const
+      {
+        assert(subdim < cell_dim_);
+        return _num_subitems_per_subdim[subdim];
+      }
+
+
+    };
+
+
     /// forward declaration of class BaseMesh::Cell
     template<
       unsigned char cell_dim_,
@@ -47,21 +111,19 @@ namespace FEAST
     * The class is only implemented for cell_dim_ = space_dim_ (see below).
     *
     * \author Hilmar Wobker
-    * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
     template<
       unsigned char cell_dim_,
       unsigned char space_dim_,
       unsigned char world_dim_>
     class CellData
-      : public Item
+      : public CellInfo<cell_dim_, space_dim_, world_dim_>
     {
     private:
 
     public:
       /// dummy function called by cells with dimension smaller than space dimension
-      inline void _init_neighbours(unsigned char array_size, unsigned char num_subcells_per_subdim[])
+      inline void _init_neighbours()
       {
         // do nothing here
       }
@@ -73,11 +135,6 @@ namespace FEAST
         Cell<cell_dim_, space_dim_, world_dim_>* neighbour)
       {
         // do nothing here
-      }
-
-      /// dummy function called by cells with dimension smaller than space dimension
-      inline void check_neighbourhood() const
-      {
       }
 
       /// dummy function called by cells with dimension smaller than space dimension
@@ -95,33 +152,14 @@ namespace FEAST
     * Only implemented for cell_dim_ = space_dim_.
     *
     * \author Hilmar Wobker
-    * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
     template<
       unsigned char cell_space_dim_,
       unsigned char world_dim_>
     class CellData<cell_space_dim_, cell_space_dim_, world_dim_>
-      : public Item
+      : public CellInfo<cell_space_dim_, cell_space_dim_, world_dim_>
     {
     private:
-
-      /**
-      * \brief array of number of subcells per subdimension
-      *
-      * Definitions of two terms we use:
-      * 1) "subdimension" = space dimension minus co-dimension where
-      *      in 3D: codim 1 -> faces, codim 2 -> edges, codim 3 -> vertices
-      *      in 2D: codim 1 -> edges, codim 2 -> vertices
-      *      in 1D: codim 1 -> vertices
-      *    Co-dimension 0 is not needed here. Hence, the number of subdimensions is equal to the space dimension.
-      * 2) "subcells" = items of lower dimension in a cell, distinguished by subdimension. Examples:
-      *      in 3D: a hexa has 6 subcells of subdimension 2 (=faces), 12 subcells of subdimension 1 (=edges)
-      *             and 8 subcells of subdimension 0 (=vertices)
-      *      in 2D: a tri has 3 subcells of subdimension 1 (=edges) and 3 subcells of subdimension 0 (=vertices)
-      *      in 1D: an edge has 2 subcells of subdimension 0 (=vertices)
-      */
-      unsigned char _num_subcells_per_subdim[cell_space_dim_];
 
       /**
       * \brief  two-dimensional array of vectors of neighbour cells:
@@ -139,15 +177,13 @@ namespace FEAST
     protected:
 
       /// function for initialising the neighbour arrays/vectors
-      void _init_neighbours(unsigned char array_size, unsigned char num_subcells_per_subdim[])
+      void _init_neighbours()
       {
-        assert(array_size == cell_space_dim_);
-        for(int i(0) ; i < cell_space_dim_ ; ++i)
+        for(int sdim(0) ; sdim < cell_space_dim_ ; ++sdim)
         {
-          _num_subcells_per_subdim[i] = num_subcells_per_subdim[i];
-          _neighbours[i]
-            = new std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>[_num_subcells_per_subdim[i]];
-          // TODO: Sind die einzelen std::vector damit schon ordentlich initialisiert? Muesste eigentlich...
+          _neighbours[sdim]
+            = new std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>
+                    [this->num_subitems_per_subdim((subdim)sdim)];
         }
       }
 
@@ -159,23 +195,17 @@ namespace FEAST
         // TODO: deallocate _neighbours !!!
       }
 
-      inline unsigned char num_subcells_per_subdim(subdim subdim)
-      {
-        assert(subdim < cell_space_dim_);
-        return _num_subcells_per_subdim[subdim];
-      }
-
       /// returns one specific neighbour for given subdim, item and index
       inline Cell<cell_space_dim_, cell_space_dim_, world_dim_>* neighbour(
         subdim subdim,
         unsigned char item,
         unsigned char index) const
       {
-        assert(subdim < world_dim_);
-        assert(item < _num_subcells_per_subdim[subdim]);
+        assert(item < this->num_subitems_per_subdim(subdim));
         assert(index < _neighbours[subdim][item].size());
         return _neighbours[subdim][item][index];
       }
+
 
       /// returns vector of neighbours for given subdimension and given item
       inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>& neighbours(
@@ -185,11 +215,13 @@ namespace FEAST
         return _neighbours[subdim][item];
       }
 
+
       /// returns array of vectors of neighbours for given subdimension
       inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>* neighbours_subdim(subdim subdim) const
       {
         return _neighbours[subdim];
       }
+
 
       /// add neighbour to the vector of neighbours of given subdim and item
       inline void add_neighbour(
@@ -200,91 +232,23 @@ namespace FEAST
         _neighbours[subdim][item].push_back(neighbour);
       }
 
-      /// checks whether neighbours are set correctly
-      inline void check_neighbourhood() const
-      {
-//std::cout << "starting neighbourhood check" << std::endl;
-        for(unsigned char sdim(0) ; sdim < cell_space_dim_; ++sdim)
-        {
-//std::cout << "sdim " <<  (int) sdim << std::endl;
-          for(unsigned char item(0) ; item < _num_subcells_per_subdim[sdim] ; ++item)
-          {
-//std::cout << "item " <<  (int) item << std::endl;
-            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>&
-              neighs = neighbours((subdim)sdim, item);
-            for(unsigned int n = 0 ; n < neighs.size() ; n++)
-            {
-//std::cout << "n " <<  n << std::endl;
-              if(!neighs[n]->active())
-              {
-                std::cerr << "Cell ";
-                neighs[n]->print_index(std::cerr);
-                std::cerr << ", being the subdim-" << (int)sdim << "-neighbour of cell ";
-                this->print_index(std::cerr);
-                std::cerr << " (at item " << (int)item << ", " << n << "-th pos.), has children"
-                          << " which must not be the case!" << std::endl;
-                std::cerr << "It seems the neighbours of cell ";
-                this->print_index(std::cerr);
-                std::cerr << " have not been updated correctly!" << std::endl;
-              }
-              else
-              {
-                std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>*
-                  neighs_of_neigh = neighs[n]->neighbours_subdim((subdim)sdim);
-                bool neighbour_found = false;
-                for(unsigned char item_nn = 0 ; item_nn < neighs[n]->num_subcells_per_subdim((subdim)sdim) ; item_nn++)
-                {
-//std::cout << "item_nn " << item_nn << std::endl;
-                  for(unsigned int nn = 0 ; nn < neighs_of_neigh[item_nn].size() ; nn++)
-                  {
-//std::cout << "nn " << nn << std::endl;
-                    if(neighs_of_neigh[item_nn][nn] == this)
-                    {
-                      std::cout << "subdim-" << (int)sdim << "-neighbourhood between cell ";
-                      this->print_index(std::cout);
-                      std::cout << " (at item " << (int)item << ", " << n << "-th pos.) and cell ";
-                      neighs[n]->print_index(std::cout);
-                      std::cout << " (item = " << (int)item_nn << ", " << nn << "-th pos.)" << std::endl;
-                      neighbour_found = true;
-                      break;
-                    }
-                  }  // for 0 <= nn < neighs_of_neigh[item_nn].size()
-                  if(neighbour_found)
-                  {
-                    break;
-                  }
-                } // for 0 <= item_nn < neighs[n]->num_subcells_per_subdim((subdim)sdim)
-                if(!neighbour_found)
-                {
-                  std::cerr << "No neighbour found!" << std::endl;
-                  std::cerr << "subdim-" << (int)sdim << "-neighbourhood between cell ";
-                  this->print_index(std::cerr);
-                  std::cerr << " (at item " << (int)item << ", " << n << "-th pos.) and cell ";
-                  neighs[n]->print_index(std::cerr);
-                  std::cerr << std::endl;
-                }
-              }
-            } // for 0 <= n < neighs.size()
-          } // for 0 <= item < _num_subcells_per_subdim[sdim]
-        } // for 0 <= sdim < cell_space_dim
-      }
 
       /// print neighbourhood information
       inline void print(std::ostream& stream)
       {
         // print neighbourhood information into the next line
         stream << std::endl << "    [N:  ";
-        for(unsigned char subdim(0) ; subdim < cell_space_dim_ ; ++subdim)
+        for(unsigned char sdim(0) ; sdim < cell_space_dim_ ; ++sdim)
         {
-          if(subdim == 0)
+          if(sdim == 0)
           {
             stream << "V( ";
           }
-          else if(subdim == 1)
+          else if(sdim == 1)
           {
             stream << ", E( ";
           }
-          else if(subdim == 2)
+          else if(sdim == 2)
           {
             stream << ", F( ";
           }
@@ -292,17 +256,17 @@ namespace FEAST
           {
             stream << ", X( ";
           }
-          for(unsigned char item(0) ; item < _num_subcells_per_subdim[subdim] ; ++item)
+          for(unsigned char item(0) ; item < this->num_subitems_per_subdim((subdim)sdim) ; ++item)
           {
-            if (_neighbours[subdim][item].size() > 0)
+            if (_neighbours[sdim][item].size() > 0)
             {
-              _neighbours[subdim][item][0]->print_index(stream);
-              for(unsigned char k(1) ; k < _neighbours[subdim][item].size() ; ++k)
+              _neighbours[sdim][item][0]->print_index(stream);
+              for(unsigned char k(1) ; k < _neighbours[sdim][item].size() ; ++k)
               {
                 stream << ", ";
-                _neighbours[subdim][item][k]->print_index(stream);
+                _neighbours[sdim][item][k]->print_index(stream);
               }
-              if(item < _num_subcells_per_subdim[subdim]-1)
+              if(item < this->num_subitems_per_subdim((subdim)sdim)-1)
               {
                 stream << " | ";
               }
@@ -313,7 +277,7 @@ namespace FEAST
             }
             else
             {
-              if(item < _num_subcells_per_subdim[subdim]-1)
+              if(item < this->num_subitems_per_subdim((subdim)sdim)-1)
               {
                 stream << "- | ";
               }

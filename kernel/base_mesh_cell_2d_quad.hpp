@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 #include <kernel/base_mesh_cell.hpp>
+#include <kernel/base_mesh_cell_data_checker.hpp>
 #include <kernel/base_mesh_cell_1d_edge.hpp>
 
 namespace FEAST
@@ -47,8 +48,6 @@ namespace FEAST
     * not be mixed up with the standard way of defining orientation (i.e., running counter-clockwise through the quad).
     *
     * \author Hilmar Wobker
-    * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennten wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
 // die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wieder um Quad und Tri erben. Darin koennte
@@ -134,7 +133,11 @@ namespace FEAST
 
     public:
       /// CTOR
-      Quad(Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3, Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3)
+      Quad(
+        Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3,
+        Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3,
+        unsigned char ref_level)
+        : Cell<2, space_dim_, world_dim_>(ref_level)
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
@@ -151,8 +154,9 @@ namespace FEAST
           assert(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>));
         }
 
-        unsigned char num_subcells_per_subdimension[2] = {4,4};
-        this->_init_neighbours(2, num_subcells_per_subdimension);
+        unsigned char num_subitems_per_subdim[2] = {4,4};
+        this->_set_num_subitems_per_subdim(2, num_subitems_per_subdim);
+        this->_init_neighbours();
 // COMMENT_HILMAR: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<2, space_dim_, world_dim_>({4,4})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
@@ -369,7 +373,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 
         for (unsigned char i(0) ; i < num_edges() ; ++i)
         {
-          new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4]);
+          new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4], 0);
           subdiv_data.created_edges.push_back(new_edges[i+8]);
         }
 
@@ -402,13 +406,13 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         //
         // These facts are exploited, e.g., within the hexa subdivision routine, so don't change this!
         _set_child(0, new Quad(new_vertices[4], new_vertices[0], new_vertices[2], vertex(0),
-                               new_edges[8], new_edges[4], new_edges[10], new_edges[0]));
+                               new_edges[8], new_edges[4], new_edges[10], new_edges[0], this->refinement_level()+1));
         _set_child(1, new Quad(new_vertices[0], new_vertices[4], vertex(1), new_vertices[3],
-                               new_edges[8], new_edges[6], new_edges[1], new_edges[11]));
+                               new_edges[8], new_edges[6], new_edges[1], new_edges[11], this->refinement_level()+1));
         _set_child(2, new Quad(new_vertices[2], vertex(2), new_vertices[4], new_vertices[1],
-                               new_edges[5], new_edges[9], new_edges[10], new_edges[2]));
+                               new_edges[5], new_edges[9], new_edges[10], new_edges[2], this->refinement_level()+1));
         _set_child(3, new Quad(vertex(3), new_vertices[3], new_vertices[1], new_vertices[4],
-                               new_edges[7], new_edges[9], new_edges[3], new_edges[11]));
+                               new_edges[7], new_edges[9], new_edges[3], new_edges[11], this->refinement_level()+1));
 
         // Geometric interpretation of this building rule:
         // To obtain the numbering of the parent quad from the numbering of a child, simply "mirror" the child at the
@@ -495,7 +499,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         // validate neighbours
         if (this->active())
         {
-          this->check_neighbourhood();
+          CellDataChecker<2, space_dim_, world_dim_>::check_neighbourhood(this);
         }
       }
 

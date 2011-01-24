@@ -18,7 +18,6 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
     class Item
     {

@@ -20,12 +20,15 @@ int main (int argc, char **argv)
   std::cout << "v0--------e0--------v1--------e1--------v2--------e2--------v3" << std::endl;
   bm.print(std::cout);
 
-  // create a couple of actions and apply them
-  std::cout << "Subdividing cell 0" << std::endl;
+  // validate base mesh
+  bm.validate();
 
+  // subdivide cell 0
+  std::cout << "Subdividing cell 0" << std::endl;
   SubdivisionData<1, WDIM, SDIM> subdiv_data;
   bm.cell(1)->subdivide(subdiv_data);
   bm.add_created_items(subdiv_data);
+
   // TODO: neighbourhood update
 
   std::cout << "Base mesh should now look like this:" << std::endl;

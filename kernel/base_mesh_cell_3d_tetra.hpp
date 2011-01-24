@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 #include <kernel/base_mesh_cell.hpp>
+#include <kernel/base_mesh_cell_data_checker.hpp>
 #include <kernel/base_mesh_cell_1d_edge.hpp>
 #include <kernel/base_mesh_cell_2d_tri.hpp>
 
@@ -23,8 +24,6 @@ namespace FEAST
     * \brief 3D base mesh cell of type tetra
     *
     * \author Hilmar Wobker
-    * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennte wir ueberlegen, eine weitere Klasse Cell3D einzufuehren,
 // die von Cell<3, space_dim_, world_dim_> erbt, und von der dann wieder um Tetra und Hexa erben.
@@ -59,9 +58,12 @@ namespace FEAST
 
     public:
       /// CTOR
-      Tetra(Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3,
-            Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3, Cell_1D_* e4, Cell_1D_* e5,
-            Cell_2D_* f0, Cell_2D_* f1,Cell_2D_* f2, Cell_2D_* f3)
+      Tetra(
+        Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3,
+        Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3, Cell_1D_* e4, Cell_1D_* e5,
+        Cell_2D_* f0, Cell_2D_* f1,Cell_2D_* f2, Cell_2D_* f3,
+        unsigned char ref_level)
+        : Cell<3, space_dim_, world_dim_>(ref_level)
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
@@ -89,8 +91,9 @@ namespace FEAST
           assert(typeid(*_faces[i]) == typeid(Tri_));
         }
 
-        unsigned char num_subcells_per_subdimension[3] = {4, 6, 4};
-        this->_init_neighbours(3, num_subcells_per_subdimension);
+        unsigned char num_subitems_per_subdim[3] = {4, 6, 4};
+        this->_set_num_subitems_per_subdim(3, num_subitems_per_subdim);
+        this->_init_neighbours();
 // COMMENT_HILMAR: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<3, space_dim_, world_dim_>({4,6,4})
 // (was nicht kompiliert). Wie kann man denn on-the-fly ein Array anlegen und durchreichen?
@@ -156,141 +159,16 @@ namespace FEAST
           exit(1);
         }
 
-// this is the copy-and-pasted Quad::subdivid() code which has to be adapted!
-//
-//        // clear all vectors of created entities in the SubdivisionData object
-//        subdiv_data.clear_created();
-//
-//        /// vertices that this action creates and/or reuses
-//        Vertex_* new_vertices[5];
-//
-//        /// edges that this action creates and/or reuses
-//        Cell_1D_* new_edges[12];
-//
-//        // local numbering (old and new)
-//        //         k2                                       e5     e4
-//        //   w2---------w3          -----v1------         -------------
-//        //   |           |          |     |     |       e6|    e10    |e3
-//        //   |           |          |  q2 | q3  |         |     |     |
-//        // k3|           |k1  ---> v2-----v4----v3        --e11----e9--
-//        //   |           |          |  q0 | q1  |       e7|     |     |e2
-//        //   |           |          |     |     |         |     e8    |
-//        //   w0---------w1          -----v0------         -------------
-//        //         k0                                        e0    e1
-//
-//        // store old active-mask of each edge, because it gets overwritten once edges are getting split below
-//        bool old_edge_active_mask[4];
-//
-//        SubdivisionData<1, space_dim_, world_dim_> subdiv_data_edge;
-//
-//        // loop over all edges and split them eventually, creating new vertices and edges on the way
-//        for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
-//        {
-//          // if edge has no children, create them
-//          if (edge(iedge)->active())
-//          {
-//            // store old active mask
-//            old_edge_active_mask[iedge] = true;
-//            // create new vertex
-//
-//            // subdivide edge
-//            edge(iedge)->subdivide(subdiv_data_edge);
-//
-//            // add the created vertices/edges to the vector of created vertices/edges
-//            subdiv_data.created_vertices.push_back(subdiv_data_edge.created_vertex);
-//
-//            // COMMENT_HILMAR: Not sure whether the order plays a role here... to be on the safe side, order them
-//            // according to the array new_edges[].
-//            if(_edge_has_correct_orientation(iedge))
-//            {
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
-//            }
-//            else
-//            {
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
-//              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
-//            }
-//          }
-//          else // edge has children, reuse them
-//          {
-//            // store old active mask
-//            old_edge_active_mask[iedge] = false;
-//          }
-//
-//          // add new vertex to array of new vertices
-//          new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
-//
-//          // add new edges to array of new edges, respect the orientation of the edge
-//          if(_edge_has_correct_orientation(iedge))
-//          {
-//            // if the edge has the orientation of the quad, then child 0 is the first edge
-//            new_edges[2*iedge]   = edge(iedge)->child(0);
-//            new_edges[2*iedge+1] = edge(iedge)->child(1);
-//          }
-//          else
-//          {
-//            // if the edge does not have the orientation of the quad, then child 1 is the first edge.
-//            new_edges[2*iedge]   = edge(iedge)->child(1);
-//            new_edges[2*iedge+1] = edge(iedge)->child(0);
-//          }
-//// COMMENT_HILMAR: Beachte, dass wir auch in dem Fall, dass eine Kante schon Kinder hatte, *nicht* annehmen koennen,
-//// dass sie vom Nachbarelement erstellt worden ist. Beispiel: 2 benachbarte Zellen C0 und C1. C0 zerteilt sich, hat
-//// somit die gemeinsame Kante e zerteilt, sodass die Reihenfolge der Kinder der lokalen Orientierung von C0 entspricht.
-//// Irgendwann später zerteilt sich C1 und nutzt aus, dass die Kinder der Kante e ja von C0 angelegt worden sein
-//// muessen und dreht deren Reihenfolge also einfach um. Hier stimmt die Annahme also noch.
-//// Jetzt vergroebert sich C0 wieder, Kante e bleibt bestehen, da sie ja noch von C1 benutzt wird. Dann irgendwann
-//// verfeinert sich C0 wieder: Nun ist es aber falsch anzunehmen, dass der Nachbar (C1) die Kante angelegt haben muss!
-//// In Wirklichkeit war C0 es selbst, hat das aber inzwischen "vergessen".
-//        } // for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
-//
-//        // create new midpoint and its incident edges (these are always new, have no children and cannot be reused)
-//        double x1 = new_vertices[0]->coord(0);
-//        double y1 = new_vertices[0]->coord(1);
-//        double x2 = new_vertices[2]->coord(0);
-//        double y2 = new_vertices[2]->coord(1);
-//        double x3 = new_vertices[1]->coord(0);
-//        double y3 = new_vertices[1]->coord(1);
-//        double x4 = new_vertices[3]->coord(0);
-//        double y4 = new_vertices[3]->coord(1);
-//        double p[2];
-//        // TODO factor out common subexpressions
-//        p[0] = ( (x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );
-//        p[1] = ( (x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4) ) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) );
-//        new_vertices[4] = new Vertex<world_dim_>(p);
-//
-//        subdiv_data.created_vertices.push_back(new_vertices[4]);
-//
-//        for (unsigned char i(0) ; i < 4 ; ++i)
-//        {
-//          new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4]);
-//          subdiv_data.created_edges.push_back(new_edges[i+8]);
-//        }
-//
-//        // set number of children to 4
-//        this->_set_num_children(4);
-//
-//        // finally, create and add new quads
-//        _set_child(0, new Quad_(vertex(0), new_vertices[0], new_vertices[4], new_vertices[3],
-//                               new_edges[0], new_edges[8], new_edges[11], new_edges[7]));
-//        _set_child(1, new Quad_(new_vertices[0], vertex(1), new_vertices[1], new_vertices[4],
-//                               new_edges[1], new_edges[2], new_edges[9], new_edges[8]));
-//        _set_child(2, new Quad_(new_vertices[4], new_vertices[1], vertex(2), new_vertices[2],
-//                               new_edges[9], new_edges[3], new_edges[4], new_edges[10]));
-//        _set_child(3, new Quad_(new_vertices[3], new_vertices[4], new_vertices[2], vertex(3),
-//                               new_edges[11], new_edges[10], new_edges[5], new_edges[6]));
-//
-//        for (unsigned char i(0) ; i < 4 ; ++i)
-//        {
-//          this->child(i)->set_parent(this);
-//          subdiv_data.created_cells.push_back(this->child(i));
-//        }
+        // to be implemented...
+
       } // subdivide()
 
 
+      /// validates the cell
+// COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
-
+        // to be implemented
       }
 
 

@@ -160,71 +160,71 @@ namespace FEAST
         // create the 14 edges
         // (just to ease manual sanity checks, always use the vertex of smaller global index as start vertex)
         // e0
-        Edge_* e = new Edge_(_vertices[0], _vertices[1]);
+        Edge_* e = new Edge_(_vertices[0], _vertices[1], 0);
         add(e);
         // e1
-        e = new Edge_(_vertices[1], _vertices[2]);
+        e = new Edge_(_vertices[1], _vertices[2], 0);
         add(e);
         // e2
-        e = new Edge_(_vertices[0], _vertices[3]);
+        e = new Edge_(_vertices[0], _vertices[3], 0);
         add(e);
         // e3
-        e = new Edge_(_vertices[1], _vertices[4]);
+        e = new Edge_(_vertices[1], _vertices[4], 0);
         add(e);
         // e4
-        e = new Edge_(_vertices[2], _vertices[5]);
+        e = new Edge_(_vertices[2], _vertices[5], 0);
         add(e);
         // e5
-        e = new Edge_(_vertices[2], _vertices[6]);
+        e = new Edge_(_vertices[2], _vertices[6], 0);
         add(e);
         // e6
-        e = new Edge_(_vertices[3], _vertices[4]);
+        e = new Edge_(_vertices[3], _vertices[4], 0);
         add(e);
         // e7
-        e = new Edge_(_vertices[4], _vertices[5]);
+        e = new Edge_(_vertices[4], _vertices[5], 0);
         add(e);
         // e8
-        e = new Edge_(_vertices[5], _vertices[6]);
+        e = new Edge_(_vertices[5], _vertices[6], 0);
         add(e);
         // e9
-        e = new Edge_(_vertices[5], _vertices[7]);
+        e = new Edge_(_vertices[5], _vertices[7], 0);
         add(e);
         // e10
-        e = new Edge_(_vertices[5], _vertices[8]);
+        e = new Edge_(_vertices[5], _vertices[8], 0);
         add(e);
         // e11
-        e = new Edge_(_vertices[6], _vertices[9]);
+        e = new Edge_(_vertices[6], _vertices[9], 0);
         add(e);
         // e12
-        e = new Edge_(_vertices[7], _vertices[8]);
+        e = new Edge_(_vertices[7], _vertices[8], 0);
         add(e);
         // e13
-        e = new Edge_(_vertices[8], _vertices[9]);
+        e = new Edge_(_vertices[8], _vertices[9], 0);
         add(e);
 
         // create quad cell c0
         Quad_* quad =
           new Quad_(_vertices[3], _vertices[4], _vertices[0], _vertices[1],
-                    _edges[6], _edges[0], _edges[2], _edges[3]);
+                    _edges[6], _edges[0], _edges[2], _edges[3], 0);
         add(quad);
 
         // create quad cell c1
         quad = new Quad_(_vertices[4], _vertices[5], _vertices[1], _vertices[2],
-                         _edges[7], _edges[1], _edges[3], _edges[4]);
+                         _edges[7], _edges[1], _edges[3], _edges[4], 0);
         add(quad);
 
         // create tri cell c2
         Tri_* tri = new Tri_(_vertices[5], _vertices[6], _vertices[2],
-                             _edges[8], _edges[5], _edges[4]);
+                             _edges[8], _edges[5], _edges[4], 0);
         add(tri);
         // create tri cell c3
         tri = new Tri_(_vertices[7], _vertices[8], _vertices[5],
-                       _edges[12], _edges[10], _edges[9]);
+                       _edges[12], _edges[10], _edges[9], 0);
         add(tri);
 
         // create quad cell c4
         quad = new Quad_(_vertices[8], _vertices[9], _vertices[5], _vertices[6],
-                         _edges[13], _edges[8], _edges[10], _edges[11]);
+                         _edges[13], _edges[8], _edges[10], _edges[11], 0);
         add(quad);
 
         // set neighbourhood information (emulated file parser part 2)

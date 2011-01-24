@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 #include <kernel/base_mesh_cell.hpp>
+#include <kernel/base_mesh_cell_data_checker.hpp>
 #include <kernel/base_mesh_cell_1d_edge.hpp>
 
 namespace FEAST
@@ -22,8 +23,6 @@ namespace FEAST
     * \brief 2D base mesh cell of type triangle
     *
     * \author Hilmar Wobker
-    * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennte wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
 // die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wieder um Quad und Tri erben. Darin koennte
@@ -59,7 +58,11 @@ namespace FEAST
 
     public:
       /// CTOR
-      Tri(Vertex_* v0, Vertex_* v1, Vertex_* v2, Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2)
+      Tri(
+        Vertex_* v0, Vertex_* v1, Vertex_* v2,
+        Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2,
+        unsigned char ref_level)
+        : Cell<2, space_dim_, world_dim_>(ref_level)
       {
         _vertices[0] = v0;
         _vertices[1] = v1;
@@ -74,8 +77,9 @@ namespace FEAST
           assert(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>));
         }
 
-        unsigned char num_subcells_per_subdimension[2] = {3,3};
-        this->_init_neighbours(2, num_subcells_per_subdimension);
+        unsigned char num_subitems_per_subdim[2] = {3,3};
+        this->_set_num_subitems_per_subdim(2, num_subitems_per_subdim);
+        this->_init_neighbours();
 
 // TODO: Eigentlich haette ich das lieber in die Konstruktoren-Liste gepackt, also sowas in der Art:
 //    : CellData<2, space_dim_, world_dim_>({3,3})
@@ -214,7 +218,7 @@ namespace FEAST
         // validate neighbours
         if (this->active())
         {
-          this->check_neighbourhood();
+          CellDataChecker<2, space_dim_, world_dim_>::check_neighbourhood(this);
         }
       }
 

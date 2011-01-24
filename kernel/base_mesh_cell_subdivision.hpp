@@ -90,6 +90,8 @@ namespace FEAST
     * factors, ...). It's hard to define such data independently of the cell dimension, hence the class is specialised
     * via the cell dimension. Another advantage: The interface of the function subdivide(...) will never have
     * to be changed again.
+    *
+    * \author Hilmar Wobker
     */
 // COMMENT_HILMAR: Wie und wo sollen die SubdivisionData-Objekte gespeichert werden? Als member von Cell<...>?
     template<
@@ -101,7 +103,11 @@ namespace FEAST
     };
 
 
-    /// subdivision specific data for 1D cells
+    /**
+    * \brief subdivision specific data for 1D cells
+    *
+    * \author Hilmar Wobker
+    */
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
@@ -131,7 +137,11 @@ namespace FEAST
     };
 
 
-    /// subdivision specific data for 2D cells
+    /**
+    * \brief subdivision specific data for 2D cells
+    *
+    * \author Hilmar Wobker
+    */
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
@@ -162,7 +172,11 @@ namespace FEAST
     };
 
 
-    /// subdivision specific data for 3D cells
+    /**
+    * \brief subdivision specific data for 3D cells
+    *
+    * \author Hilmar Wobker
+    */
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>

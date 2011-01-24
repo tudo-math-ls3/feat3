@@ -258,8 +258,6 @@ namespace FEAST
     * neighbourhood information etc. included.
     *
     * \author Hilmar Wobker
-    * \author Dominik Goeddeke
-    * \author Peter Zajac
     */
     template<
       unsigned char cell_dim_,
@@ -274,13 +272,179 @@ namespace FEAST
 
       /// parent of this cell
       Cell* _parent;
+
       /// number of children (when zero, then the cell is called active)
       unsigned char _num_children;
+
       /// array of children of this cell
       Cell** _children;
 
+      /// refinement level of this cell
+      unsigned char _refinement_level;
+
+    protected:
+
+      /**
+      * \brief sets number of children and allocates the _children array
+      *
+      * This function may only be called, when new children are to be created. "Old" children have to be cleared before via
+      * unset_children(...).
+      * Rationale:
+      * - It won't happen often that a cell creates and removes children over and over again.
+      * - A situation like "I already have 4 children, and now I want to have 2 more" will not occur.
+      * - Allocating/deallocating an array of less than 10 pointers does not really harm.
+      */
+      inline void _set_num_children(unsigned char const num)
+      {
+        // this function must not be called when there *are* already children
+        assert(_children == nullptr && _num_children == 0);
+        // and it must not be called to unset children (use unset_children() for that)
+        assert(num > 0);
+        _num_children = num;
+        _children = new Cell*[_num_children];
+        // nullify the new pointer array
+        for (unsigned char i(0) ; i < _num_children ; ++i)
+        {
+          _children[i] = nullptr;
+        }
+      }
+
+      /**
+      * \brief sets child at given index
+      *
+      * The cell-type does not have to be the same (quads can have tris as children), so a general BaseMeshItem2D is
+      * is passed to the function.
+      */
+      inline void _set_child(
+        unsigned char const index,
+        Cell* e)
+      {
+        assert(index < num_children());
+        // ensure that this function is not used to unset children (use unset_children() for that)
+        assert(e != nullptr);
+        _children[index] = e;
+      }
+
+      /// unsets all children (which should not be done via set_child(i, nullptr))
+      inline void _unset_children()
+      {
+        // COMMENT_HILMAR: For the time being, we enforce that this function may only be called when there actually *are*
+        // valid children. (To discover eventual errors in apply/unapply actions.)
+        assert(num_children() > 0);
+        for (unsigned char i(0) ; i < num_children() ; ++i)
+        {
+          assert(_children[i] != nullptr);
+          _children[i] = nullptr;
+        }
+        delete [] _children;
+        _children = nullptr;
+        _num_children = 0;
+      }
 
 
+    public:
+
+      Cell(unsigned char ref_level)
+        : _parent(nullptr),
+          _num_children(0),
+          _children(nullptr),
+          _refinement_level(ref_level)
+      {
+        assert(world_dim_ >= space_dim_);
+        assert(space_dim_ >= cell_dim_);
+      }
+
+
+      virtual ~Cell()
+      {
+        _parent = nullptr;
+      }
+
+
+      /// returns parent
+      inline Cell* parent() const
+      {
+        return _parent;
+      }
+
+
+      /// sets parent
+      inline void set_parent(Cell* const par)
+      {
+        _parent = par;
+      }
+
+
+      /// returns number of children
+      inline unsigned char num_children() const
+      {
+        return _num_children;
+      }
+
+
+      /// returns child at given index
+      inline Cell* child(unsigned char index) const
+      {
+        assert(index < num_children());
+        return _children[index];
+      }
+
+
+      /// returns refinement level of this cell
+      inline unsigned char refinement_level() const
+      {
+        return _refinement_level;
+      }
+
+
+      /// returns whether this cell is active (i.e. whether it does not have children)
+      inline bool active() const
+      {
+        return (num_children() == 0);
+      }
+
+
+      virtual void subdivide(SubdivisionData<cell_dim_, space_dim_, world_dim_>& subdiv_data) = 0;
+
+
+      virtual void print(std::ostream& stream) = 0;
+
+
+      virtual void validate() const = 0;
+
+
+      inline void print_history(std::ostream& stream)
+      {
+        stream << "[parent: ";
+        if (parent() != nullptr)
+        {
+          parent()->print_index(stream);
+        }
+        else
+        {
+          stream << "-";
+        }
+        if (num_children() > 0)
+        {
+          stream << ", children: ";
+          child(0)->print_index(stream);
+          for(int i(1) ; i < num_children() ; ++i)
+          {
+            std:: cout << ", ";
+            child(i)->print_index(stream);
+          }
+        }
+        else
+        {
+          stream << ", children: -";
+        }
+        stream << "]";
+      }
+    }; // class Cell
+  } // namespace BaseMesh
+} // namespace FEAST
+
+#endif // #define KERNEL_BASE_MESH_CELL_HPP
 
 // COMMENT_HILMAR: Das ist 2D-spezifischer Code! Der muss woanders hin!
 // Wohin?
@@ -465,157 +629,3 @@ namespace FEAST
 //    {
 //      return (edge(iedge)->vertex(0) == vertex(iedge));
 //    }
-    protected:
-
-      /**
-      * \brief sets number of children and allocates the _children array
-      *
-      * This function may only be called, when new children are to be created. "Old" children have to be cleared before via
-      * unset_children(...).
-      * Rationale:
-      * - It won't happen often that a cell creates and removes children over and over again.
-      * - A situation like "I already have 4 children, and now I want to have 2 more" will not occur.
-      * - Allocating/deallocating an array of less than 10 pointers does not really harm.
-      */
-      inline void _set_num_children(unsigned char const num)
-      {
-        // this function must not be called when there *are* already children
-        assert(_children == nullptr && _num_children == 0);
-        // and it must not be called to unset children (use unset_children() for that)
-        assert(num > 0);
-        _num_children = num;
-        _children = new Cell*[_num_children];
-        // nullify the new pointer array
-        for (unsigned char i(0) ; i < _num_children ; ++i)
-        {
-          _children[i] = nullptr;
-        }
-      }
-
-      /**
-      * \brief sets child at given index
-      *
-      * The cell-type does not have to be the same (quads can have tris as children), so a general BaseMeshItem2D is
-      * is passed to the function.
-      */
-      inline void _set_child(
-        unsigned char const index,
-        Cell* e)
-      {
-        assert(index < num_children());
-        // ensure that this function is not used to unset children (use unset_children() for that)
-        assert(e != nullptr);
-        _children[index] = e;
-      }
-
-      /// unsets all children (which should not be done via set_child(i, nullptr))
-      inline void _unset_children()
-      {
-        // COMMENT_HILMAR: For the time being, we enforce that this function may only be called when there actually *are*
-        // valid children. (To discover eventual errors in apply/unapply actions.)
-        assert(num_children() > 0);
-        for (unsigned char i(0) ; i < num_children() ; ++i)
-        {
-          assert(_children[i] != nullptr);
-          _children[i] = nullptr;
-        }
-        delete [] _children;
-        _children = nullptr;
-        _num_children = 0;
-      }
-
-
-    public:
-
-      Cell()
-        : _parent(nullptr),
-          _num_children(0),
-          _children(nullptr)
-      {
-        assert(world_dim_ >= space_dim_);
-        assert(space_dim_ >= cell_dim_);
-      }
-
-
-      virtual ~Cell()
-      {
-        _parent = nullptr;
-      }
-
-
-      /// returns parent
-      inline Cell* parent() const
-      {
-        return _parent;
-      }
-
-
-      /// sets parent
-      inline void set_parent(Cell* const par)
-      {
-        _parent = par;
-      }
-
-
-      /// returns number of children
-      inline unsigned char num_children() const
-      {
-        return _num_children;
-      }
-
-
-      /// returns child at given index
-      inline Cell* child(unsigned char index) const
-      {
-        assert(index < num_children());
-        return _children[index];
-      }
-
-
-      inline bool active() const
-      {
-        return (num_children() == 0);
-      }
-
-
-      virtual void subdivide(SubdivisionData<cell_dim_, space_dim_, world_dim_>& subdiv_data) = 0;
-
-
-      virtual void print(std::ostream& stream) = 0;
-
-
-      virtual void validate() const = 0;
-
-
-      inline void print_history(std::ostream& stream)
-      {
-        stream << "[parent: ";
-        if (parent() != nullptr)
-        {
-          parent()->print_index(stream);
-        }
-        else
-        {
-          stream << "-";
-        }
-        if (num_children() > 0)
-        {
-          stream << ", children: ";
-          child(0)->print_index(stream);
-          for(int i(1) ; i < num_children() ; ++i)
-          {
-            std:: cout << ", ";
-            child(i)->print_index(stream);
-          }
-        }
-        else
-        {
-          stream << ", children: -";
-        }
-        stream << "]";
-      }
-    };
-  } // namespace BaseMesh
-} // namespace FEAST
-
-#endif // #define KERNEL_BASE_MESH_CELL_DATA_HPP

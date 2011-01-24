@@ -18,6 +18,9 @@ int main (int argc, char **argv)
   BaseMesh3D<WDIM> bm;
   bm.print(std::cout);
 
+  // validate base mesh
+  bm.validate();
+
   // subdivide cell 0
   std::cout << "Subdividing cell 0" << std::endl;
   SubdivisionData<3, WDIM, SDIM> subdiv_data;
