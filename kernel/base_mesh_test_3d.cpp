@@ -23,7 +23,6 @@ int main (int argc, char **argv)
   SubdivisionData<3, WDIM, SDIM> subdiv_data;
   bm.cell(0)->subdivide(subdiv_data);
   bm.add_created_items(subdiv_data);
-
   bm.print(std::cout);
 
   // validate base mesh

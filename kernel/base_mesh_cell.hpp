@@ -10,6 +10,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh_cell_data.hpp>
+#include <kernel/base_mesh_cell_subdivision.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 
 namespace FEAST
@@ -148,120 +149,6 @@ namespace FEAST
     unsigned char Numbering::quad_to_quad_mappings_edges[8][4] =
       {{0,1,2,3}, {3,2,0,1}, {2,3,1,0}, {1,0,3,2}, {2,3,0,1}, {0,1,3,2}, {1,0,2,3}, {3,2,1,0}};
 
-
-
-    /**
-    * \brief class containing subdivision specific data (empty definition to be specialised by cell_dim_)
-    *
-    * The main purpose of this template design is to enable the usage of a common interface for the function
-    *   void subdivide(SubdivisionData<cell_dim_, space_dim_, world_dim_>& subdiv_data)
-    * such that it can be declared in class Cell<cell_dim_, space_dim_, world_dim_>.
-    * On the one hand, the class will contain "return" vectors of entities that have been created during the subdivision
-    * process, on the other hand it holds parameters that steer the subdivision (type of subdivision, anisotropy,
-    * factors, ...). It's hard to define such data independently of the cell dimension, hence the class is specialised
-    * via the cell dimension. Another advantage: The interface of the function subdivide(...) will never have
-    * to be changed again.
-    */
-// COMMENT_HILMAR: Wie und wo sollen die SubdivisionData-Objekte gespeichert werden? Als member von Cell<...>?
-    template<
-      unsigned char cell_dim_,
-      unsigned char space_dim_,
-      unsigned char world_dim_>
-    struct SubdivisionData
-    {
-    };
-
-    /// subdivision specific data for 1D cells
-    template<
-      unsigned char space_dim_,
-      unsigned char world_dim_>
-    struct SubdivisionData<1, space_dim_, world_dim_>
-    {
-      /// new vertex created during subdivision
-      Vertex<world_dim_>* created_vertex;
-
-      /**
-      * \brief new cells created during subdivision
-      *
-      * For sake of simplicity also pointers to the created cells are stored here. Thus, they can simply be added
-      * to the base mesh via BaseMesh1D.add_created_items(SubdivisionData<...>& subdiv_data).
-      * The alternative would be to to access these cells as children of the just subdivided cell.
-      */
-      std::vector<Cell<1, space_dim_, world_dim_>*> created_cells;
-
-      /// clears all vectors of created entities
-      inline void clear_created()
-      {
-        created_vertex = nullptr;
-        created_cells.clear();
-      }
-    };
-
-
-    /// subdivision specific data for 2D cells
-    template<
-      unsigned char space_dim_,
-      unsigned char world_dim_>
-    struct SubdivisionData<2, space_dim_, world_dim_>
-    {
-      /// new vertices created during subdivision
-      std::vector<Vertex<world_dim_>*> created_vertices;
-
-      /// new edges created during subdivision
-      std::vector<Cell<1, space_dim_, world_dim_>*> created_edges;
-
-      /**
-      * \brief new cells created during subdivision
-      *
-      * For sake of simplicity also pointers to the created cells are stored here. Thus, they can simply
-      * be added to the base mesh via BaseMesh2D.add_created_items(SubdivisionData<...>& subdiv_data).
-      * The alternative would be to to access these cells as children of the just subdivided cell.
-      */
-      std::vector<Cell<2, space_dim_, world_dim_>*> created_cells;
-
-      /// clears all vectors of created entities
-      inline void clear_created()
-      {
-        created_vertices.clear();
-        created_edges.clear();
-        created_cells.clear();
-      }
-    };
-
-
-    /// subdivision specific data for 3D cells
-    template<
-      unsigned char space_dim_,
-      unsigned char world_dim_>
-    struct SubdivisionData<3, space_dim_, world_dim_>
-    {
-      /// new vertices created during subdivision
-      std::vector<Vertex<world_dim_>*> created_vertices;
-
-      /// new edges created during subdivision
-      std::vector<Cell<1, space_dim_, world_dim_>*> created_edges;
-
-      /// new faces created during subdivision
-      std::vector<Cell<2, space_dim_, world_dim_>*> created_faces;
-
-      /**
-      * \brief new cells created during subdivision
-      *
-      * For sake of simplicity also pointers to the created cells are stored here. Thus, they can simply
-      * be added to the base mesh via BaseMesh3D.add_created_items(SubdivisionData<...>& subdiv_data).
-      * The alternative would be to to access these cells as children of the just subdivided cell.
-      */
-      std::vector<Cell<3, space_dim_, world_dim_>*> created_cells;
-
-      /// clears all vectors of created entities
-      inline void clear_created()
-      {
-        created_vertices.clear();
-        created_edges.clear();
-        created_faces.clear();
-        created_cells.clear();
-      }
-    };
 
 
     /**

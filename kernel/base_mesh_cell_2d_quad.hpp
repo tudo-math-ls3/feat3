@@ -381,19 +381,19 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         // local numbering of the four children:
         //
         // w2          e1           w3
-        //    ---------------------
+        //    +---------+---------+
         //    |1   3   3|2   2   0|
         //    |         |         |              w2----v1-----w3        --e2-----e3--
         //    |0   2   1|1   3   0|               |     |     |         |     |     |
         //    |         |         |               |  q2 | q3  |        e5     e9    e7
         //    |0   2   2|3   3   1|               |     |     |         |     |     |
-        // e2 --------------------- e3           v2----v4-----v3        --e10---e11--
+        // e2 +---------+---------+ e3           v2----v4-----v3        --e10---e11--
         //    |2   2   0|1   3   3|               |     |     |         |     |     |
         //    |         |         |               |  q0 | q1  |        e4     e8    e6
         //    |1   0   0|0   1   1|               |     |     |         |     |     |
         //    |         |         |              w0--x-v0-----w1        --e0----e1---
         //    |3   3   1|0   2   2|
-        //    ---------------------
+        //    +---------+---------+
         // w0          e0           w1
         //
         // building rule: For each child, the inner edge with local index i builds a 'T' with edge i of the
@@ -413,19 +413,15 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         // Geometric interpretation of this building rule:
         // To obtain the numbering of the parent quad from the numbering of a child, simply "mirror" the child at the
         // diagonal displayed in the following figure
-        //   ---------------------
-        //   |        /|\        |
-        //   |      /  |  \      |
-        //   |    /    |    \    |
-        //   |  /      |      \  |
-        //   |/        |        \|
-        //   ---------------------
-        //   |\        |        /|
-        //   |  \      |      /  |
-        //   |    \    |    /    |
-        //   |      \  |  /      |
-        //   |        \|/        |
-        //   ---------------------
+        //   +-----+-----+
+        //   |    /|\    |
+        //   |  /  |  \  |
+        //   |/    |    \|
+        //   +-----+-----+
+        //   |\    |    /|
+        //   |  \  |  /  |
+        //   |    \|/    |
+        //   +-----+-----+
 
         // add the quads to the vector of new created cells
         for (unsigned char i(0) ; i < this->num_children() ; ++i)

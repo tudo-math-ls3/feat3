@@ -6,7 +6,6 @@
 #include <iostream> // for std::ostream
 #include <cassert>  // for assert()
 #include <vector>   // for std::vector
-#include <list>   // for std::vector
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
