@@ -496,6 +496,9 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         // validate children
         // TODO
 
+        // validate parent-child relations
+        this->validate_history();
+
         // validate neighbours
         if (this->active())
         {

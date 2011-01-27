@@ -215,6 +215,9 @@ namespace FEAST
         // validate children
         // TODO
 
+        // validate parent-child relations
+        this->validate_history();
+
         // validate neighbours
         if (this->active())
         {

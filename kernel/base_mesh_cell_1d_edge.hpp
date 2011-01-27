@@ -121,6 +121,7 @@ namespace FEAST
       } // subdivide()
 
 
+      /// validate this cell
       void validate() const
       {
         if(space_dim_ == 1)
@@ -161,15 +162,9 @@ namespace FEAST
             std::cerr << ": One of the end vertices of the children is not set correctly!" << std::endl;
             exit(1);
           }
-          // check whether parent is set correctly
-          if(this->child(0)->parent() != this || this->child(1)->parent() != this)
-          {
-            std::cerr << "Error in edge ";
-            this->print_index(std::cerr);
-            std::cerr << ": Parent of one of the children not correctly set!" << std::endl;
-            exit(1);
-          }
         }
+        // validate parent-child relations
+        this->validate_history();
 
         if (this->active())
         {

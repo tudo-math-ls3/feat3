@@ -169,6 +169,15 @@ namespace FEAST
       inline void validate() const
       {
         // to be implemented
+
+        // validate parent-child relations
+        this->validate_history();
+
+        // validate neighbours
+        if (this->active())
+        {
+          CellDataChecker<3, space_dim_, world_dim_>::check_neighbourhood(this);
+        }
       }
 
 

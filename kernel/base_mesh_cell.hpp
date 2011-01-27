@@ -413,6 +413,64 @@ namespace FEAST
       virtual void validate() const = 0;
 
 
+      /// validate parent-child relations of this cell
+      void validate_history() const
+      {
+        // if this cell has children, do some respective validations
+        if(!active())
+        {
+          for(unsigned char ichild(0) ; ichild < this->num_children() ; ++ichild)
+          {
+            // check whether parent is set correctly
+            if(child(ichild)->parent() != this)
+            {
+              std::cerr << "Error in cell ";
+              this->print_index(std::cerr);
+              std::cerr << ": Parent-child relation to the " << ichild << "-th child not correctly set!" << std::endl;
+              exit(1);
+            }
+            // check whether refinement levels are correct
+            if(this->child(ichild)->refinement_level() != this->refinement_level()+1)
+            {
+              std::cerr << "Error in cell ";
+              this->print_index(std::cerr);
+              std::cerr << ": Refinement level of this cell or its " << ichild << "-th child is not correctly set!"
+                        << std::endl;
+              exit(1);
+            }
+          }
+        }
+        // if this cell has a parent, do some further validations
+        if(parent() != nullptr)
+        {
+          if(parent()->active())
+          {
+            std::cerr << "Error in cell ";
+            this->print_index(std::cerr);
+            std::cerr << ": Its parent is active, i.e. has no children, which is not possible!" << std::endl;
+            exit(1);
+          }
+          // validate that this cell can actually be found among the children of its parent
+          bool child_found = false;
+          for(unsigned char ichild(0) ; ichild < parent()->num_children() ; ++ichild)
+          {
+            if(parent()->child(ichild) == this)
+            {
+              child_found = true;
+              break;
+            }
+          }
+          if(!child_found)
+          {
+            std::cerr << "Error in cell ";
+            this->print_index(std::cerr);
+            std::cerr << ": It can not be found among the children of its parent!"
+                      << std::endl;
+            exit(1);
+          }
+        }
+      }
+
       inline void print_history(std::ostream& stream)
       {
         stream << "[parent: ";

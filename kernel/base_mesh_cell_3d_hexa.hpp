@@ -727,6 +727,9 @@ std::cout << ", " << subdiv_data_face.created_cells.size() << " faces created." 
           edge(iedge)->validate();
         }
 
+        // validate parent-child relations
+        this->validate_history();
+
         // validate neighbours
         if (this->active())
         {
