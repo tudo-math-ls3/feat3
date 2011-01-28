@@ -187,51 +187,55 @@ namespace FEAST
 // COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
-        if(space_dim_ == 2)
+        try
         {
-          std::cout << "Validating triangle ";
-          this->print_index(std::cout);
-          std::cout << std::endl;
-        }
-
-        // validate that all vertices and edges are set
-        for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
-        {
-          if (vertex(ivert) == nullptr)
+          if(space_dim_ == 2)
           {
-            std::cerr << "Error in Quad ";
-            this->print_index(std::cerr);
-            std::cerr << ": Vertex " << ivert << " is null." << std::endl;
-            exit(1);
+            std::cout << "Validating triangle " << this->print_index() << std::endl;
+          }
+
+          std::string s = "Triangle " + this->print_index() + ": ";
+
+          // validate that all vertices and edges are set
+          for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
+          {
+            if (vertex(ivert) == nullptr)
+            {
+              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              throw new InternalError(s);
+            }
+          }
+          for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+          {
+            if (edge(iedge) == nullptr)
+            {
+              s += "Edge " + StringUtils::stringify((int)iedge) + " is null.\n";
+              throw new InternalError(s);
+            }
+          }
+
+          // validate subitems (here: egdes)
+          for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+          {
+            edge(iedge)->validate();
+          }
+
+          // validate children numbering
+          // TODO
+
+          // validate parent-child relations
+          this->validate_history();
+
+          // validate neighbours
+          if (this->active())
+          {
+            CellDataChecker<2, space_dim_, world_dim_>::check_neighbourhood(this);
           }
         }
-        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+        catch(InternalError* e)
         {
-          if (edge(iedge) == nullptr)
-          {
-            std::cerr << "Error in Quad ";
-            this->print_index(std::cerr);
-            std::cerr << ": Edge " << iedge << " is null." << std::endl;
-            exit(1);
-          }
-        }
-
-        // validate subitems (here: egdes)
-        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
-        {
-          edge(iedge)->validate();
-        }
-
-        // validate children
-        // TODO
-
-        // validate parent-child relations
-        this->validate_history();
-
-        // validate neighbours
-        if (this->active())
-        {
-          CellDataChecker<2, space_dim_, world_dim_>::check_neighbourhood(this);
+          std::cerr << e->message() << std::endl;
+          exit(1);
         }
       }
 

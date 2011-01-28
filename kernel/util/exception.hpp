@@ -66,10 +66,10 @@ namespace FEAST
 
   protected:
     /**
-     * Constructor.
-     *
-     * \param message The exception's message.
-     */
+    * \brief Constructor.
+    *
+    * \param message The exception's message.
+    */
     Exception(const std::string & message) throw () :
       _context_data(new ContextData),
       _message(message)
@@ -144,10 +144,10 @@ namespace FEAST
   {
     public:
       /**
-       * Constructor.
-       *
-       * \param message A short error message.
-       */
+      * \brief Constructor.
+      *
+      * \param message A short error message.
+      */
       InternalError(const std::string & message) throw () :
         Exception("Internal error: " + message)
       {

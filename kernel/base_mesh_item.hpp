@@ -3,6 +3,7 @@
 #define KERNEL_BASE_MESH_ITEM_HPP
 
 // includes, system
+#include <sstream> // for std::ostream
 #include <cassert>  // for assert()
 
 // includes, FEAST
@@ -77,7 +78,7 @@ namespace FEAST
         _number = number;
       }
 
-      /// prints this item to the given stream
+      /// prints the index of this item to the given stream
       inline void print_index(std::ostream& stream) const
       {
         if (index() != Constants::MAX_INDEX)
@@ -94,6 +95,14 @@ namespace FEAST
         {
           stream << "/" << number();
         }
+      }
+
+      /// returns the index of this item as string
+      inline std::string print_index() const
+      {
+        std::ostringstream oss;
+        print_index(oss);
+        return oss.str();
       }
     };  // class Item
   } // namespace BaseMesh

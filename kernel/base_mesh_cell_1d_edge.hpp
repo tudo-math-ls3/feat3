@@ -8,6 +8,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
 #include <kernel/base_mesh_cell.hpp>
 #include <kernel/base_mesh_cell_data_checker.hpp>
 #include <kernel/base_mesh_vertex.hpp>
@@ -81,17 +82,14 @@ namespace FEAST
         // assure that this cell has not been divided yet
         if(!this->active())
         {
-          std::cerr << "Edge ";
-          this->print_index(std::cerr);
-          std::cerr << " is already subdivided! Aborting program." << std::endl;
+          std::cerr << "Edge " << this->print_index() << " is already subdivided! Aborting program." << std::endl;
           exit(1);
         }
 
         if(!this->subdiv_data_initialised())
         {
-          std::cerr << "Edge ";
-          this->print_index(std::cerr);
-          std::cerr << " cannot be subdivided! Set subdivision data first! Aborting program." << std::endl;
+          std::cerr << "Edge " << this->print_index()
+                    << " cannot be subdivided! Set subdivision data first! Aborting program." << std::endl;
           exit(1);
         }
 
@@ -133,9 +131,8 @@ namespace FEAST
         }
         else
         {
-          std::cerr << "Wrong type of subdivision in edge ";
-          this->print_index(std::cerr);
-          std::cerr << ". There is only one type of subdivision for edges: CONFORM_SAME_TYPE. Aborting program."
+          std::cerr << "Wrong type of subdivision in edge " << this->print_index()
+                    << ". There is only one type of subdivision for edges: CONFORM_SAME_TYPE. Aborting program."
                     << std::endl;
           exit(1);
         }
@@ -146,65 +143,64 @@ namespace FEAST
 // COMMENT_HILMAR: will be done via exceptions
       void validate() const
       {
-        if(space_dim_ == 1)
+        try
         {
-          std::cout << "Validating edge ";
-          this->print_index(std::cout);
-          std::cout << std::endl;
-        }
-
-        // validate that all vertices are set
-        for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
-        {
-          if (vertex(ivert) == nullptr)
+          if(space_dim_ == 1)
           {
-            std::cerr << "Error in edge ";
-            this->print_index(std::cerr);
-            std::cerr << ": Vertex " << ivert << " is null." << std::endl;
-            exit(1);
+            std::cout << "Validating edge " + this->print_index() + "\n";
           }
-        }
 
-        // validate children numbering
-        if(!this->active())
-        {
-          if(this->subdiv_data()->type == CONFORM_SAME_TYPE)
+          std::string s;
+
+          // validate that all vertices are set
+          for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
           {
-            // check whether the common vertex of the two children is set correctly
-            if(this->child(0)->vertex(1) != this->child(1)->vertex(1))
+            if (vertex(ivert) == nullptr)
             {
-              std::cerr << "Error in edge ";
-              this->print_index(std::cerr);
-              std::cerr << ": Shared vertex of the two children is not set correctly!" << std::endl;
-              exit(1);
-            }
-            // check whether the other vertices are set correctly
-            if(this->child(0)->vertex(0) != vertex(0) || this->child(1)->vertex(0) != vertex(1))
-            {
-              std::cerr << "Error in edge ";
-              this->print_index(std::cerr);
-              std::cerr << ": One of the end vertices of the children is not set correctly!" << std::endl;
-              exit(1);
+              s = "Edge " + this->print_index() + ": Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              throw new InternalError(s);
             }
           }
-        }
-        // validate parent-child relations
-        this->validate_history();
 
-        if (this->active())
+          // validate children numbering
+          if(!this->active())
+          {
+            if(this->subdiv_data()->type == CONFORM_SAME_TYPE)
+            {
+              // check whether the common vertex of the two children is set correctly
+              if(this->child(0)->vertex(1) != this->child(1)->vertex(1))
+              {
+                s = "Edge " + this->print_index() + ": Shared vertex of the two children is not set correctly!\n";
+                throw new InternalError(s);
+              }
+              // check whether the other vertices are set correctly
+              if(this->child(0)->vertex(0) != vertex(0) || this->child(1)->vertex(0) != vertex(1))
+              {
+                s = "Edge " + this->print_index() + ": One of the end vertices of the children is not set correctly!\n";
+                throw new InternalError(s);
+              }
+            }
+          }
+          // validate parent-child relations
+          this->validate_history();
+
+          if (this->active())
+          {
+            CellDataChecker<1, space_dim_, world_dim_>::check_neighbourhood(this);
+          }
+        }
+        catch(InternalError* e)
         {
-          CellDataChecker<1, space_dim_, world_dim_>::check_neighbourhood(this);
+          std::cerr << e->message() << std::endl;
+          exit(1);
         }
-
       }
 
 
       /// print information about this edge
       inline void print(std::ostream& stream)
       {
-        stream << "E";
-        this->print_index(stream);
-        stream << ": [";
+        stream << "E" << this->print_index() << ": [";
         _vertices[0]->print(stream);
         stream << ", ";
         _vertices[1]->print(stream);

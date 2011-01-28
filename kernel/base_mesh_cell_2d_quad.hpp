@@ -476,102 +476,98 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 // COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
-        if(space_dim_ == 2)
+        try
         {
-          std::cout << "Validating quad ";
-          this->print_index(std::cout);
-          std::cout << std::endl;
-        }
-
-        // validate that all vertices and edges are set
-        for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
-        {
-          if (vertex(ivert) == nullptr)
+          if(space_dim_ == 2)
           {
-            std::cerr << "Error in Quad ";
-            this->print_index(std::cerr);
-            std::cerr << ": Vertex " << (int)ivert << " is null." << std::endl;
-            exit(1);
+            std::cout << "Validating quad " << this->print_index() << std::endl;
           }
-        }
-        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
-        {
-          if (edge(iedge) == nullptr)
+
+          std::string s = "Quad " + this->print_index() + ": ";
+
+          // validate that all vertices and edges are set
+          for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
           {
-            std::cerr << "Error in Quad ";
-            this->print_index(std::cerr);
-            std::cerr << ": Edge " << (int)iedge << " is null." << std::endl;
-            exit(1);
+            if (vertex(ivert) == nullptr)
+            {
+              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              throw new InternalError(s);
+            }
           }
-        }
-
-        // validate subitems (here: egdes)
-        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
-        {
-          edge(iedge)->validate();
-        }
-
-        // validate children numbering
-        if(!this->active())
-        {
-          if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
+          for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
           {
-            // check centre vertex in all children (see numbering scheme in subdivide routine)
-            for(unsigned char ichild(0) ; ichild < num_edges()-1 ; ++ichild)
+            if (edge(iedge) == nullptr)
             {
-              if(this->child(ichild)->vertex(ichild) != this->child(ichild+1)->vertex(ichild+1))
-              {
-                std::cerr << "Error in Quad ";
-                this->print_index(std::cerr);
-                std::cerr << ": Centre vertex has wrong number in child " << (int)ichild << " or child " << ichild+1
-                           << "." << std::endl;
-                exit(1);
-              }
+              s += "Edge " + StringUtils::stringify((int)iedge) + " is null.\n";
+              throw new InternalError(s);
             }
-            // check corner vertices of the parent quad (see numbering scheme in subdivide routine)
-            if(this->child(0)->vertex(3) != vertex(0) || this->child(1)->vertex(2) != vertex(1) ||
-               this->child(2)->vertex(1) != vertex(2) || this->child(3)->vertex(0) != vertex(3))
-            {
-              std::cerr << "Error in Quad ";
-              this->print_index(std::cerr);
-              std::cerr << ": One corner vertex has a wrong number in the corresponding child." << std::endl;
-              exit(1);
-            }
+          }
 
-            // check the interior edges and and their vertices (see numbering scheme in subdivide routine)
-            for(unsigned char i(0) ; i < num_edges()-1 ; ++i)
+          // validate subitems (here: egdes)
+          for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+          {
+            edge(iedge)->validate();
+          }
+
+          // validate children numbering
+          if(!this->active())
+          {
+            if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
             {
-              Cell_1D_* edge0 = this->child(Numbering::quad_edge_vertices[i][0])->edge(i);
-              Cell_1D_* edge1 = this->child(Numbering::quad_edge_vertices[i][1])->edge(i);
-              if(edge0 != edge1)
+              // check centre vertex in all children (see numbering scheme in subdivide routine)
+              for(unsigned char ichild(0) ; ichild < num_edges()-1 ; ++ichild)
               {
-                std::cerr << "Error in Quad ";
-                this->print_index(std::cerr);
-                std::cerr << ": Interior edge connected to the " << (int)i << "-th edge of the parent quad "
-                          << "has a wrong number in one of the incident children." << std::endl;
-                exit(1);
+                if(this->child(ichild)->vertex(ichild) != this->child(ichild+1)->vertex(ichild+1))
+                {
+                  s += "Centre vertex has wrong number in child " +
+                       StringUtils::stringify((int)ichild) + " or child " + StringUtils::stringify(ichild+1) + ".\n";
+                  throw new InternalError(s);
+                }
               }
-              Vertex_* vert_quad_centre = this->child(i)->vertex(i);
-              Vertex_* vert_edge_centre = edge(i)->child(0)->vertex(1);
-              if(!(edge0->vertex(0) == vert_edge_centre &&  edge0->vertex(1) == vert_quad_centre))
+              // check corner vertices of the parent quad (see numbering scheme in subdivide routine)
+              if(this->child(0)->vertex(3) != vertex(0) || this->child(1)->vertex(2) != vertex(1) ||
+                 this->child(2)->vertex(1) != vertex(2) || this->child(3)->vertex(0) != vertex(3))
               {
-                std::cerr << "Error in Quad ";
-                this->print_index(std::cerr);
-                std::cerr << ": There is something wrong with the end vertices of the interior edge connected to the "
-                          << (int)i << "-th edge of the parent quad." << std::endl;
-                exit(1);
+                s += "One corner vertex has a wrong number in the corresponding child.\n";
+                throw new InternalError(s);
+              }
+
+              // check the interior edges and and their vertices (see numbering scheme in subdivide routine)
+              for(unsigned char i(0) ; i < num_edges()-1 ; ++i)
+              {
+                Cell_1D_* edge0 = this->child(Numbering::quad_edge_vertices[i][0])->edge(i);
+                Cell_1D_* edge1 = this->child(Numbering::quad_edge_vertices[i][1])->edge(i);
+                if(edge0 != edge1)
+                {
+                  s += "Interior edge connected to the " + StringUtils::stringify((int)i) +
+                       "-th edge of the parent quad has a wrong number in one of the incident children.\n";
+                  throw new InternalError(s);
+                }
+                Vertex_* vert_quad_centre = this->child(i)->vertex(i);
+                Vertex_* vert_edge_centre = edge(i)->child(0)->vertex(1);
+                if(!(edge0->vertex(0) == vert_edge_centre &&  edge0->vertex(1) == vert_quad_centre))
+                {
+                  s += "There is something wrong with the end vertices of the interior edge connected to the " +
+                       StringUtils::stringify((int)i) + "-th edge of the parent quad.\n";
+                  throw new InternalError(s);
+                }
               }
             }
           }
+
+          // validate parent-child relations
+          this->validate_history();
+
+          // validate neighbours
+          if (this->active())
+          {
+            CellDataChecker<2, space_dim_, world_dim_>::check_neighbourhood(this);
+          }
         }
-
-        // validate parent-child relations
-        this->validate_history();
-
-        // validate neighbours
-        if (this->active())
+        catch(InternalError* e)
         {
-          CellDataChecker<2, space_dim_, world_dim_>::check_neighbourhood(this);
+          std::cerr << e->message() << std::endl;
+          exit(1);
         }
       }
 
