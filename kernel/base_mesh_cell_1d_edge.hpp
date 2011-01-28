@@ -143,6 +143,7 @@ namespace FEAST
 
 
       /// validate this cell
+// COMMENT_HILMAR: will be done via exceptions
       void validate() const
       {
         if(space_dim_ == 1)

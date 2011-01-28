@@ -21,9 +21,10 @@ namespace FEAST
   std::list<std::string> * context_stack = 0;
 
   /**
-   * \brief This structs holds the actual context history
-   * \author Dirk Ribbrock
-   */
+  * \brief This structs holds the actual context history
+  *
+  * \author Dirk Ribbrock
+  */
   struct ContextData
   {
     /// The local context stack
@@ -45,95 +46,99 @@ namespace FEAST
   };
 
   /**
-   * \brief Base exception class.
-   * \author Dirk Ribbrock
-   */
+  * \brief Base exception class.
+  *
+  * \author Dirk Ribbrock
+  */
   class Exception :
     public std::exception
   {
-    private:
+  private:
 
-      /// Our (local) context data.
-      ContextData * const _context_data;
+    /// Our (local) context data.
+    ContextData * const _context_data;
 
-      /// descriptive error message
-      const std::string _message;
+    /// descriptive error message
+    const std::string _message;
 
-      /// Our what string (for std::exception).
-      mutable std::string _what_str;
+    /// Our what string (for std::exception).
+    mutable std::string _what_str;
 
-    protected:
-      /**
-       * Constructor.
-       *
-       * \param message The exception's message.
-       */
-      Exception(const std::string & message) throw () :
-        _context_data(new ContextData),
-        _message(message)
+  protected:
+    /**
+     * Constructor.
+     *
+     * \param message The exception's message.
+     */
+    Exception(const std::string & message) throw () :
+      _context_data(new ContextData),
+      _message(message)
+    {
+    }
+
+    /// Copy-constructor.
+    Exception(const Exception & other) :
+      std::exception(other),
+      _context_data(new ContextData(*other._context_data)),
+      _message(other._message)
+    {
+    }
+
+  public:
+    /// Destructor.
+    virtual ~Exception() throw ()
+    {
+      delete _context_data;
+    }
+
+    /// returns error message
+    const std::string message() const throw ()
+    {
+      return _message;
+    }
+
+    /// Return a backtrace.
+    std::string backtrace(const std::string & delimiter) const
+    {
+      return _context_data->backtrace(delimiter);
+    }
+
+    /// Return true if the backtrace is empty.
+    bool empty() const;
+
+    /// Return a descriptive exception name.
+    const char * what() const throw ()
+    {
+      /// \todo Add a working win32 alternative (see http://www.int0x80.gr/papers/name_mangling.pdf)
+      /*if (_what_str.empty())
       {
-      }
-
-      /// Copy-constructor.
-      Exception(const Exception & other) :
-        std::exception(other),
-        _context_data(new ContextData(*other._context_data)),
-        _message(other._message)
-      {
-      }
-
-    public:
-      /// Destructor.
-      virtual ~Exception() throw ()
-      {
-        delete _context_data;
-      }
-
-      /// returns error message
-      const std::string message() const throw ()
-      {
-        return _message;
-      }
-
-      /// Return a backtrace.
-      std::string backtrace(const std::string & delimiter) const
-      {
-        return _context_data->backtrace(delimiter);
-      }
-
-      /// Return true if the backtrace is empty.
-      bool empty() const;
-
-      /// Return a descriptive exception name.
-      const char * what() const throw ()
-      {
-        /// \todo Add a working win32 alternative (see http://www.int0x80.gr/papers/name_mangling.pdf)
-        /*if (_what_str.empty())
+        int status(0);
+        char * const name(abi::__cxa_demangle(
+              ("_Z" + StringUtils::stringify(std::exception::what())).c_str(), 0, 0, &status));
+        if (0 == status)
         {
-          int status(0);
-          char * const name(abi::__cxa_demangle(
-                ("_Z" + StringUtils::stringify(std::exception::what())).c_str(), 0, 0, &status));
-          if (0 == status)
-          {
-            _what_str = name;
-            _what_str += " (" + message() + ")";
-            std::free(name);
-          }
-        }*/
-        if (_what_str.empty())
-          _what_str = StringUtils::stringify(std::exception::what());
-        return _what_str.c_str();
+          _what_str = name;
+          _what_str += " (" + message() + ")";
+          std::free(name);
+        }
+      }*/
+      if (_what_str.empty())
+      {
+        _what_str = StringUtils::stringify(std::exception::what());
+        _what_str += " (" + message() + ")";
       }
+      return _what_str.c_str();
+    }
   };
 
   /**
-   * \brief exception that is thrown if something that is never supposed to happen happens
-   *
-   * It simply prefixes the exception message with "Internal error: ", otherwise it does not differ from its
-   * parent class Exception.
-   *
-   * \author Dirk Ribbrock
-   */
+  * \brief exception that is thrown if something that is never supposed to happen happens
+  *
+  * It simply prefixes the exception message with "Internal error: ", otherwise it does not differ from its
+  * parent class Exception.
+  *
+  * \author Dirk Ribbrock
+  */
   class InternalError :
     public Exception
   {
@@ -151,20 +156,21 @@ namespace FEAST
   };
 
   /**
-   * \brief Backtrace class context.
-   * \author Dirk Ribbrock
-   */
+  * \brief Backtrace class context.
+  *
+  * \author Dirk Ribbrock
+  */
   class Context :
     public InstantiationPolicy<Context, NonCopyable>
   {
     public:
       /**
-       * Constructor.
-       *
-       * \param file Name of the source file that contains the context.
-       * \param line Line number of the context.
-       * \param context A sentence that describes this context.
-       */
+      * \brief Constructor.
+      *
+      * \param file Name of the source file that contains the context.
+      * \param line Line number of the context.
+      * \param context A sentence that describes this context.
+      */
       Context(const char * const file, const long line, const std::string & context)
       {
         if (! context_stack)
@@ -193,10 +199,11 @@ namespace FEAST
 
 
       /**
-       * Current context
-       * \param[in] delimiter
-       * A delimiter added between to context strings
-       */
+      * \brief Current context
+      *
+      * \param[in] delimiter
+      * A delimiter added between to context strings
+      */
       static std::string backtrace(const std::string & delimiter)
       {
         if (! context_stack)
@@ -207,17 +214,17 @@ namespace FEAST
   };
 
   /**
-   * \def CONTEXT
-   *
-   * \brief Convenience definition that provides a way to declare uniquely-named instances of class Context.
-   *
-   * The created Context will be automatically provided with the correct filename and line number.
-   *
-   * \param s
-   * Context message that can be display by an exception-triggered backtrace.
-   *
-   * \warning Will only be compiled in when debug support is enabled.
-   */
+  * \def CONTEXT
+  *
+  * \brief Convenience definition that provides a way to declare uniquely-named instances of class Context.
+  *
+  * The created Context will be automatically provided with the correct filename and line number.
+  *
+  * \param s
+  * Context message that can be display by an exception-triggered backtrace.
+  *
+  * \warning Will only be compiled in when debug support is enabled.
+  */
 #if defined (DEBUG)
   // C preprocessor abomination following...
 #define CONTEXT_NAME_(x) ctx_##x
