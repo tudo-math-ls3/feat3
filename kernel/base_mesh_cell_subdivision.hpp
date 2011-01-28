@@ -128,6 +128,12 @@ namespace FEAST
       */
       std::vector<Cell<1, space_dim_, world_dim_>*> created_cells;
 
+      /// CTOR
+      SubdivisionData<1, space_dim_, world_dim_>(type_of_subdivision t)
+      {
+        type = t;
+      }
+
       /// clears all vectors of created entities
       inline void clear_created()
       {
@@ -147,6 +153,9 @@ namespace FEAST
       unsigned char world_dim_>
     struct SubdivisionData<2, space_dim_, world_dim_>
     {
+      /// type of subdivision
+      type_of_subdivision type;
+
       /// new vertices created during subdivision
       std::vector<Vertex<world_dim_>*> created_vertices;
 
@@ -161,6 +170,12 @@ namespace FEAST
       * The alternative would be to to access these cells as children of the just subdivided cell.
       */
       std::vector<Cell<2, space_dim_, world_dim_>*> created_cells;
+
+      /// CTOR
+      SubdivisionData<2, space_dim_, world_dim_>(type_of_subdivision t)
+      {
+        type = t;
+      }
 
       /// clears all vectors of created entities
       inline void clear_created()
@@ -182,6 +197,9 @@ namespace FEAST
       unsigned char world_dim_>
     struct SubdivisionData<3, space_dim_, world_dim_>
     {
+      /// type of subdivision
+      type_of_subdivision type;
+
       /// new vertices created during subdivision
       std::vector<Vertex<world_dim_>*> created_vertices;
 
@@ -199,6 +217,12 @@ namespace FEAST
       * The alternative would be to to access these cells as children of the just subdivided cell.
       */
       std::vector<Cell<3, space_dim_, world_dim_>*> created_cells;
+
+      /// CTOR
+      SubdivisionData<3, space_dim_, world_dim_>(type_of_subdivision t)
+      {
+        type = t;
+      }
 
       /// clears all vectors of created entities
       inline void clear_created()

@@ -230,7 +230,7 @@ namespace FEAST
       /// subdivision routine splitting a quad and storing parent/child information
 // COMMENT_HILMAR: this is currently hard-wired to splitting the quad into four quads. Later, this is parameterised
 // via the information in the SubdivisionData object.
-      inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>& subdiv_data)
+      inline void subdivide()
       {
         // assure that this cell has not been divided yet
         if(!this->active())
@@ -241,74 +241,82 @@ namespace FEAST
           exit(1);
         }
 
-        // clear all vectors of created entities in the SubdivisionData object
-        subdiv_data.clear_created();
-
-        /// vertices that this action creates and/or reuses
-        Vertex_* new_vertices[5];
-
-        /// edges that this action creates and/or reuses
-        Cell_1D_* new_edges[12];
-
-        // local numbering (old and new)
-        //         k1                                       e2     e3
-        //   w2---------w3          -----v1------         -------------
-        //   |           |          |     |     |       e5|    e9     |e7
-        //   |           |          |  q2 | q3  |         |     |     |
-        // k2|           |k3  ---> v2-----v4----v3        --e10---e11--
-        //   |           |          |  q0 | q1  |       e4|     |     |e6
-        //   |           |          |     |     |         |     e8    |
-        //   w0---------w1          -----v0------         -------------
-        //         k0                                        e0    e1
-
-
-        SubdivisionData<1, space_dim_, world_dim_> subdiv_data_edge;
-
-        // loop over all edges and split them eventually, creating new vertices and edges on the way
-        for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
+        if(!this->subdiv_data_initialised())
         {
-          // if edge has no children, create them
-          if (edge(iedge)->active())
+          std::cerr << "Quad ";
+          this->print_index(std::cerr);
+          std::cerr << " cannot be subdivided! Set subdivision data first! Aborting program." << std::endl;
+          exit(1);
+        }
+
+        // clear all vectors of created entities in the SubdivisionData object
+        this->subdiv_data()->clear_created();
+
+        if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
+        {
+          // Perform a nonconform subdivision without changing the cell type (1 quad --> 4 quads).
+
+          // local numbering (old and new)
+          //         k1                                       e2     e3
+          //   w2---------w3          -----v1------         -------------
+          //   |           |          |     |     |       e5|    e9     |e7
+          //   |           |          |  q2 | q3  |         |     |     |
+          // k2|           |k3  ---> v2-----v4----v3        --e10---e11--
+          //   |           |          |  q0 | q1  |       e4|     |     |e6
+          //   |           |          |     |     |         |     e8    |
+          //   w0---------w1          -----v0------         -------------
+          //         k0                                        e0    e1
+
+          /// vertices that this action creates and/or reuses
+          Vertex_* new_vertices[5];
+
+          /// edges that this action creates and/or reuses
+          Cell_1D_* new_edges[12];
+
+          // loop over all edges and split them eventually, creating new vertices and edges on the way
+          for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
           {
-            // create new vertex
+            // if edge has no children, create them
+            if (edge(iedge)->active())
+            {
+              // subdivide edge
+              edge(iedge)->init_subdiv_data(CONFORM_SAME_TYPE);
+              edge(iedge)->subdivide();
 
-            // subdivide edge
-            edge(iedge)->subdivide(subdiv_data_edge);
+              // add the created vertices/edges to the vector of created vertices/edges
+              this->subdiv_data()->created_vertices.push_back(edge(iedge)->subdiv_data()->created_vertex);
 
-            // add the created vertices/edges to the vector of created vertices/edges
-            subdiv_data.created_vertices.push_back(subdiv_data_edge.created_vertex);
+              // COMMENT_HILMAR: Not sure whether the order plays a role here... to be on the safe side, order them
+              // according to the array new_edges[].
+              if(_edge_has_correct_orientation[iedge])
+              {
+                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[0]);
+                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[1]);
+              }
+              else
+              {
+                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[1]);
+                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[0]);
+              }
+            }
 
-            // COMMENT_HILMAR: Not sure whether the order plays a role here... to be on the safe side, order them
-            // according to the array new_edges[].
+            // add new vertex to array of new vertices (exploit that the vertex shared by the edge children is stored
+            // as second vertex within the structure of both edge children)
+            new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
+
+            // add new edges to array of new edges, respect the orientation of the edge
             if(_edge_has_correct_orientation[iedge])
             {
-              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
-              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
+              // if the edge has the orientation of the quad, then child 0 is the first edge
+              new_edges[2*iedge]   = edge(iedge)->child(0);
+              new_edges[2*iedge+1] = edge(iedge)->child(1);
             }
             else
             {
-              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[1]);
-              subdiv_data.created_edges.push_back(subdiv_data_edge.created_cells[0]);
+              // if the edge does not have the orientation of the quad, then child 1 is the first edge.
+              new_edges[2*iedge]   = edge(iedge)->child(1);
+              new_edges[2*iedge+1] = edge(iedge)->child(0);
             }
-          }
-
-          // add new vertex to array of new vertices (exploit that the vertex shared by the edge children is stored
-          // as second vertex within the structure of both edge children)
-          new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
-
-          // add new edges to array of new edges, respect the orientation of the edge
-          if(_edge_has_correct_orientation[iedge])
-          {
-            // if the edge has the orientation of the quad, then child 0 is the first edge
-            new_edges[2*iedge]   = edge(iedge)->child(0);
-            new_edges[2*iedge+1] = edge(iedge)->child(1);
-          }
-          else
-          {
-            // if the edge does not have the orientation of the quad, then child 1 is the first edge.
-            new_edges[2*iedge]   = edge(iedge)->child(1);
-            new_edges[2*iedge+1] = edge(iedge)->child(0);
-          }
 // COMMENT_HILMAR: Beachte, dass wir auch in dem Fall, dass eine Kante schon Kinder hatte, *nicht* annehmen koennen,
 // dass sie vom Nachbarelement erstellt worden ist. Beispiel: 2 benachbarte Zellen C0 und C1. C0 zerteilt sich, hat
 // somit die gemeinsame Kante e zerteilt, sodass die Reihenfolge der Kinder der lokalen Orientierung von C0 entspricht.
@@ -317,32 +325,32 @@ namespace FEAST
 // Jetzt vergroebert sich C0 wieder, Kante e bleibt bestehen, da sie ja noch von C1 benutzt wird. Dann irgendwann
 // verfeinert sich C0 wieder: Nun ist es aber falsch anzunehmen, dass der Nachbar (C1) die Kante angelegt haben muss!
 // In Wirklichkeit war C0 es selbst, hat das aber inzwischen "vergessen".
-        } // for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
+          } // for(unsigned char iedge(0) ; iedge < 4 ; ++iedge)
 
-        // create new midpoint v4 and its incident edges (these are always new, have no children and cannot be reused)
-        //   -----v1------
-        //   |     |     |
-        //   |  q2 | q3  |
-        //  v2-----v4----v3
-        //   |  q0 | q1  |
-        //   |     |     |
-        //   -----v0------
+          // create new centre vertex v4
+          //   -----v1------
+          //   |     |     |
+          //   |  q2 | q3  |
+          //  v2-----v4----v3
+          //   |  q0 | q1  |
+          //   |     |     |
+          //   -----v0------
 
 /*
 COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
-        double const* x0 = new_vertices[0]->coords();
-        double const* x1 = new_vertices[1]->coords();
-        double const* x2 = new_vertices[2]->coords();
-        double const* x3 = new_vertices[3]->coords();
+          double const* x0 = new_vertices[0]->coords();
+          double const* x1 = new_vertices[1]->coords();
+          double const* x2 = new_vertices[2]->coords();
+          double const* x3 = new_vertices[3]->coords();
 
-        double p[2];
+          double p[2];
 
-        double denom = (x0[0]-x1[0])*(x2[1]-x3[1]) - (x0[1]-x1[1])*(x2[0]-x3[0]);
-        double fac0 = x0[0]*x1[1]-x0[1]*x1[0];
-        double fac1 = x2[0]*x3[1]-x2[1]*x3[0];
+          double denom = (x0[0]-x1[0])*(x2[1]-x3[1]) - (x0[1]-x1[1])*(x2[0]-x3[0]);
+          double fac0 = x0[0]*x1[1]-x0[1]*x1[0];
+          double fac1 = x2[0]*x3[1]-x2[1]*x3[0];
 
-        p[0] = ( fac0*(x2[0]-x3[0]) - (x0[0]-x1[0])*fac1 ) / denom;
-        p[1] = ( fac0*(x2[1]-x3[1]) - (x0[1]-x1[1])*fac1 ) / denom;
+          p[0] = ( fac0*(x2[0]-x3[0]) - (x0[0]-x1[0])*fac1 ) / denom;
+          p[1] = ( fac0*(x2[1]-x3[1]) - (x0[1]-x1[1])*fac1 ) / denom;
 */
 
 // COMMENT_HILMAR: For the time being simply compute the midpoint of the quad as average of the four vertices
@@ -357,100 +365,110 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 // face of the 3D reference element (cube [-1,1] x [-1,1] x [-1,1]) to the face of the actual hexa (trilinear mapping
 // restricted to one face). So, it might be necessary to compute the coordinates of the new vertex already *outside*
 // this routine...
-        double p[world_dim_];
-        for(unsigned char i(0) ; i < world_dim_ ; ++i)
-        {
-          p[i] = 0;
-          for(int j(0) ; j < num_vertices() ; ++j)
+          double p[world_dim_];
+          for(unsigned char i(0) ; i < world_dim_ ; ++i)
           {
-            p[i] += vertex(j)->coord(i);
+            p[i] = 0;
+            for(int j(0) ; j < num_vertices() ; ++j)
+            {
+              p[i] += vertex(j)->coord(i);
+            }
+            p[i] /= num_vertices();
           }
-          p[i] /= num_vertices();
+          new_vertices[4] = new Vertex<world_dim_>(p);
+
+          this->subdiv_data()->created_vertices.push_back(new_vertices[4]);
+
+          // Create the four new edges in the interior of the quad (these are always new, have no children and cannot
+          // be reused). Set the new centre vertex of the quad (v4) as the end vertex of these edges.
+          for (unsigned char i(0) ; i < num_edges() ; ++i)
+          {
+            new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4], 0);
+            this->subdiv_data()->created_edges.push_back(new_edges[i+8]);
+          }
+
+          // set number of children to 4
+          this->_set_num_children(4);
+
+          // finally, create new quads and add them as children
+          //
+          // local numbering of the four children:
+          //
+          // w2          e1           w3
+          //    +---------+---------+
+          //    |1   3   3|2   2   0|
+          //    |         |         |              w2----v1-----w3        --e2-----e3--
+          //    |0   2   1|1   3   0|               |     |     |         |     |     |
+          //    |         |         |               |  q2 | q3  |        e5     e9    e7
+          //    |0   2   2|3   3   1|               |     |     |         |     |     |
+          // e2 +---------+---------+ e3           v2----v4-----v3        --e10---e11--
+          //    |2   2   0|1   3   3|               |     |     |         |     |     |
+          //    |         |         |               |  q0 | q1  |        e4     e8    e6
+          //    |1   0   0|0   1   1|               |     |     |         |     |     |
+          //    |         |         |              w0--x-v0-----w1        --e0----e1---
+          //    |3   3   1|0   2   2|
+          //    +---------+---------+
+          // w0          e0           w1
+          //
+          // building rule: For each child, the inner edge with local index i builds a 'T' with edge i of the
+          //                parent quad, i.e. it is connected to this edge of the parent quad in its centre.
+          // ==> vertex i of child i is the centre vertex
+          //
+          // These facts are exploited, e.g., within the hexa subdivision routine, so don't change this!
+          _set_child(0, new Quad(new_vertices[4], new_vertices[0], new_vertices[2], vertex(0),
+                                 new_edges[8], new_edges[4], new_edges[10], new_edges[0], this->refinement_level()+1));
+          _set_child(1, new Quad(new_vertices[0], new_vertices[4], vertex(1), new_vertices[3],
+                                 new_edges[8], new_edges[6], new_edges[1], new_edges[11], this->refinement_level()+1));
+          _set_child(2, new Quad(new_vertices[2], vertex(2), new_vertices[4], new_vertices[1],
+                                 new_edges[5], new_edges[9], new_edges[10], new_edges[2], this->refinement_level()+1));
+          _set_child(3, new Quad(vertex(3), new_vertices[3], new_vertices[1], new_vertices[4],
+                                 new_edges[7], new_edges[9], new_edges[3], new_edges[11], this->refinement_level()+1));
+
+          // Geometric interpretation of this building rule:
+          // To obtain the numbering of the parent quad from the numbering of a child, simply "mirror" the child at the
+          // diagonal displayed in the following figure
+          //   +-----+-----+
+          //   |    /|\    |
+          //   |  /  |  \  |
+          //   |/    |    \|
+          //   +-----+-----+
+          //   |\    |    /|
+          //   |  \  |  /  |
+          //   |    \|/    |
+          //   +-----+-----+
+
+          // add the quads to the vector of new created cells
+          for (unsigned char i(0) ; i < this->num_children() ; ++i)
+          {
+            this->child(i)->set_parent(this);
+            this->subdiv_data()->created_cells.push_back(this->child(i));
+          }
+
+          // set internal neighbourhood (external neighbourhood is set outside this function)
+          // (in case space_dim_ > 2, an empty dummy function is called; see CellData)
+          // edge neighbours
+          this->child(0)->add_neighbour(SDIM_EDGE, 0, this->child(1));
+          this->child(0)->add_neighbour(SDIM_EDGE, 2, this->child(2));
+          this->child(1)->add_neighbour(SDIM_EDGE, 0, this->child(0));
+          this->child(1)->add_neighbour(SDIM_EDGE, 3, this->child(3));
+          this->child(2)->add_neighbour(SDIM_EDGE, 1, this->child(3));
+          this->child(2)->add_neighbour(SDIM_EDGE, 2, this->child(0));
+          this->child(3)->add_neighbour(SDIM_EDGE, 1, this->child(2));
+          this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(1));
+          // vertex neighbours
+          this->child(0)->add_neighbour(SDIM_VERTEX, 0, this->child(3));
+          this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(2));
+          this->child(2)->add_neighbour(SDIM_VERTEX, 2, this->child(1));
+          this->child(3)->add_neighbour(SDIM_VERTEX, 3, this->child(0));
         }
-        new_vertices[4] = new Vertex<world_dim_>(p);
-
-        subdiv_data.created_vertices.push_back(new_vertices[4]);
-
-        for (unsigned char i(0) ; i < num_edges() ; ++i)
+        else
         {
-          new_edges[i+8] = new Edge<space_dim_, world_dim_>(new_vertices[i], new_vertices[4], 0);
-          subdiv_data.created_edges.push_back(new_edges[i+8]);
+          std::cerr << "Wrong type of subdivision in quad ";
+          this->print_index(std::cerr);
+          std::cerr << ". Currently, only subdivision NONCONFORM_SAME_TYPE is supported. Aborting program."
+                    << std::endl;
+          exit(1);
         }
-
-        // set number of children to 4
-        this->_set_num_children(4);
-
-        // finally, create new quads and add them as children
-        //
-        // local numbering of the four children:
-        //
-        // w2          e1           w3
-        //    +---------+---------+
-        //    |1   3   3|2   2   0|
-        //    |         |         |              w2----v1-----w3        --e2-----e3--
-        //    |0   2   1|1   3   0|               |     |     |         |     |     |
-        //    |         |         |               |  q2 | q3  |        e5     e9    e7
-        //    |0   2   2|3   3   1|               |     |     |         |     |     |
-        // e2 +---------+---------+ e3           v2----v4-----v3        --e10---e11--
-        //    |2   2   0|1   3   3|               |     |     |         |     |     |
-        //    |         |         |               |  q0 | q1  |        e4     e8    e6
-        //    |1   0   0|0   1   1|               |     |     |         |     |     |
-        //    |         |         |              w0--x-v0-----w1        --e0----e1---
-        //    |3   3   1|0   2   2|
-        //    +---------+---------+
-        // w0          e0           w1
-        //
-        // building rule: For each child, the inner edge with local index i builds a 'T' with edge i of the
-        //                parent quad, i.e. it is connected to this edge of the parent quad in its centre.
-        // ==> vertex i of child i is the centre vertex
-        //
-        // These facts are exploited, e.g., within the hexa subdivision routine, so don't change this!
-        _set_child(0, new Quad(new_vertices[4], new_vertices[0], new_vertices[2], vertex(0),
-                               new_edges[8], new_edges[4], new_edges[10], new_edges[0], this->refinement_level()+1));
-        _set_child(1, new Quad(new_vertices[0], new_vertices[4], vertex(1), new_vertices[3],
-                               new_edges[8], new_edges[6], new_edges[1], new_edges[11], this->refinement_level()+1));
-        _set_child(2, new Quad(new_vertices[2], vertex(2), new_vertices[4], new_vertices[1],
-                               new_edges[5], new_edges[9], new_edges[10], new_edges[2], this->refinement_level()+1));
-        _set_child(3, new Quad(vertex(3), new_vertices[3], new_vertices[1], new_vertices[4],
-                               new_edges[7], new_edges[9], new_edges[3], new_edges[11], this->refinement_level()+1));
-
-        // Geometric interpretation of this building rule:
-        // To obtain the numbering of the parent quad from the numbering of a child, simply "mirror" the child at the
-        // diagonal displayed in the following figure
-        //   +-----+-----+
-        //   |    /|\    |
-        //   |  /  |  \  |
-        //   |/    |    \|
-        //   +-----+-----+
-        //   |\    |    /|
-        //   |  \  |  /  |
-        //   |    \|/    |
-        //   +-----+-----+
-
-        // add the quads to the vector of new created cells
-        for (unsigned char i(0) ; i < this->num_children() ; ++i)
-        {
-          this->child(i)->set_parent(this);
-          subdiv_data.created_cells.push_back(this->child(i));
-        }
-
-        // set internal neighbourhood (external neighbourhood is set outside this function)
-        // (in case space_dim_ > 2, an empty dummy function is called; see CellData)
-        // edge neighbours
-        this->child(0)->add_neighbour(SDIM_EDGE, 0, this->child(1));
-        this->child(0)->add_neighbour(SDIM_EDGE, 2, this->child(2));
-        this->child(1)->add_neighbour(SDIM_EDGE, 0, this->child(0));
-        this->child(1)->add_neighbour(SDIM_EDGE, 3, this->child(3));
-        this->child(2)->add_neighbour(SDIM_EDGE, 1, this->child(3));
-        this->child(2)->add_neighbour(SDIM_EDGE, 2, this->child(0));
-        this->child(3)->add_neighbour(SDIM_EDGE, 1, this->child(2));
-        this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(1));
-        // vertex neighbours
-        this->child(0)->add_neighbour(SDIM_VERTEX, 0, this->child(3));
-        this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(2));
-        this->child(2)->add_neighbour(SDIM_VERTEX, 2, this->child(1));
-        this->child(3)->add_neighbour(SDIM_VERTEX, 3, this->child(0));
-
       } // subdivide()
 
 
@@ -472,7 +490,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
           {
             std::cerr << "Error in Quad ";
             this->print_index(std::cerr);
-            std::cerr << ": Vertex " << ivert << " is null." << std::endl;
+            std::cerr << ": Vertex " << (int)ivert << " is null." << std::endl;
             exit(1);
           }
         }
@@ -482,7 +500,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
           {
             std::cerr << "Error in Quad ";
             this->print_index(std::cerr);
-            std::cerr << ": Edge " << iedge << " is null." << std::endl;
+            std::cerr << ": Edge " << (int)iedge << " is null." << std::endl;
             exit(1);
           }
         }
@@ -493,8 +511,59 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
           edge(iedge)->validate();
         }
 
-        // validate children
-        // TODO
+        // validate children numbering
+        if(!this->active())
+        {
+          if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
+          {
+            // check centre vertex in all children (see numbering scheme in subdivide routine)
+            for(unsigned char ichild(0) ; ichild < num_edges()-1 ; ++ichild)
+            {
+              if(this->child(ichild)->vertex(ichild) != this->child(ichild+1)->vertex(ichild+1))
+              {
+                std::cerr << "Error in Quad ";
+                this->print_index(std::cerr);
+                std::cerr << ": Centre vertex has wrong number in child " << (int)ichild << " or child " << ichild+1
+                           << "." << std::endl;
+                exit(1);
+              }
+            }
+            // check corner vertices of the parent quad (see numbering scheme in subdivide routine)
+            if(this->child(0)->vertex(3) != vertex(0) || this->child(1)->vertex(2) != vertex(1) ||
+               this->child(2)->vertex(1) != vertex(2) || this->child(3)->vertex(0) != vertex(3))
+            {
+              std::cerr << "Error in Quad ";
+              this->print_index(std::cerr);
+              std::cerr << ": One corner vertex has a wrong number in the corresponding child." << std::endl;
+              exit(1);
+            }
+
+            // check the interior edges and and their vertices (see numbering scheme in subdivide routine)
+            for(unsigned char i(0) ; i < num_edges()-1 ; ++i)
+            {
+              Cell_1D_* edge0 = this->child(Numbering::quad_edge_vertices[i][0])->edge(i);
+              Cell_1D_* edge1 = this->child(Numbering::quad_edge_vertices[i][1])->edge(i);
+              if(edge0 != edge1)
+              {
+                std::cerr << "Error in Quad ";
+                this->print_index(std::cerr);
+                std::cerr << ": Interior edge connected to the " << (int)i << "-th edge of the parent quad "
+                          << "has a wrong number in one of the incident children." << std::endl;
+                exit(1);
+              }
+              Vertex_* vert_quad_centre = this->child(i)->vertex(i);
+              Vertex_* vert_edge_centre = edge(i)->child(0)->vertex(1);
+              if(!(edge0->vertex(0) == vert_edge_centre &&  edge0->vertex(1) == vert_quad_centre))
+              {
+                std::cerr << "Error in Quad ";
+                this->print_index(std::cerr);
+                std::cerr << ": There is something wrong with the end vertices of the interior edge connected to the "
+                          << (int)i << "-th edge of the parent quad." << std::endl;
+                exit(1);
+              }
+            }
+          }
+        }
 
         // validate parent-child relations
         this->validate_history();

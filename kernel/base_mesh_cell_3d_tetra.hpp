@@ -148,7 +148,7 @@ namespace FEAST
       /// subdivision routine splitting a tetra and storing parent/child information
 // COMMENT_HILMAR: this is currently hard-wired to splitting the tetra into 8 tetras (called 'standard partition' or
 // '3D-Freudenthal-Bey partition'. Later, this is parameterised via the information in the SubdivisionData object.
-      inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>& subdiv_data)
+      inline void subdivide()
       {
         // assure that this cell has not been divided yet
         if(!this->active())
@@ -159,7 +159,21 @@ namespace FEAST
           exit(1);
         }
 
-        // to be implemented...
+        if(!this->subdiv_data_initialised())
+        {
+          std::cerr << "Tetra ";
+          this->print_index(std::cerr);
+          std::cerr << " cannot be subdivided! Initialise subdivision data first! Aborting program." << std::endl;
+          exit(1);
+        }
+
+        // clear all vectors of created entities in the SubdivisionData object
+        this->subdiv_data()->clear_created();
+
+        // TODO: perform subdivision
+        // ...
+        std::cerr << "Subdivision for tetraeders not implemented yet!!" << std::endl;
+        exit(1);
 
       } // subdivide()
 

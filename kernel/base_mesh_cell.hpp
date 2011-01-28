@@ -279,6 +279,9 @@ namespace FEAST
       /// array of children of this cell
       Cell** _children;
 
+      /// subdivision data
+      SubdivisionData<cell_dim_, space_dim_, world_dim_>* _subdiv_data;
+
       /// refinement level of this cell
       unsigned char _refinement_level;
 
@@ -397,6 +400,34 @@ namespace FEAST
       }
 
 
+      /// returns subdivision data object
+      inline SubdivisionData<cell_dim_, space_dim_, world_dim_>* subdiv_data() const
+      {
+        return _subdiv_data;
+      }
+
+
+      /// initialises the subdivision data object
+      inline void init_subdiv_data(type_of_subdivision type)
+      {
+        _subdiv_data = new SubdivisionData<cell_dim_, space_dim_, world_dim_>(type);
+      }
+
+      /// checks whether the subdivision data is initialised
+      inline bool subdiv_data_initialised() const
+      {
+        return _subdiv_data != nullptr;
+      }
+
+      /// deletes the subdivision data object
+      inline void delete_subdiv_data()
+      {
+        _subdiv_data->clear_created();
+        delete _subdiv_data;
+        _subdiv_data = nullptr;
+        // TODO: has to be called in destructor of this cell
+      }
+
       /// returns whether this cell is active (i.e. whether it does not have children)
       inline bool active() const
       {
@@ -404,7 +435,7 @@ namespace FEAST
       }
 
 
-      virtual void subdivide(SubdivisionData<cell_dim_, space_dim_, world_dim_>& subdiv_data) = 0;
+      virtual void subdivide() = 0;
 
 
       virtual void print(std::ostream& stream) = 0;

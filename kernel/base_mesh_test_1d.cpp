@@ -25,9 +25,9 @@ int main (int argc, char **argv)
 
   // subdivide cell 0
   std::cout << "Subdividing cell 0" << std::endl;
-  SubdivisionData<1, WDIM, SDIM> subdiv_data;
-  bm.cell(1)->subdivide(subdiv_data);
-  bm.add_created_items(subdiv_data);
+  bm.cell(1)->init_subdiv_data(CONFORM_SAME_TYPE);
+  bm.cell(1)->subdivide();
+  bm.add_created_items(bm.cell(1)->subdiv_data());
 
   // TODO: neighbourhood update
 

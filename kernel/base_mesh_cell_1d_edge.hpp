@@ -76,7 +76,7 @@ namespace FEAST
 
 
       /// subdivision routine splitting an edge into two and storing parent/child information
-      inline void subdivide(SubdivisionData<1, space_dim_, world_dim_>& subdiv_data)
+      inline void subdivide()
       {
         // assure that this cell has not been divided yet
         if(!this->active())
@@ -87,37 +87,58 @@ namespace FEAST
           exit(1);
         }
 
-        // clear all vectors of created entities in the SubdivisionData object
-        subdiv_data.clear_created();
-
-        // create new vertex as mid point of this edge
-        double p[world_dim_];
-        for(int i(0) ; i < world_dim_ ; ++i)
+        if(!this->subdiv_data_initialised())
         {
-          p[i] = vertex(0)->coord(i) + 0.5*(vertex(1)->coord(i) - vertex(0)->coord(i) );
+          std::cerr << "Edge ";
+          this->print_index(std::cerr);
+          std::cerr << " cannot be subdivided! Set subdivision data first! Aborting program." << std::endl;
+          exit(1);
         }
-        // create new vertex
-        subdiv_data.created_vertex = new Vertex_(p);
 
-        // create new edges and set them as children of this edge
-        // Note the numbering of the vertices: the new created vertex is the second one within the structure of both
-        // edge children. This is exploited at some places and must not be changed.
-        this->_set_num_children(2);
-        _set_child(0, new Edge(vertex(0), subdiv_data.created_vertex, this->refinement_level()+1));
-        _set_child(1, new Edge(vertex(1), subdiv_data.created_vertex, this->refinement_level()+1));
-        // update the parent relationship
-        this->child(0)->set_parent(this);
-        this->child(1)->set_parent(this);
+        if(this->subdiv_data()->type == CONFORM_SAME_TYPE)
+        {
+          // split the edge into two edges
 
-        // add new edges to the vector of created cells
-        subdiv_data.created_cells.push_back(this->child(0));
-        subdiv_data.created_cells.push_back(this->child(1));
+          // clear all vectors of created entities in the SubdivisionData object
+          this->subdiv_data()->clear_created();
 
-        // set internal neighbourhood (external neighbourhood is set outside this function)
-        // (in case space_dim_ > 1, an empty dummy function is called; see CellData)
-        // vertex neighbours
-        this->child(0)->add_neighbour(SDIM_VERTEX, 1, this->child(1));
-        this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(0));
+          // create new vertex as mid point of this edge
+          double p[world_dim_];
+          for(int i(0) ; i < world_dim_ ; ++i)
+          {
+            p[i] = vertex(0)->coord(i) + 0.5*(vertex(1)->coord(i) - vertex(0)->coord(i) );
+          }
+          // create new vertex
+          this->subdiv_data()->created_vertex = new Vertex_(p);
+
+          // create new edges and set them as children of this edge
+          // Note the numbering of the vertices: the new created vertex is the second one within the structure of both
+          // edge children. This is exploited at some places and must not be changed.
+          this->_set_num_children(2);
+          _set_child(0, new Edge(vertex(0), this->subdiv_data()->created_vertex, this->refinement_level()+1));
+          _set_child(1, new Edge(vertex(1), this->subdiv_data()->created_vertex, this->refinement_level()+1));
+          // update the parent relationship
+          this->child(0)->set_parent(this);
+          this->child(1)->set_parent(this);
+
+          // add new edges to the vector of created cells
+          this->subdiv_data()->created_cells.push_back(this->child(0));
+          this->subdiv_data()->created_cells.push_back(this->child(1));
+
+          // set internal neighbourhood (external neighbourhood is set outside this function)
+          // (in case space_dim_ > 1, an empty dummy function is called; see CellData)
+          // vertex neighbours
+          this->child(0)->add_neighbour(SDIM_VERTEX, 1, this->child(1));
+          this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(0));
+        }
+        else
+        {
+          std::cerr << "Wrong type of subdivision in edge ";
+          this->print_index(std::cerr);
+          std::cerr << ". There is only one type of subdivision for edges: CONFORM_SAME_TYPE. Aborting program."
+                    << std::endl;
+          exit(1);
+        }
       } // subdivide()
 
 
@@ -143,24 +164,27 @@ namespace FEAST
           }
         }
 
-        // validate children
+        // validate children numbering
         if(!this->active())
         {
-          // check whether the common vertex of the two children is set correctly
-          if(this->child(0)->vertex(1) != this->child(1)->vertex(1))
+          if(this->subdiv_data()->type == CONFORM_SAME_TYPE)
           {
-            std::cerr << "Error in edge ";
-            this->print_index(std::cerr);
-            std::cerr << ": Shared vertex of the two children is not set correctly!" << std::endl;
-            exit(1);
-          }
-          // check whether the other vertices are set correctly
-          if(this->child(0)->vertex(0) != vertex(0) || this->child(1)->vertex(0) != vertex(1))
-          {
-            std::cerr << "Error in edge ";
-            this->print_index(std::cerr);
-            std::cerr << ": One of the end vertices of the children is not set correctly!" << std::endl;
-            exit(1);
+            // check whether the common vertex of the two children is set correctly
+            if(this->child(0)->vertex(1) != this->child(1)->vertex(1))
+            {
+              std::cerr << "Error in edge ";
+              this->print_index(std::cerr);
+              std::cerr << ": Shared vertex of the two children is not set correctly!" << std::endl;
+              exit(1);
+            }
+            // check whether the other vertices are set correctly
+            if(this->child(0)->vertex(0) != vertex(0) || this->child(1)->vertex(0) != vertex(1))
+            {
+              std::cerr << "Error in edge ";
+              this->print_index(std::cerr);
+              std::cerr << ": One of the end vertices of the children is not set correctly!" << std::endl;
+              exit(1);
+            }
           }
         }
         // validate parent-child relations

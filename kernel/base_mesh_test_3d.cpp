@@ -23,9 +23,10 @@ int main (int argc, char **argv)
 
   // subdivide cell 0
   std::cout << "Subdividing cell 0" << std::endl;
-  SubdivisionData<3, WDIM, SDIM> subdiv_data;
-  bm.cell(0)->subdivide(subdiv_data);
-  bm.add_created_items(subdiv_data);
+
+  bm.cell(0)->init_subdiv_data(NONCONFORM_SAME_TYPE);
+  bm.cell(0)->subdivide();
+  bm.add_created_items(bm.cell(0)->subdiv_data());
   bm.print(std::cout);
 
   // validate base mesh

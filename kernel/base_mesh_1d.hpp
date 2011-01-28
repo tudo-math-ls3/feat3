@@ -207,12 +207,12 @@ namespace FEAST
       }
 
 
-      inline void add_created_items(SubdivisionData<1, 1, world_dim_>& subdiv_data)
+      inline void add_created_items(SubdivisionData<1, 1, world_dim_>* subdiv_data)
       {
-        add(subdiv_data.created_vertex);
-        for(unsigned int i(0) ; i < subdiv_data.created_cells.size() ; ++i)
+        add(subdiv_data->created_vertex);
+        for(unsigned int i(0) ; i < subdiv_data->created_cells.size() ; ++i)
         {
-          add(subdiv_data.created_cells[i]);
+          add(subdiv_data->created_cells[i]);
         }
       }
 

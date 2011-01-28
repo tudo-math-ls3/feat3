@@ -676,23 +676,23 @@ namespace FEAST
         remove<Cell_*>(_cells, c);
       }
 
-      inline void add_created_items(SubdivisionData<3, 3, world_dim_>& subdiv_data)
+      inline void add_created_items(SubdivisionData<3, 3, world_dim_>* subdiv_data)
       {
-        for(unsigned int i(0) ; i < subdiv_data.created_vertices.size() ; ++i)
+        for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
         {
-          add(subdiv_data.created_vertices[i]);
+          add(subdiv_data->created_vertices[i]);
         }
-        for(unsigned int i(0) ; i < subdiv_data.created_edges.size() ; ++i)
+        for(unsigned int i(0) ; i < subdiv_data->created_edges.size() ; ++i)
         {
-          add(subdiv_data.created_edges[i]);
+          add(subdiv_data->created_edges[i]);
         }
-        for(unsigned int i(0) ; i < subdiv_data.created_faces.size() ; ++i)
+        for(unsigned int i(0) ; i < subdiv_data->created_faces.size() ; ++i)
         {
-          add(subdiv_data.created_faces[i]);
+          add(subdiv_data->created_faces[i]);
         }
-        for(unsigned int i(0) ; i < subdiv_data.created_cells.size() ; ++i)
+        for(unsigned int i(0) ; i < subdiv_data->created_cells.size() ; ++i)
         {
-          add(subdiv_data.created_cells[i]);
+          add(subdiv_data->created_cells[i]);
         }
       }
 
