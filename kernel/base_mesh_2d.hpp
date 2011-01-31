@@ -424,19 +424,19 @@ namespace FEAST
         stream << "---------------------------------------------------" << std::endl;
         stream << "|               DUMPING BASE MESH                  " << std::endl;
         stream << "---------------------------------------------------" << std::endl;
-        stream << num_vertices() <<" Vertices:" << std::endl;
+        stream << _vertices.size() <<" vertices:" << std::endl;
         for (unsigned int ivert(0) ; ivert < _vertices.size() ; ++ivert)
         {
           _vertices[ivert]->print(stream);
           stream << std::endl;
         }
-        stream << num_edges() << " Edges" << std::endl;
+        stream << _edges.size() << " edges" << std::endl;
         for (unsigned int iedge(0) ; iedge < _edges.size() ; ++iedge)
         {
           _edges[iedge]->print(stream);
           stream << std::endl;
         }
-        stream << num_cells() << " Cells" << std::endl;
+        stream << _cells.size() << " cells" << std::endl;
         for (unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
           _cells[icell]->print(stream);

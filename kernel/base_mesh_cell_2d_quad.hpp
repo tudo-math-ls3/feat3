@@ -229,9 +229,11 @@ namespace FEAST
       }
 
 
-      /// subdivision routine splitting a quad and storing parent/child information
-// COMMENT_HILMAR: this is currently hard-wired to splitting the quad into four quads. Later, this is parameterised
-// via the information in the SubdivisionData object.
+      /**
+      * \brief subdivision routine splitting a quad and storing parent/child information
+      *
+      * \todo New centre vertex of the quad has to be computed properly!
+      */
       inline void subdivide()
       {
         // assure that this cell has not been divided yet
@@ -287,19 +289,8 @@ namespace FEAST
 
               // add the created vertices/edges to the vector of created vertices/edges
               this->subdiv_data()->created_vertices.push_back(edge(iedge)->subdiv_data()->created_vertex);
-
-              // COMMENT_HILMAR: Not sure whether the order plays a role here... to be on the safe side, order them
-              // according to the array new_edges[].
-              if(_edge_has_correct_orientation[iedge])
-              {
-                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[0]);
-                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[1]);
-              }
-              else
-              {
-                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[1]);
-                this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[0]);
-              }
+              this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[0]);
+              this->subdiv_data()->created_edges.push_back(edge(iedge)->subdiv_data()->created_cells[1]);
             }
 
             // add new vertex to array of new vertices (exploit that the vertex shared by the edge children is stored
