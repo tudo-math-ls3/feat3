@@ -9,6 +9,8 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/util/string_utils.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 #include <kernel/base_mesh_cell.hpp>
 #include <kernel/base_mesh_cell_data_checker.hpp>
@@ -473,7 +475,6 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
 
 
       /// validates the cell
-// COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
         try
@@ -519,8 +520,8 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
               {
                 if(this->child(ichild)->vertex(ichild) != this->child(ichild+1)->vertex(ichild+1))
                 {
-                  s += "Centre vertex has wrong number in child " +
-                       StringUtils::stringify((int)ichild) + " or child " + StringUtils::stringify(ichild+1) + ".\n";
+                  s += "Centre vertex has wrong number in child "
+                       + StringUtils::stringify((int)ichild) + " or child " + StringUtils::stringify(ichild+1) + ".\n";
                   throw new InternalError(s);
                 }
               }
@@ -539,16 +540,16 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
                 Cell_1D_* edge1 = this->child(Numbering::quad_edge_vertices[i][1])->edge(i);
                 if(edge0 != edge1)
                 {
-                  s += "Interior edge connected to the " + StringUtils::stringify((int)i) +
-                       "-th edge of the parent quad has a wrong number in one of the incident children.\n";
+                  s += "Interior edge connected to the " + StringUtils::stringify((int)i)
+                       + "-th edge of the parent quad has a wrong number in one of the incident children.\n";
                   throw new InternalError(s);
                 }
                 Vertex_* vert_quad_centre = this->child(i)->vertex(i);
                 Vertex_* vert_edge_centre = edge(i)->child(0)->vertex(1);
                 if(!(edge0->vertex(0) == vert_edge_centre &&  edge0->vertex(1) == vert_quad_centre))
                 {
-                  s += "There is something wrong with the end vertices of the interior edge connected to the " +
-                       StringUtils::stringify((int)i) + "-th edge of the parent quad.\n";
+                  s += "There is something wrong with the end vertices of the interior edge connected to the "
+                       + StringUtils::stringify((int)i) + "-th edge of the parent quad.\n";
                   throw new InternalError(s);
                 }
               }

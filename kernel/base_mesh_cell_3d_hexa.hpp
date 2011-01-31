@@ -9,6 +9,8 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/util/string_utils.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 #include <kernel/base_mesh_cell.hpp>
 #include <kernel/base_mesh_cell_data_checker.hpp>
@@ -724,36 +726,79 @@ std::cout << ", " << face(iface)->subdiv_data()->created_cells.size() << " faces
 
 
       /// validates the cell
-// COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
-        if(space_dim_ == 3)
+        try
         {
-          std::cout << "Validating hexa ";
-          this->print_index(std::cout);
-          std::cout << std::endl;
+          if(space_dim_ == 3)
+          {
+            std::cout << "Validating hexaeder ";
+            this->print_index(std::cout);
+            std::cout << std::endl;
+          }
+
+          std::string s = "Hexaeder " + this->print_index() + ": ";
+
+          // validate that all vertices, edges and faces are set
+          for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
+          {
+            if (vertex(ivert) == nullptr)
+            {
+              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              throw new InternalError(s);
+            }
+          }
+          for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+          {
+            if (edge(iedge) == nullptr)
+            {
+              s += "Edge " + StringUtils::stringify((int)iedge) + " is null.\n";
+              throw new InternalError(s);
+            }
+          }
+          for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+          {
+            if (face(iface) == nullptr)
+            {
+              s += "Face " + StringUtils::stringify((int)iface) + " is null.\n";
+              throw new InternalError(s);
+            }
+          }
+
+          // validate children numbering
+          // TODO
+          if(!this->active())
+          {
+            if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
+            {
+
+            }
+          }
+
+          // validate subitems (here: faces and edges)
+          for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+          {
+            face(iface)->validate();
+          }
+          // validate subitems (here: faces and edges)
+          for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+          {
+            edge(iedge)->validate();
+          }
+
+          // validate parent-child relations
+          this->validate_history();
+
+          // validate neighbours
+          if (this->active())
+          {
+            CellDataChecker<3, space_dim_, world_dim_>::check_neighbourhood(this);
+          }
         }
-
-        //...
-
-        // validate subitems (here: faces and edges)
-        for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+        catch(InternalError* e)
         {
-          face(iface)->validate();
-        }
-        // validate subitems (here: faces and edges)
-        for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
-        {
-          edge(iedge)->validate();
-        }
-
-        // validate parent-child relations
-        this->validate_history();
-
-        // validate neighbours
-        if (this->active())
-        {
-          CellDataChecker<3, space_dim_, world_dim_>::check_neighbourhood(this);
+          std::cerr << e->message() << std::endl;
+          exit(1);
         }
       }
 

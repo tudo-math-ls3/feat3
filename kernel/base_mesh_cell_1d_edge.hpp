@@ -9,6 +9,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/string_utils.hpp>
 #include <kernel/base_mesh_cell.hpp>
 #include <kernel/base_mesh_cell_data_checker.hpp>
 #include <kernel/base_mesh_vertex.hpp>
@@ -140,7 +141,6 @@ namespace FEAST
 
 
       /// validate this cell
-// COMMENT_HILMAR: will be done via exceptions
       void validate() const
       {
         try
@@ -150,14 +150,14 @@ namespace FEAST
             std::cout << "Validating edge " + this->print_index() + "\n";
           }
 
-          std::string s;
+          std::string s = "Edge " + this->print_index() + ": ";
 
           // validate that all vertices are set
           for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)
           {
             if (vertex(ivert) == nullptr)
             {
-              s = "Edge " + this->print_index() + ": Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -170,13 +170,13 @@ namespace FEAST
               // check whether the common vertex of the two children is set correctly
               if(this->child(0)->vertex(1) != this->child(1)->vertex(1))
               {
-                s = "Edge " + this->print_index() + ": Shared vertex of the two children is not set correctly!\n";
+                s += "Shared vertex of the two children is not set correctly!\n";
                 throw new InternalError(s);
               }
               // check whether the other vertices are set correctly
               if(this->child(0)->vertex(0) != vertex(0) || this->child(1)->vertex(0) != vertex(1))
               {
-                s = "Edge " + this->print_index() + ": One of the end vertices of the children is not set correctly!\n";
+                s += "One of the end vertices of the children is not set correctly!\n";
                 throw new InternalError(s);
               }
             }

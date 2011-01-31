@@ -9,6 +9,8 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/util/string_utils.hpp>
 #include <kernel/base_mesh_vertex.hpp>
 #include <kernel/base_mesh_cell.hpp>
 #include <kernel/base_mesh_cell_data_checker.hpp>
@@ -184,7 +186,6 @@ namespace FEAST
 
 
       /// validates the cell
-// COMMENT_HILMAR: will be done via exceptions
       inline void validate() const
       {
         try
