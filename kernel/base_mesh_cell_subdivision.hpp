@@ -16,58 +16,191 @@ namespace FEAST
   namespace BaseMesh
   {
 
+    /**
+    * \brief type of subdivisions
+    *
+    * There are (at least) two motivations for subdividing base mesh cells:
+    *   - change of shape (e.g. quad --> triangle for better approximation of geometry; some special functionality
+    *     may be available for a special element shape only)
+    *   - more MPI processes needed
+    * Depending on the situation, it may be
+    *  - necessary to perform only conform subdivisions (do not split edges/faces)
+    *  - allowed (or even wanted) to perform nonconform subdivisions (split edges/faces)
+    *
+    * \note These classifications are not complete yet. For example, transition elements are missing which may be
+    * necessary to preserve or establish conformity of the mesh (e.g. prism elements for conform transitions from
+    * hexas to tetras and vice versa). These classifications are closely connected to some "expert system" which
+    * eventually decides where and how to subdivide. Until such an "expert system" is developed, the
+    * classifications cannot be completed. The subdivision types below are just a starting point which may be useful
+    * later.
+    *
+    * \note Possible strategies in such an "expert system" may be: "First try a conform subdivision. If this is not
+    * possible (maybe due to badly shaped elements), then perform nonconform subdivision."
+    * Note that for preserving or establishing the conformity of the mesh, the "expert system" has to examine the
+    * neighbourhood of a cell.
+    */
     enum type_of_subdivision
     {
-      // subdivision into cells of the same type, eventually leading to a nonconform mesh
-      // (quad --> four quads, tri --> four tris)
-      // -------------       -------------
-      // |           |       |     |     |
-      // |           |       |     |     |
-      // |           | --->  -------------
-      // |           |       |     |     |
-      // |           |       |     |     |
-      // -------------       -------------
+      /**
+      * \brief subdivision into cells of the same type, nonconform (splitting edges/faces)
+      *
+      * 2D: tri --> four tris
+      *            /\                               /\
+      *          /    \                           /    \
+      *        /        \         --->          /________\
+      *      /            \                   / \        / \
+      *    /                \               /     \    /     \
+      *  /                    \           /         \/         \
+      * ------------------------         ------------------------
+      * 2D: quad --> four quads
+      * -------------       -------------
+      * |           |       |     |     |
+      * |           |       |     |     |
+      * |           |       |     |     |
+      * |           | --->  -------------
+      * |           |       |     |     |
+      * |           |       |     |     |
+      * |           |       |     |     |
+      * -------------       -------------
+      * 3D: tetra --> eight tetras
+      * 3D: hexa --> eight hexas
+      */
       NONCONFORM_SAME_TYPE,
 
-      // subdivision into cells of the other type, eventually leading to a nonconform mesh
-      // quad --> six tris (dividing edges, adding one line between two opposing new vertices)
-      // -------------       -------------
-      // |           |       |    /|\    |
-      // |           |       |  /  |  \  |
-      // |           |  -->  |/    |    \|
-      // |           |       |\    |    /|
-      // |           |       |  \  |  /  |
-      // |           |       |    \|/    |
-      // -------------       -------------
-      // tri --> four quads (dividing edges and adding vertex in triangle center)
+      /**
+      * \brief subdivision into cells of the other type, eventually leading to a nonconform mesh
+      *
+      * 2D: tri --> three quads
+      *            / \                               / \
+      *          /     \                           /     \
+      *        /         \         --->          / \     / \
+      *      /             \                   /     \ /     \
+      *    /                 \               /        |        \
+      *  /                     \           /          |          \
+      * -------------------------         -------------------------
+      * 2D: quad --> eight tris
+      * -------------       -------------
+      * |           |       |    /|    /|
+      * |           |       |  /  |  /  |
+      * |           |       |/    |/    |
+      * |           | --->  -------------
+      * |           |       |    /|    /|
+      * |           |       |  /  |  /  |
+      * |           |       |/    |/    |
+      * -------------       -------------
+      * 3D: tetra --> hexas ???
+      * 3D: hexa --> tetras ???
+      */
       NONCONFORM_CHANGE_TYPE,
 
-      // subdivision into cells of the same type, leading to a nonconform mesh
-      // quad --> five quads (adding small quad within the quad, connect two vertices, resp.)
-      // tri --> three tris (adding vertex in triangle center)
+      /**
+      * \brief subdivision into cells of the same type, leading to a nonconform mesh
+      *
+      * 2D: tri --> three tris (adding vertex in tri centre)
+      *            / \                               /|\
+      *          /     \                           /  |  \
+      *        /         \         --->          /    |    \
+      *      /             \                   /    __|__    \      (ugly ASCII art...)
+      *    /                 \               /  ___/     \___  \
+      *  /                     \           /  /               \  \
+      * -------------------------         -------------------------
+      * 2D: quad --> five quads
+      * ---------------      ---------------
+      * |             |      | \         / |
+      * |             |      |   \     /   |
+      * |             |      |    -----    |
+      * |             | ---> |    |   |    |
+      * |             |      |    -----    |
+      * |             |      |   /     \   |
+      * |             |      | /         \ |
+      * ---------------      ---------------
+      * 3D: tetra --> four tetras (adding vertex in tetra center; analogue to tri)
+      * 3D: hexa --> seven hexas (small hexa in the centre, surrounded by six hexas; analogue to quad)
+      */
       CONFORM_SAME_TYPE,
 
-      // subdivision into cells of the other type leading to a conform mesh
-      // quad --> two tris (adding diagonal)
-      // -------------       -------------
-      // |           |       |          /|
-      // |           |       |        /  |
-      // |           |  -->  |      /    |
-      // |           |       |    /      |
-      // |           |       |  /        |
-      // |           |       |/          |
-      // -------------       -------------
-      // quad --> four tris (adding both diagonals)
-      // -------------       -------------
-      // |           |       |\         /|
-      // |           |       |  \     /  |
-      // |           |  -->  |    \ /    |
-      // |           |       |    / \    |
-      // |           |       |  /     \  |
-      // |           |       |/         \|
-      // -------------       -------------
-      // tri --> quads: not possible!
-      CONFORM_CHANGE_TYPE
+      /**
+      * \brief subdivision into cells of the other type leading to a conform mesh
+      *
+      * 2D: tri --> quads: NOT POSSIBLE!
+      * 2D: quad --> two tris (adding diagonal)
+      * ---------------       ---------------
+      * |             |       |            /|
+      * |             |       |          /  |
+      * |             |       |        /    |
+      * |             | --->  |      /      |
+      * |             |       |    /        |
+      * |             |       |  /          |
+      * |             |       |/            |
+      * ---------------       ---------------
+      * 3D: tetra --> hexas: NOT POSSIBLE!
+      * 3D: hexa --> tetras: NOT POSSIBLE!
+      */
+      CONFORM_CHANGE_TYPE,
+
+      /**
+      * \brief nonconform subdivision into triangles (only 2D)
+      *
+      * tri -->  four tris (see ASCII art of NONCONFORM_SAME_TYPE)
+      * quad --> eight tris (see ASCII art of NONCONFORM_CHANGE_TYPE)
+      */
+      NONCONFORM_TO_TRI,
+
+      /**
+      * \brief nonconform subdivision into quads (only 2D)
+      *
+      * tri --> three quad (see ASCII art of NONCONFORM_CHANGE_TYPE)
+      * quad --> four quads (see ASCII art of NONCONFORM_SAME_TYPE)
+      */
+      NONCONFORM_TO_QUAD,
+
+      /**
+      * \brief conform subdivision into trianges (only 2D)
+      *
+      * tri --> three tris (see ASCII art of CONFORM_SAME_TYPE)
+      * quad --> two tris (see ASCII art of CONFORM_CHANGE_TYPE)
+      */
+      CONFORM_TO_TRI,
+
+      /**
+      * \brief conform subdivision into quads (only 2D)
+      *
+      * tri --> quads: NOT POSSIBLE!
+      * quad --> five quads (see ASCII art of CONFORM_SAME_TYPE)
+      */
+      CONFORM_TO_QUAD,
+
+      /**
+      * \brief nonconform subdivision into tetraeders (only 3D)
+      *
+      * tetra --> eight tetras
+      * hexa --> ??? tetras (not thought about yet...)
+      */
+      NONCONFORM_TO_TETRA,
+
+      /**
+      * \brief nonconform subdivision into hexaeders (only 3D)
+      *
+      * tetra --> ??? hexas (not thought about yet...)
+      * hexa --> eight hexas
+      */
+      NONCONFORM_TO_HEXA,
+
+      /**
+      * \brief conform subdivision into tetraeders (only 3D)
+      *
+      * tetra --> four tetras (adding vertex in tetra center)
+      * hexa --> tetras: NOT POSSIBLE!
+      */
+      CONFORM_TO_TETRA,
+
+      /**
+      * \brief conform subdivision into hexaeders (only 3D)
+      *
+      * tetra --> hexas: NOT POSSIBLE!
+      * hexa --> seven hexas (small hexa in the centre, surrounded by six hexas; analogue to quad)
+      */
+      CONFORM_TO_HEXA
     };
 
 
