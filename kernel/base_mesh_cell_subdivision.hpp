@@ -37,7 +37,11 @@ namespace FEAST
     * \note Possible strategies in such an "expert system" may be: "First try a conform subdivision. If this is not
     * possible (maybe due to badly shaped elements), then perform nonconform subdivision."
     * Note that for preserving or establishing the conformity of the mesh, the "expert system" has to examine the
-    * neighbourhood of a cell.
+    * neighbourhood of a cell. That means, whether a special subdivision leads to a conform mesh or not, does not
+    * only depend on the cell to be subdivided itself! Consequently, one has to think about renaming the types below or
+    * adding types of the form TO_QUAD_WITH_EDGE_BISECTION, TO_QUAD_WITHOUT_EDGE_BISECTION etc.
+    * But that all depends on how this "expert system" will work. Hence, it doesn't make sense *now* to put too much
+    * effort in these details.
     */
     enum type_of_subdivision
     {
