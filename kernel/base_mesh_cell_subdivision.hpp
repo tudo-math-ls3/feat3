@@ -230,7 +230,6 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-// COMMENT_HILMAR: Wie und wo sollen die SubdivisionData-Objekte gespeichert werden? Als member von Cell<...>?
     template<
       unsigned char cell_dim_,
       unsigned char space_dim_,

@@ -46,7 +46,7 @@ namespace FEAST
 
 // COMMENT_HILMAR: Im Moment gibt es hier nur das array _num_subitems_per_subdim[], eventuell kommt aber noch mehr
 //   dazu. Sollte sich herausstellen, dass doch nix mehr dazu kommt, dann kann man diese Klasse hier auch wieder
-//   wieder abschaffen und das einzige per Code-Verdopplung in die beiden Varianten der Klasse CellData verschieben.
+//   abschaffen und dieses einzige array per Code-Verdopplung in die beiden Varianten der Klasse CellData verschieben.
     template<
       unsigned char cell_dim_,
       unsigned char space_dim_,
@@ -210,7 +210,7 @@ namespace FEAST
 
 
       /// returns vector of neighbours for given subdimension and given item
-      inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>& neighbours(
+      inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>& neighbours_item(
         subdim subdim,
         unsigned char item) const
       {

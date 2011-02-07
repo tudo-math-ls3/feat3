@@ -722,3 +722,139 @@ namespace FEAST
 //    {
 //      return (edge(iedge)->vertex(0) == vertex(iedge));
 //    }
+
+/*
+Example case 1: q0.ref_level = q1.ref_level
+Situation before subdivision of q0:
+  v2-----e1------v3     v2-----e1------v3
+   |             |       |             |
+   |             |       |             |
+   |             |       |             |
+  e2     q0     e3      e2      q1     e3
+   |             |       |             |
+   |             |       |             |
+   |             |       |             |
+  v0-----e0------v1     v0-----e0------v1
+
+Situation after subdivision of q0:
+  v2-----e1------v3     v2-----e1------v3
+   |      |      |       |             |
+   |  c2  |  c3  |       |             |
+   |      |      |       |             |
+  e2-------------e3     e2      q1     e3
+   |      |      |       |             |
+   |  c0  |  c1  |       |             |
+   |      |      |       |             |
+  v0-----e0------v1     v0-----e0------v1
+
+
+
+Example case 2: q0.ref_level = q1.ref_level - 1
+Situation before subdivision of q0:
+  v2-----e1------v3      ---------------
+   |             |       |      |      |
+   |             |       |  c2  |  c3  |
+   |             |       |      |      |
+  e2     q0     e3       |-------------|
+   |             |       |      |      |
+   |             |       |  c0  |  c1  |
+   |             |       |      |      |
+  v0-----e0------v1      ---------------
+
+Situation after subdivision of q0:
+  v2-----e1------v3      ---------------
+   |      |      |       |      |      |
+   |  c2  |  c3  |       |  c2  |  c3  |
+   |      |      |       |      |      |
+  e2-------------e3      |-------------|
+   |      |      |       |      |      |
+   |  c0  |  c1  |       |  c0  |  c1  |
+   |      |      |       |      |      |
+  v0-----e0------v1      ---------------
+
+
+
+Example case 3: q0.ref_level = q1.ref_level - 2
+Situation before subdivision of q0:
+  v2------e1-------v3      -----------------
+   |               |       |c22|c23|c32|c33|
+   |               |       |---------------|
+   |               |       |c20|c21|c30|c31|
+  e2      q0      e3       |---------------|
+   |               |       |c02|c03|c12|c13|
+   |               |       |---------------|
+   |               |       |c00|c01|c10|c11|
+  v0------e0-------v1      -----------------
+
+Situation after subdivision of q0:
+  v2------e1-------v3      -----------------
+   |       |       |       |c22|c23|c32|c33|
+   |  c2   |   c3  |       |---------------|
+   |       |       |       |c20|c21|c30|c31|
+  e2---------------e3      |---------------|
+   |       |       |       |c02|c03|c12|c13|
+   |  c0   |   c1  |       |---------------|
+   |       |       |       |c00|c01|c10|c11|
+  v0------e0-------v1      -----------------
+
+
+
+Example case 4: q0.ref_level = q1.ref_level + 1
+Situation before subdivision of q0:
+  v2-----e1------v3     v2------------e1------------v3
+   |             |       |                          |
+   |             |       |                          |
+   |             |       |                          |
+  e2     q0      e3      |                          |
+   |             |       |                          |
+   |             |       |                          |
+   |             |       |                          |
+  v0-----e0------v1     e2            q1            e3
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                        v0------------e0------------v1
+
+
+Situation after subdivision of q0:
+  v2-----e1------v3     v2------------e1------------v3
+   |      |      |       |                          |
+   |  c2  |  c3  |       |                          |
+   |      |      |       |                          |
+  e2-------------e3      |                          |
+   |      |      |       |                          |
+   |  c0  |  c1  |       |                          |
+   |      |      |       |                          |
+  v0-----e0------v1     e2            q1            e3
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                         |                          |
+                        v0------------e0------------v1
+
+Strategy:
+
+Kantennachbarn updaten:
+
+for each edge q0.e[i]
+  for each cell _neighbours[SDIM_EDGE][i][pos]
+    //sdim_in_neigh ist die Nachbarschaft-subdimension in der Nachbarzelle (kleiner oder gleich SDIM_EDGE)
+    sdim_in_neigh = _neighbours_sdim[SDIM_EDGE][i][pos];
+    fuer alle items von cell der subdimension sdim_in_neigh
+      ueberpruefe, ob q0 zu den Nachbarn an diesem item gehoert
+      wenn ja, dann aktualisiere nachbarschaft entsprechend:
+        entferne q0 aus der Liste der Nachbarn an diesem Item
+        finde heraus, welches Kind von q0 stattdessen eingesetzt werden muss:
+        gehe von dem item soviele Level runter/hoch, bis item erreicht ist, das dem Level der Kinder von q0 entspricht
+        suche dieses item in den Kindern von q0, die zur Kante q0.e[i] adjazent sind
+        wenn gefunden, dann setze entsprechendes Kind als neuen Nachbarn
+
+
+*/

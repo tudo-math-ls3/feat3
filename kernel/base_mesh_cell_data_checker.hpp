@@ -22,6 +22,26 @@ namespace FEAST
     /**
     * \brief class for checking vertex neighbours
     *
+    * \note
+    * Q: Why are there three classes CellDataCheckerVertexNeighbours, CellDataCheckerEdgeNeighbours and
+    *    CellDataCheckerFaceNeighbours? Can they not be united (the code is quite similar)?
+    * A: 1) That is a consequence of that fact, that we explicitely store vertices, edges and faces instead of
+    *    putting all in one array of general "items".
+    *    2) If we only had to compare subcells here, we maybe could use the most general class BaseMeshItem (being
+    *    parent of vertices, edges and faces). However, we also have to access children/parents of those subcells,
+    *    and that is not possible if we only handle them as BaseMeshItem. (Note that for vertices we don't need
+    *    parent/child information.)
+    *    3) The code differs for vertices on the one hand and edges/faces on the other hand: For the latter we
+    *    eventually have to traverse the history (parent/child relations) for checking neighbourhood, which is not
+    *    necessary for vertices.
+    *    4) Constructs like 'if(cell_space_dim == 1) then ... else if(cell_space_dim == 2) ...' are not possible:
+    *    For cell_space_dim = 3, e.g., one would use the function num_faces() which is simply not available for
+    *    cell_space_dim < 3, i.e. the code would not compile.
+    *    5) Of course, one could modify the whole class concept, such that the code duplication below can be avoided,
+    *    but that make the whole thing even more complicated than it already is. So, my current approach is to accept
+    *    the code duplication below rather than blowing up the class hierarchy/relations or using too abstract concepts
+    *    for handling/storing subcells.
+    *
     * \author Hilmar Wobker
     */
     template<
@@ -41,7 +61,8 @@ namespace FEAST
           for(unsigned char ivertex(0) ; ivertex < c->num_vertices() ; ++ivertex)
           {
             // get vertex neighbours at vertex ivertex
-            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs = c->neighbours(SDIM_VERTEX, ivertex);
+            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs
+              = c->neighbours_item(SDIM_VERTEX, ivertex);
             for(unsigned int ineigh = 0 ; ineigh < neighs.size() ; ineigh++)
             {
               // check whether ineigh-th neighbour is active
@@ -122,6 +143,8 @@ std::cout << s;
     /**
     * \brief class for checking edge neighbours
     *
+    * \note See note in class CellDataCheckerVertexNeighbours.
+    *
     * \author Hilmar Wobker
     */
     template<
@@ -141,7 +164,8 @@ std::cout << s;
           for(unsigned char iedge(0) ; iedge < c->num_edges() ; ++iedge)
           {
             // get edge neighbours at edge iedge
-            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs = c->neighbours(SDIM_EDGE, iedge);
+            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs
+              = c->neighbours_item(SDIM_EDGE, iedge);
             for(unsigned int ineigh = 0 ; ineigh < neighs.size() ; ineigh++)
             {
               // check whether ineigh-th neighbour is active
@@ -244,6 +268,8 @@ std::cout << s;
     /**
     * \brief class for checking face neighbours
     *
+    * \note See note in class CellDataCheckerVertexNeighbours.
+    *
     * \author Hilmar Wobker
     */
     template<
@@ -263,7 +289,8 @@ std::cout << s;
           for(unsigned char iface(0) ; iface < c->num_faces() ; ++iface)
           {
             // get face neighbours at face iface
-            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs = c->neighbours(SDIM_FACE, iface);
+            std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*> neighs
+              = c->neighbours_item(SDIM_FACE, iface);
             for(unsigned int ineigh = 0 ; ineigh < neighs.size() ; ineigh++)
             {
               // check whether ineigh-th neighbour is active
