@@ -43,12 +43,20 @@ namespace FEAST
   *
   * The load bal. with id 0 in the example above then...
   * 1) ...reads in the mesh (this is only done by the dedicated load balancer process or the coordinator, resp.)
-  * 2) ...builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
+  * 2) ...defines which base mesh cells (BMCs) build a matrix patch (MP) and which MPs build a process patch (PP)
+
+COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e. one BMC per MPI job
+
+  * 3) ...decides with how many processes (usually equals the number of virtual coarse grid matrix patches, CGMPs) to
+  *    solve the global coarse grid problem and how to distribute the MPs to these processes/CGMPs.
+  *    The standard case will be that the coarse grid problem is solved on one processor, i.e. one CGMP containing
+  *    all MPs.
+  * 4) ...builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
   *    coarse mesh problem) and creates corresponding MPI communicators. The workers with the highest work group ranks
   *    are the coordinators of these work groups, which communicate with the master or the dedicated load balancer. The
   *    process topologies of the work groups are then optimised by building corresponding graph structures. There are
   *    two cases:
-  *    a) There is a dedicated load balancer: The dedicated load balancer reads the mesh, creates work groups and and a
+  *    a) There is a dedicated load balancer: The dedicated load balancer reads the mesh, creates work groups and a
   *       global graph structure for each work group. Then it distributes to each process of the work group the relevant
   *       parts of the global graph. Each work group process then creates its local graph structure and calls
   *       MPI_Dist_graph_create(...) to build the new MPI process topology in a distributed fashion.
@@ -61,13 +69,13 @@ namespace FEAST
   *    COMMENT_HILMAR: It might be more clever to also let the MPI implementation decide on which physical process the
   *    dedicated load balancer should reside (instead of pinning it to the last rank in the process group). To improve
   *    this is task of the ITMC.
-  * 3) ...tells each work group which other work groups it has to communicate with (via the communicator they all share
+  * 5) ...tells each work group which other work groups it has to communicate with (via the communicator they all share
   *    within the parent process group). E.g., the fine mesh work group has to send the restricted defect vector to the
   *    coarse mesh work group, while the coarse mesh work group has to send the coarse mesh correction to the fine mesh
   *    work group. Two such communicating workers live either on the same process (internal communication = copy) or
   *    on different processes (external communication = MPI send/recv). (See example below.)
   *
-  * 4) ...sends corresponding parts of the mesh to the work groups
+  * 6) ...sends corresponding parts of the mesh to the work groups
   *
   *     Example:
   *
