@@ -69,6 +69,36 @@ namespace FEAST
   };
 
   /**
+   * \brief TypeTraits specialisation for unsigned int
+   *
+   * \author Dirk Ribbrock
+   */
+  template <>
+  struct TypeTraits<unsigned int>
+  {
+    /// Return a string idetifying the Datatype
+    static std::string name()
+    {
+      return "unsigned int";
+    }
+  };
+
+  /**
+   * \brief TypeTraits specialisation for signed int
+   *
+   * \author Dirk Ribbrock
+   */
+  template <>
+  struct TypeTraits<int>
+  {
+    /// Return a string idetifying the Datatype
+    static std::string name()
+    {
+      return "int";
+    }
+  };
+
+  /**
    * \brief TypeTraits specialisation for Nil tag class
    *
    * \author Dirk Ribbrock
