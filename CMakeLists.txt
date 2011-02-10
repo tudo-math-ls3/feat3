@@ -10,6 +10,12 @@ PROJECT( FEAST )
 #enable DEBUG define on debug builds
 set (CMAKE_CXX_FLAGS_DEBUG "-DDEBUG")
 
+#enable DEBUG define if the option is set
+OPTION (DEBUG_BUILD "Build with debug support.")
+if (DEBUG_BUILD)
+  add_definitions (-DDEBUG)
+endif (DEBUG_BUILD)
+
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 #our custom target to execute all compiled tests
