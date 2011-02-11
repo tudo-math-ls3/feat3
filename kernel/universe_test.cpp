@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   // (must be provided when num_process_groups > 1)
   // Set the first entry either to false or to true to test two different configurations. (You don't have to change
   // the number of processes for that.) (See description of the example in routine LoadBalancer::create_subgroups().)
-  bool includes_dedicated_load_bal[] = {true, false};
+  bool includes_dedicated_load_bal[] = {false, false};
 
 // COMMENT_HILMAR: Is it problematic to define and fill the variables above already *before* MPI_Init() is called?
 // (Until now, no problems occured!) If it turns out to be problematic then the Universe::create(...) routine has to be
