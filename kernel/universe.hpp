@@ -304,25 +304,20 @@ namespace FEAST
       _world_group = new ProcessGroup(MPI_COMM_WORLD, _num_processes);
 
       // create ProcessGroup object representing the group of all COMM_WORLD processes excluding the master process
+      // Note that *all* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the
+      // forking will deadlock), so let the master call it as well. Since the master does not belong to the group, the
+      // new communicator is MPI_COMM_NULL on the master process.
+      MPI_Group gr_without_master;
+      MPI_Comm gr_comm;
+      mpi_error_code = MPI_Group_excl(_world_group->group(), 1, &rank_master, &gr_without_master);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_excl");
+      mpi_error_code = MPI_Comm_create(_world_group->comm(), gr_without_master, &gr_comm);
+      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
       if(!Process::is_master)
       {
-        MPI_Group gr_without_master;
-        MPI_Comm gr_comm;
-        MPI_Group_excl(_world_group->group(), 1, &rank_master, &gr_without_master);
-        int mpi_error_code = MPI_Comm_create(_world_group->comm(), gr_without_master, &gr_comm);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
         _world_group_without_master = new ProcessGroup(gr_comm, _num_processes-1);
       }
-      else
-      {
-        // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
-        // will deadlock), so let the master call it with special MPI_GROUP_EMPTY and dummy communicator.
-        MPI_Comm dummy_comm;
-        int mpi_error_code = MPI_Comm_create(_world_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
-      }
-
-      // create ProcessGroup object representing the group of all COMM_WORLD processes
+//COMMENT_HILMAR: Kann ich gr_comm und gr_without_master eigentlich wieder free'n? Ausprobieren!
 
       // iterator for MPI_COMM_WORLD ranks, used to split them among the groups
       int iter_MPC_rank(-1);
@@ -364,10 +359,20 @@ namespace FEAST
       else
       {
         // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
-        // will deadlock), so let the master call it with special MPI_GROUP_EMPTY and dummy communicator.
+        // will deadlock), so let the master call it with dummy communicator and dummy group. (The dummy group is
+        // necessary here since the other MPI_Group object is hidden inside the ProcessGroup constructor above.)
         MPI_Comm dummy_comm;
-        int mpi_error_code = MPI_Comm_create(_world_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+        MPI_Group dummy_group;
+        int mpi_error_code = MPI_Group_incl(_world_group->group(), 1, &Process::rank_master, &dummy_group);
+        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+        mpi_error_code = MPI_Comm_create(_world_group->comm(), dummy_group, &dummy_comm);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+        // COMMENT_HILMAR: First, I used this simpler version:
+        //   int mpi_error_code = MPI_Comm_create(_world_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+        // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that
+        // is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
+        MPI_Comm_free(&dummy_comm);
+        MPI_Group_free(&dummy_group);
       }
 
       // all ok, now decide if this process is a regular one or the group's load-balancer or even the master

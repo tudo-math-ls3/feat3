@@ -842,10 +842,23 @@ namespace FEAST
         else
         {
           // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
-          // will deadlock), so let the coordinator call the routine with MPI_GROUP_EMPTY and dummy communicator.
+          // will deadlock), so let the coordinator call the routine with dummy communicator and dummy group.  (The
+          // dummy group is necessary here since the other MPI_Group object is hidden inside the WorkGroup
+          // constructor above.)
           MPI_Comm dummy_comm;
-          int mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+          MPI_Group dummy_group;
+          int rank_aux = _process_group_parent->rank();
+          int mpi_error_code = MPI_Group_incl(_process_group_parent->group(), 1, &rank_aux, &dummy_group);
+          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+          mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), dummy_group, &dummy_comm);
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+          // COMMENT_HILMAR: First, I used this simpler version:
+          //   mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that
+          // is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
+
+          MPI_Comm_free(&dummy_comm);
+          MPI_Group_free(&dummy_group);
           _work_group = nullptr;
         }
       }

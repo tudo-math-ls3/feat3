@@ -569,8 +569,8 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // create ProcessSubgroup objects including MPI groups and MPI communicators
       // It is not possible to set up all subgroups in one call, since the processes building the subgroups are
       // not necessarily disjunct. Hence, there are as many calls as there are subgroups. All processes not belonging
-      // to the subgroup currently created call the MPI_Comm_create() function with a dummy communicator and the
-      // special group MPI_GROUP_EMPTY.
+      // to the subgroup currently created call the MPI_Comm_create() function with a with dummy communicator and
+      // dummy group.
 
       _subgroups.resize(_num_subgroups, nullptr);
       for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
@@ -583,15 +583,28 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         else
         {
           // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
-          // will deadlock), so let all processes that are not part of the current work group call it with special
-          // MPI_GROUP_EMPTY and dummy communicator.
+          // will deadlock), so let all processes that are not part of the current work group call it with dummy
+          // communicator and dummy group.  (The dummy group is necessary here since the other MPI_Group object is
+          // hidden inside the ProcessSubgroup constructor above.)
           MPI_Comm dummy_comm;
-          mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+          MPI_Group dummy_group;
+          int rank_aux = _process_group->rank();
+          int mpi_error_code = MPI_Group_incl(_process_group->group(), 1, &rank_aux, &dummy_group);
+          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+          mpi_error_code = MPI_Comm_create(_process_group->comm(), dummy_group, &dummy_comm);
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
 
+          // COMMENT_HILMAR: First, I used this simpler version:
+          //   mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that
+          // is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
+
           // Within the ProcessSubgroup constructor, another MPI communicator is created. So, do another dummy call.
-          mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
+          mpi_error_code = MPI_Comm_create(_process_group->comm(), dummy_group, &dummy_comm);
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+
+          MPI_Comm_free(&dummy_comm);
+          MPI_Group_free(&dummy_group);
         }
       } // for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
