@@ -9,13 +9,13 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/base_mesh_vertex.hpp>
-#include <kernel/base_mesh_cell.hpp>
-#include <kernel/base_mesh_cell_1d_edge.hpp>
-#include <kernel/base_mesh_cell_2d_tri.hpp>
-#include <kernel/base_mesh_cell_2d_quad.hpp>
-#include <kernel/base_mesh_cell_3d_tetra.hpp>
-#include <kernel/base_mesh_cell_3d_hexa.hpp>
+#include <kernel/base_mesh/vertex.hpp>
+#include <kernel/base_mesh/cell.hpp>
+#include <kernel/base_mesh/cell_1d_edge.hpp>
+#include <kernel/base_mesh/cell_2d_tri.hpp>
+#include <kernel/base_mesh/cell_2d_quad.hpp>
+#include <kernel/base_mesh/cell_3d_tetra.hpp>
+#include <kernel/base_mesh/cell_3d_hexa.hpp>
 
 namespace FEAST
 {

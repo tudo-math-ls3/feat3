@@ -9,7 +9,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/base_mesh_item.hpp>
+#include <kernel/base_mesh/item.hpp>
 
 namespace FEAST
 {

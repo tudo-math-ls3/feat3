@@ -11,9 +11,9 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string_utils.hpp>
-#include <kernel/base_mesh_cell_data.hpp>
-#include <kernel/base_mesh_cell.hpp>
-#include <kernel/base_mesh_vertex.hpp>
+#include <kernel/base_mesh/cell_data.hpp>
+#include <kernel/base_mesh/cell.hpp>
+#include <kernel/base_mesh/vertex.hpp>
 
 namespace FEAST
 {
