@@ -317,313 +317,313 @@ namespace FEAST
     Graph* _graph;
 
 
-    /* *****************
-    * member functions *
-    *******************/
-    /// reads (currently, basically skips) FEAST_GEOM and FEAST_FGEOM parts
-    void parse_geom(FileReaderASCII * meshfile)
-    {
-      for (unsigned int i = 0 ; i < 2 ; ++i)
-      {
-        // header
-        if (i==0)
-          meshfile->read("FEAST_GEOM");
-        else
-          meshfile->read("FEAST_FGEOM");
-        meshfile->read("2D");
-        int version_major;
-        meshfile->read(version_major);
-        int version_minor;
-        meshfile->read(version_minor);
-
-        // number of boundary components
-        unsigned int num_boundaries;
-        meshfile->read(num_boundaries);
-
-        // loop over boundary components
-        for (unsigned int ibc=0; ibc<num_boundaries; ++ibc)
-        {
-          unsigned int num_segments;
-          meshfile->read(num_segments);
-          for (unsigned int iseg = 0 ; iseg < num_segments ; ++iseg)
-          {
-            int seg_type;
-            meshfile->read(seg_type);
-            switch (seg_type)
-            {
-              case 0: // line: skip three lines
-                meshfile->skip_line();
-                meshfile->skip_line();
-                meshfile->skip_line();
-                break;
-              case 1: // circle: skip four lines
-                meshfile->skip_line();
-                meshfile->skip_line();
-                meshfile->skip_line();
-                meshfile->skip_line();
-                break;
-              default:
-                throw InternalError("Unknown boundary type found.");
-                break;
-            }
-          }
-        }
-      }
-    } // parse_geom()
-
-    /// reads MESH portion of FEAST files into this BaseMesh
-    void parse_mesh(FileReaderASCII * meshfile)
-    {
-      // header
-      meshfile->read("FEAST_MESH");
-      meshfile->read("2D");
-      int version_major;
-      meshfile->read(version_major);
-      int version_minor;
-      meshfile->read(version_minor);
-      int type;
-      meshfile->read(type);
-      // number of entities
-      unsigned int num_nodes;
-      meshfile->read(num_nodes);
-      meshfile->read(_num_cells);
-      unsigned int num_edges;
-      meshfile->read(num_edges);
-      // std::cout << num_nodes << " " << num_edges << " " << _num_cells << std::endl;
-
-      // nodes
-      for (unsigned int inode = 0 ; inode < num_nodes ; ++inode)
-      {
-        double x, y;
-        unsigned int type;
-        meshfile->read(x,y,type);
-        //std::cout << "skipping node " << x << " " << y << " " << type << std::endl;
-      }
-
-      // edges
-      for (unsigned int iedge = 0 ; iedge < num_edges ; ++iedge)
-      {
-        unsigned int n1,n2;
-        meshfile->read(n1,n2);
-        //std::cout << "skipping edge " << n1 << " " << n2 << std::endl;
-      }
-
-      // cells. Idea: First allocate everything ...
-      for (unsigned int icell = 0 ; icell < _num_cells ; ++icell)
-      {
-        BaseMeshCell * c = new BaseMeshCell2D(icell);
-        _cells.push_back(c);
-      }
-      // ... and then fill with actual data
-      for (unsigned int icell = 0 ; icell < _num_cells ; ++icell)
-      {
-        // type of this cell
-        unsigned int type;
-        meshfile->read(type);
-        switch(type)
-        {
-          case BaseMeshCell::TYPE_2D_Q1_TP:
-          {
-            _cells.at(icell)->set_type(type);
-            // skip node indices
-            unsigned int n1,n2,n3,n4;
-            meshfile->read(n1,n2,n3,n4);
-            //std::cout << "Nodes: " << n1 << " "<< n2 << " " << n3 << " " << n4 << std::endl;
-            // skip edge indices
-            unsigned int e1,e2,e3,e4;
-            meshfile->read(e1,e2,e3,e4);
-            // read edge neighbours (note the special case, only in preparation for 3D)
-            int en[4];
-            meshfile->read(en[0], en[1], en[2], en[3]);
-            //std::cout << "EN: " << en[0] << " "<< en[1] << " " << en[2] << " " << en[3] << std::endl;
-            for (unsigned int i = 0 ; i < 4 ; ++i)
-            {
-              if (en[i] > 0)
-              {
-                _cells.at(icell)->add_neighbour(1, _cells.at(en[i]-1));
-              }
-              else
-              {
-                int num_extra = abs(en[i]);
-                switch(num_extra)
-                {
-                  case 1:
-                  {
-                    int i1;
-                    meshfile->read(i1);
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
-                    break;
-                  }
-                  case 2:
-                  {
-                    int i1,i2;
-                    meshfile->read(i1, i2);
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
-                    break;
-                  }
-                  case 3:
-                  {
-                    int i1,i2, i3;
-                    meshfile->read(i1, i2, i3);
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i3-1));
-                    break;
-                  }
-                  case 4:
-                  {
-                    int i1,i2,i3,i4;
-                    meshfile->read(i1, i2, i3, i4);
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i3-1));
-                    _cells.at(icell)->add_neighbour(1, _cells.at(i4-1));
-                    break;
-                  }
-                }
-              } // switch (num_extra)
-            } // for-loop over edge neighbours
-
-            // read point neighbours (note the special case)
-            int pn[4];
-            meshfile->read(pn[0], pn[1], pn[2], pn[3]);
-            for (unsigned int i = 0 ; i < 4 ; ++i)
-            {
-              if (pn[i] > 0)
-                _cells.at(icell)->add_neighbour(0, _cells.at(pn[i]-1));
-              else
-              {
-                int num_extra = abs(pn[i]);
-                switch(num_extra)
-                {
-                  case 1:
-                  {
-                    int i1;
-                    meshfile->read(i1);
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
-                    break;
-                  }
-                  case 2:
-                  {
-                    int i1,i2;
-                    meshfile->read(i1, i2);
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
-                    break;
-                  }
-                  case 3:
-                  {
-                    int i1,i2, i3;
-                    meshfile->read(i1, i2, i3);
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i3-1));
-                    break;
-                  }
-                  case 4:
-                  {
-                    int i1,i2,i3,i4;
-                    meshfile->read(i1, i2, i3, i4);
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i3-1));
-                    _cells.at(icell)->add_neighbour(0, _cells.at(i4-1));
-                    break;
-                  }
-                }
-              }
-            } // loop over point neighbours
-            // finally, skip the line with refinement level etc.
-            int ref_level, ref_mode;
-            double ref_factor1, ref_factor2, ref_factor3;
-            meshfile->read(ref_level, ref_mode, ref_factor1, ref_factor2, ref_factor3);
-            // and continue with next cell
-            break;
-          }
-          default:
-            throw InternalError("Unknown cell type <" + StringUtils::stringify(type) + "> found.");
-        }
-      }
-    } // parse_mesh
-
-    /// parses partition part of FEAST files
-    void parse_partition(FileReaderASCII * meshfile)
-    {
-      // header
-      meshfile->read("FEAST_PART");
-      meshfile->read("2D");
-      int version_major;
-      meshfile->read(version_major);
-      int version_minor;
-      meshfile->read(version_minor);
-      // number of entities
-      unsigned int num_cells;
-      meshfile->read(num_cells);
-      if (num_cells != _num_cells)
-        throw InternalError("Number of BaseMeshCells from mesh file does not match that of partition file.");
-      meshfile->read(_num_partitions);
-      // TODO: THIS IS A HACK UNTIL HILMAR AND I DECIDE WHAT DTO DO WITH THE BASEMESH
-      if (_num_cells != _num_partitions)
-        throw InternalError("Sorry. Hilmar and Dominik currently only support one basemeshcell per process.");
-
-      // cells
-      for (unsigned int icell = 0 ; icell < _num_cells; ++icell)
-      {
-        unsigned int pb, mb;
-        meshfile->read(pb, mb);
-        _cells.at(icell)->set_parallel_block(pb-1);
-        _cells.at(icell)->set_matrix_block(mb-1);
-      }
-    }
-
-    /// creates connectivity graph from information stored in this BaseMesh
-    void create_graph()
-    {
-      // allocate index array
-      unsigned int* index = new unsigned int[_num_cells+1];
-
-      // graph data structure is filled by two sweeps through the cell list
-      // first sweep: count neighbours of each cell, and maintain running total to fill index array
-      // treat last index entry separately because cell array has one less entry than index array
-      unsigned int num_neighbours_so_far = 0;
-      for (unsigned int icell=0 ; icell < _num_cells ; ++icell)
-      {
-        // set neighbours counted so far to current cell
-        index[icell] = num_neighbours_so_far;
-        //std::cout << "Setting index[" << icell << "] = " << num_neighbours_so_far << std::endl;
-        // count neighbours (dimension-1 downto dimension=0 aka point-neighbours)
-        for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
-        {
-          num_neighbours_so_far += (_cells.at(icell)->num_neighbours(dim));
-        }
-      }
-      index[_num_cells] = num_neighbours_so_far;
-      //std::cout << "Setting index[" << _num_cells << "] = " << num_neighbours_so_far << std::endl;
-
-      // second sweep through data structure
-      // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
-      // again, treat last loop instance separately
-      unsigned int* neighbours = new unsigned int[index[_num_cells]];
-      num_neighbours_so_far = 0;
-      for (unsigned int icell=0 ; icell < _num_cells ; icell++)
-        for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
-          for (unsigned int neigh = 0 ; neigh < _cells.at(icell)->num_neighbours(dim) ; ++neigh)
-          {
-            neighbours[num_neighbours_so_far] = _cells.at(icell)->get_neighbour(dim,neigh)->number();
-            //std::cout << "neighbours[" << num_neighbours_so_far << "] = " << neighbours[num_neighbours_so_far] << std::endl;
-            ++num_neighbours_so_far;
-          }
-
-      // now, create graph object
-      // temporarily, do not distinguish edge neighbours and diagonal neighbours
-      if (_graph != nullptr)
-      {
-        delete _graph;
-        _graph = nullptr;
-      }
-      _graph = new Graph(_num_cells, index, neighbours);
-    }
+//    /* *****************
+//    * member functions *
+//    *******************/
+//    /// reads (currently, basically skips) FEAST_GEOM and FEAST_FGEOM parts
+//    void parse_geom(FileReaderASCII * meshfile)
+//    {
+//      for (unsigned int i = 0 ; i < 2 ; ++i)
+//      {
+//        // header
+//        if (i==0)
+//          meshfile->read("FEAST_GEOM");
+//        else
+//          meshfile->read("FEAST_FGEOM");
+//        meshfile->read("2D");
+//        int version_major;
+//        meshfile->read(version_major);
+//        int version_minor;
+//        meshfile->read(version_minor);
+//
+//        // number of boundary components
+//        unsigned int num_boundaries;
+//        meshfile->read(num_boundaries);
+//
+//        // loop over boundary components
+//        for (unsigned int ibc=0; ibc<num_boundaries; ++ibc)
+//        {
+//          unsigned int num_segments;
+//          meshfile->read(num_segments);
+//          for (unsigned int iseg = 0 ; iseg < num_segments ; ++iseg)
+//          {
+//            int seg_type;
+//            meshfile->read(seg_type);
+//            switch (seg_type)
+//            {
+//              case 0: // line: skip three lines
+//                meshfile->skip_line();
+//                meshfile->skip_line();
+//                meshfile->skip_line();
+//                break;
+//              case 1: // circle: skip four lines
+//                meshfile->skip_line();
+//                meshfile->skip_line();
+//                meshfile->skip_line();
+//                meshfile->skip_line();
+//                break;
+//              default:
+//                throw InternalError("Unknown boundary type found.");
+//                break;
+//            }
+//          }
+//        }
+//      }
+//    } // parse_geom()
+//
+//    /// reads MESH portion of FEAST files into this BaseMesh
+//    void parse_mesh(FileReaderASCII * meshfile)
+//    {
+//      // header
+//      meshfile->read("FEAST_MESH");
+//      meshfile->read("2D");
+//      int version_major;
+//      meshfile->read(version_major);
+//      int version_minor;
+//      meshfile->read(version_minor);
+//      int type;
+//      meshfile->read(type);
+//      // number of entities
+//      unsigned int num_nodes;
+//      meshfile->read(num_nodes);
+//      meshfile->read(_num_cells);
+//      unsigned int num_edges;
+//      meshfile->read(num_edges);
+//      // std::cout << num_nodes << " " << num_edges << " " << _num_cells << std::endl;
+//
+//      // nodes
+//      for (unsigned int inode = 0 ; inode < num_nodes ; ++inode)
+//      {
+//        double x, y;
+//        unsigned int type;
+//        meshfile->read(x,y,type);
+//        //std::cout << "skipping node " << x << " " << y << " " << type << std::endl;
+//      }
+//
+//      // edges
+//      for (unsigned int iedge = 0 ; iedge < num_edges ; ++iedge)
+//      {
+//        unsigned int n1,n2;
+//        meshfile->read(n1,n2);
+//        //std::cout << "skipping edge " << n1 << " " << n2 << std::endl;
+//      }
+//
+//      // cells. Idea: First allocate everything ...
+//      for (unsigned int icell = 0 ; icell < _num_cells ; ++icell)
+//      {
+//        BaseMeshCell * c = new BaseMeshCell2D(icell);
+//        _cells.push_back(c);
+//      }
+//      // ... and then fill with actual data
+//      for (unsigned int icell = 0 ; icell < _num_cells ; ++icell)
+//      {
+//        // type of this cell
+//        unsigned int type;
+//        meshfile->read(type);
+//        switch(type)
+//        {
+//          case BaseMeshCell::TYPE_2D_Q1_TP:
+//          {
+//            _cells.at(icell)->set_type(type);
+//            // skip node indices
+//            unsigned int n1,n2,n3,n4;
+//            meshfile->read(n1,n2,n3,n4);
+//            //std::cout << "Nodes: " << n1 << " "<< n2 << " " << n3 << " " << n4 << std::endl;
+//            // skip edge indices
+//            unsigned int e1,e2,e3,e4;
+//            meshfile->read(e1,e2,e3,e4);
+//            // read edge neighbours (note the special case, only in preparation for 3D)
+//            int en[4];
+//            meshfile->read(en[0], en[1], en[2], en[3]);
+//            //std::cout << "EN: " << en[0] << " "<< en[1] << " " << en[2] << " " << en[3] << std::endl;
+//            for (unsigned int i = 0 ; i < 4 ; ++i)
+//            {
+//              if (en[i] > 0)
+//              {
+//                _cells.at(icell)->add_neighbour(1, _cells.at(en[i]-1));
+//              }
+//              else
+//              {
+//                int num_extra = abs(en[i]);
+//                switch(num_extra)
+//                {
+//                  case 1:
+//                  {
+//                    int i1;
+//                    meshfile->read(i1);
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+//                    break;
+//                  }
+//                  case 2:
+//                  {
+//                    int i1,i2;
+//                    meshfile->read(i1, i2);
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
+//                    break;
+//                  }
+//                  case 3:
+//                  {
+//                    int i1,i2, i3;
+//                    meshfile->read(i1, i2, i3);
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i3-1));
+//                    break;
+//                  }
+//                  case 4:
+//                  {
+//                    int i1,i2,i3,i4;
+//                    meshfile->read(i1, i2, i3, i4);
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i1-1));
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i2-1));
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i3-1));
+//                    _cells.at(icell)->add_neighbour(1, _cells.at(i4-1));
+//                    break;
+//                  }
+//                }
+//              } // switch (num_extra)
+//            } // for-loop over edge neighbours
+//
+//            // read point neighbours (note the special case)
+//            int pn[4];
+//            meshfile->read(pn[0], pn[1], pn[2], pn[3]);
+//            for (unsigned int i = 0 ; i < 4 ; ++i)
+//            {
+//              if (pn[i] > 0)
+//                _cells.at(icell)->add_neighbour(0, _cells.at(pn[i]-1));
+//              else
+//              {
+//                int num_extra = abs(pn[i]);
+//                switch(num_extra)
+//                {
+//                  case 1:
+//                  {
+//                    int i1;
+//                    meshfile->read(i1);
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+//                    break;
+//                  }
+//                  case 2:
+//                  {
+//                    int i1,i2;
+//                    meshfile->read(i1, i2);
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
+//                    break;
+//                  }
+//                  case 3:
+//                  {
+//                    int i1,i2, i3;
+//                    meshfile->read(i1, i2, i3);
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i3-1));
+//                    break;
+//                  }
+//                  case 4:
+//                  {
+//                    int i1,i2,i3,i4;
+//                    meshfile->read(i1, i2, i3, i4);
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i1-1));
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i2-1));
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i3-1));
+//                    _cells.at(icell)->add_neighbour(0, _cells.at(i4-1));
+//                    break;
+//                  }
+//                }
+//              }
+//            } // loop over point neighbours
+//            // finally, skip the line with refinement level etc.
+//            int ref_level, ref_mode;
+//            double ref_factor1, ref_factor2, ref_factor3;
+//            meshfile->read(ref_level, ref_mode, ref_factor1, ref_factor2, ref_factor3);
+//            // and continue with next cell
+//            break;
+//          }
+//          default:
+//            throw InternalError("Unknown cell type <" + StringUtils::stringify(type) + "> found.");
+//        }
+//      }
+//    } // parse_mesh
+//
+//    /// parses partition part of FEAST files
+//    void parse_partition(FileReaderASCII * meshfile)
+//    {
+//      // header
+//      meshfile->read("FEAST_PART");
+//      meshfile->read("2D");
+//      int version_major;
+//      meshfile->read(version_major);
+//      int version_minor;
+//      meshfile->read(version_minor);
+//      // number of entities
+//      unsigned int num_cells;
+//      meshfile->read(num_cells);
+//      if (num_cells != _num_cells)
+//        throw InternalError("Number of BaseMeshCells from mesh file does not match that of partition file.");
+//      meshfile->read(_num_partitions);
+//      // TODO: THIS IS A HACK UNTIL HILMAR AND I DECIDE WHAT DTO DO WITH THE BASEMESH
+//      if (_num_cells != _num_partitions)
+//        throw InternalError("Sorry. Hilmar and Dominik currently only support one basemeshcell per process.");
+//
+//      // cells
+//      for (unsigned int icell = 0 ; icell < _num_cells; ++icell)
+//      {
+//        unsigned int pb, mb;
+//        meshfile->read(pb, mb);
+//        _cells.at(icell)->set_parallel_block(pb-1);
+//        _cells.at(icell)->set_matrix_block(mb-1);
+//      }
+//    }
+//
+//    /// creates connectivity graph from information stored in this BaseMesh
+//    void create_graph()
+//    {
+//      // allocate index array
+//      unsigned int* index = new unsigned int[_num_cells+1];
+//
+//      // graph data structure is filled by two sweeps through the cell list
+//      // first sweep: count neighbours of each cell, and maintain running total to fill index array
+//      // treat last index entry separately because cell array has one less entry than index array
+//      unsigned int num_neighbours_so_far = 0;
+//      for (unsigned int icell=0 ; icell < _num_cells ; ++icell)
+//      {
+//        // set neighbours counted so far to current cell
+//        index[icell] = num_neighbours_so_far;
+//        //std::cout << "Setting index[" << icell << "] = " << num_neighbours_so_far << std::endl;
+//        // count neighbours (dimension-1 downto dimension=0 aka point-neighbours)
+//        for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
+//        {
+//          num_neighbours_so_far += (_cells.at(icell)->num_neighbours(dim));
+//        }
+//      }
+//      index[_num_cells] = num_neighbours_so_far;
+//      //std::cout << "Setting index[" << _num_cells << "] = " << num_neighbours_so_far << std::endl;
+//
+//      // second sweep through data structure
+//      // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
+//      // again, treat last loop instance separately
+//      unsigned int* neighbours = new unsigned int[index[_num_cells]];
+//      num_neighbours_so_far = 0;
+//      for (unsigned int icell=0 ; icell < _num_cells ; icell++)
+//        for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
+//          for (unsigned int neigh = 0 ; neigh < _cells.at(icell)->num_neighbours(dim) ; ++neigh)
+//          {
+//            neighbours[num_neighbours_so_far] = _cells.at(icell)->get_neighbour(dim,neigh)->number();
+//            //std::cout << "neighbours[" << num_neighbours_so_far << "] = " << neighbours[num_neighbours_so_far] << std::endl;
+//            ++num_neighbours_so_far;
+//          }
+//
+//      // now, create graph object
+//      // temporarily, do not distinguish edge neighbours and diagonal neighbours
+//      if (_graph != nullptr)
+//      {
+//        delete _graph;
+//        _graph = nullptr;
+//      }
+//      _graph = new Graph(_num_cells, index, neighbours);
+//    }
 
 
   public:
@@ -686,37 +686,37 @@ namespace FEAST
         _cells.at(i)->print();
     }
 
-    /// Reads given FEAST-V3-inline file and parses its contents into this BaseMesh
-    void read_mesh(const std::string& filename)
-    {
-      FileReaderASCII * meshfile = new FileReaderASCII(filename, '#', true);
-
-      // file header
-      meshfile->read("FEAST");
-      meshfile->read("2D");
-      int version_major;
-      meshfile->read(version_major);
-      int version_minor;
-      meshfile->read(version_minor);
-      if (version_major != 3 && version_minor != 0)
-        throw InternalError("Only file format 3.0 (inline) is currently supported");
-      meshfile->read(_description);
-
-      // remaining parts of this file
-      parse_geom(meshfile);
-      parse_mesh(meshfile);
-      parse_partition(meshfile);
-      // HACK: do not read in FEAST_BC and FEAST_PROP, instead, just close the file and get on with life
-
-      // clean up file reader
-      delete meshfile;
-
-      // debug
-      print();
-
-      // and convert to Graph structure
-      create_graph();
-    }
+//    /// Reads given FEAST-V3-inline file and parses its contents into this BaseMesh
+//    void read_mesh(const std::string& filename)
+//    {
+//      FileReaderASCII * meshfile = new FileReaderASCII(filename, '#', true);
+//
+//      // file header
+//      meshfile->read("FEAST");
+//      meshfile->read("2D");
+//      int version_major;
+//      meshfile->read(version_major);
+//      int version_minor;
+//      meshfile->read(version_minor);
+//      if (version_major != 3 && version_minor != 0)
+//        throw InternalError("Only file format 3.0 (inline) is currently supported");
+//      meshfile->read(_description);
+//
+//      // remaining parts of this file
+//      parse_geom(meshfile);
+//      parse_mesh(meshfile);
+//      parse_partition(meshfile);
+//      // HACK: do not read in FEAST_BC and FEAST_PROP, instead, just close the file and get on with life
+//
+//      // clean up file reader
+//      delete meshfile;
+//
+//      // debug
+//      print();
+//
+//      // and convert to Graph structure
+//      create_graph();
+//    }
 
     /**
     * \brief Hilmar's debug utility routine
@@ -809,7 +809,6 @@ namespace FEAST
       _graph->print();
     }
   }; // class BaseMesh
-
 } // namespace FEAST
 
 #endif // guard KERNEL_BASE_MESH_HPP

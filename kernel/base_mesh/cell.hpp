@@ -504,6 +504,11 @@ namespace FEAST
           std::cerr << e->message() << std::endl;
           exit(1);
         }
+// COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
+//        catch (Exception& e)
+//        {
+//          ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
+//        }
       }
 
       inline void print_history(std::ostream& stream)

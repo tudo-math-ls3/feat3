@@ -64,7 +64,7 @@ namespace FEAST
       * TODO: This code is replicated in all base_mesh_xD classes since there is no generic class to inherit from
       */
       template<typename T_>
-      inline void remove(std::vector<T_>& v, T_ item)
+      inline void _remove(std::vector<T_>& v, T_ item)
       {
         assert(item->index() < v.size());
         v[item->index()] = v.back();
@@ -75,25 +75,88 @@ namespace FEAST
         v.pop_back();
       }
 
+
+      /// adds given vertex to base mesh and sets its index
+      inline void _add(Vertex_* v)
+      {
+        _vertices.push_back(v);
+        v->set_index(_vertices.size()-1);
+      }
+
+
+      /// adds given edge to base mesh and sets its index
+      inline void _add(Cell_1D_* e)
+      {
+        _edges.push_back(e);
+        e->set_index(_edges.size()-1);
+      }
+
+
+      /// adds given cell to base mesh and sets its index
+      inline void _add(Cell_* c)
+      {
+        _cells.push_back(c);
+        c->set_index(_cells.size()-1);
+      }
+
+
+      /// deletes given vertex
+      inline void _remove(Vertex_* v)
+      {
+        _remove<Vertex_*>(_vertices, v);
+      }
+
+
+      /// deletes given edge
+      inline void _remove(Cell_1D_* e)
+      {
+        _remove<Cell_1D_*>(_edges, e);
+      }
+
+
+      /// deletes given cell
+      inline void _remove(Cell_* c)
+      {
+        _remove<Cell_*>(_cells, c);
+      }
+
+
     public:
+
+      // Parsing of the mesh files is outsourced to class FileParser2D. Make this class friend such that it has
+      // access to private members of BaseMesh2D.
+      friend class FileParser2D;
 
       /* ***************************
       * constructors & destructors *
       *****************************/
-      /// default CTOR, currently generates a test mesh
+
+      /**
+      * \brief  default CTOR for a 2D base mesh
+      *
+      * Ceates a base mesh basing on the provided mesh file.
+      *
+      * \param[in] file_name
+      * name of the mesh file
+      */
       BaseMesh2D()
       {
-        /* Base mesh example consisting of three quads and two tris:
-        *    v0---e0---v1---e1---v2 \.
-        *    |          |         |    \.
-        *   e2    c0   e3   c1   e4  c2  \ e5
-        *    |          |         |         \.
-        *    v3---e6---v4---e7---v5----e8---v6
-        *                      /  |         |
-        *                  e9/ c3 e10  c4  e11
-        *                /        |         |
-        *              v7---e12--v8---e13---v9
-        */
+      }
+
+/*
+      /// test CTOR, generates a hard-wired test mesh
+      BaseMesh2D()
+      {
+        // Base mesh example consisting of three quads and two tris:
+        //    v0---e0---v1---e1---v2 \.
+        //    |          |         |    \.
+        //   e2    c0   e3   c1   e4  c2  \ e5
+        //    |          |         |         \.
+        //    v3---e6---v4---e7---v5----e8---v6
+        //                      /  |         |
+        //                  e9/ c3 e10  c4  e11
+        //                /        |         |
+        //              v7---e12--v8---e13---v9
 
         // create the ten vertices
         // v0
@@ -247,6 +310,7 @@ namespace FEAST
         _cells[4]->add_neighbour(SDIM_EDGE, 2, _cells[3]);
         _cells[4]->add_neighbour(SDIM_VERTEX, 2, _cells[1]);
       }
+*/
 
       /// default destructor
       ~BaseMesh2D()
@@ -287,6 +351,7 @@ namespace FEAST
         return _vertices.size();
       }
 
+
       /// returns number of edges in this mesh
       inline global_index_t num_edges() const
       {
@@ -295,21 +360,23 @@ namespace FEAST
         return _edges.size();
       }
 
+
       /// returns number of cells in this mesh (this is potentially expensive)
       inline global_index_t num_cells() const
       {
         // TODO: nochmal implementieren, wenn inaktive immer schoen ans Ende geschoben werden und es einen index gibt,
         // der die Position des letzten aktiven merkt
         global_index_t counter = 0;
-        for (global_index_t i(0) ; i < _cells.size() ; ++i)
+        for(global_index_t i(0) ; i < _cells.size() ; ++i)
         {
-          if (_cells[i]->active())
+          if(_cells[i]->active())
           {
             counter++;
           }
         }
         return counter;
       }
+
 
       /// returns vertex at given index
       inline Vertex_* vertex(global_index_t const index)
@@ -318,12 +385,14 @@ namespace FEAST
         return _vertices[index];
       }
 
+
       /// returns edge at given index
       inline Cell_1D_* edge(global_index_t const index)
       {
         assert(index < _edges.size());
         return _edges[index];
       }
+
 
       /// returns cell at given index
       inline Cell_* cell(global_index_t const index) const
@@ -332,74 +401,84 @@ namespace FEAST
         return _cells[index];
       }
 
-      /// adds given vertex to base mesh and sets its index
-      inline void add(Vertex_* v)
-      {
-        _vertices.push_back(v);
-        v->set_index(_vertices.size()-1);
-      }
-
-      /// adds given edge to base mesh and sets its index
-      inline void add(Cell_1D_* e)
-      {
-        _edges.push_back(e);
-        e->set_index(_edges.size()-1);
-      }
-
-      /// adds given cell to base mesh and sets its index
-      inline void add(Cell_* c)
-      {
-        _cells.push_back(c);
-        c->set_index(_cells.size()-1);
-      }
-
-      /// deletes given vertex
-      inline void remove(Vertex_* v)
-      {
-        remove<Vertex_*>(_vertices, v);
-      }
-
-      /// deletes given edge
-      inline void remove(Cell_1D_* e)
-      {
-        remove<Cell_1D_*>(_edges, e);
-      }
-
-      /// deletes given cell
-      inline void remove(Cell_* c)
-      {
-        remove<Cell_*>(_cells, c);
-      }
 
       inline void add_created_items(SubdivisionData<2, 2, world_dim_>* subdiv_data)
       {
         for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
         {
-          add(subdiv_data->created_vertices[i]);
+          _add(subdiv_data->created_vertices[i]);
         }
         for(unsigned int i(0) ; i < subdiv_data->created_edges.size() ; ++i)
         {
-          add(subdiv_data->created_edges[i]);
+          _add(subdiv_data->created_edges[i]);
         }
         for(unsigned int i(0) ; i < subdiv_data->created_cells.size() ; ++i)
         {
-          add(subdiv_data->created_cells[i]);
+          _add(subdiv_data->created_cells[i]);
         }
       }
 
+
+//      /// creates connectivity graph from information stored in this BaseMesh
+//      void create_graph()
+//      {
+//        // allocate index array
+//        unsigned int* index = new unsigned int[_num_cells+1];
+//
+//        // graph data structure is filled by two sweeps through the cell list
+//        // first sweep: count neighbours of each cell, and maintain running total to fill index array
+//        // treat last index entry separately because cell array has one less entry than index array
+//        unsigned int num_neighbours_so_far = 0;
+//        for (unsigned int icell=0 ; icell < _num_cells ; ++icell)
+//        {
+//          // set neighbours counted so far to current cell
+//          index[icell] = num_neighbours_so_far;
+//          //std::cout << "Setting index[" << icell << "] = " << num_neighbours_so_far << std::endl;
+//          // count neighbours (dimension-1 downto dimension=0 aka point-neighbours)
+//          for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
+//          {
+//            num_neighbours_so_far += (_cells.at(icell)->num_neighbours(dim));
+//          }
+//        }
+//        index[_num_cells] = num_neighbours_so_far;
+//        //std::cout << "Setting index[" << _num_cells << "] = " << num_neighbours_so_far << std::endl;
+//
+//        // second sweep through data structure
+//        // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
+//        // again, treat last loop instance separately
+//        unsigned int* neighbours = new unsigned int[index[_num_cells]];
+//        num_neighbours_so_far = 0;
+//        for (unsigned int icell=0 ; icell < _num_cells ; icell++)
+//          for (unsigned int dim = 0 ; dim < _cells.at(icell)->dimension() ; ++dim)
+//            for (unsigned int neigh = 0 ; neigh < _cells.at(icell)->num_neighbours(dim) ; ++neigh)
+//            {
+//              neighbours[num_neighbours_so_far] = _cells.at(icell)->get_neighbour(dim,neigh)->number();
+//              //std::cout << "neighbours[" << num_neighbours_so_far << "] = " << neighbours[num_neighbours_so_far] << std::endl;
+//              ++num_neighbours_so_far;
+//            }
+//
+//        // now, create graph object
+//        // temporarily, do not distinguish edge neighbours and diagonal neighbours
+//        if (_graph != nullptr)
+//        {
+//          delete _graph;
+//          _graph = nullptr;
+//        }
+//        _graph = new Graph(_num_cells, index, neighbours);
+//      }
 
       /// validates the base mesh and all of its cells
       void validate() const
       {
         std::cout << "Validating cells..." << std::endl;
 // COMMENT_HILMAR: I thought, iterators were simple to use, i.e. like this:
-//        for (std::vector<Cell_*>::iterator it = _cells.begin() ; it != _cells.end() ; ++it)
+//        for(std::vector<Cell_*>::iterator it = _cells.begin() ; it != _cells.end() ; ++it)
 //        {
 //          it->validate();
 //        }
 // But that seems not to be the case... :-(
 // So, I use a standard counter for the for loop.
-        for (unsigned int icell(0) ; icell < _cells.size() ; ++icell)
+        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
           cell(icell)->validate();
         }
@@ -425,19 +504,19 @@ namespace FEAST
         stream << "|               DUMPING BASE MESH                  " << std::endl;
         stream << "---------------------------------------------------" << std::endl;
         stream << _vertices.size() <<" vertices:" << std::endl;
-        for (unsigned int ivert(0) ; ivert < _vertices.size() ; ++ivert)
+        for(unsigned int ivert(0) ; ivert < _vertices.size() ; ++ivert)
         {
           _vertices[ivert]->print(stream);
           stream << std::endl;
         }
         stream << _edges.size() << " edges" << std::endl;
-        for (unsigned int iedge(0) ; iedge < _edges.size() ; ++iedge)
+        for(unsigned int iedge(0) ; iedge < _edges.size() ; ++iedge)
         {
           _edges[iedge]->print(stream);
           stream << std::endl;
         }
         stream << _cells.size() << " cells" << std::endl;
-        for (unsigned int icell(0) ; icell < _cells.size() ; ++icell)
+        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
           _cells[icell]->print(stream);
           stream << std::endl;
