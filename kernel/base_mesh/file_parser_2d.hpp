@@ -6,6 +6,7 @@
 #include <iostream> // for std::ostream
 #include <cassert>  // for assert()
 //#include <vector>   // for std::vector
+#include <math.h>   // for sin, cos
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -59,12 +60,16 @@ namespace FEAST
       unsigned int _num_boundaries;
       /// array for storing number of segments per boundary
       unsigned int* _num_segments;
-      /// cartesian coordinates of the segments' start vertices
+      /// array for storing the segment types (line or circle)
+      unsigned int** _segment_type;
+      /// cartesian coordinates of the segments' start vertices, in case of circles: centre
       double*** _start_vertex;
-      /// the segments' vectors from start vertex to the next vertex
+      /// the segments' vectors from start vertex to the next vertex, in case of circles: radius + dummy
       double*** _vector_to_end_vertex;
       /// the segments' start and end parameter values
       double*** _param_int;
+      /// the segments' start and end angle in case of circle sections
+      double*** _circle_section;
 
       /// number of vertices
       unsigned int _num_vertices;
@@ -88,21 +93,27 @@ namespace FEAST
 
         // allocate arrays
         _num_segments = new unsigned int[_num_boundaries];
+        _segment_type = new unsigned int*[_num_boundaries];
         _param_int = new double**[_num_boundaries];
         _start_vertex = new double**[_num_boundaries];
         _vector_to_end_vertex = new double**[_num_boundaries];
+        _circle_section = new double**[_num_boundaries];
 
         // loop over boundary components
         for(unsigned int ibc(0) ; ibc < _num_boundaries ; ++ibc)
         {
           // read number of segments
           mesh_file->read(_num_segments[ibc]);
-          // cartesian coordinates of the segments' start vertices
+          // segment type
+          _segment_type[ibc] = new unsigned int[_num_segments[ibc]];
+          // cartesian coordinates of the segments' start vertices, in case of circles: centre
           _start_vertex[ibc] = new double*[_num_segments[ibc]];
-          // the segments' vectors from start vertex to the next vertex
+          // the segments' vectors from start vertex to the next vertex, in case of circles: radius + dummy
           _vector_to_end_vertex[ibc] = new double*[_num_segments[ibc]];
           // the segments' start and end parameter values
           _param_int[ibc] = new double*[_num_segments[ibc]];
+          // start and end angle of circle section
+          _circle_section[ibc] = new double*[_num_segments[ibc]];
 
           for(unsigned int iseg(0) ; iseg < _num_segments[ibc] ; ++iseg)
           {
@@ -110,10 +121,9 @@ namespace FEAST
             _vector_to_end_vertex[ibc][iseg] = new double[2];
             _param_int[ibc][iseg] = new double[2];
             // read segment type
-            int seg_type;
-            mesh_file->read(seg_type);
-std::cout << "segment " << iseg << ", type " << seg_type << std::endl;
-            switch(seg_type)
+            mesh_file->read(_segment_type[ibc][iseg]);
+std::cout << "segment " << iseg << ", type " << _segment_type[ibc][iseg] << std::endl;
+            switch(_segment_type[ibc][iseg])
             {
               // line
               case 0:
@@ -132,7 +142,20 @@ std::cout << "param     : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc
               // circle
               case 1:
               {
-                throw InternalError("Circle segments are not supported in this file parser.");
+//                throw InternalError("Circle segments are not supported in this file parser.");
+                _circle_section[ibc][iseg] = new double[2];
+                // read centre
+                mesh_file->read(_start_vertex[ibc][iseg]);
+                // read radius and dummy
+                mesh_file->read(_vector_to_end_vertex[ibc][iseg]);
+                // read start and end angle
+                mesh_file->read(_circle_section[ibc][iseg]);
+                // read parameter values
+                mesh_file->read(_param_int[ibc][iseg]);
+std::cout << "centre : " << _start_vertex[ibc][iseg][0] << " " << _start_vertex[ibc][iseg][1] << std::endl;
+std::cout << "radius : " << _vector_to_end_vertex[ibc][iseg][0] << std::endl;
+std::cout << "section: " << _circle_section[ibc][iseg][0] << " " << _circle_section[ibc][iseg][1] << std::endl;
+std::cout << "param  : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc][iseg][1] << std::endl;
                 break;
               }
               default:
@@ -243,13 +266,36 @@ std::cout << "found inner vertex " << x << " " << y << std::endl;
               double pend = _param_int[ibc][iseg][1];
               if(x >= pstart && x <= pend)
               {
-                double denom = pend - pstart;
-                assert (denom > 0);
-                double factor = (x - pstart)/denom;
-                // interval found, compute cartesian coordinates
-                coords[0] = _start_vertex[ibc][iseg][0] + factor * _vector_to_end_vertex[ibc][iseg][0];
-                coords[1] = _start_vertex[ibc][iseg][1] + factor * _vector_to_end_vertex[ibc][iseg][1];
-std::cout << "found boundary vertex " << coords[0] << " " << coords[1] << std::endl;
+                // interval found, distinguish segment type
+                switch(_segment_type[ibc][iseg])
+                {
+                  // line segment
+                  case 0:
+                  {
+                    double denom = pend - pstart;
+                    assert (denom > 0);
+                    double factor = (x - pstart)/denom;
+                    // compute cartesian coordinates
+                    coords[0] = _start_vertex[ibc][iseg][0] + factor * _vector_to_end_vertex[ibc][iseg][0];
+                    coords[1] = _start_vertex[ibc][iseg][1] + factor * _vector_to_end_vertex[ibc][iseg][1];
+std::cout << "found boundary vertex on line seg: " << coords[0] << " " << coords[1] << std::endl;
+                    break;
+                  }
+                  // circle segment
+                  case 1:
+                  {
+                    double radius = _vector_to_end_vertex[ibc][iseg][0];
+                    double denom = pend - pstart;
+                    assert (denom > 0);
+                    double angle = (  (pend - x)   * _circle_section[ibc][iseg][0]
+                                    + (x - pstart) * _circle_section[ibc][iseg][1])/denom;
+                    // compute cartesian coordinates
+                    coords[0] = _start_vertex[ibc][iseg][0] + radius * cos(angle);
+                    coords[1] = _start_vertex[ibc][iseg][1] + radius * sin(angle);
+std::cout << "found boundary vertex on circle seg: " << coords[0] << " " << coords[1] << std::endl;
+                  }
+                }
+                // interval found, exit for loop
                 break;
               }
             }
@@ -315,8 +361,8 @@ std::cout << "found boundary vertex " << coords[0] << " " << coords[1] << std::e
               {
                 e[iedge]--;
               }
-std::cout << "Vertices: " << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
-std::cout << "Edges   : " << e[0] << " "<< e[1] << " " << e[2] << " " << e[3] << std::endl;
+//std::cout << "Vertices: " << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
+//std::cout << "Edges   : " << e[0] << " "<< e[1] << " " << e[2] << " " << e[3] << std::endl;
 
               _bm->_add(new Quad_(_bm->vertex(v[0]), _bm->vertex(v[1]), _bm->vertex(v[2]), _bm->vertex(v[3]),
                                   _bm->edge(e[0]), _bm->edge(e[1]), _bm->edge(e[2]), _bm->edge(e[3]), 0));
@@ -329,7 +375,7 @@ std::cout << "Edges   : " << e[0] << " "<< e[1] << " " << e[2] << " " << e[3] <<
               {
                 eneigh[iedge]--;
               }
-std::cout << "edge neighs: " << eneigh[0] << " "<< eneigh[1] << " " << eneigh[2] << " " << eneigh[3] << std::endl;
+//std::cout << "edge neighs: " << eneigh[0] << " "<< eneigh[1] << " " << eneigh[2] << " " << eneigh[3] << std::endl;
 
               // set edge neighbourhood information
               for(unsigned int iedge = 0 ; iedge < nedges ; ++iedge)
@@ -366,11 +412,12 @@ std::cout << "edge neighs: " << eneigh[0] << " "<< eneigh[1] << " " << eneigh[2]
               // shilt:               v1, v3, v2, v0
               int vneigh[4];
               mesh_file->read(vneigh[1], vneigh[3], vneigh[2], vneigh[0]);
-std::cout << "vert neighs: " << vneigh[0]-1 << " "<< vneigh[1]-1 << " " << vneigh[2]-1 << " " << vneigh[3]-1 << std::endl;
+//std::cout << "vert neighs: ";
               for(unsigned int ivert = 0 ; ivert < nverts ; ++ivert)
               {
                 if(vneigh[ivert] > 0)
                 {
+//std::cout << vneigh[ivert]-1 << " ";
                   if((unsigned int)vneigh[ivert]-1 < icell)
                   {
                     // when the index of the neighbour cell is less than that of the current cell, the neighbour cell
@@ -387,9 +434,9 @@ std::cout << "vert neighs: " << vneigh[0]-1 << " "<< vneigh[1]-1 << " " << vneig
                 }
                 else if(vneigh[ivert] < 0)
                 {
+//std::cout << "[";
                   // special case: negative number means several vertex neighbours
-// COMMENT_HILMAR: this branch is not tested yet!
-                  unsigned int num_extra = abs(vneigh[ivert]);
+                  unsigned int num_extra = -vneigh[ivert];
                   int* vdneigh = new int[num_extra];
                   // lacking a proper "line tokeniser", perform this intermediate hack
                   switch(num_extra)
@@ -421,6 +468,7 @@ std::cout << "vert neighs: " << vneigh[0]-1 << " "<< vneigh[1]-1 << " " << vneig
                   }
                   for(unsigned int ineigh = 0 ; ineigh < num_extra ; ++ineigh)
                   {
+//std::cout << vdneigh[ineigh]-1 << " ";
                     if((unsigned int)vdneigh[ineigh]-1 < icell)
                     {
                       // when the index of the neighbour cell is less than that of the current cell, the neighbour cell
@@ -435,9 +483,15 @@ std::cout << "vert neighs: " << vneigh[0]-1 << " "<< vneigh[1]-1 << " " << vneig
                       buffered_neighbourhood.push_back(buf);
                     }
                   }
+//std::cout << "] ";
                   delete [] vdneigh;
                 }
+//                else
+//                {
+//std::cout << "x ";
+//                }
               } // loop over point neighbours
+//std::cout << std::endl;
 
               // finally, skip the line with refinement level etc.
               int ref_level, ref_mode;
