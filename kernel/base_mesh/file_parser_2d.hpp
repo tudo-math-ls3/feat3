@@ -122,7 +122,7 @@ namespace FEAST
             _param_int[ibc][iseg] = new double[2];
             // read segment type
             mesh_file->read(_segment_type[ibc][iseg]);
-std::cout << "segment " << iseg << ", type " << _segment_type[ibc][iseg] << std::endl;
+//std::cout << "segment " << iseg << ", type " << _segment_type[ibc][iseg] << std::endl;
             switch(_segment_type[ibc][iseg])
             {
               // line
@@ -134,9 +134,9 @@ std::cout << "segment " << iseg << ", type " << _segment_type[ibc][iseg] << std:
                 mesh_file->read(_vector_to_end_vertex[ibc][iseg]);
                 // read parameter values
                 mesh_file->read(_param_int[ibc][iseg]);
-std::cout << "start vert: " << _start_vertex[ibc][iseg][0] << " " << _start_vertex[ibc][iseg][1] << std::endl;
-std::cout << "vector    : " << _vector_to_end_vertex[ibc][iseg][0] << " " << _vector_to_end_vertex[ibc][iseg][1] << std::endl;
-std::cout << "param     : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc][iseg][1] << std::endl;
+//std::cout << "start vert: " << _start_vertex[ibc][iseg][0] << " " << _start_vertex[ibc][iseg][1] << std::endl;
+//std::cout << "vector    : " << _vector_to_end_vertex[ibc][iseg][0] << " " << _vector_to_end_vertex[ibc][iseg][1] << std::endl;
+//std::cout << "param     : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc][iseg][1] << std::endl;
                 break;
               }
               // circle
@@ -152,10 +152,10 @@ std::cout << "param     : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc
                 mesh_file->read(_circle_section[ibc][iseg]);
                 // read parameter values
                 mesh_file->read(_param_int[ibc][iseg]);
-std::cout << "centre : " << _start_vertex[ibc][iseg][0] << " " << _start_vertex[ibc][iseg][1] << std::endl;
-std::cout << "radius : " << _vector_to_end_vertex[ibc][iseg][0] << std::endl;
-std::cout << "section: " << _circle_section[ibc][iseg][0] << " " << _circle_section[ibc][iseg][1] << std::endl;
-std::cout << "param  : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc][iseg][1] << std::endl;
+//std::cout << "centre : " << _start_vertex[ibc][iseg][0] << " " << _start_vertex[ibc][iseg][1] << std::endl;
+//std::cout << "radius : " << _vector_to_end_vertex[ibc][iseg][0] << std::endl;
+//std::cout << "section: " << _circle_section[ibc][iseg][0] << " " << _circle_section[ibc][iseg][1] << std::endl;
+//std::cout << "param  : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc][iseg][1] << std::endl;
                 break;
               }
               default:
@@ -250,7 +250,7 @@ std::cout << "param  : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc][i
           if(itype == 0)
           {
             // inner vertex
-std::cout << "found inner vertex " << x << " " << y << std::endl;
+//std::cout << "found inner vertex " << x << " " << y << std::endl;
             coords[0] = x;
             coords[1] = y;
           }
@@ -278,7 +278,7 @@ std::cout << "found inner vertex " << x << " " << y << std::endl;
                     // compute cartesian coordinates
                     coords[0] = _start_vertex[ibc][iseg][0] + factor * _vector_to_end_vertex[ibc][iseg][0];
                     coords[1] = _start_vertex[ibc][iseg][1] + factor * _vector_to_end_vertex[ibc][iseg][1];
-std::cout << "found boundary vertex on line seg: " << coords[0] << " " << coords[1] << std::endl;
+//std::cout << "found boundary vertex on line seg: " << coords[0] << " " << coords[1] << std::endl;
                     break;
                   }
                   // circle segment
@@ -292,7 +292,7 @@ std::cout << "found boundary vertex on line seg: " << coords[0] << " " << coords
                     // compute cartesian coordinates
                     coords[0] = _start_vertex[ibc][iseg][0] + radius * cos(angle);
                     coords[1] = _start_vertex[ibc][iseg][1] + radius * sin(angle);
-std::cout << "found boundary vertex on circle seg: " << coords[0] << " " << coords[1] << std::endl;
+//std::cout << "found boundary vertex on circle seg: " << coords[0] << " " << coords[1] << std::endl;
                   }
                 }
                 // interval found, exit for loop
