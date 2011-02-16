@@ -12,7 +12,10 @@
 #include <kernel/base_header.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
-#include <kernel/base_mesh.hpp>
+// COMMENT_HILMAR: Temporarily use only BaseMesh2D here! space_dim_ and world_dim_ templates are still completely
+// missing on load balancer / MPI prototype side.
+#include <kernel/base_mesh/file_parser_2d.hpp>
+#include <kernel/base_mesh/base_mesh_2d.hpp>
 
 namespace FEAST
 {
@@ -176,9 +179,10 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /**
     * \brief base mesh the load balancer works with
     *
-    * bla bla
+    * \note Temporarily use only BaseMesh2D here! space_dim_ and world_dim_ templates are still completely missing on
+    * load balancer / MPI prototype side.
     */
-    BaseMesh* _base_mesh;
+    BaseMesh::BaseMesh2D<2>* _base_mesh;
 
   public:
 
@@ -256,19 +260,23 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // the mesh is read by the process group coordinator
       if(_process_group->is_coordinator())
       {
-        _base_mesh = new BaseMesh();
-        // Hilmar's dummy routine
-        //_base_mesh->dummy_read_mesh();
-        // or Dominik's 'real' one
+        _base_mesh = new BaseMesh::BaseMesh2D<2>();
+        BaseMesh::FileParser2D parser;
         try
         {
           Logger::log_master("Reading mesh file " + mesh_file + "...\n", Logger::SCREEN_FILE);
-          _base_mesh->read_mesh(mesh_file);
+          parser.parse(mesh_file, _base_mesh);
         }
         catch (Exception& e)
         {
           ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
         }
+        // set cell numbers (equal to indices since all cells are active)
+        _base_mesh->set_cell_numbers();
+        // create base mesh's graph structure
+        _base_mesh->create_graph();
+        // print base mesh
+        _base_mesh->print(std::cout);
       }
     }
 

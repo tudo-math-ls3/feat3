@@ -574,12 +574,12 @@ COMMENT_HILMAR: will be adapted later
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
-      inline void parse(std::string const& file_name, BaseMesh2D<2>& bm)
+      inline void parse(std::string const& file_name, BaseMesh2D<2>* bm)
       {
         FileReaderASCII* mesh_file = new FileReaderASCII(file_name, '#', true);
 
         // set base mesh pointer
-        _bm = &bm;
+        _bm = bm;
 
         // file header
         mesh_file->read("FEAST");

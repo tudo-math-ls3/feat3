@@ -565,7 +565,7 @@ namespace FEAST
     /**
     * \brief sets local graph portions of a distributed graph
     *
-    * \note Currently, we do not distinguis between face-, edge- and vertex-neighbours. The graph structure
+    * \note Currently, we do not distinguish face-, edge- and vertex-neighbours. The graph structure
     *       simply contains all neighbours.
     */
     void set_graph_distributed(
@@ -687,13 +687,13 @@ namespace FEAST
   * \brief class describing a subgroup of a process group, consisting of some compute processes and eventually one
   *        extra coordinator process, sharing the same MPI communicator
   *
-  * ProcessSubgroup objects are created by the load balancer. They consist of n compute processes and eventually one extra
-  * process which is the coordinator of the parent process group. The latter is only the case if the coordinator is not
-  * part of the compute processes anyway. In both cases (containing an extra coordinator process or not), a
+  * ProcessSubgroup objects are created by the load balancer. They consist of n compute processes and eventually one
+  * extra process which is the coordinator of the parent process group. The latter is only the case if the coordinator
+  * is not part of the compute processes anyway. In both cases (containing an extra coordinator process or not), a
   * ProcessSubgroup creates a WorkGroup object, which either consists of exactly the same processes as this
-  * ProcessSubgroup (in the case there is no extra coordinator process) or of the n compute processes only (excluding the
-  * extra coordinator process). Each ProcessSubgroup has its own MPI communicator. Since the coordinator of the parent
-  * process group is part of this communicator, all necessary information (mesh, graph, ...) can be transferred
+  * ProcessSubgroup (in the case there is no extra coordinator process) or of the n compute processes only (excluding
+  * the extra coordinator process). Each ProcessSubgroup has its own MPI communicator. Since the coordinator of the
+  * parent process group is part of this communicator, all necessary information (mesh, graph, ...) can be transferred
   * efficiently via collective communication routines. The extra WorkGroup object (excluding the eventual coordinator
   * process) with its own communicator is necessary to efficiently perform collective communication during the actual
   * computation (scalar products, norms, etc).
@@ -701,10 +701,10 @@ namespace FEAST
   * Example:
   * The process group of a load balancer consists of six processes, the sixth one being the coordinator of the process
   * group. There is no dedicated load balancing process. The coordinator process (rank 5) reads the mesh and the solver
-  * configuration and decides that the coarse grid problem is to be treated by two compute processes (process group ranks
-  * 0 and 1) and the fine grid problems by six compute processes (ranks 0-5). Then two ProcessSubgroup objects are
-  * created: The first one (for the coarse grid problem) consists of the two compute processes with ranks 0 and 1 and the
-  * coordinator of the parent process group (rank 5). The other ProcessSubgroup (for the fine grid problem) object
+  * configuration and decides that the coarse grid problem is to be treated by two compute processes (process group
+  * ranks 0 and 1) and the fine grid problems by six compute processes (ranks 0-5). Then two ProcessSubgroup objects are
+  * created: The first one (for the coarse grid problem) consists of the two compute processes with ranks 0 and 1 and
+  * the coordinator of the parent process group (rank 5). The other ProcessSubgroup (for the fine grid problem) object
   * consists of all six processes (ranks 0-5). Here, the coordinator of the parent process group (rank 5) is also a
   * compute process. Both ProcessSubgroups then create a WorkGroup object. The coarse grid work group consists of the
   * two compute process (ranks 0 and 1) and thus differs from its ProcessSubgroup, while the fine grid work group

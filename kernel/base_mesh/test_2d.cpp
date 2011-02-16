@@ -32,7 +32,7 @@ int main (int argc, char **argv)
   FileParser2D parser;
   try
   {
-    parser.parse(name_mesh_file, bm);
+    parser.parse(name_mesh_file, &bm);
   }
   catch(InternalError* e)
   {

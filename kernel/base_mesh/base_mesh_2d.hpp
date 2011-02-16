@@ -422,6 +422,12 @@ namespace FEAST
       }
 
 
+      /// returns graph pointer #_graph
+      inline Graph* graph() const
+      {
+        return _graph;
+      }
+
       inline void add_created_items(SubdivisionData<2, 2, world_dim_>* subdiv_data)
       {
         for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
@@ -480,11 +486,11 @@ namespace FEAST
         // first sweep: count neighbours of each cell, and maintain running total to fill index array
         // treat last index entry separately because cell array has one less entry than index array
         unsigned int num_neighbours_so_far = 0;
+        // counter for active cells
+        global_index_t ipos(0);
         for (global_index_t icell=0 ; icell < num_cells() ; ++icell)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!
         {
-          global_index_t ipos(0);
-
           if(cell(icell)->active())
           {
             // set neighbours counted so far

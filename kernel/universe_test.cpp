@@ -17,7 +17,9 @@ using namespace FEAST;
 * \brief main routine
 *
 * Call the routine via "mpirun -np n+5 <binary_name> <relative path to base mesh> n" where n is the number of base
-* mesh cells in the mesh.
+* mesh cells in the mesh. The semi-hard-wired example then creates two 'main process groups' (for two completely
+* independent problems). Each process group has its own load balancer. Only the first process group (consisting of
+* n+2 processes does some senseful things, the second one (consisting of 2 processes) is idle.
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
@@ -35,15 +37,17 @@ int main(int argc, char* argv[])
   // create universe with one process group
 //  Universe* universe = Universe::create(argc, argv);
 
-  // the following information will be read from some dat file
+  // COMMENT_HILMAR: the following information will later be read from some parameter file
 
   // number of process groups (if not provided, then 1)
   unsigned int num_process_groups(2);
 
+  // COMMENT_HILMAR:
   // For the semi-hard-wired example using a mesh with n base mesh cells we need n+5 processes in total
   // (n+2 for the first process group, 2 for the second process group and 1 for the master process).
   // (See description of the example in routine LoadBalancer::create_subgroups().)
 
+  // COMMENT_HILMAR:
   // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
   // If no argument is provided, then it is assumed that the mesh contains 16 base mesh cells.
 
@@ -73,14 +77,13 @@ int main(int argc, char* argv[])
   Universe* universe;
   try
   {
-    universe = Universe::create(argc, argv, num_process_groups, num_processes_in_group,
-                                includes_dedicated_load_bal);
+    universe = Universe::create(argc, argv, num_process_groups, num_processes_in_group, includes_dedicated_load_bal);
   }
   catch (Exception& e)
   {
     // Assume that all critical errors are already caught within the Universe class.
     // Since it is not clear whether the communication system has already been set up, do not forward the error message
-    // to the master
+    // to the master.
     ErrorHandler::exception_occured(e, ErrorHandler::NON_CRITICAL);
   }
 
@@ -123,6 +126,7 @@ int main(int argc, char* argv[])
       // get name of the mesh file from the command line
       std::string mesh_file(argv[1]);
       load_balancer->read_mesh(mesh_file);
+
       load_balancer->create_subgroups();
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
