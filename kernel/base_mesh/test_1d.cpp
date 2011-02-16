@@ -4,8 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/base_mesh/1d.hpp>
-#include <kernel/base_mesh/cell.hpp>
+#include <kernel/base_mesh/base_mesh_1d.hpp>
 
 using namespace FEAST;
 using namespace BaseMesh;

@@ -56,7 +56,7 @@ namespace FEAST
       * TODO: This code is replicated in all base_mesh_xD classes since there is no generic class to inherit from
       */
       template<typename T_>
-      inline void remove(std::vector<T_>& v, T_ item)
+      inline void _remove(std::vector<T_>& v, T_ item)
       {
         assert(item->index() < v.size());
         v[item->index()] = v.back();
@@ -66,6 +66,33 @@ namespace FEAST
         delete item;
         v.pop_back();
       }
+
+      /// adds given vertex to base mesh and sets its index
+      inline void _add(Vertex_* v)
+      {
+        _vertices.push_back(v);
+        v->set_index(_vertices.size()-1);
+      }
+
+      /// adds given cell to base mesh and sets its index
+      inline void _add(Cell_* c)
+      {
+        _cells.push_back(c);
+        c->set_index(_cells.size()-1);
+      }
+
+      /// deletes given vertex
+      inline void _remove(Vertex_* v)
+      {
+        _remove<Vertex_*>(_vertices, v);
+      }
+
+      /// deletes given cell
+      inline void _remove(Cell_* c)
+      {
+        _remove<Cell_*>(_cells, c);
+      }
+
 
     public:
 
@@ -83,33 +110,33 @@ namespace FEAST
         // v0
         Vertex_* v = new Vertex_();
         v->set_coord(0, 0.0);
-        add(v);
+        _add(v);
 
         // v1
         v = new Vertex_();
         v->set_coord(0, 1.0);
-        add(v);
+        _add(v);
 
         // v2
         v = new Vertex_();
         v->set_coord(0, 2.0);
-        add(v);
+        _add(v);
 
         // v3
         v = new Vertex_();
         v->set_coord(0, 3.0);
-        add(v);
+        _add(v);
 
         // create the three edges (=cells)
         // e0
         Edge_* e = new Edge_(_vertices[0], _vertices[1], 0);
-        add(e);
+        _add(e);
         // e1
         e = new Edge_(_vertices[1], _vertices[2], 0);
-        add(e);
+        _add(e);
         // e2
         e = new Edge_(_vertices[2], _vertices[3], 0);
-        add(e);
+        _add(e);
 
         // set neighbourhood information (emulated file parser part 2)
         _cells[0]->add_neighbour(SDIM_VERTEX, 1, _cells[1]);
@@ -180,39 +207,13 @@ namespace FEAST
         return _cells[index];
       }
 
-      /// adds given vertex to base mesh and sets its index
-      inline void add(Vertex_* v)
-      {
-        _vertices.push_back(v);
-        v->set_index(_vertices.size()-1);
-      }
-
-      /// adds given cell to base mesh and sets its index
-      inline void add(Cell_* c)
-      {
-        _cells.push_back(c);
-        c->set_index(_cells.size()-1);
-      }
-
-      /// deletes given vertex
-      inline void remove(Vertex_* v)
-      {
-        remove<Vertex_*>(_vertices, v);
-      }
-
-      /// deletes given cell
-      inline void remove(Cell_* c)
-      {
-        remove<Cell_*>(_cells, c);
-      }
-
 
       inline void add_created_items(SubdivisionData<1, 1, world_dim_>* subdiv_data)
       {
-        add(subdiv_data->created_vertex);
+        _add(subdiv_data->created_vertex);
         for(unsigned int i(0) ; i < subdiv_data->created_cells.size() ; ++i)
         {
-          add(subdiv_data->created_cells[i]);
+          _add(subdiv_data->created_cells[i]);
         }
       }
 
@@ -221,13 +222,6 @@ namespace FEAST
       void validate() const
       {
         std::cout << "Validating cells..." << std::endl;
-// COMMENT_HILMAR: I thought, iterators were simple to use, i.e. like this:
-//        for (std::vector<Cell_*>::iterator it = _cells.begin() ; it != _cells.end() ; ++it)
-//        {
-//          it->validate();
-//        }
-// But that seems not to be the case... :-(
-// So, I use a standard counter for the for loop.
         for (unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
           cell(icell)->validate();

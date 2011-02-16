@@ -28,6 +28,9 @@ namespace FEAST
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennten wir ueberlegen, eine Klasse BaseMesh einzufuehren,
 // die als Elternklasse fuer BaseMesh1D/2D/3D dient. Und/Oder (aehnlich wie bei Cell) dimension-abhaengige Interfaces
 // definieren.
+// COMMENT_HILMAR: Ich befuerchte, wir muessen auch das BaseMesh nach space_dimension_ templatisieren. Ansonsten müssen
+// alle Klassen "oben drüber", die BaseMesh benutzen (z.B. Load Balancer), auch also ...1D, ...2D, ...3D implementiert
+// werden.
     template<unsigned char world_dim_>
     class BaseMesh2D
     {
@@ -163,132 +166,132 @@ namespace FEAST
         Vertex_* v = new Vertex_();
         v->set_coord(0, 0.0);
         v->set_coord(1, 1.0);
-        add(v);
+        _add(v);
 
         // v1
         v = new Vertex_();
         v->set_coord(0, 1.0);
         v->set_coord(1, 1.0);
-        add(v);
+        _add(v);
 
         // v2
         v = new Vertex_();
         v->set_coord(0, 2.0);
         v->set_coord(1, 1.0);
-        add(v);
+        _add(v);
 
         // v3
         v = new Vertex_();
         v->set_coord(0, 0.0);
         v->set_coord(1, 0.0);
-        add(v);
+        _add(v);
 
         // v4
         v = new Vertex_();
         v->set_coord(0, 1.0);
         v->set_coord(1, 0.0);
-        add(v);
+        _add(v);
 
         // v5
         v = new Vertex_();
         v->set_coord(0, 2.0);
         v->set_coord(1, 0.0);
-        add(v);
+        _add(v);
 
         // v6
         v = new Vertex_();
         v->set_coord(0, 3.0);
         v->set_coord(1, 0.0);
-        add(v);
+        _add(v);
 
         // v7
         v = new Vertex_();
         v->set_coord(0, 1.0);
         v->set_coord(1, -1.0);
-        add(v);
+        _add(v);
 
         // v8
         v = new Vertex_();
         v->set_coord(0, 2.0);
         v->set_coord(1, -1.0);
-        add(v);
+        _add(v);
 
         // v9
         v = new Vertex_();
         v->set_coord(0, 3.0);
         v->set_coord(1, -1.0);
-        add(v);
+        _add(v);
 
 
         // create the 14 edges
         // (just to ease manual sanity checks, always use the vertex of smaller global index as start vertex)
         // e0
         Edge_* e = new Edge_(_vertices[0], _vertices[1], 0);
-        add(e);
+        _add(e);
         // e1
         e = new Edge_(_vertices[1], _vertices[2], 0);
-        add(e);
+        _add(e);
         // e2
         e = new Edge_(_vertices[0], _vertices[3], 0);
-        add(e);
+        _add(e);
         // e3
         e = new Edge_(_vertices[1], _vertices[4], 0);
-        add(e);
+        _add(e);
         // e4
         e = new Edge_(_vertices[2], _vertices[5], 0);
-        add(e);
+        _add(e);
         // e5
         e = new Edge_(_vertices[2], _vertices[6], 0);
-        add(e);
+        _add(e);
         // e6
         e = new Edge_(_vertices[3], _vertices[4], 0);
-        add(e);
+        _add(e);
         // e7
         e = new Edge_(_vertices[4], _vertices[5], 0);
-        add(e);
+        _add(e);
         // e8
         e = new Edge_(_vertices[5], _vertices[6], 0);
-        add(e);
+        _add(e);
         // e9
         e = new Edge_(_vertices[5], _vertices[7], 0);
-        add(e);
+        _add(e);
         // e10
         e = new Edge_(_vertices[5], _vertices[8], 0);
-        add(e);
+        _add(e);
         // e11
         e = new Edge_(_vertices[6], _vertices[9], 0);
-        add(e);
+        _add(e);
         // e12
         e = new Edge_(_vertices[7], _vertices[8], 0);
-        add(e);
+        _add(e);
         // e13
         e = new Edge_(_vertices[8], _vertices[9], 0);
-        add(e);
+        _add(e);
 
         // create quad cell c0
         Quad_* quad =
           new Quad_(_vertices[3], _vertices[4], _vertices[0], _vertices[1],
                     _edges[6], _edges[0], _edges[2], _edges[3], 0);
-        add(quad);
+        _add(quad);
 
         // create quad cell c1
         quad = new Quad_(_vertices[4], _vertices[5], _vertices[1], _vertices[2],
                          _edges[7], _edges[1], _edges[3], _edges[4], 0);
-        add(quad);
+        _add(quad);
 
         // create tri cell c2
         Tri_* tri = new Tri_(_vertices[5], _vertices[6], _vertices[2],
                              _edges[8], _edges[5], _edges[4], 0);
-        add(tri);
+        _add(tri);
         // create tri cell c3
         tri = new Tri_(_vertices[7], _vertices[8], _vertices[5],
                        _edges[12], _edges[10], _edges[9], 0);
-        add(tri);
+        _add(tri);
 
         // create quad cell c4
         quad = new Quad_(_vertices[8], _vertices[9], _vertices[5], _vertices[6],
                          _edges[13], _edges[8], _edges[10], _edges[11], 0);
-        add(quad);
+        _add(quad);
 
         // set neighbourhood information (emulated file parser part 2)
         _cells[0]->add_neighbour(SDIM_EDGE, 3, _cells[1]);
@@ -471,13 +474,6 @@ namespace FEAST
       void validate() const
       {
         std::cout << "Validating cells..." << std::endl;
-// COMMENT_HILMAR: I thought, iterators were simple to use, i.e. like this:
-//        for(std::vector<Cell_*>::iterator it = _cells.begin() ; it != _cells.end() ; ++it)
-//        {
-//          it->validate();
-//        }
-// But that seems not to be the case... :-(
-// So, I use a standard counter for the for loop.
         for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
           cell(icell)->validate();

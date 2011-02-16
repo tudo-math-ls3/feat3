@@ -8,7 +8,6 @@
 //#include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/file_parser_2d.hpp>
 #include <kernel/base_mesh/base_mesh_2d.hpp>
-#include <kernel/base_mesh/cell.hpp>
 
 using namespace FEAST;
 using namespace BaseMesh;

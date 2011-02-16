@@ -71,7 +71,7 @@ namespace FEAST
       * TODO: This code is replicated in all base_mesh_xD classes since there is no generic class to inherit from
       */
       template<typename T_>
-      inline void remove(std::vector<T_>& v, T_ item)
+      inline void _remove(std::vector<T_>& v, T_ item)
       {
         assert(item->index() < v.size());
         v[item->index()] = v.back();
@@ -80,6 +80,58 @@ namespace FEAST
         item->set_index(v.size()-1);
         delete item;
         v.pop_back();
+      }
+
+      /// adds given vertex to base mesh and sets its index
+      inline void _add(Vertex_* v)
+      {
+        _vertices.push_back(v);
+        v->set_index(_vertices.size()-1);
+      }
+
+      /// adds given edge to base mesh and sets its index
+      inline void _add(Cell_1D_* e)
+      {
+        _edges.push_back(e);
+        e->set_index(_edges.size()-1);
+      }
+
+      /// adds given face to base mesh and sets its index
+      inline void _add(Cell_2D_* f)
+      {
+        _faces.push_back(f);
+        f->set_index(_faces.size()-1);
+      }
+
+      /// adds given cell to base mesh and sets its index
+      inline void _add(Cell_* c)
+      {
+        _cells.push_back(c);
+        c->set_index(_cells.size()-1);
+      }
+
+      /// deletes given vertex
+      inline void _remove(Vertex_* v)
+      {
+        _remove<Vertex_*>(_vertices, v);
+      }
+
+      /// deletes given edge
+      inline void _remove(Cell_1D_* e)
+      {
+        _remove<Cell_1D_*>(_edges, e);
+      }
+
+      /// deletes given face
+      inline void _remove(Cell_2D_* f)
+      {
+        _remove<Cell_2D_*>(_faces, f);
+      }
+
+      /// deletes given cell
+      inline void _remove(Cell_* c)
+      {
+        _remove<Cell_*>(_cells, c);
       }
 
     public:
@@ -142,222 +194,222 @@ namespace FEAST
         // v0 = (1,0,2)
         double c[3] = {1,0,2};
         Vertex_* v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v1 = (2,0,2)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v2 = (0,1,2)
         c[0] = 0;
         c[1] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v3 = (1,1,2)
         c[0] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v4 = (2,1,2)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v5 = (0,2,2)
         c[0] = 0;
         c[1] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v6 = (1,2,2)
         c[0] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v7 = (2,2,2)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v8 = (1,0,1)
         c[0] = 1;
         c[1] = 0;
         c[2] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v9 = (2,0,1)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v10 = (0,1,1)
         c[0] = 0;
         c[1] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v11 = (1,1,1)
         c[0] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v12 = (2,1,1)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v13 = (0,2,1)
         c[0] = 0;
         c[1] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v14 = (1,2,1)
         c[0] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v15 = (2,2,1)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v16 = (1,0,0)
         c[0] = 1;
         c[1] = 0;
         c[2] = 0;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v17 = (2,0,0)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v18 = (1,1,0)
         c[0] = 1;
         c[1] = 1;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
         // v19 = (2,1,0)
         c[0] = 2;
         v = new Vertex_(c);
-        add(v);
+        _add(v);
 
 
         // then, a bunch of edges
         // e0
         Edge_* e = new Edge_(_vertices[0],_vertices[1], 0);
-        add(e);
+        _add(e);
         // e1
         e = new Edge_(_vertices[0],_vertices[3], 0);
-        add(e);
+        _add(e);
         // e2
         e = new Edge_(_vertices[1],_vertices[4], 0);
-        add(e);
+        _add(e);
         // e3
         e = new Edge_(_vertices[2],_vertices[3], 0);
-        add(e);
+        _add(e);
         // e4
         e = new Edge_(_vertices[3],_vertices[4], 0);
-        add(e);
+        _add(e);
         // e5
         e = new Edge_(_vertices[2],_vertices[5], 0);
-        add(e);
+        _add(e);
         // e6
         e = new Edge_(_vertices[3],_vertices[6], 0);
-        add(e);
+        _add(e);
         // e7
         e = new Edge_(_vertices[4],_vertices[7], 0);
-        add(e);
+        _add(e);
         // e8
         e = new Edge_(_vertices[5],_vertices[6], 0);
-        add(e);
+        _add(e);
         // e9
         e = new Edge_(_vertices[6],_vertices[7], 0);
-        add(e);
+        _add(e);
         // e10
         e = new Edge_(_vertices[0],_vertices[8], 0);
-        add(e);
+        _add(e);
         // e11
         e = new Edge_(_vertices[1],_vertices[9], 0);
-        add(e);
+        _add(e);
         // e12
         e = new Edge_(_vertices[2],_vertices[10], 0);
-        add(e);
+        _add(e);
         // e13
         e = new Edge_(_vertices[3],_vertices[11], 0);
-        add(e);
+        _add(e);
         // e14
         e = new Edge_(_vertices[4],_vertices[12], 0);
-        add(e);
+        _add(e);
         // e15
         e = new Edge_(_vertices[5],_vertices[13], 0);
-        add(e);
+        _add(e);
         // e16
         e = new Edge_(_vertices[6],_vertices[14], 0);
-        add(e);
+        _add(e);
         // e17
         e = new Edge_(_vertices[7],_vertices[15], 0);
-        add(e);
+        _add(e);
         // e18
         e = new Edge_(_vertices[8],_vertices[9], 0);
-        add(e);
+        _add(e);
         // e19
         e = new Edge_(_vertices[8],_vertices[11], 0);
-        add(e);
+        _add(e);
         // e20
         e = new Edge_(_vertices[9],_vertices[12], 0);
-        add(e);
+        _add(e);
         // e21
         e = new Edge_(_vertices[10],_vertices[11], 0);
-        add(e);
+        _add(e);
         // e22
         e = new Edge_(_vertices[11],_vertices[12], 0);
-        add(e);
+        _add(e);
         // e23
         e = new Edge_(_vertices[10],_vertices[13], 0);
-        add(e);
+        _add(e);
         // e24
         e = new Edge_(_vertices[11],_vertices[14], 0);
-        add(e);
+        _add(e);
         // e25
         e = new Edge_(_vertices[12],_vertices[15], 0);
-        add(e);
+        _add(e);
         // e26
         e = new Edge_(_vertices[13],_vertices[14], 0);
-        add(e);
+        _add(e);
         // e27
         e = new Edge_(_vertices[14],_vertices[15], 0);
-        add(e);
+        _add(e);
         // e28
         e = new Edge_(_vertices[8],_vertices[16], 0);
-        add(e);
+        _add(e);
         // e29
         e = new Edge_(_vertices[9],_vertices[17], 0);
-        add(e);
+        _add(e);
         // e30
         e = new Edge_(_vertices[11],_vertices[18], 0);
-        add(e);
+        _add(e);
         // e31
         e = new Edge_(_vertices[12],_vertices[19], 0);
-        add(e);
+        _add(e);
         // e32
         e = new Edge_(_vertices[16],_vertices[17], 0);
-        add(e);
+        _add(e);
         // e33
         e = new Edge_(_vertices[16],_vertices[18], 0);
-        add(e);
+        _add(e);
         // e34
         e = new Edge_(_vertices[17],_vertices[19], 0);
-        add(e);
+        _add(e);
         // e35
         e = new Edge_(_vertices[18],_vertices[19], 0);
-        add(e);
+        _add(e);
 
         // now faces
         // f0
@@ -366,93 +418,93 @@ namespace FEAST
         // deliberately, use different local numbering
         Quad_* quad = new Quad_(_vertices[1], _vertices[4], _vertices[0], _vertices[3],
                                 _edges[2], _edges[1], _edges[0], _edges[4], 0);
-        add(quad);
+        _add(quad);
         // f1
         quad = new Quad_(_vertices[2], _vertices[3], _vertices[5], _vertices[6],
                          _edges[3], _edges[8], _edges[5], _edges[6], 0);
-        add(quad);
+        _add(quad);
         // f2
         quad = new Quad_(_vertices[3], _vertices[4], _vertices[6], _vertices[7],
                          _edges[4], _edges[9], _edges[6], _edges[7], 0);
-        add(quad);
+        _add(quad);
         // f3
         //quad = new Quad_(_vertices[0], _vertices[1], _vertices[8], _vertices[9],
         //                 _edges[0], _edges[18], _edges[10], _edges[11], 0);
         // deliberately, use different local numbering
         quad = new Quad_(_vertices[1], _vertices[9], _vertices[0], _vertices[8],
                          _edges[11], _edges[10], _edges[0], _edges[18], 0);
-        add(quad);
+        _add(quad);
         // f4
         quad = new Quad_(_vertices[0], _vertices[8], _vertices[3], _vertices[11],
                          _edges[10], _edges[13], _edges[1], _edges[19], 0);
-        add(quad);
+        _add(quad);
         // f5
         quad = new Quad_(_vertices[1], _vertices[9], _vertices[4], _vertices[12],
                          _edges[11], _edges[14], _edges[2], _edges[20], 0);
-        add(quad);
+        _add(quad);
         // f6
         quad = new Quad_(_vertices[2], _vertices[3], _vertices[10], _vertices[11],
                          _edges[3], _edges[21], _edges[12], _edges[13], 0);
-        add(quad);
+        _add(quad);
         // f7
         //quad = new Quad_(_vertices[3], _vertices[4], _vertices[11], _vertices[12],
         //                 _edges[4], _edges[22], _edges[13], _edges[14], 0);
         // deliberately, use different local numbering
         quad = new Quad_(_vertices[3], _vertices[11], _vertices[4], _vertices[12],
                          _edges[13], _edges[14], _edges[4], _edges[22], 0);
-        add(quad);
+        _add(quad);
         // f8
         quad = new Quad_(_vertices[2], _vertices[10], _vertices[5], _vertices[13],
                          _edges[12], _edges[15], _edges[5], _edges[23], 0);
-        add(quad);
+        _add(quad);
         // f9
         quad = new Quad_(_vertices[3], _vertices[11], _vertices[6], _vertices[14],
                          _edges[13], _edges[16], _edges[6], _edges[24], 0);
-        add(quad);
+        _add(quad);
         // f10
         quad = new Quad_(_vertices[4], _vertices[12], _vertices[7], _vertices[15],
                          _edges[14], _edges[17], _edges[7], _edges[25], 0);
-        add(quad);
+        _add(quad);
         // f11
         quad = new Quad_(_vertices[5], _vertices[6], _vertices[13], _vertices[14],
                          _edges[8], _edges[26], _edges[15], _edges[16], 0);
-        add(quad);
+        _add(quad);
         // f12
         quad = new Quad_(_vertices[6], _vertices[7], _vertices[14], _vertices[15],
                          _edges[9], _edges[27], _edges[16], _edges[17], 0);
-        add(quad);
+        _add(quad);
         // f13
         quad = new Quad_(_vertices[8], _vertices[9], _vertices[11], _vertices[12],
                          _edges[18], _edges[22], _edges[19], _edges[20], 0);
-        add(quad);
+        _add(quad);
         // f14
         quad = new Quad_(_vertices[10], _vertices[11], _vertices[13], _vertices[14],
                          _edges[21], _edges[26], _edges[23], _edges[24], 0);
-        add(quad);
+        _add(quad);
         // f15
         quad = new Quad_(_vertices[11], _vertices[12], _vertices[14], _vertices[15],
                          _edges[22], _edges[27], _edges[24], _edges[25], 0);
-        add(quad);
+        _add(quad);
         // f16
         quad = new Quad_(_vertices[8], _vertices[9], _vertices[16], _vertices[17],
                          _edges[18], _edges[32], _edges[28], _edges[29], 0);
-        add(quad);
+        _add(quad);
         // f17
         quad = new Quad_(_vertices[8], _vertices[16], _vertices[11], _vertices[18],
                          _edges[28], _edges[30], _edges[19], _edges[33], 0);
-        add(quad);
+        _add(quad);
         // f18
         quad = new Quad_(_vertices[9], _vertices[17], _vertices[12], _vertices[19],
                          _edges[29], _edges[31], _edges[20], _edges[34], 0);
-        add(quad);
+        _add(quad);
         // f19
         quad = new Quad_(_vertices[11], _vertices[12], _vertices[18], _vertices[19],
                          _edges[22], _edges[35], _edges[30], _edges[31], 0);
-        add(quad);
+        _add(quad);
         // f20
         quad = new Quad_(_vertices[16], _vertices[17], _vertices[18], _vertices[19],
                          _edges[32], _edges[35], _edges[33], _edges[34], 0);
-        add(quad);
+        _add(quad);
 
         // finally, cells
         // c0
@@ -461,7 +513,7 @@ namespace FEAST
                                _edges[0], _edges[18], _edges[4], _edges[22], _edges[10], _edges[11],
                                _edges[13], _edges[14], _edges[1], _edges[2], _edges[19], _edges[20],
                                _faces[3], _faces[7], _faces[0], _faces[13], _faces[4], _faces[5], 0);
-        add(hex);
+        _add(hex);
         // c1
         //hex = new Hexa_(_vertices[2], _vertices[3], _vertices[10], _vertices[11],
         //                _vertices[5], _vertices[6], _vertices[13], _vertices[14],
@@ -474,14 +526,14 @@ namespace FEAST
                         _edges[6], _edges[24], _edges[5], _edges[23], _edges[13], _edges[16],
                         _edges[12], _edges[15], _edges[3], _edges[8], _edges[21], _edges[26],
                         _faces[9], _faces[8], _faces[1], _faces[14], _faces[6], _faces[11], 0);
-        add(hex);
+        _add(hex);
         // c2
         hex = new Hexa_(_vertices[3], _vertices[4], _vertices[11], _vertices[12],
                         _vertices[6], _vertices[7], _vertices[14], _vertices[15],
                         _edges[4], _edges[22], _edges[9], _edges[27], _edges[13], _edges[14],
                         _edges[16], _edges[17], _edges[6], _edges[7], _edges[24], _edges[25],
                         _faces[7], _faces[12], _faces[2], _faces[15], _faces[9], _faces[10], 0);
-        add(hex);
+        _add(hex);
         // c3
         //hex = new Hexa_(_vertices[8], _vertices[9], _vertices[16], _vertices[17],
         //                _vertices[11], _vertices[12], _vertices[18], _vertices[19],
@@ -494,7 +546,7 @@ namespace FEAST
                         _edges[22], _edges[35], _edges[18], _edges[32], _edges[31], _edges[30],
                         _edges[29], _edges[28], _edges[20], _edges[19], _edges[34], _edges[33],
                         _faces[19], _faces[16], _faces[13], _faces[20], _faces[18], _faces[17], 0);
-        add(hex);
+        _add(hex);
 
 
         // neighbourhood
@@ -624,75 +676,24 @@ namespace FEAST
         return _cells[index];
       }
 
-      /// adds given vertex to base mesh and sets its index
-      inline void add(Vertex_* v)
-      {
-        _vertices.push_back(v);
-        v->set_index(_vertices.size()-1);
-      }
-
-      /// adds given edge to base mesh and sets its index
-      inline void add(Cell_1D_* e)
-      {
-        _edges.push_back(e);
-        e->set_index(_edges.size()-1);
-      }
-
-      /// adds given face to base mesh and sets its index
-      inline void add(Cell_2D_* f)
-      {
-        _faces.push_back(f);
-        f->set_index(_faces.size()-1);
-      }
-
-      /// adds given cell to base mesh and sets its index
-      inline void add(Cell_* c)
-      {
-        _cells.push_back(c);
-        c->set_index(_cells.size()-1);
-      }
-
-      /// deletes given vertex
-      inline void remove(Vertex_* v)
-      {
-        remove<Vertex_*>(_vertices, v);
-      }
-
-      /// deletes given edge
-      inline void remove(Cell_1D_* e)
-      {
-        remove<Cell_1D_*>(_edges, e);
-      }
-
-      /// deletes given face
-      inline void remove(Cell_2D_* f)
-      {
-        remove<Cell_2D_*>(_faces, f);
-      }
-
-      /// deletes given cell
-      inline void remove(Cell_* c)
-      {
-        remove<Cell_*>(_cells, c);
-      }
 
       inline void add_created_items(SubdivisionData<3, 3, world_dim_>* subdiv_data)
       {
         for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
         {
-          add(subdiv_data->created_vertices[i]);
+          _add(subdiv_data->created_vertices[i]);
         }
         for(unsigned int i(0) ; i < subdiv_data->created_edges.size() ; ++i)
         {
-          add(subdiv_data->created_edges[i]);
+          _add(subdiv_data->created_edges[i]);
         }
         for(unsigned int i(0) ; i < subdiv_data->created_faces.size() ; ++i)
         {
-          add(subdiv_data->created_faces[i]);
+          _add(subdiv_data->created_faces[i]);
         }
         for(unsigned int i(0) ; i < subdiv_data->created_cells.size() ; ++i)
         {
-          add(subdiv_data->created_cells[i]);
+          _add(subdiv_data->created_cells[i]);
         }
       }
 
@@ -701,13 +702,6 @@ namespace FEAST
       void validate() const
       {
         std::cout << "Validating cells..." << std::endl;
-// COMMENT_HILMAR: I thought, iterators were simple to use, i.e. like this:
-//        for (std::vector<Cell_*>::iterator it = _cells.begin() ; it != _cells.end() ; ++it)
-//        {
-//          it->validate();
-//        }
-// But that seems not to be the case... :-(
-// So, I use a standard counter for the for loop.
         for (unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
           cell(icell)->validate();
