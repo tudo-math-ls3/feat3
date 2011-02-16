@@ -197,12 +197,37 @@ namespace FEAST
         // TODO: deallocate _neighbours !!!
       }
 
+      /// returns number of neighbours for given subdimension and given item
+      inline unsigned int num_neighbours_item(
+        subdim subdim,
+        unsigned char item) const
+      {
+        assert(subdim < cell_space_dim_);
+        assert(item < this->num_subitems_per_subdim(subdim));
+        return _neighbours[subdim][item].size();
+      }
+
+
+      /// returns number of neighbours summed over all items of given subdimension
+      inline unsigned int num_neighbours_subdim(subdim subdim) const
+      {
+        assert(subdim < cell_space_dim_);
+        unsigned int num_neighbours(0);
+        for(unsigned int item(0) ; item < this->num_subitems_per_subdim(subdim) ; ++item)
+        {
+          num_neighbours += _neighbours[subdim][item].size();
+        }
+        return num_neighbours;
+      }
+
+
       /// returns one specific neighbour for given subdim, item and index
       inline Cell<cell_space_dim_, cell_space_dim_, world_dim_>* neighbour(
         subdim subdim,
         unsigned char item,
         unsigned char index) const
       {
+        assert(subdim < cell_space_dim_);
         assert(item < this->num_subitems_per_subdim(subdim));
         assert(index < _neighbours[subdim][item].size());
         return _neighbours[subdim][item][index];
@@ -214,6 +239,8 @@ namespace FEAST
         subdim subdim,
         unsigned char item) const
       {
+        assert(subdim < cell_space_dim_);
+        assert(item < this->num_subitems_per_subdim(subdim));
         return _neighbours[subdim][item];
       }
 
@@ -221,6 +248,7 @@ namespace FEAST
       /// returns array of vectors of neighbours for given subdimension
       inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>* neighbours_subdim(subdim subdim) const
       {
+        assert(subdim < cell_space_dim_);
         return _neighbours[subdim];
       }
 

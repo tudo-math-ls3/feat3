@@ -39,13 +39,33 @@ int main (int argc, char **argv)
     std::cerr << e->message() << std::endl;
     exit(1);
   }
+  // set cell numbers (equal to indices since all cells are active)
+  bm.set_cell_numbers();
+  // create base mesh's graph structure
+  bm.create_graph();
+  // print base mesh
   bm.print(std::cout);
 
-//  // create base mesh's graph structure
-//  bm->create_graph();
+  // subdivide cell 0
+  std::cout << "Subdividing cell 0" << std::endl;
+  bm.cell(0)->init_subdiv_data(NONCONFORM_SAME_TYPE);
+  bm.cell(0)->subdivide();
+  bm.add_created_items(bm.cell(0)->subdiv_data());
+  // set cell numbers (now they differ from indices)
+  bm.set_cell_numbers();
+  // print base mesh
+  bm.print(std::cout);
+
+ // validate base mesh
+  bm.validate();
+
+  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
+  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
+  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
+  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
 
 
-
+// old test code
 //  BaseMesh2D<WDIM> bm;
 //  std::cout << "Base Mesh in ASCII art (v3 is at (0,0) and all edges are unit length):" << std::endl;
 //  std::cout << "v0---e0---v1---e1---v2 \\         " << std::endl;  // stupid '//' is necessary to escape the space after /
@@ -63,7 +83,13 @@ int main (int argc, char **argv)
 //  bm.cell(0)->init_subdiv_data(NONCONFORM_SAME_TYPE);
 //  bm.cell(0)->subdivide();
 //  bm.add_created_items(bm.cell(0)->subdiv_data());
+//  // set cell numbers (equal to indices since all cells are active)
+//  bm.set_cell_numbers();
+//
 //  // TODO: neighbourhood update
+//
+//  // create base mesh's graph structure
+//  bm.create_graph();
 //
 //  std::cout << "Cell 0 should now look like this:" << std::endl;
 //  std::cout << "v00---e16---v11---e17---v01" << std::endl;
@@ -76,12 +102,4 @@ int main (int argc, char **argv)
 //  std::cout << " |           |           | " << std::endl;
 //  std::cout << "v03---e14---v10---e15---v04" << std::endl;
 //  bm.print(std::cout);
-//
-//  // validate base mesh
-//  bm.validate();
-//
-//  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
-//  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
-//  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
-//  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
 }

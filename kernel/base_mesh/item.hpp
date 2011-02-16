@@ -25,10 +25,25 @@ namespace FEAST
 
     private:
 
-      /// index
+      /**
+      * \brief index of the item
+      *
+      * The index is set when the item is added to the base mesh. It will never be changed again until destruction
+      * of the item. (Currently, the index is simply the position in the corresponding vector in the BaseMesh class
+      * (_vertices, _edges, ...)
+      */
       global_index_t _index;
 
-      /// number
+      /**
+      * \brief number of the item
+      *
+      * While all items have an index, only *active* items have a number. When a mesh is created, indices and numbers
+      * usually are equal, but as soon as one cell is subdivided, indices and numbers will differ.
+      *
+      * \sa BaseMesh2D::set_cell_numbers()
+      */
+// COMMENT_HILMAR: Brauchen wirklich alle items eine number? Oder nur die Zellen groesster Dimension? Wenn letzters,
+// dann wird die Variable in die CellData<...> Klasse verschoben.
       global_index_t _number;
 
     public:
@@ -59,7 +74,7 @@ namespace FEAST
       }
 
       /// sets the index of this item
-      inline void set_index(const global_index_t index)
+      inline void set_index(global_index_t const index)
       {
         assert(index < Constants::MAX_INDEX);
         _index = index;
@@ -72,10 +87,16 @@ namespace FEAST
       }
 
       /// sets the number of this item
-      inline void set_number(const global_index_t number)
+      inline void set_number(global_index_t const number)
       {
         assert(number < Constants::MAX_NUMBER);
         _number = number;
+      }
+
+      /// unsets the number of this item, i.e. sets it to Constants::MAX_NUMBER
+      inline void unset_number()
+      {
+        _number = Constants::MAX_NUMBER;
       }
 
       /// prints the index of this item to the given stream

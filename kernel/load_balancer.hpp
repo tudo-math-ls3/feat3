@@ -638,7 +638,9 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         _graphs[1] = _base_mesh->graph();
 // COMMENT_HILMAR:
 // We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
-// equals the local rank within the work group.
+// equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
+// layer, which both have their own connectivity structure. Here, we actually need the connectivity graph of the
+// process patch layer.
       }
 
       /* ***************************************************************************

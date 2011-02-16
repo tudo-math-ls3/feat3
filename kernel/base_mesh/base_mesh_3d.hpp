@@ -61,6 +61,11 @@ namespace FEAST
       /// array of cells
       std::vector<Cell_*> _cells;
 
+      /// graph describing the connectivity of the base mesh
+// COMMENT_HILMAR: probably not really needed... just temporarily placed here, later we need a graph structure for
+// the connectivity of process patches.
+      Graph* _graph;
+
       /* **********
       * functions *
       ************/
@@ -616,7 +621,8 @@ namespace FEAST
         return _vertices.size();
       }
 
-      /// returns number of edges in this mesh
+
+      /// returns number of edges in this mesh (including inactive ones)
       inline global_index_t num_edges() const
       {
         // TODO: potentiell falsch, auch Kanten koennen inaktiv sein und duerfen dann beim Transfer zu den Rechenprozessen
@@ -624,7 +630,8 @@ namespace FEAST
         return _edges.size();
       }
 
-      /// returns number of faces in this mesh
+
+      /// returns number of faces in this mesh (including inactive ones)
       inline global_index_t num_faces() const
       {
         // TODO: potentiell falsch, auch Faces koennen inaktiv sein und duerfen dann beim Transfer zu den Rechenprozessen
@@ -632,21 +639,30 @@ namespace FEAST
         return _faces.size();
       }
 
-      /// returns number of cells in this mesh (this is potentially expensive)
+
+      /// returns number of cells in this mesh (including inactive ones)
       inline global_index_t num_cells() const
+      {
+        return _cells.size();
+      }
+
+
+      /// returns number of active cells in this mesh (this is potentially expensive)
+      inline global_index_t num_active_cells() const
       {
         // TODO: nochmal implementieren, wenn inaktive immer schoen ans Ende geschoben werden und es einen index gibt,
         // der die Position des letzten aktiven merkt
         global_index_t counter = 0;
-        for (global_index_t i(0) ; i < _cells.size() ; ++i)
+        for(global_index_t i(0) ; i < num_cells() ; ++i)
         {
-          if (_cells[i]->active())
+          if(cell(i)->active())
           {
             counter++;
           }
         }
         return counter;
       }
+
 
       /// returns vertex at given index
       inline Vertex_* vertex(global_index_t const index)
@@ -655,6 +671,7 @@ namespace FEAST
         return _vertices[index];
       }
 
+
       /// returns edge at given index
       inline Cell_1D_* edge(global_index_t const index)
       {
@@ -662,12 +679,14 @@ namespace FEAST
         return _edges[index];
       }
 
+
       /// returns face at given index
       inline Cell_2D_* face(global_index_t const index)
       {
         assert(index < _faces.size());
         return _faces[index];
       }
+
 
       /// returns cell at given index
       inline Cell_* cell(global_index_t const index) const

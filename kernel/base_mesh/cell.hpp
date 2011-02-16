@@ -431,6 +431,13 @@ namespace FEAST
       }
 
       /// returns whether this cell is active (i.e. whether it does not have children)
+// COMMENT_HILMAR: Das ist leider falsch fuer Zellen niedrigerer Dimension! Bsp.: zwei benachbarte Quads
+// verschiedenen refinement levels, naemlich 0 und 1 --> gemeinsame Kante (Level 0) ist aktiv, obwohl sie Kinder
+// (Level 1) hat! Folge: Wir muessen den Aktivitaetsgrad entweder tatsaechlich als Variable abspeichern, oder
+// verzichten fuer Zellen niedrigerer Dimension ganz darauf. Das haette zur Folge, dass beim Verschicken des aktuellen
+// Gitters an die Rechenprozesse nicht einfach alle Zellen niedrigerer Dimension durchlaufen werden koennen und alle
+// aktiven als "zu verschicken" markiert werden koennen. Stattdessen muesste man ueber alle aktiven cells hoechster
+// Dimension die darin enthaltenen subcells als "zu verschicken" markieren.
       inline bool active() const
       {
         return (num_children() == 0);

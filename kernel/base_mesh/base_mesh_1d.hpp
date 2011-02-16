@@ -46,6 +46,11 @@ namespace FEAST
       /// array of cells
       std::vector<Cell_*> _cells;
 
+      /// graph describing the connectivity of the base mesh
+// COMMENT_HILMAR: probably not really needed... just temporarily placed here, later we need a graph structure for
+// the connectivity of process patches.
+      Graph* _graph;
+
       /* **********
       * functions *
       ************/
@@ -101,6 +106,9 @@ namespace FEAST
       *****************************/
       /// default CTOR, currently generates a test mesh
       BaseMesh1D()
+        : _vertices(nullptr),
+          _cells(nullptr),
+          _graph(nullptr)
       {
         /* Base mesh example consisting of three quads and two tris:
         *    v0---e0---v1---e1---v2---e2---v3
@@ -177,21 +185,30 @@ namespace FEAST
         return _vertices.size();
       }
 
-      /// returns number of cells in this mesh (this is potentially expensive)
+
+      /// returns number of cells in this mesh (including inactive ones)
       inline global_index_t num_cells() const
+      {
+        return _cells.size();
+      }
+
+
+      /// returns number of active cells in this mesh (this is potentially expensive)
+      inline global_index_t num_active_cells() const
       {
         // TODO: nochmal implementieren, wenn inaktive immer schoen ans Ende geschoben werden und es einen index gibt,
         // der die Position des letzten aktiven merkt
         global_index_t counter = 0;
-        for (global_index_t i(0) ; i < _cells.size() ; ++i)
+        for(global_index_t i(0) ; i < num_cells() ; ++i)
         {
-          if (_cells[i]->active())
+          if(cell(i)->active())
           {
             counter++;
           }
         }
         return counter;
       }
+
 
       /// returns vertex at given index
       inline Vertex_* vertex(global_index_t const index)

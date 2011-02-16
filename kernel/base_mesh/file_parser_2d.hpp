@@ -31,7 +31,8 @@ namespace FEAST
     * private members.
     *
     * \note Currently, we only have 2D files, so I began with a 2D file reader only. I didn't care yet how to
-    * distinguish/unite 1D, 2D and 3D. However we do it... we should try to avoid too much code duplication.
+    * distinguish/unite 1D, 2D and 3D. However we do it... we should try to avoid too much code duplication. Most
+    * probably, there will be only *one* file parser for 1D, 2D and 3D files...
     *
     * \note This is only a very rudimentary file parser which will be rewritten when we have defined the new file
     * format. It only supports some features for basic test purposes.
