@@ -91,8 +91,7 @@ int main(int argc, char* argv[])
   Universe* universe2;
   try
   {
-    universe2 = Universe::create(argc, argv, num_process_groups, num_processes_in_group,
-                                includes_dedicated_load_bal);
+    universe2 = Universe::create(argc, argv, num_process_groups, num_processes_in_group, includes_dedicated_load_bal);
   }
   catch (Exception& e)
   {

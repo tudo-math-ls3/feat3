@@ -16,8 +16,8 @@ namespace FEAST
   /**
   * \brief base class encapsulating an MPI process
   *
-  * For each MPI process spawned at program start, one static Process object will be created on this MPI process. It will
-  * live throughout the program.
+  * For each MPI process spawned at program start, one static Process object will be created on this MPI process. It
+  * will live throughout the program.
   * COMMENT_HILMAR: Maybe it makes more sense to define this class as a Singleton...
   *
   * \author Hilmar Wobker

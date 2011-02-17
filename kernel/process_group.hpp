@@ -121,6 +121,7 @@ namespace FEAST
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
 
       // since this is the world group of processes, the local and the global rank should be equal
+      // (if this constructor is used for other groups than the world group then this assert must be removed!)
       assert(Process::rank == _rank);
 
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
@@ -294,8 +295,8 @@ namespace FEAST
     * coordinator of the process group collects all these log messages in the order of process group ranks and sends
     * them as one MPI message to the master. Depending on the target the master then displays these messages on the
     * screen or writes them to the log file (one line per message). This function has to be called by \em all processes
-    * of the process group! Note no further information will be appended to the messages (like rank of the process from
-    * which the messages comes). Such infomration has to be coded directly into the message string.
+    * of the process group! Note that no further information will be appended to the messages (like rank of the process
+    * from which the messages comes). Such infomration has to be coded directly into the message string.
     *
     * \param[in] message
     * string representing the log message
@@ -716,7 +717,7 @@ namespace FEAST
   *    fine grid ProcessSubgroup:       x x x x x x
   *    fine grid WorkGroup:             x x x x x x
   *
-  * If the parent ProcessGroup contains seven processes with the seventh process being a dedicated load balancer and the
+  * If the parent ProcessGroup contains seven processes with the seventh process being dedicated load balancer and
   * coordinator at the same time, the ProcessSubgroups and WorkGroups look like this:
   *
   *    processes parent ProcessGroup:   0 1 2 3 4 5 6

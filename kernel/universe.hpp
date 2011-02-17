@@ -63,15 +63,15 @@ namespace FEAST
     /**
     * \brief process group responsible for one problem
     *
-    * When the user wants to solve to independent problems simultaneously (for example in some multiphysics application),
+    * When the user wants to solve independent problems simultaneously (for example in some multiphysics application),
     * he can create process groups. The distribution of processes to such process groups cannot be changed in the course
     * of the program, i.e. the number of process groups and the number of processes per group is fixed. Hence, there
-    * also will be no automatic load balancing across such process groups, only within each of groups.
+    * also will be no automatic load balancing across such process groups, only within each of the groups.
     */
     ProcessGroup* _process_group;
 
     /// number of process groups requested by the user via some top-level configuration file
-    const unsigned int _num_process_groups;
+    unsigned int const _num_process_groups;
 
     /**
     * \brief array of number of processes in each process group (including eventual dedicated load balancer process)
@@ -89,15 +89,12 @@ namespace FEAST
     */
     bool const * _includes_dedicated_load_bal;
 
-    /// number of processes actually needed by the user, based on some top-level configuration file
-    unsigned int _num_processes_needed;
-
     /**
     * \brief 2-dim. array of MPI_COMM_WORLD ranks in top-level process group that each process unambigously belongs to
     *
     * Dimension: [#_num_process_groups][#_num_processes_in_group[group_id]]
     */
-    int ** _group_ranks_world;
+    int** _group_ranks_world;
 
     /**
     * \brief master process responsible for screen output and initial file IO
@@ -110,7 +107,7 @@ namespace FEAST
     /**
     * \brief load balancer process
     *
-    * Will be nullptr if not living on this process
+    * Will be nullptr if not living on this process.
     */
     LoadBalancer* _load_balancer;
 
@@ -221,22 +218,20 @@ namespace FEAST
     /**
     * \brief manages initial process distribution
     *
-    * This function manages the initial process distribution into master, load balancers and process groups.
+    * This function manages the initial process distribution into master and process groups.
     * Let there be
     * \li \c n processes with \c MPI_COMM_WORLD ranks <code>0, .., n-1</code>,
     * \li \c k process groups <code>0, .., k-1</code>, process group \c i comprising <code>0 < P_i < n-1</code>
-    *     processes and one load balancer.
+    *     processes including the (eventually dedicated) load load balancer (<code>P_0 + ... + P_(k-1) = n-1)</code>
     *
     * Then the MPI_COMM_WORLD ranks are distributed as follows:
-    * \li process group 0: ranks <code>0, ..., P_0-1</code> plus rank <code>P_0</code> for load balancer 0
-    * \li process group 1: ranks <code>P_0+1, ..., P_0+P_1+1-1</code> plus rank <code>P_0 + P_1 + 1</code> for
-    *     load balancer 1
-    * \li process group 2: ranks <code>P_0 + P_1 + 2, ..., P_0 + P_1 + P_2 + 2 - 1</code> plus rank
-    *     <code>P_0 + P_1 + P_2 + 2</code> for load balancer 2
+    * \li process group 0: ranks <code>0, ..., P_0-1</code> (where <code>P_0-1</code> is the coordinator
+    *     (and eventually dedicated load balancer) process)
+    * \li process group 1: ranks <code>P_0, ..., P_0+P_1-1</code>
+    * \li process group 2: ranks <code>P_0 + P_1, ..., P_0 + P_1 + P_2 - 1</code>
     * \li ...
-    * \li process group k-1: ranks <code>P_0 + ... + P_(k-2) + k-1, .., P_0 + ... + P_(k-1) + k-1 - 1</code> plus rank
-    *     rank <code>P_0 + ... + P_(k-1) + k-1</code> for load balancer k-1
-    * \li master: rank <code>P_0 + ... + P_(k-1) + k = n_needed-1</code> where <code>n_needed <= n</code>
+    * \li process group k-1: ranks <code>P_0 + ... + P_(k-2), ..., P_0 + ... + P_(k-1) - 1</code>
+    * \li master: rank <code>P_0 + ... + P_(k-1) = n-1</code>
     */
     void _init()
     {
@@ -255,29 +250,30 @@ namespace FEAST
       Process::is_master = (Process::rank == Process::rank_master);
 
       // calculate the number of processes needed; and check whether there are enough MPI processes available:
+      unsigned int num_processes_needed;
 
       // (1) the master needs one process
-      _num_processes_needed = 1;
+      num_processes_needed = 1;
 
       for(unsigned int igroup(0) ; igroup < _num_process_groups ; ++igroup)
       {
         // (2) add number of processes in each of the process groups (eventually including a dedicated load
         // balancer process)
-        _num_processes_needed += _num_processes_in_group[igroup];
+        num_processes_needed += _num_processes_in_group[igroup];
       }
 
       // now check whether the number of available processes is sufficient
       try
       {
-        if(_num_processes < _num_processes_needed)
+        if(_num_processes < num_processes_needed)
         {
           throw InternalError("Only " + StringUtils::stringify(_num_processes) + " processes available, but "
-            + StringUtils::stringify(_num_processes_needed) + " processes needed!");
+            + StringUtils::stringify(num_processes_needed) + " processes needed!");
         }
-        else if(_num_processes > _num_processes_needed)
+        else if(_num_processes > num_processes_needed)
         {
           throw InternalError(StringUtils::stringify(_num_processes) + " processes available, and only "
-            + StringUtils::stringify(_num_processes_needed) + " processes needed! FEAST does not "
+            + StringUtils::stringify(num_processes_needed) + " processes needed! FEAST does not "
             + "support trailing orphaned processes.");
         }
         else
@@ -286,8 +282,8 @@ namespace FEAST
           if(Process::is_master)
           {
             Logger::log(StringUtils::stringify(_num_processes) + " processes available and "
-              + StringUtils::stringify(_num_processes_needed));
-            std::cout << _num_processes << " processes available and " << _num_processes_needed
+              + StringUtils::stringify(num_processes_needed));
+            std::cout << _num_processes << " processes available and " << num_processes_needed
                       << " needed." << std::endl;
           }
         }
@@ -348,7 +344,7 @@ namespace FEAST
       // final sanity check (rank assigned last must be master rank minus 1)
       assert(iter_MPC_rank == (int)_num_processes-2);
 
-      // create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
+      // Create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
       // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
       // of any group we set up.
       if(!Process::is_master)
