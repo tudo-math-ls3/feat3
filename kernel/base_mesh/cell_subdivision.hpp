@@ -265,7 +265,7 @@ namespace FEAST
       std::vector<Cell<1, space_dim_, world_dim_>*> created_cells;
 
       /// CTOR
-      SubdivisionData<1, space_dim_, world_dim_>(type_of_subdivision t)
+      SubdivisionData(type_of_subdivision t)
       {
         type = t;
       }
@@ -308,7 +308,7 @@ namespace FEAST
       std::vector<Cell<2, space_dim_, world_dim_>*> created_cells;
 
       /// CTOR
-      SubdivisionData<2, space_dim_, world_dim_>(type_of_subdivision t)
+      SubdivisionData(type_of_subdivision t)
       {
         type = t;
       }
@@ -355,7 +355,7 @@ namespace FEAST
       std::vector<Cell<3, space_dim_, world_dim_>*> created_cells;
 
       /// CTOR
-      SubdivisionData<3, space_dim_, world_dim_>(type_of_subdivision t)
+      SubdivisionData(type_of_subdivision t)
       {
         type = t;
       }

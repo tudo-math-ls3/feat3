@@ -199,16 +199,17 @@ namespace FEAST
       file_base_name = base_name;
       // add the MPI_COMM_WORLD rank of this process to the base name
       // inquire how many digits are needed (depending on the number of processes)
-      int num_digits((int)log10(Process::num_processes) + 1);
+      int num_digits((int)log10((double)Process::num_processes) + 1);
       // use at least 3 digits
       num_digits = std::max(3, num_digits);
-  // COMMENT_HILMAR: lassen sich die naechsten vier Code-Zeilen auch einfacher realisieren?
+// COMMENT_HILMAR: lassen sich die naechsten vier Code-Zeilen auch einfacher realisieren?
       // set format string for printf function, use leading zeros
       std::string format("%0"+StringUtils::stringify(num_digits)+"i");
-      char s[num_digits];
+      char* s = new char[num_digits];
       sprintf(s, format.c_str(), Process::rank);
       // set full filename
       file_name = file_base_name + s + ".log";
+      delete [] s;
 
       if (!file.is_open())
       {
@@ -364,7 +365,7 @@ namespace FEAST
       Comm::read(msg_length);
 
       // char array for storing the message
-      char message[msg_length];
+      char* message = new char[msg_length];
       // read char array from the buffer
       Comm::read(msg_length, message);
 
@@ -383,6 +384,7 @@ namespace FEAST
       {
         log(message);
       }
+      delete [] message;
     }
 
 
@@ -463,13 +465,13 @@ namespace FEAST
       target targ = SCREEN_FILE)
     {
 
-  // COMMENT_HILMAR: Maybe it is more efficient to *not* realise this via the first version of log_master_array(), but
-  // to trigger an extra service receive routine on master side...
+// COMMENT_HILMAR: Maybe it is more efficient to *not* realise this via the first version of log_master_array(), but
+// to trigger an extra service receive routine on master side...
 
       // convert the vector of strings into one long char array and determine further information needed by
       // the other version of the function log_master_array(...).
       unsigned int num_messages(messages.size());
-      unsigned int msg_lengths[num_messages];
+      unsigned int* msg_lengths = new unsigned int[num_messages];
       unsigned int total_length(0);
       for(unsigned int i(0) ; i < num_messages ; ++i)
       {
@@ -477,7 +479,7 @@ namespace FEAST
         msg_lengths[i] = messages[i].size()+1;
         total_length += msg_lengths[i];
       }
-      char messages_char[total_length];
+      char* messages_char = new char[total_length];
       // set pointer to beginning of message
       char* pos = messages_char;
       for(unsigned int i(0) ; i < num_messages ; ++i)
@@ -489,6 +491,8 @@ namespace FEAST
       }
       // now call the other version of the function log_master_array()
       log_master_array(num_messages, msg_lengths, total_length, messages_char, targ);
+      delete [] msg_lengths;
+      delete [] messages_char;
     } // log_master_array()
 
 
@@ -522,12 +526,12 @@ namespace FEAST
       Comm::read(num_messages);
 
       // allocate array for sotring message lengths
-      unsigned int msg_lengths[num_messages];
+      unsigned int* msg_lengths = new unsigned int[num_messages];
       // read message lengths from the buffer
       Comm::read(num_messages, msg_lengths);
 
       // allocate array for storing the start positions of the single messages in the receive buffer
-      unsigned int msg_start_pos[num_messages];
+      unsigned int* msg_start_pos = new unsigned int[num_messages];
 
       // set start positions of the single messages in the receive buffer
       msg_start_pos[0] = 0;
@@ -536,9 +540,10 @@ namespace FEAST
         msg_start_pos[i] = msg_start_pos[i-1] + msg_lengths[i-1];
       }
       unsigned int total_length(msg_start_pos[num_messages-1] + msg_lengths[num_messages-1]);
+      delete [] msg_lengths;
 
       // allocate char array for (consecutively) storing the messages
-      char messages[total_length];
+      char* messages = new char[total_length];
       // read char array itself from the buffer
       Comm::read(total_length, messages);
 
@@ -565,6 +570,8 @@ namespace FEAST
           log(messages + msg_start_pos[i]);
         }
       }
+      delete [] msg_start_pos;
+      delete [] messages;
     } // receive_array()
   }; // class Logger
 

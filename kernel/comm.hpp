@@ -142,12 +142,13 @@ namespace FEAST
     {
       // create char array for storing the sent message (add 1 to the size since the sent message ends with null
       // termination symbol)
-      char msg_char[size+1];
+      char* msg_char = new char[size+1];
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg_char,
                                       size, MPI_CHAR, MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
       // copy the char array to the string
       msg.assign(msg_char);
+      delete [] msg_char;
     }
 
     /**

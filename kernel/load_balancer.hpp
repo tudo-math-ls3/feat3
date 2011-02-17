@@ -676,7 +676,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
               // be prepared with n+1 segments although only n processes receive data.
               ++count;
             }
-            unsigned int num_neighbours[count];
+            unsigned int* num_neighbours = new unsigned int[count];
             unsigned int* index = _graphs[igroup]->index();
             for(unsigned int i(0) ; i < _graphs[igroup]->num_nodes() ; ++i)
             {
@@ -716,6 +716,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
                            reinterpret_cast<int*>(index), MPI_UNSIGNED,neighbours_local, num_neighbours_local,
                            MPI_UNSIGNED, root,_subgroups[igroup]->comm());
             }
+            delete [] num_neighbours;
           }
           else
           {

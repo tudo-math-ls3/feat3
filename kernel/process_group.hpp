@@ -343,9 +343,9 @@ namespace FEAST
         **********************************/
 
         // receive buffer for storing the lengths of the messages
-        unsigned int msg_lengths[_num_processes];
+        unsigned int* msg_lengths = new unsigned int[_num_processes];
         // array for storing the start positions of the single messages in the receive buffer
-        unsigned int msg_start_pos[_num_processes];
+        unsigned int* msg_start_pos = new unsigned int[_num_processes];
 
         // gather the lengths of the messages from the other processes
         MPI_Gather(&length, 1, MPI_UNSIGNED, msg_lengths, 1, MPI_UNSIGNED, _rank_coord, _comm);
@@ -361,7 +361,7 @@ namespace FEAST
         unsigned int total_length(msg_start_pos[_num_processes-1] + msg_lengths[_num_processes-1]);
 
         // receive buffer for (consecutively) storing the messages
-        char messages[total_length];
+        char* messages = new char[total_length];
 
 //        // debug output
 //        for(unsigned int i(0) ; i < _num_processes ; ++i)
@@ -387,7 +387,9 @@ namespace FEAST
 
         // now send everything to the master
         Logger::log_master_array(_num_processes, msg_lengths, total_length, messages, target);
-
+        delete [] msg_lengths;
+        delete [] msg_start_pos;
+        delete [] messages;
       }
     } // log_indiv_master
   }; // class ProcessGroup
@@ -614,7 +616,7 @@ namespace FEAST
     void do_exchange()
     {
       // length of the integer arrays to be exchanged
-      unsigned int n = 10;
+      unsigned int const n = 10;
 
       unsigned int num_neighbours = _graph_distributed->num_neighbours();
       unsigned int* neighbours = _graph_distributed->neighbours();
@@ -623,12 +625,14 @@ namespace FEAST
       // (The MPI standard says that the send buffer given to MPI_Isend(...) should neither be overwritten nor read(!)
       // until the communication has been completed. Hence, we cannot send the same array to all neighbours, but we
       // have to send num_neighbours different arrays.)
-      unsigned long a[num_neighbours][n];
-      unsigned long a_recv[num_neighbours][n];
+      unsigned long** a = new unsigned long*[num_neighbours];
+      unsigned long** a_recv = new unsigned long*[num_neighbours];
 
       // fill the array to be sent
       for(unsigned int i(0) ; i < num_neighbours; ++i)
       {
+        a[i] = new unsigned long[n];
+        a_recv[i] = new unsigned long[n];
         for(unsigned int j(0) ; j < n; ++j)
         {
           a[i][j] = 100000*_rank + 100*neighbours[i] + j;
@@ -649,8 +653,8 @@ namespace FEAST
       }
 
       // request and status objects necessary for communication
-      MPI_Request requests[num_neighbours];
-      MPI_Status statuses[num_neighbours];
+      MPI_Request* requests = new MPI_Request[num_neighbours];
+      MPI_Status* statuses = new MPI_Status[num_neighbours];
 
       // post sends to all neighbours
       for(unsigned int i(0) ; i < num_neighbours; ++i)
@@ -666,6 +670,8 @@ namespace FEAST
       }
       // wait for all receives to complete
       MPI_Waitall(num_neighbours, requests, statuses);
+      delete [] requests;
+      delete [] statuses;
 
       // debugging output
       for(unsigned int i(0) ; i < num_neighbours; ++i)
@@ -678,7 +684,14 @@ namespace FEAST
         Logger::log("Process " + StringUtils::stringify(_rank) + " received [" + s + "] from neighbour "
                     + StringUtils::stringify(neighbours[i]) + ".\n");
       }
-    }
+      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      {
+        delete [] a[i];
+        delete [] a_recv[i];
+      }
+      delete [] a;
+      delete [] a_recv;
+    } // do_exchange()
   };
 
 

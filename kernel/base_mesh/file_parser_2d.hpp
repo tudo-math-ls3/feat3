@@ -346,11 +346,11 @@ namespace FEAST
               // replace edges: 0 -> 0, 1 -> 3, 2 -> 1, 3 -> 2
 
               // read vertex indices
-              unsigned int v[nverts];
+              unsigned int* v = new unsigned int[nverts];
               mesh_file->read(v[0], v[1], v[3], v[2]);
 
               // read edge indices
-              unsigned int e[nedges];
+              unsigned int* e = new unsigned int[nedges];
               mesh_file->read(e[0], e[3], e[1], e[2]);
 
               // substract 1 from 1-based to 0-based indexing
@@ -367,7 +367,8 @@ namespace FEAST
 
               _bm->_add(new Quad_(_bm->vertex(v[0]), _bm->vertex(v[1]), _bm->vertex(v[2]), _bm->vertex(v[3]),
                                   _bm->edge(e[0]), _bm->edge(e[1]), _bm->edge(e[2]), _bm->edge(e[3]), 0));
-
+              delete [] v;
+              delete [] e;
               // read edge neighbours
               int eneigh[4];
               mesh_file->read(eneigh[0], eneigh[3], eneigh[1], eneigh[2]);
