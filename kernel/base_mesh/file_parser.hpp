@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_BM_FILE_PARSER_2D_HPP
-#define KERNEL_BM_FILE_PARSER_2D_HPP 1
+#ifndef KERNEL_BM_FILE_PARSER_HPP
+#define KERNEL_BM_FILE_PARSER_HPP 1
 
 // includes, system
 #include <iostream> // for std::ostream
@@ -13,50 +13,60 @@
 #include <kernel/util/file_reader_ascii.hpp>
 // COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
 //#include <kernel/error_handler.hpp>
-#include <kernel/base_mesh/base_mesh_2d.hpp>
-//#include <kernel/base_mesh/vertex.hpp>
-//#include <kernel/base_mesh/cell.hpp>
-//#include <kernel/base_mesh/cell_1d_edge.hpp>
-//#include <kernel/base_mesh/cell_2d_quad.hpp>
-//#include <kernel/base_mesh/cell_2d_tri.hpp>
+#include <kernel/base_mesh/bm.hpp>
 
 namespace FEAST
 {
   namespace BaseMesh
   {
     /**
-    * \brief base mesh file parser for 2D files
+    * \brief template class for base mesh file parser
     *
-    * This class parses 2D mesh files in FEAST1 format. It is friend of BaseMesh2D to have full access to BaseMesh2D's
-    * private members.
-    *
-    * \note Currently, we only have 2D files, so I began with a 2D file reader only. I didn't care yet how to
-    * distinguish/unite 1D, 2D and 3D. However we do it... we should try to avoid too much code duplication. Most
-    * probably, there will be only *one* file parser for 1D, 2D and 3D files...
-    *
-    * \note This is only a very rudimentary file parser which will be rewritten when we have defined the new file
-    * format. It only supports some features for basic test purposes.
-    *
-    * \note FEAST1 file format does not distinguish world dimension and space dimension. When it does in future,
-    * this class needs the corresponding template parameter world_dim_ (similar to class BaseMesh2D).
+    * To be specialised w.r.t. space_dim_
     *
     * \author Dominik Goeddeke
     * \author Hilmar Wobker
     */
-    class FileParser2D
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class FileParser
+    {
+    };
+
+
+    /**
+    * \brief template class for base mesh file parser, specialisation for 2D files
+    *
+    * This class parses 2D mesh files in FEAST1 format. It is friend of class BM to have full access to base mesh's
+    * private members.
+    *
+    * \note Currently, we only have 2D files, so we implemented this 2D file reader only. Before doing the same for
+    * 1D and 3D, one should think about how to avoid too much code duplication.
+    *
+    * \note This is only a very rudimentary file parser which will be rewritten when we have defined the new file
+    * format (adapted the old one, resp.). It only supports some features for basic test purposes.
+    *
+    * \note FEAST1 file format does not distinguish world dimension and space dimension. The world_dim_ template
+    * parameter actually has to be equal to 2 here.
+    *
+    * \author Dominik Goeddeke
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class FileParser<2, world_dim_>
     {
       /// shortcuts various cell types to save typing of template parameters
-      typedef Vertex<2> Vertex_;
-      typedef Edge<2, 2> Edge_;
-//      typedef Tri<2, 2> Tri_;
-      typedef Quad<2, 2> Quad_;
-//      typedef Cell<2, 2, 2> Cell_;
+      typedef Vertex<world_dim_> Vertex_;
+      typedef Edge<2, world_dim_> Edge_;
+//      typedef Tri<2, world_dim_> Tri_;
+      typedef Quad<2, world_dim_> Quad_;
 
 
     private:
 
       /// pointer to the base mesh
-      BaseMesh2D<2>* _bm;
+      BM<2, world_dim_>* _bm;
       /// number boundaries in the mesh file
       unsigned int _num_boundaries;
       /// array for storing number of segments per boundary
@@ -223,7 +233,7 @@ namespace FEAST
       } // _parse_fgeom()
 
 
-      /// reads MESH portion of FEAST files into this BaseMesh
+      /// reads MESH portion of FEAST files into this base mesh
       void _parse_mesh(FileReaderASCII * mesh_file)
       {
         // header
@@ -302,7 +312,7 @@ namespace FEAST
             }
           }
           // add vertex to base mesh
-          _bm->_add(new Vertex_(coords));
+          _bm->_subcells._add(new Vertex_(coords));
         }
 
         // read  and set edges
@@ -311,7 +321,7 @@ namespace FEAST
           unsigned int v0, v1;
           mesh_file->read(v0, v1);
           // substract 1 from 1-based to 0-based indexing
-          _bm->_add(new Edge_(_bm->vertex(v0-1), _bm->vertex(v1-1), 0));
+          _bm->_subcells._add(new Edge_(_bm->_subcells.vertex(v0-1), _bm->_subcells.vertex(v1-1), 0));
         }
 
         // vector for buffering neighbourhood information that can not be immediately set
@@ -365,8 +375,10 @@ namespace FEAST
 //std::cout << "Vertices: " << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
 //std::cout << "Edges   : " << e[0] << " "<< e[1] << " " << e[2] << " " << e[3] << std::endl;
 
-              _bm->_add(new Quad_(_bm->vertex(v[0]), _bm->vertex(v[1]), _bm->vertex(v[2]), _bm->vertex(v[3]),
-                                  _bm->edge(e[0]), _bm->edge(e[1]), _bm->edge(e[2]), _bm->edge(e[3]), 0));
+              _bm->_add(new Quad_(_bm->_subcells.vertex(v[0]), _bm->_subcells.vertex(v[1]),
+                                  _bm->_subcells.vertex(v[2]), _bm->_subcells.vertex(v[3]),
+                                  _bm->_subcells.edge(e[0]), _bm->_subcells.edge(e[1]),
+                                  _bm->_subcells.edge(e[2]), _bm->_subcells.edge(e[3]), 0));
               delete [] v;
               delete [] e;
               // read edge neighbours
@@ -542,11 +554,11 @@ COMMENT_HILMAR: will be adapted later
         unsigned int num_cells;
         mesh_file->read(num_cells);
         if(num_cells != _num_cells)
-          throw InternalError("Number of BaseMeshCells from mesh file does not match that of partition file.");
+          throw InternalError("Number of base mesh cells from mesh file does not match that of partition file.");
         mesh_file->read(_num_partitions);
-        // TODO: THIS IS A HACK UNTIL HILMAR AND I DECIDE WHAT DTO DO WITH THE BASEMESH
+        // TODO: THIS IS A HACK UNTIL HILMAR AND I DECIDE WHAT TO DO WITH THE BASE MESH
         if(_num_cells != _num_partitions)
-          throw InternalError("Sorry. Hilmar and Dominik currently only support one basemeshcell per process.");
+          throw InternalError("Sorry. Hilmar and Dominik currently only support one base mesh cell per process.");
 
         // cells
         for(unsigned int icell = 0 ; icell < _num_cells; ++icell)
@@ -575,8 +587,12 @@ COMMENT_HILMAR: will be adapted later
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
-      inline void parse(std::string const& file_name, BaseMesh2D<2>* bm)
+      inline void parse(std::string const& file_name, BM<2, world_dim_>* bm)
       {
+        // FEAST1 file format does not distinguish world dimension and space dimension. So, for now the world_dim_
+        // template parameter actually has to be equal to 2 here.
+        assert(world_dim_ == 2);
+
         FileReaderASCII* mesh_file = new FileReaderASCII(file_name, '#', true);
 
         // set base mesh pointer
@@ -611,4 +627,4 @@ COMMENT_HILMAR: will be adapted later
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BM_FILE_PARSER_2D_HPP
+#endif // #define KERNEL_BM_FILE_PARSER_HPP

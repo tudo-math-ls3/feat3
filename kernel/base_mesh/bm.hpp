@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_BASE_MESH_HPP
-#define KERNEL_BASE_MESH_HPP 1
+#ifndef KERNEL_BASE_MESH_BM_HPP
+#define KERNEL_BASE_MESH_BM_HPP 1
 
 // includes, system
 #include <iostream> // for std::ostream
@@ -11,23 +11,41 @@
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
+#include <kernel/base_mesh/base_mesh_subcells.hpp>
 #include <kernel/graph.hpp>
 
 namespace FEAST
 {
   namespace BaseMesh
   {
+
+    // forward declaration
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class FileParser;
+
     /**
     * \brief base mesh
+    *
+    * long description missing
+    *
+    * \note This class is not called 'BaseMesh' since this would collide with the namespace.
     *
     * \author Dominik Goeddeke
     * \author Hilmar Wobker
     */
-    template<unsigned char space_dim_, unsigned char world_dim_>
-    class BaseMesh
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class BM
     {
-      /// shortcut to save typing of template parameters
+      /// shortcuts to save typing of template parameters
       typedef Cell<space_dim_, space_dim_, world_dim_> Cell_;
+
+      // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
+      // access to all members of this class.
+      friend class FileParser<space_dim_, world_dim_>;
 
 
     private:
@@ -35,11 +53,8 @@ namespace FEAST
       /* *****************
       * member variables *
       *******************/
-      /// array of vertices
-      std::vector<Vertex_*> _vertices;
-
       /// object containing the vectors of subcells
-      Subcells<space_dim_, world_dim> _subcells;
+      Subcells<space_dim_, world_dim_> _subcells;
 
       /// vector of cells (of full dimension)
       std::vector<Cell_*> _cells;
@@ -53,11 +68,11 @@ namespace FEAST
       * functions *
       ************/
       /**
-      * \brief templated function to remove vertices, edges and cells from the corresponding vector
+      * \brief templated function to remove items from the given vector
       *
       * The item is swapped to the end of the list and then deleted and removed.
-      * TODO: This code is replicated in all base_mesh_xD classes since there is no generic class to inherit from
       */
+//COMMENT_HILMAR: Move this code to some parent class BaseMeshAux or similar.
       template<typename T_>
       inline void _remove(std::vector<T_>& v, T_ item)
       {
@@ -68,19 +83,6 @@ namespace FEAST
         item->set_index(v.size()-1);
         delete item;
         v.pop_back();
-      }
-
-      /// adds given vertex to base mesh and sets its index
-      inline void _add(Vertex_* v)
-      {
-        _vertices.push_back(v);
-        v->set_index(_vertices.size()-1);
-      }
-
-      /// deletes given vertex
-      inline void _remove(Vertex_* v)
-      {
-        _remove<Vertex_*>(_vertices, v);
       }
 
       /// adds given cell to base mesh and sets its index
@@ -101,42 +103,22 @@ namespace FEAST
 
     public:
 
-      // Parsing of the mesh files is outsourced to class FileParser2D. Make this class friend such that it has
-      // access to private members of BaseMesh2D.
-      friend class FileParser2D;
-
       /* ***************************
       * constructors & destructors *
       *****************************/
 
       /**
       * \brief  default CTOR for a base mesh
-      *
-      * Creates a base mesh basing on the provided mesh file.
-      *
-      * \param[in] file_name
-      * name of the mesh file
       */
-      BaseMesh()
-        : _vertices(nullptr),
-          _cells(nullptr),
+      BM()
+        : _cells(nullptr),
           _graph(nullptr)
       {
       }
 
       /// default destructor
-      ~BaseMesh()
+      ~BM()
       {
-        // delete all vertices and their associated information
-        while (!_vertices.empty())
-        {
-          delete _vertices.back();
-          _vertices.pop_back();
-        }
-
-        // delete the object containing the subcells
-        delete _subcells;
-
         // delete all cells and their associated information
         // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about with
         // the std::vector invalidates it. Also, pop_back calls default DTOR of BMI*, so we have to manually call
@@ -152,13 +134,6 @@ namespace FEAST
       /* *********************************
       * getters & setters & manipulators *
       ************************************/
-
-      /// returns number of vertices in this mesh
-      inline global_index_t num_vertices() const
-      {
-        return _vertices.size();
-      }
-
 
       /// returns number of cells in this mesh (including inactive ones)
       inline global_index_t num_cells() const
@@ -184,14 +159,6 @@ namespace FEAST
       }
 
 
-      /// returns vertex at given index
-      inline Vertex_* vertex(global_index_t const index)
-      {
-        assert(index < num_vertices());
-        return _vertices[index];
-      }
-
-
       /// returns cell at given index
       inline Cell_* cell(global_index_t const index) const
       {
@@ -208,13 +175,9 @@ namespace FEAST
 
 
       /// adds (sub)cells created during subdivision to the corresponding (sub)cell vectors
-      inline void add_created_cells(SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data)
+      inline void add_created_items(SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data)
       {
-        for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
-        {
-          _add(subdiv_data->created_vertices[i]);
-        }
-        _subcells.add_created_subcells(SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data);
+        _subcells.add_created_subcells(subdiv_data);
         for(unsigned int i(0) ; i < subdiv_data->created_cells.size() ; ++i)
         {
           _add(subdiv_data->created_cells[i]);
@@ -247,7 +210,7 @@ namespace FEAST
       }
 
 
-      /// creates connectivity graph from information stored in this BaseMesh
+      /// creates connectivity graph from information stored in this base mesh
 // COMMENT_HILMAR: This is just an intermediate solution to artificially connect the base mesh to the load balancer.
 // I.e., we assume here that each process receives exactly one BMC and that the connectivity graph relevant for the
 // load balancer actually is the connectivity graph of the base mesh. Later, there will be the matrix patch layer and
@@ -337,21 +300,21 @@ namespace FEAST
 
 
       /**
-      * \brief prints this BaseMesh to the given ostream.
+      * \brief prints this base mesh to the given ostream.
       *
       * According to http://www.cplusplus.com/reference/iostream, ostream is the superclass for both stdout, stderr and
       * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
       * and and printf()-style debugging at the same time. Neat.
       *
       * \param[in] stream
-      *            Stream to dump this BaseMesh into.
+      *            Stream to dump this base mesh into.
       */
       void print(std::ostream& stream)
       {
         stream << "---------------------------------------------------" << std::endl;
         stream << "|               DUMPING BASE MESH                  " << std::endl;
         stream << "---------------------------------------------------" << std::endl;
-        _subcells.print(std::ostream& stream);
+        _subcells.print(stream);
         stream << _cells.size() << " cells" << std::endl;
         for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
@@ -360,178 +323,8 @@ namespace FEAST
         }
         stream << "---------------------------------------------------" << std::endl;
       }
-    }; // class BaseMesh
+    }; // class BM
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BASE_MESH_HPP
-
-
-/*
-      /// test CTOR, generates a hard-wired test mesh
-      BaseMesh2D()
-      {
-        // Base mesh example consisting of three quads and two tris:
-        //    v0---e0---v1---e1---v2 \.
-        //    |          |         |    \.
-        //   e2    c0   e3   c1   e4  c2  \ e5
-        //    |          |         |         \.
-        //    v3---e6---v4---e7---v5----e8---v6
-        //                      /  |         |
-        //                  e9/ c3 e10  c4  e11
-        //                /        |         |
-        //              v7---e12--v8---e13---v9
-
-        // create the ten vertices
-        // v0
-        Vertex_* v = new Vertex_();
-        v->set_coord(0, 0.0);
-        v->set_coord(1, 1.0);
-        _add(v);
-
-        // v1
-        v = new Vertex_();
-        v->set_coord(0, 1.0);
-        v->set_coord(1, 1.0);
-        _add(v);
-
-        // v2
-        v = new Vertex_();
-        v->set_coord(0, 2.0);
-        v->set_coord(1, 1.0);
-        _add(v);
-
-        // v3
-        v = new Vertex_();
-        v->set_coord(0, 0.0);
-        v->set_coord(1, 0.0);
-        _add(v);
-
-        // v4
-        v = new Vertex_();
-        v->set_coord(0, 1.0);
-        v->set_coord(1, 0.0);
-        _add(v);
-
-        // v5
-        v = new Vertex_();
-        v->set_coord(0, 2.0);
-        v->set_coord(1, 0.0);
-        _add(v);
-
-        // v6
-        v = new Vertex_();
-        v->set_coord(0, 3.0);
-        v->set_coord(1, 0.0);
-        _add(v);
-
-        // v7
-        v = new Vertex_();
-        v->set_coord(0, 1.0);
-        v->set_coord(1, -1.0);
-        _add(v);
-
-        // v8
-        v = new Vertex_();
-        v->set_coord(0, 2.0);
-        v->set_coord(1, -1.0);
-        _add(v);
-
-        // v9
-        v = new Vertex_();
-        v->set_coord(0, 3.0);
-        v->set_coord(1, -1.0);
-        _add(v);
-
-
-        // create the 14 edges
-        // (just to ease manual sanity checks, always use the vertex of smaller global index as start vertex)
-        // e0
-        Edge_* e = new Edge_(_vertices[0], _vertices[1], 0);
-        _add(e);
-        // e1
-        e = new Edge_(_vertices[1], _vertices[2], 0);
-        _add(e);
-        // e2
-        e = new Edge_(_vertices[0], _vertices[3], 0);
-        _add(e);
-        // e3
-        e = new Edge_(_vertices[1], _vertices[4], 0);
-        _add(e);
-        // e4
-        e = new Edge_(_vertices[2], _vertices[5], 0);
-        _add(e);
-        // e5
-        e = new Edge_(_vertices[2], _vertices[6], 0);
-        _add(e);
-        // e6
-        e = new Edge_(_vertices[3], _vertices[4], 0);
-        _add(e);
-        // e7
-        e = new Edge_(_vertices[4], _vertices[5], 0);
-        _add(e);
-        // e8
-        e = new Edge_(_vertices[5], _vertices[6], 0);
-        _add(e);
-        // e9
-        e = new Edge_(_vertices[5], _vertices[7], 0);
-        _add(e);
-        // e10
-        e = new Edge_(_vertices[5], _vertices[8], 0);
-        _add(e);
-        // e11
-        e = new Edge_(_vertices[6], _vertices[9], 0);
-        _add(e);
-        // e12
-        e = new Edge_(_vertices[7], _vertices[8], 0);
-        _add(e);
-        // e13
-        e = new Edge_(_vertices[8], _vertices[9], 0);
-        _add(e);
-
-        // create quad cell c0
-        Quad_* quad =
-          new Quad_(_vertices[3], _vertices[4], _vertices[0], _vertices[1],
-                    _edges[6], _edges[0], _edges[2], _edges[3], 0);
-        _add(quad);
-
-        // create quad cell c1
-        quad = new Quad_(_vertices[4], _vertices[5], _vertices[1], _vertices[2],
-                         _edges[7], _edges[1], _edges[3], _edges[4], 0);
-        _add(quad);
-
-        // create tri cell c2
-        Tri_* tri = new Tri_(_vertices[5], _vertices[6], _vertices[2],
-                             _edges[8], _edges[5], _edges[4], 0);
-        _add(tri);
-        // create tri cell c3
-        tri = new Tri_(_vertices[7], _vertices[8], _vertices[5],
-                       _edges[12], _edges[10], _edges[9], 0);
-        _add(tri);
-
-        // create quad cell c4
-        quad = new Quad_(_vertices[8], _vertices[9], _vertices[5], _vertices[6],
-                         _edges[13], _edges[8], _edges[10], _edges[11], 0);
-        _add(quad);
-
-        // set neighbourhood information (emulated file parser part 2)
-        _cells[0]->add_neighbour(SDIM_EDGE, 3, _cells[1]);
-
-        _cells[1]->add_neighbour(SDIM_EDGE, 2, _cells[0]);
-        _cells[1]->add_neighbour(SDIM_EDGE, 3, _cells[2]);
-        _cells[1]->add_neighbour(SDIM_VERTEX, 1, _cells[4]);
-        _cells[1]->add_neighbour(SDIM_VERTEX, 1, _cells[3]);
-
-        _cells[2]->add_neighbour(SDIM_EDGE, 2, _cells[1]);
-        _cells[2]->add_neighbour(SDIM_EDGE, 0, _cells[4]);
-        _cells[2]->add_neighbour(SDIM_VERTEX, 0, _cells[3]);
-
-        _cells[3]->add_neighbour(SDIM_EDGE, 1, _cells[4]);
-        _cells[3]->add_neighbour(SDIM_VERTEX, 2, _cells[2]);
-        _cells[3]->add_neighbour(SDIM_VERTEX, 2, _cells[1]);
-
-        _cells[4]->add_neighbour(SDIM_EDGE, 1, _cells[2]);
-        _cells[4]->add_neighbour(SDIM_EDGE, 2, _cells[3]);
-        _cells[4]->add_neighbour(SDIM_VERTEX, 2, _cells[1]);
-      }
-*/
+#endif // #define KERNEL_BASE_MESH_BASE_MESH_HPP

@@ -14,8 +14,8 @@
 #include <kernel/process_group.hpp>
 // COMMENT_HILMAR: Temporarily use only BaseMesh2D here! space_dim_ and world_dim_ templates are still completely
 // missing on load balancer / MPI prototype side.
-#include <kernel/base_mesh/file_parser_2d.hpp>
-#include <kernel/base_mesh/base_mesh_2d.hpp>
+#include <kernel/base_mesh/file_parser.hpp>
+#include <kernel/base_mesh/bm.hpp>
 
 namespace FEAST
 {
@@ -182,7 +182,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     * \note Temporarily use only BaseMesh2D here! space_dim_ and world_dim_ templates are still completely missing on
     * load balancer / MPI prototype side.
     */
-    BaseMesh::BaseMesh2D<2>* _base_mesh;
+    BaseMesh::BM<2, 2>* _base_mesh;
 
   public:
 
@@ -260,8 +260,8 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // the mesh is read by the process group coordinator
       if(_process_group->is_coordinator())
       {
-        _base_mesh = new BaseMesh::BaseMesh2D<2>();
-        BaseMesh::FileParser2D parser;
+        _base_mesh = new BaseMesh::BM<2, 2>();
+        BaseMesh::FileParser<2, 2> parser;
         try
         {
           Logger::log_master("Reading mesh file " + mesh_file + "...\n", Logger::SCREEN_FILE);

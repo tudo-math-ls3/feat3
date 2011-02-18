@@ -6,8 +6,8 @@
 #include <kernel/base_header.hpp>
 // COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
 //#include <kernel/error_handler.hpp>
-#include <kernel/base_mesh/file_parser_2d.hpp>
-#include <kernel/base_mesh/base_mesh_2d.hpp>
+#include <kernel/base_mesh/file_parser.hpp>
+#include <kernel/base_mesh/bm.hpp>
 
 using namespace FEAST;
 using namespace BaseMesh;
@@ -25,11 +25,11 @@ int main (int argc, char **argv)
 
   // COMMENT_HILMAR: FEAST1 file format, which we currently use, cannot distinguish space and world dimension. Hence,
   // the case WDIM = 3 and SDIM = 2 is currently not supported.
-  assert(WDIM == 2);
+  assert(WDIM == SDIM);
 
   std::string name_mesh_file(argv[1]);
-  BaseMesh2D<WDIM> bm;
-  FileParser2D parser;
+  BM<SDIM, WDIM> bm;
+  FileParser<SDIM, WDIM> parser;
   try
   {
     parser.parse(name_mesh_file, &bm);

@@ -1,0 +1,552 @@
+#pragma once
+#ifndef KERNEL_BASE_MESH_SUBCELLS_HPP
+#define KERNEL_BASE_MESH_SUBCELLS_HPP 1
+
+// includes, system
+#include <iostream> // for std::ostream
+#include <cassert>  // for assert()
+#include <vector>   // for std::vector
+
+// includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/base_mesh/vertex.hpp>
+#include <kernel/base_mesh/cell.hpp>
+#include <kernel/base_mesh/cell_1d_edge.hpp>
+#include <kernel/base_mesh/cell_2d_quad.hpp>
+#include <kernel/base_mesh/cell_2d_tri.hpp>
+#include <kernel/graph.hpp>
+
+namespace FEAST
+{
+  namespace BaseMesh
+  {
+    // forward declaration
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class FileParser;
+
+    /**
+    * \brief class providing containers and functions for base mesh subcells
+    *
+    * To be specialised w.r.t. template parameter space_dim_.
+    *
+    * \author Hilmar Wobker
+    */
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class Subcells
+    {
+    };
+
+
+    /**
+    * \brief class providing containers and functions for subcells of 1D cells, i.e. for vertices
+    *
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class Subcells<1, world_dim_>
+    {
+      /// shortcut to save typing of template parameters
+      typedef Vertex<world_dim_> Vertex_;
+
+      // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
+      // access to all members of this class.
+      friend class FileParser<1, world_dim_>;
+
+
+    private:
+
+      /* *****************
+      * member variables *
+      *******************/
+      /// array of vertices
+      std::vector<Vertex_*> _vertices;
+
+
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief templated function to remove items from the given vector
+      *
+      * The item is swapped to the end of the list and then deleted and removed.
+      */
+//COMMENT_HILMAR: Move this function to some parent class BaseMeshAux or similar.
+      template<typename T_>
+      inline void _remove_item(std::vector<T_>& v, T_ item)
+      {
+        assert(item->index() < v.size());
+        v[item->index()] = v.back();
+        v[item->index()]->set_index(item->index());
+        v[v.size()-1] = item;
+        item->set_index(v.size()-1);
+        delete item;
+        v.pop_back();
+      }
+
+
+
+    protected:
+      /* **********
+      * functions *
+      ************/
+      /// adds given vertex to base mesh and sets its index
+      inline void _add(Vertex_* v)
+      {
+        _vertices.push_back(v);
+        v->set_index(_vertices.size()-1);
+      }
+
+
+      /// deletes given vertex
+      inline void _remove(Vertex_* v)
+      {
+        _remove_item<Vertex_*>(_vertices, v);
+      }
+
+
+    public:
+
+      /* ***************************
+      * constructors & destructors *
+      *****************************/
+
+      /// default CTOR
+      Subcells()
+        : _vertices(nullptr)
+      {
+      }
+
+      /// default destructor
+      ~Subcells()
+      {
+        // delete all vertices and their associated information
+        // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about
+        // with the std::vector invalidates it. Also, pop_back calls default DTOR of Vertex_*, so we have to manually
+        // call delete here)
+        while (!_vertices.empty())
+        {
+          delete _vertices.back();
+          _vertices.pop_back();
+        }
+      }
+
+
+      /* *********************************
+      * getters & setters & manipulators *
+      ************************************/
+
+      /// returns number of vertices in this mesh
+      inline global_index_t num_vertices() const
+      {
+        return _vertices.size();
+      }
+
+
+      /// returns vertex at given index
+      inline Vertex_* vertex(global_index_t const index)
+      {
+        assert(index < num_vertices());
+        return _vertices[index];
+      }
+
+
+      /// adds vertex created during subdivision of the corresponding edge
+      inline void add_created_subcells(SubdivisionData<1, 2, world_dim_>* subdiv_data)
+      {
+        _add(subdiv_data->created_vertex);
+      }
+
+
+      /// validates the subcells
+      void validate() const
+      {
+// COMMENT_HILMAR: muss noch angepasst werden
+//        std::cout << "Validating subcells..." << std::endl;
+//        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
+//        {
+//          cell(icell)->validate();
+//        }
+//        std::cout << "...done!" << std::endl;
+      }
+
+
+      /**
+      * \brief prints this subcells object to the given ostream.
+      *
+      * According to http://www.cplusplus.com/reference/iostream, ostream is the superclass for both stdout, stderr and
+      * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
+      * and and printf()-style debugging at the same time. Neat.
+      *
+      * \param[in] stream
+      * Stream to dump this BaseMesh into.
+      */
+      void print(std::ostream& stream)
+      {
+        stream << _vertices.size() << " vertices" << std::endl;
+        for(unsigned int ivert(0) ; ivert < _vertices.size() ; ++ivert)
+        {
+          _vertices[ivert]->print(stream);
+          stream << std::endl;
+        }
+      }
+    }; // class Subcells<1, world_dim_>
+
+
+
+
+    /**
+    * \brief class providing containers and functions for subcells of 2D cells, i.e. for vertices and edges
+    *
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class Subcells<2, world_dim_>
+     : public Subcells<1, world_dim_>
+    {
+      /// shortcut to save typing of template parameters
+      typedef Cell<1, 2, world_dim_> Cell_1D_;
+      typedef Vertex<world_dim_> Vertex_;
+
+      // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
+      // access to all members of this class.
+      friend class FileParser<2, world_dim_>;
+
+
+    private:
+
+      /* *****************
+      * member variables *
+      *******************/
+      /// array of edges
+      std::vector<Cell_1D_*> _edges;
+
+
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief templated function to remove items from the given vector
+      *
+      * The item is swapped to the end of the list and then deleted and removed.
+      */
+//COMMENT_HILMAR: Move this function to some parent class BaseMeshAux or similar.
+      template<typename T_>
+      inline void _remove_item(std::vector<T_>& v, T_ item)
+      {
+        assert(item->index() < v.size());
+        v[item->index()] = v.back();
+        v[item->index()]->set_index(item->index());
+        v[v.size()-1] = item;
+        item->set_index(v.size()-1);
+        delete item;
+        v.pop_back();
+      }
+
+
+    protected:
+      /* **********
+      * functions *
+      ************/
+
+      /// adds given edge to container and sets its index
+      inline void _add(Cell_1D_* e)
+      {
+        _edges.push_back(e);
+        e->set_index(_edges.size()-1);
+      }
+
+
+      /// deletes given edge
+      inline void _remove(Cell_1D_* e)
+      {
+        _remove_item<Cell_1D_*>(_edges, e);
+      }
+
+
+      /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
+      inline void _add(Vertex_* v)
+      {
+        Subcells<1, world_dim_>::_add(v);
+      }
+
+
+      /// deletes given vertex (wrapper for function in parent class)
+      inline void _remove(Vertex_* v)
+      {
+        Subcells<1, world_dim_>::_remove(v);
+      }
+
+
+    public:
+
+      /* ***************************
+      * constructors & destructors *
+      *****************************/
+
+      /**
+      * \brief  default CTOR for a 2D base mesh
+      *
+      * Ceates a base mesh basing on the provided mesh file.
+      *
+      * \param[in] file_name
+      * name of the mesh file
+      */
+      Subcells()
+        : Subcells<1, world_dim_>(),
+        _edges(nullptr)
+      {
+      }
+
+
+      /// default destructor
+      ~Subcells()
+      {
+        // delete all edges and their associated information
+        // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about
+        // with the std::vector invalidates it. Also, pop_back calls default DTOR of Cell_1D_*, so we have to manually
+        // call delete here)
+        while (!_edges.empty())
+        {
+          delete _edges.back();
+          _edges.pop_back();
+        }
+      }
+
+
+      /* *********************************
+      * getters & setters & manipulators *
+      ************************************/
+
+      /// returns number of edges in this mesh (including inactive ones)
+      inline global_index_t num_edges() const
+      {
+        // TODO: potentiell falsch, auch Kanten koennen inaktiv sein und duerfen dann beim Transfer zu den
+        // Rechenprozessen nicht mitgezaehlt werden!
+        return _edges.size();
+      }
+
+
+      /// returns edge at given index
+      inline Cell_1D_* edge(global_index_t const index)
+      {
+        assert(index < num_edges());
+        return _edges[index];
+      }
+
+
+      /// adds subcells created during subdivision to the corresponding subcell vectors
+      inline void add_created_subcells(SubdivisionData<2, 2, world_dim_>* subdiv_data)
+      {
+        for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
+        {
+          _add(subdiv_data->created_vertices[i]);
+        }
+        for(unsigned int i(0) ; i < subdiv_data->created_edges.size() ; ++i)
+        {
+          _add(subdiv_data->created_edges[i]);
+        }
+      }
+
+
+      /// validates the subcells
+      void validate() const
+      {
+// COMMENT_HILMAR: muss noch angepasst werden
+//        std::cout << "Validating subcells..." << std::endl;
+//        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
+//        {
+//          cell(icell)->validate();
+//        }
+//        std::cout << "...done!" << std::endl;
+      }
+
+
+      /**
+      * \brief prints this subcells object to the given ostream.
+      *
+      * According to http://www.cplusplus.com/reference/iostream, ostream is the superclass for both stdout, stderr and
+      * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
+      * and and printf()-style debugging at the same time. Neat.
+      *
+      * \param[in] stream
+      * stream to dump this object into
+      */
+      void print(std::ostream& stream)
+      {
+        Subcells<1, world_dim_>::print(stream);
+        stream << _edges.size() << " edges" << std::endl;
+        for(unsigned int iedge(0) ; iedge < _edges.size() ; ++iedge)
+        {
+          _edges[iedge]->print(stream);
+          stream << std::endl;
+        }
+      }
+    }; // class Subcells<2, world_dim_>
+
+
+
+
+    /**
+    * \brief class providing containers and functions for subcells of 3D cells, i.e. for vertices, edges and faces
+    *
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class Subcells<3, world_dim_>
+      : public Subcells<2, world_dim_>
+    {
+      /// shortcut to save typing of template parameters
+      typedef Cell<2, 3, world_dim_> Cell_2D_;
+
+      // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
+      // access to all members of this class.
+      friend class FileParser<3, world_dim_>;
+
+
+    private:
+
+      /// array of faces
+      std::vector<Cell_2D_*> _faces;
+
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief templated function to remove items from the given vector
+      *
+      * The item is swapped to the end of the list and then deleted and removed.
+      */
+//COMMENT_HILMAR: Move this function to some parent class BaseMeshAux or similar.
+      template<typename T_>
+      inline void _remove_item(std::vector<T_>& v, T_ item)
+      {
+        assert(item->index() < v.size());
+        v[item->index()] = v.back();
+        v[item->index()]->set_index(item->index());
+        v[v.size()-1] = item;
+        item->set_index(v.size()-1);
+        delete item;
+        v.pop_back();
+      }
+
+
+    protected:
+
+      /// adds given face to base mesh and sets its index
+      inline void _add(Cell_2D_* f)
+      {
+        _faces.push_back(f);
+        f->set_index(_faces.size()-1);
+      }
+
+
+      /// deletes given face
+      inline void _remove(Cell_2D_* f)
+      {
+        _remove_item<Cell_2D_*>(_faces, f);
+      }
+
+
+    public:
+
+      ///default CTOR
+      Subcells()
+        : Subcells<2, world_dim_>(),
+          _faces(nullptr)
+      {
+      }
+
+
+      /// default destructor
+      ~Subcells()
+      {
+//COMMENT_HILMAR: nochmal nachgucken, ob bzw. wie der DTOR von Subcells<2, ...> aufgerufen wird.
+        // delete all faces and their associated information
+        // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about
+        // with the std::vector invalidates it. Also, pop_back calls default DTOR of Cell_2D_*, so we have to manually
+        // call delete here)
+        while (!_faces.empty())
+        {
+          delete _faces.back();
+          _faces.pop_back();
+        }
+      }
+
+
+      /// returns number of faces in this mesh (including inactive ones)
+      inline global_index_t num_faces() const
+      {
+        // TODO: potentiell falsch, auch Faces koennen inaktiv sein und duerfen dann beim Transfer zu den Rechenprozessen
+        // nicht mitgezaehlt werden!
+        return _faces.size();
+      }
+
+
+      /// returns face at given index
+      inline Cell_2D_* face(global_index_t const index)
+      {
+        assert(index < _faces.size());
+        return _faces[index];
+      }
+
+
+      /// adds subcells created during subdivision to the corresponding subcell vectors
+      inline void add_created_subcells(SubdivisionData<3, 3, world_dim_>* subdiv_data)
+      {
+        for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
+        {
+          _add(subdiv_data->created_vertices[i]);
+        }
+        for(unsigned int i(0) ; i < subdiv_data->created_edges.size() ; ++i)
+        {
+          _add(subdiv_data->created_edges[i]);
+        }
+        for(unsigned int i(0) ; i < subdiv_data->created_faces.size() ; ++i)
+        {
+          _add(subdiv_data->created_faces[i]);
+        }
+      }
+
+
+      /// validates the subcells
+      void validate() const
+      {
+// COMMENT_HILMAR: muss noch angepasst werden
+//        std::cout << "Validating subcells..." << std::endl;
+//        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
+//        {
+//          cell(icell)->validate();
+//        }
+//        std::cout << "...done!" << std::endl;
+      }
+
+
+      /**
+      * \brief prints this subcells object to the given ostream.
+      *
+      * According to http://www.cplusplus.com/reference/iostream, ostream is the superclass for both stdout, stderr and
+      * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
+      * and and printf()-style debugging at the same time. Neat.
+      *
+      * \param[in] stream
+      * stream to dump this object into
+      */
+      void print(std::ostream& stream)
+      {
+        Subcells<2, world_dim_>::print(stream);
+        stream << _faces.size() << " faces" << std::endl;
+        for (unsigned int iface(0) ; iface < _faces.size() ; ++iface)
+        {
+          _faces[iface]->print(stream);
+          stream << std::endl;
+        }
+      }
+    };
+  } // namespace BaseMesh
+} // namespace FEAST
+
+#endif // #define KERNEL_BASE_MESH_SUBCELLS_HPP
