@@ -1,0 +1,11 @@
+ID          00009
+TYPE        optimisation_request
+STATUS      assigned
+AUTHOR      markus
+ASSIGNED TO dom_hilmar
+SEVERITY    high
+
+FULL TEXT
+A better distinction between load-balancing and flow-control is needed. Currently, both is mixed.
+
+SOLUTION
