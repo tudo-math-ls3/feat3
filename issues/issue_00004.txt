@@ -2,7 +2,7 @@ ID           00004
 TYPE         milestone
 STATUS       unassigned
 AUTHOR       markus
-ASSIGNED TO
+ASSIGNED TO  markus_dirk
 SEVERITY     medium
 
 FULL TEXT

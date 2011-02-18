@@ -1,0 +1,11 @@
+ID           00008
+TYPE         feature_request
+STATUS       assigned
+AUTHOR       markus
+ASSIGNED TO  hilmar
+SEVERITY     high
+
+FULL TEXT
+Implementation of neighbour update after subdivision is needed.
+
+SOLUTION

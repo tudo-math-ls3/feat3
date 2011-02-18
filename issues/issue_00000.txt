@@ -1,11 +1,12 @@
 ID           00000
 TYPE         feature_request
-STATUS       unassigned
+STATUS       resolved
 AUTHOR       markus
-ASSIGNED TO
+ASSIGNED TO  dirk
 SEVERITY     high
 
 FULL TEXT
 Implementation of a unit-, application- and regressiontest system is required. As decided, this should be a hybrid out of the FEAST1 and HONEI systems.
 
 SOLUTION
+Unittest system clone implemented as in HONEI.

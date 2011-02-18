@@ -1,6 +1,6 @@
 ID           00002
 TYPE         feature_request
-STATUS       assigned
+STATUS       resolved
 AUTHOR       markus
 ASSIGNED TO  dirk
 SEVERITY     critical
@@ -9,3 +9,4 @@ FULL TEXT
 Buildsystem essentials (cmake) require attention and are needed for TDD (see ticket 00000).
 
 SOLUTION
+cmake is understood and can be used.

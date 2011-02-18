@@ -1,8 +1,8 @@
 ID           00003
 TYPE         milestone
-STATUS       unassigned
+STATUS       assigned
 AUTHOR       markus
-ASSIGNED TO
+ASSIGNED TO  dom_hilmar
 SEVERITY     medium
 
 FULL TEXT
