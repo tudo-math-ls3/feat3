@@ -1,3 +1,18 @@
+// Hilmar's todo list before push to master:
+// code cleanup:
+// - use ExceptionHandler in base mesh code
+// - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into
+//   mpi_aborts/exceptions)
+// - singleton-Universe via Dirk's util class
+// - move mpi_init() from Universe::create() to the very beginning of the program
+// - completion of doxygen comments (\param, array dimensions, etc.)
+// - add/remove 'const' and other modifiers where necessary
+// - proper cleanup of resources (deletes, DTORs)
+
+// Done:
+// - FileParser --> templates!
+// - BaseMesh1D, BaseMesh2D, BaseMesh3D --> templates!
+
 // Test driver for universe
 
 // includes, system
