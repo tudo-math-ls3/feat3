@@ -5,6 +5,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT 
 00010 |feature_request      |assigned   |markus |hilmar_markus     |high     |add_mp_and_pp_layers
 00011 |feature_request      |unassigned |markus |                  |high     |implement_inter_workgroup_communication
 00012 |feature_request      |unassigned |markus |                  |high     |parsing_FPROP_and_FPART_meshfilesections
+00013 |feature_request      |unassigned |markus |                  |high     |user_controlled_creation_of_wgs
 00003 |milestone            |assigned   |markus |dom_hilmar        |medium   |kernel_subsystem_parallel_infrastructure
 00004 |milestone            |assigned   |markus |markus_dirk       |medium   |kernel_subsystem_linear_algebra_and_solvers
 00005 |milestone            |assigned   |markus |dom_hilmar_markus |medium   |kernel_subsystem_geometry
