@@ -11,7 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
-#include <kernel/base_mesh/base_mesh_subcells.hpp>
+#include <kernel/base_mesh/subcells.hpp>
 #include <kernel/graph.hpp>
 
 namespace FEAST
