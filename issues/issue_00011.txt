@@ -1,0 +1,11 @@
+ID           00011
+TYPE         feature_request
+STATUS       assigned
+AUTHOR       markus
+ASSIGNED TO  dom_hilmar
+SEVERITY     high
+
+FULL TEXT
+Implementation of inter-workgroup communication is needed.
+
+SOLUTION

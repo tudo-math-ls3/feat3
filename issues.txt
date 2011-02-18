@@ -3,6 +3,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT 
 00008 |feature_request      |assigned   |markus |hilmar        |high     |implement_nb_update_after_subdivision
 00009 |optimisation_request |assigned   |markus |dom_hilmar    |high     |better_distinction_of_lb_and_flowcontrol
 00010 |feature_request      |assigned   |markus |hilmar_markus |high     |add_mp_and_pp_layers
+00011 |feature_request      |assigned   |markus |dom_hilmar    |high     |implement_inter_workgroup_communication
 00003 |milestone            |assigned   |markus |dom_hilmar    |medium   |kernel_subsystem_parallel_infrastructure
 00004 |milestone            |assigned   |markus |markus_dirk   |medium   |kernel_subsystem_linear_algebra_and_solvers
 00005 |milestone            |unassigned |markus |              |medium   |kernel_subsystem_geometry
