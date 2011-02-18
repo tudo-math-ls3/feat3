@@ -1,4 +1,4 @@
-ID           00011
+ID           00012
 TYPE         feature_request
 STATUS       unassigned
 AUTHOR       markus
@@ -6,6 +6,6 @@ ASSIGNED TO
 SEVERITY     high
 
 FULL TEXT
-Implementation of inter-workgroup communication is needed.
+Proper parsing of FPART and FPROP parts of old FEASTs files in mesh file reader.
 
 SOLUTION

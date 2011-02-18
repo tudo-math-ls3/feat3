@@ -1,14 +1,15 @@
 NEWEST: 00010
 ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT DESCRIPTION
-00008 |feature_request      |assigned   |markus |hilmar        |high     |implement_nb_update_after_subdivision
-00009 |optimisation_request |assigned   |markus |dom_hilmar    |high     |better_distinction_of_lb_and_flowcontrol
-00010 |feature_request      |assigned   |markus |hilmar_markus |high     |add_mp_and_pp_layers
-00011 |feature_request      |assigned   |markus |dom_hilmar    |high     |implement_inter_workgroup_communication
-00003 |milestone            |assigned   |markus |dom_hilmar    |medium   |kernel_subsystem_parallel_infrastructure
-00004 |milestone            |assigned   |markus |markus_dirk   |medium   |kernel_subsystem_linear_algebra_and_solvers
-00005 |milestone            |unassigned |markus |              |medium   |kernel_subsystem_geometry
-00006 |milestone            |assigned   |markus |ITMC          |medium   |kernel_subsystem_load_balancing
-00001 |feature_request      |unassigned |markus |              |low      |implement_compiler_detection_icc
-00000 |feature_request      |resolved   |markus |dirk          |high     |implement_test_system
-00002 |feature_request      |resolved   |markus |Dirk          |critical |build_system_essentials
-00007 |bug_report           |resolved   |markus |peter         |critical |test_system_is_error_prone
+00008 |feature_request      |assigned   |markus |hilmar            |high     |implement_nb_update_after_subdivision
+00009 |optimisation_request |assigned   |markus |dom_hilmar        |high     |better_distinction_of_lb_and_flowcontrol
+00010 |feature_request      |assigned   |markus |hilmar_markus     |high     |add_mp_and_pp_layers
+00011 |feature_request      |unassigned |markus |                  |high     |implement_inter_workgroup_communication
+00012 |feature_request      |unassigned |markus |                  |high     |parsing_FPROP_and_FPART_meshfilesections
+00003 |milestone            |assigned   |markus |dom_hilmar        |medium   |kernel_subsystem_parallel_infrastructure
+00004 |milestone            |assigned   |markus |markus_dirk       |medium   |kernel_subsystem_linear_algebra_and_solvers
+00005 |milestone            |assigned   |markus |dom_hilmar_markus |medium   |kernel_subsystem_geometry
+00006 |milestone            |assigned   |markus |ITMC              |medium   |kernel_subsystem_load_balancing
+00001 |feature_request      |unassigned |markus |                  |low      |implement_compiler_detection_icc
+00000 |feature_request      |resolved   |markus |dirk              |high     |implement_test_system
+00002 |feature_request      |resolved   |markus |Dirk              |critical |build_system_essentials
+00007 |bug_report           |resolved   |markus |peter             |critical |test_system_is_error_prone
