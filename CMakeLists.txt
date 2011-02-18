@@ -14,6 +14,7 @@ set (CMAKE_CXX_FLAGS_DEBUG "-DDEBUG")
 OPTION (DEBUG_BUILD "Build with debug support.")
 if (DEBUG_BUILD)
   add_definitions (-DDEBUG)
+  message ("Building with debug support...")
 endif (DEBUG_BUILD)
 
 # our custom target to build (not execute) all tests in all directories
