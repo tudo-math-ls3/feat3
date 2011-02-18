@@ -1,4 +1,4 @@
-NEWEST: 00017
+NEWEST: 00018
 ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT DESCRIPTION
 00008 |feature_request      |assigned   |markus |hilmar            |high     |implement_nb_update_after_subdivision
 00009 |optimisation_request |assigned   |markus |dom_hilmar        |high     |better_distinction_of_lb_and_flowcontrol
@@ -13,6 +13,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT 
 00006 |milestone            |assigned   |markus |ITMC              |medium   |kernel_subsystem_load_balancing
 00015 |feature_request      |unassigned |markus |                  |medium   |data_flow_between_bm_and_wgs
 00016 |optimisation_request |assigned   |markus |thomas            |medium   |encapsulate_mpi_routines
+00018 |feature_request      |unassigned |markus |                  |medium   |ascii_files
 00017 |feature_request      |unassigned |markus |                  |low      |serial_mode
 00001 |feature_request      |unassigned |markus |                  |low      |implement_compiler_detection_icc
 00000 |feature_request      |resolved   |markus |dirk              |high     |implement_test_system
