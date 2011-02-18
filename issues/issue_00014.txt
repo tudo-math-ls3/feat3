@@ -1,0 +1,11 @@
+ID           00014
+TYPE         feature_request
+STATUS       unassigned
+AUTHOR       markus
+ASSIGNED TO
+SEVERITY     high
+
+FULL TEXT
+Implement user-controlled mappings (1) BMCs-->MPs, (2) MPs-->PPs, (3) PPs-->WGs.
+
+SOLUTION
