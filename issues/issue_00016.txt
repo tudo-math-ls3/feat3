@@ -1,0 +1,11 @@
+ID          00016
+TYPE        optimisation_request
+STATUS      assigned
+AUTHOR      markus
+ASSIGNED TO thomas
+SEVERITY    medium
+
+FULL TEXT
+Encapsulation of all mpi routines in high level class(es).
+
+SOLUTION
