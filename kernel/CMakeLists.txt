@@ -15,6 +15,7 @@ SET ( test_list base_header-test )
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} test_system)
+  ADD_TEST(${test} ${CMAKE_CURRENT_BINARY_DIR}/${test})
 ENDFOREACH(test)
 
 #add all tests to kernel_tests

@@ -12,10 +12,12 @@ ADD_LIBRARY( test_system SHARED test_system )
 #list of test_system tests
 SET ( test_list test_system-test )
 
+#SET( BACKENDS 123)
 #create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} test_system)
+  ADD_TEST(${test} ${CMAKE_CURRENT_BINARY_DIR}/${test} ${BACKENDS})
 ENDFOREACH(test)
 
 #add all tests to test_system_tests

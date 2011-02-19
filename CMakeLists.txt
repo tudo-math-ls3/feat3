@@ -7,6 +7,8 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 PROJECT( FEAST )
 
+ENABLE_TESTING()
+
 #enable DEBUG define on debug builds
 set (CMAKE_CXX_FLAGS_DEBUG "-DDEBUG")
 
