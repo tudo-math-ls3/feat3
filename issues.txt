@@ -1,5 +1,6 @@
-NEWEST: 00018
+NEWEST: 00019
 ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT DESCRIPTION
+00019 |optimisation_request |assigned   |markus |dirk              |critical |enable_mpi_in_test_system
 00008 |feature_request      |assigned   |markus |hilmar            |high     |implement_nb_update_after_subdivision
 00009 |optimisation_request |assigned   |markus |dom_hilmar        |high     |better_distinction_of_lb_and_flowcontrol
 00010 |feature_request      |assigned   |markus |hilmar_markus     |high     |add_mp_and_pp_layers
