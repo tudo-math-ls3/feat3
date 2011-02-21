@@ -20,8 +20,8 @@ FOREACH (test ${test_list} )
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --build-exe-dir "${FEAST_BINARY_DIR}/kernel/util"
-    --test-command ${test} Nil)
+    --build-exe-dir "${CURRENT_BINARY_DIR}"
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/util/${test}" Nil)
   SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
 ENDFOREACH(test)
 
