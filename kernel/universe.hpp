@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/util/instantiation_policy.hpp>
 #include <kernel/process.hpp>
 #include <kernel/master.hpp>
 #include <kernel/error_handler.hpp>
@@ -40,6 +41,7 @@ namespace FEAST
     unsigned char space_dim_,
     unsigned char world_dim_>
   class Universe
+    : public InstantiationPolicy<Universe<space_dim_, world_dim_>, Singleton>
   {
 
   private:
@@ -47,14 +49,11 @@ namespace FEAST
     /* *****************
     * member variables *
     *******************/
-    /**
-    * \brief pointer to the one and only instance of the universe
-    *
-    * Will be set within the routine Universe::create().
-    */
-    static Universe* _universe;
 
-    /// total number of processes in MPI_COMM_WORLD
+    /// flag whether universe has already been created
+    bool _universe_created;
+
+    /// number p of processes in MPI_COMM_WORLD where p is specified via, e.g., 'mpirun -np p ...'
     unsigned int _num_processes;
 
     /// process group consisting of all processes
@@ -74,7 +73,7 @@ namespace FEAST
     ProcessGroup* _process_group;
 
     /// number of process groups requested by the user via some top-level configuration file
-    unsigned int const _num_process_groups;
+    unsigned int _num_process_groups;
 
     /**
     * \brief array of number of processes in each process group (including eventual dedicated load balancer process)
@@ -82,7 +81,7 @@ namespace FEAST
     * This array must be provided when more than one process group is used.\n
     * Dimension: [#_num_process_groups]
     */
-    unsigned int const * _num_processes_in_group;
+    unsigned int* _num_processes_in_group;
 
     /**
     * \brief array of flags whether a dedicated load balancer process is needed in process group
@@ -90,7 +89,7 @@ namespace FEAST
     * This array must be provided when more than one process group is used.\n
     * Dimension: [#_num_process_groups]
     */
-    bool const * _includes_dedicated_load_bal;
+    bool* _includes_dedicated_load_bal;
 
     /**
     * \brief 2-dim. array of MPI_COMM_WORLD ranks in top-level process group that each process unambigously belongs to
@@ -115,109 +114,9 @@ namespace FEAST
     LoadBalancer<space_dim_, world_dim_>* _load_balancer;
 
 
-    /* *************************
-    * constructor & destructor *
-    ***************************/
-    /**
-    * \brief constructor for creating the one and only instance of the Universe class
-    *
-    * The constructor is deliberately chosen to be private: That way one can prevent users to create
-    * more than one instance of the Universe class ('singleton').
-    *
-    * \param[in] num_processes
-    * total number of MPI processes
-    *
-    * \param[in] num_process_groups
-    * number of process groups
-    *
-    * \param[in] num_processes_in_group
-    * array of numbers of processes in work groups, dimension [\a num_process_groups]
-    *
-    * \param[in] includes_dedicated_load_bal
-    * array of flags whether dedicated load balancer required in work groups,  dimension [\a num_process_groups]
-    */
-    Universe(
-      const unsigned int num_processes,
-      const unsigned int num_process_groups,
-      const unsigned int num_processes_in_group[],
-      const bool includes_dedicated_load_bal[])
-      : _num_processes(num_processes),
-        _num_process_groups(num_process_groups),
-        _num_processes_in_group(num_processes_in_group),
-        _includes_dedicated_load_bal(includes_dedicated_load_bal)
-    {
-      _init();
-  //    // debug output
-  //    std::cout << "Process " << Process::rank << " created its part of the Universe!" << std::endl;
-    }
-
-
-    /**
-    * \brief destructor which automatically finalizes the MPI environment
-    *
-    * Just as the constructor, the destructor is deliberately chosen to be private.
-    */
-    ~Universe()
-    {
-      // the destructor has to be called by all COMM_WORLD processes
-      if(!Process::is_master)
-      {
-        // wait for all non-master processes (the master is still in its infinite service loop)
-        MPI_Barrier(_world_group_without_master->comm());
-
-        // the coordinator of the process group _world_group_without_master tells the master to stop its service loop
-        if(_world_group_without_master->is_coordinator())
-        {
-          // the coordinator inits a new message with corresponding ID
-          Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
-          // send message
-          Comm::send();
-          // now the master ends its service loops and automatically calls Universe::destroy()
-        }
-      }
-      // clean up dynamically allocated memory
-      _cleanup();
-    }
-
-    /// copy constructor, intentionally undefined to prevent object instantiation
-    Universe(const Universe &);
-
-    /// assignment constructor, intentionally undefined to prevent object instantiation
-    Universe & operator=(const Universe &);
-
-
     /* *****************
     * member functions *
     *******************/
-    /**
-    * \brief initialises MPI, returns the total number of processes
-    *
-    * \param[in] argc
-    * argument count passed to the main() method
-    *
-    * \param[in] argv
-    * arguments passed to the main() method
-    *
-    * \param[out] num_processes
-    * number p of available MPI processes as specified via 'mpirun -np p ...'
-    */
-    static void _init_mpi(
-      int& argc,
-      char* argv[],
-      unsigned int& num_processes)
-    {
-      // init MPI
-      int mpi_error_code = MPI_Init(&argc, &argv);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Init");
-
-      int num_proc;
-      // get total number of processes
-      mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
-      num_processes = (unsigned int) num_proc;
-    }
-
-
     /**
     * \brief manages initial process distribution
     *
@@ -395,14 +294,16 @@ namespace FEAST
         // create load balancer object in each process of the process group
         _load_balancer = new LoadBalancer<space_dim_, world_dim_>(_process_group,
                                                                   _includes_dedicated_load_bal[my_group]);
+        // debug output
+        std::cout << "Process " << Process::rank << " belongs to process group " << my_group <<"." << std::endl;
       }
     } // _init()
 
 
     /**
-    * \brief cleanup counterpart for _init().
+    * \brief cleanup counterpart for _init()/create()
     *
-    * Deletes all dynamically allocated memory in _init().
+    * Deletes all dynamically allocated memory in _init() and create().
     */
     void _cleanup()
     {
@@ -424,10 +325,76 @@ namespace FEAST
         delete _process_group;
         delete _load_balancer;
       }
+      delete [] _includes_dedicated_load_bal;
+      delete [] _num_processes_in_group;
     }
 
 
   public:
+    /* *************************
+    * constructor & destructor *
+    ***************************/
+    /**
+    * \brief CTOR
+    *
+    * This constructor is deliberately chosen to be private. Is called exactly once by each process in the whole life
+    * time of the program.  It initialises the _universe_created variable and ensures that MPI is already initialised.
+    */
+// COMMENT_HILMAR@DIRK: Eigentlich sollten CTOR und DTOR private sein, ansonsten ist das ganze singleton-Konzept
+// irgendwie hinfällig... Das funktioniert aber nicht... Was mache ich falsch?
+    Universe()
+      : _universe_created(false)
+    {
+      int mpi_is_initialised;
+      MPI_Initialized(&mpi_is_initialised);
+      if(!mpi_is_initialised)
+      {
+        throw InternalError("MPI is not initialised yet! Call MPIUtils::init_MPI(argc,argv) first!");
+      }
+    }
+
+
+    /**
+    * \brief destructor which automatically finalizes the MPI environment
+    *
+    * Just like the constructor, the destructor is deliberately chosen to be private.
+    */
+    ~Universe()
+    {
+// debug output
+//std::cout << "Universe destructor called on process " << Process::rank << "!" << std::endl;
+
+      if(_universe_created)
+      {
+        // the destructor has to be called by all COMM_WORLD processes
+        if(!Process::is_master)
+        {
+          // wait for all non-master processes (the master is still in its infinite service loop)
+          MPI_Barrier(_world_group_without_master->comm());
+
+          // the coordinator of the process group _world_group_without_master tells the master to stop its service loop
+          if(_world_group_without_master->is_coordinator())
+          {
+            // the coordinator inits a new message with corresponding ID
+            Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
+            // send message
+            Comm::send();
+            // now the master ends its service loops and automatically calls Universe::destroy()
+          }
+        }
+        // clean up dynamically allocated memory
+        _cleanup();
+      }
+
+      // shut down MPI
+      int mpi_is_initialised;
+      MPI_Initialized(&mpi_is_initialised);
+      if(mpi_is_initialised)
+      {
+        MPI_Finalize();
+      }
+    }
+
 
     /* ****************
     * member functions*
@@ -435,40 +402,34 @@ namespace FEAST
     /**
     * \brief function for creating a universe with exactly one process group
     *
-    * When using this function, only the master process and one process group using an dedicated load balancer process
+    * When using this function, only the master process and one process group using no dedicated load balancer process
     * are created.
-    *
-    * \param[in] argc
-    * argument count passed to the main() method
-    *
-    * \param[in] argv
-    * arguments passed to the main() method
-    *
-    * \return Universe pointer #_universe
     */
-    static Universe* create(
-      int argc,
-      char* argv[])
+    void create()
     {
-      if(_universe == nullptr)
+      if(!_universe_created)
       {
-        unsigned int num_processes;
-        _init_mpi(argc, argv, num_processes);
+        _universe_created = true;
+        // get total number of processes
+        int num_proc;
+        int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
+        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
+        _num_processes = (unsigned int) num_proc;
 
-        // Assume that one process group is needed using all available processes (minus one master process).
-        // The dedicated load balancer process is included in this number.
-        unsigned int num_process_groups = 1;
-        unsigned int num_processes_in_group[1] = {num_processes-1};
-        bool includes_dedicated_load_bal[1] = {true};
+        // Set variables. Assume that one process group is needed using all available processes (minus one
+        // master process) and no dedicated load balancer process.
+        _num_process_groups = 1;
+        _num_processes_in_group = new unsigned int[1];
+        _num_processes_in_group[0] = _num_processes - 1;
+        _includes_dedicated_load_bal = new bool[1];
+        _includes_dedicated_load_bal[0] = false;
 
-        // create the one and only instance of the Universe class
-        _universe = new Universe(num_processes, num_process_groups, num_processes_in_group,
-                                 includes_dedicated_load_bal);
-        return _universe;
+        // call the init routine
+        _init();
       }
       else
       {
-        throw InternalError("Universe can be created only once!");
+        throw InternalError("Universe has been created already!");
       }
     }
 
@@ -480,12 +441,6 @@ namespace FEAST
     * per process group and one master process is created. The caller has to ensure that sufficient MPI processes are
     * available.
     *
-    * \param[in] argc
-    * argument count passed to the main() method
-    *
-    * \param[in] argv
-    * arguments passed to the main() method
-    *
     * \param[in] num_process_groups
     * number of process groups
     *
@@ -495,53 +450,30 @@ namespace FEAST
     * \param[in] includes_dedicated_load_bal
     * array of flags whether a dedicated load balancer process is needed in process group,
     * dimension [\a num_process_groups]
-    *
-    * \return Universe pointer #_universe
     */
-    static Universe* create(
-      int argc,
-      char* argv[],
-      const unsigned int num_process_groups,
-      const unsigned int num_processes_in_group[],
-      const bool includes_dedicated_load_bal[])
+    void create(
+      unsigned int num_process_groups,
+      unsigned int num_processes_in_group[],
+      bool includes_dedicated_load_bal[])
     {
-      if(_universe == nullptr)
+      if(!_universe_created)
       {
-        unsigned int num_processes;
-        // init MPI and get number of available processes and the rank of this processor
-        _init_mpi(argc, argv, num_processes);
-        // create the one and only instance of the Universe class
-        _universe = new Universe(num_processes, num_process_groups, num_processes_in_group,
-                                 includes_dedicated_load_bal);
-        return _universe;
+        _universe_created = true;
+        // get total number of processes
+        int num_proc;
+        int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
+        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
+        _num_processes = (unsigned int) num_proc;
+        // set variables
+        _num_process_groups = num_process_groups;
+        _num_processes_in_group = num_processes_in_group;
+        _includes_dedicated_load_bal = includes_dedicated_load_bal;
+        // call the init routine
+        _init();
       }
       else
       {
-        throw InternalError("Universe can be created only once!");
-      }
-    }
-
-
-    /// function for destroying the universe and finalizing MPI at the end of the program
-    static void destroy()
-    {
-      if(_universe != nullptr)
-      {
-        // delete the one and only instance of Universe
-        delete _universe;
-        _universe = nullptr;
-
-        // shut down MPI
-        int mpi_is_initialised;
-        MPI_Initialized(&mpi_is_initialised);
-        if(mpi_is_initialised)
-        {
-          MPI_Finalize();
-        }
-      }
-      else
-      {
-        throw InternalError("There is no universe to destroy!");
+        throw InternalError("Universe has been created already!");
       }
     }
 
@@ -556,6 +488,7 @@ namespace FEAST
     */
     inline LoadBalancer<space_dim_, world_dim_>* load_balancer() const
     {
+      assert(_universe_created);
       return _load_balancer;
     }
 
@@ -566,15 +499,10 @@ namespace FEAST
     */
     inline Master* master() const
     {
+      assert(_universe_created);
       return _master;
     }
   };
-  // initialise static member
-  template<
-    unsigned char space_dim_,
-    unsigned char world_dim_>
-  Universe<space_dim_, world_dim_>* Universe<space_dim_, world_dim_>::_universe = nullptr;
-
 } // namespace FEAST
 
 #endif // guard KERNEL_UNIVERSE_HPP

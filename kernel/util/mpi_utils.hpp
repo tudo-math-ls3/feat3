@@ -24,6 +24,27 @@ namespace FEAST
     *******************/
 
     /**
+    * \brief initialises MPI
+    *
+    * This function only calls MPI_Init(...). It has to be called before anything else happens.
+    *
+    * \param[in] argc
+    * argument count passed to the main() method
+    *
+    * \param[in] argv
+    * arguments passed to the main() method
+    */
+    static void init_MPI(
+      int argc,
+      char* argv[])
+    {
+      // init MPI
+      int mpi_error_code = MPI_Init(&argc, &argv);
+      validate_mpi_error_code(mpi_error_code, "MPI_Init");
+    }
+
+
+    /**
     * \brief aborts the program and the MPI universe
     *
     * This function aborts the program and especially blackholes the MPI universe.

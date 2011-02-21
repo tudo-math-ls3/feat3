@@ -51,8 +51,8 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // create universe with one process group
-//  Universe<SDIM, WDIM>* universe = Universe::create(argc, argv);
+  // init MPI
+  MPIUtils::init_MPI(argc, argv);
 
   // COMMENT_HILMAR: the following information will later be read from some parameter file
 
@@ -77,45 +77,31 @@ int main(int argc, char* argv[])
   unsigned int num_processes_in_first_group(num_cells + 2);
 
   // array of numbers of processes in process groups (must be provided when num_process_groups > 1)
-  unsigned int num_processes_in_group[] = {num_processes_in_first_group, 2};
+  unsigned int* num_processes_in_group = new unsigned int[num_process_groups];
+  num_processes_in_group[0] = num_processes_in_first_group;
+  num_processes_in_group[1] = 2;
 
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
   // Set the first entry either to false or to true to test two different configurations. (You don't have to change
   // the number of processes for that.) (See description of the example in routine LoadBalancer::create_subgroups().)
-  bool includes_dedicated_load_bal[] = {false, false};
+  bool* includes_dedicated_load_bal = new bool[num_process_groups];
+  includes_dedicated_load_bal[0] = false;
+  includes_dedicated_load_bal[1] = false;
 
-// COMMENT_HILMAR: Is it problematic to define and fill the variables above already *before* MPI_Init() is called?
-// (Until now, no problems occured!) If it turns out to be problematic then the Universe::create(...) routine has to be
-// split in such a way that it first calls MPI_Init() *only*, and then (after setting the variables above) doing
-// all the remaining stuff in a second step.
+  // set shortcut to the one and only instance of Universe (since this is the first call of
+  // Universe<SDIM, WDIM>::instance(), it also calls the constructor of the Universe singleton class)
+  Universe<SDIM, WDIM>* universe = Universe<SDIM, WDIM>::instance();
 
-  // create universe with several process groups
-  Universe<SDIM, WDIM>* universe;
   try
   {
-    universe = Universe<SDIM, WDIM>::create(argc, argv, num_process_groups, num_processes_in_group,
-                                            includes_dedicated_load_bal);
+    universe->create(num_process_groups, num_processes_in_group, includes_dedicated_load_bal);
   }
   catch (Exception& e)
   {
-    // Assume that all critical errors are already caught within the Universe class.
     // Since it is not clear whether the communication system has already been set up, do not forward the error message
     // to the master.
-    ErrorHandler::exception_occured(e, ErrorHandler::NON_CRITICAL);
-  }
-
-  // create a second universe to test the error handler
-  Universe<SDIM, WDIM>* universe2;
-  try
-  {
-    universe2 = Universe<SDIM, WDIM>::create(argc, argv, num_process_groups, num_processes_in_group,
-                                             includes_dedicated_load_bal);
-  }
-  catch (Exception& e)
-  {
-    // Assume that all critical errors are already caught within the Universe class.
-    ErrorHandler::exception_occured(e, ErrorHandler::NON_CRITICAL);
+    ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
   }
 
   // Get process objects. Note that on each process only one of the following two exists (the other one is the
@@ -180,22 +166,20 @@ int main(int argc, char* argv[])
         // test standard log feature
         Logger::log("BRAL\n");
       }
-      // everything done, destroy the universe
-      Universe<SDIM, WDIM>::destroy();
+      // Everything done, universe destructor automatically cleans up the system.
     }
     else
     {
       // the second process group does something else, programmed by the application outside the kernel...
       // ...
-      // everything done, destroy the universe
-      Universe<SDIM, WDIM>::destroy();
+      // Everything done, universe destructor automatically cleans up the system.
     }
   }
   else if(master != nullptr)
   {
     // This branch is entered when the infinite service loop of the master has been finished.
-    // This, however, usually happens only at program end. Hence, destroy the universe.
-    Universe<SDIM, WDIM>::destroy();
+    // This, however, usually happens only at program end.
+    // Universe destructor automatically cleans up the system.
   }
   else
   {
