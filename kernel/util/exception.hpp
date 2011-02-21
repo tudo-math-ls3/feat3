@@ -45,6 +45,7 @@ namespace FEAST
     }
   };
 
+
   /**
   * \brief Base exception class.
   *
@@ -131,6 +132,7 @@ namespace FEAST
     }
   };
 
+
   /**
   * \brief exception that is thrown if something that is never supposed to happen happens
   *
@@ -142,76 +144,76 @@ namespace FEAST
   class InternalError :
     public Exception
   {
-    public:
-      /**
-      * \brief Constructor.
-      *
-      * \param message A short error message.
-      */
-      InternalError(const std::string & message) throw () :
-        Exception("Internal error: " + message)
-      {
-      }
-
+  public:
+    /**
+    * \brief Constructor.
+    *
+    * \param message A short error message.
+    */
+    InternalError(const std::string & message) throw () :
+      Exception("Internal error: " + message)
+    {
+    }
   };
+
 
   /**
   * \brief Backtrace class context.
   *
   * \author Dirk Ribbrock
   */
-  class Context :
-    public InstantiationPolicy<Context, NonCopyable>
+  class Context
+    : public InstantiationPolicy<Context, NonCopyable>
   {
-    public:
-      /**
-      * \brief Constructor.
-      *
-      * \param file Name of the source file that contains the context.
-      * \param line Line number of the context.
-      * \param context A sentence that describes this context.
-      */
-      Context(const char * const file, const long line, const std::string & context)
+  public:
+    /**
+    * \brief Constructor.
+    *
+    * \param file Name of the source file that contains the context.
+    * \param line Line number of the context.
+    * \param context A sentence that describes this context.
+    */
+    Context(const char * const file, const long line, const std::string & context)
+    {
+      if (! context_stack)
       {
-        if (! context_stack)
-        {
-          context_stack = new std::list<std::string>;
-        }
-
-        context_stack->push_back(context + " (" + StringUtils::stringify(file) + ":"
-                                 + StringUtils::stringify(line) +")");
+        context_stack = new std::list<std::string>;
       }
 
-      /// Desctructor.
-      ~Context()
+      context_stack->push_back(context + " (" + StringUtils::stringify(file) + ":"
+                               + StringUtils::stringify(line) +")");
+    }
+
+    /// Desctructor.
+    ~Context()
+    {
+      if (! context_stack)
+        throw InternalError("no context!");
+
+      context_stack->pop_back();
+
+      if (context_stack->empty())
       {
-        if (! context_stack)
-          throw InternalError("no context!");
-
-        context_stack->pop_back();
-
-        if (context_stack->empty())
-        {
-          delete context_stack;
-          context_stack = 0;
-        }
+        delete context_stack;
+        context_stack = 0;
       }
+    }
 
+    /**
+    * \brief Current context
+    *
+    * \param[in] delimiter
+    * A delimiter added between to context strings
+    */
+    static std::string backtrace(const std::string & delimiter)
+    {
+      if (! context_stack)
+        return "";
 
-      /**
-      * \brief Current context
-      *
-      * \param[in] delimiter
-      * A delimiter added between to context strings
-      */
-      static std::string backtrace(const std::string & delimiter)
-      {
-        if (! context_stack)
-          return "";
-
-        return StringUtils::join(context_stack->begin(), context_stack->end(), delimiter);
-      }
+      return StringUtils::join(context_stack->begin(), context_stack->end(), delimiter);
+    }
   };
+
 
   /**
   * \def CONTEXT

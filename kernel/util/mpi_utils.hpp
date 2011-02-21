@@ -84,7 +84,6 @@ namespace FEAST
         abort("Function " + mpi_function_name + " failed with error code " + StringUtils::stringify(error_code) + ".");
       }
     }
-
   }; // class MPIUtils
 
 
