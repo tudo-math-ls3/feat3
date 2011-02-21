@@ -12,12 +12,20 @@ ADD_LIBRARY( test_system SHARED test_system )
 #list of test_system tests
 SET ( test_list test_system-test )
 
-#SET( BACKENDS 123)
 #create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} test_system)
-  ADD_TEST(${test} ${CMAKE_CURRENT_BINARY_DIR}/${test} ${BACKENDS})
+  ADD_TEST(${test}_nil ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target ${test}
+    --build-nocmake
+    --build-noclean
+    --build-exe-dir "${FEAST_BINARY_DIR}/test_system/"
+    --test-command ${test} Nil)
+  SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
 ENDFOREACH(test)
 
 #add all tests to test_system_tests

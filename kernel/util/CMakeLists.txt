@@ -13,7 +13,16 @@ SET ( test_list  assertion-test inheritance-test)
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} test_system)
-  ADD_TEST(${test} ${CMAKE_CURRENT_BINARY_DIR}/${test})
+  ADD_TEST(${test}_nil ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target ${test}
+    --build-nocmake
+    --build-noclean
+    --build-exe-dir "${FEAST_BINARY_DIR}/kernel/util"
+    --test-command ${test} Nil)
+  SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
 ENDFOREACH(test)
 
 #add all tests to util_tests
