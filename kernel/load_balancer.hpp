@@ -132,6 +132,9 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
   */
+  template<
+    unsigned char space_dim_,
+    unsigned char world_dim_>
   class LoadBalancer
   {
 
@@ -182,7 +185,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     * \note Temporarily use only BaseMesh2D here! space_dim_ and world_dim_ templates are still completely missing on
     * load balancer / MPI prototype side.
     */
-    BaseMesh::BM<2, 2>* _base_mesh;
+    BaseMesh::BM<space_dim_, world_dim_>* _base_mesh;
 
   public:
 
@@ -260,8 +263,8 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // the mesh is read by the process group coordinator
       if(_process_group->is_coordinator())
       {
-        _base_mesh = new BaseMesh::BM<2, 2>();
-        BaseMesh::FileParser<2, 2> parser;
+        _base_mesh = new BaseMesh::BM<space_dim_, world_dim_>();
+        BaseMesh::FileParser<space_dim_, world_dim_> parser;
         try
         {
           Logger::log_master("Reading mesh file " + mesh_file + "...\n", Logger::SCREEN_FILE);

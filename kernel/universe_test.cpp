@@ -1,6 +1,5 @@
 // Hilmar's todo list before push to master:
 // code cleanup:
-// - template all classes "above" BaseMesh
 // - use ExceptionHandler in base mesh code
 // - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
 // - move mpi_init() from Universe::create() to the very beginning of the program
@@ -10,6 +9,7 @@
 // - proper cleanup of resources (deletes, DTORs)
 
 // Done:
+// - template all classes "above" BaseMesh
 // - FileParser --> templates!
 // - BaseMesh1D, BaseMesh2D, BaseMesh3D --> templates!
 // - subdiv_data an subdivide uebergeben
@@ -26,6 +26,9 @@
 #include <kernel/universe.hpp>
 
 using namespace FEAST;
+
+#define WDIM 2
+#define SDIM 2
 
 /**
 * \brief main routine - test driver for universe
@@ -49,7 +52,7 @@ int main(int argc, char* argv[])
   }
 
   // create universe with one process group
-//  Universe* universe = Universe::create(argc, argv);
+//  Universe<SDIM, WDIM>* universe = Universe::create(argc, argv);
 
   // COMMENT_HILMAR: the following information will later be read from some parameter file
 
@@ -88,10 +91,11 @@ int main(int argc, char* argv[])
 // all the remaining stuff in a second step.
 
   // create universe with several process groups
-  Universe* universe;
+  Universe<SDIM, WDIM>* universe;
   try
   {
-    universe = Universe::create(argc, argv, num_process_groups, num_processes_in_group, includes_dedicated_load_bal);
+    universe = Universe<SDIM, WDIM>::create(argc, argv, num_process_groups, num_processes_in_group,
+                                            includes_dedicated_load_bal);
   }
   catch (Exception& e)
   {
@@ -102,10 +106,11 @@ int main(int argc, char* argv[])
   }
 
   // create a second universe to test the error handler
-  Universe* universe2;
+  Universe<SDIM, WDIM>* universe2;
   try
   {
-    universe2 = Universe::create(argc, argv, num_process_groups, num_processes_in_group, includes_dedicated_load_bal);
+    universe2 = Universe<SDIM, WDIM>::create(argc, argv, num_process_groups, num_processes_in_group,
+                                             includes_dedicated_load_bal);
   }
   catch (Exception& e)
   {
@@ -115,7 +120,7 @@ int main(int argc, char* argv[])
 
   // Get process objects. Note that on each process only one of the following two exists (the other one is the
   // null pointer).
-  LoadBalancer* load_balancer = universe->load_balancer();
+  LoadBalancer<SDIM, WDIM>* load_balancer = universe->load_balancer();
   Master* master = universe->master();
 
   int rank_world = Process::rank;
@@ -176,21 +181,21 @@ int main(int argc, char* argv[])
         Logger::log("BRAL\n");
       }
       // everything done, destroy the universe
-      Universe::destroy();
+      Universe<SDIM, WDIM>::destroy();
     }
     else
     {
       // the second process group does something else, programmed by the application outside the kernel...
       // ...
       // everything done, destroy the universe
-      Universe::destroy();
+      Universe<SDIM, WDIM>::destroy();
     }
   }
   else if(master != nullptr)
   {
     // This branch is entered when the infinite service loop of the master has been finished.
     // This, however, usually happens only at program end. Hence, destroy the universe.
-    Universe::destroy();
+    Universe<SDIM, WDIM>::destroy();
   }
   else
   {

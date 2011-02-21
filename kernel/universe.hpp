@@ -36,6 +36,9 @@ namespace FEAST
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
   */
+  template<
+    unsigned char space_dim_,
+    unsigned char world_dim_>
   class Universe
   {
 
@@ -109,7 +112,7 @@ namespace FEAST
     *
     * Will be nullptr if not living on this process.
     */
-    LoadBalancer* _load_balancer;
+    LoadBalancer<space_dim_, world_dim_>* _load_balancer;
 
 
     /* *************************
@@ -390,7 +393,8 @@ namespace FEAST
       else
       {
         // create load balancer object in each process of the process group
-        _load_balancer = new LoadBalancer(_process_group, _includes_dedicated_load_bal[my_group]);
+        _load_balancer = new LoadBalancer<space_dim_, world_dim_>(_process_group,
+                                                                  _includes_dedicated_load_bal[my_group]);
       }
     } // _init()
 
@@ -550,7 +554,7 @@ namespace FEAST
     *
     * \return pointer to LoadBalancer #_load_balancer
     */
-    inline LoadBalancer* load_balancer() const
+    inline LoadBalancer<space_dim_, world_dim_>* load_balancer() const
     {
       return _load_balancer;
     }
@@ -566,7 +570,10 @@ namespace FEAST
     }
   };
   // initialise static member
-  Universe* Universe::_universe = nullptr;
+  template<
+    unsigned char space_dim_,
+    unsigned char world_dim_>
+  Universe<space_dim_, world_dim_>* Universe<space_dim_, world_dim_>::_universe = nullptr;
 
 } // namespace FEAST
 
