@@ -177,8 +177,9 @@ std::cout << s;
                     + c->print_index() + " (at edge " + StringUtils::stringify((int)iedge) +  ", "
                     + StringUtils::stringify(ineigh) + "-th pos.), has children which must not be the case!\n";
                 s += "It seems the neighbours of cell " + c->print_index() + " have not been updated correctly!\n";
-// COMMENT_HILMAR: temporarily deactivated!
+// COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
+                std::cerr << "ERROR: " << s;
               }
               else // neighs[ineigh]->active()
               {
@@ -302,8 +303,9 @@ std::cout << s;
                     + c->print_index() + " (at face " + StringUtils::stringify((int)iface) +  ", "
                     + StringUtils::stringify(ineigh) + "-th pos.), has children which must not be the case!\n";
                 s += "It seems the neighbours of cell " + c->print_index() + " have not been updated correctly!\n";
-// COMMENT_HILMAR: temporarily deactivated!
+// COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
+                std::cerr << "ERROR: " << s;
               }
               else // neighs[ineigh]->active()
               {

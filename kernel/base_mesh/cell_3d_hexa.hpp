@@ -77,19 +77,11 @@ namespace FEAST
     class Hexa
       : public Cell<3, space_dim_, world_dim_>
     {
-      /// shortcut for type Vertex<world_dim_>
+      /// shortcuts to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
-
-      /// shortcut for type Cell<1, space_dim_, world_dim_>
       typedef Edge<space_dim_, world_dim_> Edge_;
-
-      /// shortcut for type Cell<1, space_dim_, world_dim_>
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
-
-      /// shortcut for type Quad<space_dim_, world_dim_>
       typedef Quad<space_dim_, world_dim_> Quad_;
-
-      /// shortcut for type Cell<2, space_dim_, world_dim_>
       typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
     private:
@@ -297,7 +289,7 @@ namespace FEAST
       *
       * \todo New centre vertex of the hexa has to be computed properly!
       */
-      inline void subdivide()
+      inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
         // assure that this cell has not been divided yet
         if(!this->active())
@@ -308,13 +300,7 @@ namespace FEAST
           exit(1);
         }
 
-        if(!this->subdiv_data_initialised())
-        {
-          std::cerr << "Hexa ";
-          this->print_index(std::cerr);
-          std::cerr << " cannot be subdivided! Initialise subdivision data first! Aborting program." << std::endl;
-          exit(1);
-        }
+        this->set_subdiv_data(subdiv_data);
 
         // clear all vectors of created entities in the SubdivisionData object
         this->subdiv_data()->clear_created();
@@ -367,8 +353,9 @@ namespace FEAST
             {
 
               // subdivide face
-              face(iface)->init_subdiv_data(NONCONFORM_SAME_TYPE);
-              face(iface)->subdivide();
+              SubdivisionData<2, space_dim_, world_dim_>* subdiv_data
+                = new SubdivisionData<2, space_dim_, world_dim_>(NONCONFORM_SAME_TYPE);
+              face(iface)->subdivide(subdiv_data);
 
               // add the created vertices, edges and faces to the vector of created vertices/edges/faces
               for(unsigned int i(0) ; i < face(iface)->subdiv_data()->created_vertices.size() ; ++i)

@@ -4,7 +4,10 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/base_mesh/base_mesh_1d.hpp>
+// COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
+//#include <kernel/error_handler.hpp>
+#include <kernel/base_mesh/file_parser.hpp>
+#include <kernel/base_mesh/bm.hpp>
 
 using namespace FEAST;
 using namespace BaseMesh;
@@ -14,28 +17,43 @@ using namespace BaseMesh;
 
 int main (int argc, char **argv)
 {
-  BaseMesh1D<WDIM> bm;
-  std::cout << "Base mesh in ASCII art (v0 is at (0,0) and all edges are unit length):" << std::endl;
-  std::cout << "v0--------e0--------v1--------e1--------v2--------e2--------v3" << std::endl;
+  BM<SDIM, WDIM> bm;
+  FileParser<SDIM, WDIM> parser;
+  try
+  {
+    parser.parse("dummy", &bm);
+  }
+  catch(InternalError* e)
+  {
+    std::cerr << e->message() << std::endl;
+    exit(1);
+  }
+  // set cell numbers (currently equal to indices since all cells are active)
+  bm.set_cell_numbers();
+  // create base mesh's graph structure
+  bm.create_graph();
+  // print base mesh
   bm.print(std::cout);
-
   // validate base mesh
   bm.validate();
 
-  // subdivide cell 0
-  std::cout << "Subdividing cell 0" << std::endl;
-  bm.cell(1)->init_subdiv_data(CONFORM_SAME_TYPE);
-  bm.cell(1)->subdivide();
+  // subdivide cell 1
+  std::cout << "******************" << std::endl;
+  std::cout << "Subdividing cell 1" << std::endl;
+  std::cout << "******************" << std::endl;
+  SubdivisionData<1, SDIM, WDIM>* subdiv_data = new SubdivisionData<1, SDIM, WDIM>(CONFORM_SAME_TYPE);
+  bm.cell(1)->subdivide(subdiv_data);
+
+  // add created cells and subcells to the corresponding base mesh vectors
   bm.add_created_items(bm.cell(1)->subdiv_data());
+  // set cell numbers (now they differ from indices)
+  bm.set_cell_numbers();
+  // print base mesh
+  bm.print(std::cout);
+ // validate base mesh
+  bm.validate();
 
   // TODO: neighbourhood update
-
-  std::cout << "Base mesh should now look like this:" << std::endl;
-  std::cout << "v0--------e0--------v1---e3---v4---e4---v2--------e2--------v3" << std::endl;
-  bm.print(std::cout);
-
-  // validate base mesh
-  bm.validate();
 
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;

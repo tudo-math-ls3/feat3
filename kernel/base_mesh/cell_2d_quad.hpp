@@ -234,7 +234,7 @@ namespace FEAST
       *
       * \todo New centre vertex of the quad has to be computed properly!
       */
-      inline void subdivide()
+      inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>* subdiv_data)
       {
         // assure that this cell has not been divided yet
         if(!this->active())
@@ -245,13 +245,7 @@ namespace FEAST
           exit(1);
         }
 
-        if(!this->subdiv_data_initialised())
-        {
-          std::cerr << "Quad ";
-          this->print_index(std::cerr);
-          std::cerr << " cannot be subdivided! Set subdivision data first! Aborting program." << std::endl;
-          exit(1);
-        }
+        this->set_subdiv_data(subdiv_data);
 
         // clear all vectors of created entities in the SubdivisionData object
         this->subdiv_data()->clear_created();
@@ -284,8 +278,9 @@ namespace FEAST
             if (edge(iedge)->active())
             {
               // subdivide edge
-              edge(iedge)->init_subdiv_data(CONFORM_SAME_TYPE);
-              edge(iedge)->subdivide();
+              SubdivisionData<1, space_dim_, world_dim_>* subdiv_data
+                = new SubdivisionData<1, space_dim_, world_dim_>(CONFORM_SAME_TYPE);
+              edge(iedge)->subdivide(subdiv_data);
 
               // add the created vertices/edges to the vector of created vertices/edges
               this->subdiv_data()->created_vertices.push_back(edge(iedge)->subdiv_data()->created_vertex);

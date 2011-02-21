@@ -34,6 +34,7 @@ namespace FEAST
     * \author Hilmar Wobker
     */
     template<
+      unsigned char cell_dim_,
       unsigned char space_dim_,
       unsigned char world_dim_>
     class Subcells
@@ -46,15 +47,17 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-    template<unsigned char world_dim_>
-    class Subcells<1, world_dim_>
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class Subcells<1, space_dim_, world_dim_>
     {
       /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
 
       // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
       // access to all members of this class.
-      friend class FileParser<1, world_dim_>;
+      friend class FileParser<space_dim_, world_dim_>;
 
 
     private:
@@ -155,7 +158,7 @@ namespace FEAST
 
 
       /// adds vertex created during subdivision of the corresponding edge
-      inline void add_created_subcells(SubdivisionData<1, 2, world_dim_>* subdiv_data)
+      inline void add_created_subcells(SubdivisionData<1, space_dim_, world_dim_>* subdiv_data)
       {
         _add(subdiv_data->created_vertex);
       }
@@ -193,7 +196,7 @@ namespace FEAST
           stream << std::endl;
         }
       }
-    }; // class Subcells<1, world_dim_>
+    }; // class Subcells<1, space_dim_, world_dim_>
 
 
 
@@ -203,17 +206,19 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-    template<unsigned char world_dim_>
-    class Subcells<2, world_dim_>
-     : public Subcells<1, world_dim_>
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class Subcells<2, space_dim_, world_dim_>
+     : public Subcells<1, space_dim_, world_dim_>
     {
       /// shortcut to save typing of template parameters
-      typedef Cell<1, 2, world_dim_> Cell_1D_;
+      typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
       typedef Vertex<world_dim_> Vertex_;
 
       // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
       // access to all members of this class.
-      friend class FileParser<2, world_dim_>;
+      friend class FileParser<space_dim_, world_dim_>;
 
 
     private:
@@ -270,14 +275,14 @@ namespace FEAST
       /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
       inline void _add(Vertex_* v)
       {
-        Subcells<1, world_dim_>::_add(v);
+        Subcells<1, space_dim_, world_dim_>::_add(v);
       }
 
 
       /// deletes given vertex (wrapper for function in parent class)
       inline void _remove(Vertex_* v)
       {
-        Subcells<1, world_dim_>::_remove(v);
+        Subcells<1, space_dim_, world_dim_>::_remove(v);
       }
 
 
@@ -296,7 +301,7 @@ namespace FEAST
       * name of the mesh file
       */
       Subcells()
-        : Subcells<1, world_dim_>(),
+        : Subcells<1, space_dim_, world_dim_>(),
         _edges(nullptr)
       {
       }
@@ -339,7 +344,7 @@ namespace FEAST
 
 
       /// adds subcells created during subdivision to the corresponding subcell vectors
-      inline void add_created_subcells(SubdivisionData<2, 2, world_dim_>* subdiv_data)
+      inline void add_created_subcells(SubdivisionData<2, space_dim_, world_dim_>* subdiv_data)
       {
         for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
         {
@@ -377,7 +382,7 @@ namespace FEAST
       */
       void print(std::ostream& stream)
       {
-        Subcells<1, world_dim_>::print(stream);
+        Subcells<1, space_dim_, world_dim_>::print(stream);
         stream << _edges.size() << " edges" << std::endl;
         for(unsigned int iedge(0) ; iedge < _edges.size() ; ++iedge)
         {
@@ -385,7 +390,7 @@ namespace FEAST
           stream << std::endl;
         }
       }
-    }; // class Subcells<2, world_dim_>
+    }; // class Subcells<2, space_dim_, world_dim_>
 
 
 
@@ -395,16 +400,20 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-    template<unsigned char world_dim_>
-    class Subcells<3, world_dim_>
-      : public Subcells<2, world_dim_>
+    template<
+      unsigned char space_dim_,
+      unsigned char world_dim_>
+    class Subcells<3, space_dim_, world_dim_>
+      : public Subcells<2, space_dim_, world_dim_>
     {
       /// shortcut to save typing of template parameters
-      typedef Cell<2, 3, world_dim_> Cell_2D_;
+      typedef Vertex<world_dim_> Vertex_;
+      typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
+      typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
       // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
       // access to all members of this class.
-      friend class FileParser<3, world_dim_>;
+      friend class FileParser<space_dim_, world_dim_>;
 
 
     private:
@@ -436,6 +445,34 @@ namespace FEAST
 
     protected:
 
+      /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
+      inline void _add(Vertex_* v)
+      {
+        Subcells<1, space_dim_, world_dim_>::_add(v);
+      }
+
+
+      /// deletes given vertex (wrapper for function in parent class)
+      inline void _remove(Vertex_* v)
+      {
+        Subcells<1, space_dim_, world_dim_>::_remove(v);
+      }
+
+
+      /// adds given edge to base mesh and sets its index (wrapper for function in parent class)
+      inline void _add(Cell_1D_* e)
+      {
+        Subcells<2, space_dim_, world_dim_>::_add(e);
+      }
+
+
+      /// deletes given edge (wrapper for function in parent class)
+      inline void _remove(Cell_1D_* e)
+      {
+        Subcells<2, space_dim_, world_dim_>::_remove(e);
+      }
+
+
       /// adds given face to base mesh and sets its index
       inline void _add(Cell_2D_* f)
       {
@@ -455,7 +492,7 @@ namespace FEAST
 
       ///default CTOR
       Subcells()
-        : Subcells<2, world_dim_>(),
+        : Subcells<2, space_dim_, world_dim_>(),
           _faces(nullptr)
       {
       }
@@ -495,7 +532,7 @@ namespace FEAST
 
 
       /// adds subcells created during subdivision to the corresponding subcell vectors
-      inline void add_created_subcells(SubdivisionData<3, 3, world_dim_>* subdiv_data)
+      inline void add_created_subcells(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
         for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
         {
@@ -537,7 +574,7 @@ namespace FEAST
       */
       void print(std::ostream& stream)
       {
-        Subcells<2, world_dim_>::print(stream);
+        Subcells<2, space_dim_, world_dim_>::print(stream);
         stream << _faces.size() << " faces" << std::endl;
         for (unsigned int iface(0) ; iface < _faces.size() ; ++iface)
         {
@@ -545,7 +582,7 @@ namespace FEAST
           stream << std::endl;
         }
       }
-    };
+    }; // class Subcells<3, space_dim_, world_dim_>
   } // namespace BaseMesh
 } // namespace FEAST
 

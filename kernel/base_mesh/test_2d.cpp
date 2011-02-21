@@ -39,25 +39,32 @@ int main (int argc, char **argv)
     std::cerr << e->message() << std::endl;
     exit(1);
   }
-  // set cell numbers (equal to indices since all cells are active)
+  // set cell numbers (currently equal to indices since all cells are active)
   bm.set_cell_numbers();
   // create base mesh's graph structure
   bm.create_graph();
   // print base mesh
   bm.print(std::cout);
+  // validate base mesh
+  bm.validate();
 
   // subdivide cell 0
+  std::cout << "******************" << std::endl;
   std::cout << "Subdividing cell 0" << std::endl;
-  bm.cell(0)->init_subdiv_data(NONCONFORM_SAME_TYPE);
-  bm.cell(0)->subdivide();
+  std::cout << "******************" << std::endl;
+  SubdivisionData<2, SDIM, WDIM>* subdiv_data = new SubdivisionData<2, SDIM, WDIM>(NONCONFORM_SAME_TYPE);
+  bm.cell(0)->subdivide(subdiv_data);
+
+  // add created cells and subcells to the corresponding base mesh vectors
   bm.add_created_items(bm.cell(0)->subdiv_data());
   // set cell numbers (now they differ from indices)
   bm.set_cell_numbers();
   // print base mesh
   bm.print(std::cout);
-
  // validate base mesh
   bm.validate();
+
+  // TODO: neighbourhood update
 
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
   std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;

@@ -13,6 +13,7 @@
 #include <kernel/util/file_reader_ascii.hpp>
 // COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
 //#include <kernel/error_handler.hpp>
+#include <kernel/base_mesh/cell_3d_hexa.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
 namespace FEAST
@@ -33,6 +34,101 @@ namespace FEAST
     class FileParser
     {
     };
+
+
+    /**
+    * \brief template class for base mesh file parser, specialisation for 1D files
+    *
+    * \note As long as no real file parser is implemented, we only manually create a 1D base mesh here.
+    *
+    * \author Dominik Goeddeke
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class FileParser<1, world_dim_>
+    {
+      /// shortcuts various cell types to save typing of template parameters
+      typedef Vertex<world_dim_> Vertex_;
+      typedef Edge<1, world_dim_> Edge_;
+
+    private:
+
+      /// pointer to the base mesh
+      BM<1, world_dim_>* _bm;
+
+    public:
+
+      /* ***************************
+      * constructors & destructors *
+      *****************************/
+//COMMENT_HILMAR: DTOR and clean up missing!
+
+      /* *****************
+      * member functions *
+      *******************/
+      /**
+      * \brief function for reading a 1D mesh in FEAST1 format
+      *
+      * \note As long as no real file parser is implemented, we only manually create a 1D base mesh here.
+      * \author Dominik Goeddeke
+      * \author Hilmar Wobker
+      */
+      inline void parse(std::string const& file_name, BM<1, world_dim_>* bm)
+      {
+        assert(world_dim_ == 1);
+
+        std::cout << "No file parser implemented yet!" << std::endl;
+        std::cout << "A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):" << std::endl;
+        std::cout << "v0--------e0--------v1--------e1--------v2--------e2--------v3" << std::endl;
+
+        // set base mesh pointer
+        _bm = bm;
+
+        // Base mesh example consisting four vertices and three edges
+        //   v0---e0---v1---e1---v2---e2---v3
+
+        // create the four vertices
+        // v0
+        double coords[1];
+        coords[0] = 0.0;
+
+        // shortcut for _subcells object
+        Subcells<1, 1, world_dim_>* sc = &_bm->_subcells;
+
+        // add vertex to base mesh
+        sc->_add(new Vertex_(coords));
+
+        // v1
+        coords[0] = 1.0;
+        // add vertex to base mesh
+        sc->_add(new Vertex_(coords));
+
+        // v2
+        coords[0] = 2.0;
+        // add vertex to base mesh
+        sc->_add(new Vertex_(coords));
+
+        // v3
+        coords[0] = 3.0;
+        // add vertex to base mesh
+        sc->_add(new Vertex_(coords));
+
+        // create the three edges (=cells)
+        // e0
+        _bm->_add(new Edge_(sc->vertex(0), sc->vertex(1), 0));
+        // e1
+        _bm->_add(new Edge_(sc->vertex(1), sc->vertex(2), 0));
+        // e2
+        _bm->_add(new Edge_(sc->vertex(2), sc->vertex(3), 0));
+
+        // set neighbourhood information
+        _bm->cell(0)->add_neighbour(SDIM_VERTEX, 1, _bm->cell(1));
+        _bm->cell(1)->add_neighbour(SDIM_VERTEX, 0, _bm->cell(0));
+        _bm->cell(1)->add_neighbour(SDIM_VERTEX, 1, _bm->cell(2));
+        _bm->cell(2)->add_neighbour(SDIM_VERTEX, 0, _bm->cell(1));
+      } // parse
+    }; // FileParser<1, world_dim_>
+
 
 
     /**
@@ -250,6 +346,9 @@ namespace FEAST
         mesh_file->read(_num_cells);
         mesh_file->read(_num_edges);
 
+        // shortcut for _subcells object
+        Subcells<2, 2, world_dim_>* sc = &_bm->_subcells;
+
         // read and set vertices
         for(unsigned int ivertex = 0 ; ivertex < _num_vertices ; ++ivertex)
         {
@@ -312,7 +411,7 @@ namespace FEAST
             }
           }
           // add vertex to base mesh
-          _bm->_subcells._add(new Vertex_(coords));
+          sc->_add(new Vertex_(coords));
         }
 
         // read  and set edges
@@ -321,7 +420,7 @@ namespace FEAST
           unsigned int v0, v1;
           mesh_file->read(v0, v1);
           // substract 1 from 1-based to 0-based indexing
-          _bm->_subcells._add(new Edge_(_bm->_subcells.vertex(v0-1), _bm->_subcells.vertex(v1-1), 0));
+          sc->_add(new Edge_(sc->vertex(v0-1), sc->vertex(v1-1), 0));
         }
 
         // vector for buffering neighbourhood information that can not be immediately set
@@ -375,10 +474,8 @@ namespace FEAST
 //std::cout << "Vertices: " << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
 //std::cout << "Edges   : " << e[0] << " "<< e[1] << " " << e[2] << " " << e[3] << std::endl;
 
-              _bm->_add(new Quad_(_bm->_subcells.vertex(v[0]), _bm->_subcells.vertex(v[1]),
-                                  _bm->_subcells.vertex(v[2]), _bm->_subcells.vertex(v[3]),
-                                  _bm->_subcells.edge(e[0]), _bm->_subcells.edge(e[1]),
-                                  _bm->_subcells.edge(e[2]), _bm->_subcells.edge(e[3]), 0));
+              _bm->_add(new Quad_(sc->vertex(v[0]), sc->vertex(v[1]), sc->vertex(v[2]), sc->vertex(v[3]),
+                                  sc->edge(e[0]), sc->edge(e[1]), sc->edge(e[2]), sc->edge(e[3]), 0));
               delete [] v;
               delete [] e;
               // read edge neighbours
@@ -624,7 +721,577 @@ COMMENT_HILMAR: will be adapted later
         delete mesh_file;
       } // parse
     }; // class FileParser2D
+
+
+
+
+
+    /**
+    * \brief template class for base mesh file parser, specialisation for 3D files
+    *
+    * \note As long as no real file parser is implemented, we only manually create a 3D base mesh here.
+    *
+    * \author Hilmar Wobker
+    */
+    template<unsigned char world_dim_>
+    class FileParser<3, world_dim_>
+    {
+      /// shortcuts to save typing of template parameters
+      typedef Vertex<world_dim_> Vertex_;
+      typedef Edge<3, world_dim_> Edge_;
+      typedef Quad<3, world_dim_> Quad_;
+      typedef Hexa<3, world_dim_> Hexa_;
+
+    private:
+
+      /// pointer to the base mesh
+      BM<3, world_dim_>* _bm;
+
+    public:
+
+      /* ***************************
+      * constructors & destructors *
+      *****************************/
+//COMMENT_HILMAR: DTOR and clean up missing!
+
+      /* *****************
+      * member functions *
+      *******************/
+      /**
+      * \brief function for reading a 3D mesh in FEAST1 format
+      *
+      * \note As long as no real file parser is implemented, we only manually create a 1D base mesh here.
+      * \author Dominik Goeddeke
+      * \author Hilmar Wobker
+      */
+      inline void parse(std::string const& file_name, BM<3, world_dim_>* bm)
+      {
+        assert(world_dim_ == 3);
+
+        std::cout << "No file parser implemented yet! A manual 3D base mesh is created." << std::endl;
+
+        // set base mesh pointer
+        _bm = bm;
+
+        // shortcut for _subcells object
+        Subcells<3, 3, world_dim_>* sc = &_bm->_subcells;
+
+        /*
+        * Test mesh consisting of 4 hexas:
+        * View direction (0,0,-1) (from the front), (x,y) \in [0,2]x[0,2]:
+        *   plane z=0 (back face):        plane z=1 (center):           plane z=2 (front):
+        *
+        * (0,2,0)             (2,2,0)   (0,2,1)             (2,2,1)   (0,2,2)             (2,2,2)
+        *                                 13---26---14---27---15        05---08---06---09---07
+        *                                  |         |         |         |         |         |
+        *                                 23   13   24   14   25        05   01   06   02   07      y
+        *                                  |         |         |         |         |         |      /\
+        *             18---35---19        10---21---11---22---12        02---03---03---04---04      |
+        *              |         |                   |         |                   |         |      |
+        *             33   17   34                  19   12   20                  01   00   02      |
+        *              |         |                   |         |                   |         |       --------> x
+        *             16---32---17                  08---18---09                  00---00---01
+        * (0,0,0)             (2,0,0)   (0,0,1)             (2,0,1)   (0,0,2)             (2,0,2)
+        *
+        * View direction (-1,0,0) (from the right), (y,z) \in [0,2]x[2,0]:
+        *   plane x=0 (right):          plane x=1 (center):         plane x=2 (left):
+        *
+        * (0,2,2)             (0,2,0)   (1,2,2)             (1,2,0)   (2,2,2)             (2,2,0)
+        *   05---15---13                  06---16---14                  07---17---15
+        *    |         |                   |         |                   |         |
+        *   05   07   23                  06   08   24                  07   09   25                          y
+        *    |         |                   |         |                   |         |                          /\
+        *   02---12---10                  03---13---11---30---18        04---14---12---31---19                |
+        *                                  |         |         |         |         |         |                |
+        *                                 01   03   19   16   33        02   04   20   17   34                |
+        *                                  |         |         |         |         |         |     z <--------
+        *                                 00---19---08---28---16        01---11---09---29---17
+        * (0,0,2)             (0,0,0)   (1,0,2)             (1,0,0)   (2,0,2)             (2,0,0)
+        *
+        * View direction (0,-1,0) (from the top), (x,z) \in [0,2]x[2,0]:
+        *   plane y=0 (bottom):         plane y=1 (center):         plane y=2 (top):
+        *
+        * (0,0,0)             (2,0,0)   (0,1,0)             (2,1,0)   (0,2,0)             (2,2,0)
+        *             16---32---17                  18---35---19
+        *              |         |                   |         |
+        *             28   15   29                  30   18   31                                     --------> x
+        *              |         |                   |         |                                    |
+        *             08---18---09        10---21---11---22---12        13---26---14---27---15      |
+        *              |         |         |         |         |         |         |         |      |
+        *             10   02   11        12   05   13   06   14        15   10   16   11   17      \/
+        *              |         |         |         |         |         |         |         |      z
+        *             00---00---01        02---03---03---04---04        05---08---06---09---07
+        * (0,0,2)             (2,0,2)   (0,1,2)             (2,1,2)   (0,2,2)             (2,2,2)
+        *
+        */
+        // first, a bunch of vertices
+        // v0 = (1,0,2)
+        double coords[3] = {1,0,2};
+        sc->_add(new Vertex_(coords));
+
+        // v1 = (2,0,2)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v2 = (0,1,2)
+        coords[0] = 0;
+        coords[1] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v3 = (1,1,2)
+        coords[0] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v4 = (2,1,2)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v5 = (0,2,2)
+        coords[0] = 0;
+        coords[1] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v6 = (1,2,2)
+        coords[0] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v7 = (2,2,2)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v8 = (1,0,1)
+        coords[0] = 1;
+        coords[1] = 0;
+        coords[2] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v9 = (2,0,1)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v10 = (0,1,1)
+        coords[0] = 0;
+        coords[1] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v11 = (1,1,1)
+        coords[0] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v12 = (2,1,1)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v13 = (0,2,1)
+        coords[0] = 0;
+        coords[1] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v14 = (1,2,1)
+        coords[0] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v15 = (2,2,1)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v16 = (1,0,0)
+        coords[0] = 1;
+        coords[1] = 0;
+        coords[2] = 0;
+        sc->_add(new Vertex_(coords));
+
+        // v17 = (2,0,0)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // v18 = (1,1,0)
+        coords[0] = 1;
+        coords[1] = 1;
+        sc->_add(new Vertex_(coords));
+
+        // v19 = (2,1,0)
+        coords[0] = 2;
+        sc->_add(new Vertex_(coords));
+
+        // then, a bunch of edges
+        // e0
+        sc->_add(new Edge_(sc->vertex(0), sc->vertex(1), 0));
+        // e1
+        sc->_add(new Edge_(sc->vertex(0), sc->vertex(3), 0));
+        // e2
+        sc->_add(new Edge_(sc->vertex(1), sc->vertex(4), 0));
+        // e3
+        sc->_add(new Edge_(sc->vertex(2), sc->vertex(3), 0));
+        // e4
+        sc->_add(new Edge_(sc->vertex(3), sc->vertex(4), 0));
+        // e5
+        sc->_add(new Edge_(sc->vertex(2), sc->vertex(5), 0));
+        // e6
+        sc->_add(new Edge_(sc->vertex(3), sc->vertex(6), 0));
+        // e7
+        sc->_add(new Edge_(sc->vertex(4), sc->vertex(7), 0));
+        // e8
+        sc->_add(new Edge_(sc->vertex(5), sc->vertex(6), 0));
+        // e9
+        sc->_add(new Edge_(sc->vertex(6), sc->vertex(7), 0));
+        // e10
+        sc->_add(new Edge_(sc->vertex(0), sc->vertex(8), 0));
+        // e11
+        sc->_add(new Edge_(sc->vertex(1), sc->vertex(9), 0));
+        // e12
+        sc->_add(new Edge_(sc->vertex(2), sc->vertex(10), 0));
+        // e13
+        sc->_add(new Edge_(sc->vertex(3), sc->vertex(11), 0));
+        // e14
+        sc->_add(new Edge_(sc->vertex(4), sc->vertex(12), 0));
+        // e15
+        sc->_add(new Edge_(sc->vertex(5), sc->vertex(13), 0));
+        // e16
+        sc->_add(new Edge_(sc->vertex(6), sc->vertex(14), 0));
+        // e17
+        sc->_add(new Edge_(sc->vertex(7), sc->vertex(15), 0));
+        // e18
+        sc->_add(new Edge_(sc->vertex(8), sc->vertex(9), 0));
+        // e19
+        sc->_add(new Edge_(sc->vertex(8), sc->vertex(11), 0));
+        // e20
+        sc->_add(new Edge_(sc->vertex(9), sc->vertex(12), 0));
+        // e21
+        sc->_add(new Edge_(sc->vertex(10), sc->vertex(11), 0));
+        // e22
+        sc->_add(new Edge_(sc->vertex(11), sc->vertex(12), 0));
+        // e23
+        sc->_add(new Edge_(sc->vertex(10), sc->vertex(13), 0));
+        // e24
+        sc->_add(new Edge_(sc->vertex(11), sc->vertex(14), 0));
+        // e25
+        sc->_add(new Edge_(sc->vertex(12), sc->vertex(15), 0));
+        // e26
+        sc->_add(new Edge_(sc->vertex(13), sc->vertex(14), 0));
+        // e27
+        sc->_add(new Edge_(sc->vertex(14), sc->vertex(15), 0));
+        // e28
+        sc->_add(new Edge_(sc->vertex(8), sc->vertex(16), 0));
+        // e29
+        sc->_add(new Edge_(sc->vertex(9), sc->vertex(17), 0));
+        // e30
+        sc->_add(new Edge_(sc->vertex(11), sc->vertex(18), 0));
+        // e31
+        sc->_add(new Edge_(sc->vertex(12), sc->vertex(19), 0));
+        // e32
+        sc->_add(new Edge_(sc->vertex(16), sc->vertex(17), 0));
+        // e33
+        sc->_add(new Edge_(sc->vertex(16), sc->vertex(18), 0));
+        // e34
+        sc->_add(new Edge_(sc->vertex(17), sc->vertex(19), 0));
+        // e35
+        sc->_add(new Edge_(sc->vertex(18), sc->vertex(19), 0));
+
+        // now faces
+        // f0
+        //sc->_add(new Quad_(sc->vertex(0), sc->vertex(1), sc->vertex(3), sc->vertex(4),
+        //                   sc->edge(0), sc->edge(4), sc->edge(1), sc->edge(2), 0));
+        // deliberately, use different local numbering
+        sc->_add(new Quad_(sc->vertex(1), sc->vertex(4), sc->vertex(0), sc->vertex(3),
+                           sc->edge(2), sc->edge(1), sc->edge(0), sc->edge(4), 0));
+        // f1
+        sc->_add(new Quad_(sc->vertex(2), sc->vertex(3), sc->vertex(5), sc->vertex(6),
+                           sc->edge(3), sc->edge(8), sc->edge(5), sc->edge(6), 0));
+        // f2
+        sc->_add(new Quad_(sc->vertex(3), sc->vertex(4), sc->vertex(6), sc->vertex(7),
+                           sc->edge(4), sc->edge(9), sc->edge(6), sc->edge(7), 0));
+        // f3
+        //sc->_add(new Quad_(sc->vertex(0), sc->vertex(1), sc->vertex(8), sc->vertex(9),
+        //                   sc->edge(0), sc->edge(18), sc->edge(10), sc->edge(11), 0));
+        // deliberately, use different local numbering
+        sc->_add(new Quad_(sc->vertex(1), sc->vertex(9), sc->vertex(0), sc->vertex(8),
+                           sc->edge(11), sc->edge(10), sc->edge(0), sc->edge(18), 0));
+        // f4
+        sc->_add(new Quad_(sc->vertex(0), sc->vertex(8), sc->vertex(3), sc->vertex(11),
+                           sc->edge(10), sc->edge(13), sc->edge(1), sc->edge(19), 0));
+        // f5
+        sc->_add(new Quad_(sc->vertex(1), sc->vertex(9), sc->vertex(4), sc->vertex(12),
+                           sc->edge(11), sc->edge(14), sc->edge(2), sc->edge(20), 0));
+        // f6
+        sc->_add(new Quad_(sc->vertex(2), sc->vertex(3), sc->vertex(10), sc->vertex(11),
+                           sc->edge(3), sc->edge(21), sc->edge(12), sc->edge(13), 0));
+        // f7
+        //sc->_add(new Quad_(sc->vertex(3), sc->vertex(4), sc->vertex(11), sc->vertex(12),
+        //                   sc->edge(4), sc->edge(22), sc->edge(13), sc->edge(14), 0));
+        // deliberately, use different local numbering
+        sc->_add(new Quad_(sc->vertex(3), sc->vertex(11), sc->vertex(4), sc->vertex(12),
+                           sc->edge(13), sc->edge(14), sc->edge(4), sc->edge(22), 0));
+        // f8
+        sc->_add(new Quad_(sc->vertex(2), sc->vertex(10), sc->vertex(5), sc->vertex(13),
+                           sc->edge(12), sc->edge(15), sc->edge(5), sc->edge(23), 0));
+        // f9
+        sc->_add(new Quad_(sc->vertex(3), sc->vertex(11), sc->vertex(6), sc->vertex(14),
+                           sc->edge(13), sc->edge(16), sc->edge(6), sc->edge(24), 0));
+        // f10
+        sc->_add(new Quad_(sc->vertex(4), sc->vertex(12), sc->vertex(7), sc->vertex(15),
+                           sc->edge(14), sc->edge(17), sc->edge(7), sc->edge(25), 0));
+        // f11
+        sc->_add(new Quad_(sc->vertex(5), sc->vertex(6), sc->vertex(13), sc->vertex(14),
+                           sc->edge(8), sc->edge(26), sc->edge(15), sc->edge(16), 0));
+        // f12
+        sc->_add(new Quad_(sc->vertex(6), sc->vertex(7), sc->vertex(14), sc->vertex(15),
+                           sc->edge(9), sc->edge(27), sc->edge(16), sc->edge(17), 0));
+        // f13
+        sc->_add(new Quad_(sc->vertex(8), sc->vertex(9), sc->vertex(11), sc->vertex(12),
+                           sc->edge(18), sc->edge(22), sc->edge(19), sc->edge(20), 0));
+        // f14
+        sc->_add(new Quad_(sc->vertex(10), sc->vertex(11), sc->vertex(13), sc->vertex(14),
+                           sc->edge(21), sc->edge(26), sc->edge(23), sc->edge(24), 0));
+        // f15
+        sc->_add(new Quad_(sc->vertex(11), sc->vertex(12), sc->vertex(14), sc->vertex(15),
+                           sc->edge(22), sc->edge(27), sc->edge(24), sc->edge(25), 0));
+        // f16
+        sc->_add(new Quad_(sc->vertex(8), sc->vertex(9), sc->vertex(16), sc->vertex(17),
+                           sc->edge(18), sc->edge(32), sc->edge(28), sc->edge(29), 0));
+        // f17
+        sc->_add(new Quad_(sc->vertex(8), sc->vertex(16), sc->vertex(11), sc->vertex(18),
+                           sc->edge(28), sc->edge(30), sc->edge(19), sc->edge(33), 0));
+        // f18
+        sc->_add(new Quad_(sc->vertex(9), sc->vertex(17), sc->vertex(12), sc->vertex(19),
+                           sc->edge(29), sc->edge(31), sc->edge(20), sc->edge(34), 0));
+        // f19
+        sc->_add(new Quad_(sc->vertex(11), sc->vertex(12), sc->vertex(18), sc->vertex(19),
+                           sc->edge(22), sc->edge(35), sc->edge(30), sc->edge(31), 0));
+        // f20
+        sc->_add(new Quad_(sc->vertex(16), sc->vertex(17), sc->vertex(18), sc->vertex(19),
+                           sc->edge(32), sc->edge(35), sc->edge(33), sc->edge(34), 0));
+
+        // finally, cells
+        // c0
+        _bm->_add(new Hexa_(sc->vertex(0), sc->vertex(1), sc->vertex(8), sc->vertex(9),
+                            sc->vertex(3), sc->vertex(4), sc->vertex(11), sc->vertex(12),
+                            sc->edge(0), sc->edge(18), sc->edge(4), sc->edge(22), sc->edge(10), sc->edge(11),
+                            sc->edge(13), sc->edge(14), sc->edge(1), sc->edge(2), sc->edge(19), sc->edge(20),
+                            sc->face(3), sc->face(7), sc->face(0), sc->face(13), sc->face(4), sc->face(5), 0));
+        // c1
+        //_bm->_add(new Hexa_(sc->vertex(2), sc->vertex(3), sc->vertex(10), sc->vertex(11),
+        //                sc->vertex(5), sc->vertex(6), sc->vertex(13), sc->vertex(14),
+        //                sc->edge(3), sc->edge(21), sc->edge(8), sc->edge(26), sc->edge(12), sc->edge(13),
+        //                sc->edge(15), sc->edge(16), sc->edge(5), sc->edge(6), sc->edge(23), sc->edge(24),
+        //                sc->face(6), sc->face(11), sc->face(1), sc->face(14), sc->face(8), sc->face(9), 0));
+        // deliberately, use different local numbering
+        _bm->_add(new Hexa_(sc->vertex(3), sc->vertex(6), sc->vertex(11), sc->vertex(14),
+                            sc->vertex(2), sc->vertex(5), sc->vertex(10), sc->vertex(13),
+                            sc->edge(6), sc->edge(24), sc->edge(5), sc->edge(23), sc->edge(13), sc->edge(16),
+                            sc->edge(12), sc->edge(15), sc->edge(3), sc->edge(8), sc->edge(21), sc->edge(26),
+                            sc->face(9), sc->face(8), sc->face(1), sc->face(14), sc->face(6), sc->face(11), 0));
+        // c2
+        _bm->_add(new Hexa_(sc->vertex(3), sc->vertex(4), sc->vertex(11), sc->vertex(12),
+                            sc->vertex(6), sc->vertex(7), sc->vertex(14), sc->vertex(15),
+                            sc->edge(4), sc->edge(22), sc->edge(9), sc->edge(27), sc->edge(13), sc->edge(14),
+                            sc->edge(16), sc->edge(17), sc->edge(6), sc->edge(7), sc->edge(24), sc->edge(25),
+                            sc->face(7), sc->face(12), sc->face(2), sc->face(15), sc->face(9), sc->face(10), 0));
+        // c3
+        //_bm->_add(new Hexa_(sc->vertex(8), sc->vertex(9), sc->vertex(16), sc->vertex(17),
+        //                    sc->vertex(11), sc->vertex(12), sc->vertex(18), sc->vertex(19),
+        //                    sc->edge(18), sc->edge(32), sc->edge(22), sc->edge(35), sc->edge(28), sc->edge(29),
+        //                    sc->edge(30), sc->edge(31), sc->edge(19), sc->edge(20), sc->edge(33), sc->edge(34),
+        //                    sc->face(16), sc->face(19), sc->face(13), sc->face(20), sc->face(17), sc->face(18), 0));
+        // deliberately, use different local numbering
+        _bm->_add(new Hexa_(sc->vertex(12), sc->vertex(11), sc->vertex(19), sc->vertex(18),
+                            sc->vertex(9), sc->vertex(8), sc->vertex(17), sc->vertex(16),
+                            sc->edge(22), sc->edge(35), sc->edge(18), sc->edge(32), sc->edge(31), sc->edge(30),
+                            sc->edge(29), sc->edge(28), sc->edge(20), sc->edge(19), sc->edge(34), sc->edge(33),
+                            sc->face(19), sc->face(16), sc->face(13), sc->face(20), sc->face(18), sc->face(17), 0));
+
+        // neighbourhood
+
+        // face neighbours
+        _bm->cell(0)->add_neighbour(SDIM_FACE, 1, _bm->cell(2));
+        _bm->cell(0)->add_neighbour(SDIM_FACE, 3, _bm->cell(3));
+        _bm->cell(1)->add_neighbour(SDIM_FACE, 0, _bm->cell(2));
+        _bm->cell(2)->add_neighbour(SDIM_FACE, 0, _bm->cell(0));
+        _bm->cell(2)->add_neighbour(SDIM_FACE, 4, _bm->cell(1));
+        _bm->cell(3)->add_neighbour(SDIM_FACE, 2, _bm->cell(0));
+
+        // edge neighbours
+        _bm->cell(0)->add_neighbour(SDIM_EDGE, 6, _bm->cell(1));
+        _bm->cell(1)->add_neighbour(SDIM_EDGE, 4, _bm->cell(0));
+        _bm->cell(2)->add_neighbour(SDIM_EDGE, 1, _bm->cell(3));
+        _bm->cell(3)->add_neighbour(SDIM_EDGE, 0, _bm->cell(2));
+
+        // vertex neighbours
+        _bm->cell(1)->add_neighbour(SDIM_VERTEX, 2, _bm->cell(3));
+        _bm->cell(3)->add_neighbour(SDIM_VERTEX, 1, _bm->cell(1));
+      } // parse
+    };
   } // namespace BaseMesh
 } // namespace FEAST
 
 #endif // #define KERNEL_BM_FILE_PARSER_HPP
+
+/*
+Manually created 2D base mesh, maybe still useful. But before it can be used, it must be adapted.
+      /// test CTOR, generates a hard-wired test mesh
+      BaseMesh2D()
+      {
+        // Base mesh example consisting of three quads and two tris:
+        //    v0---e0---v1---e1---v2 \.
+        //    |          |         |    \.
+        //   e2    c0   e3   c1   e4  c2  \ e5
+        //    |          |         |         \.
+        //    v3---e6---v4---e7---v5----e8---v6
+        //                      /  |         |
+        //                  e9/ c3 e10  c4  e11
+        //                /        |         |
+        //              v7---e12--v8---e13---v9
+
+        // create the ten vertices
+        // v0
+        Vertex_* v = new Vertex_();
+        v->set_coord(0, 0.0);
+        v->set_coord(1, 1.0);
+        _add(v);
+
+        // v1
+        v = new Vertex_();
+        v->set_coord(0, 1.0);
+        v->set_coord(1, 1.0);
+        _add(v);
+
+        // v2
+        v = new Vertex_();
+        v->set_coord(0, 2.0);
+        v->set_coord(1, 1.0);
+        _add(v);
+
+        // v3
+        v = new Vertex_();
+        v->set_coord(0, 0.0);
+        v->set_coord(1, 0.0);
+        _add(v);
+
+        // v4
+        v = new Vertex_();
+        v->set_coord(0, 1.0);
+        v->set_coord(1, 0.0);
+        _add(v);
+
+        // v5
+        v = new Vertex_();
+        v->set_coord(0, 2.0);
+        v->set_coord(1, 0.0);
+        _add(v);
+
+        // v6
+        v = new Vertex_();
+        v->set_coord(0, 3.0);
+        v->set_coord(1, 0.0);
+        _add(v);
+
+        // v7
+        v = new Vertex_();
+        v->set_coord(0, 1.0);
+        v->set_coord(1, -1.0);
+        _add(v);
+
+        // v8
+        v = new Vertex_();
+        v->set_coord(0, 2.0);
+        v->set_coord(1, -1.0);
+        _add(v);
+
+        // v9
+        v = new Vertex_();
+        v->set_coord(0, 3.0);
+        v->set_coord(1, -1.0);
+        _add(v);
+
+
+        // create the 14 edges
+        // (just to ease manual sanity checks, always use the vertex of smaller global index as start vertex)
+        // e0
+        Edge_* e = new Edge_(_vertices[0], _vertices[1], 0);
+        _add(e);
+        // e1
+        e = new Edge_(_vertices[1], _vertices[2], 0);
+        _add(e);
+        // e2
+        e = new Edge_(_vertices[0], _vertices[3], 0);
+        _add(e);
+        // e3
+        e = new Edge_(_vertices[1], _vertices[4], 0);
+        _add(e);
+        // e4
+        e = new Edge_(_vertices[2], _vertices[5], 0);
+        _add(e);
+        // e5
+        e = new Edge_(_vertices[2], _vertices[6], 0);
+        _add(e);
+        // e6
+        e = new Edge_(_vertices[3], _vertices[4], 0);
+        _add(e);
+        // e7
+        e = new Edge_(_vertices[4], _vertices[5], 0);
+        _add(e);
+        // e8
+        e = new Edge_(_vertices[5], _vertices[6], 0);
+        _add(e);
+        // e9
+        e = new Edge_(_vertices[5], _vertices[7], 0);
+        _add(e);
+        // e10
+        e = new Edge_(_vertices[5], _vertices[8], 0);
+        _add(e);
+        // e11
+        e = new Edge_(_vertices[6], _vertices[9], 0);
+        _add(e);
+        // e12
+        e = new Edge_(_vertices[7], _vertices[8], 0);
+        _add(e);
+        // e13
+        e = new Edge_(_vertices[8], _vertices[9], 0);
+        _add(e);
+
+        // create quad cell c0
+        Quad_* quad =
+          new Quad_(_vertices[3], _vertices[4], _vertices[0], _vertices[1],
+                    _edges[6], _edges[0], _edges[2], _edges[3], 0);
+        _add(quad);
+
+        // create quad cell c1
+        quad = new Quad_(_vertices[4], _vertices[5], _vertices[1], _vertices[2],
+                         _edges[7], _edges[1], _edges[3], _edges[4], 0);
+        _add(quad);
+
+        // create tri cell c2
+        Tri_* tri = new Tri_(_vertices[5], _vertices[6], _vertices[2],
+                             _edges[8], _edges[5], _edges[4], 0);
+        _add(tri);
+        // create tri cell c3
+        tri = new Tri_(_vertices[7], _vertices[8], _vertices[5],
+                       _edges[12], _edges[10], _edges[9], 0);
+        _add(tri);
+
+        // create quad cell c4
+        quad = new Quad_(_vertices[8], _vertices[9], _vertices[5], _vertices[6],
+                         _edges[13], _edges[8], _edges[10], _edges[11], 0);
+        _add(quad);
+
+        // set neighbourhood information (emulated file parser part 2)
+        _cells[0]->add_neighbour(SDIM_EDGE, 3, _cells[1]);
+
+        _cells[1]->add_neighbour(SDIM_EDGE, 2, _cells[0]);
+        _cells[1]->add_neighbour(SDIM_EDGE, 3, _cells[2]);
+        _cells[1]->add_neighbour(SDIM_VERTEX, 1, _cells[4]);
+        _cells[1]->add_neighbour(SDIM_VERTEX, 1, _cells[3]);
+
+        _cells[2]->add_neighbour(SDIM_EDGE, 2, _cells[1]);
+        _cells[2]->add_neighbour(SDIM_EDGE, 0, _cells[4]);
+        _cells[2]->add_neighbour(SDIM_VERTEX, 0, _cells[3]);
+
+        _cells[3]->add_neighbour(SDIM_EDGE, 1, _cells[4]);
+        _cells[3]->add_neighbour(SDIM_VERTEX, 2, _cells[2]);
+        _cells[3]->add_neighbour(SDIM_VERTEX, 2, _cells[1]);
+
+        _cells[4]->add_neighbour(SDIM_EDGE, 1, _cells[2]);
+        _cells[4]->add_neighbour(SDIM_EDGE, 2, _cells[3]);
+        _cells[4]->add_neighbour(SDIM_VERTEX, 2, _cells[1]);
+      }
+*/

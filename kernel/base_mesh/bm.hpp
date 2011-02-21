@@ -54,7 +54,7 @@ namespace FEAST
       * member variables *
       *******************/
       /// object containing the vectors of subcells
-      Subcells<space_dim_, world_dim_> _subcells;
+      Subcells<space_dim_, space_dim_, world_dim_> _subcells;
 
       /// vector of cells (of full dimension)
       std::vector<Cell_*> _cells;
@@ -237,7 +237,7 @@ namespace FEAST
             index[ipos] = num_neighbours_so_far;
 //std::cout << "Setting index[" << ipos << "] = " << num_neighbours_so_far << std::endl;
             // count neighbours (here: edge neighbours and vertex neighbours)
-            for (unsigned char sdim(0) ; sdim < 2 ; ++sdim)
+            for (unsigned char sdim(0) ; sdim < space_dim_ ; ++sdim)
             {
               num_neighbours_so_far += cell(icell)->num_neighbours_subdim((subdim)sdim);
             }

@@ -409,17 +409,18 @@ namespace FEAST
       }
 
 
-      /// initialises the subdivision data object
-      inline void init_subdiv_data(type_of_subdivision type)
+      /// returns subdivision data object
+      inline void set_subdiv_data(SubdivisionData<cell_dim_, space_dim_, world_dim_>* subdiv_data)
       {
-        _subdiv_data = new SubdivisionData<cell_dim_, space_dim_, world_dim_>(type);
+        if(_subdiv_data != nullptr)
+        {
+          std::cerr << "SubdivisionData object of cell " << this->print_index() << " is no null! Aborting program."
+                    << std::endl;
+          exit(1);
+        }
+        _subdiv_data = subdiv_data;
       }
 
-      /// checks whether the subdivision data is initialised
-      inline bool subdiv_data_initialised() const
-      {
-        return _subdiv_data != nullptr;
-      }
 
       /// deletes the subdivision data object
       inline void delete_subdiv_data()
@@ -427,7 +428,7 @@ namespace FEAST
         _subdiv_data->clear_created();
         delete _subdiv_data;
         _subdiv_data = nullptr;
-        // TODO: has to be called in destructor of this cell
+// TODO: has to be called in destructor of this cell
       }
 
       /// returns whether this cell is active (i.e. whether it does not have children)
@@ -444,7 +445,7 @@ namespace FEAST
       }
 
 
-      virtual void subdivide() = 0;
+      virtual void subdivide(SubdivisionData<cell_dim_, space_dim_, world_dim_>*) = 0;
 
 
       virtual void print(std::ostream& stream) = 0;
