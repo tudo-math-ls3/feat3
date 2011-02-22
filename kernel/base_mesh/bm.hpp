@@ -281,8 +281,11 @@ namespace FEAST
           delete _graph;
           _graph = nullptr;
         }
-        _graph = new Graph(num_cells(), index, neighbours);
-      }
+        _graph = new Graph(n_active_cells, index, neighbours);
+        // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
+        delete [] index;
+        delete [] neighbours;
+      } // create_graph()
 
 
       /// validates the base mesh and all of its cells

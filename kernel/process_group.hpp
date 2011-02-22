@@ -47,13 +47,10 @@ namespace FEAST
     /**
     * \brief array of ranks the processes of this group have in the parent group
     *
+    * The array is allocated within the constructor and deallocated in the destructor again. The array, which is
+    * passed to the constructor from outside, is copied. Deallocation of this outside array must be done outside.
     * Dimension: [#_num_processes]
     */
-    // COMMENT_HILMAR, 15.9.2010:
-    // Currently, this is simply a pointer to the part of the corresponding array
-    // _group_ranks_world[my_group] in universe.hpp. Maybe it makes sense to copy the array and delete the one in
-    // universe.hpp.
-
 // COMMENT_HILMAR: Muessen wir das abspeichern? Kann man es nicht an die MPI Routine uebergeben und dann wieder
 // wegschmeissen?
     int* _ranks_group_parent;
@@ -138,16 +135,22 @@ namespace FEAST
     */
     ProcessGroup(
       unsigned int num_processes,
-      int ranks_group_parent[],
-      ProcessGroup* process_group_parent,
+      int* const ranks_group_parent,
+      ProcessGroup* const process_group_parent,
       unsigned int const group_id)
       : _num_processes(num_processes),
-        _ranks_group_parent(ranks_group_parent),
+        _ranks_group_parent(nullptr),
         _process_group_parent(process_group_parent),
         _group_id(group_id),
         _rank_coord(num_processes-1)
     {
       assert(num_processes >= 1);
+      // copy array of parent group ranks
+      _ranks_group_parent = new int[_num_processes];
+      for(int i(0) ; i < _num_processes ; ++i)
+      {
+        _ranks_group_parent[i] = ranks_group_parent[i];
+      }
       int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
                                           _ranks_group_parent, &_group);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
@@ -190,6 +193,12 @@ namespace FEAST
     /// destructor
     ~ProcessGroup()
     {
+      if(_ranks_group_parent != nullptr)
+      {
+        delete [] _ranks_group_parent;
+        _ranks_group_parent = nullptr;
+      }
+
   // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
   //    if (_buffer != nullptr)
   //    {
@@ -487,10 +496,10 @@ namespace FEAST
     ***************************/
     /// constructor
     WorkGroup(
-      const unsigned int num_processes,
-      int ranks_group_parent[],
-      ProcessGroup* process_group_parent,
-      const unsigned int group_id)
+      unsigned int const num_processes,
+      int* const ranks_group_parent,
+      ProcessGroup* const process_group_parent,
+      unsigned int const group_id)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
 //        _comm_opt(MPI_COMM_NULL),
         _graph_distributed(nullptr),
@@ -534,6 +543,7 @@ namespace FEAST
       if(_graph_distributed != nullptr)
       {
         delete _graph_distributed;
+        _graph_distributed = nullptr;
       }
     }
 
@@ -776,10 +786,10 @@ namespace FEAST
     ***************************/
     /// constructor
     ProcessSubgroup(
-      const unsigned int num_processes,
-      int ranks_group_parent[],
-      ProcessGroup* process_group_parent,
-      const unsigned int group_id,
+      unsigned int const num_processes,
+      int* const ranks_group_parent,
+      ProcessGroup* const process_group_parent,
+      unsigned int const group_id,
       bool contains_extra_coord)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
         _contains_extra_coord(contains_extra_coord),
@@ -831,29 +841,14 @@ namespace FEAST
       {
         // in the case there is no extra coordinator process, the work group of compute processes contains all processes
         // of this subgroup
-// BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
-// kopieren!
-        int* work_group_ranks = new int[_num_processes];
-        for(unsigned int i(0) ; i < _num_processes ; ++i)
-        {
-          work_group_ranks[i] = ranks_group_parent[i];
-        }
-        _work_group = new WorkGroup(_num_processes, work_group_ranks, _process_group_parent, _group_id + 42);
+        _work_group = new WorkGroup(_num_processes, _ranks_group_parent, _process_group_parent, _group_id + 42);
       }
       else
       {
         // otherwise, the work group contains all processes of this subgroup except the last one (the extra coordinator)
-// BRAL: Wenn wir beschliessen, dass _ranks_group_parent nicht abgespeichert werden muss, dann muessen wir hier nicht
-// kopieren. Die Methode MPI_Group_incl(...) bekommt dann das Array ranks_group_parent[] durchgereicht, und
-// wegen _num_processes-1 wird nur auf die ersten _num_processes-1 Positionen zugegriffen.
-        int* work_group_ranks = new int[_num_processes-1];
-        for(unsigned int i(0) ; i < _num_processes - 1 ; ++i)
-        {
-          work_group_ranks[i] = ranks_group_parent[i];
-        }
         if(!is_coordinator())
         {
-          _work_group = new WorkGroup(_num_processes - 1, work_group_ranks, _process_group_parent, _group_id + 666);
+          _work_group = new WorkGroup(_num_processes - 1, _ranks_group_parent, _process_group_parent, _group_id + 666);
         }
         else
         {
@@ -886,6 +881,7 @@ namespace FEAST
       if(_work_group != nullptr)
       {
         delete _work_group;
+        _work_group = nullptr;
       }
     }
 

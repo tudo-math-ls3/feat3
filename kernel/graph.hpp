@@ -102,14 +102,28 @@ namespace FEAST
     /// constructor
     Graph(
       unsigned int const num_nodes,
-      unsigned int* index,
-      unsigned int* neighbours
+      unsigned int* const index,
+      unsigned int* const neighbours
       )
       : _num_nodes(num_nodes),
-        _index(index),
-        _neighbours(neighbours)
+        _index(nullptr),
+        _neighbours(nullptr)
     {
+      // copy index array
+      _index = new unsigned int[num_nodes+1];
+      for(int i(0) ; i < num_nodes+1 ; ++i)
+      {
+        _index[i] = index[i];
+      }
+
+      // copy neighbour array (its size is given by _index[_num_nodes])
+      _neighbours = new unsigned int[_index[_num_nodes]];
+      for(int i(0) ; i < _index[_num_nodes] ; ++i)
+      {
+        _neighbours[i] = neighbours[i];
+      }
     }
+
     /// destructor
     ~Graph()
     {
@@ -225,11 +239,18 @@ namespace FEAST
     /// constructor
     GraphDistributed(
       unsigned int const num_neighbours,
-      unsigned int* neighbours
+      unsigned int* const neighbours
       )
       : _num_neighbours(num_neighbours),
-        _neighbours(neighbours)
+        _neighbours(nullptr)
     {
+      assert(num_neighbours > 0);
+      // copy array of neighbours
+      _neighbours = new unsigned int[num_neighbours];
+      for(int i(0) ; i < num_neighbours ; ++i)
+      {
+        _neighbours[i] = neighbours[i];
+      }
     }
 
     /// destructor

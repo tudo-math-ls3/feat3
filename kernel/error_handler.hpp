@@ -38,6 +38,9 @@ namespace FEAST
       NON_CRITICAL
     };
 
+// COMMENT_HILMAR: wenn wir beschlieﬂen, dass eine geworfene Exception automatisch zum Programm-Abbruch fuehren soll,
+// dann wird das severity-Zeuch hier raugeschmissen.
+
     /// function reacting to an exception
     static void exception_occured(Exception const& e, severity sev)
     {

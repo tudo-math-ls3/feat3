@@ -194,7 +194,14 @@ namespace FEAST
 
       ~CellData()
       {
-        // TODO: deallocate _neighbours !!!
+        for(int sdim(0) ; sdim < cell_space_dim_ ; ++sdim)
+        {
+          for(unsigned int item(0) ; item < this->num_subitems_per_subdim((subdim)sdim) ; ++item)
+          {
+            _neighbours[sdim][item].clear();
+          }
+          delete [] _neighbours[sdim];
+        }
       }
 
       /// returns number of neighbours for given subdimension and given item

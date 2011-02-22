@@ -235,6 +235,7 @@ namespace FEAST
               // line
               case 0:
               {
+                _circle_section[ibc][iseg] = nullptr;
                 // read start vertex
                 mesh_file->read(_start_vertex[ibc][iseg]);
                 // read vector from start to end vertex
@@ -249,7 +250,6 @@ namespace FEAST
               // circle
               case 1:
               {
-//                throw InternalError("Circle segments are not supported in this file parser.");
                 _circle_section[ibc][iseg] = new double[2];
                 // read centre
                 mesh_file->read(_start_vertex[ibc][iseg]);
@@ -675,7 +675,37 @@ COMMENT_HILMAR: will be adapted later
       /* ***************************
       * constructors & destructors *
       *****************************/
-//COMMENT_HILMAR: DTOR and clean up missing!
+      /// DTOR
+      ~FileParser<2, world_dim_>()
+      {
+        // loop over boundary components
+        for(unsigned int ibc(0) ; ibc < _num_boundaries ; ++ibc)
+        {
+          delete [] _segment_type[ibc];
+
+          for(unsigned int iseg(0) ; iseg < _num_segments[ibc] ; ++iseg)
+          {
+            delete [] _start_vertex[ibc][iseg];
+            delete [] _vector_to_end_vertex[ibc][iseg];
+            delete [] _param_int[ibc][iseg];
+            if(_circle_section[ibc][iseg] != nullptr)
+            {
+              delete [] _circle_section[ibc][iseg];
+            }
+          }
+          delete [] _param_int[ibc];
+          delete [] _start_vertex[ibc];
+          delete [] _vector_to_end_vertex[ibc];
+          delete [] _circle_section[ibc];
+        }
+        delete [] _segment_type;
+        delete [] _param_int;
+        delete [] _start_vertex;
+        delete [] _vector_to_end_vertex;
+        delete [] _circle_section;
+        delete [] _num_segments;
+      }
+
 
       /* *****************
       * member functions *

@@ -324,6 +324,7 @@ namespace FEAST
       {
         delete _process_group;
         delete _load_balancer;
+        delete _world_group_without_master;
       }
       delete [] _includes_dedicated_load_bal;
       delete [] _num_processes_in_group;

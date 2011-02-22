@@ -39,6 +39,7 @@ namespace FEAST
       char* argv[])
     {
       // init MPI
+// COMMENT_HILMAR: valgrind spuckt ein paar Warnungen zu diesem Aufruf auf, die ich nicht so ganz verstehe...
       int mpi_error_code = MPI_Init(&argc, &argv);
       validate_mpi_error_code(mpi_error_code, "MPI_Init");
     }

@@ -198,6 +198,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       bool group_has_dedicated_load_bal)
       : _process_group(process_group),
         _group_has_dedicated_load_bal(group_has_dedicated_load_bal),
+        _num_subgroups(0),
         _num_proc_in_subgroup(nullptr),
         _subgroup_ranks(nullptr),
         _belongs_to_group(nullptr),
@@ -337,7 +338,10 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
       // includes_dedicated_load_bal[] in universe_test.cpp.
 
-      bool* group_contains_extra_coord;
+      // usually a boolean would do the trick, but we cannot send boolean arrays via MPI. (C++ bindings are deprecated,
+      // hence we cannot use MPI::BOOL. MPI_LOGICAL cannot be used, since this is not equivalent to C++'s bool.)
+      // So, we use unsigned char here and treat is as if it were boolean.
+      unsigned char* group_contains_extra_coord;
 
       if(_process_group->is_coordinator())
       {
@@ -350,14 +354,15 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
         // set up the two test cases
 
-        // number of work groups, manually set to 2
+        // number of subgroups, manually set to 2
         _num_subgroups = 2;
-        // array of numbers of processes per work group
-        _num_proc_in_subgroup = new unsigned int[2];
 
-        // Boolean array indicating whether the work groups contain an extra process for the coordinator (which will then
-        // not be a compute process in this work group)
-        group_contains_extra_coord = new bool[_num_subgroups];
+        // array of numbers of processes per work group
+        _num_proc_in_subgroup = new unsigned int[_num_subgroups];
+
+        // array indicating whether the subgroups contain an extra process for the coordinator (which will then
+        // not be a compute process in the corresponding work group)
+        group_contains_extra_coord = new unsigned char[_num_subgroups];
 
         // allocate first dimension of the array for rank partitioning
         _subgroup_ranks = new int*[_num_subgroups];
@@ -442,16 +447,17 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
       if(!_process_group->is_coordinator())
       {
+        assert(_num_subgroups > 0);
         _num_proc_in_subgroup = new unsigned int[_num_subgroups];
-        group_contains_extra_coord = new bool[_num_subgroups];
+        group_contains_extra_coord = new unsigned char[_num_subgroups];
       }
 
       mpi_error_code = MPI_Bcast(_num_proc_in_subgroup, _num_subgroups, MPI_UNSIGNED, _process_group->rank_coord(),
                                  _process_group->comm());
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
 
-      mpi_error_code = MPI_Bcast(group_contains_extra_coord, _num_subgroups, MPI_LOGICAL, _process_group->rank_coord(),
-                                 _process_group->comm());
+      mpi_error_code = MPI_Bcast(group_contains_extra_coord, _num_subgroups, MPI_UNSIGNED_CHAR,
+                                  _process_group->rank_coord(), _process_group->comm());
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
 
       // let the non-coordinator processes allocate the array _subgroup_ranks for rank partitioning
@@ -589,7 +595,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         if(_belongs_to_group[igroup])
         {
           _subgroups[igroup] = new ProcessSubgroup(_num_proc_in_subgroup[igroup], _subgroup_ranks[igroup],
-                                                   _process_group, igroup, group_contains_extra_coord[igroup]);
+                                                   _process_group, igroup, (bool)group_contains_extra_coord[igroup]);
         }
         else
         {
@@ -643,6 +649,9 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         neighbours[0] = 1;
         neighbours[1] = 0;
         _graphs[0] = new Graph(2, index, neighbours);
+        // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
+        delete [] index;
+        delete [] neighbours;
         _graphs[0]->print();
 
         // get connectivity graph of the base mesh; this one will be used for the fine grid work group
@@ -664,13 +673,13 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         if(_belongs_to_group[igroup])
         {
           unsigned int num_neighbours_local;
-          unsigned int* neighbours_local;
+          unsigned int* neighbours_local(nullptr);
           int root = _subgroups[igroup]->rank_coord();
           if(_subgroups[igroup]->is_coordinator())
           {
-            /* **********************************
-            * code for the sending root process *
-            ************************************/
+            /* **********************************************
+            * code for the sending root/coordinator process *
+            ************************************************/
 
             unsigned int count = _graphs[igroup]->num_nodes();
             if(_subgroups[igroup]->contains_extra_coord())
@@ -716,16 +725,16 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
               neighbours_local = new unsigned int[num_neighbours_local];
               // scatter the neighbours to the non-root processes and to the root process itself
               MPI_Scatterv(_graphs[igroup]->neighbours(), reinterpret_cast<int*>(num_neighbours),
-                           reinterpret_cast<int*>(index), MPI_UNSIGNED,neighbours_local, num_neighbours_local,
+                           reinterpret_cast<int*>(index), MPI_UNSIGNED, neighbours_local, num_neighbours_local,
                            MPI_UNSIGNED, root,_subgroups[igroup]->comm());
             }
             delete [] num_neighbours;
           }
           else
           {
-            /* ******************************************
-            * code for the receiving non-root processes *
-            ********************************************/
+            /* **********************************************************
+            * code for the receiving non-root/non-coordinator processes *
+            ************************************************************/
             // receive the number of neighbours from the root process
             MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_UNSIGNED, root,
                         _subgroups[igroup]->comm());
@@ -738,9 +747,13 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
           if (!(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
           {
-            // now create distributed graph structure within the compute work groups (the array neighbours_local will be
-            // deallocated in the destructor of the distributed graph object)
+            // now create distributed graph structure within the compute work groups (the array neighbours_local is
+            // copied in the constructor of the distributed graph object, hence it can be deallocated afterwards)
             _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, neighbours_local);
+          }
+          if(neighbours_local != nullptr)
+          {
+            delete [] neighbours_local;
           }
         } // if(_belongs_to_group[igroup])
       } // for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
