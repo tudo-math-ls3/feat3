@@ -109,9 +109,10 @@ namespace FEAST
         _num_processes(num_processes),
         _ranks_group_parent(nullptr),
         _process_group_parent(nullptr),
-        _group_id(-1),
+        _group_id(0),
         _rank_coord(num_processes-1)
     {
+      assert(num_processes >= 1);
       // get MPI_Group object for the given communicator
       int mpi_error_code = MPI_Comm_group(_comm, &_group);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_group");
@@ -146,6 +147,7 @@ namespace FEAST
         _group_id(group_id),
         _rank_coord(num_processes-1)
     {
+      assert(num_processes >= 1);
       int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
                                           _ranks_group_parent, &_group);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");

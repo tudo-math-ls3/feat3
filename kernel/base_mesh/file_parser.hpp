@@ -366,8 +366,8 @@ namespace FEAST
           }
           else
           {
+            assert(itype >= 1);
             unsigned int ibc(itype - 1);
-            assert(ibc >= 0);
             assert(ibc < _num_boundaries);
             // search parameter interval
             for(unsigned int iseg = 0 ; iseg < _num_segments[ibc] ; ++iseg)
@@ -419,6 +419,7 @@ namespace FEAST
         {
           unsigned int v0, v1;
           mesh_file->read(v0, v1);
+          assert(v0 >= 1); assert(v1 >= 1);
           // substract 1 from 1-based to 0-based indexing
           sc->_add(new Edge_(sc->vertex(v0-1), sc->vertex(v1-1), 0));
         }
@@ -584,6 +585,7 @@ namespace FEAST
                     {
                       // when the index of the neighbour cell is less than that of the current cell, the neighbour cell
                       // already exists and can be set as neighbour
+                      assert(vdneigh[ineigh] >= 1);
                       _bm->cell(icell)->add_neighbour(SDIM_VERTEX, ivert, _bm->cell(vdneigh[ineigh]-1));
                     }
                     else

@@ -2,8 +2,7 @@
 // code cleanup:
 // - use ExceptionHandler in base mesh code
 // - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
-// - move mpi_init() from Universe::create() to the very beginning of the program
-// - singleton-Universe via Dirk's util class
+// - Universe CTOR und DTOR private machen
 // - completion of doxygen comments (\param, array dimensions, etc.)
 // - add/remove 'const' and other modifiers where necessary
 // - proper cleanup of resources (deletes, DTORs)
@@ -13,6 +12,7 @@
 // - FileParser --> templates!
 // - BaseMesh1D, BaseMesh2D, BaseMesh3D --> templates!
 // - subdiv_data an subdivide uebergeben
+// - move mpi_init() from Universe::create() to the very beginning of the program
 
 // includes, system
 #include <iostream>

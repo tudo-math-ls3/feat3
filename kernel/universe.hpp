@@ -343,7 +343,17 @@ namespace FEAST
 // COMMENT_HILMAR@DIRK: Eigentlich sollten CTOR und DTOR private sein, ansonsten ist das ganze singleton-Konzept
 // irgendwie hinfällig... Das funktioniert aber nicht... Was mache ich falsch?
     Universe()
-      : _universe_created(false)
+      : _universe_created(false),
+        _num_processes(0),
+        _world_group(nullptr),
+        _world_group_without_master(nullptr),
+        _process_group(nullptr),
+        _num_process_groups(0),
+        _num_processes_in_group(nullptr),
+        _includes_dedicated_load_bal(nullptr),
+        _group_ranks_world(nullptr),
+        _master(nullptr),
+        _load_balancer(nullptr)
     {
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);
@@ -414,6 +424,7 @@ namespace FEAST
         int num_proc;
         int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
+        assert(num_proc >= 1);
         _num_processes = (unsigned int) num_proc;
 
         // Set variables. Assume that one process group is needed using all available processes (minus one
@@ -463,10 +474,16 @@ namespace FEAST
         int num_proc;
         int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
+        assert(num_proc >= 1);
         _num_processes = (unsigned int) num_proc;
         // set variables
         _num_process_groups = num_process_groups;
+        assert(_num_process_groups >= 1);
         _num_processes_in_group = num_processes_in_group;
+        for(unsigned int igroup(0) ; igroup < _num_process_groups ; ++igroup)
+        {
+          assert(_num_processes_in_group[igroup] >= 1);
+        }
         _includes_dedicated_load_bal = includes_dedicated_load_bal;
         // call the init routine
         _init();

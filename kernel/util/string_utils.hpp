@@ -355,7 +355,7 @@ namespace FEAST
     */
     void add_line_centered(const std::string& s)
     {
-      unsigned int num_blanks_total((_width - s.size() - 2));
+      int num_blanks_total(_width - s.size() - 2);
       if(num_blanks_total < 2)
       {
         // if the string is too long, produce a left aligned line without right delimiter
@@ -385,7 +385,7 @@ namespace FEAST
     */
     void add_line(const std::string& s)
     {
-      int num_blanks((_width - s.size() - 2));
+      int num_blanks(_width - s.size() - 2);
       if(num_blanks < 2)
       {
         // if the string is too long, produce a left aligned line without right delimiter
