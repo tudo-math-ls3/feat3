@@ -244,7 +244,6 @@ namespace FEAST
       : _num_neighbours(num_neighbours),
         _neighbours(nullptr)
     {
-      assert(num_neighbours > 0);
       // copy array of neighbours
       _neighbours = new unsigned int[num_neighbours];
       for(unsigned int i(0) ; i < num_neighbours ; ++i)

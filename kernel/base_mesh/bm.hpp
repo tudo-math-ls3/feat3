@@ -128,6 +128,11 @@ namespace FEAST
           delete _cells.back();
           _cells.pop_back();
         }
+        if (_graph != nullptr)
+        {
+          delete _graph;
+          _graph = nullptr;
+        }
       }
 
 

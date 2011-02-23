@@ -225,9 +225,12 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         _belongs_to_group = nullptr;
       }
 
-      for(unsigned int igroup(0) ; igroup < _subgroups.size() ; ++igroup)
+      while (!_subgroups.empty())
       {
-        delete _subgroups[igroup];
+        // call the destructor of the last element in the vector
+        delete _subgroups.back();
+        // delete the pointer from the vector
+        _subgroups.pop_back();
       }
 
       if (_num_proc_in_subgroup != nullptr)
@@ -239,6 +242,15 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       {
         delete _base_mesh;
       }
+
+      while (!_graphs.empty())
+      {
+        // call the destructor of the last element in the vector
+        delete _graphs.back();
+        // delete the pointer from the vector
+        _graphs.pop_back();
+      }
+
     }
 
     /* ******************
