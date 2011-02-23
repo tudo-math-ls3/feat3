@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <cstring> // DOM: for strcpy with mpich2
 
 // includes, Feast
 #include <kernel/base_header.hpp>
