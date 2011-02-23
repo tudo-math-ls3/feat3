@@ -42,33 +42,22 @@ namespace FEAST
 // dann wird das severity-Zeuch hier raugeschmissen.
 
     /// function reacting to an exception
-    static void exception_occured(Exception const& e, severity sev)
+    static void exception_occured(Exception const& e)
     {
       // create pretty printed error message with the prefix EXCEPTION which can be grepped for
       PrettyPrinter pp(40, '#', "EXCEPTION ");
       pp.add_line_sep();
-      if(sev == CRITICAL)
-      {
-        pp.add_line_centered("CRITICAL exception occured");
-      }
-      else
-      {
-        pp.add_line_centered("NON-CRITICAL exception occured");
-      }
-      pp.add_line_centered("on process " + StringUtils::stringify(Process::rank) + "!");
+      pp.add_line_centered("Exception occured on process " + StringUtils::stringify(Process::rank) + "!");
       pp.add_line_sep();
       pp.add_line_no_right_delim(e.message());
       pp.add_line_sep();
       pp.print(Logger::file);
 
-      // If the error is critical, it is written to stderr and the program is aborted. If the error occurs
-      // simultaneously on several processes, the error message appears several times on stderr. There is no way to
-      // prevent this.
-      if(sev == CRITICAL)
-      {
-        pp.print(std::cerr);
-        MPIUtils::abort("");
-      }
+      // An exception always leads to program abortion via MPI_Abort(). Its message is written to stderr. If the error
+      // occurs simultaneously on several processes, the error message appears several times on stderr. There is no
+      // way to prevent this.
+      pp.print(std::cerr);
+      MPIUtils::abort();
     }
   };
 } // namespace FEAST

@@ -265,7 +265,8 @@ namespace FEAST
       }
       catch (Exception& e)
       {
-        ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
+        // abort the program
+        ErrorHandler::exception_occured(e);
       }
 
       // open log files

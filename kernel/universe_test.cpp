@@ -66,7 +66,6 @@ int main(int argc, char* argv[])
 
   // COMMENT_HILMAR:
   // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
-  // If no argument is provided, then it is assumed that the mesh contains 16 base mesh cells.
 
   unsigned int num_cells;
   num_cells = atoi(argv[2]);
@@ -99,9 +98,8 @@ int main(int argc, char* argv[])
   }
   catch (Exception& e)
   {
-    // Since it is not clear whether the communication system has already been set up, do not forward the error message
-    // to the master.
-    ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
+    // abort the program
+    ErrorHandler::exception_occured(e);
   }
 
   // Get process objects. Note that on each process only one of the following two exists (the other one is the

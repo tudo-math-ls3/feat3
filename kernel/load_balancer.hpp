@@ -243,13 +243,9 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         delete _base_mesh;
       }
 
-      while (!_graphs.empty())
-      {
-        // call the destructor of the last element in the vector
-        delete _graphs.back();
-        // delete the pointer from the vector
-        _graphs.pop_back();
-      }
+      // assume that the _graphs vector only holds copies of the graph object pointers and that the graph objects
+      // themselves are destroyed where they were created
+      _graphs.clear();
 
     }
 
@@ -285,7 +281,8 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         }
         catch (Exception& e)
         {
-          ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
+          // abort the program
+          ErrorHandler::exception_occured(e);
         }
         // set cell numbers (equal to indices since all cells are active)
         _base_mesh->set_cell_numbers();
@@ -660,6 +657,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         index[2] = 2;
         neighbours[0] = 1;
         neighbours[1] = 0;
+        // Artificially create a graph object here. Usually, this comes from somewhere else.
         _graphs[0] = new Graph(2, index, neighbours);
         // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
         delete [] index;
@@ -779,6 +777,12 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
           _subgroups[igroup]->work_group()->do_exchange();
         }
       }
+      // manually destroy here the artificially created graph object
+      if(_process_group->is_coordinator())
+      {
+        delete _graphs[0];
+      }
+
     } // create_subgroups()
   };
 
