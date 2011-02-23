@@ -152,38 +152,6 @@ namespace FEAST
     */
     ~Universe()
     {
-// debug output
-//std::cout << "Universe destructor called on process " << Process::rank << "!" << std::endl;
-
-      if(_universe_created)
-      {
-        // the destructor has to be called by all COMM_WORLD processes
-        if(!Process::is_master)
-        {
-          // wait for all non-master processes (the master is still in its infinite service loop)
-          MPI_Barrier(_world_group_without_master->comm());
-
-          // the coordinator of the process group _world_group_without_master tells the master to stop its service loop
-          if(_world_group_without_master->is_coordinator())
-          {
-            // the coordinator inits a new message with corresponding ID
-            Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
-            // send message
-            Comm::send();
-            // now the master ends its service loops and automatically calls Universe::destroy()
-          }
-        }
-        // clean up dynamically allocated memory
-        _cleanup();
-      }
-
-      // shut down MPI
-      int mpi_is_initialised;
-      MPI_Initialized(&mpi_is_initialised);
-      if(mpi_is_initialised)
-      {
-        MPI_Finalize();
-      }
     }
 
 
@@ -289,7 +257,6 @@ namespace FEAST
       {
         _world_group_without_master = new ProcessGroup(gr_comm, _num_processes-1);
       }
-//COMMENT_HILMAR: Kann ich gr_comm und gr_without_master eigentlich wieder free'n? Ausprobieren!
 
       // iterator for MPI_COMM_WORLD ranks, used to split them among the groups
       int iter_MPC_rank(-1);
@@ -495,6 +462,46 @@ namespace FEAST
       else
       {
         throw InternalError("Universe has been created already!");
+      }
+    }
+
+
+    /**
+    * \brief cleanup of the universe finalising the MPI environment
+    *
+    * This function has to be called by all COMM_WORLD processes to cleanly end the program.
+    */
+    void destroy()
+    {
+      if(_universe_created)
+      {
+        if(!Process::is_master)
+        {
+          // wait for all non-master processes (the master is still in its infinite service loop)
+          MPI_Barrier(_world_group_without_master->comm());
+
+          // the coordinator of the process group _world_group_without_master tells the master to stop its service loop
+          if(_world_group_without_master->is_coordinator())
+          {
+            // the coordinator inits a new message with corresponding ID
+            Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
+            // send message
+            Comm::send();
+            // now the master ends its service loops and automatically calls Universe::destroy()
+          }
+        }
+        // clean up dynamically allocated memory
+        _cleanup();
+      }
+
+// debug output
+std::cout << "Universe destroyed on process " << Process::rank << ". Calling MPI_Finalize() now..." << std::endl;
+      // shut down MPI
+      int mpi_is_initialised;
+      MPI_Initialized(&mpi_is_initialised);
+      if(mpi_is_initialised)
+      {
+        MPI_Finalize();
       }
     }
 

@@ -198,7 +198,11 @@ namespace FEAST
         delete [] _ranks_group_parent;
         _ranks_group_parent = nullptr;
       }
-
+      if (_comm != MPI_COMM_WORLD)
+      {
+        MPI_Comm_free(&_comm);
+      }
+      MPI_Group_free(&_group);
   // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
   //    if (_buffer != nullptr)
   //    {

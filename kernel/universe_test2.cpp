@@ -139,13 +139,15 @@ int main(int argc, char* argv[])
       // test standard log feature
       Logger::log("BRAL\n");
     }
-    // Everything done, universe destructor automatically cleans up the system.
+   // Everything done, call universe destruction routine.
+    universe->destroy();
   }
   else if(master != nullptr)
   {
     // This branch is entered when the infinite service loop of the master has been finished.
     // This, however, usually happens only at program end.
-    // Universe destructor automatically cleans up the system.
+    // Everything done, call universe destruction routine.
+    universe->destroy();
   }
   else
   {
