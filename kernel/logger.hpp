@@ -202,13 +202,11 @@ namespace FEAST
       int num_digits((int)log10((double)Process::num_processes) + 1);
       // use at least 3 digits
       num_digits = std::max(3, num_digits);
-// COMMENT_HILMAR: zu der folgenden Zeile sagt valgrind "Address ... is 0 bytes after a block of size 3 alloc'd". Warum?
-      char* s = new char[num_digits];
+      // +1 needed for termination symbol
+      char* s = new char[num_digits+1];
       // use format with left-padded zeros
-// COMMENT_HILMAR: zu der folgenden Code-Zeile sagt valgrind "Invalid write of size 1". Warum?
       sprintf(s, "%0*i", num_digits, Process::rank);
       // set full filename
-// COMMENT_HILMAR: zu der folgenden Code-Zeile sagt valgrind "Invalid read of size 1". Warum?
       file_name = file_base_name + s + ".log";
       delete [] s;
 
