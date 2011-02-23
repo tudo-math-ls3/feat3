@@ -15,7 +15,7 @@ namespace FEAST
 {
 
   /**
-  * \brief class providing some functions for handling warnings, exceptions and errors
+  * \brief class providing some functions for handling warnings, errors and exceptions
   *
   * \todo This class is not finished and not tested yet!
   *
@@ -38,8 +38,40 @@ namespace FEAST
       NON_CRITICAL
     };
 
-// COMMENT_HILMAR: wenn wir beschlieﬂen, dass eine geworfene Exception automatisch zum Programm-Abbruch fuehren soll,
-// dann wird das severity-Zeuch hier raugeschmissen.
+/*
+COMMENT_HILMAR: corresponding to the function exception_occured(...), there should be something like the following
+function:
+    /// function reacting to an error
+    static void exception_occured(int error_code, severity sev)
+    {
+      // create pretty printed error message with the prefix EXCEPTION which can be grepped for
+      PrettyPrinter pp(40, '#', "ERROR ");
+      pp.add_line_sep();
+      if(sev == CRITICAL)
+      {
+        pp.add_line_centered("Error occured on process " + StringUtils::stringify(Process::rank) + "!");
+      }
+      else
+      {
+        pp.add_line_centered("Warning occured on process " + StringUtils::stringify(Process::rank) + "!");
+      }
+      pp.add_line_sep();
+      pp.add_line_no_right_delim(...); // here we need some mapping of error_code to corresponding error message
+      pp.add_line_sep();
+      pp.print(Logger::file);
+
+      // If the error is critical, then write the error to std::cerr and abort the program.
+      if(sev == CRITICAL)
+      {
+        pp.print(std::cerr);
+        MPIUtils::abort();
+      }
+    }
+
+Der error_code w‰re dann der return value einer Funktion. error_code = 0 heisst typischerweise "kein Fehler".
+Die Frage ist, wie man ein geschicktes Mapping zwischen error_code und error_message hinbekommt.
+Einfach ein statisches String-Array mit error_code = array index?
+*/
 
     /// function reacting to an exception
     static void exception_occured(Exception const& e)

@@ -1,19 +1,3 @@
-// Hilmar's todo list before push to master:
-// code cleanup:
-// - use ExceptionHandler in base mesh code
-// - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
-// - completion of doxygen comments (\param, array dimensions, etc.)
-// - add/remove 'const' and other modifiers where necessary
-// - proper cleanup of resources (deletes, DTORs)
-
-// Done:
-// - template all classes "above" BaseMesh
-// - FileParser --> templates!
-// - BaseMesh1D, BaseMesh2D, BaseMesh3D --> templates!
-// - subdiv_data an subdivide uebergeben
-// - move mpi_init() from Universe::create() to the very beginning of the program
-// - Universe CTOR und DTOR private machen
-
 // includes, system
 #include <iostream>
 
@@ -33,10 +17,8 @@ using namespace FEAST;
 /**
 * \brief main routine - test driver for universe
 *
-* Call the routine via "mpirun -np n+5 <binary_name> <relative path to base mesh> n" where n is the number of base
-* mesh cells in the mesh. The semi-hard-wired example then creates two 'main process groups' (for two completely
-* independent problems). Each process group has its own load balancer. Only the first process group (consisting of
-* n+2 processes does some senseful things, the second one (consisting of 2 processes) is idle.
+* Call the routine via "mpirun -np n+3 <binary_name> <relative path to base mesh> n" where n is the number of base
+* mesh cells in the mesh.
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
