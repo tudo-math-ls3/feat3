@@ -147,7 +147,7 @@ namespace FEAST
       assert(num_processes >= 1);
       // copy array of parent group ranks
       _ranks_group_parent = new int[_num_processes];
-      for(int i(0) ; i < _num_processes ; ++i)
+      for(unsigned int i(0) ; i < _num_processes ; ++i)
       {
         _ranks_group_parent[i] = ranks_group_parent[i];
       }

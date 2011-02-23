@@ -114,6 +114,79 @@ namespace FEAST
     LoadBalancer<space_dim_, world_dim_>* _load_balancer;
 
 
+    /* *************************
+    * constructor & destructor *
+    ***************************/
+    /**
+    * \brief CTOR
+    *
+    * This constructor is deliberately chosen to be private. Is called exactly once by each process in the whole life
+    * time of the program.  It initialises the _universe_created variable and ensures that MPI is already initialised.
+    */
+    Universe()
+      : _universe_created(false),
+        _num_processes(0),
+        _world_group(nullptr),
+        _world_group_without_master(nullptr),
+        _process_group(nullptr),
+        _num_process_groups(0),
+        _num_processes_in_group(nullptr),
+        _includes_dedicated_load_bal(nullptr),
+        _group_ranks_world(nullptr),
+        _master(nullptr),
+        _load_balancer(nullptr)
+    {
+      int mpi_is_initialised;
+      MPI_Initialized(&mpi_is_initialised);
+      if(!mpi_is_initialised)
+      {
+        throw InternalError("MPI is not initialised yet! Call MPIUtils::init_MPI(argc,argv) first!");
+      }
+    }
+
+
+    /**
+    * \brief destructor which automatically finalizes the MPI environment
+    *
+    * Just like the constructor, the destructor is deliberately chosen to be private.
+    */
+    ~Universe()
+    {
+// debug output
+//std::cout << "Universe destructor called on process " << Process::rank << "!" << std::endl;
+
+      if(_universe_created)
+      {
+        // the destructor has to be called by all COMM_WORLD processes
+        if(!Process::is_master)
+        {
+          // wait for all non-master processes (the master is still in its infinite service loop)
+          MPI_Barrier(_world_group_without_master->comm());
+
+          // the coordinator of the process group _world_group_without_master tells the master to stop its service loop
+          if(_world_group_without_master->is_coordinator())
+          {
+            // the coordinator inits a new message with corresponding ID
+            Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
+            // send message
+            Comm::send();
+            // now the master ends its service loops and automatically calls Universe::destroy()
+          }
+        }
+        // clean up dynamically allocated memory
+        _cleanup();
+      }
+
+      // shut down MPI
+      int mpi_is_initialised;
+      MPI_Initialized(&mpi_is_initialised);
+      if(mpi_is_initialised)
+      {
+        MPI_Finalize();
+      }
+    }
+
+
     /* *****************
     * member functions *
     *******************/
@@ -332,80 +405,9 @@ namespace FEAST
 
 
   public:
-    /* *************************
-    * constructor & destructor *
-    ***************************/
-    /**
-    * \brief CTOR
-    *
-    * This constructor is deliberately chosen to be private. Is called exactly once by each process in the whole life
-    * time of the program.  It initialises the _universe_created variable and ensures that MPI is already initialised.
-    */
-// COMMENT_HILMAR@DIRK: Eigentlich sollten CTOR und DTOR private sein, ansonsten ist das ganze singleton-Konzept
-// irgendwie hinfällig... Das funktioniert aber nicht... Was mache ich falsch?
-    Universe()
-      : _universe_created(false),
-        _num_processes(0),
-        _world_group(nullptr),
-        _world_group_without_master(nullptr),
-        _process_group(nullptr),
-        _num_process_groups(0),
-        _num_processes_in_group(nullptr),
-        _includes_dedicated_load_bal(nullptr),
-        _group_ranks_world(nullptr),
-        _master(nullptr),
-        _load_balancer(nullptr)
-    {
-      int mpi_is_initialised;
-      MPI_Initialized(&mpi_is_initialised);
-      if(!mpi_is_initialised)
-      {
-        throw InternalError("MPI is not initialised yet! Call MPIUtils::init_MPI(argc,argv) first!");
-      }
-    }
 
-
-    /**
-    * \brief destructor which automatically finalizes the MPI environment
-    *
-    * Just like the constructor, the destructor is deliberately chosen to be private.
-    */
-    ~Universe()
-    {
-// debug output
-//std::cout << "Universe destructor called on process " << Process::rank << "!" << std::endl;
-
-      if(_universe_created)
-      {
-        // the destructor has to be called by all COMM_WORLD processes
-        if(!Process::is_master)
-        {
-          // wait for all non-master processes (the master is still in its infinite service loop)
-          MPI_Barrier(_world_group_without_master->comm());
-
-          // the coordinator of the process group _world_group_without_master tells the master to stop its service loop
-          if(_world_group_without_master->is_coordinator())
-          {
-            // the coordinator inits a new message with corresponding ID
-            Comm::init(ServiceIDs::MASTER_FINISH_SERVICE);
-            // send message
-            Comm::send();
-            // now the master ends its service loops and automatically calls Universe::destroy()
-          }
-        }
-        // clean up dynamically allocated memory
-        _cleanup();
-      }
-
-      // shut down MPI
-      int mpi_is_initialised;
-      MPI_Initialized(&mpi_is_initialised);
-      if(mpi_is_initialised)
-      {
-        MPI_Finalize();
-      }
-    }
-
+    // set parent class as friend such that it can execute CTOR and DTOR of this class
+    friend class InstantiationPolicy<Universe<space_dim_, world_dim_>, Singleton>;
 
     /* ****************
     * member functions*

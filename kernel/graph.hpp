@@ -111,14 +111,14 @@ namespace FEAST
     {
       // copy index array
       _index = new unsigned int[num_nodes+1];
-      for(int i(0) ; i < num_nodes+1 ; ++i)
+      for(unsigned int i(0) ; i < num_nodes+1 ; ++i)
       {
         _index[i] = index[i];
       }
 
       // copy neighbour array (its size is given by _index[_num_nodes])
       _neighbours = new unsigned int[_index[_num_nodes]];
-      for(int i(0) ; i < _index[_num_nodes] ; ++i)
+      for(unsigned int i(0) ; i < _index[_num_nodes] ; ++i)
       {
         _neighbours[i] = neighbours[i];
       }
@@ -247,7 +247,7 @@ namespace FEAST
       assert(num_neighbours > 0);
       // copy array of neighbours
       _neighbours = new unsigned int[num_neighbours];
-      for(int i(0) ; i < num_neighbours ; ++i)
+      for(unsigned int i(0) ; i < num_neighbours ; ++i)
       {
         _neighbours[i] = neighbours[i];
       }
