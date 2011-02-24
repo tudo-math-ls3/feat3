@@ -3,7 +3,7 @@
 #define KERNEL_BASE_MESH_ITEM_HPP
 
 // includes, system
-#include <sstream> // for std::ostream
+#include <sstream> // for std::ostringstream
 #include <cassert>  // for assert()
 
 // includes, FEAST

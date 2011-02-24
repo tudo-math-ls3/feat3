@@ -44,14 +44,9 @@ namespace FEAST
     /// current size of buffer Comm::MCW_buffer
     static int MCW_received_bytes;
 
-    /* *************************
-    * constructor & destructor *
-    ***************************/
-
     /* *****************
     * member functions *
     *******************/
-
     /**
     * \brief init a new MPI_COMM_WORLD message
     *
@@ -70,6 +65,7 @@ namespace FEAST
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
     }
 
+
     /// send the current MPI_COMM_WORLD buffer #MCW_buffer to the master
     static void send()
     {
@@ -78,6 +74,7 @@ namespace FEAST
                                     MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
     }
+
 
     /**
     * \brief write one item of template type T_ to the MPI_COMM_WORLD buffer
@@ -93,6 +90,7 @@ namespace FEAST
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
     }
+
 
     /**
     * \brief overloaded function for writing a string to the MPI_COMM_WORLD buffer
@@ -112,6 +110,7 @@ namespace FEAST
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
     }
 
+
     /**
     * \brief read one integer from the MPI_COMM_WORLD buffer
     *
@@ -125,6 +124,7 @@ namespace FEAST
                                       1, MPIType<T_>::value(), MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
     }
+
 
     /**
     * \brief read a string from the MPI_COMM_WORLD buffer
@@ -151,6 +151,7 @@ namespace FEAST
       delete [] msg_char;
     }
 
+
     /**
     * \brief write an array of items of template type T_ to the MPI_COMM_WORLD buffer
     *
@@ -168,6 +169,7 @@ namespace FEAST
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
     }
+
 
     /**
     * \brief read an array of items of template type T_ from the MPI_COMM_WORLD buffer

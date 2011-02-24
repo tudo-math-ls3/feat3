@@ -225,7 +225,7 @@ namespace FEAST
           if(Process::is_master)
           {
             Logger::log(StringUtils::stringify(_num_processes) + " processes available and "
-              + StringUtils::stringify(num_processes_needed));
+              + StringUtils::stringify(num_processes_needed) + " needed.\n");
             std::cout << _num_processes << " processes available and " << num_processes_needed
                       << " needed." << std::endl;
           }
@@ -325,6 +325,8 @@ namespace FEAST
         // for the last rank (_num_processes-1) create master process object (responsible for screen output)
         _master = new Master();
 
+        // debug output
+        Logger::log("Process " + StringUtils::stringify(Process::rank) + " is the MASTER OF THE UNIVERSE!\n");
         std::cout << "Process " << Process::rank << " is the MASTER OF THE UNIVERSE!" << std::endl;
 
         // start the infinite service loop on the master, which waits for messages
@@ -336,7 +338,8 @@ namespace FEAST
         _load_balancer = new LoadBalancer<space_dim_, world_dim_>(_process_group,
                                                                   _includes_dedicated_load_bal[my_group]);
         // debug output
-        std::cout << "Process " << Process::rank << " belongs to process group " << my_group <<"." << std::endl;
+        Logger::log("Process " + StringUtils::stringify(Process::rank) + " belongs to process group "
+                    + StringUtils::stringify(my_group) + ".\n");
       }
     } // _init()
 
@@ -458,6 +461,8 @@ namespace FEAST
         _includes_dedicated_load_bal = includes_dedicated_load_bal;
         // call the init routine
         _init();
+        // debug output
+        Logger::log("Universe created on process " + StringUtils::stringify(Process::rank) + ".\n");
       }
       else
       {
@@ -493,9 +498,9 @@ namespace FEAST
         // clean up dynamically allocated memory
         _cleanup();
       }
-
-// debug output
-std::cout << "Universe destroyed on process " << Process::rank << ". Calling MPI_Finalize() now..." << std::endl;
+      // debug output
+      Logger::log("Universe destroyed on process " + StringUtils::stringify(Process::rank)
+                  + ". Calling MPI_Finalize() now...\n");
       // shut down MPI
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);

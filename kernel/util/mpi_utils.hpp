@@ -127,18 +127,19 @@ namespace FEAST
   public:
     static inline MPI_Datatype value()
     {
+      MPIUtils::abort("Don't try to translate bool into an MPI datatype! There is no such type!");
       return MPI_LOGICAL;
     }
   };
 
-  /// template specialisation: char to MPI_CHAR
+  /// template specialisation: char to MPI_CHARACTER
   template <>
   class MPIType<char>
   {
   public:
     static inline MPI_Datatype value()
     {
-      return MPI_CHAR;
+      return MPI_CHARACTER;
     }
   };
 

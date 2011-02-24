@@ -31,6 +31,163 @@ using namespace FEAST;
 #define WDIM 2
 #define SDIM 2
 
+
+/**
+* \brief dummy function in preparation of a function for defining work groups (which will reside in the load bal. class)
+*
+* This dummy function creates two work groups: one consisting of two workers responsible for the coarse grid
+* problem and one consisting of all the other workers responsible for the fine grid problem. Currently, everything
+* is hard-coded. Later, the user must be able to control the creation of work groups and even later the load
+* balancer has to apply clever strategies to create these work groups automatically so that the user doesn't have
+* to do anything.
+*
+* To optimise the communication between the coordinator of the main process group and the work groups, we add
+* this coordinator to a work group if it is not a compute process of this work group anyway. Hence, for each work
+* group, there are three different possibilities:
+* 1) There is a dedicated load balancer process, which is automatically the coordinator of the main process group
+*    and belongs to no work group:
+*    --> work group adds the coordinator as extra process
+* 2) There is no dedicated load balancer process, and the coordinator of the main process group ...
+*   a) ... is not part of the work group:
+*     --> work group adds the coordinator as extra process
+*   b) ... is part of the work group:
+*     --> work group does not have to add the coordinator
+* Thus the 1-to-n or n-to-1 communication between coordinator and n work group processes can be performed via
+* MPI_Scatter() and MPI_Gather() (which always have to be called by all members of an MPI process group). This
+* is more efficient then using n calls of MPI_send() / MPI_recv() via the communicator of the main process group.
+*
+* \param[in] load_balancer
+* pointer to the load balancer object to get some further information
+*
+* \param[out] num_subgroups
+* number of subgroups
+*
+* \param[out] num_proc_in_subgroup
+* array of numbers of processes per subgroup
+*
+* \param[out] group_contains_extra_coord
+* Array indicating whether the subgroups contain an extra process for the coordinator (which will then
+* not be a compute process in the corresponding work group).
+* Usually a boolean would do the trick, but we cannot send boolean arrays via MPI. (C++ bindings are deprecated,
+* hence we cannot use MPI::BOOL. MPI_LOGICAL cannot be used, since this is not equivalent to C++'s bool.)
+* So, we use unsigned char here and treat is as if it were boolean.
+*
+* \param[out] subgroup_ranks
+* array for defining the rank partitioning
+*/
+void define_work_groups(
+  LoadBalancer<SDIM, WDIM>* load_balancer,
+  unsigned int& num_subgroups,
+  unsigned int*& num_proc_in_subgroup,
+  unsigned char*& group_contains_extra_coord,
+  int**& subgroup_ranks)
+{
+  // COMMENT_HILMAR:
+  // The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
+  // Furthermore, two extra processes are required for testing the creation of a second work group and the use
+  // of a dedicated load balancing process.
+  // Later, this has to be all done in some auto-magically way.
+
+  // Two different tests can be performed (n is the number of base mesh cells):
+  // 1) with dedicated load balancer process
+  //    - work group for coarse grid: 2 processes: {0, 1}
+  //    - work group for fine grid: n processes: {1, ..., n}
+  //    - i.e. process 1 is in both work groups
+  //    - dedicated load balancer and coordinator process: n+1
+  // 2) without dedicated load balancer process
+  //    - work group for coarse grid: 2 processes: {0, 1}
+  //    - work group for fine grid: n processes: {2, ..., n+1}
+  //    - i.e. the two work groups are disjunct
+  //    - coordinator process: n+1
+  // Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
+  // includes_dedicated_load_bal[] in universe_test.cpp.
+
+  // set number of subgroups manually to 2
+  num_subgroups = 2;
+  // allocate arrays
+  num_proc_in_subgroup = new unsigned int[num_subgroups];
+  group_contains_extra_coord = new unsigned char[num_subgroups];
+  subgroup_ranks = new int*[num_subgroups];
+
+  // shortcut to the number of processes in the load balancer's process group
+  unsigned int num_processes = load_balancer->process_group()->num_processes();
+
+  // shortcut to the number of cells in the base mesh
+  unsigned int num_cells = load_balancer->base_mesh()->num_cells();
+
+  // debug output
+  Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
+  // assert that the number of processes is n+2
+  assert(num_processes == num_cells + 2);
+
+  // set up the two test cases
+
+  if(load_balancer->group_has_dedicated_load_bal())
+  {
+    // test case 1 (n is the number of base mesh cells)
+    // with dedicated load balancer process
+    //  - work group for coarse grid: 2 processes: {0, 1}
+    //  - work group for fine grid: n processes: {1, ..., n}
+    //  - i.e. process 1 is in both work groups
+    //  - dedicated load balancer and coordinator process: n+1
+
+    // since there is a dedicated load balancer process, this has to be added to both work groups as extra
+    // coordinator process
+    group_contains_extra_coord[0] = true;
+    group_contains_extra_coord[1] = true;
+
+    // set number of processes per group
+    num_proc_in_subgroup[0] = 2 + 1;
+    num_proc_in_subgroup[1] = num_cells + 1;
+
+    // partition the process group ranks into work groups
+    // coarse grid work group
+    subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
+    subgroup_ranks[0][0] = 0;
+    subgroup_ranks[0][1] = 1;
+    subgroup_ranks[0][2] = num_cells + 1;
+
+    // fine grid work group
+    subgroup_ranks[1] = new int[num_proc_in_subgroup[1]];
+    // set entries to {1, ..., n+1}
+    for(unsigned int i(0) ; i < num_proc_in_subgroup[1] ; ++i)
+    {
+      subgroup_ranks[1][i] = i+1;
+    }
+  }
+  else
+  {
+    // test case 2 (n is the number of base mesh cells)
+    // without dedicated load balancer process
+    //  - work group for coarse grid: 2 processes: {0, 1}
+    //  - work group for fine grid: n processes: {2, ..., n+1}
+    //  - i.e. the two work groups are disjunct
+    //  - coordinator process: n+1
+
+    // the coordinator is at the same time a compute process of the second work group, so only the first work group
+    // has to add an extra process
+    group_contains_extra_coord[0] = true;
+    group_contains_extra_coord[1] = false;
+
+    // set number of processes per group
+    num_proc_in_subgroup[0] = 2 + 1;
+    num_proc_in_subgroup[1] = num_cells;
+
+    // partition the process group ranks into work groups
+    subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
+    subgroup_ranks[0][0] = 0;
+    subgroup_ranks[0][1] = 1;
+    subgroup_ranks[0][2] = num_cells + 1;
+    subgroup_ranks[1] = new int[num_proc_in_subgroup[1]];
+    // set entries to {2, ..., n+1}
+    for(unsigned int i(0) ; i < num_proc_in_subgroup[1] ; ++i)
+    {
+      subgroup_ranks[1][i] = i+2;
+    }
+  }
+}
+
+
 /**
 * \brief main routine - test driver for universe
 *
@@ -63,7 +220,7 @@ int main(int argc, char* argv[])
   // COMMENT_HILMAR:
   // For the semi-hard-wired example using a mesh with n base mesh cells we need n+5 processes in total
   // (n+2 for the first process group, 2 for the second process group and 1 for the master process).
-  // (See description of the example in routine LoadBalancer::create_subgroups().)
+  // (See description of the example in routine LoadBalancer::create_work_groups().)
 
   // COMMENT_HILMAR:
   // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
@@ -84,7 +241,7 @@ int main(int argc, char* argv[])
   // array of flags whether a dedicated load balancer process is needed in process groups
   // (must be provided when num_process_groups > 1)
   // Set the first entry either to false or to true to test two different configurations. (You don't have to change
-  // the number of processes for that.) (See description of the example in routine LoadBalancer::create_subgroups().)
+  // the number of processes for that.) (See description of the example in routine LoadBalancer::create_work_groups().)
   bool* includes_dedicated_load_bal = new bool[num_process_groups];
   includes_dedicated_load_bal[0] = false;
   includes_dedicated_load_bal[1] = false;
@@ -128,9 +285,27 @@ int main(int argc, char* argv[])
     {
       // get name of the mesh file from the command line
       std::string mesh_file(argv[1]);
+      // let the load balancer read the mesh file and create a base mesh (this is only done by the coordinator process)
       load_balancer->read_mesh(mesh_file);
 
-      load_balancer->create_subgroups();
+      // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
+      unsigned int num_subgroups;
+      unsigned int* num_proc_in_subgroup(nullptr);
+      unsigned char* group_contains_extra_coord(nullptr);
+      int** subgroup_ranks(nullptr);
+
+      /* ********************************************************************************
+      * The coordinator is the only one knowing the base mesh, so only the coordinator  *
+      * decides over the number of work groups and the process distribution to them.    *
+      **********************************************************************************/
+      if(process_group->is_coordinator())
+      {
+        define_work_groups(load_balancer, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+                           subgroup_ranks);
+      }
+      // now let the load balancer create the subgroups (this function is called on all processes)
+      load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+                                        subgroup_ranks);
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
       // standard file logging functions

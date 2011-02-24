@@ -20,6 +20,11 @@
 namespace FEAST
 {
 
+// COMMENT_HILMAR: entsprechend der Idee, den load balancer besser abzugrenzen, sollte diese ganze Klasse besser
+// ProcessOrganiser, ProcessManager (oder so ähnlich) genannt werden. Die eigentliche load balancer Klasse wird dann
+// (erstmal) nur auf dem coordinator der zugrundeliegenden Prozessgruppe instantiiert. Sie wird dann z.B. die
+// Funktion define_work_groups() enthalten. (Waehrend die Funktion create_work_groups() hier in dieser Klasse bleiben
+// sollte, da sie nur umsetzt, was der load balancer ihr vorgibt.)
   /**
   * \brief class defining a load balancer
   *
@@ -263,6 +268,27 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     }
 
 
+    /**
+    * \brief getter for the base mesh
+    *
+    * \return BaseMesh::BM<space_dim_, world_dim_> pointer #_base_mesh
+    */
+    inline BaseMesh::BM<space_dim_, world_dim_>* base_mesh() const
+    {
+      return _base_mesh;
+    }
+
+
+    /**
+    * \brief getter for the flag whether the process group has a dedicated load balancer
+    *
+    * \return BaseMesh::BM<space_dim_, world_dim_> pointer #_base_mesh
+    */
+    inline bool group_has_dedicated_load_bal() const
+    {
+      return _group_has_dedicated_load_bal;
+    }
+
     /* *****************
     * member functions *
     *******************/
@@ -289,160 +315,56 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         // create base mesh's graph structure
         _base_mesh->create_graph();
         // print base mesh
-        _base_mesh->print(std::cout);
+        std::string s = _base_mesh->print();
+        Logger::log_master(s, Logger::SCREEN);
+        Logger::log(s);
       }
     }
 
     /**
-    * \brief dummy function in preparation of a function for managing work groups
+    * \brief dummy function in preparation of a function for defining work groups
     *
-    * This dummy function creates two work groups: one consisting of two workers responsible for the coarse grid
-    * problem and one consisting of all the other workers responsible for the fine grid problem. Currently, everything
-    * is hard-coded. Later, the user must be able to control the creation of work groups and even later the load
-    * balancer has to apply clever strategies to create these work groups automatically so that the user doesn't have
-    * to do anything.
-    *
-    * To optimise the communication between the coordinator of the main process group and the work groups, we add
-    * this coordinator to a work group if it is not a compute process of this work group anyway. Hence, for each work
-    * group, there are three different possibilities:
-    * 1) There is a dedicated load balancer process, which is automatically the coordinator of the main process group
-    *    and belongs to no work group:
-    *    --> work group adds the coordinator as extra process
-    * 2) There is no dedicated load balancer process, and the coordinator of the main process group ...
-    *   a) ... is not part of the work group:
-    *     --> work group adds the coordinator as extra process
-    *   b) ... is part of the work group:
-    *     --> work group does not have to add the coordinator
-    * Thus the 1-to-n or n-to-1 communication between coordinator and n work group processes can be performed via
-    * MPI_Scatter() and MPI_Gather() (which always have to be called by all members of an MPI process group). This
-    * is more efficient then using n calls of MPI_send() / MPI_recv() via the communicator of the main process group.
+    * As long as we cannot do this in an automatic way, the test driver calls a corresponding function, which sets
+    * work groups manually.
     */
-    void create_subgroups()
+    void define_work_groups()
     {
-      // shortcut to the number of processes in the load balancer's process group
-      unsigned int num_processes = _process_group->num_processes();
+    }
 
-      /* ********************************************************************************
-      * The coordinator is the only one knowing the base mesh, so only the coordinator  *
-      * decides over the number of work groups and the process distribution to them.    *
-      **********************************************************************************/
 
-      // COMMENT_HILMAR:
-      // The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
-      // Furthermore, two extra processes are required for testing the creation of a second work group and the use
-      // of a dedicated load balancing process.
-      // Later, this has to be all done in some auto-magically way.
-
-      // Two different tests can be performed (n is the number of base mesh cells):
-      // 1) with dedicated load balancer process
-      //    - work group for coarse grid: 2 processes: {0, 1}
-      //    - work group for fine grid: n processes: {1, ..., n}
-      //    - i.e. process 1 is in both work groups
-      //    - dedicated load balancer and coordinator process: n+1
-      // 2) without dedicated load balancer process
-      //    - work group for coarse grid: 2 processes: {0, 1}
-      //    - work group for fine grid: n processes: {2, ..., n+1}
-      //    - i.e. the two work groups are disjunct
-      //    - coordinator process: n+1
-      // Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
-      // includes_dedicated_load_bal[] in universe_test.cpp.
-
-      // usually a boolean would do the trick, but we cannot send boolean arrays via MPI. (C++ bindings are deprecated,
-      // hence we cannot use MPI::BOOL. MPI_LOGICAL cannot be used, since this is not equivalent to C++'s bool.)
-      // So, we use unsigned char here and treat is as if it were boolean.
-      unsigned char* group_contains_extra_coord;
-
+    /**
+    * \brief function that sets up subgroups and work groups basing on the provided information
+    *
+    *
+    * \param[in] num_subgroups
+    * number of subgroups
+    *
+    * \param[in] num_proc_in_subgroup
+    * array of numbers of processes per work group
+    *
+    * \param[in] group_contains_extra_coord
+    * Array indicating whether the subgroups contain an extra process for the coordinator (which will then
+    * not be a compute process in the corresponding work group).
+    * Usually a boolean would do the trick, but we cannot send boolean arrays via MPI. (C++ bindings are deprecated,
+    * hence we cannot use MPI::BOOL. MPI_LOGICAL cannot be used, since this is not equivalent to C++'s bool.)
+    * So, we use unsigned char here and treat is as if it were boolean.
+    *
+    * \param[in] subgroup_ranks
+    * array for defining the rank partitioning
+    */
+    void create_work_groups(
+      unsigned int num_subgroups,
+      unsigned int* num_proc_in_subgroup,
+      unsigned char* group_contains_extra_coord,
+      int** subgroup_ranks)
+    {
+      // set data/pointers on the coordinator process (where the data is already available)
       if(_process_group->is_coordinator())
       {
-        unsigned int num_cells;
-        num_cells = _base_mesh->num_cells();
-        // debug output
-        Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
-        // assert that the number of processes is n+2
-        assert(num_processes == num_cells + 2);
-
-        // set up the two test cases
-
-        // number of subgroups, manually set to 2
-        _num_subgroups = 2;
-
-        // array of numbers of processes per work group
-        _num_proc_in_subgroup = new unsigned int[_num_subgroups];
-
-        // array indicating whether the subgroups contain an extra process for the coordinator (which will then
-        // not be a compute process in the corresponding work group)
-        group_contains_extra_coord = new unsigned char[_num_subgroups];
-
-        // allocate first dimension of the array for rank partitioning
-        _subgroup_ranks = new int*[_num_subgroups];
-
-        if(_group_has_dedicated_load_bal)
-        {
-          // test case 1 (n is the number of base mesh cells)
-          // with dedicated load balancer process
-          //  - work group for coarse grid: 2 processes: {0, 1}
-          //  - work group for fine grid: n processes: {1, ..., n}
-          //  - i.e. process 1 is in both work groups
-          //  - dedicated load balancer and coordinator process: n+1
-
-          // since there is a dedicated load balancer process, this has to be added to both work groups as extra
-          // coordinator process
-          group_contains_extra_coord[0] = true;
-          group_contains_extra_coord[1] = true;
-
-          // set number of processes per group
-          _num_proc_in_subgroup[0] = 2 + 1;
-          _num_proc_in_subgroup[1] = num_cells + 1;
-
-          // partition the process group ranks into work groups
-          // coarse grid work group
-          _subgroup_ranks[0] = new int[_num_proc_in_subgroup[0]];
-          _subgroup_ranks[0][0] = 0;
-          _subgroup_ranks[0][1] = 1;
-          _subgroup_ranks[0][2] = num_cells + 1;
-
-          // fine grid work group
-          _subgroup_ranks[1] = new int[_num_proc_in_subgroup[1]];
-          // set entries to {1, ..., n+1}
-          for(unsigned int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
-          {
-            _subgroup_ranks[1][i] = i+1;
-          }
-        }
-        else
-        {
-          // test case 2 (n is the number of base mesh cells)
-          // without dedicated load balancer process
-          //  - work group for coarse grid: 2 processes: {0, 1}
-          //  - work group for fine grid: n processes: {2, ..., n+1}
-          //  - i.e. the two work groups are disjunct
-          //  - coordinator process: n+1
-
-          // the coordinator is at the same time a compute process of the second work group, so only the first work group
-          // has to add an extra process
-          group_contains_extra_coord[0] = true;
-          group_contains_extra_coord[1] = false;
-
-          // set number of processes per group
-          _num_proc_in_subgroup[0] = 2 + 1;
-          _num_proc_in_subgroup[1] = num_cells;
-
-          // partition the process group ranks into work groups
-          _subgroup_ranks[0] = new int[_num_proc_in_subgroup[0]];
-          _subgroup_ranks[0][0] = 0;
-          _subgroup_ranks[0][1] = 1;
-          _subgroup_ranks[0][2] = num_cells + 1;
-          _subgroup_ranks[1] = new int[_num_proc_in_subgroup[1]];
-          // set entries to {2, ..., n+1}
-          for(unsigned int i(0) ; i < _num_proc_in_subgroup[1] ; ++i)
-          {
-            _subgroup_ranks[1][i] = i+2;
-          }
-        }
-      }  // if(_process_group->is_coordinator())
-      /* *****************************
-      * End of semi-hard-wired code. *
-      *******************************/
+        _num_subgroups = num_subgroups;
+        _num_proc_in_subgroup = num_proc_in_subgroup;
+        _subgroup_ranks = subgroup_ranks;
+      }
 
       // now the coordinator broadcasts the relevant data to the other processes, that is:
       //   - _num_subgroups
@@ -472,16 +394,10 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // let the non-coordinator processes allocate the array _subgroup_ranks for rank partitioning
       if(!_process_group->is_coordinator())
       {
-        // debug output
-//        std::cout << "Process " << _process_group->rank() << "received _num_subgroups=" << _num_subgroups << std::endl;
-
         _subgroup_ranks = new int*[_num_subgroups];
         for (unsigned int i(0) ; i<_num_subgroups ; ++i)
         {
           _subgroup_ranks[i] = new int[_num_proc_in_subgroup[i]];
-          // debug output
-//          std::cout << "Process " << _process_group->rank() << "received _num_proc_in_subgroup[" << i << "] = "
-//                    << _num_proc_in_subgroup[i] << std::endl;
         }
       }
 
@@ -622,8 +538,8 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
           // COMMENT_HILMAR: First, I used this simpler version:
           //   mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
-          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that
-          // is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
+          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if
+          // that is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
 
           // Within the ProcessSubgroup constructor, another MPI communicator is created. So, do another dummy call.
           mpi_error_code = MPI_Comm_create(_process_group->comm(), dummy_group, &dummy_comm);
@@ -634,7 +550,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         }
       } // for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
-      // delete aux. array
+      // delete aux. array (on all processes)
       delete [] group_contains_extra_coord;
 
 
@@ -783,7 +699,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         delete _graphs[0];
       }
 
-    } // create_subgroups()
+    } // create_work_groups()
   };
 
 } // namespace FEAST

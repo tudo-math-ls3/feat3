@@ -117,6 +117,7 @@ namespace FEAST
           }
           default:
           {
+            MPIUtils::abort("ServiceID not found!");
           }
         }
 

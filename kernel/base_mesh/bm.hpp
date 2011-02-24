@@ -308,7 +308,7 @@ namespace FEAST
 
 
       /**
-      * \brief prints this base mesh to the given ostream.
+      * \brief prints this base mesh to the given ostream
       *
       * According to http://www.cplusplus.com/reference/iostream, ostream is the superclass for both stdout, stderr and
       * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
@@ -317,7 +317,7 @@ namespace FEAST
       * \param[in] stream
       *            Stream to dump this base mesh into.
       */
-      void print(std::ostream& stream)
+      void print(std::ostream& stream) const
       {
         stream << "---------------------------------------------------" << std::endl;
         stream << "|               DUMPING BASE MESH                  " << std::endl;
@@ -330,6 +330,14 @@ namespace FEAST
           stream << std::endl;
         }
         stream << "---------------------------------------------------" << std::endl;
+      }
+
+      /// returns the base mesh print as string
+      inline std::string print() const
+      {
+        std::ostringstream oss;
+        print(oss);
+        return oss.str();
       }
     }; // class BM
   } // namespace BaseMesh

@@ -187,7 +187,7 @@ namespace FEAST
       * \param[in] stream
       * Stream to dump this BaseMesh into.
       */
-      void print(std::ostream& stream)
+      void print(std::ostream& stream) const
       {
         stream << _vertices.size() << " vertices" << std::endl;
         for(unsigned int ivert(0) ; ivert < _vertices.size() ; ++ivert)
@@ -380,7 +380,7 @@ namespace FEAST
       * \param[in] stream
       * stream to dump this object into
       */
-      void print(std::ostream& stream)
+      void print(std::ostream& stream) const
       {
         Subcells<1, space_dim_, world_dim_>::print(stream);
         stream << _edges.size() << " edges" << std::endl;
@@ -572,7 +572,7 @@ namespace FEAST
       * \param[in] stream
       * stream to dump this object into
       */
-      void print(std::ostream& stream)
+      void print(std::ostream& stream) const
       {
         Subcells<2, space_dim_, world_dim_>::print(stream);
         stream << _faces.size() << " faces" << std::endl;
