@@ -15,6 +15,84 @@ using namespace FEAST;
 #define SDIM 2
 
 /**
+* \brief dummy function in preparation of a function for defining work groups (which will reside in the load bal. class)
+*
+* This dummy function creates one work group consisting of all available processes.
+* This test code is semi hard-wired in the sense that we schedule one BMC to each processor.
+* We need n processes for the following (where n is the number of base mesh cells).
+*
+* \param[in] load_balancer
+* pointer to the load balancer object to get some further information
+*
+* \param[out] num_subgroups
+* number of subgroups
+*
+* \param[out] num_proc_in_subgroup
+* array of numbers of processes per subgroup
+*
+* \param[out] group_contains_extra_coord
+* Array indicating whether the subgroups contain an extra process for the coordinator (which will then
+* not be a compute process in the corresponding work group).
+* Usually a boolean would do the trick, but we cannot send boolean arrays via MPI. (C++ bindings are deprecated,
+* hence we cannot use MPI::BOOL. MPI_LOGICAL cannot be used, since this is not equivalent to C++'s bool.)
+* So, we use unsigned char here and treat is as if it were boolean.
+*
+* \param[out] subgroup_ranks
+* array for defining the rank partitioning
+*/
+void define_work_groups(
+  LoadBalancer<SDIM, WDIM>* load_balancer,
+  unsigned int& num_subgroups,
+  unsigned int*& num_proc_in_subgroup,
+  unsigned char*& group_contains_extra_coord,
+  int**& subgroup_ranks)
+{
+  // set number of subgroups manually to 1
+  num_subgroups = 1;
+  // allocate arrays
+  num_proc_in_subgroup = new unsigned int[num_subgroups];
+  group_contains_extra_coord = new unsigned char[num_subgroups];
+  subgroup_ranks = new int*[num_subgroups];
+
+  // shortcut to the number of processes in the load balancer's process group
+  unsigned int num_processes = load_balancer->process_group()->num_processes();
+
+  // shortcut to the number of cells in the base mesh
+  unsigned int num_cells = load_balancer->base_mesh()->num_cells();
+
+  // debug output
+  Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
+  // assert that the number of processes is n
+  assert(num_processes == num_cells);
+  assert(!load_balancer->group_has_dedicated_load_bal());
+
+  // set up the test case
+  // test case 1 (n is the number of base mesh cells)
+  // with dedicated load balancer process
+  //  - work group for coarse grid: 2 processes: {0, 1}
+  //  - work group for fine grid: n processes: {1, ..., n}
+  //  - i.e. process 1 is in both work groups
+  //  - dedicated load balancer and coordinator process: n+1
+
+  // since there is a dedicated load balancer process, this has to be added to both work groups as extra
+  // coordinator process
+  group_contains_extra_coord[0] = false;
+
+  // set number of processes per group
+  num_proc_in_subgroup[0] = num_cells;
+
+  // fine grid work group
+  subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
+  // set entries to {0, ..., n-1}
+  for(unsigned int i(0) ; i < num_proc_in_subgroup[0] ; ++i)
+  {
+    subgroup_ranks[0][i] = i;
+  }
+}
+
+
+
+/**
 * \brief main routine - test driver for universe
 *
 * Call the routine via "mpirun -np n+3 <binary_name> <relative path to base mesh> n" where n is the number of base
@@ -28,7 +106,7 @@ int main(int argc, char* argv[])
 
   if (argc < 3)
   {
-    std::cerr << "Call the program with \"mpirun -np n+3 " << argv[0] << " <relative_path_to_mesh_file> n\", "
+    std::cerr << "Call the program with \"mpirun -np n+1 " << argv[0] << " <relative_path_to_mesh_file> n\", "
               << "where n is the number of base mesh cells." << std::endl;
     return 1;
   }
@@ -71,7 +149,7 @@ int main(int argc, char* argv[])
 
   if(load_balancer != nullptr)
   {
-//    ProcessGroup* process_group = load_balancer->process_group();
+    ProcessGroup* process_group = load_balancer->process_group();
 //    // debug output
 //    int rank_process_group = process_group->rank();
 //    std::string s("Process " + StringUtils::stringify(rank_world) + " is the ");
@@ -86,7 +164,25 @@ int main(int argc, char* argv[])
     std::string mesh_file(argv[1]);
     load_balancer->read_mesh(mesh_file);
 
-    load_balancer->create_subgroups();
+    // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
+    unsigned int num_subgroups;
+    unsigned int* num_proc_in_subgroup(nullptr);
+    unsigned char* group_contains_extra_coord(nullptr);
+    int** subgroup_ranks(nullptr);
+
+    /* ********************************************************************************
+    * The coordinator is the only one knowing the base mesh, so only the coordinator  *
+    * decides over the number of work groups and the process distribution to them.    *
+    **********************************************************************************/
+    if(process_group->is_coordinator())
+    {
+      define_work_groups(load_balancer, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+                         subgroup_ranks);
+    }
+    // now let the load balancer create the subgroups (this function is called on all processes)
+    load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+                                      subgroup_ranks);
+
 
     // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
     // standard file logging functions

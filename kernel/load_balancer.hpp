@@ -557,31 +557,40 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       /* *********************************************************
       * create graph structures corresponding to the work groups *
       ***********************************************************/
-
+// COMMENT_HILMAR: hier ist immer noch hard-wired code. Der wird auch bald ausgelagert!
+// siehe auch weiter unten!!
       // let the coordinator create the process topology
       if(_process_group->is_coordinator())
       {
         _graphs.resize(_num_subgroups, nullptr);
 
-        // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
-        // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
-        // be used for the coarse grid work group
-        unsigned int* index = new unsigned int[3];
-        unsigned int* neighbours = new unsigned int[2];
-        index[0] = 0;
-        index[1] = 1;
-        index[2] = 2;
-        neighbours[0] = 1;
-        neighbours[1] = 0;
-        // Artificially create a graph object here. Usually, this comes from somewhere else.
-        _graphs[0] = new Graph(2, index, neighbours);
-        // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
-        delete [] index;
-        delete [] neighbours;
-        _graphs[0]->print();
+        if (_num_subgroups == 2)
+        {
+          // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
+          // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
+          // be used for the coarse grid work group
+          unsigned int* index = new unsigned int[3];
+          unsigned int* neighbours = new unsigned int[2];
+          index[0] = 0;
+          index[1] = 1;
+          index[2] = 2;
+          neighbours[0] = 1;
+          neighbours[1] = 0;
+          // Artificially create a graph object here. Usually, this comes from somewhere else.
+          _graphs[0] = new Graph(2, index, neighbours);
+          // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
+          delete [] index;
+          delete [] neighbours;
+          _graphs[0]->print();
 
-        // get connectivity graph of the base mesh; this one will be used for the fine grid work group
-        _graphs[1] = _base_mesh->graph();
+          // get connectivity graph of the base mesh; this one will be used for the fine grid work group
+          _graphs[1] = _base_mesh->graph();
+        }
+        else
+        {
+          // get connectivity graph of the base mesh; this one will be used for the fine grid work group
+          _graphs[0] = _base_mesh->graph();
+        }
 // COMMENT_HILMAR:
 // We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
 // equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
@@ -693,8 +702,10 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
           _subgroups[igroup]->work_group()->do_exchange();
         }
       }
+
+//COMMENT_HILMAR: hard-wired code!!!
       // manually destroy here the artificially created graph object
-      if(_process_group->is_coordinator())
+      if(_num_subgroups == 2 && _process_group->is_coordinator())
       {
         delete _graphs[0];
       }
