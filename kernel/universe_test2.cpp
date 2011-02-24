@@ -39,13 +39,17 @@ using namespace FEAST;
 *
 * \param[out] subgroup_ranks
 * array for defining the rank partitioning
+*
+* \param[out] graphs
+* array of Graph pointers representing the connectivity of work group processes
 */
 void define_work_groups(
   LoadBalancer<SDIM, WDIM>* load_balancer,
   unsigned int& num_subgroups,
   unsigned int*& num_proc_in_subgroup,
   unsigned char*& group_contains_extra_coord,
-  int**& subgroup_ranks)
+  int**& subgroup_ranks,
+  Graph**& graphs)
 {
   // set number of subgroups manually to 1
   num_subgroups = 1;
@@ -53,6 +57,7 @@ void define_work_groups(
   num_proc_in_subgroup = new unsigned int[num_subgroups];
   group_contains_extra_coord = new unsigned char[num_subgroups];
   subgroup_ranks = new int*[num_subgroups];
+  graphs = new Graph*[num_subgroups];
 
   // shortcut to the number of processes in the load balancer's process group
   unsigned int num_processes = load_balancer->process_group()->num_processes();
@@ -64,6 +69,7 @@ void define_work_groups(
   Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
   // assert that the number of processes is n
   assert(num_processes == num_cells);
+  // assert that no dedicated load balancer is used
   assert(!load_balancer->group_has_dedicated_load_bal());
 
   // set up the test case
@@ -88,6 +94,18 @@ void define_work_groups(
   {
     subgroup_ranks[0][i] = i;
   }
+
+  /* *********************************************************
+  * create graph structures corresponding to the work groups *
+  ***********************************************************/
+  // get connectivity graph of the base mesh; this one will be used for the one and only work group
+  graphs[0] = load_balancer->base_mesh()->graph();
+
+// COMMENT_HILMAR:
+// We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
+// equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
+// layer, which both have their own connectivity structure. Here, we actually need the connectivity graph of the
+// process patch layer.
 }
 
 
@@ -169,20 +187,21 @@ int main(int argc, char* argv[])
     unsigned int* num_proc_in_subgroup(nullptr);
     unsigned char* group_contains_extra_coord(nullptr);
     int** subgroup_ranks(nullptr);
+    Graph** graphs;
 
-    /* ********************************************************************************
-    * The coordinator is the only one knowing the base mesh, so only the coordinator  *
-    * decides over the number of work groups and the process distribution to them.    *
-    **********************************************************************************/
+    // define work groups
     if(process_group->is_coordinator())
     {
+      // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
+      // work groups and the process distribution to them. The passed arrays are allocated within this routine.
       define_work_groups(load_balancer, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                         subgroup_ranks);
+                         subgroup_ranks, graphs);
     }
-    // now let the load balancer create the subgroups (this function is called on all processes)
+    // Now let the load balancer create the work groups (this function is called on all processes of the process
+    // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
+    // balancer class.
     load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                                      subgroup_ranks);
-
+                                      subgroup_ranks, graphs);
 
     // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
     // standard file logging functions
@@ -217,7 +236,13 @@ int main(int argc, char* argv[])
       // test standard log feature
       Logger::log("BRAL\n");
     }
-   // Everything done, call universe destruction routine.
+    if(process_group->is_coordinator())
+    {
+     // delete the graphs array
+      delete [] graphs;
+    }
+
+    // Everything done, call universe destruction routine.
     universe->destroy();
   }
   else if(master != nullptr)

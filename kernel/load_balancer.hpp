@@ -351,12 +351,16 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     *
     * \param[in] subgroup_ranks
     * array for defining the rank partitioning
+    *
+    * \param[in] graphs
+    * array of Graph pointers representing the connectivity of work group processes
     */
     void create_work_groups(
       unsigned int num_subgroups,
       unsigned int* num_proc_in_subgroup,
       unsigned char* group_contains_extra_coord,
-      int** subgroup_ranks)
+      int** subgroup_ranks,
+      Graph** graphs)
     {
       // set data/pointers on the coordinator process (where the data is already available)
       if(_process_group->is_coordinator())
@@ -553,58 +557,18 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // delete aux. array (on all processes)
       delete [] group_contains_extra_coord;
 
-
-      /* *********************************************************
-      * create graph structures corresponding to the work groups *
-      ***********************************************************/
-// COMMENT_HILMAR: hier ist immer noch hard-wired code. Der wird auch bald ausgelagert!
-// siehe auch weiter unten!!
-      // let the coordinator create the process topology
-      if(_process_group->is_coordinator())
-      {
-        _graphs.resize(_num_subgroups, nullptr);
-
-        if (_num_subgroups == 2)
-        {
-          // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
-          // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
-          // be used for the coarse grid work group
-          unsigned int* index = new unsigned int[3];
-          unsigned int* neighbours = new unsigned int[2];
-          index[0] = 0;
-          index[1] = 1;
-          index[2] = 2;
-          neighbours[0] = 1;
-          neighbours[1] = 0;
-          // Artificially create a graph object here. Usually, this comes from somewhere else.
-          _graphs[0] = new Graph(2, index, neighbours);
-          // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
-          delete [] index;
-          delete [] neighbours;
-          _graphs[0]->print();
-
-          // get connectivity graph of the base mesh; this one will be used for the fine grid work group
-          _graphs[1] = _base_mesh->graph();
-        }
-        else
-        {
-          // get connectivity graph of the base mesh; this one will be used for the fine grid work group
-          _graphs[0] = _base_mesh->graph();
-        }
-// COMMENT_HILMAR:
-// We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
-// equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
-// layer, which both have their own connectivity structure. Here, we actually need the connectivity graph of the
-// process patch layer.
-      }
-
       /* ***************************************************************************
       * now let the coordinator send the relevant parts of the global graph to the *
       * corresponding work group members                                           *
       *****************************************************************************/
 
+      // resize the vector of Graph object pointers
+      _graphs.resize(_num_subgroups, nullptr);
       for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
+        // set the graph pointer for the current subgroup
+        _graphs[igroup] = graphs[igroup];
+
         if(_belongs_to_group[igroup])
         {
           unsigned int num_neighbours_local;
@@ -702,14 +666,6 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
           _subgroups[igroup]->work_group()->do_exchange();
         }
       }
-
-//COMMENT_HILMAR: hard-wired code!!!
-      // manually destroy here the artificially created graph object
-      if(_num_subgroups == 2 && _process_group->is_coordinator())
-      {
-        delete _graphs[0];
-      }
-
     } // create_work_groups()
   };
 

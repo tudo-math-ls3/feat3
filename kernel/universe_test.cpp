@@ -4,6 +4,7 @@
 // - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
 // - completion of doxygen comments (\param, array dimensions, etc.)
 // - add/remove 'const' and other modifiers where necessary
+// - virtual DTORs?
 // - check all the MPI-related valgrind warnings (--> Dom)
 
 // Done:
@@ -23,6 +24,7 @@
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/comm.hpp>
+#include <kernel/graph.hpp>
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
 
@@ -56,6 +58,25 @@ using namespace FEAST;
 * MPI_Scatter() and MPI_Gather() (which always have to be called by all members of an MPI process group). This
 * is more efficient then using n calls of MPI_send() / MPI_recv() via the communicator of the main process group.
 *
+* The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
+* Furthermore, two extra processes are required for testing the creation of a second work group and the use
+* of a dedicated load balancing process.
+* Later, this has to be all done in some auto-magically way.
+*
+* Two different tests can be performed (n is the number of base mesh cells):
+* 1) with dedicated load balancer process
+*    - work group for coarse grid: 2 processes: {0, 1}
+*    - work group for fine grid: n processes: {1, ..., n}
+*    - i.e. process 1 is in both work groups
+*    - dedicated load balancer and coordinator process: n+1
+* 2) without dedicated load balancer process
+*    - work group for coarse grid: 2 processes: {0, 1}
+*    - work group for fine grid: n processes: {2, ..., n+1}
+*    - i.e. the two work groups are disjunct
+*    - coordinator process: n+1
+* Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
+* includes_dedicated_load_bal[] in the main() method.
+*
 * \param[in] load_balancer
 * pointer to the load balancer object to get some further information
 *
@@ -74,40 +95,25 @@ using namespace FEAST;
 *
 * \param[out] subgroup_ranks
 * array for defining the rank partitioning
+*
+* \param[out] graphs
+* array of Graph pointers representing the connectivity of work group processes
 */
 void define_work_groups(
   LoadBalancer<SDIM, WDIM>* load_balancer,
   unsigned int& num_subgroups,
   unsigned int*& num_proc_in_subgroup,
   unsigned char*& group_contains_extra_coord,
-  int**& subgroup_ranks)
+  int**& subgroup_ranks,
+  Graph**& graphs)
 {
-  // COMMENT_HILMAR:
-  // The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
-  // Furthermore, two extra processes are required for testing the creation of a second work group and the use
-  // of a dedicated load balancing process.
-  // Later, this has to be all done in some auto-magically way.
-
-  // Two different tests can be performed (n is the number of base mesh cells):
-  // 1) with dedicated load balancer process
-  //    - work group for coarse grid: 2 processes: {0, 1}
-  //    - work group for fine grid: n processes: {1, ..., n}
-  //    - i.e. process 1 is in both work groups
-  //    - dedicated load balancer and coordinator process: n+1
-  // 2) without dedicated load balancer process
-  //    - work group for coarse grid: 2 processes: {0, 1}
-  //    - work group for fine grid: n processes: {2, ..., n+1}
-  //    - i.e. the two work groups are disjunct
-  //    - coordinator process: n+1
-  // Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
-  // includes_dedicated_load_bal[] in universe_test.cpp.
-
   // set number of subgroups manually to 2
   num_subgroups = 2;
   // allocate arrays
   num_proc_in_subgroup = new unsigned int[num_subgroups];
   group_contains_extra_coord = new unsigned char[num_subgroups];
   subgroup_ranks = new int*[num_subgroups];
+  graphs = new Graph*[num_subgroups];
 
   // shortcut to the number of processes in the load balancer's process group
   unsigned int num_processes = load_balancer->process_group()->num_processes();
@@ -185,6 +191,35 @@ void define_work_groups(
       subgroup_ranks[1][i] = i+2;
     }
   }
+
+  /* *********************************************************
+  * create graph structures corresponding to the work groups *
+  ***********************************************************/
+  // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
+  // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
+  // be used for the coarse grid work group
+  unsigned int* index = new unsigned int[3];
+  unsigned int* neighbours = new unsigned int[2];
+  index[0] = 0;
+  index[1] = 1;
+  index[2] = 2;
+  neighbours[0] = 1;
+  neighbours[1] = 0;
+  // Artificially create a graph object here. Usually, this comes from somewhere else.
+  graphs[0] = new Graph(2, index, neighbours);
+  // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
+  delete [] index;
+  delete [] neighbours;
+  graphs[0]->print();
+
+  // get connectivity graph of the base mesh; this one will be used for the fine grid work group
+  graphs[1] = load_balancer->base_mesh()->graph();
+
+// COMMENT_HILMAR:
+// We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
+// equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
+// layer, which both have their own connectivity structure. Here, we actually need the connectivity graph of the
+// process patch layer.
 }
 
 
@@ -293,19 +328,21 @@ int main(int argc, char* argv[])
       unsigned int* num_proc_in_subgroup(nullptr);
       unsigned char* group_contains_extra_coord(nullptr);
       int** subgroup_ranks(nullptr);
+      Graph** graphs;
 
-      /* ********************************************************************************
-      * The coordinator is the only one knowing the base mesh, so only the coordinator  *
-      * decides over the number of work groups and the process distribution to them.    *
-      **********************************************************************************/
+      // define work groups
       if(process_group->is_coordinator())
       {
+        // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
+        // work groups and the process distribution to them. The passed arrays are allocated within this routine.
         define_work_groups(load_balancer, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                           subgroup_ranks);
+                           subgroup_ranks, graphs);
       }
-      // now let the load balancer create the subgroups (this function is called on all processes)
+      // Now let the load balancer create the work groups (this function is called on all processes of the process
+      // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
+      // balancer class.
       load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                                        subgroup_ranks);
+                                        subgroup_ranks, graphs);
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
       // standard file logging functions
@@ -340,6 +377,15 @@ int main(int argc, char* argv[])
         // test standard log feature
         Logger::log("BRAL\n");
       }
+
+      if(process_group->is_coordinator())
+      {
+        // manually destroy here the artificially created graph object (the other one is destroyed by the base mesh)
+        delete graphs[0];
+        // delete the graphs array
+        delete [] graphs;
+      }
+
       // Everything done, call universe destruction routine.
       universe->destroy();
     }
