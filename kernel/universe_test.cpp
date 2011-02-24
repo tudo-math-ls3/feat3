@@ -5,7 +5,7 @@
 // - completion of doxygen comments (\param, array dimensions, etc.)
 // - add/remove 'const' and other modifiers where necessary
 // - virtual DTORs?
-// - check all the MPI-related valgrind warnings (--> Dom)
+// - missing output when using MPICH
 
 // Done:
 // - template all classes "above" BaseMesh
@@ -15,6 +15,7 @@
 // - move mpi_init() from Universe::create() to the very beginning of the program
 // - Universe CTOR und DTOR private machen
 // - proper cleanup of resources (deletes, DTORs)
+// - check all the MPI-related valgrind warnings (--> Dom)
 
 // includes, system
 #include <iostream>
@@ -210,7 +211,6 @@ void define_work_groups(
   // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
   delete [] index;
   delete [] neighbours;
-  graphs[0]->print();
 
   // get connectivity graph of the base mesh; this one will be used for the fine grid work group
   graphs[1] = load_balancer->base_mesh()->graph();

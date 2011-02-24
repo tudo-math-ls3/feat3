@@ -169,27 +169,35 @@ namespace FEAST
     /* *****************
     * member functions *
     *******************/
-    /// print the graph
-    void print()
+    /// print the graph to the given stream
+    void print(std::ostream& stream) const
     {
-      std::cout << "number of nodes: " << _num_nodes << std::endl;
+      stream << "number of nodes: " << _num_nodes << std::endl;
       if (_num_nodes > 0)
       {
-        std::cout << "node | degree | neighbours: " << std::endl;
+        stream << "node | degree | neighbours: " << std::endl;
         for(unsigned int i(0) ; i < _num_nodes ; ++i)
         {
-          std::cout << i << " | " << _index[i+1] - _index[i];
+          stream << i << " | " << _index[i+1] - _index[i];
           if (_index[i+1] - _index[i] > 0)
           {
-            std::cout << " | " << _neighbours[_index[i]];
+            stream << " | " << _neighbours[_index[i]];
             for(unsigned int j(_index[i]+1) ; j < _index[i+1] ; ++j)
             {
-              std::cout << ", " << _neighbours[j];
+              stream << ", " << _neighbours[j];
             }
           }
-          std::cout << std::endl;
+          stream << std::endl;
         }
       }
+    }
+
+    /// returns the graph print as string
+    inline std::string print() const
+    {
+      std::ostringstream oss;
+      print(oss);
+      return oss.str();
     }
   }; // class Graph
 
@@ -285,7 +293,8 @@ namespace FEAST
     /* *****************
     * member functions *
     *******************/
-    void print(std::ostream& stream)
+    /// prints the distributed graph to the given stream
+    void print(std::ostream& stream) const
     {
       stream << "distributed graph: ";
       for(unsigned int i(0) ; i < _num_neighbours ; ++i)
@@ -293,6 +302,14 @@ namespace FEAST
         stream << _neighbours[i] << " ";
       }
       stream << std::endl;
+    }
+
+    /// returns the distributed graph print as string
+    inline std::string print() const
+    {
+      std::ostringstream oss;
+      print(oss);
+      return oss.str();
     }
   }; // class GraphDistributed
 

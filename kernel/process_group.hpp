@@ -593,16 +593,13 @@ namespace FEAST
     {
       _graph_distributed = new GraphDistributed(num_neighbours, neighbours);
 
-      // debug output (demonstrating how to use the SomeClass::print(std::ostream) methods)
-
       // log into process-own log file
       _graph_distributed->print(Logger::file);
 
       // let the master log to screen and to the master log file
-      std::stringstream ss;
-      ss << "Proc " << Process::rank << ": ";
-      _graph_distributed->print(ss);
-      log_indiv_master(ss.str());
+      std::string s = "Proc " + StringUtils::stringify(Process::rank) + ": ";
+      s += _graph_distributed->print();
+      log_indiv_master(s);
 
 // COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
 //   Unfortunately, this function has only been introduced with MPI-2.2 and is not yet implemented in OpenMPI yet.

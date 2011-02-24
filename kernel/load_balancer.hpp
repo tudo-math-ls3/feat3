@@ -539,6 +539,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
           mpi_error_code = MPI_Comm_create(_process_group->comm(), dummy_group, &dummy_comm);
           MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+          MPI_Comm_free(&dummy_comm);
 
           // COMMENT_HILMAR: First, I used this simpler version:
           //   mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
@@ -562,13 +563,8 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       * corresponding work group members                                           *
       *****************************************************************************/
 
-      // resize the vector of Graph object pointers
-      _graphs.resize(_num_subgroups, nullptr);
       for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
-        // set the graph pointer for the current subgroup
-        _graphs[igroup] = graphs[igroup];
-
         if(_belongs_to_group[igroup])
         {
           unsigned int num_neighbours_local;
@@ -579,6 +575,9 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
             /* **********************************************
             * code for the sending root/coordinator process *
             ************************************************/
+
+            // set the graph pointer for the current subgroup
+            _graphs.push_back(graphs[igroup]);
 
             unsigned int count = _graphs[igroup]->num_nodes();
             if(_subgroups[igroup]->contains_extra_coord())
