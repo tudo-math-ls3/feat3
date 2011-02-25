@@ -224,10 +224,10 @@ namespace FEAST
           // all ok, let only one process comment on this
           if(Process::is_master)
           {
-            Logger::log(StringUtils::stringify(_num_processes) + " processes available and "
-              + StringUtils::stringify(num_processes_needed) + " needed.\n");
-            std::cout << _num_processes << " processes available and " << num_processes_needed
-                      << " needed." << std::endl;
+            std::string s = StringUtils::stringify(_num_processes) + " processes available and "
+              + StringUtils::stringify(num_processes_needed) + " needed.\n";
+            Logger::log(s);
+            std::cout << s;
           }
         }
       }
@@ -326,8 +326,9 @@ namespace FEAST
         _master = new Master();
 
         // debug output
-        Logger::log("Process " + StringUtils::stringify(Process::rank) + " is the MASTER OF THE UNIVERSE!\n");
-        std::cout << "Process " << Process::rank << " is the MASTER OF THE UNIVERSE!" << std::endl;
+        std::string s = "Process " + StringUtils::stringify(Process::rank) + " is the MASTER OF THE UNIVERSE!\n";
+        Logger::log(s);
+        std::cout << s;
 
         // start the infinite service loop on the master, which waits for messages
         _master->service();

@@ -1,5 +1,6 @@
 // includes, system
 #include <iostream>
+#include <cstdlib> // for exit()
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -126,7 +127,7 @@ int main(int argc, char* argv[])
   {
     std::cerr << "Call the program with \"mpirun -np n+1 " << argv[0] << " <relative_path_to_mesh_file> n\", "
               << "where n is the number of base mesh cells." << std::endl;
-    return 1;
+    exit(1);
   }
 
   // init MPI
@@ -177,7 +178,8 @@ int main(int argc, char* argv[])
 //    }
 //    s += "load balancer with local rank " + StringUtils::stringify(rank_process_group);
 //    s += " in group " + StringUtils::stringify(group_id) + ".";
-//    std::cout << s <<  std::endl;
+//    process_group->log_indiv_master(s);
+
     // get name of the mesh file from the command line
     std::string mesh_file(argv[1]);
     load_balancer->read_mesh(mesh_file);

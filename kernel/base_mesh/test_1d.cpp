@@ -23,7 +23,7 @@ int main (int argc, char **argv)
   {
     parser.parse("dummy", &bm);
   }
-  catch(InternalError* e)
+  catch(Exception& e)
   {
     std::cerr << e->message() << std::endl;
     exit(1);
@@ -35,7 +35,7 @@ int main (int argc, char **argv)
   // print base mesh
   bm.print(std::cout);
   // validate base mesh
-  bm.validate();
+  bm.validate(Logger::file);
 
   // subdivide cell 1
   std::cout << "******************" << std::endl;

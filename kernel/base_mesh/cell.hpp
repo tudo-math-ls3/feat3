@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/cell_data.hpp>
 #include <kernel/base_mesh/cell_subdivision.hpp>
 #include <kernel/base_mesh/vertex.hpp>
@@ -412,13 +413,18 @@ namespace FEAST
       /// returns subdivision data object
       inline void set_subdiv_data(SubdivisionData<cell_dim_, space_dim_, world_dim_>* subdiv_data)
       {
-        if(_subdiv_data != nullptr)
+        try
         {
-          std::cerr << "SubdivisionData object of cell " << this->print_index() << " is no null! Aborting program."
-                    << std::endl;
-          exit(1);
+          if(_subdiv_data != nullptr)
+          {
+            throw InternalError("SubdivisionData object of cell " + this->print_index() + " is not null!");
+          }
+          _subdiv_data = subdiv_data;
         }
-        _subdiv_data = subdiv_data;
+        catch(Exception& e)
+        {
+          ErrorHandler::exception_occured(e);
+        }
       }
 
 
@@ -451,11 +457,16 @@ namespace FEAST
       virtual void print(std::ostream& stream) = 0;
 
 
-      virtual void validate() const = 0;
+      virtual void validate(std::ostream&) const = 0;
 
 
-      /// validate parent-child relations of this cell
-      void validate_history() const
+      /**
+      * \brief validate parent-child relations of this cell
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      void validate_history(std::ostream& stream) const
       {
         try
         {
@@ -507,18 +518,19 @@ namespace FEAST
             }
           }
         }
-        catch(InternalError* e)
+        catch(Exception& e)
         {
-          std::cerr << e->message() << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
-// COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
-//        catch (Exception& e)
-//        {
-//          ErrorHandler::exception_occured(e, ErrorHandler::CRITICAL);
-//        }
       }
 
+
+      /**
+      * \brief print parent-child relations of this cell
+      *
+      * \param[in] stream
+      * Stream to write into.
+      */
       inline void print_history(std::ostream& stream)
       {
         stream << "[parent: ";

@@ -11,9 +11,10 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
-#include <kernel/base_mesh/cell_data_checker.hpp>
+#include <kernel/base_mesh/cell_data_validation.hpp>
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 #include <kernel/base_mesh/cell_2d_tri.hpp>
 
@@ -150,47 +151,45 @@ namespace FEAST
       /// subdivision routine splitting a tetra and storing parent/child information
 // COMMENT_HILMAR: this is currently hard-wired to splitting the tetra into 8 tetras (called 'standard partition' or
 // '3D-Freudenthal-Bey partition'. Later, this is parameterised via the information in the SubdivisionData object.
-      inline void subdivide()
+      inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
-        // assure that this cell has not been divided yet
-        if(!this->active())
+        try
         {
-          std::cerr << "Tetra ";
-          this->print_index(std::cerr);
-          std::cerr << " is already subdivided! Aborting program." << std::endl;
-          exit(1);
-        }
+          // assure that this cell has not been divided yet
+          if(!this->active())
+          {
+              throw InternalError("Tetraeder " + this->print_index() + " is already subdivided!");
+          }
 
-        if(!this->subdiv_data_initialised())
+          this->set_subdiv_data(subdiv_data);
+
+          // clear all vectors of created entities in the SubdivisionData object
+          this->subdiv_data()->clear_created();
+
+          // TODO: perform subdivision
+          // ...
+          throw InternalError("Subdivision for tetraeders not implemented yet!!");
+        }
+        catch(Exception& e)
         {
-          std::cerr << "Tetra ";
-          this->print_index(std::cerr);
-          std::cerr << " cannot be subdivided! Initialise subdivision data first! Aborting program." << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
-
-        // clear all vectors of created entities in the SubdivisionData object
-        this->subdiv_data()->clear_created();
-
-        // TODO: perform subdivision
-        // ...
-        std::cerr << "Subdivision for tetraeders not implemented yet!!" << std::endl;
-        exit(1);
-
       } // subdivide()
 
 
-      /// validates the cell
-// COMMENT_HILMAR: will be done via exceptions
-      inline void validate() const
+      /**
+      * \brief validate this cell
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      inline void validate(std::ostream& stream) const
       {
         try
         {
           if(space_dim_ == 3)
           {
-            std::cout << "Validating triangle ";
-            this->print_index(std::cout);
-            std::cout << std::endl;
+            stream << "Validating triangle " << this->print_index() << "..." << std::endl;
           }
 
           std::string s = "Triangle " + this->print_index() + ": ";
@@ -226,27 +225,26 @@ namespace FEAST
           // validate subitems (here: faces and edges)
           for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
           {
-            face(iface)->validate();
+            face(iface)->validate(stream);
           }
           // validate subitems (here: faces and edges)
           for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
           {
-            edge(iedge)->validate();
+            edge(iedge)->validate(stream);
           }
 
           // validate parent-child relations
-          this->validate_history();
+          this->validate_history(stream);
 
           // validate neighbours
           if (this->active())
           {
-            CellDataChecker<3, space_dim_, world_dim_>::check_neighbourhood(this);
+            CellDataValidation<3, space_dim_, world_dim_>::validate_neighbourhood(this, stream);
           }
         }
-        catch(InternalError* e)
+        catch(Exception& e)
         {
-          std::cerr << e->message() << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
       }
 

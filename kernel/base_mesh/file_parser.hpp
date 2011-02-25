@@ -5,14 +5,12 @@
 // includes, system
 #include <iostream> // for std::ostream
 #include <cassert>  // for assert()
-//#include <vector>   // for std::vector
 #include <math.h>   // for sin, cos
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/file_reader_ascii.hpp>
-// COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
-//#include <kernel/error_handler.hpp>
+#include <kernel/logger.hpp>
 #include <kernel/base_mesh/cell_3d_hexa.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
@@ -77,9 +75,9 @@ namespace FEAST
       {
         assert(world_dim_ == 1);
 
-        std::cout << "No file parser implemented yet!" << std::endl;
-        std::cout << "A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):" << std::endl;
-        std::cout << "v0--------e0--------v1--------e1--------v2--------e2--------v3" << std::endl;
+        Logger::log_master("No file parser implemented yet!\n\
+                          A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):\n\
+                          v0--------e0--------v1--------e1--------v2--------e2--------v3");
 
         // set base mesh pointer
         _bm = bm;
@@ -784,7 +782,7 @@ COMMENT_HILMAR: will be adapted later
       /* ***************************
       * constructors & destructors *
       *****************************/
-//COMMENT_HILMAR: DTOR and clean up missing!
+//COMMENT_HILMAR: DTOR missing
 
       /* *****************
       * member functions *
@@ -792,7 +790,7 @@ COMMENT_HILMAR: will be adapted later
       /**
       * \brief function for reading a 3D mesh in FEAST1 format
       *
-      * \note As long as no real file parser is implemented, we only manually create a 1D base mesh here.
+      * \note As long as no real file parser is implemented, we only manually create a 3D base mesh here.
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
@@ -800,7 +798,7 @@ COMMENT_HILMAR: will be adapted later
       {
         assert(world_dim_ == 3);
 
-        std::cout << "No file parser implemented yet! A manual 3D base mesh is created." << std::endl;
+        Logger::log_master("No file parser implemented yet! A manual 3D base mesh is created.");
 
         // set base mesh pointer
         _bm = bm;

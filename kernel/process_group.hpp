@@ -176,7 +176,6 @@ namespace FEAST
 //        // In the unlikely case that a char is not 1 byte, determine the size of the buffer. The -0.001 is a precaution
 //        // for the case the division results in 42.00000000001 instead of 42.0.
 //        int buffer_size = ceil(BUFFERSIZE_BYTES/size_of_char - 0.001);
-// //       std::cout << "buffer size: " << StringUtils::stringify(buffer_size) <<  std::endl;
 //        _buffer = new char[buffer_size];
 //      }
 //      else

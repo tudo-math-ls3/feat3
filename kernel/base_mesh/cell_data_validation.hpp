@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_BM_CELL_DATA_CHECKER_HPP
-#define KERNEL_BM_CELL_DATA_CHECKER_HPP 1
+#ifndef KERNEL_BM_CELL_DATA_VALIDATION_HPP
+#define KERNEL_BM_CELL_DATA_VALIDATION_HPP 1
 
 // includes, system
 #include <iostream> // for std::ostream
@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/cell_data.hpp>
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/vertex.hpp>
@@ -20,11 +21,11 @@ namespace FEAST
   namespace BaseMesh
   {
     /**
-    * \brief class for checking vertex neighbours
+    * \brief class for validating vertex neighbours
     *
     * \note
-    * Q: Why are there three classes CellDataCheckerVertexNeighbours, CellDataCheckerEdgeNeighbours and
-    *    CellDataCheckerFaceNeighbours? Can they not be united (the code is quite similar)?
+    * Q: Why are there three classes CellDataValidationVertNeigh, CellDataValidationEdgeNeigh and
+    *    CellDataValidationFaceNeigh? Can they not be united (the code is quite similar)?
     * A: 1) That is a consequence of that fact, that we explicitely store vertices, edges and faces instead of
     *    putting all in one array of general "items".
     *    2) If we only had to compare subcells here, we maybe could use the most general class BaseMeshItem (being
@@ -32,7 +33,7 @@ namespace FEAST
     *    and that is not possible if we only handle them as BaseMeshItem. (Note that for vertices we don't need
     *    parent/child information.)
     *    3) The code differs for vertices on the one hand and edges/faces on the other hand: For the latter we
-    *    eventually have to traverse the history (parent/child relations) for checking neighbourhood, which is not
+    *    eventually have to traverse the history (parent/child relations) for validating neighbourhood, which is not
     *    necessary for vertices.
     *    4) Constructs like 'if(cell_space_dim == 1) then ... else if(cell_space_dim == 2) ...' are not possible:
     *    For cell_space_dim = 3, e.g., one would use the function num_faces() which is simply not available for
@@ -47,12 +48,20 @@ namespace FEAST
     template<
       unsigned char cell_space_dim_,
       unsigned char world_dim_>
-    class CellDataCheckerVertexNeighbours
+    class CellDataValidationVertNeigh
     {
     private:
     public:
-      /// checks whether vertex neighbours are set correctly
-      static void check(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c)
+      /**
+      * \brief validates whether vertex neighbours are set correctly
+      *
+      * \param[in] c
+      * cell whose neighbourhood is to be validated
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         assert(cell_space_dim_ >= 1);
         try
@@ -94,13 +103,13 @@ namespace FEAST
                   {
                     if(neighs_of_neigh[ivertex_in_neigh][nn] == c)
                     {
-// debug output
-s = "Vertex-neighbourhood between cell " + c->print_index() + " (at vertex "
-    + StringUtils::stringify((int)ivertex) + ", " + StringUtils::stringify(ineigh)
-    + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (vertex = "
-    + StringUtils::stringify((int)ivertex_in_neigh) + ", " + StringUtils::stringify(nn)
-    + "-th pos.) found!\n";
-std::cout << s;
+                      // debug output
+                      s = "Vertex-neighbourhood between cell " + c->print_index() + " (at vertex "
+                          + StringUtils::stringify((int)ivertex) + ", " + StringUtils::stringify(ineigh)
+                          + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (vertex = "
+                          + StringUtils::stringify((int)ivertex_in_neigh) + ", " + StringUtils::stringify(nn)
+                          + "-th pos.) found!\n";
+                      stream << s;
                       neighbour_found = true;
 
                       // check whether the two neighbours really share the same vertex
@@ -132,31 +141,38 @@ std::cout << s;
             } // for 0 <= ineigh < neighs.size()
           } // for 0 <= ivertex < c->num_vertices()
         }
-        catch(InternalError* e)
+        catch(Exception& e)
         {
-          std::cerr << e->message() << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
-      } // check(...)
-    }; // class CellDataCheckerVertexNeighbours
+      } // validate(...)
+    }; // class CellDataValidationVertNeigh
 
 
     /**
-    * \brief class for checking edge neighbours
+    * \brief class for validating edge neighbours
     *
-    * \note See note in class CellDataCheckerVertexNeighbours.
+    * \note See note in class CellDataValidationVertNeigh.
     *
     * \author Hilmar Wobker
     */
     template<
       unsigned char cell_space_dim_,
       unsigned char world_dim_>
-    class CellDataCheckerEdgeNeighbours
+    class CellDataValidationEdgeNeigh
     {
     private:
     public:
-      /// checks whether edge neighbours are set correctly
-      static void check(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c)
+      /**
+      * \brief validates whether edge neighbours are set correctly
+      *
+      * \param[in] c
+      * cell whose neighbourhood is to be validated
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         assert(cell_space_dim_ >= 2);
         try
@@ -197,13 +213,13 @@ std::cout << s;
                   {
                     if(neighs_of_neigh[iedge_in_neigh][nn] == c)
                     {
-// debug output
-s = "Edge-neighbourhood between cell " + c->print_index() + " (at edge "
-    + StringUtils::stringify((int)iedge) + ", " + StringUtils::stringify(ineigh)
-    + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (edge = "
-    + StringUtils::stringify((int)iedge_in_neigh) + ", " + StringUtils::stringify(nn)
-    + "-th pos.) found!\n";
-std::cout << s;
+                      // debug output
+                      s = "Edge-neighbourhood between cell " + c->print_index() + " (at edge "
+                          + StringUtils::stringify((int)iedge) + ", " + StringUtils::stringify(ineigh)
+                          + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (edge = "
+                          + StringUtils::stringify((int)iedge_in_neigh) + ", " + StringUtils::stringify(nn)
+                          + "-th pos.) found!\n";
+                      stream << s;
                       neighbour_found = true;
 
                       // We have to check whether the refinement levels of the two edges differ (which means, that the
@@ -258,31 +274,38 @@ std::cout << s;
             } // for 0 <= ineigh < neighs.size()
           } // for 0 <= iedge < c->num_edges()
         }
-        catch(InternalError* e)
+        catch(Exception& e)
         {
-          std::cerr << e->message() << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
-      } // check(...)
-    }; // class CellDataCheckerEdgeNeighbours
+      } // validate(...)
+    }; // class CellDataValidationEdgeNeigh
 
 
     /**
-    * \brief class for checking face neighbours
+    * \brief class for validating face neighbours
     *
-    * \note See note in class CellDataCheckerVertexNeighbours.
+    * \note See note in class CellDataValidationVertNeigh.
     *
     * \author Hilmar Wobker
     */
     template<
       unsigned char cell_space_dim_,
       unsigned char world_dim_>
-    class CellDataCheckerFaceNeighbours
+    class CellDataValidationFaceNeigh
     {
     private:
     public:
-      /// checks whether face neighbours are set correctly
-      static void check(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c)
+      /**
+      * \brief validates whether face neighbours are set correctly
+      *
+      * \param[in] c
+      * cell whose neighbourhood is to be validated
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         assert(cell_space_dim_ >= 3);
         try
@@ -324,12 +347,12 @@ std::cout << s;
                     if(neighs_of_neigh[iface_in_neigh][nn] == c)
                     {
                       // debug output
-s = "Face-neighbourhood between cell " + c->print_index() + " (at face "
-    + StringUtils::stringify((int)iface) + ", " + StringUtils::stringify(ineigh)
-    + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (face = "
-    + StringUtils::stringify((int)iface_in_neigh) + ", " + StringUtils::stringify(nn)
-    + "-th pos.) found!\n";
-std::cout << s;
+                      s = "Face-neighbourhood between cell " + c->print_index() + " (at face "
+                          + StringUtils::stringify((int)iface) + ", " + StringUtils::stringify(ineigh)
+                          + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (face = "
+                          + StringUtils::stringify((int)iface_in_neigh) + ", " + StringUtils::stringify(nn)
+                          + "-th pos.) found!\n";
+                      stream << s;
                       neighbour_found = true;
 
                       // We have to check whether the refinement levels of the two faces differ (which means, that the
@@ -384,17 +407,16 @@ std::cout << s;
             } // for 0 <= ineigh < neighs.size()
           } // for 0 <= iface < c->num_faces()
         }
-        catch(InternalError* e)
+        catch(Exception& e)
         {
-          std::cerr << e->message() << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
-      } // check(...)
-    }; // class CellDataCheckerFaceNeighbours
+      } // validate(...)
+    }; // class CellDataValidationFaceNeigh
 
 
     /**
-    * \brief class for checking cell-specific data like neighbourhood information
+    * \brief class for validating cell-specific data like neighbourhood information
     *
     * This general class is empty, only specialisations for cell_dim_ = space_dim_ are implemented.
     *
@@ -404,70 +426,105 @@ std::cout << s;
       unsigned char cell_dim_,
       unsigned char space_dim_,
       unsigned char world_dim_>
-    class CellDataChecker
+    class CellDataValidation
     {
     private:
     public:
-      /// dummy function called by cells with dimension smaller than space dimension
-      static void check_neighbourhood(Cell<cell_dim_, space_dim_, world_dim_> const * c)
+      /**
+      * \brief dummy function called by cells with dimension smaller than space dimension
+      *
+      * \param[in] c
+      * dummy cell
+      *
+      * \param[in] stream
+      * dummy stream
+      */
+      static void validate_neighbourhood(Cell<cell_dim_, space_dim_, world_dim_> const * c, std::ostream& stream)
       {
       }
     };
 
 
     /**
-    * \brief specialisation of class CellDataChecker for cell_dim_ = space_dim_ = 3
+    * \brief specialisation of class CellDataValidation for cell_dim_ = space_dim_ = 3
     *
     * \author Hilmar Wobker
     */
     template<unsigned char world_dim_>
-    class CellDataChecker<3, 3, world_dim_>
+    class CellDataValidation<3, 3, world_dim_>
     {
     private:
     public:
-      static void check_neighbourhood(Cell<3, 3, world_dim_> const * c)
+      /**
+      * \brief validates neighbourhood of 3D cells
+      *
+      * \param[in] c
+      * cell whose neighbourhood is to be validated
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      static void validate_neighbourhood(Cell<3, 3, world_dim_> const * c, std::ostream& stream)
       {
-        CellDataCheckerVertexNeighbours<3, world_dim_>::check(c);
-        CellDataCheckerEdgeNeighbours<3, world_dim_>::check(c);
-        CellDataCheckerFaceNeighbours<3, world_dim_>::check(c);
+        CellDataValidationVertNeigh<3, world_dim_>::validate(c, stream);
+        CellDataValidationEdgeNeigh<3, world_dim_>::validate(c, stream);
+        CellDataValidationFaceNeigh<3, world_dim_>::validate(c, stream);
       }
     };
 
 
     /**
-    * \brief specialisation of class CellDataChecker for cell_dim_ = space_dim_ = 2
+    * \brief specialisation of class CellDataValidation for cell_dim_ = space_dim_ = 2
     *
     * \author Hilmar Wobker
     */
     template<unsigned char world_dim_>
-    class CellDataChecker<2, 2, world_dim_>
+    class CellDataValidation<2, 2, world_dim_>
     {
     private:
     public:
-      static void check_neighbourhood(Cell<2, 2, world_dim_> const * c)
+      /**
+      * \brief validates neighbourhood of 2D cells
+      *
+      * \param[in] c
+      * cell whose neighbourhood is to be validated
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      static void validate_neighbourhood(Cell<2, 2, world_dim_> const * c, std::ostream& stream)
       {
-        CellDataCheckerVertexNeighbours<2, world_dim_>::check(c);
-        CellDataCheckerEdgeNeighbours<2, world_dim_>::check(c);
+        CellDataValidationVertNeigh<2, world_dim_>::validate(c, stream);
+        CellDataValidationEdgeNeigh<2, world_dim_>::validate(c, stream);
       }
     };
 
 
     /**
-    * \brief specialisation of class CellDataChecker for cell_dim_ = space_dim_ = 1
+    * \brief specialisation of class CellDataValidation for cell_dim_ = space_dim_ = 1
     *
     * \author Hilmar Wobker
     */
     template<unsigned char world_dim_>
-    class CellDataChecker<1, 1, world_dim_>
+    class CellDataValidation<1, 1, world_dim_>
     {
     private:
     public:
-      static void check_neighbourhood(Cell<1, 1, world_dim_> const * c)
+      /**
+      * \brief validates neighbourhood of 1D cells
+      *
+      * \param[in] c
+      * cell whose neighbourhood is to be validated
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      static void validate_neighbourhood(Cell<1, 1, world_dim_> const * c, std::ostream& stream)
       {
-        CellDataCheckerVertexNeighbours<1, world_dim_>::check(c);
+        CellDataValidationVertNeigh<1, world_dim_>::validate(c, stream);
       }
     };
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BM_CELL_DATA_CHECKER_HPP
+#endif // #define KERNEL_BM_CELL_DATA_VALIDATION_HPP

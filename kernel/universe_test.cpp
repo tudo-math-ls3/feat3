@@ -1,11 +1,11 @@
 // Hilmar's todo list before push to master:
 // code cleanup:
-// - use ErrorHandler in base mesh code
-// - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
 // - completion of doxygen comments (\param, array dimensions, etc.)
 // - add/remove 'const' and other modifiers where necessary
 // - virtual DTORs?
 // - missing output when using MPICH
+// - CONTEXT("...")
+// - test_1d.cpp etc. ersetzen
 
 // Done:
 // - template all classes "above" BaseMesh
@@ -16,9 +16,12 @@
 // - Universe CTOR und DTOR private machen
 // - proper cleanup of resources (deletes, DTORs)
 // - check all the MPI-related valgrind warnings (--> Dom)
+// - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
+// - use ErrorHandler in base mesh code
 
 // includes, system
 #include <iostream>
+#include <cstdlib> // for exit()
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -241,7 +244,7 @@ int main(int argc, char* argv[])
   {
     std::cerr << "Call the program with \"mpirun -np n+5 " << argv[0] << " <relative_path_to_mesh_file> n\", "
               << "where n is the number of base mesh cells." << std::endl;
-    return 1;
+    exit(1);
   }
 
   // init MPI
@@ -263,7 +266,6 @@ int main(int argc, char* argv[])
   unsigned int num_cells;
   num_cells = atoi(argv[2]);
   assert(num_cells > 0);
-//  std::cout << "Number of base mesh cells read from command line: " << num_cells << std::endl;
 
   // The number of processes for the first process group must equal num_cells + 2.
   unsigned int num_processes_in_first_group(num_cells + 2);
@@ -314,8 +316,10 @@ int main(int argc, char* argv[])
 //      s += "DEDICATED ";
 //    }
 //    s += "load balancer with local rank " + StringUtils::stringify(rank_process_group);
-//    s += " in group " + StringUtils::stringify(group_id) + ".";
-//    std::cout << s <<  std::endl;
+//    s += " in group " + StringUtils::stringify(group_id) + ".\n";
+//    process_group->log_indiv_master(s);
+
+    // perform actions depending on the group id
     if(group_id == 0)
     {
       // get name of the mesh file from the command line

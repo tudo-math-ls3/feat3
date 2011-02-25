@@ -11,6 +11,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/item.hpp>
 
 namespace FEAST

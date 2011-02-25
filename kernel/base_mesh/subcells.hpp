@@ -164,19 +164,6 @@ namespace FEAST
       }
 
 
-      /// validates the subcells
-      void validate() const
-      {
-// COMMENT_HILMAR: muss noch angepasst werden
-//        std::cout << "Validating subcells..." << std::endl;
-//        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
-//        {
-//          cell(icell)->validate();
-//        }
-//        std::cout << "...done!" << std::endl;
-      }
-
-
       /**
       * \brief prints this subcells object to the given ostream.
       *
@@ -357,19 +344,6 @@ namespace FEAST
       }
 
 
-      /// validates the subcells
-      void validate() const
-      {
-// COMMENT_HILMAR: muss noch angepasst werden
-//        std::cout << "Validating subcells..." << std::endl;
-//        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
-//        {
-//          cell(icell)->validate();
-//        }
-//        std::cout << "...done!" << std::endl;
-      }
-
-
       /**
       * \brief prints this subcells object to the given ostream.
       *
@@ -546,19 +520,6 @@ namespace FEAST
         {
           _add(subdiv_data->created_faces[i]);
         }
-      }
-
-
-      /// validates the subcells
-      void validate() const
-      {
-// COMMENT_HILMAR: muss noch angepasst werden
-//        std::cout << "Validating subcells..." << std::endl;
-//        for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
-//        {
-//          cell(icell)->validate();
-//        }
-//        std::cout << "...done!" << std::endl;
       }
 
 

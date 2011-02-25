@@ -130,7 +130,8 @@ namespace FEAST
           result += delimiter;
         }
       }
-      result +="\n";
+// COMMENT_HILMAR: Do not add linebreak. The user can do this by himself if he wants.
+//      result +="\n";
       return result;
     }
   }; // class StringUtils

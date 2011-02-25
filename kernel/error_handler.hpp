@@ -83,6 +83,9 @@ Einfach ein statisches String-Array mit error_code = array index?
       pp.add_line_sep();
       pp.add_line_no_right_delim(e.message());
       pp.add_line_sep();
+      pp.add_line("Backtrace:");
+      pp.add_line(e.backtrace("\nEXCEPTION # "));
+      pp.add_line_sep();
       pp.print(Logger::file);
 
       // An exception always leads to program abortion via MPI_Abort(). Its message is written to stderr. If the error

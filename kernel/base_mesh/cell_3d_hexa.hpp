@@ -11,9 +11,10 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
-#include <kernel/base_mesh/cell_data_checker.hpp>
+#include <kernel/base_mesh/cell_data_validation.hpp>
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 #include <kernel/base_mesh/cell_2d_quad.hpp>
 
@@ -126,56 +127,53 @@ namespace FEAST
       */
       inline void _determine_face_numbering()
       {
-        for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+        try
         {
-          // init the array entry
-          _face_numbering[iface] = 42;
-          for(unsigned char ivert(0) ; ivert < face(iface)->num_vertices() ; ++ivert)
+          for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
           {
-            // inquire whether the vertex with index ivert within the face structure is the first vertex of this face
-            // within the hex structure
-            if(face(iface)->vertex(ivert) == vertex(Numbering::hexa_face_vertices[iface][0]))
+            // init the array entry
+            _face_numbering[iface] = 42;
+            for(unsigned char ivert(0) ; ivert < face(iface)->num_vertices() ; ++ivert)
             {
-              // If so then we either have relation ivert or ivert+4. Determine which of the two by comparing the
-              // orientations. Within the face structure, we have to use the corresponding function next_vertex_ccw(..),
-              // while in the hex structure we know that the vertex with index 1 is the ccw-next of vertex with index 0.
-              if(face(iface)->next_vertex_ccw(ivert) == vertex(Numbering::hexa_face_vertices[iface][1]))
+              // inquire whether the vertex with index ivert within the face structure is the first vertex of this face
+              // within the hex structure
+              if(face(iface)->vertex(ivert) == vertex(Numbering::hexa_face_vertices[iface][0]))
               {
-                // same orientation
-                _face_numbering[iface] = ivert;
+                // If so then we either have relation ivert or ivert+4. Determine which of the two by comparing the
+                // orientations. Within the face structure, we have to use the corresponding function
+                // next_vertex_ccw(..), while in the hex structure we know that the vertex with index 1 is the ccw-next
+                // of vertex with index 0.
+                if(face(iface)->next_vertex_ccw(ivert) == vertex(Numbering::hexa_face_vertices[iface][1]))
+                {
+                  // same orientation
+                  _face_numbering[iface] = ivert;
+                }
+                else if(face(iface)->previous_vertex_ccw(ivert) == vertex(Numbering::hexa_face_vertices[iface][1]))
+                {
+                  // opposite orientation
+                  _face_numbering[iface] = ivert+4;
+                }
+                else
+                {
+                  throw InternalError("Something is wrong with the numbering of the "
+                                      + StringUtils::stringify((int)iface) + "-th face with index "
+                                      + face(iface)->print_index() + " in hexa " + this->print_index() + ".");
+                }
               }
-              else if(face(iface)->previous_vertex_ccw(ivert) == vertex(Numbering::hexa_face_vertices[iface][1]))
-              {
-                // opposite orientation
-                _face_numbering[iface] = ivert+4;
-              }
-              else
-              {
-                std::cerr << "Something is wrong with the numbering of the "<< (int)iface << "-th face with index ";
-                face(iface)->print_index(std::cerr);
-                std::cerr << " in hexa ";
-                this->print_index(std::cerr);
-                std::cerr << "." << std::endl;
-                exit(1);
-              }
-            }
-          } // for(unsigned char ivert(0) ; ivert < face(iface)->num_vertices() ; ++ivert)
+            } // for(unsigned char ivert(0) ; ivert < face(iface)->num_vertices() ; ++ivert)
 
-          if (_face_numbering[iface] == 42)
-          {
-            std::cerr << "Vertex ";
-            vertex(Numbering::hexa_face_vertices[iface][0])->print_index(std::cerr);
-            std::cerr << " not found in "<< (int)iface << "-th face with index ";
-            face(iface)->print_index(std::cerr);
-            std::cerr << " in hexa ";
-            this->print_index(std::cerr);
-            std::cerr << "." << std::endl;
-            exit(1);
-          }
-          //std::cout << "face " << (int)iface << "(";
-          //face(iface)->print_index(std::cout);
-          //std::cout << "), numb " << (int)_face_numbering[iface] << std::endl;
-        } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+            if (_face_numbering[iface] == 42)
+            {
+              throw InternalError("Vertex " + vertex(Numbering::hexa_face_vertices[iface][0])->print_index()
+                                  + " not found in " + StringUtils::stringify((int)iface) + "-th face with index "
+                                  + face(iface)->print_index() + " in hexa " + this->print_index() + ".");
+            }
+          } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+        }
+        catch(Exception& e)
+        {
+          ErrorHandler::exception_occured(e);
+        }
       }
 
 
@@ -291,418 +289,431 @@ namespace FEAST
       */
       inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
-        // assure that this cell has not been divided yet
-        if(!this->active())
+        try
         {
-          std::cerr << "Hexa ";
-          this->print_index(std::cerr);
-          std::cerr << " is already subdivided! Aborting program." << std::endl;
-          exit(1);
+          // assure that this cell has not been divided yet
+          if(!this->active())
+          {
+            throw InternalError("Hexa " + this->print_index() + " is already subdivided!");
+          }
+
+          this->set_subdiv_data(subdiv_data);
+
+          // clear all vectors of created entities in the SubdivisionData object
+          this->subdiv_data()->clear_created();
+
+          if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
+          {
+            // Perform a nonconform subdivision without changing the cell type (1 hexa --> 8 hexas).
+
+            /**
+            * \brief vertices that this action creates and/or reuses (12 + 6 + 1)
+            *
+            * numbering scheme: new vertices
+            *   - on existing edges: new_vertex_index = old_edge_index (positions 0-11 in array new_vertices[])
+            *   - in face centres: new_vertex_index = 12 + old_face_index (positions 12-17)
+            *   - in centre of the hexa: new_vertex_index = greatest new index (position 18)
+            */
+            Vertex_* new_vertices[19];
+
+            /**
+            * \brief edges that this action creates and/or reuses (12*2 + 6*4 + 6)
+            *
+            * numbering scheme: new edges
+            *   - children of existing edges: new_edge_index = 2*(old_edge_index) + {0,1}
+            *     (corresponding to edge vertex index within the hex numbering) (positions 0 - 23 in array new_edges[])
+            *   - on faces: new_edge_index = 24 + 4*old_face_index + {0,1,2,3}
+            *     (corresponding to face edge index within the hex numbering) (positions 24 - 47)
+            *   - towards centre of the hexa: new_edge_index = 48 + old_face_index (positions 48-53)
+            */
+            Cell_1D_* new_edges[54];
+
+            /**
+            * \brief faces that this action creates and/or reuses (4*6 + 12)
+            *
+            * numbering scheme: new faces
+            *   - children of existing faces: new_face_index = 4*(old_face_index) + {0,1,2,3}
+            *     (corresponding to face vertex index within the hex numbering) (positions 0 - 23 in array new_faces[])
+            *   - in the interior: new_face_index = 24 + old_edge_index (positions 24 - 35)
+            *     (each new interior face bisects one old edge)
+            */
+            Cell_2D_* new_faces[36];
+
+            // numbering of 8 new hexas: new_hexa_index = old_vertex_index
+            // (each new hexa can be associated with one vertex of the old hexa)
+
+            // loop over all faces and split them eventually, creating new vertices, edges and faces on the way
+            for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+            {
+              // if edge has no children, create them
+              if (face(iface)->active())
+              {
+
+                // subdivide face
+                SubdivisionData<2, space_dim_, world_dim_>* subdiv_data
+                  = new SubdivisionData<2, space_dim_, world_dim_>(NONCONFORM_SAME_TYPE);
+                face(iface)->subdivide(subdiv_data);
+
+                // add the created vertices, edges and faces to the vector of created vertices/edges/faces
+                for(unsigned int i(0) ; i < face(iface)->subdiv_data()->created_vertices.size() ; ++i)
+                {
+                  this->subdiv_data()->created_vertices.push_back(face(iface)->subdiv_data()->created_vertices[i]);
+                }
+
+                for(unsigned int i(0) ; i < face(iface)->subdiv_data()->created_edges.size() ; ++i)
+                {
+                  this->subdiv_data()->created_edges.push_back(face(iface)->subdiv_data()->created_edges[i]);
+                }
+
+                for(unsigned int i(0) ; i < face(iface)->subdiv_data()->created_cells.size() ; ++i)
+                {
+                  this->subdiv_data()->created_faces.push_back(face(iface)->subdiv_data()->created_cells[i]);
+                }
+                // debug output
+                Logger::log("Face " + StringUtils::stringify((int)iface) + ":"
+                            + StringUtils::stringify(face(iface)->subdiv_data()->created_vertices.size())
+                            + " vertices, " + StringUtils::stringify(face(iface)->subdiv_data()->created_edges.size())
+                            + " edges, " + StringUtils::stringify(face(iface)->subdiv_data()->created_cells.size())
+                            + " faces created.\n");
+              }
+            } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
+
+
+            // add vertices lying in the centres of the old edges to the array of new vertices (indices 0-11)
+            // (they have already been pushed to the subdivision data structure)
+            for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+            {
+              // exploit that the vertex shared by the edge children is stored as second vertex within the structure of
+              // both edge children
+              new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
+            }
+
+            // add vertices lying in the centres of the faces to the array of new vertices (indices 12-17)
+            // (they have already been pushed to the subdivision data structure)
+            for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
+            {
+              // exploit that the centre vertex of the face has index i in child i (no matter if it has been
+              // created in this subdivision step or already by the neighbour hex) (see quad subdivision routine)
+              new_vertices[12 + iface] = face(iface)->child(0)->vertex(0);
+            }
+
+            // create the centre vertex of the hexa
+  // COMMENT_HILMAR: For the time being simply compute the centre vertex of the hexa as average of the eight corner
+  // vertices until we find out, what is the best way of computing this point correctly.
+            double p[world_dim_];
+            for(unsigned char i(0) ; i < world_dim_ ; ++i)
+            {
+              p[i] = 0;
+              for(int j(0) ; j < num_vertices()-1 ; ++j)
+              {
+                p[i] += vertex(j)->coord(i);
+              }
+              p[i] /= num_vertices();
+            }
+            new_vertices[18] = new Vertex<world_dim_>(p);
+            this->subdiv_data()->created_vertices.push_back(new_vertices[18]);
+
+            // add edges being children of the old edges to the array of new edges (indices 0-23)
+            // (they have already been pushed to the subdivision data structure)
+            for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
+            {
+              // inquire whether the internal edge orientation equals its orientation within the hexa
+              if (_edge_has_correct_orientation(iedge))
+              {
+                new_edges[2*iedge] = edge(iedge)->child(0);
+                new_edges[2*iedge+1] = edge(iedge)->child(1);
+              }
+              else
+              {
+                new_edges[2*iedge] = edge(iedge)->child(1);
+                new_edges[2*iedge+1] = edge(iedge)->child(0);
+              }
+            }
+
+            // add edges lying in the interior of the faces to the array of new edges (indices 24-47)
+            // (they have already been pushed to the subdivision data structure)
+            for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
+            {
+              assert(face(iface)->num_children() == 4);
+              for (unsigned char iedge(0) ; iedge < 4 ; ++iedge)
+              {
+                // Exploit that the edge from edge iedge of the parent face towards the centre vertex of the subdivided
+                // face has index iedge in the two children adjacent to this edge (see quad subdivision routine).
+                //
+                // Example (see figure): The interior edge marked by "xx", which is connected to parent edge pe3, can be
+                // accessed as local edge e3 of child c1 (v1 being the start vertex of pe3) or of child e3 (v3 being the
+                // end vertex of edge pe3).
+                // v2           pe1          v3
+                //     ---------------------
+                //     |   e3    |   e2    |
+                //     |         |         |
+                //     |e0 c2  e1|e1 c3  e0|
+                //     |         |         |
+                //     |   e2    |   e3    |
+                // pe2 ----------|-----xx--- pe3
+                //     |   e2    |   e3    |
+                //     |         |         |
+                //     |e1 c0  e0|e0 c1  e1|
+                //     |         |         |
+                //     |   e3    |   e2    |
+                //     ---------------------
+                // v0           pe0          v1
+
+                // The face numbering has to be mapped to the local face structure via the array
+                // Numbering::quad_to_quad_mappings_edges[][]. So, how to get the correct edge?
+                // First, get the index of the current edge within the face structure
+                unsigned char iedge_in_face = Numbering::quad_to_quad_mappings_edges[_face_numbering[iface]][iedge];
+                // Then, get the index of the start vertex of this edge within the face structure (one could also take
+                // the end vertex). This index is also the index of the child which we use to get the desired edge.
+                unsigned char ivert_start = Numbering::quad_edge_vertices[iedge_in_face][0];
+                // Now, the desired edge is the iedge_in_face-th edge of the ivert_start-th child of the quad.
+                new_edges[24 + 4*iface + iedge] = face(iface)->child(ivert_start)->edge(iedge_in_face);
+              }
+            }
+
+            // create edges from face centres to centre vertex of the hexa, add them to the array of new edges
+            // (indices 48-53) and to the subdivision data structure
+            for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
+            {
+              new_edges[48 + iface] = new Edge_(new_vertices[12 + iface], new_vertices[18], 0);
+              this->subdiv_data()->created_edges.push_back(new_edges[48 + iface]);
+            }
+
+            // add children of faces of the parent hexa to the array of new faces (indices 0-23)
+            // (they have already been pushed to the subdivision data structure)
+            for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
+            {
+              assert(face(iface)->num_children() == 4);
+              for (unsigned char ivert(0) ; ivert < 4 ; ++ivert)
+              {
+                new_faces[4*iface + ivert]
+                  = face(iface)->child(Numbering::quad_to_quad_mappings_vertices[_face_numbering[iface]][ivert]);
+
+              }
+            }
+
+            // create interior faces, add them to the array of new faces (indices 24-35) and to the subdivision data
+            // structure (each new interior face can be associated with one edge of the parent hexa)
+            // building rules:
+            //   a) interior face in new_faces[24 + iedge] is associated with edge iedge of the parent hexa,
+            //   b) interior numbering of the faces analogue to that of quad subdivision (as if the four quads building
+            //      one "slice" were children of a non-existing parent quad)
+
+            // four quads building the "slice" between the left and right face of the parent hexa
+            new_faces[24] = new Quad_(new_vertices[18], new_vertices[12], new_vertices[14], new_vertices[0],
+                                      new_edges[48], new_edges[32], new_edges[50], new_edges[24], 0);
+            new_faces[25] = new Quad_(new_vertices[12], new_vertices[18], new_vertices[1], new_vertices[15],
+                                      new_edges[48], new_edges[36], new_edges[25], new_edges[51], 0);
+            new_faces[26] = new Quad_(new_vertices[14], new_vertices[2], new_vertices[18], new_vertices[13],
+                                      new_edges[33], new_edges[49], new_edges[50], new_edges[28], 0);
+            new_faces[27] = new Quad_(new_vertices[3], new_vertices[15], new_vertices[13], new_vertices[18],
+                                      new_edges[37], new_edges[49], new_edges[29], new_edges[51], 0);
+            // four quads building the "slice" between the front and back face of the parent hexa
+            new_faces[28] = new Quad_(new_vertices[18], new_vertices[12], new_vertices[16], new_vertices[4],
+                                      new_edges[48], new_edges[40], new_edges[52], new_edges[26], 0);
+            new_faces[29] = new Quad_(new_vertices[12], new_vertices[18], new_vertices[5], new_vertices[17],
+                                      new_edges[48], new_edges[44], new_edges[27], new_edges[53], 0);
+            new_faces[30] = new Quad_(new_vertices[16], new_vertices[6], new_vertices[18], new_vertices[13],
+                                      new_edges[41], new_edges[49], new_edges[52], new_edges[30], 0);
+            new_faces[31] = new Quad_(new_vertices[7], new_vertices[17], new_vertices[13], new_vertices[18],
+                                      new_edges[45], new_edges[49], new_edges[31], new_edges[53], 0);
+            // four quads building the "slice" between the bottom and top face of the parent hexa
+            new_faces[32] = new Quad_(new_vertices[18], new_vertices[14], new_vertices[16], new_vertices[8],
+                                      new_edges[50], new_edges[42], new_edges[52], new_edges[34], 0);
+            new_faces[33] = new Quad_(new_vertices[14], new_vertices[18], new_vertices[9], new_vertices[17],
+                                      new_edges[50], new_edges[46], new_edges[35], new_edges[53], 0);
+            new_faces[34] = new Quad_(new_vertices[16], new_vertices[10], new_vertices[18], new_vertices[15],
+                                      new_edges[43], new_edges[51], new_edges[52], new_edges[38], 0);
+            new_faces[35] = new Quad_(new_vertices[11], new_vertices[17], new_vertices[15], new_vertices[18],
+                                      new_edges[47], new_edges[51], new_edges[39], new_edges[53], 0);
+            for (unsigned char i(24) ; i < 24 + num_edges() ; ++i)
+            {
+              this->subdiv_data()->created_faces.push_back(new_faces[i]);
+            }
+
+            // set number of children to 8
+            this->_set_num_children(8);
+
+            // finally, create and add new hexas
+            // building rules:
+            //   - vertex i of the parent hexa is vertex 0 of the i-th child hexa
+            //   - new_faces[i] is face 0 in i-th child hexa.
+            //   - edge 0 of each child lies either on face 2 (front) or face 3 (back) of the parent hexa
+            //  ==> face 0 of each child lies either on face 0 (bottom) or face 1 (top) of the parent hexa
+            //  ==> faces 0/2/4 of each child lie on the boundary of the parent hexa (i.e. are children of parent hexa
+            //      faces), faces 1/3/5 are interior faces
+            //  ==> face 1 of child i is face 1 of child i+4, i=0,1,2,3 (between top and bottom children)
+            //  ==> face 3 of child i is face 3 of child i+2, i=0,1,4,5 (between front and back children)
+            //  ==> face 5 of child i is face 5 of child i+1, i=0,2,4,6 (between left and right children)
+
+            // child 0 (front, bottom, left)
+            _set_child(0, new Hexa(vertex(0), new_vertices[0], new_vertices[4], new_vertices[12],
+                                   new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
+                                   new_edges[0], new_edges[26], new_edges[34], new_edges[52],
+                                   new_edges[8], new_edges[24], new_edges[42], new_edges[50],
+                                   new_edges[16], new_edges[32], new_edges[40], new_edges[48],
+                                   new_faces[0], new_faces[32], new_faces[8],
+                                   new_faces[28], new_faces[16], new_faces[24],
+                                   this->refinement_level()+1));
+            // child 1 (front, bottom, right)
+            _set_child(1, new Hexa(vertex(1), new_vertices[0], new_vertices[5], new_vertices[12],
+                                   new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
+                                   new_edges[1], new_edges[27], new_edges[35], new_edges[53],
+                                   new_edges[10], new_edges[24], new_edges[46], new_edges[50],
+                                   new_edges[18], new_edges[32], new_edges[44], new_edges[48],
+                                   new_faces[1], new_faces[33], new_faces[9],
+                                   new_faces[29], new_faces[20], new_faces[24],
+                                   this->refinement_level()+1));
+            // child 2 (back, bottom, left)
+            _set_child(2, new Hexa(vertex(2), new_vertices[1], new_vertices[4], new_vertices[12],
+                                   new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
+                                   new_edges[2], new_edges[26], new_edges[38], new_edges[52],
+                                   new_edges[9], new_edges[25], new_edges[43], new_edges[51],
+                                   new_edges[20], new_edges[36], new_edges[40], new_edges[48],
+                                   new_faces[2], new_faces[34], new_faces[12],
+                                   new_faces[28], new_faces[17], new_faces[25],
+                                   this->refinement_level()+1));
+            // child 3 (back, bottom, right)
+            _set_child(3, new Hexa(vertex(3), new_vertices[1], new_vertices[5], new_vertices[12],
+                                   new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
+                                   new_edges[3], new_edges[27], new_edges[39], new_edges[53],
+                                   new_edges[11], new_edges[25], new_edges[47], new_edges[51],
+                                   new_edges[22], new_edges[36], new_edges[44], new_edges[48],
+                                   new_faces[3], new_faces[35], new_faces[13],
+                                   new_faces[29], new_faces[21], new_faces[25],
+                                   this->refinement_level()+1));
+            // child 4 (front, top, left)
+            _set_child(4, new Hexa(vertex(4), new_vertices[2], new_vertices[6], new_vertices[13],
+                                   new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
+                                   new_edges[4], new_edges[30], new_edges[34], new_edges[52],
+                                   new_edges[12], new_edges[28], new_edges[42], new_edges[50],
+                                   new_edges[17], new_edges[33], new_edges[41], new_edges[49],
+                                   new_faces[4], new_faces[32], new_faces[10],
+                                   new_faces[30], new_faces[18], new_faces[26],
+                                   this->refinement_level()+1));
+            // child 5 (front, top, right)
+            _set_child(5, new Hexa(vertex(5), new_vertices[2], new_vertices[7], new_vertices[13],
+                                   new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
+                                   new_edges[5], new_edges[31], new_edges[35], new_edges[53],
+                                   new_edges[14], new_edges[28], new_edges[46], new_edges[50],
+                                   new_edges[19], new_edges[33], new_edges[45], new_edges[49],
+                                   new_faces[5], new_faces[33], new_faces[11],
+                                   new_faces[31], new_faces[22], new_faces[26],
+                                   this->refinement_level()+1));
+            // child 6 (back, top, left)
+            _set_child(6, new Hexa(vertex(6), new_vertices[3], new_vertices[6], new_vertices[13],
+                                   new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
+                                   new_edges[6], new_edges[30], new_edges[38], new_edges[52],
+                                   new_edges[13], new_edges[29], new_edges[43], new_edges[51],
+                                   new_edges[21], new_edges[37], new_edges[41], new_edges[49],
+                                   new_faces[6], new_faces[34], new_faces[14],
+                                   new_faces[30], new_faces[19], new_faces[27],
+                                   this->refinement_level()+1));
+            // child 7 (back, top, right)
+            _set_child(7, new Hexa(vertex(7), new_vertices[3], new_vertices[7], new_vertices[13],
+                                   new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
+                                   new_edges[7], new_edges[31], new_edges[39], new_edges[53],
+                                   new_edges[15], new_edges[29], new_edges[47], new_edges[51],
+                                   new_edges[23], new_edges[37], new_edges[45], new_edges[49],
+                                   new_faces[7], new_faces[35], new_faces[15],
+                                   new_faces[31], new_faces[23], new_faces[27],
+                                   this->refinement_level()+1));
+
+            // add the hexas to the vector of new created cells
+            for (unsigned char i(0) ; i < this->num_children() ; ++i)
+            {
+              this->child(i)->set_parent(this);
+              this->subdiv_data()->created_cells.push_back(this->child(i));
+            }
+
+            // set internal neighbourhood (external neighbourhood is set outside this function)
+            // (in case space_dim_ > 3, an empty dummy function is called; see CellData)
+            // face neighbours
+            this->child(0)->add_neighbour(SDIM_FACE, 1, this->child(4));
+            this->child(0)->add_neighbour(SDIM_FACE, 3, this->child(2));
+            this->child(0)->add_neighbour(SDIM_FACE, 5, this->child(1));
+            this->child(1)->add_neighbour(SDIM_FACE, 1, this->child(5));
+            this->child(1)->add_neighbour(SDIM_FACE, 3, this->child(3));
+            this->child(1)->add_neighbour(SDIM_FACE, 5, this->child(0));
+            this->child(2)->add_neighbour(SDIM_FACE, 1, this->child(6));
+            this->child(2)->add_neighbour(SDIM_FACE, 3, this->child(0));
+            this->child(2)->add_neighbour(SDIM_FACE, 5, this->child(3));
+            this->child(3)->add_neighbour(SDIM_FACE, 1, this->child(7));
+            this->child(3)->add_neighbour(SDIM_FACE, 3, this->child(1));
+            this->child(3)->add_neighbour(SDIM_FACE, 5, this->child(2));
+            this->child(4)->add_neighbour(SDIM_FACE, 1, this->child(0));
+            this->child(4)->add_neighbour(SDIM_FACE, 3, this->child(6));
+            this->child(4)->add_neighbour(SDIM_FACE, 5, this->child(5));
+            this->child(5)->add_neighbour(SDIM_FACE, 1, this->child(1));
+            this->child(5)->add_neighbour(SDIM_FACE, 3, this->child(7));
+            this->child(5)->add_neighbour(SDIM_FACE, 5, this->child(4));
+            this->child(6)->add_neighbour(SDIM_FACE, 1, this->child(2));
+            this->child(6)->add_neighbour(SDIM_FACE, 3, this->child(4));
+            this->child(6)->add_neighbour(SDIM_FACE, 5, this->child(7));
+            this->child(7)->add_neighbour(SDIM_FACE, 1, this->child(3));
+            this->child(7)->add_neighbour(SDIM_FACE, 3, this->child(5));
+            this->child(7)->add_neighbour(SDIM_FACE, 5, this->child(6));
+            // edge neighbours
+            this->child(0)->add_neighbour(SDIM_EDGE, 3, this->child(6));
+            this->child(0)->add_neighbour(SDIM_EDGE, 7, this->child(5));
+            this->child(0)->add_neighbour(SDIM_EDGE, 11, this->child(3));
+            this->child(1)->add_neighbour(SDIM_EDGE, 3, this->child(7));
+            this->child(1)->add_neighbour(SDIM_EDGE, 7, this->child(4));
+            this->child(1)->add_neighbour(SDIM_EDGE, 11, this->child(2));
+            this->child(2)->add_neighbour(SDIM_EDGE, 3, this->child(4));
+            this->child(2)->add_neighbour(SDIM_EDGE, 7, this->child(7));
+            this->child(2)->add_neighbour(SDIM_EDGE, 11, this->child(1));
+            this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(5));
+            this->child(3)->add_neighbour(SDIM_EDGE, 7, this->child(6));
+            this->child(3)->add_neighbour(SDIM_EDGE, 11, this->child(0));
+            this->child(4)->add_neighbour(SDIM_EDGE, 3, this->child(2));
+            this->child(4)->add_neighbour(SDIM_EDGE, 7, this->child(1));
+            this->child(4)->add_neighbour(SDIM_EDGE, 11, this->child(7));
+            this->child(5)->add_neighbour(SDIM_EDGE, 3, this->child(3));
+            this->child(5)->add_neighbour(SDIM_EDGE, 7, this->child(0));
+            this->child(5)->add_neighbour(SDIM_EDGE, 11, this->child(6));
+            this->child(6)->add_neighbour(SDIM_EDGE, 3, this->child(0));
+            this->child(6)->add_neighbour(SDIM_EDGE, 7, this->child(3));
+            this->child(6)->add_neighbour(SDIM_EDGE, 11, this->child(5));
+            this->child(7)->add_neighbour(SDIM_EDGE, 3, this->child(1));
+            this->child(7)->add_neighbour(SDIM_EDGE, 7, this->child(2));
+            this->child(7)->add_neighbour(SDIM_EDGE, 11, this->child(4));
+            // vertex neighbours
+            this->child(0)->add_neighbour(SDIM_VERTEX, 7, this->child(7));
+            this->child(1)->add_neighbour(SDIM_VERTEX, 7, this->child(6));
+            this->child(2)->add_neighbour(SDIM_VERTEX, 7, this->child(5));
+            this->child(3)->add_neighbour(SDIM_VERTEX, 7, this->child(4));
+            this->child(4)->add_neighbour(SDIM_VERTEX, 7, this->child(3));
+            this->child(5)->add_neighbour(SDIM_VERTEX, 7, this->child(2));
+            this->child(6)->add_neighbour(SDIM_VERTEX, 7, this->child(1));
+            this->child(7)->add_neighbour(SDIM_VERTEX, 7, this->child(0));
+          }
+          else
+          {
+            throw InternalError("Wrong type of subdivision in hexa " + this->print_index()
+                                + ". Currently, only subdivision NONCONFORM_SAME_TYPE is supported.");
+          }
         }
-
-        this->set_subdiv_data(subdiv_data);
-
-        // clear all vectors of created entities in the SubdivisionData object
-        this->subdiv_data()->clear_created();
-
-        if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
+        catch(Exception& e)
         {
-          // Perform a nonconform subdivision without changing the cell type (1 hexa --> 8 hexas).
-
-          /**
-          * \brief vertices that this action creates and/or reuses (12 + 6 + 1)
-          *
-          * numbering scheme: new vertices
-          *   - on existing edges: new_vertex_index = old_edge_index (positions 0-11 in array new_vertices[])
-          *   - in face centres: new_vertex_index = 12 + old_face_index (positions 12-17)
-          *   - in centre of the hexa: new_vertex_index = greatest new index (position 18)
-          */
-          Vertex_* new_vertices[19];
-
-          /**
-          * \brief edges that this action creates and/or reuses (12*2 + 6*4 + 6)
-          *
-          * numbering scheme: new edges
-          *   - children of existing edges: new_edge_index = 2*(old_edge_index) + {0,1}
-          *     (corresponding to edge vertex index within the hex numbering) (positions 0 - 23 in array new_edges[])
-          *   - on faces: new_edge_index = 24 + 4*old_face_index + {0,1,2,3}
-          *     (corresponding to face edge index within the hex numbering) (positions 24 - 47)
-          *   - towards centre of the hexa: new_edge_index = 48 + old_face_index (positions 48-53)
-          */
-          Cell_1D_* new_edges[54];
-
-          /**
-          * \brief faces that this action creates and/or reuses (4*6 + 12)
-          *
-          * numbering scheme: new faces
-          *   - children of existing faces: new_face_index = 4*(old_face_index) + {0,1,2,3}
-          *     (corresponding to face vertex index within the hex numbering) (positions 0 - 23 in array new_faces[])
-          *   - in the interior: new_face_index = 24 + old_edge_index (positions 24 - 35)
-          *     (each new interior face bisects one old edge)
-          */
-          Cell_2D_* new_faces[36];
-
-          // numbering of 8 new hexas: new_hexa_index = old_vertex_index
-          // (each new hexa can be associated with one vertex of the old hexa)
-
-          // loop over all faces and split them eventually, creating new vertices, edges and faces on the way
-          for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
-          {
-            // if edge has no children, create them
-            if (face(iface)->active())
-            {
-
-              // subdivide face
-              SubdivisionData<2, space_dim_, world_dim_>* subdiv_data
-                = new SubdivisionData<2, space_dim_, world_dim_>(NONCONFORM_SAME_TYPE);
-              face(iface)->subdivide(subdiv_data);
-
-              // add the created vertices, edges and faces to the vector of created vertices/edges/faces
-              for(unsigned int i(0) ; i < face(iface)->subdiv_data()->created_vertices.size() ; ++i)
-              {
-                this->subdiv_data()->created_vertices.push_back(face(iface)->subdiv_data()->created_vertices[i]);
-              }
-
-              for(unsigned int i(0) ; i < face(iface)->subdiv_data()->created_edges.size() ; ++i)
-              {
-                this->subdiv_data()->created_edges.push_back(face(iface)->subdiv_data()->created_edges[i]);
-              }
-
-              for(unsigned int i(0) ; i < face(iface)->subdiv_data()->created_cells.size() ; ++i)
-              {
-                this->subdiv_data()->created_faces.push_back(face(iface)->subdiv_data()->created_cells[i]);
-              }
-// debug output
-std::cout << "face " << (int)iface << ":" << std::endl;
-std::cout << face(iface)->subdiv_data()->created_vertices.size() << " vertices";
-std::cout << ", " << face(iface)->subdiv_data()->created_edges.size() << " edges";
-std::cout << ", " << face(iface)->subdiv_data()->created_cells.size() << " faces created." << std::endl;
-            }
-          } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
-
-
-          // add vertices lying in the centres of the old edges to the array of new vertices (indices 0-11)
-          // (they have already been pushed to the subdivision data structure)
-          for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
-          {
-            // exploit that the vertex shared by the edge children is stored as second vertex within the structure of
-            // both edge children
-            new_vertices[iedge] = edge(iedge)->child(0)->vertex(1);
-          }
-
-          // add vertices lying in the centres of the faces to the array of new vertices (indices 12-17)
-          // (they have already been pushed to the subdivision data structure)
-          for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
-          {
-            // exploit that the centre vertex of the face has index i in child i (no matter if it has been
-            // created in this subdivision step or already by the neighbour hex) (see quad subdivision routine)
-            new_vertices[12 + iface] = face(iface)->child(0)->vertex(0);
-          }
-
-          // create the centre vertex of the hexa
-// COMMENT_HILMAR: For the time being simply compute the centre vertex of the hexa as average of the eight corner
-// vertices until we find out, what is the best way of computing this point correctly.
-          double p[world_dim_];
-          for(unsigned char i(0) ; i < world_dim_ ; ++i)
-          {
-            p[i] = 0;
-            for(int j(0) ; j < num_vertices()-1 ; ++j)
-            {
-              p[i] += vertex(j)->coord(i);
-            }
-            p[i] /= num_vertices();
-          }
-          new_vertices[18] = new Vertex<world_dim_>(p);
-          this->subdiv_data()->created_vertices.push_back(new_vertices[18]);
-
-          // add edges being children of the old edges to the array of new edges (indices 0-23)
-          // (they have already been pushed to the subdivision data structure)
-          for (unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
-          {
-            // inquire whether the internal edge orientation equals its orientation within the hexa
-            if (_edge_has_correct_orientation(iedge))
-            {
-              new_edges[2*iedge] = edge(iedge)->child(0);
-              new_edges[2*iedge+1] = edge(iedge)->child(1);
-            }
-            else
-            {
-              new_edges[2*iedge] = edge(iedge)->child(1);
-              new_edges[2*iedge+1] = edge(iedge)->child(0);
-            }
-          }
-
-          // add edges lying in the interior of the faces to the array of new edges (indices 24-47)
-          // (they have already been pushed to the subdivision data structure)
-          for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
-          {
-            assert(face(iface)->num_children() == 4);
-            for (unsigned char iedge(0) ; iedge < 4 ; ++iedge)
-            {
-              // Exploit that the edge from edge iedge of the parent face towards the centre vertex of the subdivided
-              // face has index iedge in the two children adjacent to this edge (see quad subdivision routine).
-              //
-              // Example (see figure): The interior edge marked by "xx", which is connected to parent edge pe3, can be
-              // accessed as local edge e3 of child c1 (v1 being the start vertex of pe3) or of child e3 (v3 being the
-              // end vertex of edge pe3).
-              // v2           pe1          v3
-              //     ---------------------
-              //     |   e3    |   e2    |
-              //     |         |         |
-              //     |e0 c2  e1|e1 c3  e0|
-              //     |         |         |
-              //     |   e2    |   e3    |
-              // pe2 ----------|-----xx--- pe3
-              //     |   e2    |   e3    |
-              //     |         |         |
-              //     |e1 c0  e0|e0 c1  e1|
-              //     |         |         |
-              //     |   e3    |   e2    |
-              //     ---------------------
-              // v0           pe0          v1
-
-              // The face numbering has to be mapped to the local face structure via the array
-              // Numbering::quad_to_quad_mappings_edges[][]. So, how to get the correct edge?
-              // First, get the index of the current edge within the face structure
-              unsigned char iedge_in_face = Numbering::quad_to_quad_mappings_edges[_face_numbering[iface]][iedge];
-              // Then, get the index of the start vertex of this edge within the face structure (one could also take
-              // the end vertex). This index is also the index of the child which we use to get the desired edge.
-              unsigned char ivert_start = Numbering::quad_edge_vertices[iedge_in_face][0];
-              // Now, the desired edge is the iedge_in_face-th edge of the ivert_start-th child of the quad.
-              new_edges[24 + 4*iface + iedge] = face(iface)->child(ivert_start)->edge(iedge_in_face);
-            }
-          }
-
-          // create edges from face centres to centre vertex of the hexa, add them to the array of new edges
-          // (indices 48-53) and to the subdivision data structure
-          for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
-          {
-            new_edges[48 + iface] = new Edge_(new_vertices[12 + iface], new_vertices[18], 0);
-            this->subdiv_data()->created_edges.push_back(new_edges[48 + iface]);
-          }
-
-          // add children of faces of the parent hexa to the array of new faces (indices 0-23)
-          // (they have already been pushed to the subdivision data structure)
-          for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
-          {
-            assert(face(iface)->num_children() == 4);
-            for (unsigned char ivert(0) ; ivert < 4 ; ++ivert)
-            {
-              new_faces[4*iface + ivert]
-                = face(iface)->child(Numbering::quad_to_quad_mappings_vertices[_face_numbering[iface]][ivert]);
-
-            }
-          }
-
-          // create interior faces, add them to the array of new faces (indices 24-35) and to the subdivision data
-          // structure (each new interior face can be associated with one edge of the parent hexa)
-          // building rules:
-          //   a) interior face in new_faces[24 + iedge] is associated with edge iedge of the parent hexa,
-          //   b) interior numbering of the faces analogue to that of quad subdivision (as if the four quads building
-          //      one "slice" were children of a non-existing parent quad)
-
-          // four quads building the "slice" between the left and right face of the parent hexa
-          new_faces[24] = new Quad_(new_vertices[18], new_vertices[12], new_vertices[14], new_vertices[0],
-                                    new_edges[48], new_edges[32], new_edges[50], new_edges[24], 0);
-          new_faces[25] = new Quad_(new_vertices[12], new_vertices[18], new_vertices[1], new_vertices[15],
-                                    new_edges[48], new_edges[36], new_edges[25], new_edges[51], 0);
-          new_faces[26] = new Quad_(new_vertices[14], new_vertices[2], new_vertices[18], new_vertices[13],
-                                    new_edges[33], new_edges[49], new_edges[50], new_edges[28], 0);
-          new_faces[27] = new Quad_(new_vertices[3], new_vertices[15], new_vertices[13], new_vertices[18],
-                                    new_edges[37], new_edges[49], new_edges[29], new_edges[51], 0);
-          // four quads building the "slice" between the front and back face of the parent hexa
-          new_faces[28] = new Quad_(new_vertices[18], new_vertices[12], new_vertices[16], new_vertices[4],
-                                    new_edges[48], new_edges[40], new_edges[52], new_edges[26], 0);
-          new_faces[29] = new Quad_(new_vertices[12], new_vertices[18], new_vertices[5], new_vertices[17],
-                                    new_edges[48], new_edges[44], new_edges[27], new_edges[53], 0);
-          new_faces[30] = new Quad_(new_vertices[16], new_vertices[6], new_vertices[18], new_vertices[13],
-                                    new_edges[41], new_edges[49], new_edges[52], new_edges[30], 0);
-          new_faces[31] = new Quad_(new_vertices[7], new_vertices[17], new_vertices[13], new_vertices[18],
-                                    new_edges[45], new_edges[49], new_edges[31], new_edges[53], 0);
-          // four quads building the "slice" between the bottom and top face of the parent hexa
-          new_faces[32] = new Quad_(new_vertices[18], new_vertices[14], new_vertices[16], new_vertices[8],
-                                    new_edges[50], new_edges[42], new_edges[52], new_edges[34], 0);
-          new_faces[33] = new Quad_(new_vertices[14], new_vertices[18], new_vertices[9], new_vertices[17],
-                                    new_edges[50], new_edges[46], new_edges[35], new_edges[53], 0);
-          new_faces[34] = new Quad_(new_vertices[16], new_vertices[10], new_vertices[18], new_vertices[15],
-                                    new_edges[43], new_edges[51], new_edges[52], new_edges[38], 0);
-          new_faces[35] = new Quad_(new_vertices[11], new_vertices[17], new_vertices[15], new_vertices[18],
-                                    new_edges[47], new_edges[51], new_edges[39], new_edges[53], 0);
-          for (unsigned char i(24) ; i < 24 + num_edges() ; ++i)
-          {
-            this->subdiv_data()->created_faces.push_back(new_faces[i]);
-          }
-
-          // set number of children to 8
-          this->_set_num_children(8);
-
-          // finally, create and add new hexas
-          // building rules:
-          //   - vertex i of the parent hexa is vertex 0 of the i-th child hexa
-          //   - new_faces[i] is face 0 in i-th child hexa.
-          //   - edge 0 of each child lies either on face 2 (front) or face 3 (back) of the parent hexa
-          //  ==> face 0 of each child lies either on face 0 (bottom) or face 1 (top) of the parent hexa
-          //  ==> faces 0/2/4 of each child lie on the boundary of the parent hexa (i.e. are children of parent hexa
-          //      faces), faces 1/3/5 are interior faces
-          //  ==> face 1 of child i is face 1 of child i+4, i=0,1,2,3 (between top and bottom children)
-          //  ==> face 3 of child i is face 3 of child i+2, i=0,1,4,5 (between front and back children)
-          //  ==> face 5 of child i is face 5 of child i+1, i=0,2,4,6 (between left and right children)
-
-          // child 0 (front, bottom, left)
-          _set_child(0, new Hexa(vertex(0), new_vertices[0], new_vertices[4], new_vertices[12],
-                                 new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
-                                 new_edges[0], new_edges[26], new_edges[34], new_edges[52],
-                                 new_edges[8], new_edges[24], new_edges[42], new_edges[50],
-                                 new_edges[16], new_edges[32], new_edges[40], new_edges[48],
-                                 new_faces[0], new_faces[32], new_faces[8], new_faces[28], new_faces[16], new_faces[24],
-                                 this->refinement_level()+1));
-          // child 1 (front, bottom, right)
-          _set_child(1, new Hexa(vertex(1), new_vertices[0], new_vertices[5], new_vertices[12],
-                                 new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
-                                 new_edges[1], new_edges[27], new_edges[35], new_edges[53],
-                                 new_edges[10], new_edges[24], new_edges[46], new_edges[50],
-                                 new_edges[18], new_edges[32], new_edges[44], new_edges[48],
-                                 new_faces[1], new_faces[33], new_faces[9], new_faces[29], new_faces[20], new_faces[24],
-                                 this->refinement_level()+1));
-          // child 2 (back, bottom, left)
-          _set_child(2, new Hexa(vertex(2), new_vertices[1], new_vertices[4], new_vertices[12],
-                                 new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
-                                 new_edges[2], new_edges[26], new_edges[38], new_edges[52],
-                                 new_edges[9], new_edges[25], new_edges[43], new_edges[51],
-                                 new_edges[20], new_edges[36], new_edges[40], new_edges[48],
-                                 new_faces[2], new_faces[34], new_faces[12], new_faces[28], new_faces[17], new_faces[25],
-                                 this->refinement_level()+1));
-          // child 3 (back, bottom, right)
-          _set_child(3, new Hexa(vertex(3), new_vertices[1], new_vertices[5], new_vertices[12],
-                                 new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
-                                 new_edges[3], new_edges[27], new_edges[39], new_edges[53],
-                                 new_edges[11], new_edges[25], new_edges[47], new_edges[51],
-                                 new_edges[22], new_edges[36], new_edges[44], new_edges[48],
-                                 new_faces[3], new_faces[35], new_faces[13], new_faces[29], new_faces[21], new_faces[25],
-                                 this->refinement_level()+1));
-          // child 4 (front, top, left)
-          _set_child(4, new Hexa(vertex(4), new_vertices[2], new_vertices[6], new_vertices[13],
-                                 new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
-                                 new_edges[4], new_edges[30], new_edges[34], new_edges[52],
-                                 new_edges[12], new_edges[28], new_edges[42], new_edges[50],
-                                 new_edges[17], new_edges[33], new_edges[41], new_edges[49],
-                                 new_faces[4], new_faces[32], new_faces[10], new_faces[30], new_faces[18], new_faces[26],
-                                 this->refinement_level()+1));
-          // child 5 (front, top, right)
-          _set_child(5, new Hexa(vertex(5), new_vertices[2], new_vertices[7], new_vertices[13],
-                                 new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
-                                 new_edges[5], new_edges[31], new_edges[35], new_edges[53],
-                                 new_edges[14], new_edges[28], new_edges[46], new_edges[50],
-                                 new_edges[19], new_edges[33], new_edges[45], new_edges[49],
-                                 new_faces[5], new_faces[33], new_faces[11], new_faces[31], new_faces[22], new_faces[26],
-                                 this->refinement_level()+1));
-          // child 6 (back, top, left)
-          _set_child(6, new Hexa(vertex(6), new_vertices[3], new_vertices[6], new_vertices[13],
-                                 new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
-                                 new_edges[6], new_edges[30], new_edges[38], new_edges[52],
-                                 new_edges[13], new_edges[29], new_edges[43], new_edges[51],
-                                 new_edges[21], new_edges[37], new_edges[41], new_edges[49],
-                                 new_faces[6], new_faces[34], new_faces[14], new_faces[30], new_faces[19], new_faces[27],
-                                 this->refinement_level()+1));
-          // child 7 (back, top, right)
-          _set_child(7, new Hexa(vertex(7), new_vertices[3], new_vertices[7], new_vertices[13],
-                                 new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
-                                 new_edges[7], new_edges[31], new_edges[39], new_edges[53],
-                                 new_edges[15], new_edges[29], new_edges[47], new_edges[51],
-                                 new_edges[23], new_edges[37], new_edges[45], new_edges[49],
-                                 new_faces[7], new_faces[35], new_faces[15], new_faces[31], new_faces[23], new_faces[27],
-                                 this->refinement_level()+1));
-
-          // add the hexas to the vector of new created cells
-          for (unsigned char i(0) ; i < this->num_children() ; ++i)
-          {
-            this->child(i)->set_parent(this);
-            this->subdiv_data()->created_cells.push_back(this->child(i));
-          }
-
-          // set internal neighbourhood (external neighbourhood is set outside this function)
-          // (in case space_dim_ > 3, an empty dummy function is called; see CellData)
-          // face neighbours
-          this->child(0)->add_neighbour(SDIM_FACE, 1, this->child(4));
-          this->child(0)->add_neighbour(SDIM_FACE, 3, this->child(2));
-          this->child(0)->add_neighbour(SDIM_FACE, 5, this->child(1));
-          this->child(1)->add_neighbour(SDIM_FACE, 1, this->child(5));
-          this->child(1)->add_neighbour(SDIM_FACE, 3, this->child(3));
-          this->child(1)->add_neighbour(SDIM_FACE, 5, this->child(0));
-          this->child(2)->add_neighbour(SDIM_FACE, 1, this->child(6));
-          this->child(2)->add_neighbour(SDIM_FACE, 3, this->child(0));
-          this->child(2)->add_neighbour(SDIM_FACE, 5, this->child(3));
-          this->child(3)->add_neighbour(SDIM_FACE, 1, this->child(7));
-          this->child(3)->add_neighbour(SDIM_FACE, 3, this->child(1));
-          this->child(3)->add_neighbour(SDIM_FACE, 5, this->child(2));
-          this->child(4)->add_neighbour(SDIM_FACE, 1, this->child(0));
-          this->child(4)->add_neighbour(SDIM_FACE, 3, this->child(6));
-          this->child(4)->add_neighbour(SDIM_FACE, 5, this->child(5));
-          this->child(5)->add_neighbour(SDIM_FACE, 1, this->child(1));
-          this->child(5)->add_neighbour(SDIM_FACE, 3, this->child(7));
-          this->child(5)->add_neighbour(SDIM_FACE, 5, this->child(4));
-          this->child(6)->add_neighbour(SDIM_FACE, 1, this->child(2));
-          this->child(6)->add_neighbour(SDIM_FACE, 3, this->child(4));
-          this->child(6)->add_neighbour(SDIM_FACE, 5, this->child(7));
-          this->child(7)->add_neighbour(SDIM_FACE, 1, this->child(3));
-          this->child(7)->add_neighbour(SDIM_FACE, 3, this->child(5));
-          this->child(7)->add_neighbour(SDIM_FACE, 5, this->child(6));
-          // edge neighbours
-          this->child(0)->add_neighbour(SDIM_EDGE, 3, this->child(6));
-          this->child(0)->add_neighbour(SDIM_EDGE, 7, this->child(5));
-          this->child(0)->add_neighbour(SDIM_EDGE, 11, this->child(3));
-          this->child(1)->add_neighbour(SDIM_EDGE, 3, this->child(7));
-          this->child(1)->add_neighbour(SDIM_EDGE, 7, this->child(4));
-          this->child(1)->add_neighbour(SDIM_EDGE, 11, this->child(2));
-          this->child(2)->add_neighbour(SDIM_EDGE, 3, this->child(4));
-          this->child(2)->add_neighbour(SDIM_EDGE, 7, this->child(7));
-          this->child(2)->add_neighbour(SDIM_EDGE, 11, this->child(1));
-          this->child(3)->add_neighbour(SDIM_EDGE, 3, this->child(5));
-          this->child(3)->add_neighbour(SDIM_EDGE, 7, this->child(6));
-          this->child(3)->add_neighbour(SDIM_EDGE, 11, this->child(0));
-          this->child(4)->add_neighbour(SDIM_EDGE, 3, this->child(2));
-          this->child(4)->add_neighbour(SDIM_EDGE, 7, this->child(1));
-          this->child(4)->add_neighbour(SDIM_EDGE, 11, this->child(7));
-          this->child(5)->add_neighbour(SDIM_EDGE, 3, this->child(3));
-          this->child(5)->add_neighbour(SDIM_EDGE, 7, this->child(0));
-          this->child(5)->add_neighbour(SDIM_EDGE, 11, this->child(6));
-          this->child(6)->add_neighbour(SDIM_EDGE, 3, this->child(0));
-          this->child(6)->add_neighbour(SDIM_EDGE, 7, this->child(3));
-          this->child(6)->add_neighbour(SDIM_EDGE, 11, this->child(5));
-          this->child(7)->add_neighbour(SDIM_EDGE, 3, this->child(1));
-          this->child(7)->add_neighbour(SDIM_EDGE, 7, this->child(2));
-          this->child(7)->add_neighbour(SDIM_EDGE, 11, this->child(4));
-          // vertex neighbours
-          this->child(0)->add_neighbour(SDIM_VERTEX, 7, this->child(7));
-          this->child(1)->add_neighbour(SDIM_VERTEX, 7, this->child(6));
-          this->child(2)->add_neighbour(SDIM_VERTEX, 7, this->child(5));
-          this->child(3)->add_neighbour(SDIM_VERTEX, 7, this->child(4));
-          this->child(4)->add_neighbour(SDIM_VERTEX, 7, this->child(3));
-          this->child(5)->add_neighbour(SDIM_VERTEX, 7, this->child(2));
-          this->child(6)->add_neighbour(SDIM_VERTEX, 7, this->child(1));
-          this->child(7)->add_neighbour(SDIM_VERTEX, 7, this->child(0));
-        }
-        else
-        {
-          std::cerr << "Wrong type of subdivision in hexa ";
-          this->print_index(std::cerr);
-          std::cerr << ". Currently, only subdivision NONCONFORM_SAME_TYPE is supported. Aborting program."
-                    << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
       } // subdivide()
 
 
-      /// validates the cell
-      inline void validate() const
+      /**
+      * \brief validate this cell
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      inline void validate(std::ostream& stream) const
       {
         try
         {
           if(space_dim_ == 3)
           {
-            std::cout << "Validating hexaeder ";
-            this->print_index(std::cout);
-            std::cout << std::endl;
+            stream << "Validating hexaeder " << this->print_index() << "..." << std::endl;
           }
 
           std::string s = "Hexaeder " + this->print_index() + ": ";
@@ -857,27 +868,26 @@ std::cout << ", " << face(iface)->subdiv_data()->created_cells.size() << " faces
           // validate subitems (here: faces and edges)
           for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
           {
-            face(iface)->validate();
+            face(iface)->validate(stream);
           }
           // validate subitems (here: faces and edges)
           for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
           {
-            edge(iedge)->validate();
+            edge(iedge)->validate(stream);
           }
 
           // validate parent-child relations
-          this->validate_history();
+          this->validate_history(stream);
 
           // validate neighbours
           if (this->active())
           {
-            CellDataChecker<3, space_dim_, world_dim_>::check_neighbourhood(this);
+            CellDataValidation<3, space_dim_, world_dim_>::validate_neighbourhood(this, stream);
           }
         }
-        catch(InternalError* e)
+        catch(Exception& e)
         {
-          std::cerr << e->message() << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
       }
 

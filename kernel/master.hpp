@@ -94,9 +94,9 @@ namespace FEAST
         // read first integer which is the ID of the message
         Comm::read(id);
 
-  //      // debug output
-  //      std::cout << "Master " << Process::rank << " received message with ID "
-  //                << id << " and size " << Comm::MCW_received_bytes << "." << std::endl;
+//        // debug output
+//        std::cout << "Master " << Process::rank << " received message with ID "
+//                  << id << " and size " << Comm::MCW_received_bytes << "." << std::endl;
 
         switch(id)
         {

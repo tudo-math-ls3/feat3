@@ -240,7 +240,6 @@ namespace FEAST
           {
             // set neighbours counted so far
             index[ipos] = num_neighbours_so_far;
-//std::cout << "Setting index[" << ipos << "] = " << num_neighbours_so_far << std::endl;
             // count neighbours (here: edge neighbours and vertex neighbours)
             for (unsigned char sdim(0) ; sdim < space_dim_ ; ++sdim)
             {
@@ -250,7 +249,6 @@ namespace FEAST
           }
         }
         index[n_active_cells] = num_neighbours_so_far;
-//std::cout << "Setting index[" << n_active_cells << "] = " << num_neighbours_so_far << std::endl;
 
         // second sweep through data structure
         // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
@@ -271,7 +269,6 @@ namespace FEAST
                 for(unsigned char k(0) ; k < neigh_cells.size() ; ++k)
                 {
                   neighbours[num_neighbours_so_far] = neigh_cells[k]->number();
-//std::cout << "neighbours[" << num_neighbours_so_far << "] = " << neighbours[num_neighbours_so_far] << std::endl;
                   ++num_neighbours_so_far;
                 }
               }
@@ -293,16 +290,22 @@ namespace FEAST
       } // create_graph()
 
 
-      /// validates the base mesh and all of its cells
-      void validate() const
+      /**
+      * \brief validates the base mesh and all of its cells
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      void validate(std::ostream& stream) const
       {
-        std::cout << "Validating cells..." << std::endl;
+        stream << "Validating cells..." << std::endl;
         for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
-          cell(icell)->validate();
+          cell(icell)->validate(stream);
         }
-        std::cout << "...done!" << std::endl;
-//        _subcells.validate();
+        stream << "...done!" << std::endl;
+        // validation of _subcells not necessary since they are already validated within cell validation above
+
         // COMMENT_HILMAR: add further validations...
       }
 
@@ -315,7 +318,7 @@ namespace FEAST
       * and and printf()-style debugging at the same time. Neat.
       *
       * \param[in] stream
-      *            Stream to dump this base mesh into.
+      * Stream to dump this base mesh into.
       */
       void print(std::ostream& stream) const
       {

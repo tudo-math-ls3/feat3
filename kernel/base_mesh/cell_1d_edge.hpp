@@ -10,8 +10,9 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/cell.hpp>
-#include <kernel/base_mesh/cell_data_checker.hpp>
+#include <kernel/base_mesh/cell_data_validation.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
 namespace FEAST
@@ -80,72 +81,78 @@ namespace FEAST
       /// subdivision routine splitting an edge into two and storing parent/child information
       inline void subdivide(SubdivisionData<1, space_dim_, world_dim_>* subdiv_data)
       {
-        // assure that this cell has not been divided yet
-        if(!this->active())
+        try
         {
-          std::cerr << "Edge " << this->print_index() << " is already subdivided! Aborting program." << std::endl;
-          exit(1);
-        }
+          // assure that this cell has not been divided yet
+          if(!this->active())
+          {
+            throw InternalError("Edge " + this->print_index() + " is already subdivided!");
+          }
 
-        this->set_subdiv_data(subdiv_data);
-
-        // clear all vectors of created entities in the SubdivisionData object
-        this->subdiv_data()->clear_created();
-
-        if(this->subdiv_data()->type == CONFORM_SAME_TYPE)
-        {
-          // split the edge into two edges
+          this->set_subdiv_data(subdiv_data);
 
           // clear all vectors of created entities in the SubdivisionData object
           this->subdiv_data()->clear_created();
 
-          // create new vertex as mid point of this edge
-          double p[world_dim_];
-          for(int i(0) ; i < world_dim_ ; ++i)
+          if(this->subdiv_data()->type == CONFORM_SAME_TYPE)
           {
-            p[i] = vertex(0)->coord(i) + 0.5*(vertex(1)->coord(i) - vertex(0)->coord(i) );
+            // split the edge into two edges
+
+            // create new vertex as mid point of this edge
+            double p[world_dim_];
+            for(int i(0) ; i < world_dim_ ; ++i)
+            {
+              p[i] = vertex(0)->coord(i) + 0.5*(vertex(1)->coord(i) - vertex(0)->coord(i) );
+            }
+            // create new vertex
+            this->subdiv_data()->created_vertex = new Vertex_(p);
+
+            // create new edges and set them as children of this edge
+            // Note the numbering of the vertices: the new created vertex is the second one within the structure of both
+            // edge children. This is exploited at some places and must not be changed.
+            this->_set_num_children(2);
+            _set_child(0, new Edge(vertex(0), this->subdiv_data()->created_vertex, this->refinement_level()+1));
+            _set_child(1, new Edge(vertex(1), this->subdiv_data()->created_vertex, this->refinement_level()+1));
+            // update the parent relationship
+            this->child(0)->set_parent(this);
+            this->child(1)->set_parent(this);
+
+            // add new edges to the vector of created cells
+            this->subdiv_data()->created_cells.push_back(this->child(0));
+            this->subdiv_data()->created_cells.push_back(this->child(1));
+
+            // set internal neighbourhood (external neighbourhood is set outside this function)
+            // (in case space_dim_ > 1, an empty dummy function is called; see CellData)
+            // vertex neighbours
+            this->child(0)->add_neighbour(SDIM_VERTEX, 1, this->child(1));
+            this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(0));
           }
-          // create new vertex
-          this->subdiv_data()->created_vertex = new Vertex_(p);
-
-          // create new edges and set them as children of this edge
-          // Note the numbering of the vertices: the new created vertex is the second one within the structure of both
-          // edge children. This is exploited at some places and must not be changed.
-          this->_set_num_children(2);
-          _set_child(0, new Edge(vertex(0), this->subdiv_data()->created_vertex, this->refinement_level()+1));
-          _set_child(1, new Edge(vertex(1), this->subdiv_data()->created_vertex, this->refinement_level()+1));
-          // update the parent relationship
-          this->child(0)->set_parent(this);
-          this->child(1)->set_parent(this);
-
-          // add new edges to the vector of created cells
-          this->subdiv_data()->created_cells.push_back(this->child(0));
-          this->subdiv_data()->created_cells.push_back(this->child(1));
-
-          // set internal neighbourhood (external neighbourhood is set outside this function)
-          // (in case space_dim_ > 1, an empty dummy function is called; see CellData)
-          // vertex neighbours
-          this->child(0)->add_neighbour(SDIM_VERTEX, 1, this->child(1));
-          this->child(1)->add_neighbour(SDIM_VERTEX, 1, this->child(0));
+          else
+          {
+            throw InternalError("Wrong type of subdivision in quad " + this->print_index()
+                                + ". Currently, only subdivision CONFORM_SAME_TYPE is supported.");
+          }
         }
-        else
+        catch(Exception& e)
         {
-          std::cerr << "Wrong type of subdivision in edge " << this->print_index()
-                    << ". There is only one type of subdivision for edges: CONFORM_SAME_TYPE. Aborting program."
-                    << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
       } // subdivide()
 
 
-      /// validate this cell
-      void validate() const
+      /**
+      * \brief validates this cell
+      *
+      * \param[in] stream
+      * stream validation info is written into
+      */
+      void validate(std::ostream& stream) const
       {
         try
         {
           if(space_dim_ == 1)
           {
-            std::cout << "Validating edge " + this->print_index() + "\n";
+            stream << "Validating edge " + this->print_index() << "..." << std::endl;
           }
 
           std::string s = "Edge " + this->print_index() + ": ";
@@ -180,17 +187,16 @@ namespace FEAST
             }
           }
           // validate parent-child relations
-          this->validate_history();
+          this->validate_history(stream);
 
           if (this->active())
           {
-            CellDataChecker<1, space_dim_, world_dim_>::check_neighbourhood(this);
+            CellDataValidation<1, space_dim_, world_dim_>::validate_neighbourhood(this, stream);
           }
         }
-        catch(InternalError* e)
+        catch(Exception& e)
         {
-          std::cerr << e->message() << std::endl;
-          exit(1);
+          ErrorHandler::exception_occured(e);
         }
       }
 

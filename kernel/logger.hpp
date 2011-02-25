@@ -239,7 +239,8 @@ namespace FEAST
       }
       else
       {
-        std::cerr << "Error! Log file cannot be closed since it seems not have been openend before..." << std::endl;
+        MPIUtils::abort("Error! Log file " + file_name + " cannot be closed since it does not seems to have been " +
+                        "openend before...!");
       }
     }
 

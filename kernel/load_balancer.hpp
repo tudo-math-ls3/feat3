@@ -10,10 +10,10 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/error_handler.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
-// COMMENT_HILMAR: Temporarily use only BaseMesh2D here! space_dim_ and world_dim_ templates are still completely
-// missing on load balancer / MPI prototype side.
 #include <kernel/base_mesh/file_parser.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
@@ -300,12 +300,12 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       {
         _base_mesh = new BaseMesh::BM<space_dim_, world_dim_>();
         BaseMesh::FileParser<space_dim_, world_dim_> parser;
+        Logger::log_master("Reading mesh file " + mesh_file + "...\n", Logger::SCREEN_FILE);
         try
         {
-          Logger::log_master("Reading mesh file " + mesh_file + "...\n", Logger::SCREEN_FILE);
           parser.parse(mesh_file, _base_mesh);
         }
-        catch (Exception& e)
+        catch(Exception& e)
         {
           // abort the program
           ErrorHandler::exception_occured(e);
@@ -489,8 +489,9 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 //        {
 //          s +=  " " + StringUtils::stringify(_subgroup_ranks[i][j]);
 //        }
-//        std::cout << "Process " << _process_group->rank() << "received _subgroup_ranks[" << i << "] = "
-//                  << s << std::endl;
+//        s = "Process " + StringUtils::stringify(_process_group->rank()) + " received _subgroup_ranks["
+//            + StringUtils::stringify(i) + "] = " + s;
+//        _process_group->log_indiv_master(s);
 //      }
 
       /* *********************************
