@@ -28,7 +28,7 @@ namespace FEAST
     * \author Hilmar Wobker
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennte wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
-// die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wieder um Quad und Tri erben. Darin koennte
+// die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wiederum Quad und Tri erben. Darin koennte
 // man zum Beispiel die Funktion _edge_has_correct_orientation() implementieren.
     template<
       unsigned char space_dim_,
@@ -53,6 +53,7 @@ namespace FEAST
       /// returns true when edge with local index iedge has the same orientation as the quad
       inline bool _edge_has_correct_orientation(unsigned char iedge)
       {
+        CONTEXT("BaseMesh::Tri::_edge_has_correct_orientation()");
         // the orientation of the edge is correct (i.e. the same as that of the quad), when its start vertex within
         // the quad (i.e. the vertex with the same local index) is local vertex 0 within the edge structure
         return (vertex(iedge) == edge(iedge)->vertex(0));
@@ -67,6 +68,7 @@ namespace FEAST
         unsigned char ref_level)
         : Cell<2, space_dim_, world_dim_>(ref_level)
       {
+        CONTEXT("BaseMesh::Tri::Tri()");
         _vertices[0] = v0;
         _vertices[1] = v1;
         _vertices[2] = v2;
@@ -93,6 +95,7 @@ namespace FEAST
       /// returns number of vertices
       inline unsigned char num_vertices() const
       {
+        CONTEXT("BaseMesh::Tri::num_vertices()");
         return 3;
       }
 
@@ -100,6 +103,7 @@ namespace FEAST
       /// returns vertex at given index
       inline Vertex_* vertex(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tri::vertex()");
         assert(index < num_vertices());
         return _vertices[index];
       }
@@ -108,6 +112,7 @@ namespace FEAST
       /// returns number of edges
       inline unsigned char num_edges() const
       {
+        CONTEXT("BaseMesh::Tri::num_edges()");
         return 3;
       }
 
@@ -115,6 +120,7 @@ namespace FEAST
       /// returns edge at given index
       inline Cell_1D_* edge(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tri::edge()");
         assert(index < num_edges());
         return _edges[index];
       }
@@ -123,6 +129,7 @@ namespace FEAST
       /// returns next vertex of vertex with given index w.r.t. to ccw ordering
       inline Vertex_* next_vertex_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tri::next_vertex_ccw()");
         assert(index < num_vertices());
 // TODO: to be implemented correctly!
         return nullptr;
@@ -132,6 +139,7 @@ namespace FEAST
       /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
       inline Vertex_* previous_vertex_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tri::previous_vertex_ccw()");
         assert(index < num_vertices());
 // TODO: to be implemented correctly!
         return nullptr;
@@ -141,6 +149,7 @@ namespace FEAST
       /// returns next edge of edge with given index w.r.t. to ccw ordering
       inline Cell_1D_* next_edge_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tri::next_edge_ccw()");
         assert(index < num_edges());
 // TODO: to be implemented correctly!
         return nullptr;
@@ -150,6 +159,7 @@ namespace FEAST
       /// returns previous edge of edge with given index w.r.t. to ccw ordering
       inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tri::previous_edge_ccw()");
         assert(index < num_edges());
 // TODO: to be implemented correctly!
         return nullptr;
@@ -159,6 +169,7 @@ namespace FEAST
       /// subdivision routine splitting a tri and storing parent/child information
       inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Tri::subdivide()");
         try
         {
           // assure that this cell has not been divided yet
@@ -191,6 +202,7 @@ namespace FEAST
       */
       inline void validate(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Tri::validate()");
         try
         {
           if(space_dim_ == 2)
@@ -242,9 +254,11 @@ namespace FEAST
         }
       }
 
+
       /// print information about this tri
-      inline void print(std::ostream& stream)
+      inline void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Tri::print()");
         stream << "Tri";
         this->print_index(stream);
 

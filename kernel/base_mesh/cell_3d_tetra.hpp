@@ -68,6 +68,7 @@ namespace FEAST
         unsigned char ref_level)
         : Cell<3, space_dim_, world_dim_>(ref_level)
       {
+        CONTEXT("BaseMesh::Tetra::Tetra()");
         _vertices[0] = v0;
         _vertices[1] = v1;
         _vertices[2] = v2;
@@ -106,6 +107,7 @@ namespace FEAST
       /// returns number of vertices
       inline unsigned char num_vertices() const
       {
+        CONTEXT("BaseMesh::Tetra::num_vertices()");
         return 4;
       }
 
@@ -113,6 +115,7 @@ namespace FEAST
       /// returns vertex at given index
       inline Vertex_* vertex(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tetra::vertex()");
         assert(index < num_vertices());
         return _vertices[index];
       }
@@ -121,6 +124,7 @@ namespace FEAST
       /// returns number of edges
       inline unsigned char num_edges() const
       {
+        CONTEXT("BaseMesh::Tetra::num_edges()");
         return 6;
       }
 
@@ -128,6 +132,7 @@ namespace FEAST
       /// returns edge at given index
       inline Cell_1D_* edge(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tetra::edge()");
         assert(index < num_edges());
         return _edges[index];
       }
@@ -136,6 +141,7 @@ namespace FEAST
       /// returns number of faces
       inline unsigned char num_faces() const
       {
+        CONTEXT("BaseMesh::Tetra::num_faces()");
         return 4;
       }
 
@@ -143,6 +149,7 @@ namespace FEAST
       /// returns face at given index
       inline Cell_2D_* face(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Tetra::face()");
         assert(index < num_faces());
         return _faces[index];
       }
@@ -153,6 +160,7 @@ namespace FEAST
 // '3D-Freudenthal-Bey partition'. Later, this is parameterised via the information in the SubdivisionData object.
       inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Tetra::subdivide()");
         try
         {
           // assure that this cell has not been divided yet
@@ -185,6 +193,7 @@ namespace FEAST
       */
       inline void validate(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Tetra::validate()");
         try
         {
           if(space_dim_ == 3)
@@ -249,9 +258,10 @@ namespace FEAST
       }
 
 
-      /// print information about this quad
-      inline void print(std::ostream& stream)
+      /// print information about this tetra
+      inline void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Tetra::print()");
         stream << "Tetra";
         this->print_index(stream);
         stream << ": [";

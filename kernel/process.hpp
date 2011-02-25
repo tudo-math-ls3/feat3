@@ -14,7 +14,7 @@ namespace FEAST
 {
 
   /**
-  * \brief base class encapsulating an MPI process
+  * \brief struct encapsulating an MPI process
   *
   * For each MPI process spawned at program start, one static Process object will be created on this MPI process. It
   * will live throughout the program.
@@ -23,7 +23,7 @@ namespace FEAST
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
   */
-  class Process
+  struct Process
   {
 
   private:
@@ -50,14 +50,7 @@ namespace FEAST
 
     /// flag whether this process is the master process
     static bool is_master;
-
-    /* *************************
-    * constructor & destructor *
-    ***************************/
-    /// empty constructor
-    Process();
-
-  }; // class Process
+  }; // struct Process
 
   // define static member variables
   int Process::rank = MPI_PROC_NULL;

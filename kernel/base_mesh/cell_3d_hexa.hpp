@@ -102,6 +102,7 @@ namespace FEAST
       /// returns index (w.r.t. to hexa numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
+        CONTEXT("BaseMesh::Hexa::_edge_vertex()");
         assert(iedge < num_edges());
         assert(iv < 2);
         // the index is inquired from the fixed numbering scheme stored in Numbering::hexa_edge_vertices
@@ -112,6 +113,7 @@ namespace FEAST
       /// returns true when the orientation of the edge coincides with its orientation within the hexa
       inline bool _edge_has_correct_orientation(unsigned char iedge)
       {
+        CONTEXT("BaseMesh::Hexa::_edge_has_correct_orientation()");
         assert(iedge < num_edges());
         // return true when the edge's start vertex within the hexa is local vertex 0 within the edge structure
         return (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0));
@@ -127,6 +129,7 @@ namespace FEAST
       */
       inline void _determine_face_numbering()
       {
+        CONTEXT("BaseMesh::Hexa::_determine_face_numbering()");
         try
         {
           for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
@@ -187,6 +190,7 @@ namespace FEAST
         unsigned char ref_level)
         : Cell<3, space_dim_, world_dim_>(ref_level)
       {
+        CONTEXT("BaseMesh::Hexa::Hexa()");
         _vertices[0] = v0;
         _vertices[1] = v1;
         _vertices[2] = v2;
@@ -240,6 +244,7 @@ namespace FEAST
       /// returns number of vertices
       inline unsigned char num_vertices() const
       {
+        CONTEXT("BaseMesh::Hexa::num_vertices()");
         return 8;
       }
 
@@ -247,6 +252,7 @@ namespace FEAST
       /// returns vertex at given index
       inline Vertex_* vertex(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Hexa::vertex()");
         assert(index < num_vertices());
         return _vertices[index];
       }
@@ -255,6 +261,7 @@ namespace FEAST
       /// returns number of edges
       inline unsigned char num_edges() const
       {
+        CONTEXT("BaseMesh::Hexa::num_edges()");
         return 12;
       }
 
@@ -262,6 +269,7 @@ namespace FEAST
       /// returns edge at given index
       inline Cell_1D_* edge(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Hexa::edge()");
         assert(index < num_edges());
         return _edges[index];
       }
@@ -270,6 +278,7 @@ namespace FEAST
       /// returns number of faces
       inline unsigned char num_faces() const
       {
+        CONTEXT("BaseMesh::Hexa::num_faces()");
         return 6;
       }
 
@@ -277,6 +286,7 @@ namespace FEAST
       /// returns face at given index
       inline Cell_2D_* face(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Hexa::face()");
         assert(index < num_faces());
         return _faces[index];
       }
@@ -289,6 +299,7 @@ namespace FEAST
       */
       inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Hexa::subdivide()");
         try
         {
           // assure that this cell has not been divided yet
@@ -709,6 +720,7 @@ namespace FEAST
       */
       inline void validate(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Hexa::validate()");
         try
         {
           if(space_dim_ == 3)
@@ -893,8 +905,9 @@ namespace FEAST
 
 
       /// print information about this quad
-      inline void print(std::ostream& stream)
+      inline void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Hexa::print()");
         stream << "Hexa";
         this->print_index(stream);
 

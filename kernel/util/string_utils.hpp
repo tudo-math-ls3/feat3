@@ -550,7 +550,6 @@ namespace FEAST
       return _s;
     }
   }; // class Prefix
-
 } // namespace FEAST
 
 #endif //  #ifndef STRING_UTILS_HPP

@@ -9,6 +9,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/subcells.hpp>
@@ -76,6 +77,7 @@ namespace FEAST
       template<typename T_>
       inline void _remove(std::vector<T_>& v, T_ item)
       {
+        CONTEXT("BaseMesh::BM::_remove()");
         assert(item->index() < v.size());
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
@@ -88,6 +90,7 @@ namespace FEAST
       /// adds given cell to base mesh and sets its index
       inline void _add(Cell_* c)
       {
+        CONTEXT("BaseMesh::BM::_add()");
         _cells.push_back(c);
         c->set_index(_cells.size()-1);
       }
@@ -95,6 +98,7 @@ namespace FEAST
       /// deletes given cell
       inline void _remove(Cell_* c)
       {
+        CONTEXT("BaseMesh::BM::_remove()");
         _remove<Cell_*>(_cells, c);
       }
 
@@ -106,19 +110,18 @@ namespace FEAST
       /* ***************************
       * constructors & destructors *
       *****************************/
-
-      /**
-      * \brief  default CTOR for a base mesh
-      */
+      /// default CTOR for a base mesh
       BM()
         : _cells(nullptr),
           _graph(nullptr)
       {
+        CONTEXT("BaseMesh::BM::BM()");
       }
 
       /// default destructor
       ~BM()
       {
+        CONTEXT("BaseMesh::BM::~BM()");
         // delete all cells and their associated information
         // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about with
         // the std::vector invalidates it. Also, pop_back calls default DTOR of BMI*, so we have to manually call
@@ -143,6 +146,7 @@ namespace FEAST
       /// returns number of cells in this mesh (including inactive ones)
       inline global_index_t num_cells() const
       {
+        CONTEXT("BaseMesh::BM::num_cells()");
         return _cells.size();
       }
 
@@ -150,6 +154,7 @@ namespace FEAST
       /// returns number of active cells in this mesh (this is potentially expensive)
       inline global_index_t num_active_cells() const
       {
+        CONTEXT("BaseMesh::BM::num_active_cells()");
         // TODO: nochmal implementieren, wenn inaktive immer schoen ans Ende geschoben werden und es einen index gibt,
         // der die Position des letzten aktiven merkt
         global_index_t counter = 0;
@@ -167,6 +172,7 @@ namespace FEAST
       /// returns cell at given index
       inline Cell_* cell(global_index_t const index) const
       {
+        CONTEXT("BaseMesh::BM::cell()");
         assert(index < num_cells());
         return _cells[index];
       }
@@ -175,6 +181,7 @@ namespace FEAST
       /// returns graph pointer #_graph
       inline Graph* graph() const
       {
+        CONTEXT("BaseMesh::BM::graph()");
         return _graph;
       }
 
@@ -182,6 +189,7 @@ namespace FEAST
       /// adds (sub)cells created during subdivision to the corresponding (sub)cell vectors
       inline void add_created_items(SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::BM::add_created_items()");
         _subcells.add_created_subcells(subdiv_data);
         for(unsigned int i(0) ; i < subdiv_data->created_cells.size() ; ++i)
         {
@@ -199,6 +207,7 @@ namespace FEAST
       */
       inline void set_cell_numbers() const
       {
+        CONTEXT("BaseMesh::BM::set_cell_numbers()");
         global_index_t counter = 0;
         for(global_index_t i(0) ; i < num_cells() ; ++i)
         {
@@ -223,6 +232,7 @@ namespace FEAST
 // connectivity graph of the process patch layer. We also do not distinguish between edge and vertex neighbours here.
       void create_graph()
       {
+        CONTEXT("BaseMesh::BM::create_graph()");
         global_index_t n_active_cells = num_active_cells();
         // allocate index array
         unsigned int* index = new unsigned int[n_active_cells + 1];
@@ -298,6 +308,7 @@ namespace FEAST
       */
       void validate(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::BM::validate()");
         stream << "Validating cells..." << std::endl;
         for(unsigned int icell(0) ; icell < _cells.size() ; ++icell)
         {
@@ -322,6 +333,7 @@ namespace FEAST
       */
       void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::BM::print()");
         stream << "---------------------------------------------------" << std::endl;
         stream << "|               DUMPING BASE MESH                  " << std::endl;
         stream << "---------------------------------------------------" << std::endl;
@@ -338,6 +350,7 @@ namespace FEAST
       /// returns the base mesh print as string
       inline std::string print() const
       {
+        CONTEXT("BaseMesh::BM::print()");
         std::ostringstream oss;
         print(oss);
         return oss.str();

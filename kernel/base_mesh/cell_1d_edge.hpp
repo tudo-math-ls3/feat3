@@ -54,6 +54,7 @@ namespace FEAST
         unsigned char ref_level)
         : Cell<1, space_dim_, world_dim_>(ref_level)
       {
+        CONTEXT("BaseMesh::Edge::Edge()");
         _vertices[0] = v0;
         _vertices[1] = v1;
 
@@ -66,6 +67,7 @@ namespace FEAST
       /// returns number of vertices
       inline unsigned char num_vertices() const
       {
+        CONTEXT("BaseMesh::Edge::num_vertices()");
         return 2;
       }
 
@@ -73,6 +75,7 @@ namespace FEAST
       /// returns vertex at given index
       inline Vertex_* vertex(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Edge::vertex()");
         assert(index < num_vertices());
         return _vertices[index];
       }
@@ -81,6 +84,7 @@ namespace FEAST
       /// subdivision routine splitting an edge into two and storing parent/child information
       inline void subdivide(SubdivisionData<1, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Edge::subdivide()");
         try
         {
           // assure that this cell has not been divided yet
@@ -129,7 +133,7 @@ namespace FEAST
           }
           else
           {
-            throw InternalError("Wrong type of subdivision in quad " + this->print_index()
+            throw InternalError("Wrong type of subdivision in edge " + this->print_index()
                                 + ". Currently, only subdivision CONFORM_SAME_TYPE is supported.");
           }
         }
@@ -148,6 +152,7 @@ namespace FEAST
       */
       void validate(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Edge::validate()");
         try
         {
           if(space_dim_ == 1)
@@ -202,8 +207,9 @@ namespace FEAST
 
 
       /// print information about this edge
-      inline void print(std::ostream& stream)
+      inline void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Edge::print()");
         stream << "E" << this->print_index() << ": [";
         _vertices[0]->print(stream);
         stream << ", ";

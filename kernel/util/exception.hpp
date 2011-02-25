@@ -12,6 +12,7 @@
 // includes, Feast
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/util/exception.hpp>
 #include <kernel/base_header.hpp>
 
 namespace FEAST
@@ -30,6 +31,7 @@ namespace FEAST
     /// The local context stack
     std::list<std::string> local_context_stack;
 
+    /// CTOR
     ContextData()
     {
       if (context_stack)
@@ -38,7 +40,7 @@ namespace FEAST
       }
     }
 
-    /// Return a full context stack aka backtrace.
+    /// returns a full context stack aka backtrace
     std::string backtrace(const std::string& delimiter) const
     {
       return StringUtils::join(local_context_stack.begin(), local_context_stack.end(), delimiter);
@@ -67,9 +69,10 @@ namespace FEAST
 
   protected:
     /**
-    * \brief Constructor.
+    * \brief CTOR
     *
-    * \param message The exception's message.
+    * \param message
+    * the exception's message
     */
     Exception(const std::string & message) throw () :
       _context_data(new ContextData),
@@ -77,7 +80,7 @@ namespace FEAST
     {
     }
 
-    /// Copy-constructor.
+    /// copy CTOR
     Exception(const Exception & other) :
       std::exception(other),
       _context_data(new ContextData(*other._context_data)),
@@ -86,7 +89,7 @@ namespace FEAST
     }
 
   public:
-    /// Destructor.
+    /// DTOR
     virtual ~Exception() throw ()
     {
       delete _context_data;
@@ -98,16 +101,16 @@ namespace FEAST
       return _message;
     }
 
-    /// Return a backtrace.
+    /// returns backtrace
     std::string backtrace(const std::string & delimiter) const
     {
       return _context_data->backtrace(delimiter);
     }
 
-    /// Return true if the backtrace is empty.
+    /// returns true if the backtrace is empty
     bool empty() const;
 
-    /// Return a descriptive exception name.
+    /// return descriptive exception name
     const char * what() const throw ()
     {
       /// \todo Add a working win32 alternative (see http://www.int0x80.gr/papers/name_mangling.pdf)

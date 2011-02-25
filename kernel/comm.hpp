@@ -10,6 +10,7 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/util/exception.hpp>
 #include <kernel/process.hpp>
 #include <kernel/service_ids.hpp>
 
@@ -57,6 +58,7 @@ namespace FEAST
     */
     static void init(ServiceIDs::service_id service_id)
     {
+      CONTEXT("Comm::init()");
       // reset buffer
       Comm::MCW_buffer_pos = 0;
       // write the message id to the buffer
@@ -69,6 +71,7 @@ namespace FEAST
     /// send the current MPI_COMM_WORLD buffer #MCW_buffer to the master
     static void send()
     {
+      CONTEXT("Comm::send()");
       // send message
       int mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
                                     MPI_COMM_WORLD);
@@ -85,6 +88,7 @@ namespace FEAST
     template <typename T_>
     static void write(T_ msg)
     {
+      CONTEXT("Comm::write()");
       // write the integer to the current position of the buffer
       int mpi_error_code = MPI_Pack(&msg, 1, MPIType<T_>::value(), Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
@@ -103,6 +107,7 @@ namespace FEAST
     */
     static void write(std::string const &msg)
     {
+      CONTEXT("Comm::write()");
       // Write the string as char array to the current position of the buffer (size + 1, since the null termination
       // symbol is appended). The const of the resulting char array has to be cast away.
       int mpi_error_code = MPI_Pack(const_cast<char *>(msg.c_str()), msg.size()+1, MPI_CHARACTER, Comm::MCW_buffer,
@@ -120,6 +125,7 @@ namespace FEAST
     template <typename T_>
     static void read(T_& msg)
     {
+      CONTEXT("Comm::read()");
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg,
                                       1, MPIType<T_>::value(), MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
@@ -140,6 +146,7 @@ namespace FEAST
     */
     static void read(unsigned int const size, std::string& msg)
     {
+      CONTEXT("Comm::read()");
       // create char array for storing the sent message (add 1 to the size since the sent message ends with null
       // termination symbol)
       char* msg_char = new char[size+1];
@@ -164,6 +171,7 @@ namespace FEAST
     template <typename T_>
     static void write(T_ msg[], int const size)
     {
+      CONTEXT("Comm::write()");
       // write the array to the current position of the buffer
       int mpi_error_code = MPI_Pack(msg, size, MPIType<T_>::value(), Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
@@ -183,6 +191,7 @@ namespace FEAST
     template <typename T_>
     static void read(int const size, T_ msg[])
     {
+      CONTEXT("Comm::read()");
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
                                       size, MPIType<T_>::value(), MPI_COMM_WORLD);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");

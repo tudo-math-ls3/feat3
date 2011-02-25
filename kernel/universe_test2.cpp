@@ -52,6 +52,7 @@ void define_work_groups(
   int**& subgroup_ranks,
   Graph**& graphs)
 {
+  CONTEXT("universe_test2: define_work_groups()");
   // set number of subgroups manually to 1
   num_subgroups = 1;
   // allocate arrays
@@ -122,7 +123,7 @@ void define_work_groups(
 */
 int main(int argc, char* argv[])
 {
-
+  CONTEXT("universe_test2: main()");
   if (argc < 3)
   {
     std::cerr << "Call the program with \"mpirun -np n+1 " << argv[0] << " <relative_path_to_mesh_file> n\", "

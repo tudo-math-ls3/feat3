@@ -63,6 +63,7 @@ namespace FEAST
       */
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
+        CONTEXT("BaseMesh::CellDataValidationVertNeigh::validate()");
         assert(cell_space_dim_ >= 1);
         try
         {
@@ -174,6 +175,7 @@ namespace FEAST
       */
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
+        CONTEXT("BaseMesh::CellDataValidationEdgeNeigh::validate()");
         assert(cell_space_dim_ >= 2);
         try
         {
@@ -307,6 +309,7 @@ namespace FEAST
       */
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
+        CONTEXT("BaseMesh::CellDataValidationFaceNeigh::validate()");
         assert(cell_space_dim_ >= 3);
         try
         {
@@ -466,6 +469,7 @@ namespace FEAST
       */
       static void validate_neighbourhood(Cell<3, 3, world_dim_> const * c, std::ostream& stream)
       {
+        CONTEXT("BaseMesh::CellDataValidation::validate_neighbourhood()");
         CellDataValidationVertNeigh<3, world_dim_>::validate(c, stream);
         CellDataValidationEdgeNeigh<3, world_dim_>::validate(c, stream);
         CellDataValidationFaceNeigh<3, world_dim_>::validate(c, stream);
@@ -494,6 +498,7 @@ namespace FEAST
       */
       static void validate_neighbourhood(Cell<2, 2, world_dim_> const * c, std::ostream& stream)
       {
+        CONTEXT("BaseMesh::CellDataValidation::validate_neighbourhood()");
         CellDataValidationVertNeigh<2, world_dim_>::validate(c, stream);
         CellDataValidationEdgeNeigh<2, world_dim_>::validate(c, stream);
       }
@@ -521,6 +526,7 @@ namespace FEAST
       */
       static void validate_neighbourhood(Cell<1, 1, world_dim_> const * c, std::ostream& stream)
       {
+        CONTEXT("BaseMesh::CellDataValidation::validate_neighbourhood()");
         CellDataValidationVertNeigh<1, world_dim_>::validate(c, stream);
       }
     };

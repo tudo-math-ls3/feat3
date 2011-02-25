@@ -9,6 +9,7 @@
 
 // includes, Feast
 #include <kernel/util/string_utils.hpp>
+#include <kernel/util/exception.hpp>
 
 namespace FEAST
 {
@@ -38,6 +39,7 @@ namespace FEAST
       int argc,
       char* argv[])
     {
+      CONTEXT("MPIUtils::init_MPI()");
       // init MPI
 // COMMENT_HILMAR: valgrind spuckt ein paar Warnungen zu diesem Aufruf auf, die ich nicht so ganz verstehe...
       int mpi_error_code = MPI_Init(&argc, &argv);
@@ -55,6 +57,7 @@ namespace FEAST
     */
     static void abort(const std::string& msg = "")
     {
+      CONTEXT("MPIUtils::abort()");
       // flush cout and cerr
       std::cout.flush();
       std::cerr.flush();
@@ -101,6 +104,7 @@ namespace FEAST
       int error_code,
       std::string mpi_function_name)
     {
+      CONTEXT("MPIUtils::validate_mpi_error_code()");
       if (error_code != MPI_SUCCESS)
       {
         abort("Function " + mpi_function_name + " failed with error code " + StringUtils::stringify(error_code) + ".");
@@ -127,6 +131,7 @@ namespace FEAST
   public:
     static inline MPI_Datatype value()
     {
+      // call abort() (error handler is not available here)
       MPIUtils::abort("Don't try to translate bool into an MPI datatype! There is no such type!");
       return MPI_LOGICAL;
     }

@@ -109,6 +109,7 @@ namespace FEAST
         _group_id(0),
         _rank_coord(num_processes-1)
     {
+      CONTEXT("ProcessGroup::ProcessGroup()");
       assert(num_processes >= 1);
       // get MPI_Group object for the given communicator
       int mpi_error_code = MPI_Comm_group(_comm, &_group);
@@ -144,6 +145,7 @@ namespace FEAST
         _group_id(group_id),
         _rank_coord(num_processes-1)
     {
+      CONTEXT("ProcessGroup::ProcessGroup()");
       assert(num_processes >= 1);
       // copy array of parent group ranks
       _ranks_group_parent = new int[_num_processes];
@@ -192,6 +194,7 @@ namespace FEAST
     /// destructor
     ~ProcessGroup()
     {
+      CONTEXT("ProcessGroup::~ProcessGroup()");
       if(_ranks_group_parent != nullptr)
       {
         delete [] _ranks_group_parent;
@@ -222,6 +225,7 @@ namespace FEAST
     */
     inline const MPI_Group& group() const
     {
+      CONTEXT("ProcessGroup::group()");
       return _group;
     }
 
@@ -235,6 +239,7 @@ namespace FEAST
     */
     inline const MPI_Comm& comm() const
     {
+      CONTEXT("ProcessGroup::comm()");
       return _comm;
     }
 
@@ -245,6 +250,7 @@ namespace FEAST
     */
     inline unsigned int num_processes() const
     {
+      CONTEXT("ProcessGroup::num_processes()");
       return _num_processes;
     }
 
@@ -255,6 +261,7 @@ namespace FEAST
     */
     inline ProcessGroup* process_group_parent() const
     {
+      CONTEXT("ProcessGroup::process_group_parent()");
       return _process_group_parent;
     }
 
@@ -265,6 +272,7 @@ namespace FEAST
     */
     inline unsigned int group_id() const
     {
+      CONTEXT("ProcessGroup::group_id()");
       return _group_id;
     }
 
@@ -275,6 +283,7 @@ namespace FEAST
     */
     inline int rank() const
     {
+      CONTEXT("ProcessGroup::rank()");
       return _rank;
     }
 
@@ -285,6 +294,7 @@ namespace FEAST
     */
     inline int rank_coord() const
     {
+      CONTEXT("ProcessGroup::rank_coord()");
       return _rank_coord;
     }
 
@@ -299,6 +309,7 @@ namespace FEAST
     */
     inline bool is_coordinator() const
     {
+      CONTEXT("ProcessGroup::is_coordinator()");
       return _rank == _rank_coord;
     }
 
@@ -324,7 +335,7 @@ namespace FEAST
     */
     void log_indiv_master(std::string message, Logger::target target = Logger::SCREEN_FILE)
     {
-
+      CONTEXT("ProcessGroup::log_indiv_master()");
       // add 1 to the message length since string::c_str() adds the null termination symbol to the resulting char array
       unsigned int length = message.length() + 1;
 
@@ -508,6 +519,7 @@ namespace FEAST
         _graph_distributed(nullptr),
         _ranks_finer(nullptr)
     {
+      CONTEXT("WorkGroup::WorkGroup()");
       // debugging output
       /* ******************************
       * test the logger functionality *
@@ -543,6 +555,7 @@ namespace FEAST
     /// destructor
     ~WorkGroup()
     {
+      CONTEXT("WorkGroup::~WorkGroup()");
       if(_graph_distributed != nullptr)
       {
         delete _graph_distributed;
@@ -574,6 +587,7 @@ namespace FEAST
     */
     inline GraphDistributed* graph_distributed() const
     {
+      CONTEXT("WorkGroup::graph_distributed()");
       return _graph_distributed;
     }
 
@@ -590,6 +604,7 @@ namespace FEAST
       unsigned int const num_neighbours,
       unsigned int* neighbours)
     {
+      CONTEXT("WorkGroup::set_graph_distributed()");
       _graph_distributed = new GraphDistributed(num_neighbours, neighbours);
 
       // log into process-own log file
@@ -627,6 +642,7 @@ namespace FEAST
     */
     void do_exchange()
     {
+      CONTEXT("WorkGroup::do_exchange()");
       // length of the integer arrays to be exchanged
       unsigned int const n = 10;
 
@@ -795,6 +811,7 @@ namespace FEAST
         _contains_extra_coord(contains_extra_coord),
         _work_group(nullptr)
     {
+      CONTEXT("ProcessSubgroup::ProcessSubgroup()");
       /* ******************************
       * test the logger functionality *
       ********************************/
@@ -878,6 +895,7 @@ namespace FEAST
     /// destructor
     ~ProcessSubgroup()
     {
+      CONTEXT("ProcessSubgroup::~ProcessSubgroup()");
       if(_work_group != nullptr)
       {
         delete _work_group;
@@ -892,6 +910,7 @@ namespace FEAST
     */
     inline bool contains_extra_coord() const
     {
+      CONTEXT("ProcessSubgroup::contains_extra_coord()");
       return _contains_extra_coord;
     }
 
@@ -902,10 +921,10 @@ namespace FEAST
     */
     inline WorkGroup* work_group() const
     {
+      CONTEXT("ProcessSubgroup::work_group()");
       return _work_group;
     }
   };
-
 } // namespace FEAST
 
 #endif // guard KERNEL_PROCESS_GROUP_HPP

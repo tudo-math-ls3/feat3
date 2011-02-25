@@ -267,12 +267,14 @@ namespace FEAST
       /// CTOR
       SubdivisionData(type_of_subdivision t)
       {
+        CONTEXT("BaseMesh::SubdivisionData::SubdivisionData()");
         type = t;
       }
 
       /// clears all vectors of created entities
       inline void clear_created()
       {
+        CONTEXT("BaseMesh::SubdivisionData::clear_created()");
         created_vertex = nullptr;
         created_cells.clear();
       }
@@ -310,12 +312,14 @@ namespace FEAST
       /// CTOR
       SubdivisionData(type_of_subdivision t)
       {
+        CONTEXT("BaseMesh::SubdivisionData::SubdivisionData()");
         type = t;
       }
 
       /// clears all vectors of created entities
       inline void clear_created()
       {
+        CONTEXT("BaseMesh::SubdivisionData::clear_created()");
         created_vertices.clear();
         created_edges.clear();
         created_cells.clear();
@@ -357,12 +361,14 @@ namespace FEAST
       /// CTOR
       SubdivisionData(type_of_subdivision t)
       {
+        CONTEXT("BaseMesh::SubdivisionData::SubdivisionData()");
         type = t;
       }
 
       /// clears all vectors of created entities
       inline void clear_created()
       {
+        CONTEXT("BaseMesh::SubdivisionData::clear_created()");
         created_vertices.clear();
         created_edges.clear();
         created_faces.clear();

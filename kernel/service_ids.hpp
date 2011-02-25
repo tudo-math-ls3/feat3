@@ -31,7 +31,6 @@ namespace FEAST
     };
 
   }; // class ServiceIDs
-
 } // namespace FEAST
 
 #endif // guard KERNEL_SERVICE_IDS_HPP

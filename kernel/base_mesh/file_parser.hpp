@@ -56,11 +56,6 @@ namespace FEAST
 
     public:
 
-      /* ***************************
-      * constructors & destructors *
-      *****************************/
-//COMMENT_HILMAR: DTOR and clean up missing!
-
       /* *****************
       * member functions *
       *******************/
@@ -73,6 +68,7 @@ namespace FEAST
       */
       inline void parse(std::string const& file_name, BM<1, world_dim_>* bm)
       {
+        CONTEXT("BaseMesh::FileParser::parse()");
         assert(world_dim_ == 1);
 
         Logger::log_master("No file parser implemented yet!\n\
@@ -159,6 +155,9 @@ namespace FEAST
 
     private:
 
+      /* *****************
+      * member variables *
+      *******************/
       /// pointer to the base mesh
       BM<2, world_dim_>* _bm;
       /// number boundaries in the mesh file
@@ -183,9 +182,13 @@ namespace FEAST
       /// number of cells
       unsigned int _num_cells;
 
+      /* *****************
+      * member functions *
+      *******************/
       /// reads FEAST_GEOM to extract vertex coordinates
       void _parse_geom(FileReaderASCII* mesh_file)
       {
+        CONTEXT("BaseMesh::FileParser::_parse_geom()");
         mesh_file->read("FEAST_GEOM");
         mesh_file->read("2D");
         int version_major;
@@ -272,9 +275,11 @@ namespace FEAST
         }
       } // _parse_geom()
 
+
       /// reads and skips FEAST_FGEOM parts
       void _parse_fgeom(FileReaderASCII* mesh_file)
       {
+        CONTEXT("BaseMesh::FileParser::_parse_fgeom()");
         mesh_file->read("FEAST_FGEOM");
         mesh_file->read("2D");
         int version_major;
@@ -330,6 +335,7 @@ namespace FEAST
       /// reads MESH portion of FEAST files into this base mesh
       void _parse_mesh(FileReaderASCII * mesh_file)
       {
+        CONTEXT("BaseMesh::FileParser::_parse_mesh()");
         // header
         mesh_file->read("FEAST_MESH");
         mesh_file->read("2D");
@@ -640,6 +646,7 @@ COMMENT_HILMAR: will be adapted later
       /// parses partition part of FEAST files
       void _parse_partition(FileReaderASCII * mesh_file)
       {
+        CONTEXT("BaseMesh::FileParser::_parse_partition()");
         // header
         mesh_file->read("FEAST_PART");
         mesh_file->read("2D");
@@ -676,6 +683,7 @@ COMMENT_HILMAR: will be adapted later
       /// DTOR
       ~FileParser<2, world_dim_>()
       {
+        CONTEXT("BaseMesh::FileParser::~FileParser()");
         // loop over boundary components
         for(unsigned int ibc(0) ; ibc < _num_boundaries ; ++ibc)
         {
@@ -716,6 +724,7 @@ COMMENT_HILMAR: will be adapted later
       */
       inline void parse(std::string const& file_name, BM<2, world_dim_>* bm)
       {
+        CONTEXT("BaseMesh::FileParser::parse()");
         // FEAST1 file format does not distinguish world dimension and space dimension. So, for now the world_dim_
         // template parameter actually has to be equal to 2 here.
         assert(world_dim_ == 2);
@@ -779,11 +788,6 @@ COMMENT_HILMAR: will be adapted later
 
     public:
 
-      /* ***************************
-      * constructors & destructors *
-      *****************************/
-//COMMENT_HILMAR: DTOR missing
-
       /* *****************
       * member functions *
       *******************/
@@ -796,6 +800,7 @@ COMMENT_HILMAR: will be adapted later
       */
       inline void parse(std::string const& file_name, BM<3, world_dim_>* bm)
       {
+        CONTEXT("BaseMesh::FileParser::parse()");
         assert(world_dim_ == 3);
 
         Logger::log_master("No file parser implemented yet! A manual 3D base mesh is created.");

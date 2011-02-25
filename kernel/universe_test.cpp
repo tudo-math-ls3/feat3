@@ -2,10 +2,9 @@
 // code cleanup:
 // - completion of doxygen comments (\param, array dimensions, etc.)
 // - add/remove 'const' and other modifiers where necessary
-// - virtual DTORs?
-// - missing output when using MPICH
-// - CONTEXT("...")
+// - missing DTORs, virtual DTORs?
 // - test_1d.cpp etc. ersetzen
+// - check: missing output when using MPICH
 
 // Done:
 // - template all classes "above" BaseMesh
@@ -18,6 +17,7 @@
 // - check all the MPI-related valgrind warnings (--> Dom)
 // - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
 // - use ErrorHandler in base mesh code
+// - CONTEXT("...") einfuegen
 
 // includes, system
 #include <iostream>
@@ -111,6 +111,7 @@ void define_work_groups(
   int**& subgroup_ranks,
   Graph**& graphs)
 {
+  CONTEXT("universe_test: define_work_groups()");
   // set number of subgroups manually to 2
   num_subgroups = 2;
   // allocate arrays
@@ -239,7 +240,7 @@ void define_work_groups(
 */
 int main(int argc, char* argv[])
 {
-
+  CONTEXT("universe_test: main()");
   if (argc < 3)
   {
     std::cerr << "Call the program with \"mpirun -np n+5 " << argv[0] << " <relative_path_to_mesh_file> n\", "

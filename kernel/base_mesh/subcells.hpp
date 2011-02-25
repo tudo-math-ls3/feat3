@@ -81,6 +81,7 @@ namespace FEAST
       template<typename T_>
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
+        CONTEXT("BaseMesh::Subcells::_remove_item()");
         assert(item->index() < v.size());
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
@@ -99,6 +100,7 @@ namespace FEAST
       /// adds given vertex to base mesh and sets its index
       inline void _add(Vertex_* v)
       {
+        CONTEXT("BaseMesh::Subcells::_add()");
         _vertices.push_back(v);
         v->set_index(_vertices.size()-1);
       }
@@ -107,6 +109,7 @@ namespace FEAST
       /// deletes given vertex
       inline void _remove(Vertex_* v)
       {
+        CONTEXT("BaseMesh::Subcells::_remove()");
         _remove_item<Vertex_*>(_vertices, v);
       }
 
@@ -121,11 +124,13 @@ namespace FEAST
       Subcells()
         : _vertices(nullptr)
       {
+        CONTEXT("BaseMesh::Subcells::Subcells()");
       }
 
       /// default destructor
       ~Subcells()
       {
+        CONTEXT("BaseMesh::Subcells::~Subcells()");
         // delete all vertices and their associated information
         // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about
         // with the std::vector invalidates it. Also, pop_back calls default DTOR of Vertex_*, so we have to manually
@@ -145,6 +150,7 @@ namespace FEAST
       /// returns number of vertices in this mesh
       inline global_index_t num_vertices() const
       {
+        CONTEXT("BaseMesh::Subcells::num_vertices()");
         return _vertices.size();
       }
 
@@ -152,6 +158,7 @@ namespace FEAST
       /// returns vertex at given index
       inline Vertex_* vertex(global_index_t const index)
       {
+        CONTEXT("BaseMesh::Subcells::vertex()");
         assert(index < num_vertices());
         return _vertices[index];
       }
@@ -160,6 +167,7 @@ namespace FEAST
       /// adds vertex created during subdivision of the corresponding edge
       inline void add_created_subcells(SubdivisionData<1, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Subcells::add_created_subcells()");
         _add(subdiv_data->created_vertex);
       }
 
@@ -176,6 +184,7 @@ namespace FEAST
       */
       void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Subcells::print()");
         stream << _vertices.size() << " vertices" << std::endl;
         for(unsigned int ivert(0) ; ivert < _vertices.size() ; ++ivert)
         {
@@ -229,6 +238,7 @@ namespace FEAST
       template<typename T_>
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
+        CONTEXT("BaseMesh::Subcells::_remove_item()");
         assert(item->index() < v.size());
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
@@ -247,6 +257,7 @@ namespace FEAST
       /// adds given edge to container and sets its index
       inline void _add(Cell_1D_* e)
       {
+        CONTEXT("BaseMesh::Subcells::_add()");
         _edges.push_back(e);
         e->set_index(_edges.size()-1);
       }
@@ -255,6 +266,7 @@ namespace FEAST
       /// deletes given edge
       inline void _remove(Cell_1D_* e)
       {
+        CONTEXT("BaseMesh::Subcells::_remove()");
         _remove_item<Cell_1D_*>(_edges, e);
       }
 
@@ -262,6 +274,7 @@ namespace FEAST
       /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
       inline void _add(Vertex_* v)
       {
+        CONTEXT("BaseMesh::Subcells::_add()");
         Subcells<1, space_dim_, world_dim_>::_add(v);
       }
 
@@ -269,6 +282,7 @@ namespace FEAST
       /// deletes given vertex (wrapper for function in parent class)
       inline void _remove(Vertex_* v)
       {
+        CONTEXT("BaseMesh::Subcells::_remove()");
         Subcells<1, space_dim_, world_dim_>::_remove(v);
       }
 
@@ -291,12 +305,14 @@ namespace FEAST
         : Subcells<1, space_dim_, world_dim_>(),
         _edges(nullptr)
       {
+        CONTEXT("BaseMesh::Subcells::Subcells()");
       }
 
 
       /// default destructor
       ~Subcells()
       {
+        CONTEXT("BaseMesh::Subcells::~Subcells()");
         // delete all edges and their associated information
         // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about
         // with the std::vector invalidates it. Also, pop_back calls default DTOR of Cell_1D_*, so we have to manually
@@ -316,6 +332,7 @@ namespace FEAST
       /// returns number of edges in this mesh (including inactive ones)
       inline global_index_t num_edges() const
       {
+        CONTEXT("BaseMesh::Subcells::num_edges()");
         // TODO: potentiell falsch, auch Kanten koennen inaktiv sein und duerfen dann beim Transfer zu den
         // Rechenprozessen nicht mitgezaehlt werden!
         return _edges.size();
@@ -325,6 +342,7 @@ namespace FEAST
       /// returns edge at given index
       inline Cell_1D_* edge(global_index_t const index)
       {
+        CONTEXT("BaseMesh::Subcells::edge()");
         assert(index < num_edges());
         return _edges[index];
       }
@@ -333,6 +351,7 @@ namespace FEAST
       /// adds subcells created during subdivision to the corresponding subcell vectors
       inline void add_created_subcells(SubdivisionData<2, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Subcells::add_created_subcells()");
         for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
         {
           _add(subdiv_data->created_vertices[i]);
@@ -356,6 +375,7 @@ namespace FEAST
       */
       void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Subcells::print()");
         Subcells<1, space_dim_, world_dim_>::print(stream);
         stream << _edges.size() << " edges" << std::endl;
         for(unsigned int iedge(0) ; iedge < _edges.size() ; ++iedge)
@@ -407,6 +427,7 @@ namespace FEAST
       template<typename T_>
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
+        CONTEXT("BaseMesh::Subcells::_remove_item()");
         assert(item->index() < v.size());
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
@@ -422,6 +443,7 @@ namespace FEAST
       /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
       inline void _add(Vertex_* v)
       {
+        CONTEXT("BaseMesh::Subcells::_add()");
         Subcells<1, space_dim_, world_dim_>::_add(v);
       }
 
@@ -429,6 +451,7 @@ namespace FEAST
       /// deletes given vertex (wrapper for function in parent class)
       inline void _remove(Vertex_* v)
       {
+        CONTEXT("BaseMesh::Subcells::_remove()");
         Subcells<1, space_dim_, world_dim_>::_remove(v);
       }
 
@@ -436,6 +459,7 @@ namespace FEAST
       /// adds given edge to base mesh and sets its index (wrapper for function in parent class)
       inline void _add(Cell_1D_* e)
       {
+        CONTEXT("BaseMesh::Subcells::_add()");
         Subcells<2, space_dim_, world_dim_>::_add(e);
       }
 
@@ -443,6 +467,7 @@ namespace FEAST
       /// deletes given edge (wrapper for function in parent class)
       inline void _remove(Cell_1D_* e)
       {
+        CONTEXT("BaseMesh::Subcells::_remove()");
         Subcells<2, space_dim_, world_dim_>::_remove(e);
       }
 
@@ -450,6 +475,7 @@ namespace FEAST
       /// adds given face to base mesh and sets its index
       inline void _add(Cell_2D_* f)
       {
+        CONTEXT("BaseMesh::Subcells::_add()");
         _faces.push_back(f);
         f->set_index(_faces.size()-1);
       }
@@ -458,6 +484,7 @@ namespace FEAST
       /// deletes given face
       inline void _remove(Cell_2D_* f)
       {
+        CONTEXT("BaseMesh::Subcells::_remove()");
         _remove_item<Cell_2D_*>(_faces, f);
       }
 
@@ -469,12 +496,14 @@ namespace FEAST
         : Subcells<2, space_dim_, world_dim_>(),
           _faces(nullptr)
       {
+        CONTEXT("BaseMesh::Subcells::Subcells()");
       }
 
 
       /// default destructor
       ~Subcells()
       {
+        CONTEXT("BaseMesh::Subcells::~Subcells()");
 //COMMENT_HILMAR: nochmal nachgucken, ob bzw. wie der DTOR von Subcells<2, ...> aufgerufen wird.
         // delete all faces and their associated information
         // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about
@@ -491,6 +520,7 @@ namespace FEAST
       /// returns number of faces in this mesh (including inactive ones)
       inline global_index_t num_faces() const
       {
+        CONTEXT("BaseMesh::Subcells::num_faces()");
         // TODO: potentiell falsch, auch Faces koennen inaktiv sein und duerfen dann beim Transfer zu den Rechenprozessen
         // nicht mitgezaehlt werden!
         return _faces.size();
@@ -500,6 +530,7 @@ namespace FEAST
       /// returns face at given index
       inline Cell_2D_* face(global_index_t const index)
       {
+        CONTEXT("BaseMesh::Subcells::face()");
         assert(index < _faces.size());
         return _faces[index];
       }
@@ -508,6 +539,7 @@ namespace FEAST
       /// adds subcells created during subdivision to the corresponding subcell vectors
       inline void add_created_subcells(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Subcells::add_created_subcells()");
         for(unsigned int i(0) ; i < subdiv_data->created_vertices.size() ; ++i)
         {
           _add(subdiv_data->created_vertices[i]);
@@ -535,6 +567,7 @@ namespace FEAST
       */
       void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Subcells::print()");
         Subcells<2, space_dim_, world_dim_>::print(stream);
         stream << _faces.size() << " faces" << std::endl;
         for (unsigned int iface(0) ; iface < _faces.size() ; ++iface)

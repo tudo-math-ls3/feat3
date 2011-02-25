@@ -80,6 +80,7 @@ namespace FEAST
       /// setter for the number of subitems per subdimension
       void _set_num_subitems_per_subdim(unsigned char array_size, unsigned char num_subitems_per_subdim[])
       {
+        CONTEXT("BaseMesh::CellInfo::_set_num_subitems_per_subdim()");
         assert(array_size == cell_dim_);
         for(int i(0) ; i < cell_dim_ ; ++i)
         {
@@ -91,6 +92,7 @@ namespace FEAST
 
       inline unsigned char num_subitems_per_subdim(subdim subdim) const
       {
+        CONTEXT("BaseMesh::CellInfo::num_subitems_per_subdim()");
         assert(subdim < cell_dim_);
         return _num_subitems_per_subdim[subdim];
       }
@@ -141,7 +143,7 @@ namespace FEAST
       }
 
       /// dummy function called by cells with dimension smaller than space dimension
-      inline void print(std::ostream& stream)
+      inline void print(std::ostream& stream) const
       {
         // do nothing here
       }
@@ -182,6 +184,7 @@ namespace FEAST
       /// function for initialising the neighbour arrays/vectors
       void _init_neighbours()
       {
+        CONTEXT("BaseMesh::CellData::_init_neighbours()");
         for(int sdim(0) ; sdim < cell_space_dim_ ; ++sdim)
         {
           _neighbours[sdim]
@@ -195,6 +198,7 @@ namespace FEAST
 
       ~CellData()
       {
+        CONTEXT("BaseMesh::CellData::~CellData()");
         for(int sdim(0) ; sdim < cell_space_dim_ ; ++sdim)
         {
           for(unsigned int item(0) ; item < this->num_subitems_per_subdim((subdim)sdim) ; ++item)
@@ -210,6 +214,7 @@ namespace FEAST
         subdim subdim,
         unsigned char item) const
       {
+        CONTEXT("BaseMesh::CellData::num_neighbours_item()");
         assert(subdim < cell_space_dim_);
         assert(item < this->num_subitems_per_subdim(subdim));
         return _neighbours[subdim][item].size();
@@ -219,6 +224,7 @@ namespace FEAST
       /// returns number of neighbours summed over all items of given subdimension
       inline unsigned int num_neighbours_subdim(subdim subdim) const
       {
+        CONTEXT("BaseMesh::CellData::num_neighbours_subdim()");
         assert(subdim < cell_space_dim_);
         unsigned int num_neighbours(0);
         for(unsigned int item(0) ; item < this->num_subitems_per_subdim(subdim) ; ++item)
@@ -235,6 +241,7 @@ namespace FEAST
         unsigned char item,
         unsigned char index) const
       {
+        CONTEXT("BaseMesh::CellData::neighbour()");
         assert(subdim < cell_space_dim_);
         assert(item < this->num_subitems_per_subdim(subdim));
         assert(index < _neighbours[subdim][item].size());
@@ -247,6 +254,7 @@ namespace FEAST
         subdim subdim,
         unsigned char item) const
       {
+        CONTEXT("BaseMesh::CellData::neighbours_item()");
         assert(subdim < cell_space_dim_);
         assert(item < this->num_subitems_per_subdim(subdim));
         return _neighbours[subdim][item];
@@ -256,6 +264,7 @@ namespace FEAST
       /// returns array of vectors of neighbours for given subdimension
       inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>* neighbours_subdim(subdim subdim) const
       {
+        CONTEXT("BaseMesh::CellData::neighbours_subdim()");
         assert(subdim < cell_space_dim_);
         return _neighbours[subdim];
       }
@@ -267,13 +276,15 @@ namespace FEAST
         unsigned char item,
         Cell<cell_space_dim_, cell_space_dim_, world_dim_>* neighbour)
       {
+        CONTEXT("BaseMesh::CellData::add_neighbour()");
         _neighbours[subdim][item].push_back(neighbour);
       }
 
 
       /// print neighbourhood information
-      inline void print(std::ostream& stream)
+      inline void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::CellData::print()");
         // print neighbourhood information into the next line
         stream << std::endl << "    [N:  ";
         for(unsigned char sdim(0) ; sdim < cell_space_dim_ ; ++sdim)
@@ -327,7 +338,7 @@ namespace FEAST
           }
         }
         stream << "]";
-      }
+      } // print()
     };
   } // namespace BaseMesh
 } // namespace FEAST

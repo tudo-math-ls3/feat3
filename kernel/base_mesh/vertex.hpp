@@ -37,6 +37,7 @@ namespace FEAST
       Vertex()
         : Item()
       {
+        CONTEXT("BaseMesh::Vertex::Vertex()");
         for(int i(0) ; i < world_dim_ ; ++i)
         {
           _coords[i] = 0.0;
@@ -48,6 +49,7 @@ namespace FEAST
       Vertex(double coords[])
         : Item()
       {
+        CONTEXT("BaseMesh::Vertex::Vertex()");
         for(int i(0) ; i < world_dim_ ; ++i)
         {
           _coords[i] = coords[i];
@@ -58,12 +60,14 @@ namespace FEAST
       /// DTOR
       ~Vertex()
       {
+        CONTEXT("BaseMesh::Vertex::~Vertex()");
       }
 
 
       /// returns a specific coordinate
       inline double coord(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Vertex::coord()");
         assert(index < world_dim_);
         return _coords[index];
       }
@@ -72,6 +76,7 @@ namespace FEAST
       /// returns a pointer to the coordinate array
       inline double const* coords() const
       {
+        CONTEXT("BaseMesh::Vertex::coords()");
         return _coords;
       }
 
@@ -79,6 +84,7 @@ namespace FEAST
       /// sets the coordinates of this vertex
       inline void set_coords(double const* coords)
       {
+        CONTEXT("BaseMesh::Vertex::set_coords()");
         for (unsigned char index(0) ; index < world_dim_ ; ++index)
         {
           _coords[index] = coords[index];
@@ -88,6 +94,7 @@ namespace FEAST
       /// sets a  a specific coordinate
       inline void set_coord(unsigned char const index, double const coord)
       {
+        CONTEXT("BaseMesh::Vertex::set_coord()");
         assert(index < world_dim_);
         _coords[index] = coord;
       }
@@ -96,6 +103,7 @@ namespace FEAST
       /// prints this vertex to the given stream
       inline void print(std::ostream& stream)
       {
+        CONTEXT("BaseMesh::Vertex::print()");
         stream << "V";
         print_index(stream);
 //        stream.precision(3);

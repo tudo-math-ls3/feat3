@@ -47,14 +47,19 @@ namespace FEAST
   template<typename T_>
   class InstantiationPolicy<T_, NonCopyable>
   {
+
   private:
+
     /// Unwanted copy constructor: Do not implement!
     InstantiationPolicy(const InstantiationPolicy &);
+
 
     /// Unwanted copy assignment operator: Do not implement!
     InstantiationPolicy & operator= (const InstantiationPolicy &);
 
+
   public:
+
     /// Default constructor.
     InstantiationPolicy()
     {
@@ -70,7 +75,9 @@ namespace FEAST
   template<typename T_>
   class InstantiationPolicy<T_, NonInstantiable>
   {
+
   private:
+
     /// Unwanted copy constructor: Do not implement!
     InstantiationPolicy(const InstantiationPolicy &);
 
@@ -90,7 +97,9 @@ namespace FEAST
   template <typename T_>
   class InstantiationPolicy<T_, Singleton>
   {
+
   private:
+
     class DeleteOnDestruction;
 
     friend class DeleteOnDestruction;
@@ -104,23 +113,28 @@ namespace FEAST
       return &instance;
     }
 
+
     /// Deletes the object of T_ that is pointed at by ptr.
     static void _delete(T_ * const ptr)
     {
       delete ptr;
     }
 
+
     /// Unwanted copy constructor: Do not implement!
     InstantiationPolicy(const InstantiationPolicy &);
 
+
     /// Unwanted copy assignment operator: Do not implement!
     InstantiationPolicy & operator= (const InstantiationPolicy &);
+
 
   protected:
     /// Default constructor.
     InstantiationPolicy()
     {
     }
+
 
   public:
     /// Returns the instance.
@@ -146,6 +160,7 @@ namespace FEAST
   };
 
 
+
   /**
   * \brief allows automatic deletion of the destructed object
   *
@@ -155,15 +170,19 @@ namespace FEAST
   class InstantiationPolicy<T_, Singleton>::DeleteOnDestruction
   {
   private:
+
     /// Pointer to our managed object
     T_ * * const _ptr;
 
+
   public:
+
     /// Constructor
     DeleteOnDestruction(T_ * * const ptr)
       : _ptr(ptr)
     {
     }
+
 
     /// Destructor
     ~DeleteOnDestruction()

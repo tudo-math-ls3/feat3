@@ -51,6 +51,7 @@ namespace FEAST
       /// CTOR 1
       Item()
       {
+        CONTEXT("BaseMesh::Item::Item()");
         _index = Constants::MAX_INDEX;
         _number = Constants::MAX_NUMBER;
       }
@@ -60,22 +61,26 @@ namespace FEAST
         : _index(index),
           _number(number)
       {
+        CONTEXT("BaseMesh::Item::Item()");
       }
 
       /// DTOR (must be virtual)
       virtual ~Item()
       {
+        CONTEXT("BaseMesh::Item::~Item()");
       }
 
       /// returns the index of this item
       inline global_index_t index() const
       {
+        CONTEXT("BaseMesh::Item::index()");
         return _index;
       }
 
       /// sets the index of this item
       inline void set_index(global_index_t const index)
       {
+        CONTEXT("BaseMesh::Item::set_index()");
         assert(index < Constants::MAX_INDEX);
         _index = index;
       }
@@ -83,12 +88,14 @@ namespace FEAST
       /// returns the number of this item
       inline global_index_t number() const
       {
+        CONTEXT("BaseMesh::Item::number()");
         return _number;
       }
 
       /// sets the number of this item
       inline void set_number(global_index_t const number)
       {
+        CONTEXT("BaseMesh::Item::set_number()");
         assert(number < Constants::MAX_NUMBER);
         _number = number;
       }
@@ -96,12 +103,14 @@ namespace FEAST
       /// unsets the number of this item, i.e. sets it to Constants::MAX_NUMBER
       inline void unset_number()
       {
+        CONTEXT("BaseMesh::Item::unset_number()");
         _number = Constants::MAX_NUMBER;
       }
 
       /// prints the index of this item to the given stream
       inline void print_index(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Item::print_index()");
         if (index() != Constants::MAX_INDEX)
         {
           stream << index();
@@ -121,6 +130,7 @@ namespace FEAST
       /// returns the index of this item as string
       inline std::string print_index() const
       {
+        CONTEXT("BaseMesh::Item::print_index()");
         std::ostringstream oss;
         print_index(oss);
         return oss.str();

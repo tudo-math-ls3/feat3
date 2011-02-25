@@ -196,6 +196,7 @@ namespace FEAST
     */
     static void open_log_file(std::string const &base_name = file_base_name_default)
     {
+      CONTEXT("Logger::open_log_file()");
       // set base name of the log file
       file_base_name = base_name;
       // add the MPI_COMM_WORLD rank of this process to the base name
@@ -233,6 +234,7 @@ namespace FEAST
     */
     static void close_log_file()
     {
+      CONTEXT("Logger::close_log_file()");
       if (file.is_open())
       {
         file.close();
@@ -257,6 +259,7 @@ namespace FEAST
     */
     static void log(std::string const message)
     {
+      CONTEXT("Logger::log()");
       file << message;
     }
 
@@ -294,6 +297,7 @@ namespace FEAST
     */
     static void log(std::vector<std::string> const &messages)
     {
+      CONTEXT("Logger::log()");
       for(unsigned int i(0) ; i<messages.size() ; ++i)
       {
         file << messages[i];
@@ -321,6 +325,7 @@ namespace FEAST
       std::string const &message,
       target targ = SCREEN_FILE)
     {
+      CONTEXT("Logger::log_master()");
       // init a new message with corresponding ID
       Comm::init(ServiceIDs::LOG_RECEIVE);
 
@@ -361,6 +366,7 @@ namespace FEAST
     */
     static void receive()
     {
+      CONTEXT("Logger::receive()");
       // read length of the messages from the buffer
       unsigned int msg_length;
       Comm::read(msg_length);
@@ -422,6 +428,7 @@ namespace FEAST
       char* const messages,
       target targ = SCREEN_FILE)
     {
+      CONTEXT("Logger::log_master_array()");
       // init a new message with corresponding ID
       Comm::init(ServiceIDs::LOG_RECEIVE_ARRAY);
 
@@ -465,6 +472,7 @@ namespace FEAST
       std::vector<std::string> const &messages,
       target targ = SCREEN_FILE)
     {
+      CONTEXT("Logger::log_master_array()");
 
 // COMMENT_HILMAR: Maybe it is more efficient to *not* realise this via the first version of log_master_array(), but
 // to trigger an extra service receive routine on master side...
@@ -517,10 +525,11 @@ namespace FEAST
     */
     static void receive_array()
     {
+      CONTEXT("Logger::receive_array()");
 
-  // COMMENT_HILMAR:
-  // This function allocates and deallocates three arrays. Maybe it is more efficient to use and reuse some
-  // "pre-allocated" storage...
+// COMMENT_HILMAR:
+// This function allocates and deallocates three arrays. Maybe it is more efficient to use and reuse some
+// "pre-allocated" storage...
 
       // read number of messages the char array consists of from to the buffer
       unsigned int num_messages;

@@ -136,6 +136,7 @@ namespace FEAST
         _master(nullptr),
         _load_balancer(nullptr)
     {
+      CONTEXT("Universe::Universe()");
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);
       if(!mpi_is_initialised)
@@ -152,6 +153,7 @@ namespace FEAST
     */
     ~Universe()
     {
+      CONTEXT("Universe::~Universe()");
     }
 
 
@@ -178,6 +180,7 @@ namespace FEAST
     */
     void _init()
     {
+      CONTEXT("Universe::_init()");
       // get MPI_COMM_WORLD rank of this process
       int my_rank;
       int mpi_error_code = MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -352,6 +355,7 @@ namespace FEAST
     */
     void _cleanup()
     {
+      CONTEXT("Universe::_cleanup()");
       // open log files
       Logger::close_log_file();
 
@@ -381,6 +385,35 @@ namespace FEAST
     // set parent class as friend such that it can execute CTOR and DTOR of this class
     friend class InstantiationPolicy<Universe<space_dim_, world_dim_>, Singleton>;
 
+    /* ******************
+    * getters & setters *
+    ********************/
+    /**
+    * \brief getter for the load balancer object
+    *
+    * \return pointer to LoadBalancer #_load_balancer
+    */
+    inline LoadBalancer<space_dim_, world_dim_>* load_balancer() const
+    {
+      CONTEXT("Universe::load_balancer()");
+      assert(_universe_created);
+      return _load_balancer;
+    }
+
+
+    /**
+    * \brief getter for the master process object
+    *
+    * \return pointer to Master #_master
+    */
+    inline Master* master() const
+    {
+      CONTEXT("Universe::master()");
+      assert(_universe_created);
+      return _master;
+    }
+
+
     /* ****************
     * member functions*
     ******************/
@@ -392,6 +425,7 @@ namespace FEAST
     */
     void create()
     {
+      CONTEXT("Universe::create()");
       if(!_universe_created)
       {
         _universe_created = true;
@@ -442,6 +476,7 @@ namespace FEAST
       unsigned int num_processes_in_group[],
       bool includes_dedicated_load_bal[])
     {
+      CONTEXT("Universe::create()");
       if(!_universe_created)
       {
         _universe_created = true;
@@ -479,6 +514,7 @@ namespace FEAST
     */
     void destroy()
     {
+      CONTEXT("Universe::destroy()");
       if(_universe_created)
       {
         if(!Process::is_master)
@@ -509,32 +545,6 @@ namespace FEAST
       {
         MPI_Finalize();
       }
-    }
-
-
-    /* ******************
-    * getters & setters *
-    ********************/
-    /**
-    * \brief getter for the load balancer object
-    *
-    * \return pointer to LoadBalancer #_load_balancer
-    */
-    inline LoadBalancer<space_dim_, world_dim_>* load_balancer() const
-    {
-      assert(_universe_created);
-      return _load_balancer;
-    }
-
-    /**
-    * \brief getter for the master process object
-    *
-    * \return pointer to Master #_master
-    */
-    inline Master* master() const
-    {
-      assert(_universe_created);
-      return _master;
     }
   };
 } // namespace FEAST

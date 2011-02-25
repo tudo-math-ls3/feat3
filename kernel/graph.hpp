@@ -109,6 +109,7 @@ namespace FEAST
         _index(nullptr),
         _neighbours(nullptr)
     {
+      CONTEXT("Graph::Graph()");
       // copy index array
       _index = new unsigned int[num_nodes+1];
       for(unsigned int i(0) ; i < num_nodes+1 ; ++i)
@@ -127,6 +128,7 @@ namespace FEAST
     /// destructor
     ~Graph()
     {
+      CONTEXT("Graph::~Graph()");
       delete [] _index;
       _index = nullptr;
       delete [] _neighbours;
@@ -143,6 +145,7 @@ namespace FEAST
     */
     inline unsigned int num_nodes() const
     {
+      CONTEXT("Graph::num_nodes()");
       return _num_nodes;
     }
 
@@ -153,6 +156,7 @@ namespace FEAST
     */
     inline unsigned int* index() const
     {
+      CONTEXT("Graph::index()");
       return _index;
     }
 
@@ -163,6 +167,7 @@ namespace FEAST
     */
     inline unsigned int* neighbours() const
     {
+      CONTEXT("Graph::neighbours()");
       return _neighbours;
     }
 
@@ -172,6 +177,7 @@ namespace FEAST
     /// print the graph to the given stream
     void print(std::ostream& stream) const
     {
+      CONTEXT("Graph::print()");
       stream << "number of nodes: " << _num_nodes << std::endl;
       if (_num_nodes > 0)
       {
@@ -195,6 +201,7 @@ namespace FEAST
     /// returns the graph print as string
     inline std::string print() const
     {
+      CONTEXT("Graph::print()");
       std::ostringstream oss;
       print(oss);
       return oss.str();
@@ -252,6 +259,7 @@ namespace FEAST
       : _num_neighbours(num_neighbours),
         _neighbours(nullptr)
     {
+      CONTEXT("GraphDistributed::GraphDistributed()");
       // copy array of neighbours
       _neighbours = new unsigned int[num_neighbours];
       for(unsigned int i(0) ; i < num_neighbours ; ++i)
@@ -263,6 +271,7 @@ namespace FEAST
     /// destructor
     ~GraphDistributed()
     {
+      CONTEXT("GraphDistributed::~GraphDistributed()");
       delete [] _neighbours;
       _neighbours = nullptr;
     }
@@ -277,6 +286,7 @@ namespace FEAST
     */
     inline unsigned int num_neighbours() const
     {
+      CONTEXT("GraphDistributed::num_neighbours()");
       return _num_neighbours;
     }
 
@@ -287,6 +297,7 @@ namespace FEAST
     */
     inline unsigned int* neighbours() const
     {
+      CONTEXT("GraphDistributed::neighbours()");
       return _neighbours;
     }
 
@@ -296,6 +307,7 @@ namespace FEAST
     /// prints the distributed graph to the given stream
     void print(std::ostream& stream) const
     {
+      CONTEXT("GraphDistributed::print()");
       stream << "distributed graph: ";
       for(unsigned int i(0) ; i < _num_neighbours ; ++i)
       {
@@ -307,12 +319,12 @@ namespace FEAST
     /// returns the distributed graph print as string
     inline std::string print() const
     {
+      CONTEXT("GraphDistributed::print()");
       std::ostringstream oss;
       print(oss);
       return oss.str();
     }
   }; // class GraphDistributed
-
 } // namespace FEAST
 
 #endif // guard KERNEL_GRAPH_HPP

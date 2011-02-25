@@ -53,7 +53,7 @@ namespace FEAST
     * \author Hilmar Wobker
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennten wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
-// die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wieder um Quad und Tri erben. Darin koennte
+// die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wiederum Quad und Tri erben. Darin koennte
 // man zum Beispiel die Funktion _determine_edge_orientation() implementieren.
     template<
       unsigned char space_dim_,
@@ -80,6 +80,7 @@ namespace FEAST
       /// returns index (w.r.t. to quad numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
+        CONTEXT("BaseMesh::Quad::_edge_vertex()");
         assert(iedge < num_edges());
         assert(iv < 2);
         // the index is inquired from the fixed numbering scheme stored in Numbering::quad_edge_vertices
@@ -94,6 +95,7 @@ namespace FEAST
       */
       inline void _determine_edge_orientation()
       {
+        CONTEXT("BaseMesh::Quad::_determine_edge_orientation()");
         try
         {
           for(unsigned char iedge(0) ; iedge < num_edges() ; ++iedge)
@@ -131,6 +133,7 @@ namespace FEAST
         unsigned char ref_level)
         : Cell<2, space_dim_, world_dim_>(ref_level)
       {
+        CONTEXT("BaseMesh::Quad::Quad()");
         _vertices[0] = v0;
         _vertices[1] = v1;
         _vertices[2] = v2;
@@ -160,6 +163,7 @@ namespace FEAST
       /// returns number of vertices
       inline unsigned char num_vertices() const
       {
+        CONTEXT("BaseMesh::Quad::num_vertices()");
         return 4;
       }
 
@@ -167,6 +171,7 @@ namespace FEAST
       /// returns vertex at given index
       inline Vertex_* vertex(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Quad::vertex()");
         assert(index < num_vertices());
         return _vertices[index];
       }
@@ -175,6 +180,7 @@ namespace FEAST
       /// returns number of edges
       inline unsigned char num_edges() const
       {
+        CONTEXT("BaseMesh::Quad::num_edges()");
         return 4;
       }
 
@@ -182,6 +188,7 @@ namespace FEAST
       /// returns edge at given index
       inline Cell_1D_* edge(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Quad::edge()");
         assert(index < num_edges());
         return _edges[index];
       }
@@ -190,6 +197,7 @@ namespace FEAST
       /// returns next vertex of vertex with given index w.r.t. to ccw ordering
       inline Vertex_* next_vertex_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Quad::next_vertex_ccw()");
         assert(index < num_vertices());
         return _vertices[Numbering::quad_next_vertex_ccw[index]];
       }
@@ -198,6 +206,7 @@ namespace FEAST
       /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
       inline Vertex_* previous_vertex_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Quad::previous_vertex_ccw()");
         assert(index < num_vertices());
         return _vertices[Numbering::quad_previous_vertex_ccw[index]];
       }
@@ -206,6 +215,7 @@ namespace FEAST
       /// returns next edge of edge with given index w.r.t. to ccw ordering
       inline Cell_1D_* next_edge_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Quad::next_edge_ccw()");
         assert(index < num_edges());
         return _edges[Numbering::quad_next_edge_ccw[index]];
       }
@@ -214,6 +224,7 @@ namespace FEAST
       /// returns previous edge of edge with given index w.r.t. to ccw ordering
       inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
       {
+        CONTEXT("BaseMesh::Quad::previous_edge_ccw()");
         assert(index < num_edges());
         return _edges[Numbering::quad_previous_edge_ccw[index]];
       }
@@ -226,6 +237,7 @@ namespace FEAST
       */
       inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Quad::subdivide()");
         try
         {
           // assure that this cell has not been divided yet
@@ -463,6 +475,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
       */
       inline void validate(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Quad::validate()");
         try
         {
           if(space_dim_ == 2)
@@ -557,9 +570,11 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
         }
       }
 
+
       /// print information about this quad
-      inline void print(std::ostream& stream)
+      inline void print(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Quad::print()");
         stream << "Quad";
         this->print_index(stream);
 

@@ -302,6 +302,7 @@ namespace FEAST
       */
       inline void _set_num_children(unsigned char const num)
       {
+        CONTEXT("BaseMesh::Cell::_set_num_children()");
         // this function must not be called when there *are* already children
         assert(_children == nullptr && _num_children == 0);
         // and it must not be called to unset children (use unset_children() for that)
@@ -325,6 +326,7 @@ namespace FEAST
         unsigned char const index,
         Cell* e)
       {
+        CONTEXT("BaseMesh::Cell::_set_child()");
         assert(index < num_children());
         // ensure that this function is not used to unset children (use unset_children() for that)
         assert(e != nullptr);
@@ -334,6 +336,7 @@ namespace FEAST
       /// unsets all children (which should not be done via set_child(i, nullptr))
       inline void _unset_children()
       {
+        CONTEXT("BaseMesh::Cell::_unset_children()");
         // COMMENT_HILMAR: For the time being, we enforce that this function may only be called when there actually *are*
         // valid children. (To discover eventual errors in apply/unapply actions.)
         assert(num_children() > 0);
@@ -356,6 +359,7 @@ namespace FEAST
           _children(nullptr),
           _refinement_level(ref_level)
       {
+        CONTEXT("BaseMesh::Cell::Cell()");
         assert(world_dim_ >= space_dim_);
         assert(space_dim_ >= cell_dim_);
       }
@@ -363,6 +367,7 @@ namespace FEAST
 
       virtual ~Cell()
       {
+        CONTEXT("BaseMesh::Cell::~Cell()");
         _parent = nullptr;
       }
 
@@ -370,6 +375,7 @@ namespace FEAST
       /// returns parent
       inline Cell* parent() const
       {
+        CONTEXT("BaseMesh::Cell::parent()");
         return _parent;
       }
 
@@ -377,6 +383,7 @@ namespace FEAST
       /// sets parent
       inline void set_parent(Cell* const par)
       {
+        CONTEXT("BaseMesh::Cell::set_parent()");
         _parent = par;
       }
 
@@ -384,6 +391,7 @@ namespace FEAST
       /// returns number of children
       inline unsigned char num_children() const
       {
+        CONTEXT("BaseMesh::Cell::num_children()");
         return _num_children;
       }
 
@@ -391,6 +399,7 @@ namespace FEAST
       /// returns child at given index
       inline Cell* child(unsigned char index) const
       {
+        CONTEXT("BaseMesh::Cell::child()");
         assert(index < num_children());
         return _children[index];
       }
@@ -399,6 +408,7 @@ namespace FEAST
       /// returns refinement level of this cell
       inline unsigned char refinement_level() const
       {
+        CONTEXT("BaseMesh::Cell::refinement_level()");
         return _refinement_level;
       }
 
@@ -406,6 +416,7 @@ namespace FEAST
       /// returns subdivision data object
       inline SubdivisionData<cell_dim_, space_dim_, world_dim_>* subdiv_data() const
       {
+        CONTEXT("BaseMesh::Cell::subdiv_data()");
         return _subdiv_data;
       }
 
@@ -413,6 +424,7 @@ namespace FEAST
       /// returns subdivision data object
       inline void set_subdiv_data(SubdivisionData<cell_dim_, space_dim_, world_dim_>* subdiv_data)
       {
+        CONTEXT("BaseMesh::Cell::set_subdiv_data()");
         try
         {
           if(_subdiv_data != nullptr)
@@ -431,6 +443,7 @@ namespace FEAST
       /// deletes the subdivision data object
       inline void delete_subdiv_data()
       {
+        CONTEXT("BaseMesh::Cell::delete_subdiv_data()");
         _subdiv_data->clear_created();
         delete _subdiv_data;
         _subdiv_data = nullptr;
@@ -447,6 +460,7 @@ namespace FEAST
 // Dimension die darin enthaltenen subcells als "zu verschicken" markieren.
       inline bool active() const
       {
+        CONTEXT("BaseMesh::Cell::active()");
         return (num_children() == 0);
       }
 
@@ -454,7 +468,7 @@ namespace FEAST
       virtual void subdivide(SubdivisionData<cell_dim_, space_dim_, world_dim_>*) = 0;
 
 
-      virtual void print(std::ostream& stream) = 0;
+      virtual void print(std::ostream& stream) const = 0;
 
 
       virtual void validate(std::ostream&) const = 0;
@@ -468,6 +482,7 @@ namespace FEAST
       */
       void validate_history(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Cell::validate_history()");
         try
         {
           std::string s = "Error in cell " + this->print_index() + ": ";
@@ -531,8 +546,9 @@ namespace FEAST
       * \param[in] stream
       * Stream to write into.
       */
-      inline void print_history(std::ostream& stream)
+      inline void print_history(std::ostream& stream) const
       {
+        CONTEXT("BaseMesh::Cell::print_history()");
         stream << "[parent: ";
         if (parent() != nullptr)
         {

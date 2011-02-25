@@ -58,6 +58,7 @@ namespace FEAST
     /// infinite service loop waiting for messages
     void service()
     {
+      CONTEXT("Master::service()");
       std::cout << "Master at your service... " << std::endl;
       sleep(2.0);
 
@@ -130,7 +131,6 @@ namespace FEAST
       std::cout << "Master finished service." << std::endl;
     }
   }; // class Master
-
 } // namespace FEAST
 
 #endif // guard KERNEL_MASTER_HPP

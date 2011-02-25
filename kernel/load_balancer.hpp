@@ -209,11 +209,13 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         _belongs_to_group(nullptr),
         _base_mesh(nullptr)
     {
+      CONTEXT("LoadBalancer::LoadBalancer()");
     }
 
     /// destructor
     ~LoadBalancer()
     {
+      CONTEXT("LoadBalancer::~LoadBalancer()");
       if (_subgroup_ranks != nullptr)
       {
         for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
@@ -264,6 +266,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     inline ProcessGroup* process_group() const
     {
+      CONTEXT("LoadBalancer::process_group()");
       return _process_group;
     }
 
@@ -275,6 +278,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     inline BaseMesh::BM<space_dim_, world_dim_>* base_mesh() const
     {
+      CONTEXT("LoadBalancer::base_mesh()");
       return _base_mesh;
     }
 
@@ -286,6 +290,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     inline bool group_has_dedicated_load_bal() const
     {
+      CONTEXT("LoadBalancer::group_has_dedicated_load_bal()");
       return _group_has_dedicated_load_bal;
     }
 
@@ -295,6 +300,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /// dummy function in preparation of a function reading in a mesh file
     void read_mesh(std::string const & mesh_file)
     {
+      CONTEXT("LoadBalancer::read_mesh()");
       // the mesh is read by the process group coordinator
       if(_process_group->is_coordinator())
       {
@@ -329,6 +335,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     void define_work_groups()
     {
+      CONTEXT("LoadBalancer::define_work_groups()");
     }
 
 
@@ -362,6 +369,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       int** subgroup_ranks,
       Graph** graphs)
     {
+      CONTEXT("LoadBalancer::create_work_groups()");
       // set data/pointers on the coordinator process (where the data is already available)
       if(_process_group->is_coordinator())
       {
@@ -668,7 +676,6 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       }
     } // create_work_groups()
   };
-
 } // namespace FEAST
 
 #endif // guard KERNEL_LOAD_BAL_HPP
