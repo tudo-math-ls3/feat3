@@ -13,6 +13,12 @@ int main(int argc, char** argv)
 {
     int result(EXIT_SUCCESS);
 
+    std::string mpc("mpiproccount");
+    if (argc == 2 && std::string(argv[1]) == mpc.c_str())
+    {
+        return (*TestList::instance()->begin_tests())->mpi_proc_count();
+    }
+
     if (argc > 1)
     {
       std::list<std::string> labels;

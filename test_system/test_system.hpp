@@ -171,6 +171,12 @@ namespace TestSystem
         return _id;
       }
 
+      /// Returns the mpi proc count to use.
+      virtual unsigned long mpi_proc_count() const
+      {
+        return 1;
+      }
+
       /// Utility method used bei TEST_CHECK_*
       virtual void check(const char * const function, const char * const file,
           const long line, bool was_ok, const std::string & message) const
