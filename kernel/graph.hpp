@@ -99,7 +99,7 @@ namespace FEAST
     /* *************************
     * constructor & destructor *
     ***************************/
-    /// constructor
+    /// CTOR
     Graph(
       unsigned int const num_nodes,
       unsigned int* const index,
@@ -125,7 +125,7 @@ namespace FEAST
       }
     }
 
-    /// destructor
+    /// DTOR
     ~Graph()
     {
       CONTEXT("Graph::~Graph()");
@@ -251,7 +251,7 @@ namespace FEAST
     /* *************************
     * constructor & destructor *
     ***************************/
-    /// constructor
+    /// CTOR
     GraphDistributed(
       unsigned int const num_neighbours,
       unsigned int* const neighbours
@@ -268,7 +268,7 @@ namespace FEAST
       }
     }
 
-    /// destructor
+    /// DTOR
     ~GraphDistributed()
     {
       CONTEXT("GraphDistributed::~GraphDistributed()");

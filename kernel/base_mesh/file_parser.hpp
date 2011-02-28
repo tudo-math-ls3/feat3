@@ -23,6 +23,12 @@ namespace FEAST
     *
     * To be specialised w.r.t. space_dim_
     *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Dominik Goeddeke
     * \author Hilmar Wobker
     */
@@ -36,6 +42,9 @@ namespace FEAST
 
     /**
     * \brief template class for base mesh file parser, specialisation for 1D files
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \note As long as no real file parser is implemented, we only manually create a 1D base mesh here.
     *
@@ -130,6 +139,9 @@ namespace FEAST
     *
     * This class parses 2D mesh files in FEAST1 format. It is friend of class BM to have full access to base mesh's
     * private members.
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \note Currently, we only have 2D files, so we implemented this 2D file reader only. Before doing the same for
     * 1D and 3D, one should think about how to avoid too much code duplication.
@@ -767,6 +779,9 @@ COMMENT_HILMAR: will be adapted later
 
     /**
     * \brief template class for base mesh file parser, specialisation for 3D files
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \note As long as no real file parser is implemented, we only manually create a 3D base mesh here.
     *

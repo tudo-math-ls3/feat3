@@ -31,6 +31,15 @@ namespace FEAST
     *
     * To be specialised w.r.t. template parameter space_dim_.
     *
+    * \tparam cell_dim_
+    * cell dimension (must be <= space dimension)
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
     template<
@@ -44,6 +53,12 @@ namespace FEAST
 
     /**
     * \brief class providing containers and functions for subcells of 1D cells, i.e. for vertices
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \author Hilmar Wobker
     */
@@ -78,6 +93,15 @@ namespace FEAST
       * \brief templated function to remove items from the given vector
       *
       * The item is swapped to the end of the list and then deleted and removed.
+      *
+      * \tparam T_
+      * class type of the item and the vector items
+      *
+      * \param[in] v
+      * vector from which the item is to be removed
+      *
+      * \param[in] item
+      * item to be removed from the vector
       */
 //COMMENT_HILMAR: Move this function to some parent class BaseMeshAux or similar.
       template<typename T_>
@@ -199,6 +223,12 @@ namespace FEAST
 
     /**
     * \brief class providing containers and functions for subcells of 2D cells, i.e. for vertices and edges
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \author Hilmar Wobker
     */
@@ -369,6 +399,12 @@ namespace FEAST
 
     /**
     * \brief class providing containers and functions for subcells of 3D cells, i.e. for vertices, edges and faces
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \author Hilmar Wobker
     */

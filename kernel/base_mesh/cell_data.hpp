@@ -40,6 +40,15 @@ namespace FEAST
     /**
     * \brief general cell information which is needed by Cell and CellData class
     *
+    * \tparam cell_dim_
+    * cell dimension (must be <= space dimension)
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
 // COMMENT_HILMAR: Das erscheint irgendwie maechtig umstaendlich, ist aber leider aufgrund der Besonderheit der
@@ -112,8 +121,17 @@ namespace FEAST
     /**
     * \brief emtpy cell data class definition for cells with dimension smaller than space dimension
     *
-    * Avoid instatiation of cell-specific data in shapes with dimension smaller than space dimension.
+    * Avoid instatiation of cell-specific data in cells with dimension smaller than space dimension.
     * The class is only implemented for cell_dim_ = space_dim_ (see below).
+    *
+    * \tparam cell_dim_
+    * cell dimension (must be <= space dimension)
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \author Hilmar Wobker
     */
@@ -154,7 +172,14 @@ namespace FEAST
     /**
     * \brief class storing cell-specific data like neighbourhood information
     *
-    * Only implemented for cell_dim_ = space_dim_.
+    * This data is only stored for cells of full dimension, i.e., for those having space dimension.
+    *
+    * \tparam cell_space_dim_
+    * cell and space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in
+    * a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \author Hilmar Wobker
     */
@@ -196,6 +221,7 @@ namespace FEAST
 
     public:
 
+      /// DTOR (automatically virtual since DTOR of base class Item is virtual)
       ~CellData()
       {
         CONTEXT("BaseMesh::CellData::~CellData()");

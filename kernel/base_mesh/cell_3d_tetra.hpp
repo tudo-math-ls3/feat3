@@ -26,6 +26,12 @@ namespace FEAST
     /**
     * \brief 3D base mesh cell of type tetra
     *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennte wir ueberlegen, eine weitere Klasse Cell3D einzufuehren,

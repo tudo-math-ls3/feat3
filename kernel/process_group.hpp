@@ -191,8 +191,8 @@ namespace FEAST
     /* ***********
     * destructor *
     *************/
-    /// destructor
-    ~ProcessGroup()
+    /// DTOR
+    virtual ~ProcessGroup()
     {
       CONTEXT("ProcessGroup::~ProcessGroup()");
       if(_ranks_group_parent != nullptr)
@@ -552,7 +552,7 @@ namespace FEAST
     } // constructor
 
 
-    /// destructor
+    /// DTOR (automatically virtual since DTOR of base class ProcessGroup is virtual)
     ~WorkGroup()
     {
       CONTEXT("WorkGroup::~WorkGroup()");
@@ -892,7 +892,7 @@ namespace FEAST
       }
     } // constructor
 
-    /// destructor
+    /// DTOR (automatically virtual since DTOR of base class ProcessGroup is virtual)
     ~ProcessSubgroup()
     {
       CONTEXT("ProcessSubgroup::~ProcessSubgroup()");

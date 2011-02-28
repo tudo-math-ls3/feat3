@@ -29,10 +29,13 @@ namespace FEAST
     /**
     * \brief converting an item to a string
     *
+    * \tparam T_
+    * type to be stringified
+    *
     * \param[in] item
     * The item to stringify
     */
-    template <typename T_>
+    template<typename T_>
     static inline std::string stringify(const T_ & item)
     {
       std::ostringstream s;
@@ -198,7 +201,7 @@ namespace FEAST
   public:
 
     /**
-    * \brief constructor using prefix
+    * \brief CTOR using prefix
     *
     * \param[in] width
     * width of the lines in the pretty printed block
@@ -222,7 +225,7 @@ namespace FEAST
 
 
     /**
-    * \brief constructor using an empty prefix
+    * \brief CTOR using an empty prefix
     *
     * \param[in] width
     * width of the lines in the pretty printed block
@@ -237,12 +240,6 @@ namespace FEAST
         _width(width),
         _delim(delim),
         _prefix("")
-    {
-    }
-
-
-    /// destructor
-    ~PrettyPrinter()
     {
     }
 

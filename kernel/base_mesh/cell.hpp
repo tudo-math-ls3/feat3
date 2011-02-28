@@ -21,7 +21,11 @@ namespace FEAST
   namespace BaseMesh
   {
 
-    /// stores the fixed numbering schemes
+    /**
+    * \brief stores the fixed numbering schemes
+    *
+    * \author Hilmar Wobker
+    */
     struct Numbering
     {
       /// indices of start and end vertex of the four edges in a quad
@@ -154,6 +158,7 @@ namespace FEAST
 
 
 
+
     /**
     * \brief dimension specific function interface for cell class (empty definition to be specialised by cell dimension)
     *
@@ -163,6 +168,17 @@ namespace FEAST
     * Why do we need this interface already in the Cell class? Since we must be able to do something like
     *   face(iface)->child(0)->edge(1)
     * where child(0) is of type Cell<2, ...> (and not, e.g., of type Quad<...>!).
+    *
+    * \tparam cell_dim_
+    * cell dimension (must be <= space dimension)
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
+    * \author Hilmar Wobker
     */
     template<
       unsigned char cell_dim_,
@@ -173,7 +189,19 @@ namespace FEAST
     };
 
 
-    /// function interface for 1D cells
+
+
+    /**
+    * \brief function interface for 1D cells
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
+    * \author Hilmar Wobker
+    */
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
@@ -189,7 +217,19 @@ namespace FEAST
     };
 
 
-    /// function interface for 2D cells
+
+
+    /**
+    * \brief function interface for 2D cells
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
+    * \author Hilmar Wobker
+    */
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
@@ -223,7 +263,18 @@ namespace FEAST
 
 
 
-    /// function interface for 3D cells
+
+    /**
+    * \brief function interface for 3D cells
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
+    * \author Hilmar Wobker
+    */
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>
@@ -252,13 +303,21 @@ namespace FEAST
 
 
 
-
     /**
     * \brief general base mesh cell class containing parent/child information
     *
     * Used for cells of maximum dimension (e.g., quads in a 2D world), but also for those of lower dimension
     * (e.g., edges in a 2D world). For the latter, however, the CellData class is empty such that no unnecessary
     * neighbourhood information etc. included.
+    *
+    * \tparam cell_dim_
+    * cell dimension (must be <= space dimension)
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
     *
     * \author Hilmar Wobker
     */
@@ -353,6 +412,12 @@ namespace FEAST
 
     public:
 
+      /**
+      * \brief CTOR
+      *
+      * \param[in] ref_level
+      * level of refinement on which this cell is created
+      */
       Cell(unsigned char ref_level)
         : _parent(nullptr),
           _num_children(0),
@@ -365,7 +430,8 @@ namespace FEAST
       }
 
 
-      virtual ~Cell()
+      /// DTOR (automatically virtual since DTOR of base class Item is virtual)
+      ~Cell()
       {
         CONTEXT("BaseMesh::Cell::~Cell()");
         _parent = nullptr;

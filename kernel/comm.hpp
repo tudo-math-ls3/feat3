@@ -82,10 +82,13 @@ namespace FEAST
     /**
     * \brief write one item of template type T_ to the MPI_COMM_WORLD buffer
     *
+    * \tparam T_
+    * type to be written to the buffer
+    *
     * \param[in] msg
     * item of template type T_ to be written to the buffer
     */
-    template <typename T_>
+    template<typename T_>
     static void write(T_ msg)
     {
       CONTEXT("Comm::write()");
@@ -119,10 +122,13 @@ namespace FEAST
     /**
     * \brief read one integer from the MPI_COMM_WORLD buffer
     *
+    * \tparam T_
+    * type to be read from the buffer
+    *
     * \param[out] msg
     * integer read from the buffer
     */
-    template <typename T_>
+    template<typename T_>
     static void read(T_& msg)
     {
       CONTEXT("Comm::read()");
@@ -162,13 +168,16 @@ namespace FEAST
     /**
     * \brief write an array of items of template type T_ to the MPI_COMM_WORLD buffer
     *
+    * \tparam T_
+    * type to be written to the buffer
+    *
     * \param[in] msg
     * array of items of template type T_ to be written to the buffer
     *
     * \param[in] size
     * size of the array
     */
-    template <typename T_>
+    template<typename T_>
     static void write(T_ msg[], int const size)
     {
       CONTEXT("Comm::write()");
@@ -182,13 +191,16 @@ namespace FEAST
     /**
     * \brief read an array of items of template type T_ from the MPI_COMM_WORLD buffer
     *
+    * \tparam T_
+    * type to be read from the buffer
+    *
     * \param[in] size
     * size of the array to be read
     *
     * \param[out] msg
     * array of items of template type T_ read from the buffer (has to be allocated before function call)
     */
-    template <typename T_>
+    template<typename T_>
     static void read(int const size, T_ msg[])
     {
       CONTEXT("Comm::read()");

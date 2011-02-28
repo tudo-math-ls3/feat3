@@ -34,6 +34,12 @@ namespace FEAST
   * Idea: The soon-to-be-implemented global Feast_init() routine encapsulates the entire universe and makes physics-level
   *       subgroups available to the programmer.
   *
+  * \tparam space_dim_
+  * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+  *
+  * \tparam world_dim_
+  * world dimension (determines the number of coordinates)
+  *
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
   */
@@ -147,7 +153,7 @@ namespace FEAST
 
 
     /**
-    * \brief destructor which automatically finalizes the MPI environment
+    * \brief DTOR which automatically finalizes the MPI environment
     *
     * Just like the constructor, the destructor is deliberately chosen to be private.
     */

@@ -64,7 +64,7 @@ namespace FEAST
         CONTEXT("BaseMesh::Item::Item()");
       }
 
-      /// DTOR (must be virtual)
+      /// DTOR
       virtual ~Item()
       {
         CONTEXT("BaseMesh::Item::~Item()");

@@ -50,6 +50,12 @@ namespace FEAST
     * "Orientation in the quad" means that edge vertices are traversed by increasing local vertex index. So, this must
     * not be mixed up with the standard way of defining orientation (i.e., running counter-clockwise through the quad).
     *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
 // COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennten wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,

@@ -23,6 +23,13 @@ namespace FEAST
     /**
     * \brief class for validating vertex neighbours
     *
+    * \tparam cell_space_dim_
+    * cell and space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in
+    * a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \note
     * Q: Why are there three classes CellDataValidationVertNeigh, CellDataValidationEdgeNeigh and
     *    CellDataValidationFaceNeigh? Can they not be united (the code is quite similar)?
@@ -50,8 +57,11 @@ namespace FEAST
       unsigned char world_dim_>
     class CellDataValidationVertNeigh
     {
+
     private:
+
     public:
+
       /**
       * \brief validates whether vertex neighbours are set correctly
       *
@@ -153,6 +163,13 @@ namespace FEAST
     /**
     * \brief class for validating edge neighbours
     *
+    * \tparam cell_space_dim_
+    * cell and space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in
+    * a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \note See note in class CellDataValidationVertNeigh.
     *
     * \author Hilmar Wobker
@@ -162,8 +179,11 @@ namespace FEAST
       unsigned char world_dim_>
     class CellDataValidationEdgeNeigh
     {
+
     private:
+
     public:
+
       /**
       * \brief validates whether edge neighbours are set correctly
       *
@@ -287,6 +307,13 @@ namespace FEAST
     /**
     * \brief class for validating face neighbours
     *
+    * \tparam cell_space_dim_
+    * cell and space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in
+    * a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \note See note in class CellDataValidationVertNeigh.
     *
     * \author Hilmar Wobker
@@ -296,8 +323,11 @@ namespace FEAST
       unsigned char world_dim_>
     class CellDataValidationFaceNeigh
     {
+
     private:
+
     public:
+
       /**
       * \brief validates whether face neighbours are set correctly
       *
@@ -423,6 +453,15 @@ namespace FEAST
     *
     * This general class is empty, only specialisations for cell_dim_ = space_dim_ are implemented.
     *
+    * \tparam cell_dim_
+    * cell dimension (must be <= space dimension)
+    *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
     template<
@@ -431,8 +470,11 @@ namespace FEAST
       unsigned char world_dim_>
     class CellDataValidation
     {
+
     private:
+
     public:
+
       /**
       * \brief dummy function called by cells with dimension smaller than space dimension
       *
@@ -451,13 +493,19 @@ namespace FEAST
     /**
     * \brief specialisation of class CellDataValidation for cell_dim_ = space_dim_ = 3
     *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
     template<unsigned char world_dim_>
     class CellDataValidation<3, 3, world_dim_>
     {
+
     private:
+
     public:
+
       /**
       * \brief validates neighbourhood of 3D cells
       *
@@ -480,13 +528,19 @@ namespace FEAST
     /**
     * \brief specialisation of class CellDataValidation for cell_dim_ = space_dim_ = 2
     *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
     template<unsigned char world_dim_>
     class CellDataValidation<2, 2, world_dim_>
     {
+
     private:
+
     public:
+
       /**
       * \brief validates neighbourhood of 2D cells
       *
@@ -508,13 +562,19 @@ namespace FEAST
     /**
     * \brief specialisation of class CellDataValidation for cell_dim_ = space_dim_ = 1
     *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     */
     template<unsigned char world_dim_>
     class CellDataValidation<1, 1, world_dim_>
     {
+
     private:
+
     public:
+
       /**
       * \brief validates neighbourhood of 1D cells
       *

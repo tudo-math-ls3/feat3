@@ -23,6 +23,12 @@ namespace FEAST
     /**
     * \brief 1D base mesh cell of type edge
     *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \note
     * Be aware of the difference between Cell<1, space_dim_, world_dim_> and Edge<space_dim_, world_dim_>. It is
     * analogous to the difference between Cell<2, space_dim_, world_dim_> and Quad<space_dim_, world_dim_>

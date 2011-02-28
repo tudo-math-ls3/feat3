@@ -18,6 +18,9 @@ namespace FEAST
     /**
     * \brief Container for a base mesh vertex, templated with dimension of the entire base mesh.
     *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke
     */

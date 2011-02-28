@@ -67,6 +67,12 @@ namespace FEAST
     *
     * "Orientation in the hexa" means that edge and face vertices are traversed by increasing local vertex index.
     *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \author Hilmar Wobker
     * \author Dominik Goeddeke
     */

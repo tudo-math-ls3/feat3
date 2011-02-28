@@ -187,7 +187,7 @@ namespace FEAST
                                + StringUtils::stringify(line) +")");
     }
 
-    /// Desctructor.
+    /// DTOR
     ~Context()
     {
       if (! context_stack)

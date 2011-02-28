@@ -31,16 +31,27 @@ namespace FEAST
   /**
   * \brief utility base class to restrict instantiation behaviour of its descendants
   *
+  * Empty class definition, to be specialised w.r.t. to tag Tag_.
+  *
+  * \tparam T_
+  * class to be tagged with an instantiation policy
+  *
+  * \tparam Tag_
+  * specific instantion policy tag
+  *
   * \author Dirk Ribbrock
   */
   template<
     typename T_,
-    typename Method_>
+    typename Tag_>
   class InstantiationPolicy;
 
 
   /**
   * \brief base class to prevent copying
+  *
+  * \tparam T_
+  * class to be tagged as NonCopyable
   *
   * \author Dirk Ribbrock
   */
@@ -70,6 +81,9 @@ namespace FEAST
   /**
   * \brief base class to prevent instantiation
   *
+  * \tparam T_
+  * class to be tagged as NonInstantiable
+  *
   * \author Dirk Ribbrock
   */
   template<typename T_>
@@ -92,9 +106,12 @@ namespace FEAST
   /**
   * \brief base class to prevent multiple instantiation
   *
+  * \tparam T_
+  * class to be tagged as singleton
+  *
   * \author Dirk Ribbrock
   */
-  template <typename T_>
+  template<typename T_>
   class InstantiationPolicy<T_, Singleton>
   {
 
@@ -164,9 +181,12 @@ namespace FEAST
   /**
   * \brief allows automatic deletion of the destructed object
   *
+  * \tparam T_
+  * class to be tagged as singleton
+  *
   * \author Dirk Ribbrock
   */
-  template <typename T_>
+  template<typename T_>
   class InstantiationPolicy<T_, Singleton>::DeleteOnDestruction
   {
   private:

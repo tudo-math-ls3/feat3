@@ -134,6 +134,12 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
   *       B <--> D (external, ranks 1+3) B <--> E (external, ranks 1+4)
   *       C <--> F (external, ranks 2+5) C <--> G (external, ranks 2+6)
   *
+  * \tparam space_dim_
+  * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+  *
+  * \tparam world_dim_
+  * world dimension (determines the number of coordinates)
+  *
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
   */
@@ -197,7 +203,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /* *************************
     * constructor & destructor *
     ***************************/
-    /// constructor
+    /// CTOR
     LoadBalancer(
       ProcessGroup* process_group,
       bool group_has_dedicated_load_bal)
@@ -212,7 +218,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       CONTEXT("LoadBalancer::LoadBalancer()");
     }
 
-    /// destructor
+    /// DTOR
     ~LoadBalancer()
     {
       CONTEXT("LoadBalancer::~LoadBalancer()");

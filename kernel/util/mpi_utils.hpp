@@ -116,16 +116,21 @@ namespace FEAST
   /**
   * \brief template class for translating built-in types into MPI types (e.g. int to MPI_INTEGER)
   *
+  * Empty class definition, to be specialised w.r.t. type T_.
+  *
+  * \tparam T_
+  * type to be translated into MPI type
+  *
   * \author Dirk Ribbrock
   * \author Hilmar Wobker
   */
-  template <typename T_>
+  template<typename T_>
   class MPIType
   {
   };
 
   /// template specialisation: bool to MPI_LOGICAL
-  template <>
+  template<>
   class MPIType<bool>
   {
   public:
@@ -138,7 +143,7 @@ namespace FEAST
   };
 
   /// template specialisation: char to MPI_CHARACTER
-  template <>
+  template<>
   class MPIType<char>
   {
   public:
@@ -149,7 +154,7 @@ namespace FEAST
   };
 
   /// template specialisation: short int to MPI_SHORT
-  template <>
+  template<>
   class MPIType<short int>
   {
   public:
@@ -160,7 +165,7 @@ namespace FEAST
   };
 
   /// template specialisation: unsigned short int to MPI_UNSIGNED_SHORT
-  template <>
+  template<>
   class MPIType<unsigned short int>
   {
   public:
@@ -171,7 +176,7 @@ namespace FEAST
   };
 
   /// template specialisation: int to MPI_INTEGER
-  template <>
+  template<>
   class MPIType<int>
   {
   public:
@@ -182,7 +187,7 @@ namespace FEAST
   };
 
   /// template specialisation: unsigned int to MPI_UNSIGNED
-  template <>
+  template<>
   class MPIType<unsigned int>
   {
   public:
@@ -193,7 +198,7 @@ namespace FEAST
   };
 
   /// template specialisation: long to MPI_LONG
-  template <>
+  template<>
   class MPIType<long>
   {
   public:
@@ -204,7 +209,7 @@ namespace FEAST
   };
 
   /// template specialisation: unsigned long to MPI_UNSIGNED_LONG
-  template <>
+  template<>
   class MPIType<unsigned long>
   {
   public:
@@ -215,7 +220,7 @@ namespace FEAST
   };
 
   /// template specialisation: long long to MPI_LONG_LONG
-  template <>
+  template<>
   class MPIType<long long>
   {
   public:
@@ -226,7 +231,7 @@ namespace FEAST
   };
 
   /// template specialisation: unsigned long long to MPI_UNSIGNED_LONG_LONG
-  template <>
+  template<>
   class MPIType<unsigned long long>
   {
   public:
@@ -237,7 +242,7 @@ namespace FEAST
   };
 
   /// template specialisation: float to MPI_FLOAT
-  template <>
+  template<>
   class MPIType<float>
   {
   public:
@@ -248,7 +253,7 @@ namespace FEAST
   };
 
   /// template specialisation: double to MPI_DOUBLE
-  template <>
+  template<>
   class MPIType<double>
   {
   public:
@@ -259,7 +264,7 @@ namespace FEAST
   };
 
   /// template specialisation: long double to MPI_LONG_DOUBLE
-  template <>
+  template<>
   class MPIType<long double>
   {
   public:

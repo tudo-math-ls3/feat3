@@ -31,6 +31,12 @@ namespace FEAST
     *
     * long description missing
     *
+    * \tparam space_dim_
+    * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+    *
+    * \tparam world_dim_
+    * world dimension (determines the number of coordinates)
+    *
     * \note This class is not called 'BaseMesh' since this would collide with the namespace.
     *
     * \author Dominik Goeddeke
@@ -72,10 +78,19 @@ namespace FEAST
       * \brief templated function to remove items from the given vector
       *
       * The item is swapped to the end of the list and then deleted and removed.
+      *
+      * \tparam T_
+      * class type of the item and the vector items
+      *
+      * \param[in] v
+      * vector from which the item is to be removed
+      *
+      * \param[in] item
+      * item to be removed from the vector
       */
 //COMMENT_HILMAR: Move this code to some parent class BaseMeshAux or similar.
       template<typename T_>
-      inline void _remove(std::vector<T_>& v, T_ item)
+      inline void _remove_item(std::vector<T_>& v, T_ item)
       {
         CONTEXT("BaseMesh::BM::_remove()");
         assert(item->index() < v.size());
@@ -99,7 +114,7 @@ namespace FEAST
       inline void _remove(Cell_* c)
       {
         CONTEXT("BaseMesh::BM::_remove()");
-        _remove<Cell_*>(_cells, c);
+        _remove_item<Cell_*>(_cells, c);
       }
 
 

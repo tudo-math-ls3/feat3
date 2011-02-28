@@ -6,12 +6,20 @@ using namespace TestSystem;
 using namespace FEAST;
 
 /**
- * \brief Test class for the base_header.
- *
- * \author Dirk Ribbrock
- * \test
- */
-template <typename Tag_, typename DT_>
+* \brief Test class for the base_header.
+*
+* \tparam Tag_
+* description missing
+*
+* \tparam DT_
+* description missing
+*
+* \test
+* test description missing
+*
+* \author Dirk Ribbrock
+*/
+template<typename Tag_, typename DT_>
 class BaseHeaderTest :
   public TaggedTest<Tag_, DT_>
 {
