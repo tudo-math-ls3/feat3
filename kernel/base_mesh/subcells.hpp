@@ -69,6 +69,8 @@ namespace FEAST
       std::vector<Vertex_*> _vertices;
 
 
+    protected:
+
       /* **********
       * functions *
       ************/
@@ -92,8 +94,6 @@ namespace FEAST
       }
 
 
-
-    protected:
       /* **********
       * functions *
       ************/
@@ -127,8 +127,8 @@ namespace FEAST
         CONTEXT("BaseMesh::Subcells::Subcells()");
       }
 
-      /// default destructor
-      ~Subcells()
+      /// DTOR
+      virtual ~Subcells()
       {
         CONTEXT("BaseMesh::Subcells::~Subcells()");
         // delete all vertices and their associated information
@@ -226,34 +226,11 @@ namespace FEAST
       std::vector<Cell_1D_*> _edges;
 
 
-      /* **********
-      * functions *
-      ************/
-      /**
-      * \brief templated function to remove items from the given vector
-      *
-      * The item is swapped to the end of the list and then deleted and removed.
-      */
-//COMMENT_HILMAR: Move this function to some parent class BaseMeshAux or similar.
-      template<typename T_>
-      inline void _remove_item(std::vector<T_>& v, T_ item)
-      {
-        CONTEXT("BaseMesh::Subcells::_remove_item()");
-        assert(item->index() < v.size());
-        v[item->index()] = v.back();
-        v[item->index()]->set_index(item->index());
-        v[v.size()-1] = item;
-        item->set_index(v.size()-1);
-        delete item;
-        v.pop_back();
-      }
-
-
     protected:
+
       /* **********
       * functions *
       ************/
-
       /// adds given edge to container and sets its index
       inline void _add(Cell_1D_* e)
       {
@@ -267,7 +244,8 @@ namespace FEAST
       inline void _remove(Cell_1D_* e)
       {
         CONTEXT("BaseMesh::Subcells::_remove()");
-        _remove_item<Cell_1D_*>(_edges, e);
+        // the template keyword is necessary here, otherwise the compiler cannot parse the expression
+        this->template _remove_item<Cell_1D_*>(_edges, e);
       }
 
 
@@ -309,7 +287,7 @@ namespace FEAST
       }
 
 
-      /// default destructor
+      /// DTOR (automatically virtual since DTOR of base class Item is virtual)
       ~Subcells()
       {
         CONTEXT("BaseMesh::Subcells::~Subcells()");
@@ -415,31 +393,11 @@ namespace FEAST
       /// array of faces
       std::vector<Cell_2D_*> _faces;
 
+
+    protected:
       /* **********
       * functions *
       ************/
-      /**
-      * \brief templated function to remove items from the given vector
-      *
-      * The item is swapped to the end of the list and then deleted and removed.
-      */
-//COMMENT_HILMAR: Move this function to some parent class BaseMeshAux or similar.
-      template<typename T_>
-      inline void _remove_item(std::vector<T_>& v, T_ item)
-      {
-        CONTEXT("BaseMesh::Subcells::_remove_item()");
-        assert(item->index() < v.size());
-        v[item->index()] = v.back();
-        v[item->index()]->set_index(item->index());
-        v[v.size()-1] = item;
-        item->set_index(v.size()-1);
-        delete item;
-        v.pop_back();
-      }
-
-
-    protected:
-
       /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
       inline void _add(Vertex_* v)
       {
@@ -485,7 +443,8 @@ namespace FEAST
       inline void _remove(Cell_2D_* f)
       {
         CONTEXT("BaseMesh::Subcells::_remove()");
-        _remove_item<Cell_2D_*>(_faces, f);
+        // the template keyword is necessary here, otherwise the compiler cannot parse the expression
+        this->template _remove_item<Cell_2D_*>(_faces, f);
       }
 
 
@@ -500,7 +459,7 @@ namespace FEAST
       }
 
 
-      /// default destructor
+      /// DTOR (automatically virtual since DTOR of base class Item is virtual)
       ~Subcells()
       {
         CONTEXT("BaseMesh::Subcells::~Subcells()");
