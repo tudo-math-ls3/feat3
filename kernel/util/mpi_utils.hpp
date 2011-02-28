@@ -134,6 +134,7 @@ namespace FEAST
   class MPIType<bool>
   {
   public:
+    /// calls an MPI_Abort() since there is no logical/boolean MPI datatype.
     static inline MPI_Datatype value()
     {
       // call abort() (error handler is not available here)
@@ -147,6 +148,7 @@ namespace FEAST
   class MPIType<char>
   {
   public:
+    /// translates char to MPI_CHARACTER
     static inline MPI_Datatype value()
     {
       return MPI_CHARACTER;
@@ -158,6 +160,7 @@ namespace FEAST
   class MPIType<short int>
   {
   public:
+    /// translates short int to MPI_SHORT
     static inline MPI_Datatype value()
     {
       return MPI_SHORT;
@@ -169,6 +172,7 @@ namespace FEAST
   class MPIType<unsigned short int>
   {
   public:
+    /// translates unsigned short int to MPI_UNSIGNED_SHORT
     static inline MPI_Datatype value()
     {
       return MPI_UNSIGNED_SHORT;
@@ -180,6 +184,7 @@ namespace FEAST
   class MPIType<int>
   {
   public:
+    /// translates int to MPI_INTEGER
     static inline MPI_Datatype value()
     {
       return MPI_INTEGER;
@@ -191,6 +196,7 @@ namespace FEAST
   class MPIType<unsigned int>
   {
   public:
+    /// translates unsigned int to MPI_UNSIGNED
     static inline MPI_Datatype value()
     {
       return MPI_UNSIGNED;
@@ -202,6 +208,7 @@ namespace FEAST
   class MPIType<long>
   {
   public:
+    /// translates long to MPI_LONG
     static inline MPI_Datatype value()
     {
       return MPI_LONG;
@@ -213,6 +220,7 @@ namespace FEAST
   class MPIType<unsigned long>
   {
   public:
+    /// translates unsigned long to MPI_UNSIGNED_LONG
     static inline MPI_Datatype value()
     {
       return MPI_UNSIGNED_LONG;
@@ -224,6 +232,7 @@ namespace FEAST
   class MPIType<long long>
   {
   public:
+    /// translates long long to MPI_LONG_LONG
     static inline MPI_Datatype value()
     {
       return MPI_LONG_LONG;
@@ -235,6 +244,7 @@ namespace FEAST
   class MPIType<unsigned long long>
   {
   public:
+    /// translates unsigned long long to MPI_UNSIGNED_LONG_LONG
     static inline MPI_Datatype value()
     {
       return MPI_UNSIGNED_LONG_LONG;
@@ -246,6 +256,7 @@ namespace FEAST
   class MPIType<float>
   {
   public:
+    /// translates float to MPI_FLOAT
     static inline MPI_Datatype value()
     {
       return MPI_FLOAT;
@@ -257,6 +268,7 @@ namespace FEAST
   class MPIType<double>
   {
   public:
+    /// translates double to MPI_DOUBLE
     static inline MPI_Datatype value()
     {
       return MPI_DOUBLE;
@@ -268,6 +280,7 @@ namespace FEAST
   class MPIType<long double>
   {
   public:
+    /// translates long double to MPI_LONG_DOUBLE
     static inline MPI_Datatype value()
     {
       return MPI_LONG_DOUBLE;

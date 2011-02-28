@@ -67,10 +67,10 @@ namespace FEAST
     class Quad
       : public Cell<2, space_dim_, world_dim_>
     {
-      /// shortcut for type Vertex<world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
 
-      /// shortcut for type Cell<1, space_dim_, world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
     private:
@@ -238,6 +238,9 @@ namespace FEAST
 
       /**
       * \brief subdivision routine splitting a quad and storing parent/child information
+      *
+      * \param[in,out] subdiv_data
+      * pointer to the subdivision data object
       *
       * \todo New centre vertex of the quad has to be computed properly!
       */

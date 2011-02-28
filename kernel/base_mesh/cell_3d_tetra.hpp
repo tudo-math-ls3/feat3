@@ -42,16 +42,16 @@ namespace FEAST
     class Tetra
       : public Cell<3, space_dim_, world_dim_>
     {
-      /// shortcut for type Vertex<world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
 
-      /// shortcut for type Cell<1, space_dim_, world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
-      /// shortcut for type Tri<space_dim_, world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Tri<space_dim_, world_dim_> Tri_;
 
-      /// shortcut for type Cell<2, space_dim_, world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
     private:
@@ -161,9 +161,12 @@ namespace FEAST
       }
 
 
-      /// subdivision routine splitting a tetra and storing parent/child information
-// COMMENT_HILMAR: this is currently hard-wired to splitting the tetra into 8 tetras (called 'standard partition' or
-// '3D-Freudenthal-Bey partition'. Later, this is parameterised via the information in the SubdivisionData object.
+      /**
+      * \brief subdivision routine splitting a tetra and storing parent/child information
+      *
+      * \param[in,out] subdiv_data
+      * pointer to the subdivision data object
+      */
       inline void subdivide(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::Tetra::subdivide()");
@@ -180,9 +183,20 @@ namespace FEAST
           // clear all vectors of created entities in the SubdivisionData object
           this->subdiv_data()->clear_created();
 
-          // TODO: perform subdivision
-          // ...
-          throw InternalError("Subdivision for tetraeders not implemented yet!!");
+
+          if(this->subdiv_data()->type == NONCONFORM_SAME_TYPE)
+          {
+            // Perform a nonconform subdivision without changing the cell type (1 tetra --> 8 tetras; called
+            // 'standard partition' or '3D-Freudenthal-Bey partition'.
+            // TODO: perform subdivision
+            // ...
+            throw InternalError("Subdivision for tetraeders not implemented yet!!");
+          }
+          else
+          {
+            throw InternalError("Wrong type of subdivision in tetra " + this->print_index()
+                                + ". Currently, only subdivision NONCONFORM_SAME_TYPE is supported.");
+          }
         }
         catch(Exception& e)
         {

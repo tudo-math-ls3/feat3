@@ -84,11 +84,19 @@ namespace FEAST
     class Hexa
       : public Cell<3, space_dim_, world_dim_>
     {
-      /// shortcuts to save typing of template parameters
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
+
+      /// shortcut to save typing of template parameters
       typedef Edge<space_dim_, world_dim_> Edge_;
+
+      /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
+
+      /// shortcut to save typing of template parameters
       typedef Quad<space_dim_, world_dim_> Quad_;
+
+      /// shortcut to save typing of template parameters
       typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
     private:
@@ -300,6 +308,9 @@ namespace FEAST
 
       /**
       * \brief subdivision routine splitting a hex and storing parent/child information
+      *
+      * \param[in,out] subdiv_data
+      * pointer to the subdivision data object
       *
       * \todo New centre vertex of the hexa has to be computed properly!
       */

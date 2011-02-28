@@ -47,7 +47,7 @@ namespace FEAST
       unsigned char world_dim_>
     class BM
     {
-      /// shortcuts to save typing of template parameters
+      /// shortcut to save typing of template parameters
       typedef Cell<space_dim_, space_dim_, world_dim_> Cell_;
 
       // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
@@ -159,7 +159,7 @@ namespace FEAST
       ************************************/
 
       /// returns number of cells in this mesh (including inactive ones)
-      inline global_index_t num_cells() const
+      inline index_t_glob num_cells() const
       {
         CONTEXT("BaseMesh::BM::num_cells()");
         return _cells.size();
@@ -167,13 +167,13 @@ namespace FEAST
 
 
       /// returns number of active cells in this mesh (this is potentially expensive)
-      inline global_index_t num_active_cells() const
+      inline index_t_glob num_active_cells() const
       {
         CONTEXT("BaseMesh::BM::num_active_cells()");
         // TODO: nochmal implementieren, wenn inaktive immer schoen ans Ende geschoben werden und es einen index gibt,
         // der die Position des letzten aktiven merkt
-        global_index_t counter = 0;
-        for(global_index_t i(0) ; i < num_cells() ; ++i)
+        index_t_glob counter = 0;
+        for(index_t_glob i(0) ; i < num_cells() ; ++i)
         {
           if(cell(i)->active())
           {
@@ -184,8 +184,13 @@ namespace FEAST
       }
 
 
-      /// returns cell at given index
-      inline Cell_* cell(global_index_t const index) const
+      /**
+      * \brief returns cell at given index
+      *
+      * \param[in] index
+      * position of the cell in the array #_cells
+      */
+      inline Cell_* cell(index_t_glob const index) const
       {
         CONTEXT("BaseMesh::BM::cell()");
         assert(index < num_cells());
@@ -223,8 +228,8 @@ namespace FEAST
       inline void set_cell_numbers() const
       {
         CONTEXT("BaseMesh::BM::set_cell_numbers()");
-        global_index_t counter = 0;
-        for(global_index_t i(0) ; i < num_cells() ; ++i)
+        index_t_glob counter = 0;
+        for(index_t_glob i(0) ; i < num_cells() ; ++i)
         {
           if(cell(i)->active())
           {
@@ -248,7 +253,7 @@ namespace FEAST
       void create_graph()
       {
         CONTEXT("BaseMesh::BM::create_graph()");
-        global_index_t n_active_cells = num_active_cells();
+        index_t_glob n_active_cells = num_active_cells();
         // allocate index array
         unsigned int* index = new unsigned int[n_active_cells + 1];
 
@@ -257,8 +262,8 @@ namespace FEAST
         // treat last index entry separately because cell array has one less entry than index array
         unsigned int num_neighbours_so_far = 0;
         // counter for active cells
-        global_index_t ipos(0);
-        for (global_index_t icell=0 ; icell < num_cells() ; ++icell)
+        index_t_glob ipos(0);
+        for (index_t_glob icell=0 ; icell < num_cells() ; ++icell)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!
         {
           if(cell(icell)->active())
@@ -280,7 +285,7 @@ namespace FEAST
         // again, treat last loop instance separately
         unsigned int* neighbours = new unsigned int[index[n_active_cells]];
         num_neighbours_so_far = 0;
-        for (global_index_t icell=0 ; icell < n_active_cells ; icell++)
+        for (index_t_glob icell=0 ; icell < n_active_cells ; icell++)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!
         {
           Cell_* c = cell(icell);

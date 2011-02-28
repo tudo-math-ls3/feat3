@@ -99,6 +99,7 @@ namespace FEAST
 
     public:
 
+      /// getter for the number of subitems of the given subdimension
       inline unsigned char num_subitems_per_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellInfo::num_subitems_per_subdim()");

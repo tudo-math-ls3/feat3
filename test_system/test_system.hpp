@@ -346,11 +346,13 @@ namespace TestSystem
   };
 }
 
+// let Doxygen ignore the following block
+// \cond
 // define __PRETTY_FUNCTION if not defined
 #ifndef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
-
+// \endcond
 /**
  * \brief Check that a == b.
  */

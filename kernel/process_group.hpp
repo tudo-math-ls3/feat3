@@ -133,6 +133,18 @@ namespace FEAST
     * This constructor can be used for splitting the complete set of COMM_WORLD processes into subgroups for performing
     * two or more completely separated tasks (e.g., for multiphysics).
     * The coordinator of this process group is set to rank #_num_processes-1, i.e. the last rank in the process group.
+    *
+    * \param[in] num_processes
+    * number of processes in this group
+    *
+    * \param[in] ranks_group_parent
+    * ranks in the parent group
+    *
+    * \param[in] process_group_parent
+    * parent group of processes
+    *
+    * \param[in] group_id
+    * ID of this group
     */
     ProcessGroup(
       unsigned int num_processes,
@@ -596,6 +608,12 @@ namespace FEAST
     *******************/
     /**
     * \brief sets local graph portions of a distributed graph
+    *
+    * \param[in] num_neighbours
+    * number of neighbours
+    *
+    * \param[in] neighbours
+    * neighbours of this portion of the graph
     *
     * \note Currently, we do not distinguish face-, edge- and vertex-neighbours. The graph structure
     *       simply contains all neighbours.

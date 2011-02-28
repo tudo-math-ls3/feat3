@@ -45,7 +45,7 @@ namespace FEAST
     class Edge
       : public Cell<1, space_dim_, world_dim_>
     {
-      /// shortcut for type Vertex<world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
 
 
@@ -87,7 +87,12 @@ namespace FEAST
       }
 
 
-      /// subdivision routine splitting an edge into two and storing parent/child information
+      /**
+      * \brief subdivision routine splitting an edge into two and storing parent/child information
+      *
+      * \param[in,out] subdiv_data
+      * pointer to the subdivision data object
+      */
       inline void subdivide(SubdivisionData<1, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::Edge::subdivide()");

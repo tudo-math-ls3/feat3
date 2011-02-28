@@ -42,10 +42,10 @@ namespace FEAST
     class Tri
       : public Cell<2, space_dim_, world_dim_>
     {
-      /// shortcuts for type Vertex<world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
 
-      /// shortcut for type Cell<1, space_dim_, world_dim_>
+      /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
     private:
@@ -172,7 +172,12 @@ namespace FEAST
       }
 
 
-      /// subdivision routine splitting a tri and storing parent/child information
+      /**
+      * \brief subdivision routine splitting a tri and storing parent/child information
+      *
+      * \param[in,out] subdiv_data
+      * pointer to the subdivision data object
+      */
       inline void subdivide(SubdivisionData<2, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::Tri::subdivide()");

@@ -172,7 +172,7 @@ namespace FEAST
       ************************************/
 
       /// returns number of vertices in this mesh
-      inline global_index_t num_vertices() const
+      inline index_t_glob num_vertices() const
       {
         CONTEXT("BaseMesh::Subcells::num_vertices()");
         return _vertices.size();
@@ -180,7 +180,7 @@ namespace FEAST
 
 
       /// returns vertex at given index
-      inline Vertex_* vertex(global_index_t const index)
+      inline Vertex_* vertex(index_t_glob const index)
       {
         CONTEXT("BaseMesh::Subcells::vertex()");
         assert(index < num_vertices());
@@ -240,6 +240,8 @@ namespace FEAST
     {
       /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
+
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
 
       // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
@@ -301,14 +303,7 @@ namespace FEAST
       * constructors & destructors *
       *****************************/
 
-      /**
-      * \brief  default CTOR for a 2D base mesh
-      *
-      * Ceates a base mesh basing on the provided mesh file.
-      *
-      * \param[in] file_name
-      * name of the mesh file
-      */
+      ///default CTOR
       Subcells()
         : Subcells<1, space_dim_, world_dim_>(),
         _edges(nullptr)
@@ -338,7 +333,7 @@ namespace FEAST
       ************************************/
 
       /// returns number of edges in this mesh (including inactive ones)
-      inline global_index_t num_edges() const
+      inline index_t_glob num_edges() const
       {
         CONTEXT("BaseMesh::Subcells::num_edges()");
         // TODO: potentiell falsch, auch Kanten koennen inaktiv sein und duerfen dann beim Transfer zu den
@@ -348,7 +343,7 @@ namespace FEAST
 
 
       /// returns edge at given index
-      inline Cell_1D_* edge(global_index_t const index)
+      inline Cell_1D_* edge(index_t_glob const index)
       {
         CONTEXT("BaseMesh::Subcells::edge()");
         assert(index < num_edges());
@@ -416,7 +411,11 @@ namespace FEAST
     {
       /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
+
+      /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
+
+      /// shortcut to save typing of template parameters
       typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
       // Parsing of the mesh files is outsourced to class FileParser. Make this class friend such that it has
@@ -513,7 +512,7 @@ namespace FEAST
 
 
       /// returns number of faces in this mesh (including inactive ones)
-      inline global_index_t num_faces() const
+      inline index_t_glob num_faces() const
       {
         CONTEXT("BaseMesh::Subcells::num_faces()");
         // TODO: potentiell falsch, auch Faces koennen inaktiv sein und duerfen dann beim Transfer zu den Rechenprozessen
@@ -523,7 +522,7 @@ namespace FEAST
 
 
       /// returns face at given index
-      inline Cell_2D_* face(global_index_t const index)
+      inline Cell_2D_* face(index_t_glob const index)
       {
         CONTEXT("BaseMesh::Subcells::face()");
         assert(index < _faces.size());

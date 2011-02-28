@@ -73,9 +73,25 @@ namespace FEAST
 
   public:
 
-    /// CTOR
-    FileReaderASCII(const std::string& filename, const char comment_char, const bool skip_empty_lines)
-      : _filename(filename), _comment_char(comment_char), _skip_empty_lines(skip_empty_lines)
+    /**
+    * \brief CTOR
+    *
+    * \param[in] filename
+    * name of the file to be connected to this file reader
+    *
+    * \param[in] comment_char
+    * character to be interpreted as comment character
+    *
+    * \param[in] skip_empty_lines
+    * flag whether to skip empty lines
+    */
+    FileReaderASCII(
+      const std::string& filename,
+      const char comment_char,
+      const bool skip_empty_lines)
+      : _filename(filename),
+        _comment_char(comment_char),
+        _skip_empty_lines(skip_empty_lines)
     {
       CONTEXT("FileReaderASCII::FileReaderASCII()");
       myfile.open(filename.c_str(), std::ios::in);
@@ -106,7 +122,12 @@ namespace FEAST
     }
 
 
-    /// skips empty lines, and checks if first non-empty line starts with given keyword
+    /**
+    * \brief skips empty lines, and checks if first non-empty line starts with given keyword
+    *
+    * \param[in] keyword
+    * keyword to be checked
+    */
     inline void read(std::string const& keyword)
     {
       CONTEXT("FileReaderASCII::read()");
@@ -122,7 +143,12 @@ namespace FEAST
     }
 
 
-    /// stores first non-empty non-comment line in given string
+    /**
+    * \brief stores first non-empty non-comment line in given string
+    *
+    * \param[out] value
+    * stores the line
+    */
     inline void read(std::string& value)
     {
       CONTEXT("FileReaderASCII::read()");
@@ -133,8 +159,14 @@ namespace FEAST
     }
 
 
-    /// extracts one integer from first non-empty non-comment line (assumes that the line contains nothing else except
-    /// possible trailing comments)
+    /**
+    * \brief extracts one integer from first non-empty non-comment line
+    *
+    * \param[out] value
+    * stores first integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
     inline void read(int& value)
     {
       CONTEXT("FileReaderASCII::read()");
@@ -147,9 +179,20 @@ namespace FEAST
     }
 
 
-    /// extracts two integers from first non-empty non-comment line (assumes that the line contains nothing else except
-    /// possible trailing comments)
-    inline void read(int& value1, int& value2)
+    /**
+    * \brief extracts two integers from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first integer value
+    *
+    * \param[out] value2
+    * stores second integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      int& value1,
+      int& value2)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -161,9 +204,24 @@ namespace FEAST
     }
 
 
-    /// extracts three integers from first non-empty non-comment line (assumes that the line contains nothing else except
-    /// possible trailing comments)
-    inline void read(int& value1, int& value2, int& value3)
+    /**
+    * \brief extracts three integers from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first integer value
+    *
+    * \param[out] value2
+    * stores second integer value
+    *
+    * \param[out] value3
+    * stores first integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      int& value1,
+      int& value2,
+      int& value3)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -175,9 +233,28 @@ namespace FEAST
     }
 
 
-    /// extracts four integers from first non-empty non-comment line (assumes that the line contains nothing else except
-    /// possible trailing comments)
-    inline void read(int& value1, int& value2, int& value3, int& value4)
+    /**
+    * \brief extracts four integers from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first integer value
+    *
+    * \param[out] value2
+    * stores second integer value
+    *
+    * \param[out] value3
+    * stores first integer value
+    *
+    * \param[out] value4
+    * stores second integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      int& value1,
+      int& value2,
+      int& value3,
+      int& value4)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -189,8 +266,14 @@ namespace FEAST
     }
 
 
-    /// extracts one integer from first non-empty non-comment line (assumes that the line contains nothing else except
-    /// possible trailing comments)
+    /**
+    * \brief extracts one unsigned integer from first non-empty non-comment line
+    *
+    * \param[out] value
+    * stores first integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
     inline void read(unsigned int& value)
     {
       CONTEXT("FileReaderASCII::read()");
@@ -203,9 +286,20 @@ namespace FEAST
     }
 
 
-    /// extracts two integers from first non-empty non-comment line (assumes that the line contains nothing else except
-    /// possible trailing comments)
-    inline void read(unsigned int& value1, unsigned int& value2)
+    /**
+    * \brief extracts two unsigned integers from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first unsigned integer value
+    *
+    * \param[out] value2
+    * stores second unsigned integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      unsigned int& value1,
+      unsigned int& value2)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -217,9 +311,28 @@ namespace FEAST
     }
 
 
-    /// extracts four integers from first non-empty non-comment line (assumes that the line contains nothing else except
-    /// possible trailing comments)
-    inline void read(unsigned int& value1, unsigned int& value2, unsigned int& value3, unsigned int& value4)
+    /**
+    * \brief extracts four unsigned integers from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first unsigned integer value
+    *
+    * \param[out] value2
+    * stores second unsigned integer value
+    *
+    * \param[out] value3
+    * stores first unsigned integer value
+    *
+    * \param[out] value4
+    * stores second unsigned integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      unsigned int& value1,
+      unsigned int& value2,
+      unsigned int& value3,
+      unsigned int& value4)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -231,9 +344,24 @@ namespace FEAST
     }
 
 
-    /// extracts two doubles and one int from first non-empty non-comment line
-    /// (assumes that the line contains nothing else except possible trailing comments)
-    inline void read(double& value1, double& value2, unsigned int& value3)
+    /**
+    * \brief extracts two doubles and one unsigned integer from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first double value
+    *
+    * \param[out] value2
+    * stores second double value
+    *
+    * \param[out] value3
+    * stores first unsigned integer value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      double& value1,
+      double& value2,
+      unsigned int& value3)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -245,9 +373,20 @@ namespace FEAST
     }
 
 
-    /// extracts two doubles from first non-empty non-comment line
-    /// (assumes that the line contains nothing else except possible trailing comments)
-    inline void read(double& value1, double& value2)
+    /**
+    * \brief extracts two doubles from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first double value
+    *
+    * \param[out] value2
+    * stores second double value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      double& value1,
+      double& value2)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -259,9 +398,16 @@ namespace FEAST
     }
 
 
-    /// extracts two doubles from first non-empty non-comment line, assumes the array values to have length 2
-    /// (assumes that the line contains nothing else except possible trailing comments)
-    inline void read(double values[])
+    /**
+    * \brief extracts two doubles from first non-empty non-comment line and stores them in the given array
+    *
+    * \param[out] values
+    * array of double values
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments. Assumes the array to have
+    * at least length 2.
+    */
+    inline void read2(double values[])
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;
@@ -272,10 +418,32 @@ namespace FEAST
       std::istringstream(line) >> values[0] >> values[1];
     }
 
-
-    /// extracts two ints and three doubles from first non-empty non-comment line
-    /// (assumes that the line contains nothing else except possible trailing comments)
-    inline void read(int& value1, int& value2, double& value3, double& value4, double& value5)
+    /**
+    * \brief extracts two integers and three doubles from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first integer value
+    *
+    * \param[out] value2
+    * stores second integer value
+    *
+    * \param[out] value3
+    * stores first double value
+    *
+    * \param[out] value4
+    * stores second double value
+    *
+    * \param[out] value5
+    * stores third double value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      int& value1,
+      int& value2,
+      double& value3,
+      double& value4,
+      double& value5)
     {
       CONTEXT("FileReaderASCII::read()");
       std::string line;

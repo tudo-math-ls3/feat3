@@ -4,13 +4,11 @@
 #define KERNEL_BASE_HEADER_HPP 1
 
 /**
- * \file base_header.hpp
- * \brief FEAST Kernel base header.
- *
- * This file is the base header for the FEAST kernel, which is included by all other
- * FEAST header and source files.
- * This file defines macros and data types which are frequently used in other files.
- */
+* \brief FEAST Kernel base header.
+*
+* This file is the base header for the FEAST kernel, which is included by all other FEAST header and source files.
+* It defines macros and data types which are frequently used in other files.
+*/
 
 // Make sure the DOXYGEN macro is not defined at compile-time;
 // it is reserved for doxygen's preprocessor.
@@ -57,6 +55,8 @@
 #  define WINDOWS 1
 #endif
 
+// let Doxygen ignore the following block
+//\cond
 // In order to increase performance one can ignore the status object in some MPI functions
 // (see Section 3.2.6 in the MPI 2.2 standard). In debug mode, we use a real status object, otherwise
 // the special MPI status MPI_STATUS_IGNORE. Requires that the MPI_Status object *always* has the name 'status'.
@@ -72,13 +72,12 @@
 #else
 #  define MPI_STATUS_MACRO &status
 #endif
+//\endcond
 
-/**
- * \brief FEAST namespace.
- */
+/// FEAST namespace
 namespace FEAST
 {
-  // FEAST version
+  /// FEAST version
   enum
   {
     /// FEAST major version number
@@ -90,30 +89,29 @@ namespace FEAST
   };
 
   /**
-   * \brief Index data type.
-   * \details
-   * This type is used for indexing entities on a single matrix patch like e.g. vertice indices, degrees of freedom
-   * or column indices in a sparse matrix implementation.
-   */
+  * \brief index data type
+  *
+  * This type is used for indexing entities on a single matrix patch like e.g. vertice indices, degrees of freedom
+  * or column indices in a sparse matrix implementation.
+  */
   typedef unsigned long index_t;
 
   /**
-   * \brief Global index data type.
-   * \details
-   * This type is used for indexing entities in a global parallel simulation.
-   */
-  typedef unsigned long global_index_t;
+  * \brief global index data type
+  *
+  * This type is used for indexing entities in a global parallel simulation.
+  */
+  typedef unsigned long index_t_glob;
 
   /**
-   * \brief Nil class definition.
-   *
-   * This is an empty tag class which may be used for templates with optional parameters.\n
-   * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
-   */
+  * \brief Nil class definition.
+  *
+  * This is an empty tag class which may be used for templates with optional parameters.\n
+  * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
+  */
   class Nil
   {
   }; // class Nil
-
 } // namespace FEAST
 
 #endif // KERNEL_BASE_HEADER_HPP

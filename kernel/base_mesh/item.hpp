@@ -32,7 +32,7 @@ namespace FEAST
       * of the item. (Currently, the index is simply the position in the corresponding vector in the BaseMesh class
       * (_vertices, _edges, ...)
       */
-      global_index_t _index;
+      index_t_glob _index;
 
       /**
       * \brief number of the item
@@ -44,7 +44,7 @@ namespace FEAST
       */
 // COMMENT_HILMAR: Brauchen wirklich alle items eine number? Oder nur die Zellen groesster Dimension? Wenn letzters,
 // dann wird die Variable in die CellData<...> Klasse verschoben.
-      global_index_t _number;
+      index_t_glob _number;
 
     public:
 
@@ -57,7 +57,7 @@ namespace FEAST
       }
 
       /// CTOR 2
-      Item(global_index_t index, global_index_t number)
+      Item(index_t_glob index, index_t_glob number)
         : _index(index),
           _number(number)
       {
@@ -71,14 +71,14 @@ namespace FEAST
       }
 
       /// returns the index of this item
-      inline global_index_t index() const
+      inline index_t_glob index() const
       {
         CONTEXT("BaseMesh::Item::index()");
         return _index;
       }
 
       /// sets the index of this item
-      inline void set_index(global_index_t const index)
+      inline void set_index(index_t_glob const index)
       {
         CONTEXT("BaseMesh::Item::set_index()");
         assert(index < Constants::MAX_INDEX);
@@ -86,14 +86,14 @@ namespace FEAST
       }
 
       /// returns the number of this item
-      inline global_index_t number() const
+      inline index_t_glob number() const
       {
         CONTEXT("BaseMesh::Item::number()");
         return _number;
       }
 
       /// sets the number of this item
-      inline void set_number(global_index_t const number)
+      inline void set_number(index_t_glob const number)
       {
         CONTEXT("BaseMesh::Item::set_number()");
         assert(number < Constants::MAX_NUMBER);

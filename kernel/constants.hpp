@@ -14,23 +14,24 @@
 namespace FEAST
 {
 
+  /// providing global constants
   class Constants
   {
 
   public:
 
     /// global constant: max counting number for an index (if a given index evaluates to this value then it is not valid)
-    static const global_index_t MAX_INDEX;
+    static const index_t_glob MAX_INDEX;
 
     /// global constant: max counting number for a number (if a given number evaluates to this value then it is not valid)
-    static const global_index_t MAX_NUMBER;
+    static const index_t_glob MAX_NUMBER;
   };
 
   /// global constant: max counting number for an index (if a given index evaluates to this value then it is not valid)
-  const global_index_t Constants::MAX_INDEX(std::numeric_limits<global_index_t>::max());
+  const index_t_glob Constants::MAX_INDEX(std::numeric_limits<index_t_glob>::max());
 
   /// global constant: max counting number for a number (if a given number evaluates to this value then it is not valid)
-  const global_index_t Constants::MAX_NUMBER(std::numeric_limits<global_index_t>::max());
+  const index_t_glob Constants::MAX_NUMBER(std::numeric_limits<index_t_glob>::max());
 
 } // namespace FEAST
 

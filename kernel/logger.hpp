@@ -263,26 +263,15 @@ namespace FEAST
       file << message;
     }
 
-  // COMMENT_HILMAR: This version seems not to be necessary. The above function log(std::string const &message) is also
-  // able to process char pointers (see for example the call in Logger::receive_array())
-  // Using this version here additionally triggers the gcc compiler to throw a warning when passing a constant string
-  // to the log(...) function, e.g. 'log("BRAL")'.
-  //   ...: warning: deprecated conversion from string constant to 'char*'
-  //  /**
-  //  * \brief writes a message to the log file of this process
-  //  *
-  //  * This function receives a char array representing a log message and writes it to the log file attached to this
-  //  * process.
-  //  *
-  //  * \param[in] message
-  //  * char array representing the log message
-  //  *
-  //  * \author Hilmar Wobker
-  //  */
-  //  static void log(char message[])
-  //  {
-  //    file << message;
-  //  }
+// COMMENT_HILMAR: This version seems not to be necessary. The above function log(std::string const &message) is also
+// able to process char pointers (see for example the call in Logger::receive_array())
+// Using this version here additionally triggers the gcc compiler to throw a warning when passing a constant string
+// to the log(...) function, e.g. 'log("BRAL")'.
+//   ...: warning: deprecated conversion from string constant to 'char*'
+//  static void log(char message[])
+//  {
+//    file << message;
+//  }
 
     /**
     * \brief writes a number of messages to the log file of this process

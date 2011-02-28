@@ -54,8 +54,10 @@ namespace FEAST
     template<unsigned char world_dim_>
     class FileParser<1, world_dim_>
     {
-      /// shortcuts various cell types to save typing of template parameters
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
+
+      /// shortcut to save typing of template parameters
       typedef Edge<1, world_dim_> Edge_;
 
     private:
@@ -71,7 +73,14 @@ namespace FEAST
       /**
       * \brief function for reading a 1D mesh in FEAST1 format
       *
+      * \param[in] file_name
+      * name of the mesh file
+      *
+      * \param[in,out] bm
+      * base mesh to be built from the mesh file
+      *
       * \note As long as no real file parser is implemented, we only manually create a 1D base mesh here.
+      *
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
@@ -158,10 +167,11 @@ namespace FEAST
     template<unsigned char world_dim_>
     class FileParser<2, world_dim_>
     {
-      /// shortcuts various cell types to save typing of template parameters
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
+      /// shortcut to save typing of template parameters
       typedef Edge<2, world_dim_> Edge_;
-//      typedef Tri<2, world_dim_> Tri_;
+      /// shortcut to save typing of template parameters
       typedef Quad<2, world_dim_> Quad_;
 
 
@@ -250,11 +260,11 @@ namespace FEAST
               {
                 _circle_section[ibc][iseg] = nullptr;
                 // read start vertex
-                mesh_file->read(_start_vertex[ibc][iseg]);
+                mesh_file->read2(_start_vertex[ibc][iseg]);
                 // read vector from start to end vertex
-                mesh_file->read(_vector_to_end_vertex[ibc][iseg]);
+                mesh_file->read2(_vector_to_end_vertex[ibc][iseg]);
                 // read parameter values
-                mesh_file->read(_param_int[ibc][iseg]);
+                mesh_file->read2(_param_int[ibc][iseg]);
 //std::cout << "start vert: " << _start_vertex[ibc][iseg][0] << " " << _start_vertex[ibc][iseg][1] << std::endl;
 //std::cout << "vector    : " << _vector_to_end_vertex[ibc][iseg][0] << " " << _vector_to_end_vertex[ibc][iseg][1] << std::endl;
 //std::cout << "param     : " << _param_int[ibc][iseg][0] << " " << _param_int[ibc][iseg][1] << std::endl;
@@ -265,13 +275,13 @@ namespace FEAST
               {
                 _circle_section[ibc][iseg] = new double[2];
                 // read centre
-                mesh_file->read(_start_vertex[ibc][iseg]);
+                mesh_file->read2(_start_vertex[ibc][iseg]);
                 // read radius and dummy
-                mesh_file->read(_vector_to_end_vertex[ibc][iseg]);
+                mesh_file->read2(_vector_to_end_vertex[ibc][iseg]);
                 // read start and end angle
-                mesh_file->read(_circle_section[ibc][iseg]);
+                mesh_file->read2(_circle_section[ibc][iseg]);
                 // read parameter values
-                mesh_file->read(_param_int[ibc][iseg]);
+                mesh_file->read2(_param_int[ibc][iseg]);
 //std::cout << "centre : " << _start_vertex[ibc][iseg][0] << " " << _start_vertex[ibc][iseg][1] << std::endl;
 //std::cout << "radius : " << _vector_to_end_vertex[ibc][iseg][0] << std::endl;
 //std::cout << "section: " << _circle_section[ibc][iseg][0] << " " << _circle_section[ibc][iseg][1] << std::endl;
@@ -731,6 +741,12 @@ COMMENT_HILMAR: will be adapted later
       /**
       * \brief function for reading a 2D mesh in FEAST1 format
       *
+      * \param[in] file_name
+      * name of the mesh file
+      *
+      * \param[in,out] bm
+      * base mesh to be built from the mesh file
+      *
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
@@ -790,10 +806,16 @@ COMMENT_HILMAR: will be adapted later
     template<unsigned char world_dim_>
     class FileParser<3, world_dim_>
     {
-      /// shortcuts to save typing of template parameters
+      /// shortcut to save typing of template parameters
       typedef Vertex<world_dim_> Vertex_;
+
+      /// shortcut to save typing of template parameters
       typedef Edge<3, world_dim_> Edge_;
+
+      /// shortcut to save typing of template parameters
       typedef Quad<3, world_dim_> Quad_;
+
+      /// shortcut to save typing of template parameters
       typedef Hexa<3, world_dim_> Hexa_;
 
     private:
@@ -809,7 +831,14 @@ COMMENT_HILMAR: will be adapted later
       /**
       * \brief function for reading a 3D mesh in FEAST1 format
       *
+      * \param[in] file_name
+      * name of the mesh file
+      *
+      * \param[in,out] bm
+      * base mesh to be built from the mesh file
+      *
       * \note As long as no real file parser is implemented, we only manually create a 3D base mesh here.
+      *
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */

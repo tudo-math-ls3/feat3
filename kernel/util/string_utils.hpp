@@ -93,7 +93,7 @@ namespace FEAST
 
 
     /**
-    * \brief converting an item to a string (overload for char *, which isn't a screwup like other pointers)
+    * \brief converts an item to a string (overload for char *, which isn't a screwup like other pointers)
     *
     * This function is selected when using the syntax \code StringUtils::stringify("some string") \endcode .
     *
@@ -107,10 +107,19 @@ namespace FEAST
 
 
     /**
-    * \brief Concatenate strings between begin and end iterator
+    * \brief concatenates strings between begin and end iterator
+    *
+    * \param[in] begin
+    * first element
+    *
+    * \param[in] end
+    * last element
+    *
+    * \param[in] delimiter
+    * string to use as delimiter
     *
     * \todo also implement for std::vector iterator
-    * COMMENT_HILMAR: is there a clever way to provide this functionality for all STL containers at once?
+//COMMENT_HILMAR: is there a clever way to provide this functionality for all STL containers at once?
     *
     * \author Dirk Ribbrock
     */
@@ -138,6 +147,7 @@ namespace FEAST
       return result;
     }
   }; // class StringUtils
+
 
 
 

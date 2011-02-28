@@ -352,12 +352,15 @@ namespace FEAST
       /**
       * \brief sets number of children and allocates the _children array
       *
-      * This function may only be called, when new children are to be created. "Old" children have to be cleared before via
-      * unset_children(...).
+      * This function may only be called, when new children are to be created. "Old" children have to be cleared before
+      * via unset_children(...).
       * Rationale:
       * - It won't happen often that a cell creates and removes children over and over again.
       * - A situation like "I already have 4 children, and now I want to have 2 more" will not occur.
       * - Allocating/deallocating an array of less than 10 pointers does not really harm.
+      *
+      * \param[in] num
+      * new number of children
       */
       inline void _set_num_children(unsigned char const num)
       {
@@ -379,7 +382,13 @@ namespace FEAST
       * \brief sets child at given index
       *
       * The cell-type does not have to be the same (quads can have tris as children), so a general BaseMeshItem2D is
-      * is passed to the function.
+      * passed to the function.
+      *
+      * \param[in] index
+      * position of the child in array #_children
+      *
+      * \param[in] e
+      * cell pointer to be set as child
       */
       inline void _set_child(
         unsigned char const index,
@@ -531,13 +540,16 @@ namespace FEAST
       }
 
 
+      /// pure virtual function for subdividing the cell
       virtual void subdivide(SubdivisionData<cell_dim_, space_dim_, world_dim_>*) = 0;
 
 
-      virtual void print(std::ostream& stream) const = 0;
-
-
+      /// pure virtual function for validating the cell
       virtual void validate(std::ostream&) const = 0;
+
+
+      /// pure virtual function for printing the cell
+      virtual void print(std::ostream& stream) const = 0;
 
 
       /**
