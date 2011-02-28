@@ -17,8 +17,10 @@
 #include <kernel/base_mesh/cell_data_validation.hpp>
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
     /**
@@ -73,7 +75,12 @@ namespace FEAST
       /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
+
     private:
+
+      /* *****************
+      * member variables *
+      *******************/
       /// vertices of the quad
       Vertex_* _vertices[4];
 
@@ -83,7 +90,21 @@ namespace FEAST
       /// stores whether the edge orientations in edge- and quad structure coincide
       bool _edge_has_correct_orientation[4];
 
-      /// returns index (w.r.t. to quad numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
+
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief returns index (w.r.t. to quad numbering) of start vertex (iv=0) or end vertex (iv=1) of edge iedge
+      *
+      * \param[in] iedge
+      * index of the edge whose start or end vertex is inquired
+      *
+      * \param[in] iv
+      * decides whether start vertex (iv = 0) or end vertex (iv = 1) is inquired
+      *
+      * \return index of start or end vertex
+      */
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
         CONTEXT("BaseMesh::Quad::_edge_vertex()");
@@ -92,6 +113,7 @@ namespace FEAST
         // the index is inquired from the fixed numbering scheme stored in Numbering::quad_edge_vertices
         return Numbering::quad_edge_vertices[iedge][iv];
       }
+
 
       /**
       * \brief Determines orientation of the edges and tests whether edges are set up correctly.
@@ -132,7 +154,19 @@ namespace FEAST
 
 
     public:
-      /// CTOR
+
+      /**
+      * \brief CTOR
+      *
+      * \param[in] v0, v1, v2, v3
+      * vertices the quad is built of
+      *
+      * \param[in] e0, e1, e2, e3
+      * edges the quad is built of
+      *
+      * \param[in] ref_level
+      * refinement level the quad is created on
+      */
       Quad(
         Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3,
         Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3,
@@ -166,7 +200,14 @@ namespace FEAST
       }
 
 
-      /// returns number of vertices
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief returns number of vertices
+      *
+      * \return number of vertices
+      */
       inline unsigned char num_vertices() const
       {
         CONTEXT("BaseMesh::Quad::num_vertices()");
@@ -174,7 +215,14 @@ namespace FEAST
       }
 
 
-      /// returns vertex at given index
+      /**
+      * \brief returns pointer to the vertex at given index
+      *
+      * \param[in] index
+      * index of the vertex to be returned
+      *
+      * \return pointer to the vertex at given index
+      */
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::vertex()");
@@ -183,7 +231,11 @@ namespace FEAST
       }
 
 
-      /// returns number of edges
+      /**
+      * \brief returns number of edges
+      *
+      * \return number of edges
+      */
       inline unsigned char num_edges() const
       {
         CONTEXT("BaseMesh::Quad::num_edges()");
@@ -191,7 +243,14 @@ namespace FEAST
       }
 
 
-      /// returns edge at given index
+      /**
+      * \brief returns pointer to the edge at given index
+      *
+      * \param[in] index
+      * index of the edge to be returned
+      *
+      * \return pointer to the edge at given index
+      */
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::edge()");
@@ -200,7 +259,14 @@ namespace FEAST
       }
 
 
-      /// returns next vertex of vertex with given index w.r.t. to ccw ordering
+      /**
+      * \brief returns next vertex of vertex with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the vertex whose next vertex is to be returned
+      *
+      * \return next vertex of given vertex
+      */
       inline Vertex_* next_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::next_vertex_ccw()");
@@ -209,7 +275,14 @@ namespace FEAST
       }
 
 
-      /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
+      /**
+      * \brief returns previous vertex of vertex with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the vertex whose previous vertex is to be returned
+      *
+      * \return previous vertex of given vertex
+      */
       inline Vertex_* previous_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::previous_vertex_ccw()");
@@ -218,7 +291,14 @@ namespace FEAST
       }
 
 
-      /// returns next edge of edge with given index w.r.t. to ccw ordering
+      /**
+      * \brief returns next edge of edge with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the edge whose next edge is to be returned
+      *
+      * \return next edge of given edge
+      */
       inline Cell_1D_* next_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::next_edge_ccw()");
@@ -227,7 +307,14 @@ namespace FEAST
       }
 
 
-      /// returns previous edge of edge with given index w.r.t. to ccw ordering
+      /**
+      * \brief pure virtual function for returning previous edge of edge with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the edge whose previous edge is to be returned
+      *
+      * \return previous edge of given edge
+      */
       inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::previous_edge_ccw()");
@@ -479,7 +566,7 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
       /**
       * \brief validates this cell
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       inline void validate(std::ostream& stream) const
@@ -580,7 +667,12 @@ COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
       }
 
 
-      /// print information about this quad
+      /**
+      * \brief prints information about this quad to the given stream
+      *
+      * \param[in,out] stream
+      * stream to write into
+      */
       inline void print(std::ostream& stream) const
       {
         CONTEXT("BaseMesh::Quad::print()");

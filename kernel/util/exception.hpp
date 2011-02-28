@@ -15,6 +15,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/base_header.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
   /// The global context stack.

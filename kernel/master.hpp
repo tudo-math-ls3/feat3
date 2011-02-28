@@ -15,10 +15,9 @@
 #include <kernel/process_group.hpp>
 #include <kernel/logger.hpp>
 
-
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief class defining the master
   *

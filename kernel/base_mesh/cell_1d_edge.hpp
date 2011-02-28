@@ -15,8 +15,10 @@
 #include <kernel/base_mesh/cell_data_validation.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
 
@@ -50,13 +52,24 @@ namespace FEAST
 
 
     private:
+
       /// vertices of the edge
       Vertex_* _vertices[2];
 
     public:
-      /// CTOR
+
+      /**
+      * \brief CTOR
+      *
+      * \param[in] v0, v1
+      * vertices the edge is built of
+      *
+      * \param[in] ref_level
+      * refinement level the edge is created on
+      */
       Edge(
-        Vertex_* v0, Vertex_* v1,
+        Vertex_* v0,
+        Vertex_* v1,
         unsigned char ref_level)
         : Cell<1, space_dim_, world_dim_>(ref_level)
       {
@@ -70,7 +83,14 @@ namespace FEAST
       }
 
 
-      /// returns number of vertices
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief returns number of vertices
+      *
+      * \return number of vertices
+      */
       inline unsigned char num_vertices() const
       {
         CONTEXT("BaseMesh::Edge::num_vertices()");
@@ -78,7 +98,14 @@ namespace FEAST
       }
 
 
-      /// returns vertex at given index
+      /**
+      * \brief returns pointer to the vertex at given index
+      *
+      * \param[in] index
+      * index of the vertex to be returned
+      *
+      * \return pointer to the vertex at given index
+      */
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Edge::vertex()");
@@ -158,7 +185,7 @@ namespace FEAST
       /**
       * \brief validates this cell
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       void validate(std::ostream& stream) const
@@ -217,7 +244,12 @@ namespace FEAST
       }
 
 
-      /// print information about this edge
+      /**
+      * \brief prints information about this edge to the given stream
+      *
+      * \param[in,out] stream
+      * stream to write into
+      */
       inline void print(std::ostream& stream) const
       {
         CONTEXT("BaseMesh::Edge::print()");

@@ -11,8 +11,10 @@
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
 
@@ -20,12 +22,12 @@ namespace FEAST
     * \brief type of subdivisions
     *
     * There are (at least) two motivations for subdividing base mesh cells:
-    *   - change of shape (e.g. quad --> triangle for better approximation of geometry; some special functionality
+    * \li change of shape (e.g. quad to triangle for better approximation of geometry; some special functionality
     *     may be available for a special element shape only)
-    *   - more MPI processes needed
+    * \li more MPI processes needed
     * Depending on the situation, it may be
-    *  - necessary to perform only conform subdivisions (do not split edges/faces)
-    *  - allowed (or even wanted) to perform nonconform subdivisions (split edges/faces)
+    * \li necessary to perform only conform subdivisions (do not split edges/faces)
+    * \li allowed (or even wanted) to perform nonconform subdivisions (split edges/faces)
     *
     * \note These classifications are not complete yet. For example, transition elements are missing which may be
     * necessary to preserve or establish conformity of the mesh (e.g. prism elements for conform transitions from
@@ -49,6 +51,7 @@ namespace FEAST
       * \brief subdivision into cells of the same type, nonconform (splitting edges/faces)
       *
       * 2D: tri --> four tris
+      * \verbatim
       *            /\                               /\
       *          /    \                           /    \
       *        /        \         --->          /________\
@@ -56,7 +59,9 @@ namespace FEAST
       *    /                \               /     \    /     \
       *  /                    \           /         \/         \
       * ------------------------         ------------------------
+      * \endverbatim
       * 2D: quad --> four quads
+      * \verbatim
       * -------------       -------------
       * |           |       |     |     |
       * |           |       |     |     |
@@ -66,6 +71,7 @@ namespace FEAST
       * |           |       |     |     |
       * |           |       |     |     |
       * -------------       -------------
+      * \endverbatim
       * 3D: tetra --> eight tetras
       * 3D: hexa --> eight hexas
       */
@@ -75,6 +81,7 @@ namespace FEAST
       * \brief subdivision into cells of the other type, eventually leading to a nonconform mesh
       *
       * 2D: tri --> three quads
+      * \verbatim
       *            / \                               / \
       *          /     \                           /     \
       *        /         \         --->          / \     / \
@@ -82,7 +89,9 @@ namespace FEAST
       *    /                 \               /        |        \
       *  /                     \           /          |          \
       * -------------------------         -------------------------
+      * \endverbatim
       * 2D: quad --> eight tris
+      * \verbatim
       * -------------       -------------
       * |           |       |    /|    /|
       * |           |       |  /  |  /  |
@@ -92,6 +101,7 @@ namespace FEAST
       * |           |       |  /  |  /  |
       * |           |       |/    |/    |
       * -------------       -------------
+      * \endverbatim
       * 3D: tetra --> hexas ???
       * 3D: hexa --> tetras ???
       */
@@ -101,6 +111,7 @@ namespace FEAST
       * \brief subdivision into cells of the same type, leading to a nonconform mesh
       *
       * 2D: tri --> three tris (adding vertex in tri centre)
+      * \verbatim
       *            / \                               /|\
       *          /     \                           /  |  \
       *        /         \         --->          /    |    \
@@ -108,7 +119,9 @@ namespace FEAST
       *    /                 \               /  ___/     \___  \
       *  /                     \           /  /               \  \
       * -------------------------         -------------------------
+      * \endverbatim
       * 2D: quad --> five quads
+      * \verbatim
       * ---------------      ---------------
       * |             |      | \         / |
       * |             |      |   \     /   |
@@ -118,6 +131,7 @@ namespace FEAST
       * |             |      |   /     \   |
       * |             |      | /         \ |
       * ---------------      ---------------
+      * \endverbatim
       * 3D: tetra --> four tetras (adding vertex in tetra center; analogue to tri)
       * 3D: hexa --> seven hexas (small hexa in the centre, surrounded by six hexas; analogue to quad)
       */
@@ -128,6 +142,7 @@ namespace FEAST
       *
       * 2D: tri --> quads: NOT POSSIBLE!
       * 2D: quad --> two tris (adding diagonal)
+      * \verbatim
       * ---------------       ---------------
       * |             |       |            /|
       * |             |       |          /  |
@@ -137,6 +152,7 @@ namespace FEAST
       * |             |       |  /          |
       * |             |       |/            |
       * ---------------       ---------------
+      * \endverbatim
       * 3D: tetra --> hexas: NOT POSSIBLE!
       * 3D: hexa --> tetras: NOT POSSIBLE!
       */

@@ -11,8 +11,10 @@
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh/item.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
     /**

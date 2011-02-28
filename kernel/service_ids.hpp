@@ -5,10 +5,9 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 
-
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief class defining an enumeration of service IDs for the master service loop
   *

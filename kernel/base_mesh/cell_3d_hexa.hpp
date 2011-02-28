@@ -18,8 +18,10 @@
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 #include <kernel/base_mesh/cell_2d_quad.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
 
@@ -99,7 +101,12 @@ namespace FEAST
       /// shortcut to save typing of template parameters
       typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
+
     private:
+
+      /* *****************
+      * member variables *
+      *******************/
       /// vertices of the hexa
       Vertex_* _vertices[8];
 
@@ -109,11 +116,28 @@ namespace FEAST
       /// faces of the hexa
       Cell_2D_* _faces[6];
 
+// TODO: use the following (as in Quad class):
+//      /// stores whether the edge orientations in edge- and quad structure coincide
+//      bool _edge_has_correct_orientation[4];
+
       /// relation between local quad numbering and face numbering within the hexa for each face (see struct Numbering)
       unsigned char _face_numbering[6];
 
 
-      /// returns index (w.r.t. to hexa numbering) of the start vertex (iv=0) or the end vertex (iv=1) of edge iedge
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief returns index (w.r.t. to hexa numbering) of start vertex (iv=0) or end vertex (iv=1) of edge iedge
+      *
+      * \param[in] iedge
+      * index of the edge whose start or end vertex is inquired
+      *
+      * \param[in] iv
+      * decides whether start vertex (iv = 0) or end vertex (iv = 1) is inquired
+      *
+      * \return index of start or end vertex
+      */
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
       {
         CONTEXT("BaseMesh::Hexa::_edge_vertex()");
@@ -127,6 +151,8 @@ namespace FEAST
       /// returns true when the orientation of the edge coincides with its orientation within the hexa
       inline bool _edge_has_correct_orientation(unsigned char iedge)
       {
+//TODO: will be replaced by function (as in Quad class):
+//      inline void _determine_edge_orientation()
         CONTEXT("BaseMesh::Hexa::_edge_has_correct_orientation()");
         assert(iedge < num_edges());
         // return true when the edge's start vertex within the hexa is local vertex 0 within the edge structure
@@ -195,7 +221,22 @@ namespace FEAST
 
 
     public:
-      /// CTOR
+
+      /**
+      * \brief CTOR
+      *
+      * \param[in] v0, v1, v2, v3, v4, v5, v6, v7
+      * vertices the hexa is built of
+      *
+      * \param[in] e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11
+      * edges the hexa is built of
+      *
+      * \param[in] f0, f1, f2, f3, f4, f5
+      * faces the hexa is built of
+      *
+      * \param[in] ref_level
+      * refinement level the hexa is created on
+      */
       Hexa(
         Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3, Vertex_* v4, Vertex_* v5, Vertex_* v6, Vertex_* v7,
         Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3, Cell_1D_* e4, Cell_1D_* e5,
@@ -255,7 +296,14 @@ namespace FEAST
       }
 
 
-      /// returns number of vertices
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief returns number of vertices
+      *
+      * \return number of vertices
+      */
       inline unsigned char num_vertices() const
       {
         CONTEXT("BaseMesh::Hexa::num_vertices()");
@@ -263,7 +311,14 @@ namespace FEAST
       }
 
 
-      /// returns vertex at given index
+      /**
+      * \brief returns pointer to the vertex at given index
+      *
+      * \param[in] index
+      * index of the vertex to be returned
+      *
+      * \return pointer to the vertex at given index
+      */
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Hexa::vertex()");
@@ -272,7 +327,11 @@ namespace FEAST
       }
 
 
-      /// returns number of edges
+      /**
+      * \brief returns number of edges
+      *
+      * \return number of edges
+      */
       inline unsigned char num_edges() const
       {
         CONTEXT("BaseMesh::Hexa::num_edges()");
@@ -280,7 +339,14 @@ namespace FEAST
       }
 
 
-      /// returns edge at given index
+      /**
+      * \brief returns pointer to the edge at given index
+      *
+      * \param[in] index
+      * index of the edge to be returned
+      *
+      * \return pointer to the edge at given index
+      */
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Hexa::edge()");
@@ -289,7 +355,11 @@ namespace FEAST
       }
 
 
-      /// returns number of faces
+      /**
+      * \brief returns number of faces
+      *
+      * \return number of faces
+      */
       inline unsigned char num_faces() const
       {
         CONTEXT("BaseMesh::Hexa::num_faces()");
@@ -297,7 +367,14 @@ namespace FEAST
       }
 
 
-      /// returns face at given index
+      /**
+      * \brief returns pointer to the face at given index
+      *
+      * \param[in] index
+      * index of the face to be returned
+      *
+      * \return pointer to the face at given index
+      */
       inline Cell_2D_* face(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Hexa::face()");
@@ -426,8 +503,8 @@ namespace FEAST
             }
 
             // create the centre vertex of the hexa
-  // COMMENT_HILMAR: For the time being simply compute the centre vertex of the hexa as average of the eight corner
-  // vertices until we find out, what is the best way of computing this point correctly.
+// COMMENT_HILMAR: For the time being simply compute the centre vertex of the hexa as average of the eight corner
+// vertices until we find out, what is the best way of computing this point correctly.
             double p[world_dim_];
             for(unsigned char i(0) ; i < world_dim_ ; ++i)
             {
@@ -730,9 +807,9 @@ namespace FEAST
 
 
       /**
-      * \brief validate this cell
+      * \brief validates this cell
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       inline void validate(std::ostream& stream) const
@@ -921,7 +998,12 @@ namespace FEAST
       }
 
 
-      /// print information about this quad
+      /**
+      * \brief prints information about this hexaeder to the given stream
+      *
+      * \param[in,out] stream
+      * stream to write into
+      */
       inline void print(std::ostream& stream) const
       {
         CONTEXT("BaseMesh::Hexa::print()");

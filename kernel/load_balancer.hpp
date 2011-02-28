@@ -17,9 +17,9 @@
 #include <kernel/base_mesh/file_parser.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
-
 // COMMENT_HILMAR: entsprechend der Idee, den load balancer besser abzugrenzen, sollte diese ganze Klasse besser
 // ProcessOrganiser, ProcessManager (oder so ähnlich) genannt werden. Die eigentliche load balancer Klasse wird dann
 // (erstmal) nur auf dem coordinator der zugrundeliegenden Prozessgruppe instantiiert. Sie wird dann z.B. die

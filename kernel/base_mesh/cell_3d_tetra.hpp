@@ -18,8 +18,10 @@
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 #include <kernel/base_mesh/cell_2d_tri.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
 
@@ -54,7 +56,12 @@ namespace FEAST
       /// shortcut to save typing of template parameters
       typedef Cell<2, space_dim_, world_dim_> Cell_2D_;
 
+
     private:
+
+      /* *****************
+      * member variables *
+      *******************/
       /// vertices of the tetra
       Vertex_* _vertices[4];
 
@@ -66,7 +73,22 @@ namespace FEAST
 
 
     public:
-      /// CTOR
+
+      /**
+      * \brief CTOR
+      *
+      * \param[in] v0, v1, v2, v3
+      * vertices the triangle is built of
+      *
+      * \param[in] e0, e1, e2, e3, e4, e5
+      * edges the triangle is built of
+      *
+      * \param[in] f0, f1, f2, f3
+      * faces the triangle is built of
+      *
+      * \param[in] ref_level
+      * refinement level the triangle is created on
+      */
       Tetra(
         Vertex_* v0, Vertex_* v1, Vertex_* v2, Vertex_* v3,
         Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2, Cell_1D_* e3, Cell_1D_* e4, Cell_1D_* e5,
@@ -110,7 +132,14 @@ namespace FEAST
       }
 
 
-      /// returns number of vertices
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief returns number of vertices
+      *
+      * \return number of vertices
+      */
       inline unsigned char num_vertices() const
       {
         CONTEXT("BaseMesh::Tetra::num_vertices()");
@@ -118,7 +147,14 @@ namespace FEAST
       }
 
 
-      /// returns vertex at given index
+      /**
+      * \brief returns pointer to the vertex at given index
+      *
+      * \param[in] index
+      * index of the vertex to be returned
+      *
+      * \return pointer to the vertex at given index
+      */
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::vertex()");
@@ -127,7 +163,11 @@ namespace FEAST
       }
 
 
-      /// returns number of edges
+      /**
+      * \brief returns number of edges
+      *
+      * \return number of edges
+      */
       inline unsigned char num_edges() const
       {
         CONTEXT("BaseMesh::Tetra::num_edges()");
@@ -135,7 +175,14 @@ namespace FEAST
       }
 
 
-      /// returns edge at given index
+      /**
+      * \brief returns pointer to the edge at given index
+      *
+      * \param[in] index
+      * index of the edge to be returned
+      *
+      * \return pointer to the edge at given index
+      */
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::edge()");
@@ -144,7 +191,11 @@ namespace FEAST
       }
 
 
-      /// returns number of faces
+      /**
+      * \brief returns number of faces
+      *
+      * \return number of faces
+      */
       inline unsigned char num_faces() const
       {
         CONTEXT("BaseMesh::Tetra::num_faces()");
@@ -152,7 +203,14 @@ namespace FEAST
       }
 
 
-      /// returns face at given index
+      /**
+      * \brief returns pointer to the face at given index
+      *
+      * \param[in] index
+      * index of the face to be returned
+      *
+      * \return pointer to the face at given index
+      */
       inline Cell_2D_* face(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::face()");
@@ -206,9 +264,9 @@ namespace FEAST
 
 
       /**
-      * \brief validate this cell
+      * \brief validates this cell
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       inline void validate(std::ostream& stream) const
@@ -278,7 +336,12 @@ namespace FEAST
       }
 
 
-      /// print information about this tetra
+      /**
+      * \brief prints information about this tetraeder to the given stream
+      *
+      * \param[in,out] stream
+      * stream to write into
+      */
       inline void print(std::ostream& stream) const
       {
         CONTEXT("BaseMesh::Tetra::print()");

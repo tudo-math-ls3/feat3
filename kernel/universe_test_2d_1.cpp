@@ -1,6 +1,6 @@
 // Hilmar's todo list before push to master:
 // code cleanup:
-// - completion of doxygen comments (\param, array dimensions, etc.)
+// - completion of doxygen comments (\param, array dimensions, \return, \throws etc.)
 // - add/remove 'const' and other modifiers where necessary
 // - test_1d.cpp etc. ersetzen
 // - check: missing output when using MPICH

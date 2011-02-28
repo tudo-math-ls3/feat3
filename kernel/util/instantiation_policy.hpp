@@ -6,6 +6,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
   /**

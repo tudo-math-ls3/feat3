@@ -9,9 +9,9 @@
 // includes, Feast
 #include <kernel/util/exception.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief wrapper class for ASCII (line-based) input
   *

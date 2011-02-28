@@ -11,9 +11,9 @@
 #include <kernel/logger.hpp>
 #include <kernel/util/exception.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief class providing some functions for handling warnings, errors and exceptions
   *

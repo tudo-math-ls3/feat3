@@ -9,9 +9,9 @@
 #include <vector>
 #include <cassert>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief collection of various string utilities
   *

@@ -16,8 +16,10 @@
 #include <kernel/base_mesh/cell_2d_tri.hpp>
 #include <kernel/graph.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
     // forward declaration
@@ -103,7 +105,7 @@ namespace FEAST
       * \param[in] item
       * item to be removed from the vector
       */
-//COMMENT_HILMAR: Move this function to some parent class BaseMeshAux or similar.
+//COMMENT_HILMAR: Move this code to some auxiliary class (it is also needed in bm.hpp)
       template<typename T_>
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
@@ -121,7 +123,12 @@ namespace FEAST
       /* **********
       * functions *
       ************/
-      /// adds given vertex to base mesh and sets its index
+      /**
+      * \brief adds given vertex to the base mesh's subcells and sets its index
+      *
+      * \param[in] v
+      * vertex to be added to the vector #_vertices
+      */
       inline void _add(Vertex_* v)
       {
         CONTEXT("BaseMesh::Subcells::_add()");
@@ -130,7 +137,14 @@ namespace FEAST
       }
 
 
-      /// deletes given vertex
+      /**
+      * \brief deletes given vertex
+      *
+      * Deleting the given vertex is an O(1) operation since its position within the vector is given by its index.
+      *
+      * \param[in] v
+      * vertex to be removed from the vector #_vertices
+      */
       inline void _remove(Vertex_* v)
       {
         CONTEXT("BaseMesh::Subcells::_remove()");
@@ -188,7 +202,12 @@ namespace FEAST
       }
 
 
-      /// adds vertex created during subdivision of the corresponding edge
+      /**
+      * \brief adds vertex created during subdivision of the corresponding edge
+      *
+      * \param[in] subdiv_data
+      * object containing pointer to the vertex to be added
+      */
       inline void add_created_subcells(SubdivisionData<1, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::Subcells::add_created_subcells()");
@@ -203,8 +222,8 @@ namespace FEAST
       * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
       * and and printf()-style debugging at the same time. Neat.
       *
-      * \param[in] stream
-      * Stream to dump this BaseMesh into.
+      * \param[in,out] stream
+      * stream to dump the subcells into
       */
       void print(std::ostream& stream) const
       {
@@ -263,7 +282,28 @@ namespace FEAST
       /* **********
       * functions *
       ************/
-      /// adds given edge to container and sets its index
+      /// adds given vertex to the base mesh's subcells and sets its index (wrapper calling function in parent class)
+      inline void _add(Vertex_* v)
+      {
+        CONTEXT("BaseMesh::Subcells::_add()");
+        Subcells<1, space_dim_, world_dim_>::_add(v);
+      }
+
+
+      /// deletes given vertex (wrapper calling function in parent class)
+      inline void _remove(Vertex_* v)
+      {
+        CONTEXT("BaseMesh::Subcells::_remove()");
+        Subcells<1, space_dim_, world_dim_>::_remove(v);
+      }
+
+
+      /**
+      * \brief adds given edge to the base mesh's subcells and sets its index
+      *
+      * \param[in] e
+      * edge to be added to the vector #_edges
+      */
       inline void _add(Cell_1D_* e)
       {
         CONTEXT("BaseMesh::Subcells::_add()");
@@ -272,28 +312,19 @@ namespace FEAST
       }
 
 
-      /// deletes given edge
+      /**
+      * \brief deletes given edge
+      *
+      * Deleting the given edge is an O(1) operation since its position within the vector is given by its index.
+      *
+      * \param[in] e
+      * edge to be removed from the vector #_edges
+      */
       inline void _remove(Cell_1D_* e)
       {
         CONTEXT("BaseMesh::Subcells::_remove()");
         // the template keyword is necessary here, otherwise the compiler cannot parse the expression
         this->template _remove_item<Cell_1D_*>(_edges, e);
-      }
-
-
-      /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
-      inline void _add(Vertex_* v)
-      {
-        CONTEXT("BaseMesh::Subcells::_add()");
-        Subcells<1, space_dim_, world_dim_>::_add(v);
-      }
-
-
-      /// deletes given vertex (wrapper for function in parent class)
-      inline void _remove(Vertex_* v)
-      {
-        CONTEXT("BaseMesh::Subcells::_remove()");
-        Subcells<1, space_dim_, world_dim_>::_remove(v);
       }
 
 
@@ -351,7 +382,12 @@ namespace FEAST
       }
 
 
-      /// adds subcells created during subdivision to the corresponding subcell vectors
+      /**
+      * \brief adds subcells created during subdivision to the corresponding subcell vectors
+      *
+      * \param[in] subdiv_data
+      * object containing pointers to the subcells to be added
+      */
       inline void add_created_subcells(SubdivisionData<2, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::Subcells::add_created_subcells()");
@@ -373,7 +409,7 @@ namespace FEAST
       * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
       * and and printf()-style debugging at the same time. Neat.
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream to dump this object into
       */
       void print(std::ostream& stream) const
@@ -433,7 +469,7 @@ namespace FEAST
       /* **********
       * functions *
       ************/
-      /// adds given vertex to base mesh and sets its index (wrapper for function in parent class)
+      /// adds given vertex to the base mesh's subcells and sets its index (wrapper calling function in parent class)
       inline void _add(Vertex_* v)
       {
         CONTEXT("BaseMesh::Subcells::_add()");
@@ -441,7 +477,7 @@ namespace FEAST
       }
 
 
-      /// deletes given vertex (wrapper for function in parent class)
+      /// deletes given vertex (wrapper calling function in parent class)
       inline void _remove(Vertex_* v)
       {
         CONTEXT("BaseMesh::Subcells::_remove()");
@@ -449,7 +485,7 @@ namespace FEAST
       }
 
 
-      /// adds given edge to base mesh and sets its index (wrapper for function in parent class)
+      /// adds given edge to the base mesh's subcells and sets its index (wrapper calling function in parent class)
       inline void _add(Cell_1D_* e)
       {
         CONTEXT("BaseMesh::Subcells::_add()");
@@ -457,7 +493,7 @@ namespace FEAST
       }
 
 
-      /// deletes given edge (wrapper for function in parent class)
+      /// deletes given edge (wrapper calling function in parent class)
       inline void _remove(Cell_1D_* e)
       {
         CONTEXT("BaseMesh::Subcells::_remove()");
@@ -465,7 +501,12 @@ namespace FEAST
       }
 
 
-      /// adds given face to base mesh and sets its index
+      /**
+      * \brief adds given face to the base mesh's subcells and sets its index
+      *
+      * \param[in] f
+      * face to be added to the vector #_faces
+      */
       inline void _add(Cell_2D_* f)
       {
         CONTEXT("BaseMesh::Subcells::_add()");
@@ -474,7 +515,14 @@ namespace FEAST
       }
 
 
-      /// deletes given face
+      /**
+      * \brief deletes given face
+      *
+      * Deleting the given face is an O(1) operation since its position within the vector is given by its index.
+      *
+      * \param[in] f
+      * face to be removed from the vector #_faces
+      */
       inline void _remove(Cell_2D_* f)
       {
         CONTEXT("BaseMesh::Subcells::_remove()");
@@ -530,7 +578,12 @@ namespace FEAST
       }
 
 
-      /// adds subcells created during subdivision to the corresponding subcell vectors
+      /**
+      * \brief adds subcells created during subdivision to the corresponding subcell vectors
+      *
+      * \param[in] subdiv_data
+      * object containing pointers to the subcells to be added
+      */
       inline void add_created_subcells(SubdivisionData<3, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::Subcells::add_created_subcells()");
@@ -556,7 +609,7 @@ namespace FEAST
       * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
       * and and printf()-style debugging at the same time. Neat.
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream to dump this object into
       */
       void print(std::ostream& stream) const

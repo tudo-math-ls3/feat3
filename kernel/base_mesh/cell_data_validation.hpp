@@ -16,8 +16,10 @@
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
     /**
@@ -68,7 +70,7 @@ namespace FEAST
       * \param[in] c
       * cell whose neighbourhood is to be validated
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
@@ -191,7 +193,7 @@ namespace FEAST
       * \param[in] c
       * cell whose neighbourhood is to be validated
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
@@ -336,7 +338,7 @@ namespace FEAST
       * \param[in] c
       * cell whose neighbourhood is to be validated
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
@@ -484,7 +486,7 @@ namespace FEAST
       * \param[in] c
       * dummy cell
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * dummy stream
       */
       static void validate_neighbourhood(Cell<cell_dim_, space_dim_, world_dim_> const * c, std::ostream& stream)
@@ -515,7 +517,7 @@ namespace FEAST
       * \param[in] c
       * cell whose neighbourhood is to be validated
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       static void validate_neighbourhood(Cell<3, 3, world_dim_> const * c, std::ostream& stream)
@@ -550,7 +552,7 @@ namespace FEAST
       * \param[in] c
       * cell whose neighbourhood is to be validated
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       static void validate_neighbourhood(Cell<2, 2, world_dim_> const * c, std::ostream& stream)
@@ -584,7 +586,7 @@ namespace FEAST
       * \param[in] c
       * cell whose neighbourhood is to be validated
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       static void validate_neighbourhood(Cell<1, 1, world_dim_> const * c, std::ostream& stream)

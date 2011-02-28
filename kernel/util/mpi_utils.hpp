@@ -11,9 +11,9 @@
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/exception.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /// collection of various MPI utilities
   class MPIUtils
   {

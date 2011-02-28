@@ -14,8 +14,10 @@
 #include <kernel/base_mesh/cell_3d_hexa.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
     /**

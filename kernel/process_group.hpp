@@ -15,9 +15,9 @@
 #include <kernel/process.hpp>
 #include <kernel/graph.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief group of processes sharing an MPI communicator
   *

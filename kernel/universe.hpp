@@ -17,9 +17,9 @@
 #include <kernel/error_handler.hpp>
 #include <kernel/load_balancer.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief creates and manages the parallel universe
   *

@@ -9,10 +9,9 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 
-
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief struct encapsulating an MPI process
   *

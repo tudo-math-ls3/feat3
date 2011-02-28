@@ -6,9 +6,9 @@
 #include <iostream>
 #include <stdlib.h>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief class providing a graph data structure for defining connectivity of subdomains / matrix patches / processes
   *

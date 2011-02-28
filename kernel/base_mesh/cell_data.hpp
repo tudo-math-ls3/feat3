@@ -14,8 +14,10 @@
 #include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/item.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
 
@@ -64,7 +66,9 @@ namespace FEAST
     class CellInfo
       : public Item
     {
+
     private:
+
       /**
       * \brief array of number of subitems per subdimension
       *
@@ -84,10 +88,21 @@ namespace FEAST
 // COMMENT_HILMAR: Eigentlich ganz schoener overkill, das fuer jede Zelle extra abzuspeichern. Besser waere evtl.,
 //   die Informationen irgendwo statisch pro Zelltyp 1x abzuspeichern und dann mit einer Art Zelltyp-ID abzufragen.
 
+
     protected:
 
-      /// setter for the number of subitems per subdimension
-      void _set_num_subitems_per_subdim(unsigned char array_size, unsigned char num_subitems_per_subdim[])
+      /**
+      * \brief setter for the number of subitems per subdimension
+      *
+      * \param[in] array_size
+      * size of the array num_subitems_per_subdim
+      *
+      * \param[in] num_subitems_per_subdim
+      * number of subitems per subdimension
+      */
+      void _set_num_subitems_per_subdim(
+        unsigned char array_size,
+        unsigned char num_subitems_per_subdim[])
       {
         CONTEXT("BaseMesh::CellInfo::_set_num_subitems_per_subdim()");
         assert(array_size == cell_dim_);
@@ -97,9 +112,17 @@ namespace FEAST
         }
       }
 
+
     public:
 
-      /// getter for the number of subitems of the given subdimension
+      /**
+      * \brief getter for the number of subitems of the given subdimension
+      *
+      * \param[in] subdim
+      * desired subdimension
+      *
+      * \return number of subitems of the given subdimension
+      */
       inline unsigned char num_subitems_per_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellInfo::num_subitems_per_subdim()");
@@ -111,7 +134,7 @@ namespace FEAST
     };
 
 
-    /// forward declaration of class BaseMesh::Cell
+    /// forward declaration of class Cell
     template<
       unsigned char cell_dim_,
       unsigned char space_dim_,
@@ -143,9 +166,12 @@ namespace FEAST
     class CellData
       : public CellInfo<cell_dim_, space_dim_, world_dim_>
     {
+
     private:
 
+
     public:
+
       /// dummy function called by cells with dimension smaller than space dimension
       inline void _init_neighbours()
       {
@@ -190,6 +216,7 @@ namespace FEAST
     class CellData<cell_space_dim_, cell_space_dim_, world_dim_>
       : public CellInfo<cell_space_dim_, cell_space_dim_, world_dim_>
     {
+
     private:
 
       /**

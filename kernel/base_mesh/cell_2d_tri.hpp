@@ -17,8 +17,10 @@
 #include <kernel/base_mesh/cell_data_validation.hpp>
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
 
@@ -48,17 +50,32 @@ namespace FEAST
       /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
+
     private:
+
+      /* *****************
+      * member variables *
+      *******************/
       /// vertices of the triangle
       Vertex_* _vertices[3];
 
       /// edges of the triangle
       Cell_1D_* _edges[3];
 
+// TODO: use the following (as in Quad class):
+//      /// stores whether the edge orientations in edge- and quad structure coincide
+//      bool _edge_has_correct_orientation[4];
 
+
+      /* **********
+      * functions *
+      ************/
       /// returns true when edge with local index iedge has the same orientation as the quad
       inline bool _edge_has_correct_orientation(unsigned char iedge)
       {
+//TODO: will be replaced by function (as in Quad class):
+//      inline void _determine_edge_orientation()
+
         CONTEXT("BaseMesh::Tri::_edge_has_correct_orientation()");
         // the orientation of the edge is correct (i.e. the same as that of the quad), when its start vertex within
         // the quad (i.e. the vertex with the same local index) is local vertex 0 within the edge structure
@@ -67,7 +84,19 @@ namespace FEAST
 
 
     public:
-      /// CTOR
+
+      /**
+      * \brief CTOR
+      *
+      * \param[in] v0, v1, v2
+      * vertices the triangle is built of
+      *
+      * \param[in] e0, e1, e2
+      * edges the triangle is built of
+      *
+      * \param[in] ref_level
+      * refinement level the triangle is created on
+      */
       Tri(
         Vertex_* v0, Vertex_* v1, Vertex_* v2,
         Cell_1D_* e0, Cell_1D_* e1, Cell_1D_* e2,
@@ -98,7 +127,14 @@ namespace FEAST
       }
 
 
-      /// returns number of vertices
+      /* **********
+      * functions *
+      ************/
+      /**
+      * \brief returns number of vertices
+      *
+      * \return number of vertices
+      */
       inline unsigned char num_vertices() const
       {
         CONTEXT("BaseMesh::Tri::num_vertices()");
@@ -106,7 +142,14 @@ namespace FEAST
       }
 
 
-      /// returns vertex at given index
+      /**
+      * \brief returns pointer to the vertex at given index
+      *
+      * \param[in] index
+      * index of the vertex to be returned
+      *
+      * \return pointer to the vertex at given index
+      */
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::vertex()");
@@ -115,7 +158,11 @@ namespace FEAST
       }
 
 
-      /// returns number of edges
+      /**
+      * \brief returns number of edges
+      *
+      * \return number of edges
+      */
       inline unsigned char num_edges() const
       {
         CONTEXT("BaseMesh::Tri::num_edges()");
@@ -123,7 +170,14 @@ namespace FEAST
       }
 
 
-      /// returns edge at given index
+      /**
+      * \brief returns pointer to the edge at given index
+      *
+      * \param[in] index
+      * index of the edge to be returned
+      *
+      * \return pointer to the edge at given index
+      */
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::edge()");
@@ -132,7 +186,14 @@ namespace FEAST
       }
 
 
-      /// returns next vertex of vertex with given index w.r.t. to ccw ordering
+      /**
+      * \brief returns next vertex of vertex with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the vertex whose next vertex is to be returned
+      *
+      * \return next vertex of given vertex
+      */
       inline Vertex_* next_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::next_vertex_ccw()");
@@ -142,7 +203,14 @@ namespace FEAST
       }
 
 
-      /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
+      /**
+      * \brief returns previous vertex of vertex with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the vertex whose previous vertex is to be returned
+      *
+      * \return previous vertex of given vertex
+      */
       inline Vertex_* previous_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::previous_vertex_ccw()");
@@ -152,7 +220,14 @@ namespace FEAST
       }
 
 
-      /// returns next edge of edge with given index w.r.t. to ccw ordering
+      /**
+      * \brief returns next edge of edge with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the edge whose next edge is to be returned
+      *
+      * \return next edge of given edge
+      */
       inline Cell_1D_* next_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::next_edge_ccw()");
@@ -162,7 +237,14 @@ namespace FEAST
       }
 
 
-      /// returns previous edge of edge with given index w.r.t. to ccw ordering
+      /**
+      * \brief pure virtual function for returning previous edge of edge with given index w.r.t. to ccw ordering
+      *
+      * \param[in] index
+      * index of the edge whose previous edge is to be returned
+      *
+      * \return previous edge of given edge
+      */
       inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::previous_edge_ccw()");
@@ -206,9 +288,9 @@ namespace FEAST
 
 
       /**
-      * \brief validate this cell
+      * \brief validates this cell
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       inline void validate(std::ostream& stream) const
@@ -266,7 +348,12 @@ namespace FEAST
       }
 
 
-      /// print information about this tri
+      /**
+      * \brief prints information about this triangle to the given stream
+      *
+      * \param[in,out] stream
+      * stream to write into
+      */
       inline void print(std::ostream& stream) const
       {
         CONTEXT("BaseMesh::Tri::print()");

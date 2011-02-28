@@ -14,10 +14,9 @@
 #include <kernel/process.hpp>
 #include <kernel/service_ids.hpp>
 
-
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief class providing basic communication functions
   *

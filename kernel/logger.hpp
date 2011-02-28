@@ -16,9 +16,9 @@
 #include <kernel/comm.hpp>
 #include <kernel/process_group.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
-
   /**
   * \brief class providing logging mechanisms
   *

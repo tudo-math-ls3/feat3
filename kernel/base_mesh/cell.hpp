@@ -16,11 +16,12 @@
 #include <kernel/base_mesh/cell_subdivision.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
-
     /**
     * \brief stores the fixed numbering schemes
     *
@@ -207,13 +208,16 @@ namespace FEAST
       unsigned char world_dim_>
     class CellInterface<1, space_dim_, world_dim_>
     {
+
     public:
-      /// returns number of vertices
+
+      /// pure virtual function for returning number of vertices
       virtual unsigned char num_vertices() const = 0;
 
-      /// returns vertex at given index
+
+      /// pure virtual function for returning pointer to the vertex at given index
 // TODO: pointer oder referenz auf pointer zurueckgeben? (ueberall sonst dann ggfls. auch anpassen)
-      virtual Vertex<world_dim_>* vertex(unsigned char const index) const = 0;
+      virtual Vertex<world_dim_>* vertex(unsigned char const) const = 0;
     };
 
 
@@ -235,30 +239,39 @@ namespace FEAST
       unsigned char world_dim_>
     class CellInterface<2, space_dim_, world_dim_>
     {
+
     public:
-      /// returns number of vertices
+
+      /// pure virtual function for returning number of vertices
       virtual unsigned char num_vertices() const = 0;
 
-      /// returns vertex at given index
-      virtual Vertex<world_dim_>* vertex(unsigned char const index) const = 0;
 
-      /// returns number of edges
+      /// pure virtual function for returning pointer to the vertex at given index
+      virtual Vertex<world_dim_>* vertex(unsigned char const) const = 0;
+
+
+      /// pure virtual function for returning number of edges
       virtual unsigned char num_edges() const = 0;
 
-      /// returns edge at given index
-      virtual Cell<1, space_dim_, world_dim_>* edge(unsigned char const index) const = 0;
 
-      /// returns next vertex of vertex with given index w.r.t. to ccw ordering
-      virtual Vertex<world_dim_>* next_vertex_ccw(unsigned char const index) const = 0;
+      /// pure virtual function for returning pointer to the edge at given index
+      virtual Cell<1, space_dim_, world_dim_>* edge(unsigned char const) const = 0;
 
-      /// returns previous vertex of vertex with given index w.r.t. to ccw ordering
-      virtual Vertex<world_dim_>* previous_vertex_ccw(unsigned char const index) const = 0;
 
-      /// returns next edge of edge with given index w.r.t. to ccw ordering
-      virtual Cell<1, space_dim_, world_dim_>* next_edge_ccw(unsigned char const index) const = 0;
+      /// pure virtual function for returning next vertex of vertex with given index w.r.t. to ccw ordering
+      virtual Vertex<world_dim_>* next_vertex_ccw(unsigned char const) const = 0;
 
-      /// returns previous edge of edge with given index w.r.t. to ccw ordering
-      virtual Cell<1, space_dim_, world_dim_>* previous_edge_ccw(unsigned char const index) const = 0;
+
+      /// pure virtual function for returning previous vertex of vertex with given index w.r.t. to ccw ordering
+      virtual Vertex<world_dim_>* previous_vertex_ccw(unsigned char const) const = 0;
+
+
+      /// pure virtual function for returning next edge of edge with given index w.r.t. to ccw ordering
+      virtual Cell<1, space_dim_, world_dim_>* next_edge_ccw(unsigned char const) const = 0;
+
+
+      /// pure virtual function for returning previous edge of edge with given index w.r.t. to ccw ordering
+      virtual Cell<1, space_dim_, world_dim_>* previous_edge_ccw(unsigned char const) const = 0;
     };
 
 
@@ -280,24 +293,31 @@ namespace FEAST
       unsigned char world_dim_>
     class CellInterface<3, space_dim_, world_dim_>
     {
+
     public:
-      /// returns number of vertices
+
+      /// pure virtual function for returning number of vertices
       virtual unsigned char num_vertices() const = 0;
 
-      /// returns vertex at given index
-      virtual Vertex<world_dim_>* vertex(unsigned char const index) const = 0;
 
-      /// returns number of edges
+      /// pure virtual function for returning pointer to the vertex at given index
+      virtual Vertex<world_dim_>* vertex(unsigned char const) const = 0;
+
+
+      /// pure virtual function for returning number of edges
       virtual unsigned char num_edges() const = 0;
 
-      /// returns edge at given index
-      virtual Cell<1, space_dim_, world_dim_>* edge(unsigned char const index) const = 0;
 
-      /// returns number of faces
+      /// pure virtual function for returning pointer to the edge at given index
+      virtual Cell<1, space_dim_, world_dim_>* edge(unsigned char const) const = 0;
+
+
+      /// pure virtual function for returning number of faces
       virtual unsigned char num_faces() const = 0;
 
-      /// returns face at given index
-      virtual Cell<2, space_dim_, world_dim_>* face(unsigned char const index) const = 0;
+
+      /// pure virtual function for returning pointer to the face at given index
+      virtual Cell<2, space_dim_, world_dim_>* face(unsigned char const) const = 0;
     };
 
 
@@ -330,6 +350,7 @@ namespace FEAST
     // COMMENT_HILMAR: muss "virtual public" sein, falls z.B. Quad direkt den CellData-Konstruktor aufrufen muss
         public CellInterface<cell_dim_, space_dim_, world_dim_>
     {
+
     private:
 
       /// parent of this cell
@@ -346,6 +367,7 @@ namespace FEAST
 
       /// refinement level of this cell
       unsigned char _refinement_level;
+
 
     protected:
 
@@ -378,6 +400,7 @@ namespace FEAST
         }
       }
 
+
       /**
       * \brief sets child at given index
       *
@@ -401,21 +424,41 @@ namespace FEAST
         _children[index] = e;
       }
 
-      /// unsets all children (which should not be done via set_child(i, nullptr))
+
+      /**
+      * \brief unsets all children
+      *
+      * Deletes the array _children and sets _num_children to zero. The actual destruction of the children is
+      * triggered by the base mesh.
+      *
+      * \note Unsetting children should not be done via _set_child(i, nullptr).
+      */
       inline void _unset_children()
       {
         CONTEXT("BaseMesh::Cell::_unset_children()");
-        // COMMENT_HILMAR: For the time being, we enforce that this function may only be called when there actually *are*
-        // valid children. (To discover eventual errors in apply/unapply actions.)
-        assert(num_children() > 0);
-        for (unsigned char i(0) ; i < num_children() ; ++i)
+        if(_children != nullptr)
         {
-          assert(_children[i] != nullptr);
-          _children[i] = nullptr;
+          delete [] _children;
+          _children = nullptr;
+          _num_children = 0;
         }
-        delete [] _children;
-        _children = nullptr;
-        _num_children = 0;
+      }
+
+
+      /**
+      * \brief deletes the subdivision data object
+      *
+      * Deletes the subdivision data pointer #_subdiv_data when it is not the nullptr.
+      */
+      inline void _delete_subdiv_data()
+      {
+        CONTEXT("BaseMesh::Cell::_delete_subdiv_data()");
+        if(_subdiv_data != nullptr)
+        {
+          _subdiv_data->clear_created();
+          delete _subdiv_data;
+          _subdiv_data = nullptr;
+        }
       }
 
 
@@ -444,11 +487,17 @@ namespace FEAST
       ~Cell()
       {
         CONTEXT("BaseMesh::Cell::~Cell()");
+        _delete_subdiv_data();
+        _unset_children();
         _parent = nullptr;
       }
 
 
-      /// returns parent
+      /**
+      * \brief returns pointer to parent cell
+      *
+      * \return pointer to parent cell
+      */
       inline Cell* parent() const
       {
         CONTEXT("BaseMesh::Cell::parent()");
@@ -456,7 +505,12 @@ namespace FEAST
       }
 
 
-      /// sets parent
+      /**
+      * \brief sets pointer to parent cell
+      *
+      * \param[in] par
+      * pointer to parent cell
+      */
       inline void set_parent(Cell* const par)
       {
         CONTEXT("BaseMesh::Cell::set_parent()");
@@ -464,7 +518,11 @@ namespace FEAST
       }
 
 
-      /// returns number of children
+      /**
+      * \brief returns number of children
+      *
+      * \return number of children
+      */
       inline unsigned char num_children() const
       {
         CONTEXT("BaseMesh::Cell::num_children()");
@@ -472,7 +530,13 @@ namespace FEAST
       }
 
 
-      /// returns child at given index
+      /**
+      * \brief returns pointer to child at given index
+      *
+      * \param[in] index of the child to be returned
+      *
+      * \return pointer to child at given index
+      */
       inline Cell* child(unsigned char index) const
       {
         CONTEXT("BaseMesh::Cell::child()");
@@ -481,7 +545,11 @@ namespace FEAST
       }
 
 
-      /// returns refinement level of this cell
+      /**
+      * \brief returns refinement level this cell has been created at
+      *
+      * \return refinement level this cell has been created at
+      */
       inline unsigned char refinement_level() const
       {
         CONTEXT("BaseMesh::Cell::refinement_level()");
@@ -489,7 +557,11 @@ namespace FEAST
       }
 
 
-      /// returns subdivision data object
+      /**
+      * \brief returns pointer to subdivision data object
+      *
+      * \return pointer to subdivision data object
+      */
       inline SubdivisionData<cell_dim_, space_dim_, world_dim_>* subdiv_data() const
       {
         CONTEXT("BaseMesh::Cell::subdiv_data()");
@@ -497,7 +569,14 @@ namespace FEAST
       }
 
 
-      /// returns subdivision data object
+      /**
+      * \brief sets pointer subdivision data object
+      *
+      * Assumes that the subdivision data pointer _subdiv_data is nullptr.
+      *
+      * \param[in] subdiv_data
+      * pointer subdivision data object
+      */
       inline void set_subdiv_data(SubdivisionData<cell_dim_, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::Cell::set_subdiv_data()");
@@ -516,24 +595,19 @@ namespace FEAST
       }
 
 
-      /// deletes the subdivision data object
-      inline void delete_subdiv_data()
-      {
-        CONTEXT("BaseMesh::Cell::delete_subdiv_data()");
-        _subdiv_data->clear_created();
-        delete _subdiv_data;
-        _subdiv_data = nullptr;
-// TODO: has to be called in destructor of this cell
-      }
-
-      /// returns whether this cell is active (i.e. whether it does not have children)
-// COMMENT_HILMAR: Das ist leider falsch fuer Zellen niedrigerer Dimension! Bsp.: zwei benachbarte Quads
-// verschiedenen refinement levels, naemlich 0 und 1 --> gemeinsame Kante (Level 0) ist aktiv, obwohl sie Kinder
-// (Level 1) hat! Folge: Wir muessen den Aktivitaetsgrad entweder tatsaechlich als Variable abspeichern, oder
-// verzichten fuer Zellen niedrigerer Dimension ganz darauf. Das haette zur Folge, dass beim Verschicken des aktuellen
-// Gitters an die Rechenprozesse nicht einfach alle Zellen niedrigerer Dimension durchlaufen werden koennen und alle
-// aktiven als "zu verschicken" markiert werden koennen. Stattdessen muesste man ueber alle aktiven cells hoechster
-// Dimension die darin enthaltenen subcells als "zu verschicken" markieren.
+      /**
+      * \brief returns whether this cell is active (i.e. whether it does not have children)
+      *
+      * \return flag whether this cell is active
+      *
+      * \todo Falsch fuer Zellen niedrigerer Dimension! Bsp.: zwei benachbarte Quads
+      * verschiedenen refinement levels, naemlich 0 und 1 --> gemeinsame Kante (Level 0) ist aktiv, obwohl sie Kinder
+      * (Level 1) hat! Folge: Wir muessen den Aktivitaetsgrad entweder tatsaechlich als Variable abspeichern, oder
+      * verzichten fuer Zellen niedrigerer Dimension ganz darauf. Das haette zur Folge, dass beim Verschicken des
+      * aktuellen Gitters an die Rechenprozesse nicht einfach alle Zellen niedrigerer Dimension durchlaufen werden
+      * koennen und alle aktiven als "zu verschicken" markiert werden koennen. Stattdessen muesste man ueber alle
+      * aktiven cells hoechster Dimension die darin enthaltenen subcells als "zu verschicken" markieren.
+      */
       inline bool active() const
       {
         CONTEXT("BaseMesh::Cell::active()");
@@ -550,13 +624,13 @@ namespace FEAST
 
 
       /// pure virtual function for printing the cell
-      virtual void print(std::ostream& stream) const = 0;
+      virtual void print(std::ostream&) const = 0;
 
 
       /**
-      * \brief validate parent-child relations of this cell
+      * \brief validates parent-child relations of this cell
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       void validate_history(std::ostream& stream) const
@@ -620,10 +694,10 @@ namespace FEAST
 
 
       /**
-      * \brief print parent-child relations of this cell
+      * \brief prints parent-child relations of this cell to the given stream
       *
-      * \param[in] stream
-      * Stream to write into.
+      * \param[in,out] stream
+      * stream to write into
       */
       inline void print_history(std::ostream& stream) const
       {

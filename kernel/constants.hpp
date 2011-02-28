@@ -8,12 +8,9 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 
-/**
- * \brief FEAST namespace.
- */
+/// FEAST namespace
 namespace FEAST
 {
-
   /// providing global constants
   class Constants
   {

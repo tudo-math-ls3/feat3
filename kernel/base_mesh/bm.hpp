@@ -15,11 +15,12 @@
 #include <kernel/base_mesh/subcells.hpp>
 #include <kernel/graph.hpp>
 
+/// FEAST namespace
 namespace FEAST
 {
+  /// BaseMesh namespace comprising base mesh specific code
   namespace BaseMesh
   {
-
     // forward declaration
     template<
       unsigned char space_dim_,
@@ -88,7 +89,7 @@ namespace FEAST
       * \param[in] item
       * item to be removed from the vector
       */
-//COMMENT_HILMAR: Move this code to some parent class BaseMeshAux or similar.
+//COMMENT_HILMAR: Move this code to some auxiliary class (it is also needed in subcells.hpp)
       template<typename T_>
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
@@ -102,7 +103,13 @@ namespace FEAST
         v.pop_back();
       }
 
-      /// adds given cell to base mesh and sets its index
+
+      /**
+      * \brief adds given cell to the base mesh and sets its index
+      *
+      * \param[in] c
+      * cell to be added to the vector #_cells
+      */
       inline void _add(Cell_* c)
       {
         CONTEXT("BaseMesh::BM::_add()");
@@ -110,7 +117,15 @@ namespace FEAST
         c->set_index(_cells.size()-1);
       }
 
-      /// deletes given cell
+
+      /**
+      * \brief deletes given cell
+      *
+      * Deleting the given cell is an O(1) operation since its position within the vector is given by its index.
+      *
+      * \param[in] c
+      * cell to be removed from the vector #_cells
+      */
       inline void _remove(Cell_* c)
       {
         CONTEXT("BaseMesh::BM::_remove()");
@@ -158,7 +173,11 @@ namespace FEAST
       * getters & setters & manipulators *
       ************************************/
 
-      /// returns number of cells in this mesh (including inactive ones)
+      /**
+      * \brief returns number of cells in this mesh (including inactive ones)
+      *
+      * \return number of cells
+      */
       inline index_t_glob num_cells() const
       {
         CONTEXT("BaseMesh::BM::num_cells()");
@@ -166,7 +185,11 @@ namespace FEAST
       }
 
 
-      /// returns number of active cells in this mesh (this is potentially expensive)
+      /**
+      * \brief returns number of active cells in this mesh (this is potentially expensive)
+      *
+      * \return number of active cells
+      */
       inline index_t_glob num_active_cells() const
       {
         CONTEXT("BaseMesh::BM::num_active_cells()");
@@ -185,10 +208,12 @@ namespace FEAST
 
 
       /**
-      * \brief returns cell at given index
+      * \brief returns pointer to Cell at given index
       *
       * \param[in] index
       * position of the cell in the array #_cells
+      *
+      * \return pointer to Cell at given index
       */
       inline Cell_* cell(index_t_glob const index) const
       {
@@ -198,7 +223,11 @@ namespace FEAST
       }
 
 
-      /// returns graph pointer #_graph
+      /**
+      * \brief returns pointer to Graph #_graph
+      *
+      * \return pointer to Graph #_graph
+      */
       inline Graph* graph() const
       {
         CONTEXT("BaseMesh::BM::graph()");
@@ -206,7 +235,12 @@ namespace FEAST
       }
 
 
-      /// adds (sub)cells created during subdivision to the corresponding (sub)cell vectors
+      /**
+      * \brief adds (sub)cells created during subdivision to the corresponding (sub)cell vectors
+      *
+      * \param[in] subdiv_data
+      * object containing pointers to the (sub)cells to be added
+      */
       inline void add_created_items(SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data)
       {
         CONTEXT("BaseMesh::BM::add_created_items()");
@@ -245,13 +279,13 @@ namespace FEAST
 
 
       /// creates connectivity graph from information stored in this base mesh
+      void create_graph()
+      {
 // COMMENT_HILMAR: This is just an intermediate solution to artificially connect the base mesh to the load balancer.
 // I.e., we assume here that each process receives exactly one BMC and that the connectivity graph relevant for the
 // load balancer actually is the connectivity graph of the base mesh. Later, there will be the matrix patch layer and
 // the process patch layer, which both have their own connectivity structure. The load balancer then actually needs the
 // connectivity graph of the process patch layer. We also do not distinguish between edge and vertex neighbours here.
-      void create_graph()
-      {
         CONTEXT("BaseMesh::BM::create_graph()");
         index_t_glob n_active_cells = num_active_cells();
         // allocate index array
@@ -323,7 +357,7 @@ namespace FEAST
       /**
       * \brief validates the base mesh and all of its cells
       *
-      * \param[in] stream
+      * \param[in,out] stream
       * stream validation info is written into
       */
       void validate(std::ostream& stream) const
@@ -348,8 +382,8 @@ namespace FEAST
       * a (stream associated with) an arbitrary already opened ASCII file, so this routine can be used for logging
       * and and printf()-style debugging at the same time. Neat.
       *
-      * \param[in] stream
-      * Stream to dump this base mesh into.
+      * \param[in,out] stream
+      * stream to dump this base mesh into
       */
       void print(std::ostream& stream) const
       {
@@ -367,7 +401,11 @@ namespace FEAST
         stream << "---------------------------------------------------" << std::endl;
       }
 
-      /// returns the base mesh print as string
+      /**
+      * \brief returns base mesh dump as string
+      *
+      * \return base mesh dump
+      */
       inline std::string print() const
       {
         CONTEXT("BaseMesh::BM::print()");
