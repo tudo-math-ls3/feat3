@@ -431,6 +431,7 @@ namespace FEAST
         : _parent(nullptr),
           _num_children(0),
           _children(nullptr),
+          _subdiv_data(nullptr),
           _refinement_level(ref_level)
       {
         CONTEXT("BaseMesh::Cell::Cell()");
@@ -642,7 +643,7 @@ namespace FEAST
           child(0)->print_index(stream);
           for(int i(1) ; i < num_children() ; ++i)
           {
-            std:: cout << ", ";
+            stream << ", ";
             child(i)->print_index(stream);
           }
         }

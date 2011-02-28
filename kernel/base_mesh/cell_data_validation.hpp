@@ -96,6 +96,7 @@ namespace FEAST
 // COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
                 std::cerr << "ERROR: " << s;
+                stream << "ERROR: " << s;
               }
               else // neighs[ineigh]->active()
               {
@@ -218,6 +219,7 @@ namespace FEAST
 // COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
                 std::cerr << "ERROR: " << s;
+                stream << "ERROR: " << s;
               }
               else // neighs[ineigh]->active()
               {
@@ -362,6 +364,7 @@ namespace FEAST
 // COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
                 std::cerr << "ERROR: " << s;
+                stream << "ERROR: " << s;
               }
               else // neighs[ineigh]->active()
               {

@@ -303,7 +303,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /* *****************
     * member functions *
     *******************/
-    /// dummy function in preparation of a function reading in a mesh file
+    /// read in a mesh file and set up base mesh
     void read_mesh(std::string const & mesh_file)
     {
       CONTEXT("LoadBalancer::read_mesh()");
@@ -330,6 +330,8 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         std::string s = _base_mesh->print();
         Logger::log_master(s, Logger::SCREEN);
         Logger::log(s);
+        // validate base mesh
+        _base_mesh->validate(Logger::file);
       }
     }
 

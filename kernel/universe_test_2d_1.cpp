@@ -2,7 +2,6 @@
 // code cleanup:
 // - completion of doxygen comments (\param, array dimensions, etc.)
 // - add/remove 'const' and other modifiers where necessary
-// - missing DTORs, virtual DTORs?
 // - test_1d.cpp etc. ersetzen
 // - check: missing output when using MPICH
 
@@ -18,6 +17,7 @@
 // - replace std::cout/std::err/exit(1) by Logger::... (or remove, or change into mpi_aborts/exceptions)
 // - use ErrorHandler in base mesh code
 // - CONTEXT("...") einfuegen
+// - missing DTORs, virtual DTORs?
 
 // includes, system
 #include <iostream>
@@ -34,8 +34,9 @@
 
 using namespace FEAST;
 
-#define WDIM 2
+// set space and world dimension manually
 #define SDIM 2
+#define WDIM 2
 
 
 /**
@@ -234,6 +235,8 @@ void define_work_groups(
 * mesh cells in the mesh. The semi-hard-wired example then creates two 'main process groups' (for two completely
 * independent problems). Each process group has its own load balancer. Only the first process group (consisting of
 * n+2 processes does some useful things, the second one (consisting of 2 processes) is idle.
+*
+* \todo set up separate tests for universe, work group creation, logging/pretty printer, cell subdivision
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke

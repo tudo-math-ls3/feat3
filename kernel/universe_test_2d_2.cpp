@@ -9,6 +9,7 @@
 #include <kernel/comm.hpp>
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
+#include <kernel/base_mesh/cell_subdivision.hpp>
 
 using namespace FEAST;
 
@@ -68,7 +69,8 @@ void define_work_groups(
   unsigned int num_cells = load_balancer->base_mesh()->num_cells();
 
   // debug output
-  Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
+  Logger::log_master("num_processes: " + StringUtils::stringify(num_processes) + "\nnum_cells: "
+                     + StringUtils::stringify(num_cells) + "\n");
   // assert that the number of processes is n
   assert(num_processes == num_cells);
   // assert that no dedicated load balancer is used
@@ -115,8 +117,10 @@ void define_work_groups(
 /**
 * \brief main routine - test driver for universe
 *
-* Call the routine via "mpirun -np n+3 <binary_name> <relative path to base mesh> n" where n is the number of base
+* Call the routine via "mpirun -np n+1 <binary_name> <relative path to base mesh> n" where n is the number of base
 * mesh cells in the mesh.
+*
+* \todo set up separate tests for universe, work group creation, logging/pretty printer, cell subdivision
 *
 * \author Hilmar Wobker
 * \author Dominik Goeddeke
@@ -206,39 +210,35 @@ int main(int argc, char* argv[])
     load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                                       subgroup_ranks, graphs);
 
-    // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
-    // standard file logging functions
-    if (Process::rank % 7 == 0)
+    // get pointer to the base mesh
+    BaseMesh::BM<SDIM, WDIM>* bm = load_balancer->base_mesh();
+
+    // let the coordinator subdivide a cell
+    if(process_group->is_coordinator())
     {
-      // test the PrettyPrinter
-      std::string prefix(std::string("Proc" + StringUtils::stringify(Process::rank)));
-      PrettyPrinter pp(40, '#', prefix + " ");
-      pp.add_line_sep();
-      pp.add_line_centered("Testing pp and logging!");
-      pp.add_line_sep();
-      pp.add_line("left bla blub");
-      pp.add_line("too long too long too long too long too long too long");
-      pp.add_line_no_right_delim("also too long too long too long too long too long too long");
-      pp.add_line("left bla blub");
-      pp.add_line_sep();
-      // print it like this...
-      Logger::log(pp.block());
-      // ... or like this...
-      pp.print(Logger::file);
-      // send it to the master for file output
-      Logger::log_master(pp.block(), Logger::FILE);
+      // subdivide cell 0
+      Logger::log("******************\n");
+      Logger::log("Subdividing cell 0\n");
+      Logger::log("******************\n");
+      BaseMesh::SubdivisionData<2, SDIM, WDIM>* subdiv_data
+        = new BaseMesh::SubdivisionData<2, SDIM, WDIM>(BaseMesh::NONCONFORM_SAME_TYPE);
+      bm->cell(0)->subdivide(subdiv_data);
 
-      // test vector version of log_master_array()
-      std::vector<std::string> messages(3);
-      messages[0] = prefix + ": Testing this...\n";
-      messages[1] = prefix + ": ...vector logging...\n";
-      messages[2] = prefix + ": ...feature!\n";
-      Logger::log_master_array(messages, Logger::FILE);
-      Logger::log(messages);
+      // add created cells and subcells to the corresponding base mesh vectors
+      bm->add_created_items(bm->cell(0)->subdiv_data());
+      // set cell numbers (now they differ from indices)
+      bm->set_cell_numbers();
+      // print base mesh
+      bm->print(Logger::file);
+     // validate base mesh
+      bm->validate(Logger::file);
 
-      // test standard log feature
-      Logger::log("BRAL\n");
+      // TODO: neighbourhood update
+
+      Logger::log("!!! Neighbourhood update after subdivision not implemented yet!!!\n");
+      Logger::log("!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!\n");
     }
+
     if(process_group->is_coordinator())
     {
      // delete the graphs array
