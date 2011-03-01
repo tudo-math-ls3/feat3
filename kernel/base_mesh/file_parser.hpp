@@ -91,9 +91,10 @@ namespace FEAST
         CONTEXT("BaseMesh::FileParser::parse()");
         assert(world_dim_ == 1);
 
-        Logger::log_master("No file parser implemented yet!\n\
-                          A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):\n\
-                          v0--------e0--------v1--------e1--------v2--------e2--------v3");
+        std::string s = "No file parser implemented yet!\n";
+        s += "A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):\n";
+        s += "v0--------e0--------v1--------e1--------v2--------e2--------v3\n";
+        Logger::log_master(s);
 
         // set base mesh pointer
         _bm = bm;

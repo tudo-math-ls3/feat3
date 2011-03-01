@@ -1,63 +1,231 @@
 // includes, system
-#include <iostream> // for std::ostream
+#include <iostream>
 #include <cstdlib> // for exit()
 
-// includes, FEAST
+// includes, Feast
 #include <kernel/base_header.hpp>
-// COMMENT_HILMAR: wenn Fusion mit MPI vollendet, dann nutze das hier:
-//#include <kernel/error_handler.hpp>
-#include <kernel/base_mesh/file_parser.hpp>
-#include <kernel/base_mesh/bm.hpp>
+#include <kernel/util/string_utils.hpp>
+#include <kernel/util/mpi_utils.hpp>
+#include <kernel/comm.hpp>
+#include <kernel/process.hpp>
+#include <kernel/universe.hpp>
+#include <kernel/base_mesh/cell_subdivision.hpp>
 
 using namespace FEAST;
-using namespace BaseMesh;
 
+// set space and world dimension manually to 1
 #define WDIM 1
 #define SDIM 1
 
-int main (int argc, char **argv)
+/**
+* \brief dummy function in preparation of a function for defining work groups (which will reside in the load bal. class)
+*
+* This dummy function creates one work group consisting of all available processes.
+* This test code is semi hard-wired in the sense that we schedule one BMC to each processor.
+* We need n processes for the following (where n is the number of base mesh cells).
+*
+* \param[in] load_balancer
+* pointer to the load balancer object to get some further information
+*
+* \param[out] num_subgroups
+* number of subgroups
+*
+* \param[out] num_proc_in_subgroup
+* array of numbers of processes per subgroup
+*
+* \param[out] group_contains_extra_coord
+* Array indicating whether the subgroups contain an extra process for the coordinator (which will then
+* not be a compute process in the corresponding work group).
+* Usually a boolean would do the trick, but we cannot send boolean arrays via MPI. (C++ bindings are deprecated,
+* hence we cannot use MPI::BOOL. MPI_LOGICAL cannot be used, since this is not equivalent to C++'s bool.)
+* So, we use unsigned char here and treat is as if it were boolean.
+*
+* \param[out] subgroup_ranks
+* array for defining the rank partitioning
+*
+* \param[out] graphs
+* array of Graph pointers representing the connectivity of work group processes
+*/
+void define_work_groups(
+  LoadBalancer<SDIM, WDIM>* load_balancer,
+  unsigned int& num_subgroups,
+  unsigned int*& num_proc_in_subgroup,
+  unsigned char*& group_contains_extra_coord,
+  int**& subgroup_ranks,
+  Graph**& graphs)
 {
-  BM<SDIM, WDIM> bm;
-  FileParser<SDIM, WDIM> parser;
-  try
+  CONTEXT("universe_test_1d_1: define_work_groups()");
+  // set number of subgroups manually to 1
+  num_subgroups = 1;
+  // allocate arrays
+  num_proc_in_subgroup = new unsigned int[num_subgroups];
+  group_contains_extra_coord = new unsigned char[num_subgroups];
+  subgroup_ranks = new int*[num_subgroups];
+  graphs = new Graph*[num_subgroups];
+
+  // shortcut to the number of processes in the load balancer's process group
+  unsigned int num_processes = load_balancer->process_group()->num_processes();
+
+  // shortcut to the number of cells in the base mesh
+  unsigned int num_cells = load_balancer->base_mesh()->num_cells();
+
+  // debug output
+  Logger::log_master("num_processes: " + StringUtils::stringify(num_processes) + "\nnum_cells: "
+                     + StringUtils::stringify(num_cells) + "\n");
+  // assert that the number of processes is n
+  assert(num_processes == num_cells);
+  // assert that no dedicated load balancer is used
+  assert(!load_balancer->group_has_dedicated_load_bal());
+
+  // set up the test case
+
+  // no extra coordinator process is needed
+  group_contains_extra_coord[0] = false;
+  // set number of processes in the work group
+  num_proc_in_subgroup[0] = num_cells;
+  // work group ranks
+  subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
+  // set entries to {0, ..., n-1}
+  for(unsigned int i(0) ; i < num_proc_in_subgroup[0] ; ++i)
   {
-    parser.parse("dummy", &bm);
+    subgroup_ranks[0][i] = i;
   }
-  catch(Exception& e)
+
+  // get connectivity graph of the base mesh; this one will be used for the one and only work group
+  graphs[0] = load_balancer->base_mesh()->graph();
+
+// COMMENT_HILMAR:
+// We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
+// equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
+// layer, which both have their own connectivity structure. Here, we actually need the connectivity graph of the
+// process patch layer.
+}
+
+
+
+/**
+* \brief main routine - test driver for universe
+*
+* Call the routine via "mpirun -np 4 <binary_name>".
+*
+* \todo set up separate tests for universe, work group creation, logging/pretty printer, cell subdivision
+*
+* \author Hilmar Wobker
+* \author Dominik Goeddeke
+*/
+int main(int argc, char* argv[])
+{
+  CONTEXT("universe_test_1d_1: main()");
+  if (argc > 1)
   {
-    std::cerr << e->message() << std::endl;
+    std::cerr << "Call the program with \"mpirun -np 4 " << argv[0] << "\"." << std::endl;
     exit(1);
   }
-  // set cell numbers (currently equal to indices since all cells are active)
-  bm.set_cell_numbers();
-  // create base mesh's graph structure
-  bm.create_graph();
-  // print base mesh
-  bm.print(std::cout);
-  // validate base mesh
-  bm.validate(Logger::file);
 
-  // subdivide cell 1
-  std::cout << "******************" << std::endl;
-  std::cout << "Subdividing cell 1" << std::endl;
-  std::cout << "******************" << std::endl;
-  SubdivisionData<1, SDIM, WDIM>* subdiv_data = new SubdivisionData<1, SDIM, WDIM>(CONFORM_SAME_TYPE);
-  bm.cell(1)->subdivide(subdiv_data);
+  // init MPI
+  MPIUtils::init_MPI(argc, argv);
 
-  // add created cells and subcells to the corresponding base mesh vectors
-  bm.add_created_items(bm.cell(1)->subdiv_data());
-  // set cell numbers (now they differ from indices)
-  bm.set_cell_numbers();
-  // print base mesh
-  bm.print(std::cout);
- // validate base mesh
-  bm.validate();
+  // COMMENT_HILMAR:
+  // For this hard-wired example using the fixed 1D mesh defined in the file parser with 3 base mesh cells we need 4
+  // processes in total (3 for the one and only process group and 1 for the master process).
 
-  // TODO: neighbourhood update
+  // set shortcut to the one and only instance of Universe (since this is the first call of
+  // Universe<SDIM, WDIM>::instance(), it also calls the constructor of the Universe singleton class)
+  Universe<SDIM, WDIM>* universe = Universe<SDIM, WDIM>::instance();
 
-  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
-  std::cout << "!!! Neighbourhood update after subdivision not implemented yet!!!" << std::endl;
-  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
-  std::cout << "!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!" << std::endl;
+  try
+  {
+    universe->create();
+  }
+  catch (Exception& e)
+  {
+    // abort the program
+    ErrorHandler::exception_occured(e);
+  }
 
+  // Get process objects. Note that on each process only one of the following two exists (the other one is the
+  // null pointer).
+  LoadBalancer<SDIM, WDIM>* load_balancer = universe->load_balancer();
+  Master* master = universe->master();
+
+  int rank_world = Process::rank;
+
+  if(load_balancer != nullptr)
+  {
+    ProcessGroup* process_group = load_balancer->process_group();
+
+    // let the load balancer "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
+    load_balancer->read_mesh("dummy");
+
+    // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
+    unsigned int num_subgroups;
+    unsigned int* num_proc_in_subgroup(nullptr);
+    unsigned char* group_contains_extra_coord(nullptr);
+    int** subgroup_ranks(nullptr);
+    Graph** graphs;
+
+    // define work groups
+    if(process_group->is_coordinator())
+    {
+      // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
+      // work groups and the process distribution to them. The passed arrays are allocated within this routine.
+      define_work_groups(load_balancer, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+                         subgroup_ranks, graphs);
+    }
+    // Now let the load balancer create the work groups (this function is called on all processes of the process
+    // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
+    // balancer class.
+    load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+                                      subgroup_ranks, graphs);
+
+    // get pointer to the base mesh
+    BaseMesh::BM<SDIM, WDIM>* bm = load_balancer->base_mesh();
+
+    // let the coordinator subdivide a cell
+    if(process_group->is_coordinator())
+    {
+     // subdivide cell 1
+      Logger::log("******************\n");
+      Logger::log("Subdividing cell 1\n");
+      Logger::log("******************\n");
+      BaseMesh::SubdivisionData<1, SDIM, WDIM>* subdiv_data
+        = new BaseMesh::SubdivisionData<1, SDIM, WDIM>(BaseMesh::CONFORM_SAME_TYPE);
+      bm->cell(1)->subdivide(subdiv_data);
+
+      // add created cells and subcells to the corresponding base mesh vectors
+      bm->add_created_items(bm->cell(1)->subdiv_data());
+      // set cell numbers (now they differ from indices)
+      bm->set_cell_numbers();
+      // print base mesh
+      bm->print(Logger::file);
+     // validate base mesh
+      bm->validate(Logger::file);
+
+      // TODO: neighbourhood update
+
+      Logger::log("!!! Neighbourhood update after subdivision not implemented yet!!!\n");
+      Logger::log("!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!\n");
+    }
+
+    if(process_group->is_coordinator())
+    {
+     // delete the graphs array
+      delete [] graphs;
+    }
+
+    // Everything done, call universe destruction routine.
+    universe->destroy();
+  }
+  else if(master != nullptr)
+  {
+    // This branch is entered when the infinite service loop of the master has been finished.
+    // This, however, usually happens only at program end.
+    // Everything done, call universe destruction routine.
+    universe->destroy();
+  }
+  else
+  {
+    MPIUtils::abort("Process with rank " + StringUtils::stringify(rank_world)
+                    + " has no particular role, this should not happen.");
+  }
 }

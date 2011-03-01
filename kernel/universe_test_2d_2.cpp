@@ -13,6 +13,7 @@
 
 using namespace FEAST;
 
+// set space and world dimension manually to 2
 #define WDIM 2
 #define SDIM 2
 
@@ -53,7 +54,7 @@ void define_work_groups(
   int**& subgroup_ranks,
   Graph**& graphs)
 {
-  CONTEXT("universe_test2: define_work_groups()");
+  CONTEXT("universe_test_2d_2: define_work_groups()");
   // set number of subgroups manually to 1
   num_subgroups = 1;
   // allocate arrays
@@ -77,21 +78,12 @@ void define_work_groups(
   assert(!load_balancer->group_has_dedicated_load_bal());
 
   // set up the test case
-  // test case 1 (n is the number of base mesh cells)
-  // with dedicated load balancer process
-  //  - work group for coarse grid: 2 processes: {0, 1}
-  //  - work group for fine grid: n processes: {1, ..., n}
-  //  - i.e. process 1 is in both work groups
-  //  - dedicated load balancer and coordinator process: n+1
 
-  // since there is a dedicated load balancer process, this has to be added to both work groups as extra
-  // coordinator process
+  // no extra coordinator process is needed
   group_contains_extra_coord[0] = false;
-
-  // set number of processes per group
+  // set number of processes in the work group
   num_proc_in_subgroup[0] = num_cells;
-
-  // fine grid work group
+  // work group ranks
   subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
   // set entries to {0, ..., n-1}
   for(unsigned int i(0) ; i < num_proc_in_subgroup[0] ; ++i)
@@ -99,9 +91,6 @@ void define_work_groups(
     subgroup_ranks[0][i] = i;
   }
 
-  /* *********************************************************
-  * create graph structures corresponding to the work groups *
-  ***********************************************************/
   // get connectivity graph of the base mesh; this one will be used for the one and only work group
   graphs[0] = load_balancer->base_mesh()->graph();
 
@@ -127,7 +116,7 @@ void define_work_groups(
 */
 int main(int argc, char* argv[])
 {
-  CONTEXT("universe_test2: main()");
+  CONTEXT("universe_test_2d_2: main()");
   if (argc < 3)
   {
     std::cerr << "Call the program with \"mpirun -np n+1 " << argv[0] << " <relative_path_to_mesh_file> n\", "
@@ -139,15 +128,13 @@ int main(int argc, char* argv[])
   MPIUtils::init_MPI(argc, argv);
 
   // COMMENT_HILMAR:
-  // For the semi-hard-wired example using a mesh with n base mesh cells we need n+3 processes in total
-  // (n+2 for the one for the one and only process group and 1 for the master process).
-  // (See description of the example in routine LoadBalancer::create_subgroups().)
+  // For the semi-hard-wired example using a mesh with n base mesh cells we need n+1 processes in total
+  // (n for the one and only process group and 1 for the master process).
 
   // COMMENT_HILMAR:
   // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
 
-  unsigned int num_cells;
-  num_cells = atoi(argv[2]);
+  unsigned int num_cells = atoi(argv[2]);
   assert(num_cells > 0);
 
   // set shortcut to the one and only instance of Universe (since this is the first call of

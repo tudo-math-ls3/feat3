@@ -34,7 +34,7 @@
 
 using namespace FEAST;
 
-// set space and world dimension manually
+// set space and world dimension manually to 2
 #define SDIM 2
 #define WDIM 2
 
@@ -112,7 +112,7 @@ void define_work_groups(
   int**& subgroup_ranks,
   Graph**& graphs)
 {
-  CONTEXT("universe_test: define_work_groups()");
+  CONTEXT("universe_test_2d_1: define_work_groups()");
   // set number of subgroups manually to 2
   num_subgroups = 2;
   // allocate arrays
@@ -243,7 +243,7 @@ void define_work_groups(
 */
 int main(int argc, char* argv[])
 {
-  CONTEXT("universe_test: main()");
+  CONTEXT("universe_test_2d_1: main()");
   if (argc < 3)
   {
     std::cerr << "Call the program with \"mpirun -np n+5 " << argv[0] << " <relative_path_to_mesh_file> n\", "
@@ -262,13 +262,12 @@ int main(int argc, char* argv[])
   // COMMENT_HILMAR:
   // For the semi-hard-wired example using a mesh with n base mesh cells we need n+5 processes in total
   // (n+2 for the first process group, 2 for the second process group and 1 for the master process).
-  // (See description of the example in routine LoadBalancer::create_work_groups().)
+  // (See description of the example in routine define_work_groups(...).)
 
   // COMMENT_HILMAR:
   // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
 
-  unsigned int num_cells;
-  num_cells = atoi(argv[2]);
+  unsigned int num_cells = atoi(argv[2]);
   assert(num_cells > 0);
 
   // The number of processes for the first process group must equal num_cells + 2.
