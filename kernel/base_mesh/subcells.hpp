@@ -186,7 +186,7 @@ namespace FEAST
       ************************************/
 
       /// returns number of vertices in this mesh
-      inline index_t_glob num_vertices() const
+      inline index_glob_t num_vertices() const
       {
         CONTEXT("BaseMesh::Subcells::num_vertices()");
         return _vertices.size();
@@ -194,7 +194,7 @@ namespace FEAST
 
 
       /// returns vertex at given index
-      inline Vertex_* vertex(index_t_glob const index)
+      inline Vertex_* vertex(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::vertex()");
         assert(index < num_vertices());
@@ -364,7 +364,7 @@ namespace FEAST
       ************************************/
 
       /// returns number of edges in this mesh (including inactive ones)
-      inline index_t_glob num_edges() const
+      inline index_glob_t num_edges() const
       {
         CONTEXT("BaseMesh::Subcells::num_edges()");
         // TODO: potentiell falsch, auch Kanten koennen inaktiv sein und duerfen dann beim Transfer zu den
@@ -374,7 +374,7 @@ namespace FEAST
 
 
       /// returns edge at given index
-      inline Cell_1D_* edge(index_t_glob const index)
+      inline Cell_1D_* edge(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::edge()");
         assert(index < num_edges());
@@ -560,7 +560,7 @@ namespace FEAST
 
 
       /// returns number of faces in this mesh (including inactive ones)
-      inline index_t_glob num_faces() const
+      inline index_glob_t num_faces() const
       {
         CONTEXT("BaseMesh::Subcells::num_faces()");
         // TODO: potentiell falsch, auch Faces koennen inaktiv sein und duerfen dann beim Transfer zu den Rechenprozessen
@@ -570,7 +570,7 @@ namespace FEAST
 
 
       /// returns face at given index
-      inline Cell_2D_* face(index_t_glob const index)
+      inline Cell_2D_* face(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::face()");
         assert(index < _faces.size());

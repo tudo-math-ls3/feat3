@@ -178,7 +178,7 @@ namespace FEAST
       *
       * \return number of cells
       */
-      inline index_t_glob num_cells() const
+      inline index_glob_t num_cells() const
       {
         CONTEXT("BaseMesh::BM::num_cells()");
         return _cells.size();
@@ -190,13 +190,13 @@ namespace FEAST
       *
       * \return number of active cells
       */
-      inline index_t_glob num_active_cells() const
+      inline index_glob_t num_active_cells() const
       {
         CONTEXT("BaseMesh::BM::num_active_cells()");
         // TODO: nochmal implementieren, wenn inaktive immer schoen ans Ende geschoben werden und es einen index gibt,
         // der die Position des letzten aktiven merkt
-        index_t_glob counter = 0;
-        for(index_t_glob i(0) ; i < num_cells() ; ++i)
+        index_glob_t counter = 0;
+        for(index_glob_t i(0) ; i < num_cells() ; ++i)
         {
           if(cell(i)->active())
           {
@@ -215,7 +215,7 @@ namespace FEAST
       *
       * \return pointer to Cell at given index
       */
-      inline Cell_* cell(index_t_glob const index) const
+      inline Cell_* cell(index_glob_t const index) const
       {
         CONTEXT("BaseMesh::BM::cell()");
         assert(index < num_cells());
@@ -262,8 +262,8 @@ namespace FEAST
       inline void set_cell_numbers() const
       {
         CONTEXT("BaseMesh::BM::set_cell_numbers()");
-        index_t_glob counter = 0;
-        for(index_t_glob i(0) ; i < num_cells() ; ++i)
+        index_glob_t counter = 0;
+        for(index_glob_t i(0) ; i < num_cells() ; ++i)
         {
           if(cell(i)->active())
           {
@@ -287,7 +287,7 @@ namespace FEAST
 // the process patch layer, which both have their own connectivity structure. The load balancer then actually needs the
 // connectivity graph of the process patch layer. We also do not distinguish between edge and vertex neighbours here.
         CONTEXT("BaseMesh::BM::create_graph()");
-        index_t_glob n_active_cells = num_active_cells();
+        index_glob_t n_active_cells = num_active_cells();
         // allocate index array
         unsigned int* index = new unsigned int[n_active_cells + 1];
 
@@ -296,8 +296,8 @@ namespace FEAST
         // treat last index entry separately because cell array has one less entry than index array
         unsigned int num_neighbours_so_far = 0;
         // counter for active cells
-        index_t_glob ipos(0);
-        for (index_t_glob icell=0 ; icell < num_cells() ; ++icell)
+        index_glob_t ipos(0);
+        for (index_glob_t icell=0 ; icell < num_cells() ; ++icell)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!
         {
           if(cell(icell)->active())
@@ -319,7 +319,7 @@ namespace FEAST
         // again, treat last loop instance separately
         unsigned int* neighbours = new unsigned int[index[n_active_cells]];
         num_neighbours_so_far = 0;
-        for (index_t_glob icell=0 ; icell < n_active_cells ; icell++)
+        for (index_glob_t icell=0 ; icell < n_active_cells ; icell++)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!
         {
           Cell_* c = cell(icell);

@@ -18,17 +18,17 @@ namespace FEAST
   public:
 
     /// global constant: max counting number for an index (if a given index evaluates to this value then it is not valid)
-    static const index_t_glob MAX_INDEX;
+    static const index_glob_t MAX_INDEX;
 
     /// global constant: max counting number for a number (if a given number evaluates to this value then it is not valid)
-    static const index_t_glob MAX_NUMBER;
+    static const index_glob_t MAX_NUMBER;
   };
 
   /// global constant: max counting number for an index (if a given index evaluates to this value then it is not valid)
-  const index_t_glob Constants::MAX_INDEX(std::numeric_limits<index_t_glob>::max());
+  const index_glob_t Constants::MAX_INDEX(std::numeric_limits<index_glob_t>::max());
 
   /// global constant: max counting number for a number (if a given number evaluates to this value then it is not valid)
-  const index_t_glob Constants::MAX_NUMBER(std::numeric_limits<index_t_glob>::max());
+  const index_glob_t Constants::MAX_NUMBER(std::numeric_limits<index_glob_t>::max());
 
 } // namespace FEAST
 

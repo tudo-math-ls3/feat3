@@ -111,7 +111,7 @@ namespace FEAST
   *
   * This type is used for indexing entities in a global parallel simulation.
   */
-  typedef unsigned long index_t_glob;
+  typedef unsigned long index_glob_t;
 
   /**
   * \brief Nil class definition.
