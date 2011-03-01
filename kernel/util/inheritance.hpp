@@ -4,13 +4,14 @@
 #define UTIL_INHERITANCE_HPP 1
 
 /**
- * \file inheritance.hpp
- *
- * \brief Static compile-time inheritance analysis.
- *
- * \author Dirk Ribbrock
- */
+* \file inheritance.hpp
+*
+* \brief Static compile-time inheritance analysis.
+*
+* \author Dirk Ribbrock
+*/
 
+/// FEAST namespace
 namespace FEAST
 {
   template <typename T, typename U>
@@ -21,22 +22,21 @@ namespace FEAST
     static small Test (const U& );
     static Big Test(...);
     static T MakeT();
-    public:
-      enum {exists = sizeof(Test(MakeT())) == sizeof(small) };
-      enum {sameType = false};
+
+  public:
+    enum {exists = sizeof(Test(MakeT())) == sizeof(small) };
+    enum {sameType = false};
   };
 
   template <typename T>
   class Conversion<T, T>
   {
-    public:
-      enum {exists = 1, sameType = 1};
+  public:
+    enum {exists = 1, sameType = 1};
   };
 }
 
-/**
- * \brief Check that U inherits from T.
- */
+/// checks if U inherits from T
 #define SUPERSUBCLASS(T, U) \
   (::FEAST::Conversion<const U*, const T*>::exists && \
    !::FEAST::Conversion<const T*, const void*>::sameType)

@@ -3,35 +3,39 @@
 /// Header guard
 #define UTIL_TYPE_TRAITS_HHP 1
 
+// includes, system
 #include <typeinfo>
-#include <kernel/util/stringify.hpp>
 
+// includes, FEAST
+#include <kernel/util/string_utils.hpp>
+
+/// FEAST namespace
 namespace FEAST
 {
   /**
-   * \brief Basic TypeTraits struct
-   *
-   * \author Dirk Ribbrock
-   */
-  template <typename DT_>
+  * \brief basic TypeTraits struct
+  *
+  * \author Dirk Ribbrock
+  */
+  template<typename DT_>
   struct TypeTraits
   {
-    /// Return a string idetifying the Datatype
+    /// returns a string identifying the datatype
     static std::string name()
     {
-      return stringify(typeid(DT_).name());
+      return StringUtils::stringify(typeid(DT_).name());
     }
   };
 
   /**
-   * \brief TypeTraits specialisation for float
-   *
-   * \author Dirk Ribbrock
-   */
-  template <>
+  * \brief TypeTraits specialisation for float
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
   struct TypeTraits<float>
   {
-    /// Return a string idetifying the Datatype
+    /// returns a string identifying the datatype
     static std::string name()
     {
       return "float";
@@ -39,14 +43,14 @@ namespace FEAST
   };
 
   /**
-   * \brief TypeTraits specialisation for double
-   *
-   * \author Dirk Ribbrock
-   */
-  template <>
+  * \brief TypeTraits specialisation for double
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
   struct TypeTraits<double>
   {
-    /// Return a string idetifying the Datatype
+    /// returns a string identifying the datatype
     static std::string name()
     {
       return "double";
@@ -54,14 +58,14 @@ namespace FEAST
   };
 
   /**
-   * \brief TypeTraits specialisation for unsigned long
-   *
-   * \author Dirk Ribbrock
-   */
-  template <>
+  * \brief TypeTraits specialisation for unsigned long
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
   struct TypeTraits<unsigned long>
   {
-    /// Return a string idetifying the Datatype
+    /// returns a string identifying the datatype
     static std::string name()
     {
       return "unsigned long";
@@ -69,14 +73,14 @@ namespace FEAST
   };
 
   /**
-   * \brief TypeTraits specialisation for unsigned int
-   *
-   * \author Dirk Ribbrock
-   */
-  template <>
+  * \brief TypeTraits specialisation for unsigned int
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
   struct TypeTraits<unsigned int>
   {
-    /// Return a string idetifying the Datatype
+    /// returns a string identifying the datatype
     static std::string name()
     {
       return "unsigned int";
@@ -84,14 +88,14 @@ namespace FEAST
   };
 
   /**
-   * \brief TypeTraits specialisation for signed int
-   *
-   * \author Dirk Ribbrock
-   */
-  template <>
+  * \brief TypeTraits specialisation for signed int
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
   struct TypeTraits<int>
   {
-    /// Return a string idetifying the Datatype
+    /// returns a string identifying the datatype
     static std::string name()
     {
       return "int";
@@ -99,14 +103,14 @@ namespace FEAST
   };
 
   /**
-   * \brief TypeTraits specialisation for Nil tag class
-   *
-   * \author Dirk Ribbrock
-   */
-  template <>
+  * \brief TypeTraits specialisation for Nil tag class
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
   struct TypeTraits<Nil>
   {
-    /// Return a string idetifying the Datatype
+    /// returns a string identifying the datatype
     static std::string name()
     {
       return "Nil";

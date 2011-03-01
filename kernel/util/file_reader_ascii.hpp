@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-// includes, Feast
+// includes, FEAST
 #include <kernel/util/exception.hpp>
 
 /// FEAST namespace

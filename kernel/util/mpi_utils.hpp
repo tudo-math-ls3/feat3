@@ -7,7 +7,7 @@
 #include <string>
 #include <mpi.h>
 
-// includes, Feast
+// includes, FEAST
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/exception.hpp>
 

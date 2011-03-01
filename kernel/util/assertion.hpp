@@ -9,63 +9,91 @@
 
 namespace FEAST
 {
-    /**
-     * \brief Assertion is thrown when a critical condition is not fulfilled.
-     * \author Dirk Ribbrock
-     */
-    class Assertion :
-        public Exception
-    {
-        public:
-            /**
-             * Constructor.
-             *
-             * \param function Name of the function in which the assertion failed.
-             * \param file Name of the source file that contains the failed assertion.
-             * \param line Line number of the failed assertion.
-             * \param message Message that shall be displayed.
-             */
-            Assertion(const char * const function, const char * const file,
-                const long line, const std::string & message) :
-              Exception(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message)
-            {
-              std::cout << backtrace("\n") << this->message() << std::endl;
-            }
-    };
+  /**
+  * \brief defining assertion
+  *
+  * An assertion is thrown when a critical condition is not fulfilled. Together with the macro defined below, it
+  * replaces the standard C assert(...).
+  *
+  * \author Dirk Ribbrock
+  */
+  class Assertion
+    : public Exception
+  {
+
+  public:
 
     /**
-     *  \brief Simple struct to catch compile time assertions
-     * \author Dirk Ribbrock
-     */
-    template <bool>
-    struct CompileTimeChecker
+    * \brief CTOR
+    *
+    * \param[in] function
+    * name of the function in which the assertion failed
+    *
+    * \param[in] file
+    * name of the source file that contains the failed assertion
+    *
+    * \param[in] line
+    * line number of the failed assertion
+    *
+    * \param[in] message
+    * message that shall be displayed
+    */
+    Assertion(
+      const char * const function,
+      const char * const file,
+      const long line,
+      const std::string & message)
+      : Exception(StringUtils::stringify(file) + ":" + StringUtils::stringify(line) + ": in "
+                  + StringUtils::stringify(function) + ": " + message)
     {
-      /// Constructor accepting any kind of arguments:
-      CompileTimeChecker(...){};
-    };
+      std::cout << backtrace("\n") << this->message() << std::endl;
+    }
+  };
 
-    /**
-     * \brief 'False' version of CompileTimeChecker struct to catch compile time assertions.
-     * \author Dirk Ribbrock
-     */
-    template <> struct CompileTimeChecker<false>
-    {
-    };
+
+
+
+  /**
+  * \brief Simple struct to catch compile time assertions
+  *
+  * \author Dirk Ribbrock
+  */
+  template<bool>
+  struct CompileTimeChecker
+  {
+    /// Constructor accepting any kind of arguments:
+    CompileTimeChecker(...){};
+  };
+
+
+
+
+  /**
+  * \brief 'False' version of CompileTimeChecker struct to catch compile time assertions.
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
+  struct CompileTimeChecker<false>
+  {
+  };
+
+
 
 
 /**
- * \def ASSERT
- *
- * \brief Convenience definition that provides a way to throw Assertion exceptions.
- *
- * The thrown Assertion will be automatically provided with the correct filename,
- * line number and function name.
- *
- * \param expr Boolean expression that shall be asserted.
- * \param msg Error message that will be display in case that expr evaluates to false.
- *
- * \warning Will only be compiled in when debug support is enabled.
- */
+* \def ASSERT
+*
+* \brief Convenience definition that provides a way to throw Assertion exceptions.
+*
+* The thrown Assertion will be automatically provided with the correct filename,
+* line number and function name.
+*
+* \param expr Boolean expression that shall be asserted.
+* \param msg Error message that will be display in case that expr evaluates to false.
+*
+* \warning Will only be compiled in when debug support is enabled.
+*/
 #if defined (DEBUG)
 #define ASSERT(expr, msg) \
     do { \
@@ -76,19 +104,22 @@ namespace FEAST
 #define ASSERT(expr, msg)
 #endif
 
+
+
+
 /**
- * \def STATIC_ASSERT
- *
- * \brief Convenience definition that provides a way to throw compile-time errors.
- *
- * The thrown Assertion will be automatically provided with the correct filename,
- * line number and function name.
- *
- * \param expr Boolean expression that shall be asserted.
- * \param msg Error message that will be display in case that expr evaluates to false.
- *
- * \warning Will only be compiled in when debug support is enabled.
- */
+* \def STATIC_ASSERT
+*
+* \brief Convenience definition that provides a way to throw compile-time errors.
+*
+* The thrown Assertion will be automatically provided with the correct filename,
+* line number and function name.
+*
+* \param expr Boolean expression that shall be asserted.
+* \param msg Error message that will be display in case that expr evaluates to false.
+*
+* \warning Will only be compiled in when debug support is enabled.
+*/
 #if defined (DEBUG)
 #define STATIC_ASSERT(const_expr, msg) \
     {\

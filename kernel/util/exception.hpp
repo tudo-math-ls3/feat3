@@ -9,7 +9,7 @@
 #include <iostream>
 #include <list>
 
-// includes, Feast
+// includes, FEAST
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/base_header.hpp>
