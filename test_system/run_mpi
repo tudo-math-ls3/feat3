@@ -16,6 +16,6 @@ usage() {
 if test -z "$1" ; then
   usage
 fi
-./$1 mpiproccount
+$1 mpiproccount
 procs=$?
 mpiexec -n ${procs} $1 $2 $3 $4 $5 $6 $7 $8 $9

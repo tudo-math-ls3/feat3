@@ -21,6 +21,17 @@ int main(int argc, char** argv)
 
     if (argc > 1)
     {
+      for (TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
+          i != i_end ; ++i)
+      {
+        if ((*i)->mpi_proc_count() != (*TestList::instance()->begin_tests())->mpi_proc_count())
+        {
+          std::cout << "mpi_proc_count missmatch!"<<std::endl;
+          result = EXIT_FAILURE;
+          return (result);
+        }
+      }
+
       std::list<std::string> labels;
       for (int i(1) ; i < argc ; ++i)
       {
