@@ -32,6 +32,15 @@
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+CTestTestfile.cmake
+CMakeFiles/
+Testing/
+kernel/CMakeFiles/
+kernel/Testing/
+kernel/util/CMakeFiles/
+kernel/util/Testing/
+test_system/CMakeFiles/
+test_system/Testing/
 
 # Ignore Visual Studio files
 bin32/*
