@@ -60,7 +60,7 @@ public:
 
     try
     {
-      universe->create();
+      universe->create("cell_1d_edge-test_subdivision");
     }
     catch (Exception& e)
     {

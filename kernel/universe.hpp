@@ -120,6 +120,13 @@ namespace FEAST
     LoadBalancer<space_dim_, world_dim_>* _load_balancer;
 
 
+    /**
+    * \brief variable storing the base name of the log files
+    *
+    * If not set by the user, the file base name is set to 'feast'. The variable is passed to class Logger.
+    */
+    std::string _logfile_base_name;
+
     /* *************************
     * constructor & destructor *
     ***************************/
@@ -140,7 +147,8 @@ namespace FEAST
         _includes_dedicated_load_bal(nullptr),
         _group_ranks_world(nullptr),
         _master(nullptr),
-        _load_balancer(nullptr)
+        _load_balancer(nullptr),
+        _logfile_base_name("")
     {
       CONTEXT("Universe::Universe()");
       int mpi_is_initialised;
@@ -202,7 +210,7 @@ namespace FEAST
       Process::is_master = (Process::rank == Process::rank_master);
 
       // open log files
-      Logger::open_log_file();
+      Logger::open_log_file(_logfile_base_name);
 
       // calculate the number of processes needed; and check whether there are enough MPI processes available:
       unsigned int num_processes_needed;
@@ -428,12 +436,18 @@ namespace FEAST
     *
     * When using this function, only the master process and one process group using no dedicated load balancer process
     * are created.
+    *
+    * \param[in] logfile_base_name
+    * optional base name of log files (name pattern '<logfile_base_name><world rank of the process>.log'); if not
+    * provided, it is set to 'feast'
     */
-    void create()
+    void create(std::string const logfile_base_name = "feast")
     {
       CONTEXT("Universe::create()");
       if(!_universe_created)
       {
+        assert(logfile_base_name.size() > 0);
+        _logfile_base_name = logfile_base_name;
         _universe_created = true;
         // get total number of processes
         int num_proc;
@@ -476,15 +490,22 @@ namespace FEAST
     * \param[in] includes_dedicated_load_bal
     * array of flags whether a dedicated load balancer process is needed in process group,
     * dimension [\a num_process_groups]
+    *
+    * \param[in] logfile_base_name
+    * optional base name of log files (name pattern '<logfile_base_name><world rank of the process>.log'); if not
+    * provided, it is set to 'feast'
     */
     void create(
       unsigned int num_process_groups,
       unsigned int num_processes_in_group[],
-      bool includes_dedicated_load_bal[])
+      bool includes_dedicated_load_bal[],
+      std::string const logfile_base_name = "feast")
     {
       CONTEXT("Universe::create()");
       if(!_universe_created)
       {
+        assert(logfile_base_name.size() > 0);
+        _logfile_base_name = logfile_base_name;
         _universe_created = true;
         // get total number of processes
         int num_proc;

@@ -25,10 +25,10 @@ namespace FEAST
   * <ul>
   *   <li>
   *   Each process is connected to a single log file. The log directory \c logdir, as well as the base name \c basename
-  *   of the log files is set in some basic configuration file. The name of the log file is '\c logdir/basename\<n\>\c .log'
-  *   where \c n is the MPI_COMM_WORLD rank of the process. \c n is displayed with at least three digits using leading
-  *   zeros. When 1000 or more MPI processes are used, the number of digits is automatically increased. The basename is
-  *   empty by default, and the log directory is \c ./log by default.
+  *   of the log files is set in some basic configuration file. The name of the log file is
+  *   '\c logdir/basename\<n\>\c .log' where \c n is the MPI_COMM_WORLD rank of the process. \c n is displayed with at
+  *   least three  digits using leading zeros. When 1000 or more MPI processes are used, the number of digits is
+  *   automatically increased. The basename is empty by default, and the log directory is \c ./log by default.
   *   <li>
   *   Only the master process is allowed to produce screen log.
   *   <li>
@@ -158,9 +158,6 @@ namespace FEAST
     /// variable storing the base name of the log file
     static std::string file_base_name;
 
-    /// default base name of the log file
-    static std::string file_base_name_default;
-
     /// variable storing the complete name of the log file
     static std::string file_name;
 
@@ -187,14 +184,20 @@ namespace FEAST
     /**
     * \brief opens the log file
     *
-    * This function receives a string representing a log message and writes it to the log file attached to this process.
+    * This function opens a log file. It has to be called on each process. The filename is assembled as
+    * '<base_name><world_rank>.log', i.e. each MPI_COMM_WORLD process has his own log file.
     *
     * \param[in] base_name
-    * The base name of the file (default #file_base_name_default)
+    * The base name of the log file
+    *
+    * \todo Currently, the file is simply created in the current directory. E.g., when starting the automatic test
+    * system ('ctest test'), all files are created in this root directory. When starting the program manually, e.g.,
+    * in the kernel folder, the files are created there. So, the system has to be enhanced so that the user can specify
+    * the absolute path to the desired log file folder (Windows and Unix).
     *
     * \author Hilmar Wobker
     */
-    static void open_log_file(std::string const &base_name = file_base_name_default)
+    static void open_log_file(std::string const base_name)
     {
       CONTEXT("Logger::open_log_file()");
       // set base name of the log file
@@ -227,6 +230,7 @@ namespace FEAST
       }
     }
 
+
     /**
     * \brief closes the log file
     *
@@ -246,6 +250,7 @@ namespace FEAST
       }
     }
 
+
     /**
     * \brief writes a message to the log file of this process
     *
@@ -263,6 +268,7 @@ namespace FEAST
       file << message;
     }
 
+
 // COMMENT_HILMAR: This version seems not to be necessary. The above function log(std::string const &message) is also
 // able to process char pointers (see for example the call in Logger::receive_array())
 // Using this version here additionally triggers the gcc compiler to throw a warning when passing a constant string
@@ -272,6 +278,7 @@ namespace FEAST
 //  {
 //    file << message;
 //  }
+
 
     /**
     * \brief writes a number of messages to the log file of this process
@@ -292,6 +299,7 @@ namespace FEAST
         file << messages[i];
       }
     }
+
 
     /**
     * \brief triggers logging of a message (given as string) on the master process
@@ -574,7 +582,6 @@ namespace FEAST
     } // receive_array()
   }; // class Logger
 
-  std::string Logger::file_base_name_default("feast");
   std::string Logger::file_name;
   std::string Logger::file_base_name;
   std::ofstream Logger::file;

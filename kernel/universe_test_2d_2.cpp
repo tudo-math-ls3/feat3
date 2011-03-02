@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    universe->create();
+    universe->create("universe_test_2d_2_");
   }
   catch (Exception& e)
   {

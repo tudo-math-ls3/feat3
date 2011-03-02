@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    universe->create(num_process_groups, num_processes_in_group, includes_dedicated_load_bal);
+    universe->create(num_process_groups, num_processes_in_group, includes_dedicated_load_bal, "universe_test_2d_1_");
   }
   catch (Exception& e)
   {

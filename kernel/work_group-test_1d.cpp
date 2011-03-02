@@ -143,7 +143,7 @@ public:
 
     try
     {
-      universe->create();
+      universe->create("work_group-test_1d");
     }
     catch (Exception& e)
     {
