@@ -201,6 +201,9 @@ namespace FEAST
       Process::num_processes = _num_processes;
       Process::is_master = (Process::rank == Process::rank_master);
 
+      // open log files
+      Logger::open_log_file();
+
       // calculate the number of processes needed; and check whether there are enough MPI processes available:
       unsigned int num_processes_needed;
 
@@ -245,9 +248,6 @@ namespace FEAST
         // abort the program
         ErrorHandler::exception_occured(e);
       }
-
-      // open log files
-      Logger::open_log_file();
 
       // create ProcessGroup object representing the group of all COMM_WORLD processes
       _world_group = new ProcessGroup(MPI_COMM_WORLD, _num_processes);
