@@ -11,23 +11,34 @@ using namespace TestSystem;
 using namespace FEAST;
 
 /**
-* \brief testing creation of work groups based on a 1D mesh
+* \brief testing creation of work groups based on a 2D mesh
 *
 * \test
-* This test creates a universe, reads a 1D mesh (currently hard coded), builds a base mesh and creates work groups.
+* This test creates a universe, reads a 2D mesh, builds a base mesh and creates work groups.
 *
 * \author Hilmar Wobker
 */
 template <typename Tag_, typename DT_, unsigned char world_dim_, unsigned char space_dim_>
-class WorkGroupTest1D
+class WorkGroupTest2D1
   : public TaggedTest<Tag_, DT_>
 {
 
+private:
+
+  /// name of the mesh file to be read
+  std::string _mesh_file;
+
 public:
 
-  /// CTOR
-  WorkGroupTest1D()
-    : TaggedTest<Tag_, DT_>("work_group_test_1d")
+  /**
+  * \brief CTOR
+  *
+  * \param[in] mesh_file
+  * name of the mesh file to be read
+  */
+  WorkGroupTest2D1(std::string const mesh_file)
+    : TaggedTest<Tag_, DT_>("cell_2d_quad_test_subdivision"),
+      _mesh_file(mesh_file)
   {
   }
 
@@ -68,7 +79,7 @@ public:
     int**& subgroup_ranks,
     Graph**& graphs) const
   {
-    CONTEXT("WorkGroupTest1D::define_work_groups()");
+    CONTEXT("WorkGroupTest2D1::define_work_groups()");
     // set number of subgroups manually to 1
     num_subgroups = 1;
     // allocate arrays
@@ -116,17 +127,24 @@ public:
   }
 
 
-  /// sets the number of processes to use to 4 (3 BMCs + 1 master)
+  /**
+  * \brief sets the number of processes to use to 17 (16 BMCs + 1 master)
+  *
+  * For the semi-hard-wired example using a mesh with n base mesh cells we need n+1 processes in total
+  * (n for the one and only process group and 1 for the master process).
+  *
+  * \todo As an intermediate hack, read the number of BMCs from the mesh file name and return a corresponding value.
+  */
   unsigned long mpi_proc_count() const
   {
-    return 4;
+    return 17;
   }
 
 
   /// main routine
   void run() const
   {
-    CONTEXT("WorkGroupTest1D::run()");
+    CONTEXT("WorkGroupTest2D1::run()");
     // init MPI
     MPIUtils::init_MPI();
 
@@ -159,8 +177,19 @@ public:
     {
       ProcessGroup* process_group = load_balancer->process_group();
 
-      // let the load balancer "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
-      load_balancer->read_mesh("dummy");
+      // debug output
+      int rank_process_group = process_group->rank();
+      std::string s("Process " + StringUtils::stringify(rank_world) + " is the ");
+      if(load_balancer->is_dedicated_load_bal())
+      {
+        s += "DEDICATED ";
+      }
+      s += "load balancer with local rank " + StringUtils::stringify(rank_process_group);
+      s += " in group " + StringUtils::stringify(group_id) + ".";
+      Logger::log(s);
+
+      // let the load balancer read the mesh file
+      load_balancer->read_mesh(_mesh_file);
 
       // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
       unsigned int num_subgroups;
@@ -210,5 +239,5 @@ public:
 
 }; // WorkGroupTest1D
 
-// create test instance, using space and world dimension 1
-WorkGroupTest1D<Nil, Nil, 1, 1> work_group_test_1d;
+// create test instance, using space and world dimension 2
+WorkGroupTest2D1<Nil, Nil, 2, 2> work_group_test_2d_1("data/meshes/test_16bmc.feast");
