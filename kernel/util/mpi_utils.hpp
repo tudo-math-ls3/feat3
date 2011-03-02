@@ -33,7 +33,7 @@ namespace FEAST
     {
       CONTEXT("MPIUtils::init_MPI()");
       // init MPI
-      int mpi_error_code = MPI_Init(nullptr, nullptr);
+      int mpi_error_code = MPI_Init(NULL, NULL);
       validate_mpi_error_code(mpi_error_code, "MPI_Init");
     }
 

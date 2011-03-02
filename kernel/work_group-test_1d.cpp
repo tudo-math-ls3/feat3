@@ -15,10 +15,6 @@
 using namespace TestSystem;
 using namespace FEAST;
 
-// set space and world dimension manually to 1
-#define WDIM 1
-#define SDIM 1
-
 /**
 * \brief testing creation of work groups based on a 1D mesh
 *
@@ -27,7 +23,7 @@ using namespace FEAST;
 *
 * \author Hilmar Wobker
 */
-template <typename Tag_, typename DT_>
+template <typename Tag_, typename DT_, unsigned char world_dim_, unsigned char space_dim_>
 class WorkGroupTest1D
   : public TaggedTest<Tag_, DT_>
 {
@@ -70,7 +66,7 @@ public:
   * array of Graph pointers representing the connectivity of work group processes
   */
   void define_work_groups(
-    LoadBalancer<SDIM, WDIM>* load_balancer,
+    LoadBalancer<space_dim_, world_dim_>* load_balancer,
     unsigned int& num_subgroups,
     unsigned int*& num_proc_in_subgroup,
     unsigned char*& group_contains_extra_coord,
@@ -143,8 +139,8 @@ public:
     // processes in total (3 for the one and only process group and 1 for the master process).
 
     // set shortcut to the one and only instance of Universe (since this is the first call of
-    // Universe<SDIM, WDIM>::instance(), it also calls the constructor of the Universe singleton class)
-    Universe<SDIM, WDIM>* universe = Universe<SDIM, WDIM>::instance();
+    // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)
+    Universe<space_dim_, world_dim_>* universe = Universe<space_dim_, world_dim_>::instance();
 
     try
     {
@@ -158,7 +154,7 @@ public:
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
-    LoadBalancer<SDIM, WDIM>* load_balancer = universe->load_balancer();
+    LoadBalancer<space_dim_, world_dim_>* load_balancer = universe->load_balancer();
     Master* master = universe->master();
 
     int rank_world = Process::rank;
@@ -192,7 +188,7 @@ public:
                                         subgroup_ranks, graphs);
 
 //      // get pointer to the base mesh
-//      BaseMesh::BM<SDIM, WDIM>* bm = load_balancer->base_mesh();
+//      BaseMesh::BM<space_dim_, world_dim_>* bm = load_balancer->base_mesh();
 //
 //      // let the coordinator subdivide a cell
 //      if(process_group->is_coordinator())
@@ -201,8 +197,8 @@ public:
 //        Logger::log("******************\n");
 //        Logger::log("Subdividing cell 1\n");
 //        Logger::log("******************\n");
-//        BaseMesh::SubdivisionData<1, SDIM, WDIM>* subdiv_data
-//          = new BaseMesh::SubdivisionData<1, SDIM, WDIM>(BaseMesh::CONFORM_SAME_TYPE);
+//        BaseMesh::SubdivisionData<1, space_dim_, world_dim_>* subdiv_data
+//          = new BaseMesh::SubdivisionData<1, space_dim_, world_dim_>(BaseMesh::CONFORM_SAME_TYPE);
 //        bm->cell(1)->subdivide(subdiv_data);
 //
 //        // add created cells and subcells to the corresponding base mesh vectors
@@ -245,5 +241,5 @@ public:
 
 }; // WorkGroupTest1D
 
-// create test instance
-WorkGroupTest1D<Nil, Nil> work_group_test_1d;
+// create test instance, using space and world dimension 1
+WorkGroupTest1D<Nil, Nil, 1, 1> work_group_test_1d;
