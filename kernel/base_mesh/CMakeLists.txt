@@ -6,8 +6,8 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 #top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
 
-#list of util tests
-SET (test_list assertion-test inheritance-test)
+#list of base mesh tests
+SET (test_list cell_1d_edge-test_subdivision)
 
 #create all tests
 FOREACH (test ${test_list} )
@@ -21,11 +21,11 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/util/${test}" Nil)
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/base_mesh/${test}" Nil)
   SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
 ENDFOREACH(test)
 
-#add all tests to util_tests
-ADD_CUSTOM_TARGET(util_tests DEPENDS ${test_list})
+#add all tests to base_mesh_tests
+ADD_CUSTOM_TARGET(base_mesh_tests DEPENDS ${test_list})
 #build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests util_tests)
+ADD_DEPENDENCIES(tests base_mesh_tests)

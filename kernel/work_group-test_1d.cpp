@@ -10,7 +10,6 @@
 #include <kernel/comm.hpp>
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
-#include <kernel/base_mesh/cell_subdivision.hpp>
 
 using namespace TestSystem;
 using namespace FEAST;
@@ -187,34 +186,7 @@ public:
       load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                                         subgroup_ranks, graphs);
 
-//      // get pointer to the base mesh
-//      BaseMesh::BM<space_dim_, world_dim_>* bm = load_balancer->base_mesh();
-//
-//      // let the coordinator subdivide a cell
-//      if(process_group->is_coordinator())
-//      {
-//       // subdivide cell 1
-//        Logger::log("******************\n");
-//        Logger::log("Subdividing cell 1\n");
-//        Logger::log("******************\n");
-//        BaseMesh::SubdivisionData<1, space_dim_, world_dim_>* subdiv_data
-//          = new BaseMesh::SubdivisionData<1, space_dim_, world_dim_>(BaseMesh::CONFORM_SAME_TYPE);
-//        bm->cell(1)->subdivide(subdiv_data);
-//
-//        // add created cells and subcells to the corresponding base mesh vectors
-//        bm->add_created_items(bm->cell(1)->subdiv_data());
-//        // set cell numbers (now they differ from indices)
-//        bm->set_cell_numbers();
-//        // print base mesh
-//        bm->print(Logger::file);
-//       // validate base mesh
-//        bm->validate(Logger::file);
-//
-//        // TODO: neighbourhood update
-//
-//        Logger::log("!!! Neighbourhood update after subdivision not implemented yet!!!\n");
-//        Logger::log("!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!\n");
-//      }
+// add some CHECK(...)
 
       if(process_group->is_coordinator())
       {
