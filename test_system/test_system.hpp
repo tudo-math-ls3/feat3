@@ -360,10 +360,10 @@ namespace TestSystem
   {
   public:
     /**
-    * Constructor.
+    * \brief CTOR
     *
     * \param[in] id
-    * The testcase's id string.
+    * the testcase's id string
     */
     TaggedTest(const std::string & id)
       : BaseTest(id)

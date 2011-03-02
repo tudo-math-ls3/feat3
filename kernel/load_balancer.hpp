@@ -14,6 +14,7 @@
 #include <kernel/error_handler.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
+#include <kernel/process_subgroup.hpp>
 #include <kernel/base_mesh/file_parser.hpp>
 #include <kernel/base_mesh/bm.hpp>
 

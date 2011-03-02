@@ -28,6 +28,20 @@ namespace FEAST
     * \brief initialises MPI
     *
     * This function only calls MPI_Init(...). It has to be called before anything else happens.
+    */
+    static void init_MPI()
+    {
+      CONTEXT("MPIUtils::init_MPI()");
+      // init MPI
+      int mpi_error_code = MPI_Init(nullptr, nullptr);
+      validate_mpi_error_code(mpi_error_code, "MPI_Init");
+    }
+
+
+    /**
+    * \brief initialises MPI
+    *
+    * This function only calls MPI_Init(...). It has to be called before anything else happens.
     *
     * \param[in] argc
     * argument count passed to the main() method
@@ -41,7 +55,6 @@ namespace FEAST
     {
       CONTEXT("MPIUtils::init_MPI()");
       // init MPI
-// COMMENT_HILMAR: valgrind spuckt ein paar Warnungen zu diesem Aufruf auf, die ich nicht so ganz verstehe...
       int mpi_error_code = MPI_Init(&argc, &argv);
       validate_mpi_error_code(mpi_error_code, "MPI_Init");
     }

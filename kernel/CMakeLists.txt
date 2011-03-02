@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
 ADD_SUBDIRECTORY( util )
 
 #list of kernel tests
-SET ( test_list base_header-test )
+SET ( test_list base_header-test work_group-test_1d )
 
 #create all tests
 FOREACH (test ${test_list} )
