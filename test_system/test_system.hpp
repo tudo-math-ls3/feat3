@@ -384,8 +384,9 @@ namespace TestSystem
 #define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 // \endcond
+
 /// checks if a == b
- define TEST_CHECK_EQUAL(a, b) \
+#define TEST_CHECK_EQUAL(a, b) \
   do { \
     try { \
       BaseTest::TwoVarHolder test_h(a, b); \
