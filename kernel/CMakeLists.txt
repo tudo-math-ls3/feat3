@@ -10,7 +10,7 @@ ADD_SUBDIRECTORY( util )
 ADD_SUBDIRECTORY( base_mesh )
 
 #list of kernel tests
-SET (test_list base_header-test work_group-test_1d)
+SET (test_list base_header-test work_group-test_1d work_group-test_2d_1)
 
 #create all tests
 FOREACH (test ${test_list} )

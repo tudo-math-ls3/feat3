@@ -179,13 +179,8 @@ public:
 
       // debug output
       int rank_process_group = process_group->rank();
-      std::string s("Process " + StringUtils::stringify(rank_world) + " is the ");
-      if(load_balancer->is_dedicated_load_bal())
-      {
-        s += "DEDICATED ";
-      }
-      s += "load balancer with local rank " + StringUtils::stringify(rank_process_group);
-      s += " in group " + StringUtils::stringify(group_id) + ".";
+      std::string s("Process " + StringUtils::stringify(rank_world) + " is the load balancer with local rank "
+                    + StringUtils::stringify(rank_process_group) + ".");
       Logger::log(s);
 
       // let the load balancer read the mesh file
