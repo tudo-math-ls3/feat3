@@ -85,7 +85,7 @@ public:
         Logger::log("Subdividing cell 1\n");
         Logger::log("******************\n");
         BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data
-          = new BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>(BaseMesh::NONCONFORM_SAME_TYPE);
+          = new BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>(BaseMesh::CONFORM_SAME_TYPE);
         bm->cell(1)->subdivide(subdiv_data);
 
         // add created cells and subcells to the corresponding base mesh vectors
