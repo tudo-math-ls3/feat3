@@ -666,39 +666,37 @@ namespace FEAST
         buffered_neighbourhood.clear();
       } // _parse_mesh
 
-/*
-COMMENT_HILMAR: will be adapted later
-      /// parses partition part of FEAST files
-      void _parse_partition(FileReaderASCII * mesh_file)
-      {
-        CONTEXT("BaseMesh::FileParser::_parse_partition()");
-        // header
-        mesh_file->read("FEAST_PART");
-        mesh_file->read("2D");
-        int version_major;
-        mesh_file->read(version_major);
-        int version_minor;
-        mesh_file->read(version_minor);
-        // number of entities
-        unsigned int num_cells;
-        mesh_file->read(num_cells);
-        if(num_cells != _num_cells)
-          throw InternalError("Number of base mesh cells from mesh file does not match that of partition file.");
-        mesh_file->read(_num_partitions);
-        // TODO: THIS IS A HACK UNTIL HILMAR AND I DECIDE WHAT TO DO WITH THE BASE MESH
-        if(_num_cells != _num_partitions)
-          throw InternalError("Sorry. Hilmar and Dominik currently only support one base mesh cell per process.");
-
-        // cells
-        for(unsigned int icell = 0 ; icell < _num_cells; ++icell)
-        {
-          unsigned int pb, mb;
-          mesh_file->read(pb, mb);
-          _cells.at(icell)->set_parallel_block(pb-1);
-          _cells.at(icell)->set_matrix_block(mb-1);
-        }
-      } // _parse_partition
-*/
+//COMMENT_HILMAR: will be adapted later
+//      /// parses partition part of FEAST files
+//      void _parse_partition(FileReaderASCII * mesh_file)
+//      {
+//        CONTEXT("BaseMesh::FileParser::_parse_partition()");
+//        // header
+//        mesh_file->read("FEAST_PART");
+//        mesh_file->read("2D");
+//        int version_major;
+//        mesh_file->read(version_major);
+//        int version_minor;
+//        mesh_file->read(version_minor);
+//        // number of entities
+//        unsigned int num_cells;
+//        mesh_file->read(num_cells);
+//        if(num_cells != _num_cells)
+//          throw InternalError("Number of base mesh cells from mesh file does not match that of partition file.");
+//        mesh_file->read(_num_partitions);
+//        // TODO: THIS IS A HACK UNTIL HILMAR AND I DECIDE WHAT TO DO WITH THE BASE MESH
+//        if(_num_cells != _num_partitions)
+//          throw InternalError("Sorry. Hilmar and Dominik currently only support one base mesh cell per process.");
+//
+//        // cells
+//        for(unsigned int icell = 0 ; icell < _num_cells; ++icell)
+//        {
+//          unsigned int pb, mb;
+//          mesh_file->read(pb, mb);
+//          _cells.at(icell)->set_parallel_block(pb-1);
+//          _cells.at(icell)->set_matrix_block(mb-1);
+//        }
+//      } // _parse_partition
 
     public:
 

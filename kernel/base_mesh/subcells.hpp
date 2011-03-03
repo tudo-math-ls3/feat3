@@ -546,7 +546,6 @@ namespace FEAST
       ~Subcells()
       {
         CONTEXT("BaseMesh::Subcells::~Subcells()");
-//COMMENT_HILMAR: nochmal nachgucken, ob bzw. wie der DTOR von Subcells<2, ...> aufgerufen wird.
         // delete all faces and their associated information
         // (pop_back calls destructor of the element being removed, so do not use an iterator because fiddling about
         // with the std::vector invalidates it. Also, pop_back calls default DTOR of Cell_2D_*, so we have to manually

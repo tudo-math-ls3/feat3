@@ -108,7 +108,7 @@ namespace FEAST
       */
 // COMMENT_HILMAR: Sieht hier jemand eine Moeglichkeit, dieses Mapping ohne explizites Abspeichern zu erhalten? Also
 // durch Berechnung in Abhaengigkeit vom Knoten- bzw. Kantenindex? Ich seh's nicht...
-// COMMENT_HILMAR: Mit dem Standard-ccw-Mapping waere das alles einfacher... da koennte man mit sowas ähnlichem wie
+// COMMENT_HILMAR: Mit dem Standard-ccw-Mapping waere das alles einfacher... da koennte man mit sowas aehnlichem wie
 // (ivertex + ishift)%4 arbeiten.
       static unsigned char quad_to_quad_mappings_vertices[][4];
 
@@ -733,8 +733,8 @@ namespace FEAST
 
 #endif // #define KERNEL_BASE_MESH_CELL_HPP
 
-// COMMENT_HILMAR: Das ist 2D-spezifischer Code! Der muss woanders hin!
-// Wohin?
+// COMMENT_HILMAR: AB HIER BITTE ALLES IGNORIEREN!!!
+//
 // Routinen:
 //    void update_edge_neighbours()
 //       --> Cell2D spezifisch, erfordert neighbour-Zugriff

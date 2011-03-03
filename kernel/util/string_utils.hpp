@@ -480,7 +480,7 @@ namespace FEAST
   *
   * COMMENT_HILMAR:
   * How should we use this feature? Should there be some sort of process-global prefix which is known to all
-  * objects and can be modified from everywhere? (If yes: where should it reside?) Or is the prefix object
+  * objects and can be modified from everywhere (realised as singleton?)? Or is the prefix object
   * passed through all the routines? (Which means adapting all the interfaces...)
   */
   class Prefix

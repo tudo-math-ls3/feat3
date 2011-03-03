@@ -35,9 +35,9 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-// COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennte wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
+// COMMENT_HILMAR: Um Code-Redundanz zu vermeiden, koennten wir ueberlegen, eine weitere Klasse Cell2D einzufuehren,
 // die von Cell<2, space_dim_, world_dim_> erbt, und von der dann wiederum Quad und Tri erben. Darin koennte
-// man zum Beispiel die Funktion _edge_has_correct_orientation() implementieren.
+// man zum Beispiel die Funktion _determine_edge_orientation() implementieren.
     template<
       unsigned char space_dim_,
       unsigned char world_dim_>

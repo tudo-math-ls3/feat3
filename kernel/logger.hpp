@@ -133,20 +133,18 @@ namespace FEAST
   *             which collects them in some array structure and sends them to the master.
   *        <li> All processes of the group send their message directly to the master, which collects them in some
   *             array structure and displays/writes them.
-  *             COMMENT_HILMAR: I'm not sure how to implement this version... When two process groups
-  *             send indiv. messages then the master should group them accordingly. The master can only
-  *             communicate via the COMM_WORLD communicator to the two process groups, so one has to distinguish them
-  *             via MPI tags. Imagine the first process group contains 3 processes using tag 0 and the second process
-  *             group 5 processes using tag 1. When the request of the first group arrives first, then the master creates
-  *             an array of length 3 to store three strings and starts a loop calling two further receives of strings
-  *             (the first one it alreday got) listening to tag 0 only. But what happens now with the requests of
-  *             the second process group, which can (and must not) accepted in that loop (due to the wrong tag)? Are
-  *             they automatically postponed?
-  *             Due to the uncertainties with the second approach, I implemented the first one.
+  * COMMENT_HILMAR: When two process groups send indiv. messages then the master has to group them
+  * accordingly. The master can only communicate via the COMM_WORLD communicator to the two process groups,
+  * so one has to distinguish them via MPI tags. Imagine the first process group contains 3 processes using
+  * tag 0 and the second process group 5 processes using tag 1. When the request of the first group arrives
+  * first, then the master creates an array of length 3 to store three strings and starts a loop calling
+  * two further receives of strings (the first one it alreday got) listening to tag 0 only. The requests of
+  * the second process group are postponed by the master automatically.
+  * Currently, the first version is implemented. It might be more efficient, however, to use the second version
+  * (which doesn't need synchronisation between the members of the process group).
   *      </ol>
   *  </ol>
   * </ul>
-  * \todo everything concerning file output still has to be implemented
   *
   * \author Hilmar Wobker
   */

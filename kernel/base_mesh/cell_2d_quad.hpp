@@ -405,7 +405,7 @@ namespace FEAST
 // COMMENT_HILMAR: Beachte, dass wir auch in dem Fall, dass eine Kante schon Kinder hatte, *nicht* annehmen koennen,
 // dass sie vom Nachbarelement erstellt worden ist. Beispiel: 2 benachbarte Zellen C0 und C1. C0 zerteilt sich, hat
 // somit die gemeinsame Kante e zerteilt, sodass die Reihenfolge der Kinder der lokalen Orientierung von C0 entspricht.
-// Irgendwann später zerteilt sich C1 und nutzt aus, dass die Kinder der Kante e ja von C0 angelegt worden sein
+// Irgendwann spaeter zerteilt sich C1 und nutzt aus, dass die Kinder der Kante e ja von C0 angelegt worden sein
 // muessen und dreht deren Reihenfolge also einfach um. Hier stimmt die Annahme also noch.
 // Jetzt vergroebert sich C0 wieder, Kante e bleibt bestehen, da sie ja noch von C1 benutzt wird. Dann irgendwann
 // verfeinert sich C0 wieder: Nun ist es aber falsch anzunehmen, dass der Nachbar (C1) die Kante angelegt haben muss!
@@ -421,22 +421,20 @@ namespace FEAST
             //   |     |     |
             //   -----v0------
 
-/*
-COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
-            double const* x0 = new_vertices[0]->coords();
-            double const* x1 = new_vertices[1]->coords();
-            double const* x2 = new_vertices[2]->coords();
-            double const* x3 = new_vertices[3]->coords();
-
-            double p[2];
-
-            double denom = (x0[0]-x1[0])*(x2[1]-x3[1]) - (x0[1]-x1[1])*(x2[0]-x3[0]);
-            double fac0 = x0[0]*x1[1]-x0[1]*x1[0];
-            double fac1 = x2[0]*x3[1]-x2[1]*x3[0];
-
-            p[0] = ( fac0*(x2[0]-x3[0]) - (x0[0]-x1[0])*fac1 ) / denom;
-            p[1] = ( fac0*(x2[1]-x3[1]) - (x0[1]-x1[1])*fac1 ) / denom;
-*/
+//COMMENT_HILMAR: Das hier funktioniert nur fuer world_dim_ = 2!
+//            double const* x0 = new_vertices[0]->coords();
+//            double const* x1 = new_vertices[1]->coords();
+//            double const* x2 = new_vertices[2]->coords();
+//            double const* x3 = new_vertices[3]->coords();
+//
+//            double p[2];
+//
+//            double denom = (x0[0]-x1[0])*(x2[1]-x3[1]) - (x0[1]-x1[1])*(x2[0]-x3[0]);
+//            double fac0 = x0[0]*x1[1]-x0[1]*x1[0];
+//            double fac1 = x2[0]*x3[1]-x2[1]*x3[0];
+//
+//            p[0] = ( fac0*(x2[0]-x3[0]) - (x0[0]-x1[0])*fac1 ) / denom;
+//            p[1] = ( fac0*(x2[1]-x3[1]) - (x0[1]-x1[1])*fac1 ) / denom;
 
 // COMMENT_HILMAR: For the time being simply compute the midpoint of the quad as average of the four vertices
 // until we find out, what is the best way of computing this point correctly.

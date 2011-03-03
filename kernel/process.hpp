@@ -17,7 +17,8 @@ namespace FEAST
   *
   * For each MPI process spawned at program start, one static Process object will be created on this MPI process. It
   * will live throughout the program.
-  * COMMENT_HILMAR: Maybe it makes more sense to define this class as a Singleton...
+  *
+  * \todo Da hier eh alles public ist, kann man das auch gleich als struct definieren.
   *
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
