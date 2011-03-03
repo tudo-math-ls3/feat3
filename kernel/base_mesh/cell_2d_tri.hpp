@@ -71,7 +71,7 @@ namespace FEAST
       * functions *
       ************/
       /// returns true when edge with local index iedge has the same orientation as the quad
-      inline bool _edge_has_correct_orientation(unsigned char iedge)
+      inline bool _edge_has_correct_orientation(unsigned char iedge) const
       {
 //TODO: will be replaced by function (as in Quad class):
 //      inline void _determine_edge_orientation()

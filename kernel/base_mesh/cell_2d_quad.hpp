@@ -105,7 +105,7 @@ namespace FEAST
       *
       * \return index of start or end vertex
       */
-      inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
+      inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv) const
       {
         CONTEXT("BaseMesh::Quad::_edge_vertex()");
         assert(iedge < num_edges());

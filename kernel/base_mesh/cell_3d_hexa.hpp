@@ -138,7 +138,7 @@ namespace FEAST
       *
       * \return index of start or end vertex
       */
-      inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv)
+      inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv) const
       {
         CONTEXT("BaseMesh::Hexa::_edge_vertex()");
         assert(iedge < num_edges());
@@ -149,7 +149,7 @@ namespace FEAST
 
 
       /// returns true when the orientation of the edge coincides with its orientation within the hexa
-      inline bool _edge_has_correct_orientation(unsigned char iedge)
+      inline bool _edge_has_correct_orientation(unsigned char iedge) const
       {
 //TODO: will be replaced by function (as in Quad class):
 //      inline void _determine_edge_orientation()
