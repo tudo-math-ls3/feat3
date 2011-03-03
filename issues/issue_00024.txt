@@ -1,0 +1,14 @@
+ID           00024
+TYPE         feature_request
+STATUS       unassigned
+AUTHOR       hilmar
+ASSIGNED TO
+SEVERITY     high
+
+FULL TEXT
+Before definig an appropriate ASCII-file format and implementing the necessary infrastructure (see issue00018), we need a preliminary version:
+  * read key-value pairs from one ASCII file "feast.ini"
+  * store the information in some simple structure
+  * There will be some mandatory keys. If these are not present in the file, an exception is thrown.
+
+SOLUTION

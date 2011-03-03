@@ -1,0 +1,11 @@
+ID           00028
+TYPE         feature_request
+STATUS       unassigned
+AUTHOR       hilmar
+ASSIGNED TO
+SEVERITY     high
+
+FULL TEXT
+Implement status class, which is used by functions as "return value" to report errors. Status objects are passed as last parameter to a function. When the function finishes and the object is the nullptr, everything worked fine. Otherwise, the object contains a specific error code and an error string. The class ErrorHandler should be used to process such an Status object. The error can be critical and result in program abortion, or it can be uncritical (e.g., a solver diverged ==> try again with different solver settings).
+
+SOLUTION

@@ -1,0 +1,11 @@
+ID           00020
+TYPE         feature_request
+STATUS       unassigned
+AUTHOR       hilmar
+ASSIGNED TO
+SEVERITY     high
+
+FULL TEXT
+Implement preliminary version of conform subdivision for triangles (1-to-3) and quads (1-to-5). We need this to test base mesh subdivision and process scheduling without having to deal with hanging nodes.
+
+SOLUTION

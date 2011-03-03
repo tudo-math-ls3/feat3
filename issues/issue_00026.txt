@@ -1,0 +1,11 @@
+ID           00026
+TYPE         feature_request
+STATUS       unassigned
+AUTHOR       hilmar
+ASSIGNED TO
+SEVERITY     low
+
+FULL TEXT
+PrettyPrinter in util/string_utils.hpp should be able to create some tabular output, e.g., for solver statistics. See \todo in class description for an example.
+
+SOLUTION

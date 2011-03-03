@@ -1,0 +1,11 @@
+ID           00022
+TYPE         feature_request
+STATUS       unassigned
+AUTHOR       hilmar
+ASSIGNED TO
+SEVERITY     low
+
+FULL TEXT
+Implement class for static cell data which doesn't change (e.g., all hexas have 6 faces, 8 vertices and 12 edges). Must be accessible via some unique "cell type ID".
+
+SOLUTION

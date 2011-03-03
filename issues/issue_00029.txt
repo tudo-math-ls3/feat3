@@ -1,0 +1,11 @@
+ID           00029
+TYPE         optimisation_request
+STATUS       assigned
+AUTHOR       hilmar
+ASSIGNED TO  hilmar
+SEVERITY     high
+
+FULL TEXT
+Separate load balancer process and coordinator process. In the case, there is a dedicated load balancer (which might perform some extra computations in parallel) it is not clever to let this process also be the coordinator of the process group.
+
+SOLUTION

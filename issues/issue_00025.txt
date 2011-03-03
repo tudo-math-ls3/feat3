@@ -1,0 +1,11 @@
+ID           00025
+TYPE         optimisation_request
+STATUS       unassigned
+AUTHOR       hilmar
+ASSIGNED TO
+SEVERITY     low
+
+FULL TEXT
+Use templates in util/file_ascii_reader.hpp.
+
+SOLUTION

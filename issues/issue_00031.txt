@@ -1,0 +1,13 @@
+ID           00031
+TYPE         feature_request
+STATUS       assigned
+AUTHOR       hilmar
+ASSIGNED TO  dirk
+SEVERITY     medium
+
+FULL TEXT
+Realise nightly regression test which tests as many elements of the cross product
+  "compiler x MPI environment x architecture x ...."
+as possible (performing all (or a somehow defined subset of) available tests in FEAST's test system).
+
+SOLUTION

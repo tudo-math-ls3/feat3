@@ -1,0 +1,11 @@
+ID           00021
+TYPE         feature_request
+STATUS       unassigned
+AUTHOR       hilmar
+ASSIGNED TO
+SEVERITY     low
+
+FULL TEXT
+Implement preliminary version of nonconform subdivision for triangles (1-to-4).
+
+SOLUTION

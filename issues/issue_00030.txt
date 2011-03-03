@@ -1,0 +1,14 @@
+ID           00030
+TYPE         feature_request
+STATUS       assigned
+AUTHOR       hilmar
+ASSIGNED TO  dirk_dom
+SEVERITY     medium
+
+FULL TEXT
+Enhance the build system.
+ * guess_id
+ * collect and store compiler settings for optimised and debug modes
+ * usage should be flexible and comfortable)
+
+SOLUTION
