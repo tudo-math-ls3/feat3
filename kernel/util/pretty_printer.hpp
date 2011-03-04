@@ -7,6 +7,7 @@
 
 // includes, FEAST
 #include <kernel/util/string_utils.hpp>
+#include <kernel/util/exception.hpp>
 
 /// FEAST namespace
 namespace FEAST
@@ -91,6 +92,7 @@ namespace FEAST
         _delim(delim),
         _prefix(prefix)
     {
+      CONTEXT("PrettyPrinter::PrettyPrinter()");
     }
 
 
@@ -111,6 +113,7 @@ namespace FEAST
         _delim(delim),
         _prefix("")
     {
+      CONTEXT("PrettyPrinter::PrettyPrinter()");
     }
 
 
@@ -127,6 +130,7 @@ namespace FEAST
     */
     inline const std::string& block() const
     {
+      CONTEXT("PrettyPrinter::block()");
       return _block;
     }
 
@@ -135,6 +139,7 @@ namespace FEAST
     */
     inline void set_block(std::string block)
     {
+      CONTEXT("PrettyPrinter::set_block()");
       _block = block;
     }
 
@@ -145,6 +150,7 @@ namespace FEAST
     */
     inline unsigned int width() const
     {
+      CONTEXT("PrettyPrinter::width()");
       return _width;
     }
 
@@ -153,6 +159,7 @@ namespace FEAST
     */
     inline void set_width(unsigned int width)
     {
+      CONTEXT("PrettyPrinter::set_width()");
       _width = width;
     }
 
@@ -166,6 +173,7 @@ namespace FEAST
     */
     inline const std::string& prefix() const
     {
+      CONTEXT("PrettyPrinter::prefix()");
       return _prefix;
     }
 
@@ -174,6 +182,7 @@ namespace FEAST
     */
     inline void set_prefix(std::string prefix)
     {
+      CONTEXT("PrettyPrinter::set_prefix()");
       _prefix = prefix;
     }
 
@@ -184,6 +193,7 @@ namespace FEAST
     */
     inline char delim() const
     {
+      CONTEXT("PrettyPrinter::delim()");
       return _delim;
     }
 
@@ -192,6 +202,7 @@ namespace FEAST
     */
     inline void set_delim(char delim)
     {
+      CONTEXT("PrettyPrinter::set_delim()");
       _delim = delim;
     }
 
@@ -207,6 +218,7 @@ namespace FEAST
     */
     void add_line_sep()
     {
+      CONTEXT("PrettyPrinter::add_line_sep()");
       _block += _prefix + std::string(_width, _delim) + "\n";
     }
 
@@ -223,6 +235,7 @@ namespace FEAST
     */
     void add_line_centered(const std::string& s)
     {
+      CONTEXT("PrettyPrinter::add_line_centered()");
       int num_blanks_total(_width - s.size() - 2);
       if(num_blanks_total < 2)
       {
@@ -253,6 +266,7 @@ namespace FEAST
     */
     void add_line(const std::string& s)
     {
+      CONTEXT("PrettyPrinter::add_line()");
       int num_blanks(_width - s.size() - 2);
       if(num_blanks < 2)
       {
@@ -278,6 +292,7 @@ namespace FEAST
     */
     void add_line_no_right_delim(const std::string& s)
     {
+      CONTEXT("PrettyPrinter::add_line_no_right_delim()");
       _block += _prefix + stringify(_delim) + " " + s + "\n";
     }
 
@@ -286,6 +301,7 @@ namespace FEAST
     */
     inline void reset_block()
     {
+      CONTEXT("PrettyPrinter::reset_block()");
       _block = "";
     }
 
@@ -294,6 +310,7 @@ namespace FEAST
     */
     void print(std::ostream& stream)
     {
+      CONTEXT("PrettyPrinter::print()");
       stream << _block;
     }
   }; // class PrettyPrinter
