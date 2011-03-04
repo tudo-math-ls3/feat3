@@ -9,6 +9,7 @@
 
 // includes, FEAST
 #include <kernel/util/string_utils.hpp>
+#include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/exception.hpp>
 
 /// FEAST namespace

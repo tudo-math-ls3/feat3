@@ -8,6 +8,7 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
+#include <kernel/util/pretty_printer.hpp>
 #include <kernel/logger.hpp>
 #include <kernel/util/exception.hpp>
 

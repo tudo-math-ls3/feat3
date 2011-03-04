@@ -1,0 +1,302 @@
+#pragma once
+#ifndef PRETTY_PRINTER_HPP
+#define PRETTY_PRINTER_HPP
+
+// includes, system
+#include <string>
+
+// includes, FEAST
+#include <kernel/util/string_utils.hpp>
+
+/// FEAST namespace
+namespace FEAST
+{
+  /**
+  * \brief class for semi-automatically pretty printing contiguous blocks of strings
+  *
+  * The class can be used to produce pretty printed output blocks like the following:
+  *
+  * \verbatim
+      PRE #######################################
+      PRE #          SOLVER STATISTICS          #
+      PRE #######################################
+      PRE # it: 42                              #
+      PRE # conv rate: 0.23                     #
+      PRE # MFLOP/sec: 666                      #
+      PRE #######################################
+      PRE # some additional information whose length can not be estimated a priori
+      PRE # and which should thus not use a closing '#' at the end of the line
+      PRE #######################################
+  * \endverbatim
+  *
+  * The width of the block, the delimiter symbol, and the prefix are set by the user. The strings to be written can be
+  * centered or left aligned. For too long strings, the right delimiter can be omitted (is omitted automatically, resp.).
+  *
+  * Some construction rules: No blank is appended to the prefix (i.e., in the example above the prefix is "PRE ", and
+  * not "PRE"). One blank is inserted between left delimiter and the string. Between the string and the right delimiter
+  * there must be at least one blank, otherwise the right delimiter is omitted.
+  *
+  * \todo add functionalities for producing tabular output like this:
+  * \verbatim
+      #########################################
+      #   it |     conv |    MFLOP |     MFR  #
+      # ------------------------------------- #
+      #    1 |     0.23 |     42.1 |     666  #
+      #    2 |     0.22 |     42.0 |     667  #
+      #    3 |     0.21 |     42.0 |     668  #
+      #    4 |     0.24 |     42.1 |     665  #
+      #########################################
+  * \endverbatim
+  * \todo maybe use two different chars for separator lines and delimiter
+  * \author Hilmar Wobker
+  */
+  class PrettyPrinter
+  {
+
+  private:
+
+    /// string holding the pretty printed block of messages
+    std::string _block;
+
+    ///width of the pretty printed block (from left to right delimiter, excluding the prefix)
+    unsigned int _width;
+
+    /// character to be used to enclose lines and to build separator lines
+    char _delim;
+
+    /// string each line is prefixed with (useful in connection with grep commands)
+    std::string _prefix;
+
+
+  public:
+
+    /**
+    * \brief CTOR using prefix
+    *
+    * \param[in] width
+    * width of the lines in the pretty printed block
+    *
+    * \param[in] delim
+    * character to be used to enclose lines and to build separator lines
+    *
+    * \param[in] prefix
+    * prefix which can be useful in connection with grep commands
+    */
+    PrettyPrinter(
+      unsigned int width,
+      char delim,
+      const std::string& prefix)
+      : _block(""),
+        _width(width),
+        _delim(delim),
+        _prefix(prefix)
+    {
+    }
+
+
+    /**
+    * \brief CTOR using an empty prefix
+    *
+    * \param[in] width
+    * width of the lines in the pretty printed block
+    *
+    * \param[in] delim
+    * character to be used to enclose lines and to build separator lines
+    */
+    PrettyPrinter(
+      unsigned int width,
+      char delim)
+      : _block(""),
+        _width(width),
+        _delim(delim),
+        _prefix("")
+    {
+    }
+
+
+    /* ******************
+    * getters & setters *
+    ********************/
+    /**
+    * \brief getter for the pretty printed block
+    *
+    * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
+    * cannot change the string.
+    *
+    * \return reference to the pretty printed block #_block
+    */
+    inline const std::string& block() const
+    {
+      return _block;
+    }
+
+    /**
+    * \brief setter for the pretty printed block
+    */
+    inline void set_block(std::string block)
+    {
+      _block = block;
+    }
+
+    /**
+    * \brief getter for the width of the pretty printed block
+    *
+    * \return width of the pretty printed block #_width
+    */
+    inline unsigned int width() const
+    {
+      return _width;
+    }
+
+    /**
+    * \brief setter for the width of the pretty printed block
+    */
+    inline void set_width(unsigned int width)
+    {
+      _width = width;
+    }
+
+    /**
+    * \brief getter for the prefix
+    *
+    * Return a reference in order to avoid making a copy. Make this return reference constant so that the user
+    * cannot change the string.
+    *
+    * \return reference to the prefix #_prefix
+    */
+    inline const std::string& prefix() const
+    {
+      return _prefix;
+    }
+
+    /**
+    * \brief setter for the prefix
+    */
+    inline void set_prefix(std::string prefix)
+    {
+      _prefix = prefix;
+    }
+
+    /**
+    * \brief getter for the delimiter character
+    *
+    * \return delimiter #_delim
+    */
+    inline char delim() const
+    {
+      return _delim;
+    }
+
+    /**
+    * \brief setter for the delimiter character
+    */
+    inline void set_delim(char delim)
+    {
+      _delim = delim;
+    }
+
+
+    /* *****************
+    * member functions *
+    *******************/
+    /**
+    * \brief pretty printing a separator line of length #_width consisting of the delimiter char #_delim
+    *
+    * This function can be used to automatically produce the 1., 3., 7. and last line of the example output in the class
+    * description.
+    */
+    void add_line_sep()
+    {
+      _block += _prefix + std::string(_width, _delim) + "\n";
+    }
+
+
+    /**
+    * \brief adding a line of length #_width, with the given string \a s centered and #_delim as left and right delimiter
+    *
+    * This function can be used to automatically produce the 2. line of the example output in the class description.
+    * If the number of blanks is odd, then on the left side one blank less is used. If the string is too long, it is
+    * displayed left aligned without right delimiter.
+    *
+    * \param[in] s
+    * the string to be centered in the line
+    */
+    void add_line_centered(const std::string& s)
+    {
+      int num_blanks_total(_width - s.size() - 2);
+      if(num_blanks_total < 2)
+      {
+        // if the string is too long, produce a left aligned line without right delimiter
+        add_line_no_right_delim(s);
+      }
+      else
+      {
+        // calculate blanks on the left and the right side
+        unsigned int num_blanks_left(num_blanks_total / 2);
+        unsigned int num_blanks_right(num_blanks_total%2 == 0 ? num_blanks_left : num_blanks_left + 1);
+        // add the line to the pretty printed block
+        _block += _prefix + stringify(_delim) + std::string(num_blanks_left, ' ') + s
+                  + std::string(num_blanks_right, ' ') + stringify(_delim) + "\n";
+      }
+    }
+
+
+    /**
+    * \brief adding a line of length #_width, with the given string \a s left aligned and #_delim as left and right
+    *        delimiter
+    *
+    * This function can be used to automatically produce the 4., 5. and 6. line of the example output in the class
+    * description. If the string is too long, it is displayed left aligned without right delimiter.
+    *
+    * \param[in] s
+    * the string to be written
+    */
+    void add_line(const std::string& s)
+    {
+      int num_blanks(_width - s.size() - 2);
+      if(num_blanks < 2)
+      {
+        // if the string is too long, produce a left aligned line without right delimiter
+        add_line_no_right_delim(s);
+      }
+      else
+      {
+        // add the line to the pretty printed block
+        _block += _prefix + stringify(_delim) + " " + s + std::string(num_blanks - 1, ' ')
+                  + stringify(_delim) + "\n";
+      }
+    }
+
+    /**
+    * \brief adding a line of length #_width, with the given string \a s left aligned and #_delim as left delimiter
+    *
+    * This function can be used to automatically produce the 8. and 9. line of the example output in the class
+    * description.
+    *
+    * \param[in] s
+    * the string to be written
+    */
+    void add_line_no_right_delim(const std::string& s)
+    {
+      _block += _prefix + stringify(_delim) + " " + s + "\n";
+    }
+
+    /**
+    * \brief reset the pretty printed block to an emtpy string (equivalent to PrettyPrinter::set_block(""))
+    */
+    inline void reset_block()
+    {
+      _block = "";
+    }
+
+    /**
+    * \brief print the pretty printed block to the given stream
+    */
+    void print(std::ostream& stream)
+    {
+      stream << _block;
+    }
+  }; // class PrettyPrinter
+} // namespace FEAST
+
+#endif //  #ifndef PRETTY_PRINTER_HPP
