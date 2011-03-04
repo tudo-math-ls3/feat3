@@ -115,10 +115,12 @@ namespace FEAST
 * The thrown Assertion will be automatically provided with the correct filename,
 * line number and function name.
 *
-* \param expr Boolean expression that shall be asserted.
-* \param msg Error message that will be display in case that expr evaluates to false.
+* \param[in] expr
+* Boolean expression that shall be asserted.
+* \param[in] msg
+* Error message that will be display in case that expr evaluates to false.
 *
-* \warning Will only be compiled in when debug support is enabled.
+* \note Will only be compiled in when debug support is enabled.
 */
 #if defined (DEBUG)
 #define STATIC_ASSERT(const_expr, msg) \
