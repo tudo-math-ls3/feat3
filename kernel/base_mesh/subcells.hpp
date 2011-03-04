@@ -110,7 +110,8 @@ namespace FEAST
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
         CONTEXT("BaseMesh::Subcells::_remove_item()");
-        ASSERT(item->index() < v.size(), "");
+        ASSERT(item->index() < v.size(), "Item index " + stringify(item->index()) + " must not exceed vector size "
+               + stringify(v.size()) + ".");
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
         v[v.size()-1] = item;
@@ -197,7 +198,8 @@ namespace FEAST
       inline Vertex_* vertex(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::vertex()");
-        ASSERT(index < num_vertices(), "");
+        ASSERT(index < num_vertices(), "Index " + stringify(index) + " must not exceed number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 
@@ -377,7 +379,8 @@ namespace FEAST
       inline Cell_1D_* edge(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::edge()");
-        ASSERT(index < num_edges(), "");
+        ASSERT(index < num_edges(), "Index " + stringify(index) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
         return _edges[index];
       }
 
@@ -572,7 +575,8 @@ namespace FEAST
       inline Cell_2D_* face(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::face()");
-        ASSERT(index < _faces.size(), "");
+        ASSERT(index < num_faces(), "Index " + stringify(index) + " must not exceed number of faces "
+               + stringify(num_faces()) + ".");
         return _faces[index];
       }
 

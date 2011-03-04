@@ -47,6 +47,9 @@ namespace FEAST
       typedef Vertex<world_dim_> Vertex_;
 
       /// shortcut to save typing of template parameters
+      typedef Edge<space_dim_, world_dim_> Edge_;
+
+      /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
       /// shortcut to save typing of template parameters
@@ -110,7 +113,8 @@ namespace FEAST
         // of type Cell<1, space_dim_, world_dim_>
         for(int i(0) ; i < 6 ; ++i)
         {
-          ASSERT(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>), "");
+          ASSERT(typeid(*_edges[i]) == typeid(Edge_), "The " + stringify(i) + "-th edge (index "
+                 + stringify(_edges[i]->index()) + ") must be of type Edge<space_dim_, world_dim_>.");
         }
         _faces[0] = f0;
         _faces[1] = f1;
@@ -119,7 +123,8 @@ namespace FEAST
         // assure that the faces are in fact of type Tri_, and not "only" of type Cell_2D_
         for(int i(0) ; i < 4 ; ++i)
         {
-          ASSERT(typeid(*_faces[i]) == typeid(Tri_), "");
+          ASSERT(typeid(*_faces[i]) == typeid(Tri_), "The " + stringify(i) + "-th face (index "
+                 + stringify(_faces[i]->index()) + ") must be of type Tri<space_dim_, world_dim_>.");
         }
 
         unsigned char num_subitems_per_subdim[3] = {4, 6, 4};
@@ -157,7 +162,8 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::vertex()");
-        ASSERT(index < num_vertices(), "");
+        ASSERT(index < num_vertices(), "Index " + stringify(index) + " must not exceed number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 
@@ -185,7 +191,8 @@ namespace FEAST
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::edge()");
-        ASSERT(index < num_edges(), "");
+        ASSERT(index < num_edges(), "Index " + stringify(index) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
         return _edges[index];
       }
 
@@ -213,7 +220,8 @@ namespace FEAST
       inline Cell_2D_* face(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::face()");
-        ASSERT(index < num_faces(), "");
+        ASSERT(index < num_faces(), "Index " + stringify(index) + " must not exceed number of faces "
+               + stringify(num_faces()) + ".");
         return _faces[index];
       }
 

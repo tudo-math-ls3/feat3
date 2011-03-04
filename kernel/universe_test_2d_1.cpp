@@ -135,7 +135,8 @@ void define_work_groups(
   // debug output
   Logger::log_master("num_cells: " + stringify(num_cells) + "\n");
   // assert that the number of processes is n+2
-  ASSERT(num_processes == num_cells + 2, "");
+  ASSERT(num_processes == num_cells + 2, "Number of processes " + stringify(num_processes)
+         + " must be number of cells + 2, i.e., " + stringify(num_cells + 2) + ".");
 
   // set up the two test cases
 
@@ -273,7 +274,7 @@ int main(int argc, char* argv[])
   // As an intermediate hack, the number of base mesh cells has to be provided as first argument to the program call.
 
   unsigned int num_cells = atoi(argv[2]);
-  ASSERT(num_cells > 0, "");
+  ASSERT(num_cells > 0, "Number of cells must not be zero.");
 
   // The number of processes for the first process group must equal num_cells + 2.
   unsigned int num_processes_in_first_group(num_cells + 2);

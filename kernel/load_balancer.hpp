@@ -400,7 +400,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
       if(!_process_group->is_coordinator())
       {
-        ASSERT(_num_subgroups > 0, "");
+        ASSERT(_num_subgroups > 0, "Number of subgroups must be greater than 0.");
         _num_proc_in_subgroup = new unsigned int[_num_subgroups];
         group_contains_extra_coord = new unsigned char[_num_subgroups];
       }

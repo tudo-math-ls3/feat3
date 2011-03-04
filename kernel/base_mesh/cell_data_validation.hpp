@@ -76,7 +76,7 @@ namespace FEAST
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidationVertNeigh::validate()");
-        ASSERT(cell_space_dim_ >= 1, "");
+        ASSERT(cell_space_dim_ >= 1, "Cell + space dimension " + stringify(cell_space_dim_) + " must be at least 1.");
         try
         {
           std::string s;
@@ -197,7 +197,7 @@ namespace FEAST
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidationEdgeNeigh::validate()");
-        ASSERT(cell_space_dim_ >= 2, "");
+        ASSERT(cell_space_dim_ >= 2, "Cell + space dimension " + stringify(cell_space_dim_) + " must be at least 2.");
         try
         {
           std::string s;
@@ -265,8 +265,10 @@ namespace FEAST
                         edge_c = edge_c->parent();
                         level_diff--;
                       }
-                      ASSERT(level_diff == 0, "");
-                      ASSERT(edge_c->refinement_level() == edge_neigh->refinement_level(), "");
+                      ASSERT(level_diff == 0, "Level difference " + stringify(level_diff) + " must be 0.");
+                      ASSERT(edge_c->refinement_level() == edge_neigh->refinement_level(), "Edge ref. level "
+                             + stringify(edge_c->refinement_level()) + " must equal ref. level "
+                             + stringify(edge_neigh->refinement_level()) + " of neighbour edge.");
                       // check whether the two neighbours really share the same edge
                       if (edge_c != edge_neigh)
                       {
@@ -339,7 +341,7 @@ namespace FEAST
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidationFaceNeigh::validate()");
-        ASSERT(cell_space_dim_ >= 3, "");
+        ASSERT(cell_space_dim_ >= 3, "Cell + space dimension " + stringify(cell_space_dim_) + " must be at least 3.");
         try
         {
           std::string s;
@@ -407,8 +409,10 @@ namespace FEAST
                         face_c = face_c->parent();
                         level_diff--;
                       }
-                      ASSERT(level_diff == 0, "");
-                      ASSERT(face_c->refinement_level() == face_neigh->refinement_level(), "");
+                      ASSERT(level_diff == 0, "Level difference " + stringify(level_diff) + " must be 0.");
+                      ASSERT(face_c->refinement_level() == face_neigh->refinement_level(), "Face ref. level "
+                             + stringify(face_c->refinement_level()) + " must equal ref. level "
+                             + stringify(face_neigh->refinement_level()) + " of neighbour face.");
                       // check whether the two neighbours really share the same face
                       if (face_c != face_neigh)
                       {

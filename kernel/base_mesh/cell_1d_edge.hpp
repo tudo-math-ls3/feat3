@@ -109,7 +109,7 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Edge::vertex()");
-        ASSERT(index < num_vertices(), "Vertex index " + stringify(index) + " exceeds number of vertices "
+        ASSERT(index < num_vertices(), "Index " + stringify(index) + " must not exceed number of vertices "
                + stringify(num_vertices()) + ".");
         return _vertices[index];
       }

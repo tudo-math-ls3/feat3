@@ -302,7 +302,8 @@ namespace FEAST
         }
       }
       // final sanity check (rank assigned last must be master rank minus 1)
-      ASSERT(iter_MPC_rank == (int)_num_processes-2, "");
+      ASSERT(iter_MPC_rank == (int)_num_processes-2, "iter_MPC_rank " + stringify(iter_MPC_rank)
+             + " must be equal to " + stringify((int)_num_processes-2)".");
 
       // Create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
       // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
@@ -409,7 +410,7 @@ namespace FEAST
     inline LoadBalancer<space_dim_, world_dim_>* load_balancer() const
     {
       CONTEXT("Universe::load_balancer()");
-      ASSERT(_universe_created, "");
+      ASSERT(_universe_created, "Universe must be created first by calling create(...).");
       return _load_balancer;
     }
 
@@ -422,7 +423,7 @@ namespace FEAST
     inline Master* master() const
     {
       CONTEXT("Universe::master()");
-      ASSERT(_universe_created, "");
+      ASSERT(_universe_created, "Universe must be created first by calling create(...).");
       return _master;
     }
 
@@ -445,14 +446,14 @@ namespace FEAST
       CONTEXT("Universe::create()");
       if(!_universe_created)
       {
-        ASSERT(logfile_base_name.size() > 0, "");
+        ASSERT(logfile_base_name.size() > 0, "Logfile base name must not be empty.");
         _logfile_base_name = logfile_base_name;
         _universe_created = true;
         // get total number of processes
         int num_proc;
         int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
-        ASSERT(num_proc >= 1, "");
+        ASSERT(num_proc >= 1, "Number of processes must be at least 1.");
         _num_processes = (unsigned int) num_proc;
 
         // Set variables. Assume that one process group is needed using all available processes (minus one
@@ -503,22 +504,23 @@ namespace FEAST
       CONTEXT("Universe::create()");
       if(!_universe_created)
       {
-        ASSERT(logfile_base_name.size() > 0, "");
+        ASSERT(logfile_base_name.size() > 0, "Logfile base name must not be empty.");
         _logfile_base_name = logfile_base_name;
         _universe_created = true;
         // get total number of processes
         int num_proc;
         int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
         MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
-        ASSERT(num_proc >= 1, "");
+        ASSERT(num_proc >= 1, "Number of processes must be at least 1.");
         _num_processes = (unsigned int) num_proc;
         // set variables
         _num_process_groups = num_process_groups;
-        ASSERT(_num_process_groups >= 1, "");
+        ASSERT(_num_process_groups >= 1, "Number of process groups must be at least 1.");
         _num_processes_in_group = num_processes_in_group;
         for(unsigned int igroup(0) ; igroup < _num_process_groups ; ++igroup)
         {
-          ASSERT(_num_processes_in_group[igroup] >= 1, "");
+          ASSERT(_num_processes_in_group[igroup] >= 1, "Number of processes in process group " + stringify(igroup)
+                 + " must be at least 1.");
         }
         _includes_dedicated_load_bal = includes_dedicated_load_bal;
         // call the init routine

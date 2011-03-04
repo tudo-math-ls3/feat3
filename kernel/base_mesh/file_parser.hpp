@@ -90,7 +90,7 @@ namespace FEAST
       inline void parse(std::string const& file_name, BM<1, world_dim_>* bm)
       {
         CONTEXT("BaseMesh::FileParser::parse()");
-        ASSERT(world_dim_ == 1, "");
+        ASSERT(world_dim_ == 1, "Currently, world dim " + stringify(world_dim_) + " must be 1.");
 
         std::string s = "No file parser implemented yet!\n";
         s += "A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):\n";
@@ -396,9 +396,10 @@ namespace FEAST
           }
           else
           {
-            ASSERT(itype >= 1, "");
+            ASSERT(itype >= 1, "itype " stringify(itype) " must be >= 1.");
             unsigned int ibc(itype - 1);
-            ASSERT(ibc < _num_boundaries, "");
+            ASSERT(ibc < _num_boundaries, "Boundary index " + stringify() + " must not exceed number of boundaries"
+                   + stringify(_num_boundaries) + ".");
             // search parameter interval
             for(unsigned int iseg = 0 ; iseg < _num_segments[ibc] ; ++iseg)
             {
@@ -444,13 +445,13 @@ namespace FEAST
           sc->_add(new Vertex_(coords));
         }
 
-        // read  and set edges
+        // read and set edges
         for(unsigned int iedge = 0 ; iedge < _num_edges ; ++iedge)
         {
           unsigned int v0, v1;
           mesh_file->read(v0, v1);
-          ASSERT(v0 >= 1, "");
-          ASSERT(v1 >= 1, "");
+          ASSERT(v0 >= 1, "Vertex index " + stringify(v0) + " must be >=1.");
+          ASSERT(v1 >= 1, "Vertex index " + stringify(v1) + " must be >=1.");
           // substract 1 from 1-based to 0-based indexing
           sc->_add(new Edge_(sc->vertex(v0-1), sc->vertex(v1-1), 0));
         }
@@ -616,7 +617,8 @@ namespace FEAST
                     {
                       // when the index of the neighbour cell is less than that of the current cell, the neighbour cell
                       // already exists and can be set as neighbour
-                      ASSERT(vdneigh[ineigh] >= 1, "");
+                      ASSERT(vdneigh[ineigh] >= 1, "Index " + stringify(vdneigh[ineigh]) + " of the "
+                             + stringify(ineigh) + "-th neighbour must be >=1.");
                       _bm->cell(icell)->add_neighbour(SDIM_VERTEX, ivert, _bm->cell(vdneigh[ineigh]-1));
                     }
                     else
@@ -758,7 +760,7 @@ namespace FEAST
         CONTEXT("BaseMesh::FileParser::parse()");
         // FEAST1 file format does not distinguish world dimension and space dimension. So, for now the world_dim_
         // template parameter actually has to be equal to 2 here.
-        ASSERT(world_dim_ == 2, "");
+        ASSERT(world_dim_ == 2, "Currently, world dim " + stringify(world_dim_) + " must be 2.");
 
         FileReaderASCII* mesh_file = new FileReaderASCII(file_name, '#', true);
 
@@ -848,7 +850,7 @@ namespace FEAST
       inline void parse(std::string const& file_name, BM<3, world_dim_>* bm)
       {
         CONTEXT("BaseMesh::FileParser::parse()");
-        ASSERT(world_dim_ == 3, "");
+        ASSERT(world_dim_ == 3, "Currently, world dim " + stringify(world_dim_) + " must be 3.");
 
         Logger::log_master("No file parser implemented yet! A manual 3D base mesh is created.");
 

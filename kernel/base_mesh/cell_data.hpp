@@ -105,7 +105,8 @@ namespace FEAST
         unsigned char num_subitems_per_subdim[])
       {
         CONTEXT("BaseMesh::CellInfo::_set_num_subitems_per_subdim()");
-        ASSERT(array_size == cell_dim_, "");
+        ASSERT(array_size == cell_dim_, "Array size " + stringify(array_size) + " must be equal to cell dimension"
+               + stringify(cell_dim_) + ".");
         for(int i(0) ; i < cell_dim_ ; ++i)
         {
           _num_subitems_per_subdim[i] = num_subitems_per_subdim[i];
@@ -126,7 +127,8 @@ namespace FEAST
       inline unsigned char num_subitems_per_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellInfo::num_subitems_per_subdim()");
-        ASSERT(subdim < cell_dim_, "");
+        ASSERT(subdim < cell_dim_, "Subdimension " + stringify(subdim) + " must be smaller than cell dimension"
+               + stringify(cell_dim_) + ".");
         return _num_subitems_per_subdim[subdim];
       }
 
@@ -263,14 +265,18 @@ namespace FEAST
         }
       }
 
+
       /// returns number of neighbours for given subdimension and given item
       inline unsigned int num_neighbours_item(
         subdim subdim,
         unsigned char item) const
       {
         CONTEXT("BaseMesh::CellData::num_neighbours_item()");
-        ASSERT(subdim < cell_space_dim_, "");
-        ASSERT(item < this->num_subitems_per_subdim(subdim), "");
+        ASSERT(subdim < cell_space_dim_, "Subdimension " + stringify(subdim)
+               + " must not exceed cell-space dimension" + stringify(cell_dim_) + ".");
+        ASSERT(item < this->num_subitems_per_subdim(subdim), "Item index " + stringify(item)
+               + " must not exceed number of subitems " + stringify(this->num_subitems_per_subdim(subdim))
+               + " of subdimension " + stringify(subdim) + ".");
         return _neighbours[subdim][item].size();
       }
 
@@ -279,7 +285,8 @@ namespace FEAST
       inline unsigned int num_neighbours_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellData::num_neighbours_subdim()");
-        ASSERT(subdim < cell_space_dim_, "");
+        ASSERT(subdim < cell_space_dim_, "Subdimension " + stringify(subdim)
+               + " must be smaller than cell-space dimension" + stringify(cell_dim_) + ".");
         unsigned int num_neighbours(0);
         for(unsigned int item(0) ; item < this->num_subitems_per_subdim(subdim) ; ++item)
         {
@@ -296,9 +303,14 @@ namespace FEAST
         unsigned char index) const
       {
         CONTEXT("BaseMesh::CellData::neighbour()");
-        ASSERT(subdim < cell_space_dim_, "");
-        ASSERT(item < this->num_subitems_per_subdim(subdim), "");
-        ASSERT(index < _neighbours[subdim][item].size(), "");
+        ASSERT(subdim < cell_space_dim_, "Subdimension " + stringify(subdim)
+               + " must not exceed cell-space dimension" + stringify(cell_dim_) + ".");
+        ASSERT(item < this->num_subitems_per_subdim(subdim), "Item index " + stringify(item)
+               + " must not exceed number of subitems " + stringify(this->num_subitems_per_subdim(subdim))
+               + " of subdimension " + stringify(subdim) + ".");
+        ASSERT(index < _neighbours[subdim][item].size(), "Index " + stringify(index)
+               + " must not exceed neighbour vector size " + stringify(_neighbours[subdim][item].size())
+               + " for item " + stringify(item) + " of subdimension " + stringify(subdim) + ".");
         return _neighbours[subdim][item][index];
       }
 
@@ -309,8 +321,11 @@ namespace FEAST
         unsigned char item) const
       {
         CONTEXT("BaseMesh::CellData::neighbours_item()");
-        ASSERT(subdim < cell_space_dim_, "");
-        ASSERT(item < this->num_subitems_per_subdim(subdim), "");
+        ASSERT(subdim < cell_space_dim_, "Subdimension " + stringify(subdim)
+               + " must not exceed cell-space dimension" + stringify(cell_dim_) + ".");
+        ASSERT(item < this->num_subitems_per_subdim(subdim), "Item index " + stringify(item)
+               + " must not exceed number of subitems " + stringify(this->num_subitems_per_subdim(subdim))
+               + " of subdimension " + stringify(subdim) + ".");
         return _neighbours[subdim][item];
       }
 
@@ -319,7 +334,8 @@ namespace FEAST
       inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>* neighbours_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellData::neighbours_subdim()");
-        ASSERT(subdim < cell_space_dim_, "");
+        ASSERT(subdim < cell_space_dim_, "Subdimension " + stringify(subdim)
+               + " must not exceed cell-space dimension" + stringify(cell_dim_) + ".");
         return _neighbours[subdim];
       }
 
@@ -331,6 +347,11 @@ namespace FEAST
         Cell<cell_space_dim_, cell_space_dim_, world_dim_>* neighbour)
       {
         CONTEXT("BaseMesh::CellData::add_neighbour()");
+        ASSERT(subdim < cell_space_dim_, "Subdimension " + stringify(subdim)
+               + " must not exceed cell-space dimension" + stringify(cell_dim_) + ".");
+        ASSERT(item < this->num_subitems_per_subdim(subdim), "Item index " + stringify(item)
+               + " must not exceed number of subitems " + stringify(this->num_subitems_per_subdim(subdim))
+               + " of subdimension " + stringify(subdim) + ".");
         _neighbours[subdim][item].push_back(neighbour);
       }
 

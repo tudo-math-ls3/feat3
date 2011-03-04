@@ -141,8 +141,9 @@ namespace FEAST
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv) const
       {
         CONTEXT("BaseMesh::Hexa::_edge_vertex()");
-        ASSERT(iedge < num_edges(), "");
-        ASSERT(iv < 2, "");
+        ASSERT(iedge < num_edges(), "Index " + stringify(iedge) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
+        ASSERT(iv < 2, "Edge vertex index " + stringify(iv) + " must not be larger than 1.");
         // the index is inquired from the fixed numbering scheme stored in Numbering::hexa_edge_vertices
         return Numbering::hexa_edge_vertices[iedge][iv];
       }
@@ -154,7 +155,8 @@ namespace FEAST
 //TODO: will be replaced by function (as in Quad class):
 //      inline void _determine_edge_orientation()
         CONTEXT("BaseMesh::Hexa::_edge_has_correct_orientation()");
-        ASSERT(iedge < num_edges(), "");
+        ASSERT(iedge < num_edges(), "Index " + stringify(iedge) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
         // return true when the edge's start vertex within the hexa is local vertex 0 within the edge structure
         return (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0));
       }
@@ -270,7 +272,8 @@ namespace FEAST
         // of type Cell<1, space_dim_, world_dim_>
         for(int i(0) ; i < 12 ; ++i)
         {
-          ASSERT(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>), "");
+          ASSERT(typeid(*_edges[i]) == typeid(Edge_), "The " + stringify(i) + "-th edge (index "
+                 + stringify(_edges[i]->index()) + ") must be of type Edge<space_dim_, world_dim_>.");
         }
         _faces[0] = f0;
         _faces[1] = f1;
@@ -281,7 +284,8 @@ namespace FEAST
         // assure that the faces are in fact of type Quad_, and not "only" of type Cell_2D_
         for(int i(0) ; i < 6 ; ++i)
         {
-          ASSERT(typeid(*_faces[i]) == typeid(Quad_), "");
+          ASSERT(typeid(*_faces[i]) == typeid(Quad_), "The " + stringify(i) + "-th face (index "
+                 + stringify(_faces[i]->index()) + ") must be of type Quad<space_dim_, world_dim_>.");
         }
 
         unsigned char num_subitems_per_subdim[3] = {8, 12, 6};
@@ -322,7 +326,8 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Hexa::vertex()");
-        ASSERT(index < num_vertices(), "");
+        ASSERT(index < num_vertices(), "Index " + stringify(index) + " must not exceed number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 
@@ -350,7 +355,8 @@ namespace FEAST
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Hexa::edge()");
-        ASSERT(index < num_edges(), "");
+        ASSERT(index < num_edges(), "Index " + stringify(index) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
         return _edges[index];
       }
 
@@ -378,7 +384,8 @@ namespace FEAST
       inline Cell_2D_* face(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Hexa::face()");
-        ASSERT(index < num_faces(), "");
+        ASSERT(index < num_faces(), "Index " + stringify(index) + " must not exceed number of faces "
+               + stringify(num_faces()) + ".");
         return _faces[index];
       }
 
@@ -539,7 +546,9 @@ namespace FEAST
             // (they have already been pushed to the subdivision data structure)
             for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
             {
-              ASSERT(face(iface)->num_children() == 4, "");
+              ASSERT(face(iface)->num_children() == 4, "Number of children of " + stringify(ifaced)
+                     + "-th face (index" + stringify(face(iface)->index()) + ") is "
+                     + stringify(face(iface)->num_children()) + ", but it must be 4.");
               for (unsigned char iedge(0) ; iedge < 4 ; ++iedge)
               {
                 // Exploit that the edge from edge iedge of the parent face towards the centre vertex of the subdivided
@@ -588,7 +597,9 @@ namespace FEAST
             // (they have already been pushed to the subdivision data structure)
             for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
             {
-              ASSERT(face(iface)->num_children() == 4, "");
+              ASSERT(face(iface)->num_children() == 4, "Number of children of " + stringify(iface)
+                     + "-th face (index" + stringify(face(iface)->index()) + ") is "
+                     + stringify(face(iface)->num_children()) + ", but it must be 4.");
               for (unsigned char ivert(0) ; ivert < 4 ; ++ivert)
               {
                 new_faces[4*iface + ivert]

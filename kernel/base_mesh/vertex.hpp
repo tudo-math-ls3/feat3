@@ -73,7 +73,8 @@ namespace FEAST
       inline double coord(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Vertex::coord()");
-        ASSERT(index < world_dim_, "");
+        ASSERT(index < world_dim_, "Index " + stringify(index) + " must not exceed world dimension "
+               + stringify(world_dim_) +".");
         return _coords[index];
       }
 
@@ -100,7 +101,8 @@ namespace FEAST
       inline void set_coord(unsigned char const index, double const coord)
       {
         CONTEXT("BaseMesh::Vertex::set_coord()");
-        ASSERT(index < world_dim_, "");
+        ASSERT(index < world_dim_, "Index " + stringify(index) + " must not exceed world dimension "
+               + stringify(world_dim_) +".");
         _coords[index] = coord;
       }
 

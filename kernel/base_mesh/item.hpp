@@ -83,7 +83,7 @@ namespace FEAST
       inline void set_index(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Item::set_index()");
-        ASSERT(index < Constants::MAX_INDEX, "");
+        ASSERT(index < Constants::MAX_INDEX, "Index " + stringify(index) + " must not exceed Constants::MAX_INDEX.");
         _index = index;
       }
 
@@ -98,7 +98,7 @@ namespace FEAST
       inline void set_number(index_glob_t const number)
       {
         CONTEXT("BaseMesh::Item::set_number()");
-        ASSERT(number < Constants::MAX_NUMBER, "");
+        ASSERT(number < Constants::MAX_INDEX, "Number " + stringify(number) + " must not exceed Constants::MAX_INDEX.");
         _number = number;
       }
 

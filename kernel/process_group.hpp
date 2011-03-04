@@ -111,7 +111,7 @@ namespace FEAST
         _rank_coord(num_processes-1)
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
-      ASSERT(num_processes >= 1, "");
+      ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
       // get MPI_Group object for the given communicator
       int mpi_error_code = MPI_Comm_group(_comm, &_group);
       MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_group");
@@ -122,8 +122,8 @@ namespace FEAST
 
       // since this is the world group of processes, the local and the global rank should be equal
       // (if this constructor is used for other groups than the world group then this assert must be removed!)
-      ASSERT(Process::rank == _rank, "");
-
+      ASSERT(Process::rank == _rank, "Process::rank " + stringify(Process::rank) " and _rank " + stringify(_rank)
+             + " must be equal.");
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
 //      _buffer = nullptr;
     }
@@ -159,7 +159,7 @@ namespace FEAST
         _rank_coord(num_processes-1)
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
-      ASSERT(num_processes >= 1, "");
+      ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
       // copy array of parent group ranks
       _ranks_group_parent = new int[_num_processes];
       for(unsigned int i(0) ; i < _num_processes ; ++i)

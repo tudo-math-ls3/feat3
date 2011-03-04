@@ -48,6 +48,9 @@ namespace FEAST
       typedef Vertex<world_dim_> Vertex_;
 
       /// shortcut to save typing of template parameters
+      typedef Edge<space_dim_, world_dim_> Edge_;
+
+      /// shortcut to save typing of template parameters
       typedef Cell<1, space_dim_, world_dim_> Cell_1D_;
 
 
@@ -114,7 +117,8 @@ namespace FEAST
         // of type Cell<1, space_dim_, world_dim_>
         for(int i(0) ; i < 3 ; ++i)
         {
-          ASSERT(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>), "");
+          ASSERT(typeid(*_edges[i]) == typeid(Edge_), "The " + stringify(i) + "-th edge (index "
+                 + stringify(_edges[i]->index()) + ") must be of type Edge<space_dim_, world_dim_>.");
         }
 
         unsigned char num_subitems_per_subdim[2] = {3,3};
@@ -153,7 +157,8 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::vertex()");
-        ASSERT(index < num_vertices(), "");
+        ASSERT(index < num_vertices(), "Index " + stringify(index) + " must not exceed number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 
@@ -181,7 +186,8 @@ namespace FEAST
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::edge()");
-        ASSERT(index < num_edges(), "");
+        ASSERT(index < num_edges(), "Index " + stringify(index) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
         return _edges[index];
       }
 
@@ -197,7 +203,8 @@ namespace FEAST
       inline Vertex_* next_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::next_vertex_ccw()");
-        ASSERT(index < num_vertices(), "");
+        ASSERT(index < num_vertices(), "Index " + stringify(index) + " must not exceed number of vertices "
+               + stringify(num_vertices()) + ".");
 // TODO: to be implemented correctly!
         return nullptr;
       }
@@ -214,7 +221,8 @@ namespace FEAST
       inline Vertex_* previous_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::previous_vertex_ccw()");
-        ASSERT(index < num_vertices(), "");
+        ASSERT(index < num_vertices(), "Index " + stringify(index) + " must not exceed number of vertices "
+               + stringify(num_vertices()) + ".");
 // TODO: to be implemented correctly!
         return nullptr;
       }
@@ -231,7 +239,8 @@ namespace FEAST
       inline Cell_1D_* next_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::next_edge_ccw()");
-        ASSERT(index < num_edges(), "");
+        ASSERT(index < num_edges(), "Index " + stringify(index) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
 // TODO: to be implemented correctly!
         return nullptr;
       }
@@ -248,7 +257,8 @@ namespace FEAST
       inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tri::previous_edge_ccw()");
-        ASSERT(index < num_edges(), "");
+        ASSERT(index < num_edges(), "Index " + stringify(index) + " must not exceed number of edges "
+               + stringify(num_edges()) + ".");
 // TODO: to be implemented correctly!
         return nullptr;
       }

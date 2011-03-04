@@ -388,8 +388,8 @@ namespace FEAST
       {
         CONTEXT("BaseMesh::Cell::_set_num_children()");
         // this function must not be called when there *are* already children
-        ASSERT(_children == nullptr, "Array of children is not the nullptr.");
-        ASSERT(_num_children == 0, "Number of children " + stringify(_num_children) + " is not zero.");
+        ASSERT(_children == nullptr, "Array of children must be the nullptr.");
+        ASSERT(_num_children == 0, "Number of children " + stringify(_num_children) + " must be zero.");
         // and it must not be called to unset children (use unset_children() for that)
         ASSERT(num > 0,
                "This function must not be used to set number of children to zero. Use unset_children() instead.");
@@ -420,7 +420,7 @@ namespace FEAST
         Cell* e)
       {
         CONTEXT("BaseMesh::Cell::_set_child()");
-        ASSERT(index < num_children(), "Child index " + stringify(index) + " exceeds number of children "
+        ASSERT(index < num_children(), "Index " + stringify(index) + " must not exceed number of children "
                + stringify(num_children()) + " .");
         // ensure that this function is not used to unset children (use unset_children() for that)
         ASSERT(e != nullptr,
@@ -482,10 +482,10 @@ namespace FEAST
           _refinement_level(ref_level)
       {
         CONTEXT("BaseMesh::Cell::Cell()");
-        ASSERT(world_dim_ >= space_dim_, "Space dimension " + stringify(space_dim_) + " exceeds world dimension "
-               + stringify(world_dim_) + ".");
-        ASSERT(space_dim_ >= cell_dim_, "Cell dimension " + stringify(space_dim_) + " exceeds space dimension "
-               + stringify(cell_dim_) + ".");
+        ASSERT(world_dim_ >= space_dim_, "Space dimension " + stringify(space_dim_)
+               + " must not exceed world dimension " + stringify(world_dim_) + ".");
+        ASSERT(space_dim_ >= cell_dim_, "Cell dimension " + stringify(space_dim_)
+               + " must not exceed space dimension " + stringify(cell_dim_) + ".");
       }
 
 
@@ -546,7 +546,7 @@ namespace FEAST
       inline Cell* child(unsigned char index) const
       {
         CONTEXT("BaseMesh::Cell::child()");
-        ASSERT(index < num_children(), "Child index " + stringify(index) + " exceeds number of children "
+        ASSERT(index < num_children(), "Index " + stringify(index) + " must not exceed number of children "
                + stringify(num_children()) + ".");
         return _children[index];
       }
@@ -838,7 +838,7 @@ namespace FEAST
 //      std::vector<Cell*>& cells_at_edge,
 //      BaseMeshItem1D<2>* shared_edge)
 //    {
-//      ASSERT(contains(shared_edge), "Shared edge is not contained in the cell.");
+//      ASSERT(contains(shared_edge), "Shared edge must be contained in the cell.");
 //      if (active())
 //      {
 //        cells_at_edge.push_back(this);
@@ -892,14 +892,14 @@ namespace FEAST
 //      BaseMeshItem1D<2>* edge)
 //    {
 //      // may only be called when the cell actually has children
-//      ASSERT(!active(), "Cell has no children.");
+//      ASSERT(!active(), "Cell must have children.");
 //
 //    }
 
 //    void get_edge_children_ccw(BaseMeshItem1D<2>* edge, BaseMeshItem1D<2>* children_ordered[])
 //    {
 //      // assumption: edge->child(i) is incident with edge->vertex(i), i = 0,1
-//      ASSERT(!edge->active(), "Cell has no children.");
+//      ASSERT(!edge->active(), "Cell must have children.");
 //      if (edge_orientation_ccw(edge))
 //      {
 //        children_ordered[0] = edge->child(0);
