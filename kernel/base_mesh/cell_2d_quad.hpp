@@ -108,9 +108,9 @@ namespace FEAST
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv) const
       {
         CONTEXT("BaseMesh::Quad::_edge_vertex()");
-        ASSERT(iedge < num_edges(), "Edge index " + StringUtils::stringify(iedge) + " exceeds number of edges "
-               + StringUtils::stringify(num_edges()) + ".");
-        ASSERT(iv < 2, "Edge vertex index " + StringUtils::stringify(iv) + " is larger than 1.");
+        ASSERT(iedge < num_edges(), "Edge index " + stringify(iedge) + " exceeds number of edges "
+               + stringify(num_edges()) + ".");
+        ASSERT(iv < 2, "Edge vertex index " + stringify(iv) + " is larger than 1.");
         // the index is inquired from the fixed numbering scheme stored in Numbering::quad_edge_vertices
         return Numbering::quad_edge_vertices[iedge][iv];
       }
@@ -141,9 +141,9 @@ namespace FEAST
             }
             else
             {
-              throw InternalError("Something is wrong with the numbering of the "
-                                  + StringUtils::stringify((int)iedge) + "-th edge with index "
-                                  + edge(iedge)->print_index() + " in quad " + this->print_index() + ".");
+              throw InternalError("Something is wrong with the numbering of the " + stringify((int)iedge)
+                                  + "-th edge with index " + edge(iedge)->print_index() + " in quad "
+                                  + this->print_index() + ".");
             }
           }
         }
@@ -187,7 +187,7 @@ namespace FEAST
         // of type Cell<1, space_dim_, world_dim_>
         for(int i(0) ; i < 4 ; ++i)
         {
-          ASSERT(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>), "Edge " + StringUtils::stringify(i)
+          ASSERT(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>), "Edge " + stringify(i)
                  + " is not of correct type.");
         }
 
@@ -228,8 +228,8 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::vertex()");
-        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
-               + StringUtils::stringify(num_vertices()) + ".");
+        ASSERT(index < num_vertices(), "Vertex index " + stringify(index) + " exceeds number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 
@@ -257,8 +257,8 @@ namespace FEAST
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::edge()");
-        ASSERT(index < num_edges(), "Edge index " + StringUtils::stringify(index) + " exceeds number of edges "
-               + StringUtils::stringify(num_edges()) + ".");
+        ASSERT(index < num_edges(), "Edge index " + stringify(index) + " exceeds number of edges "
+               + stringify(num_edges()) + ".");
         return _edges[index];
       }
 
@@ -274,8 +274,8 @@ namespace FEAST
       inline Vertex_* next_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::next_vertex_ccw()");
-        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
-               + StringUtils::stringify(num_vertices()) + ".");
+        ASSERT(index < num_vertices(), "Vertex index " + stringify(index) + " exceeds number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[Numbering::quad_next_vertex_ccw[index]];
       }
 
@@ -291,8 +291,8 @@ namespace FEAST
       inline Vertex_* previous_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::previous_vertex_ccw()");
-        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
-               + StringUtils::stringify(num_vertices()) + ".");
+        ASSERT(index < num_vertices(), "Vertex index " + stringify(index) + " exceeds number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[Numbering::quad_previous_vertex_ccw[index]];
       }
 
@@ -308,8 +308,8 @@ namespace FEAST
       inline Cell_1D_* next_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::next_edge_ccw()");
-        ASSERT(index < num_edges(), "Edge index " + StringUtils::stringify(index) + " exceeds number of edges "
-               + StringUtils::stringify(num_edges()) + ".");
+        ASSERT(index < num_edges(), "Edge index " + stringify(index) + " exceeds number of edges "
+               + stringify(num_edges()) + ".");
         return _edges[Numbering::quad_next_edge_ccw[index]];
       }
 
@@ -325,8 +325,8 @@ namespace FEAST
       inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::previous_edge_ccw()");
-        ASSERT(index < num_edges(), "Edge index " + StringUtils::stringify(index) + " exceeds number of edges "
-               + StringUtils::stringify(num_edges()) + ".");
+        ASSERT(index < num_edges(), "Edge index " + stringify(index) + " exceeds number of edges "
+               + stringify(num_edges()) + ".");
         return _edges[Numbering::quad_previous_edge_ccw[index]];
       }
 
@@ -592,7 +592,7 @@ namespace FEAST
           {
             if (vertex(ivert) == nullptr)
             {
-              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              s += "Vertex " + stringify((int)ivert) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -600,7 +600,7 @@ namespace FEAST
           {
             if (edge(iedge) == nullptr)
             {
-              s += "Edge " + StringUtils::stringify((int)iedge) + " is null.\n";
+              s += "Edge " + stringify((int)iedge) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -621,8 +621,8 @@ namespace FEAST
               {
                 if(this->child(ichild)->vertex(ichild) != this->child(ichild+1)->vertex(ichild+1))
                 {
-                  s += "Centre vertex has wrong number in child "
-                       + StringUtils::stringify((int)ichild) + " or child " + StringUtils::stringify(ichild+1) + ".\n";
+                  s += "Centre vertex has wrong number in child " + stringify((int)ichild) + " or child "
+                       + stringify(ichild+1) + ".\n";
                   throw new InternalError(s);
                 }
               }
@@ -641,7 +641,7 @@ namespace FEAST
                 Cell_1D_* edge1 = this->child(Numbering::quad_edge_vertices[i][1])->edge(i);
                 if(edge0 != edge1)
                 {
-                  s += "Interior edge connected to the " + StringUtils::stringify((int)i)
+                  s += "Interior edge connected to the " + stringify((int)i)
                        + "-th edge of the parent quad has a wrong number in one of the incident children.\n";
                   throw new InternalError(s);
                 }
@@ -650,7 +650,7 @@ namespace FEAST
                 if(!(edge0->vertex(0) == vert_edge_centre &&  edge0->vertex(1) == vert_quad_centre))
                 {
                   s += "There is something wrong with the end vertices of the interior edge connected to the "
-                       + StringUtils::stringify((int)i) + "-th edge of the parent quad.\n";
+                       + stringify((int)i) + "-th edge of the parent quad.\n";
                   throw new InternalError(s);
                 }
               }

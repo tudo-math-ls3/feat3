@@ -404,10 +404,10 @@ namespace FEAST
 //        // debug output
 //        for(unsigned int i(0) ; i < _num_processes ; ++i)
 //        {
-//          std::cout << "local process " << StringUtils::stringify(i) << ": length of string = "
-//                    << StringUtils::stringify(msg_lengths[i]) << std::endl;
+//          std::cout << "local process " << stringify(i) << ": length of string = "
+//                    << stringify(msg_lengths[i]) << std::endl;
 //        }
-//        std::cout << "Total length: " << StringUtils::stringify(total_length) << std::endl;
+//        std::cout << "Total length: " << stringify(total_length) << std::endl;
 
         // gather the messages from the other processes.
         MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages,

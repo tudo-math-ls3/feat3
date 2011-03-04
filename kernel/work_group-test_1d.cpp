@@ -85,8 +85,7 @@ public:
     unsigned int num_cells = load_balancer->base_mesh()->num_cells();
 
     // debug output
-    Logger::log_master("num_processes: " + StringUtils::stringify(num_processes) + "\nnum_cells: "
-                       + StringUtils::stringify(num_cells) + "\n");
+    Logger::log_master("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n");
     // assert that the number of processes is n
     ASSERT(num_processes == num_cells, "");
     // assert that no dedicated load balancer is used
@@ -204,7 +203,7 @@ public:
     }
     else
     {
-      MPIUtils::abort("Process with rank " + StringUtils::stringify(rank_world)
+      MPIUtils::abort("Process with rank " + stringify(rank_world)
                       + " has no particular role, this should not happen.");
     }
   } // run()

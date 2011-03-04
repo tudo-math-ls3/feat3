@@ -133,7 +133,7 @@ void define_work_groups(
   unsigned int num_cells = load_balancer->base_mesh()->num_cells();
 
   // debug output
-  Logger::log_master("num_cells: " + StringUtils::stringify(num_cells) + "\n");
+  Logger::log_master("num_cells: " + stringify(num_cells) + "\n");
   // assert that the number of processes is n+2
   ASSERT(num_processes == num_cells + 2, "");
 
@@ -318,13 +318,13 @@ int main(int argc, char* argv[])
     unsigned int group_id = process_group->group_id();
 //    // debug output
 //    int rank_process_group = process_group->rank();
-//    std::string s("Process " + StringUtils::stringify(rank_world) + " is the ");
+//    std::string s("Process " + stringify(rank_world) + " is the ");
 //    if(load_balancer->is_dedicated_load_bal())
 //    {
 //      s += "DEDICATED ";
 //    }
-//    s += "load balancer with local rank " + StringUtils::stringify(rank_process_group);
-//    s += " in group " + StringUtils::stringify(group_id) + ".\n";
+//    s += "load balancer with local rank " + stringify(rank_process_group);
+//    s += " in group " + stringify(group_id) + ".\n";
 //    process_group->log_indiv_master(s);
 
     // perform actions depending on the group id
@@ -361,7 +361,7 @@ int main(int argc, char* argv[])
       if (Process::rank % 7 == 0)
       {
         // test the PrettyPrinter
-        std::string prefix(std::string("Proc" + StringUtils::stringify(Process::rank)));
+        std::string prefix(std::string("Proc" + stringify(Process::rank)));
         PrettyPrinter pp(40, '#', prefix + " ");
         pp.add_line_sep();
         pp.add_line_centered("Testing pp and logging!");
@@ -418,7 +418,6 @@ int main(int argc, char* argv[])
   }
   else
   {
-    MPIUtils::abort("Process with rank " + StringUtils::stringify(rank_world)
-                    + " has no particular role, this should not happen.");
+    MPIUtils::abort("Process with rank " + stringify(rank_world) + " has no particular role, this should not happen.");
   }
 }

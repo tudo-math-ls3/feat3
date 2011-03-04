@@ -653,7 +653,7 @@ namespace FEAST
 
             default:
             {
-              throw InternalError("Unknown cell type <" + StringUtils::stringify(type) + "> found.");
+              throw InternalError("Unknown cell type <" + stringify(type) + "> found.");
             }
           } // switch(type)
         } // for(unsigned int icell = 0 ; icell < _num_cells ; ++icell)

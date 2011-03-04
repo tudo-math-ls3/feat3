@@ -91,9 +91,9 @@ namespace FEAST
               if(!neighs[ineigh]->active())
               {
                 // if not, throw an error
-                s = "Cell " + neighs[ineigh]->print_index() + ", being the vertex-neighbour of cell "
-                    + c->print_index() + " (at vertex " + StringUtils::stringify((int)ivertex) +  ", "
-                    + StringUtils::stringify(ineigh) + "-th pos.), has children which must not be the case!\n";
+                s = "Cell " + neighs[ineigh]->print_index() + ", being the vertex-neighbour of cell " + c->print_index()
+                    + " (at vertex " + stringify((int)ivertex) +  ", " + stringify(ineigh)
+                    + "-th pos.), has children which must not be the case!\n";
                 s += "It seems the neighbours of cell " + c->print_index() + " have not been updated correctly!\n";
 // COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
@@ -119,20 +119,18 @@ namespace FEAST
                     {
                       // debug output
                       s = "Vertex-neighbourhood between cell " + c->print_index() + " (at vertex "
-                          + StringUtils::stringify((int)ivertex) + ", " + StringUtils::stringify(ineigh)
-                          + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (vertex = "
-                          + StringUtils::stringify((int)ivertex_in_neigh) + ", " + StringUtils::stringify(nn)
-                          + "-th pos.) found!\n";
+                          + stringify((int)ivertex) + ", " + stringify(ineigh) + "-th pos.) and cell "
+                          + neighs[ineigh]->print_index() + " (vertex = " + stringify((int)ivertex_in_neigh)
+                          + ", " + stringify(nn) + "-th pos.) found!\n";
                       stream << s;
                       neighbour_found = true;
 
                       // check whether the two neighbours really share the same vertex
                       if (c->vertex(ivertex) != neighs[ineigh]->vertex(ivertex_in_neigh))
                       {
-                        s = "Vertex-neighbours cell " + c->print_index() + " (at vertex "
-                            + StringUtils::stringify((int)ivertex) + ", " + StringUtils::stringify(ineigh)
-                            + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (vertex = "
-                            + StringUtils::stringify((int)ivertex_in_neigh) + ", " + StringUtils::stringify(nn)
+                        s = "Vertex-neighbours cell " + c->print_index() + " (at vertex " + stringify((int)ivertex)
+                            + ", " + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index()
+                            + " (vertex = " + stringify((int)ivertex_in_neigh) + ", " + stringify(nn)
                             + "-th pos.) do not share the same vertex! Aborting program!\n";
                         throw new InternalError(s);
                       }
@@ -146,9 +144,9 @@ namespace FEAST
                 } // for 0 <= ivertex_in_neigh < neighs[ineigh]->num_vertices()
                 if(!neighbour_found)
                 {
-                  s = "No vertex-neighbour between cell " + c->print_index() + " (at vertex "
-                      + StringUtils::stringify((int)ivertex) + ", " + StringUtils::stringify(ineigh)
-                      + "-th pos.) and cell " + neighs[ineigh]->print_index() + " found! Aborting program!\n";
+                  s = "No vertex-neighbour between cell " + c->print_index() + " (at vertex " + stringify((int)ivertex)
+                      + ", " + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index()
+                      + " found! Aborting program!\n";
                   throw new InternalError(s);
                 }
               }
@@ -215,8 +213,8 @@ namespace FEAST
               {
                 // if not, throw an error
                 s = "Cell " + neighs[ineigh]->print_index() + ", being the edge-neighbour of cell "
-                    + c->print_index() + " (at edge " + StringUtils::stringify((int)iedge) +  ", "
-                    + StringUtils::stringify(ineigh) + "-th pos.), has children which must not be the case!\n";
+                    + c->print_index() + " (at edge " + stringify((int)iedge) +  ", " + stringify(ineigh)
+                    + "-th pos.), has children which must not be the case!\n";
                 s += "It seems the neighbours of cell " + c->print_index() + " have not been updated correctly!\n";
 // COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
@@ -240,11 +238,9 @@ namespace FEAST
                     if(neighs_of_neigh[iedge_in_neigh][nn] == c)
                     {
                       // debug output
-                      s = "Edge-neighbourhood between cell " + c->print_index() + " (at edge "
-                          + StringUtils::stringify((int)iedge) + ", " + StringUtils::stringify(ineigh)
-                          + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (edge = "
-                          + StringUtils::stringify((int)iedge_in_neigh) + ", " + StringUtils::stringify(nn)
-                          + "-th pos.) found!\n";
+                      s = "Edge-neighbourhood between cell " + c->print_index() + " (at edge " + stringify((int)iedge)
+                          + ", " + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index()
+                          + " (edge = " + stringify((int)iedge_in_neigh) + ", " + stringify(nn) + "-th pos.) found!\n";
                       stream << s;
                       neighbour_found = true;
 
@@ -274,10 +270,9 @@ namespace FEAST
                       // check whether the two neighbours really share the same edge
                       if (edge_c != edge_neigh)
                       {
-                        s = "Edge-neighbours cell " + c->print_index() + " (at edge "
-                            + StringUtils::stringify((int)iedge) + ", " + StringUtils::stringify(ineigh)
-                            + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (edge = "
-                            + StringUtils::stringify((int)iedge_in_neigh) + ", " + StringUtils::stringify(nn)
+                        s = "Edge-neighbours cell " + c->print_index() + " (at edge " + stringify((int)iedge)
+                            + ", " + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index()
+                            + " (edge = " + stringify((int)iedge_in_neigh) + ", " + stringify(nn)
                             + "-th pos.) do not share the same edge! Aborting program!\n";
                         throw new InternalError(s);
                       }
@@ -291,9 +286,9 @@ namespace FEAST
                 } // for 0 <= iedge_in_neigh < neighs[ineigh]->num_edges()
                 if(!neighbour_found)
                 {
-                  s = "No edge-neighbour between cell " + c->print_index() + " (at edge "
-                      + StringUtils::stringify((int)iedge) + ", " + StringUtils::stringify(ineigh)
-                      + "-th pos.) and cell " + neighs[ineigh]->print_index() + " found! Aborting program!\n";
+                  s = "No edge-neighbour between cell " + c->print_index() + " (at edge " + stringify((int)iedge)
+                      + ", " + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index()
+                      + " found! Aborting program!\n";
                   throw new InternalError(s);
                 }
               }
@@ -359,9 +354,9 @@ namespace FEAST
               if(!neighs[ineigh]->active())
               {
                 // if not, throw an error
-                s = "Cell " + neighs[ineigh]->print_index() + ", being the face-neighbour of cell "
-                    + c->print_index() + " (at face " + StringUtils::stringify((int)iface) +  ", "
-                    + StringUtils::stringify(ineigh) + "-th pos.), has children which must not be the case!\n";
+                s = "Cell " + neighs[ineigh]->print_index() + ", being the face-neighbour of cell " + c->print_index()
+                    + " (at face " + stringify((int)iface) +  ", " + stringify(ineigh)
+                    + "-th pos.), has children which must not be the case!\n";
                 s += "It seems the neighbours of cell " + c->print_index() + " have not been updated correctly!\n";
 // COMMENT_HILMAR: Deactivated until update of neighbourhood has been implemented! Instead, only print error message.
 //                throw new InternalError(s);
@@ -385,11 +380,9 @@ namespace FEAST
                     if(neighs_of_neigh[iface_in_neigh][nn] == c)
                     {
                       // debug output
-                      s = "Face-neighbourhood between cell " + c->print_index() + " (at face "
-                          + StringUtils::stringify((int)iface) + ", " + StringUtils::stringify(ineigh)
-                          + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (face = "
-                          + StringUtils::stringify((int)iface_in_neigh) + ", " + StringUtils::stringify(nn)
-                          + "-th pos.) found!\n";
+                      s = "Face-neighbourhood between cell " + c->print_index() + " (at face " + stringify((int)iface)
+                          + ", " + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index()
+                          + " (face = " + stringify((int)iface_in_neigh) + ", " + stringify(nn) + "-th pos.) found!\n";
                       stream << s;
                       neighbour_found = true;
 
@@ -419,10 +412,9 @@ namespace FEAST
                       // check whether the two neighbours really share the same face
                       if (face_c != face_neigh)
                       {
-                        s = "Face-neighbours cell " + c->print_index() + " (at face "
-                            + StringUtils::stringify((int)iface) + ", " + StringUtils::stringify(ineigh)
-                            + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (face = "
-                            + StringUtils::stringify((int)iface_in_neigh) + ", " + StringUtils::stringify(nn)
+                        s = "Face-neighbours cell " + c->print_index() + " (at face " + stringify((int)iface) + ", "
+                            + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index() + " (face = "
+                            + stringify((int)iface_in_neigh) + ", " + stringify(nn)
                             + "-th pos.) do not share the same face! Aborting program!\n";
                         throw new InternalError(s);
                       }
@@ -436,9 +428,9 @@ namespace FEAST
                 } // for 0 <= iface_in_neigh < neighs[ineigh]->num_faces()
                 if(!neighbour_found)
                 {
-                  s = "No face-neighbour between cell " + c->print_index() + " (at face "
-                      + StringUtils::stringify((int)iface) + ", " + StringUtils::stringify(ineigh)
-                      + "-th pos.) and cell " + neighs[ineigh]->print_index() + " found! Aborting program!\n";
+                  s = "No face-neighbour between cell " + c->print_index() + " (at face " + stringify((int)iface)
+                      + ", " + stringify(ineigh) + "-th pos.) and cell " + neighs[ineigh]->print_index()
+                      + " found! Aborting program!\n";
                   throw new InternalError(s);
                 }
               }

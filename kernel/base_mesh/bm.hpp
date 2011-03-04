@@ -94,8 +94,8 @@ namespace FEAST
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
         CONTEXT("BaseMesh::BM::_remove_item()");
-        ASSERT(item->index() < v.size(), "Item index " + StringUtils::stringify(item->index())
-               + "  exceeds vector size " + StringUtils::stringify(v.size()) + ".");
+        ASSERT(item->index() < v.size(), "Item index " + stringify(item->index()) + "  exceeds vector size "
+               + stringify(v.size()) + ".");
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
         v[v.size()-1] = item;
@@ -219,8 +219,8 @@ namespace FEAST
       inline Cell_* cell(index_glob_t const index) const
       {
         CONTEXT("BaseMesh::BM::cell()");
-        ASSERT(index < num_cells(), "Cell index " + StringUtils::stringify(index) + "  exceeds number of cells "
-               + StringUtils::stringify(num_cells()) + ".");
+        ASSERT(index < num_cells(), "Cell index " + stringify(index) + "  exceeds number of cells "
+               + stringify(num_cells()) + ".");
         return _cells[index];
       }
 

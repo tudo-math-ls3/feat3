@@ -118,7 +118,7 @@ public:
     }
     else
     {
-      MPIUtils::abort("Process with rank " + StringUtils::stringify(rank_world)
+      MPIUtils::abort("Process with rank " + stringify(rank_world)
                       + " has no particular role, this should not happen.");
     }
   } // run()

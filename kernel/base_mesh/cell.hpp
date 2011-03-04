@@ -389,7 +389,7 @@ namespace FEAST
         CONTEXT("BaseMesh::Cell::_set_num_children()");
         // this function must not be called when there *are* already children
         ASSERT(_children == nullptr, "Array of children is not the nullptr.");
-        ASSERT(_num_children == 0, "Number of children " + StringUtils::stringify(_num_children) + " is not zero.");
+        ASSERT(_num_children == 0, "Number of children " + stringify(_num_children) + " is not zero.");
         // and it must not be called to unset children (use unset_children() for that)
         ASSERT(num > 0,
                "This function must not be used to set number of children to zero. Use unset_children() instead.");
@@ -420,8 +420,8 @@ namespace FEAST
         Cell* e)
       {
         CONTEXT("BaseMesh::Cell::_set_child()");
-        ASSERT(index < num_children(), "Child index " + StringUtils::stringify(index) + " exceeds number of children "
-               + StringUtils::stringify(num_children()) + " .");
+        ASSERT(index < num_children(), "Child index " + stringify(index) + " exceeds number of children "
+               + stringify(num_children()) + " .");
         // ensure that this function is not used to unset children (use unset_children() for that)
         ASSERT(e != nullptr,
                "This function must not be used to set children to null. Use unset_children() instead.");
@@ -482,10 +482,10 @@ namespace FEAST
           _refinement_level(ref_level)
       {
         CONTEXT("BaseMesh::Cell::Cell()");
-        ASSERT(world_dim_ >= space_dim_, "Space dimension " + StringUtils::stringify(space_dim_)
-               + " exceeds world dimension " + StringUtils::stringify(world_dim_) + ".");
-        ASSERT(space_dim_ >= cell_dim_, "Cell dimension " + StringUtils::stringify(space_dim_)
-               + " exceeds space dimension " + StringUtils::stringify(cell_dim_) + ".");
+        ASSERT(world_dim_ >= space_dim_, "Space dimension " + stringify(space_dim_) + " exceeds world dimension "
+               + stringify(world_dim_) + ".");
+        ASSERT(space_dim_ >= cell_dim_, "Cell dimension " + stringify(space_dim_) + " exceeds space dimension "
+               + stringify(cell_dim_) + ".");
       }
 
 
@@ -546,8 +546,8 @@ namespace FEAST
       inline Cell* child(unsigned char index) const
       {
         CONTEXT("BaseMesh::Cell::child()");
-        ASSERT(index < num_children(), "Child index " + StringUtils::stringify(index) + " exceeds number of children "
-               + StringUtils::stringify(num_children()) + ".");
+        ASSERT(index < num_children(), "Child index " + stringify(index) + " exceeds number of children "
+               + stringify(num_children()) + ".");
         return _children[index];
       }
 
@@ -655,14 +655,13 @@ namespace FEAST
               // check whether parent is set correctly
               if(child(ichild)->parent() != this)
               {
-                s += "Parent-child relation to the " + StringUtils::stringify((int)ichild)
-                     + "-th child not correctly set!\n";
+                s += "Parent-child relation to the " + stringify((int)ichild) + "-th child not correctly set!\n";
                 throw new InternalError(s);
               }
               // check whether refinement levels are correct
               if(this->child(ichild)->refinement_level() != this->refinement_level()+1)
               {
-                s += "Refinement level of this cell or its " + StringUtils::stringify((int)ichild)
+                s += "Refinement level of this cell or its " + stringify((int)ichild)
                      + "-th child is not correctly set!\n";
                 throw new InternalError(s);
               }

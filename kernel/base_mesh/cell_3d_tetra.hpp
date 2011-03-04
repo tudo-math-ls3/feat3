@@ -285,7 +285,7 @@ namespace FEAST
           {
             if (vertex(ivert) == nullptr)
             {
-              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              s += "Vertex " + stringify((int)ivert) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -293,7 +293,7 @@ namespace FEAST
           {
             if (edge(iedge) == nullptr)
             {
-              s += "Edge " + StringUtils::stringify((int)iedge) + " is null.\n";
+              s += "Edge " + stringify((int)iedge) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -301,7 +301,7 @@ namespace FEAST
           {
             if (face(iface) == nullptr)
             {
-              s += "Face " + StringUtils::stringify((int)iface) + " is null.\n";
+              s += "Face " + stringify((int)iface) + " is null.\n";
               throw new InternalError(s);
             }
           }

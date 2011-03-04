@@ -230,22 +230,22 @@ namespace FEAST
       {
         if(_num_processes < num_processes_needed)
         {
-          throw InternalError("Only " + StringUtils::stringify(_num_processes) + " processes available, but "
-            + StringUtils::stringify(num_processes_needed) + " processes needed!");
+          throw InternalError("Only " + stringify(_num_processes) + " processes available, but "
+                              + stringify(num_processes_needed) + " processes needed!");
         }
         else if(_num_processes > num_processes_needed)
         {
-          throw InternalError(StringUtils::stringify(_num_processes) + " processes available, and only "
-            + StringUtils::stringify(num_processes_needed) + " processes needed! FEAST does not "
-            + "support trailing orphaned processes.");
+          throw InternalError(stringify(_num_processes) + " processes available, and only "
+                              + stringify(num_processes_needed) + " processes needed! FEAST does not "
+                              + "support trailing orphaned processes.");
         }
         else
         {
           // all ok, let only one process comment on this
           if(Process::is_master)
           {
-            std::string s = StringUtils::stringify(_num_processes) + " processes available and "
-              + StringUtils::stringify(num_processes_needed) + " needed.\n";
+            std::string s = stringify(_num_processes) + " processes available and " + stringify(num_processes_needed)
+                            + " needed.\n";
             Logger::log(s);
             std::cout << s;
           }
@@ -343,7 +343,7 @@ namespace FEAST
         _master = new Master();
 
         // debug output
-        std::string s = "Process " + StringUtils::stringify(Process::rank) + " is the MASTER OF THE UNIVERSE!\n";
+        std::string s = "Process " + stringify(Process::rank) + " is the MASTER OF THE UNIVERSE!\n";
         Logger::log(s);
         std::cout << s;
 
@@ -356,8 +356,7 @@ namespace FEAST
         _load_balancer = new LoadBalancer<space_dim_, world_dim_>(_process_group,
                                                                   _includes_dedicated_load_bal[my_group]);
         // debug output
-        Logger::log("Process " + StringUtils::stringify(Process::rank) + " belongs to process group "
-                    + StringUtils::stringify(my_group) + ".\n");
+        Logger::log("Process " + stringify(Process::rank) + " belongs to process group " + stringify(my_group) + ".\n");
       }
     } // _init()
 
@@ -525,7 +524,7 @@ namespace FEAST
         // call the init routine
         _init();
         // debug output
-        Logger::log("Universe created on process " + StringUtils::stringify(Process::rank) + ".\n");
+        Logger::log("Universe created on process " + stringify(Process::rank) + ".\n");
       }
       else
       {
@@ -563,8 +562,7 @@ namespace FEAST
         _cleanup();
       }
       // debug output
-      Logger::log("Universe destroyed on process " + StringUtils::stringify(Process::rank)
-                  + ". Calling MPI_Finalize() now...\n");
+      Logger::log("Universe destroyed on process " + stringify(Process::rank) + ". Calling MPI_Finalize() now...\n");
       // shut down MPI
       int mpi_is_initialised;
       MPI_Initialized(&mpi_is_initialised);

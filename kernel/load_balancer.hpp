@@ -502,13 +502,12 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 //      // debug output
 //      for (unsigned int i(0) ; i<_num_subgroups ; ++i)
 //      {
-//        std::string s = StringUtils::stringify(_subgroup_ranks[i][0]);
+//        std::string s = stringify(_subgroup_ranks[i][0]);
 //        for(unsigned int j(1) ; j < _num_proc_in_subgroup[i] ; ++j)
 //        {
-//          s +=  " " + StringUtils::stringify(_subgroup_ranks[i][j]);
+//          s +=  " " + stringify(_subgroup_ranks[i][j]);
 //        }
-//        s = "Process " + StringUtils::stringify(_process_group->rank()) + " received _subgroup_ranks["
-//            + StringUtils::stringify(i) + "] = " + s;
+//        s = "Process " + stringify(_process_group->rank()) + " received _subgroup_ranks[" + stringify(i) + "] = " + s;
 //        _process_group->log_indiv_master(s);
 //      }
 

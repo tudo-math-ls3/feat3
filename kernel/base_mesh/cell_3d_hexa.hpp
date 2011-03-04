@@ -198,9 +198,9 @@ namespace FEAST
                 }
                 else
                 {
-                  throw InternalError("Something is wrong with the numbering of the "
-                                      + StringUtils::stringify((int)iface) + "-th face with index "
-                                      + face(iface)->print_index() + " in hexa " + this->print_index() + ".");
+                  throw InternalError("Something is wrong with the numbering of the " + stringify((int)iface)
+                                      + "-th face with index " + face(iface)->print_index() + " in hexa "
+                                      + this->print_index() + ".");
                 }
               }
             } // for(unsigned char ivert(0) ; ivert < face(iface)->num_vertices() ; ++ivert)
@@ -208,7 +208,7 @@ namespace FEAST
             if (_face_numbering[iface] == 42)
             {
               throw InternalError("Vertex " + vertex(Numbering::hexa_face_vertices[iface][0])->print_index()
-                                  + " not found in " + StringUtils::stringify((int)iface) + "-th face with index "
+                                  + " not found in " + stringify((int)iface) + "-th face with index "
                                   + face(iface)->print_index() + " in hexa " + this->print_index() + ".");
             }
           } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
@@ -475,10 +475,10 @@ namespace FEAST
                   this->subdiv_data()->created_faces.push_back(face(iface)->subdiv_data()->created_cells[i]);
                 }
                 // debug output
-                Logger::log("Face " + StringUtils::stringify((int)iface) + ":"
-                            + StringUtils::stringify(face(iface)->subdiv_data()->created_vertices.size())
-                            + " vertices, " + StringUtils::stringify(face(iface)->subdiv_data()->created_edges.size())
-                            + " edges, " + StringUtils::stringify(face(iface)->subdiv_data()->created_cells.size())
+                Logger::log("Face " + stringify((int)iface) + ":"
+                            + stringify(face(iface)->subdiv_data()->created_vertices.size())
+                            + " vertices, " + stringify(face(iface)->subdiv_data()->created_edges.size())
+                            + " edges, " + stringify(face(iface)->subdiv_data()->created_cells.size())
                             + " faces created.\n");
               }
             } // for(unsigned char iface(0) ; iface < num_faces() ; ++iface)
@@ -829,7 +829,7 @@ namespace FEAST
           {
             if (vertex(ivert) == nullptr)
             {
-              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              s += "Vertex " + stringify((int)ivert) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -837,7 +837,7 @@ namespace FEAST
           {
             if (edge(iedge) == nullptr)
             {
-              s += "Edge " + StringUtils::stringify((int)iedge) + " is null.\n";
+              s += "Edge " + stringify((int)iedge) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -845,7 +845,7 @@ namespace FEAST
           {
             if (face(iface) == nullptr)
             {
-              s += "Face " + StringUtils::stringify((int)iface) + " is null.\n";
+              s += "Face " + stringify((int)iface) + " is null.\n";
               throw new InternalError(s);
             }
           }
@@ -860,8 +860,8 @@ namespace FEAST
               {
                 if (this->child(ichild)->vertex(7) != this->child(ichild+1)->vertex(7))
                 {
-                  s += "Vertex 7 in child " + StringUtils::stringify((int)ichild) + " or child "
-                       + StringUtils::stringify(ichild+1) + " is not the centre vertex of the parent hexa!\n";
+                  s += "Vertex 7 in child " + stringify((int)ichild) + " or child " + stringify(ichild+1)
+                       + " is not the centre vertex of the parent hexa!\n";
                   throw new InternalError(s);
                 }
               }
@@ -871,8 +871,8 @@ namespace FEAST
               {
                 if (this->child(ichild)->vertex(0) != this->vertex(ichild))
                 {
-                  s += "Vertex 0 in child " + StringUtils::stringify((int)ichild) + " is not vertex "
-                       + StringUtils::stringify(ichild+1) + " in the parent hexa!\n";
+                  s += "Vertex 0 in child " + stringify((int)ichild) + " is not vertex " + stringify(ichild+1)
+                       + " in the parent hexa!\n";
                   throw new InternalError(s);
                 }
               }
@@ -918,9 +918,8 @@ namespace FEAST
                   }
                   if(!face_found)
                   {
-                    s += "Face " + StringUtils::stringify((int)ifacelocal) + " of child "
-                         + StringUtils::stringify((int)ichild) + " is not a child of face "
-                         + StringUtils::stringify((int)face_index) + " of the parent hexa!\n";
+                    s += "Face " + stringify((int)ifacelocal) + " of child " + stringify((int)ichild)
+                         + " is not a child of face " + stringify((int)face_index) + " of the parent hexa!\n";
                     throw new InternalError(s);
                   }
                 }
@@ -960,10 +959,9 @@ namespace FEAST
                   if(   this->child(children[ichild])->face(ifacelocal)
                      != this->child(children[ichild] + ioffset)->face(ifacelocal))
                   {
-                    s += "Face " + StringUtils::stringify((int)ifacelocal) + " of child "
-                         + StringUtils::stringify((int)children[ichild]) + " is not equal to face "
-                         + StringUtils::stringify((int)ifacelocal) + " of child "
-                         + StringUtils::stringify(children[ichild] + ioffset) + "!\n";
+                    s += "Face " + stringify((int)ifacelocal) + " of child " + stringify((int)children[ichild])
+                         + " is not equal to face " + stringify((int)ifacelocal) + " of child "
+                         + stringify(children[ichild] + ioffset) + "!\n";
                     throw new InternalError(s);
                   }
                 }

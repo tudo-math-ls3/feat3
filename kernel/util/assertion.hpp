@@ -43,8 +43,7 @@ namespace FEAST
       const char * const file,
       const long line,
       const std::string & message)
-      : Exception(StringUtils::stringify(file) + ":" + StringUtils::stringify(line) + ": in "
-                  + StringUtils::stringify(function) + ": " + message)
+      : Exception(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message)
     {
       std::cout << backtrace("\n") << this->message() << std::endl;
     }

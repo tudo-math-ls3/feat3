@@ -114,8 +114,8 @@ namespace FEAST
     // let the coordinator of the subgroup trigger some common messages
 //      if(is_coordinator())
 //      {
-//        std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
-//                      + " and I am the coordinator of process subgroup " + StringUtils::stringify(_group_id));
+//        std::string s("I have COMM_WORLD rank " + stringify(Process::rank)
+//                      + " and I am the coordinator of process subgroup " + stringify(_group_id));
 //   //      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
 //        Logger::log_master("Hello, master file! " + s, Logger::FILE);
 //   //      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
@@ -123,9 +123,8 @@ namespace FEAST
 //      }
 
       // write some individual messages to screen and file
-      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
-                    + " and group rank " + StringUtils::stringify(_rank)
-                    + " in process subgroup " + StringUtils::stringify(_group_id) + ".");
+      std::string s("I have COMM_WORLD rank " + stringify(Process::rank) + " and group rank " + stringify(_rank)
+                    + " in process subgroup " + stringify(_group_id) + ".");
       if(is_coordinator())
       {
         s += " I am the coordinator!";

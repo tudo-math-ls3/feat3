@@ -43,7 +43,7 @@ namespace FEAST
     /// returns a full context stack aka backtrace
     std::string backtrace(const std::string& delimiter) const
     {
-      return StringUtils::join(local_context_stack.begin(), local_context_stack.end(), delimiter);
+      return join_strings(local_context_stack.begin(), local_context_stack.end(), delimiter);
     }
   };
 
@@ -117,8 +117,7 @@ namespace FEAST
       /*if (_what_str.empty())
       {
         int status(0);
-        char * const name(abi::__cxa_demangle(
-              ("_Z" + StringUtils::stringify(std::exception::what())).c_str(), 0, 0, &status));
+        char * const name(abi::__cxa_demangle(("_Z" + stringify(std::exception::what())).c_str(), 0, 0, &status));
         if (0 == status)
         {
           _what_str = name;
@@ -128,7 +127,7 @@ namespace FEAST
       }*/
       if (_what_str.empty())
       {
-        _what_str = StringUtils::stringify(std::exception::what());
+        _what_str = stringify(std::exception::what());
         _what_str += " (" + message() + ")";
       }
       return _what_str.c_str();
@@ -187,8 +186,7 @@ namespace FEAST
         context_stack = new std::list<std::string>;
       }
 
-      context_stack->push_back(context + " (" + StringUtils::stringify(file) + ":"
-                               + StringUtils::stringify(line) +")");
+      context_stack->push_back(context + " (" + stringify(file) + ":" + stringify(line) +")");
     }
 
     /// DTOR
@@ -217,7 +215,7 @@ namespace FEAST
       if (! context_stack)
         return "";
 
-      return StringUtils::join(context_stack->begin(), context_stack->end(), delimiter);
+      return join_strings(context_stack->begin(), context_stack->end(), delimiter);
     }
   };
 

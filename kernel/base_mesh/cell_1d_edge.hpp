@@ -109,8 +109,8 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Edge::vertex()");
-        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
-               + StringUtils::stringify(num_vertices()) + ".");
+        ASSERT(index < num_vertices(), "Vertex index " + stringify(index) + " exceeds number of vertices "
+               + stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 
@@ -206,7 +206,7 @@ namespace FEAST
           {
             if (vertex(ivert) == nullptr)
             {
-              s += "Vertex " + StringUtils::stringify((int)ivert) + " is null.\n";
+              s += "Vertex " + stringify((int)ivert) + " is null.\n";
               throw new InternalError(s);
             }
           }

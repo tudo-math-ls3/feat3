@@ -118,17 +118,16 @@ namespace FEAST
 //      // let the coordinator of the subgroup trigger some common messages
 //      if(is_coordinator())
 //      {
-//        std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
-//                      + " and I am the coordinator of work group " + StringUtils::stringify(_group_id));
+//        std::string s("I have COMM_WORLD rank " + stringify(Process::rank)
+//                      + " and I am the coordinator of work group " + stringify(_group_id));
 // //        Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
 //        Logger::log_master("Hello, master file! " + s, Logger::FILE);
 // //        Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
 // //        Logger::log_master("Hello, default master screen and file! " + s);
 //      }
       // write some individual messages to screen and file
-      std::string s("I have COMM_WORLD rank " + StringUtils::stringify(Process::rank)
-                    + " and group rank " + StringUtils::stringify(_rank)
-                    + " in work group " + StringUtils::stringify(_group_id) + ".");
+      std::string s("I have COMM_WORLD rank " + stringify(Process::rank) + " and group rank " + stringify(_rank)
+                    + " in work group " + stringify(_group_id) + ".");
       if(is_coordinator())
       {
         s += " I am the coordinator!";
@@ -208,8 +207,7 @@ namespace FEAST
       _graph_distributed->print(Logger::file);
 
       // let the master log to screen and to the master log file
-      std::string s = "Proc " + StringUtils::stringify(Process::rank) + ": ";
-      s += _graph_distributed->print();
+      std::string s = "Proc " + stringify(Process::rank) + ": " + _graph_distributed->print();
       log_indiv_master(s);
 
 // COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
@@ -268,13 +266,13 @@ namespace FEAST
       std::string s;
       for(unsigned int i(0) ; i < num_neighbours; ++i)
       {
-        s = StringUtils::stringify(a[i][0]);
+        s = stringify(a[i][0]);
         for(unsigned int j(1) ; j < n; ++j)
         {
-          s +=  " " + StringUtils::stringify(a[i][j]);
+          s +=  " " + stringify(a[i][j]);
         }
-        Logger::log("Process " + StringUtils::stringify(_rank) + " sends [" + s + "] to neighbour "
-                    + StringUtils::stringify(neighbours[i]) + ".\n");
+        Logger::log("Process " + stringify(_rank) + " sends [" + s + "] to neighbour "
+                    + stringify(neighbours[i]) + ".\n");
       }
 
       // request and status objects necessary for communication
@@ -301,13 +299,13 @@ namespace FEAST
       // debugging output
       for(unsigned int i(0) ; i < num_neighbours; ++i)
       {
-        s = StringUtils::stringify(a_recv[i][0]);
+        s = stringify(a_recv[i][0]);
         for(unsigned int j(1) ; j < n; ++j)
         {
-          s += " " + StringUtils::stringify(a_recv[i][j]);
+          s += " " + stringify(a_recv[i][j]);
         }
-        Logger::log("Process " + StringUtils::stringify(_rank) + " received [" + s + "] from neighbour "
-                    + StringUtils::stringify(neighbours[i]) + ".\n");
+        Logger::log("Process " + stringify(_rank) + " received [" + s + "] from neighbour "
+                    + stringify(neighbours[i]) + ".\n");
       }
       for(unsigned int i(0) ; i < num_neighbours; ++i)
       {

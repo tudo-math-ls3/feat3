@@ -120,7 +120,7 @@ namespace FEAST
       CONTEXT("MPIUtils::validate_mpi_error_code()");
       if (error_code != MPI_SUCCESS)
       {
-        abort("Function " + mpi_function_name + " failed with error code " + StringUtils::stringify(error_code) + ".");
+        abort("Function " + mpi_function_name + " failed with error code " + stringify(error_code) + ".");
       }
     }
   }; // class MPIUtils

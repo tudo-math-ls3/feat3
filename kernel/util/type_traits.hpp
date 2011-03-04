@@ -23,7 +23,7 @@ namespace FEAST
     /// returns a string identifying the datatype
     static std::string name()
     {
-      return StringUtils::stringify(typeid(DT_).name());
+      return stringify(typeid(DT_).name());
     }
   };
 

@@ -49,11 +49,11 @@ function:
       pp.add_line_sep();
       if(sev == CRITICAL)
       {
-        pp.add_line_centered("Error occured on process " + StringUtils::stringify(Process::rank) + "!");
+        pp.add_line_centered("Error occured on process " + stringify(Process::rank) + "!");
       }
       else
       {
-        pp.add_line_centered("Warning occured on process " + StringUtils::stringify(Process::rank) + "!");
+        pp.add_line_centered("Warning occured on process " + stringify(Process::rank) + "!");
       }
       pp.add_line_sep();
       pp.add_line_no_right_delim(...); // here we need some mapping of error_code to corresponding error message
@@ -79,7 +79,7 @@ Einfach ein statisches String-Array mit error_code = array index?
       // create pretty printed error message with the prefix EXCEPTION which can be grepped for
       PrettyPrinter pp(40, '#', "EXCEPTION ");
       pp.add_line_sep();
-      pp.add_line_centered("Exception occured on process " + StringUtils::stringify(Process::rank) + "!");
+      pp.add_line_centered("Exception occured on process " + stringify(Process::rank) + "!");
       pp.add_line_sep();
       pp.add_line_no_right_delim(e.message());
       pp.add_line_sep();
