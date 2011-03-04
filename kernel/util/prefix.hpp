@@ -1,10 +1,14 @@
 #pragma once
-#ifndef PRETTY_PRINTER_HPP
-#define PRETTY_PRINTER_HPP
+#ifndef PREFIX_HPP
+#define PREFIX_HPP
 
 // includes, system
 #include <string>
 #include <vector>
+
+// includes, FEAST
+#include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 
 /// FEAST namespace
 namespace FEAST
@@ -66,11 +70,13 @@ namespace FEAST
     Prefix()
       : _s("")
     {
+      CONTEXT("Prefix::Prefix()");
     }
 
     /// destructor
     ~Prefix()
     {
+      CONTEXT("Prefix::~Prefix()");
       _start_pos.clear();
     }
 
@@ -86,8 +92,9 @@ namespace FEAST
     */
     void push(std::string string_to_append)
     {
+      CONTEXT("Prefix::push()");
       // forbid pushing empty strings
-      assert(string_to_append.size() > 0);
+      ASSERT(string_to_append.size() > 0, "String must not be of zero size.");
       // store the length of the current prefix string (which is at the same time the start position of the substring s
       // within the prefix string)
       _start_pos.push_back(_s.size());
@@ -103,8 +110,9 @@ namespace FEAST
     */
     void pop()
     {
+      CONTEXT("Prefix::pop()");
       // assert that there is a substring to be removed
-      assert(_start_pos.size() > 0);
+      ASSERT(_start_pos.size() > 0, "There is no string to remove!");
       // replace the prefix string by its leading part resulting from removing the substring appended last
       _s = _s.substr(0, _start_pos.back());
       _start_pos.pop_back();
@@ -123,9 +131,10 @@ namespace FEAST
     */
     inline const std::string& s() const
     {
+      CONTEXT("Prefix::s()");
       return _s;
     }
   }; // class Prefix
 } // namespace FEAST
 
-#endif //  #ifndef PRETTY_PRINTER_HPP
+#endif //  #ifndef PREFIX_HPP
