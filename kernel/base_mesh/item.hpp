@@ -4,10 +4,10 @@
 
 // includes, system
 #include <sstream> // for std::ostringstream
-#include <cassert>  // for assert()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/constants.hpp>
 
 /// FEAST namespace
@@ -83,7 +83,7 @@ namespace FEAST
       inline void set_index(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Item::set_index()");
-        assert(index < Constants::MAX_INDEX);
+        ASSERT(index < Constants::MAX_INDEX, "");
         _index = index;
       }
 
@@ -98,7 +98,7 @@ namespace FEAST
       inline void set_number(index_glob_t const number)
       {
         CONTEXT("BaseMesh::Item::set_number()");
-        assert(number < Constants::MAX_NUMBER);
+        ASSERT(number < Constants::MAX_NUMBER, "");
         _number = number;
       }
 

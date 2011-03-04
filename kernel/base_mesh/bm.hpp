@@ -4,12 +4,12 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <vector>   // for std::vector
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/subcells.hpp>
@@ -93,8 +93,9 @@ namespace FEAST
       template<typename T_>
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
-        CONTEXT("BaseMesh::BM::_remove()");
-        assert(item->index() < v.size());
+        CONTEXT("BaseMesh::BM::_remove_item()");
+        ASSERT(item->index() < v.size(), "Item index " + StringUtils::stringify(item->index())
+               + "  exceeds vector size " + StringUtils::stringify(v.size()) + ".");
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
         v[v.size()-1] = item;
@@ -211,14 +212,15 @@ namespace FEAST
       * \brief returns pointer to Cell at given index
       *
       * \param[in] index
-      * position of the cell in the array #_cells
+      * position of the cell in the vector #_cells
       *
       * \return pointer to Cell at given index
       */
       inline Cell_* cell(index_glob_t const index) const
       {
         CONTEXT("BaseMesh::BM::cell()");
-        assert(index < num_cells());
+        ASSERT(index < num_cells(), "Cell index " + StringUtils::stringify(index) + "  exceeds number of cells "
+               + StringUtils::stringify(num_cells()) + ".");
         return _cells[index];
       }
 

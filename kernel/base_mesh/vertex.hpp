@@ -5,10 +5,10 @@
 // includes, system
 #include <iostream> // for std::ostream
 //#include <iomanip>  // for std::setw
-#include <cassert>  // for assert()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/base_mesh/item.hpp>
 
 /// FEAST namespace
@@ -73,7 +73,7 @@ namespace FEAST
       inline double coord(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Vertex::coord()");
-        assert(index < world_dim_);
+        ASSERT(index < world_dim_, "");
         return _coords[index];
       }
 
@@ -100,7 +100,7 @@ namespace FEAST
       inline void set_coord(unsigned char const index, double const coord)
       {
         CONTEXT("BaseMesh::Vertex::set_coord()");
-        assert(index < world_dim_);
+        ASSERT(index < world_dim_, "");
         _coords[index] = coord;
       }
 

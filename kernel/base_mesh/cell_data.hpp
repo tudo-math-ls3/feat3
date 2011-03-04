@@ -4,12 +4,12 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <vector>   // for std::vector
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/item.hpp>
@@ -105,7 +105,7 @@ namespace FEAST
         unsigned char num_subitems_per_subdim[])
       {
         CONTEXT("BaseMesh::CellInfo::_set_num_subitems_per_subdim()");
-        assert(array_size == cell_dim_);
+        ASSERT(array_size == cell_dim_, "");
         for(int i(0) ; i < cell_dim_ ; ++i)
         {
           _num_subitems_per_subdim[i] = num_subitems_per_subdim[i];
@@ -126,7 +126,7 @@ namespace FEAST
       inline unsigned char num_subitems_per_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellInfo::num_subitems_per_subdim()");
-        assert(subdim < cell_dim_);
+        ASSERT(subdim < cell_dim_, "");
         return _num_subitems_per_subdim[subdim];
       }
 
@@ -269,8 +269,8 @@ namespace FEAST
         unsigned char item) const
       {
         CONTEXT("BaseMesh::CellData::num_neighbours_item()");
-        assert(subdim < cell_space_dim_);
-        assert(item < this->num_subitems_per_subdim(subdim));
+        ASSERT(subdim < cell_space_dim_, "");
+        ASSERT(item < this->num_subitems_per_subdim(subdim), "");
         return _neighbours[subdim][item].size();
       }
 
@@ -279,7 +279,7 @@ namespace FEAST
       inline unsigned int num_neighbours_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellData::num_neighbours_subdim()");
-        assert(subdim < cell_space_dim_);
+        ASSERT(subdim < cell_space_dim_, "");
         unsigned int num_neighbours(0);
         for(unsigned int item(0) ; item < this->num_subitems_per_subdim(subdim) ; ++item)
         {
@@ -296,9 +296,9 @@ namespace FEAST
         unsigned char index) const
       {
         CONTEXT("BaseMesh::CellData::neighbour()");
-        assert(subdim < cell_space_dim_);
-        assert(item < this->num_subitems_per_subdim(subdim));
-        assert(index < _neighbours[subdim][item].size());
+        ASSERT(subdim < cell_space_dim_, "");
+        ASSERT(item < this->num_subitems_per_subdim(subdim), "");
+        ASSERT(index < _neighbours[subdim][item].size(), "");
         return _neighbours[subdim][item][index];
       }
 
@@ -309,8 +309,8 @@ namespace FEAST
         unsigned char item) const
       {
         CONTEXT("BaseMesh::CellData::neighbours_item()");
-        assert(subdim < cell_space_dim_);
-        assert(item < this->num_subitems_per_subdim(subdim));
+        ASSERT(subdim < cell_space_dim_, "");
+        ASSERT(item < this->num_subitems_per_subdim(subdim), "");
         return _neighbours[subdim][item];
       }
 
@@ -319,7 +319,7 @@ namespace FEAST
       inline std::vector<Cell<cell_space_dim_, cell_space_dim_, world_dim_>*>* neighbours_subdim(subdim subdim) const
       {
         CONTEXT("BaseMesh::CellData::neighbours_subdim()");
-        assert(subdim < cell_space_dim_);
+        ASSERT(subdim < cell_space_dim_, "");
         return _neighbours[subdim];
       }
 

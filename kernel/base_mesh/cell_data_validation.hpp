@@ -4,12 +4,12 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <vector>   // for std::vector
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/cell_data.hpp>
@@ -76,7 +76,7 @@ namespace FEAST
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidationVertNeigh::validate()");
-        assert(cell_space_dim_ >= 1);
+        ASSERT(cell_space_dim_ >= 1, "");
         try
         {
           std::string s;
@@ -199,7 +199,7 @@ namespace FEAST
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidationEdgeNeigh::validate()");
-        assert(cell_space_dim_ >= 2);
+        ASSERT(cell_space_dim_ >= 2, "");
         try
         {
           std::string s;
@@ -269,8 +269,8 @@ namespace FEAST
                         edge_c = edge_c->parent();
                         level_diff--;
                       }
-                      assert(level_diff == 0);
-                      assert(edge_c->refinement_level() == edge_neigh->refinement_level());
+                      ASSERT(level_diff == 0, "");
+                      ASSERT(edge_c->refinement_level() == edge_neigh->refinement_level(), "");
                       // check whether the two neighbours really share the same edge
                       if (edge_c != edge_neigh)
                       {
@@ -344,7 +344,7 @@ namespace FEAST
       static void validate(Cell<cell_space_dim_, cell_space_dim_, world_dim_> const * c, std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidationFaceNeigh::validate()");
-        assert(cell_space_dim_ >= 3);
+        ASSERT(cell_space_dim_ >= 3, "");
         try
         {
           std::string s;
@@ -414,8 +414,8 @@ namespace FEAST
                         face_c = face_c->parent();
                         level_diff--;
                       }
-                      assert(level_diff == 0);
-                      assert(face_c->refinement_level() == face_neigh->refinement_level());
+                      ASSERT(level_diff == 0, "");
+                      ASSERT(face_c->refinement_level() == face_neigh->refinement_level(), "");
                       // check whether the two neighbours really share the same face
                       if (face_c != face_neigh)
                       {

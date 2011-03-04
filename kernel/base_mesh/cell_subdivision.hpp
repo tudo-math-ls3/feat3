@@ -4,7 +4,6 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <vector>   // for std::vector
 
 // includes, FEAST

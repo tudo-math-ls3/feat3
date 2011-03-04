@@ -4,12 +4,12 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <typeinfo>  // for typeid()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/vertex.hpp>
@@ -108,8 +108,9 @@ namespace FEAST
       inline unsigned char _edge_vertex(unsigned char iedge, unsigned char iv) const
       {
         CONTEXT("BaseMesh::Quad::_edge_vertex()");
-        assert(iedge < num_edges());
-        assert(iv < 2);
+        ASSERT(iedge < num_edges(), "Edge index " + StringUtils::stringify(iedge) + " exceeds number of edges "
+               + StringUtils::stringify(num_edges()) + ".");
+        ASSERT(iv < 2, "Edge vertex index " + StringUtils::stringify(iv) + " is larger than 1.");
         // the index is inquired from the fixed numbering scheme stored in Numbering::quad_edge_vertices
         return Numbering::quad_edge_vertices[iedge][iv];
       }
@@ -130,12 +131,12 @@ namespace FEAST
           {
             if(vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(0))
             {
-              assert(vertex(_edge_vertex(iedge,1)) == edge(iedge)->vertex(1));
+              ASSERT(vertex(_edge_vertex(iedge,1)) == edge(iedge)->vertex(1), "Vertex pointers are not equal.");
               _edge_has_correct_orientation[iedge] = true;
             }
             else if (vertex(_edge_vertex(iedge,0)) == edge(iedge)->vertex(1))
             {
-              assert(vertex(_edge_vertex(iedge,1)) == edge(iedge)->vertex(0));
+              ASSERT(vertex(_edge_vertex(iedge,1)) == edge(iedge)->vertex(0), "Vertex pointers are not equal.");
               _edge_has_correct_orientation[iedge] = false;
             }
             else
@@ -186,7 +187,8 @@ namespace FEAST
         // of type Cell<1, space_dim_, world_dim_>
         for(int i(0) ; i < 4 ; ++i)
         {
-          assert(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>));
+          ASSERT(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>), "Edge " + StringUtils::stringify(i)
+                 + " is not of correct type.");
         }
 
         unsigned char num_subitems_per_subdim[2] = {4,4};
@@ -226,7 +228,8 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::vertex()");
-        assert(index < num_vertices());
+        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
+               + StringUtils::stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 
@@ -254,7 +257,8 @@ namespace FEAST
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::edge()");
-        assert(index < num_edges());
+        ASSERT(index < num_edges(), "Edge index " + StringUtils::stringify(index) + " exceeds number of edges "
+               + StringUtils::stringify(num_edges()) + ".");
         return _edges[index];
       }
 
@@ -270,7 +274,8 @@ namespace FEAST
       inline Vertex_* next_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::next_vertex_ccw()");
-        assert(index < num_vertices());
+        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
+               + StringUtils::stringify(num_vertices()) + ".");
         return _vertices[Numbering::quad_next_vertex_ccw[index]];
       }
 
@@ -286,7 +291,8 @@ namespace FEAST
       inline Vertex_* previous_vertex_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::previous_vertex_ccw()");
-        assert(index < num_vertices());
+        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
+               + StringUtils::stringify(num_vertices()) + ".");
         return _vertices[Numbering::quad_previous_vertex_ccw[index]];
       }
 
@@ -302,7 +308,8 @@ namespace FEAST
       inline Cell_1D_* next_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::next_edge_ccw()");
-        assert(index < num_edges());
+        ASSERT(index < num_edges(), "Edge index " + StringUtils::stringify(index) + " exceeds number of edges "
+               + StringUtils::stringify(num_edges()) + ".");
         return _edges[Numbering::quad_next_edge_ccw[index]];
       }
 
@@ -318,7 +325,8 @@ namespace FEAST
       inline Cell_1D_* previous_edge_ccw(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Quad::previous_edge_ccw()");
-        assert(index < num_edges());
+        ASSERT(index < num_edges(), "Edge index " + StringUtils::stringify(index) + " exceeds number of edges "
+               + StringUtils::stringify(num_edges()) + ".");
         return _edges[Numbering::quad_previous_edge_ccw[index]];
       }
 

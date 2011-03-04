@@ -4,11 +4,11 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <vector>   // for std::vector
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/cell_1d_edge.hpp>
@@ -110,7 +110,7 @@ namespace FEAST
       inline void _remove_item(std::vector<T_>& v, T_ item)
       {
         CONTEXT("BaseMesh::Subcells::_remove_item()");
-        assert(item->index() < v.size());
+        ASSERT(item->index() < v.size(), "");
         v[item->index()] = v.back();
         v[item->index()]->set_index(item->index());
         v[v.size()-1] = item;
@@ -197,7 +197,7 @@ namespace FEAST
       inline Vertex_* vertex(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::vertex()");
-        assert(index < num_vertices());
+        ASSERT(index < num_vertices(), "");
         return _vertices[index];
       }
 
@@ -377,7 +377,7 @@ namespace FEAST
       inline Cell_1D_* edge(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::edge()");
-        assert(index < num_edges());
+        ASSERT(index < num_edges(), "");
         return _edges[index];
       }
 
@@ -572,7 +572,7 @@ namespace FEAST
       inline Cell_2D_* face(index_glob_t const index)
       {
         CONTEXT("BaseMesh::Subcells::face()");
-        assert(index < _faces.size());
+        ASSERT(index < _faces.size(), "");
         return _faces[index];
       }
 

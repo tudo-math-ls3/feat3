@@ -4,7 +4,6 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <typeinfo>  // for typeid()
 
 // includes, FEAST
@@ -111,7 +110,7 @@ namespace FEAST
         // of type Cell<1, space_dim_, world_dim_>
         for(int i(0) ; i < 6 ; ++i)
         {
-          assert(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>));
+          ASSERT(typeid(*_edges[i]) == typeid(Edge<space_dim_, world_dim_>), "");
         }
         _faces[0] = f0;
         _faces[1] = f1;
@@ -120,7 +119,7 @@ namespace FEAST
         // assure that the faces are in fact of type Tri_, and not "only" of type Cell_2D_
         for(int i(0) ; i < 4 ; ++i)
         {
-          assert(typeid(*_faces[i]) == typeid(Tri_));
+          ASSERT(typeid(*_faces[i]) == typeid(Tri_), "");
         }
 
         unsigned char num_subitems_per_subdim[3] = {4, 6, 4};
@@ -158,7 +157,7 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::vertex()");
-        assert(index < num_vertices());
+        ASSERT(index < num_vertices(), "");
         return _vertices[index];
       }
 
@@ -186,7 +185,7 @@ namespace FEAST
       inline Cell_1D_* edge(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::edge()");
-        assert(index < num_edges());
+        ASSERT(index < num_edges(), "");
         return _edges[index];
       }
 
@@ -214,7 +213,7 @@ namespace FEAST
       inline Cell_2D_* face(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Tetra::face()");
-        assert(index < num_faces());
+        ASSERT(index < num_faces(), "");
         return _faces[index];
       }
 

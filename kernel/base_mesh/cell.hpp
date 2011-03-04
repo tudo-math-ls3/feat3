@@ -4,12 +4,12 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 #include <vector>   // for std::vector
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/cell_data.hpp>
@@ -388,9 +388,11 @@ namespace FEAST
       {
         CONTEXT("BaseMesh::Cell::_set_num_children()");
         // this function must not be called when there *are* already children
-        assert(_children == nullptr && _num_children == 0);
+        ASSERT(_children == nullptr, "Array of children is not the nullptr.");
+        ASSERT(_num_children == 0, "Number of children " + StringUtils::stringify(_num_children) + " is not zero.");
         // and it must not be called to unset children (use unset_children() for that)
-        assert(num > 0);
+        ASSERT(num > 0,
+               "This function must not be used to set number of children to zero. Use unset_children() instead.");
         _num_children = num;
         _children = new Cell*[_num_children];
         // nullify the new pointer array
@@ -418,9 +420,11 @@ namespace FEAST
         Cell* e)
       {
         CONTEXT("BaseMesh::Cell::_set_child()");
-        assert(index < num_children());
+        ASSERT(index < num_children(), "Child index " + StringUtils::stringify(index) + " exceeds number of children "
+               + StringUtils::stringify(num_children()) + " .");
         // ensure that this function is not used to unset children (use unset_children() for that)
-        assert(e != nullptr);
+        ASSERT(e != nullptr,
+               "This function must not be used to set children to null. Use unset_children() instead.");
         _children[index] = e;
       }
 
@@ -478,8 +482,10 @@ namespace FEAST
           _refinement_level(ref_level)
       {
         CONTEXT("BaseMesh::Cell::Cell()");
-        assert(world_dim_ >= space_dim_);
-        assert(space_dim_ >= cell_dim_);
+        ASSERT(world_dim_ >= space_dim_, "Space dimension " + StringUtils::stringify(space_dim_)
+               + " exceeds world dimension " + StringUtils::stringify(world_dim_) + ".");
+        ASSERT(space_dim_ >= cell_dim_, "Cell dimension " + StringUtils::stringify(space_dim_)
+               + " exceeds space dimension " + StringUtils::stringify(cell_dim_) + ".");
       }
 
 
@@ -540,7 +546,8 @@ namespace FEAST
       inline Cell* child(unsigned char index) const
       {
         CONTEXT("BaseMesh::Cell::child()");
-        assert(index < num_children());
+        ASSERT(index < num_children(), "Child index " + StringUtils::stringify(index) + " exceeds number of children "
+               + StringUtils::stringify(num_children()) + ".");
         return _children[index];
       }
 
@@ -832,7 +839,7 @@ namespace FEAST
 //      std::vector<Cell*>& cells_at_edge,
 //      BaseMeshItem1D<2>* shared_edge)
 //    {
-//      assert(contains(shared_edge));
+//      ASSERT(contains(shared_edge), "Shared edge is not contained in the cell.");
 //      if (active())
 //      {
 //        cells_at_edge.push_back(this);
@@ -886,14 +893,14 @@ namespace FEAST
 //      BaseMeshItem1D<2>* edge)
 //    {
 //      // may only be called when the cell actually has children
-//      assert(!active());
+//      ASSERT(!active(), "Cell has no children.");
 //
 //    }
 
 //    void get_edge_children_ccw(BaseMeshItem1D<2>* edge, BaseMeshItem1D<2>* children_ordered[])
 //    {
 //      // assumption: edge->child(i) is incident with edge->vertex(i), i = 0,1
-//      assert(!edge->active());
+//      ASSERT(!edge->active(), "Cell has no children.");
 //      if (edge_orientation_ccw(edge))
 //      {
 //        children_ordered[0] = edge->child(0);

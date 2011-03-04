@@ -4,11 +4,11 @@
 
 // includes, system
 #include <iostream> // for std::ostream
-#include <cassert>  // for assert()
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/cell.hpp>
@@ -109,7 +109,8 @@ namespace FEAST
       inline Vertex_* vertex(unsigned char const index) const
       {
         CONTEXT("BaseMesh::Edge::vertex()");
-        assert(index < num_vertices());
+        ASSERT(index < num_vertices(), "Vertex index " + StringUtils::stringify(index) + " exceeds number of vertices "
+               + StringUtils::stringify(num_vertices()) + ".");
         return _vertices[index];
       }
 

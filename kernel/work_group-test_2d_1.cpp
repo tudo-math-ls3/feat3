@@ -2,6 +2,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/comm.hpp>
 #include <kernel/process.hpp>
@@ -98,9 +99,9 @@ public:
     Logger::log_master("num_processes: " + StringUtils::stringify(num_processes) + "\nnum_cells: "
                        + StringUtils::stringify(num_cells) + "\n");
     // assert that the number of processes is n
-    assert(num_processes == num_cells);
+    ASSERT(num_processes == num_cells, "");
     // assert that no dedicated load balancer is used
-    assert(!load_balancer->group_has_dedicated_load_bal());
+    ASSERT(!load_balancer->group_has_dedicated_load_bal(), "");
 
     // set up the test case
 
