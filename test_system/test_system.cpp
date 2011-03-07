@@ -7,6 +7,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/mpi_utils.hpp>
 
 using namespace FEAST;
 using namespace TestSystem;
@@ -14,6 +15,9 @@ using namespace TestSystem;
 int main(int argc, char** argv)
 {
   int result(EXIT_SUCCESS);
+  MPIUtils::init_MPI(argc, argv);
+  int rank(-1);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   std::string mpc("mpiproccount");
   if(argc == 2 && std::string(argv[1]) == mpc.c_str())
@@ -60,25 +64,39 @@ int main(int argc, char** argv)
     CONTEXT("When running test case '" + (*i)->id() + "':");
     try
     {
-      std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Backend: "
-        << (*i)->get_tag_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
+      if (rank == 0)
+        std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Backend: "
+          << (*i)->get_tag_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
       (*i)->run();
-      std::cout << "PASSED" << std::endl;
+      if (rank == 0)
+        std::cout << "PASSED" << std::endl;
     }
     catch (TestFailedException & e)
     {
-      std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
+      if (rank == 0)
+        std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
       result = EXIT_FAILURE;
     }
     catch (InternalError & e)
     {
-      std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
-                << stringify(e.message()) << std::endl;
+      if (rank == 0)
+        std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
+          << stringify(e.message()) << std::endl;
       result = EXIT_FAILURE;
     }
     i = TestList::instance()->erase(i);
     iterator_index++;
   }
 
+  for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
+      i != i_end ; )
+  {
+    i = TestList::instance()->erase(i);
+  }
+
+  int flag(0);
+  MPI_Finalized(&flag);
+  if (!flag)
+    MPI_Finalize();
   return result;
 }

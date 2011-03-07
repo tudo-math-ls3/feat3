@@ -9,23 +9,23 @@ PROJECT( FEAST )
 
 ENABLE_TESTING()
 
-#enable DEBUG define on debug builds
-set (CMAKE_CXX_FLAGS_DEBUG "-DDEBUG")
+INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
+
 
 #enable DEBUG define if the option is set
 OPTION (DEBUG_BUILD "Build with debug support.")
 if (DEBUG_BUILD)
   add_definitions (-DDEBUG)
-  message ("Building with debug support...")
+  #message ("Building with debug support...")
 endif (DEBUG_BUILD)
 
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 #our custom target to execute all compiled tests
-ADD_CUSTOM_TARGET (check COMMAND ${FEAST_SOURCE_DIR}/test_system/run_tests ${FEAST_BINARY_DIR} )
-ADD_DEPENDENCIES( check tests )
+#ADD_CUSTOM_TARGET (check COMMAND ${FEAST_SOURCE_DIR}/test_system/run_tests ${FEAST_BINARY_DIR} )
+#ADD_DEPENDENCIES( check tests )
 # our custom target to wipe out all cmake generated files
-INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake OPTIONAL )
+INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake )
 ADD_DEPENDENCIES( distclean clean )
 # our custom target to build the documentation via doxygen
 # TODO Redirect doxygen output to BINARY_DIR/doc
