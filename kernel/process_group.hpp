@@ -122,7 +122,7 @@ namespace FEAST
 
       // since this is the world group of processes, the local and the global rank should be equal
       // (if this constructor is used for other groups than the world group then this assert must be removed!)
-      ASSERT(Process::rank == _rank, "Process::rank " + stringify(Process::rank) " and _rank " + stringify(_rank)
+      ASSERT(Process::rank == _rank, "Process::rank " + stringify(Process::rank) + " and _rank " + stringify(_rank)
              + " must be equal.");
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
 //      _buffer = nullptr;

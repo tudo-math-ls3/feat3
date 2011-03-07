@@ -396,9 +396,9 @@ namespace FEAST
           }
           else
           {
-            ASSERT(itype >= 1, "itype " stringify(itype) " must be >= 1.");
+            ASSERT(itype >= 1, "itype " + stringify(itype) + " must be >= 1.");
             unsigned int ibc(itype - 1);
-            ASSERT(ibc < _num_boundaries, "Boundary index " + stringify() + " must not exceed number of boundaries"
+            ASSERT(ibc < _num_boundaries, "Boundary index " + stringify(ibc) + " must not exceed number of boundaries"
                    + stringify(_num_boundaries) + ".");
             // search parameter interval
             for(unsigned int iseg = 0 ; iseg < _num_segments[ibc] ; ++iseg)

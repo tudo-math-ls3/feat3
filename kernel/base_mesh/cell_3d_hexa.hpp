@@ -546,7 +546,7 @@ namespace FEAST
             // (they have already been pushed to the subdivision data structure)
             for (unsigned char iface(0) ; iface < num_faces() ; ++iface)
             {
-              ASSERT(face(iface)->num_children() == 4, "Number of children of " + stringify(ifaced)
+              ASSERT(face(iface)->num_children() == 4, "Number of children of " + stringify(iface)
                      + "-th face (index" + stringify(face(iface)->index()) + ") is "
                      + stringify(face(iface)->num_children()) + ", but it must be 4.");
               for (unsigned char iedge(0) ; iedge < 4 ; ++iedge)

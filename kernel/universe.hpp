@@ -303,7 +303,7 @@ namespace FEAST
       }
       // final sanity check (rank assigned last must be master rank minus 1)
       ASSERT(iter_MPC_rank == (int)_num_processes-2, "iter_MPC_rank " + stringify(iter_MPC_rank)
-             + " must be equal to " + stringify((int)_num_processes-2)".");
+             + " must be equal to " + stringify((int)_num_processes-2) + ".");
 
       // Create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
       // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
