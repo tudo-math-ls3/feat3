@@ -29,7 +29,7 @@ namespace FEAST
   * the item to stringify
   */
   template<typename T_>
-  static inline std::string stringify(const T_ & item)
+  inline std::string stringify(const T_ & item)
   {
     std::ostringstream s;
     s << item;
@@ -43,7 +43,7 @@ namespace FEAST
   * \param[in] item
   * the item to stringify
   */
-  static inline std::string stringify(const std::string & item)
+  inline std::string stringify(const std::string & item)
   {
     return item;
   }
@@ -55,7 +55,7 @@ namespace FEAST
   * \param[in] item
   * the item to stringify
   */
-  static inline std::string stringify(const char & item)
+  inline std::string stringify(const char & item)
   {
     return std::string(1, item);
   }
@@ -67,7 +67,7 @@ namespace FEAST
   * \param[in] item
   * the item to stringify
   */
-  static inline std::string stringify(const unsigned char & item)
+  inline std::string stringify(const unsigned char & item)
   {
     return std::string(1, item);
   }
@@ -79,7 +79,7 @@ namespace FEAST
   * \param[in] item
   * the item to stringify
   */
-  static inline std::string stringify(const bool & item)
+  inline std::string stringify(const bool & item)
   {
     return item ? "true" : "false";
   }
@@ -93,7 +93,7 @@ namespace FEAST
   * \param[in] item
   * the item to stringify
   */
-  static inline std::string stringify(const char * const item)
+  inline std::string stringify(const char * const item)
   {
     return std::string(item);
   }
@@ -116,7 +116,7 @@ namespace FEAST
   *
   * \author Dirk Ribbrock
   */
-  static std::string join_strings(
+  std::string join_strings(
     std::list<std::string>::const_iterator begin,
     std::list<std::string>::const_iterator end,
     const std::string& delimiter)
