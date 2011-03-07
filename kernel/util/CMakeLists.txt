@@ -7,7 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
 
 #list of util tests
-SET (test_list assertion-test inheritance-test)
+SET (test_list assertion-test inheritance-test pretty_printer-test)
 
 #create all tests
 FOREACH (test ${test_list} )
