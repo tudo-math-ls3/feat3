@@ -42,6 +42,9 @@ kernel/util/Testing/
 test_system/CMakeFiles/
 test_system/Testing/
 
+# Ignore FEAST test output files
+*test*.log
+
 # Ignore Visual Studio files
 bin32/*
 bin64/*
