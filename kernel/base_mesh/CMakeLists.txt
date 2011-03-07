@@ -7,7 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
 
 #list of base mesh tests
-SET (test_list cell_1d_edge-test_subdivision cell_3d_hexa-test_subdivision)
+SET (test_list cell_1d_edge-test_subdivision cell_2d_quad-test_subdivision cell_3d_hexa-test_subdivision)
 
 #create all tests
 FOREACH (test ${test_list} )
