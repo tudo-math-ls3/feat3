@@ -494,6 +494,10 @@ namespace FEAST
     * \param[in] logfile_base_name
     * optional base name of log files (name pattern '<logfile_base_name><world rank of the process>.log'); if not
     * provided, it is set to 'feast'
+    *
+    * \todo When the number of parameters increases even more, than one should think about creating some struct which
+    * contains all this data (something like "struct UniverseData"), so that this struct can be extended in future
+    * without changing the interface of the routine. Then one could also merge the two versions of the create routine.
     */
     void create(
       unsigned int num_process_groups,
