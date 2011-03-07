@@ -10,5 +10,6 @@ Before definig an appropriate ASCII-file format and implementing the necessary i
   * read key-value pairs from one ASCII file "feast.ini"
   * store the information in some simple structure
   * There will be some mandatory keys. If these are not present in the file, an exception is thrown.
+  * Exemplary entries for the initial project phase: mesh file name, log directory, log levels (when implemented; see issue00023), number of process groups, number of work groups per process group, ...
 
 SOLUTION
