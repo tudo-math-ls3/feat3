@@ -155,7 +155,7 @@ public:
 
     try
     {
-      universe->create("work_group_test_1d");
+      universe->create("work_group_test_2d_1");
     }
     catch (Exception& e)
     {
@@ -177,7 +177,7 @@ public:
       // debug output
       int rank_process_group = process_group->rank();
       std::string s("Process " + stringify(rank_world) + " is the load balancer with local rank "
-                    + stringify(rank_process_group) + ".");
+                    + stringify(rank_process_group) + ".\n");
       Logger::log(s);
 
       // let the load balancer read the mesh file
@@ -228,8 +228,7 @@ public:
                       + " has no particular role, this should not happen.");
     }
   } // run()
-
-}; // WorkGroupTest1D
+}; // WorkGroupTest2D1
 
 // create test instance, using space and world dimension 2
 WorkGroupTest2D1<Nil, Nil, 2, 2> work_group_test_2d_1("data/meshes/test_16bmc.feast");
