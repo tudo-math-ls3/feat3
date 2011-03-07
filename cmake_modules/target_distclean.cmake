@@ -5,6 +5,7 @@
 
 IF (UNIX)
     ADD_CUSTOM_TARGET (distclean @echo cleaning for source distribution)
+    ADD_DEPENDENCIES( "distclean" clean )
     SET(DISTCLEANED
         cmake.depends
         cmake.check_depends

@@ -19,6 +19,11 @@ if (DEBUG_BUILD)
   #message ("Building with debug support...")
 endif (DEBUG_BUILD)
 
+#add FEAST dirs to definitions
+add_definitions ("-DFEAST_SRC_DIR=${FEAST_SOURCE_DIR}")
+add_definitions ("-DFEAST_BIN_DIR=${FEAST_BINARY_DIR}")
+
+
 # our custom target to build (not execute) all tests in all directories
 ADD_CUSTOM_TARGET (tests)
 #our custom target to execute all compiled tests
@@ -26,7 +31,6 @@ ADD_CUSTOM_TARGET (tests)
 #ADD_DEPENDENCIES( check tests )
 # our custom target to wipe out all cmake generated files
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake )
-ADD_DEPENDENCIES( distclean clean )
 # our custom target to build the documentation via doxygen
 # TODO Redirect doxygen output to BINARY_DIR/doc
 ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doc/doxygen_config WORKING_DIRECTORY ${FEAST_SOURCE_DIR} )
