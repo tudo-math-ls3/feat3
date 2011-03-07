@@ -38,7 +38,7 @@ public:
   * name of the mesh file to be read
   */
   WorkGroupTest2D1(std::string const mesh_file)
-    : TaggedTest<Tag_, DT_>("cell_2d_quad_test_subdivision"),
+    : TaggedTest<Tag_, DT_>("work_group_test_2d_1"),
       _mesh_file(mesh_file)
   {
   }

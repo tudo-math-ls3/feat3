@@ -20,15 +20,12 @@
 namespace FEAST
 {
   /**
-  * \brief class describing a work group, i.e. a set of worker processes sharing the same MPI communicator and performing
+  * \brief describes a work group, i.e. a set of worker processes sharing the same MPI communicator and performing
   *        the same compute task
   *
-  * A WorkGroup object is part of a ProcessSubgroup. It describes a set of compute processes sharing the MPI communicator.
-  *
-  * The member of the work group living on this process is called "worker" (which is not realised via an extra class.)
-  *
-  * Communication between different work groups is done via the enclosing ProcessGroup communicator.
-  *
+  * A WorkGroup object is part of a ProcessSubgroup. It describes a set of compute processes sharing the MPI
+  * communicator. The member of the work group living on this process is called "worker" (which is not realised via an
+  * extra class). Communication between different work groups is done via the enclosing ProcessGroup communicator.
   * For an example concerning WorkGroup and ProcessSubgroup creation, see the description of class ProcessSubgroup.
   *
   * \author Hilmar Wobker
