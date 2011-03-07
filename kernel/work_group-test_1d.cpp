@@ -116,7 +116,12 @@ public:
   }
 
 
-  /// sets the number of processes to use to 4 (3 BMCs + 1 master)
+  /**
+  * \brief sets the number of processes to use to 4 (3 BMCs + 1 master)
+  *
+  * For this hard-wired example using the fixed 1D mesh defined in the file parser with 3 base mesh cells we need 4
+  * processes in total (3 for the one and only process group and 1 for the master process).
+  */
   unsigned long mpi_proc_count() const
   {
     return 4;
@@ -129,10 +134,6 @@ public:
     CONTEXT("WorkGroupTest1D::run()");
     // init MPI
     MPIUtils::init_MPI();
-
-    // COMMENT_HILMAR:
-    // For this hard-wired example using the fixed 1D mesh defined in the file parser with 3 base mesh cells we need 4
-    // processes in total (3 for the one and only process group and 1 for the master process).
 
     // set shortcut to the one and only instance of Universe (since this is the first call of
     // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)

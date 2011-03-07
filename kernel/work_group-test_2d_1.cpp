@@ -133,7 +133,8 @@ public:
   * For the semi-hard-wired example using a mesh with n base mesh cells we need n+1 processes in total
   * (n for the one and only process group and 1 for the master process).
   *
-  * \todo As an intermediate hack, read the number of BMCs from the mesh file name and return a corresponding value.
+  * \todo Instead of returning a hard-coded 17 here, get the number of BMCs from the name of the mesh file or somehow
+  * else.
   */
   unsigned long mpi_proc_count() const
   {
@@ -147,10 +148,6 @@ public:
     CONTEXT("WorkGroupTest2D1::run()");
     // init MPI
     MPIUtils::init_MPI();
-
-    // COMMENT_HILMAR:
-    // For this hard-wired example using the fixed 1D mesh defined in the file parser with 3 base mesh cells we need 4
-    // processes in total (3 for the one and only process group and 1 for the master process).
 
     // set shortcut to the one and only instance of Universe (since this is the first call of
     // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)
