@@ -372,8 +372,8 @@ namespace FEAST
       Comm::read(msg_length, message);
 
       // read log target from the buffer
-      Logger::target target;
-      Comm::read((int&)target);
+      unsigned int target;
+      Comm::read(target);
 
       // display message on screen if requested
       if (target == SCREEN || target == SCREEN_FILE)
@@ -553,8 +553,8 @@ namespace FEAST
       Comm::read(total_length, messages);
 
       // read log target from the buffer
-      Logger::target target;
-      Comm::read((int&)target);
+      unsigned int target;
+      Comm::read(target);
 
       // display messages on screen if requested
       if (target == SCREEN || target == SCREEN_FILE)
