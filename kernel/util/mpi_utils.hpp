@@ -29,13 +29,21 @@ namespace FEAST
     * \brief initialises MPI
     *
     * This function only calls MPI_Init(...). It has to be called before anything else happens.
+    *
+    * \note If FEAST's test system is used, it also calls MPI_Init(). Hence, the function must not be called again
+    * within the code. To prevent this, we inquire if MPI is already initialised.
     */
     static void init_MPI()
     {
       CONTEXT("MPIUtils::init_MPI()");
       // init MPI
-      int mpi_error_code = MPI_Init(NULL, NULL);
-      validate_mpi_error_code(mpi_error_code, "MPI_Init");
+      int mpi_is_initialised;
+      MPI_Initialized(&mpi_is_initialised);
+      if(!mpi_is_initialised)
+      {
+        int mpi_error_code = MPI_Init(NULL, NULL);
+        validate_mpi_error_code(mpi_error_code, "MPI_Init");
+      }
     }
 
 
