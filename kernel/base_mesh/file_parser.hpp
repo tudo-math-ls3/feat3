@@ -382,7 +382,7 @@ namespace FEAST
         // read and set vertices
         for(unsigned int ivertex = 0 ; ivertex < _num_vertices ; ++ivertex)
         {
-          double coords[2];
+          double coords[2] = {0};
           double x, y;
           unsigned int itype;
           mesh_file->read(x, y, itype);
@@ -434,6 +434,10 @@ namespace FEAST
                     coords[0] = _start_vertex[ibc][iseg][0] + radius * cos(angle);
                     coords[1] = _start_vertex[ibc][iseg][1] + radius * sin(angle);
 //std::cout << "found boundary vertex on circle seg: " << coords[0] << " " << coords[1] << std::endl;
+                  }
+                  default:
+                  {
+                    throw InternalError("Unknown/unhandled segment type found.");
                   }
                 }
                 // interval found, exit for loop
