@@ -434,6 +434,7 @@ namespace FEAST
                     coords[0] = _start_vertex[ibc][iseg][0] + radius * cos(angle);
                     coords[1] = _start_vertex[ibc][iseg][1] + radius * sin(angle);
 //std::cout << "found boundary vertex on circle seg: " << coords[0] << " " << coords[1] << std::endl;
+                    break;
                   }
                   default:
                   {
