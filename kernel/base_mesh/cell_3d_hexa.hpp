@@ -897,7 +897,7 @@ namespace FEAST
                 for(unsigned char ichild(0) ; ichild < this->num_children() ; ++ichild)
                 {
                   bool face_found = false;
-                  unsigned char face_index;
+                  unsigned char face_index = 0;
                   switch(ifacelocal)
                   {
                     case(0):
@@ -943,7 +943,7 @@ namespace FEAST
               unsigned char children[4] = {0,1,2,3};
               for(unsigned char ifacelocal(1) ; ifacelocal <= 5 ; ifacelocal +=2)
               {
-                unsigned char ioffset;
+                unsigned char ioffset = 0;
                 switch(ifacelocal)
                 {
                   case(1):
