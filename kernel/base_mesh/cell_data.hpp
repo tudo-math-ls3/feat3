@@ -182,21 +182,17 @@ namespace FEAST
 
       /// dummy function called by cells with dimension smaller than space dimension
       inline void add_neighbour(
-        subdim subdim,
-        unsigned char item,
-        Cell<cell_dim_, space_dim_, world_dim_>* neighbour)
+        subdim,
+        unsigned char,
+        Cell<cell_dim_, space_dim_, world_dim_>*)
       {
         // do nothing here
-// COMMENT_HILMAR: compilers complain about unused variables here. Should we ignore that? Or is there some trick
-// to suppress these warnings?
       }
 
       /// dummy function called by cells with dimension smaller than space dimension
-      inline void print(std::ostream& stream) const
+      inline void print(std::ostream&) const
       {
         // do nothing here
-// COMMENT_HILMAR: compilers complain about unused variables here. Should we ignore that? Or is there some trick
-// to suppress these warnings?
       }
 
     };

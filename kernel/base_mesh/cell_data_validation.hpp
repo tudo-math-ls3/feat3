@@ -485,11 +485,11 @@ namespace FEAST
       * \param[in,out] stream
       * dummy stream
       */
-      static void validate_neighbourhood(Cell<cell_dim_, space_dim_, world_dim_> const * c, std::ostream& stream)
+      static void validate_neighbourhood(
+        Cell<cell_dim_, space_dim_, world_dim_> const *,
+        std::ostream&)
       {
         // do nothing here
-// COMMENT_HILMAR: compilers complain about unused variables here. Should we ignore that? Or is there some trick
-// to suppress these warnings?
       }
     };
 
@@ -519,7 +519,9 @@ namespace FEAST
       * \param[in,out] stream
       * stream validation info is written into
       */
-      static void validate_neighbourhood(Cell<3, 3, world_dim_> const * c, std::ostream& stream)
+      static void validate_neighbourhood(
+        Cell<3, 3, world_dim_> const * c,
+        std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidation::validate_neighbourhood()");
         CellDataValidationVertNeigh<3, world_dim_>::validate(c, stream);
@@ -554,7 +556,9 @@ namespace FEAST
       * \param[in,out] stream
       * stream validation info is written into
       */
-      static void validate_neighbourhood(Cell<2, 2, world_dim_> const * c, std::ostream& stream)
+      static void validate_neighbourhood(
+        Cell<2, 2, world_dim_> const * c,
+        std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidation::validate_neighbourhood()");
         CellDataValidationVertNeigh<2, world_dim_>::validate(c, stream);
@@ -588,7 +592,9 @@ namespace FEAST
       * \param[in,out] stream
       * stream validation info is written into
       */
-      static void validate_neighbourhood(Cell<1, 1, world_dim_> const * c, std::ostream& stream)
+      static void validate_neighbourhood(
+        Cell<1, 1, world_dim_> const * c,
+        std::ostream& stream)
       {
         CONTEXT("BaseMesh::CellDataValidation::validate_neighbourhood()");
         CellDataValidationVertNeigh<1, world_dim_>::validate(c, stream);
