@@ -280,7 +280,7 @@ public:
   /// main routine
   void run() const
   {
-    CONTEXT("WorkGroupTest2D1::run()");
+    CONTEXT("WorkGroupTest2D2::run()");
     // init MPI
     MPIUtils::init_MPI();
 
