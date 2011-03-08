@@ -171,9 +171,9 @@ namespace FEAST
           MPI_Group dummy_group;
           int rank_aux = _process_group_parent->rank();
           int mpi_error_code = MPI_Group_incl(_process_group_parent->group(), 1, &rank_aux, &dummy_group);
-          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+          validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
           mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), dummy_group, &dummy_comm);
-          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+          validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
           // COMMENT_HILMAR: First, I used this simpler version:
           //   mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), MPI_GROUP_EMPTY, &dummy_comm);
           // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that

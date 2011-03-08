@@ -114,11 +114,11 @@ namespace FEAST
       ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
       // get MPI_Group object for the given communicator
       int mpi_error_code = MPI_Comm_group(_comm, &_group);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_group");
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_group");
 
       // and finally look up the local rank of this process w.r.t. the group's communicator
       mpi_error_code = MPI_Group_rank(_group, &_rank);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
+      validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
 
       // since this is the world group of processes, the local and the global rank should be equal
       // (if this constructor is used for other groups than the world group then this assert must be removed!)
@@ -168,23 +168,23 @@ namespace FEAST
       }
       int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
                                           _ranks_group_parent, &_group);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+      validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
 
       // Create the group communicator for, among others, collective operations.
       // It is essential that *all* processes in MPI_COMM_WORLD participate since MPI_COMM_WORLD
       // is a parent sub-universe, i.e., something to spawn from
       mpi_error_code = MPI_Comm_create(_process_group_parent->_comm, _group, &_comm);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
 
       // and finally look up the local rank of this process w.r.t. the group's communicator
       mpi_error_code = MPI_Group_rank(_group, &_rank);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_rank");
+      validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
 
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
 //      // allocate communication buffers
 //      int size_of_char;
 //      mpi_error_code = MPI_Pack_size(1, MPI_CHAR, MPI_COMM_WORLD, &size_of_char);
-//      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack_size");
+//      validate_error_code_mpi(mpi_error_code, "MPI_Pack_size");
 //
 //      if (size_of_char != 1)
 //      {

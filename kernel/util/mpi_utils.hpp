@@ -12,127 +12,127 @@
 #include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/exception.hpp>
 
+/**
+* \file collection of various MPI utilities
+*
+* \note Following the FEAST naming convention, the functions defined here should actually be called mpi_abort,
+* mpi_init, etc. (the distinguishing part of the name has to be appended to the common part). But to avoid confusion
+* with the original MPI functions, we deliberately break this rule here.
+*
+* \author Hilmar Wobker
+* \author Dirk Ribbrock
+*/
+
 /// FEAST namespace
 namespace FEAST
 {
-  /// collection of various MPI utilities
-  class MPIUtils
+  /**
+  * \brief aborts the program and the MPI universe
+  *
+  * This function aborts the program and especially blackholes the MPI universe.
+  *
+  * \param[in] msg
+  * message explaining the reason for the abortion (default "")
+  */
+  void abort_mpi(const std::string& msg = "")
   {
-
-  public:
-
-    /* *****************
-    * member functions *
-    *******************/
-
-    /**
-    * \brief initialises MPI
-    *
-    * This function only calls MPI_Init(...). It has to be called before anything else happens.
-    *
-    * \note If FEAST's test system is used, it also calls MPI_Init(). Hence, the function must not be called again
-    * within the code. To prevent this, we inquire if MPI is already initialised.
-    */
-    static void init_MPI()
+    CONTEXT("abort_mpi()");
+    // flush cout and cerr
+    std::cout.flush();
+    std::cerr.flush();
+    // print error message to logfile and stderr
+    PrettyPrinter pp(40, '#');
+    pp.add_line_sep();
+    if(msg.size() > 0)
     {
-      CONTEXT("MPIUtils::init_MPI()");
-      // init MPI
-      int mpi_is_initialised;
-      MPI_Initialized(&mpi_is_initialised);
-      if(!mpi_is_initialised)
-      {
-        int mpi_error_code = MPI_Init(NULL, NULL);
-        validate_mpi_error_code(mpi_error_code, "MPI_Init");
-      }
-    }
-
-
-    /**
-    * \brief initialises MPI
-    *
-    * This function only calls MPI_Init(...). It has to be called before anything else happens.
-    *
-    * \param[in] argc
-    * argument count passed to the main() method
-    *
-    * \param[in] argv
-    * arguments passed to the main() method
-    */
-    static void init_MPI(
-      int argc,
-      char* argv[])
-    {
-      CONTEXT("MPIUtils::init_MPI()");
-      // init MPI
-      int mpi_error_code = MPI_Init(&argc, &argv);
-      validate_mpi_error_code(mpi_error_code, "MPI_Init");
-    }
-
-
-    /**
-    * \brief aborts the program and the MPI universe
-    *
-    * This function aborts the program and especially blackholes the MPI universe.
-    *
-    * \param[in] msg
-    * message explaining the reason for the abortion (default "")
-    */
-    static void abort(const std::string& msg = "")
-    {
-      CONTEXT("MPIUtils::abort()");
-      // flush cout and cerr
-      std::cout.flush();
-      std::cerr.flush();
-      // print error message to logfile and stderr
-      PrettyPrinter pp(40, '#');
+      pp.add_line_no_right_delim(msg);
       pp.add_line_sep();
-      if(msg.size() > 0)
-      {
-        pp.add_line_no_right_delim(msg);
-        pp.add_line_sep();
-      }
-      else
-      {
-        pp.add_line_centered("Aborting the MPI universe...");
-      }
-      pp.add_line_sep();
-      pp.print(std::cerr);
-      std::cerr.flush();
-      // shut down
-      int mpi_is_initialised;
-      MPI_Initialized(&mpi_is_initialised);
-      if (mpi_is_initialised)
-      {
-        // TODO: Mapping to Feast error codes like in FEAST1? [dom 25.8.2010]
-        MPI_Abort(MPI_COMM_WORLD, 1);
-      }
-      exit(1);
     }
-
-
-    /**
-    * \brief evaluates the return value of MPI routines
-    *
-    * Some MPI routines return an integer error code. This routine checks if the error code is MPI_SUCCESS.
-    * If not, then it aborts the program.
-    *
-    * \param[in] error_code
-    * MPI error code
-    *
-    * \param[in] mpi_function_name
-    * name of the calling routine
-    */
-    static void validate_mpi_error_code(
-      int error_code,
-      std::string mpi_function_name)
+    else
     {
-      CONTEXT("MPIUtils::validate_mpi_error_code()");
-      if (error_code != MPI_SUCCESS)
-      {
-        abort("Function " + mpi_function_name + " failed with error code " + stringify(error_code) + ".");
-      }
+      pp.add_line_centered("Aborting the MPI universe...");
     }
-  }; // class MPIUtils
+    pp.add_line_sep();
+    pp.print(std::cerr);
+    std::cerr.flush();
+    // shut down
+    int mpi_is_initialised;
+    MPI_Initialized(&mpi_is_initialised);
+    if (mpi_is_initialised)
+    {
+      // TODO: Mapping to Feast error codes like in FEAST1? [dom 25.8.2010]
+      MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+    exit(1);
+  }
+
+
+  /**
+  * \brief evaluates the return value of MPI routines
+  *
+  * Some MPI routines return an integer error code. This routine checks if the error code is MPI_SUCCESS.
+  * If not, then it aborts the program.
+  *
+  * \param[in] error_code
+  * MPI error code
+  *
+  * \param[in] mpi_function_name
+  * name of the calling routine
+  */
+  void validate_error_code_mpi(
+    int error_code,
+    std::string mpi_function_name)
+  {
+    CONTEXT("validate_error_code_mpi()");
+    if (error_code != MPI_SUCCESS)
+    {
+      abort_mpi("Function " + mpi_function_name + " failed with error code " + stringify(error_code) + ".");
+    }
+  }
+
+
+  /**
+  * \brief initialises MPI
+  *
+  * This function only calls MPI_Init(...). It has to be called before anything else happens.
+  *
+  * \note If FEAST's test system is used, it also calls MPI_Init(). Hence, the function must not be called again
+  * within the code. To prevent this, we inquire if MPI is already initialised.
+  */
+  void init_mpi()
+  {
+    CONTEXT("init_mpi()");
+    // init MPI
+    int mpi_is_initialised;
+    MPI_Initialized(&mpi_is_initialised);
+    if(!mpi_is_initialised)
+    {
+      int mpi_error_code = MPI_Init(NULL, NULL);
+      validate_error_code_mpi(mpi_error_code, "MPI_Init");
+    }
+  }
+
+
+  /**
+  * \brief initialises MPI
+  *
+  * This function only calls MPI_Init(...). It has to be called before anything else happens.
+  *
+  * \param[in] argc
+  * argument count passed to the main() method
+  *
+  * \param[in] argv
+  * arguments passed to the main() method
+  */
+  void init_mpi(
+    int argc,
+    char* argv[])
+  {
+    CONTEXT("init_mpi()");
+    // init MPI
+    int mpi_error_code = MPI_Init(&argc, &argv);
+    validate_error_code_mpi(mpi_error_code, "MPI_Init");
+  }
 
 
   /**
@@ -159,8 +159,8 @@ namespace FEAST
     /// calls an MPI_Abort() since there is no logical/boolean MPI datatype.
     static inline MPI_Datatype value()
     {
-      // call abort() (error handler is not available here)
-      MPIUtils::abort("Don't try to translate bool into an MPI datatype! There is no such type!");
+      // call abort_mpi() (error handler is not available here)
+      abort_mpi("Don't try to translate bool into an MPI datatype! There is no such type!");
       return MPI_LOGICAL;
     }
   };

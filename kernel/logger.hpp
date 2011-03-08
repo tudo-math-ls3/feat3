@@ -219,12 +219,12 @@ namespace FEAST
         // catch file opening error
         if (file.fail())
         {
-          MPIUtils::abort("Error! Could not open log file " + file_name + ".");
+          abort_mpi("Error! Could not open log file " + file_name + ".");
         }
       }
       else
       {
-        MPIUtils::abort("Error! Log file " + file_name + " is already opened!");
+        abort_mpi("Error! Log file " + file_name + " is already opened!");
       }
     }
 
@@ -243,8 +243,8 @@ namespace FEAST
       }
       else
       {
-        MPIUtils::abort("Error! Log file " + file_name + " cannot be closed since it does not seems to have been " +
-                        "openend before...!");
+        abort_mpi("Error! Log file " + file_name + " cannot be closed since it does not seems to have been "
+                  + "openend before...!");
       }
     }
 

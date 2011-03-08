@@ -65,7 +65,7 @@ function:
       if(sev == CRITICAL)
       {
         pp.print(std::cerr);
-        MPIUtils::abort();
+        abort_mpi();
       }
     }
 
@@ -93,7 +93,7 @@ Einfach ein statisches String-Array mit error_code = array index?
       // occurs simultaneously on several processes, the error message appears several times on stderr. There is no
       // way to prevent this.
       pp.print(std::cerr);
-      MPIUtils::abort();
+      abort_mpi();
     }
   };
 } // namespace FEAST

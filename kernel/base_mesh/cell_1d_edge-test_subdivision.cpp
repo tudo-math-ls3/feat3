@@ -44,7 +44,7 @@ public:
   void run() const
   {
     // init MPI
-    MPIUtils::init_MPI();
+    init_mpi();
 
     // set shortcut to the one and only instance of Universe (since this is the first call of
     // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)

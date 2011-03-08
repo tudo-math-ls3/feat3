@@ -63,7 +63,7 @@ namespace FEAST
       // write the message id to the buffer
       int mpi_error_code = MPI_Pack(&service_id, 1, MPI_INTEGER, Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+      validate_error_code_mpi(mpi_error_code, "MPI_Pack");
     }
 
 
@@ -74,7 +74,7 @@ namespace FEAST
       // send message
       int mpi_error_code = MPI_Send(Comm::MCW_buffer, Comm::MCW_buffer_pos, MPI_PACKED, Process::rank_master, 0,
                                     MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Send");
+      validate_error_code_mpi(mpi_error_code, "MPI_Send");
     }
 
 
@@ -94,7 +94,7 @@ namespace FEAST
       // write the integer to the current position of the buffer
       int mpi_error_code = MPI_Pack(&msg, 1, MPIType<T_>::value(), Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+      validate_error_code_mpi(mpi_error_code, "MPI_Pack");
     }
 
 
@@ -114,7 +114,7 @@ namespace FEAST
       // symbol is appended). The const of the resulting char array has to be cast away.
       int mpi_error_code = MPI_Pack(const_cast<char *>(msg.c_str()), msg.size()+1, MPI_CHARACTER, Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+      validate_error_code_mpi(mpi_error_code, "MPI_Pack");
     }
 
 
@@ -133,7 +133,7 @@ namespace FEAST
       CONTEXT("Comm::read()");
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, &msg,
                                       1, MPIType<T_>::value(), MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+      validate_error_code_mpi(mpi_error_code, "MPI_Unpack");
     }
 
 
@@ -157,7 +157,7 @@ namespace FEAST
       char* msg_char = new char[size+1];
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg_char,
                                       size, MPI_CHAR, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+      validate_error_code_mpi(mpi_error_code, "MPI_Unpack");
       // copy the char array to the string
       msg.assign(msg_char);
       delete [] msg_char;
@@ -183,7 +183,7 @@ namespace FEAST
       // write the array to the current position of the buffer
       int mpi_error_code = MPI_Pack(msg, size, MPIType<T_>::value(), Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Pack");
+      validate_error_code_mpi(mpi_error_code, "MPI_Pack");
     }
 
 
@@ -205,7 +205,7 @@ namespace FEAST
       CONTEXT("Comm::read()");
       int mpi_error_code = MPI_Unpack(Comm::MCW_buffer, Comm::MCW_received_bytes, &Comm::MCW_buffer_pos, msg,
                                       size, MPIType<T_>::value(), MPI_COMM_WORLD);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Unpack");
+      validate_error_code_mpi(mpi_error_code, "MPI_Unpack");
     }
   }; // class Comm
 

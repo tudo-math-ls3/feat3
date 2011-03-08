@@ -155,7 +155,7 @@ namespace FEAST
       MPI_Initialized(&mpi_is_initialised);
       if(!mpi_is_initialised)
       {
-        throw InternalError("MPI is not initialised yet! Call MPIUtils::init_MPI(argc,argv) first!");
+        throw InternalError("MPI is not initialised yet! Call init_mpi(argc,argv) first!");
       }
     }
 
@@ -198,7 +198,7 @@ namespace FEAST
       // get MPI_COMM_WORLD rank of this process
       int my_rank;
       int mpi_error_code = MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_rank");
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_rank");
 
       // set MPI_COMM_WORLD rank of the master process
       int rank_master = _num_processes-1;
@@ -267,9 +267,9 @@ namespace FEAST
       MPI_Group gr_without_master;
       MPI_Comm gr_comm;
       mpi_error_code = MPI_Group_excl(_world_group->group(), 1, &rank_master, &gr_without_master);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_excl");
+      validate_error_code_mpi(mpi_error_code, "MPI_Group_excl");
       mpi_error_code = MPI_Comm_create(_world_group->comm(), gr_without_master, &gr_comm);
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
       if(!Process::is_master)
       {
         _world_group_without_master = new ProcessGroup(gr_comm, _num_processes-1);
@@ -321,9 +321,9 @@ namespace FEAST
         MPI_Comm dummy_comm;
         MPI_Group dummy_group;
         int mpi_error_code = MPI_Group_incl(_world_group->group(), 1, &Process::rank_master, &dummy_group);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+        validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
         mpi_error_code = MPI_Comm_create(_world_group->comm(), dummy_group, &dummy_comm);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+        validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
         // COMMENT_HILMAR: First, I used this simpler version:
         //   int mpi_error_code = MPI_Comm_create(_world_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
         // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that
@@ -452,7 +452,7 @@ namespace FEAST
         // get total number of processes
         int num_proc;
         int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
+        validate_error_code_mpi(mpi_error_code, "MPI_Comm_size");
         ASSERT(num_proc >= 1, "Number of processes must be at least 1.");
         _num_processes = (unsigned int) num_proc;
 
@@ -514,7 +514,7 @@ namespace FEAST
         // get total number of processes
         int num_proc;
         int mpi_error_code = MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
-        MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_size");
+        validate_error_code_mpi(mpi_error_code, "MPI_Comm_size");
         ASSERT(num_proc >= 1, "Number of processes must be at least 1.");
         _num_processes = (unsigned int) num_proc;
         // set variables

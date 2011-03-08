@@ -53,7 +53,7 @@ public:
   {
     CONTEXT("LoggerTest::run()");
     // init MPI
-    MPIUtils::init_MPI();
+    init_mpi();
 
     // set number of process groups
     unsigned int num_process_groups(3);

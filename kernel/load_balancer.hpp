@@ -396,7 +396,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
       int mpi_error_code = MPI_Bcast(&_num_subgroups, 1, MPI_UNSIGNED, _process_group->rank_coord(),
                                      _process_group->comm());
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
+      validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
       if(!_process_group->is_coordinator())
       {
@@ -407,11 +407,11 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
       mpi_error_code = MPI_Bcast(_num_proc_in_subgroup, _num_subgroups, MPI_UNSIGNED, _process_group->rank_coord(),
                                  _process_group->comm());
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
+      validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
       mpi_error_code = MPI_Bcast(group_contains_extra_coord, _num_subgroups, MPI_UNSIGNED_CHAR,
                                   _process_group->rank_coord(), _process_group->comm());
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
+      validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
       // let the non-coordinator processes allocate the array _subgroup_ranks for rank partitioning
       if(!_process_group->is_coordinator())
@@ -477,7 +477,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // broadcast the 1D array
       mpi_error_code = MPI_Bcast(_subgroup_ranks_1D, total_length, MPI_INTEGER, _process_group->rank_coord(),
                                  _process_group->comm());
-      MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Bcast");
+      validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
       // let the non-coordinator processes copy the 1D array into the 2D array
       if(!_process_group->is_coordinator())
@@ -554,9 +554,9 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
           MPI_Group dummy_group;
           int rank_aux = _process_group->rank();
           int mpi_error_code = MPI_Group_incl(_process_group->group(), 1, &rank_aux, &dummy_group);
-          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Group_incl");
+          validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
           mpi_error_code = MPI_Comm_create(_process_group->comm(), dummy_group, &dummy_comm);
-          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+          validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
           MPI_Comm_free(&dummy_comm);
 
           // COMMENT_HILMAR: First, I used this simpler version:
@@ -566,7 +566,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
 
           // Within the ProcessSubgroup constructor, another MPI communicator is created. So, do another dummy call.
           mpi_error_code = MPI_Comm_create(_process_group->comm(), dummy_group, &dummy_comm);
-          MPIUtils::validate_mpi_error_code(mpi_error_code, "MPI_Comm_create");
+          validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
 
           MPI_Comm_free(&dummy_comm);
           MPI_Group_free(&dummy_group);
