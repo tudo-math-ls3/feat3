@@ -311,22 +311,13 @@ public:
     // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)
     Universe<space_dim_, world_dim_>* universe = Universe<space_dim_, world_dim_>::instance();
 
-    try
-    {
-      universe->create(num_process_groups, num_processes_in_group, includes_dedicated_load_bal, "work_group_test_2d_2");
-    }
-    catch (Exception& e)
-    {
-      // abort the program
-      ErrorHandler::exception_occured(e);
-    }
+    // create universe, let the outer test system catch eventual exceptions
+    universe->create(num_process_groups, num_processes_in_group, includes_dedicated_load_bal, "work_group_test_2d_2");
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
     LoadBalancer<space_dim_, world_dim_>* load_balancer = universe->load_balancer();
     Master* master = universe->master();
-
-    int rank_world = Process::rank;
 
     if(load_balancer != nullptr)
     {
@@ -335,7 +326,7 @@ public:
 
       // debug output
       int rank_process_group = process_group->rank();
-      std::string s("Process " + stringify(rank_world) + " is the load balancer with local rank "
+      std::string s("Process " + stringify(Process::rank) + " is the load balancer with local rank "
                     + stringify(rank_process_group) + " in group " + stringify(group_id) + ".\n");
       Logger::log(s);
 
@@ -368,41 +359,6 @@ public:
 
 // add some TEST_CHECK(...)
 
-        // TODO: move the following stuff to an extra test for logger functions
-        // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
-        // standard file logging functions
-        if (Process::rank % 7 == 0)
-        {
-          // test the PrettyPrinter
-          std::string prefix(std::string("Proc" + stringify(Process::rank)));
-          PrettyPrinter pp(40, '#', prefix + " ");
-          pp.add_line_sep();
-          pp.add_line_centered("Testing pp and logging!");
-          pp.add_line_sep();
-          pp.add_line("left bla blub");
-          pp.add_line("too long too long too long too long too long too long");
-          pp.add_line_no_right_delim("also too long too long too long too long too long too long");
-          pp.add_line("left bla blub");
-          pp.add_line_sep();
-          // print it like this...
-          Logger::log(pp.block());
-          // ... or like this...
-          pp.print(Logger::file);
-          // send it to the master for file output
-          Logger::log_master(pp.block(), Logger::FILE);
-
-          // test vector version of log_master_array()
-          std::vector<std::string> messages(3);
-          messages[0] = prefix + ": Testing this...\n";
-          messages[1] = prefix + ": ...vector logging...\n";
-          messages[2] = prefix + ": ...feature!\n";
-          Logger::log_master_array(messages, Logger::FILE);
-          Logger::log(messages);
-
-          // test standard log feature
-          Logger::log("BRAL\n");
-        }
-
         if(process_group->is_coordinator())
         {
           // manually destroy here the artificially created graph object (the other one is destroyed by the base mesh)
@@ -432,8 +388,9 @@ public:
     }
     else
     {
-      MPIUtils::abort("Process with rank " + stringify(rank_world)
-                      + " has no particular role, this should not happen.");
+      // This branch must not be entered. Throw InternalError which is caught by outer test system.
+      throw InternalError("Process with rank " + stringify(Process::rank)
+                          + " has no particular role, this should not happen.");
     }
   } // run()
 }; // WorkGroupTest2D2
