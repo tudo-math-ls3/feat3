@@ -56,15 +56,8 @@ public:
     // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)
     Universe<space_dim_, world_dim_>* universe = Universe<space_dim_, world_dim_>::instance();
 
-    try
-    {
-      universe->create("cell_2d_quad-test_subdivision");
-    }
-    catch (Exception& e)
-    {
-      // abort the program
-      ErrorHandler::exception_occured(e);
-    }
+    // create universe, let the outer test system catch eventual exceptions
+    universe->create("cell_2d_quad-test_subdivision");
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
@@ -124,8 +117,9 @@ public:
     }
     else
     {
-      MPIUtils::abort("Process with rank " + stringify(rank_world)
-                      + " has no particular role, this should not happen.");
+      // This branch must not be entered. Throw InternalError which is caught by outer test system.
+      throw InternalError("Process with rank " + stringify(Process::rank)
+                          + " has no particular role, this should not happen.");
     }
   } // run()
 
