@@ -540,7 +540,7 @@ namespace FEAST
 
 
     /**
-    * \brief cleanup of the universe finalising the MPI environment
+    * \brief cleanup of the universe
     *
     * This function has to be called by all COMM_WORLD processes to cleanly end the program.
     */
@@ -568,14 +568,14 @@ namespace FEAST
         _cleanup();
       }
       // debug output
-      Logger::log("Universe destroyed on process " + stringify(Process::rank) + ". Calling MPI_Finalize() now...\n");
+      Logger::log("Universe destroyed on process " + stringify(Process::rank) + ".\n");
+
+// COMMENT_HILMAR: Das folgende wird rausgeschmissen, sobald Dirk das in die Testumgebung eingebaut hat.
+// Fuer Code, der nicht innerhalb des Test-Systems ausgefuehrt wird, muessen wir uns noch ueberlegen, wie man
+// MPI sauber startet und beendet.
       // shut down MPI
-      int mpi_is_initialised;
-      MPI_Initialized(&mpi_is_initialised);
-      if(mpi_is_initialised)
-      {
-        MPI_Finalize();
-      }
+      Logger::log("Finalising MPI on process " + stringify(Process::rank) + "...\n");
+      finalise_mpi();
     }
   };
 } // namespace FEAST

@@ -96,12 +96,21 @@ namespace FEAST
   *
   * This function only calls MPI_Init(...). It has to be called before anything else happens.
   *
-  * \note If FEAST's test system is used, it also calls MPI_Init(). Hence, the function must not be called again
-  * within the code. To prevent this, we inquire if MPI is already initialised.
+  * \note If FEAST's test system is used, it calls MPI_Init(). To prevent calling the function twice,
+  * we inquire if MPI is already initialised.
   */
   void init_mpi()
   {
     CONTEXT("init_mpi()");
+
+    // inquire if MPI is already finalised
+    int mpi_is_finalised;
+    MPI_Finalized(&mpi_is_finalised);
+    if(mpi_is_finalised)
+    {
+      throw InternalError("MPI cannot be initialised, since it has already been finalised.");
+    }
+
     // init MPI
     int mpi_is_initialised;
     MPI_Initialized(&mpi_is_initialised);
@@ -109,6 +118,35 @@ namespace FEAST
     {
       int mpi_error_code = MPI_Init(NULL, NULL);
       validate_error_code_mpi(mpi_error_code, "MPI_Init");
+    }
+  }
+
+
+  /**
+  * \brief finalises MPI
+  *
+  * This function only calls MPI_Finalize(...). It has to be called before anything else happens.
+  *
+  * \note If FEAST's test system is used, it needs to call MPI_Finalize(). To prevent calling the function twice,
+  * we inquire if MPI is already finalised.
+  */
+  void finalise_mpi()
+  {
+    CONTEXT("finalise_mpi()");
+    // inquire if MPI is initialised
+    int mpi_is_initialised;
+    MPI_Initialized(&mpi_is_initialised);
+    if(!mpi_is_initialised)
+    {
+      throw InternalError("MPI cannot be finalised, since it has not been initialised.");
+    }
+    // finalise MPI
+    int mpi_is_finalised;
+    MPI_Finalized(&mpi_is_finalised);
+    if(!mpi_is_finalised)
+    {
+      int mpi_error_code = MPI_Finalize();
+      validate_error_code_mpi(mpi_error_code, "MPI_Finalize");
     }
   }
 
