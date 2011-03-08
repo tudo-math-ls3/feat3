@@ -97,6 +97,9 @@ namespace FEAST
         s += "v0--------e0--------v1--------e1--------v2--------e2--------v3\n";
         Logger::log_master(s);
 
+        // TODO: remove the following line as soon as a real file parser is implemented
+        Logger::log("Write file name " + file_name + " to prevent compiler warning about unused variable.");
+
         // set base mesh pointer
         _bm = bm;
 
@@ -858,6 +861,9 @@ namespace FEAST
         ASSERT(world_dim_ == 3, "Currently, world dim " + stringify(world_dim_) + " must be 3.");
 
         Logger::log_master("No file parser implemented yet! A manual 3D base mesh is created.");
+
+        // TODO: remove the following line as soon as a real file parser is implemented
+        Logger::log("Write file name " + file_name + " to prevent compiler warning about unused variable.");
 
         // set base mesh pointer
         _bm = bm;

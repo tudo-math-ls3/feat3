@@ -487,6 +487,9 @@ namespace FEAST
       */
       static void validate_neighbourhood(Cell<cell_dim_, space_dim_, world_dim_> const * c, std::ostream& stream)
       {
+        // do nothing here
+// COMMENT_HILMAR: compilers complain about unused variables here. Should we ignore that? Or is there some trick
+// to suppress these warnings?
       }
     };
 

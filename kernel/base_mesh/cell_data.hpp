@@ -107,7 +107,7 @@ namespace FEAST
         CONTEXT("BaseMesh::CellInfo::_set_num_subitems_per_subdim()");
         ASSERT(array_size == cell_dim_, "Array size " + stringify(array_size) + " must be equal to cell dimension"
                + stringify(cell_dim_) + ".");
-        for(int i(0) ; i < cell_dim_ ; ++i)
+        for(int i(0) ; i < array_size ; ++i)
         {
           _num_subitems_per_subdim[i] = num_subitems_per_subdim[i];
         }
@@ -187,12 +187,16 @@ namespace FEAST
         Cell<cell_dim_, space_dim_, world_dim_>* neighbour)
       {
         // do nothing here
+// COMMENT_HILMAR: compilers complain about unused variables here. Should we ignore that? Or is there some trick
+// to suppress these warnings?
       }
 
       /// dummy function called by cells with dimension smaller than space dimension
       inline void print(std::ostream& stream) const
       {
         // do nothing here
+// COMMENT_HILMAR: compilers complain about unused variables here. Should we ignore that? Or is there some trick
+// to suppress these warnings?
       }
 
     };
