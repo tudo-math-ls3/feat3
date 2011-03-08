@@ -569,13 +569,6 @@ namespace FEAST
       }
       // debug output
       Logger::log("Universe destroyed on process " + stringify(Process::rank) + ".\n");
-
-// COMMENT_HILMAR: Das folgende wird rausgeschmissen, sobald Dirk das in die Testumgebung eingebaut hat.
-// Fuer Code, der nicht innerhalb des Test-Systems ausgefuehrt wird, muessen wir uns noch ueberlegen, wie man
-// MPI sauber startet und beendet.
-      // shut down MPI
-      Logger::log("Finalising MPI on process " + stringify(Process::rank) + "...\n");
-      finalise_mpi();
     }
   };
 } // namespace FEAST

@@ -15,7 +15,7 @@ using namespace TestSystem;
 int main(int argc, char** argv)
 {
   int result(EXIT_SUCCESS);
-  MPIUtils::init_MPI(argc, argv);
+  init_mpi(argc, argv);
   int rank(-1);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -94,9 +94,6 @@ int main(int argc, char** argv)
     i = TestList::instance()->erase(i);
   }
 
-  int flag(0);
-  MPI_Finalized(&flag);
-  if (!flag)
-    MPI_Finalize();
+  finalise_mpi();
   return result;
 }
