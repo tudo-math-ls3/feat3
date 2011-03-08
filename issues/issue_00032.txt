@@ -1,0 +1,12 @@
+ID          00032
+TYPE        optimisation_request
+STATUS      unassigned
+AUTHOR      markus
+ASSIGNED TO
+SEVERITY    low
+
+FULL TEXT
+Coding conventions for namespaces impose "kernel" to be a namespace, but not necessarily "basemesh" to be a namespace.
+Maybe, CCs have to be rediscussed in that regard.
+
+SOLUTION

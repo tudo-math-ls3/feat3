@@ -1,4 +1,4 @@
-NEWEST: 00031
+NEWEST: 00032
 ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT DESCRIPTION
 00008 |feature_request      |assigned   |markus |hilmar            |high     |implement_nb_update_after_subdivision
 00009 |optimisation_request |assigned   |markus |dom_hilmar        |high     |better_distinction_of_lb_and_flowcontrol
@@ -28,6 +28,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT 
 00022 |feature_request      |unassigned |hilmar |                  |low      |implement_class_for_static_cell_data
 00025 |optimisation_request |unassigned |hilmar |                  |low      |template_file_ascii_reader
 00026 |feature_request      |unassigned |hilmar |                  |low      |implement_pretty_printer_table_functionality
+00032 |optimisation_request |unassigned |markus |                  |low      |apply_coding_conventions_for_namespaces
 00000 |feature_request      |resolved   |markus |dirk              |high     |implement_test_system
 00002 |feature_request      |resolved   |markus |dirk              |critical |build_system_essentials
 00007 |bug_report           |resolved   |markus |peter             |critical |test_system_is_error_prone
