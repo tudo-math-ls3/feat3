@@ -98,9 +98,10 @@ public:
     // debug output
     Logger::log_master("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n");
     // assert that the number of processes is n
-    ASSERT(num_processes == num_cells, "");
+    ASSERT(num_processes == num_cells, "Number of processes " + stringify(num_processes)
+           + " must equal number of cells " + stringify(num_cells) + ".");
     // assert that no dedicated load balancer is used
-    ASSERT(!load_balancer->group_has_dedicated_load_bal(), "");
+    ASSERT(!load_balancer->group_has_dedicated_load_bal(), "For this test, no dedicated load balancer must be used.");
 
     // set up the test case
 
