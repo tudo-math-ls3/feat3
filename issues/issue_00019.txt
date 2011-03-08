@@ -1,6 +1,6 @@
 ID           00019
 TYPE         optimisation_request
-STATUS       assigned
+STATUS       resolved
 AUTHOR       markus
 ASSIGNED TO  dirk
 SEVERITY     critical
@@ -9,3 +9,4 @@ FULL TEXT
 Test system must be adjusted for usage with backend MPI, that is "mpirun ..." must be included in "make tests processes=..." like mechanism.
 
 SOLUTION
+Adding for example mpicxx to cmake/ccmake works now.
