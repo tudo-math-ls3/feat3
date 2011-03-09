@@ -4,9 +4,9 @@
 // - completion of doxygen comments (\param, array dimensions, \return, \throws etc.)
 
 // functionality:
-// - tests splitten und an Dirks Test-System anpassen
 // - weitere tests schreiben
 // - check: missing output when using MPICH
+// - valgrind check
 
 // Done:
 // - template all classes "above" BaseMesh
@@ -22,6 +22,7 @@
 // - CONTEXT("...") einfuegen
 // - missing DTORs, virtual DTORs?
 // - test_1d.cpp etc. ersetzen
+// - tests splitten und an Dirks Test-System anpassen
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -396,4 +397,4 @@ public:
 }; // WorkGroupTest2D2
 
 // create test instance, using space and world dimension 2
-WorkGroupTest2D2<Nil, Nil, 2, 2> work_group_test_2d_2("data/meshes/test_16bmc.feast");
+WorkGroupTest2D2<Nil, Nil, 2, 2> work_group_test_2d_2(stringify(FEAST_SRC_DIR) + "/data/meshes/test_16bmc.feast");

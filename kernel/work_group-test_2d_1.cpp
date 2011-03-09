@@ -224,4 +224,4 @@ public:
 }; // WorkGroupTest2D1
 
 // create test instance, using space and world dimension 2
-WorkGroupTest2D1<Nil, Nil, 2, 2> work_group_test_2d_1("data/meshes/test_16bmc.feast");
+WorkGroupTest2D1<Nil, Nil, 2, 2> work_group_test_2d_1(stringify(FEAST_SRC_DIR) + "/data/meshes/test_16bmc.feast");

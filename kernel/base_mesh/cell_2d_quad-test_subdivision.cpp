@@ -124,4 +124,5 @@ public:
 }; // Cell2DQuadTestSubdivision
 
 // create test instance, using space and world dimension 2
-Cell2DQuadTestSubdivision<Nil, Nil, 2, 2> cell_2d_quad_test_subdivision("data/meshes/test_16bmc.feast");
+Cell2DQuadTestSubdivision<Nil, Nil, 2, 2>
+  cell_2d_quad_test_subdivision(stringify(FEAST_SRC_DIR) + "/data/meshes/test_16bmc.feast");
