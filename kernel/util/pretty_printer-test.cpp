@@ -18,9 +18,17 @@ using namespace FEAST;
 * \test
 * This tests the functionality of the pretty printer.
 *
+* \tparam Tag_
+* description missing
+*
+* \tparam DT_
+* description missing
+*
 * \author Hilmar Wobker
 */
-template <typename Tag_, typename DT_>
+template<
+  typename Tag_,
+  typename DT_>
 class PrettyPrinterTest
   : public TaggedTest<Tag_, DT_>
 {

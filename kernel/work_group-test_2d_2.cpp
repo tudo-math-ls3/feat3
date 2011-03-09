@@ -44,9 +44,25 @@ using namespace FEAST;
 * \test
 * This test creates a universe, reads a 2D mesh, builds a base mesh and creates work groups.
 *
+* \tparam Tag_
+* description missing
+*
+* \tparam DT_
+* description missing
+*
+* \tparam space_dim_
+* space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)
+*
+* \tparam world_dim_
+* world dimension (determines the number of coordinates)
+*
 * \author Hilmar Wobker
 */
-template <typename Tag_, typename DT_, unsigned char world_dim_, unsigned char space_dim_>
+template<
+  typename Tag_,
+  typename DT_,
+  unsigned char space_dim_,
+  unsigned char world_dim_>
 class WorkGroupTest2D2
   : public TaggedTest<Tag_, DT_>
 {

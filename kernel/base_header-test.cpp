@@ -19,9 +19,11 @@ using namespace FEAST;
 *
 * \author Dirk Ribbrock
 */
-template<typename Tag_, typename DT_>
-class BaseHeaderTest :
-  public TaggedTest<Tag_, DT_>
+template<
+  typename Tag_,
+  typename DT_>
+class BaseHeaderTest
+  : public TaggedTest<Tag_, DT_>
 {
   public:
     /// Constructor

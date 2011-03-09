@@ -21,9 +21,17 @@ class C{};
 *
 * \test test description missing
 *
+* \tparam Tag_
+* description missing
+*
+* \tparam DT_
+* description missing
+*
 * \author Dirk Ribbrock
 */
-template <typename Tag_, typename DT_>
+template<
+  typename Tag_,
+  typename DT_>
 class InheritanceTest
   : public TaggedTest<Tag_, DT_>
 {
