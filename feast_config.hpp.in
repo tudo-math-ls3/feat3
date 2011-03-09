@@ -1,0 +1,21 @@
+// Template file for configuration done by CMAKE
+#pragma once
+#ifndef FEAST_CONFIG_HPP
+/// Header guard
+#define FEAST_CONFIG_HPP 1
+
+/// Should the build include DEBUG support?
+#cmakedefine DEBUG_BUILD
+#ifdef DEBUG_BUILD
+  #define DEBUG
+#endif
+
+/// Path to the FEAST source dir
+#define FEAST_SRC_DIR "${FEAST_SOURCE_DIR}"
+/// Path to the FEAST binary dir
+#define FEAST_BINARY_DIR "${FEAST_BINARY_DIR}"
+
+/// The used build id
+#define BUILD_ID "${BUILD_ID}"
+
+#endif // FEAST_CONFIG_HPP

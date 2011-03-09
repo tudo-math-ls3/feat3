@@ -3,6 +3,8 @@
 /// Header guard
 #define KERNEL_BASE_HEADER_HPP 1
 
+#include <feast_config.hpp>
+
 /**
 * \brief FEAST Kernel base header.
 *
@@ -26,7 +28,7 @@
 #ifndef DEBUG
 #  define NDEBUG 1
 #endif
-#ifndef NDEBUG
+#if !defined (NDEBUG) && !defined(DEBUG)
 #  define DEBUG 1
 #endif
 

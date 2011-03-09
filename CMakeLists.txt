@@ -9,19 +9,12 @@ PROJECT( FEAST )
 
 ENABLE_TESTING()
 
+#shall we enable debug support?
+OPTION (DEBUG_BUILD "Build with debug support.")
+
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
 
-
-#enable DEBUG define if the option is set
-OPTION (DEBUG_BUILD "Build with debug support.")
-if (DEBUG_BUILD)
-  add_definitions (-DDEBUG)
-  #message ("Building with debug support...")
-endif (DEBUG_BUILD)
-
-#add FEAST dirs to definitions
-add_definitions ("-DFEAST_SRC_DIR=${FEAST_SOURCE_DIR}")
-add_definitions ("-DFEAST_BIN_DIR=${FEAST_BINARY_DIR}")
+configure_file (${FEAST_SOURCE_DIR}/feast_config.hpp.in ${FEAST_BINARY_DIR}/feast_config.hpp)
 
 
 # our custom target to build (not execute) all tests in all directories

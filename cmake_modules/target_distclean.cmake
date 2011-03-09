@@ -10,6 +10,7 @@ IF (UNIX)
         cmake.depends
         cmake.check_depends
         CMakeCache.txt
+        feast_config.hpp
         cmake.check_cache
         *.cmake
         Makefile

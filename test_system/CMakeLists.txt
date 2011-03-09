@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 2.8)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 #top lvl include dir
-INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 #our test_system basic library
 ADD_LIBRARY( test_system SHARED test_system )

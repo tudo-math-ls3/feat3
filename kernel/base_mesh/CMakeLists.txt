@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 2.8)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 #top lvl include dir
-INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 #list of base mesh tests
 SET (test_list cell_1d_edge-test_subdivision cell_2d_quad-test_subdivision cell_3d_hexa-test_subdivision)

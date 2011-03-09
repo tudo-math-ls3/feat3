@@ -12,6 +12,7 @@ elseif (BUILD_ID STREQUAL "")
   #set (CMAKE_SHARED_LINKER_FLAGS "")
   #set (CMAKE_EXE_LINKER_FLAGS "")
   #set (CMAKE_MODULE_LINKER_FLAGS "")
+  #set (DEBUG_BUILD ON)
 else ()
   #use specific id
   message ("Build ID not known!")
