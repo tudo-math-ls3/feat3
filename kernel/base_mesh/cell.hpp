@@ -216,7 +216,6 @@ namespace FEAST
 
 
       /// pure virtual function for returning pointer to the vertex at given index
-// TODO: pointer oder referenz auf pointer zurueckgeben? (ueberall sonst dann ggfls. auch anpassen)
       virtual Vertex<world_dim_>* vertex(unsigned char const) const = 0;
     };
 
@@ -347,7 +346,6 @@ namespace FEAST
       unsigned char world_dim_>
     class Cell
       : public CellData<cell_dim_, space_dim_, world_dim_>,
-    // COMMENT_HILMAR: muss "virtual public" sein, falls z.B. Quad direkt den CellData-Konstruktor aufrufen muss
         public CellInterface<cell_dim_, space_dim_, world_dim_>
     {
 
