@@ -23,13 +23,10 @@
 #  error The DEBUG and NDEBUG macros must not be defined at the same time.
 #endif // defined(DEBUG) && defined(NDEBUG)
 
-// Assure that DEBUG or NDEBUG is defined
+// Assure that DEBUG xor NDEBUG is defined
 // In consequence, if DEBUG and NDEBUG are note defined, NDEBUG is defined.
-#ifndef DEBUG
-#  define NDEBUG 1
-#endif
 #if !defined (NDEBUG) && !defined(DEBUG)
-#  define DEBUG 1
+#  define NDEBUG 1
 #endif
 
 // include compiler detection headers
