@@ -55,7 +55,11 @@ public:
   }
 
 
-  /// sets the number of processes to use to 2 (1 load balancer + 1 master)
+  /**
+  * \brief sets the number of processes needed to 2 (1 load balancer + 1 master)
+  *
+  * \return number of processes needed
+  */
   unsigned long mpi_proc_count() const
   {
     return 2;

@@ -53,10 +53,12 @@ public:
   }
 
   /**
-  * \brief sets the number of processes to use to 10 (2 + 3 + 4 for 3 process groups + 1 master)
+  * \brief sets the number of processes needed to 10 (2 + 3 + 4 for 3 process groups + 1 master)
   *
   * For the hard-wired example creating three process groups we need 10 processes in total (2, 3 and 4 processes, resp.,
   * for the process groups and 1 for the master).
+  *
+  * \return number of processes needed
   */
   unsigned long mpi_proc_count() const
   {

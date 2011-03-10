@@ -145,10 +145,12 @@ public:
 
 
   /**
-  * \brief sets the number of processes to use to 17 (16 BMCs + 1 master)
+  * \brief sets the number of processes needed to 17 (16 BMCs + 1 master)
   *
   * For the semi-hard-wired example using a mesh with n base mesh cells we need n+1 processes in total
   * (n for the one and only process group and 1 for the master process).
+  *
+  * \return number of processes needed
   *
   * \todo Instead of returning a hard-coded 17 here, get the number of BMCs from the name of the mesh file or somehow
   * else.

@@ -285,6 +285,8 @@ public:
   * load balancer. Only the first process group (consisting of n+2 processes does some useful things, the second one
   * (consisting of 2 processes) is idle.
   *
+  * \return number of processes needed
+  *
   * \todo Instead of returning a hard-coded 17 here, get the number of BMCs from the name of the mesh file or somehow
   * else. (Also store it in some variable, it is needed in run().)
   */

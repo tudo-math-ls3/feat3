@@ -117,10 +117,12 @@ public:
 
 
   /**
-  * \brief sets the number of processes to use to 4 (3 BMCs + 1 master)
+  * \brief sets the number of processes needed to 4 (3 BMCs + 1 master)
   *
   * For this hard-wired example using the fixed 1D mesh defined in the file parser with 3 base mesh cells we need 4
   * processes in total (3 for the one and only process group and 1 for the master process).
+  *
+  * \return number of processes needed
   */
   unsigned long mpi_proc_count() const
   {
