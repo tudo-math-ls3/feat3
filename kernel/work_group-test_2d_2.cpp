@@ -392,8 +392,6 @@ public:
       else
       {
         // the second process group does something else, programmed by the application outside the kernel...
-        // TODO: at least, produce some log output here (or create an extra test for testing the global process groups)
-        // ...
         // Everything done, call universe destruction routine.
         universe->destroy();
      }
