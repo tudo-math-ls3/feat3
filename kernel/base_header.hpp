@@ -34,6 +34,7 @@
 #include <kernel/util/compiler_intel.hpp>      // Intel(R) C/C++ compiler
 #include <kernel/util/compiler_microsoft.hpp>  // Microsoft(R) (Visual) C/C++ compiler
 #include "kernel/util/compiler_oracle.hpp"     // SunStudio/OracleStudio C/C++ compiler
+#include "kernel/util/compiler_open64.hpp"     // Open64 C/C++ compiler
 
 // If the compiler doesn't support the C++0x nullptr, we have to define it via pre-processor.
 #if !defined(HAVE_CPP0X_NULLPTR) && !defined(DOXYGEN)

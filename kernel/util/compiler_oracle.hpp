@@ -22,7 +22,7 @@
 //   SunStudio does not support nullptr, do not define HAVE_CPP0X_NULLPTR 1
 #    define FEAST_COMPILER "SunStudio/OracleStudio C/C++ compiler 12.2"
 #  else
-#    define FEAST_COMPILER "SunStudio/OracleStudio C/C++ compiler (unknownn version)"
+#    define FEAST_COMPILER "SunStudio/OracleStudio C/C++ compiler (unknown version)"
 #  endif
 
 #endif // !defined(FEAST_COMPILER) && defined(__SUNPRO_CC)

@@ -9,9 +9,13 @@
  * \brief Compiler detection header for GNU C++ compiler.
  *
  * \author Dirk Ribbrock
+ * \author Dominik Goeddeke
  */
 
-#if !defined(FEAST_COMPILER) && defined(__GNUC__)
+// Note: Open64 is a fork of GCC, so defines __GNUC__ as well.
+// Consequence: Also check for __OPEN64__ here to be able to
+// distinguish them.
+#if !defined(FEAST_COMPILER) && defined(__GNUC__) && !defined(__OPEN64__)
 
 // calc linear sortable gcc version
 #  define _GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
