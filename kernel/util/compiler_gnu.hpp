@@ -1,10 +1,10 @@
 #pragma once
-#ifndef UTIL_COMPILER_GCC_HPP
+#ifndef UTIL_COMPILER_GNU_HPP
 /// Header guard
-#define UTIL_COMPILER_GCC_HPP 1
+#define UTIL_COMPILER_GNU_HPP 1
 
 /**
- * \file compiler_gcc.hpp
+ * \file compiler_gnu.hpp
  *
  * \brief Compiler detection header for GNU C++ compiler.
  *
@@ -17,7 +17,7 @@
 #  define _GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
 // define FEAST_COMPILER_GCC
-#  define FEAST_COMPILER_GCC _GCC_VER
+#  define FEAST_COMPILER_GNU _GCC_VER
 
 #  define FEAST_COMPILER "GNU C++ compiler"
 
@@ -34,4 +34,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__GNUC__)
 
-#endif // UTIL_COMPILER_GCC_HPP
+#endif // UTIL_COMPILER_GNU_HPP

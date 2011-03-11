@@ -1,14 +1,22 @@
 #pragma once
-#ifndef UTIL_COMPILER_MSC_HPP
+#ifndef UTIL_COMPILER_MICROSOFT_HPP
 /// Header guard
-#define UTIL_COMPILER_MSC_HPP 1
+#define UTIL_COMPILER_MICROSOFT_HPP 1
 
-// Compiler detection header for Microsoft Visual C++ compiler.
+
+
+/**
+ * \file compiler_microsoft.hpp
+ *
+ * \brief Compiler detection header for Microsoft Visual C++ compiler.
+ *
+ * \author Peter Zajac
+ */
 
 #if !defined(FEAST_COMPILER) && defined(_MSC_VER)
 
-// define FEAST_COMPILER_MSC macro
-#  define FEAST_COMPILER_MSC _MSC_VER
+// define FEAST_COMPILER_MICROSOFT macro
+#  define FEAST_COMPILER_MICROSOFT _MSC_VER
 
 // detect the compiler verson and define the FEAST_COMPILER macro
 #  if (_MSC_VER >= 1600)
@@ -48,4 +56,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(_MSC_VER)
 
-#endif // UTIL_COMPILER_MSC_HPP
+#endif // UTIL_COMPILER_MICROSOFT_HPP
