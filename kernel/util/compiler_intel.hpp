@@ -17,8 +17,11 @@
 // Note that __ICC is already linear sortable
 #  define FEAST_COMPILER_INTEL __ICC
 
-// map version to human-readable string
+// map version to human-readable string and add a few
+// C++0x-specific details.
 #  if (__ICC >= 1200)
+//   no Intel compiler up to 12.0.1.107 supports "nullptr"
+//   so do not define HAVE_CPP0X_NULLPTR 1
 #    define FEAST_COMPILER "Intel C/C++ compiler 12.0"
 #  elif (__ICC >= 1110)
 #    define FEAST_COMPILER "Intel C/C++ compiler 11.1"
