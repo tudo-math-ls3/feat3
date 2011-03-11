@@ -4,7 +4,7 @@
 #define UTIL_COMPILER_INTEL_HPP
 
 /**
- * \file compiler_gnu.hpp
+ * \file compiler_intel.hpp
  *
  * \brief Compiler detection header for Intel C++ compiler.
  *
