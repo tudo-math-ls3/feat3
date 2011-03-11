@@ -129,8 +129,8 @@ public:
   * Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
   * includes_dedicated_load_bal[] in the main() method.
   *
-  * \param[in] load_balancer
-  * pointer to the load balancer object to get some further information
+  * \param[in] manager
+  * pointer to the manager object to get some further information
   *
   * \param[out] num_subgroups
   * number of subgroups
@@ -152,7 +152,7 @@ public:
   * array of Graph pointers representing the connectivity of work group processes
   */
   void define_work_groups(
-    LoadBalancer<space_dim_, world_dim_>* load_balancer,
+    Manager<space_dim_, world_dim_>* manager,
     unsigned int& num_subgroups,
     unsigned int*& num_proc_in_subgroup,
     unsigned char*& group_contains_extra_coord,
@@ -169,11 +169,11 @@ public:
     subgroup_ranks = new int*[num_subgroups];
     graphs = new Graph*[num_subgroups];
 
-    // shortcut to the number of processes in the load balancer's process group
-    unsigned int num_processes = load_balancer->process_group()->num_processes();
+    // shortcut to the number of processes in the manager's process group
+    unsigned int num_processes = manager->process_group()->num_processes();
 
     // shortcut to the number of cells in the base mesh
-    unsigned int num_cells = load_balancer->base_mesh()->num_cells();
+    unsigned int num_cells = manager->base_mesh()->num_cells();
 
     // debug output
     Logger::log_master("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n");
@@ -183,7 +183,7 @@ public:
 
     // set up the two test cases
 
-    if(load_balancer->group_has_dedicated_load_bal())
+    if(manager->group_has_dedicated_load_bal())
     {
       // test case 1 (n is the number of base mesh cells)
       // with dedicated load balancer process
@@ -267,7 +267,7 @@ public:
     delete [] neighbours;
 
     // get connectivity graph of the base mesh; this one will be used for the fine grid work group
-    graphs[1] = load_balancer->base_mesh()->graph();
+    graphs[1] = manager->base_mesh()->graph();
 
 // COMMENT_HILMAR:
 // We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
@@ -282,7 +282,7 @@ public:
   *
   * For the semi-hard-wired example using a mesh with n base mesh cells we need n+5 processes in total. Two
   * 'main process groups' (for two completely independent problems) are created. Each process group has its own
-  * load balancer. Only the first process group (consisting of n+2 processes does some useful things, the second one
+  * manager. Only the first process group (consisting of n+2 processes does some useful things, the second one
   * (consisting of 2 processes) is idle.
   *
   * \return number of processes needed
@@ -335,25 +335,25 @@ public:
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
-    LoadBalancer<space_dim_, world_dim_>* load_balancer = universe->load_balancer();
+    Manager<space_dim_, world_dim_>* manager = universe->manager();
     Master* master = universe->master();
 
-    if(load_balancer != nullptr)
+    if(manager != nullptr)
     {
-      ProcessGroup* process_group = load_balancer->process_group();
+      ProcessGroup* process_group = manager->process_group();
       unsigned int group_id = process_group->group_id();
 
       // debug output
       int rank_process_group = process_group->rank();
-      std::string s("Process " + stringify(Process::rank) + " is the load balancer with local rank "
+      std::string s("Process " + stringify(Process::rank) + " is the manager with local rank "
                     + stringify(rank_process_group) + " in group " + stringify(group_id) + ".\n");
       Logger::log(s);
 
       // perform actions depending on the group id
       if(group_id == 0)
       {
-        // let the load balancer read the mesh file and create a base mesh (this is only done by the coordinator process)
-        load_balancer->read_mesh(_mesh_file);
+        // let the manager read the mesh file and create a base mesh (this is only done by the coordinator process)
+        manager->read_mesh(_mesh_file);
 
         // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
         unsigned int num_subgroups;
@@ -367,13 +367,13 @@ public:
         {
           // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
           // work groups and the process distribution to them. The passed arrays are allocated within this routine.
-          define_work_groups(load_balancer, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+          define_work_groups(manager, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                              subgroup_ranks, graphs);
         }
-        // Now let the load balancer create the work groups (this function is called on all processes of the process
+        // Now let the manager create the work groups (this function is called on all processes of the process
         // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
         // balancer class.
-        load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+        manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                                           subgroup_ranks, graphs);
 
 // add some TEST_CHECK(...)

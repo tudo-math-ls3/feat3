@@ -56,7 +56,7 @@ public:
 
 
   /**
-  * \brief sets the number of processes needed to 2 (1 load balancer + 1 master)
+  * \brief sets the number of processes needed to 2 (1 manager + 1 master)
   *
   * \return number of processes needed
   */
@@ -81,18 +81,18 @@ public:
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
-    LoadBalancer<space_dim_, world_dim_>* load_balancer = universe->load_balancer();
+    Manager<space_dim_, world_dim_>* manager = universe->manager();
     Master* master = universe->master();
 
-    if(load_balancer != nullptr)
+    if(manager != nullptr)
     {
-      ProcessGroup* process_group = load_balancer->process_group();
+      ProcessGroup* process_group = manager->process_group();
 
-      // let the load balancer read the mesh
-      load_balancer->read_mesh(_mesh_file);
+      // let the manager read the mesh
+      manager->read_mesh(_mesh_file);
 
       // get pointer to the base mesh
-      BaseMesh::BM<space_dim_, world_dim_>* bm = load_balancer->base_mesh();
+      BaseMesh::BM<space_dim_, world_dim_>* bm = manager->base_mesh();
 
       // let the coordinator subdivide a cell
       if(process_group->is_coordinator())

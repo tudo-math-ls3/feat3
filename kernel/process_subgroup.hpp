@@ -24,7 +24,7 @@ namespace FEAST
   * \brief class describing a subgroup of a process group, consisting of some compute processes and eventually one
   *        extra coordinator process, sharing the same MPI communicator
   *
-  * ProcessSubgroup objects are created by the load balancer. They consist of n compute processes and eventually one
+  * ProcessSubgroup objects are created by the manager. They consist of n compute processes and eventually one
   * extra process which is the coordinator of the parent process group. The latter is only the case if the coordinator
   * is not part of the compute processes anyway. In both cases (containing an extra coordinator process or not), a
   * ProcessSubgroup creates a WorkGroup object, which either consists of exactly the same processes as this
@@ -36,7 +36,7 @@ namespace FEAST
   * computation (scalar products, norms, etc).
   *
   * Example:
-  * The process group of a load balancer consists of six processes, the sixth one being the coordinator of the process
+  * The process group of a manager consists of six processes, the sixth one being the coordinator of the process
   * group. There is no dedicated load balancing process. The coordinator process (rank 5) reads the mesh and the solver
   * configuration and decides that the coarse grid problem is to be treated by two compute processes (process group
   * ranks 0 and 1) and the fine grid problems by six compute processes (ranks 0-5). Then two ProcessSubgroup objects are
@@ -86,7 +86,7 @@ namespace FEAST
     * it contains only the compute processes excluding the the extra coordinator process. The parent process group of
     * the work group is not this ProcessSubgroup, but the parent group of this ProcessSubgroup. That is why, when
     * creating the work group, the dummy calls of MPI_Comm_create(...) by the remaining processes of the parent process
-    * group are performed in the load balancer class and not here.
+    * group are performed in the manager class and not here.
     */
     WorkGroup* _work_group;
 
@@ -147,7 +147,7 @@ namespace FEAST
       // end of debugging output
 
       // create work group consisting of the real compute processes only (the dummy calls of MPI_Comm_create(...) by the
-      // remaining processes of the parent process group are performed in the load balancer class and not here)
+      // remaining processes of the parent process group are performed in the manager class and not here)
       if (!_contains_extra_coord)
       {
         // in the case there is no extra coordinator process, the work group of compute processes contains all processes

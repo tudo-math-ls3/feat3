@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_LOAD_BAL_HPP
-#define KERNEL_LOAD_BAL_HPP 1
+#ifndef KERNEL_MANAGER_HPP
+#define KERNEL_MANAGER_HPP 1
 
 // includes, system
 #include <mpi.h>
@@ -28,9 +28,9 @@ namespace FEAST
 // Funktion define_work_groups() enthalten. (Waehrend die Funktion create_work_groups() hier in dieser Klasse bleiben
 // sollte, da sie nur umsetzt, was der load balancer ihr vorgibt.)
   /**
-  * \brief class defining a load balancer
+  * \brief class defining a process group manager
   *
-  * Each initial process group is organised by a load balancer. It runs on all processes of the process group, which
+  * Each initial process group is organised by a manager. It runs on all processes of the process group, which
   * eases work flow organisation significantly. There is one coordinator process which is the only one knowing the
   * complete computational mesh. It is responsible for reading and distributing the mesh to the other processes, and for
   * organising partitioning and load balancing (collect and process matrix patch statistics, ...). This coordinator is
@@ -40,7 +40,7 @@ namespace FEAST
   * or if it should be a dedicated load balancing / coordinator process doing nothing else. This means, the coordinator
   * process and the dedicated load balancer process, if the latter exists, coincide.
   *
-  * The user knows what each process group and its respective load balancer should do. He calls, e.g.,
+  * The user knows what each process group and its respective manager should do. He calls, e.g.,
   * if(load_bal->group_id() == 0)
   * {
   *   load_bal->readMesh();
@@ -52,7 +52,7 @@ namespace FEAST
   * }
   *
   * The load bal. with id 0 in the example above then...
-  * 1) ...reads in the mesh (this is only done by the dedicated load balancer process or the coordinator, resp.)
+  * 1) ...reads in the mesh (this is only done by the coordinator)
   * 2) ...defines which base mesh cells (BMCs) build a matrix patch (MP) and which MPs build a process patch (PP)
 
 COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e. one BMC per MPI job
@@ -73,7 +73,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
   *    b) There is no dedicated load balancer: Same as case a), but instead of the dedicated load balancer the
   *       coordinator of the process group builds the global graph structure. In this case, it must be distinguished
   *       whether the coordinator is part of the work group or not.
-  *    The load balancer does not create the work group objects directly, but "intermediate" groups, the so called
+  *    The manager does not create the work group objects directly, but "intermediate" groups, the so called
   *    ProcessSubgroup objects. These objects then contain the actual work groups. (See the description of class
   *    ProcessSubgroup.)
   *    COMMENT_HILMAR: It might be more clever to also let the MPI implementation decide on which physical process the
@@ -142,13 +142,19 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
   * \tparam world_dim_
   * world dimension (determines the number of coordinates)
   *
+  * \note Since a manager manages one (global) process group, it could also have been called 'ProcessGroupManager'.
+  * But since 99 % of the code 'happens' within process groups (only application programmers dealing with multiphysics
+  * or similar stuff have to organise different process groups), I omitted the leading 'ProcessGroup'.
+  * Other names which came to my mind were 'ProgramFlowManager' (too long) and 'FlowManager' (misleading in a FE tool
+  * dealing with CFD problems). (Hilmar)
+  *
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
   */
   template<
     unsigned char space_dim_,
     unsigned char world_dim_>
-  class LoadBalancer
+  class Manager
   {
 
   private:
@@ -156,13 +162,13 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /* *****************
     * member variables *
     *******************/
-    /// pointer to the process group the load balancer manages
+    /// pointer to the process group the manager manages
     ProcessGroup* _process_group;
 
-    /// flag whether the load balancer's process group uses a dedicated load balancer process
+    /// flag whether the manager's process group uses a dedicated load balancer process
     bool _group_has_dedicated_load_bal;
 
-    /// vector of work process subgroups the load balancer manages
+    /// vector of process subgroups the manager manages
     std::vector<ProcessSubgroup*> _subgroups;
 
     /// vector of graph structures representing the process topology within the work groups
@@ -192,12 +198,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     bool* _belongs_to_group;
 
-    /**
-    * \brief base mesh the load balancer works with
-    *
-    * \note Temporarily use only BaseMesh2D here! space_dim_ and world_dim_ templates are still completely missing on
-    * load balancer / MPI prototype side.
-    */
+    /// base mesh the manager works with
     BaseMesh::BM<space_dim_, world_dim_>* _base_mesh;
 
   public:
@@ -206,7 +207,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     * constructor & destructor *
     ***************************/
     /// CTOR
-    LoadBalancer(
+    Manager(
       ProcessGroup* process_group,
       bool group_has_dedicated_load_bal)
       : _process_group(process_group),
@@ -217,13 +218,13 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         _belongs_to_group(nullptr),
         _base_mesh(nullptr)
     {
-      CONTEXT("LoadBalancer::LoadBalancer()");
+      CONTEXT("Manager::Manager()");
     }
 
     /// DTOR
-    ~LoadBalancer()
+    ~Manager()
     {
-      CONTEXT("LoadBalancer::~LoadBalancer()");
+      CONTEXT("Manager::~Manager()");
       if (_subgroup_ranks != nullptr)
       {
         for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
@@ -274,7 +275,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     inline ProcessGroup* process_group() const
     {
-      CONTEXT("LoadBalancer::process_group()");
+      CONTEXT("Manager::process_group()");
       return _process_group;
     }
 
@@ -286,7 +287,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     inline BaseMesh::BM<space_dim_, world_dim_>* base_mesh() const
     {
-      CONTEXT("LoadBalancer::base_mesh()");
+      CONTEXT("Manager::base_mesh()");
       return _base_mesh;
     }
 
@@ -298,7 +299,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     inline bool group_has_dedicated_load_bal() const
     {
-      CONTEXT("LoadBalancer::group_has_dedicated_load_bal()");
+      CONTEXT("Manager::group_has_dedicated_load_bal()");
       return _group_has_dedicated_load_bal;
     }
 
@@ -308,7 +309,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /// read in a mesh file and set up base mesh
     void read_mesh(std::string const & mesh_file)
     {
-      CONTEXT("LoadBalancer::read_mesh()");
+      CONTEXT("Manager::read_mesh()");
       // the mesh is read by the process group coordinator
       if(_process_group->is_coordinator())
       {
@@ -345,7 +346,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     */
     void define_work_groups()
     {
-      CONTEXT("LoadBalancer::define_work_groups()");
+      CONTEXT("Manager::define_work_groups()");
     }
 
 
@@ -379,7 +380,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       int** subgroup_ranks,
       Graph** graphs)
     {
-      CONTEXT("LoadBalancer::create_work_groups()");
+      CONTEXT("Manager::create_work_groups()");
       // set data/pointers on the coordinator process (where the data is already available)
       if(_process_group->is_coordinator())
       {
@@ -687,4 +688,4 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_LOAD_BAL_HPP
+#endif // guard KERNEL_MANAGER_HPP

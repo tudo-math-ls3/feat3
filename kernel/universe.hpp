@@ -15,7 +15,7 @@
 #include <kernel/process.hpp>
 #include <kernel/master.hpp>
 #include <kernel/error_handler.hpp>
-#include <kernel/load_balancer.hpp>
+#include <kernel/manager.hpp>
 
 /// FEAST namespace
 namespace FEAST
@@ -113,11 +113,11 @@ namespace FEAST
     Master* _master;
 
     /**
-    * \brief load balancer process
+    * \brief manager process
     *
     * Will be nullptr if not living on this process.
     */
-    LoadBalancer<space_dim_, world_dim_>* _load_balancer;
+    Manager<space_dim_, world_dim_>* _manager;
 
 
     /**
@@ -147,7 +147,7 @@ namespace FEAST
         _includes_dedicated_load_bal(nullptr),
         _group_ranks_world(nullptr),
         _master(nullptr),
-        _load_balancer(nullptr),
+        _manager(nullptr),
         _logfile_base_name("")
     {
       CONTEXT("Universe::Universe()");
@@ -181,7 +181,7 @@ namespace FEAST
     * Let there be
     * \li \c n processes with \c MPI_COMM_WORLD ranks <code>0, .., n-1</code>,
     * \li \c k process groups <code>0, .., k-1</code>, process group \c i comprising <code>0 < P_i < n-1</code>
-    *     processes including the (eventually dedicated) load load balancer (<code>P_0 + ... + P_(k-1) = n-1)</code>
+    *     processes including the eventually dedicated load balancer (<code>P_0 + ... + P_(k-1) = n-1)</code>
     *
     * Then the MPI_COMM_WORLD ranks are distributed as follows:
     * \li process group 0: ranks <code>0, ..., P_0-1</code> (where <code>P_0-1</code> is the coordinator
@@ -335,7 +335,7 @@ namespace FEAST
       // all ok, now decide if this process is a regular one or the group's load-balancer or even the master
 
       // initialise the pointers as nullptr
-      _load_balancer = nullptr;
+      _manager = nullptr;
       _master = nullptr;
 
       if(Process::is_master)
@@ -353,8 +353,8 @@ namespace FEAST
       }
       else
       {
-        // create load balancer object in each process of the process group
-        _load_balancer = new LoadBalancer<space_dim_, world_dim_>(_process_group,
+        // create manager object in each process of the process group
+        _manager = new Manager<space_dim_, world_dim_>(_process_group,
                                                                   _includes_dedicated_load_bal[my_group]);
         // debug output
         Logger::log("Process " + stringify(Process::rank) + " belongs to process group " + stringify(my_group) + ".\n");
@@ -386,7 +386,7 @@ namespace FEAST
       else
       {
         delete _process_group;
-        delete _load_balancer;
+        delete _manager;
         delete _world_group_without_master;
       }
       delete [] _includes_dedicated_load_bal;
@@ -403,15 +403,15 @@ namespace FEAST
     * getters & setters *
     ********************/
     /**
-    * \brief getter for the load balancer object
+    * \brief getter for the manager object
     *
-    * \return pointer to LoadBalancer #_load_balancer
+    * \return pointer to Manager #_manager
     */
-    inline LoadBalancer<space_dim_, world_dim_>* load_balancer() const
+    inline Manager<space_dim_, world_dim_>* manager() const
     {
-      CONTEXT("Universe::load_balancer()");
+      CONTEXT("Universe::manager()");
       ASSERT(_universe_created, "Universe must be created first by calling create(...).");
-      return _load_balancer;
+      return _manager;
     }
 
 
@@ -477,7 +477,7 @@ namespace FEAST
     /**
     * \brief function for creating a universe with several process groups
     *
-    * When using this function, one can choose how many process groups are created. Additionally, one load balancer
+    * When using this function, one can choose how many process groups are created. Additionally, one manager
     * per process group and one master process is created. The caller has to ensure that sufficient MPI processes are
     * available.
     *

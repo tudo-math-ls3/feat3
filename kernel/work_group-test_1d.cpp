@@ -39,8 +39,8 @@ public:
   * This test code is semi hard-wired in the sense that we schedule one BMC to each processor.
   * We need n processes for the following (where n is the number of base mesh cells).
   *
-  * \param[in] load_balancer
-  * pointer to the load balancer object to get some further information
+  * \param[in] manager
+  * pointer to the manager object to get some further information
   *
   * \param[out] num_subgroups
   * number of subgroups
@@ -62,7 +62,7 @@ public:
   * array of Graph pointers representing the connectivity of work group processes
   */
   void define_work_groups(
-    LoadBalancer<space_dim_, world_dim_>* load_balancer,
+    Manager<space_dim_, world_dim_>* manager,
     unsigned int& num_subgroups,
     unsigned int*& num_proc_in_subgroup,
     unsigned char*& group_contains_extra_coord,
@@ -78,18 +78,18 @@ public:
     subgroup_ranks = new int*[num_subgroups];
     graphs = new Graph*[num_subgroups];
 
-    // shortcut to the number of processes in the load balancer's process group
-    unsigned int num_processes = load_balancer->process_group()->num_processes();
+    // shortcut to the number of processes in the manager's process group
+    unsigned int num_processes = manager->process_group()->num_processes();
 
     // shortcut to the number of cells in the base mesh
-    unsigned int num_cells = load_balancer->base_mesh()->num_cells();
+    unsigned int num_cells = manager->base_mesh()->num_cells();
 
     // debug output
     Logger::log_master("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n");
     // assert that the number of processes is n
     ASSERT(num_processes == num_cells, "");
     // assert that no dedicated load balancer is used
-    ASSERT(!load_balancer->group_has_dedicated_load_bal(), "");
+    ASSERT(!manager->group_has_dedicated_load_bal(), "");
 
     // set up the test case
 
@@ -106,7 +106,7 @@ public:
     }
 
     // get connectivity graph of the base mesh; this one will be used for the one and only work group
-    graphs[0] = load_balancer->base_mesh()->graph();
+    graphs[0] = manager->base_mesh()->graph();
 
   // COMMENT_HILMAR:
   // We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
@@ -146,15 +146,15 @@ public:
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
-    LoadBalancer<space_dim_, world_dim_>* load_balancer = universe->load_balancer();
+    Manager<space_dim_, world_dim_>* manager = universe->manager();
     Master* master = universe->master();
 
-    if(load_balancer != nullptr)
+    if(manager != nullptr)
     {
-      ProcessGroup* process_group = load_balancer->process_group();
+      ProcessGroup* process_group = manager->process_group();
 
-      // let the load balancer "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
-      load_balancer->read_mesh("dummy");
+      // let the manager "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
+      manager->read_mesh("dummy");
 
       // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
       unsigned int num_subgroups;
@@ -168,13 +168,13 @@ public:
       {
         // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
         // work groups and the process distribution to them. The passed arrays are allocated within this routine.
-        define_work_groups(load_balancer, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+        define_work_groups(manager, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                            subgroup_ranks, graphs);
       }
-      // Now let the load balancer create the work groups (this function is called on all processes of the process
+      // Now let the manager create the work groups (this function is called on all processes of the process
       // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
       // balancer class.
-      load_balancer->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
+      manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                                         subgroup_ranks, graphs);
 
 // add some TEST_CHECK(...)

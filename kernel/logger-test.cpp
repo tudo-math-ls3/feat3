@@ -100,12 +100,12 @@ public:
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
-    LoadBalancer<space_dim_, world_dim_>* load_balancer = universe->load_balancer();
+    Manager<space_dim_, world_dim_>* manager = universe->manager();
     Master* master = universe->master();
 
-    if(load_balancer != nullptr)
+    if(manager != nullptr)
     {
-      ProcessGroup* process_group = load_balancer->process_group();
+      ProcessGroup* process_group = manager->process_group();
       unsigned int group_id = process_group->group_id();
 
       int rank_process_group = process_group->rank();
