@@ -10,7 +10,6 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT 
 00020 |feature_request      |unassigned |hilmar |                  |high     |implement_subdivision_quad_tri_conform
 00024 |feature_request      |unassigned |hilmar |                  |high     |preliminary_ascii_file_handling
 00028 |feature_request      |unassigned |hilmar |                  |high     |implement_status_class
-00029 |optimisation_request |assigned   |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
 00031 |feature_request      |assigned   |hilmar |dirk              |high     |realise_nightly_regression_test
 00033 |bug_report           |assigned   |hilmar |hilmar            |high     |log_comm_to_master_faulty_with_mpich
 00003 |milestone            |assigned   |markus |dom_hilmar        |medium   |kernel_subsystem_parallel_infrastructure
@@ -34,3 +33,4 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT 
 00002 |feature_request      |resolved   |markus |dirk              |critical |build_system_essentials
 00007 |bug_report           |resolved   |markus |peter             |critical |test_system_is_error_prone
 00019 |optimisation_request |resolved   |markus |dirk              |critical |enable_mpi_in_test_system
+00029 |optimisation_request |resolved   |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process

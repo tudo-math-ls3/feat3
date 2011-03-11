@@ -172,7 +172,8 @@ public:
     // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)
     Universe<space_dim_, world_dim_>* universe = Universe<space_dim_, world_dim_>::instance();
 
-    // create universe, let the outer test system catch eventual exceptions
+    // create universe consisting of one process group without dedicated load balancer,
+    // let the outer test system catch eventual exceptions
     universe->create("work_group_test_2d_1");
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
@@ -212,7 +213,7 @@ public:
       // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
       // balancer class.
       manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                                        subgroup_ranks, graphs);
+                                  subgroup_ranks, graphs);
 
 // add some TEST_CHECK(...)
 

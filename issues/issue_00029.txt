@@ -1,6 +1,6 @@
 ID           00029
 TYPE         optimisation_request
-STATUS       assigned
+STATUS       resolved
 AUTHOR       hilmar
 ASSIGNED TO  hilmar
 SEVERITY     high
@@ -9,3 +9,4 @@ FULL TEXT
 Separate load balancer process and coordinator process. In the case, there is a dedicated load balancer (which might perform some extra computations in parallel) it is not clever to let this process also be the coordinator of the process group.
 
 SOLUTION
+Coordinator process is always the process with rank 0 within the process group. If the load balancer is NOT a dedicated process, it coincides with the coordinator process, otherwise it is the process with the highest rank in the process group.

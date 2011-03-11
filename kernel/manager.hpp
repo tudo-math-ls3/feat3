@@ -32,50 +32,55 @@ namespace FEAST
   *
   * Each initial process group is organised by a manager. It runs on all processes of the process group, which
   * eases work flow organisation significantly. There is one coordinator process which is the only one knowing the
-  * complete computational mesh. It is responsible for reading and distributing the mesh to the other processes, and for
-  * organising partitioning and load balancing (collect and process matrix patch statistics, ...). This coordinator is
-  * always the process with the largest rank within the process group.
+  * complete computational mesh. It is part of at least one work group, i.e., it performs compute tasks, but it is
+  * also responsible for reading and distributing the mesh to the other processes, and for organising load balancing.
+  * The coordinator has rank 0 within the process group.
   *
-  * The user can choose if this coordinator process should also perform compute tasks (solving linear systems etc),
-  * or if it should be a dedicated load balancing / coordinator process doing nothing else. This means, the coordinator
-  * process and the dedicated load balancer process, if the latter exists, coincide.
+  * One process is responsible for performing load balancing (collect and process matrix patch statistics, compute
+  * partitioning, define work groups, ...). This is either the coordinator process of the process group (being a compute
+  * process at the same time), or a dedicated load balancer process (which does nothing else). If the user decides to
+  * use such a decicated load balancer process, it is the process with the highest rank in the process group.
   *
   * The user knows what each process group and its respective manager should do. He calls, e.g.,
-  * if(load_bal->group_id() == 0)
+  * if(manager->group_id() == 0)
   * {
-  *   load_bal->readMesh();
+  *   manager->readMesh();
   *   ...
   * }
   * else
   * {
-  *   coffee_machine.start();
+  *   manager->start_coffee_machine();
   * }
   *
-  * The load bal. with id 0 in the example above then...
+  * The manager with id 0 in the example above then...
   * 1) ...reads in the mesh (this is only done by the coordinator)
-  * 2) ...defines which base mesh cells (BMCs) build a matrix patch (MP) and which MPs build a process patch (PP)
+  * 2) ...lets its load balancer define which base mesh cells (BMCs) build a matrix patch (MP) and which MPs build a
+  *    process patch (PP)
 
 COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e. one BMC per MPI job
 
-  * 3) ...decides with how many processes (usually equals the number of virtual coarse grid matrix patches, CGMPs) to
-  *    solve the global coarse grid problem and how to distribute the MPs to these processes/CGMPs.
-  *    The standard case will be that the coarse grid problem is solved on one processor, i.e. one CGMP containing
-  *    all MPs.
-  * 4) ...builds the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems and one for the
-  *    coarse mesh problem) and creates corresponding MPI communicators. The workers with the highest work group ranks
-  *    are the coordinators of these work groups, which communicate with the master or the dedicated load balancer. The
-  *    process topologies of the work groups are then optimised by building corresponding graph structures. There are
-  *    two cases:
-  *    a) There is a dedicated load balancer: The dedicated load balancer reads the mesh, creates work groups and a
-  *       global graph structure for each work group. Then it distributes to each process of the work group the relevant
-  *       parts of the global graph. Each work group process then creates its local graph structure and calls
+  * 3) ...lets its load balancer define with how many processes (usually equals the number of virtual coarse grid
+  *    matrix patches, CGMPs) to solve the global coarse grid problem and how to distribute the MPs to these
+  *    processes/CGMPs. The standard case will be that the coarse grid problem is solved on one processor, i.e. one
+  *    CGMP containing all MPs.
+  * 4) ...lets its load balancer define the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems
+  *    and one for the coarse mesh problem) and creates corresponding MPI communicators. The workers with rank 0 within
+  *    the work group (being itself a process group) are the coordinators of these work groups, which communicate with
+  *    the master or the dedicated load balancer. The process topologies of the work groups are then optimised by
+  *    building corresponding graph structures. There are two cases:
+  *    a) There is a dedicated load balancer: The dedicated load balancer gets all necessary information from the
+  *       coordinator (e.g., graph describing the neighourhood of the base mesh cells), defines MP and PP partitioning.
+  *       Then it returns the necessary information to the coordinator of the process group which organises the actual
+  *       setup of work groups and process distribution, e.g. by distributing to each worker process the relevant
+  *       parts of the global graph. Each worker process then creates its local graph structure and calls
   *       MPI_Dist_graph_create(...) to build the new MPI process topology in a distributed fashion.
-  *    b) There is no dedicated load balancer: Same as case a), but instead of the dedicated load balancer the
-  *       coordinator of the process group builds the global graph structure. In this case, it must be distinguished
-  *       whether the coordinator is part of the work group or not.
-  *    The manager does not create the work group objects directly, but "intermediate" groups, the so called
-  *    ProcessSubgroup objects. These objects then contain the actual work groups. (See the description of class
-  *    ProcessSubgroup.)
+  *    b) There is no dedicated load balancer: Same as case a), but the tasks of the dedicated load balancer are
+  *       performed by the coordinator of the process group.
+  *    In both cases, one must distinguish whether the coordinator is part of the specific work group currently set up.
+  *    The manager does not create the work group objects directly, but 'intermediate' groups, the so called
+  *    ProcessSubgroup objects. These objects then contain the actual work groups and eventually additionally the
+  *    coordinator process if it is not part of the work group anyway (see the description of class
+  *    ProcessSubgroup for details).
   *    COMMENT_HILMAR: It might be more clever to also let the MPI implementation decide on which physical process the
   *    dedicated load balancer should reside (instead of pinning it to the last rank in the process group). To improve
   *    this is task of the ITMC.
@@ -162,11 +167,19 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /* *****************
     * member variables *
     *******************/
-    /// pointer to the process group the manager manages
+    /// process group the manager manages
     ProcessGroup* _process_group;
 
     /// flag whether the manager's process group uses a dedicated load balancer process
-    bool _group_has_dedicated_load_bal;
+    bool const _group_has_dedicated_load_bal;
+
+    /**
+    * \brief rank of the load balancer process
+    *
+    * If the process group uses a dedicated load balancer process, then it has rank #_num_processes - 1. Otherwise,
+    * it coincides with the coordinator process, i.e. it has rank 0.
+    */
+    int _rank_load_balancer;
 
     /// vector of process subgroups the manager manages
     std::vector<ProcessSubgroup*> _subgroups;
@@ -174,7 +187,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /// vector of graph structures representing the process topology within the work groups
     std::vector<Graph*> _graphs;
 
-    /// number of work groups
+    /// number of subgroups / work groups
     unsigned int _num_subgroups;
 
     /**
@@ -212,6 +225,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       bool group_has_dedicated_load_bal)
       : _process_group(process_group),
         _group_has_dedicated_load_bal(group_has_dedicated_load_bal),
+        _rank_load_balancer(MPI_PROC_NULL),
         _num_subgroups(0),
         _num_proc_in_subgroup(nullptr),
         _subgroup_ranks(nullptr),
@@ -219,6 +233,17 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         _base_mesh(nullptr)
     {
       CONTEXT("Manager::Manager()");
+      // set rank of the load balancer process
+      if(_group_has_dedicated_load_bal)
+      {
+        // if the group contains a dedicated load balancer, it is the process with the highest rank in the process group
+        _rank_load_balancer = _process_group->num_processes()-1;
+      }
+      else
+      {
+        // otherwise the coordinator plays the role of the load balancer
+        _rank_load_balancer = _process_group->rank_coord();
+      }
     }
 
     /// DTOR
@@ -303,9 +328,49 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       return _group_has_dedicated_load_bal;
     }
 
+
+    /**
+    * \brief getter for rank of the load balancer process
+    *
+    * If the process group uses a dedicated load balancer process, then it has rank #_num_processes - 1. Otherwise,
+    * it coincides with the coordinator process, i.e. it has rank 0.
+    *
+    * \return rank of the load balancer process
+    */
+    inline int rank_load_balancer() const
+    {
+      CONTEXT("Manager::rank_load_balancer()");
+      return _rank_load_balancer;
+    }
+
+
     /* *****************
     * member functions *
     *******************/
+    /**
+    * \brief checks whether this process is the load balancer of the process group
+    *
+    * \return true if this process is the load balancer of the process group, otherwise false
+    */
+    inline bool is_load_balancer() const
+    {
+      CONTEXT("ProcessGroup::is_load_balancer()");
+      return _process_group->rank() == _rank_load_balancer;
+    }
+
+
+    /**
+    * \brief checks whether this process is the dedicated load balancer of the process group
+    *
+    * \return true if this process is the dedicated load balancer of the process group, otherwise false
+    */
+    inline bool is_dedicated_load_balancer() const
+    {
+      CONTEXT("ProcessGroup::is_dedicated_load_balancer()");
+      return group_has_dedicated_load_bal() && is_load_balancer();
+    }
+
+
     /// read in a mesh file and set up base mesh
     void read_mesh(std::string const & mesh_file)
     {
@@ -353,6 +418,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
     /**
     * \brief function that sets up subgroups and work groups basing on the provided information
     *
+    * This function is called on all processes of the process group.
     *
     * \param[in] num_subgroups
     * number of subgroups
@@ -399,6 +465,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
                                      _process_group->comm());
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
+      // allocate arrays on the non-coordinator processes
       if(!_process_group->is_coordinator())
       {
         ASSERT(_num_subgroups > 0, "Number of subgroups must be greater than 0.");
@@ -411,7 +478,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
       mpi_error_code = MPI_Bcast(group_contains_extra_coord, _num_subgroups, MPI_UNSIGNED_CHAR,
-                                  _process_group->rank_coord(), _process_group->comm());
+                                 _process_group->rank_coord(), _process_group->comm());
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
       // let the non-coordinator processes allocate the array _subgroup_ranks for rank partitioning
@@ -534,8 +601,7 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
       // create ProcessSubgroup objects including MPI groups and MPI communicators
       // It is not possible to set up all subgroups in one call, since the processes building the subgroups are
       // not necessarily disjunct. Hence, there are as many calls as there are subgroups. All processes not belonging
-      // to the subgroup currently created call the MPI_Comm_create() function with a with dummy communicator and
-      // dummy group.
+      // to the subgroup currently created call the MPI_Comm_create() function with dummy communicator and dummy group.
 
       _subgroups.resize(_num_subgroups, nullptr);
       for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
@@ -588,78 +654,99 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
         {
           unsigned int num_neighbours_local;
           unsigned int* neighbours_local(nullptr);
-          int root = _subgroups[igroup]->rank_coord();
+          int rank_coord = _subgroups[igroup]->rank_coord();
           if(_subgroups[igroup]->is_coordinator())
           {
             /* **********************************************
-            * code for the sending root/coordinator process *
+            * code for the sending coordinator process *
             ************************************************/
 
             // set the graph pointer for the current subgroup
             _graphs.push_back(graphs[igroup]);
 
-            unsigned int count = _graphs[igroup]->num_nodes();
+            unsigned int* num_neighbours;
+            unsigned int* index;
+
+            unsigned int num_nodes;
             if(_subgroups[igroup]->contains_extra_coord())
             {
-              // MPI_Scatter() counts the extra coordinator process as well (which only sends data). Arrays have to
-              // be prepared with n+1 segments although only n processes receive data.
-              ++count;
+              // In case there is an extra coordinator process, we have to add one pseudo node to the graph and the
+              // index array must be modified correspondingingly. This pseudo node corresponds to the coordinator
+              // process itself which has to be included in the call of MPI_Scatterv(...). It has to appear at the
+              // position in the arrays num_neighbours[] and index[] corresponding to the rank of the coordinator.
+              // Although we know, that this is rank 0, we do not explicitly exploit this information here since it
+              // might be that this is changed in future.
+              num_nodes = _graphs[igroup]->num_nodes() + 1;
+              num_neighbours = new unsigned int[num_nodes];
+              index = new unsigned int[num_nodes + 1];
+              for(unsigned int i(0) ; i < (unsigned int)rank_coord+1 ; ++i)
+              {
+                index[i] = _graphs[igroup]->index()[i];
+              }
+              index[rank_coord+1] = index[rank_coord];
+              for(unsigned int i(rank_coord+1) ; i < _graphs[igroup]->num_nodes()+1 ; ++i)
+              {
+                index[i+1] = _graphs[igroup]->index()[i];
+              }
             }
-            unsigned int* num_neighbours = new unsigned int[count];
-            unsigned int* index = _graphs[igroup]->index();
-            for(unsigned int i(0) ; i < _graphs[igroup]->num_nodes() ; ++i)
+            else
+            {
+              // in case there is no extra coordinator process, the number of neighbours equals the number of nodes
+              // in the graph and the index array does not have to be modified
+              num_nodes = _graphs[igroup]->num_nodes();
+              num_neighbours = new unsigned int[num_nodes];
+              index = _graphs[igroup]->index();
+            }
+
+            // now determine the number of neighbours per node (eventually including the pseudo node for the extra
+            // coordinator process)
+            for(unsigned int i(0) ; i < num_nodes ; ++i)
             {
               num_neighbours[i] = index[i+1] - index[i];
             }
 
             if(_subgroups[igroup]->contains_extra_coord())
             {
-              // the extra coordinator process is the last in the work rank, so set the last entry of the array to zero
-              num_neighbours[count-1] = 0;
-
-              // send the number of neighbours to the non-root processes (use MPI_IN_PLACE to indicate that the root
-              // does not receive/store any data)
-              MPI_Scatter(num_neighbours, 1, MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
+              // send the number of neighbours to the non-coordinator processes (use MPI_IN_PLACE to indicate that the
+              // coordinator does not receive/store any data)
+              MPI_Scatter(num_neighbours, 1, MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, rank_coord,
                           _subgroups[igroup]->comm());
-              // send the neighbours to the non-root processes (usually the neighbours array must also have n+1
-              // segments, but since num_neighbours[count-1] == 0, the last segment is empty)
+              // send the neighbours to the non-coordinator processes
               MPI_Scatterv(_graphs[igroup]->neighbours(), reinterpret_cast<int*>(num_neighbours),
-                           reinterpret_cast<int*>(index), MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, root,
+                           reinterpret_cast<int*>(index), MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, rank_coord,
                            _subgroups[igroup]->comm());
-// COMMENT_HILMAR:
-// Is it problematic to define num_neighbours as unsigned int* and then to cast it to int* when passed to
-// MPI_Scatterv()? (This question also applies to other places in the code!)
-// Should we better define it as int* right from the beginning?
+              // delete the aux. index array again
+              delete [] index;
             }
             else
             {
-              // When there is no extra coordinator process, then the root is part of the compute work group and
+              // When there is no extra coordinator process, then the coordinator is part of the compute work group and
               // also sends data to itself.
 
-              // scatter the number of neighbours to the non-root processes and to the root process itself
-              MPI_Scatter(num_neighbours, 1, MPI_UNSIGNED, &num_neighbours_local, 1, MPI_UNSIGNED, root,
+              // scatter the number of neighbours to the non-coordinator processes and to the coordinator process itself
+              MPI_Scatter(num_neighbours, 1, MPI_UNSIGNED, &num_neighbours_local, 1, MPI_UNSIGNED, rank_coord,
                           _subgroups[igroup]->comm());
               neighbours_local = new unsigned int[num_neighbours_local];
-              // scatter the neighbours to the non-root processes and to the root process itself
+              // scatter the neighbours to the non-coordinator processes and to the coordinator process itself
               MPI_Scatterv(_graphs[igroup]->neighbours(), reinterpret_cast<int*>(num_neighbours),
                            reinterpret_cast<int*>(index), MPI_UNSIGNED, neighbours_local, num_neighbours_local,
-                           MPI_UNSIGNED, root,_subgroups[igroup]->comm());
+                           MPI_UNSIGNED, rank_coord, _subgroups[igroup]->comm());
             }
             delete [] num_neighbours;
           }
-          else
+          else // !_subgroups[igroup]->is_coordinator()
           {
-            /* **********************************************************
-            * code for the receiving non-root/non-coordinator processes *
-            ************************************************************/
-            // receive the number of neighbours from the root process
-            MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_UNSIGNED, root,
+            /* *************************************************
+            * code for the receiving non-coordinator processes *
+            ***************************************************/
+            // receive the number of neighbours from the coordinator process
+            MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_UNSIGNED, rank_coord,
                         _subgroups[igroup]->comm());
 
             // receive the neighbours
             neighbours_local = new unsigned int[num_neighbours_local];
             MPI_Scatterv(nullptr, 0, nullptr, MPI_DATATYPE_NULL, neighbours_local, num_neighbours_local, MPI_UNSIGNED,
-                         root, _subgroups[igroup]->comm());
+                         rank_coord, _subgroups[igroup]->comm());
           }
 
           if (!(_subgroups[igroup]->is_coordinator() && _subgroups[igroup]->contains_extra_coord()))
@@ -667,14 +754,12 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
             // now create distributed graph structure within the compute work groups (the array neighbours_local is
             // copied in the constructor of the distributed graph object, hence it can be deallocated afterwards)
             _subgroups[igroup]->work_group()->set_graph_distributed(num_neighbours_local, neighbours_local);
-          }
-          if(neighbours_local != nullptr)
-          {
             delete [] neighbours_local;
           }
         } // if(_belongs_to_group[igroup])
       } // for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
 
+// TODO: remove this test code here and call it from somewhere else
       // test local neighbourhood communication
       for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {

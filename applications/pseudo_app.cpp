@@ -52,12 +52,13 @@ using namespace FEAST;
 *    - work group for coarse grid: 2 processes: {0, 1}
 *    - work group for fine grid: n processes: {1, ..., n}
 *    - i.e. process 1 is in both work groups
-*    - dedicated load balancer and coordinator process: n+1
+*    - coordinator process: 0
+*    - dedicated load balancer process: n+1
 * 2) without dedicated load balancer process
 *    - work group for coarse grid: 2 processes: {0, 1}
 *    - work group for fine grid: n processes: {2, ..., n+1}
 *    - i.e. the two work groups are disjunct
-*    - coordinator process: n+1
+*    - coordinator process: 0
 * Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
 * includes_dedicated_load_bal[] in the main() method.
 *
@@ -92,6 +93,7 @@ void define_work_groups(
   Graph**& graphs)
 {
   CONTEXT("pseudo_app: define_work_groups()");
+
   // set number of subgroups manually to 2
   num_subgroups = 2;
   // allocate arrays
@@ -121,15 +123,16 @@ void define_work_groups(
     //  - work group for coarse grid: 2 processes: {0, 1}
     //  - work group for fine grid: n processes: {1, ..., n}
     //  - i.e. process 1 is in both work groups
-    //  - dedicated load balancer and coordinator process: n+1
+    //  - coordinator process: 0
+    //  - dedicated load balancer: n+1
 
-    // since there is a dedicated load balancer process, this has to be added to both work groups as extra
-    // coordinator process
-    group_contains_extra_coord[0] = true;
+    // the coordinator (rank 0) is at the same time a compute process of the first work group, so only the second
+    // work group has to add an extra process
+    group_contains_extra_coord[0] = false;
     group_contains_extra_coord[1] = true;
 
     // set number of processes per group
-    num_proc_in_subgroup[0] = 2 + 1;
+    num_proc_in_subgroup[0] = 2;
     num_proc_in_subgroup[1] = num_cells + 1;
 
     // partition the process group ranks into work groups
@@ -137,14 +140,13 @@ void define_work_groups(
     subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
     subgroup_ranks[0][0] = 0;
     subgroup_ranks[0][1] = 1;
-    subgroup_ranks[0][2] = num_cells + 1;
 
     // fine grid work group
     subgroup_ranks[1] = new int[num_proc_in_subgroup[1]];
-    // set entries to {1, ..., n+1}
+    // set entries to {0,1, ..., n}
     for(unsigned int i(0) ; i < num_proc_in_subgroup[1] ; ++i)
     {
-      subgroup_ranks[1][i] = i+1;
+      subgroup_ranks[1][i] = i;
     }
   }
   else
@@ -154,27 +156,27 @@ void define_work_groups(
     //  - work group for coarse grid: 2 processes: {0, 1}
     //  - work group for fine grid: n processes: {2, ..., n+1}
     //  - i.e. the two work groups are disjunct
-    //  - coordinator process: n+1
+    //  - coordinator (and load balancer) process: 0
 
-    // the coordinator is at the same time a compute process of the second work group, so only the first work group
-    // has to add an extra process
-    group_contains_extra_coord[0] = true;
-    group_contains_extra_coord[1] = false;
+    // the coordinator (rank 0) is at the same time a compute process of the first work group, so only the second
+    // work group has to add an extra process
+    group_contains_extra_coord[0] = false;
+    group_contains_extra_coord[1] = true;
 
     // set number of processes per group
-    num_proc_in_subgroup[0] = 2 + 1;
-    num_proc_in_subgroup[1] = num_cells;
+    num_proc_in_subgroup[0] = 2;
+    num_proc_in_subgroup[1] = num_cells + 1;
 
     // partition the process group ranks into work groups
     subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
     subgroup_ranks[0][0] = 0;
     subgroup_ranks[0][1] = 1;
-    subgroup_ranks[0][2] = num_cells + 1;
     subgroup_ranks[1] = new int[num_proc_in_subgroup[1]];
-    // set entries to {2, ..., n+1}
-    for(unsigned int i(0) ; i < num_proc_in_subgroup[1] ; ++i)
+    // set entries to {0, 2, ..., n+1}
+    subgroup_ranks[1][0] = 0;
+    for(unsigned int i(1) ; i < num_proc_in_subgroup[1] ; ++i)
     {
-      subgroup_ranks[1][i] = i+2;
+      subgroup_ranks[1][i] = i+1;
     }
   }
 
@@ -271,7 +273,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    universe->create(num_process_groups, num_processes_in_group, includes_dedicated_load_bal);
+    universe->create(num_process_groups, num_processes_in_group, includes_dedicated_load_bal, "pseudo_app");
   }
   catch (Exception& e)
   {

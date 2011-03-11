@@ -92,7 +92,7 @@ namespace FEAST
     * \brief constructor for the case the MPI_Group and the MPI_Comm already exist
     *
     * This constructor is intended for creating a process group object containing all COMM_WORLD processes. The
-    * coordinator is set to rank #_num_processes-1, i.e. the last rank in the process group.
+    * coordinator is set to rank 0, i.e. the first rank in the process group.
     *
     * \param[in] comm
     * communicator shared by the group processes
@@ -108,7 +108,7 @@ namespace FEAST
         _ranks_group_parent(nullptr),
         _process_group_parent(nullptr),
         _group_id(0),
-        _rank_coord(num_processes-1)
+        _rank_coord(0)
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
       ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
@@ -128,12 +128,13 @@ namespace FEAST
 //      _buffer = nullptr;
     }
 
+
     /**
     * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
     *
     * This constructor can be used for splitting the complete set of COMM_WORLD processes into subgroups for performing
     * two or more completely separated tasks (e.g., for multiphysics).
-    * The coordinator of this process group is set to rank #_num_processes-1, i.e. the last rank in the process group.
+    * The coordinator of this process group is set to rank 0, i.e. the first rank in the process group.
     *
     * \param[in] num_processes
     * number of processes in this group
@@ -156,7 +157,7 @@ namespace FEAST
         _ranks_group_parent(nullptr),
         _process_group_parent(process_group_parent),
         _group_id(group_id),
-        _rank_coord(num_processes-1)
+        _rank_coord(0)
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
       ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
@@ -325,6 +326,7 @@ namespace FEAST
       CONTEXT("ProcessGroup::is_coordinator()");
       return _rank == _rank_coord;
     }
+
 
     /**
     * \brief sending individual messages to the master

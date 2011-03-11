@@ -354,8 +354,7 @@ namespace FEAST
       else
       {
         // create manager object in each process of the process group
-        _manager = new Manager<space_dim_, world_dim_>(_process_group,
-                                                                  _includes_dedicated_load_bal[my_group]);
+        _manager = new Manager<space_dim_, world_dim_>(_process_group, _includes_dedicated_load_bal[my_group]);
         // debug output
         Logger::log("Process " + stringify(Process::rank) + " belongs to process group " + stringify(my_group) + ".\n");
       }

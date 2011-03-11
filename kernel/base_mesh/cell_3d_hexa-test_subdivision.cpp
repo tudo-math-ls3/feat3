@@ -70,7 +70,8 @@ public:
     // Universe<space_dim_, world_dim_>::instance(), it also calls the constructor of the Universe singleton class)
     Universe<space_dim_, world_dim_>* universe = Universe<space_dim_, world_dim_>::instance();
 
-    // create universe, let the outer test system catch eventual exceptions
+    // create universe consisting of one process group without dedicated load balancer,
+    // let the outer test system catch eventual exceptions
     universe->create("cell_3d_hexa-test_subdivision");
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the

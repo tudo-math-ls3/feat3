@@ -24,9 +24,14 @@ namespace FEAST
   *        the same compute task
   *
   * A WorkGroup object is part of a ProcessSubgroup. It describes a set of compute processes sharing the MPI
-  * communicator. The member of the work group living on this process is called "worker" (which is not realised via an
+  * communicator. The member of the work group living on this process is called 'worker' (which is not realised via an
   * extra class). Communication between different work groups is done via the enclosing ProcessGroup communicator.
   * For an example concerning WorkGroup and ProcessSubgroup creation, see the description of class ProcessSubgroup.
+  *
+  * \note Note that the variables #_ranks_group_parent and #_process_group_parent do not refer to the ProcessSubgroup
+  * object 'inbetween' this work group and the enclosing process group, but to the enclosing process group. This work
+  * group has to communicate with other work groups, and this is only possible via the common communicator of the
+  * enclosing process group. That is why the process subgroup is 'skipped'.
   *
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
@@ -96,7 +101,21 @@ namespace FEAST
     /* *************************
     * constructor & destructor *
     ***************************/
-    /// constructor
+    /**
+    * \brief CTOR
+    *
+    * \param[in] num_processes
+    * number of processes in this group
+    *
+    * \param[in] ranks_group_parent
+    * ranks in the parent group
+    *
+    * \param[in] process_group_parent
+    * parent group of processes
+    *
+    * \param[in] group_id
+    * ID of this group
+    */
     WorkGroup(
       unsigned int const num_processes,
       int* const ranks_group_parent,
@@ -108,6 +127,9 @@ namespace FEAST
         _ranks_finer(nullptr)
     {
       CONTEXT("WorkGroup::WorkGroup()");
+
+//TODO: remove this debug output
+
       // debugging output
       /* ******************************
       * test the logger functionality *
@@ -167,6 +189,7 @@ namespace FEAST
 //    return _comm_opt;
 //  }
 
+
     /**
     * \brief getter for the distributed graph object
     *
@@ -177,6 +200,7 @@ namespace FEAST
       CONTEXT("WorkGroup::graph_distributed()");
       return _graph_distributed;
     }
+
 
     /* *****************
     * member functions *
