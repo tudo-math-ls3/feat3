@@ -1,0 +1,11 @@
+ID           00033
+TYPE         bug_report
+STATUS       assigned
+AUTHOR       hilmar
+ASSIGNED TO  hilmar
+SEVERITY     high
+
+FULL TEXT
+When using MPICH the function ProcessGroup::log_indiv_master() is defective: the (screen+file) output the master should produce vanishes. With OpenMPI everything works fine.
+
+SOLUTION

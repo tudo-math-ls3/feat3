@@ -1,4 +1,4 @@
-NEWEST: 00032
+NEWEST: 00033
 ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT DESCRIPTION
 00008 |feature_request      |assigned   |markus |hilmar            |high     |implement_nb_update_after_subdivision
 00009 |optimisation_request |assigned   |markus |dom_hilmar        |high     |better_distinction_of_lb_and_flowcontrol
@@ -12,6 +12,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT 
 00028 |feature_request      |unassigned |hilmar |                  |high     |implement_status_class
 00029 |optimisation_request |assigned   |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
 00031 |feature_request      |assigned   |hilmar |dirk              |high     |realise_nightly_regression_test
+00033 |bug_report           |assigned   |hilmar |hilmar            |high     |log_comm_to_master_faulty_with_mpich
 00003 |milestone            |assigned   |markus |dom_hilmar        |medium   |kernel_subsystem_parallel_infrastructure
 00004 |milestone            |assigned   |markus |markus_dirk       |medium   |kernel_subsystem_linear_algebra_and_solvers
 00005 |milestone            |assigned   |markus |dom_hilmar_markus |medium   |kernel_subsystem_geometry
