@@ -22,8 +22,7 @@
 // map version to human-readable string and add a few
 // C++0x-specific details.
 #  if (_OPEN64_VER >= 40204)
-//   no Intel compiler up to 12.0.1.107 supports "nullptr"
-//   so do not define HAVE_CPP0X_NULLPTR 1
+//   Open64 does not support "nullptr" so do not define HAVE_CPP0X_NULLPTR 1
 #    define FEAST_COMPILER "Open64 C/C++ compiler 4.2.4 (or greater)"
 #  else
 #    define FEAST_COMPILER "Open64 C/C++ compiler (unknown version)"
