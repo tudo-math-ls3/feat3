@@ -5,7 +5,6 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO       |SEVERITY |SH
 00010 |feature_request      |assigned   |markus |hilmar_markus     |high     |add_mp_and_pp_layers
 00011 |feature_request      |assigned   |markus |hilmar            |high     |implement_inter_workgroup_communication
 00012 |feature_request      |assigned   |markus |hilmar_dom        |high     |parsing_FPROP_and_FPART_meshfilesections
-00013 |feature_request      |unassigned |markus |                  |high     |user_controlled_creation_of_wgs
 00014 |feature_request      |unassigned |markus |                  |high     |user_controlled_mappings_bmc_mp_pp_wg
 00020 |feature_request      |unassigned |hilmar |                  |high     |implement_subdivision_quad_tri_conform
 00024 |feature_request      |unassigned |hilmar |                  |high     |preliminary_ascii_file_handling
@@ -16,6 +15,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO       |SEVERITY |SH
 00004 |milestone            |assigned   |markus |markus_dirk       |medium   |kernel_subsystem_linear_algebra_and_solvers
 00005 |milestone            |assigned   |markus |dom_hilmar_markus |medium   |kernel_subsystem_geometry
 00006 |milestone            |assigned   |markus |ITMC              |medium   |kernel_subsystem_load_balancing
+00013 |feature_request      |unassigned |markus |                  |medium   |user_controlled_creation_of_wgs
 00015 |feature_request      |unassigned |markus |                  |medium   |data_flow_between_bm_and_wgs
 00016 |optimisation_request |assigned   |markus |thomas            |medium   |encapsulate_mpi_routines
 00018 |feature_request      |unassigned |markus |                  |medium   |ascii_files
