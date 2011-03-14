@@ -1,8 +1,8 @@
 ID           00025
 TYPE         optimisation_request
-STATUS       unassigned
+STATUS       assigned
 AUTHOR       hilmar
-ASSIGNED TO
+ASSIGNED TO  thomas_dirk
 SEVERITY     low
 
 FULL TEXT
