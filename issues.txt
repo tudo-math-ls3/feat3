@@ -26,7 +26,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO       |SEVERITY |SH
 00021 |feature_request      |assigned   |hilmar |markus            |low      |implement_subdivision_tri_nonconform
 00022 |feature_request      |assigned   |hilmar |peter             |low      |implement_class_for_static_cell_data
 00025 |optimisation_request |assigned   |hilmar |thomas_dirk       |low      |template_file_ascii_reader
-00026 |feature_request      |unassigned |hilmar |                  |low      |implement_pretty_printer_table_functionality
+00026 |feature_request      |assigned   |hilmar |thomas_dirk       |low      |implement_pretty_printer_table_functionality
 00032 |optimisation_request |unassigned |markus |                  |low      |apply_coding_conventions_for_namespaces
 00000 |feature_request      |resolved   |markus |dirk              |high     |implement_test_system
 00001 |feature_request      |resolved   |markus |dom               |low      |implement_compiler_detection_icc
