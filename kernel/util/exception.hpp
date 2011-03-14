@@ -232,7 +232,7 @@ namespace FEAST
   *
   * \warning Will only be compiled in when debug support is enabled.
   */
-#if defined (DEBUG)
+#if defined (DEBUG) && !defined(FEAST_NO_CONTEST)
   // C preprocessor abomination following...
 #define CONTEXT_NAME_(x) ctx_##x
 #define CONTEXT_NAME(x) CONTEXT_NAME_(x)
