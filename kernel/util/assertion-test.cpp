@@ -11,6 +11,15 @@
 using namespace TestSystem;
 using namespace FEAST;
 
+template <int i> class c
+{
+  public:
+    void f()
+    {
+      STATIC_ASSERT(i < 5, eeek);
+    }
+};
+
 /**
 * \brief Test class for the assertion class.
 *
@@ -57,6 +66,8 @@ public:
     TEST_CHECK(no_exception_thrown);
 
     STATIC_ASSERT(0<1, eek);
+    c<4> tc;
+    tc.f();
     //STATIC_ASSERT(false, eek);
   }
 };
