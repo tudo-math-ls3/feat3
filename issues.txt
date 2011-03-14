@@ -1,9 +1,9 @@
 NEWEST: 00033
-ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO   |SEVERITY |SHORT DESCRIPTION
+ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
 00008 |feature_request      |assigned   |markus |hilmar            |high     |implement_nb_update_after_subdivision
 00009 |optimisation_request |assigned   |markus |dom_hilmar        |high     |better_distinction_of_lb_and_flowcontrol
 00010 |feature_request      |assigned   |markus |hilmar_markus     |high     |add_mp_and_pp_layers
-00011 |feature_request      |unassigned |markus |                  |high     |implement_inter_workgroup_communication
+00011 |feature_request      |assigned   |markus |hilmar            |high     |implement_inter_workgroup_communication
 00012 |feature_request      |unassigned |markus |                  |high     |parsing_FPROP_and_FPART_meshfilesections
 00013 |feature_request      |unassigned |markus |                  |high     |user_controlled_creation_of_wgs
 00014 |feature_request      |unassigned |markus |                  |high     |user_controlled_mappings_bmc_mp_pp_wg

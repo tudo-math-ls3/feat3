@@ -1,8 +1,8 @@
 ID           00011
 TYPE         feature_request
-STATUS       unassigned
+STATUS       assigned
 AUTHOR       markus
-ASSIGNED TO
+ASSIGNED TO  hilmar
 SEVERITY     high
 
 FULL TEXT
