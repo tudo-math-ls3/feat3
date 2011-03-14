@@ -1,11 +1,12 @@
 ID           00001
 TYPE         feature_request
-STATUS       unassigned
+STATUS       resolved
 AUTHOR       markus
-ASSIGNED TO
+ASSIGNED TO  dom
 SEVERITY     low
 
 FULL TEXT
 Implementation of icc compiler detection required.
 
 SOLUTION
+Compiler support for icc and other compilers has been added.

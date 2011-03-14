@@ -23,13 +23,13 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO       |SEVERITY |SH
 00027 |feature_request      |unassigned |hilmar |                  |medium   |implement_base_mesh_iterator_active_cells
 00030 |feature_request      |assigned   |hilmar |dirk_dom          |medium   |enhance_build_system
 00017 |feature_request      |assigned   |markus |peter             |low      |serial_mode
-00001 |feature_request      |unassigned |markus |                  |low      |implement_compiler_detection_icc
 00021 |feature_request      |unassigned |hilmar |                  |low      |implement_subdivision_tri_nonconform
 00022 |feature_request      |unassigned |hilmar |                  |low      |implement_class_for_static_cell_data
 00025 |optimisation_request |unassigned |hilmar |                  |low      |template_file_ascii_reader
 00026 |feature_request      |unassigned |hilmar |                  |low      |implement_pretty_printer_table_functionality
 00032 |optimisation_request |unassigned |markus |                  |low      |apply_coding_conventions_for_namespaces
 00000 |feature_request      |resolved   |markus |dirk              |high     |implement_test_system
+00001 |feature_request      |resolved   |markus |dom               |low      |implement_compiler_detection_icc
 00002 |feature_request      |resolved   |markus |dirk              |critical |build_system_essentials
 00007 |bug_report           |resolved   |markus |peter             |critical |test_system_is_error_prone
 00019 |optimisation_request |resolved   |markus |dirk              |critical |enable_mpi_in_test_system
