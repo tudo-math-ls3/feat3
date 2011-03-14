@@ -7,7 +7,7 @@ ID    |TYPE                 |STATUS     |AUTHOR |ASSIGNED TO       |SEVERITY |SH
 00012 |feature_request      |assigned   |markus |hilmar_dom        |high     |parsing_FPROP_and_FPART_meshfilesections
 00014 |feature_request      |assigned   |markus |hilmar_markus     |high     |user_controlled_mappings_bmc_mp_pp_wg
 00020 |feature_request      |assigned   |hilmar |markus            |high     |implement_subdivision_quad_tri_conform
-00024 |feature_request      |unassigned |hilmar |                  |high     |preliminary_ascii_file_handling
+00024 |feature_request      |assigned   |hilmar |thomas_dirk       |high     |preliminary_ascii_file_handling
 00028 |feature_request      |unassigned |hilmar |                  |high     |implement_status_class
 00031 |feature_request      |assigned   |hilmar |dirk              |high     |realise_nightly_regression_test
 00033 |bug_report           |assigned   |hilmar |hilmar            |high     |log_comm_to_master_faulty_with_mpich
