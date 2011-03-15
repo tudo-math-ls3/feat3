@@ -1,8 +1,8 @@
 ID          00009
 TYPE        optimisation_request
-STATUS      assigned
+STATUS      in_progress
 AUTHOR      markus
-ASSIGNED TO dom_hilmar
+ASSIGNED TO hilmar
 SEVERITY    high
 
 FULL TEXT
