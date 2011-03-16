@@ -42,39 +42,39 @@ namespace FEAST
   * use such a decicated load balancer process, it is the process with the highest rank in the process group.
   *
   * The user knows what each process group and its respective manager should do. He calls, e.g.,
-  * if(manager->group_id() == 0)
-  * {
-  *   manager->readMesh();
-  *   ...
-  * }
-  * else
-  * {
-  *   manager->start_coffee_machine();
-  * }
+  \verbatim
+  if(manager->group_id() == 0)
+  {
+    manager->readMesh();
+    ...
+  }
+  else
+  {
+    manager->start_coffee_machine();
+  }
+  \endverbatim
   *
   * The manager with id 0 in the example above then...
-  * 1) ...reads in the mesh (this is only done by the coordinator)
-  * 2) ...lets its load balancer define which base mesh cells (BMCs) build a matrix patch (MP) and which MPs build a
+  * -# ...reads in the mesh (this is only done by the coordinator)
+  * -# ...lets its load balancer define which base mesh cells (BMCs) build a matrix patch (MP) and which MPs build a
   *    process patch (PP)
-
-COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e. one BMC per MPI job
-
-  * 3) ...lets its load balancer define with how many processes (usually equals the number of virtual coarse grid
+  *    COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e. one BMC per MPI job
+  * -# ...lets its load balancer define with how many processes (usually equals the number of virtual coarse grid
   *    matrix patches, CGMPs) to solve the global coarse grid problem and how to distribute the MPs to these
   *    processes/CGMPs. The standard case will be that the coarse grid problem is solved on one processor, i.e. one
   *    CGMP containing all MPs.
-  * 4) ...lets its load balancer define the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems
+  * -# ...lets its load balancer define the necessary WorkGroup objects (e.g., one WorkGroup for the fine mesh problems
   *    and one for the coarse mesh problem) and creates corresponding MPI communicators. The workers with rank 0 within
   *    the work group (being itself a process group) are the coordinators of these work groups, which communicate with
   *    the master or the dedicated load balancer. The process topologies of the work groups are then optimised by
   *    building corresponding graph structures. There are two cases:
-  *    a) There is a dedicated load balancer: The dedicated load balancer gets all necessary information from the
+  *    -# There is a dedicated load balancer: The dedicated load balancer gets all necessary information from the
   *       coordinator (e.g., graph describing the neighourhood of the base mesh cells), defines MP and PP partitioning.
   *       Then it returns the necessary information to the coordinator of the process group which organises the actual
   *       setup of work groups and process distribution, e.g. by distributing to each worker process the relevant
   *       parts of the global graph. Each worker process then creates its local graph structure and calls
   *       MPI_Dist_graph_create(...) to build the new MPI process topology in a distributed fashion.
-  *    b) There is no dedicated load balancer: Same as case a), but the tasks of the dedicated load balancer are
+  *    -# There is no dedicated load balancer: Same as case a), but the tasks of the dedicated load balancer are
   *       performed by the coordinator of the process group.
   *    In both cases, one must distinguish whether the coordinator is part of the specific work group currently set up.
   *    The manager does not create the work group objects directly, but 'intermediate' groups, the so called
@@ -84,62 +84,69 @@ COMMENT_HILMAR: Currently, only perform the most simple case: BMC = MP = PP, i.e
   *    COMMENT_HILMAR: It might be more clever to also let the MPI implementation decide on which physical process the
   *    dedicated load balancer should reside (instead of pinning it to the last rank in the process group). To improve
   *    this is task of the ITMC.
-  * 5) ...tells each work group which other work groups it has to communicate with (via the communicator they all share
+  * -# ...tells each work group which other work groups it has to communicate with (via the communicator they all share
   *    within the parent process group). E.g., the fine mesh work group has to send the restricted defect vector to the
   *    coarse mesh work group, while the coarse mesh work group has to send the coarse mesh correction to the fine mesh
   *    work group. Two such communicating workers live either on the same process (internal communication = copy) or
   *    on different processes (external communication = MPI send/recv). (See example below.)
+  * -# ...sends corresponding parts of the mesh to the work groups
   *
-  * 6) ...sends corresponding parts of the mesh to the work groups
+  * Example:
   *
-  *     Example:
+  * Distribution of submeshes to processes A-G on different levels (note that processes A-G are not necessarily
+  * disjunct, i.e., several of them can refer to the same physical process, see cases a and b):
   *
-  *     Distribution of submeshes to processes A-G on different levels (note that processes A-G are not necessarily
-  *     disjunct, i.e., several of them can refer to the same physical process, see cases a and b):
+  \verbatim
+  ---------------      ---------------      ---------------
+  |             |      |      |      |      |      |      |
+  |             |      |      |      |      |  D   |  G   |
+  |             |      |      |      |      |      |      |
+  |      A      |      |  B   |  C   |      ---------------
+  |             |      |      |      |      |      |      |
+  |             |      |      |      |      |  E   |  F   |
+  |             |      |      |      |      |      |      |
+  ---------------      ---------------      ---------------
+    level 0               level 1              levels 2-L
+  \endverbatim
   *
-  *     ---------------      ---------------      ---------------
-  *     |             |      |      |      |      |      |      |
-  *     |             |      |      |      |      |  D   |  G   |
-  *     |             |      |      |      |      |      |      |
-  *     |      A      |      |  B   |  C   |      ---------------
-  *     |             |      |      |      |      |      |      |
-  *     |             |      |      |      |      |  E   |  F   |
-  *     |             |      |      |      |      |      |      |
-  *     ---------------      ---------------      ---------------
-  *       level 0               level 1              levels 2-L
+  * -# case a, four physical processes:
+  \verbatim
+  process group rank:  0  1  2  3
+         WorkGroup 2:  D  E  F  G         (four WorkGroup processes for the problems on level 2-L)
+         WorkGroup 1:  B     C            (two WorkGroup processes for the problem on level 1)
+         WorkGroup 0:  A                  (one WorkGroup process for the coarse mesh problem on level 0)
+  \endverbatim
   *
-  *     * case a, four physical processes:
-  *       process group rank:  0  1  2  3
-  *              WorkGroup 2:  D  E  F  G         (four WorkGroup processes for the problems on level 2-L)
-  *              WorkGroup 1:  B     C            (two WorkGroup processes for the problem on level 1)
-  *              WorkGroup 0:  A                  (one WorkGroup process for the coarse mesh problem on level 0)
+  *   Communication:
+  *   A <--> B (internal, rank 0) A <--> C (external, ranks 0+2)
+  *   B <--> D (internal, rank 0) B <--> E (external, ranks 0+1)
+  *   C <--> F (internal, rank 2) C <--> G (external, ranks 2+3)
   *
-  *       Communication:
-  *       A <--> B (internal, rank 0) A <--> C (external, ranks 0+2)
-  *       B <--> D (internal, rank 0) B <--> E (external, ranks 0+1)
-  *       C <--> F (internal, rank 2) C <--> G (external, ranks 2+3)
+  * -# case b, five physical processes::
+  \verbatim
+  process group rank:  0  1  2  3  4
+         WorkGroup 2:     D  E  F  G
+         WorkGroup 1:     B     C
+         WorkGroup 0:  A
+  \endverbatim
   *
-  *     * case b, five physical processes::
-  *       process group rank:  0  1  2  3  4
-  *              WorkGroup 2:     D  E  F  G
-  *              WorkGroup 1:     B     C
-  *              WorkGroup 0:  A
+  *   Communication:
+  *   A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+3)
+  *   B <--> D (internal, rank 1)    B <--> E (external, ranks 1+2)
+  *   C <--> F (internal, rank 3)    C <--> G (external, ranks 3+4)
   *
-  *       Communication:
-  *       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+3)
-  *       B <--> D (internal, rank 1) B <--> E (external, ranks 1+2)
-  *       C <--> F (internal, rank 3) C <--> G (external, ranks 3+4)
+  * -# case c, seven physical processes:
+  \verbatim
+  process group rank:  0  1  2  3  4  5  6
+         WorkGroup 2:           D  E  F  G
+         WorkGroup 1:     B  C
+         WorkGroup 0:  A
+  \endverbatim
   *
-  *     * case c, seven physical processes:
-  *       process group rank:  0  1  2  3  4  5  6
-  *              WorkGroup 2:           D  E  F  G
-  *              WorkGroup 1:     B  C
-  *              WorkGroup 0:  A
-  *
-  *       Communication:
-  *       A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+2)
-  *       B <--> D (external, ranks 1+3) B <--> E (external, ranks 1+4)
-  *       C <--> F (external, ranks 2+5) C <--> G (external, ranks 2+6)
+  *   Communication:
+  *   A <--> B (external, ranks 0+1) A <--> C (external, ranks 0+2)
+  *   B <--> D (external, ranks 1+3) B <--> E (external, ranks 1+4)
+  *   C <--> F (external, ranks 2+5) C <--> G (external, ranks 2+6)
   *
   * \tparam space_dim_
   * space dimension (must be <= world_dim_; it is < world_dim_, e.g., when doing FE on 2D surfaces in a 3D world)

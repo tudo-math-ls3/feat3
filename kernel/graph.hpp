@@ -66,6 +66,7 @@ namespace FEAST
     *
     * Example: domain consisting of 7 subdomains, each subdomain is a node in the graph. Graph edges represent
     * neighbouring subdomains, including diagonal neighbours.
+    * \verbatim
     *   -----------------
     *   | 0 | 1 | 2 | 3 |
     *   -----------------
@@ -84,6 +85,7 @@ namespace FEAST
     * _num_nodes = 7
     * _index      = [0,        3,           7,      10, 11,          15,          20,    22]
     * _neighbours = [4, 5, 1,  0, 4, 5, 2,  1, 5, 3, 2,  0, 1, 5, 6,  0, 1, 2, 4,  6, 4,  5]
+    * \endverbatim
     *
     * Dimension: [total number of neighbours] = [number of edges] = [#_index[#_num_nodes]]
     */
