@@ -1,6 +1,6 @@
 ID          00009
 TYPE        optimisation_request
-STATUS      in_progress
+STATUS      resolved
 AUTHOR      markus
 ASSIGNED TO hilmar
 SEVERITY    high
@@ -9,3 +9,4 @@ FULL TEXT
 A better distinction between load-balancing and flow-control is needed. Currently, both is mixed.
 
 SOLUTION
+The former LoadBalancer class is now called Manager, and a dummy LoadBalancer class has been created. The latter does not contain any useful data or routines yet. All load balancing functionality, however, will be implemented in this class.
