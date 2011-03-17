@@ -28,8 +28,10 @@ namespace FEAST
   *
   * COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
   *
-  * COMMENT_HILMAR: This graph structure is the most general one. When it comes to MPI communication, we surely have to
-  *   distinguish edge neighbours and diagonal neighbours.
+  * COMMENT_HILMAR:
+  * This graph structure is the most general one. When it comes to MPI communication, we surely have to
+  * distinguish face, edge and vertex neighbours, i.e., making this distinction within an enhanced graph class
+  * or using more than one graph.
   *
   * \author Hilmar Wobker
   */
@@ -42,7 +44,7 @@ namespace FEAST
     * member variables *
     *******************/
     /// number of nodes in the graph, which are numbered from 0 to num_nodes-1
-    unsigned int const _num_nodes;
+    index_glob_t const _num_nodes;
 
     /**
     * \brief access information for the array #_neighbours
@@ -56,7 +58,7 @@ namespace FEAST
     *
     * Dimension: [#_num_nodes+1]
     */
-    unsigned int* _index;
+    index_glob_t* _index;
 
     /**
     * \brief node neighbours within the graph (i.e. edges of the graph), represented as a list of node numbers
@@ -83,13 +85,13 @@ namespace FEAST
     *   5         0,1,2,4,6
     *   6         4,5
     * _num_nodes = 7
-    * _index      = [0,        3,           7,      10, 11,          15,          20,    22]
-    * _neighbours = [4, 5, 1,  0, 4, 5, 2,  1, 5, 3, 2,  0, 1, 5, 6,  0, 1, 2, 4,  6, 4,  5]
+    * _index      = [0,        3,           7,      10, 11,          15,              20,   22]
+    * _neighbours = [4, 5, 1,  0, 4, 5, 2,  1, 5, 3, 2,  0, 1, 5, 6,  0, 1, 2, 4,  6,  4, 5]
     * \endverbatim
     *
     * Dimension: [total number of neighbours] = [number of edges] = [#_index[#_num_nodes]]
     */
-    unsigned int* _neighbours;
+    index_glob_t* _neighbours;
 
 
   public:
@@ -103,25 +105,24 @@ namespace FEAST
     ***************************/
     /// CTOR
     Graph(
-      unsigned int const num_nodes,
-      unsigned int* const index,
-      unsigned int* const neighbours
-      )
+      index_glob_t const num_nodes,
+      index_glob_t const* index,
+      index_glob_t const* neighbours)
       : _num_nodes(num_nodes),
         _index(nullptr),
         _neighbours(nullptr)
     {
       CONTEXT("Graph::Graph()");
       // copy index array
-      _index = new unsigned int[num_nodes+1];
-      for(unsigned int i(0) ; i < num_nodes+1 ; ++i)
+      _index = new index_glob_t[num_nodes+1];
+      for(index_glob_t i(0) ; i < num_nodes+1 ; ++i)
       {
         _index[i] = index[i];
       }
 
       // copy neighbour array (its size is given by _index[_num_nodes])
-      _neighbours = new unsigned int[_index[_num_nodes]];
-      for(unsigned int i(0) ; i < _index[_num_nodes] ; ++i)
+      _neighbours = new index_glob_t[_index[_num_nodes]];
+      for(index_glob_t i(0) ; i < _index[_num_nodes] ; ++i)
       {
         _neighbours[i] = neighbours[i];
       }
@@ -145,7 +146,7 @@ namespace FEAST
     *
     * \return number of nodes #_num_nodes
     */
-    inline unsigned int num_nodes() const
+    inline index_glob_t num_nodes() const
     {
       CONTEXT("Graph::num_nodes()");
       return _num_nodes;
@@ -156,7 +157,7 @@ namespace FEAST
     *
     * \return pointer to the index array #_index
     */
-    inline unsigned int* index() const
+    inline index_glob_t* index() const
     {
       CONTEXT("Graph::index()");
       return _index;
@@ -167,7 +168,7 @@ namespace FEAST
     *
     * \return pointer to the edge array #_neighbours
     */
-    inline unsigned int* neighbours() const
+    inline index_glob_t* neighbours() const
     {
       CONTEXT("Graph::neighbours()");
       return _neighbours;
@@ -184,13 +185,13 @@ namespace FEAST
       if (_num_nodes > 0)
       {
         stream << "node | degree | neighbours: " << std::endl;
-        for(unsigned int i(0) ; i < _num_nodes ; ++i)
+        for(index_glob_t i(0) ; i < _num_nodes ; ++i)
         {
           stream << i << " | " << _index[i+1] - _index[i];
           if (_index[i+1] - _index[i] > 0)
           {
             stream << " | " << _neighbours[_index[i]];
-            for(unsigned int j(_index[i]+1) ; j < _index[i+1] ; ++j)
+            for(index_glob_t j(_index[i]+1) ; j < _index[i+1] ; ++j)
             {
               stream << ", " << _neighbours[j];
             }
@@ -213,8 +214,7 @@ namespace FEAST
 
 
   /**
-  * \brief class providing a distributed graph data structure for defining connectivity of subdomains / matrix patches /
-  *        processes
+  * \brief class providing a distributed graph data structure for defining connectivity of process patches
   *
   * This data structure represents the part of the global graph this process is associated with. It basically stores the
   * number of neighbours and the ranks of the neighbours. The data structure can be constructed from a global graph with
@@ -225,7 +225,7 @@ namespace FEAST
   * to get the ranks of the neighbours. With the help of this data structure the global MPI topology graph can be
   * created via the function MPI_Dist_graph_create(...).
   *
-  * COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
+  * \todo This is only a very rough first version, which will be surely adapted to our needs...
   *
   * \author Hilmar Wobker
   */
@@ -237,15 +237,23 @@ namespace FEAST
     /* *****************
     * member variables *
     *******************/
-    /// number of neighbours
-    unsigned int _num_neighbours;
+    /**
+    * \brief number of neighbours
+    *
+    * \note Here, one could suppose that we don't need to use index_glob_t, since the number of neighbours of one
+    * node in the communication graph should be limited. However, we also have the situation that a process reponsible
+    * for treating (a part of) the coarse grid problem has to communicate with many (or even all) fine grid processes.
+    * The GraphDistributed structure may be used in this scenario, as well. Hence, to be on the safe side, we use
+    * index_glob_t here, as well.
+    */
+    index_glob_t _num_neighbours;
 
     /**
     * \brief ranks of the neighbours
     *
     * Dimension: [#_num_neighbours]
     */
-    unsigned int* _neighbours;
+    index_glob_t* _neighbours;
 
 
   public:
@@ -255,16 +263,16 @@ namespace FEAST
     ***************************/
     /// CTOR
     GraphDistributed(
-      unsigned int const num_neighbours,
-      unsigned int* const neighbours
+      index_glob_t const num_neighbours,
+      index_glob_t* const neighbours
       )
       : _num_neighbours(num_neighbours),
         _neighbours(nullptr)
     {
       CONTEXT("GraphDistributed::GraphDistributed()");
       // copy array of neighbours
-      _neighbours = new unsigned int[num_neighbours];
-      for(unsigned int i(0) ; i < num_neighbours ; ++i)
+      _neighbours = new index_glob_t[num_neighbours];
+      for(index_glob_t i(0) ; i < num_neighbours ; ++i)
       {
         _neighbours[i] = neighbours[i];
       }
@@ -286,7 +294,7 @@ namespace FEAST
     *
     * \return number of neighbours #_num_neighbours
     */
-    inline unsigned int num_neighbours() const
+    inline index_glob_t num_neighbours() const
     {
       CONTEXT("GraphDistributed::num_neighbours()");
       return _num_neighbours;
@@ -297,7 +305,7 @@ namespace FEAST
     *
     * \return pointer to the neibhbour array #_neighbours
     */
-    inline unsigned int* neighbours() const
+    inline index_glob_t* neighbours() const
     {
       CONTEXT("GraphDistributed::neighbours()");
       return _neighbours;
@@ -311,7 +319,7 @@ namespace FEAST
     {
       CONTEXT("GraphDistributed::print()");
       stream << "distributed graph: ";
-      for(unsigned int i(0) ; i < _num_neighbours ; ++i)
+      for(index_glob_t i(0) ; i < _num_neighbours ; ++i)
       {
         stream << _neighbours[i] << " ";
       }

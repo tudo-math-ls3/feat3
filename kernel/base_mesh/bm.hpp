@@ -291,12 +291,12 @@ namespace FEAST
         CONTEXT("BaseMesh::BM::create_graph()");
         index_glob_t n_active_cells = num_active_cells();
         // allocate index array
-        unsigned int* index = new unsigned int[n_active_cells + 1];
+        index_glob_t* index = new index_glob_t[n_active_cells + 1];
 
         // graph data structure is filled by two sweeps through the cell list
         // first sweep: count neighbours of each cell, and maintain running total to fill index array
         // treat last index entry separately because cell array has one less entry than index array
-        unsigned int num_neighbours_so_far = 0;
+        index_glob_t num_neighbours_so_far = 0;
         // counter for active cells
         index_glob_t ipos(0);
         for (index_glob_t icell=0 ; icell < num_cells() ; ++icell)
@@ -319,7 +319,7 @@ namespace FEAST
         // second sweep through data structure
         // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
         // again, treat last loop instance separately
-        unsigned int* neighbours = new unsigned int[index[n_active_cells]];
+        index_glob_t* neighbours = new index_glob_t[index[n_active_cells]];
         num_neighbours_so_far = 0;
         for (index_glob_t icell=0 ; icell < n_active_cells ; icell++)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!

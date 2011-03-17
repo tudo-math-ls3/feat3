@@ -186,8 +186,8 @@ void define_work_groups(
   // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
   // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
   // be used for the coarse grid work group
-  unsigned int* index = new unsigned int[3];
-  unsigned int* neighbours = new unsigned int[2];
+  index_glob_t* index = new index_glob_t[3];
+  index_glob_t* neighbours = new index_glob_t[2];
   index[0] = 0;
   index[1] = 1;
   index[2] = 2;
@@ -324,7 +324,7 @@ int main(int argc, char* argv[])
       // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
       // balancer class.
       manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                                        subgroup_ranks, graphs);
+                                  subgroup_ranks, graphs);
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
       // standard file logging functions

@@ -206,10 +206,10 @@ namespace FEAST
     * member functions *
     *******************/
     /**
-    * \brief sets local graph portions of a distributed graph
+    * \brief sets local graph portion of a distributed graph corresponding to one node (=process)
     *
     * \param[in] num_neighbours
-    * number of neighbours
+    * number of neighbours of one graph node
     *
     * \param[in] neighbours
     * neighbours of this portion of the graph
@@ -218,18 +218,14 @@ namespace FEAST
     *       simply contains all neighbours.
     */
     void set_graph_distributed(
-      unsigned int const num_neighbours,
-      unsigned int* neighbours)
+      index_glob_t const num_neighbours,
+      index_glob_t * neighbours)
     {
       CONTEXT("WorkGroup::set_graph_distributed()");
       _graph_distributed = new GraphDistributed(num_neighbours, neighbours);
 
       // log into process-own log file
       _graph_distributed->print(Logger::file);
-
-      // let the master log to screen and to the master log file
-      std::string s = "Proc " + stringify(Process::rank) + ": " + _graph_distributed->print();
-      log_indiv_master(s);
 
 // COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
 //   Unfortunately, this function has only been introduced with MPI-2.2 and is not yet implemented in OpenMPI yet.
@@ -260,10 +256,10 @@ namespace FEAST
     {
       CONTEXT("WorkGroup::do_exchange()");
       // length of the integer arrays to be exchanged
-      unsigned int const n = 10;
+      index_glob_t const n = 10;
 
-      unsigned int num_neighbours = _graph_distributed->num_neighbours();
-      unsigned int* neighbours = _graph_distributed->neighbours();
+      index_glob_t num_neighbours = _graph_distributed->num_neighbours();
+      index_glob_t* neighbours = _graph_distributed->neighbours();
 
       // arrays for sending and receiving
       // (The MPI standard says that the send buffer given to MPI_Isend(...) should neither be overwritten nor read(!)
@@ -273,11 +269,11 @@ namespace FEAST
       unsigned long** a_recv = new unsigned long*[num_neighbours];
 
       // fill the array to be sent
-      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      for(index_glob_t i(0) ; i < num_neighbours; ++i)
       {
         a[i] = new unsigned long[n];
         a_recv[i] = new unsigned long[n];
-        for(unsigned int j(0) ; j < n; ++j)
+        for(index_glob_t j(0) ; j < n; ++j)
         {
           a[i][j] = 100000*_rank + 100*neighbours[i] + j;
         }
@@ -285,10 +281,10 @@ namespace FEAST
 
       // debugging output
       std::string s;
-      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      for(index_glob_t i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a[i][0]);
-        for(unsigned int j(1) ; j < n; ++j)
+        for(index_glob_t j(1) ; j < n; ++j)
         {
           s +=  " " + stringify(a[i][j]);
         }
