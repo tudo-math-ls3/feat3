@@ -200,6 +200,12 @@ namespace FEAST
       int mpi_error_code = MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
       validate_error_code_mpi(mpi_error_code, "MPI_Comm_rank");
 
+#if defined ENABLE_FEAST_VALGRIND_MODE && !defined WINDOWS
+      // print out mapping between process ID and global rank, which is useful for grepping in valgrind output
+      pid_t my_pid = getpid();
+      printf("VALGRINDMODE: PID %d is global rank %d\n", my_pid, my_rank);
+#endif
+
       // set MPI_COMM_WORLD rank of the master process
       int rank_master = _num_processes-1;
 
