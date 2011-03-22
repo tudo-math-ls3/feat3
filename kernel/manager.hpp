@@ -506,21 +506,23 @@ namespace FEAST
 //      // create MPI datatype for sending the 2D array _subgroup_ranks
 //      MPI_Aint base;
 //      MPI_Address(_subgroup_ranks[0], &base);
-//      MPI_Aint displacements[_num_subgroups];
-//      for (unsigned int i(0) ; i<_num_subgroups ; ++i)
+//      MPI_Aint* displacements = new MPI_Aint[_num_subgroups];
+//      for (unsigned int i(0) ; i < _num_subgroups ; ++i)
 //      {
 //        MPI_Address(_subgroup_ranks[i], &displacements[i]);
 //        displacements[i] -= base;
 //      }
 //
-//      MPI_Datatype iarray2D;
-//      MPI_Type_hindexed(_num_subgroups, _num_proc_in_subgroup, displacements, MPI_UNSIGNED, &iarray2D);
-//      MPI_Type_commit(&iarray2D);
+//      MPI_Datatype int_array_2d;
+//      MPI_Type_create_hindexed(_num_subgroups, reinterpret_cast<int*>(_num_proc_in_subgroup), displacements,
+//                               MPI_INTEGER, &int_array_2d);
+//      MPI_Type_commit(&int_array_2d);
 //
 //      // let the coordinator send the array to all non-coordinator processes
-//      MPI_Bcast(_subgroup_ranks, 1, iarray2D, _process_group->rank_coord(), _process_group->comm());
+//      MPI_Bcast(_subgroup_ranks, 1, int_array_2d, _process_group->rank_coord(), _process_group->comm());
 //
-//      MPI_Type_free(&iarray2D);
+//      MPI_Type_free(&int_array_2d);
+//      delete [] displacements;
 
 /* ****************
 * workaround code *
