@@ -392,7 +392,6 @@ int main(int argc, char* argv[])
     throw InternalError("Process with rank " + stringify(Process::rank)
                         + " has no particular role, this should not happen.");
   }
-sleep(5);
   // let all processes call function ot finalise MPI
   finalise_mpi();
 }
