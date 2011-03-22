@@ -117,10 +117,10 @@ namespace FEAST
     */
     ProcessSubgroup(
       unsigned int const num_processes,
-      int* const ranks_group_parent,
-      ProcessGroup* const process_group_parent,
+      int const* ranks_group_parent,
+      ProcessGroup const* process_group_parent,
       unsigned int const group_id,
-      bool contains_extra_coord)
+      bool const contains_extra_coord)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
         _contains_extra_coord(contains_extra_coord),
         _work_group(nullptr)

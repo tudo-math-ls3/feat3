@@ -417,10 +417,10 @@ namespace FEAST
     * \author Hilmar Wobker
     */
     static void log_master_array(
-      unsigned int num_messages,
-      unsigned int* const msg_lengths,
+      unsigned int const num_messages,
+      unsigned int const* msg_lengths,
       unsigned int const total_length,
-      char* const messages,
+      char const* messages,
       target targ = SCREEN_FILE)
     {
       CONTEXT("Logger::log_master_array()");

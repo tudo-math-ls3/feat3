@@ -177,11 +177,11 @@ namespace FEAST
     * size of the array
     */
     template<typename T_>
-    static void write(T_ msg[], int const size)
+    static void write(T_ const* msg, int const size)
     {
       CONTEXT("Comm::write()");
       // write the array to the current position of the buffer
-      int mpi_error_code = MPI_Pack(msg, size, MPIType<T_>::value(), Comm::MCW_buffer,
+      int mpi_error_code = MPI_Pack(const_cast<T_*>(msg), size, MPIType<T_>::value(), Comm::MCW_buffer,
                                     Comm::MCW_BUFFERSIZE, &Comm::MCW_buffer_pos, MPI_COMM_WORLD);
       validate_error_code_mpi(mpi_error_code, "MPI_Pack");
     }

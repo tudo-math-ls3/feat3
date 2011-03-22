@@ -264,7 +264,7 @@ namespace FEAST
     /// CTOR
     GraphDistributed(
       index_glob_t const num_neighbours,
-      index_glob_t* const neighbours
+      index_glob_t const* neighbours
       )
       : _num_neighbours(num_neighbours),
         _neighbours(nullptr)

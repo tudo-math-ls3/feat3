@@ -57,7 +57,7 @@ namespace FEAST
     int* _ranks_group_parent;
 
     /// pointer to the process group from which this process group has been spawned
-    ProcessGroup* _process_group_parent;
+    ProcessGroup const* _process_group_parent;
 
 //    /// process groups spawned from this process group
 //  COMMENT_HILMAR, 15.9.2010: not sure yet if this is needed
@@ -149,9 +149,9 @@ namespace FEAST
     * ID of this group
     */
     ProcessGroup(
-      unsigned int num_processes,
-      int* const ranks_group_parent,
-      ProcessGroup* const process_group_parent,
+      unsigned int const num_processes,
+      int const* ranks_group_parent,
+      ProcessGroup const* process_group_parent,
       unsigned int const group_id)
       : _num_processes(num_processes),
         _ranks_group_parent(nullptr),
@@ -273,7 +273,7 @@ namespace FEAST
     *
     * \return parent process group pointer #_process_group_parent
     */
-    inline ProcessGroup* process_group_parent() const
+    inline ProcessGroup const* process_group_parent() const
     {
       CONTEXT("ProcessGroup::process_group_parent()");
       return _process_group_parent;

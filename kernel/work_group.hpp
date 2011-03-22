@@ -118,8 +118,8 @@ namespace FEAST
     */
     WorkGroup(
       unsigned int const num_processes,
-      int* const ranks_group_parent,
-      ProcessGroup* const process_group_parent,
+      int const* ranks_group_parent,
+      ProcessGroup const* process_group_parent,
       unsigned int const group_id)
       : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
 //        _comm_opt(MPI_COMM_NULL),

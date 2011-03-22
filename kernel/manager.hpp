@@ -744,7 +744,6 @@ namespace FEAST
               // also sends data to itself.
 
               // scatter the number of neighbours to the non-coordinator processes and to the coordinator process itself
-// BRAL: funktioniert das? INTEGER in --> LONG INTEGER out?
               MPI_Scatter(reinterpret_cast<int*>(num_neighbours_aux), 1, MPI_UNSIGNED, &num_neighbours_local, 1,
                           MPI_INTEGER, rank_coord, _subgroups[igroup]->comm());
               neighbours_local = new index_glob_t[num_neighbours_local];
