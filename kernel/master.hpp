@@ -59,7 +59,6 @@ namespace FEAST
     {
       CONTEXT("Master::service()");
       std::cout << "Master at your service... " << std::endl;
-      sleep(2.0);
 
       // service ID read from the sent messages
       int id;
