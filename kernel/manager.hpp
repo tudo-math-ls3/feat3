@@ -498,95 +498,37 @@ namespace FEAST
         }
       }
 
-// COMMENT_HILMAR:
-// The most elegant way to broadcasting the 2D array _subgroup_ranks is by defining a corresponding MPI datatype.
-// The following code should do it, but it doesn't... :-)
-// Until I find the bug, the workaround code below does the trick.
+      /* *******************************************************************
+      * send the 2D array _subgroup_ranks to the non-coordinator processes *
+      * using a self-defined MPI datatype                                  *
+      *********************************************************************/
 
-//      // create MPI datatype for sending the 2D array _subgroup_ranks
-//      MPI_Aint base;
-//      MPI_Address(_subgroup_ranks[0], &base);
-//      MPI_Aint* displacements = new MPI_Aint[_num_subgroups];
-//      for (unsigned int i(0) ; i < _num_subgroups ; ++i)
-//      {
-//        MPI_Address(_subgroup_ranks[i], &displacements[i]);
-//        displacements[i] -= base;
-//      }
-//
-//      MPI_Datatype int_array_2d;
-//      MPI_Type_create_hindexed(_num_subgroups, reinterpret_cast<int*>(_num_proc_in_subgroup), displacements,
-//                               MPI_INTEGER, &int_array_2d);
-//      MPI_Type_commit(&int_array_2d);
-//
-//      // let the coordinator send the array to all non-coordinator processes
-//      MPI_Bcast(_subgroup_ranks, 1, int_array_2d, _process_group->rank_coord(), _process_group->comm());
-//
-//      MPI_Type_free(&int_array_2d);
-//      delete [] displacements;
+      // get base address
+      MPI_Aint base;
+      MPI_Get_address(_subgroup_ranks, &base);
 
-/* ****************
-* workaround code *
-******************/
-
-      // let all processes create a 1D array which will hold a copy of the 2D array to be broadcast
-      unsigned int total_length(0);
-      int* _subgroup_ranks_1D;
-      for (unsigned int i(0) ; i<_num_subgroups ; ++i)
+      // calculate offsets of the subarray addresses w.r.t. base adress
+      MPI_Aint* displacements = new MPI_Aint[_num_subgroups];
+      for (unsigned int i(0) ; i < _num_subgroups ; ++i)
       {
-        total_length += _num_proc_in_subgroup[i];
-      }
-      _subgroup_ranks_1D = new int[total_length];
-
-      // let the coordinator copy the 2D array into a 1D array
-      if(_process_group->is_coordinator())
-      {
-        unsigned int pos(0);
-        for (unsigned int i(0) ; i<_num_subgroups ; ++i)
-        {
-          for(unsigned int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
-          {
-            _subgroup_ranks_1D[pos] = _subgroup_ranks[i][j];
-            ++pos;
-          }
-        }
+        MPI_Get_address(_subgroup_ranks[i], &displacements[i]);
+        displacements[i] -= base;
       }
 
-      // broadcast the 1D array
-      mpi_error_code = MPI_Bcast(_subgroup_ranks_1D, total_length, MPI_INTEGER, _process_group->rank_coord(),
-                                 _process_group->comm());
-      validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
+      // create MPI datatype
+      MPI_Datatype int_array_2d;
+      MPI_Type_create_hindexed(_num_subgroups, reinterpret_cast<int*>(_num_proc_in_subgroup), displacements,
+                               MPI_INTEGER, &int_array_2d);
+      MPI_Type_commit(&int_array_2d);
 
-      // let the non-coordinator processes copy the 1D array into the 2D array
-      if(!_process_group->is_coordinator())
-      {
-        unsigned int pos(0);
-        for (unsigned int i(0) ; i<_num_subgroups ; ++i)
-        {
-          for(unsigned int j(0) ; j < _num_proc_in_subgroup[i] ; ++j)
-          {
-            _subgroup_ranks[i][j] = _subgroup_ranks_1D[pos];
-            ++pos;
-          }
-        }
-      }
-      // and delete the temporary 1D array again
-      delete [] _subgroup_ranks_1D;
+      // let the coordinator send the array to all non-coordinator processes
+      MPI_Bcast(_subgroup_ranks, 1, int_array_2d, _process_group->rank_coord(), _process_group->comm());
 
-/* ***********************
-* end of workaround code *
-*************************/
+      // free the datatype definition again
+      MPI_Type_free(&int_array_2d);
+      // delete offset array
+      delete [] displacements;
 
-//      // debug output
-//      for (unsigned int i(0) ; i<_num_subgroups ; ++i)
-//      {
-//        std::string s = stringify(_subgroup_ranks[i][0]);
-//        for(unsigned int j(1) ; j < _num_proc_in_subgroup[i] ; ++j)
-//        {
-//          s +=  " " + stringify(_subgroup_ranks[i][j]);
-//        }
-//        s = "Process " + stringify(_process_group->rank()) + " received _subgroup_ranks[" + stringify(i) + "] = " + s;
-//        _process_group->log_indiv_master(s);
-//      }
 
       /* *********************************
       * now begin creating the subgroups *
