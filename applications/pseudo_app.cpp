@@ -374,7 +374,8 @@ int main(int argc, char* argv[])
     else
     {
       // the second process group does something else, programmed by the application outside the kernel...
-      // ...
+      Logger::log("Proc " + stringify(Process::rank) + " in group with ID " + stringify(group_id)
+                  + " does something useful...\n");
       // Everything done, call universe destruction routine.
       universe->destroy();
    }
