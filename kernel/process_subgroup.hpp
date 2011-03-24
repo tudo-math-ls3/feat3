@@ -227,10 +227,12 @@ namespace FEAST
           validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
           mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), dummy_group, &dummy_comm);
           validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
-          // COMMENT_HILMAR: First, I used this simpler version:
+          // COMMENT_HILMAR: First, we used this simpler version:
           //   mpi_error_code = MPI_Comm_create(_process_group_parent->comm(), MPI_GROUP_EMPTY, &dummy_comm);
-          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that
-          // is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
+          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We reported this issue to
+          // Open MPI user's mailing list and got the confirmation that this is actually a bug in OpenMPI 1.4.3. See
+          // http://www.open-mpi.org/community/lists/users/2011/03/15803.php
+          // https://svn.open-mpi.org/trac/ompi/ticket/2752
 
           MPI_Comm_free(&dummy_comm);
           MPI_Group_free(&dummy_group);
