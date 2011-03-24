@@ -133,7 +133,7 @@ namespace FEAST
     /**
     * \brief CTOR
     *
-    * This constructor is deliberately chosen to be private. Is called exactly once by each process in the whole life
+    * This constructor is deliberately chosen to be private. It is called exactly once by each process in the whole life
     * time of the program.  It initialises the _universe_created variable and ensures that MPI is already initialised.
     */
     Universe()
@@ -264,7 +264,7 @@ namespace FEAST
       }
 
       // create ProcessGroup object representing the group of all COMM_WORLD processes
-      _world_group = new ProcessGroup(MPI_COMM_WORLD, _num_processes);
+      _world_group = new ProcessGroup(MPI_COMM_WORLD);
 
       // create ProcessGroup object representing the group of all COMM_WORLD processes excluding the master process
       // Note that *all* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the
@@ -278,7 +278,7 @@ namespace FEAST
       validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
       if(!Process::is_master)
       {
-        _world_group_without_master = new ProcessGroup(gr_comm, _num_processes-1);
+        _world_group_without_master = new ProcessGroup(gr_comm);
       }
 
       // iterator for MPI_COMM_WORLD ranks, used to split them among the groups
@@ -311,34 +311,16 @@ namespace FEAST
       ASSERT(iter_MPC_rank == (int)_num_processes-2, "iter_MPC_rank " + stringify(iter_MPC_rank)
              + " must be equal to " + stringify((int)_num_processes-2) + ".");
 
-      // Create ProcessGroup object. The constructor automatically calls the corresponding MPI routines for creating
-      // MPI group and MPI communicator. Exclude the master because it is only a member of COMM_WORLD and not
+      // Create ProcessGroup object. Exclude the master because it is only a member of COMM_WORLD and not
       // of any group we set up.
       if(!Process::is_master)
       {
-        _process_group = new ProcessGroup(_num_processes_in_group[my_group], _group_ranks_world[my_group],
-                                          _world_group, my_group);
-      }
-      else
-      {
-        // *All* processes of the parent MPI group have to call the MPI_Comm_create() routine (otherwise the forking
-        // will deadlock), so let the master call it with dummy communicator and dummy group. (The dummy group is
-        // necessary here since the other MPI_Group object is hidden inside the ProcessGroup constructor above.)
-        MPI_Comm dummy_comm;
-        MPI_Group dummy_group;
-        int mpi_error_code = MPI_Group_incl(_world_group->group(), 1, &Process::rank_master, &dummy_group);
-        validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
-        mpi_error_code = MPI_Comm_create(_world_group->comm(), dummy_group, &dummy_comm);
-        validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
-        // COMMENT_HILMAR: First, I used this simpler version:
-        //   int mpi_error_code = MPI_Comm_create(_world_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
-        // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if that
-        // is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
-        MPI_Comm_free(&dummy_comm);
-        MPI_Group_free(&dummy_group);
+        // Inside this constructor, MPI_Comm_split() is called for performing the creation of MPI groups and
+        // communicators. my_group serves as 'color' key for defining the groups.
+        _process_group = new ProcessGroup(_group_ranks_world[my_group], _world_group_without_master, my_group);
       }
 
-      // all ok, now decide if this process is a regular one or the group's load-balancer or even the master
+      // now decide if this process is a regular one or the group's load-balancer or even the master
 
       // initialise the pointers as nullptr
       _manager = nullptr;

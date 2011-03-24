@@ -89,51 +89,110 @@ namespace FEAST
     * constructor & destructor *
     ***************************/
     /**
-    * \brief constructor for the case the MPI_Group and the MPI_Comm already exist
+    * \brief CTORs for the case the MPI_Group and the MPI_Comm already exist
     *
-    * This constructor is intended for creating a process group object containing all COMM_WORLD processes. The
-    * coordinator is set to rank 0, i.e. the first rank in the process group.
+    * This constructor is, e.g., intended for creating a process group object containing all COMM_WORLD processes or
+    * all COMM_WORLD processes except the master. The coordinator is set to rank 0, i.e., the first rank in the process
+    * group. The group ID is set to 0. (Hence, this constructor should not be used for creating the main process groups
+    * for performing two or more completely separated tasks (e.g., for multiphysics).)
     *
     * \param[in] comm
     * communicator shared by the group processes
-    *
-    * \param[in] num_processes
-    * number of processes in the group
     */
-    ProcessGroup(
-      MPI_Comm comm,
-      unsigned int num_processes)
+    ProcessGroup(MPI_Comm comm)
       : _comm(comm),
-        _num_processes(num_processes),
+        _num_processes(0),
         _ranks_group_parent(nullptr),
         _process_group_parent(nullptr),
         _group_id(0),
         _rank_coord(0)
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
-      ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
       // get MPI_Group object for the given communicator
       int mpi_error_code = MPI_Comm_group(_comm, &_group);
       validate_error_code_mpi(mpi_error_code, "MPI_Comm_group");
+
+      // get the size of the group
+      int num_proc;
+      mpi_error_code = MPI_Comm_size(_comm, &num_proc);
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_size");
+      ASSERT(num_proc >= 1, "Number of processes must be at least 1.");
+      _num_processes = (unsigned int) num_proc;
 
       // and finally look up the local rank of this process w.r.t. the group's communicator
       mpi_error_code = MPI_Group_rank(_group, &_rank);
       validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
 
-      // since this is the world group of processes, the local and the global rank should be equal
-      // (if this constructor is used for other groups than the world group then this assert must be removed!)
-      ASSERT(Process::rank == _rank, "Process::rank " + stringify(Process::rank) + " and _rank " + stringify(_rank)
-             + " must be equal.");
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
 //      _buffer = nullptr;
     }
 
 
     /**
-    * \brief constructor for the case the MPI_Group and the corresponding communicator have to be created
+    * \brief CTOR for the case the parent group is split in disjunct process groups
     *
     * This constructor can be used for splitting the complete set of COMM_WORLD processes into subgroups for performing
     * two or more completely separated tasks (e.g., for multiphysics).
+    * The coordinator of this process group is set to rank 0, i.e. the first rank in the process group.
+    *
+    * \param[in] comm
+    * communicator shared by the group processes
+    *
+    * \param[in] ranks_group_parent
+    * ranks in the parent group
+    *
+    * \param[in] process_group_parent
+    * parent group of processes
+    *
+    * \param[in] group_id
+    * ID of this group, used as 'color' code for the MPI_Comm_split routine
+    */
+    ProcessGroup(
+      int const* ranks_group_parent,
+      ProcessGroup const* process_group_parent,
+      unsigned int const group_id)
+      : _num_processes(0),
+        _ranks_group_parent(nullptr),
+        _process_group_parent(process_group_parent),
+        _group_id(group_id),
+        _rank_coord(0)
+    {
+      CONTEXT("ProcessGroup::ProcessGroup()");
+
+      int mpi_error_code = MPI_Comm_split(_process_group_parent->comm(), _group_id, 0, &_comm);
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_split");
+
+      // get MPI_Group object for the given communicator
+      mpi_error_code = MPI_Comm_group(_comm, &_group);
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_group");
+
+      // get the size of the group
+      int num_proc;
+      mpi_error_code = MPI_Comm_size(_comm, &num_proc);
+      validate_error_code_mpi(mpi_error_code, "MPI_Comm_size");
+      ASSERT(num_proc >= 1, "Number of processes must be at least 1.");
+      _num_processes = (unsigned int) num_proc;
+
+      // copy array of parent group ranks
+      _ranks_group_parent = new int[_num_processes];
+      for(unsigned int i(0) ; i < _num_processes ; ++i)
+      {
+        _ranks_group_parent[i] = ranks_group_parent[i];
+      }
+
+      // and finally look up the local rank of this process w.r.t. the group's communicator
+      mpi_error_code = MPI_Group_rank(_group, &_rank);
+      validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
+
+// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//      _buffer = nullptr;
+    }
+
+
+    /**
+    * \brief CTOR for the case the MPI_Group and the corresponding communicator have to be created
+    *
+    * This constructor can be used for creating single process groups from a parent group.
     * The coordinator of this process group is set to rank 0, i.e. the first rank in the process group.
     *
     * \param[in] num_processes
@@ -147,6 +206,9 @@ namespace FEAST
     *
     * \param[in] group_id
     * ID of this group
+    *
+    * \warning Do not forget to call MPI_Comm_create() outside this routine (has to be called by all processes of the
+    * parent group.
     */
     ProcessGroup(
       unsigned int const num_processes,
