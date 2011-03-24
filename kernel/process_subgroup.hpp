@@ -11,7 +11,6 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
-#include <kernel/logger.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
 #include <kernel/work_group.hpp>
@@ -98,7 +97,7 @@ namespace FEAST
     * constructor & destructor *
     ***************************/
     /**
-    * \brief CTOR
+    * \brief CTOR which also immediately constructs the work group belonging to this process subgroup
     *
     * \param[in] num_processes
     * number of processes in this group
@@ -126,48 +125,6 @@ namespace FEAST
         _work_group(nullptr)
     {
       CONTEXT("ProcessSubgroup::ProcessSubgroup()");
-      /* ******************************
-      * test the logger functionality *
-      ********************************/
-
-//TODO: remove this debug output
-
-      // debugging output
-    // let the coordinator of the subgroup trigger some common messages
-//      if(is_coordinator())
-//      {
-//        std::string s("I have COMM_WORLD rank " + stringify(Process::rank)
-//                      + " and I am the coordinator of process subgroup " + stringify(_group_id));
-//   //      Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
-//        Logger::log_master("Hello, master file! " + s, Logger::FILE);
-//   //      Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-//   //      Logger::log_master("Hello, default master screen and file! " + s);
-//      }
-
-      // write some individual messages to screen and file
-      std::string s("I have COMM_WORLD rank " + stringify(Process::rank) + " and group rank " + stringify(_rank)
-                    + " in process subgroup " + stringify(_group_id) + ".");
-      if(is_coordinator())
-      {
-        s += " I am the coordinator!";
-      }
-      // vary the lengths of the messages a little bit
-      for(int i(0) ; i < _rank+1 ; ++i)
-      {
-        s += " R";
-      }
-      for(unsigned int i(0) ; i < _group_id+1 ; ++i)
-      {
-        s += " G";
-      }
-      s += "\n";
-//      log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
-      log_indiv_master("Hello, master file! " + s, Logger::FILE);
-//      log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-//      log_indiv_master("Hello, master default screen and file! " + s);
-
-      // end of debugging output
-
       // Create work group consisting of the real compute processes only (the dummy calls of MPI_Comm_create(...) by the
       // remaining processes of the parent process group are performed in the manager class and not here). The group id
       // of the work group is the same as that of the process subgroup.
