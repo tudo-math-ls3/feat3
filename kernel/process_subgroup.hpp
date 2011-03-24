@@ -103,7 +103,7 @@ namespace FEAST
     * number of processes in this group
     *
     * \param[in] ranks_group_parent
-    * ranks in the parent group
+    * array of ranks the processes building this subgroup have in the parent group
     *
     * \param[in] process_group_parent
     * parent group of processes
@@ -132,7 +132,7 @@ namespace FEAST
       {
         // in the case there is no extra coordinator process, the work group of compute processes contains all processes
         // of this subgroup
-        _work_group = new WorkGroup(_num_processes, _ranks_group_parent, _process_group_parent, _group_id);
+        _work_group = new WorkGroup(_num_processes, ranks_group_parent, _process_group_parent, _group_id);
       }
       else
       {
@@ -156,9 +156,9 @@ namespace FEAST
           unsigned int shift(0);
           for(unsigned int i(0) ; i < _num_processes ; ++i)
           {
-            if(_ranks_group_parent[i] != _process_group_parent->rank_coord())
+            if(ranks_group_parent[i] != _process_group_parent->rank_coord())
             {
-              ranks_group_parent_aux[i - shift] = _ranks_group_parent[i];
+              ranks_group_parent_aux[i - shift] = ranks_group_parent[i];
             }
             else
             {

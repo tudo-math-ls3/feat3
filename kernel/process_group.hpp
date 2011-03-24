@@ -45,17 +45,6 @@ namespace FEAST
     /// rank of this process with respect to the ProcessGroup's communicator
     int _rank;
 
-    /**
-    * \brief array of ranks the processes of this group have in the parent group
-    *
-    * The array is allocated within the constructor and deallocated in the destructor again. The array, which is
-    * passed to the constructor from outside, is copied. Deallocation of this outside array must be done outside.
-    * Dimension: [#_num_processes]
-    */
-// COMMENT_HILMAR: Muessen wir das abspeichern? Kann man es nicht an die MPI Routine uebergeben und dann wieder
-// wegschmeissen?
-    int* _ranks_group_parent;
-
     /// pointer to the process group from which this process group has been spawned
     ProcessGroup const* _process_group_parent;
 
@@ -102,7 +91,6 @@ namespace FEAST
     ProcessGroup(MPI_Comm comm)
       : _comm(comm),
         _num_processes(0),
-        _ranks_group_parent(nullptr),
         _process_group_parent(nullptr),
         _group_id(0),
         _rank_coord(0)
@@ -135,12 +123,6 @@ namespace FEAST
     * two or more completely separated tasks (e.g., for multiphysics).
     * The coordinator of this process group is set to rank 0, i.e. the first rank in the process group.
     *
-    * \param[in] comm
-    * communicator shared by the group processes
-    *
-    * \param[in] ranks_group_parent
-    * ranks in the parent group
-    *
     * \param[in] process_group_parent
     * parent group of processes
     *
@@ -148,11 +130,9 @@ namespace FEAST
     * ID of this group, used as 'color' code for the MPI_Comm_split routine
     */
     ProcessGroup(
-      int const* ranks_group_parent,
       ProcessGroup const* process_group_parent,
       unsigned int const group_id)
       : _num_processes(0),
-        _ranks_group_parent(nullptr),
         _process_group_parent(process_group_parent),
         _group_id(group_id),
         _rank_coord(0)
@@ -177,13 +157,6 @@ namespace FEAST
       ASSERT(num_proc >= 1, "Number of processes must be at least 1.");
       _num_processes = (unsigned int) num_proc;
 
-      // copy array of parent group ranks
-      _ranks_group_parent = new int[_num_processes];
-      for(unsigned int i(0) ; i < _num_processes ; ++i)
-      {
-        _ranks_group_parent[i] = ranks_group_parent[i];
-      }
-
       // and finally look up the local rank of this process w.r.t. the group's communicator
       mpi_error_code = MPI_Group_rank(_group, &_rank);
       validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
@@ -203,7 +176,7 @@ namespace FEAST
     * number of processes in this group
     *
     * \param[in] ranks_group_parent
-    * ranks in the parent group
+    * array of ranks the processes building this group have in the parent group
     *
     * \param[in] process_group_parent
     * parent group of processes
@@ -220,21 +193,15 @@ namespace FEAST
       ProcessGroup const* process_group_parent,
       unsigned int const group_id)
       : _num_processes(num_processes),
-        _ranks_group_parent(nullptr),
         _process_group_parent(process_group_parent),
         _group_id(group_id),
         _rank_coord(0)
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
       ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
-      // copy array of parent group ranks
-      _ranks_group_parent = new int[_num_processes];
-      for(unsigned int i(0) ; i < _num_processes ; ++i)
-      {
-        _ranks_group_parent[i] = ranks_group_parent[i];
-      }
+
       int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
-                                          _ranks_group_parent, &_group);
+                                          const_cast<int*>(ranks_group_parent), &_group);
       validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
 
       // Create the group communicator for, among others, collective operations.
@@ -275,11 +242,6 @@ namespace FEAST
     virtual ~ProcessGroup()
     {
       CONTEXT("ProcessGroup::~ProcessGroup()");
-      if(_ranks_group_parent != nullptr)
-      {
-        delete [] _ranks_group_parent;
-        _ranks_group_parent = nullptr;
-      }
       if (_comm != MPI_COMM_WORLD)
       {
         MPI_Comm_free(&_comm);

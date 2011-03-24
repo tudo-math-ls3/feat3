@@ -28,10 +28,10 @@ namespace FEAST
   * extra class). Communication between different work groups is done via the enclosing ProcessGroup communicator.
   * For an example concerning WorkGroup and ProcessSubgroup creation, see the description of class ProcessSubgroup.
   *
-  * \note Note that the variables #_ranks_group_parent and #_process_group_parent do not refer to the ProcessSubgroup
-  * object 'inbetween' this work group and the enclosing process group, but to the enclosing process group. This work
-  * group has to communicate with other work groups, and this is only possible via the common communicator of the
-  * enclosing process group. That is why the process subgroup is 'skipped'.
+  * \note Note that the variable #_process_group_parent does not refer to the ProcessSubgroup object 'inbetween' this
+  * work group and the enclosing process group, but to the enclosing process group. This work group has to communicate
+  * with other work groups, and this is only possible via the common communicator of the enclosing process group. That
+  * is why the process subgroup is 'skipped'.
   *
   * \author Hilmar Wobker
   * \author Dominik Goeddeke
@@ -108,7 +108,7 @@ namespace FEAST
     * number of processes in this group
     *
     * \param[in] ranks_group_parent
-    * ranks in the parent group
+    * array of ranks the processes building this group have in the parent group
     *
     * \param[in] process_group_parent
     * parent group of processes

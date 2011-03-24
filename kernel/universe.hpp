@@ -317,7 +317,7 @@ namespace FEAST
       {
         // Inside this constructor, MPI_Comm_split() is called for performing the creation of MPI groups and
         // communicators. my_group serves as 'color' key for defining the groups.
-        _process_group = new ProcessGroup(_group_ranks_world[my_group], _world_group_without_master, my_group);
+        _process_group = new ProcessGroup(_world_group_without_master, my_group);
       }
 
       // now decide if this process is a regular one or the group's load-balancer or even the master
