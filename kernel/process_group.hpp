@@ -159,6 +159,10 @@ namespace FEAST
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
 
+      // Split process groups according to the group id which serves as 'color' code. The 0 is the key which determines
+      // which process gets which rank in the new communicator. Since all get the same key (namely 0), the ranks
+      // are ordered relative to the ranks of the parent group. (I.e., when the parent group ranks are 1,42,3,6, then
+      // these four processes get the local ranks 0,3,1,2.)
       int mpi_error_code = MPI_Comm_split(_process_group_parent->comm(), _group_id, 0, &_comm);
       validate_error_code_mpi(mpi_error_code, "MPI_Comm_split");
 
