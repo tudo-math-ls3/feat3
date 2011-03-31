@@ -22,11 +22,6 @@
 /// FEAST namespace
 namespace FEAST
 {
-// COMMENT_HILMAR: entsprechend der Idee, den load balancer besser abzugrenzen, sollte diese ganze Klasse besser
-// ProcessOrganiser, ProcessManager (oder so ähnlich) genannt werden. Die eigentliche load balancer Klasse wird dann
-// (erstmal) nur auf dem coordinator der zugrundeliegenden Prozessgruppe instantiiert. Sie wird dann z.B. die
-// Funktion define_work_groups() enthalten. (Waehrend die Funktion create_work_groups() hier in dieser Klasse bleiben
-// sollte, da sie nur umsetzt, was der load balancer ihr vorgibt.)
   /**
   * \brief class defining a process group manager
   *
@@ -188,7 +183,7 @@ namespace FEAST
     */
     int _rank_load_balancer;
 
-    /// vector of process subgroups the manager manages
+    /// vector of process subgroups / work groups the manager manages
     std::vector<ProcessSubgroup*> _subgroups;
 
     /// vector of graph structures representing the process topology within the work groups
@@ -205,7 +200,7 @@ namespace FEAST
     unsigned int* _num_proc_in_subgroup;
 
     /**
-    * \brief 2-dim. array for storing the process group ranks building the subgroups
+    * \brief 2-dim. array of process group ranks building the subgroups
     *
     * Dimension: [#_num_subgroups][#_num_proc_in_subgroup[\a group_id]]
     */
@@ -217,6 +212,23 @@ namespace FEAST
     * Dimension: [#_num_subgroups]
     */
     bool* _belongs_to_group;
+
+    /// number of inter level groups
+    unsigned int _num_inter_level_groups;
+
+    /**
+    * \brief array of number of workers in each inter level group
+    *
+    * Dimension: [#_num_inter_level_groups]
+    */
+    unsigned int* _num_proc_in_inter_level_group;
+
+    /**
+    * \brief 2-dim. array of process group ranks building the inter level groups
+    *
+    * Dimension: [#_num_inter_level_groups][#_num_proc_in_inter_level_group[\a group_id]]
+    */
+    int** _inter_level_group_ranks;
 
     /// base mesh the manager works with
     BaseMesh::BM<space_dim_, world_dim_>* _base_mesh;
@@ -410,17 +422,6 @@ namespace FEAST
       }
     }
 
-    /**
-    * \brief dummy function in preparation of a function for defining work groups
-    *
-    * As long as we cannot do this in an automatic way, the test driver calls a corresponding function, which sets
-    * work groups manually.
-    */
-    void define_work_groups()
-    {
-      CONTEXT("Manager::define_work_groups()");
-    }
-
 
     /**
     * \brief function that sets up subgroups and work groups basing on the provided information
@@ -442,16 +443,12 @@ namespace FEAST
     *
     * \param[in] subgroup_ranks
     * array for defining the rank partitioning
-    *
-    * \param[in] graphs
-    * array of Graph pointers representing the connectivity of work group processes
     */
     void create_work_groups(
       unsigned int num_subgroups,
       unsigned int* num_proc_in_subgroup,
       unsigned char* group_contains_extra_coord,
-      int** subgroup_ranks,
-      Graph** graphs)
+      int** subgroup_ranks)
     {
       CONTEXT("Manager::create_work_groups()");
       // set data/pointers on the coordinator process (where the data is already available)
@@ -579,8 +576,10 @@ namespace FEAST
 
           // COMMENT_HILMAR: First, I used this simpler version:
           //   mpi_error_code = MPI_Comm_create(_process_group->comm(), MPI_GROUP_EMPTY, &dummy_comm);
-          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We are not quite sure yet, if
-          // that is a bug in OpenMPI 1.4.3, or if this use of MPI_GROUP_EMPTY is incorrect.
+          // It worked with OpenMPI 1.4.2 and MPICH2, but does not with OpenMPI 1.4.3. We reported this issue to
+          // Open MPI user's mailing list and got the confirmation that this is actually a bug in OpenMPI 1.4.3. See
+          // http://www.open-mpi.org/community/lists/users/2011/03/15803.php
+          // https://svn.open-mpi.org/trac/ompi/ticket/2752
 
           // Within the ProcessSubgroup constructor, another MPI communicator is created. So, do another dummy call.
           mpi_error_code = MPI_Comm_create(_process_group->comm(), dummy_group, &dummy_comm);
@@ -593,11 +592,22 @@ namespace FEAST
 
       // delete aux. array (on all processes)
       delete [] group_contains_extra_coord;
+    } // create_work_groups()
 
-      /* ***************************************************************************
-      * now let the coordinator send the relevant parts of the global graph to the *
-      * corresponding work group members                                           *
-      *****************************************************************************/
+
+    /**
+    * \brief sends the relevant parts of the global graph to the corresponding workers of each work group
+    *
+    * The local graphs tell the workers with which workers of their work group they have to communicate.
+    * This function is called on all processes of the process group. Before this function can be used, the function
+    * create_work_groups() must have been called.
+    *
+    * \param[in] graphs
+    * array of Graph pointers representing the connectivity of work group processes
+    */
+    void send_graphs_to_workers(Graph** graphs)
+    {
+      CONTEXT("Manager::send_graphs_to_workers()");
 
       for(unsigned int igroup(0) ; igroup < _num_subgroups ; ++igroup)
       {
@@ -631,7 +641,7 @@ namespace FEAST
               // process itself which has to be included in the call of MPI_Scatterv(...). It has to appear at the
               // position in the arrays num_neighbours_aux[] and index_aux[] corresponding to the rank of the
               // coordinator. Although we know, that this is rank 0, we do not explicitly exploit this information here
-              // since it might be that this is changed in future.
+              // since this might be changed in future.
               num_nodes = _graphs[igroup]->num_nodes() + 1;
               index_aux = new unsigned int[num_nodes + 1];
               // copy the first part of the graphs's index array to the aux array, performing implicit cast from
@@ -737,7 +747,7 @@ namespace FEAST
           _subgroups[igroup]->work_group()->do_exchange();
         }
       }
-    } // create_work_groups()
+    } // send_graphs_to_workers()
   };
 } // namespace FEAST
 

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_PROCESS_GROUP_HPP
-#define KERNEL_PROCESS_GROUP_HPP 1
+#ifndef KERNEL_WORK_GROUP_HPP
+#define KERNEL_WORK_GROUP_HPP 1
 
 // includes, system
 #include <iostream>
@@ -14,6 +14,7 @@
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
+//#include <kernel/inter_level_group.hpp>
 #include <kernel/graph.hpp>
 
 /// FEAST namespace
@@ -85,16 +86,11 @@ namespace FEAST
     */
     int _rank_coarser; // COMMENT_HILMAR: find a better variable name!
 
-// COMMENT_HILMAR, 20.10.2010:
-// Bei den letzten beiden Variablen muss man abfragen, ob der entsprechende worker auf demselben Prozess lebt,
-// denn MPI_send/recv mit source=destination ist unsafe. Dazuein  Zitat aus dem MPI2.2-Standard, Seite 31:
-//   Source = destination is allowed, that is, a process can send a message to itself.
-//   (However, it is unsafe to do so with the blocking send and receive operations described above,
-//   since this may lead to deadlock. See Section 3.5.)
-// Fuer den Fall, dass source und destination worker auf dem selben Prozess leben, muss kopiert anstatt kommuniziert
-// werden. Dafuer muss eine entsprechende Funktion vorgesehen werden, und die beiden muessen sich
-// datenstruktur-technisch "kennen". Das heisst, man wird in diesem Fall wohl noch einen Pointer auf die entsprechende
-// WorkGroup abspeichern muessen... na, mal sehen, wenn's an die Details geht.
+    /// inter level work group this process builds with the processes of the finer grid work group
+//    InterLevelGroup* _group_finer;
+
+    /// inter level work group this process builds with the process of the coarser grid work group
+//    InterLevelGroup* _group_coarser;
 
   public:
 
@@ -335,4 +331,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_PROCESS_GROUP_HPP
+#endif // guard KERNEL_WORK_GROUP_HPP

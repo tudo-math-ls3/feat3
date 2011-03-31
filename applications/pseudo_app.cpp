@@ -305,26 +305,43 @@ int main(int argc, char* argv[])
       // let the manager read the mesh file and create a base mesh (this is only done by the coordinator process)
       manager->read_mesh(mesh_file);
 
-      // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
-      unsigned int num_subgroups;
-      unsigned int* num_proc_in_subgroup(nullptr);
-      unsigned char* group_contains_extra_coord(nullptr);
-      int** subgroup_ranks(nullptr);
-      Graph** graphs;
-
       // define work groups
       if(process_group->is_coordinator())
       {
+        // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
+        unsigned int num_subgroups;
+        unsigned int* num_proc_in_subgroup(nullptr);
+        unsigned char* group_contains_extra_coord(nullptr);
+        int** subgroup_ranks(nullptr);
+        Graph** graphs;
+
         // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
         // work groups and the process distribution to them. The passed arrays are allocated within this routine.
         define_work_groups(manager, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                            subgroup_ranks, graphs);
+
+        // Now let the manager create the work groups. Deallocation of arrays (except the graph array) and destruction
+        // of objects is done within the manager class. This function also has to be called on the non-coordinator
+        // processes of the process group.
+        manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord, subgroup_ranks);
+
+        // now let the manager send local parts of the global graphs to the worker processes
+        manager->send_graphs_to_workers(graphs);
+
+        // manually destroy here the artificially created graph object (the other one is destroyed by the base mesh)
+        delete graphs[0];
+        // delete the graphs array
+        delete [] graphs;
       }
-      // Now let the manager create the work groups (this function is called on all processes of the process
-      // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
-      // balancer class.
-      manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                                  subgroup_ranks, graphs);
+      else
+      {
+        // The non-coordinator processes also have to call the function for creating work groups. They receive the
+        // necessary data from the coordinator. (This is why only nullptr are passed to the routine.)
+        manager->create_work_groups(0, nullptr, nullptr, nullptr);
+
+        // let the non-coordinator processes receive the local parts of the global graphs
+        manager->send_graphs_to_workers(nullptr);
+      }
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
       // standard file logging functions
@@ -358,14 +375,6 @@ int main(int argc, char* argv[])
 
         // test standard log feature
         Logger::log("BRAL\n");
-      }
-
-      if(process_group->is_coordinator())
-      {
-        // manually destroy here the artificially created graph object (the other one is destroyed by the base mesh)
-        delete graphs[0];
-        // delete the graphs array
-        delete [] graphs;
       }
 
       // Everything done, call universe destruction routine.

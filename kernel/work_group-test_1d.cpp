@@ -5,6 +5,7 @@
 #include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/comm.hpp>
+#include <kernel/graph.hpp>
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
 
@@ -154,34 +155,43 @@ public:
       // let the manager "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
       manager->read_mesh("dummy");
 
-      // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
-      unsigned int num_subgroups;
-      unsigned int* num_proc_in_subgroup(nullptr);
-      unsigned char* group_contains_extra_coord(nullptr);
-      int** subgroup_ranks(nullptr);
-      Graph** graphs;
-
       // define work groups
       if(process_group->is_coordinator())
       {
+        // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
+        unsigned int num_subgroups;
+        unsigned int* num_proc_in_subgroup(nullptr);
+        unsigned char* group_contains_extra_coord(nullptr);
+        int** subgroup_ranks(nullptr);
+        Graph** graphs;
+
         // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
         // work groups and the process distribution to them. The passed arrays are allocated within this routine.
         define_work_groups(manager, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
                            subgroup_ranks, graphs);
-      }
-      // Now let the manager create the work groups (this function is called on all processes of the process
-      // group). Deallocation of arrays (except the graph array) and destruction of objects is done within the load
-      // balancer class.
-      manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                                        subgroup_ranks, graphs);
 
-// add some TEST_CHECK(...)
+        // Now let the manager create the work groups. Deallocation of arrays (except the graph array) and destruction
+        // of objects is done within the manager class. This function also has to be called on the non-coordinator
+        // processes of the process group.
+        manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord, subgroup_ranks);
 
-      if(process_group->is_coordinator())
-      {
-       // delete the graphs array
+        // now let the manager send local parts of the global graphs to the worker processes
+        manager->send_graphs_to_workers(graphs);
+
+        // delete the graphs array
         delete [] graphs;
       }
+      else
+      {
+        // The non-coordinator processes also have to call the function for creating work groups. They receive the
+        // necessary data from the coordinator. (This is why only nullptr are passed to the routine.)
+        manager->create_work_groups(0, nullptr, nullptr, nullptr);
+
+        // let the non-coordinator processes receive the local parts of the global graphs
+        manager->send_graphs_to_workers(nullptr);
+      }
+
+// add some TEST_CHECK(...)
 
       // Everything done, call universe destruction routine.
       universe->destroy();
