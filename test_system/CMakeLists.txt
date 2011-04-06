@@ -6,16 +6,12 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 #top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-#our test_system basic library
-ADD_LIBRARY( test_system SHARED test_system )
-
 #list of test_system tests
 SET ( test_list test_system-test )
 
 #create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} test_system)
   ADD_TEST(${test}_nil ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
