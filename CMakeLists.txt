@@ -7,7 +7,11 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 PROJECT( FEAST )
 
+include (CTest)
 ENABLE_TESTING()
+
+set(MEMORYCHECK_COMMAND "valgrind")
+set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full")
 
 # BUILD_ID mechanism
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
