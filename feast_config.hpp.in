@@ -5,17 +5,42 @@
 #define FEAST_CONFIG_HPP 1
 
 /// Should the build include DEBUG support?
+// TODO why cmake_define for FEAST_DEBUG_MODE?
+// ultimately, dom doesn't understand the reason this file exists
+// because most of it is defined elsewhere, and we currently have
+// two half-finished solutions, one via cmake and one via base-header,
+// which could be merged into one by cmake add_definitions() rather than
+// dumping this file. I prefer removing this file completely.
 #cmakedefine DEBUG_BUILD
+#cmakedefine FEAST_DEBUG_MODE
 #if defined(DEBUG_BUILD) && !defined(DEBUG)
+  #define DEBUG
+#endif
+
+#if defined(FEAST_DEBUG_MODE) && !defined(DEBUG)
   #define DEBUG
 #endif
 
 /// Path to the FEAST source dir
 #define FEAST_SRC_DIR "${FEAST_SOURCE_DIR}"
+
 /// Path to the FEAST binary dir
 #define FEAST_BINARY_DIR "${FEAST_BINARY_DIR}"
 
-/// The used build id
+/// BUILD-ID (in standardised format) being used
 #define BUILD_ID "${BUILD_ID}"
+
+/// MPI environment being used ( a valid option is "serial"
+#define FEAST_MPI_ENV_NAME "${FEAST_MPI_ENV_NAME}"
+
+/// Compiler being used
+// TODO redundant information is in base_header.hpp
+#define FEAST_COMPILER_NAME "${FEAST_COMPILER_NAME}"
+
+/// CPU microarchitecture being used
+#define FEAST_CPU_TYPE "${FEAST_CPU_TYPE}"
+
+/// TODO this is redundant
+#define FEAST_BUILD_MODE "${FEAST_BUILD_MODE}"
 
 #endif // FEAST_CONFIG_HPP

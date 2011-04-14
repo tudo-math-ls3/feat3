@@ -9,10 +9,9 @@ PROJECT( FEAST )
 
 ENABLE_TESTING()
 
-#shall we enable debug support?
-OPTION (DEBUG_BUILD "Build with debug support.")
-
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
+
+OPTION (DEBUG_BUILD "Build with debug support.")
 
 configure_file (${FEAST_SOURCE_DIR}/feast_config.hpp.in ${FEAST_BINARY_DIR}/feast_config.hpp)
 
@@ -29,7 +28,6 @@ INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake )
 ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doc/doxygen_config WORKING_DIRECTORY ${FEAST_SOURCE_DIR} )
 if ( NOT (${FEAST_SOURCE_DIR} STREQUAL ${FEAST_BINARY_DIR}) AND UNIX)
     ADD_CUSTOM_command( TARGET doc POST_BUILD
-      COMMAND rm -rf ${FEAST_BINARY_DIR}/doc
       COMMAND mkdir ${FEAST_BINARY_DIR}/doc
       COMMAND mv ${FEAST_SOURCE_DIR}/doc/html ${FEAST_BINARY_DIR}/doc)
 endif ( NOT (${FEAST_SOURCE_DIR} STREQUAL ${FEAST_BINARY_DIR}) AND UNIX)
