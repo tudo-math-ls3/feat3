@@ -82,98 +82,102 @@ else ()
 endif ()
 
 
+# if compiler flags are not passed externally, determine our own
+if (FEAST_CXX_FLAGS STREQUAL "")
 
-# generic settings independent of arch and optimisation level
-set (FEAST_CXX_FLAGS "-pipe")
+  # generic settings independent of arch and optimisation level
+  set (FEAST_CXX_FLAGS "-pipe")
 
 
-if (FEAST_DEBUG_MODE)
-  # unoptimised settings for all archs
-  # Note: OPEN64 supports either 1998 ISO C++, or the same with GNU extensions (-std=gnu++98)
-  set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -O0 -std=gnu++98 -pedantic -Wall -Wextra -Wundef -g")
+  if (FEAST_DEBUG_MODE)
+    # unoptimised settings for all archs
+    # Note: OPEN64 supports either 1998 ISO C++, or the same with GNU extensions (-std=gnu++98)
+    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -O0 -std=gnu++98 -pedantic -Wall -Wextra -Wundef -g")
 
-else ()
-  # optimised settings for all currently supported archs
-  # -ftree-vectorize is ignored by OPEN64
-  # -ffast-math turns on additional non-IEEE-compliant optimisations
-  # -ffast-stdlib uses faster versions of some standard functions, when available
-  # the other default flags are self-explanatory and are not included in -O3
-  set (FEAST_CXX_FLAGS "-O3 -ffast-math -ffast-stdlib -funroll-loops")
-
-  # please try to maintain the same order as in the buildid_arch module
-  # Intel CPUs
-  if (FEAST_CPU_TYPE STREQUAL "i486")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "pentium")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "pentiumpro")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "pentium2")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "pentium3")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "pentiumm")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "pentium4m")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=em64t")
-  elseif (FEAST_CPU_TYPE STREQUAL "coresolo")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse3")
-  elseif (FEAST_CPU_TYPE STREQUAL "coreduo")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse3")
-  elseif (FEAST_CPU_TYPE STREQUAL "penryn")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse4.1")
-  elseif (FEAST_CPU_TYPE STREQUAL "nehalem")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse4.2")
-  elseif (FEAST_CPU_TYPE STREQUAL "westmere")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse4.2")
-  elseif (FEAST_CPU_TYPE STREQUAL "itanium")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "pentium4")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=pentium4")
-  elseif (FEAST_CPU_TYPE STREQUAL "nocona")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse3")
-  elseif (FEAST_CPU_TYPE STREQUAL "itanium2")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-
-  # AMD CPUs
-  elseif (FEAST_CPU_TYPE STREQUAL "amd486")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "k5")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "k6")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
-  elseif (FEAST_CPU_TYPE STREQUAL "athlon")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon")
-  elseif (FEAST_CPU_TYPE STREQUAL "athlonxp")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon")
-  elseif (FEAST_CPU_TYPE STREQUAL "opteron")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=opteron")
-  elseif (FEAST_CPU_TYPE STREQUAL "athlon64")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon64")
-  elseif (FEAST_CPU_TYPE STREQUAL "opteronx2")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon64fx")
-  elseif (FEAST_CPU_TYPE STREQUAL "turionx2")
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon64fx")
-  elseif (FEAST_CPU_TYPE STREQUAL "barcelona")
-    # note that amdfam10 and barcelona are synonymous
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=barcelona")
-
-  # generic settings for all archs
   else ()
-    message (STATUS "WARNING: Unsupported architecture/compiler combination found.")
-    message (STATUS "Using generic optimisation flags. ")
-  endif ()
+    # optimised settings for all currently supported archs
+    # -ftree-vectorize is ignored by OPEN64
+    # -ffast-math turns on additional non-IEEE-compliant optimisations
+    # -ffast-stdlib uses faster versions of some standard functions, when available
+    # the other default flags are self-explanatory and are not included in -O3
+    set (FEAST_CXX_FLAGS "-O3 -ffast-math -ffast-stdlib -funroll-loops")
 
-  # check if compiler supports the given flags
-  set (COMPILER_SUPPORTS_FLAG ON)
-  include (CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG("${FEAST_CXX_FLAGS}" COMPILER_SUPPORTS_FLAG)
-  if (NOT COMPILER_SUPPORTS_FLAG)
-    message (STATUS "##############################################################")
-    message (STATUS "One of the flags ${FEAST_CXX_FLAGS} is apparently             ")
-    message (STATUS "unsupported by the OPEN64 Compiler v.${OPEN64_VERSION_VALUE}. ")
-    message (STATUS "##############################################################")
-    message (FATAL_ERROR "")
-  endif ()
+    # please try to maintain the same order as in the buildid_arch module
+    # Intel CPUs
+    if (FEAST_CPU_TYPE STREQUAL "i486")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "pentium")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "pentiumpro")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "pentium2")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "pentium3")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "pentiumm")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "pentium4m")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=em64t")
+    elseif (FEAST_CPU_TYPE STREQUAL "coresolo")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse3")
+    elseif (FEAST_CPU_TYPE STREQUAL "coreduo")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse3")
+    elseif (FEAST_CPU_TYPE STREQUAL "penryn")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse4.1")
+    elseif (FEAST_CPU_TYPE STREQUAL "nehalem")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse4.2")
+    elseif (FEAST_CPU_TYPE STREQUAL "westmere")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse4.2")
+    elseif (FEAST_CPU_TYPE STREQUAL "itanium")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "pentium4")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=pentium4")
+    elseif (FEAST_CPU_TYPE STREQUAL "nocona")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=core -msse3")
+    elseif (FEAST_CPU_TYPE STREQUAL "itanium2")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
 
-endif (FEAST_DEBUG_MODE)
+    # AMD CPUs
+    elseif (FEAST_CPU_TYPE STREQUAL "amd486")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "k5")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "k6")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+    elseif (FEAST_CPU_TYPE STREQUAL "athlon")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon")
+    elseif (FEAST_CPU_TYPE STREQUAL "athlonxp")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon")
+    elseif (FEAST_CPU_TYPE STREQUAL "opteron")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=opteron")
+    elseif (FEAST_CPU_TYPE STREQUAL "athlon64")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon64")
+    elseif (FEAST_CPU_TYPE STREQUAL "opteronx2")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon64fx")
+    elseif (FEAST_CPU_TYPE STREQUAL "turionx2")
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=athlon64fx")
+    elseif (FEAST_CPU_TYPE STREQUAL "barcelona")
+      # note that amdfam10 and barcelona are synonymous
+      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -march=barcelona")
+
+    # generic settings for all archs
+    else ()
+      message (STATUS "WARNING: Unsupported architecture/compiler combination found.")
+      message (STATUS "Using generic optimisation flags. ")
+    endif ()
+
+  endif (FEAST_DEBUG_MODE)
+endif (FEAST_CXX_FLAGS STREQUAL "")
+
+
+# check if compiler supports the given flags
+set (COMPILER_SUPPORTS_FLAG ON)
+include (CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("${FEAST_CXX_FLAGS}" COMPILER_SUPPORTS_FLAG)
+if (NOT COMPILER_SUPPORTS_FLAG)
+  message (STATUS "##############################################################")
+  message (STATUS "One of the flags ${FEAST_CXX_FLAGS} is apparently             ")
+  message (STATUS "unsupported by the OPEN64 Compiler v.${OPEN64_VERSION_VALUE}. ")
+  message (STATUS "##############################################################")
+  message (FATAL_ERROR "")
+endif ()
