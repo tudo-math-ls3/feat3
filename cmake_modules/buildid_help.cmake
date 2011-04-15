@@ -46,25 +46,15 @@ message (STATUS "  mode    : debug (pedantic error checking) or optimised      "
 message (STATUS "            code for the target architecture [mandatory token]")
 message (STATUS "  mpi     : serial or MPI build, in the latter case this sets ")
 message (STATUS "            the MPI environment to be used [mandatory token]  ")
-message (STATUS "  compiler: the compiler suite to be used                     ")
-
-# the default compiler is OS-dependent
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  message (STATUS "            on Linux systems: GNU                           ")
-elseif (CMAKE_SYSTEM_NAME STREQUAL "SunOS")
-  message (STATUS "            on SunOS systems: GNU                           ")
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  message (STATUS "            on Mac systems: TODO probably unsupported       ")
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  message (STATUS "            on Windows systems:  TODO probably unsupported  ")
-endif ()
-
-# continue with the list of tokens
+message (STATUS "  compiler: the compiler suite to be used [mandatory token]   ")
 message (STATUS "  arch:     the microarchitecture to be used for the CPUs and ")
 message (STATUS "            other devices in the system, e.g.,                ")
 message (STATUS "              nehalem                                         ")
 message (STATUS "              westmere-opencl                                 ")
 message (STATUS "              magnycours-cuda2.1                              ")
+message (STATUS "            If this token is omitted, then the current        ")
+message (STATUS "            architecture will be determined automatically, and")
+message (STATUS "            optimised compiler settings will be set.          ")
 
 # give information about each of these tokens, idea: Each individual cmake module
 # dumps out its own information for less cluttered code

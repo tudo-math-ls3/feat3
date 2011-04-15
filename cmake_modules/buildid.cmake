@@ -80,7 +80,9 @@ if ( (BUILD_ID STREQUAL "HELP") OR (BUILD_ID STREQUAL "help") )
   message (STATUS "Bailing out because \"help\" is not intended to actually      ")
   message (STATUS "configure anything.                                           ")
   message (STATUS "Ignore whatever cmake says below.                             ")
-  message (FATAL_ERROR "##############################################################")
+  message (STATUS "##############################################################")
+  message (FATAL_ERROR "")
+
 
 
 
@@ -122,18 +124,24 @@ else ()
       # TODO implement
       message (STATUS "##############################################################")
       message (STATUS "ERROR: Default build-ID not implemented yet for Darwin.       ")
-      message (FATAL_ERROR "##############################################################")
+      message (STATUS "##############################################################")
+      message (FATAL_ERROR "")
+
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
       # TODO implement
       message (STATUS "##############################################################")
       message (STATUS "ERROR: Default build-ID not implemented yet for Windows.      ")
-      message (FATAL_ERROR "##############################################################")
+      message (STATUS "##############################################################")
+      message (FATAL_ERROR "")
+
 
     else ()
       message (STATUS "##############################################################")
       message (STATUS "ERROR: Unsupported operating system found.                    ")
-      message (FATAL_ERROR "##############################################################")
+      message (STATUS "##############################################################")
+      message (FATAL_ERROR "")
+
     endif ()
 
   endif ()

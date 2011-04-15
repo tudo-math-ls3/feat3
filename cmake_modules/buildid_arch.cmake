@@ -177,7 +177,8 @@ macro (guess_cpu)
     message (STATUS "##############################################################")
     message (STATUS "ERROR: The operating system ${CMAKE_SYSTEM_NAME}              ")
     message (STATUS "is not supported.                                             ")
-    message (FATAL_ERROR "##############################################################")
+    message (STATUS "##############################################################")
+    message (FATAL_ERROR "")
 
   endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
