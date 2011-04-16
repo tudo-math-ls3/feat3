@@ -20,6 +20,14 @@ set (FORCE_ERROR_MESSAGE OFF)
 # recall that this token is mandatory if tokens are used at all.
 if (NOT DISPLAY_HELP_ONLY)
 
+  # this is unfortunately needed to use command line values, because
+  # in cmake, an unset variable is not strequal ""
+  if (NOT FEAST_CXX_FLAGS STREQUAL "")
+   set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS}")
+  else ()
+   set (FEAST_CXX_FLAGS_INTERNAL "")
+  endif ()
+
   # map ambiguous compiler token to unique identifier,
   # this also checks if a supported compiler is requested,
   # and include the corresponding compiler file which in
@@ -81,7 +89,9 @@ if (NOT DISPLAY_HELP_ONLY)
 
   endif (NOT FEAST_MPI_ENV_NAME STREQUAL "serial")
 
-  # copy compiler flags selected to cmake
+
+  # finally, pass all compiler flags to cmake
+  set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS_INTERNAL}")
   add_definitions(${FEAST_CXX_FLAGS})
 
 

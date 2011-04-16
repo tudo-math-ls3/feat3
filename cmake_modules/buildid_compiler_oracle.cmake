@@ -4,7 +4,7 @@
 # This module sets the following variables:
 #   FEAST_COMPILER_NAME (oracle)
 #   CMAKE_CXX_COMPILER (sunCC)
-#   FEAST_CXX_FLAGS (string)
+#   FEAST_CXX_FLAGS_INTERNAL (string)
 #
 #
 # Maintainer information:
@@ -83,10 +83,10 @@ message (STATUS "##############################################################"
 
 
 # if compiler flags are not passed externally, determine our own
-if (FEAST_CXX_FLAGS STREQUAL "")
+if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
 
   # generic settings independent of arch and optimisation level
-  set (FEAST_CXX_FLAGS "")
+  set (FEAST_CXX_FLAGS_INTERNAL "")
 
 
   if (FEAST_DEBUG_MODE)
@@ -94,7 +94,7 @@ if (FEAST_CXX_FLAGS STREQUAL "")
     # compat=5 is "according to the ANSI/ISO 1998 C++ standard as corrected in 2003"
     # which seems closest to chat we want
     # -verbose=template might be useful occasionally
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -O0 -compat=5 -erroff=%none -g")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -compat=5 -erroff=%none -g")
 
   else ()
     # optimised settings for all currently supported archs
@@ -106,45 +106,45 @@ if (FEAST_CXX_FLAGS STREQUAL "")
     # -xlibmil inlines selected libmath functions (implied by -fast)
     # -xlibmopt uses optimised implemenation of libmath (implied by -fast)
     # -xprefetch=auto,explicit inserts prefetching instructions to improve overall instruction throughput
-    set (FEAST_CXX_FLAGS "-fast-xprefetch=auto,explicit")
+    set (FEAST_CXX_FLAGS_INTERNAL "-fast-xprefetch=auto,explicit")
 
     # please try to maintain the same order as in the buildid_arch module
     # Intel CPUs
     if (FEAST_CPU_TYPE STREQUAL "i486")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=pentium -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=pentium -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentiumpro")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=pentium_pro -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=pentium_pro -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium2")
       # strangely, pentium2 is not available
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium3")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=pentium3 -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=pentium3 -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentiumm")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=pentium3 -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=pentium3 -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium4m")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=pentium4 -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=pentium4 -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "coresolo")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic64 -xarch=sse3 -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic64 -xarch=sse3 -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "coreduo")
       # possible alternative: -xtarget=woodcrest?
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic64 -xchip=core2 -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic64 -xchip=core2 -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "penryn")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=penryn -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=penryn -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "nehalem")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=nehalem -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=nehalem -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "westmere")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=nehalem -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=nehalem -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "itanium")
       message (STATUS "##############################################################")
       message (STATUS "Oracle compiler suite does not support itanium.               ")
       message (STATUS "##############################################################")
       message (FATAL_ERROR "")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium4")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=pentium4")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=pentium4")
     elseif (FEAST_CPU_TYPE STREQUAL "nocona")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic64 -xchip=core2 -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic64 -xchip=core2 -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "itanium2")
       message (STATUS "##############################################################")
       message (STATUS "Oracle compiler suite does not support itanium.               ")
@@ -153,46 +153,46 @@ if (FEAST_CXX_FLAGS STREQUAL "")
 
     # AMD CPUs
     elseif (FEAST_CPU_TYPE STREQUAL "amd486")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "k5")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "k6")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "athlon")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "athlonxp")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic -m32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic -m32")
     elseif (FEAST_CPU_TYPE STREQUAL "opteron")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=opteron -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=opteron -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "athlon64")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=opteron -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=opteron -m64")
     elseif (FEAST_CPU_TYPE STREQUAL "opteronx2")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=opteron -m64 -xarch=sse3")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=opteron -m64 -xarch=sse3")
     elseif (FEAST_CPU_TYPE STREQUAL "turionx2")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=opteron -m64 -xarch=sse3")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=opteron -m64 -xarch=sse3")
     elseif (FEAST_CPU_TYPE STREQUAL "barcelona")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=barcelona -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=barcelona -m64")
 
     # generic settings for all archs
     else ()
       message (STATUS "WARNING: Unsupported architecture/compiler combination found.")
       message (STATUS "Using generic optimisation flags. ")
       # filter out native part of -fast again
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xtarget=generic64 -m64")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xtarget=generic64 -m64")
 
     endif ()
 
   endif (FEAST_DEBUG_MODE)
-endif (FEAST_CXX_FLAGS STREQUAL "")
+endif (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
 
 
 # check if compiler supports the given flags
 set (COMPILER_SUPPORTS_FLAG ON)
 include (CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("${FEAST_CXX_FLAGS}" COMPILER_SUPPORTS_FLAG)
+CHECK_CXX_COMPILER_FLAG("${FEAST_CXX_FLAGS_INTERNAL}" COMPILER_SUPPORTS_FLAG)
 if (NOT COMPILER_SUPPORTS_FLAG)
   message (STATUS "##############################################################")
-  message (STATUS "One of the flags ${FEAST_CXX_FLAGS} is apparently             ")
+  message (STATUS "One of the flags ${FEAST_CXX_FLAGS_INTERNAL} is apparently             ")
   message (STATUS "unsupported by the Oracle Compiler.                           ")
   message (STATUS "##############################################################")
   message (FATAL_ERROR "")

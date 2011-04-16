@@ -4,7 +4,7 @@
 # This module sets the following variables:
 #   FEAST_COMPILER_NAME (intel)
 #   CMAKE_CXX_COMPILER (icpc)
-#   FEAST_CXX_FLAGS (string)
+#   FEAST_CXX_FLAGS_INTERNAL (string)
 #
 #
 # Maintainer information:
@@ -96,85 +96,84 @@ else ()
   message (STATUS "TODO: Implement Intel version detection for Non-Linux systems.")
 endif ()
 
-
 # if compiler flags are not passed externally, determine our own
-if (FEAST_CXX_FLAGS STREQUAL "")
+if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
 
   # generic settings independent of arch and optimisation level
-  set (FEAST_CXX_FLAGS "")
+  set (FEAST_CXX_FLAGS_INTERNAL "")
 
 
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
-    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -O0 -std=c++0x -Wall -g")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++0x -Wall -g")
 
   else ()
     # optimised settings for all currently supported archs
     # please try to maintain the same order as in the buildid_arch module
     # Note: SSE2 is on by default, so we only have to specify what's better
     #       or worse
-    set (FEAST_CXX_FLAGS "-O3")
+    set (FEAST_CXX_FLAGS_INTERNAL "-O3")
 
     # please try to maintain the same order as in the buildid_arch module
     # Intel CPUs
     if (FEAST_CPU_TYPE STREQUAL "i486")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentiumpro")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium2")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium3")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "pentiumm")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE2")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE2")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium4m")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE2")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE2")
     elseif (FEAST_CPU_TYPE STREQUAL "coresolo")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE3")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE3")
     elseif (FEAST_CPU_TYPE STREQUAL "coreduo")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE3")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE3")
     elseif (FEAST_CPU_TYPE STREQUAL "penryn")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE4.1")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE4.1")
     elseif (FEAST_CPU_TYPE STREQUAL "nehalem")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE4.2")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE4.2")
     elseif (FEAST_CPU_TYPE STREQUAL "westmere")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE4.2")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE4.2")
     elseif (FEAST_CPU_TYPE STREQUAL "itanium")
       # no setting necessary, the itanium version of the intel compiler
       # sets everything automatically
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium4")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE2")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE2")
     elseif (FEAST_CPU_TYPE STREQUAL "nocona")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -xSSE3")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -xSSE3")
     elseif (FEAST_CPU_TYPE STREQUAL "itanium2")
       # no setting necessary, the itanium version of the intel compiler
       #sets everything automatically
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
 
       # AMD CPUs
     elseif (FEAST_CPU_TYPE STREQUAL "amd486")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "k5")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "k6")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "athlon")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "athlonxp")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mIA32")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mIA32")
     elseif (FEAST_CPU_TYPE STREQUAL "opteron")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mSSE2")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mSSE2")
     elseif (FEAST_CPU_TYPE STREQUAL "athlon64")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mSSE2")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mSSE2")
     elseif (FEAST_CPU_TYPE STREQUAL "opteronx2")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mSSE3")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mSSE3")
     elseif (FEAST_CPU_TYPE STREQUAL "turionx2")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mSSE3")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mSSE3")
     elseif (FEAST_CPU_TYPE STREQUAL "barcelona")
-      set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -mSSE4.1")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -mSSE4.1")
 
     # generic settings for all archs
     else ()
@@ -183,16 +182,16 @@ if (FEAST_CXX_FLAGS STREQUAL "")
     endif ()
 
   endif (FEAST_DEBUG_MODE)
-endif (FEAST_CXX_FLAGS STREQUAL "")
+endif (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
 
 
 # check if compiler supports the given flags
 set (COMPILER_SUPPORTS_FLAG ON)
 include (CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("${FEAST_CXX_FLAGS}" COMPILER_SUPPORTS_FLAG)
+CHECK_CXX_COMPILER_FLAG("${FEAST_CXX_FLAGS_INTERNAL}" COMPILER_SUPPORTS_FLAG)
 if (NOT COMPILER_SUPPORTS_FLAG)
   message (STATUS "##############################################################")
-  message (STATUS "One of the flags ${FEAST_CXX_FLAGS} is apparently             ")
+  message (STATUS "One of the flags ${FEAST_CXX_FLAGS_INTERNAL} is apparently             ")
   message (STATUS "unsupported by the Intel Compiler v.${INTEL_VERSION_VALUE}.   ")
   message (STATUS "##############################################################")
   message (FATAL_ERROR "")
