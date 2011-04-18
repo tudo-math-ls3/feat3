@@ -106,7 +106,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
     # -xlibmil inlines selected libmath functions (implied by -fast)
     # -xlibmopt uses optimised implemenation of libmath (implied by -fast)
     # -xprefetch=auto,explicit inserts prefetching instructions to improve overall instruction throughput
-    set (FEAST_CXX_FLAGS_INTERNAL "-fast-xprefetch=auto,explicit")
+    set (FEAST_CXX_FLAGS_INTERNAL "-fast -xprefetch=auto,explicit")
 
     # please try to maintain the same order as in the buildid_arch module
     # Intel CPUs
