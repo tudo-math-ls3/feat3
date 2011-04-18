@@ -97,6 +97,10 @@ elseif ( (BUILD_ID STREQUAL "MANUAL") OR (BUILD_ID STREQUAL "manual") )
 # in any case, parse BUILD_ID
 else ()
 
+  # first of all, purge some settings, cmake could grab from the shell environment
+  set (CMAKE_CXX_COMPILER_ARG1 "")
+  set (CMAKE_CXX_FLAGS "")
+
   # create a default build-ID
   if (BUILD_ID STREQUAL "")
     # tell the build system to guess the arch later on
