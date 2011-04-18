@@ -5,20 +5,11 @@
 #define FEAST_CONFIG_HPP 1
 
 /// Should the build include DEBUG support?
-// TODO why cmake_define for FEAST_DEBUG_MODE?
-// ultimately, dom doesn't understand the reason this file exists
-// because most of it is defined elsewhere, and we currently have
-// two half-finished solutions, one via cmake and one via base-header,
-// which could be merged into one by cmake add_definitions() rather than
-// dumping this file. I prefer removing this file completely.
-#cmakedefine DEBUG_BUILD
 #cmakedefine FEAST_DEBUG_MODE
-#if defined(DEBUG_BUILD) && !defined(DEBUG)
-  #define DEBUG
-#endif
-
 #if defined(FEAST_DEBUG_MODE) && !defined(DEBUG)
   #define DEBUG
+#else
+  #define NDEBUG
 #endif
 
 /// Path to the FEAST source dir

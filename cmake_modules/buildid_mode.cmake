@@ -2,7 +2,8 @@
 #
 # This module sets the following variables:
 #   FEAST_DEBUG_MODE (bool, cached)
-#   FEAST_BUILD_MODE_NAME (string, opt|debug)
+#   FEAST_BUILD_MODE_NAME (string, debug|release|minsizerel|relwithdebinfo)
+#   CMAKE_BUILD_TYPE (to cmake-equivalents of FEAST_BUILD_MODE_NAME)
 #
 # \author Dominik Goeddeke
 # \author Dirk Ribbrock
@@ -10,7 +11,6 @@
 
 # initialise local variables
 set (FORCE_ERROR_MESSAGE OFF)
-
 
 # determine and validate setting of "mode" token,
 # recall that this token is mandatory if tokens are used at all.
@@ -24,10 +24,23 @@ if (NOT DISPLAY_HELP_ONLY)
        (BUILD_ID MATCHES "^noopt-.+|.+-noopt-.+|.+-noopt$") )
     set (FEAST_DEBUG_MODE ON CACHE BOOL "" FORCE)
     set (FEAST_BUILD_MODE_NAME "debug")
+    set (CMAKE_BUILD_TYPE "Debug")
 
-  elseif (BUILD_ID MATCHES "^opt-.+|.+-opt-.+|.+-opt$")
+  elseif ( (BUILD_ID MATCHES "^opt-.+|.+-opt-.+|.+-opt$") OR
+           (BUILD_ID MATCHES "^release-.+|.+-release-.+|.+-release$") )
     set (FEAST_DEBUG_MODE OFF CACHE BOOL "" FORCE)
     set (FEAST_BUILD_MODE_NAME "opt")
+    set (CMAKE_BUILD_TYPE "Release")
+
+  elseif (BUILD_ID MATCHES "^relwithdebinfo-.+|.+-relwithdebinfo-.+|.+-relwithdebinfo$")
+    set (FEAST_DEBUG_MODE OFF CACHE BOOL "" FORCE)
+    set (FEAST_BUILD_MODE_NAME "relwithdebinfo")
+    set (CMAKE_BUILD_TYPE "RelWithDepInfo")
+
+  elseif (BUILD_ID MATCHES "^minsizerel-.+|.+-minsizerel-.+|.+-minsizerel$")
+    set (FEAST_DEBUG_MODE OFF CACHE BOOL "" FORCE)
+    set (FEAST_BUILD_MODE_NAME "minsizerel")
+    set (CMAKE_BUILD_TYPE "MinSizeRel")
 
   else ()
     # an unsupported "mode" token has been encountered, so bail out
@@ -50,8 +63,11 @@ endif (FORCE_ERROR_MESSAGE)
 if ( (DISPLAY_HELP_ONLY) OR (FORCE_ERROR_MESSAGE) )
   message (STATUS "##############################################################")
   message (STATUS "Valid settings for token \"mode\"                             ")
-  message (STATUS "opt        : enable full compiler optimisations               ")
-  message (STATUS "debug|noopt: no compiler optimisations                        ")
+  message (STATUS "debug|noopt   : no compiler optimisations                     ")
+  message (STATUS "release|opt   : enable full compiler optimisations            ")
+  message (STATUS "relwithdebinfo: release + debug info                          ")
+  message (STATUS "minsizerel    : currently equivalent to release               ")
+
 endif ()
 
 if (FORCE_ERROR_MESSAGE)

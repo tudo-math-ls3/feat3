@@ -168,7 +168,6 @@ macro (guess_cpu)
     mark_as_advanced(_vendor_id _cpu_id)
     string(REGEX REPLACE ".* Family ([0-9]+) .*" "\\1" _cpu_family "${_cpu_id}")
     string(REGEX REPLACE ".* Model ([0-9]+) .*" "\\1" _cpu_model "${_cpu_id}")
-    message(AUTHOR_WARNING "If you know how to query the processor capabilities wrt. SSE on Windows, let Dirk know!")
     message (STATUS "WARNING: UNCHARTED BUILD SYSTEM TERRITORY FROM NOW ON")
 
   else ()

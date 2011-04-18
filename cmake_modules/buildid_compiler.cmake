@@ -91,9 +91,19 @@ if (NOT DISPLAY_HELP_ONLY)
 
 
   # finally, pass all compiler flags to cmake
-  set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS_INTERNAL}")
-  add_definitions(${FEAST_CXX_FLAGS})
+  if (FEAST_BUILD_MODE_NAME STREQUAL "debug")
+    set (CMAKE_CXX_FLAGS_DEBUG "${FEAST_CXX_FLAGS_INTERNAL}")
+  elseif (FEAST_BUILD_MODE_NAME STREQUAL "minsizerel")
+    set (CMAKE_CXX_FLAGS_MINSIZEREL "${FEAST_CXX_FLAGS_INTERNAL}")
+  elseif (FEAST_BUILD_MODE_NAME STREQUAL "release")
+    set (CMAKE_CXX_FLAGS_RELEASE "${FEAST_CXX_FLAGS_INTERNAL}")
+  elseif (FEAST_BUILD_MODE_NAME STREQUAL "relwithdebinfo")
+    set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${FEAST_CXX_FLAGS_INTERNAL}")
+   set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g")
+  endif ()
 
+  # and store them in our internal variable as well
+  set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS_INTERNAL}")
 
 endif (NOT DISPLAY_HELP_ONLY)
 

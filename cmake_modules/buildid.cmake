@@ -15,7 +15,8 @@
 #     nothing
 #   buildid_mode:
 #     FEAST_DEBUG_MODE (bool, cached)
-#     FEAST_BUILD_MODE_NAME (string, debug|opt)
+#     FEAST_BUILD_MODE_NAME (string, debug|release|minsizerel|relwithdebinfo)
+#     CMAKE_BUILD_TYPE (to cmake-equivalents of FEAST_BUILD_MODE_NAME)
 #   buildid_mpi:
 #     FEAST_MPI_ENV_NAME (string, serial|openmpi|mpich2)
 #   buildid_arch:
