@@ -95,14 +95,14 @@ if (NOT DISPLAY_HELP_ONLY)
     set (CMAKE_CXX_FLAGS_DEBUG "${FEAST_CXX_FLAGS_INTERNAL}")
   elseif (FEAST_BUILD_MODE_NAME STREQUAL "minsizerel")
     set (CMAKE_CXX_FLAGS_MINSIZEREL "${FEAST_CXX_FLAGS_INTERNAL}")
-  elseif (FEAST_BUILD_MODE_NAME STREQUAL "release")
+  elseif (FEAST_BUILD_MODE_NAME STREQUAL "opt")
     set (CMAKE_CXX_FLAGS_RELEASE "${FEAST_CXX_FLAGS_INTERNAL}")
   elseif (FEAST_BUILD_MODE_NAME STREQUAL "relwithdebinfo")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -g")
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${FEAST_CXX_FLAGS_INTERNAL}")
-   set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g")
   endif ()
 
-  # and store them in our internal variable as well
+  # and store them in our variable as well for proper screen output
   set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS_INTERNAL}")
 
 endif (NOT DISPLAY_HELP_ONLY)

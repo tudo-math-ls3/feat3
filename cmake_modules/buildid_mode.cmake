@@ -35,7 +35,7 @@ if (NOT DISPLAY_HELP_ONLY)
   elseif (BUILD_ID MATCHES "^relwithdebinfo-.+|.+-relwithdebinfo-.+|.+-relwithdebinfo$")
     set (FEAST_DEBUG_MODE OFF CACHE BOOL "" FORCE)
     set (FEAST_BUILD_MODE_NAME "relwithdebinfo")
-    set (CMAKE_BUILD_TYPE "RelWithDepInfo")
+    set (CMAKE_BUILD_TYPE "RelWithDebInfo")
 
   elseif (BUILD_ID MATCHES "^minsizerel-.+|.+-minsizerel-.+|.+-minsizerel$")
     set (FEAST_DEBUG_MODE OFF CACHE BOOL "" FORCE)
