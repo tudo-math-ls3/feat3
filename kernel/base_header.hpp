@@ -18,6 +18,11 @@
 #  error The DOXYGEN macro must not be defined at compile-time
 #endif // DOXYGEN
 
+//Activate DEBUG macro if the build system tells us to do so.
+#if defined FEAST_DEBUG_MODE && !defined(DEBUG)
+#  define DEBUG
+#endif
+
 // The DEBUG and NDEBUG macros are mutually exclusive
 #if defined(DEBUG) && defined(NDEBUG)
 #  error The DEBUG and NDEBUG macros must not be defined at the same time.
