@@ -537,10 +537,14 @@ int main(int argc, char** argv)
   int rank(-1);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  std::string mpc("mpiproccount");
-  if(argc == 2 && std::string(argv[1]) == mpc.c_str())
+  if (argc == 2)
   {
-    return (*TestList::instance()->begin_tests())->mpi_proc_count();
+    std::string mpc("mpiproccount");
+    std::string argv1(argv[1]);
+    if(0 == mpc.compare(argv1))
+    {
+      return (*TestList::instance()->begin_tests())->mpi_proc_count();
+    }
   }
 
   if(argc > 1)
