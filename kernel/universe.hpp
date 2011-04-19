@@ -384,7 +384,8 @@ namespace FEAST
   public:
 
     // set parent class as friend such that it can execute CTOR and DTOR of this class
-    friend class InstantiationPolicy<Universe<space_dim_, world_dim_>, Singleton>;
+    friend Universe* InstantiationPolicy<Universe, Singleton>::instance();
+    friend void InstantiationPolicy<Universe, Singleton>::_delete(Universe<space_dim_, world_dim_>*);
 
     /* ******************
     * getters & setters *

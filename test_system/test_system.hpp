@@ -93,6 +93,7 @@ namespace TestSystem
     /// internal STL list representation of TestList
     std::list<BaseTest*> _tests;
 
+    /// default CTOR
     TestList()
     {
     }
@@ -100,7 +101,7 @@ namespace TestSystem
 
   public:
 
-    friend class InstantiationPolicy<TestList, Singleton>;
+    friend TestList* InstantiationPolicy<TestList, Singleton>::instance();
 
     /// TestList forward iterator.
     typedef std::list<BaseTest*>::iterator Iterator;
