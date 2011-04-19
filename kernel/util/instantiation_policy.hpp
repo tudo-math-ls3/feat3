@@ -132,13 +132,6 @@ namespace FEAST
     }
 
 
-    /// Deletes the object of T_ that is pointed at by ptr.
-    static void _delete(T_ * const ptr)
-    {
-      delete ptr;
-    }
-
-
     /// Unwanted copy constructor: Do not implement!
     InstantiationPolicy(const InstantiationPolicy &);
 
@@ -151,6 +144,19 @@ namespace FEAST
     /// Default constructor.
     InstantiationPolicy()
     {
+    }
+
+
+    /**
+     * \brief Deletes the object of T_ that is pointed at by ptr.
+     *
+     * This routine is currently protected instead of private, because
+     * it must be a friend of other classes, and a private routine cannot
+     * be named a friend.
+     */
+    static void _delete(T_ * const ptr)
+    {
+      delete ptr;
     }
 
 
