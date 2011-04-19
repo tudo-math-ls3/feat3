@@ -12,10 +12,10 @@ IF (UNIX)
         CMakeCache.txt
         feast_config.hpp
         cmake.check_cache
-        *.cmake
         Makefile
         core core.*
         gmon.out
+        CMakeFiles
         *~
         )
 
