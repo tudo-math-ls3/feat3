@@ -9,9 +9,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/assertion.hpp>
 
-using namespace TestSystem;
-using namespace FEAST;
-
 class A{};
 class B : public A{};
 class C{};

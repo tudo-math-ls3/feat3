@@ -26,360 +26,361 @@
 * Implementation of Test and related classes.
 */
 
-using namespace FEAST;
-
 /// TestSystem namespace
-namespace TestSystem
+namespace FEAST
 {
-  // Forwared declaration
-  class BaseTest;
-
-  /// exception thrown by the check method in BaseTest
-  class TestFailedException
-    : public std::exception
+  namespace TestSystem
   {
+    // Forwared declaration
+    class BaseTest;
 
-  private:
-
-    /// failure message
-    const std::string _message;
-
-
-  public:
-
-    /**
-    * \brief CTOR
-    *
-    * \param[in] function
-    * The function that trows the exception.
-    *
-    * \param[in] file
-    * The file the exception was thrown in.
-    *
-    * \param[in] line
-    * The line the exception was thrown in.
-    *
-    * \param[in] message
-    * A message describing the exception.
-    */
-    TestFailedException(
-      const char* const function,
-      const char* const file,
-      const long line,
-      const std::string & message) throw ()
-      : _message(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message )
+    /// exception thrown by the check method in BaseTest
+    class TestFailedException
+      : public std::exception
     {
-    }
 
-    /// DTOR
-    virtual ~TestFailedException() throw ()
-    {
-    }
+      private:
 
-    /// description
-    const char* what() const throw ()
-    {
-      return _message.c_str();
-    }
-  };
-
-  /// list of all instantiated tests
-  class TestList
-    : public InstantiationPolicy<TestList, Singleton>
-  {
-
-  private:
-
-    /// internal STL list representation of TestList
-    std::list<BaseTest*> _tests;
-
-    /// default CTOR
-    TestList()
-    {
-    }
+        /// failure message
+        const std::string _message;
 
 
-  public:
+      public:
 
-    friend TestList* InstantiationPolicy<TestList, Singleton>::instance();
-
-    /// TestList forward iterator.
-    typedef std::list<BaseTest*>::iterator Iterator;
-
-    /**
-    * \brief adds a test to the TestList
-    *
-    * \param[in] test
-    * the test that will be added
-    */
-    void register_test(BaseTest* const test)
-    {
-      _tests.push_back(test);
-    }
-
-    /// returns an iterator to the front of the TestList
-    Iterator begin_tests()
-    {
-      return _tests.begin();
-    }
-
-    /// returns an iterator beyond the last element of the TestList
-    Iterator end_tests()
-    {
-      return _tests.end();
-    }
-
-    /// returns the size of the TestList
-    size_t size()
-    {
-      return _tests.size();
-    }
-
-    /// removes iterator target from the TestList
-    Iterator erase (Iterator i)
-    {
-      return _tests.erase(i);
-    }
-  };
-
-
-  /**
-  * \brief base class for all Tests
-  *
-  * \author Dirk Ribbrock
-  */
-  class BaseTest
-  {
-
-  protected:
-
-    /// test description String
-    const std::string _id;
-    /// architecture description String
-    std::string _tag_name;
-    /// precision description String
-    std::string _prec_name;
-
-
-  public:
-
-    /**
-    * \brief CTOR
-    *
-    * \param[in] id
-    * the testcase's id string
-    */
-    BaseTest(const std::string& id)
-     : _id(id),
-       _tag_name("NONE"),
-       _prec_name("NONE")
-    {
-      TestList::instance()->register_test(this);
-    }
-
-    /// DTOR
-    virtual ~BaseTest() {}
-
-    /// returns our id string
-    virtual const std::string id() const
-    {
-      return _id;
-    }
-
-    /// returns the mpi proc count to use
-    virtual unsigned long mpi_proc_count() const
-    {
-      return 1;
-    }
-
-    /// utility method used bei TEST_CHECK_*
-    virtual void check(const char * const function, const char * const file,
-        const long line, bool was_ok, const std::string & message) const
-    {
-      if(! was_ok)
-        throw TestFailedException(function, file, line, message);
-    }
-
-    /**
-    * \brief runs the test case
-    *
-    * Called by unittest framework only.
-    */
-    virtual void run() const = 0;
-
-    /// returns our target platform
-    virtual std::string get_tag_name()
-    {
-      return _tag_name;
-    }
-
-    /// returns our target platform
-    virtual std::string get_prec_name()
-    {
-      return _prec_name;
-    }
-
-    /// utility class used by TEST_CHECK_EQUAL
-    struct TwoVarHolder
-    {
-      /// result of comparison
-      bool result;
-      /// string representation of first parameter
-      std::string s_a;
-      /// string representation of second parameter
-      std::string s_b;
-
-      /**
-      * \brief CTOR
-      *
-      * \param[in] a
-      * First value to compare
-      *
-      * \param[in] b
-      * Second value to compare
-      */
-      template<
-        typename T1_,
-        typename T2_>
-      TwoVarHolder(
-        T1_ a,
-        T2_ b)
-        : result(a == b),
-          s_a(),
-          s_b()
-      {
-        if(!result)
+        /**
+         * \brief CTOR
+         *
+         * \param[in] function
+         * The function that trows the exception.
+         *
+         * \param[in] file
+         * The file the exception was thrown in.
+         *
+         * \param[in] line
+         * The line the exception was thrown in.
+         *
+         * \param[in] message
+         * A message describing the exception.
+         */
+        TestFailedException(
+            const char* const function,
+            const char* const file,
+            const long line,
+            const std::string & message) throw ()
+          : _message(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message )
         {
-          s_a = stringify(a);
-          s_b = stringify(b);
         }
-      }
+
+        /// DTOR
+        virtual ~TestFailedException() throw ()
+        {
+        }
+
+        /// description
+        const char* what() const throw ()
+        {
+          return _message.c_str();
+        }
     };
 
-    /// utility class used by TEST_CHECK_NOT_EQUAL
-    struct TwoVarHolder2
+    /// list of all instantiated tests
+    class TestList
+      : public InstantiationPolicy<TestList, Singleton>
     {
-      /// result of comparison
-      bool result;
-      /// string representation of first parameter
-      std::string s_a;
-      /// string representation of second parameter
-      std::string s_b;
 
-      /**
-      * \brief Constructor
-      *
-      * \param[in] a
-      * First value to compare
-      *
-      * \param[in] b
-      * Second value to compare
-      */
-      template<
-        typename T1_,
-        typename T2_>
-      TwoVarHolder2(
-        T1_ a,
-        T2_ b)
-        : result(a == b),
-          s_a(),
-          s_b()
-      {
-        if(result)
+      private:
+
+        /// internal STL list representation of TestList
+        std::list<BaseTest*> _tests;
+
+        /// default CTOR
+        TestList()
         {
-          s_a = stringify(a);
-          s_b = stringify(b);
         }
-      }
+
+
+      public:
+
+        friend TestList* InstantiationPolicy<TestList, Singleton>::instance();
+
+        /// TestList forward iterator.
+        typedef std::list<BaseTest*>::iterator Iterator;
+
+        /**
+         * \brief adds a test to the TestList
+         *
+         * \param[in] test
+         * the test that will be added
+         */
+        void register_test(BaseTest* const test)
+        {
+          _tests.push_back(test);
+        }
+
+        /// returns an iterator to the front of the TestList
+        Iterator begin_tests()
+        {
+          return _tests.begin();
+        }
+
+        /// returns an iterator beyond the last element of the TestList
+        Iterator end_tests()
+        {
+          return _tests.end();
+        }
+
+        /// returns the size of the TestList
+        size_t size()
+        {
+          return _tests.size();
+        }
+
+        /// removes iterator target from the TestList
+        Iterator erase (Iterator i)
+        {
+          return _tests.erase(i);
+        }
     };
 
-    /// utility class used by TEST_CHECK_EQUAL_WITHIN_EPS.
-    struct WithinEpsCalculator
-    {
-      /// result of comparison
-      bool result;
-      /// string representation of first parameter
-      std::string s_a;
-      /// string representation of second parameter
-      std::string s_b;
-      /// string representation of eps
-      std::string s_diff;
 
-      /**
-      * \brief Constructor
-      *
-      * \param[in] a
-      * first value to compare
-      *
-      * \param[in] b
-      * second value to compare
-      *
-      * \param[in] c
-      * maximum epsilon the values a and b are allowed to differ from each other
-      */
-      template<
-        typename T1_,
-        typename T2_,
-        typename T3_>
-      WithinEpsCalculator(
-        T1_ a,
-        T2_ b,
-        T3_ c)
-        : s_a(),
-          s_b()
+    /**
+     * \brief base class for all Tests
+     *
+     * \author Dirk Ribbrock
+     */
+    class BaseTest
+    {
+
+      protected:
+
+        /// test description String
+        const std::string _id;
+        /// architecture description String
+        std::string _tag_name;
+        /// precision description String
+        std::string _prec_name;
+
+
+      public:
+
+        /**
+         * \brief CTOR
+         *
+         * \param[in] id
+         * the testcase's id string
+         */
+        BaseTest(const std::string& id)
+          : _id(id),
+          _tag_name("NONE"),
+          _prec_name("NONE")
       {
-        if(a >= b)
+        TestList::instance()->register_test(this);
+      }
+
+        /// DTOR
+        virtual ~BaseTest() {}
+
+        /// returns our id string
+        virtual const std::string id() const
         {
-          result = ((a - b) <= c);
-          if(!result)
+          return _id;
+        }
+
+        /// returns the mpi proc count to use
+        virtual unsigned long mpi_proc_count() const
+        {
+          return 1;
+        }
+
+        /// utility method used bei TEST_CHECK_*
+        virtual void check(const char * const function, const char * const file,
+            const long line, bool was_ok, const std::string & message) const
+        {
+          if(! was_ok)
+            throw TestFailedException(function, file, line, message);
+        }
+
+        /**
+         * \brief runs the test case
+         *
+         * Called by unittest framework only.
+         */
+        virtual void run() const = 0;
+
+        /// returns our target platform
+        virtual std::string get_tag_name()
+        {
+          return _tag_name;
+        }
+
+        /// returns our target platform
+        virtual std::string get_prec_name()
+        {
+          return _prec_name;
+        }
+
+        /// utility class used by TEST_CHECK_EQUAL
+        struct TwoVarHolder
+        {
+          /// result of comparison
+          bool result;
+          /// string representation of first parameter
+          std::string s_a;
+          /// string representation of second parameter
+          std::string s_b;
+
+          /**
+           * \brief CTOR
+           *
+           * \param[in] a
+           * First value to compare
+           *
+           * \param[in] b
+           * Second value to compare
+           */
+          template<
+            typename T1_,
+                     typename T2_>
+                       TwoVarHolder(
+                           T1_ a,
+                           T2_ b)
+                       : result(a == b),
+                       s_a(),
+                       s_b()
           {
-            s_diff = stringify(a - b);
-            s_a = stringify(a);
-            s_b = stringify(b);
+            if(!result)
+            {
+              s_a = stringify(a);
+              s_b = stringify(b);
+            }
           }
-        }
-        else
+        };
+
+        /// utility class used by TEST_CHECK_NOT_EQUAL
+        struct TwoVarHolder2
         {
-          result = ((b - a) <= c);
-          if(!result)
+          /// result of comparison
+          bool result;
+          /// string representation of first parameter
+          std::string s_a;
+          /// string representation of second parameter
+          std::string s_b;
+
+          /**
+           * \brief Constructor
+           *
+           * \param[in] a
+           * First value to compare
+           *
+           * \param[in] b
+           * Second value to compare
+           */
+          template<
+            typename T1_,
+                     typename T2_>
+                       TwoVarHolder2(
+                           T1_ a,
+                           T2_ b)
+                       : result(a == b),
+                       s_a(),
+                       s_b()
           {
-            s_diff = stringify(b - a);
-            s_a = stringify(a);
-            s_b = stringify(b);
+            if(result)
+            {
+              s_a = stringify(a);
+              s_b = stringify(b);
+            }
           }
-        }
-      }
-    };
-  };
+        };
 
-  /**
-  * \brief abstract base class for all tagged test classes
-  *
-  * \author Dirk Ribbrock
-  */
-  template<
-    typename Tag_,
-    typename DataType_>
-  class TaggedTest
-    : public BaseTest
-  {
-  public:
+        /// utility class used by TEST_CHECK_EQUAL_WITHIN_EPS.
+        struct WithinEpsCalculator
+        {
+          /// result of comparison
+          bool result;
+          /// string representation of first parameter
+          std::string s_a;
+          /// string representation of second parameter
+          std::string s_b;
+          /// string representation of eps
+          std::string s_diff;
+
+          /**
+           * \brief Constructor
+           *
+           * \param[in] a
+           * first value to compare
+           *
+           * \param[in] b
+           * second value to compare
+           *
+           * \param[in] c
+           * maximum epsilon the values a and b are allowed to differ from each other
+           */
+          template<
+            typename T1_,
+                     typename T2_,
+                     typename T3_>
+                       WithinEpsCalculator(
+                           T1_ a,
+                           T2_ b,
+                           T3_ c)
+                       : s_a(),
+                       s_b()
+          {
+            if(a >= b)
+            {
+              result = ((a - b) <= c);
+              if(!result)
+              {
+                s_diff = stringify(a - b);
+                s_a = stringify(a);
+                s_b = stringify(b);
+              }
+            }
+            else
+            {
+              result = ((b - a) <= c);
+              if(!result)
+              {
+                s_diff = stringify(b - a);
+                s_a = stringify(a);
+                s_b = stringify(b);
+              }
+            }
+          }
+        };
+    };
+
     /**
-    * \brief CTOR
-    *
-    * \param[in] id
-    * the testcase's id string
-    */
-    TaggedTest(const std::string & id)
-      : BaseTest(id)
-    {
-      _tag_name = TypeTraits<Tag_>::name();
-      _prec_name = TypeTraits<DataType_>::name();
-    };
+     * \brief abstract base class for all tagged test classes
+     *
+     * \author Dirk Ribbrock
+     */
+    template<
+      typename Tag_,
+               typename DataType_>
+                 class TaggedTest
+                 : public BaseTest
+                 {
+                   public:
+                     /**
+                      * \brief CTOR
+                      *
+                      * \param[in] id
+                      * the testcase's id string
+                      */
+                     TaggedTest(const std::string & id)
+                       : BaseTest(id)
+                     {
+                       _tag_name = TypeTraits<Tag_>::name();
+                       _prec_name = TypeTraits<DataType_>::name();
+                     };
 
-    /// DTOR
-    virtual ~TaggedTest() {}
-  };
+                     /// DTOR
+                     virtual ~TaggedTest() {}
+                 };
+  }
 }
 
 // let Doxygen ignore the following block
@@ -528,7 +529,7 @@ namespace TestSystem
 
 
 using namespace FEAST;
-using namespace TestSystem;
+using namespace FEAST::TestSystem;
 
 int main(int argc, char** argv)
 {
@@ -569,7 +570,7 @@ int main(int argc, char** argv)
         i != i_end ; )
     {
       if((find(labels.begin(), labels.end(), (*i)->get_tag_name()) == labels.end()) &&
-         (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()))
+          (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()))
       {
         i = TestList::instance()->erase(i);
         continue;

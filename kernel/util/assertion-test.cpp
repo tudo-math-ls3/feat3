@@ -8,9 +8,6 @@
 #include <test_system/test_system.hpp>
 #include <string>
 
-using namespace TestSystem;
-using namespace FEAST;
-
 template <int i> class c
 {
   public:

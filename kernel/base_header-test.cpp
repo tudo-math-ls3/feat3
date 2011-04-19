@@ -2,9 +2,6 @@
 #include <test_system/test_system.hpp>
 #include <string>
 
-using namespace TestSystem;
-using namespace FEAST;
-
 /**
 * \brief Test class for the base_header.
 *

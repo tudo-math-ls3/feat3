@@ -1,9 +1,6 @@
 // includes, FEAST
 #include <test_system/test_system.hpp>
 
-using namespace TestSystem;
-using namespace FEAST;
-
 /**
 *
 * \brief test class for the unittest framework itself

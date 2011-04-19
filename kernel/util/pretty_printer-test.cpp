@@ -9,9 +9,6 @@
 #include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
 
-using namespace TestSystem;
-using namespace FEAST;
-
 /**
 * \brief testing the pretty printer
 *

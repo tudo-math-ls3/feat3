@@ -35,9 +35,6 @@
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
 
-using namespace TestSystem;
-using namespace FEAST;
-
 /**
 * \brief testing creation of work groups based on a 2D mesh
 *

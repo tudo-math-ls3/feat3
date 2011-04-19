@@ -8,9 +8,6 @@
 #include <kernel/universe.hpp>
 #include <kernel/base_mesh/cell_subdivision.hpp>
 
-using namespace TestSystem;
-using namespace FEAST;
-
 /**
 * \brief testing subdivision of a hexa in 3D
 *
