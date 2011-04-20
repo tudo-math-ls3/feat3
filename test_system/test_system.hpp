@@ -171,8 +171,8 @@ namespace FEAST
          */
         BaseTest(const std::string& id)
           : _id(id),
-          _tag_name("NONE"),
-          _prec_name("NONE")
+          _tag_name(TypeTraits<Nil>::name()),
+          _prec_name(TypeTraits<Nil>::name())
       {
         TestList::instance()->register_test(this);
       }
