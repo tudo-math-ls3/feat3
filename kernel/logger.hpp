@@ -7,7 +7,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <cstring> // DOM: for strcpy with mpich2
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -401,7 +400,7 @@ namespace FEAST
     * the number of messages the char array \a messages contains
     *
     * \param[in] msg_lengths
-    * array of lengths of the single messages, dimension: [\a num_messages]
+    * array of lengths of the single messages (including the null termination symbol), dimension: [\a num_messages]
     *
     * \param[in] total_length
     * total length of all messages (could also be computed in this function, but is often already available outside)
@@ -449,8 +448,8 @@ namespace FEAST
     /**
     * \brief triggers logging of distinct messages (given as vector of strings) on the master process
     *
-    * This function receives a vector of strings representing distinct messages. It converts the messages to one large
-    * char array and calls the first version of the routine log_master_array(), which then triggers logging of these
+    * This function receives a vector of strings representing distinct messages. It converts the messages to one long
+    * string and calls the first version of the routine log_master_array(), which then triggers logging of these
     * messages on the master process. Note that no line break is performed.
     *
     * \param[in] messages
@@ -472,31 +471,41 @@ namespace FEAST
 // COMMENT_HILMAR: Maybe it is more efficient to *not* realise this via the first version of log_master_array(), but
 // to trigger an extra service receive routine on master side...
 
-      // convert the vector of strings into one long char array and determine further information needed by
-      // the other version of the function log_master_array(...).
+      // get number of messages
       unsigned int num_messages(messages.size());
+      ASSERT(num_messages > 0, "There must be at least one message in the message vector!");
+
+      // store lengths of the single strings
       unsigned int* msg_lengths = new unsigned int[num_messages];
-      unsigned int total_length(0);
       for(unsigned int i(0) ; i < num_messages ; ++i)
       {
-        // add 1 due to the null termination symbol added by string::c_str()
-        msg_lengths[i] = messages[i].size()+1;
-        total_length += msg_lengths[i];
+        // add 1 due to the null termination symbol which we insert manually
+        msg_lengths[i] = messages[i].size() + 1;
       }
-      char* messages_char = new char[total_length];
-      // set pointer to beginning of message
-      char* pos = messages_char;
-      for(unsigned int i(0) ; i < num_messages ; ++i)
+
+      // Convert the vector of strings into one long string, where the single strings are separated by null termination
+      // symbols '\0' (which eases output of the resulting char array on receiver side). Do not add '\0' to the last
+      // string since this is added automatically by the c_str() method used below.
+
+      // initialise the string with the first message
+      std::string msgs_as_one_string(messages[0]);
+      for(unsigned int i(1) ; i < num_messages ; ++i)
       {
-        // copy message to corresponding part of the char array
-        strcpy(pos, messages[i].c_str());
-        // move pointer
-        pos += msg_lengths[i];
+        // append null termination symbol
+        msgs_as_one_string.append(1,'\0');
+        // append next string
+        msgs_as_one_string.append(messages[i]);
       }
-      // now call the other version of the function log_master_array()
-      log_master_array(num_messages, msg_lengths, total_length, messages_char, targ);
+      // COMMENT_HILMAR: The previous code was originally realised via strcpy(...) (from cstring header).
+      // But the sunstudio compiler (tested with version 12.2) produces defective binaries as soon as cstring functions
+      // are used. However, the new code using string::append() is more elegant anyway. So, even if the
+      // sunstudio+cstring problem is resolved in future, the code will not be reverted.
+
+      // now call the other version of the function log_master_array(), pass char array representation of the string
+      log_master_array(num_messages, msg_lengths, msgs_as_one_string.size()+1, msgs_as_one_string.c_str(), targ);
+
+      // delete aux. array again
       delete [] msg_lengths;
-      delete [] messages_char;
     } // log_master_array()
 
 
