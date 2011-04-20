@@ -1,6 +1,6 @@
 ID           00030
 TYPE         feature_request
-STATUS       assigned
+STATUS       resolved
 AUTHOR       hilmar
 ASSIGNED TO  dirk_dom
 SEVERITY     medium
@@ -12,3 +12,7 @@ Enhance the build system.
  * usage should be flexible and comfortable)
 
 SOLUTION
+cmake build system supports everything we want. Guess_ID and BUILD_ID
+mechanisms have been implemented. Type
+"cmake -D BUILD_ID=help /path/to/sources"
+to use the new system.
