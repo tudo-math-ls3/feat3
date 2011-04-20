@@ -7,7 +7,7 @@
 #   FEAST_CXX_FLAGS_INTERNAL (string)
 #
 # Maintainer information:
-# TODO add compiler flags
+# Run pgCC -help for lots of details
 #
 # \author Dominik Goeddeke
 # \author Dirk Ribbrock
@@ -53,7 +53,7 @@ if ( CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # ask the compiler about its version by executing it
   exec_program("${CMAKE_CXX_COMPILER} -V 2>&1 | head -n 2" OUTPUT_VARIABLE PGI_VERSION_STRING)
   # extract version from compiler output (because we know what the output looks like)
-  string(REGEX REPLACE ".*([0-9]+[.]+[0-9]).*" "\\1" PGI_VERSION_VALUE "${PGI_VERSION_STRING}")
+  string(REGEX REPLACE ".*([0-9]+[0-9]+[.]+[0-9]).*" "\\1" PGI_VERSION_VALUE "${PGI_VERSION_STRING}")
   # in case my regexp is not clever enough
   string(STRIP "${PGI_VERSION_VALUE}" PGI_VERSION_VALUE)
   message (STATUS "Found PGI compiler suite v.${PGI_VERSION_VALUE}")
@@ -74,76 +74,79 @@ endif ()
 # if compiler flags are not passed externally, determine our own
 if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
 
-  message (STATUS "WARNING: PGI compiler flags not implemented yet.")
-
   # generic settings independent of arch and optimisation level
   set (FEAST_CXX_FLAGS_INTERNAL "")
 
 
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+    # -Mbounds: insert bound checking code
+    # -traceback: run time crash tracebacks
+    # -Minform=warn: -Wall
+    # --remarks: let the compiler be a little bit verbose
+    # -A: ANSI C++
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -g -Mbounds -traceback -Minform=warn --remarks -A")
 
   else ()
     # optimised settings for all currently supported archs
-    set (FEAST_CXX_FLAGS_INTERNAL "-O3")
+    set (FEAST_CXX_FLAGS_INTERNAL "-fast -O4")
 
     # please try to maintain the same order as in the buildid_arch module
     # Intel CPUs
     if (FEAST_CPU_TYPE STREQUAL "i486")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=px")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=p5")
     elseif (FEAST_CPU_TYPE STREQUAL "pentiumpro")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=p6")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium2")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=p6")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium3")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=piii")
     elseif (FEAST_CPU_TYPE STREQUAL "pentiumm")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=p6")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium4m")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=piv")
     elseif (FEAST_CPU_TYPE STREQUAL "coresolo")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=p7")
     elseif (FEAST_CPU_TYPE STREQUAL "coreduo")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=core2")
     elseif (FEAST_CPU_TYPE STREQUAL "penryn")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=penryn")
     elseif (FEAST_CPU_TYPE STREQUAL "nehalem")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=nehalem")
     elseif (FEAST_CPU_TYPE STREQUAL "westmere")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=nehalem")
     elseif (FEAST_CPU_TYPE STREQUAL "itanium")
       set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
     elseif (FEAST_CPU_TYPE STREQUAL "pentium4")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=piv")
     elseif (FEAST_CPU_TYPE STREQUAL "nocona")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=p7")
     elseif (FEAST_CPU_TYPE STREQUAL "itanium2")
       set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
 
     # AMD CPUs
     elseif (FEAST_CPU_TYPE STREQUAL "amd486")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=px")
     elseif (FEAST_CPU_TYPE STREQUAL "k5")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=px")
     elseif (FEAST_CPU_TYPE STREQUAL "k6")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=px")
     elseif (FEAST_CPU_TYPE STREQUAL "athlon")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=athlon")
     elseif (FEAST_CPU_TYPE STREQUAL "athlonxp")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=athlonxp")
     elseif (FEAST_CPU_TYPE STREQUAL "opteron")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=k8")
     elseif (FEAST_CPU_TYPE STREQUAL "athlon64")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=k8")
     elseif (FEAST_CPU_TYPE STREQUAL "opteronx2")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=k8")
     elseif (FEAST_CPU_TYPE STREQUAL "turionx2")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=k8")
     elseif (FEAST_CPU_TYPE STREQUAL "barcelona")
-      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL}")
+      set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -tp=barcelona")
 
     # generic settings for all archs
     else ()
