@@ -1,4 +1,4 @@
-NEWEST: 00033
+NEWEST: 00034
 ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
 00008 |feature_request      |assigned    |markus |hilmar            |high     |implement_nb_update_after_subdivision
 00010 |feature_request      |assigned    |markus |hilmar_markus     |high     |add_mp_and_pp_layers
@@ -34,3 +34,4 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00009 |optimisation_request |assigned    |markus |hilmar_luis       |high     |better_distinction_of_lb_and_flowcontrol
 00019 |optimisation_request |resolved    |markus |dirk              |critical |enable_mpi_in_test_system
 00029 |optimisation_request |resolved    |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
+00034 |feature_request      |unassigned  |dom    |                  |high     |proper_compiler_version_detection

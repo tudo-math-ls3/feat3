@@ -1,0 +1,11 @@
+ID          00034
+TYPE        feature_request
+STATUS      unassigned
+AUTHOR      dom
+ASSIGNED TO
+SEVERITY    high
+
+FULL TEXT
+proper compiler version detection for all supported compilers (the current implementation does string arithmetics)
+
+SOLUTION
