@@ -97,17 +97,15 @@ elseif ( (BUILD_ID STREQUAL "MANUAL") OR (BUILD_ID STREQUAL "manual") )
 # in any case, parse BUILD_ID
 else ()
 
-  # first of all, purge some settings, cmake could grab from the shell environment
+  # first of all, purge some settings, that cmake could grab from the shell environment
   set (CMAKE_CXX_COMPILER_ARG1 "")
   set (CMAKE_CXX_FLAGS "")
+  set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
   # create a default build-ID
   if (BUILD_ID STREQUAL "")
     # tell the build system to guess the arch later on
     set (GUESS_ARCH ON)
-
-    # TODO HIER MUSS DER CMAKE-CACHE GELOESCHT WERDEN, SONST PASSIERT BELIEBIG BLOEDSINN
-    # WENN MAN BSPW gcc-opt-openmpi ERST AUF SUNOS UND DANN AUF LINUX AUSFUEHRT
 
     # and define the default ID for different operating systems
     # cmake-doc: the value of CMAKE_SYSTEM_NAME is the output of
