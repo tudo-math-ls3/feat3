@@ -496,10 +496,6 @@ namespace FEAST
         // append next string
         msgs_as_one_string.append(messages[i]);
       }
-      // COMMENT_HILMAR: The previous code was originally realised via strcpy(...) (from cstring header).
-      // But the sunstudio compiler (tested with version 12.2) produces defective binaries as soon as cstring functions
-      // are used. However, the new code using string::append() is more elegant anyway. So, even if the
-      // sunstudio+cstring problem is resolved in future, the code will not be reverted.
 
       // now call the other version of the function log_master_array(), pass char array representation of the string
       log_master_array(num_messages, msg_lengths, msgs_as_one_string.size()+1, msgs_as_one_string.c_str(), targ);
