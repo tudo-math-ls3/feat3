@@ -663,77 +663,77 @@ namespace FEAST
             //  ==> face 5 of child i is face 5 of child i+1, i=0,2,4,6 (between left and right children)
 
             // child 0 (front, bottom, left)
-            _set_child(0, new Hexa(vertex(0), new_vertices[0], new_vertices[4], new_vertices[12],
-                                   new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
-                                   new_edges[0], new_edges[26], new_edges[34], new_edges[52],
-                                   new_edges[8], new_edges[24], new_edges[42], new_edges[50],
-                                   new_edges[16], new_edges[32], new_edges[40], new_edges[48],
-                                   new_faces[0], new_faces[32], new_faces[8],
-                                   new_faces[28], new_faces[16], new_faces[24],
-                                   this->refinement_level()+1));
+            this->_set_child(0, new Hexa(vertex(0), new_vertices[0], new_vertices[4], new_vertices[12],
+                                         new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
+                                         new_edges[0], new_edges[26], new_edges[34], new_edges[52],
+                                         new_edges[8], new_edges[24], new_edges[42], new_edges[50],
+                                         new_edges[16], new_edges[32], new_edges[40], new_edges[48],
+                                         new_faces[0], new_faces[32], new_faces[8],
+                                         new_faces[28], new_faces[16], new_faces[24],
+                                         this->refinement_level()+1));
             // child 1 (front, bottom, right)
-            _set_child(1, new Hexa(vertex(1), new_vertices[0], new_vertices[5], new_vertices[12],
-                                   new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
-                                   new_edges[1], new_edges[27], new_edges[35], new_edges[53],
-                                   new_edges[10], new_edges[24], new_edges[46], new_edges[50],
-                                   new_edges[18], new_edges[32], new_edges[44], new_edges[48],
-                                   new_faces[1], new_faces[33], new_faces[9],
-                                   new_faces[29], new_faces[20], new_faces[24],
-                                   this->refinement_level()+1));
+            this->_set_child(1, new Hexa(vertex(1), new_vertices[0], new_vertices[5], new_vertices[12],
+                                         new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
+                                         new_edges[1], new_edges[27], new_edges[35], new_edges[53],
+                                         new_edges[10], new_edges[24], new_edges[46], new_edges[50],
+                                         new_edges[18], new_edges[32], new_edges[44], new_edges[48],
+                                         new_faces[1], new_faces[33], new_faces[9],
+                                         new_faces[29], new_faces[20], new_faces[24],
+                                         this->refinement_level()+1));
             // child 2 (back, bottom, left)
-            _set_child(2, new Hexa(vertex(2), new_vertices[1], new_vertices[4], new_vertices[12],
-                                   new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
-                                   new_edges[2], new_edges[26], new_edges[38], new_edges[52],
-                                   new_edges[9], new_edges[25], new_edges[43], new_edges[51],
-                                   new_edges[20], new_edges[36], new_edges[40], new_edges[48],
-                                   new_faces[2], new_faces[34], new_faces[12],
-                                   new_faces[28], new_faces[17], new_faces[25],
-                                   this->refinement_level()+1));
+            this->_set_child(2, new Hexa(vertex(2), new_vertices[1], new_vertices[4], new_vertices[12],
+                                         new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
+                                         new_edges[2], new_edges[26], new_edges[38], new_edges[52],
+                                         new_edges[9], new_edges[25], new_edges[43], new_edges[51],
+                                         new_edges[20], new_edges[36], new_edges[40], new_edges[48],
+                                         new_faces[2], new_faces[34], new_faces[12],
+                                         new_faces[28], new_faces[17], new_faces[25],
+                                         this->refinement_level()+1));
             // child 3 (back, bottom, right)
-            _set_child(3, new Hexa(vertex(3), new_vertices[1], new_vertices[5], new_vertices[12],
-                                   new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
-                                   new_edges[3], new_edges[27], new_edges[39], new_edges[53],
-                                   new_edges[11], new_edges[25], new_edges[47], new_edges[51],
-                                   new_edges[22], new_edges[36], new_edges[44], new_edges[48],
-                                   new_faces[3], new_faces[35], new_faces[13],
-                                   new_faces[29], new_faces[21], new_faces[25],
-                                   this->refinement_level()+1));
+            this->_set_child(3, new Hexa(vertex(3), new_vertices[1], new_vertices[5], new_vertices[12],
+                                         new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
+                                         new_edges[3], new_edges[27], new_edges[39], new_edges[53],
+                                         new_edges[11], new_edges[25], new_edges[47], new_edges[51],
+                                         new_edges[22], new_edges[36], new_edges[44], new_edges[48],
+                                         new_faces[3], new_faces[35], new_faces[13],
+                                         new_faces[29], new_faces[21], new_faces[25],
+                                         this->refinement_level()+1));
             // child 4 (front, top, left)
-            _set_child(4, new Hexa(vertex(4), new_vertices[2], new_vertices[6], new_vertices[13],
-                                   new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
-                                   new_edges[4], new_edges[30], new_edges[34], new_edges[52],
-                                   new_edges[12], new_edges[28], new_edges[42], new_edges[50],
-                                   new_edges[17], new_edges[33], new_edges[41], new_edges[49],
-                                   new_faces[4], new_faces[32], new_faces[10],
-                                   new_faces[30], new_faces[18], new_faces[26],
-                                   this->refinement_level()+1));
+            this->_set_child(4, new Hexa(vertex(4), new_vertices[2], new_vertices[6], new_vertices[13],
+                                         new_vertices[8], new_vertices[14], new_vertices[16], new_vertices[18],
+                                         new_edges[4], new_edges[30], new_edges[34], new_edges[52],
+                                         new_edges[12], new_edges[28], new_edges[42], new_edges[50],
+                                         new_edges[17], new_edges[33], new_edges[41], new_edges[49],
+                                         new_faces[4], new_faces[32], new_faces[10],
+                                         new_faces[30], new_faces[18], new_faces[26],
+                                         this->refinement_level()+1));
             // child 5 (front, top, right)
-            _set_child(5, new Hexa(vertex(5), new_vertices[2], new_vertices[7], new_vertices[13],
-                                   new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
-                                   new_edges[5], new_edges[31], new_edges[35], new_edges[53],
-                                   new_edges[14], new_edges[28], new_edges[46], new_edges[50],
-                                   new_edges[19], new_edges[33], new_edges[45], new_edges[49],
-                                   new_faces[5], new_faces[33], new_faces[11],
-                                   new_faces[31], new_faces[22], new_faces[26],
-                                   this->refinement_level()+1));
+            this->_set_child(5, new Hexa(vertex(5), new_vertices[2], new_vertices[7], new_vertices[13],
+                                         new_vertices[9], new_vertices[14], new_vertices[17], new_vertices[18],
+                                         new_edges[5], new_edges[31], new_edges[35], new_edges[53],
+                                         new_edges[14], new_edges[28], new_edges[46], new_edges[50],
+                                         new_edges[19], new_edges[33], new_edges[45], new_edges[49],
+                                         new_faces[5], new_faces[33], new_faces[11],
+                                         new_faces[31], new_faces[22], new_faces[26],
+                                         this->refinement_level()+1));
             // child 6 (back, top, left)
-            _set_child(6, new Hexa(vertex(6), new_vertices[3], new_vertices[6], new_vertices[13],
-                                   new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
-                                   new_edges[6], new_edges[30], new_edges[38], new_edges[52],
-                                   new_edges[13], new_edges[29], new_edges[43], new_edges[51],
-                                   new_edges[21], new_edges[37], new_edges[41], new_edges[49],
-                                   new_faces[6], new_faces[34], new_faces[14],
-                                   new_faces[30], new_faces[19], new_faces[27],
-                                   this->refinement_level()+1));
+            this->_set_child(6, new Hexa(vertex(6), new_vertices[3], new_vertices[6], new_vertices[13],
+                                         new_vertices[10], new_vertices[15], new_vertices[16], new_vertices[18],
+                                         new_edges[6], new_edges[30], new_edges[38], new_edges[52],
+                                         new_edges[13], new_edges[29], new_edges[43], new_edges[51],
+                                         new_edges[21], new_edges[37], new_edges[41], new_edges[49],
+                                         new_faces[6], new_faces[34], new_faces[14],
+                                         new_faces[30], new_faces[19], new_faces[27],
+                                         this->refinement_level()+1));
             // child 7 (back, top, right)
-            _set_child(7, new Hexa(vertex(7), new_vertices[3], new_vertices[7], new_vertices[13],
-                                   new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
-                                   new_edges[7], new_edges[31], new_edges[39], new_edges[53],
-                                   new_edges[15], new_edges[29], new_edges[47], new_edges[51],
-                                   new_edges[23], new_edges[37], new_edges[45], new_edges[49],
-                                   new_faces[7], new_faces[35], new_faces[15],
-                                   new_faces[31], new_faces[23], new_faces[27],
-                                   this->refinement_level()+1));
+            this->_set_child(7, new Hexa(vertex(7), new_vertices[3], new_vertices[7], new_vertices[13],
+                                         new_vertices[11], new_vertices[15], new_vertices[17], new_vertices[18],
+                                         new_edges[7], new_edges[31], new_edges[39], new_edges[53],
+                                         new_edges[15], new_edges[29], new_edges[47], new_edges[51],
+                                         new_edges[23], new_edges[37], new_edges[45], new_edges[49],
+                                         new_faces[7], new_faces[35], new_faces[15],
+                                         new_faces[31], new_faces[23], new_faces[27],
+                                         this->refinement_level()+1));
 
             // add the hexas to the vector of new created cells
             for (unsigned char i(0) ; i < this->num_children() ; ++i)

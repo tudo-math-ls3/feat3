@@ -154,8 +154,8 @@ namespace FEAST
             // Note the numbering of the vertices: the new created vertex is the second one within the structure of both
             // edge children. This is exploited at some places and must not be changed.
             this->_set_num_children(2);
-            _set_child(0, new Edge(vertex(0), this->subdiv_data()->created_vertex, this->refinement_level()+1));
-            _set_child(1, new Edge(vertex(1), this->subdiv_data()->created_vertex, this->refinement_level()+1));
+            this->_set_child(0, new Edge(vertex(0), this->subdiv_data()->created_vertex, this->refinement_level()+1));
+            this->_set_child(1, new Edge(vertex(1), this->subdiv_data()->created_vertex, this->refinement_level()+1));
             // update the parent relationship
             this->child(0)->set_parent(this);
             this->child(1)->set_parent(this);

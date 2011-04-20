@@ -509,18 +509,18 @@ namespace FEAST
             // ==> vertex i of child i is the centre vertex
             //
             // These facts are exploited, e.g., within the hexa subdivision routine, so don't change this!
-            _set_child(0, new Quad(new_vertices[4], new_vertices[0], new_vertices[2], vertex(0),
-                                   new_edges[8], new_edges[4], new_edges[10], new_edges[0],
-                                   this->refinement_level()+1));
-            _set_child(1, new Quad(new_vertices[0], new_vertices[4], vertex(1), new_vertices[3],
-                                   new_edges[8], new_edges[6], new_edges[1], new_edges[11],
-                                   this->refinement_level()+1));
-            _set_child(2, new Quad(new_vertices[2], vertex(2), new_vertices[4], new_vertices[1],
-                                   new_edges[5], new_edges[9], new_edges[10], new_edges[2],
-                                   this->refinement_level()+1));
-            _set_child(3, new Quad(vertex(3), new_vertices[3], new_vertices[1], new_vertices[4],
-                                   new_edges[7], new_edges[9], new_edges[3], new_edges[11],
-                                   this->refinement_level()+1));
+            this->_set_child(0, new Quad(new_vertices[4], new_vertices[0], new_vertices[2], vertex(0),
+                                         new_edges[8], new_edges[4], new_edges[10], new_edges[0],
+                                         this->refinement_level()+1));
+            this->_set_child(1, new Quad(new_vertices[0], new_vertices[4], vertex(1), new_vertices[3],
+                                         new_edges[8], new_edges[6], new_edges[1], new_edges[11],
+                                         this->refinement_level()+1));
+            this->_set_child(2, new Quad(new_vertices[2], vertex(2), new_vertices[4], new_vertices[1],
+                                         new_edges[5], new_edges[9], new_edges[10], new_edges[2],
+                                         this->refinement_level()+1));
+            this->_set_child(3, new Quad(vertex(3), new_vertices[3], new_vertices[1], new_vertices[4],
+                                         new_edges[7], new_edges[9], new_edges[3], new_edges[11],
+                                         this->refinement_level()+1));
 
             // Geometric interpretation of this building rule:
             // To obtain the numbering of the parent quad from the numbering of a child, simply "mirror" the child at
