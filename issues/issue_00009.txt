@@ -2,7 +2,7 @@ ID          00009
 TYPE        optimisation_request
 STATUS      resolved
 AUTHOR      markus
-ASSIGNED TO hilmar
+ASSIGNED TO hilmar_luis
 SEVERITY    high
 
 FULL TEXT

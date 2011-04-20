@@ -31,6 +31,6 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00001 |feature_request      |resolved    |markus |dom               |low      |implement_compiler_detection_icc
 00002 |feature_request      |resolved    |markus |dirk              |critical |build_system_essentials
 00007 |bug_report           |resolved    |markus |peter             |critical |test_system_is_error_prone
-00009 |optimisation_request |resolved    |markus |hilmar            |high     |better_distinction_of_lb_and_flowcontrol
+00009 |optimisation_request |assigned    |markus |hilmar_luis       |high     |better_distinction_of_lb_and_flowcontrol
 00019 |optimisation_request |resolved    |markus |dirk              |critical |enable_mpi_in_test_system
 00029 |optimisation_request |resolved    |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
