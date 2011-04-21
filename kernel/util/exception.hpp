@@ -43,7 +43,11 @@ namespace FEAST
     /// returns a full context stack aka backtrace
     std::string backtrace(const std::string& delimiter) const
     {
-      return join_strings(local_context_stack.begin(), local_context_stack.end(), delimiter);
+      if (context_stack)
+      {
+        return join_strings(local_context_stack.begin(), local_context_stack.end(), delimiter);
+      }
+      else return "";
     }
   };
 
