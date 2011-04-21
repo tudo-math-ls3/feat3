@@ -1,6 +1,5 @@
 NEWEST: 00034
 ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
-00008 |feature_request      |assigned    |markus |hilmar            |high     |implement_nb_update_after_subdivision
 00010 |feature_request      |assigned    |markus |hilmar_markus     |high     |add_mp_and_pp_layers
 00011 |feature_request      |in_progress |markus |hilmar            |high     |implement_inter_workgroup_communication
 00012 |feature_request      |assigned    |markus |hilmar_dom        |high     |parsing_FPROP_and_FPART_meshfilesections
@@ -10,10 +9,12 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00028 |feature_request      |unassigned  |hilmar |                  |high     |implement_status_class
 00031 |feature_request      |assigned    |hilmar |dirk              |high     |realise_nightly_regression_test
 00033 |bug_report           |assigned    |hilmar |hilmar            |high     |log_comm_to_master_faulty_with_mpich
+00034 |feature_request      |unassigned  |dom    |                  |high     |proper_compiler_version_detection
 00003 |milestone            |assigned    |markus |dom_hilmar        |medium   |kernel_subsystem_parallel_infrastructure
 00004 |milestone            |assigned    |markus |markus_dirk       |medium   |kernel_subsystem_linear_algebra_and_solvers
 00005 |milestone            |assigned    |markus |dom_hilmar_markus |medium   |kernel_subsystem_geometry
 00006 |milestone            |assigned    |markus |ITMC              |medium   |kernel_subsystem_load_balancing
+00008 |feature_request      |unassigned  |markus |                  |medium   |implement_nb_update_after_subdivision
 00013 |feature_request      |unassigned  |markus |                  |medium   |user_controlled_creation_of_wgs
 00015 |feature_request      |unassigned  |markus |                  |medium   |data_flow_between_bm_and_wgs
 00016 |optimisation_request |assigned    |markus |thomas            |medium   |encapsulate_mpi_routines
@@ -27,11 +28,11 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00025 |optimisation_request |assigned    |hilmar |thomas_dirk       |low      |template_file_ascii_reader
 00026 |feature_request      |assigned    |hilmar |thomas_dirk       |low      |implement_pretty_printer_table_functionality
 00032 |optimisation_request |unassigned  |markus |                  |low      |apply_coding_conventions_for_namespaces
+
 00000 |feature_request      |resolved    |markus |dirk              |high     |implement_test_system
 00001 |feature_request      |resolved    |markus |dom               |low      |implement_compiler_detection_icc
 00002 |feature_request      |resolved    |markus |dirk              |critical |build_system_essentials
 00007 |bug_report           |resolved    |markus |peter             |critical |test_system_is_error_prone
-00009 |optimisation_request |assigned    |markus |hilmar_luis       |high     |better_distinction_of_lb_and_flowcontrol
+00009 |optimisation_request |resolved    |markus |hilmar            |high     |better_distinction_of_lb_and_flowcontrol
 00019 |optimisation_request |resolved    |markus |dirk              |critical |enable_mpi_in_test_system
 00029 |optimisation_request |resolved    |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
-00034 |feature_request      |unassigned  |dom    |                  |high     |proper_compiler_version_detection

@@ -6,8 +6,6 @@ ASSIGNED TO  hilmar
 SEVERITY     high
 
 FULL TEXT
-When using MPICH the function ProcessGroup::log_indiv_master() is defective: the (screen+file) output the master should produce vanishes. With OpenMPI everything works fine.
-
-DOM: This probably refers to MPICH2
+When using MPICH2 the function ProcessGroup::log_indiv_master() is defective: the (screen+file) output the master should produce vanishes. With OpenMPI everything works fine.
 
 SOLUTION

@@ -1,9 +1,9 @@
 ID           00008
 TYPE         feature_request
-STATUS       assigned
+STATUS       unassigned
 AUTHOR       markus
-ASSIGNED TO  hilmar
-SEVERITY     high
+ASSIGNED TO
+SEVERITY     medium
 
 FULL TEXT
 Implementation of neighbour update after subdivision is needed.
