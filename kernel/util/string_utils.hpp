@@ -139,6 +139,85 @@ namespace FEAST
 //      result +="\n";
     return result;
   }
+
+
+  /**
+  * \brief trims leading and trailing white spaces from a string
+  *
+  * This function simply removes all sorts of leading and trailing whitespace from the given string and returns the
+  * result in a new string object.
+  *
+  * \note basically taken from Bruce Eckel, Thinking in C++, Volume 2
+  *
+  * \param[in] str
+  * string to be trimmed
+  *
+  * \return trimmed string
+  *
+  * \author Hilmar Wobker
+  */
+  std::string trim(const std::string& str)
+  {
+    if(str.length() == 0)
+    {
+      return str;
+    }
+    size_t start = str.find_first_not_of(" \a\b\f\n\r\t\v");
+    size_t end = str.find_last_not_of(" \a\b\f\n\r\t\v");
+    // test if there are any non-whitespace characters at all
+    if(start == std::string::npos)
+    {
+      return "";
+    }
+    return std::string(str, start, end - start + 1);
+  }
+
+
+  /**
+  * \brief turns a string into its upper case variant
+  *
+  * \note basically taken from Bruce Eckel, Thinking in C++, Volume 2
+  *
+  * \param[in] str
+  * string to be turned to upper case
+  *
+  * \return upper case string
+  *
+  * \author Hilmar Wobker
+  */
+  inline std::string upper_case(const std::string& str)
+  {
+    std::string str_up(str);
+    for(size_t i = 0; i < str.length(); ++i)
+    {
+      str_up[i] = std::toupper(str_up[i]);
+    }
+    return str_up;
+  }
+
+
+  /**
+  * \brief turns a string into its lower case variant
+  *
+  * \note basically taken from Bruce Eckel, Thinking in C++, Volume 2
+  *
+  * \param[in] str
+  * string to be turned to lower case
+  *
+  * \return lower case string
+  *
+  * \author Hilmar Wobker
+  */
+  inline std::string lower_case(const std::string& str)
+  {
+    std::string str_low(str);
+    for(size_t i = 0; i < str.length(); ++i)
+    {
+      str_low[i] = std::tolower(str_low[i]);
+    }
+    return str_low;
+  }
+
 } // namespace FEAST
 
 #endif //  #ifndef STRING_UTILS_HPP
