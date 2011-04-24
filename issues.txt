@@ -1,4 +1,4 @@
-NEWEST: 00034
+NEWEST: 00035
 ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
 00010 |feature_request      |assigned    |markus |hilmar_markus     |high     |add_mp_and_pp_layers
 00011 |feature_request      |in_progress |markus |hilmar            |high     |implement_inter_workgroup_communication
@@ -28,6 +28,7 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00025 |optimisation_request |assigned    |hilmar |thomas_dirk       |low      |template_file_ascii_reader
 00026 |feature_request      |assigned    |hilmar |thomas_dirk       |low      |implement_pretty_printer_table_functionality
 00032 |optimisation_request |unassigned  |markus |                  |low      |apply_coding_conventions_for_namespaces
+00035 |feature_request      |unassigned  |dom    |                  |low      |make_cmake_buildid_system_non_linux
 
 00000 |feature_request      |resolved    |markus |dirk              |high     |implement_test_system
 00001 |feature_request      |resolved    |markus |dom               |low      |implement_compiler_detection_icc

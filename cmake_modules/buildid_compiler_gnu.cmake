@@ -30,6 +30,7 @@ set (CMAKE_CXX_COMPILER "g++")
 set (FEAST_COMPILER_NAME "gnu")
 
 # bail out for unsupported OSes
+# see issue 00035
 if (NOT (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "SunOS"))
   message (STATUS "##############################################################")
   message (STATUS "GNU compiler support is only available for Linux/SunOS        ")

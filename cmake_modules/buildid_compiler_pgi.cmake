@@ -18,6 +18,7 @@ set (CMAKE_CXX_COMPILER "pgCC")
 set (FEAST_COMPILER_NAME "pgi")
 
 # bail out for unsupported OSes
+# see issue 00035
 if (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
   message (STATUS "##############################################################")
   message (STATUS "PGI compiler support is only available for Linux              ")

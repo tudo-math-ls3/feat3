@@ -28,6 +28,7 @@ set (CMAKE_CXX_COMPILER "openCC")
 set (FEAST_COMPILER_NAME "open64")
 
 # bail out for unsupported OSes
+# see issue 00035
 if (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
   message (STATUS "##############################################################")
   message (STATUS "OPEN64 compiler support is only available for Linux           ")

@@ -45,6 +45,7 @@ set (FEAST_COMPILER_NAME "oracle")
 
 
 # bail out for unsupported OSes
+# see issue 00035
 if (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
   message (STATUS "##############################################################")
   message (STATUS "Oracle compiler support is only available for Linux           ")

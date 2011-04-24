@@ -8,6 +8,7 @@
 #   buildid_compiler_gnu|intel|...
 # implement FEAST's environment-aware build system. These modules are
 # included appropriately by this file, and set the following cmake variables:
+# see issue 00035
 # TODO keep this list up to date
 #   buildid (this file):
 #     BUILD_ID (potentially corrected/reordered)
@@ -117,14 +118,17 @@ else ()
       #   - full compiler optimisations
       #   - GNU compiler suite
       #   - autodetection of underlying hardware
+      # see issue 00035
       set (BUILD_ID opt-openmpi-gnu)
 
     elseif (CMAKE_SYSTEM_NAME STREQUAL "SunOS")
       # same default
+      # see issue 00035
       set (BUILD_ID opt-openmpi-gnu)
 
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
       # TODO implement
+      # see issue 00035
       message (STATUS "##############################################################")
       message (STATUS "ERROR: Default build-ID not implemented yet for Darwin.       ")
       message (STATUS "##############################################################")

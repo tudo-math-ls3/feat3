@@ -42,6 +42,7 @@ set (FEAST_COMPILER_NAME "intel")
 
 
 # bail out for unsupported OSes
+# see issue 00035
 if (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
   message (STATUS "##############################################################")
   message (STATUS "Intel compiler support is only available for Linux            ")
