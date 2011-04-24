@@ -64,6 +64,7 @@ if ( (CMAKE_SYSTEM_NAME STREQUAL "Linux") OR
   set (GNU_VERSION_VALUE "")
   set (GNU_VERSION_OK ON)
   # ask the compiler about its version by executing it
+  # see isseu #34
   exec_program("${CMAKE_CXX_COMPILER} --version 2>&1 | head -n 1" OUTPUT_VARIABLE GNU_VERSION_STRING)
   # extract version from compiler output (because we know what the output looks like)
   string(REGEX REPLACE ".*([0-9]+[.]+[0-9]+[.]+[0-9]).*" "\\1" GNU_VERSION_VALUE "${GNU_VERSION_STRING}")

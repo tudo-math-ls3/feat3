@@ -53,6 +53,7 @@ if ( CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # ask the compiler about its version by executing it
   exec_program("${CMAKE_CXX_COMPILER} -V 2>&1 | head -n 2" OUTPUT_VARIABLE PGI_VERSION_STRING)
   # extract version from compiler output (because we know what the output looks like)
+  # see isseu #34
   string(REGEX REPLACE ".*([0-9]+[0-9]+[.]+[0-9]).*" "\\1" PGI_VERSION_VALUE "${PGI_VERSION_STRING}")
   # in case my regexp is not clever enough
   string(STRIP "${PGI_VERSION_VALUE}" PGI_VERSION_VALUE)
