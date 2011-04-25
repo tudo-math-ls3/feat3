@@ -160,6 +160,53 @@ namespace FEAST
 
 
     /**
+    * \brief extracts two strings from first non-empty non-comment line
+    *
+    * \param[out] value1
+    * stores first string value
+    *
+    * \param[out] value2
+    * stores second string value
+    *
+    * \note Assumes that the line contains nothing else except possible trailing comments.
+    */
+    inline void read(
+      std::string& value1,
+      std::string& value2)
+    {
+      CONTEXT("FileReaderASCII::read()");
+      std::string line;
+      if(!get_next_line(line))
+      {
+        throw InternalError("Unexpected end of file (in " + _filename + ").");
+      }
+
+      // since "std::istringstream(line) >> value1 >> value2" does not work for strings, we have to extract the two
+      // key-value strings manually
+
+      // remove leading and trailing white spaces from line
+      line = trim(line);
+
+      if(line.length() == 0)
+      {
+        throw InternalError("Line is emty!");
+      }
+
+      // find position of the first blank after the key
+      size_t pos = line.find_first_of(' ');
+      if(pos == std::string::npos)
+      {
+        throw InternalError("No white space found after key in line '" + line + "'.");
+      }
+      // set first value to first token in the line
+      value1 = line.substr(0, pos);
+
+      // set second value to the trimmed remaining line
+      value2 = trim(line.substr(pos+1));
+    }
+
+
+    /**
     * \brief extracts one integer from first non-empty non-comment line
     *
     * \param[out] value
