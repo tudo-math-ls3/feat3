@@ -84,7 +84,8 @@ public:
 
     if(manager != nullptr)
     {
-      ProcessGroup* process_group = manager->process_group();
+      // get pointer to the process group this process belongs to
+      ProcessGroup* process_group = manager->process_group_main();
 
       // let the manager read the mesh
       manager->read_mesh(_mesh_file);

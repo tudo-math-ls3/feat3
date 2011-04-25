@@ -45,13 +45,6 @@ namespace FEAST
     /// rank of this process with respect to the ProcessGroup's communicator
     int _rank;
 
-    /// pointer to the process group from which this process group has been spawned
-    ProcessGroup const* _process_group_parent;
-
-//    /// process groups spawned from this process group
-//  COMMENT_HILMAR, 15.9.2010: not sure yet if this is needed
-//    ProcessGroup** _process_group_child;
-
     /**
     * \brief ID of the process group
     *
@@ -74,25 +67,28 @@ namespace FEAST
 
   public:
 
-    /* *************************
-    * constructor & destructor *
-    ***************************/
+    /* **************************
+    * constructors & destructor *
+    ****************************/
     /**
     * \brief CTORs for the case the MPI_Group and the MPI_Comm already exist
     *
     * This constructor is, e.g., intended for creating a process group object containing all COMM_WORLD processes or
     * all COMM_WORLD processes except the master. The coordinator is set to rank 0, i.e., the first rank in the process
-    * group. The group ID is set to 0. (Hence, this constructor should not be used for creating the main process groups
-    * for performing two or more completely separated tasks (e.g., for multiphysics).)
+    * group. The group ID is set to the given group ID, or 0, if no ID is given.
     *
     * \param[in] comm
     * communicator shared by the group processes
+    *
+    * \param[in] group_id
+    * ID of the process group (default value 0 when not provided)
     */
-    ProcessGroup(MPI_Comm comm)
+    ProcessGroup(
+      MPI_Comm comm,
+      unsigned int const group_id = 0)
       : _comm(comm),
         _num_processes(0),
-        _process_group_parent(nullptr),
-        _group_id(0),
+        _group_id(group_id),
         _rank_coord(0)
     {
       CONTEXT("ProcessGroup::ProcessGroup()");
@@ -133,7 +129,6 @@ namespace FEAST
       ProcessGroup const* process_group_parent,
       unsigned int const group_id)
       : _num_processes(0),
-        _process_group_parent(process_group_parent),
         _group_id(group_id),
         _rank_coord(0)
     {
@@ -143,7 +138,7 @@ namespace FEAST
       // which process gets which rank in the new communicator. Since all get the same key (namely 0), the ranks
       // are ordered relative to the ranks of the parent group. (I.e., when the parent group ranks are 1,42,3,6, then
       // these four processes get the local ranks 0,3,1,2.)
-      int mpi_error_code = MPI_Comm_split(_process_group_parent->comm(), _group_id, 0, &_comm);
+      int mpi_error_code = MPI_Comm_split(process_group_parent->comm(), _group_id, 0, &_comm);
       validate_error_code_mpi(mpi_error_code, "MPI_Comm_split");
 
       // get MPI_Group object for the given communicator
@@ -161,60 +156,7 @@ namespace FEAST
       mpi_error_code = MPI_Group_rank(_group, &_rank);
       validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
 
-// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
-//      _buffer = nullptr;
-    }
-
-
-    /**
-    * \brief CTOR for the case the MPI_Group and the corresponding communicator have to be created
-    *
-    * This constructor can be used for creating single process groups from a parent group.
-    * The coordinator of this process group is set to rank 0, i.e. the first rank in the process group.
-    *
-    * \param[in] num_processes
-    * number of processes in this group
-    *
-    * \param[in] ranks_group_parent
-    * array of ranks the processes building this group have in the parent group
-    *
-    * \param[in] process_group_parent
-    * parent group of processes
-    *
-    * \param[in] group_id
-    * ID of this group
-    *
-    * \warning Do not forget to call MPI_Comm_create() outside this routine (has to be called by all processes of the
-    * parent group.
-    */
-    ProcessGroup(
-      unsigned int const num_processes,
-      int const* ranks_group_parent,
-      ProcessGroup const* process_group_parent,
-      unsigned int const group_id)
-      : _num_processes(num_processes),
-        _process_group_parent(process_group_parent),
-        _group_id(group_id),
-        _rank_coord(0)
-    {
-      CONTEXT("ProcessGroup::ProcessGroup()");
-      ASSERT(num_processes >= 1, "Number of processes must be at least 1.");
-
-      int mpi_error_code = MPI_Group_incl(_process_group_parent->_group, _num_processes,
-                                          const_cast<int*>(ranks_group_parent), &_group);
-      validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
-
-      // Create the group communicator for, among others, collective operations.
-      // It is essential that *all* processes in MPI_COMM_WORLD participate since MPI_COMM_WORLD
-      // is a parent sub-universe, i.e., something to spawn from
-      mpi_error_code = MPI_Comm_create(_process_group_parent->_comm, _group, &_comm);
-      validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
-
-      // and finally look up the local rank of this process w.r.t. the group's communicator
-      mpi_error_code = MPI_Group_rank(_group, &_rank);
-      validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
-
-// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+// COMMENT_HILMAR: every process group will eventually need its own MPI buffer... then activate this code.
 //      // allocate communication buffers
 //      int size_of_char;
 //      mpi_error_code = MPI_Pack_size(1, MPI_CHAR, MPI_COMM_WORLD, &size_of_char);
@@ -232,26 +174,23 @@ namespace FEAST
 //        // otherwise, array size (in bytes) and number of array entries are equal
 //        _buffer = new char[BUFFERSIZE_BYTES];
 //      }
-
     }
 
-    /* ***********
-    * destructor *
-    *************/
+
     /// DTOR
     virtual ~ProcessGroup()
     {
       CONTEXT("ProcessGroup::~ProcessGroup()");
-      if (_comm != MPI_COMM_WORLD)
+      if(_comm != MPI_COMM_WORLD && _comm != MPI_COMM_NULL)
       {
         MPI_Comm_free(&_comm);
+        MPI_Group_free(&_group);
       }
-      MPI_Group_free(&_group);
-  // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
-  //    if (_buffer != nullptr)
-  //    {
-  //      delete [] _buffer;
-  //    }
+// COMMENT_HILMAR: every process group will eventually need its own MPI buffer... then activate this code.
+//      if (_buffer != nullptr)
+//      {
+//        delete [] _buffer;
+//      }
     }
 
     /* ******************
@@ -294,17 +233,6 @@ namespace FEAST
     {
       CONTEXT("ProcessGroup::num_processes()");
       return _num_processes;
-    }
-
-    /**
-    * \brief getter for the pointer to the parent process group
-    *
-    * \return parent process group pointer #_process_group_parent
-    */
-    inline ProcessGroup const* process_group_parent() const
-    {
-      CONTEXT("ProcessGroup::process_group_parent()");
-      return _process_group_parent;
     }
 
     /**

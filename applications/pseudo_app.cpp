@@ -10,204 +10,13 @@
 #include <kernel/comm.hpp>
 #include <kernel/graph.hpp>
 #include <kernel/process.hpp>
+#include <kernel/manager.hpp>
 #include <kernel/universe.hpp>
 
 using namespace FEAST;
 
 #define WDIM 2
 #define SDIM 2
-
-
-/**
-* \brief dummy function in preparation of a function for defining work groups (which will reside in the load bal. class)
-*
-* This dummy function creates two work groups: one consisting of two workers responsible for the coarse grid
-* problem and one consisting of all the other workers responsible for the fine grid problem. Currently, everything
-* is hard-coded. Later, the user must be able to control the creation of work groups and even later the load
-* balancer has to apply clever strategies to create these work groups automatically so that the user doesn't have
-* to do anything.
-*
-* To optimise the communication between the coordinator of the main process group and the work groups, we add
-* this coordinator to a work group if it is not a compute process of this work group anyway. Hence, for each work
-* group, there are three different possibilities:
-* 1) There is a dedicated load balancer process, which is automatically the coordinator of the main process group
-*    and belongs to no work group:
-*    --> work group adds the coordinator as extra process
-* 2) There is no dedicated load balancer process, and the coordinator of the main process group ...
-*   a) ... is not part of the work group:
-*     --> work group adds the coordinator as extra process
-*   b) ... is part of the work group:
-*     --> work group does not have to add the coordinator
-* Thus the 1-to-n or n-to-1 communication between coordinator and n work group processes can be performed via
-* MPI_Scatter() and MPI_Gather() (which always have to be called by all members of an MPI process group). This
-* is more efficient then using n calls of MPI_send() / MPI_recv() via the communicator of the main process group.
-*
-* The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
-* Furthermore, two extra processes are required for testing the creation of a second work group and the use
-* of a dedicated load balancing process.
-* Later, this has to be all done in some auto-magically way.
-*
-* Two different tests can be performed (n is the number of base mesh cells):
-* 1) with dedicated load balancer process
-*    - work group for coarse grid: 2 processes: {0, 1}
-*    - work group for fine grid: n processes: {1, ..., n}
-*    - i.e. process 1 is in both work groups
-*    - coordinator process: 0
-*    - dedicated load balancer process: n+1
-* 2) without dedicated load balancer process
-*    - work group for coarse grid: 2 processes: {0, 1}
-*    - work group for fine grid: n processes: {2, ..., n+1}
-*    - i.e. the two work groups are disjunct
-*    - coordinator process: 0
-* Both tests need n+2 processes in total. To choose the test, change the first entry of the boolean array
-* includes_dedicated_load_bal[] in the main() method.
-*
-* \param[in] manager
-* pointer to the manager object to get some further information
-*
-* \param[out] num_subgroups
-* number of subgroups
-*
-* \param[out] num_proc_in_subgroup
-* array of numbers of processes per subgroup
-*
-* \param[out] group_contains_extra_coord
-* Array indicating whether the subgroups contain an extra process for the coordinator (which will then
-* not be a compute process in the corresponding work group).
-* Usually a boolean would do the trick, but we cannot send boolean arrays via MPI. (C++ bindings are deprecated,
-* hence we cannot use MPI::BOOL. MPI_LOGICAL cannot be used, since this is not equivalent to C++'s bool.)
-* So, we use unsigned char here and treat is as if it were boolean.
-*
-* \param[out] subgroup_ranks
-* array for defining the rank partitioning
-*
-* \param[out] graphs
-* array of Graph pointers representing the connectivity of work group processes
-*/
-void define_work_groups(
-  Manager<SDIM, WDIM>* manager,
-  unsigned int& num_subgroups,
-  unsigned int*& num_proc_in_subgroup,
-  unsigned char*& group_contains_extra_coord,
-  int**& subgroup_ranks,
-  Graph**& graphs)
-{
-  CONTEXT("pseudo_app: define_work_groups()");
-
-  // set number of subgroups manually to 2
-  num_subgroups = 2;
-  // allocate arrays
-  num_proc_in_subgroup = new unsigned int[num_subgroups];
-  group_contains_extra_coord = new unsigned char[num_subgroups];
-  subgroup_ranks = new int*[num_subgroups];
-  graphs = new Graph*[num_subgroups];
-
-  // shortcut to the number of processes in the manager's process group
-  unsigned int num_processes = manager->process_group()->num_processes();
-
-  // shortcut to the number of cells in the base mesh
-  unsigned int num_cells = manager->base_mesh()->num_cells();
-
-  // debug output
-  Logger::log_master("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n");
-  // assert that the number of processes is n+2
-  ASSERT(num_processes == num_cells + 2, "Number of processes " + stringify(num_processes)
-         + " must be number of cells + 2, i.e., " + stringify(num_cells + 2) + ".");
-
-  // set up the two test cases
-
-  if(manager->group_has_dedicated_load_bal())
-  {
-    // test case 1 (n is the number of base mesh cells)
-    // with dedicated load balancer process
-    //  - work group for coarse grid: 2 processes: {0, 1}
-    //  - work group for fine grid: n processes: {1, ..., n}
-    //  - i.e. process 1 is in both work groups
-    //  - coordinator process: 0
-    //  - dedicated load balancer: n+1
-
-    // the coordinator (rank 0) is at the same time a compute process of the first work group, so only the second
-    // work group has to add an extra process
-    group_contains_extra_coord[0] = false;
-    group_contains_extra_coord[1] = true;
-
-    // set number of processes per group
-    num_proc_in_subgroup[0] = 2;
-    num_proc_in_subgroup[1] = num_cells + 1;
-
-    // partition the process group ranks into work groups
-    // coarse grid work group
-    subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
-    subgroup_ranks[0][0] = 0;
-    subgroup_ranks[0][1] = 1;
-
-    // fine grid work group
-    subgroup_ranks[1] = new int[num_proc_in_subgroup[1]];
-    // set entries to {0,1, ..., n}
-    for(unsigned int i(0) ; i < num_proc_in_subgroup[1] ; ++i)
-    {
-      subgroup_ranks[1][i] = i;
-    }
-  }
-  else
-  {
-    // test case 2 (n is the number of base mesh cells)
-    // without dedicated load balancer process
-    //  - work group for coarse grid: 2 processes: {0, 1}
-    //  - work group for fine grid: n processes: {2, ..., n+1}
-    //  - i.e. the two work groups are disjunct
-    //  - coordinator (and load balancer) process: 0
-
-    // the coordinator (rank 0) is at the same time a compute process of the first work group, so only the second
-    // work group has to add an extra process
-    group_contains_extra_coord[0] = false;
-    group_contains_extra_coord[1] = true;
-
-    // set number of processes per group
-    num_proc_in_subgroup[0] = 2;
-    num_proc_in_subgroup[1] = num_cells + 1;
-
-    // partition the process group ranks into work groups
-    subgroup_ranks[0] = new int[num_proc_in_subgroup[0]];
-    subgroup_ranks[0][0] = 0;
-    subgroup_ranks[0][1] = 1;
-    subgroup_ranks[1] = new int[num_proc_in_subgroup[1]];
-    // set entries to {0, 2, ..., n+1}
-    subgroup_ranks[1][0] = 0;
-    for(unsigned int i(1) ; i < num_proc_in_subgroup[1] ; ++i)
-    {
-      subgroup_ranks[1][i] = i+1;
-    }
-  }
-
-  /* *********************************************************
-  * create graph structures corresponding to the work groups *
-  ***********************************************************/
-  // build an artificial graph mimicing the distribution of the 16 base mesh cells to two processors
-  // (e.g. BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph will
-  // be used for the coarse grid work group
-  index_glob_t* index = new index_glob_t[3];
-  index_glob_t* neighbours = new index_glob_t[2];
-  index[0] = 0;
-  index[1] = 1;
-  index[2] = 2;
-  neighbours[0] = 1;
-  neighbours[1] = 0;
-  // Artificially create a graph object here. Usually, this comes from somewhere else.
-  graphs[0] = new Graph(2, index, neighbours);
-  // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
-  delete [] index;
-  delete [] neighbours;
-
-  // get connectivity graph of the base mesh; this one will be used for the fine grid work group
-  graphs[1] = manager->base_mesh()->graph();
-
-// COMMENT_HILMAR:
-// We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
-// equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
-// layer, which both have their own connectivity structure. Here, we actually need the connectivity graph of the
-// process patch layer.
-}
 
 
 /**
@@ -264,7 +73,7 @@ int main(int argc, char* argv[])
   // Set the first entry either to false or to true to test two different configurations. (You don't have to change
   // the number of processes for that.) (See description of the example in routine define_work_groups().)
   bool* includes_dedicated_load_bal = new bool[num_process_groups];
-  includes_dedicated_load_bal[0] = false;
+  includes_dedicated_load_bal[0] = true;
   includes_dedicated_load_bal[1] = false;
 
   // set shortcut to the one and only instance of Universe (since this is the first call of
@@ -281,14 +90,16 @@ int main(int argc, char* argv[])
     ErrorHandler::exception_occured(e);
   }
 
-  // Get process objects. Note that on each process only one of the following two exists (the other one is the
-  // null pointer).
+  // Get process objects. Note that on each process only one of the following two exists (the other one is
+  // automatically the null pointer).
   Manager<SDIM, WDIM>* manager = universe->manager();
   Master* master = universe->master();
 
   if(manager != nullptr)
   {
-    ProcessGroup* process_group = manager->process_group();
+    // get pointer to the process group this process belongs to
+    ProcessGroup* process_group = manager->process_group_main();
+    // get group id
     unsigned int group_id = process_group->group_id();
 
     // debug output
@@ -305,43 +116,13 @@ int main(int argc, char* argv[])
       // let the manager read the mesh file and create a base mesh (this is only done by the coordinator process)
       manager->read_mesh(mesh_file);
 
-      // define work groups
-      if(process_group->is_coordinator())
-      {
-        // necessary data to be set for creating work groups (see function define_work_groups(...) for details)
-        unsigned int num_subgroups;
-        unsigned int* num_proc_in_subgroup(nullptr);
-        unsigned char* group_contains_extra_coord(nullptr);
-        int** subgroup_ranks(nullptr);
-        Graph** graphs;
+      // let the load balancer define the work groups (currently hard-coded)
+      manager->define_work_groups_2();
 
-        // The coordinator is the only one knowing the base mesh, so only the coordinator decides over the number of
-        // work groups and the process distribution to them. The passed arrays are allocated within this routine.
-        define_work_groups(manager, num_subgroups, num_proc_in_subgroup, group_contains_extra_coord,
-                           subgroup_ranks, graphs);
-
-        // Now let the manager create the work groups. Deallocation of arrays (except the graph array) and destruction
-        // of objects is done within the manager class. This function also has to be called on the non-coordinator
-        // processes of the process group.
-        manager->create_work_groups(num_subgroups, num_proc_in_subgroup, group_contains_extra_coord, subgroup_ranks);
-
-        // now let the manager send local parts of the global graphs to the worker processes
-        manager->send_graphs_to_workers(graphs);
-
-        // manually destroy here the artificially created graph object (the other one is destroyed by the base mesh)
-        delete graphs[0];
-        // delete the graphs array
-        delete [] graphs;
-      }
-      else
-      {
-        // The non-coordinator processes also have to call the function for creating work groups. They receive the
-        // necessary data from the coordinator. (This is why only nullptr are passed to the routine.)
-        manager->create_work_groups(0, nullptr, nullptr, nullptr);
-
-        // let the non-coordinator processes receive the local parts of the global graphs
-        manager->send_graphs_to_workers(nullptr);
-      }
+      // Now let the manager create the work groups. Deallocation of arrays (except the graph array) and destruction
+      // of objects is done within the manager class. This function also has to be called on the non-coordinator
+      // processes of the process group.
+      manager->create_work_groups();
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
       // standard file logging functions
@@ -380,7 +161,7 @@ int main(int argc, char* argv[])
       // Everything done, call universe destruction routine.
       universe->destroy();
     }
-    else
+    else // group_id != 0
     {
       // the second process group does something else, programmed by the application outside the kernel...
       Logger::log("Proc " + stringify(Process::rank) + " in group with ID " + stringify(group_id)

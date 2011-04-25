@@ -78,7 +78,8 @@ public:
 
     if(manager != nullptr)
     {
-      ProcessGroup* process_group = manager->process_group();
+      // get pointer to the process group this process belongs to
+      ProcessGroup* process_group = manager->process_group_main();
 
       // let the manager "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
       manager->read_mesh("dummy");

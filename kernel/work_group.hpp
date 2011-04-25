@@ -29,13 +29,7 @@ namespace FEAST
   * extra class). Communication between different work groups is done via the enclosing ProcessGroup communicator.
   * For an example concerning WorkGroup and ProcessSubgroup creation, see the description of class ProcessSubgroup.
   *
-  * \note Note that the variable #_process_group_parent does not refer to the ProcessSubgroup object 'inbetween' this
-  * work group and the enclosing process group, but to the enclosing process group. This work group has to communicate
-  * with other work groups, and this is only possible via the common communicator of the enclosing process group. That
-  * is why the process subgroup is 'skipped'.
-  *
   * \author Hilmar Wobker
-  * \author Dominik Goeddeke
   *
   */
   class WorkGroup
@@ -100,47 +94,24 @@ namespace FEAST
     /**
     * \brief CTOR
     *
-    * \param[in] num_processes
-    * number of processes in this group
-    *
-    * \param[in] ranks_group_parent
-    * array of ranks the processes building this group have in the parent group
-    *
-    * \param[in] process_group_parent
-    * parent group of processes
+    * \param[in] comm
+    * communicator shared by the group processes
     *
     * \param[in] group_id
     * ID of this group
     */
     WorkGroup(
-      unsigned int const num_processes,
-      int const* ranks_group_parent,
-      ProcessGroup const* process_group_parent,
+      MPI_Comm comm,
       unsigned int const group_id)
-      : ProcessGroup(num_processes, ranks_group_parent, process_group_parent, group_id),
+      : ProcessGroup(comm, group_id),
 //        _comm_opt(MPI_COMM_NULL),
         _graph_distributed(nullptr),
         _ranks_finer(nullptr)
     {
       CONTEXT("WorkGroup::WorkGroup()");
 
-//TODO: remove this debug output
-
       // debugging output
-      /* ******************************
-      * test the logger functionality *
-      ********************************/
-//      // let the coordinator of the subgroup trigger some common messages
-//      if(is_coordinator())
-//      {
-//        std::string s("I have COMM_WORLD rank " + stringify(Process::rank)
-//                      + " and I am the coordinator of work group " + stringify(_group_id));
-// //        Logger::log_master("Hello, master screen! " + s, Logger::SCREEN);
-//        Logger::log_master("Hello, master file! " + s, Logger::FILE);
-// //        Logger::log_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-// //        Logger::log_master("Hello, default master screen and file! " + s);
-//      }
-      // write some individual messages to screen and file
+      // write some individual messages to file
       std::string s("I have COMM_WORLD rank " + stringify(Process::rank) + " and group rank " + stringify(_rank)
                     + " in work group " + stringify(_group_id) + ".");
       if(is_coordinator())
@@ -148,11 +119,7 @@ namespace FEAST
         s += " I am the coordinator!";
       }
       s += "\n";
-//      log_indiv_master("Hello, master screen! " + s, Logger::SCREEN);
-      log_indiv_master("Hello, master file! " + s, Logger::FILE);
-//      log_indiv_master("Hello, master screen and file! " + s, Logger::SCREEN_FILE);
-//      log_indiv_master("Hello, master default screen and file! " + s);
-
+      Logger::log(s);
       // end of debugging output
     } // constructor
 

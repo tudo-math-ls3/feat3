@@ -16,6 +16,8 @@
 #include <kernel/master.hpp>
 #include <kernel/error_handler.hpp>
 #include <kernel/manager.hpp>
+//#include <kernel/manager_coord.hpp>
+//#include <kernel/manager_non_coord.hpp>
 
 /// FEAST namespace
 namespace FEAST
@@ -118,7 +120,6 @@ namespace FEAST
     * Will be nullptr if not living on this process.
     */
     Manager<space_dim_, world_dim_>* _manager;
-
 
     /**
     * \brief variable storing the base name of the log files
@@ -320,7 +321,7 @@ namespace FEAST
         _process_group = new ProcessGroup(_world_group_without_master, my_group);
       }
 
-      // now decide if this process is a regular one or the group's load-balancer or even the master
+      // now decide if this process is the coordinator process, or a non-coordinator or the master
 
       // initialise the pointers as nullptr
       _manager = nullptr;
@@ -341,7 +342,6 @@ namespace FEAST
       }
       else
       {
-        // create manager object in each process of the process group
         _manager = new Manager<space_dim_, world_dim_>(_process_group, _includes_dedicated_load_bal[my_group]);
         // debug output
         Logger::log("Process " + stringify(Process::rank) + " belongs to process group " + stringify(my_group) + ".\n");
@@ -372,8 +372,8 @@ namespace FEAST
       }
       else
       {
-        delete _process_group;
         delete _manager;
+        delete _process_group;
         delete _world_group_without_master;
       }
       delete [] _includes_dedicated_load_bal;

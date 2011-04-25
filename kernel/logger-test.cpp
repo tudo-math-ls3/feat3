@@ -102,7 +102,7 @@ public:
 
     if(manager != nullptr)
     {
-      ProcessGroup* process_group = manager->process_group();
+      ProcessGroup* process_group = manager->process_group_main();
       unsigned int group_id = process_group->group_id();
 
       int rank_process_group = process_group->rank();

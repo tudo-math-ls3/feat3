@@ -7,13 +7,13 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <math.h>
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/service_ids.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/comm.hpp>
-#include <kernel/process_group.hpp>
 
 /// FEAST namespace
 namespace FEAST
