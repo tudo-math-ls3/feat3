@@ -57,11 +57,11 @@ namespace FEAST
     /// underlying base mesh
     BaseMesh::BM<space_dim_, world_dim_>* _base_mesh;
 
-    /// number of ext. work groups
+    /// number of (ext.) work groups
     unsigned int _num_work_groups;
 
     ///array of numbers of processes per ext. work group
-    unsigned int* _num_proc_in_work_group;
+    unsigned int* _num_proc_in_ext_work_group;
 
     /**
     * \brief array indicating whether the ext. work groups contain an extra process for the coordinator
@@ -74,7 +74,7 @@ namespace FEAST
     unsigned char* _group_contains_extra_coord;
 
     /// array for defining the rank partitioning
-    int** _work_group_ranks;
+    int** _ext_work_group_ranks;
 
     /// array of Graphs representing the connectivity of work group processes
     Graph** _graphs;
@@ -105,9 +105,9 @@ namespace FEAST
         _rank_dedicated_load_balancer(rank_dedicated_load_balancer),
         _base_mesh(nullptr),
         _num_work_groups(0),
-        _num_proc_in_work_group(nullptr),
+        _num_proc_in_ext_work_group(nullptr),
         _group_contains_extra_coord(nullptr),
-        _work_group_ranks(nullptr),
+        _ext_work_group_ranks(nullptr),
         _graphs(nullptr),
         _graph_has_been_created_here(nullptr)
     {
@@ -158,10 +158,10 @@ namespace FEAST
     *
     * \return pointer to array of number of processes per ext. work group
     */
-    inline unsigned int* num_proc_in_work_group() const
+    inline unsigned int* num_proc_in_ext_work_group() const
     {
-      CONTEXT("LoadBalancer::num_proc_in_work_group()");
-      return _num_proc_in_work_group;
+      CONTEXT("LoadBalancer::num_proc_in_ext_work_group()");
+      return _num_proc_in_ext_work_group;
     }
 
 
@@ -182,10 +182,10 @@ namespace FEAST
     *
     * \return 2D array of ext. work group ranks
     */
-    inline int** work_group_ranks() const
+    inline int** ext_work_group_ranks() const
     {
-      CONTEXT("LoadBalancer::work_group_ranks()");
-      return _work_group_ranks;
+      CONTEXT("LoadBalancer::ext_work_group_ranks()");
+      return _ext_work_group_ranks;
     }
 
 
@@ -250,9 +250,9 @@ namespace FEAST
       // set number of ext. work groups manually to 2
       _num_work_groups = 2;
       // allocate arrays
-      _num_proc_in_work_group = new unsigned int[_num_work_groups];
+      _num_proc_in_ext_work_group = new unsigned int[_num_work_groups];
       _group_contains_extra_coord = new unsigned char[_num_work_groups];
-      _work_group_ranks = new int*[_num_work_groups];
+      _ext_work_group_ranks = new int*[_num_work_groups];
       _graphs = new Graph*[_num_work_groups];
 
       // shortcut to the number of processes in the manager's process group
@@ -285,21 +285,21 @@ namespace FEAST
         _group_contains_extra_coord[1] = true;
 
         // set number of processes per group
-        _num_proc_in_work_group[0] = 2;
-        _num_proc_in_work_group[1] = num_cells + 1;
+        _num_proc_in_ext_work_group[0] = 2;
+        _num_proc_in_ext_work_group[1] = num_cells + 1;
 
         // partition the process group ranks into work groups
         // coarse grid work group
-        _work_group_ranks[0] = new int[_num_proc_in_work_group[0]];
-        _work_group_ranks[0][0] = 0;
-        _work_group_ranks[0][1] = 1;
+        _ext_work_group_ranks[0] = new int[_num_proc_in_ext_work_group[0]];
+        _ext_work_group_ranks[0][0] = 0;
+        _ext_work_group_ranks[0][1] = 1;
 
         // fine grid work group
-        _work_group_ranks[1] = new int[_num_proc_in_work_group[1]];
+        _ext_work_group_ranks[1] = new int[_num_proc_in_ext_work_group[1]];
         // set entries to {0,1, ..., n}
-        for(unsigned int i(0) ; i < _num_proc_in_work_group[1] ; ++i)
+        for(unsigned int i(0) ; i < _num_proc_in_ext_work_group[1] ; ++i)
         {
-          _work_group_ranks[1][i] = i;
+          _ext_work_group_ranks[1][i] = i;
         }
       }
       else
@@ -317,19 +317,19 @@ namespace FEAST
         _group_contains_extra_coord[1] = true;
 
         // set number of processes per group
-        _num_proc_in_work_group[0] = 2;
-        _num_proc_in_work_group[1] = num_cells + 1;
+        _num_proc_in_ext_work_group[0] = 2;
+        _num_proc_in_ext_work_group[1] = num_cells + 1;
 
         // partition the process group ranks into work groups
-        _work_group_ranks[0] = new int[_num_proc_in_work_group[0]];
-        _work_group_ranks[0][0] = 0;
-        _work_group_ranks[0][1] = 1;
-        _work_group_ranks[1] = new int[_num_proc_in_work_group[1]];
+        _ext_work_group_ranks[0] = new int[_num_proc_in_ext_work_group[0]];
+        _ext_work_group_ranks[0][0] = 0;
+        _ext_work_group_ranks[0][1] = 1;
+        _ext_work_group_ranks[1] = new int[_num_proc_in_ext_work_group[1]];
         // set entries to {0, 2, ..., n+1}
-        _work_group_ranks[1][0] = 0;
-        for(unsigned int i(1) ; i < _num_proc_in_work_group[1] ; ++i)
+        _ext_work_group_ranks[1][0] = 0;
+        for(unsigned int i(1) ; i < _num_proc_in_ext_work_group[1] ; ++i)
         {
-          _work_group_ranks[1][i] = i+1;
+          _ext_work_group_ranks[1][i] = i+1;
         }
       }
 
@@ -379,9 +379,9 @@ namespace FEAST
       // set number of ext. work groups manually to 1
       _num_work_groups = 1;
       // allocate arrays
-      _num_proc_in_work_group = new unsigned int[_num_work_groups];
+      _num_proc_in_ext_work_group = new unsigned int[_num_work_groups];
       _group_contains_extra_coord = new unsigned char[_num_work_groups];
-      _work_group_ranks = new int*[_num_work_groups];
+      _ext_work_group_ranks = new int*[_num_work_groups];
       _graphs = new Graph*[_num_work_groups];
 
       // shortcut to the number of processes in the manager's process group
@@ -407,13 +407,13 @@ namespace FEAST
       // no extra coordinator process is needed
       _group_contains_extra_coord[0] = false;
       // set number of processes in the work group
-      _num_proc_in_work_group[0] = num_cells;
+      _num_proc_in_ext_work_group[0] = num_cells;
       // work group ranks
-      _work_group_ranks[0] = new int[_num_proc_in_work_group[0]];
+      _ext_work_group_ranks[0] = new int[_num_proc_in_ext_work_group[0]];
       // set entries to {0, ..., n-1}
-      for(unsigned int i(0) ; i < _num_proc_in_work_group[0] ; ++i)
+      for(unsigned int i(0) ; i < _num_proc_in_ext_work_group[0] ; ++i)
       {
-        _work_group_ranks[0][i] = i;
+        _ext_work_group_ranks[0][i] = i;
       }
 
       // get connectivity graph of the base mesh; this one will be used for the fine grid work group

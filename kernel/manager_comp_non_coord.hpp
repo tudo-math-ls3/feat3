@@ -100,10 +100,10 @@ namespace FEAST
     *
     * \return pointer to array of number of processes per ext. work group
     */
-    inline unsigned int* num_proc_in_work_group() const
+    inline unsigned int* num_proc_in_ext_work_group() const
     {
-      CONTEXT("ManagerCompNonCoord::num_proc_in_work_group()");
-      return ManagerComp<space_dim_, world_dim_>::_num_proc_in_work_group;
+      CONTEXT("ManagerCompNonCoord::num_proc_in_ext_work_group()");
+      return ManagerComp<space_dim_, world_dim_>::_num_proc_in_ext_work_group;
     }
 
 
@@ -112,10 +112,10 @@ namespace FEAST
     *
     * \param[in] pointer to array of number of processes per ext. work group
     */
-    inline void set_num_proc_in_work_group(unsigned int* num_proc_in_work_group)
+    inline void set_num_proc_in_ext_work_group(unsigned int* num_proc_in_ext_work_group)
     {
-      CONTEXT("ManagerCompNonCoord::set_num_proc_in_work_group()");
-      ManagerComp<space_dim_, world_dim_>::_num_proc_in_work_group = num_proc_in_work_group;
+      CONTEXT("ManagerCompNonCoord::set_num_proc_in_ext_work_group()");
+      ManagerComp<space_dim_, world_dim_>::_num_proc_in_ext_work_group = num_proc_in_ext_work_group;
     }
 
 
@@ -128,7 +128,7 @@ namespace FEAST
     */
     inline unsigned char* group_contains_extra_coord() const
     {
-      CONTEXT("ManagerCompCoord::num_proc_in_work_group()");
+      CONTEXT("ManagerCompCoord::num_proc_in_ext_work_group()");
       return ManagerComp<space_dim_, world_dim_>::_group_contains_extra_coord;
     }
 
@@ -152,10 +152,10 @@ namespace FEAST
     *
     * \return pointer to 2D array of ext. work group ranks
     */
-    inline int** work_group_ranks() const
+    inline int** ext_work_group_ranks() const
     {
-      CONTEXT("ManagerCompNonCoord::work_group_ranks()");
-      return ManagerComp<space_dim_, world_dim_>::_work_group_ranks;
+      CONTEXT("ManagerCompNonCoord::ext_work_group_ranks()");
+      return ManagerComp<space_dim_, world_dim_>::_ext_work_group_ranks;
     }
 
 
@@ -164,10 +164,10 @@ namespace FEAST
     *
     * \param[in] pointer to 2D array of ext. work group ranks
     */
-    inline void set_work_group_ranks(int** work_group_ranks)
+    inline void set_ext_work_group_ranks(int** ext_work_group_ranks)
     {
-      CONTEXT("ManagerCompNonCoord::set_work_group_ranks()");
-      ManagerComp<space_dim_, world_dim_>::_work_group_ranks = work_group_ranks;
+      CONTEXT("ManagerCompNonCoord::set_ext_work_group_ranks()");
+      ManagerComp<space_dim_, world_dim_>::_ext_work_group_ranks = ext_work_group_ranks;
     }
 
 
@@ -213,7 +213,7 @@ namespace FEAST
 
       // now the non-coordinator processes receive data which is broadcasted by the coordinator:
       //   - _num_work_groups
-      //   - _num_proc_in_work_group
+      //   - _num_proc_in_ext_work_group
       //   - group_contains_extra_coord
 
       unsigned int temp;
@@ -227,7 +227,7 @@ namespace FEAST
       mpi_error_code = MPI_Bcast(num_proc_in_subgr, num_work_groups(), MPI_UNSIGNED, process_group()->rank_coord(),
                                  process_group()->comm());
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
-      set_num_proc_in_work_group(num_proc_in_subgr);
+      set_num_proc_in_ext_work_group(num_proc_in_subgr);
 
       // allocate array
       unsigned char* group_contains_extra_coord = new unsigned char[num_work_groups()];
@@ -236,15 +236,15 @@ namespace FEAST
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
       set_group_contains_extra_coord(group_contains_extra_coord);
 
-      // let the non-coordinator processes allocate the array _work_group_ranks for rank partitioning
+      // let the non-coordinator processes allocate the array _ext_work_group_ranks for rank partitioning
       int** subgr_ranks = new int*[num_work_groups()];
       for (unsigned int i(0) ; i < num_work_groups() ; ++i)
       {
-        subgr_ranks[i] = new int[num_proc_in_work_group()[i]];
+        subgr_ranks[i] = new int[num_proc_in_ext_work_group()[i]];
       }
-      set_work_group_ranks(subgr_ranks);
+      set_ext_work_group_ranks(subgr_ranks);
 
-      // call routine for creating work groups (within this routine the array work_group_ranks is transferred)
+      // call routine for creating work groups (within this routine the array ext_work_group_ranks is transferred)
       ManagerComp<space_dim_, world_dim_>::_create_work_groups();
     } // create_work_groups()
 

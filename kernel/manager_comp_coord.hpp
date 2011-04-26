@@ -131,10 +131,10 @@ namespace FEAST
     *
     * \return pointer to array of number of processes per work group
     */
-    inline unsigned int* num_proc_in_work_group() const
+    inline unsigned int* num_proc_in_ext_work_group() const
     {
-      CONTEXT("ManagerCompCoord::num_proc_in_work_group()");
-      return ManagerComp<space_dim_, world_dim_>::_num_proc_in_work_group;
+      CONTEXT("ManagerCompCoord::num_proc_in_ext_work_group()");
+      return ManagerComp<space_dim_, world_dim_>::_num_proc_in_ext_work_group;
     }
 
 
@@ -143,10 +143,10 @@ namespace FEAST
     *
     * \param[in] pointer to array of number of processes per extended work group
     */
-    inline void set_num_proc_in_work_group(unsigned int* num_proc_in_work_group)
+    inline void set_num_proc_in_ext_work_group(unsigned int* num_proc_in_ext_work_group)
     {
-      CONTEXT("ManagerCompCoord::set_num_proc_in_work_group()");
-      ManagerComp<space_dim_, world_dim_>::_num_proc_in_work_group = num_proc_in_work_group;
+      CONTEXT("ManagerCompCoord::set_num_proc_in_ext_work_group()");
+      ManagerComp<space_dim_, world_dim_>::_num_proc_in_ext_work_group = num_proc_in_ext_work_group;
     }
 
 
@@ -183,10 +183,10 @@ namespace FEAST
     *
     * \return pointer to 2D array of ext. work group ranks
     */
-    inline int** work_group_ranks() const
+    inline int** ext_work_group_ranks() const
     {
-      CONTEXT("ManagerCompCoord::work_group_ranks()");
-      return ManagerComp<space_dim_, world_dim_>::_work_group_ranks;
+      CONTEXT("ManagerCompCoord::ext_work_group_ranks()");
+      return ManagerComp<space_dim_, world_dim_>::_ext_work_group_ranks;
     }
 
 
@@ -195,10 +195,10 @@ namespace FEAST
     *
     * \param[in] pointer to 2D array of ext. work group ranks
     */
-    inline void set_work_group_ranks(int** work_group_ranks)
+    inline void set_ext_work_group_ranks(int** ext_work_group_ranks)
     {
-      CONTEXT("ManagerCompCoord::set_work_group_ranks()");
-      ManagerComp<space_dim_, world_dim_>::_work_group_ranks = work_group_ranks;
+      CONTEXT("ManagerCompCoord::set_ext_work_group_ranks()");
+      ManagerComp<space_dim_, world_dim_>::_ext_work_group_ranks = ext_work_group_ranks;
     }
 
 
@@ -301,20 +301,20 @@ namespace FEAST
 
       // set data/pointers on the coordinator process (where the data is already available)
       set_num_work_groups(_load_balancer->num_work_groups());
-      set_num_proc_in_work_group(_load_balancer->num_proc_in_work_group());
+      set_num_proc_in_ext_work_group(_load_balancer->num_proc_in_ext_work_group());
       set_group_contains_extra_coord(_load_balancer->group_contains_extra_coord());
-      set_work_group_ranks(_load_balancer->work_group_ranks());
+      set_ext_work_group_ranks(_load_balancer->ext_work_group_ranks());
 
       // now the coordinator broadcasts the relevant data to the other processes, that is:
       //   - _num_work_groups
-      //   - _num_proc_in_work_group
+      //   - _num_proc_in_ext_work_group
       //   - _group_contains_extra_coord
 
       unsigned int temp(num_work_groups());
       int mpi_error_code = MPI_Bcast(&temp, 1, MPI_UNSIGNED, process_group()->rank_coord(), process_group()->comm());
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
-      mpi_error_code = MPI_Bcast(num_proc_in_work_group(), num_work_groups(), MPI_UNSIGNED,
+      mpi_error_code = MPI_Bcast(num_proc_in_ext_work_group(), num_work_groups(), MPI_UNSIGNED,
                                  process_group()->rank_coord(), process_group()->comm());
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
@@ -322,7 +322,7 @@ namespace FEAST
                                  process_group()->rank_coord(), process_group()->comm());
       validate_error_code_mpi(mpi_error_code, "MPI_Bcast");
 
-      // call routine for creating work groups (within this routine the array _work_group_ranks is transferred)
+      // call routine for creating work groups (within this routine the array _ext_work_group_ranks is transferred)
       ManagerComp<space_dim_, world_dim_>::_create_work_groups();
     } // create_work_groups()
 

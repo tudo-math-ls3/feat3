@@ -57,7 +57,7 @@ namespace FEAST
     *
     * Dimension: [#_num_work_groups]
     */
-    unsigned int* _num_proc_in_work_group;
+    unsigned int* _num_proc_in_ext_work_group;
 
     /**
     * \brief array indicating whether the extended work groups contain an extra process for the coordinator
@@ -72,9 +72,9 @@ namespace FEAST
     /**
     * \brief 2-dim. array of process group ranks building the extended work groups
     *
-    * Dimension: [#_num_work_groups][#_num_proc_in_work_group[\a group_id]]
+    * Dimension: [#_num_work_groups][#_num_proc_in_ext_work_group[\a group_id]]
     */
-    int** _work_group_ranks;
+    int** _ext_work_group_ranks;
 
     /**
     * \brief boolean array indicating to which work groups this process belongs
@@ -116,30 +116,30 @@ namespace FEAST
       CONTEXT("ManagerComp::_create_work_groups()");
 
       /* *************************************************************************
-      * send the 2D array _work_group_ranks to the non-coordinator processes *
+      * send the 2D array _ext_work_group_ranks to the non-coordinator processes *
       * using a self-defined MPI datatype                                        *
       ***************************************************************************/
 
       // get base address
       MPI_Aint base;
-      MPI_Get_address(_work_group_ranks, &base);
+      MPI_Get_address(_ext_work_group_ranks, &base);
 
       // calculate offsets of the subarray addresses w.r.t. base adress
       MPI_Aint* displacements = new MPI_Aint[_num_work_groups];
       for (unsigned int i(0) ; i < _num_work_groups ; ++i)
       {
-        MPI_Get_address(_work_group_ranks[i], &displacements[i]);
+        MPI_Get_address(_ext_work_group_ranks[i], &displacements[i]);
         displacements[i] -= base;
       }
 
       // create MPI datatype
       MPI_Datatype int_array_2d;
-      MPI_Type_create_hindexed(_num_work_groups, reinterpret_cast<int*>(_num_proc_in_work_group), displacements,
+      MPI_Type_create_hindexed(_num_work_groups, reinterpret_cast<int*>(_num_proc_in_ext_work_group), displacements,
                                MPI_INTEGER, &int_array_2d);
       MPI_Type_commit(&int_array_2d);
 
       // let the coordinator send the array to all non-coordinator processes
-      MPI_Bcast(_work_group_ranks, 1, int_array_2d, _process_group->rank_coord(), _process_group->comm());
+      MPI_Bcast(_ext_work_group_ranks, 1, int_array_2d, _process_group->rank_coord(), _process_group->comm());
 
       // free the datatype definition again
       MPI_Type_free(&int_array_2d);
@@ -157,9 +157,9 @@ namespace FEAST
       {
         // intialise with false
         _belongs_to_group[igroup] = false;
-        for(unsigned int j(0) ; j < _num_proc_in_work_group[igroup] ; ++j)
+        for(unsigned int j(0) ; j < _num_proc_in_ext_work_group[igroup] ; ++j)
         {
-          if(_process_group->rank() == _work_group_ranks[igroup][j])
+          if(_process_group->rank() == _ext_work_group_ranks[igroup][j])
           {
             _belongs_to_group[igroup] = true;
           }
@@ -177,8 +177,8 @@ namespace FEAST
         MPI_Group group_work;
         MPI_Comm group_comm;
 
-        int mpi_error_code = MPI_Group_incl(_process_group->group(), _num_proc_in_work_group[igroup],
-                                            const_cast<int*>(_work_group_ranks[igroup]), &group_work);
+        int mpi_error_code = MPI_Group_incl(_process_group->group(), _num_proc_in_ext_work_group[igroup],
+                                            const_cast<int*>(_ext_work_group_ranks[igroup]), &group_work);
         validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
 
         // Create the group communicator for, among others, collective operations.
@@ -205,9 +205,9 @@ namespace FEAST
       : _process_group(process_group),
         _rank_load_balancer(MPI_PROC_NULL),
         _num_work_groups(0),
-        _num_proc_in_work_group(nullptr),
+        _num_proc_in_ext_work_group(nullptr),
         _group_contains_extra_coord(nullptr),
-        _work_group_ranks(nullptr),
+        _ext_work_group_ranks(nullptr),
         _belongs_to_group(nullptr)
     {
       CONTEXT("ManagerComp::ManagerComp()");
@@ -217,14 +217,14 @@ namespace FEAST
     virtual ~ManagerComp()
     {
       CONTEXT("ManagerComp::~ManagerComp()");
-      if (_work_group_ranks != nullptr)
+      if (_ext_work_group_ranks != nullptr)
       {
         for(unsigned int igroup(0) ; igroup < _num_work_groups ; ++igroup)
         {
-          delete [] _work_group_ranks[igroup];
+          delete [] _ext_work_group_ranks[igroup];
         }
-        delete [] _work_group_ranks;
-        _work_group_ranks = nullptr;
+        delete [] _ext_work_group_ranks;
+        _ext_work_group_ranks = nullptr;
       }
 
       if (_belongs_to_group != nullptr)
@@ -241,9 +241,9 @@ namespace FEAST
         _work_groups.pop_back();
       }
 
-      if (_num_proc_in_work_group != nullptr)
+      if (_num_proc_in_ext_work_group != nullptr)
       {
-        delete [] _num_proc_in_work_group;
+        delete [] _num_proc_in_ext_work_group;
       }
 
       if (_group_contains_extra_coord != nullptr)
