@@ -529,11 +529,19 @@ namespace FEAST
       {
         delete _manager_comp_non_coord;
       }
+      if(is_load_balancer())
+      {
+        delete _load_balancer;
+      }
       if(_group_has_dedicated_load_bal)
       {
         if(!is_dedicated_load_balancer())
         {
           delete _process_group_comp;
+        }
+        else
+        {
+          delete _load_balancer_dedicated;
         }
       }
     }
