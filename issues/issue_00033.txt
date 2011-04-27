@@ -1,6 +1,6 @@
 ID           00033
 TYPE         bug_report
-STATUS       assigned
+STATUS       resolved
 AUTHOR       hilmar
 ASSIGNED TO  hilmar
 SEVERITY     high
@@ -9,3 +9,4 @@ FULL TEXT
 When using MPICH2 the function ProcessGroup::log_indiv_master() is defective: the (screen+file) output the master should produce vanishes. With OpenMPI everything works fine.
 
 SOLUTION
+This bug magically vanished. Either due to Dirk's fix of an invalid pointer access (commit de205e4b586e5091e9b723c883cd389eb9afdc5b) or due to the general program reorganisation done by Hilmar.
