@@ -98,14 +98,8 @@ namespace FEAST
     /**
     * \brief CTOR which immediately constructs the work group belonging to this extended work group
     *
-    * \param[in] num_processes
-    * number of processes in this group
-    *
-    * \param[in] ranks_group_parent
-    * array of ranks the processes building this extended work group have in the parent group
-    *
-    * \param[in] process_group_parent
-    * parent group of processes
+    * \param[in] comm
+    * communicator shared by the group processes
     *
     * \param[in] group_id
     * ID of this group
@@ -146,10 +140,17 @@ namespace FEAST
         // otherwise, the work group contains all processes of this extended work group except the coordinator process
 
         // We assume here that the coordinator of this extended work group is also the coordinator of the parent group.
-        // Since we always set the process with rank 0 to be the coordinator, this condition is fulfilled automatically.
+        // Since the coordinator of the parent group is always part of this extended work group and we always set the
+        // process with rank 0 to be the coordinator, this condition is fulfilled automatically.
         // However, when the latter is changed for some reason, the condition might be violated. In this case, we have
         // to provide the possibility to determine which process exactly should be the coordinator when creating
         // a process group (instead of unconditionally setting the first process to be the coordinator).
+// COMMENT_HILMAR: A problem discovered by Dirk: If the code is compiled without FEAST_DEBUG_MODE, but with flags
+//   -Wall -Wextra, then we get a warning (error when -Werror is used) that the paramater is_coord_in_parent is not used
+//   (since the ASSERT call is removed). How should we deal with such a situation in general?
+//   Regarding this special situation here: It's essential that the coordinator of the extended work group is also the
+//   coordinator of the parent process group. Currently, this is guaranteed (see comment above). But I'm not sure if
+//   this doesn't change in future. So, I would like to keep this inquiry here to be on the safe side!
         ASSERT(is_coord_in_parent == is_coordinator(),
                "Coordinator process of the extended work group has to be coordinator of the parent, too!");
 
