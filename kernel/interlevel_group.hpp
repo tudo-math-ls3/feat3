@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_INTER_LEVEL_GROUP_HPP
-#define KERNEL_INTER_LEVEL_GROUP_HPP 1
+#ifndef KERNEL_INTERLEVEL_GROUP_HPP
+#define KERNEL_INTERLEVEL_GROUP_HPP 1
 
 // includes, system
 #include <iostream>
@@ -20,7 +20,7 @@ namespace FEAST
   /**
   * \brief represents the group of processes from work groups of different levels that interact with each other
   *
-  * Illustration of inter-level work group communication:
+  * Illustration of interlevel work group communication:
   *
   *   ---------------        ---------------
   *   |      |      |        |      |      |
@@ -92,7 +92,7 @@ namespace FEAST
   * The operations (send|recv)_(defect|corr) will probably be part of the grid transfer routines restrict/prolong
   * (and will be called send_restricted_vector() etc. or similar). When two compute tasks are performed on the same
   * process (e.g., process 0(A+C) in the example above), then the send/recv routines have to perform corresponding
-  * copy operations instead of calling MPI. This sort of data transfer is not performed via the class InterLevelGroup.
+  * copy operations instead of calling MPI. This sort of data transfer is not performed via the class InterlevelGroup.
   * COMMENT_HILMAR: Or maybe it will? Collective routines can also send data to itself... let's see what is more
   *   appropriate...
   *
@@ -104,7 +104,7 @@ namespace FEAST
   * The four work groups on layer 2 have to communicate with each other over their common boundary. For this, other
   * communication patterns are needed than for the inter level communication considered here.
   */
-  class InterLevelGroup
+  class InterlevelGroup
     : public ProcessGroup
   {
 
@@ -119,12 +119,12 @@ namespace FEAST
 //    ...
 
   public:
-    InterLevelGroup(...)
+    InterlevelGroup(...)
     {
 //      ...
     }
 
-    ~InterLevelGroup()
+    ~InterlevelGroup()
     {
 //      ...
     }
@@ -133,4 +133,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_INTER_LEVEL_GROUP_HPP
+#endif // guard KERNEL_INTERLEVEL_GROUP_HPP
