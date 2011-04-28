@@ -1,0 +1,20 @@
+ID          00036
+TYPE        feature_request
+STATUS      unassigned
+AUTHOR      dom
+ASSIGNED TO
+SEVERITY    low
+
+FULL TEXT
+re-think the way certain global defines are provided. Currently, there is
+a lot of potentially redundant code in our self-defined cmake-modules and
+in the bease-header subsystem:
+* Compiler version detection is implemented twice
+* Not all defines provided in the cmake-generated feast_config and base-headers
+are unique.
+
+Reporter's note: Let's try to build up a critical mass of code first, and then
+sync up the implementation as soon as we have a clearer idea which of our
+global defines are needed at which stage in the toolchain process.
+
+SOLUTION
