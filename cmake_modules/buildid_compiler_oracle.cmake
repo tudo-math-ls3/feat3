@@ -109,7 +109,8 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
     # compat=5 is "according to the ANSI/ISO 1998 C++ standard as corrected in 2003"
     # which seems closest to chat we want
     # -verbose=template might be useful occasionally
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -compat=5 -erroff=%none -g")
+    # -xport64=full enables additional 32-64 bit warnings
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -compat=5 -erroff=%none -g -xport64=full")
 
   else ()
     # optimised settings for all currently supported archs
