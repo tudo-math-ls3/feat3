@@ -121,14 +121,16 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
 
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++0x -Wall -g")
+    # TODO: figure out how to set explicit 64-bit mode in this case
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++0x -Wall -g -Wp64 -mcmodel=large -Wshorten-64-to-32")
 
   else ()
     # optimised settings for all currently supported archs
     # please try to maintain the same order as in the buildid_arch module
     # Note: SSE2 is on by default, so we only have to specify what's better
     #       or worse
-    set (FEAST_CXX_FLAGS_INTERNAL "-O3")
+    # Note: 64 bit is enabled automatically by passing -xBLA
+    set (FEAST_CXX_FLAGS_INTERNAL "-O3 -mcmodel=large")
 
     # please try to maintain the same order as in the buildid_arch module
     # Intel CPUs
