@@ -86,6 +86,20 @@ message (STATUS "##############################################################"
 # if compiler flags are not passed externally, determine our own
 if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
 
+  # ensure that OS is 64-bit
+  if ( (CMAKE_SYSTEM_NAME STREQUAL "Linux") )
+    exec_program("uname -m" OUTPUT_VARIABLE UNAME_OUTPUT)
+    if (NOT UNAME_OUTPUT STREQUAL "x86_64")
+      message (STATUS "##############################################################")
+      message (STATUS "Only 64-bit operating systems are supported by default.       ")
+      message (STATUS "You might want to switch to manual mode.                       ")
+      message (STATUS "##############################################################")
+      message (FATAL_ERROR "")
+    endif ()
+   else ()
+     message (STATUS "TODO: Implement 64-bit OS detection for Non-Linux systems.")
+  endif ()
+
   # generic settings independent of arch and optimisation level
   set (FEAST_CXX_FLAGS_INTERNAL "")
 
