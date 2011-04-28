@@ -98,6 +98,7 @@ if (NOT DISPLAY_HELP_ONLY)
   elseif (FEAST_BUILD_MODE_NAME STREQUAL "opt")
     set (CMAKE_CXX_FLAGS_RELEASE "${FEAST_CXX_FLAGS_INTERNAL}")
   elseif (FEAST_BUILD_MODE_NAME STREQUAL "relwithdebinfo")
+    # TODO This should really be done inside the compiler-specific module
     set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -g")
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${FEAST_CXX_FLAGS_INTERNAL}")
   endif ()
