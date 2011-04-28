@@ -73,11 +73,39 @@ namespace FEAST
     */
     unsigned char* _group_contains_extra_coord;
 
-    /// array for defining the rank partitioning
+    /// array defining the rank partitioning of ext. work groups
     int** _ext_work_group_ranks;
 
     /// array of Graphs representing the connectivity of work group processes
     Graph** _graphs;
+
+    /// number of interlevel groups
+    unsigned int _num_interlevel_groups;
+
+    /**
+    * \brief array of number of processes in each interlevel group
+    *
+    * Dimension: [#_num_interlevel_groups]
+    */
+    unsigned int* _num_proc_in_interlevel_group;
+
+    /**
+    * \brief array of positions of the root rank within the array _interlevel_group_ranks per interlevel group
+    *
+    * Dimension: [#_num_interlevel_groups]
+    *
+    * COMMENT_HILMAR: Maybe one could also store the rank of the root *always* in the first position of the array
+    *   _interlevel_group_ranks and omit this extra array here... but I'm not sure if this is always possible.
+    *   Furthermore, it would be more error-prone since one has to know that the root has to be at the first position.
+    */
+    unsigned int* _pos_of_root_in_interlevel_group;
+
+    /**
+    * \brief 2-dim. array of process group ranks building the interlevel groups
+    *
+    * Dimension: [#_num_interlevel_groups][#_num_proc_in_interlevel_group[\a group_id]]
+    */
+    int** _interlevel_group_ranks;
 
     /**
     * \brief array of flags whether graph has been created in this class
@@ -109,6 +137,10 @@ namespace FEAST
         _group_contains_extra_coord(nullptr),
         _ext_work_group_ranks(nullptr),
         _graphs(nullptr),
+        _num_interlevel_groups(0),
+        _num_proc_in_interlevel_group(nullptr),
+        _pos_of_root_in_interlevel_group(nullptr),
+        _interlevel_group_ranks(nullptr),
         _graph_has_been_created_here(nullptr)
     {
     }
@@ -129,7 +161,14 @@ namespace FEAST
         delete [] _graph_has_been_created_here;
         delete [] _graphs;
       }
+
+      // Although created here, all arrays related to work groups and interlevel groups are not delete here, but
+      // within the DTOR of class ManagerComp. The reason is that within the ManagerComp class these arrays have to
+      // be deleted anyway on the non-coordinator processes. To avoid code duplication we delete the arrays on the
+      // coordinator process (which point to the same arrays as the arrays in the LoadBalancer class) also in the DTOR
+      // of ManagerComp class.
     }
+
     /* ******************
     * getters & setters *
     ********************/
@@ -200,6 +239,55 @@ namespace FEAST
       return _graphs;
     }
 
+
+    /**
+    * \brief getter for the number of interlevel groups
+    *
+    * \return number of interlevel groups
+    */
+    inline unsigned int num_interlevel_groups() const
+    {
+      CONTEXT("LoadBalancer::num_interlevel_groups()");
+      return _num_interlevel_groups;
+    }
+
+
+    /**
+    * \brief getter for the array of number of processes per interlevel group
+    *
+    * \return pointer to array of number of processes per interlevel group
+    */
+    inline unsigned int* num_proc_in_interlevel_group() const
+    {
+      CONTEXT("LoadBalancer::num_proc_in_interlevel_group()");
+      return _num_proc_in_interlevel_group;
+    }
+
+
+    /**
+    * \brief getter for the array of position of root rank per interlevel group
+    *
+    * \return pointer to array of position of root rank per interlevel group
+    */
+    inline unsigned int* pos_of_root_in_interlevel_group() const
+    {
+      CONTEXT("LoadBalancer::pos_of_root_in_interlevel_group()");
+      return _pos_of_root_in_interlevel_group;
+    }
+
+
+    /**
+    * \brief getter for the 2D array of interlevel group ranks
+    *
+    * \return 2D array of interlevel group ranks
+    */
+    inline int** interlevel_group_ranks() const
+    {
+      CONTEXT("LoadBalancer::interlevel_group_ranks()");
+      return _interlevel_group_ranks;
+    }
+
+
     /* *****************
     * member functions *
     *******************/
@@ -212,19 +300,39 @@ namespace FEAST
     * balancer has to apply clever strategies to create these work groups automatically so that the user doesn't have
     * to do anything.
     *
+    * The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
+    * Furthermore, two extra processes are required for testing the creation of a second work group.
+    * Later, this has to be all done in some auto-magically way.
+    *
+    * In this dummy test example you can imagine we have something like the following situation:
+    \verbatim
+    -----------------        -----------------
+    |               |        |12 |13 |14 |15 |
+    |      1        |        |---+---+---+---|
+    |               |        | 8 | 9 |10 |11 |
+    |---------------|        |---+---+---+---|
+    |               |        | 4 | 5 | 6 | 7 |
+    |      0        |        |---+---+---+---|
+    |               |        | 0 | 1 | 2 | 3 |
+    -----------------        -----------------
+    coarse grid (CG)          fine grid (FG)
+        2 CGMPs                  16 PPs
+    \endverbatim
+    * The fine grid problem consists of 16 process patches (here PP = BMC) and is solved by n (in the figure n=16)
+    * processes, i.e., the fine grid work group contains n=16 processes. The coarse grid problem consists of
+    * 2 coarse grid matrix patches (CGMP) and is solved by 2 processes, i.e., the coarse grid work group contains
+    * 2 processes.
+    *
     * To optimise the communication between the coordinator of the main process group and the work groups, we add
     * this coordinator to a work group if it is not a compute process of this work group anyway. Hence, for each work
     * group, there are two possibilities:
-    * 1) The coordinator of the main process group ...
-    *   a) ... is not part of the work group:
+    * The coordinator of the main process group is...
+    *   1) ... not part of the work group:
     *     --> work group adds the coordinator as extra process
-    *   b) ... is part of the work group:
+    *   2) ... is part of the work group:
     *     --> work group does not have to add the coordinator
-    *
-    * The following test code is semi hard-wired in the sense that we schedule one BMC to each processor.
-    * Furthermore, two extra processes are required for testing the creation of a second work group and the use
-    * of a dedicated load balancing process.
-    * Later, this has to be all done in some auto-magically way.
+    * The work group plus the coordinator process is called 'extended work group'. In the case the coordinator is part
+    * of the work group anyway, the extended work group and the actual work group are equal.
     *
     * Depending on whether a dedicated load balancer is used or not, two different tests are performed (where n is the
     * number of base mesh cells):
@@ -239,7 +347,18 @@ namespace FEAST
     *    - work group for fine grid: n processes: {2, ..., n+1}
     *    - i.e. the two work groups are disjunct
     *    - coordinator process: 0
-    * Both tests need n+2 processes in total.
+    * This distinction is done only to be able to run both tests with n+2 processes in total. There is of course no
+    * relation between overlapping of work groups on the one hand and use of a dedicated load balancer on the other
+    * hand.
+    *
+    * We need two interlevel groups which connects each of the 2 processes in the coarse grid level work group to
+    * 8 processes, resp., of the fine level work group. In the example above, the process dealing with CGMP 0 (1) builds
+    * a interlevel group with the processes dealing with PPs 0-7 (8-15).
+    *
+    * COMMENT_HILMAR: We assume here that each process receives exactly one BMC and that the index of the cell in the
+    *   graph structure equals the local rank within the work group. Later, there will be the matrix patch layer and
+    *   the process patch layer, which both have their own connectivity structure. Here, we then actually need the
+    *   connectivity graph of the process patch layer and a mapping between process patch index and work group ranks.
     *
     * \warning If this dummy function is removed / changed, also remove the deletion of _graphs[0] in the DTOR
     */
@@ -249,11 +368,16 @@ namespace FEAST
 
       // set number of ext. work groups manually to 2
       _num_work_groups = 2;
+      // set number of interlevel groups manually to 2
+      _num_interlevel_groups = 2;
       // allocate arrays
       _num_proc_in_ext_work_group = new unsigned int[_num_work_groups];
       _group_contains_extra_coord = new unsigned char[_num_work_groups];
       _ext_work_group_ranks = new int*[_num_work_groups];
       _graphs = new Graph*[_num_work_groups];
+      _interlevel_group_ranks = new int*[_num_interlevel_groups];
+      _num_proc_in_interlevel_group = new unsigned int[_num_interlevel_groups];
+      _pos_of_root_in_interlevel_group = new unsigned int[_num_interlevel_groups];
 
       // shortcut to the number of processes in the manager's process group
       unsigned int num_processes = _process_group->num_processes();
@@ -289,6 +413,7 @@ namespace FEAST
         _num_proc_in_ext_work_group[1] = num_cells + 1;
 
         // partition the process group ranks into work groups
+
         // coarse grid work group
         _ext_work_group_ranks[0] = new int[_num_proc_in_ext_work_group[0]];
         _ext_work_group_ranks[0][0] = 0;
@@ -296,11 +421,45 @@ namespace FEAST
 
         // fine grid work group
         _ext_work_group_ranks[1] = new int[_num_proc_in_ext_work_group[1]];
-        // set entries to {0,1, ..., n}
+        // set entries to {0, 1, ..., n}
         for(unsigned int i(0) ; i < _num_proc_in_ext_work_group[1] ; ++i)
         {
           _ext_work_group_ranks[1][i] = i;
         }
+
+        // set number of processes per interlevel group: one for the coarse grid process and half of the fine grid
+        // processes (if num_cells is odd, then the first interlevel group contains one process less than the second
+        // interlevel group)
+        _num_proc_in_interlevel_group[0] = 1 + num_cells/2;
+        _num_proc_in_interlevel_group[1] = 1 + num_cells - num_cells/2;
+
+        // set ranks for the interlevel work groups
+
+        // first interlevel group connecting 0 and 1, ..., n/2
+        _interlevel_group_ranks[0] = new int[_num_proc_in_interlevel_group[0]];
+        // root of the interlevel group = coarse grid process
+        _interlevel_group_ranks[0][0] = _ext_work_group_ranks[0][0];
+        _pos_of_root_in_interlevel_group[0] = 0;
+        // set entries to {1, 2, ..., n/2} (omit _ext_work_group_ranks[1][0] = 0 since this is only the extra
+        // coordinator process and not a compute process)
+        for(unsigned int i(1) ; i < _num_proc_in_interlevel_group[0] ; ++i)
+        {
+          _interlevel_group_ranks[0][i] = _ext_work_group_ranks[1][i];
+        }
+
+        // second interlevel group connecting 1 and n/2 + 1, ..., n
+        _interlevel_group_ranks[1] = new int[_num_proc_in_interlevel_group[1]];
+        // root of the interlevel group = coarse grid process = _ext_work_group_ranks[0][1] = 1
+        _interlevel_group_ranks[1][0] = _ext_work_group_ranks[0][1];
+        _pos_of_root_in_interlevel_group[1] = 0;
+        // set entries to {n/2 + 1, ..., n}
+        for(unsigned int i(1) ; i < _num_proc_in_interlevel_group[1] ; ++i)
+        {
+          _interlevel_group_ranks[1][i] = _ext_work_group_ranks[1][i + _num_proc_in_interlevel_group[0] - 1];
+        }
+        // COMMENT_HILMAR: Note that process with rank 1 is in both interlevel groups! This is not optimal (since
+        //   when communication within the two groups is started simultaneously, they have to wait on each other), but
+        //   it should work (i.e., MPI should be able to deal with this situation automatically without deadlocking).
       }
       else
       {
@@ -331,6 +490,37 @@ namespace FEAST
         {
           _ext_work_group_ranks[1][i] = i+1;
         }
+
+        // set number of processes per interlevel group: one for the coarse grid process and half of the fine grid
+        // processes (if num_cells is odd, then the first interlevel group contains one process less than the second
+        // interlevel group)
+        _num_proc_in_interlevel_group[0] = 1 + num_cells/2;
+        _num_proc_in_interlevel_group[1] = 1 + num_cells - num_cells/2;
+
+        // set ranks for the interlevel work groups
+
+        // first interlevel group connecting 0 and 2, ..., n/2 + 1
+        _interlevel_group_ranks[0] = new int[_num_proc_in_interlevel_group[0]];
+        // root of the interlevel group = coarse grid process
+        _interlevel_group_ranks[0][0] = _ext_work_group_ranks[0][0];
+        _pos_of_root_in_interlevel_group[0] = 0;
+        // set entries to {2, ..., n/2 + 1} (omit _ext_work_group_ranks[1][0] = 0 since this is only the extra
+        // coordinator process and not a compute process)
+        for(unsigned int i(1) ; i < _num_proc_in_interlevel_group[0] ; ++i)
+        {
+          _interlevel_group_ranks[0][i] = _ext_work_group_ranks[1][i];
+        }
+
+        // second interlevel group connecting 1 and n/2 + 2, ..., n + 1
+        _interlevel_group_ranks[1] = new int[_num_proc_in_interlevel_group[1]];
+        // root of the interlevel group = coarse grid process
+        _interlevel_group_ranks[1][0] = _ext_work_group_ranks[0][1];
+        _pos_of_root_in_interlevel_group[1] = 0;
+        // set entries to {n/2 + 2, ..., n + 1}
+        for(unsigned int i(1) ; i < _num_proc_in_interlevel_group[1] ; ++i)
+        {
+          _interlevel_group_ranks[1][i] = _ext_work_group_ranks[1][i + _num_proc_in_interlevel_group[0] - 1];
+        }
       }
 
       /* *********************************************************
@@ -358,19 +548,14 @@ namespace FEAST
       _graph_has_been_created_here = new bool[_num_work_groups];
       _graph_has_been_created_here[0] = true;
       _graph_has_been_created_here[1] = false;
-
-// COMMENT_HILMAR:
-// We assume here that each process receives exactly one BMC and that the index of the cell in the graph structure
-// equals the local rank within the work group. Later, there will be the matrix patch layer and the process patch
-// layer, which both have their own connectivity structure. Here, we then actually need the connectivity graph of
-// the process patch layer.
     }
 
 
     /**
     * \brief second dummy test function in preparation of a function for defining work groups
     *
-    * Same as above, but only one work group consisting of all processes of the compute process group is created.
+    * Same as above, but only one work group consisting of all processes of the compute process group and no
+    * interlevel group are created.
     */
     void define_work_groups_1()
     {
@@ -378,6 +563,10 @@ namespace FEAST
 
       // set number of ext. work groups manually to 1
       _num_work_groups = 1;
+
+      // set number of interlevel groups manually to 0
+      _num_interlevel_groups = 0;
+
       // allocate arrays
       _num_proc_in_ext_work_group = new unsigned int[_num_work_groups];
       _group_contains_extra_coord = new unsigned char[_num_work_groups];

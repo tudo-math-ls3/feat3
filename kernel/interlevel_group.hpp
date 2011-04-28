@@ -22,20 +22,22 @@ namespace FEAST
   *
   * Illustration of interlevel work group communication:
   *
-  *   ---------------        ---------------
-  *   |      |      |        |      |      |
-  *   |      |      |        |  E   |  F   |
-  *   |      |      |        |      |      |
-  *   |  A   |  B   |        ---------------
-  *   |      |      |        |      |      |
-  *   |      |      |        |  C   |  D   |
-  *   |      |      |        |      |      |
-  *   ---------------        ---------------
-  *   coarse grid (CG)       fine grid (FG)
+  \verbatim
+  ---------------        ---------------
+  |      |      |        |      |      |
+  |      |      |        |  E   |  F   |
+  |      |      |        |      |      |
+  |  A   |  B   |        ---------------
+  |      |      |        |      |      |
+  |      |      |        |  C   |  D   |
+  |      |      |        |      |      |
+  ---------------        ---------------
+  coarse grid (CG)       fine grid (FG)
+  \endverbatim
   *
   *   A - F = compute tasks, each performed on one process
   *
-  *   coarse grid work group: A,B
+  *   coarse grid work group: A, B
   *   fine grid work group: C, D, E, F
   *
   *   necessary data exchange for restriction and prolongation:   A <-> (C|E),     B <-> (D|F)
@@ -96,13 +98,26 @@ namespace FEAST
   * COMMENT_HILMAR: Or maybe it will? Collective routines can also send data to itself... let's see what is more
   *   appropriate...
   *
+  * COMMENT_HILMAR: Imagine the following modification of the example above:
+  *       processes:  0   1   2   3   4
+  *   CG work group:  A   B
+  *   FG work group:  D       C   E   F
+  * i.e., A and D are on the same process, but they don't have talk to each other in interlevel communication. Then
+  * the two interlevel groups are given by:
+  *   communicator 1:  0 (CG-WG), 2, 3 (FG-WG)
+  *   communicator 2:  1 (CG-WG), 0, 4 (FG-WG)
+  * i.e., they are not disjunct (process 0 appears in both). As far as I understand MPI, it should not be a problem to
+  * start communication in both groups simultaneously: As long as the first 'blocks' process 0, the second has to
+  * wait. Of course, this is not efficient, since the communications have to wait on each other. Hence, it is advisable
+  * to create disjunct interlevel groups when possible.
+  *
   * \note When realising the n-layer-ScaRC concept, we will probably need another sort of inter work group
   * communication. Imagine a unitsquare consisting of 4x4 BMCs and a 3-layer-ScaRC scheme.
   *   Layer 1: global MG, acting on all 16 BMCs, one work group consisting of 16 processes
   *   Layer 2: four MGs acting on 2x2 BMCs each, four work groups consisting of 4 processes each
   *   Layer 3: 16 local MGs acting on 1 BMC each
   * The four work groups on layer 2 have to communicate with each other over their common boundary. For this, other
-  * communication patterns are needed than for the inter level communication considered here.
+  * communication patterns are needed than for the interlevel communication considered here.
   */
   class InterlevelGroup
     : public ProcessGroup
@@ -110,26 +125,141 @@ namespace FEAST
 
   private:
     /**
-    * \brief rank of the root process for all MPI routines
+    * \brief rank of the root process (w.r.t. to the InterlevelGroup's communicator) for collective MPI routines
     *
-    * rank of the process from the coarser grid level work group which is the
+    * The root process is always the process from the coarser grid level work group.
     */
-    int _root;
+    int _rank_root;
 
 //    ...
 
   public:
-    InterlevelGroup(...)
+
+    /* *************************
+    * constructor & destructor *
+    ***************************/
+    /**
+    * \brief CTOR
+    *
+    * \param[in] comm
+    * communicator shared by the group processes
+    *
+    * \param[in] group_id
+    * ID of this group
+    *
+    * \param[in] rank_root
+    * rank of the root process for collective MPI routines
+    *
+    */
+    InterlevelGroup(
+      MPI_Comm comm,
+      unsigned int const group_id,
+      int rank_root)
+      : ProcessGroup(comm, group_id),
+        _rank_root(rank_root)
     {
 //      ...
+
     }
 
     ~InterlevelGroup()
     {
-//      ...
     }
 
-//    ...
+    /* *****************
+    * member functions *
+    *******************/
+    /**
+    * \brief checks whether this process is the root of the interlevel group
+    *
+    * \return true if this process is the root of the interlevel group, otherwise false
+    */
+    inline bool is_root() const
+    {
+      CONTEXT("InterlevelGroup::is_root()");
+      return _rank == _rank_root;
+    }
+
+
+    /**
+    * \brief dummy function for testing communication within the interlevel group
+    *
+    * The function simply performs a gather operation, where the root process gathers integers from the non-root
+    * processes.
+    *
+    * COMMENT_HILMAR: Actually, I intended to make this function private and declare the functions
+    *     ManagerCompCoord<space_dim_, world_dim_>::_test_communication()
+    *   and
+    *     ManagerCompNonCoord<space_dim_, world_dim_>::_test_communication()
+    *   as friends. But since the InterlevelGroup class doesn't know the template parameters space_dim_ and world_dim_,
+    *   this is not possible. Maybe there is a way to realise it, but I didn't have the time to find out how.
+    *
+    * \return flag whether test was succesful (0: succesful, >0: failed)
+    */
+    bool test_communication()
+    {
+      CONTEXT("InterlevelGroup::test_communication()");
+
+      // the value to be gathered is the world rank of this process
+      int world_rank = Process::rank;
+
+      if(!is_root())
+      {
+        // non-root process
+
+        // debug output
+        Logger::log("Interlevel group " + stringify(_group_id) + ": Process " + stringify(_rank)
+                     + " sends its world rank " + stringify(Process::rank) + " to the root process.\n");
+        // non-root process sends it world rank to the root
+        MPI_Gather(&world_rank, 1, MPI_INTEGER, nullptr, 0, MPI_DATATYPE_NULL, _rank_root, _comm);
+
+        // additionally perform a reduce operation (sum up all world ranks)
+        MPI_Reduce(&world_rank, nullptr, 1, MPI_INTEGER, MPI_SUM, _rank_root, _comm);
+
+        // on non-root side there is nothing to check, so simply return 0 (test successful)
+        return 0;
+      }
+      else
+      {
+        // root process
+
+        // array on the root process for collecting the data from the other processes
+        int* recv_ranks = new int[num_processes()];
+
+        // root process collects all world ranks from the non-roots
+        MPI_Gather(&world_rank, 1, MPI_INTEGER, recv_ranks, 1, MPI_INTEGER, _rank_root, _comm);
+
+        // debugging output
+        std::string s(stringify(recv_ranks[0]));
+        int sum(recv_ranks[0]);
+        for(unsigned int i(1) ; i < num_processes(); ++i)
+        {
+          s += " " + stringify(recv_ranks[i]);
+          sum += recv_ranks[i];
+        }
+
+        int sum_reduce;
+        // additionally perform a reduce operation (sum up all world ranks)
+        MPI_Reduce(&world_rank, &sum_reduce, 1, MPI_INTEGER, MPI_SUM, _rank_root, _comm);
+
+        Logger::log("Interlevel group " + stringify(_group_id) + ": Root process " + stringify(_rank)
+                    + " gathered world ranks " + s + ", summing up to " + stringify(sum_reduce) + "\n");
+        delete [] recv_ranks;
+
+        // We cannot really do a clever check here, so we simply check wether sums are equal.
+        // (The general problem is: When there is something wrong with the communication, then usually MPI
+        // crashes completely. On the other hand, when communication is fine then usually correct values are sent.
+        // So, it is very unlikely that communication works *AND* this test here returns false.)
+        if(sum_reduce == sum)
+        {
+          return 0;
+        }
+        else
+        {
+          return 1;
+        }
+      }
+    } // test_communication()
   };
 } // namespace FEAST
 

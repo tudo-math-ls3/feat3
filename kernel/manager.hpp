@@ -476,6 +476,7 @@ namespace FEAST
       }
       else
       {
+        // otherwise, the compute group equals the main group
         _process_group_comp = _process_group_main;
       }
 
@@ -714,6 +715,7 @@ namespace FEAST
     }
 
 
+    /// calls corresponding function in compute manager (coordinator and non-coordinators)
     void create_work_groups()
     {
       if(_manager_comp_coord != nullptr)
@@ -721,21 +723,62 @@ namespace FEAST
         // Now let the manager create the work groups. Deallocation of arrays (except the graph array) and destruction
         // of objects is done within the manager class. This function also has to be called on the non-coordinator
         // processes of the process group.
-        _manager_comp_coord->create_work_groups();
+        _manager_comp_coord->_create_work_groups();
 
         // now let the manager send local parts of the global graphs to the worker processes
-        _manager_comp_coord->transfer_graphs_to_workers(_load_balancer->graphs());
+        _manager_comp_coord->_transfer_graphs_to_workers(_load_balancer->graphs());
       }
       else if(_manager_comp_non_coord != nullptr)
       {
         // The non-coordinator processes also have to call the function for creating work groups. They receive the
         // necessary data from the coordinator.
-        _manager_comp_non_coord->create_work_groups();
+        _manager_comp_non_coord->_create_work_groups();
 
         // let the non-coordinator processes receive the local parts of the global graphs
-        _manager_comp_non_coord->receive_and_set_graphs();
+        _manager_comp_non_coord->_receive_and_set_graphs();
       }
     }
+
+
+    /**
+    * \brief dummy function for testing work group and interlevel group communication
+    *
+    * Calls corresponding function in compute manager (coordinator and non-coordinators).
+    *
+    * \return flag whether test was succesful (0: succesful, >0: failed)
+    */
+    unsigned int test_communication()
+    {
+      unsigned int test_result;
+      CONTEXT("Manager::test_communication()");
+      if(_manager_comp_coord != nullptr)
+      {
+        test_result = _manager_comp_coord->_test_communication();
+      }
+      else if(_manager_comp_non_coord != nullptr)
+      {
+        test_result = _manager_comp_non_coord->_test_communication();
+      }
+      else
+      {
+        // for the dedicated load balancing process, there is no senseful test (yet), to we simply return
+        // the flag whether the group has a dedicated balancer (which should be true)
+        if(_group_has_dedicated_load_bal)
+        {
+          test_result = 0;
+        }
+        else
+        {
+          test_result = 1;
+        }
+      }
+
+      // Determine the maximum over the test results of all processes. Rationale: When one process failed, the whole
+      // test should be considered as failed. So, let all processes return the same values.
+      unsigned int test_result_max;
+      MPI_Allreduce(&test_result, &test_result_max, 1, MPI_UNSIGNED, MPI_MAX, _process_group_main->comm());
+      return test_result_max;
+    } // test_communication
   };
 } // namespace FEAST
 

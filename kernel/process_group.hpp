@@ -324,13 +324,6 @@ namespace FEAST
         // non-const send buffer.)
         MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, nullptr, nullptr, nullptr,
                     MPI_DATATYPE_NULL, _rank_coord, _comm);
-// COMMENT_HILMAR: not sure, if it is actually legitimate to simply cast the const away or if one has to manually copy
-// the string like this:
-//    char bla[length];
-//    strcpy(bla, message.c_str());
-//    MPI_Gatherv(bla, length, MPI_CHAR, nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, _rank_coord, _comm);
-// With gcc 4.4.0 and intel 11.1 it works for tiny test problems. (If the function call is changed, then also
-// change the call on coordinator side some lines below.)
       }
       else
       {

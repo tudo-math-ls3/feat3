@@ -116,13 +116,15 @@ int main(int argc, char* argv[])
       // let the manager read the mesh file and create a base mesh (this is only done by the coordinator process)
       manager->read_mesh(mesh_file);
 
-      // let the load balancer define the work groups (currently hard-coded)
+      // let the load balancer define the work groups and interlevel groups (currently hard-coded)
       manager->define_work_groups_2();
 
-      // Now let the manager create the work groups. Deallocation of arrays (except the graph array) and destruction
-      // of objects is done within the manager class. This function also has to be called on the non-coordinator
-      // processes of the process group.
+      // let the manager create the work groups and interlevel groups
       manager->create_work_groups();
+
+      // perform a hard-coded test checking whether work group and interlevel group communication works
+      unsigned int test_result = manager->test_communication();
+      Logger::log("Process " + stringify(Process::rank) + ": Test ok? " + stringify(test_result == 0) + "\n");
 
       // let some process test the PrettyPrinter, the vector version of the function log_master_array() and the
       // standard file logging functions

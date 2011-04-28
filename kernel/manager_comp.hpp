@@ -16,6 +16,7 @@
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
 #include <kernel/work_group_ext.hpp>
+#include <kernel/interlevel_group.hpp>
 
 /// FEAST namespace
 namespace FEAST
@@ -77,48 +78,64 @@ namespace FEAST
     int** _ext_work_group_ranks;
 
     /**
-    * \brief boolean array indicating to which work groups this process belongs
+    * \brief boolean array indicating to which (ext.) work groups this process belongs
     *
     * Dimension: [#_num_work_groups]
     */
-    bool* _belongs_to_group;
+    bool* _belongs_to_work_group;
 
-
-    /// number of inter level groups
-    unsigned int _num_inter_level_groups;
-
-    /**
-    * \brief array of number of workers in each inter level group
-    *
-    * Dimension: [#_num_inter_level_groups]
-    */
-    unsigned int* _num_proc_in_inter_level_group;
+    /// number of interlevel groups
+    unsigned int _num_interlevel_groups;
 
     /**
-    * \brief 2-dim. array of process group ranks building the inter level groups
+    * \brief array of number of processes in each interlevel group
     *
-    * Dimension: [#_num_inter_level_groups][#_num_proc_in_inter_level_group[\a group_id]]
+    * Dimension: [#_num_interlevel_groups]
     */
-    int** _inter_level_group_ranks;
+    unsigned int* _num_proc_in_interlevel_group;
+
+    /**
+    * \brief array of positions of the root rank within the array _interlevel_group_ranks per interlevel group
+    *
+    * Dimension: [#_num_interlevel_groups]
+    */
+    unsigned int* _pos_of_root_in_interlevel_group;
+
+    /**
+    * \brief 2-dim. array of process group ranks building the interlevel groups
+    *
+    * Dimension: [#_num_interlevel_groups][#_num_proc_in_interlevel_group[\a group_id]]
+    */
+    int** _interlevel_group_ranks;
+
+    /**
+    * \brief boolean array indicating to which interlevel group this process belongs
+    *
+    * Dimension: [#_num_interlevel_groups]
+    */
+    bool* _belongs_to_interlevel_group;
+
+    /// vector of interlevel groups the manager manages
+    std::vector<InterlevelGroup*> _interlevel_groups;
 
     /* *****************
     * member functions *
     *******************/
     /**
-    * \brief function that sets up (extended) work groups basing on the provided information
+    * \brief sets up (extended) work groups and interlevel groups basing on the provided information
     *
-    * This function is called on all processes of the process group.
+    * This function is called on all processes of the compute process group.
     *
     * \author Hilmar Wobker
     */
-    void _create_work_groups()
+    void _create_work_groups_common()
     {
-      CONTEXT("ManagerComp::_create_work_groups()");
+      CONTEXT("ManagerComp::_create_work_groups_common()");
 
-      /* *************************************************************************
-      * send the 2D array _ext_work_group_ranks to the non-coordinator processes *
-      * using a self-defined MPI datatype                                        *
-      ***************************************************************************/
+      /* ************************************************************************
+      * send the 2D arrays _ext_work_group_ranks and _interlevel_group_ranks to *
+      * the non-coordinator processes using a self-defined MPI datatype         *
+      **************************************************************************/
 
       // get base address
       MPI_Aint base;
@@ -147,21 +164,49 @@ namespace FEAST
       delete [] displacements;
 
 
+      if(_num_interlevel_groups > 0)
+      {
+        // now _interlevel_group_ranks
+        MPI_Get_address(_interlevel_group_ranks, &base);
+
+        // calculate offsets of the subarray addresses w.r.t. base adress
+        displacements = new MPI_Aint[_num_interlevel_groups];
+        for (unsigned int i(0) ; i < _num_interlevel_groups ; ++i)
+        {
+          MPI_Get_address(_interlevel_group_ranks[i], &displacements[i]);
+          displacements[i] -= base;
+        }
+
+        // create MPI datatype
+        MPI_Type_create_hindexed(_num_interlevel_groups, reinterpret_cast<int*>(_num_proc_in_interlevel_group),
+                                 displacements, MPI_INTEGER, &int_array_2d);
+        MPI_Type_commit(&int_array_2d);
+
+        // let the coordinator send the array to all non-coordinator processes
+        MPI_Bcast(_interlevel_group_ranks, 1, int_array_2d, _process_group->rank_coord(), _process_group->comm());
+
+        // free the datatype definition again
+        MPI_Type_free(&int_array_2d);
+        // delete offset array
+        delete [] displacements;
+      }
+
+
       /* ***********************************
       * now begin creating the work groups *
       *************************************/
 
       // boolean array indicating to which work groups this process belongs
-      _belongs_to_group = new bool[_num_work_groups];
+      _belongs_to_work_group = new bool[_num_work_groups];
       for(unsigned int igroup(0) ; igroup < _num_work_groups ; ++igroup)
       {
         // intialise with false
-        _belongs_to_group[igroup] = false;
+        _belongs_to_work_group[igroup] = false;
         for(unsigned int j(0) ; j < _num_proc_in_ext_work_group[igroup] ; ++j)
         {
           if(_process_group->rank() == _ext_work_group_ranks[igroup][j])
           {
-            _belongs_to_group[igroup] = true;
+            _belongs_to_work_group[igroup] = true;
           }
         }
       } // for(unsigned int igroup(0) ; igroup < _num_work_groups ; ++igroup)
@@ -174,25 +219,80 @@ namespace FEAST
       _work_groups.resize(_num_work_groups, nullptr);
       for(unsigned int igroup(0) ; igroup < _num_work_groups ; ++igroup)
       {
-        MPI_Group group_work;
-        MPI_Comm group_comm;
+        MPI_Group group;
+        MPI_Comm comm;
 
         int mpi_error_code = MPI_Group_incl(_process_group->group(), _num_proc_in_ext_work_group[igroup],
-                                            const_cast<int*>(_ext_work_group_ranks[igroup]), &group_work);
+                                            const_cast<int*>(_ext_work_group_ranks[igroup]), &group);
         validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
 
-        // Create the group communicator for, among others, collective operations.
+        // Create the group communicator.
         // It is essential that *all* processes of the process group participate.
-        mpi_error_code = MPI_Comm_create(_process_group->comm(), group_work, &group_comm);
+        mpi_error_code = MPI_Comm_create(_process_group->comm(), group, &comm);
         validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
 
-        if(belongs_to_group()[igroup])
+        if(belongs_to_work_group()[igroup])
         {
-          _work_groups[igroup] = new WorkGroupExt(group_comm, igroup, (bool)_group_contains_extra_coord[igroup],
+          _work_groups[igroup] = new WorkGroupExt(comm, igroup, (bool)_group_contains_extra_coord[igroup],
                                                   _process_group->is_coordinator());
         }
+        // free the group again
+        MPI_Group_free(&group);
       } // for(unsigned int igroup(0) ; igroup < _num_work_groups ; ++igroup)
-    } // _create_work_groups()
+
+
+      /* *****************************************
+      * now begin creating the interlevel groups *
+      *******************************************/
+
+      if(_num_interlevel_groups > 0)
+      {
+        // boolean array indicating to which interlevel groups this process belongs
+        _belongs_to_interlevel_group = new bool[_num_interlevel_groups];
+        for(unsigned int igroup(0) ; igroup < _num_interlevel_groups ; ++igroup)
+        {
+          // intialise with false
+          _belongs_to_interlevel_group[igroup] = false;
+          for(unsigned int j(0) ; j < _num_proc_in_interlevel_group[igroup] ; ++j)
+          {
+            if(_process_group->rank() == _interlevel_group_ranks[igroup][j])
+            {
+              _belongs_to_interlevel_group[igroup] = true;
+            }
+          }
+        } // for(unsigned int igroup(0) ; igroup < _num_interlevel_groups ; ++igroup)
+
+        // create InterlevelGroup objects including MPI groups and MPI communicators
+        // Since interlevel groups are also not necessariyl disjunct, we proceed as for the work groups.
+
+        _interlevel_groups.resize(_num_interlevel_groups, nullptr);
+        for(unsigned int igroup(0) ; igroup < _num_interlevel_groups ; ++igroup)
+        {
+          MPI_Group group;
+          MPI_Comm comm;
+
+          int mpi_error_code = MPI_Group_incl(_process_group->group(), _num_proc_in_interlevel_group[igroup],
+                                              const_cast<int*>(_interlevel_group_ranks[igroup]), &group);
+          validate_error_code_mpi(mpi_error_code, "MPI_Group_incl");
+
+          // Create the group communicator.
+          // It is essential that *all* processes of the process group participate.
+          mpi_error_code = MPI_Comm_create(_process_group->comm(), group, &comm);
+          validate_error_code_mpi(mpi_error_code, "MPI_Comm_create");
+
+          if(belongs_to_interlevel_group()[igroup])
+          {
+            // since MPI_Group_incl(...) arranges the processes in the same order as they appear in the array
+            // _interlevel_group_ranks[igroup], the local rank (w.r.t. to the newly created interlevel group) coincides
+            // with the position in the array _interlevel_group_ranks[igroup]. So, we can pass the value
+            // _pos_of_root_in_interlevel_group[igroup] as local root rank.
+            _interlevel_groups[igroup] = new InterlevelGroup(comm, igroup, _pos_of_root_in_interlevel_group[igroup]);
+          }
+          // free the group again
+          MPI_Group_free(&group);
+        } // for(unsigned int igroup(0) ; igroup < _num_interlevel_groups ; ++igroup)
+      } // if(_num_interlevel_groups > 0)
+    } // _create_work_groups_common()
 
 
   public:
@@ -208,7 +308,12 @@ namespace FEAST
         _num_proc_in_ext_work_group(nullptr),
         _group_contains_extra_coord(nullptr),
         _ext_work_group_ranks(nullptr),
-        _belongs_to_group(nullptr)
+        _belongs_to_work_group(nullptr),
+        _num_interlevel_groups(0),
+        _num_proc_in_interlevel_group(nullptr),
+        _pos_of_root_in_interlevel_group(nullptr),
+        _interlevel_group_ranks(nullptr),
+        _belongs_to_interlevel_group(nullptr)
     {
       CONTEXT("ManagerComp::ManagerComp()");
     }
@@ -217,6 +322,16 @@ namespace FEAST
     virtual ~ManagerComp()
     {
       CONTEXT("ManagerComp::~ManagerComp()");
+      if (_num_proc_in_ext_work_group != nullptr)
+      {
+        delete [] _num_proc_in_ext_work_group;
+      }
+
+      if (_group_contains_extra_coord != nullptr)
+      {
+        delete [] _group_contains_extra_coord;
+      }
+
       if (_ext_work_group_ranks != nullptr)
       {
         for(unsigned int igroup(0) ; igroup < _num_work_groups ; ++igroup)
@@ -227,10 +342,10 @@ namespace FEAST
         _ext_work_group_ranks = nullptr;
       }
 
-      if (_belongs_to_group != nullptr)
+      if (_belongs_to_work_group != nullptr)
       {
-        delete [] _belongs_to_group;
-        _belongs_to_group = nullptr;
+        delete [] _belongs_to_work_group;
+        _belongs_to_work_group = nullptr;
       }
 
       while (!_work_groups.empty())
@@ -241,14 +356,38 @@ namespace FEAST
         _work_groups.pop_back();
       }
 
-      if (_num_proc_in_ext_work_group != nullptr)
+      if (_num_proc_in_interlevel_group != nullptr)
       {
-        delete [] _num_proc_in_ext_work_group;
+        delete [] _num_proc_in_interlevel_group;
       }
 
-      if (_group_contains_extra_coord != nullptr)
+      if (_pos_of_root_in_interlevel_group != nullptr)
       {
-        delete [] _group_contains_extra_coord;
+        delete [] _pos_of_root_in_interlevel_group;
+      }
+
+      if (_interlevel_group_ranks != nullptr)
+      {
+        for(unsigned int igroup(0) ; igroup < _num_interlevel_groups ; ++igroup)
+        {
+          delete [] _interlevel_group_ranks[igroup];
+        }
+        delete [] _interlevel_group_ranks;
+        _interlevel_group_ranks = nullptr;
+      }
+
+      if (_belongs_to_interlevel_group != nullptr)
+      {
+        delete [] _belongs_to_interlevel_group;
+        _belongs_to_interlevel_group = nullptr;
+      }
+
+      while (!_interlevel_groups.empty())
+      {
+        // call the destructor of the last element in the vector
+        delete _interlevel_groups.back();
+        // delete the pointer from the vector
+        _interlevel_groups.pop_back();
       }
     }
 
@@ -261,18 +400,24 @@ namespace FEAST
     *
     * \return array indicating to which work groups this process belongs
     */
-    inline bool* belongs_to_group() const
+    inline bool* belongs_to_work_group() const
     {
-      CONTEXT("ManagerComp::belongs_to_group()");
-      return _belongs_to_group;
+      CONTEXT("ManagerComp::belongs_to_work_group()");
+      return _belongs_to_work_group;
     }
 
 
-
-    /* *****************
-    * member functions *
-    *******************/
-  };
+    /**
+    * \brief getter for the array indicating to which interlevel groups this process belongs
+    *
+    * \return array indicating to which interlevel groups this process belongs
+    */
+    inline bool* belongs_to_interlevel_group() const
+    {
+      CONTEXT("ManagerComp::belongs_to_interlevel_group()");
+      return _belongs_to_interlevel_group;
+    }
+  }; //ManagerComp
 } // namespace FEAST
 
 #endif // guard KERNEL_MANAGER_COMP_HPP

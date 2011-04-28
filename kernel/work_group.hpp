@@ -212,12 +212,25 @@ namespace FEAST
     /**
     * \brief dummy function for testing local neighbour communication via non-blocking sends/receives
     *
-    * The function simply performs an exchange of integer arrays between neighouring processes. The aim is to
+    * The function simply performs an exchange of integer arrays between neighbouring processes. The aim is to
     * demonstrate that this is quite easy when using non-blocking send and receive calls.
+    *
+    * COMMENT_HILMAR: Actually, I intended to make this function private and declare the functions
+    *     ManagerCompCoord<space_dim_, world_dim_>::_test_communication()
+    *   and
+    *     ManagerCompNonCoord<space_dim_, world_dim_>::_test_communication()
+    *   as friends. But since the WorkGroup class doesn't know the template parameters space_dim_ and world_dim_,
+    *   this is not possible. Maybe there is a way to realise it, but I didn't have the time to find out how.
+    *
+    * \return flag whether test was succesful (0: succesful, >0: failed)
     */
-    void do_exchange()
+    unsigned int test_communication()
     {
-      CONTEXT("WorkGroup::do_exchange()");
+      CONTEXT("WorkGroup::test_communication()");
+
+      // flag whether test is succesful
+      bool test_result = 0;
+
       // length of the integer arrays to be exchanged
       index_glob_t const n = 10;
 
@@ -251,8 +264,8 @@ namespace FEAST
         {
           s +=  " " + stringify(a[i][j]);
         }
-        Logger::log("Process " + stringify(_rank) + " sends [" + s + "] to neighbour "
-                    + stringify(neighbours[i]) + ".\n");
+        Logger::log("Work group " + stringify(_group_id) + ": Process " + stringify(_rank) + " sends [" + s
+                    + "] to neighbour " + stringify(neighbours[i]) + ".\n");
       }
 
       // request and status objects necessary for communication
@@ -260,14 +273,14 @@ namespace FEAST
       MPI_Status* statuses = new MPI_Status[num_neighbours];
 
       // post sends to all neighbours
-      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      for(index_glob_t i(0) ; i < num_neighbours; ++i)
       {
         MPI_Isend(a[i], n, MPI_UNSIGNED_LONG, neighbours[i], 0, _comm, &requests[i]);
         // request objects are not needed
         MPI_Request_free(&requests[i]);
       }
       // post receives from all neighbours
-      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      for(index_glob_t i(0) ; i < num_neighbours; ++i)
       {
         MPI_Irecv(a_recv[i], n, MPI_UNSIGNED_LONG, neighbours[i], 0, _comm, &requests[i]);
       }
@@ -277,15 +290,24 @@ namespace FEAST
       delete [] statuses;
 
       // debugging output
-      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      for(index_glob_t i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a_recv[i][0]);
-        for(unsigned int j(1) ; j < n; ++j)
+        for(index_glob_t j(1) ; j < n; ++j)
         {
           s += " " + stringify(a_recv[i][j]);
+          // We cannot really do a clever check here, so we simply check whether a_recv really contains the value we
+          // expect. (The general problem is: When there is something wrong with the communication, then usually MPI
+          // crashes completely. On the other hand, when communication is fine then usually correct values are sent.
+          // So, it is very unlikely that communication works *AND* this test here returns false.)
+          unsigned long expected_value = 100000*neighbours[i] + 100*_rank + j;
+          if(expected_value != a_recv[i][j])
+          {
+            test_result = 1;
+          }
         }
-        Logger::log("Process " + stringify(_rank) + " received [" + s + "] from neighbour "
-                    + stringify(neighbours[i]) + ".\n");
+        Logger::log("Work group " + stringify(_group_id) + ": Process " + stringify(_rank) + " received [" + s
+                    + "] from neighbour " + stringify(neighbours[i]) + ".\n");
       }
       for(unsigned int i(0) ; i < num_neighbours; ++i)
       {
@@ -294,7 +316,9 @@ namespace FEAST
       }
       delete [] a;
       delete [] a_recv;
-    } // do_exchange()
+
+      return test_result;
+    } // test_communication()
   };
 } // namespace FEAST
 

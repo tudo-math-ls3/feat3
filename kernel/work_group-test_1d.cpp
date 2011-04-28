@@ -78,16 +78,22 @@ public:
       // let the manager "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
       manager->read_mesh("dummy");
 
-      // let the load balancer define the work groups (currently hard-coded)
+      // let the load balancer define the work groups and interlevel groups (currently hard-coded)
       manager->define_work_groups_1();
 
-      // let the manager create the work groups
+      // let the manager create the work groups and interlevel groups
       manager->create_work_groups();
 
-// add some TEST_CHECK(...)
+      // perform a hard-coded test checking whether work group and interlevel group communication works
+      unsigned int test_result = manager->test_communication();
 
       // Everything done, call universe destruction routine.
       universe->destroy();
+
+      // check whether the test was succesful (Don't try to do this check *before* destruction of the universe! If
+      // the test failed (i.e., test_result > 0), then the program deadlocks.)
+      TEST_CHECK(test_result == 0);
+
     }
     else if(master != nullptr)
     {
