@@ -1,7 +1,6 @@
 NEWEST: 00036
 ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
 00010 |feature_request      |assigned    |markus |hilmar_markus     |high     |add_mp_and_pp_layers
-00011 |feature_request      |in_progress |markus |hilmar            |high     |implement_inter_workgroup_communication
 00012 |feature_request      |assigned    |markus |hilmar_dom        |high     |parsing_FPROP_and_FPART_meshfilesections
 00014 |feature_request      |assigned    |markus |hilmar_markus     |high     |user_controlled_mappings_bmc_mp_pp_wg
 00020 |feature_request      |assigned    |hilmar |markus            |high     |implement_subdivision_quad_tri_conform
@@ -36,6 +35,7 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00002 |feature_request      |resolved    |markus |dirk              |critical |build_system_essentials
 00007 |bug_report           |resolved    |markus |peter             |critical |test_system_is_error_prone
 00009 |optimisation_request |resolved    |markus |hilmar            |high     |better_distinction_of_lb_and_flowcontrol
+00011 |feature_request      |resolved    |markus |hilmar            |high     |implement_inter_workgroup_communication
 00019 |optimisation_request |resolved    |markus |dirk              |critical |enable_mpi_in_test_system
 00029 |optimisation_request |resolved    |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
 00033 |bug_report           |resolved    |hilmar |hilmar            |high     |log_comm_to_master_faulty_with_mpich

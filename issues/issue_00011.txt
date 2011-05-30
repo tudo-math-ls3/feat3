@@ -1,6 +1,6 @@
 ID           00011
 TYPE         feature_request
-STATUS       in_progress
+STATUS       resolved
 AUTHOR       markus
 ASSIGNED TO  hilmar
 SEVERITY     high
@@ -9,3 +9,6 @@ FULL TEXT
 Implementation of inter-workgroup communication is needed.
 
 SOLUTION
+Inter-workgroup communication is now called interlevel communication. Its
+basic features have been implemented. Further functionality has to implemented
+when actual load balancing & computation tasks are performed.
