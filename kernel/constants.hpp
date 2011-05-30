@@ -1,3 +1,10 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * We did not really decide yet, how we deal with global constants... so this file was intended to be the preliminary
+ * place where to collect global constants. Either continue using it, or move the constants already defined here to a
+ * more appropriate place.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_CONSTANTS_HPP
 #define KERNEL_CONSTANTS_HPP 1

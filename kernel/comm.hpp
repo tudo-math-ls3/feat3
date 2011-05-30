@@ -1,3 +1,17 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * This class provides auxiliary functions for buffered communication within MPI_COMM_WORLD. Its main intention was
+ * to free the programmer from writing all these complicated MPI_Pack/Unpack/Send/Recv routines, maintaining buffers
+ * and so on. Its currently only used for communication between the master and the rest for logging.
+ * However, for performance critical communications (like sending solution vectors or so), you shouldn't use
+ * this functionality here anyway, but you should build appropriate MPI_Datatypes instead. Furthermore, most
+ * communication in FEAST does not happen via MPI_COMM_WORLD, but via all those different process groups (work groups,
+ * interlevel groups, ...) So, maybe it makes sense to extend this class here to be able to deal with other
+ * communicators as well (if one decides that this way of communication via MPI_Pack/Unpack is needed there as well).
+ * But then one maybe should rather think about some better suited MPI-auxiliary class like what Thomas Rohkaemper
+ * thought about some months ago... (overloading the "<<" operator for writing to an MPI buffer and so on).
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_COMM_HPP
 #define KERNEL_COMM_HPP 1
@@ -18,7 +32,7 @@
 namespace FEAST
 {
   /**
-  * \brief class providing basic communication functions
+  * \brief provides basic communication functions
   *
   * \author Hilmar Wobker
   */

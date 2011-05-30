@@ -1,3 +1,11 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * This class is really just a rudimentary graph implementation which I needed for testing MPI stuff.
+ * As far as I remember Peter wants to take a closer look and merge it with his more sophisticated graph
+ * implementation. (Feel free to throw my implementation away completely, Peter!) Also see my comments
+ * below.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_GRAPH_HPP
 #define KERNEL_GRAPH_HPP 1

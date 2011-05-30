@@ -1,3 +1,12 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * This class is meant to provide auxiliary functionality for reacting on errors, exceptions and similar. "React" means:
+ * Processing status objects (which do not exist yet; see issue 00028), performing corresponding file/screen output,
+ * eventually aborting the program. Until now, I only realised some sort of "exception handler" (which simply
+ * performs pretty printing of the exception message and aborts the program). Maybe "ErrorHandler" is not the best
+ * name for the class, since it should also process warnings and exceptions... maybe you find a better name.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef UTIL_ERROR_HANDLER_HHP
 /// Header guard
@@ -42,13 +51,13 @@ namespace FEAST
 /*
 COMMENT_HILMAR: corresponding to the function exception_occured(...), there should be something like the following
 function:
-    /// function reacting to an error
-    static void exception_occured(int error_code, severity sev)
+    /// function reacting to error/warnings
+    static void error_occured(StatusObject status)
     {
-      // create pretty printed error message with the prefix EXCEPTION which can be grepped for
+      // create pretty printed error message with the prefix Error which can be grepped for
       PrettyPrinter pp(40, '#', "ERROR ");
       pp.add_line_sep();
-      if(sev == CRITICAL)
+      if(status.severity == CRITICAL)
       {
         pp.add_line_centered("Error occured on process " + stringify(Process::rank) + "!");
       }
@@ -57,7 +66,7 @@ function:
         pp.add_line_centered("Warning occured on process " + stringify(Process::rank) + "!");
       }
       pp.add_line_sep();
-      pp.add_line_no_right_delim(...); // here we need some mapping of error_code to corresponding error message
+      pp.add_line_no_right_delim(status.message);
       pp.add_line_sep();
       pp.print(Logger::file);
 
@@ -68,10 +77,6 @@ function:
         abort_mpi();
       }
     }
-
-Der error_code wäre dann der return value einer Funktion. error_code = 0 heisst typischerweise "kein Fehler".
-Die Frage ist, wie man ein geschicktes Mapping zwischen error_code und error_message hinbekommt.
-Einfach ein statisches String-Array mit error_code = array index?
 */
 
     /// function reacting to an exception
