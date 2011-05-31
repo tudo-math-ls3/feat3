@@ -11,6 +11,8 @@ Extend logger functionalities:
   * Introduce log levels and log categories. For example something like this:
     - log levels 0 (error), 1 (warning), ..., 4 (unimportant)
     - categories ASSEMBLY, SOLVER, LOADBALANCER, ...
-    - The user sets (via configuration file): I want to see only error messages about matrix assembly (ASSEMBLY 0), I want to see everything about the solving process (SOLVER 4), and the important messages of the load balancing process (LOADBALANCER 2)
+    - The user sets (via configuration file): I want to see only error messages about matrix assembly (ASSEMBLY 0), I want to see everything about the solving process (SOLVER 4), and the important messages of the load balancing process (LOADBALANCER 2). The number of categories should be kept small (<10), otherwise this system would hardly be usable.
+  * The article http://www10.informatik.uni-erlangen.de/Publications/TechnicalReports/TechRep10-1.pdf found by Dirk shows how log commands could be included in the code via clever preprocessor macros and switched off completely. Maybe, some ideas from this article can be used. (However, they only have log levels, no log categories.)
+  * Before the final logger can be implemented, the FEAT/FEAST/HONEY guys have to discuss what they actually expect from a logger and how it should be realised.
 
 SOLUTION

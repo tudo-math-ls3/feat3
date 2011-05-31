@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See issue_00023.txt and COMMENT_HILMAR in this file.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_LOGGER_HPP
 #define KERNEL_LOGGER_HPP 1

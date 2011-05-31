@@ -1,3 +1,18 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * In order to really start working on the load balancer, it is essential define some preliminary "statistics module"
+ * providing some "pseudo" data for matrix patches / process patches. I think it is not really necessary that the
+ * matrix patch / process patch stuff (issue00010) is already finished for that (although it would makes things
+ * clearer and easier...) For a start, it should be sufficient to "fake" some matrix patches and statistics. At the
+ * end the load balancer "only" needs a graph and node values...
+ * Until now I only implemented two semi-hard-coded pseudo tests which show what kind of data the load balancer has to
+ * prepare such that the manager can create work groups. These tests have of course nothing to do with real load
+ * balancing...
+ *
+ * Also see COMMENT_HILMAR throughout this file.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
+
 #pragma once
 #ifndef KERNEL_LOAD_BALANCER_HPP
 #define KERNEL_LOAD_BALANCER_HPP 1

@@ -1,3 +1,14 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * As we discussed in our last meeting, it is not clear yet how this dedicated load balancing process is to be
+ * integrated into the program. My idea was that only the (normal) load balancer "knows" this dedicated load balancer
+ * and provides it with special tasks... but maybe it turns out that this is not so clever... I really don't know
+ * since its not really clear to me, how these tasks exactly look like... (predicting and calculating some possible
+ * scenarios based on previous iterations during the actual computation and before the current data arrives...)
+ * So, Luis... this is your playground! Do whatever you like! :-)
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
+
 #pragma once
 #ifndef KERNEL_LOAD_BAL_DEDICATED_HPP
 #define KERNEL_LOAD_BAL_DEDICATED_HPP 1

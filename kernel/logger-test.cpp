@@ -1,4 +1,10 @@
-// includes, Feast
+/* GENERAL_REMARK_BY_HILMAR:
+ * See COMMENT_HILMAR in this file.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
+
+ // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
@@ -158,10 +164,13 @@ public:
         throw InternalError("group_id " + stringify(group_id) + " is not valid!");
       }
 
-// TODO: add some TEST_CHECK(...)
-
       // Everything done, call universe destruction routine.
       universe->destroy();
+
+      // COMMENT_HILMAR:
+      // It would be nice to have some TEST_CHECK(...) here... But it's hard to check whether some screen output
+      // appeared as expected. Concerning logfile output... maybe one could read the content of the file and compare
+      // it to what is expected to be in the file...
     }
     else if(master != nullptr)
     {
