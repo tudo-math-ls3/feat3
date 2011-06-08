@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See GENERAL_REMARK_BY_HILMAR in manager.hpp.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_MANAGER_COMP_HPP
 #define KERNEL_MANAGER_COMP_HPP 1
@@ -23,6 +28,8 @@ namespace FEAST
 {
   /**
   * \brief defines manager of a compute process group (super class of coordinator and non-coordinator versions)
+  *
+  * See the description of class Manager.
   *
   * \author Hilmar Wobker
   */

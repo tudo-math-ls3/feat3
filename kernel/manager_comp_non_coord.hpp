@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See GENERAL_REMARK_BY_HILMAR in manager.hpp.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERN_MANAG_COMP_NON_COORD_HPP
 #define KERN_MANAG_COMP_NON_COORD_HPP 1
@@ -27,6 +32,8 @@ namespace FEAST
 
   /**
   * \brief defines manager of a compute process group on non-coordinator processes
+  *
+  * See the description of class Manager.
   *
   * \author Hilmar Wobker
   */

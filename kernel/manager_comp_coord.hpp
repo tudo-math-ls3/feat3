@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See GENERAL_REMARK_BY_HILMAR in manager.hpp.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERN_MANAG_COMP_COORD_HPP
 #define KERN_MANAG_COMP_COORD_HPP 1
@@ -30,6 +35,8 @@ namespace FEAST
 
   /**
   * \brief defines manager of a compute process group on the coordinator process
+  *
+  * See the description of class Manager.
   *
   * \author Hilmar Wobker
   */
@@ -245,7 +252,7 @@ namespace FEAST
 
           // since the MPI routines used below expect integer arrays, we have to copy two index_glob_t arrays
           // within the graph structures to corresponding int arrays
-// COMMENT_HILMAR: Gibt es eine Moeglichkeit, das zu vermeiden? Ein reinterpret_cast<int*>(unsigned long) funzt nicht!
+// COMMENT_HILMAR: Is there a possibility to avoid this? A reinterpret_cast<int*>(unsigned long) does not work!
           unsigned int* num_neighbours_aux;
           unsigned int* index_aux;
 

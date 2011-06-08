@@ -1,3 +1,9 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * The description of this manager class especially sketches the general program flow.
+ * See COMMENT_HILMAR throughout this file and issue_00037.txt.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_MANAGER_HPP
 #define KERNEL_MANAGER_HPP 1
@@ -501,7 +507,6 @@ namespace FEAST
         }
 
         // load balancer is created on coordinator process
-        // COMMENT_HILMAR: For the time being... not sure yet, if it is necessary to create it on all processes
         if(is_load_balancer())
         {
           _load_balancer = new LoadBalancer<space_dim_, world_dim_>(_process_group_main, _group_has_dedicated_load_bal,
