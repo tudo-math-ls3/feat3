@@ -1,4 +1,4 @@
-NEWEST: 00036
+NEWEST: 00037
 ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
 00010 |feature_request      |assigned    |markus |hilmar_markus     |high     |add_mp_and_pp_layers
 00012 |feature_request      |assigned    |markus |hilmar_dom        |high     |parsing_FPROP_and_FPART_meshfilesections
@@ -28,6 +28,7 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00032 |optimisation_request |unassigned  |markus |                  |low      |apply_coding_conventions_for_namespaces
 00035 |feature_request      |unassigned  |dom    |                  |low      |make_cmake_buildid_system_non_linux
 00036 |feature_request      |unassigned  |dom    |                  |low      |sync_cmake_and_baseheader
+00037 |feature_request      |unassigned  |hilmar |                  |low      |diversify_manager_class
 
 
 00000 |feature_request      |resolved    |markus |dirk              |high     |implement_test_system
