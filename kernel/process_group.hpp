@@ -1,3 +1,9 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * If buffered communication is necessary (not sure...), each process group needs its own buffer. This has to be
+ * organised somehow. There are some rudimentary preparation for this (commented out).
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_BM_PROCESS_GROUP_HPP
 #define KERNEL_BM_PROCESS_GROUP_HPP 1
@@ -57,7 +63,7 @@ namespace FEAST
     /// rank of the coordinator process within the group
     int const _rank_coord;
 
-//   COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+//   COMMENT_HILMAR: every process group will eventually need its own MPI buffer... then activate this code.
 //    /// buffer size
 //    static unsigned int BUFFERSIZE_BYTES;
 //
@@ -107,7 +113,7 @@ namespace FEAST
       mpi_error_code = MPI_Group_rank(_group, &_rank);
       validate_error_code_mpi(mpi_error_code, "MPI_Group_rank");
 
-// COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
+// COMMENT_HILMAR: every process group will eventually need its own MPI buffer... then activate this code.
 //      _buffer = nullptr;
     }
 

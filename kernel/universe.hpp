@@ -1,3 +1,7 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_UNIVERSE_HPP
 #define KERNEL_UNIVERSE_HPP 1

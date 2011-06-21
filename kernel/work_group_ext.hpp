@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See COMMENT_HILMAR below.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_WORK_GROUP_EXT_HPP
 #define KERNEL_WORK_GROUP_EXT_HPP 1

@@ -1,3 +1,13 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See COMMENT_HILMAR below.
+ * The link to interlevel groups is still missing and only rudimentarily prepared. Actually, I'm not really sure if
+ * such a link is necessary here at all. It might turn out, that you will never have to access interlevel groups from
+ * within a work group. Maybe everything will be managed from outside (i.e., in some class which knows the work groups
+ * and the interlevel groups). At this stage I simply don't know yet, how and where exactly the work group / interlevel
+ * group functionality is used, so I thought it is better to *not* fix this link already.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_WORK_GROUP_HPP
 #define KERNEL_WORK_GROUP_HPP 1
@@ -14,7 +24,7 @@
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
-//#include <kernel/inter_level_group.hpp>
+//#include <kernel/interlevel_group.hpp>
 #include <kernel/graph.hpp>
 
 /// FEAST namespace
@@ -60,31 +70,11 @@ namespace FEAST
     */
     GraphDistributed* _graph_distributed;
 
-    /**
-    * \brief vector of process group ranks of members of the "next finer" work group this worker has to exchange
-    *        data with
-    *
-    * Since those workers live in a different work group, this worker has to communicate with them via the
-    * process group communicator. Note that one of those workers may have the same process group rank (i.e., live on the
-    * same MPI_COMM_WORLD process) as this worker (hence, no MPI communication is necessary in this case).
-    */
-    std::vector<int> _ranks_finer; // COMMENT_HILMAR: find a better variable name!
+    /// interlevel group this process builds with the processes of the finer grid work group
+//    InterlevelGroup* _group_finer;
 
-    /**
-    * \brief process group rank of the worker in the "next coarser" work group this worker has to exchange data with
-    *        (this is always only one!)
-    *
-    * Since the worker lives in a different work group, this worker has to communicate with it via the process
-    * group communicator. Note that the worker may have the same process group rank (i.e., live on the same
-    * MPI_COMM_WORLD process) as this worker (hence, no MPI communication is necessary in this case).
-    */
-    int _rank_coarser; // COMMENT_HILMAR: find a better variable name!
-
-    /// inter level work group this process builds with the processes of the finer grid work group
-//    InterLevelGroup* _group_finer;
-
-    /// inter level work group this process builds with the process of the coarser grid work group
-//    InterLevelGroup* _group_coarser;
+    /// interlevel group this process builds with the process of the coarser grid work group
+//    InterlevelGroup* _group_coarser;
 
   public:
 
@@ -105,8 +95,7 @@ namespace FEAST
       unsigned int const group_id)
       : ProcessGroup(comm, group_id),
 //        _comm_opt(MPI_COMM_NULL),
-        _graph_distributed(nullptr),
-        _ranks_finer(nullptr)
+        _graph_distributed(nullptr)
     {
       CONTEXT("WorkGroup::WorkGroup()");
 

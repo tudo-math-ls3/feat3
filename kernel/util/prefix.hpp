@@ -1,3 +1,10 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See COMMENT_HILMAR below.
+ * When you decide on how the logger should work, this might also be related to this class (in the sense that this
+ * prefix-functionality is especially used for logging).
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef PREFIX_HPP
 #define PREFIX_HPP

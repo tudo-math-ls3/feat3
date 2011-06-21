@@ -1,3 +1,9 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * When you decide on how the logger should work, this might also be related to this class (in the sense that this
+ * pretty-printer-functionality is especially used for logging).
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef PRETTY_PRINTER_HPP
 #define PRETTY_PRINTER_HPP

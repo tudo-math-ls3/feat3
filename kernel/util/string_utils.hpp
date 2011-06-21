@@ -1,3 +1,7 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef STRING_UTILS_HPP
 #define STRING_UTILS_HPP
@@ -14,6 +18,7 @@
 *
 * \author Dirk Ribbrock
 * \author Dominik Goeddeke
+* \author Hilmar Wobker
 */
 
 /// FEAST namespace

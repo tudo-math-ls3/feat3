@@ -1,3 +1,10 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * Here, one has to find out if it *really* is no problem, when one process is member of two interlevel groups
+ * (see COMMENT_HILMAR below). The main challenge regarding interlevel groups is to dynamically determine the fine-
+ * and coarse level groups and the corresponding interlevel groups.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_INTERLEVEL_GROUP_HPP
 #define KERNEL_INTERLEVEL_GROUP_HPP 1

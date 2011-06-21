@@ -1,3 +1,9 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * Rudimentary class for reading ascii files. Should be improved/replaced when the 'real' ascii/xml file reader is
+ * implemented.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef UTIL_FILE_READER_ASCII_HPP
 #define UTIL_FILE_READER_ASCII_HPP 1

@@ -1,3 +1,18 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * IMHO a master process is not really necessary. However, we decided that we will stick to it for the time being.
+ * The advantage of using a master process is that one can (at least up to a certain level)  produce coherent screen
+ * output. E.g., two process groups are triggering screen output at the same time. Without a master process, one
+ * cannot control how the two outputs appear on the screen, i.e., they can completely intermix. However, when really
+ * large parallel jobs are performed, screen output doesn't make sense anyway, so this is quite a weak argument. Getting
+ * individual process group output can be achieved much better by using keywords and grep commands after the
+ * computation. And if screen output is used to actively follow a computation while it is running, then one can also
+ * live with a cluttered output.
+ * If it comes to multiphysics computations or similar, i.e. where two completely independent main process groups (and
+ * load balancers) are created, and the user wants to coordinate these two computations, then this is also possible
+ * without a master process.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_MASTER_HPP
 #define KERNEL_MASTER_HPP 1

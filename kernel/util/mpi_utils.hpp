@@ -1,3 +1,9 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * For the case a more general 'MPI functionality class' is written (see my comment in comm.hpp), then maybe some of
+ * the functionality implemented here will move to that class.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef MPI_UTILS_HPP
 #define MPI_UTILS_HPP

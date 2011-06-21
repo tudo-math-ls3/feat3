@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * If you decide to kick out the master process, you can probably also remove this class.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_SERVICE_IDS_HPP
 #define KERNEL_SERVICE_IDS_HPP 1
