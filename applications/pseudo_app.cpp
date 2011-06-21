@@ -1,7 +1,8 @@
-//// includes, system
-//#include <iostream>
-//#include <cstdlib> // for exit()
-//
+/* GENERAL_REMARK_BY_HILMAR:
+ * See COMMENT_HILMAR below.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>

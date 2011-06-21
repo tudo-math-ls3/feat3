@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * Generally, Peter wanted to take a deeper look at the base mesh implementation.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_BASE_MESH_CELL_SUBDIV_HPP
 #define KERNEL_BASE_MESH_CELL_SUBDIV_HPP 1

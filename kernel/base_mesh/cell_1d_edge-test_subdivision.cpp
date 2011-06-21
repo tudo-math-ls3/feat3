@@ -1,3 +1,8 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See COMMENT_HILMAR in this file.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
@@ -107,12 +112,12 @@ public:
        // validate base mesh
         bm->validate(Logger::file);
 
-        // TODO: neighbourhood update
+        // COMMENT_HILMAR: neighbourhood update
 
         Logger::log("!!! Neighbourhood update after subdivision not implemented yet!!!\n");
         Logger::log("!!! DTORS not checked yet! Possible memory holes! Not 'valgrinded' yet !!!\n");
 
-// add some TEST_CHECK(...)
+// COMMENT_HILMAR: add some TEST_CHECK(...)
 
       }
 

@@ -3,8 +3,7 @@
  *
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
-
- // includes, Feast
+// includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>

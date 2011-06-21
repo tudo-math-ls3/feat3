@@ -1,3 +1,9 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * See COMMENT_HILMAR below.
+ * Generally, Peter wanted to take a deeper look at the base mesh implementation.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_BM_CELL_DATA_VALIDATION_HPP
 #define KERNEL_BM_CELL_DATA_VALIDATION_HPP 1

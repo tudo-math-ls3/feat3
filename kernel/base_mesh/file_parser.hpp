@@ -1,3 +1,9 @@
+/* GENERAL_REMARK_BY_HILMAR:
+ * Parsing of part and prop files is missing (see issue00012).
+ * Generally, Peter wanted to take a deeper look at the base mesh implementation.
+ *
+ * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
+ */
 #pragma once
 #ifndef KERNEL_BM_FILE_PARSER_HPP
 #define KERNEL_BM_FILE_PARSER_HPP 1
@@ -678,7 +684,7 @@ namespace FEAST
         buffered_neighbourhood.clear();
       } // _parse_mesh
 
-//COMMENT_HILMAR: will be adapted later
+//COMMENT_HILMAR: see issue00012
 //      /// parses partition part of FEAST files
 //      void _parse_partition(FileReaderASCII * mesh_file)
 //      {
