@@ -1,4 +1,4 @@
-NEWEST: 00037
+NEWEST: 00038
 ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
 00010 |feature_request      |assigned    |markus |hilmar_markus     |high     |add_mp_and_pp_layers
 00012 |feature_request      |assigned    |markus |hilmar_dom        |high     |parsing_FPROP_and_FPART_meshfilesections
@@ -18,8 +18,6 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00018 |feature_request      |unassigned  |markus |                  |medium   |ascii_files
 00023 |feature_request      |unassigned  |hilmar |                  |medium   |extend_logger_functionalities
 00027 |feature_request      |unassigned  |hilmar |                  |medium   |implement_base_mesh_iterator_active_cells
-00030 |feature_request      |resolved    |hilmar |dirk_dom          |medium   |enhance_build_system
-00034 |feature_request      |assigned    |dom    |dirk_dom          |medium   |proper_compiler_version_detection
 00017 |feature_request      |assigned    |markus |peter             |low      |serial_mode
 00021 |feature_request      |assigned    |hilmar |markus            |low      |implement_subdivision_tri_nonconform
 00022 |feature_request      |assigned    |hilmar |peter             |low      |implement_class_for_static_cell_data
@@ -29,14 +27,17 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00035 |feature_request      |unassigned  |dom    |                  |low      |make_cmake_buildid_system_non_linux
 00036 |feature_request      |unassigned  |dom    |                  |low      |sync_cmake_and_baseheader
 00037 |feature_request      |unassigned  |hilmar |                  |low      |diversify_manager_class
+00038 |feature_request      |unassigned  |dom    |                  |low      |oracle_version_detection
 
 
 00000 |feature_request      |resolved    |markus |dirk              |high     |implement_test_system
 00001 |feature_request      |resolved    |markus |dom               |low      |implement_compiler_detection_icc
 00002 |feature_request      |resolved    |markus |dirk              |critical |build_system_essentials
+00030 |feature_request      |resolved    |hilmar |dirk_dom          |medium   |enhance_build_system
 00007 |bug_report           |resolved    |markus |peter             |critical |test_system_is_error_prone
 00009 |optimisation_request |resolved    |markus |hilmar            |high     |better_distinction_of_lb_and_flowcontrol
 00011 |feature_request      |resolved    |markus |hilmar            |high     |implement_inter_workgroup_communication
 00019 |optimisation_request |resolved    |markus |dirk              |critical |enable_mpi_in_test_system
 00029 |optimisation_request |resolved    |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
 00033 |bug_report           |resolved    |hilmar |hilmar            |high     |log_comm_to_master_faulty_with_mpich
+00034 |feature_request      |resolved    |dom    |dirk_dom          |medium   |proper_compiler_version_detection

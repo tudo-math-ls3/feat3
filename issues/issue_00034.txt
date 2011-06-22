@@ -1,6 +1,6 @@
 ID          00034
 TYPE        feature_request
-STATUS      unassigned
+STATUS      resolved
 AUTHOR      dom
 ASSIGNED TO dirk_dom
 SEVERITY    medium
@@ -9,3 +9,6 @@ FULL TEXT
 proper compiler version detection for all supported compilers (the current implementation does string arithmetics)
 
 SOLUTION
+
+cmake supports VERSION_GREATER etc. comparisons. Use these (and some more
+regex magic) to portably perform string comparisons.
