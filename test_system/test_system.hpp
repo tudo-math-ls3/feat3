@@ -584,7 +584,7 @@ int main(int argc, char** argv)
   for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
       i != i_end ; )
   {
-    CONTEXT("When running test case '" + (*i)->id() + "':");
+    CONTEXT("When running test case '" + (*i)->id() + "' on mpi process " + stringify(rank) + ":");
     try
     {
       if (rank == 0)
@@ -597,14 +597,19 @@ int main(int argc, char** argv)
     catch (TestFailedException & e)
     {
       if (rank == 0)
-        std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
+        std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << " on mpi process " << stringify(rank) << std::endl;
       result = EXIT_FAILURE;
     }
     catch (InternalError & e)
     {
-      if (rank == 0)
-        std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
-          << stringify(e.message()) << std::endl;
+        std::cout << "FAILED with InternalError: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
+          << stringify(e.message()) << " on mpi process " << stringify(rank) << std::endl;
+      result = EXIT_FAILURE;
+    }
+    catch (std::exception & e)
+    {
+      std::cout << "FAILED with unknown Exception: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
+        << " on mpi process " << stringify(rank) << std::endl;
       result = EXIT_FAILURE;
     }
     i = TestList::instance()->erase(i);
