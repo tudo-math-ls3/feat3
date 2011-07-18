@@ -49,6 +49,11 @@ namespace FEAST
     inline bool get_next_line(std::string& sbuf)
     {
       CONTEXT("FileReaderASCII::get_next_line()");
+      // skip leading spaces
+      while (myfile.peek() == ' ')
+      {
+        myfile.get();
+      }
       // skip comment lines
       if(myfile.peek() == _comment_char)
       {
