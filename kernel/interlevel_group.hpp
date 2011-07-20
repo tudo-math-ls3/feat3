@@ -28,6 +28,56 @@ namespace FEAST
   * \brief represents the group of processes from work groups of different levels that interact with each other
   *
   * Illustration of interlevel work group communication:
+  * A - F = compute tasks, each performed on one process
+  *
+  * <bf>Simplemost example:</bf>
+  *
+  \verbatim
+  ---------------        ---------------
+  |             |        |      |      |
+  |             |        |  C   |  D   |
+  |             |        |      |      |
+  |      A      |        ---------------
+  |             |        |      |      |
+  |             |        |  B   |  E   |
+  |             |        |      |      |
+  ---------------        ---------------
+  coarse grid (CG)       fine grid (FG)
+  \endverbatim
+  *
+  *   coarse grid work group: A
+  *   fine grid work group: B,C,D,E
+  *
+  * necessary data exchange for restriction and prolongation: A <-> (B,C,D,E)
+  *
+  *   exemplary distribution of processes and corresponding program flow:
+  *
+  *       processes:  0   1   2   3   4
+  *   CG work group:  A
+  *   FG work group:      B   C   D   E
+  *
+  * step  0(A)                    1(B)                  2(C),                3(D)                 4(E)
+  * 0     recv_defect(1,2,3,4)    solver.start()        solver.start()       solver.start()       solver.start()
+  * 1     *wait*                  smooth()              smooth()             smooth()             smooth()
+  * 2     *wait*                  restrict(FG->CG)      restrict(FG->CG)     restrict(FG->CG)     restrict(FG->CG)
+  * 3     *wait*                  send_defect(0)        send_defect(0)       send_defect(0)       send_defect(0)
+  * 4     solve_coarse()          recv_corr(0)          recv_corr(0)         recv_corr(0)         recv_corr(0)
+  * 5     send_corr(0,1,2,3)      *wait*                *wait*               *wait*               *wait*
+  * 6     recv_defect(1,2,3,4)(a) prolong(CG->FG)       prolong(CG->FG)      prolong(CG->FG)      prolong(CG->FG)
+  * 7     *wait*                  smooth()              smooth()             smooth()             smooth()
+  *
+  * (a) already for the next coarse grid solution
+  *
+  * send_defect(i) means 'send defect vector to process i'
+  * recv_defect(i,...) means 'receive defect vector from processes i,...
+  * send_corr(i,j) means 'send parts of the correction vector corresponding to the region scheduled to processes
+  *                       i and j, resp., to these processes'
+  *
+  * Explanation: one dedicated process to solve the coarse grid problem serially, while all fine grid processes
+  * are idle and vice versa. More technical details below in the more complex example.
+  *
+  *
+  * <bf>More complicated example:</bf>
   *
   \verbatim
   ---------------        ---------------
@@ -41,8 +91,6 @@ namespace FEAST
   ---------------        ---------------
   coarse grid (CG)       fine grid (FG)
   \endverbatim
-  *
-  *   A - F = compute tasks, each performed on one process
   *
   *   coarse grid work group: A, B
   *   fine grid work group: C, D, E, F
@@ -63,13 +111,13 @@ namespace FEAST
   * 4     recv_defect(0,3)         *wait*              recv_corr(1)         recv_corr(0)         recv_corr(1)
   * 5     solve_coarse()         solve_coarse()          *wait*               *wait*               *wait*
   * 6     send_corr(0,3)         send_corr(2,4)          *wait*               *wait*               *wait*
-  * 7     recv_corr(0)           recv_defect(2,4)      prolong(FG->CG)      prolong(FG->CG)      prolong(FG->CG)
-  * 8     prolong(CG -> FG)        *wait*                *wait*               *wait*               *wait*
+  * 7     recv_corr(0)           recv_defect(2,4)(a)   prolong(CG->FG)      prolong(CG->FG)      prolong(CG->FG)
+  * 8     prolong(CG -> FG)        *wait*                *wait*(b)             *wait*(b)            *wait*(b)
   * 9     smooth()                 *wait*              smooth()             smooth()             smooth()
   *
-  * send_defect(i) means 'send defect vector to process i'
-  * send_corr(i,j) means 'send parts of the correction vector corresponding to the region scheduled to processes
-  *                       i and j, resp., to these processes'
+  * (a) already for the next coarse grid solution
+  * (b) waiting because process 0 is not yet ready with prolongation, and neighbour exchange is necessary
+  *     after each prolongation step
   *
   * Example (see sketch above): C and E compute their local portions of the global defect and sent it to A. A assembles
   * these two portions and computes a correction vector. The two parts of this correction vector corresponding to the
@@ -125,6 +173,11 @@ namespace FEAST
   *   Layer 3: 16 local MGs acting on 1 BMC each
   * The four work groups on layer 2 have to communicate with each other over their common boundary. For this, other
   * communication patterns are needed than for the interlevel communication considered here.
+  *
+  * \note (dom, Jul 20, 2011) This is closely related to the matrix patch layer, and not to the coarse/fine distribution.
+  * Depending on how we implement this, the ScaRC layers define the "outer" communication, and depending on the sizes
+  * and on the available resources, each such layer may or may not choose to perform their coarse grid solution using
+  * separate process subsets.
   */
   class InterlevelGroup
     : public ProcessGroup
