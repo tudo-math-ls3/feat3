@@ -37,6 +37,11 @@ namespace FEAST
   * and the whole lot for multiphysics applications. The normal user and kernel programmer should not have to interfere
   * with the universe for singlephysics applications.
   *
+  * COMMENT_DOM [Jul 20, 2011]: I think the above comment is misleading. MPI processes are created and destroyed by
+  *                             routines in utils/mpi_utils.hpp, which do not belong to any class at all and must
+  *                             currently be called from user code. This class only works if MPI has been initialised
+  *                             successfully before!
+  *
   * Idea: The soon-to-be-implemented global Feast_init() routine encapsulates the entire universe and makes physics-level
   *       subgroups available to the programmer.
   *
@@ -186,7 +191,7 @@ namespace FEAST
     * Let there be
     * \li \c n processes with \c MPI_COMM_WORLD ranks <code>0, .., n-1</code>,
     * \li \c k process groups <code>0, .., k-1</code>, process group \c i comprising <code>0 < P_i < n-1</code>
-    *     processes including the eventually dedicated load balancer (<code>P_0 + ... + P_(k-1) = n-1)</code>
+    *     processes including the eventually dedicated load balancer <code>(P_0 + ... + P_(k-1) = n-1)</code>
     *
     * Then the MPI_COMM_WORLD ranks are distributed as follows:
     * \li process group 0: ranks <code>0, ..., P_0-1</code> (where <code>P_0-1</code> is the coordinator
