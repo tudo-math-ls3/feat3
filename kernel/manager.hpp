@@ -31,7 +31,7 @@ namespace FEAST
   /**
   * \brief class defining a process group manager
   *
-  * The user creates one more main process groups. These groups have nothing to do with each other. Every communication
+  * The user creates one or more main process groups. These groups have nothing to do with each other. Every communication
   * between them has to be organised manually by the user (via the parent MPI communicator MPI_COMM_WORLD). More than
   * one process group is used in case the user wants to perform some multiphysics problem or similar where several
   * tasks can be performed (nearly) independent of each other. The user knows what each main process group
@@ -66,8 +66,8 @@ namespace FEAST
   \endverbatim
   * i.e., only on the coordinator process a corresponding read routine is called in some object manager_comp_coord
   * which lives on the coordinator process (see below). This is especially important when code is involved that calls
-  * collective MPI routines (like MPI_Bcast(...)): The user just calls one general routine on all processes (whithout
-  * doing any distinction who sends and who receives data), while the manager then guarantees that the correct routines
+  * collective MPI routines (like MPI_Bcast(...)): The user just calls one general routine on all processes (without
+  * any distinction who sends and who receives data), while the manager then guarantees that the correct routines
   * on sender and receiver side are called.
   *
   * All standard tasks within the simulation process should be organised in this way via this Manager class
@@ -76,21 +76,25 @@ namespace FEAST
   * class (yet). This may require the user to do manual distinctions of the processes on his own. However, a 'standard'
   * user simulation code should do without ever explicitly asking 'are you the coordinator process?'.
   * (COMMENT_HILMAR: At least, that's the plan...)
+  * (COMMENT_DOM: Maybe some sort of dummy callback routine is necessary. Also, all the infrastructure operations
+  *  should be somehow steerable by the user, e.g., to decide if loadbalancing is performed every solver iteration,
+  *  every solver call, or every timestep...)
   *
   * The processes of the group take different roles, and depending on that, different objects are created on the
   * processes.
   * - The coordinator process is the only one storing the complete computational mesh, reading config files etc. The
-  *   coordinator has rank 0 within the main process group.
+  *   coordinator has rank 0 within the main process group. The coordinator is not dedicated, but also serves
+  *   as a compute process.
   * - The user can decide to use a dedicated load balancer process. It is the process with the largest rank in the
-  *   main process group.
+  *   main process group. COMMENT_DOM: I thought that's the master?
   * - All other processes are standard 'compute' processes.
   *
   * As 'compute process' we denote those processes which do the actual compute work (assembly, solving linear systems,
   * etc.).
   *
   * While the (optional) dedicated load balancer process is exclusively used for special load balancing tasks which
-  * can be performed during the actual computations, the coordinator process also performs standard compute tasks, i.e.
-  * it is also a compute process.
+  * can be performed asynchroneously to the actual computations, the coordinator process also performs standard
+  * compute tasks, i.e., it is also a compute process.
   *
   * Hence, all processes except the dedicated load balancer process build the group of compute processes. That is why
   * an extra process group is built that represents this group of compute processes. In case, there is no dedicated
@@ -133,10 +137,11 @@ namespace FEAST
   * This especially means, that the non-coordinator processes are always under user control. It's not like they are
   * in an infinite wait loop to be woken up by the coordinator for special tasks.
   *
-  * On the coordinator process, a further object is created: a LoadBalancer object.
-  * It is responsible for performing tasks that have to do with work distribution / load balancing (process
-  * matrix patch (MP) statistics, compute partitioning, define work groups, ...). It lives on the same process as the
-  * compute coordinator ManagerCompCoord since the two share some data, e.g. the base mesh (BM)/matrix patch mesh (MPM).
+  * On the coordinator process, a further object is created: a LoadBalancer object. It lives here because it needs
+  * access to the global mesh/patch information. It is responsible for performing tasks that have to do with work
+  * distribution / load balancing (process matrix patch (MP) statistics, compute partitioning, define work groups, ...).
+  * It lives on the same process as the compute coordinator ManagerCompCoord since the two share some data, e.g.,
+  * the base mesh (BM)/matrix patch mesh (MPM).
   *
   * Input for the load balancer is (probably among others) the connectivity of the MPM and MP statistics. Based on the
   * provided information, the load balancer distributes MPs to MPI processes, i.e., it creates process patches (PP).
@@ -196,12 +201,15 @@ namespace FEAST
   *   details are not clear yet, I'm not sure what is the better way. Currently, I like the idea better that the
   *   LoadBalancer object exclusivly talks to the ManagerCompCoord, and only ManagerCompCoord talks to the
   *   non-coordinator processes.
+  * COMMENT_DOM: A consequence of this alternative is that all process know the global mesh. Might be a problem to
+  *   keep this info synchroneous, e.g., when things are split or merged. Also, statistics information must be
+  *   allgathered (n:n communication).
   *
   * If a dedicated load balancer is used, there is an extra process which is not part of the compute process group
   * (actually the one process, which distinguishes the main process group from the compute process group). On this
   * process, an object of type LoadBalancerDedicated is created. This object performs 'special' load balancing tasks
-  * which can be done during the actual computation (e.g., pre-calculating some possible scenarios based on history
-  * data).
+  * which can be done asynchroneously to the actual computation (e.g., pre-calculating some possible scenarios based
+  * on history data).
   *
   * COMMENT_HILMAR: It is not quite clear yet how communication to this object works. My current idea is that only the
   *   load balancer class is 'connected' to the dedicated load balancer class. I.e., data transfer etc. has to be
@@ -254,8 +262,8 @@ namespace FEAST
   * group which computes something different. For the first process group he uses a dedicated load balancer. Of the
   * 5 remaining compute processes, one has to be used for fine and coarse grid problems. The following table shows the
   * distribution of the processes to different kind of process groups (pg), and which objects live on which
-  * processes (obj).Numbers denote the local ranks within the corresponding process group, 'X' means, that an object
-  * of this class is instantiated on this process. Letters in parantheses refer to the compute tasks in the figures,
+  * processes (obj). Numbers denote the local ranks within the corresponding process group, 'X' means, that an object
+  * of this class is instantiated on this process. Letters in parentheses refer to the compute tasks in the figures,
   * an asterisk '*' means 'this is the root process of different collective MPI routines'.
   *
   \verbatim
