@@ -477,7 +477,7 @@ namespace FEAST
 // to trigger an extra service receive routine on master side...
 
       // get number of messages
-      unsigned int num_messages(messages.size());
+      unsigned int num_messages(unsigned int(messages.size()));
       ASSERT(num_messages > 0, "There must be at least one message in the message vector!");
 
       // store lengths of the single strings
@@ -485,7 +485,7 @@ namespace FEAST
       for(unsigned int i(0) ; i < num_messages ; ++i)
       {
         // add 1 due to the null termination symbol which we insert manually
-        msg_lengths[i] = messages[i].size() + 1;
+        msg_lengths[i] = unsigned int(messages[i].size()) + 1;
       }
 
       // Convert the vector of strings into one long string, where the single strings are separated by null termination
@@ -503,7 +503,7 @@ namespace FEAST
       }
 
       // now call the other version of the function log_master_array(), pass char array representation of the string
-      log_master_array(num_messages, msg_lengths, msgs_as_one_string.size()+1, msgs_as_one_string.c_str(), targ);
+      log_master_array(num_messages, msg_lengths, unsigned int(msgs_as_one_string.size())+1, msgs_as_one_string.c_str(), targ);
 
       // delete aux. array again
       delete [] msg_lengths;

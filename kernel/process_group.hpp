@@ -313,7 +313,7 @@ namespace FEAST
     {
       CONTEXT("ProcessGroup::log_indiv_master()");
       // add 1 to the message length since string::c_str() adds the null termination symbol to the resulting char array
-      unsigned int length = message.length() + 1;
+      unsigned int length = unsigned int(message.length()) + 1;
 
       if (!is_coordinator())
       {
