@@ -1,79 +1,92 @@
 #pragma once
 #ifndef KERNEL_BASE_HEADER_HPP
-/// Header guard
 #define KERNEL_BASE_HEADER_HPP 1
 
-#include <feast_config.hpp>
-
 /**
-* \brief FEAST Kernel base header.
-*
-* This file is the base header for the FEAST kernel, which is included by all other FEAST header and source files.
-* It defines macros and data types which are frequently used in other files.
-*/
+ * \brief FEAST Kernel base header.
+ *
+ * This file is the base header for the FEAST kernel, which is included by all other FEAST header and source files.
+ * It defines macros and data types which are frequently used in other files.
+ */
+
+// The CMake build system automatically generates a FEAST configuration header, which is included here.
+// If we use the *hand-made* Visual Studio project files, which define the VISUAL_STUDIO macro, we'll have to
+// skip this inclusion.
+#ifndef VISUAL_STUDIO
+#  include <feast_config.hpp>
+#endif
 
 // Make sure the DOXYGEN macro is not defined at compile-time;
 // it is reserved for doxygen's preprocessor.
 #ifdef DOXYGEN
 #  error The DOXYGEN macro must not be defined at compile-time
-#endif // DOXYGEN
+#endif
 
-//Activate DEBUG macro if the build system tells us to do so.
-#if defined FEAST_DEBUG_MODE && !defined(DEBUG)
-#  define DEBUG
+// Activate DEBUG macro if the build system tells us to do so.
+#if defined(FEAST_DEBUG_MODE) && !defined(DEBUG)
+#  define DEBUG 1
 #endif
 
 // The DEBUG and NDEBUG macros are mutually exclusive
 #if defined(DEBUG) && defined(NDEBUG)
 #  error The DEBUG and NDEBUG macros must not be defined at the same time.
-#endif // defined(DEBUG) && defined(NDEBUG)
+#endif
 
-// Assure that DEBUG xor NDEBUG is defined
-// In consequence, if DEBUG and NDEBUG are note defined, NDEBUG is defined.
+// Assure that either DEBUG or NDEBUG is defined
+// In consequence, if DEBUG and NDEBUG are both undefined, NDEBUG is defined.
 #if !defined (NDEBUG) && !defined(DEBUG)
 #  define NDEBUG 1
+#endif
+
+// Activate SERIAL macro if the build system tells us to do so.
+#if defined(FEAST_SERIAL_MODE) && !defined(SERIAL)
+#  define SERIAL 1
+#endif
+
+// The SERIAL and PARALLEL macros are mutually exclusive
+#if defined(SERIAL) && defined(PARALLEL)
+#  error The SERIAL and PARALLEL macros must not be defined at the same time.
+#endif
+
+// Assure that either SERIAL or PARALLEL is defined
+// In consequence, if SERIAL and PARALLEL are both undefined, PARALLEL is defined.
+#if !defined(SERIAL) && !defined(PARALLEL)
+#  define PARALLEL 1
 #endif
 
 // include compiler detection headers
 #include <kernel/util/compiler_gnu.hpp>        // GNU C/C++ compiler
 #include <kernel/util/compiler_intel.hpp>      // Intel(R) C/C++ compiler
 #include <kernel/util/compiler_microsoft.hpp>  // Microsoft(R) (Visual) C/C++ compiler
-#include "kernel/util/compiler_oracle.hpp"     // SunStudio/OracleStudio C/C++ compiler
-#include "kernel/util/compiler_open64.hpp"     // Open64 C/C++ compiler
-#include "kernel/util/compiler_pgi.hpp"        // PGI C/C++ compiler
+#include <kernel/util/compiler_oracle.hpp>     // SunStudio/OracleStudio C/C++ compiler
+#include <kernel/util/compiler_open64.hpp>     // Open64 C/C++ compiler
+#include <kernel/util/compiler_pgi.hpp>        // PGI C/C++ compiler
 
+// hide the following block from doxygen
+/// \cond
 // If the compiler doesn't support the C++0x nullptr, we have to define it via pre-processor.
-#if !defined(HAVE_CPP0X_NULLPTR) && !defined(DOXYGEN)
+#ifndef HAVE_CPP0X_NULLPTR
 #  define nullptr 0
 #endif
 
-// define __PRETTY_FUNCTION if not defined
-#ifndef __PRETTY_FUNCTION__
-#  ifndef DOXYGEN
-#    define __PRETTY_FUNCTION__ __FUNCTION__
-#  endif
+// If the compiler doesn't support the C++0x static_assert, we'll define it as an empty macro.
+// We do not use any hand-made emulations in this case, as there is no way to implement a both
+// fully working and portable solution for this feature.
+#ifndef HAVE_CPP0X_STATIC_ASSERT
+#  define static_assert(expr, msg)
 #endif
 
-// If the compiler doesn't support the 'extern template' specifier or its usage is
-// disabled by defining the FEAST_NO_EXPL_TEMPL_INST macro, both the DEF_EXPL_TEMPL_INST
-// and DECL_EXPL_TEMPL_INST macros are defined as empty macros.
-#if !defined(DOXYGEN)
-#  if !defined(HAVE_CPP0X_EXTERN_TEMPLATE) || defined(FEAST_NO_EXPL_TEMPL_INST)
-#    define DEF_EXPL_TEMPL_INST(expr)
-#    define DECL_EXPL_TEMPL_INST(expr)
+// Define THIS_FUNCTION macro.
+#ifndef THIS_FUNCTION
+#  ifdef __PRETTY_FUNCTION__
+#    define THIS_FUNCTION __PRETTY_FUNCTION__
 #  else
-#    define DEF_EXPL_TEMPL_INST(expr) template<> expr
-#    define DECL_EXPL_TEMPL_INST(expr) extern template<> expr
+#    define THIS_FUNCTION __FUNCTION__
 #  endif
 #endif
 
-// define WINDOWS macro on windows platform
-#ifdef _WIN32
-#  define WINDOWS 1
-#endif
-
-// let Doxygen ignore the following block
-//\cond
+// TODO_PZAJAC: remove the following #define and adapt all necessary files using it.
+//
 // In order to increase performance one can ignore the status object in some MPI functions
 // (see Section 3.2.6 in the MPI 2.2 standard). In debug mode, we use a real status object, otherwise
 // the special MPI status MPI_STATUS_IGNORE. Requires that the MPI_Status object *always* has the name 'status'.
@@ -89,20 +102,22 @@
 #else
 #  define MPI_STATUS_MACRO &status
 #endif
-//\endcond
+
+///\endcond
+// end of block hidden from doxygen
 
 /// FEAST namespace
 namespace FEAST
 {
   /// FEAST version
-  enum
+  enum Version
   {
     /// FEAST major version number
     version_major = 1,
     /// FEAST minor version number
     version_minor = 0,
     /// FEAST patch version number
-    version_patch = 0
+    version_patch = 0,
   };
 
   /**
