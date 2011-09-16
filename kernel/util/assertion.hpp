@@ -130,7 +130,7 @@ namespace FEAST
     }
 #else
 #define STATIC_ASSERT(const_expr, msg)
-#endif
-}*/
+#endif*/
+} // namespace FEAST
 
 #endif // KERNEL_UTIL_ASSERTION_HPP
