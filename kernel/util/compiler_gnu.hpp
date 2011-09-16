@@ -1,7 +1,6 @@
 #pragma once
-#ifndef UTIL_COMPILER_GNU_HPP
-/// Header guard
-#define UTIL_COMPILER_GNU_HPP 1
+#ifndef KERNEL_UTIL_COMPILER_GNU_HPP
+#define KERNEL_UTIL_COMPILER_GNU_HPP 1
 
 /**
  * \file compiler_gnu.hpp
@@ -38,4 +37,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__GNUC__)
 
-#endif // UTIL_COMPILER_GNU_HPP
+#endif // KERNEL_UTIL_COMPILER_GNU_HPP

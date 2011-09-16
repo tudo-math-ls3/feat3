@@ -8,11 +8,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef UTIL_ERROR_HANDLER_HHP
-/// Header guard
-#define UTIL_ERROR_HANDLER_HHP 1
-
-// includes, system
+#ifndef KERNEL_ERROR_HANDLER_HHP
+#define KERNEL_ERROR_HANDLER_HHP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -21,7 +18,8 @@
 #include <kernel/logger.hpp>
 #include <kernel/util/exception.hpp>
 
-/// FEAST namespace
+// includes, system
+
 namespace FEAST
 {
   /**
@@ -103,4 +101,4 @@ function:
   };
 } // namespace FEAST
 
-#endif //UTIL_ERROR_HANDLER_HPP
+#endif // KERNEL_UTIL_ERROR_HANDLER_HPP

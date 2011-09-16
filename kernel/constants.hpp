@@ -9,13 +9,12 @@
 #ifndef KERNEL_CONSTANTS_HPP
 #define KERNEL_CONSTANTS_HPP 1
 
-// includes, system
-#include <limits> // for numeric_limits
-
 // includes, FEAST
 #include <kernel/base_header.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <limits> // for numeric_limits
+
 namespace FEAST
 {
   /// providing global constants
@@ -40,4 +39,4 @@ namespace FEAST
 } // namespace FEAST
 
 
-#endif // #define KERNEL_CONSTANTS_HPP
+#endif // KERNEL_CONSTANTS_HPP

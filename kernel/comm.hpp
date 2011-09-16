@@ -16,11 +16,6 @@
 #ifndef KERNEL_COMM_HPP
 #define KERNEL_COMM_HPP 1
 
-// includes, system
-#include <mpi.h>
-#include <iostream>
-#include <stdlib.h>
-
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/mpi_utils.hpp>
@@ -28,7 +23,11 @@
 #include <kernel/process.hpp>
 #include <kernel/service_ids.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <mpi.h>
+#include <iostream>
+#include <stdlib.h>
+
 namespace FEAST
 {
   /**
@@ -234,4 +233,4 @@ namespace FEAST
 
 } // namespace FEAST
 
-#endif // guard KERNEL_COMM_HPP
+#endif // KERNEL_COMM_HPP

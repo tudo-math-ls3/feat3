@@ -4,14 +4,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERN_MANAG_COMP_NON_COORD_HPP
-#define KERN_MANAG_COMP_NON_COORD_HPP 1
-
-// includes, system
-#include <mpi.h>
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
+#ifndef KERNEL_MANAGER_COMP_NON_COORD_HPP
+#define KERNEL_MANAGER_COMP_NON_COORD_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -20,7 +14,12 @@
 #include <kernel/error_handler.hpp>
 #include <kernel/manager_comp.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <mpi.h>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+
 namespace FEAST
 {
 
@@ -331,4 +330,4 @@ namespace FEAST
   }; // class ManagerCompNonCoord
 } // namespace FEAST
 
-#endif // guard KERN_MANAG_COMP_NON_COORD_HPP
+#endif // KERNEL_MANAGER_COMP_NON_COORD_HPP

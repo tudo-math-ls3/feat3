@@ -10,16 +10,15 @@
  */
 
 #pragma once
-#ifndef KERNEL_LOAD_BAL_DEDICATED_HPP
-#define KERNEL_LOAD_BAL_DEDICATED_HPP 1
-
-// includes, system
+#ifndef KERNEL_LOAD_BALANCER_DEDICATED_HPP
+#define KERNEL_LOAD_BALANCER_DEDICATED_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/process_group.hpp>
 
-/// FEAST namespace
+// includes, system
+
 namespace FEAST
 {
   /**
@@ -62,4 +61,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_LOAD_BAL_DEDICATED_HPP
+#endif // KERNEL_LOAD_BALANCER_DEDICATED_HPP

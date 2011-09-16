@@ -9,19 +9,18 @@
 #ifndef KERNEL_INTERLEVEL_GROUP_HPP
 #define KERNEL_INTERLEVEL_GROUP_HPP 1
 
-// includes, system
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-#include <mpi.h>
-
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+#include <mpi.h>
+
 namespace FEAST
 {
   /**
@@ -323,4 +322,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_INTERLEVEL_GROUP_HPP
+#endif // KERNEL_INTERLEVEL_GROUP_HPP

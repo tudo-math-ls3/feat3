@@ -3,8 +3,10 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef STRING_UTILS_HPP
-#define STRING_UTILS_HPP
+#ifndef KERNEL_UTIL_STRING_UTILS_HPP
+#define KERNEL_UTIL_STRING_UTILS_HPP 1
+
+// includes, FEAST
 
 // includes, system
 #include <sstream>
@@ -21,7 +23,6 @@
 * \author Hilmar Wobker
 */
 
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -225,4 +226,4 @@ namespace FEAST
 
 } // namespace FEAST
 
-#endif //  #ifndef STRING_UTILS_HPP
+#endif // KERNEL_UTIL_STRING_UTILS_HPP

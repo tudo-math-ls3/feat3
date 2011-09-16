@@ -6,17 +6,16 @@
  */
 #pragma once
 #ifndef KERNEL_BASE_MESH_ITEM_HPP
-#define KERNEL_BASE_MESH_ITEM_HPP
-
-// includes, system
-#include <sstream> // for std::ostringstream
+#define KERNEL_BASE_MESH_ITEM_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/constants.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <sstream> // for std::ostringstream
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code

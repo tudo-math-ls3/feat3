@@ -7,6 +7,12 @@
 #ifndef KERNEL_LOGGER_HPP
 #define KERNEL_LOGGER_HPP 1
 
+// includes, Feast
+#include <kernel/base_header.hpp>
+#include <kernel/service_ids.hpp>
+#include <kernel/util/mpi_utils.hpp>
+#include <kernel/comm.hpp>
+
 // includes, system
 #include <mpi.h>
 #include <iostream>
@@ -14,13 +20,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-// includes, Feast
-#include <kernel/base_header.hpp>
-#include <kernel/service_ids.hpp>
-#include <kernel/util/mpi_utils.hpp>
-#include <kernel/comm.hpp>
-
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -596,4 +595,4 @@ namespace FEAST
 
 } // namespace FEAST
 
-#endif // guard KERNEL_LOGGER_HPP
+#endif // KERNEL_LOGGER_HPP

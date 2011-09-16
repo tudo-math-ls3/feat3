@@ -5,17 +5,16 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef UTIL_FILE_READER_ASCII_HPP
-#define UTIL_FILE_READER_ASCII_HPP 1
+#ifndef KERNEL_UTIL_FILE_READER_ASCII_HPP
+#define KERNEL_UTIL_FILE_READER_ASCII_HPP 1
+
+// includes, FEAST
+#include <kernel/util/exception.hpp>
 
 // includes, system
 #include <iostream>
 #include <fstream>
 
-// includes, FEAST
-#include <kernel/util/exception.hpp>
-
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -514,4 +513,4 @@ namespace FEAST
   }; // class FileReaderASCII
 } // namespace FEAST
 
-#endif // guard UTIL_FILE_READER_ASCII_HPP
+#endif // KERNEL_UTIL_FILE_READER_ASCII_HPP

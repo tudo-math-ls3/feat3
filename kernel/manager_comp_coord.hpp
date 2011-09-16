@@ -4,14 +4,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERN_MANAG_COMP_COORD_HPP
-#define KERN_MANAG_COMP_COORD_HPP 1
-
-// includes, system
-#include <mpi.h>
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
+#ifndef KERNEL_MANAGER_COMP_COORD_HPP
+#define KERNEL_MANAGER_COMP_COORD_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -23,7 +17,12 @@
 #include <kernel/base_mesh/file_parser.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <mpi.h>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+
 namespace FEAST
 {
 
@@ -479,4 +478,4 @@ namespace FEAST
   }; // class ManagerCompCoord
 } // namespace FEAST
 
-#endif // guard KERN_MANAG_COMP_COORD_HPP
+#endif // KERNEL_MANAGER_COMP_COORD_HPP

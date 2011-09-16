@@ -7,16 +7,15 @@
 #ifndef KERNEL_BASE_MESH_VERTEX_HPP
 #define KERNEL_BASE_MESH_VERTEX_HPP 1
 
-// includes, system
-#include <iostream> // for std::ostream
-//#include <iomanip>  // for std::setw
-
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/base_mesh/item.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream> // for std::ostream
+//#include <iomanip>  // for std::setw
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code
@@ -133,4 +132,4 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BASE_MESH_VERTEX_HPP
+#endif // KERNEL_BASE_MESH_VERTEX_HPP

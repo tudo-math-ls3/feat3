@@ -5,18 +5,18 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef MPI_UTILS_HPP
-#define MPI_UTILS_HPP
-
-// includes, system
-#include <stdlib.h>
-#include <string>
-#include <mpi.h>
+#ifndef KERNEL_UTIL_MPI_UTILS_HPP
+#define KERNEL_UTIL_MPI_UTILS_HPP 1
 
 // includes, FEAST
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/exception.hpp>
+
+// includes, system
+#include <stdlib.h>
+#include <string>
+#include <mpi.h>
 
 /**
 * \file collection of various MPI utilities
@@ -29,7 +29,6 @@
 * \author Dirk Ribbrock
 */
 
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -354,4 +353,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif //  #ifndef MPI_UTILS_HPP
+#endif // KERNEL_UTIL_MPI_UTILS_HPP

@@ -1,12 +1,10 @@
 #pragma once
-#ifndef UTIL_INSTANTIATION_POLICY_HPP
-/// Header guard
-#define UTIL_INSTANTIATION_POLICY_HPP 1
+#ifndef KERNEL_UTIL_INSTANTIATION_POLICY_HPP
+#define KERNEL_UTIL_INSTANTIATION_POLICY_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -220,4 +218,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // UTIL_INSTANTIATION_POLICY_HPP
+#endif // KERNEL_UTIL_INSTANTIATION_POLICY_HPP

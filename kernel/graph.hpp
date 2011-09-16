@@ -10,11 +10,12 @@
 #ifndef KERNEL_GRAPH_HPP
 #define KERNEL_GRAPH_HPP 1
 
+// includes, FEAST
+
 // includes, system
 #include <iostream>
 #include <stdlib.h>
 
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -345,4 +346,4 @@ namespace FEAST
   }; // class GraphDistributed
 } // namespace FEAST
 
-#endif // guard KERNEL_GRAPH_HPP
+#endif // KERNEL_GRAPH_HPP

@@ -1,7 +1,6 @@
 #pragma once
-#ifndef UTIL_COMPILER_OPEN64_HPP
-/// Header guard
-#define UTIL_COMPILER_OPEN64_HPP
+#ifndef KERNEL_UTIL_COMPILER_OPEN64_HPP
+#define KERNEL_UTIL_COMPILER_OPEN64_HPP 1
 
 /**
  * \file compiler_open64.hpp
@@ -30,4 +29,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__OPEN64__)
 
-#endif // UTIL_COMPILER_OPEN64_HPP
+#endif // KERNEL_UTIL_COMPILER_OPEN64_HPP

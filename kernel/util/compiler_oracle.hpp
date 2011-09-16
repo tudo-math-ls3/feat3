@@ -1,7 +1,6 @@
 #pragma once
-#ifndef UTIL_COMPILER_ORACLE_HPP
-/// Header guard
-#define UTIL_COMPILER_ORACLE_HPP
+#ifndef KERNEL_UTIL_COMPILER_ORACLE_HPP
+#define KERNEL_UTIL_COMPILER_ORACLE_HPP 1
 
 /**
  * \file compiler_oracle.hpp
@@ -27,4 +26,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__SUNPRO_CC)
 
-#endif // UTIL_COMPILER_ORACLE_HPP
+#endif // KERNEL_UTIL_COMPILER_ORACLE_HPP

@@ -1,7 +1,11 @@
 #pragma once
-#ifndef UTIL_EXCEPTION_HHP
-/// Header guard
-#define UTIL_EXCEPTION_HHP 1
+#ifndef KERNEL_UTIL_EXCEPTION_HPP
+#define KERNEL_UTIL_EXCEPTION_HPP 1
+
+// includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/util/instantiation_policy.hpp>
+#include <kernel/util/string_utils.hpp>
 
 // includes, system
 #include <string>
@@ -9,12 +13,6 @@
 #include <iostream>
 #include <list>
 
-// includes, FEAST
-#include <kernel/util/instantiation_policy.hpp>
-#include <kernel/util/string_utils.hpp>
-#include <kernel/base_header.hpp>
-
-/// FEAST namespace
 namespace FEAST
 {
   /// The global context stack.
@@ -248,4 +246,4 @@ namespace FEAST
 
 } // namespace FEAST
 
-#endif //UTIL_EXCEPTION_HPP
+#endif // KERNEL_UTIL_EXCEPTION_HPP

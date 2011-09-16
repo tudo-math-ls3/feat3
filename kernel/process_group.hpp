@@ -5,8 +5,15 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_BM_PROCESS_GROUP_HPP
-#define KERNEL_BM_PROCESS_GROUP_HPP 1
+#ifndef KERNEL_PROCESS_GROUP_HPP
+#define KERNEL_PROCESS_GROUP_HPP 1
+
+// includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
+#include <kernel/logger.hpp>
+#include <kernel/process.hpp>
+#include <kernel/graph.hpp>
 
 // includes, system
 #include <iostream>
@@ -15,14 +22,6 @@
 #include <mpi.h>
 #include <math.h>
 
-// includes, Feast
-#include <kernel/base_header.hpp>
-#include <kernel/util/assertion.hpp>
-#include <kernel/logger.hpp>
-#include <kernel/process.hpp>
-#include <kernel/graph.hpp>
-
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -395,4 +394,4 @@ namespace FEAST
 //int ProcessGroup::BUFFERSIZE_BYTES = 4194304;
 } // namespace FEAST
 
-#endif // guard KERNEL_BM_PROCESS_GROUP_HPP
+#endif // KERNEL_BM_PROCESS_GROUP_HPP

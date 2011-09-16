@@ -7,9 +7,6 @@
 #ifndef KERNEL_BASE_MESH_CELL_1D_EDGE_HPP
 #define KERNEL_BASE_MESH_CELL_1D_EDGE_HPP 1
 
-// includes, system
-#include <iostream> // for std::ostream
-
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
@@ -20,7 +17,9 @@
 #include <kernel/base_mesh/cell_data_validation.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream> // for std::ostream
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code
@@ -272,4 +271,4 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BASE_MESH_CELL_1D_EDGE_HPP
+#endif // KERNEL_BASE_MESH_CELL_1D_EDGE_HPP

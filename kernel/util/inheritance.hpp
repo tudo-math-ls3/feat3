@@ -1,7 +1,6 @@
 #pragma once
-#ifndef UTIL_INHERITANCE_HPP
-/// Header guard
-#define UTIL_INHERITANCE_HPP 1
+#ifndef KERNEL_UTIL_INHERITANCE_HPP
+#define KERNEL_UTIL_INHERITANCE_HPP 1
 
 /**
 * \file inheritance.hpp
@@ -11,7 +10,6 @@
 * \author Dirk Ribbrock
 */
 
-/// FEAST namespace
 namespace FEAST
 {
   template <typename T, typename U>
@@ -40,4 +38,4 @@ namespace FEAST
 #define SUPERSUBCLASS(T, U) \
   (::FEAST::Conversion<const U*, const T*>::exists && \
    !::FEAST::Conversion<const T*, const void*>::sameType)
-#endif // UTIL_INHERITANCE_HPP
+#endif // KERNEL_UTIL_INHERITANCE_HPP

@@ -8,10 +8,6 @@
 #ifndef KERNEL_BASE_MESH_SUBCELLS_HPP
 #define KERNEL_BASE_MESH_SUBCELLS_HPP 1
 
-// includes, system
-#include <iostream> // for std::ostream
-#include <vector>   // for std::vector
-
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
@@ -22,7 +18,10 @@
 #include <kernel/base_mesh/cell_2d_tri.hpp>
 #include <kernel/graph.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream> // for std::ostream
+#include <vector>   // for std::vector
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code
@@ -636,4 +635,4 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BASE_MESH_SUBCELLS_HPP
+#endif // KERNEL_BASE_MESH_SUBCELLS_HPP

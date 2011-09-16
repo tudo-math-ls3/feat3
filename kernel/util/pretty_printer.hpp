@@ -5,17 +5,16 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef PRETTY_PRINTER_HPP
-#define PRETTY_PRINTER_HPP
-
-// includes, system
-#include <string>
+#ifndef KERNEL_UTIL_PRETTY_PRINTER_HPP
+#define KERNEL_UTIL_PRETTY_PRINTER_HPP 1
 
 // includes, FEAST
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/exception.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <string>
+
 namespace FEAST
 {
   /**
@@ -322,4 +321,4 @@ namespace FEAST
   }; // class PrettyPrinter
 } // namespace FEAST
 
-#endif //  #ifndef PRETTY_PRINTER_HPP
+#endif // KERNEL_UTIL_PRETTY_PRINTER_HPP

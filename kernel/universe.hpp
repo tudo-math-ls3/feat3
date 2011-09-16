@@ -6,11 +6,7 @@
 #ifndef KERNEL_UNIVERSE_HPP
 #define KERNEL_UNIVERSE_HPP 1
 
-// includes, system
-#include <iostream>
-#include <stdlib.h>
-
-// includes, Feast
+// includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/assertion.hpp>
@@ -23,7 +19,10 @@
 //#include <kernel/manager_coord.hpp>
 //#include <kernel/manager_non_coord.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream>
+#include <stdlib.h>
+
 namespace FEAST
 {
   /**
@@ -570,4 +569,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_UNIVERSE_HPP
+#endif // KERNEL_UNIVERSE_HPP

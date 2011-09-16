@@ -17,12 +17,6 @@
 #ifndef KERNEL_LOAD_BALANCER_HPP
 #define KERNEL_LOAD_BALANCER_HPP 1
 
-// includes, system
-#include <mpi.h>
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
@@ -32,7 +26,12 @@
 #include <kernel/process_group.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <mpi.h>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+
 namespace FEAST
 {
   /**
@@ -629,4 +628,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_LOAD_BALANCER_HPP
+#endif // KERNEL_LOAD_BALANCER_HPP

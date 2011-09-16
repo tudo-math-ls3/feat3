@@ -8,10 +8,6 @@
 #ifndef KERNEL_BASE_MESH_CELL_3D_TETRA_HPP
 #define KERNEL_BASE_MESH_CELL_3D_TETRA_HPP 1
 
-// includes, system
-#include <iostream> // for std::ostream
-#include <typeinfo>  // for typeid()
-
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
@@ -23,7 +19,10 @@
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 #include <kernel/base_mesh/cell_2d_tri.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream> // for std::ostream
+#include <typeinfo>  // for typeid()
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code
@@ -384,4 +383,4 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BASE_MESH_CELL_3D_TETRA_HPP
+#endif // KERNEL_BASE_MESH_CELL_3D_TETRA_HPP

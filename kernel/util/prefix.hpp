@@ -6,18 +6,17 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef PREFIX_HPP
-#define PREFIX_HPP
-
-// includes, system
-#include <string>
-#include <vector>
+#ifndef KERNEL_UTIL_PREFIX_HPP
+#define KERNEL_UTIL_PREFIX_HPP 1
 
 // includes, FEAST
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <string>
+#include <vector>
+
 namespace FEAST
 {
   /**
@@ -145,4 +144,4 @@ namespace FEAST
   }; // class Prefix
 } // namespace FEAST
 
-#endif //  #ifndef PREFIX_HPP
+#endif // KERNEL_UTIL_PREFIX_HPP

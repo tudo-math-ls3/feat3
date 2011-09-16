@@ -17,11 +17,6 @@
 #ifndef KERNEL_MASTER_HPP
 #define KERNEL_MASTER_HPP 1
 
-// includes, system
-#include <iostream>
-#include <stdlib.h>
-#include <mpi.h>
-
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/mpi_utils.hpp>
@@ -30,7 +25,11 @@
 #include <kernel/process_group.hpp>
 #include <kernel/logger.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream>
+#include <stdlib.h>
+#include <mpi.h>
+
 namespace FEAST
 {
   /**
@@ -146,4 +145,4 @@ namespace FEAST
   }; // class Master
 } // namespace FEAST
 
-#endif // guard KERNEL_MASTER_HPP
+#endif // KERNEL_MASTER_HPP

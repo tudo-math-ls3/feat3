@@ -1,7 +1,6 @@
 #pragma once
-#ifndef UTIL_COMPILER_INTEL_HPP
-/// Header guard
-#define UTIL_COMPILER_INTEL_HPP
+#ifndef KERNEL_UTIL_COMPILER_INTEL_HPP
+#define KERNEL_UTIL_COMPILER_INTEL_HPP 1
 
 /**
  * \file compiler_intel.hpp
@@ -38,4 +37,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__INTEL_COMPILER)
 
-#endif // UTIL_COMPILER_INTEL_HPP
+#endif // KERNEL_UTIL_COMPILER_INTEL_HPP

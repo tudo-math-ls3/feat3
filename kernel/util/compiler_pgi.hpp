@@ -1,7 +1,6 @@
 #pragma once
-#ifndef UTIL_COMPILER_PGI_HPP
-/// Header guard
-#define UTIL_COMPILER_PGI_HPP
+#ifndef KERNEL_UTIL_COMPILER_PGI_HPP
+#define KERNEL_UTIL_COMPILER_PGI_HPP 1
 
 /**
  * \file compiler_pgi.hpp
@@ -24,4 +23,4 @@
 
 #endif // !defined(FEAST_COMPILER) && defined(__PGI)
 
-#endif // UTIL_COMPILER_PGI_HPP
+#endif // KERNEL_UTIL_COMPILER_PGI_HPP

@@ -1,15 +1,13 @@
 #pragma once
-#ifndef UTIL_TYPE_TRAITS_HHP
-/// Header guard
-#define UTIL_TYPE_TRAITS_HHP 1
-
-// includes, system
-#include <typeinfo>
+#ifndef KERNEL_UTIL_TYPE_TRAITS_HPP
+#define KERNEL_UTIL_TYPE_TRAITS_HPP 1
 
 // includes, FEAST
 #include <kernel/util/string_utils.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <typeinfo>
+
 namespace FEAST
 {
   /**
@@ -118,4 +116,4 @@ namespace FEAST
   };
 }
 
-#endif //UTIL_TYPE_TRAITS_HHP
+#endif // KERNEL_UTIL_TYPE_TRAITS_HPP

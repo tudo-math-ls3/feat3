@@ -7,12 +7,6 @@
 #ifndef KERNEL_MANAGER_COMP_HPP
 #define KERNEL_MANAGER_COMP_HPP 1
 
-// includes, system
-#include <mpi.h>
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
@@ -23,7 +17,12 @@
 #include <kernel/work_group_ext.hpp>
 #include <kernel/interlevel_group.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <mpi.h>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+
 namespace FEAST
 {
   /**
@@ -427,4 +426,4 @@ namespace FEAST
   }; //ManagerComp
 } // namespace FEAST
 
-#endif // guard KERNEL_MANAGER_COMP_HPP
+#endif // KERNEL_MANAGER_COMP_HPP

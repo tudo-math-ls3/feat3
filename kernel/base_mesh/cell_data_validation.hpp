@@ -5,12 +5,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_BM_CELL_DATA_VALIDATION_HPP
-#define KERNEL_BM_CELL_DATA_VALIDATION_HPP 1
-
-// includes, system
-#include <iostream> // for std::ostream
-#include <vector>   // for std::vector
+#ifndef KERNEL_BASE_MESH_CELL_DATA_VALIDATION_HPP
+#define KERNEL_BASE_MESH_CELL_DATA_VALIDATION_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -22,7 +18,10 @@
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream> // for std::ostream
+#include <vector>   // for std::vector
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code
@@ -609,4 +608,4 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BM_CELL_DATA_VALIDATION_HPP
+#endif // KERNEL_BASE_MESH_CELL_DATA_VALIDATION_HPP

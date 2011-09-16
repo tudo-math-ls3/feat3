@@ -6,14 +6,13 @@
 #ifndef KERNEL_PROCESS_HPP
 #define KERNEL_PROCESS_HPP 1
 
+// includes, FEAST
+#include <kernel/base_header.hpp>
+
 // includes, system
 #include <stdlib.h>
 #include <mpi.h>
 
-// includes, Feast
-#include <kernel/base_header.hpp>
-
-/// FEAST namespace
 namespace FEAST
 {
   /**
@@ -59,4 +58,4 @@ namespace FEAST
 
 } // namespace FEAST
 
-#endif // guard KERNEL_PROCESS_HPP
+#endif // KERNEL_PROCESS_HPP

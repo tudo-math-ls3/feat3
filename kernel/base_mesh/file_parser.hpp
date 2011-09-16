@@ -5,12 +5,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_BM_FILE_PARSER_HPP
-#define KERNEL_BM_FILE_PARSER_HPP 1
-
-// includes, system
-#include <iostream> // for std::ostream
-#include <math.h>   // for sin, cos
+#ifndef KERNEL_BASE_MESH_FILE_PARSER_HPP
+#define KERNEL_BASE_MESH_FILE_PARSER_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -21,7 +17,10 @@
 #include <kernel/base_mesh/cell_3d_hexa.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream> // for std::ostream
+#include <math.h>   // for sin, cos
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code
@@ -1225,7 +1224,7 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BM_FILE_PARSER_HPP
+#endif // KERNEL_BASE_MESH_FILE_PARSER_HPP
 
 /*
 Manually created 2D base mesh, maybe still useful. But before it can be used, it must be adapted.

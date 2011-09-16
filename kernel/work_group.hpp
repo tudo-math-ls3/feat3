@@ -12,14 +12,7 @@
 #ifndef KERNEL_WORK_GROUP_HPP
 #define KERNEL_WORK_GROUP_HPP 1
 
-// includes, system
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-#include <mpi.h>
-#include <math.h>
-
-// includes, Feast
+// includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
@@ -27,7 +20,13 @@
 //#include <kernel/interlevel_group.hpp>
 #include <kernel/graph.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+#include <mpi.h>
+#include <math.h>
+
 namespace FEAST
 {
   /**
@@ -311,4 +310,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // guard KERNEL_WORK_GROUP_HPP
+#endif // KERNEL_WORK_GROUP_HPP

@@ -1,9 +1,6 @@
 #pragma once
-#ifndef UTIL_COMPILER_MICROSOFT_HPP
-/// Header guard
-#define UTIL_COMPILER_MICROSOFT_HPP 1
-
-
+#ifndef KERNEL_UTIL_COMPILER_MICROSOFT_HPP
+#define KERNEL_UTIL_COMPILER_MICROSOFT_HPP 1
 
 /**
  * \file compiler_microsoft.hpp
@@ -12,7 +9,6 @@
  *
  * \author Peter Zajac
  */
-
 #if !defined(FEAST_COMPILER) && defined(_MSC_VER)
 
 // define FEAST_COMPILER_MICROSOFT macro
@@ -52,8 +48,8 @@
 #  endif
 
 // disable CRT security warnings for standard C/C++ library functions
-#define _CRT_SECURE_NO_WARNINGS 1
+#pragma warning(disable: 4996)
 
 #endif // !defined(FEAST_COMPILER) && defined(_MSC_VER)
 
-#endif // UTIL_COMPILER_MICROSOFT_HPP
+#endif // KERNEL_UTIL_COMPILER_MICROSOFT_HPP

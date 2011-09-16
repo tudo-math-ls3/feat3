@@ -10,7 +10,8 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 
-/// FEAST namespace
+// includes, system
+
 namespace FEAST
 {
   /**
@@ -37,4 +38,4 @@ namespace FEAST
   }; // class ServiceIDs
 } // namespace FEAST
 
-#endif // guard KERNEL_SERVICE_IDS_HPP
+#endif // KERNEL_SERVICE_IDS_HPP

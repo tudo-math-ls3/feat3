@@ -4,18 +4,17 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_BASE_MESH_CELL_SUBDIV_HPP
-#define KERNEL_BASE_MESH_CELL_SUBDIV_HPP 1
-
-// includes, system
-#include <iostream> // for std::ostream
-#include <vector>   // for std::vector
+#ifndef KERNEL_BASE_MESH_CELL_SUBDIVISION_HPP
+#define KERNEL_BASE_MESH_CELL_SUBDIVISION_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 
-/// FEAST namespace
+// includes, system
+#include <iostream> // for std::ostream
+#include <vector>   // for std::vector
+
 namespace FEAST
 {
   /// BaseMesh namespace comprising base mesh specific code
@@ -398,4 +397,4 @@ namespace FEAST
   } // namespace BaseMesh
 } // namespace FEAST
 
-#endif // #define KERNEL_BASE_MESH_CELL_SUBDIV_HPP
+#endif // KERNEL_BASE_MESH_CELL_SUBDIVISION_HPP
