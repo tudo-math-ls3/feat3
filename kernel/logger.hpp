@@ -12,6 +12,7 @@
 #include <kernel/service_ids.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/comm.hpp>
+#include <kernel/util/assertion.hpp>
 
 // includes, system
 #include <mpi.h>
