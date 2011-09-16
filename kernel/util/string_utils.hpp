@@ -14,6 +14,7 @@
 #include <list>
 #include <vector>
 #include <cassert>
+#include <locale>
 
 /**
 * \file collection of various string utilities
@@ -190,13 +191,24 @@ namespace FEAST
   * \return upper case string
   *
   * \author Hilmar Wobker
+  *
+  * \todo Check whether also other compilers than MSVC need to call the two-argument version of std::toupper, since
+  * the single-argument version of std::toupper is not defined in the C++03-Standard, see 22.1.3.2, pp. 424.
   */
   inline std::string upper_case(const std::string& str)
   {
     std::string str_up(str);
     for(size_t i = 0; i < str.length(); ++i)
     {
+#ifdef FEAST_COMPILER_MICROSOFT
+      // The C++-Standard toupper-function has two arguments, where the second is of type std::locale.
+      // We'll pass the standard ASCII-C-locale, which is retrieved by calling the function below,.
+      str_up[i] = std::toupper(str_up[i], std::locale::classic());
+#else
+      // All other compilers seem to have a non-standard implementation of std::toupper which has only
+      // one argument.
       str_up[i] = std::toupper(str_up[i]);
+#endif
     }
     return str_up;
   }
@@ -213,13 +225,21 @@ namespace FEAST
   * \return lower case string
   *
   * \author Hilmar Wobker
+  *
+  * \todo Same problem as upper_case().
   */
   inline std::string lower_case(const std::string& str)
   {
     std::string str_low(str);
     for(size_t i = 0; i < str.length(); ++i)
     {
+#ifdef FEAST_COMPILER_MICROSOFT
+      // The C++-Standard tolower-function has two arguments, where the second is of type std::locale.
+      // We'll pass the standard ASCII-C-locale, which is retrieved by calling the function below,.
+      str_low[i] = std::tolower(str_low[i], std::locale::classic());
+#else
       str_low[i] = std::tolower(str_low[i]);
+#endif
     }
     return str_low;
   }
