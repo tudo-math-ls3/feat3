@@ -70,7 +70,7 @@ namespace FEAST
     std::string _s;
 
     /// start positions of the substrings inside the string #_s
-    std::vector<unsigned int> _start_pos;
+    std::vector<size_t> _start_pos;
 
   public:
     /// constructor

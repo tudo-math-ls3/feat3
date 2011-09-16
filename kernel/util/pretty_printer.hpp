@@ -64,8 +64,8 @@ namespace FEAST
     /// string holding the pretty printed block of messages
     std::string _block;
 
-    ///width of the pretty printed block (from left to right delimiter, excluding the prefix)
-    unsigned int _width;
+    /// width of the pretty printed block (from left to right delimiter, excluding the prefix)
+    size_t _width;
 
     /// character to be used to enclose lines and to build separator lines
     char _delim;
@@ -89,7 +89,7 @@ namespace FEAST
     * prefix which can be useful in connection with grep commands
     */
     PrettyPrinter(
-      unsigned int width,
+      size_t width,
       char delim,
       const std::string& prefix)
       : _block(""),
@@ -111,7 +111,7 @@ namespace FEAST
     * character to be used to enclose lines and to build separator lines
     */
     PrettyPrinter(
-      unsigned int width,
+      size_t width,
       char delim)
       : _block(""),
         _width(width),
@@ -153,7 +153,7 @@ namespace FEAST
     *
     * \return width of the pretty printed block #_width
     */
-    inline unsigned int width() const
+    inline size_t width() const
     {
       CONTEXT("PrettyPrinter::width()");
       return _width;
@@ -241,8 +241,7 @@ namespace FEAST
     void add_line_centered(const std::string& s)
     {
       CONTEXT("PrettyPrinter::add_line_centered()");
-      int num_blanks_total(_width - s.size() - 2);
-      if(num_blanks_total < 2)
+      if(_width < s.size() + 4)
       {
         // if the string is too long, produce a left aligned line without right delimiter
         add_line_no_right_delim(s);
@@ -250,8 +249,9 @@ namespace FEAST
       else
       {
         // calculate blanks on the left and the right side
-        unsigned int num_blanks_left(num_blanks_total / 2);
-        unsigned int num_blanks_right(num_blanks_total%2 == 0 ? num_blanks_left : num_blanks_left + 1);
+        size_t num_blanks_total = _width - s.size() - 2;
+        size_t num_blanks_left(num_blanks_total / 2);
+        size_t num_blanks_right(num_blanks_total % 2 == 0 ? num_blanks_left : num_blanks_left + 1);
         // add the line to the pretty printed block
         _block += _prefix + stringify(_delim) + std::string(num_blanks_left, ' ') + s
                   + std::string(num_blanks_right, ' ') + stringify(_delim) + "\n";
@@ -272,8 +272,7 @@ namespace FEAST
     void add_line(const std::string& s)
     {
       CONTEXT("PrettyPrinter::add_line()");
-      int num_blanks(_width - s.size() - 2);
-      if(num_blanks < 2)
+      if(_width < s.size() + 4)
       {
         // if the string is too long, produce a left aligned line without right delimiter
         add_line_no_right_delim(s);
@@ -281,7 +280,7 @@ namespace FEAST
       else
       {
         // add the line to the pretty printed block
-        _block += _prefix + stringify(_delim) + " " + s + std::string(num_blanks - 1, ' ')
+        _block += _prefix + stringify(_delim) + " " + s + std::string(_width - s.size() - 3, ' ')
                   + stringify(_delim) + "\n";
       }
     }
