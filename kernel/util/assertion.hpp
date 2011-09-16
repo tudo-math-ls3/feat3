@@ -1,9 +1,11 @@
 #pragma once
-#ifndef UTIL_ASSERTION_HH
-/// Header guard
-#define UTIL_ASSERTION_HH 1
+#ifndef KERNEL_UTIL_ASSERTION_HPP
+#define KERNEL_UTIL_ASSERTION_HPP 1
 
+// includes, FEAST
 #include <kernel/util/exception.hpp>
+
+// includes, system
 #include <string>
 #include <iostream>
 
@@ -97,16 +99,14 @@ namespace FEAST
 #define ASSERT(expr, msg) \
     do { \
         if (! (expr)) \
-            throw FEAST::Assertion(__PRETTY_FUNCTION__, __FILE__, __LINE__, msg); \
+            throw FEAST::Assertion(THIS_FUNCTION, __FILE__, __LINE__, msg); \
     } while (false)
 #else
 #define ASSERT(expr, msg)
 #endif
 
-
-
-
-/**
+// The following static-assert emulation has been disabled. Use the C++0x keyword static_assert instead.
+/*
 * \def STATIC_ASSERT
 *
 * \brief Convenience definition that provides a way to throw compile-time errors.
@@ -121,7 +121,7 @@ namespace FEAST
 *
 * \note Will only be compiled in when debug support is enabled.
 */
-#if defined (DEBUG)
+/*#if defined (DEBUG)
 #define STATIC_ASSERT(const_expr, msg) \
     {\
       class ERROR_##msg {}; \
@@ -131,6 +131,6 @@ namespace FEAST
 #else
 #define STATIC_ASSERT(const_expr, msg)
 #endif
-}
+}*/
 
-#endif //UTIL_ASSERTION_HPP
+#endif // KERNEL_UTIL_ASSERTION_HPP
