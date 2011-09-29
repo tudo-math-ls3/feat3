@@ -11,6 +11,7 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
@@ -321,5 +322,7 @@ namespace FEAST
     } // test_communication()
   };
 } // namespace FEAST
+
+#endif // PARALLEL
 
 #endif // KERNEL_INTERLEVEL_GROUP_HPP

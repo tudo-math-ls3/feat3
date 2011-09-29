@@ -10,6 +10,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/assertion.hpp>
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
@@ -394,4 +395,5 @@ namespace FEAST
 //int ProcessGroup::BUFFERSIZE_BYTES = 4194304;
 } // namespace FEAST
 
+#endif // PARALLEL
 #endif // KERNEL_BM_PROCESS_GROUP_HPP

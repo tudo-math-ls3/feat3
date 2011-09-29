@@ -9,6 +9,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
 #include <kernel/work_group.hpp>
@@ -232,4 +233,5 @@ namespace FEAST
   };
 } // namespace FEAST
 
+#endif // PARALLEL
 #endif // KERNEL_WORK_GROUP_EXT_HPP

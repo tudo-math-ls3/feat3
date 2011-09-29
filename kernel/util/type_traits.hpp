@@ -114,6 +114,6 @@ namespace FEAST
       return "Nil";
     }
   };
-}
+} // FEAST
 
 #endif // KERNEL_UTIL_TYPE_TRAITS_HPP

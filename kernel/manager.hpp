@@ -10,6 +10,7 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/process_group.hpp>
@@ -794,4 +795,5 @@ namespace FEAST
   };
 } // namespace FEAST
 
+#endif // PARALLEL
 #endif // KERNEL_MANAGER_HPP

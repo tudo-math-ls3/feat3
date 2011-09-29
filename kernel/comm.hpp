@@ -18,6 +18,7 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/process.hpp>
@@ -221,16 +222,8 @@ namespace FEAST
       validate_error_code_mpi(mpi_error_code, "MPI_Unpack");
     }
   }; // class Comm
-
-  // COMMENT_HILMAR: JUST TEMPORARILY
-  // initialisation of static members
-  // COMMENT_HILMAR: Use some arbitrary size for the time being. This has to be parameterised somehow...
-  unsigned int Comm::MCW_BUFFERSIZE = 4194304;
-  char* Comm::MCW_buffer = new char[MCW_BUFFERSIZE];
-  int Comm::MCW_buffer_pos = 0;
-  int Comm::MCW_received_bytes = 0;
-  // COMMENT_HILMAR: JUST TEMPORARILY
-
 } // namespace FEAST
+
+#endif // PARALLEL
 
 #endif // KERNEL_COMM_HPP

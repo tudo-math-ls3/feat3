@@ -9,13 +9,12 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
-#include <kernel/service_ids.hpp>
-#include <kernel/util/mpi_utils.hpp>
-#include <kernel/comm.hpp>
 #include <kernel/util/assertion.hpp>
+#ifdef PARALLEL
+#include <kernel/comm.hpp>
+#endif
 
 // includes, system
-#include <mpi.h>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -589,10 +588,6 @@ namespace FEAST
       delete [] messages;
     } // receive_array()
   }; // class Logger
-
-  std::string Logger::file_name;
-  std::string Logger::file_base_name;
-  std::ofstream Logger::file;
 
 } // namespace FEAST
 

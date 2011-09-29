@@ -9,6 +9,7 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/error_handler.hpp>
@@ -330,4 +331,5 @@ namespace FEAST
   }; // class ManagerCompNonCoord
 } // namespace FEAST
 
+#endif // PARALLEL
 #endif // KERNEL_MANAGER_COMP_NON_COORD_HPP

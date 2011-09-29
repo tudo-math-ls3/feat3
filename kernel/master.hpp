@@ -19,6 +19,7 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/comm.hpp>
 #include <kernel/service_ids.hpp>
@@ -145,4 +146,5 @@ namespace FEAST
   }; // class Master
 } // namespace FEAST
 
+#endif // PARALLEL
 #endif // KERNEL_MASTER_HPP

@@ -9,6 +9,8 @@
 #define KERNEL_UTIL_MPI_UTILS_HPP 1
 
 // includes, FEAST
+#include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/exception.hpp>
@@ -353,4 +355,5 @@ namespace FEAST
   };
 } // namespace FEAST
 
+#endif // PARALLEL
 #endif // KERNEL_UTIL_MPI_UTILS_HPP

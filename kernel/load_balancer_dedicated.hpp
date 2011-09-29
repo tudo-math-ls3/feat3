@@ -15,6 +15,7 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/process_group.hpp>
 
 // includes, system
@@ -61,4 +62,5 @@ namespace FEAST
   };
 } // namespace FEAST
 
+#endif // PARALLEL
 #endif // KERNEL_LOAD_BALANCER_DEDICATED_HPP

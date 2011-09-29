@@ -121,19 +121,20 @@ namespace FEAST
   };
 
   /**
-  * \brief index data type
-  *
-  * This type is used for indexing entities on a single matrix patch like e.g. vertice indices, degrees of freedom
-  * or column indices in a sparse matrix implementation.
-  */
-  typedef unsigned long index_t;
+   * \brief Index data type.
+   */
+  typedef unsigned long Index;
 
   /**
-  * \brief global index data type
-  *
-  * This type is used for indexing entities in a global parallel simulation.
-  */
-  typedef unsigned long index_glob_t;
+   * \brief Real data type.
+   */
+  typedef double Real;
+
+  /// deprecated; use Index instead
+  typedef Index index_t;
+
+  /// deprecated; use Index instead
+  typedef Index index_glob_t;
 
   /**
   * \brief Nil class definition.
