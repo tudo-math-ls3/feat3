@@ -1,4 +1,5 @@
 #include <kernel/comm.hpp>
+#ifdef PARALLEL
 
 namespace FEAST
 {
@@ -12,3 +13,5 @@ namespace FEAST
   // COMMENT_HILMAR: JUST TEMPORARILY
 
 } // namespace FEAST
+
+#endif // PARALLEL
