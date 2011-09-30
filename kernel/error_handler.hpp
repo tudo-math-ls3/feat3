@@ -13,9 +13,9 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/logger.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/pretty_printer.hpp>
-#include <kernel/logger.hpp>
 #include <kernel/util/exception.hpp>
 
 // includes, system
@@ -83,20 +83,23 @@ function:
       // create pretty printed error message with the prefix EXCEPTION which can be grepped for
       PrettyPrinter pp(40, '#', "EXCEPTION ");
       pp.add_line_sep();
+#ifdef PARALLEL
       pp.add_line_centered("Exception occured on process " + stringify(Process::rank) + "!");
+#endif
       pp.add_line_sep();
       pp.add_line_no_right_delim(e.message());
       pp.add_line_sep();
       pp.add_line("Backtrace:");
       pp.add_line(e.backtrace("\nEXCEPTION # "));
       pp.add_line_sep();
-      pp.print(Logger::file);
+      //pp.print(Logger::file);
+      Logger::log(pp.block());
 
       // An exception always leads to program abortion via MPI_Abort(). Its message is written to stderr. If the error
       // occurs simultaneously on several processes, the error message appears several times on stderr. There is no
       // way to prevent this.
       pp.print(std::cerr);
-      abort_mpi();
+      abort("Unhandled exception");
     }
   };
 } // namespace FEAST
