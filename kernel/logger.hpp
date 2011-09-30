@@ -9,7 +9,9 @@
 
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/util/abort.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/string.hpp>
 #ifdef PARALLEL
 #include <kernel/comm.hpp>
 #endif
@@ -17,12 +19,10 @@
 // includes, system
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>
-#include <math.h>
 
 namespace FEAST
 {
-  /**
+  /*
   * \brief class providing logging mechanisms
   *
   * <ul>
@@ -151,6 +151,15 @@ namespace FEAST
   *
   * \author Hilmar Wobker
   */
+
+
+  /* ******************************************************************************************* */
+  /* ******************************************************************************************* */
+  /* ******************************************************************************************* */
+
+// Peter: Here comes the old logger implementation. This has to be deleted once the new logger is
+//        ready for its duty.
+#ifdef OLD_LOGGER
   class Logger
   {
 
@@ -589,6 +598,209 @@ namespace FEAST
     } // receive_array()
   }; // class Logger
 
+#else
+  /* ******************************************************************************************* */
+  /* ******************************************************************************************* */
+  /* ******************************************************************************************* */
+
+  /**
+   * \brief Logger class implementation
+   * \author Peter Zajac
+   */
+  class Logger
+  {
+  public:
+    /**
+     * \brief Logger channel enumeration
+     *
+     * This enumeration...
+     */
+    enum Channel
+    {
+      /// none...
+      none                    = 0x00000000,
+
+      /**
+       * \brief Local stdout channel.
+       *
+       * This channel represents the stdout channel of the calling process.
+       */
+      local_stdout            = 0x00008000,
+      local_file_0            = 0x00000001,
+      local_file_1            = 0x00000002,
+      local_file_2            = 0x00000004,
+      local_file_3            = 0x00000008,
+
+      /**
+       * \brief Master stdout channel.
+       *
+       * This channel represents the stdout channel of the master process.
+       */
+      master_stdout           = 0x80000000,
+      master_file_0           = 0x00010000,
+      master_file_1           = 0x00020000,
+      master_file_2           = 0x00040000,
+      master_file_3           = 0x00080000,
+
+      /**
+       * \brief Screen output channel.
+       *
+       * \li In a parallel build, this channel refers to the master's standard output stream.\n
+       * \li In a serial build, this channel refers to the local standard output stream.
+       */
+#ifdef PARALLEL
+      screen                  = master_stdout,
+#else
+      screen                  = local_stdout,
+#endif
+
+      /**
+       * \brief Standard output channel.
+       *
+       * \li In a parallel build, this channel is equivalent to \p local_file_0.
+       * \li In a serial build, this channel is a combination of \p local_file_0 and \p local_stdout.
+       */
+#ifdef PARALLEL
+      standard                = 0x00000001,   // local file 0 only
+#else
+      standard                = 0x00008001,   // local file 0 and screen
+#endif
+    }; // enum Channel
+
+    enum
+    {
+      /**
+       * \brief Maximum number of log files.
+       */
+      max_files = 4,
+    };
+
+  private:
+    /// local log file streams
+    static std::ofstream _stream[max_files];
+
+  public:
+    static void open(
+      const String& base_name,
+      int index = 0)
+    {
+      CONTEXT("Logger::open()");
+
+      // check index range
+      ASSERT((index >= 0) && (index < max_files), "Index out of range");
+
+      // ensure that the specified channel isn't already open
+      if(_stream[index].is_open())
+      {
+        abort("Index is already open!");
+      }
+
+      // build the file name
+      String file_name(base_name);
+
+#ifdef PARALLEL
+      // count number of decimal digits
+      int num_digits(0);
+      unsigned int i = Process::num_processes;
+      while(i)
+      {
+        ++num_digits;
+        i /= 10;
+      }
+      num_digits = std::max(3, num_digits);
+      char* tmp = new char[num_digits+3];
+      sprintf(tmp, "_%0*i", num_digits, Process::rank);
+      file_name.append(tmp);
+      delete [] tmp;
+#endif // PARALLEL
+
+      // append file extension
+      file_name.append(".log");
+
+      // try to open the desired log file stream
+      _stream[index].open(file_name.c_str());
+      if(_stream[index].fail())
+      {
+        abort("Failed to open log file '" + file_name + "'");
+      }
+    }
+
+    static void close(int index)
+    {
+      CONTEXT("Logger::close()");
+      ASSERT((index >= 0) && (index < max_files), "Index out of range");
+      if(!_stream[index].is_open())
+      {
+        abort("Log file is not open (anymore)");
+      }
+      _stream[index].close();
+    }
+
+    static void close_all()
+    {
+      CONTEXT("Logger::close_all()");
+
+      // loop over all streams and close the open ones.
+      for(int i = 0; i < max_files; ++i)
+      {
+        if(_stream[i].is_open())
+        {
+          _stream[i].close();
+        }
+      }
+    }
+
+    static Channel file_channel(
+      int index,
+      bool master = false)
+    {
+      CONTEXT("Logger::file_channel()");
+      ASSERT((index >= 0) && (index < max_files), "Index out of range");
+
+      // encode channel
+      return (Channel)(1 << (index + (master ? 16 : 0)));
+    }
+
+    static void log(
+      const String& msg,
+      Channel channel = standard)
+    {
+      CONTEXT("Logger::log()");
+
+      // log to local stdout?
+      if((channel & local_stdout) != none)
+      {
+        std::cout << msg;
+      }
+
+      // log to local files?
+      for(int i(0); i < max_files; ++i)
+      {
+        if((channel & file_channel(i, false)) != none)
+        {
+          _stream[i] << msg;
+        }
+      }
+
+#ifdef PARALLEL
+      // TODO: log to master
+#endif // PARALLEL
+    }
+  }; // class Logger
+
+  /// \cond nodoxy
+  inline Logger::Channel operator|(Logger::Channel a, Logger::Channel b)
+  {
+    return (Logger::Channel)(((int)a) | ((int)b));
+  }
+
+  inline Logger::Channel operator&(Logger::Channel a, Logger::Channel b)
+  {
+    return (Logger::Channel)(((int)a) & ((int)b));
+  }
+  /// \endcond
+
+#endif // OLD_LOGGER
 } // namespace FEAST
 
 #endif // KERNEL_LOGGER_HPP
