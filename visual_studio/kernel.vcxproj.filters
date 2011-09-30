@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files\base_mesh">
+      <UniqueIdentifier>{c91d9cea-cb44-4cc8-8eed-2e8b0ceece43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{09524e05-8107-4f0a-b5f7-c473b2106d8d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\base_header.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\comm.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\constants.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\error_handler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\graph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\interlevel_group.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\load_balancer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\load_balancer_dedicated.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\logger.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\manager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\manager_comp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\manager_comp_coord.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\manager_comp_non_coord.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\master.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\process.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\process_group.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\service_ids.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\universe.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\work_group.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\work_group_ext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\bm.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_1d_edge.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_2d_quad.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_2d_tri.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_3d_hexa.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_3d_tetra.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_data.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_data_validation.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\cell_subdivision.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\file_parser.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\item.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\subcells.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\base_mesh\vertex.hpp">
+      <Filter>Header Files\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\abort.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\assertion.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\compiler_gnu.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\compiler_intel.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\compiler_microsoft.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\compiler_open64.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\compiler_oracle.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\compiler_pgi.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\exception.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\file_reader_ascii.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\inheritance.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\instantiation_policy.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\mpi_utils.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\prefix.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\pretty_printer.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\string_utils.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\type_traits.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\string.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="feast_config.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\comm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\constants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dummy.cpp" />
+  </ItemGroup>
+</Project>
