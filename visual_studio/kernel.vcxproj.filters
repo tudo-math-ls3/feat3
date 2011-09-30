@@ -188,6 +188,5 @@
     <ClCompile Include="..\kernel\logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\dummy.cpp" />
   </ItemGroup>
 </Project>
