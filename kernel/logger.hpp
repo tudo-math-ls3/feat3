@@ -605,6 +605,8 @@ namespace FEAST
 
   /**
    * \brief Logger class implementation
+   *
+   * \todo detailed documentation
    * \author Peter Zajac
    */
   class Logger
@@ -613,57 +615,74 @@ namespace FEAST
     /**
      * \brief Logger channel enumeration
      *
-     * This enumeration...
+     * \internal \b Internal:\n
+     * Each channel encodes a 32 bit mask, where the low-order 16 bits are reserved for local channels, whereas
+     * the high-order 16 bits represent channels on the master process.
      */
     enum Channel
     {
-      /// none...
+      /// Null channel.
       none                    = 0x00000000,
 
       /**
-       * \brief Local stdout channel.
+       * \brief Default local channel.
        *
-       * This channel represents the stdout channel of the calling process.
+       * \li In a parallel build, this channel is equivalent to \link local_file_0\endlink.
+       * \li In a serial build, this channel is an OR-ed combination of \link local_file_0\endlink and
+       *     \link local_standard\endlink.
        */
-      local_stdout            = 0x00008000,
+#ifdef PARALLEL
+      local                   = 0x00000001, // = local_file_0
+#else
+      local                   = 0x00008001, // = local_file_0 | local_standard
+#endif
+
+      /**
+       * \brief Local standard output channel.
+       *
+       * This channel represents the standard output stream (i.e. <c>std::cout</c>) of the calling process.
+       */
+      local_standard          = 0x00008000,
+
+      /**
+       * \brief Local log file channels.
+       */
       local_file_0            = 0x00000001,
+      /// see \link local_file_0\endlink
       local_file_1            = 0x00000002,
+      /// see \link local_file_0\endlink
       local_file_2            = 0x00000004,
+      /// see \link local_file_0\endlink
       local_file_3            = 0x00000008,
 
       /**
-       * \brief Master stdout channel.
+       * \brief Master standard output channel.
        *
-       * This channel represents the stdout channel of the master process.
+       * This channel represents the standard output stream  (i.e. <c>std::cout</c>) of the master process.
        */
-      master_stdout           = 0x80000000,
+      master_standard         = 0x80000000,
+
+      /**
+       * \brief Master log file channels.
+       */
       master_file_0           = 0x00010000,
+      /// see \link master_file_0\endlink
       master_file_1           = 0x00020000,
+      /// see \link master_file_0\endlink
       master_file_2           = 0x00040000,
+      /// see \link master_file_0\endlink
       master_file_3           = 0x00080000,
 
       /**
        * \brief Screen output channel.
        *
-       * \li In a parallel build, this channel refers to the master's standard output stream.\n
+       * \li In a parallel build, this channel refers to the master standard output stream.\n
        * \li In a serial build, this channel refers to the local standard output stream.
        */
 #ifdef PARALLEL
-      screen                  = master_stdout,
+      screen                  = master_standard,
 #else
-      screen                  = local_stdout,
-#endif
-
-      /**
-       * \brief Standard output channel.
-       *
-       * \li In a parallel build, this channel is equivalent to \p local_file_0.
-       * \li In a serial build, this channel is a combination of \p local_file_0 and \p local_stdout.
-       */
-#ifdef PARALLEL
-      standard                = 0x00000001,   // local file 0 only
-#else
-      standard                = 0x00008001,   // local file 0 and screen
+      screen                  = local_standard,
 #endif
     }; // enum Channel
 
@@ -680,6 +699,21 @@ namespace FEAST
     static std::ofstream _stream[max_files];
 
   public:
+    /**
+     * \brief Opens a local log file.
+     *
+     * This function opens a local log file, which can then be targeted by the <c>log_channel_<index></c> channel
+     * for logging.
+     * \li In a parallel build, each process has its own local log file, whose file name is assembled as
+     * <c><base-name>_<world-rank>.log</c>.
+     * \li In a serial build, the log file name is simply given as <c><base-name>.log</c>.
+     *
+     * \param[in] base_name
+     * The base name of the log file name.
+     *
+     * \param[in] index
+     * The index of the log file that is to be opened. Must be in range {0, ..., max_files}.
+     */
     static void open(
       const String& base_name,
       int index = 0)
@@ -702,12 +736,13 @@ namespace FEAST
       // count number of decimal digits
       int num_digits(0);
       unsigned int i = Process::num_processes;
-      while(i)
+      while(i != 0)
       {
         ++num_digits;
         i /= 10;
       }
       num_digits = std::max(3, num_digits);
+      // print rank suffix
       char* tmp = new char[num_digits+3];
       sprintf(tmp, "_%0*i", num_digits, Process::rank);
       file_name.append(tmp);
@@ -725,6 +760,12 @@ namespace FEAST
       }
     }
 
+    /**
+     * \brief Closes a local log file.
+     *
+     * \param[in] index
+     * The index of the log file to be closed.
+     */
     static void close(int index)
     {
       CONTEXT("Logger::close()");
@@ -736,6 +777,9 @@ namespace FEAST
       _stream[index].close();
     }
 
+    /**
+     * \brief Closes all currently open local log files.
+     */
     static void close_all()
     {
       CONTEXT("Logger::close_all()");
@@ -750,6 +794,24 @@ namespace FEAST
       }
     }
 
+    /**
+     * \brief Returns a log file channel.
+     *
+     * This is an auxiliary function which returns the channel for a local or master log file.
+     *
+     * \param[in] index
+     * The index of the log file channel to be returned.
+     *
+     * \param[in] master
+     * If \c true, then the returned channel will be a master channel, otherwise a local channel.
+     *
+     * \returns
+     * A Logger::Channel for the desired log file.
+     *
+     * Examples:
+     * \li <c>file_channel(0,false)</c> returns Logger::local_file_0
+     * \li <c>file_channel(2,true)</c> returns Logger::master_file_2
+     */
     static Channel file_channel(
       int index,
       bool master = false)
@@ -761,29 +823,49 @@ namespace FEAST
       return (Channel)(1 << (index + (master ? 16 : 0)));
     }
 
+    /**
+     * \brief Logs a message.
+     *
+     * \todo more documentation
+     *
+     * \param[in] message
+     * The string message that is to be logged.
+     *
+     * \param[in] channels
+     * An OR-ed combination of log channels to which the message should be written.
+     */
     static void log(
-      const String& msg,
-      Channel channel = standard)
+      const String& message,
+      Channel channels = local)
     {
       CONTEXT("Logger::log()");
 
+      // trivial call?
+      if(message.empty() || (channels == none))
+        return;
+
       // log to local stdout?
-      if((channel & local_stdout) != none)
+      if((channels & local_standard) != none)
       {
-        std::cout << msg;
+        std::cout << message;
       }
 
       // log to local files?
       for(int i(0); i < max_files; ++i)
       {
-        if((channel & file_channel(i, false)) != none)
+        if((channels & file_channel(i, false)) != none)
         {
-          _stream[i] << msg;
+          if(_stream[i].is_open())
+          {
+            _stream[i] << message;
+          }
+          // Note: The lack of an else-block spitting out error messages about closed streams is intended.
         }
       }
 
+      /// \todo implement sending to master
 #ifdef PARALLEL
-      // TODO: log to master
+      // <insert-MPI-magic-here>
 #endif // PARALLEL
     }
   }; // class Logger
