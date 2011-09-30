@@ -58,7 +58,7 @@ namespace FEAST
     String& trim(const String& charset = " \a\b\f\n\r\t\v")
     {
       if(empty() || charset.empty())
-        return;
+        return *this;
 
       // remove trailing chars
       size_type pos = find_last_not_of(charset);
