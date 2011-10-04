@@ -123,7 +123,7 @@ namespace FEAST
   *
   * \author Dirk Ribbrock
   */
-  std::string join_strings(
+  inline std::string join_strings(
     std::list<std::string>::const_iterator begin,
     std::list<std::string>::const_iterator end,
     const std::string& delimiter)
@@ -163,7 +163,7 @@ namespace FEAST
   *
   * \author Hilmar Wobker
   */
-  std::string trim(const std::string& str)
+  inline std::string trim(const std::string& str)
   {
     if(str.length() == 0)
     {

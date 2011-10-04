@@ -27,7 +27,7 @@ namespace FEAST
    * \author Hilmar Wobker
    * \author Peter Zajac
    */
-  void abort(
+  inline void abort(
     const String& message,
     int exit_code = -1)
   {

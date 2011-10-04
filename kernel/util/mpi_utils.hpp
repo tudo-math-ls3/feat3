@@ -41,7 +41,7 @@ namespace FEAST
   * \param[in] msg
   * message explaining the reason for the abortion (default "")
   */
-  void abort_mpi(const std::string& msg = "")
+  inline void abort_mpi(const std::string& msg = "")
   {
     CONTEXT("abort_mpi()");
     // flush cout and cerr
@@ -86,7 +86,7 @@ namespace FEAST
   * \param[in] mpi_function_name
   * name of the calling routine
   */
-  void validate_error_code_mpi(
+  inline void validate_error_code_mpi(
     int error_code,
     std::string mpi_function_name)
   {
@@ -106,7 +106,7 @@ namespace FEAST
   * \note If FEAST's test system is used, it calls MPI_Init(). To prevent calling the function twice,
   * we inquire if MPI is already initialised.
   */
-  void init_mpi()
+  inline void init_mpi()
   {
     CONTEXT("init_mpi()");
 
@@ -137,7 +137,7 @@ namespace FEAST
   * \note If FEAST's test system is used, it needs to call MPI_Finalize(). To prevent calling the function twice,
   * we inquire if MPI is already finalised.
   */
-  void finalise_mpi()
+  inline void finalise_mpi()
   {
     CONTEXT("finalise_mpi()");
     // inquire if MPI is initialised
@@ -169,7 +169,7 @@ namespace FEAST
   * \param[in] argv
   * arguments passed to the main() method
   */
-  void init_mpi(
+  inline void init_mpi(
     int argc,
     char* argv[])
   {
