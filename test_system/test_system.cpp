@@ -115,23 +115,22 @@ int main(int argc, char** argv)
   TestList::Iterator it(TestList::instance()->begin_tests());
   TestList::Iterator jt(TestList::instance()->end_tests());
 
-  for( ; it != jt ; ++it)
+  while(it != jt)
   {
-      //CONTEXT("When running test case '" + (*i)->id() + "':");
-      try
-      {
-          std::cout << "(" << iterator_index << "/" << list_size << ") " << (*it)->id() + " [Backend: "
-              << (*it)->get_tag_name() << "]" << " [Precision: "<< (*it)->get_prec_name() << "]" << std::endl;
-          (*it)->run();
-          std::cout << "PASSED" << std::endl;
-      }
-      catch (TestFailedException & e)
-      {
-          std::cout << "FAILED: " << (*it)->id() << std::endl << stringify(e.what()) << std::endl;
-          result = EXIT_FAILURE;
-      }
-      it = TestList::instance()->erase(it);
-      ++iterator_index;
+    try
+    {
+      std::cout << "(" << iterator_index << "/" << list_size << ") " << (*it)->id() + " [Backend: "
+        << (*it)->get_tag_name() << "]" << " [Precision: "<< (*it)->get_prec_name() << "]" << std::endl;
+      (*it)->run();
+      std::cout << "PASSED" << std::endl;
+    }
+    catch (TestFailedException & e)
+    {
+      std::cout << "FAILED: " << (*it)->id() << std::endl << stringify(e.what()) << std::endl;
+      result = EXIT_FAILURE;
+    }
+    it = TestList::instance()->erase(it);
+    ++iterator_index;
   }
 
   return result;
