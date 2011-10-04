@@ -119,11 +119,11 @@ namespace FEAST
             Logger::receive();
             break;
           }
-          case(ServiceIDs::LOG_RECEIVE_ARRAY):
+          /*case(ServiceIDs::LOG_RECEIVE_ARRAY):
           {
             Logger::receive_array();
             break;
-          }
+          }*/
           case(ServiceIDs::MASTER_FINISH_SERVICE):
           {
             _finish_service = true;
