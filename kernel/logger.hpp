@@ -880,11 +880,37 @@ namespace FEAST
       // <insert-MPI-magic-here>
 #endif // PARALLEL
     }
+
+    /**
+     * \brief Flushes all local channels.
+     *
+     * This function flushes the local standard output stream as well as all currently open local log file streams.
+     *
+     * \todo Maybe this function should also send a message to the master telling him to flush his channels, too?
+     */
+    static void flush()
+    {
+      CONTEXT("Logger::flush()");
+
+      // flush local stdout
+      std::cout.flush();
+
+      // flush local files
+      for(int i(0); i < max_files; ++i)
+      {
+        if(_stream[i].is_open())
+        {
+          _stream[i].flush();
+        }
+      }
+    }
   }; // class Logger
 
   /// \cond nodoxy
   inline Logger::Channel operator|(Logger::Channel a, Logger::Channel b)
   {
+    // The following type-casts should be safe, as the C++ standard describes in [dcl.enum] that an enumeration
+    // has to use the int type as an underlying type.
     return (Logger::Channel)(((int)a) | ((int)b));
   }
 
