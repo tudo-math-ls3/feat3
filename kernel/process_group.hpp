@@ -290,7 +290,7 @@ namespace FEAST
     }
 
 
-    /**
+    /*
     * \brief sending individual messages to the master
     *
     * With this function the processes of the process group can send individual log messages to the master. The
@@ -310,83 +310,83 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-    void log_indiv_master(std::string message, Logger::target target = Logger::SCREEN_FILE)
-    {
-      CONTEXT("ProcessGroup::log_indiv_master()");
-      // add 1 to the message length since string::c_str() adds the null termination symbol to the resulting char array
-      unsigned int length = unsigned int(message.length()) + 1;
-
-      if (!is_coordinator())
-      {
-        /* ***************************************
-        * code for all non-coordinator processes *
-        *****************************************/
-
-        // coordinator process gathers the lengths of the messages
-        MPI_Gather(&length, 1, MPI_UNSIGNED, nullptr, 0, MPI_DATATYPE_NULL, _rank_coord, _comm);
-
-        // coordinator process gathers the messages
-        // (Here, it is necessary to cast away the const'ness of string::c_str() since the MPI routine expects a
-        // non-const send buffer.)
-        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, nullptr, nullptr, nullptr,
-                    MPI_DATATYPE_NULL, _rank_coord, _comm);
-      }
-      else
-      {
-        /* ********************************
-        * code for the coordinator process *
-        **********************************/
-
-        // receive buffer for storing the lengths of the messages
-        unsigned int* msg_lengths = new unsigned int[_num_processes];
-        // array for storing the start positions of the single messages in the receive buffer
-        unsigned int* msg_start_pos = new unsigned int[_num_processes];
-
-        // gather the lengths of the messages from the other processes
-        MPI_Gather(&length, 1, MPI_UNSIGNED, msg_lengths, 1, MPI_UNSIGNED, _rank_coord, _comm);
-
-        // set start positions of the single messages in the receive buffer
-        msg_start_pos[0] = 0;
-        for(unsigned int i(1) ; i < _num_processes ; ++i)
-        {
-          msg_start_pos[i] = msg_start_pos[i-1] + msg_lengths[i-1];
-        }
-
-        // determine total length of the messages and allocate receive buffer accordingly
-        unsigned int total_length(msg_start_pos[_num_processes-1] + msg_lengths[_num_processes-1]);
-
-        // receive buffer for (consecutively) storing the messages
-        char* messages = new char[total_length];
-
-//        // debug output
-//        for(unsigned int i(0) ; i < _num_processes ; ++i)
+//    void log_indiv_master(std::string message, Logger::target target = Logger::SCREEN_FILE)
+//    {
+//      CONTEXT("ProcessGroup::log_indiv_master()");
+//      // add 1 to the message length since string::c_str() adds the null termination symbol to the resulting char array
+//      unsigned int length = unsigned int(message.length()) + 1;
+//
+//      if (!is_coordinator())
+//      {
+//        /* ***************************************
+//        * code for all non-coordinator processes *
+//        *****************************************/
+//
+//        // coordinator process gathers the lengths of the messages
+//        MPI_Gather(&length, 1, MPI_UNSIGNED, nullptr, 0, MPI_DATATYPE_NULL, _rank_coord, _comm);
+//
+//        // coordinator process gathers the messages
+//        // (Here, it is necessary to cast away the const'ness of string::c_str() since the MPI routine expects a
+//        // non-const send buffer.)
+//        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, nullptr, nullptr, nullptr,
+//                    MPI_DATATYPE_NULL, _rank_coord, _comm);
+//      }
+//      else
+//      {
+//        /* ********************************
+//        * code for the coordinator process *
+//        **********************************/
+//
+//        // receive buffer for storing the lengths of the messages
+//        unsigned int* msg_lengths = new unsigned int[_num_processes];
+//        // array for storing the start positions of the single messages in the receive buffer
+//        unsigned int* msg_start_pos = new unsigned int[_num_processes];
+//
+//        // gather the lengths of the messages from the other processes
+//        MPI_Gather(&length, 1, MPI_UNSIGNED, msg_lengths, 1, MPI_UNSIGNED, _rank_coord, _comm);
+//
+//        // set start positions of the single messages in the receive buffer
+//        msg_start_pos[0] = 0;
+//        for(unsigned int i(1) ; i < _num_processes ; ++i)
 //        {
-//          std::cout << "local process " << stringify(i) << ": length of string = "
-//                    << stringify(msg_lengths[i]) << std::endl;
+//          msg_start_pos[i] = msg_start_pos[i-1] + msg_lengths[i-1];
 //        }
-//        std::cout << "Total length: " << stringify(total_length) << std::endl;
-
-        // gather the messages from the other processes.
-        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages,
-                    reinterpret_cast<int*>(msg_lengths), reinterpret_cast<int*>(msg_start_pos), MPI_CHAR, _rank_coord,
-                    _comm);
-
-//        // debug output
-//        // output the strings collected from all processes by using corresponding offsets in the
-//        // char array (pointer arithmetic)
-//        for(unsigned int i(0) ; i < _num_processes ; ++i)
-//        {
-//          std::cout << "Process " << Process::rank << " writes: "
-//                    << std::string(messages + msg_start_pos[i], msg_lengths[i]) << std::endl;
-//        }
-
-        // now send everything to the master
-        Logger::log_master_array(_num_processes, msg_lengths, total_length, messages, target);
-        delete [] msg_lengths;
-        delete [] msg_start_pos;
-        delete [] messages;
-      }
-    } // log_indiv_master
+//
+//        // determine total length of the messages and allocate receive buffer accordingly
+//        unsigned int total_length(msg_start_pos[_num_processes-1] + msg_lengths[_num_processes-1]);
+//
+//        // receive buffer for (consecutively) storing the messages
+//        char* messages = new char[total_length];
+//
+////        // debug output
+////        for(unsigned int i(0) ; i < _num_processes ; ++i)
+////        {
+////          std::cout << "local process " << stringify(i) << ": length of string = "
+////                    << stringify(msg_lengths[i]) << std::endl;
+////        }
+////        std::cout << "Total length: " << stringify(total_length) << std::endl;
+//
+//        // gather the messages from the other processes.
+//        MPI_Gatherv(const_cast<char *>(message.c_str()), length, MPI_CHAR, messages,
+//                    reinterpret_cast<int*>(msg_lengths), reinterpret_cast<int*>(msg_start_pos), MPI_CHAR, _rank_coord,
+//                    _comm);
+//
+////        // debug output
+////        // output the strings collected from all processes by using corresponding offsets in the
+////        // char array (pointer arithmetic)
+////        for(unsigned int i(0) ; i < _num_processes ; ++i)
+////        {
+////          std::cout << "Process " << Process::rank << " writes: "
+////                    << std::string(messages + msg_start_pos[i], msg_lengths[i]) << std::endl;
+////        }
+//
+//        // now send everything to the master
+//        Logger::log_master_array(_num_processes, msg_lengths, total_length, messages, target);
+//        delete [] msg_lengths;
+//        delete [] msg_start_pos;
+//        delete [] messages;
+//      }
+//    } // log_indiv_master
   }; // class ProcessGroup
 
 // COMMENT_HILMAR: every process group will certainly need its own MPI buffer... then activate this code.
