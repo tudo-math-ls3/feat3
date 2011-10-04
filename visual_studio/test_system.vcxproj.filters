@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files %28test_system%29">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files %28kernel%29">
+      <UniqueIdentifier>{60bef431-064c-44e4-afee-144e42f55290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files %28kernel%29\util">
+      <UniqueIdentifier>{cd9fd17b-3eeb-4fe3-a1c1-2575812060fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files %28kernel%29\base_mesh">
+      <UniqueIdentifier>{b76e32c4-102f-492c-8781-caca90597588}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\test_system\test_system.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\test_system\test_system-test.cpp">
+      <Filter>Source Files %28test_system%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\work_group-test_1d.cpp">
+      <Filter>Source Files %28kernel%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\work_group-test_2d_1.cpp">
+      <Filter>Source Files %28kernel%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\work_group-test_2d_2.cpp">
+      <Filter>Source Files %28kernel%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\assertion-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\inheritance-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\pretty_printer-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\base_mesh\cell_1d_edge-test_subdivision.cpp">
+      <Filter>Source Files %28kernel%29\base_mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\base_mesh\cell_2d_quad-test_subdivision.cpp">
+      <Filter>Source Files %28kernel%29\base_mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\base_mesh\cell_3d_hexa-test_subdivision.cpp">
+      <Filter>Source Files %28kernel%29\base_mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test_system\test_system.cpp">
+      <Filter>Source Files %28test_system%29</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
