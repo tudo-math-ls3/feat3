@@ -615,13 +615,20 @@ namespace FEAST
     /**
      * \brief Logger channel enumeration
      *
-     * \internal \b Internal:\n
+     * This enumeration describes the channels to which a message can be logged. Different values in this enumeration
+     * can be combined by using the bit-wise \c OR ( \c | ) and \c AND ( \c & ) operators.
+     *
+     * \internal \b Internal: \n
      * Each channel encodes a 32 bit mask, where the low-order 16 bits are reserved for local channels, whereas
-     * the high-order 16 bits represent channels on the master process.
+     * the high-order 16 bits represent channels on the master process.\n
+     * Each master channel (e.g. \c master_file_0), can be translated into the corresponding local channel (e.g.
+     * \c local_file_0) by simply performing a right bit shift by 16 bits and vice versa.
      */
     enum Channel
     {
-      /// Null channel.
+      /**
+       * \brief Null channel.
+       */
       none                    = 0x00000000,
 
       /**
@@ -646,6 +653,11 @@ namespace FEAST
 
       /**
        * \brief Local log file channels.
+       *
+       * Each log file channel represents a separate log file, which can be targeted for output by setting
+       * the \p channels parameter of Logger::log.\n
+       * Local log files are created <em>per process</em>, i.e. each process in a parallel simulation has
+       * its own set of local log files.
        */
       local_file_0            = 0x00000001,
       /// see \link local_file_0\endlink
@@ -712,7 +724,7 @@ namespace FEAST
      * The base name of the log file name.
      *
      * \param[in] index
-     * The index of the log file that is to be opened. Must be in range {0, ..., max_files}.
+     * The index of the log file that is to be opened. Must be in range {0, ..., Logger::max_files - 1}.
      */
     static void open(
       const String& base_name,
@@ -726,7 +738,7 @@ namespace FEAST
       // ensure that the specified channel isn't already open
       if(_stream[index].is_open())
       {
-        abort("Index is already open!");
+        abort("Log file stream is already open!");
       }
 
       // build the file name
@@ -764,7 +776,7 @@ namespace FEAST
      * \brief Closes a local log file.
      *
      * \param[in] index
-     * The index of the log file to be closed.
+     * The index of the local log file to be closed.
      */
     static void close(int index)
     {
@@ -826,7 +838,7 @@ namespace FEAST
     /**
      * \brief Logs a message.
      *
-     * \todo more documentation
+     * This function writes a message string to the specified output channels.
      *
      * \param[in] message
      * The string message that is to be logged.
