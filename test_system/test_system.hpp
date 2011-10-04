@@ -3,6 +3,14 @@
 /// Header guard
 #define TEST_SYSTEM_TEST_SYSTEM_HPP 1
 
+// includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/util/string_utils.hpp>
+#include <kernel/util/type_traits.hpp>
+#include <kernel/util/instantiation_policy.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/util/mpi_utils.hpp>
+
 // includes, system
 #include <string>
 #include <exception>
@@ -12,23 +20,15 @@
 #include <iostream>
 #include <algorithm>
 
-// includes, FEAST
-#include <kernel/base_header.hpp>
-#include <kernel/util/string_utils.hpp>
-#include <kernel/util/type_traits.hpp>
-#include <kernel/util/instantiation_policy.hpp>
-#include <kernel/util/exception.hpp>
-#include <kernel/util/mpi_utils.hpp>
-
 /**
 * \file
 *
 * Implementation of Test and related classes.
 */
 
-/// TestSystem namespace
 namespace FEAST
 {
+  /// TestSystem namespace
   namespace TestSystem
   {
     // Forwared declaration
@@ -380,33 +380,25 @@ namespace FEAST
                      /// DTOR
                      virtual ~TaggedTest() {}
                  };
-  }
-}
-
-// let Doxygen ignore the following block
-// \cond
-// define __PRETTY_FUNCTION if not defined
-#ifndef __PRETTY_FUNCTION__
-#define __PRETTY_FUNCTION__ __FUNCTION__
-#endif
-// \endcond
+  } // namespace TestSystem
+} // namespace FEAST
 
 /// checks if a == b
 #define TEST_CHECK_EQUAL(a, b) \
   do { \
     try { \
       BaseTest::TwoVarHolder test_h(a, b); \
-      this->check(__PRETTY_FUNCTION__, __FILE__, __LINE__, test_h.result, \
+      this->check(THIS_FUNCTION, __FILE__, __LINE__, test_h.result, \
           this->_id + "\n" +  "Expected '" #a "' to equal \n'" + test_h.s_b + \
           "'\nbut got\n'" + test_h.s_a + "'"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_EQUAL block"); \
     } catch (...) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_EQUAL block"); \
     } \
   } while (false)
@@ -416,17 +408,17 @@ namespace FEAST
   do { \
     try { \
       BaseTest::TwoVarHolder2 test_h(a, b); \
-      this->check(__PRETTY_FUNCTION__, __FILE__, __LINE__, !test_h.result, \
+      this->check(THIS_FUNCTION, __FILE__, __LINE__, !test_h.result, \
           this->_id + "\n" +  "Expected '" #a "' that is'" + test_h.s_a + \
           "' to equal not '" + test_h.s_b + "'"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_NOT_EQUAL block"); \
     } catch (...) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_NOT_EQUAL block"); \
     } \
   } while (false)
@@ -437,17 +429,17 @@ namespace FEAST
     try { \
       std::string s_a(FEAST::stringify(a)); \
       std::string s_b(FEAST::stringify(b)); \
-      this->check(__PRETTY_FUNCTION__, __FILE__, __LINE__, s_a == s_b, \
+      this->check(THIS_FUNCTION, __FILE__, __LINE__, s_a == s_b, \
           this->_id + "\n" +  "Expected '" #a "' to equal '" + s_b + \
           "'\nbut got\n'" + s_a + "'"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_STRINGIFY_EQUAL block"); \
     } catch (...) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_STRINGIFY_EQUAL block"); \
     } \
   } while (false)
@@ -456,16 +448,16 @@ namespace FEAST
 #define TEST_CHECK(a) \
   do { \
     try { \
-      this->check(__PRETTY_FUNCTION__, __FILE__, __LINE__, a, \
+      this->check(THIS_FUNCTION, __FILE__, __LINE__, a, \
           this->_id + "\n" +  "Check '" #a "' failed"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK block"); \
     } catch (...) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK block"); \
     } \
   } while (false)
@@ -476,7 +468,7 @@ namespace FEAST
     try { \
       try { \
         a; \
-        this->check(__PRETTY_FUNCTION__, __FILE__, __LINE__, false, \
+        this->check(THIS_FUNCTION, __FILE__, __LINE__, false, \
             this->_id + "\n" +  "Expected exception of type '" #b "' not thrown"); \
       } catch (b &) { \
         TEST_CHECK(true); \
@@ -484,11 +476,11 @@ namespace FEAST
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_THROWS block"); \
     } catch (...) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_THROWS block"); \
     } \
   } while (false)
@@ -498,17 +490,17 @@ namespace FEAST
   do { \
     try { \
       BaseTest::WithinEpsCalculator calc(a, b, eps); \
-      this->check(__PRETTY_FUNCTION__, __FILE__, __LINE__, calc.result,  \
+      this->check(THIS_FUNCTION, __FILE__, __LINE__, calc.result,  \
           this->_id + "\n" + "Expected '|" #a " - " #b \
           "|' < '" + FEAST::stringify(eps) + "' but was '" + calc.s_diff +"'"); \
     } catch (const TestFailedException & test_e) { \
       throw;  \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_EQUAL_WITHIN_EPS block"); \
     } catch (...) { \
-      throw TestFailedException(__PRETTY_FUNCTION__, __FILE__, __LINE__, \
+      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_EQUAL_WITHIN_EPS block"); \
     } \
   } while (false)
@@ -524,106 +516,5 @@ namespace FEAST
       throw; } \
     post; \
   } while (false)
-
-
-
-
-using namespace FEAST;
-using namespace FEAST::TestSystem;
-
-int main(int argc, char** argv)
-{
-  int result(EXIT_SUCCESS);
-  init_mpi(argc, argv);
-  int rank(-1);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-  if (argc == 2)
-  {
-    std::string mpc("mpiproccount");
-    std::string argv1(argv[1]);
-    if(0 == mpc.compare(argv1))
-    {
-      return (*TestList::instance()->begin_tests())->mpi_proc_count();
-    }
-  }
-
-  if(argc > 1)
-  {
-    for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
-        i != i_end ; ++i)
-    {
-      if((*i)->mpi_proc_count() != (*TestList::instance()->begin_tests())->mpi_proc_count())
-      {
-        std::cout << "mpi_proc_count missmatch!"<<std::endl;
-        result = EXIT_FAILURE;
-        return (result);
-      }
-    }
-
-    std::list<std::string> labels;
-    for(int i(1) ; i < argc ; ++i)
-    {
-      labels.push_back(argv[i]);
-    }
-    for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
-        i != i_end ; )
-    {
-      if((find(labels.begin(), labels.end(), (*i)->get_tag_name()) == labels.end()) &&
-          (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()))
-      {
-        i = TestList::instance()->erase(i);
-        continue;
-      }
-      ++i;
-    }
-  }
-
-  size_t list_size(TestList::instance()->size());
-  unsigned long iterator_index(1);
-  for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
-      i != i_end ; )
-  {
-    CONTEXT("When running test case '" + (*i)->id() + "' on mpi process " + stringify(rank) + ":");
-    try
-    {
-      if (rank == 0)
-        std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Backend: "
-          << (*i)->get_tag_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
-      (*i)->run();
-      if (rank == 0)
-        std::cout << "PASSED" << std::endl;
-    }
-    catch (TestFailedException & e)
-    {
-      if (rank == 0)
-        std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << " on mpi process " << stringify(rank) << std::endl;
-      result = EXIT_FAILURE;
-    }
-    catch (InternalError & e)
-    {
-        std::cout << "FAILED with InternalError: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
-          << stringify(e.message()) << " on mpi process " << stringify(rank) << std::endl;
-      result = EXIT_FAILURE;
-    }
-    catch (std::exception & e)
-    {
-      std::cout << "FAILED with unknown Exception: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
-        << " on mpi process " << stringify(rank) << std::endl;
-      result = EXIT_FAILURE;
-    }
-    i = TestList::instance()->erase(i);
-    iterator_index++;
-  }
-
-  for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
-      i != i_end ; )
-  {
-    i = TestList::instance()->erase(i);
-  }
-
-  finalise_mpi();
-  return result;
-}
 
 #endif // TEST_SYSTEM_TEST_SYSTEM_HPP

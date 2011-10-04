@@ -105,5 +105,35 @@ int main(int argc, char** argv)
 /* ************************************************************************************* */
 /*   -  S E R I A L   T E S T   D R I V E R  *  S E R I A L   T E S T   D R I V E R   -  */
 /* ************************************************************************************* */
+int main(int argc, char** argv)
+{
+  int result(EXIT_SUCCESS);
 
+  size_t list_size = TestList::instance()->size();
+  unsigned long iterator_index(1);
+
+  TestList::Iterator it(TestList::instance()->begin_tests());
+  TestList::Iterator jt(TestList::instance()->end_tests());
+
+  for( ; it != jt ; ++it)
+  {
+      //CONTEXT("When running test case '" + (*i)->id() + "':");
+      try
+      {
+          std::cout << "(" << iterator_index << "/" << list_size << ") " << (*it)->id() + " [Backend: "
+              << (*it)->get_tag_name() << "]" << " [Precision: "<< (*it)->get_prec_name() << "]" << std::endl;
+          (*it)->run();
+          std::cout << "PASSED" << std::endl;
+      }
+      catch (TestFailedException & e)
+      {
+          std::cout << "FAILED: " << (*it)->id() << std::endl << stringify(e.what()) << std::endl;
+          result = EXIT_FAILURE;
+      }
+      it = TestList::instance()->erase(it);
+      ++iterator_index;
+  }
+
+  return result;
+}
 #endif // PARALLEL
