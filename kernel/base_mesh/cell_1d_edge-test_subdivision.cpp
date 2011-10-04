@@ -13,6 +13,9 @@
 #include <kernel/universe.hpp>
 #include <kernel/base_mesh/cell_subdivision.hpp>
 
+using namespace FEAST;
+using namespace FEAST::TestSystem;
+
 /**
 * \brief testing subdivision of an edge in 1D
 *

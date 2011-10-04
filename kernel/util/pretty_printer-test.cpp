@@ -1,13 +1,16 @@
-// includes, system
-#include <iostream>
-#include <string>
-
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
+
+// includes, system
+#include <iostream>
+#include <string>
+
+using namespace FEAST;
+using namespace FEAST::TestSystem;
 
 /**
 * \brief testing the pretty printer

@@ -13,6 +13,9 @@
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
 
+using namespace FEAST;
+using namespace FEAST::TestSystem;
+
 /**
 * \brief testing creation of work groups based on a 1D mesh
 *

@@ -13,6 +13,9 @@
 #include <kernel/universe.hpp>
 #include <kernel/base_mesh/cell_subdivision.hpp>
 
+using namespace FEAST;
+using namespace FEAST::TestSystem;
+
 /**
 * \brief testing subdivision of a hexa in 3D
 *
@@ -108,9 +111,11 @@ public:
         // set cell numbers (now they differ from indices)
         bm->set_cell_numbers();
         // print base mesh
-        bm->print(Logger::file);
+        Logger::log(bm->print());
        // validate base mesh
-        bm->validate(Logger::file);
+        std::ostringstream strstream;
+        bm->validate(strstream);
+        Logger::log(strstream.str());
 
         // COMMENT_HILMAR: neighbourhood update
 
