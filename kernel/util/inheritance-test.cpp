@@ -13,6 +13,9 @@ class A{};
 class B : public A{};
 class C{};
 
+using namespace FEAST;
+using namespace FEAST::TestSystem;
+
 /**
 * \brief Test class for the inheritance macro.
 *
@@ -46,7 +49,8 @@ public:
     TEST_CHECK(! SUPERSUBCLASS(B, A));
     TEST_CHECK(! SUPERSUBCLASS(A, C));
     TEST_CHECK(! SUPERSUBCLASS(C, A));
-    STATIC_ASSERT(SUPERSUBCLASS(A, B), wrong_inheritance_detetect_at_compile_time);
+    //STATIC_ASSERT(SUPERSUBCLASS(A, B), wrong_inheritance_detetect_at_compile_time);
+    static_assert(SUPERSUBCLASS(A,B), "Wrong inheritance detected");
   }
 };
 InheritanceTest<Nil, Nil> inheritance_test;

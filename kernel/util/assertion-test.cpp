@@ -3,19 +3,14 @@
 #define DEBUG 1
 #endif
 
-#include <kernel/util/assertion.hpp>
 #include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
+
 #include <string>
 
-template <int i> class c
-{
-  public:
-    void f()
-    {
-      STATIC_ASSERT(i < 5, eeek);
-    }
-};
+using namespace FEAST;
+using namespace FEAST::TestSystem;
 
 /**
 * \brief Test class for the assertion class.
@@ -62,10 +57,6 @@ public:
     }
     TEST_CHECK(no_exception_thrown);
 
-    STATIC_ASSERT(0<1, eek);
-    c<4> tc;
-    tc.f();
-    //STATIC_ASSERT(false, eek);
   }
 };
 AssertionTest<Nil, Nil> assertion_test;
