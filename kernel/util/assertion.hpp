@@ -47,7 +47,11 @@ namespace FEAST
       const std::string & message)
       : Exception(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message)
     {
+#ifndef FEAST_NO_CONTEXT
       std::cout << backtrace("\n") << this->message() << std::endl;
+#else
+      std::cout << this->message() << std::endl;
+#endif
     }
   };
 

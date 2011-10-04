@@ -15,6 +15,7 @@
 
 namespace FEAST
 {
+#ifndef FEAST_NO_CONTEXT
   /// The global context stack.
   /// \todo Ist der stack global oder compile-unit lokal?
   std::list<std::string> * context_stack = 0;
@@ -48,7 +49,7 @@ namespace FEAST
       else return "";
     }
   };
-
+#endif // FEAST_NO_CONTEXT
 
   /**
   * \brief Base exception class.
@@ -59,9 +60,10 @@ namespace FEAST
     public std::exception
   {
   private:
-
+#ifndef FEAST_NO_CONTEXT
     /// Our (local) context data.
     ContextData * const _context_data;
+#endif // FEAST_NO_CONTEXT
 
     /// descriptive error message
     const std::string _message;
@@ -76,8 +78,10 @@ namespace FEAST
     * \param message
     * the exception's message
     */
-    Exception(const std::string & message) throw () :
+    Exception(const std::string & message) :
+#ifndef FEAST_NO_CONTEXT
       _context_data(new ContextData),
+#endif // FEAST_NO_CONTEXT
       _message(message)
     {
     }
@@ -85,35 +89,41 @@ namespace FEAST
     /// copy CTOR
     Exception(const Exception & other) :
       std::exception(other),
+#ifndef FEAST_NO_CONTEXT
       _context_data(new ContextData(*other._context_data)),
+#endif // FEAST_NO_CONTEXT
       _message(other._message)
     {
     }
 
   public:
     /// DTOR
-    virtual ~Exception() throw ()
+    virtual ~Exception()
     {
+#ifndef FEAST_NO_CONTEXT
       delete _context_data;
+#endif // FEAST_NO_CONTEXT
     }
 
     /// returns error message
-    const std::string message() const throw ()
+    const std::string message() const
     {
       return _message;
     }
 
+#ifndef FEAST_NO_CONTEXT
     /// returns backtrace
     std::string backtrace(const std::string & delimiter) const
     {
       return _context_data->backtrace(delimiter);
     }
+#endif // FEAST_NO_CONTEXT
 
     /// returns true if the backtrace is empty
     bool empty() const;
 
     /// return descriptive exception name
-    const char * what() const throw ()
+    const char * what() const
     {
       /// \todo Add a working win32 alternative (see http://www.int0x80.gr/papers/name_mangling.pdf)
       /*if (_what_str.empty())
@@ -155,13 +165,13 @@ namespace FEAST
     * \param message
     * A short error message.
     */
-    InternalError(const std::string & message) throw () :
+    InternalError(const std::string & message) :
       Exception("Internal error: " + message)
     {
     }
   };
 
-
+#ifndef FEAST_NO_CONTEXT
   /**
   * \brief Backtrace class context.
   *
@@ -220,7 +230,7 @@ namespace FEAST
       return join_strings(context_stack->begin(), context_stack->end(), delimiter);
     }
   };
-
+#endif // FEAST_NO_CONTEXT
 
   /**
   * \def CONTEXT
@@ -234,7 +244,7 @@ namespace FEAST
   *
   * \warning Will only be compiled in when debug support is enabled.
   */
-#if defined (DEBUG) && !defined(FEAST_NO_CONTEST)
+#if defined (DEBUG) && !defined(FEAST_NO_CONTEXT)
   // C preprocessor abomination following...
 #define CONTEXT_NAME_(x) ctx_##x
 #define CONTEXT_NAME(x) CONTEXT_NAME_(x)

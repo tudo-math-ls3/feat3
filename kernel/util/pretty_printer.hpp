@@ -9,6 +9,7 @@
 #define KERNEL_UTIL_PRETTY_PRINTER_HPP 1
 
 // includes, FEAST
+#include <kernel/base_header.hpp>
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/exception.hpp>
 

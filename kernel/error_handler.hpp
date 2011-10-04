@@ -89,9 +89,11 @@ function:
       pp.add_line_sep();
       pp.add_line_no_right_delim(e.message());
       pp.add_line_sep();
+#ifndef FEAST_NO_CONTEXT
       pp.add_line("Backtrace:");
       pp.add_line(e.backtrace("\nEXCEPTION # "));
       pp.add_line_sep();
+#endif
       //pp.print(Logger::file);
       Logger::log(pp.block());
 

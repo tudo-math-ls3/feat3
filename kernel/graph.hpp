@@ -11,6 +11,7 @@
 #define KERNEL_GRAPH_HPP 1
 
 // includes, FEAST
+#include <kernel/base_header.hpp>
 
 // includes, system
 #include <iostream>
