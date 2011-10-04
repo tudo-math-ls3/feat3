@@ -34,12 +34,14 @@ using namespace FEAST;
 int main(int argc, char* argv[])
 {
   CONTEXT("pseudo_app: main()");
+#ifdef PARALLEL
   if (argc < 3)
   {
     std::cerr << "Call the program with \"mpirun -np n+5 " << argv[0] << " <absolute_path_to_mesh_file> n\", "
               << "where n is the number of base mesh cells." << std::endl;
     exit(1);
   }
+#endif // PARALLEL
 
   // init MPI
   init_mpi(argc, argv);
@@ -142,20 +144,19 @@ int main(int argc, char* argv[])
         pp.add_line_no_right_delim("also too long too long too long too long too long too long");
         pp.add_line("left bla blub");
         pp.add_line_sep();
-        // print it like this...
+        // print it like this
         Logger::log(pp.block());
-        // ... or like this...
-        pp.print(Logger::file);
         // send it to the master for file output
-        Logger::log_master(pp.block(), Logger::FILE);
+        //Logger::log_master(pp.block(), Logger::FILE);
+        Logger::log(pp.block(), Logger::master_file_0);
 
         // test vector version of log_master_array()
-        std::vector<std::string> messages(3);
+        /*std::vector<std::string> messages(3);
         messages[0] = prefix + ": Testing this...\n";
         messages[1] = prefix + ": ...vector logging...\n";
         messages[2] = prefix + ": ...feature!\n";
         Logger::log_master_array(messages, Logger::FILE);
-        Logger::log(messages);
+        Logger::log(messages);*/
 
         // test standard log feature
         Logger::log("BRAL\n");
