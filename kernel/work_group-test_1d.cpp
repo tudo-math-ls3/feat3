@@ -4,6 +4,7 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/assertion.hpp>
@@ -120,3 +121,4 @@ public:
 
 // create test instance, using space and world dimension 1
 WorkGroupTest1D<Nil, Nil, 1, 1> work_group_test_1d;
+#endif // PARALLEL

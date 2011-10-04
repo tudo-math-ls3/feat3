@@ -5,6 +5,7 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <test_system/test_system.hpp>
@@ -148,3 +149,4 @@ public:
 
 // create test instance, using space and world dimension 3
 Cell3DHexaTestSubdivision<Nil, Nil, 3, 3> cell_3d_hexa_test_subdivision;
+#endif // PARALLEL

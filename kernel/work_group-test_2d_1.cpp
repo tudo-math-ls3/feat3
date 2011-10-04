@@ -4,6 +4,7 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/assertion.hpp>
@@ -150,3 +151,4 @@ public:
 
 // create test instance, using space and world dimension 2
 WorkGroupTest2D1<Nil, Nil, 2, 2> work_group_test_2d_1(stringify(FEAST_SRC_DIR) + "/data/meshes/test_16bmc.feast");
+#endif // PARALLEL

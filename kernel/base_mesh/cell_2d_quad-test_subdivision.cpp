@@ -5,6 +5,7 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#ifdef PARALLEL
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <test_system/test_system.hpp>
@@ -153,3 +154,4 @@ public:
 // create test instance, using space and world dimension 2
 Cell2DQuadTestSubdivision<Nil, Nil, 2, 2>
   cell_2d_quad_test_subdivision(stringify(FEAST_SRC_DIR) + "/data/meshes/test_16bmc.feast");
+#endif // PARALLEL
