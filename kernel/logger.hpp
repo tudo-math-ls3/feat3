@@ -696,6 +696,12 @@ namespace FEAST
 #else
       screen                  = local_standard,
 #endif
+      /// \cond internal
+      /** bit mask for local channels */
+      local_mask              = 0x0000FFFF,
+      /** bit mask for master channels */
+      master_mask             = 0xFFFF0000,
+      /// \endcond
     }; // enum Channel
 
     enum
@@ -877,8 +883,31 @@ namespace FEAST
 
       /// \todo implement sending to master
 #ifdef PARALLEL
+      // check whether we need to send something to the master, otherwise return here
+      if((channels & master_mask) == none)
+        return;
+
       // <insert-MPI-magic-here>
 #endif // PARALLEL
+    }
+
+    /**
+     * \brief recieves a log message and processes it
+     *
+     * This function is called on the master to process log messages which have been sent by the Logger::log() function
+     * on the slave processes.
+     * \note In a serial build this function does nothing.
+     */
+    static void receive()
+    {
+      // Peter: In the log() function above one should send the channels parameter via MPI to the master.
+      // After reading the data from the MPI buffer, one can simply perform a right shift of the channel by
+      // 16 bits to translate a master_* channel to the corresponding local_* channel and, unless another approach
+      // seems more feasible, call the log() function with the shifted channel mask to let the master log into its
+      // own local files and/or stdout.
+#ifdef PARALLEL
+      // <insert-MPI-magic-here>
+#endif
     }
 
     /**
