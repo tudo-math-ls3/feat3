@@ -100,7 +100,7 @@ namespace FEAST
         std::string s = "No file parser implemented yet!\n";
         s += "A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):\n";
         s += "v0--------e0--------v1--------e1--------v2--------e2--------v3\n";
-        Logger::log_master(s);
+        Logger::log(s, Logger::master);
 
         // TODO: remove the following line as soon as a real file parser is implemented
         Logger::log("Write file name " + file_name + " to prevent compiler warning about unused variable.");
@@ -865,7 +865,7 @@ namespace FEAST
         CONTEXT("BaseMesh::FileParser::parse()");
         ASSERT(world_dim_ == 3, "Currently, world dim " + stringify(world_dim_) + " must be 3.");
 
-        Logger::log_master("No file parser implemented yet! A manual 3D base mesh is created.");
+        Logger::log("No file parser implemented yet! A manual 3D base mesh is created.", Logger::master);
 
         // TODO: remove the following line as soon as a real file parser is implemented
         Logger::log("Write file name " + file_name + " to prevent compiler warning about unused variable.");
