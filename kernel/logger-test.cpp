@@ -5,13 +5,23 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/logger.hpp>
+#include <test_system/test_system.hpp>
+#ifdef PARALLEL
 #include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/assertion.hpp>
-#include <test_system/test_system.hpp>
 #include <kernel/process.hpp>
 #include <kernel/universe.hpp>
+#endif // PARALLEL
 
+using namespace FEAST;
+using namespace FEAST::TestSystem;
+
+#ifdef PARALLEL
+/* ********************************************************************************************* */
+/*   -  P A R A L L E L   T E S T   D R I V E R  *  P A R A L L E L   T E S T   D R I V E R   -  */
+/* ********************************************************************************************* */
 /**
 * \brief testing creation of work groups based on a 2D mesh
 *
@@ -50,7 +60,7 @@ public:
   * name of the mesh file to be read
   */
   LoggerTest()
-    : TaggedTest<Tag_, DT_>("logger_test")
+    : TaggedTest<Tag_, DT_>("logger_test (parallel)")
   {
   }
 
@@ -126,18 +136,8 @@ public:
         pp.add_line_sep();
         // print it like this...
         Logger::log(pp.block());
-        // ... or like this...
-        pp.print(Logger::file);
         // send it to the master for screen and file output
-        Logger::log_master(pp.block());
-
-        // test log_master_array()
-        std::vector<std::string> messages(3);
-        messages[0] = prefix + ": Testing this...\n";
-        messages[1] = prefix + ": ...vector logging...\n";
-        messages[2] = prefix + ": ...feature!\n";
-        Logger::log_master_array(messages, Logger::SCREEN_FILE);
-        Logger::log(messages);
+        Logger::log(pp.block(), Logger::master);
       }
 
       // let all processes write something to their log file
@@ -146,7 +146,7 @@ public:
       Logger::log(s);
 
       // perform actions depending on the group id
-      if(group_id == 0)
+      /*if(group_id == 0)
       {
         process_group->log_indiv_master(prefix + ": NI!\n", Logger::SCREEN_FILE);
       }
@@ -161,7 +161,7 @@ public:
       else
       {
         throw InternalError("group_id " + stringify(group_id) + " is not valid!");
-      }
+      }*/
 
       // Everything done, call universe destruction routine.
       universe->destroy();
@@ -189,3 +189,42 @@ public:
 
 // create test instance, using space and world dimension 1
 LoggerTest<Nil, Nil, 1, 1> logger_test;
+
+#else
+/* ************************************************************************************* */
+/*   -  S E R I A L   T E S T   D R I V E R  *  S E R I A L   T E S T   D R I V E R   -  */
+/* ************************************************************************************* */
+class LoggerTest
+  : public TaggedTest<Nil, Nil>
+{
+public:
+  /// CTOR
+  LoggerTest()
+    : TaggedTest<Nil, Nil>("logger_test (serial)")
+  {
+  }
+
+  /// main routine
+  void run() const
+  {
+    CONTEXT("LoggerTest::run()");
+
+    // open two log files
+    Logger::open("./logger_test_0", 0);
+    Logger::open("./logger_test_1", 1);
+
+    // print something
+    Logger::log("This should appear on the screen and nowhere else\n", Logger::screen);
+    Logger::log("This should appear on the screen and in log file 0\n", Logger::local);
+    Logger::log("This should appear in log file 1\n", Logger::local_file_1);
+    Logger::log("This should appear in log file 0 and 1\n", Logger::local_file_0|Logger::local_file_1);
+    Logger::log("This should not appear anywhere\n", Logger::none);
+
+    // close log files
+    Logger::close_all();
+  }
+}; // LoggerTest
+
+LoggerTest logger_test;
+
+#endif // PARALLEL
