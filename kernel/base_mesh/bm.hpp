@@ -148,8 +148,8 @@ namespace FEAST
       *****************************/
       /// default CTOR for a base mesh
       BM()
-        : _cells(nullptr),
-          _graph(nullptr)
+        : _cells(),
+        _graph(nullptr)
       {
         CONTEXT("BaseMesh::BM::BM()");
       }
