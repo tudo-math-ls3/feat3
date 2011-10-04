@@ -112,9 +112,9 @@ public:
         // set cell numbers (now they differ from indices)
         bm->set_cell_numbers();
         // print base mesh
-        bm->print(Logger::file);
+        Logger::log(bm->print(), Logger::local_file_0);
        // validate base mesh
-        bm->validate(Logger::file);
+        Logger::log(bm->validate(), Logger::local_file_0);
 
         // COMMENT_HILMAR: neighbourhood update
 

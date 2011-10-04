@@ -381,6 +381,13 @@ namespace FEAST
         // COMMENT_HILMAR: add further validations...
       }
 
+      std::string validate() const
+      {
+        std::ostringstream oss;
+        validate(oss);
+        return oss.str();
+      }
+
 
       /**
       * \brief prints this base mesh to the given ostream
