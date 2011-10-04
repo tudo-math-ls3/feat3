@@ -544,7 +544,7 @@ namespace FEAST
       ///default CTOR
       Subcells()
         : Subcells<2, space_dim_, world_dim_>(),
-          _faces(nullptr)
+          _faces()
       {
         CONTEXT("BaseMesh::Subcells::Subcells()");
       }
