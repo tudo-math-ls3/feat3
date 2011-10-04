@@ -162,7 +162,7 @@ namespace FEAST
     /// Returns the instance.
     static T_ * instance()
     {
-      T_ * * instance_ptr(_instance_ptr());
+      T_ ** instance_ptr = _instance_ptr();
 
       if (nullptr == *instance_ptr)
       {
