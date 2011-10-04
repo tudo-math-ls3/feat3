@@ -306,7 +306,7 @@ namespace FEAST
             + ManagerComp<space_dim_, world_dim_>::_interlevel_groups[igroup]->test_communication();
         }
       }
-      return work_group_test_ok + interlevel_group_test_ok;
+      return (work_group_test_ok + interlevel_group_test_ok) == 0;
     } // _test_communication
 
 

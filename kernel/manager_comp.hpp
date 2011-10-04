@@ -240,7 +240,7 @@ namespace FEAST
 
         if(belongs_to_work_group()[igroup])
         {
-          _work_groups[igroup] = new WorkGroupExt(comm, igroup, (bool)_group_contains_extra_coord[igroup],
+          _work_groups[igroup] = new WorkGroupExt(comm, igroup, _group_contains_extra_coord[igroup] == 0,
                                                   _process_group->is_coordinator());
         }
         // free the group again
