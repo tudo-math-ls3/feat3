@@ -645,6 +645,18 @@ namespace FEAST
 #endif
 
       /**
+       * \brief Default master channel.
+       * \li In a parallel build, this channel is an OR-ed combination of \link master_file_0\endlink and
+       *     \link master_standard\endlink.
+       * \li In a serial build, this channel is (currently) equivalent to \link none\endlink.
+       */
+#ifdef PARALLEL
+      master                  = 0x80010000, // = master_file_0 | master_standard
+#else
+      master                  = 0,          // = none; maybe change that...
+#endif
+
+      /**
        * \brief Local standard output channel.
        *
        * This channel represents the standard output stream (i.e. <c>std::cout</c>) of the calling process.

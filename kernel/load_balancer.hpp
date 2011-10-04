@@ -401,7 +401,8 @@ namespace FEAST
       unsigned int num_cells = _base_mesh->num_cells();
 
       // debug output
-      Logger::log_master("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n");
+      Logger::log("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n",
+        Logger::master);
       // assert that the number of processes is n+2
       ASSERT(num_processes == num_cells + 2, "Number of processes " + stringify(num_processes)
              + " must be number of cells + 2, i.e., " + stringify(num_cells + 2) + ".");

@@ -225,8 +225,8 @@ namespace FEAST
       Process::num_processes = _num_processes;
       Process::is_master = (Process::rank == Process::rank_master);
 
-      // open log files
-      Logger::open_log_file(_logfile_base_name);
+      // open local log file 0
+      Logger::open(_logfile_base_name, 0);
 
       // calculate the number of processes needed; and check whether there are enough MPI processes available:
       unsigned int num_processes_needed;
@@ -367,7 +367,7 @@ namespace FEAST
     {
       CONTEXT("Universe::_cleanup()");
       // open log files
-      Logger::close_log_file();
+      Logger::close_all();
 
       delete _world_group;
       for(unsigned int igroup(0) ; igroup < _num_process_groups ; ++igroup)

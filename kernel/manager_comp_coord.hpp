@@ -455,7 +455,7 @@ namespace FEAST
 
       _base_mesh = new BaseMesh::BM<space_dim_, world_dim_>();
       BaseMesh::FileParser<space_dim_, world_dim_> parser;
-      Logger::log_master("Reading mesh file " + mesh_file + "...\n", Logger::SCREEN_FILE);
+      Logger::log("Reading mesh file " + mesh_file + "...\n", Logger::master);
       try
       {
         parser.parse(mesh_file, _base_mesh);
@@ -471,10 +471,12 @@ namespace FEAST
       _base_mesh->create_graph();
       // print base mesh
       std::string s = _base_mesh->print();
-      Logger::log_master(s, Logger::SCREEN);
+      Logger::log(s, Logger::master_standard);
       Logger::log(s);
       // validate base mesh
-      _base_mesh->validate(Logger::file);
+      std::ostringstream strstream;
+      _base_mesh->validate(strstream);
+      Logger::log(strstream.str());
     }
   }; // class ManagerCompCoord
 } // namespace FEAST
