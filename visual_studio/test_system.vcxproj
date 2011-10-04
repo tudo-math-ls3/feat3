@@ -421,6 +421,7 @@
     <ClCompile Include="..\kernel\base_mesh\cell_1d_edge-test_subdivision.cpp" />
     <ClCompile Include="..\kernel\base_mesh\cell_2d_quad-test_subdivision.cpp" />
     <ClCompile Include="..\kernel\base_mesh\cell_3d_hexa-test_subdivision.cpp" />
+    <ClCompile Include="..\kernel\logger-test.cpp" />
     <ClCompile Include="..\kernel\util\assertion-test.cpp" />
     <ClCompile Include="..\kernel\util\inheritance-test.cpp" />
     <ClCompile Include="..\kernel\util\pretty_printer-test.cpp" />

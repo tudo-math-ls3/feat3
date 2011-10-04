@@ -547,7 +547,7 @@
     <ClInclude Include="feast_config.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\dummy.cpp" />
+    <ClCompile Include="..\kernel\base_mesh\cell.cpp" />
     <ClCompile Include="..\kernel\comm.cpp" />
     <ClCompile Include="..\kernel\constants.cpp" />
     <ClCompile Include="..\kernel\logger.cpp" />

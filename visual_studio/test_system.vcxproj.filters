@@ -58,5 +58,8 @@
     <ClCompile Include="..\test_system\test_system.cpp">
       <Filter>Source Files %28test_system%29</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\logger-test.cpp">
+      <Filter>Source Files %28kernel%29</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

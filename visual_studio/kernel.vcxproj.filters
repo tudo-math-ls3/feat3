@@ -15,6 +15,9 @@
     <Filter Include="Header Files\util">
       <UniqueIdentifier>{09524e05-8107-4f0a-b5f7-c473b2106d8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\base_mesh">
+      <UniqueIdentifier>{e1d9298f-51d5-4664-81c5-40d3d3081b8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
@@ -187,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="..\kernel\logger.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\base_mesh\cell.cpp">
+      <Filter>Source Files\base_mesh</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
