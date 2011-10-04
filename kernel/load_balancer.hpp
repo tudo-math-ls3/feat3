@@ -596,7 +596,8 @@ namespace FEAST
       unsigned int num_cells = _base_mesh->num_cells();
 
       // debug output
-      Logger::log_master("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n");
+      Logger::log("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n",
+        Logger::master);
       // if there is dedicated load balancer process, substract one process from the number of processes (to get the
       // actual number of compute processes)
       if(_group_has_dedicated_load_bal)
