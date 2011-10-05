@@ -5,7 +5,6 @@ namespace FEAST
 {
 #ifndef FEAST_NO_CONTEXT
   /// The global context stack.
-  /// \todo Ist der stack global oder compile-unit lokal?
   std::list<std::string> * context_stack = 0;
 
   /**
@@ -44,8 +43,8 @@ namespace FEAST
     _context_data(new ContextData),
 #endif // FEAST_NO_CONTEXT
     _message(message)
-    {
-    }
+  {
+  }
 
   Exception::Exception(const Exception & other) :
     std::exception(other),
@@ -53,8 +52,8 @@ namespace FEAST
     _context_data(new ContextData(*other._context_data)),
 #endif // FEAST_NO_CONTEXT
     _message(other._message)
-    {
-    }
+  {
+  }
 
   Exception::~Exception() throw()
   {
@@ -130,5 +129,5 @@ namespace FEAST
 
     return join_strings(context_stack->begin(), context_stack->end(), delimiter);
   }
-};
 #endif // FEAST_NO_CONTEXT
+} // namespace FEAST
