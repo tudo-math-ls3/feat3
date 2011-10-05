@@ -98,7 +98,7 @@ namespace FEAST
 
   public:
     /// DTOR
-    virtual ~Exception()
+    virtual ~Exception() throw()
     {
 #ifndef FEAST_NO_CONTEXT
       delete _context_data;
@@ -123,7 +123,7 @@ namespace FEAST
     bool empty() const;
 
     /// return descriptive exception name
-    const char * what() const
+    const char * what() const throw()
     {
       /// \todo Add a working win32 alternative (see http://www.int0x80.gr/papers/name_mangling.pdf)
       /*if (_what_str.empty())
