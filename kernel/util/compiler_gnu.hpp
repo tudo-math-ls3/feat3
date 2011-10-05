@@ -25,6 +25,7 @@
 #  define FEAST_COMPILER "GNU C++ compiler"
 
 // Now let's see what C++0x features the compiler offers
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
 #  if (_GCC_VER > 40600)
 #    define HAVE_CPP0X_NULLPTR 1
 #  endif
@@ -34,6 +35,7 @@
 #  if (_GCC_VER > 40100)
 #    define HAVE_CPP0X_EXTERN_TEMPLATE 1
 #  endif
+#endif // __GXX_EXPERIMENTAL_CXX0X__
 
 #endif // !defined(FEAST_COMPILER) && defined(__GNUC__)
 
