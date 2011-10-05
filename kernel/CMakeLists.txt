@@ -9,12 +9,16 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 ADD_SUBDIRECTORY( util )
 ADD_SUBDIRECTORY( base_mesh )
 
+ADD_LIBRARY(feast STATIC comm.cpp process.cpp logger.cpp constants.cpp)
+TARGET_LINK_LIBRARIES (feast kernel-base_mesh kernel-util)
+
 #list of kernel tests
-SET (test_list base_header-test logger-test work_group-test_1d work_group-test_2d_1 work_group-test_2d_2)
+SET (test_list logger-test work_group-test_1d work_group-test_2d_1 work_group-test_2d_2)
 
 #create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
+  TARGET_LINK_LIBRARIES(${test} feast test_system)
   ADD_TEST(${test}_nil ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
