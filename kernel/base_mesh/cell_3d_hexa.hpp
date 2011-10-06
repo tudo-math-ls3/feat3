@@ -838,7 +838,7 @@ namespace FEAST
             stream << "Validating hexaeder " << this->print_index() << "..." << std::endl;
           }
 
-          std::string s = "Hexaeder " + this->print_index() + ": ";
+          String s = "Hexaeder " + this->print_index() + ": ";
 
           // validate that all vertices, edges and faces are set
           for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)

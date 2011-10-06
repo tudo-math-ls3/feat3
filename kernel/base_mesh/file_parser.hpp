@@ -92,12 +92,12 @@ namespace FEAST
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
-      inline void parse(std::string const& file_name, BM<1, world_dim_>* bm)
+      inline void parse(String const& file_name, BM<1, world_dim_>* bm)
       {
         CONTEXT("BaseMesh::FileParser::parse()");
         ASSERT(world_dim_ == 1, "Currently, world dim " + stringify(world_dim_) + " must be 1.");
 
-        std::string s = "No file parser implemented yet!\n";
+        String s = "No file parser implemented yet!\n";
         s += "A manual 1D base mesh is created (v0 is at (0,0) and all edges are unit length):\n";
         s += "v0--------e0--------v1--------e1--------v2--------e2--------v3\n";
         Logger::log(s, Logger::master);
@@ -768,7 +768,7 @@ namespace FEAST
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
-      inline void parse(std::string const& file_name, BM<2, world_dim_>* bm)
+      inline void parse(String const& file_name, BM<2, world_dim_>* bm)
       {
         CONTEXT("BaseMesh::FileParser::parse()");
         // FEAST1 file format does not distinguish world dimension and space dimension. So, for now the world_dim_
@@ -792,7 +792,7 @@ namespace FEAST
           throw InternalError("Only file format 3.0 (inline) is currently supported");
         }
         // description of this base mesh
-        std::string saux;
+        String saux;
         mesh_file->read(saux);
 
         // remaining parts of this file
@@ -860,7 +860,7 @@ namespace FEAST
       * \author Dominik Goeddeke
       * \author Hilmar Wobker
       */
-      inline void parse(std::string const& file_name, BM<3, world_dim_>* bm)
+      inline void parse(String const& file_name, BM<3, world_dim_>* bm)
       {
         CONTEXT("BaseMesh::FileParser::parse()");
         ASSERT(world_dim_ == 3, "Currently, world dim " + stringify(world_dim_) + " must be 3.");

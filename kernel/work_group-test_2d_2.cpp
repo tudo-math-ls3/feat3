@@ -49,7 +49,7 @@ class WorkGroupTest2D2
 private:
 
   /// name of the mesh file to be read
-  std::string _mesh_file;
+  String _mesh_file;
 
 public:
 
@@ -59,7 +59,7 @@ public:
   * \param[in] mesh_file
   * name of the mesh file to be read
   */
-  WorkGroupTest2D2(std::string const mesh_file)
+  WorkGroupTest2D2(String const mesh_file)
     : TaggedTest<Tag_, DT_>("work_group_test_2d_2"),
       _mesh_file(mesh_file)
   {
@@ -135,7 +135,7 @@ public:
 
       // debug output
       int rank_process_group = process_group->rank();
-      std::string s("Process " + stringify(Process::rank) + " is the manager with local rank "
+      String s("Process " + stringify(Process::rank) + " is the manager with local rank "
                     + stringify(rank_process_group) + " in group " + stringify(group_id) + ".\n");
       Logger::log(s);
 

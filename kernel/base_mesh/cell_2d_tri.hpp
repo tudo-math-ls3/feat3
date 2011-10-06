@@ -318,7 +318,7 @@ namespace FEAST
             stream << "Validating triangle " << this->print_index() << "..." << std::endl;
           }
 
-          std::string s = "Triangle " + this->print_index() + ": ";
+          String s = "Triangle " + this->print_index() + ": ";
 
           // validate that all vertices and edges are set
           for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)

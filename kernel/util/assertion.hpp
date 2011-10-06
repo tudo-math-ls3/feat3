@@ -6,8 +6,6 @@
 #include <kernel/util/exception.hpp>
 
 // includes, system
-#include <string>
-#include <iostream>
 
 namespace FEAST
 {
@@ -44,7 +42,7 @@ namespace FEAST
       const char * const function,
       const char * const file,
       const long line,
-      const std::string & message)
+      const String & message)
       : Exception(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message)
     {
 #ifndef FEAST_NO_CONTEXT

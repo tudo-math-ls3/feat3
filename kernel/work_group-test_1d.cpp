@@ -79,7 +79,7 @@ public:
 
       // debug output
       int rank_process_group = process_group->rank();
-      std::string s("Process " + stringify(Process::rank) + " is manager process with local rank "
+      String s("Process " + stringify(Process::rank) + " is manager process with local rank "
                     + stringify(rank_process_group) + ".\n");
       Logger::log(s);
 

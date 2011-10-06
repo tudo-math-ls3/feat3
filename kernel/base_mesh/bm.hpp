@@ -381,7 +381,7 @@ namespace FEAST
         // COMMENT_HILMAR: add further validations...
       }
 
-      std::string validate() const
+      String validate() const
       {
         std::ostringstream oss;
         validate(oss);
@@ -420,7 +420,7 @@ namespace FEAST
       *
       * \return base mesh dump
       */
-      inline std::string print() const
+      inline String print() const
       {
         CONTEXT("BaseMesh::BM::print()");
         std::ostringstream oss;

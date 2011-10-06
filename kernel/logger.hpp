@@ -166,10 +166,10 @@ namespace FEAST
   public:
 
     /// variable storing the base name of the log file
-    static std::string file_base_name;
+    static String file_base_name;
 
     /// variable storing the complete name of the log file
-    static std::string file_name;
+    static String file_name;
 
     /// log file stream
     static std::ofstream file;
@@ -207,7 +207,7 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-    static void open_log_file(std::string const base_name)
+    static void open_log_file(String const base_name)
     {
       CONTEXT("Logger::open_log_file()");
       // set base name of the log file
@@ -272,7 +272,7 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-    static void log(std::string const message)
+    static void log(String const message)
     {
       CONTEXT("Logger::log()");
       file << message;

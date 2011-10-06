@@ -40,8 +40,26 @@ namespace FEAST
     }
 
     /// CTOR
+    inline String(const char* str, size_type count)
+      : std::string(str, count)
+    {
+    }
+
+    /// CTOR
     inline String(const std::string& str)
       : std::string(str)
+    {
+    }
+
+    /// CTOR
+    inline String(const std::string& str, size_type offset, size_type count = npos)
+      : std::string(str, offset, count)
+    {
+    }
+
+    /// CTOR
+    inline String(size_type count, char c)
+      : std::string(count, c)
     {
     }
 

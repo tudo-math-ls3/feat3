@@ -135,7 +135,7 @@ namespace FEAST
     *
     * If not set by the user, the file base name is set to 'feast'. The variable is passed to class Logger.
     */
-    std::string _logfile_base_name;
+    String _logfile_base_name;
 
     /* *************************
     * constructor & destructor *
@@ -260,7 +260,7 @@ namespace FEAST
           // all ok, let only one process comment on this
           if(Process::is_master)
           {
-            std::string s = stringify(_num_processes) + " processes available and " + stringify(num_processes_needed)
+            String s = stringify(_num_processes) + " processes available and " + stringify(num_processes_needed)
                             + " needed.\n";
             Logger::log(s);
             std::cout << s;
@@ -342,7 +342,7 @@ namespace FEAST
         _master = new Master();
 
         // debug output
-        std::string s = "Process " + stringify(Process::rank) + " is the MASTER OF THE UNIVERSE!\n";
+        String s = "Process " + stringify(Process::rank) + " is the MASTER OF THE UNIVERSE!\n";
         Logger::log(s);
         std::cout << s;
 
@@ -438,7 +438,7 @@ namespace FEAST
     * optional base name of log files (name pattern '<logfile_base_name><world rank of the process>.log'); if not
     * provided, it is set to 'feast'
     */
-    void create(std::string const logfile_base_name = "feast")
+    void create(String const logfile_base_name = "feast")
     {
       CONTEXT("Universe::create()");
       if(!_universe_created)
@@ -500,7 +500,7 @@ namespace FEAST
       unsigned int num_process_groups,
       unsigned int num_processes_in_group[],
       bool includes_dedicated_load_bal[],
-      std::string const logfile_base_name = "feast")
+      String const logfile_base_name = "feast")
     {
       CONTEXT("Universe::create()");
       if(!_universe_created)

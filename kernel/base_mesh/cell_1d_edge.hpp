@@ -203,7 +203,7 @@ namespace FEAST
             stream << "Validating edge " + this->print_index() << "..." << std::endl;
           }
 
-          std::string s = "Edge " + this->print_index() + ": ";
+          String s = "Edge " + this->print_index() + ": ";
 
           // validate that all vertices are set
           for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)

@@ -17,7 +17,7 @@ class UnitTest
 {
 public:
   /// Constructor
-  UnitTest(const std::string & id)
+  UnitTest(const String & id)
     : BaseTest(id)
   {
   }
@@ -30,7 +30,7 @@ public:
     TEST_CHECK_NOT_EQUAL(1, 0.5);
     TEST_CHECK_STRINGIFY_EQUAL(4711, 4711);
     TEST_CHECK_EQUAL_WITHIN_EPS(25,23,2.2);
-    TEST_CHECK_THROWS(std::string("0").at(10), std::exception);
+    TEST_CHECK_THROWS(String("0").at(10), std::exception);
   }
 } unittest("UnitTest-test");
 
@@ -51,7 +51,7 @@ class TaggedUnitTest
 {
 public:
   /// Constructor
-  TaggedUnitTest(const std::string & id)
+  TaggedUnitTest(const String & id)
     : TaggedTest<Tag_, DT_>(id)
   {
   }
@@ -64,7 +64,7 @@ public:
     TEST_CHECK_NOT_EQUAL(1, 0.5);
     TEST_CHECK_STRINGIFY_EQUAL(4711, 4711);
     TEST_CHECK_EQUAL_WITHIN_EPS(25,23,2.2);
-    TEST_CHECK_THROWS(std::string("0").at(10), std::exception);
+    TEST_CHECK_THROWS(String("0").at(10), std::exception);
   }
 };
 TaggedUnitTest<Nil, float> taggedunittestf ("TaggedUnitTest-test float");

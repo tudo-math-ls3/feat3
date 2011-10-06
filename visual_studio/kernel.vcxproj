@@ -552,6 +552,7 @@
     <ClCompile Include="..\kernel\constants.cpp" />
     <ClCompile Include="..\kernel\logger.cpp" />
     <ClCompile Include="..\kernel\process.cpp" />
+    <ClCompile Include="..\kernel\util\exception.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

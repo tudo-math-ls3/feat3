@@ -67,7 +67,7 @@ namespace FEAST
   {
   private:
     /// string holding the prefix built by pushing and popping substrings
-    std::string _s;
+    String _s;
 
     /// start positions of the substrings inside the string #_s
     std::vector<size_t> _start_pos;
@@ -97,7 +97,7 @@ namespace FEAST
     *
     * \author Hilmar Wobker
     */
-    void push(std::string string_to_append)
+    void push(String string_to_append)
     {
       CONTEXT("Prefix::push()");
       // forbid pushing empty strings
@@ -136,7 +136,7 @@ namespace FEAST
     *
     * \return reference to prefix #_s
     */
-    inline const std::string& s() const
+    inline const String& s() const
     {
       CONTEXT("Prefix::s()");
       return _s;

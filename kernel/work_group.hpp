@@ -101,7 +101,7 @@ namespace FEAST
 
       // debugging output
       // write some individual messages to file
-      std::string s("I have COMM_WORLD rank " + stringify(Process::rank) + " and group rank " + stringify(_rank)
+      String s("I have COMM_WORLD rank " + stringify(Process::rank) + " and group rank " + stringify(_rank)
                     + " in work group " + stringify(_group_id) + ".");
       if(is_coordinator())
       {
@@ -245,7 +245,7 @@ namespace FEAST
       }
 
       // debugging output
-      std::string s;
+      String s;
       for(index_glob_t i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a[i][0]);

@@ -593,7 +593,7 @@ namespace FEAST
             stream << "Validating quad " << this->print_index() << "..." << std::endl;
           }
 
-          std::string s = "Quad " + this->print_index() + ": ";
+          String s = "Quad " + this->print_index() + ": ";
 
           // validate that all vertices and edges are set
           for(unsigned char ivert(0) ; ivert < num_vertices() ; ++ivert)

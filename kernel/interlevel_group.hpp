@@ -290,7 +290,7 @@ namespace FEAST
         MPI_Gather(&world_rank, 1, MPI_INTEGER, recv_ranks, 1, MPI_INTEGER, _rank_root, _comm);
 
         // debugging output
-        std::string s(stringify(recv_ranks[0]));
+        String s(stringify(recv_ranks[0]));
         int sum(recv_ranks[0]);
         for(unsigned int i(1) ; i < num_processes(); ++i)
         {

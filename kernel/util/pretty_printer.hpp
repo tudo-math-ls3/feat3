@@ -63,7 +63,7 @@ namespace FEAST
   private:
 
     /// string holding the pretty printed block of messages
-    std::string _block;
+    String _block;
 
     /// width of the pretty printed block (from left to right delimiter, excluding the prefix)
     size_t _width;
@@ -72,7 +72,7 @@ namespace FEAST
     char _delim;
 
     /// string each line is prefixed with (useful in connection with grep commands)
-    std::string _prefix;
+    String _prefix;
 
 
   public:
@@ -92,7 +92,7 @@ namespace FEAST
     PrettyPrinter(
       size_t width,
       char delim,
-      const std::string& prefix)
+      const String& prefix)
       : _block(""),
         _width(width),
         _delim(delim),
@@ -134,7 +134,7 @@ namespace FEAST
     *
     * \return reference to the pretty printed block #_block
     */
-    inline const std::string& block() const
+    inline const String& block() const
     {
       CONTEXT("PrettyPrinter::block()");
       return _block;
@@ -143,7 +143,7 @@ namespace FEAST
     /**
     * \brief setter for the pretty printed block
     */
-    inline void set_block(std::string block)
+    inline void set_block(String block)
     {
       CONTEXT("PrettyPrinter::set_block()");
       _block = block;
@@ -177,7 +177,7 @@ namespace FEAST
     *
     * \return reference to the prefix #_prefix
     */
-    inline const std::string& prefix() const
+    inline const String& prefix() const
     {
       CONTEXT("PrettyPrinter::prefix()");
       return _prefix;
@@ -186,7 +186,7 @@ namespace FEAST
     /**
     * \brief setter for the prefix
     */
-    inline void set_prefix(std::string prefix)
+    inline void set_prefix(String prefix)
     {
       CONTEXT("PrettyPrinter::set_prefix()");
       _prefix = prefix;
@@ -225,7 +225,7 @@ namespace FEAST
     void add_line_sep()
     {
       CONTEXT("PrettyPrinter::add_line_sep()");
-      _block += _prefix + std::string(_width, _delim) + "\n";
+      _block += _prefix + String(_width, _delim) + "\n";
     }
 
 
@@ -239,7 +239,7 @@ namespace FEAST
     * \param[in] s
     * the string to be centered in the line
     */
-    void add_line_centered(const std::string& s)
+    void add_line_centered(const String& s)
     {
       CONTEXT("PrettyPrinter::add_line_centered()");
       if(_width < s.size() + 4)
@@ -254,8 +254,8 @@ namespace FEAST
         size_t num_blanks_left(num_blanks_total / 2);
         size_t num_blanks_right(num_blanks_total % 2 == 0 ? num_blanks_left : num_blanks_left + 1);
         // add the line to the pretty printed block
-        _block += _prefix + stringify(_delim) + std::string(num_blanks_left, ' ') + s
-                  + std::string(num_blanks_right, ' ') + stringify(_delim) + "\n";
+        _block += _prefix + stringify(_delim) + String(num_blanks_left, ' ') + s
+                  + String(num_blanks_right, ' ') + stringify(_delim) + "\n";
       }
     }
 
@@ -270,7 +270,7 @@ namespace FEAST
     * \param[in] s
     * the string to be written
     */
-    void add_line(const std::string& s)
+    void add_line(const String& s)
     {
       CONTEXT("PrettyPrinter::add_line()");
       if(_width < s.size() + 4)
@@ -281,7 +281,7 @@ namespace FEAST
       else
       {
         // add the line to the pretty printed block
-        _block += _prefix + stringify(_delim) + " " + s + std::string(_width - s.size() - 3, ' ')
+        _block += _prefix + stringify(_delim) + " " + s + String(_width - s.size() - 3, ' ')
                   + stringify(_delim) + "\n";
       }
     }
@@ -295,7 +295,7 @@ namespace FEAST
     * \param[in] s
     * the string to be written
     */
-    void add_line_no_right_delim(const std::string& s)
+    void add_line_no_right_delim(const String& s)
     {
       CONTEXT("PrettyPrinter::add_line_no_right_delim()");
       _block += _prefix + stringify(_delim) + " " + s + "\n";

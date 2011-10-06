@@ -122,7 +122,7 @@ public:
 
       int rank_process_group = process_group->rank();
 
-      std::string prefix(std::string("Group " + stringify(group_id) + ", proc " + stringify(rank_process_group)));
+      String prefix(String("Group " + stringify(group_id) + ", proc " + stringify(rank_process_group)));
 
       // let the coordinators perform some extra log output
       if(process_group->is_coordinator())
@@ -141,7 +141,7 @@ public:
       }
 
       // let all processes write something to their log file
-      std::string s("Process with world rank " + stringify(Process::rank) + " has local rank "
+      String s("Process with world rank " + stringify(Process::rank) + " has local rank "
                     + stringify(rank_process_group) + " in group " + stringify(group_id) + ".\n");
       Logger::log(s);
 

@@ -18,6 +18,9 @@
     <Filter Include="Source Files\base_mesh">
       <UniqueIdentifier>{e1d9298f-51d5-4664-81c5-40d3d3081b8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{fc956664-a3a9-45df-92e4-c5631ac60774}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
@@ -193,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="..\kernel\base_mesh\cell.cpp">
       <Filter>Source Files\base_mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\exception.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

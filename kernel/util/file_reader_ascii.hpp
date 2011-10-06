@@ -33,7 +33,7 @@ namespace FEAST
     static const char ENDL = '\n';
 
     /// filename associated with this reader
-    const std::string& _filename;
+    const String& _filename;
 
     /// stream associated with this reader
     std::ifstream myfile;
@@ -45,7 +45,7 @@ namespace FEAST
     bool _skip_empty_lines;
 
     /// main util function (returns false if end of file is reached, true otherwise)
-    inline bool get_next_line(std::string& sbuf)
+    inline bool get_next_line(String& sbuf)
     {
       CONTEXT("FileReaderASCII::get_next_line()");
       // skip leading spaces
@@ -96,7 +96,7 @@ namespace FEAST
     * flag whether to skip empty lines
     */
     FileReaderASCII(
-      const std::string& filename,
+      const String& filename,
       const char comment_char,
       const bool skip_empty_lines)
       : _filename(filename),
@@ -124,7 +124,7 @@ namespace FEAST
     inline void skip_line()
     {
       CONTEXT("FileReaderASCII::skip_line()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -138,15 +138,15 @@ namespace FEAST
     * \param[in] keyword
     * keyword to be checked
     */
-    inline void read(std::string const& keyword)
+    inline void read(String const& keyword)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
       }
-      if(line.find(keyword) == std::string::npos)
+      if(line.find(keyword) == String::npos)
       {
         throw InternalError("Keyword <" + keyword + "> not found");
       }
@@ -159,7 +159,7 @@ namespace FEAST
     * \param[out] value
     * stores the line
     */
-    inline void read(std::string& value)
+    inline void read(String& value)
     {
       CONTEXT("FileReaderASCII::read()");
       if(!get_next_line(value))
@@ -181,11 +181,11 @@ namespace FEAST
     * \note Assumes that the line contains nothing else except possible trailing comments.
     */
     inline void read(
-      std::string& value1,
-      std::string& value2)
+      String& value1,
+      String& value2)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -204,7 +204,7 @@ namespace FEAST
 
       // find position of the first blank after the key
       size_t pos = line.find_first_of(' ');
-      if(pos == std::string::npos)
+      if(pos == String::npos)
       {
         throw InternalError("No white space found after key in line '" + line + "'.");
       }
@@ -227,7 +227,7 @@ namespace FEAST
     inline void read(int& value)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -252,7 +252,7 @@ namespace FEAST
       int& value2)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -281,7 +281,7 @@ namespace FEAST
       int& value3)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -314,7 +314,7 @@ namespace FEAST
       int& value4)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -334,7 +334,7 @@ namespace FEAST
     inline void read(unsigned int& value)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -359,7 +359,7 @@ namespace FEAST
       unsigned int& value2)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -392,7 +392,7 @@ namespace FEAST
       unsigned int& value4)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -421,7 +421,7 @@ namespace FEAST
       unsigned int& value3)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -446,7 +446,7 @@ namespace FEAST
       double& value2)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -467,7 +467,7 @@ namespace FEAST
     inline void read2(double values[])
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");
@@ -503,7 +503,7 @@ namespace FEAST
       double& value5)
     {
       CONTEXT("FileReaderASCII::read()");
-      std::string line;
+      String line;
       if(!get_next_line(line))
       {
         throw InternalError("Unexpected end of file (in " + _filename + ").");

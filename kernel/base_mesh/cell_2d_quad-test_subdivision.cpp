@@ -49,12 +49,12 @@ class Cell2DQuadTestSubdivision
 private:
 
   /// name of the mesh file to be read
-  std::string _mesh_file;
+  String _mesh_file;
 
 public:
 
   /// CTOR
-  Cell2DQuadTestSubdivision(std::string const mesh_file)
+  Cell2DQuadTestSubdivision(String const mesh_file)
     : TaggedTest<Tag_, DT_>("cell_2d_quad_test_subdivision"),
       _mesh_file(mesh_file)
   {

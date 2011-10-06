@@ -135,7 +135,7 @@ namespace FEAST
       }
 
       /// returns the index of this item as string
-      inline std::string print_index() const
+      inline String print_index() const
       {
         CONTEXT("BaseMesh::Item::print_index()");
         std::ostringstream oss;

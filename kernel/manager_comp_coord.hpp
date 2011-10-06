@@ -448,7 +448,7 @@ namespace FEAST
     * member functions *
     *******************/
     /// read in a mesh file and set up base mesh
-    void read_mesh(std::string const & mesh_file)
+    void read_mesh(String const & mesh_file)
     {
       CONTEXT("ManagerCompCoord::read_mesh()");
       // the mesh is read by the process group coordinator
@@ -470,7 +470,7 @@ namespace FEAST
       // create base mesh's graph structure
       _base_mesh->create_graph();
       // print base mesh
-      std::string s = _base_mesh->print();
+      String s = _base_mesh->print();
       Logger::log(s, Logger::master_standard);
       Logger::log(s);
       // validate base mesh

@@ -84,7 +84,7 @@ namespace FEAST
         ASSERT(cell_space_dim_ >= 1, "Cell + space dimension " + stringify(cell_space_dim_) + " must be at least 1.");
         try
         {
-          std::string s;
+          String s;
           for(unsigned char ivertex(0) ; ivertex < c->num_vertices() ; ++ivertex)
           {
             // get vertex neighbours at vertex ivertex
@@ -205,7 +205,7 @@ namespace FEAST
         ASSERT(cell_space_dim_ >= 2, "Cell + space dimension " + stringify(cell_space_dim_) + " must be at least 2.");
         try
         {
-          std::string s;
+          String s;
           for(unsigned char iedge(0) ; iedge < c->num_edges() ; ++iedge)
           {
             // get edge neighbours at edge iedge
@@ -349,7 +349,7 @@ namespace FEAST
         ASSERT(cell_space_dim_ >= 3, "Cell + space dimension " + stringify(cell_space_dim_) + " must be at least 3.");
         try
         {
-          std::string s;
+          String s;
           for(unsigned char iface(0) ; iface < c->num_faces() ; ++iface)
           {
             // get face neighbours at face iface

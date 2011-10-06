@@ -121,7 +121,7 @@ namespace FEAST
     * \param[in] msg
     * string to be written to the buffer
     */
-    static void write(std::string const &msg)
+    static void write(String const &msg)
     {
       CONTEXT("Comm::write()");
       // Write the string as char array to the current position of the buffer (size + 1, since the null termination
@@ -163,7 +163,7 @@ namespace FEAST
     * \param[out] msg
     * string read from the buffer
     */
-    static void read(unsigned int const size, std::string& msg)
+    static void read(unsigned int const size, String& msg)
     {
       CONTEXT("Comm::read()");
       // create char array for storing the sent message (add 1 to the size since the sent message ends with null

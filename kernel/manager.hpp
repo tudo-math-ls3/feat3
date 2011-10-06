@@ -689,7 +689,7 @@ namespace FEAST
 
 
     /// read in a mesh file and set up base mesh
-    void read_mesh(std::string const & mesh_file)
+    void read_mesh(String const & mesh_file)
     {
       CONTEXT("Manager::read_mesh()");
 

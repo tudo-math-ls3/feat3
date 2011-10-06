@@ -212,7 +212,7 @@ namespace FEAST
     }
 
     /// returns the graph print as string
-    inline std::string print() const
+    inline String print() const
     {
       CONTEXT("Graph::print()");
       std::ostringstream oss;
@@ -337,7 +337,7 @@ namespace FEAST
     }
 
     /// returns the distributed graph print as string
-    inline std::string print() const
+    inline String print() const
     {
       CONTEXT("GraphDistributed::print()");
       std::ostringstream oss;

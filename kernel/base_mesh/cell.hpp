@@ -614,7 +614,7 @@ namespace FEAST
         {
           stream << "Validating history of cell " << this->print_index() << "..." << std::endl;
 
-          std::string s = "Error in cell " + this->print_index() + ": ";
+          String s = "Error in cell " + this->print_index() + ": ";
 
           // if this cell has children, do some respective validations
           if(!active())

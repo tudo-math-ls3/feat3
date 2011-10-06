@@ -48,7 +48,7 @@ public:
     CONTEXT("PrettyPrinterTest::run()");
 
     // test the PrettyPrinter
-    std::string prefix(std::string("Proc 42"));
+    String prefix(String("Proc 42"));
     PrettyPrinter pp(40, '#', prefix + " ");
     pp.add_line_sep();
     pp.add_line_centered("Testing the pretty printer");

@@ -5,10 +5,10 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/instantiation_policy.hpp>
+#include <kernel/util/string.hpp>
 #include <kernel/util/string_utils.hpp>
 
 // includes, system
-#include <string>
 #include <cstdlib>
 #include <iostream>
 #include <list>
@@ -35,10 +35,10 @@ namespace FEAST
 #endif // FEAST_NO_CONTEXT
 
     /// descriptive error message
-    const std::string _message;
+    const String _message;
 
     /// Our what string (for std::exception).
-    mutable std::string _what_str;
+    mutable String _what_str;
 
   protected:
     /**
@@ -47,7 +47,7 @@ namespace FEAST
     * \param message
     * the exception's message
     */
-    Exception(const std::string & message);
+    Exception(const String & message);
 
     /// copy CTOR
     Exception(const Exception & other);
@@ -57,11 +57,11 @@ namespace FEAST
     virtual ~Exception() throw();
 
     /// returns error message
-    const std::string message() const;
+    const String message() const;
 
 #ifndef FEAST_NO_CONTEXT
     /// returns backtrace
-    std::string backtrace(const std::string & delimiter) const;
+    String backtrace(const String & delimiter) const;
 #endif // FEAST_NO_CONTEXT
 
     /// returns true if the backtrace is empty
@@ -90,7 +90,7 @@ namespace FEAST
     * \param message
     * A short error message.
     */
-    InternalError(const std::string & message) :
+    InternalError(const String & message) :
       Exception("Internal error: " + message)
     {
     }
@@ -116,7 +116,7 @@ namespace FEAST
     * \param context
     * description of the context
     */
-    Context(const char * const file, const long line, const std::string & context);
+    Context(const char * const file, const long line, const String & context);
 
     /// DTOR
     ~Context();
@@ -127,7 +127,7 @@ namespace FEAST
     * \param[in] delimiter
     * A delimiter added between to context strings
     */
-    static std::string backtrace(const std::string & delimiter);
+    static String backtrace(const String & delimiter);
   };
 #endif // FEAST_NO_CONTEXT
 

@@ -41,7 +41,7 @@ namespace FEAST
   * \param[in] msg
   * message explaining the reason for the abortion (default "")
   */
-  inline void abort_mpi(const std::string& msg = "")
+  inline void abort_mpi(const String& msg = "")
   {
     CONTEXT("abort_mpi()");
     // flush cout and cerr
@@ -88,7 +88,7 @@ namespace FEAST
   */
   inline void validate_error_code_mpi(
     int error_code,
-    std::string mpi_function_name)
+    String mpi_function_name)
   {
     CONTEXT("validate_error_code_mpi()");
     if (error_code != MPI_SUCCESS)

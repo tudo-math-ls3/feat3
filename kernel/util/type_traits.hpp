@@ -3,6 +3,7 @@
 #define KERNEL_UTIL_TYPE_TRAITS_HPP 1
 
 // includes, FEAST
+#include <kernel/util/string.hpp>
 #include <kernel/util/string_utils.hpp>
 
 // includes, system
@@ -19,7 +20,7 @@ namespace FEAST
   struct TypeTraits
   {
     /// returns a string identifying the datatype
-    static std::string name()
+    static String name()
     {
       return stringify(typeid(DT_).name());
     }
@@ -34,7 +35,7 @@ namespace FEAST
   struct TypeTraits<float>
   {
     /// returns a string identifying the datatype
-    static std::string name()
+    static String name()
     {
       return "float";
     }
@@ -49,7 +50,7 @@ namespace FEAST
   struct TypeTraits<double>
   {
     /// returns a string identifying the datatype
-    static std::string name()
+    static String name()
     {
       return "double";
     }
@@ -64,7 +65,7 @@ namespace FEAST
   struct TypeTraits<unsigned long>
   {
     /// returns a string identifying the datatype
-    static std::string name()
+    static String name()
     {
       return "unsigned long";
     }
@@ -79,7 +80,7 @@ namespace FEAST
   struct TypeTraits<unsigned int>
   {
     /// returns a string identifying the datatype
-    static std::string name()
+    static String name()
     {
       return "unsigned int";
     }
@@ -94,7 +95,7 @@ namespace FEAST
   struct TypeTraits<int>
   {
     /// returns a string identifying the datatype
-    static std::string name()
+    static String name()
     {
       return "int";
     }
@@ -109,7 +110,7 @@ namespace FEAST
   struct TypeTraits<Nil>
   {
     /// returns a string identifying the datatype
-    static std::string name()
+    static String name()
     {
       return "Nil";
     }

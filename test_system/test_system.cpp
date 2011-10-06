@@ -16,8 +16,8 @@ int main(int argc, char** argv)
 
   if (argc == 2)
   {
-    std::string mpc("mpiproccount");
-    std::string argv1(argv[1]);
+    String mpc("mpiproccount");
+    String argv1(argv[1]);
     if(0 == mpc.compare(argv1))
     {
       return (*TestList::instance()->begin_tests())->mpi_proc_count();
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
       }
     }
 
-    std::list<std::string> labels;
+    std::list<String> labels;
     for(int i(1) ; i < argc ; ++i)
     {
       labels.push_back(argv[i]);

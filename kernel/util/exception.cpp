@@ -5,7 +5,7 @@ namespace FEAST
 {
 #ifndef FEAST_NO_CONTEXT
   /// The global context stack.
-  std::list<std::string> * context_stack = 0;
+  std::list<String> * context_stack = 0;
 
   /**
    * \brief This structs holds the actual context history
@@ -15,7 +15,7 @@ namespace FEAST
   struct ContextData
   {
     /// The local context stack
-    std::list<std::string> local_context_stack;
+    std::list<String> local_context_stack;
 
     /// CTOR
     ContextData()
@@ -27,7 +27,7 @@ namespace FEAST
     }
 
     /// returns a full context stack aka backtrace
-    std::string backtrace(const std::string& delimiter) const
+    String backtrace(const String& delimiter) const
     {
       if (context_stack)
       {
@@ -38,7 +38,7 @@ namespace FEAST
   };
 #endif // FEAST_NO_CONTEXT
 
-  Exception::Exception(const std::string & message) :
+  Exception::Exception(const String & message) :
 #ifndef FEAST_NO_CONTEXT
     _context_data(new ContextData),
 #endif // FEAST_NO_CONTEXT
@@ -62,13 +62,13 @@ namespace FEAST
 #endif // FEAST_NO_CONTEXT
   }
 
-  const std::string Exception::message() const
+  const String Exception::message() const
   {
     return _message;
   }
 
 #ifndef FEAST_NO_CONTEXT
-  std::string Exception::backtrace(const std::string & delimiter) const
+  String Exception::backtrace(const String & delimiter) const
   {
     return _context_data->backtrace(delimiter);
   }
@@ -98,11 +98,11 @@ namespace FEAST
 
 
 #ifndef FEAST_NO_CONTEXT
-  Context::Context(const char * const file, const long line, const std::string & context)
+  Context::Context(const char * const file, const long line, const String & context)
   {
     if (! context_stack)
     {
-      context_stack = new std::list<std::string>;
+      context_stack = new std::list<String>;
     }
 
     context_stack->push_back(context + " (" + stringify(file) + ":" + stringify(line) +")");
@@ -122,7 +122,7 @@ namespace FEAST
     }
   }
 
-  std::string Context::backtrace(const std::string & delimiter)
+  String Context::backtrace(const String & delimiter)
   {
     if (! context_stack)
       return "";
