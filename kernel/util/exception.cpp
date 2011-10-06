@@ -31,7 +31,8 @@ namespace FEAST
     {
       if (context_stack)
       {
-        return join_strings(local_context_stack.begin(), local_context_stack.end(), delimiter);
+        String str;
+        return str.join(local_context_stack.begin(), local_context_stack.end(), delimiter);
       }
       else return "";
     }
@@ -127,7 +128,8 @@ namespace FEAST
     if (! context_stack)
       return "";
 
-    return join_strings(context_stack->begin(), context_stack->end(), delimiter);
+    String str;
+    return str.join(context_stack->begin(), context_stack->end(), delimiter);
   }
 #endif // FEAST_NO_CONTEXT
 } // namespace FEAST
