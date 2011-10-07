@@ -240,7 +240,7 @@ namespace FEAST
         a_recv[i] = new unsigned long[n];
         for(Index j(0) ; j < n; ++j)
         {
-          a[i][j] = 100000*(unsigned long(_rank)) + 100*(unsigned long(neighbours[i])) + unsigned long(j);
+          a[i][j] = 100000*(unsigned long)(_rank) + 100*(unsigned long)(neighbours[i]) + (unsigned long)(j);
         }
       }
 
@@ -289,8 +289,8 @@ namespace FEAST
           // expect. (The general problem is: When there is something wrong with the communication, then usually MPI
           // crashes completely. On the other hand, when communication is fine then usually correct values are sent.
           // So, it is very unlikely that communication works *AND* this test here returns false.)
-          unsigned long expected_value = 100000*(unsigned long(neighbours[i])) + 100*(unsigned long(_rank))
-            + unsigned long(j);
+          unsigned long expected_value = 100000*(unsigned long)(neighbours[i]) + 100*(unsigned long)(_rank)
+            + (unsigned long)(j);
           if(expected_value != a_recv[i][j])
           {
             test_result = 1;

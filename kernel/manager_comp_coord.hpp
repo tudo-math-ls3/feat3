@@ -271,7 +271,7 @@ namespace FEAST
             // Index to unsigned int
             for(Index i(0) ; i < (Index)rank_coord+1 ; ++i)
             {
-              index_aux[i] = unsigned int(_graphs[igroup]->index()[i]);
+              index_aux[i] = (unsigned int)(_graphs[igroup]->index()[i]);
             }
             // insert the pseudo node
             index_aux[rank_coord+1] = index_aux[rank_coord];
@@ -279,7 +279,7 @@ namespace FEAST
             // Index to unsigned int
             for(Index i(rank_coord+1) ; i < num_nodes ; ++i)
             {
-              index_aux[i+1] = unsigned int(_graphs[igroup]->index()[i]);
+              index_aux[i+1] = (unsigned int)(_graphs[igroup]->index()[i]);
             }
           }
           else
@@ -292,7 +292,7 @@ namespace FEAST
             // unsigned int
             for(Index i(0) ; i < num_nodes+1 ; ++i)
             {
-              index_aux[i] = unsigned int(_graphs[igroup]->index()[i]);
+              index_aux[i] = (unsigned int)(_graphs[igroup]->index()[i]);
             }
           }
 
