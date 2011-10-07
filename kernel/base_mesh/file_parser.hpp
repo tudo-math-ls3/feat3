@@ -20,6 +20,7 @@
 // includes, system
 #include <iostream> // for std::ostream
 #include <math.h>   // for sin, cos
+#include <assert.h>
 
 namespace FEAST
 {

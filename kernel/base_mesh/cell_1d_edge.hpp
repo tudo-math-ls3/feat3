@@ -11,7 +11,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/util/string_utils.hpp>
 #include <kernel/error_handler.hpp>
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/cell_data_validation.hpp>

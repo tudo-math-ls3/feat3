@@ -11,13 +11,11 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
-#include <kernel/util/string_utils.hpp>
 #include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/exception.hpp>
 
 // includes, system
 #include <stdlib.h>
-#include <string>
 #include <mpi.h>
 
 /**

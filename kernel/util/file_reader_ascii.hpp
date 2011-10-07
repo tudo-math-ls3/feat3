@@ -195,9 +195,7 @@ namespace FEAST
       // key-value strings manually
 
       // remove leading and trailing white spaces from line
-      line = trim(line);
-
-      if(line.length() == 0)
+      if(line.trim().length() == 0)
       {
         throw InternalError("Line is emty!");
       }
@@ -212,7 +210,7 @@ namespace FEAST
       value1 = line.substr(0, pos);
 
       // set second value to the trimmed remaining line
-      value2 = trim(line.substr(pos+1));
+      (value2 = line.substr(pos+1)).trim();
     }
 
 

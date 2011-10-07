@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/util/string.hpp>
-#include <kernel/util/string_utils.hpp>
 
 // includes, system
 #include <typeinfo>

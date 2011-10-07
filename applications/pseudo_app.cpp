@@ -5,7 +5,6 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
-#include <kernel/util/string_utils.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/comm.hpp>

@@ -7,6 +7,7 @@
 
 // includes, system
 #include <string>
+#include <sstream>
 #include <locale>
 
 #ifdef FEAST_COMPILER_MICROSOFT
@@ -188,7 +189,7 @@ namespace FEAST
     /**
      * \brief Appends a set of strings.
      *
-     * This method appends a set of strings given by two forward iterators, separating them by a delimiter.
+     * This method appends a set of strings given by two input iterators, separating them by a delimiter.
      *
      * \param[in] begin, end
      * Two forward iterators representing the string set.
@@ -239,6 +240,52 @@ namespace FEAST
       return join(container.cbegin(), container.cend(), delimiter);
     }
   }; // class String
+
+  /**
+   * \brief Converts an item into a String.
+   *
+   * \tparam T_
+   * The type of the item to be converted.
+   *
+   * \param[in] item
+   * The item to be converted.
+   *
+   * \returns
+   * A String representation of the item.
+   */
+  template<typename T_>
+  inline String stringify(const T_& item)
+  {
+    std::ostringstream oss;
+    oss << item;
+    return oss.str();
+  }
+
+  /// \cond internal
+  template<>
+  inline String stringify<const char*>(const char* const& item)
+  {
+    return String(item);
+  }
+
+  template<>
+  inline String stringify<std::string>(const std::string& item)
+  {
+    return item;
+  }
+
+  template<>
+  inline String stringify<char>(const char& item)
+  {
+    return String(1, item);
+  }
+
+  template<>
+  inline String stringify<bool>(const bool& item)
+  {
+    return String(item ? "true" : "false");
+  }
+  /// \endcond
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_STRING_HPP

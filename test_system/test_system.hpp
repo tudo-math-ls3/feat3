@@ -5,7 +5,6 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/util/string_utils.hpp>
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/exception.hpp>

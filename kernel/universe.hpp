@@ -9,7 +9,6 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
-#include <kernel/util/string_utils.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/instantiation_policy.hpp>
