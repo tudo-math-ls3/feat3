@@ -281,7 +281,7 @@ namespace FEAST
     *
     * \return flag whether test was succesful (0: succesful, >0: failed)
     */
-    bool _test_communication()
+    unsigned int _test_communication()
     {
       CONTEXT("ManagerCompNonCoord::_test_communication()");
 
@@ -306,7 +306,7 @@ namespace FEAST
             + ManagerComp<space_dim_, world_dim_>::_interlevel_groups[igroup]->test_communication();
         }
       }
-      return (work_group_test_ok + interlevel_group_test_ok) == 0;
+      return work_group_test_ok + interlevel_group_test_ok;
     } // _test_communication
 
 
