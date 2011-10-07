@@ -21,10 +21,10 @@ namespace FEAST
   public:
 
     /// global constant: max counting number for an index (if a given index evaluates to this value then it is not valid)
-    static const index_glob_t MAX_INDEX;
+    static const Index MAX_INDEX;
 
     /// global constant: max counting number for a number (if a given number evaluates to this value then it is not valid)
-    static const index_glob_t MAX_NUMBER;
+    static const Index MAX_NUMBER;
   };
 
 } // namespace FEAST

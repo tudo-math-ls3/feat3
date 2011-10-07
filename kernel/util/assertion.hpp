@@ -35,7 +35,7 @@ namespace FEAST
     * \param[in] line
     * line number of the failed assertion
     *
-    * \param[in] message
+    * \param[in] msg
     * message that shall be displayed
     */
     Assertion(

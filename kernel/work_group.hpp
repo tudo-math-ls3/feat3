@@ -170,8 +170,8 @@ namespace FEAST
     *       simply contains all neighbours.
     */
     void set_graph_distributed(
-      index_glob_t const num_neighbours,
-      index_glob_t * neighbours)
+      Index const num_neighbours,
+      Index * neighbours)
     {
       CONTEXT("WorkGroup::set_graph_distributed()");
       _graph_distributed = new GraphDistributed(num_neighbours, neighbours);
@@ -221,10 +221,10 @@ namespace FEAST
       bool test_result = 0;
 
       // length of the integer arrays to be exchanged
-      index_glob_t const n = 10;
+      Index const n = 10;
 
-      index_glob_t num_neighbours = _graph_distributed->num_neighbours();
-      index_glob_t* neighbours = _graph_distributed->neighbours();
+      Index num_neighbours = _graph_distributed->num_neighbours();
+      Index* neighbours = _graph_distributed->neighbours();
 
       // arrays for sending and receiving
       // (The MPI standard says that the send buffer given to MPI_Isend(...) should neither be overwritten nor read(!)
@@ -234,22 +234,22 @@ namespace FEAST
       unsigned long** a_recv = new unsigned long*[num_neighbours];
 
       // fill the array to be sent
-      for(index_glob_t i(0) ; i < num_neighbours; ++i)
+      for(Index i(0) ; i < num_neighbours; ++i)
       {
         a[i] = new unsigned long[n];
         a_recv[i] = new unsigned long[n];
-        for(index_glob_t j(0) ; j < n; ++j)
+        for(Index j(0) ; j < n; ++j)
         {
-          a[i][j] = 100000*_rank + 100*neighbours[i] + j;
+          a[i][j] = 100000*(unsigned long(_rank)) + 100*(unsigned long(neighbours[i])) + unsigned long(j);
         }
       }
 
       // debugging output
       String s;
-      for(index_glob_t i(0) ; i < num_neighbours; ++i)
+      for(Index i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a[i][0]);
-        for(index_glob_t j(1) ; j < n; ++j)
+        for(Index j(1) ; j < n; ++j)
         {
           s +=  " " + stringify(a[i][j]);
         }
@@ -262,34 +262,35 @@ namespace FEAST
       MPI_Status* statuses = new MPI_Status[num_neighbours];
 
       // post sends to all neighbours
-      for(index_glob_t i(0) ; i < num_neighbours; ++i)
+      for(Index i(0) ; i < num_neighbours; ++i)
       {
-        MPI_Isend(a[i], n, MPI_UNSIGNED_LONG, neighbours[i], 0, _comm, &requests[i]);
+        MPI_Isend(a[i], n, MPI_UNSIGNED_LONG, int(neighbours[i]), 0, _comm, &requests[i]);
         // request objects are not needed
         MPI_Request_free(&requests[i]);
       }
       // post receives from all neighbours
-      for(index_glob_t i(0) ; i < num_neighbours; ++i)
+      for(Index i(0) ; i < num_neighbours; ++i)
       {
-        MPI_Irecv(a_recv[i], n, MPI_UNSIGNED_LONG, neighbours[i], 0, _comm, &requests[i]);
+        MPI_Irecv(a_recv[i], n, MPI_UNSIGNED_LONG, int(neighbours[i]), 0, _comm, &requests[i]);
       }
       // wait for all receives to complete
-      MPI_Waitall(num_neighbours, requests, statuses);
+      MPI_Waitall(int(num_neighbours), requests, statuses);
       delete [] requests;
       delete [] statuses;
 
       // debugging output
-      for(index_glob_t i(0) ; i < num_neighbours; ++i)
+      for(Index i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a_recv[i][0]);
-        for(index_glob_t j(1) ; j < n; ++j)
+        for(Index j(1) ; j < n; ++j)
         {
           s += " " + stringify(a_recv[i][j]);
           // We cannot really do a clever check here, so we simply check whether a_recv really contains the value we
           // expect. (The general problem is: When there is something wrong with the communication, then usually MPI
           // crashes completely. On the other hand, when communication is fine then usually correct values are sent.
           // So, it is very unlikely that communication works *AND* this test here returns false.)
-          unsigned long expected_value = 100000*neighbours[i] + 100*_rank + j;
+          unsigned long expected_value = 100000*(unsigned long(neighbours[i])) + 100*(unsigned long(_rank))
+            + unsigned long(j);
           if(expected_value != a_recv[i][j])
           {
             test_result = 1;

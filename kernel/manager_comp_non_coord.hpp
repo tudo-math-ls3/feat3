@@ -246,9 +246,9 @@ namespace FEAST
         {
           ASSERT(!_work_groups()[igroup]->is_coordinator(), "Routine must be called on non-coordinator processes.");
           // number of neighbours of the graph node corresponding to this process (use unsigned int datatype here
-          // instead of index_glob_t since MPI routines expect it)
+          // instead of Index since MPI routines expect it)
           unsigned int num_neighbours_local;
-          index_glob_t* neighbours_local(nullptr);
+          Index* neighbours_local(nullptr);
           int rank_coord = _work_groups()[igroup]->rank_coord();
 
           // receive the number of neighbours from the coordinator process
@@ -256,9 +256,9 @@ namespace FEAST
                       rank_coord, _work_groups()[igroup]->comm());
 
           // receive the neighbours
-          neighbours_local = new index_glob_t[num_neighbours_local];
+          neighbours_local = new Index[num_neighbours_local];
           MPI_Scatterv(nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, neighbours_local,
-                       num_neighbours_local, MPIType<index_glob_t>::value(), rank_coord,
+                       num_neighbours_local, MPIType<Index>::value(), rank_coord,
                        _work_groups()[igroup]->comm());
 
           // now create distributed graph structure within the compute work groups

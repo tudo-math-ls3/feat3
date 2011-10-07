@@ -294,7 +294,7 @@ namespace FEAST
         unsigned int num_neighbours(0);
         for(unsigned int item(0) ; item < this->num_subitems_per_subdim(subdim) ; ++item)
         {
-          num_neighbours += _neighbours[subdim][item].size();
+          num_neighbours += unsigned int(_neighbours[subdim][item].size());
         }
         return num_neighbours;
       }

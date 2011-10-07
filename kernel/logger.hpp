@@ -712,7 +712,7 @@ namespace FEAST
       /** bit mask for local channels */
       local_mask              = 0x0000FFFF,
       /** bit mask for master channels */
-      master_mask             = 0xFFFF0000,
+      master_mask             = 0xFFFF0000
       /// \endcond
     }; // enum Channel
 
@@ -721,7 +721,7 @@ namespace FEAST
       /**
        * \brief Maximum number of log files.
        */
-      max_files = 4,
+      max_files = 4
     };
 
   private:

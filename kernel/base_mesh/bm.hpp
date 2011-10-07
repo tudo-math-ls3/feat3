@@ -120,7 +120,7 @@ namespace FEAST
       {
         CONTEXT("BaseMesh::BM::_add()");
         _cells.push_back(c);
-        c->set_index(_cells.size()-1);
+        c->set_index(Index(_cells.size())-1);
       }
 
 
@@ -184,10 +184,10 @@ namespace FEAST
       *
       * \return number of cells
       */
-      inline index_glob_t num_cells() const
+      inline Index num_cells() const
       {
         CONTEXT("BaseMesh::BM::num_cells()");
-        return _cells.size();
+        return Index(_cells.size());
       }
 
 
@@ -196,13 +196,13 @@ namespace FEAST
       *
       * \return number of active cells
       */
-      inline index_glob_t num_active_cells() const
+      inline Index num_active_cells() const
       {
         CONTEXT("BaseMesh::BM::num_active_cells()");
         // TODO: nochmal implementieren, wenn inaktive immer schoen ans Ende geschoben werden und es einen index gibt,
         // der die Position des letzten aktiven merkt
-        index_glob_t counter = 0;
-        for(index_glob_t i(0) ; i < num_cells() ; ++i)
+        Index counter = 0;
+        for(Index i(0) ; i < num_cells() ; ++i)
         {
           if(cell(i)->active())
           {
@@ -221,7 +221,7 @@ namespace FEAST
       *
       * \return pointer to Cell at given index
       */
-      inline Cell_* cell(index_glob_t const index) const
+      inline Cell_* cell(Index const index) const
       {
         CONTEXT("BaseMesh::BM::cell()");
         ASSERT(index < num_cells(), "Index " + stringify(index) + " must not exceed number of cells "
@@ -269,8 +269,8 @@ namespace FEAST
       inline void set_cell_numbers() const
       {
         CONTEXT("BaseMesh::BM::set_cell_numbers()");
-        index_glob_t counter = 0;
-        for(index_glob_t i(0) ; i < num_cells() ; ++i)
+        Index counter = 0;
+        for(Index i(0) ; i < num_cells() ; ++i)
         {
           if(cell(i)->active())
           {
@@ -294,17 +294,17 @@ namespace FEAST
 // the process patch layer, which both have their own connectivity structure. The load balancer then actually needs the
 // connectivity graph of the process patch layer. We also do not distinguish between edge and vertex neighbours here.
         CONTEXT("BaseMesh::BM::create_graph()");
-        index_glob_t n_active_cells = num_active_cells();
+        Index n_active_cells = num_active_cells();
         // allocate index array
-        index_glob_t* index = new index_glob_t[n_active_cells + 1];
+        Index* index = new Index[n_active_cells + 1];
 
         // graph data structure is filled by two sweeps through the cell list
         // first sweep: count neighbours of each cell, and maintain running total to fill index array
         // treat last index entry separately because cell array has one less entry than index array
-        index_glob_t num_neighbours_so_far = 0;
+        Index num_neighbours_so_far = 0;
         // counter for active cells
-        index_glob_t ipos(0);
-        for (index_glob_t icell=0 ; icell < num_cells() ; ++icell)
+        Index ipos(0);
+        for (Index icell=0 ; icell < num_cells() ; ++icell)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!
         {
           if(cell(icell)->active())
@@ -324,9 +324,9 @@ namespace FEAST
         // second sweep through data structure
         // second sweep adds actual neighbour cell numbers in the appropriate places into array neighbours
         // again, treat last loop instance separately
-        index_glob_t* neighbours = new index_glob_t[index[n_active_cells]];
+        Index* neighbours = new Index[index[n_active_cells]];
         num_neighbours_so_far = 0;
-        for (index_glob_t icell=0 ; icell < n_active_cells ; icell++)
+        for (Index icell=0 ; icell < n_active_cells ; icell++)
 // TODO: wir brauchen einen iterator fuer aktive Zellen!
         {
           Cell_* c = cell(icell);

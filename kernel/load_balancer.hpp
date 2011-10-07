@@ -398,7 +398,7 @@ namespace FEAST
       unsigned int num_processes = _process_group->num_processes();
 
       // shortcut to the number of cells in the base mesh
-      unsigned int num_cells = _base_mesh->num_cells();
+      unsigned int num_cells = unsigned int(_base_mesh->num_cells());
 
       // debug output
       Logger::log("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n",
@@ -545,8 +545,8 @@ namespace FEAST
       // build an artificial graph mimicing the distribution of the base mesh cells to two processors (e.g. for a mesh
       // of 16 BMCs: BMCs 0-7 on proc 1 and BMCs 8-15 on proc 2) which start an imagined coarse grid solver; this graph
       // will be used for the coarse grid work group
-      index_glob_t* index = new index_glob_t[3];
-      index_glob_t* neighbours = new index_glob_t[2];
+      Index* index = new Index[3];
+      Index* neighbours = new Index[2];
       index[0] = 0;
       index[1] = 1;
       index[2] = 2;
@@ -593,7 +593,7 @@ namespace FEAST
       unsigned int num_processes = _process_group->num_processes();
 
       // shortcut to the number of cells in the base mesh
-      unsigned int num_cells = _base_mesh->num_cells();
+      unsigned int num_cells = unsigned int(_base_mesh->num_cells());
 
       // debug output
       Logger::log("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n",

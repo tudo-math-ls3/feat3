@@ -8,8 +8,8 @@
 namespace FEAST
 {
   /// global constant: max counting number for an index (if a given index evaluates to this value then it is not valid)
-  const index_glob_t Constants::MAX_INDEX(std::numeric_limits<index_glob_t>::max());
+  const Index Constants::MAX_INDEX(std::numeric_limits<Index>::max());
 
   /// global constant: max counting number for a number (if a given number evaluates to this value then it is not valid)
-  const index_glob_t Constants::MAX_NUMBER(std::numeric_limits<index_glob_t>::max());
+  const Index Constants::MAX_NUMBER(std::numeric_limits<Index>::max());
 } // namespace FEAST

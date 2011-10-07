@@ -201,15 +201,15 @@ namespace FEAST
      */
     template<typename Iterator_>
     String& join(
-      Iterator_ begin,
-      Iterator_ end,
+      Iterator_ first,
+      Iterator_ last,
       const String& delimiter = "")
     {
-      Iterator_ it(begin);
-      while(it != end)
+      Iterator_ it(first);
+      while(it != last)
       {
         append(*it);
-        if(++it == end)
+        if(++it == last)
         {
           return *this;
         }

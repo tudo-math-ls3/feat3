@@ -122,7 +122,7 @@ namespace FEAST
     /// FEAST minor version number
     version_minor = 0,
     /// FEAST patch version number
-    version_patch = 0,
+    version_patch = 0
   };
 
   /**
@@ -134,12 +134,6 @@ namespace FEAST
    * \brief Real data type.
    */
   typedef double Real;
-
-  /// deprecated; use Index instead
-  typedef Index index_t;
-
-  /// deprecated; use Index instead
-  typedef Index index_glob_t;
 
   /**
   * \brief Nil class definition.
