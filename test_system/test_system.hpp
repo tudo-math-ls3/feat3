@@ -100,6 +100,7 @@ namespace FEAST
 
     public:
 
+      /// pointer to TestList singleton
       friend TestList* InstantiationPolicy<TestList, Singleton>::instance();
 
       /// TestList forward iterator.

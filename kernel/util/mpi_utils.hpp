@@ -19,7 +19,8 @@
 #include <mpi.h>
 
 /**
-* \file collection of various MPI utilities
+* \file
+* \brief collection of various MPI utilities
 *
 * \note Following the FEAST naming convention, the functions defined here should actually be called mpi_abort,
 * mpi_init, etc. (the distinguishing part of the name has to be appended to the common part). But to avoid confusion

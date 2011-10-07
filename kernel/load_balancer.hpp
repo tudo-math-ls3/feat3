@@ -187,7 +187,7 @@ namespace FEAST
     /* ******************
     * getters & setters *
     ********************/
-    ///
+    /// stores the base mesh
     inline void set_base_mesh(BaseMesh::BM<space_dim_, world_dim_>* base_mesh)
     {
       CONTEXT("LoadBalancer::set_base_mesh()");

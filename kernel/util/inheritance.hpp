@@ -12,6 +12,7 @@
 
 namespace FEAST
 {
+  /// \cond
   template <typename T, typename U>
   class Conversion
   {
@@ -32,6 +33,7 @@ namespace FEAST
   public:
     enum {exists = 1, sameType = 1};
   };
+  /// \endcond
 }
 
 /// checks if U inherits from T

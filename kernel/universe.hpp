@@ -434,7 +434,7 @@ namespace FEAST
     * are created.
     *
     * \param[in] logfile_base_name
-    * optional base name of log files (name pattern '<logfile_base_name><world rank of the process>.log'); if not
+    * optional base name of log files (name pattern '\<logfile_base_name\>\<world rank of the process\>.log'); if not
     * provided, it is set to 'feast'
     */
     void create(String const logfile_base_name = "feast")

@@ -30,7 +30,7 @@ namespace FEAST
   * Illustration of interlevel work group communication:
   * A - F = compute tasks, each performed on one process
   *
-  * <bf>Simplemost example:</bf>
+  * <b>Simplemost example:</b>
   *
   \verbatim
   ---------------        ---------------
@@ -77,7 +77,7 @@ namespace FEAST
   * are idle and vice versa. More technical details below in the more complex example.
   *
   *
-  * <bf>More complicated example:</bf>
+  * <b>More complicated example:</b>
   *
   \verbatim
   ---------------        ---------------

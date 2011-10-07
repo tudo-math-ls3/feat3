@@ -151,6 +151,9 @@ namespace FEAST
      * This routine is currently protected instead of private, because
      * it must be a friend of other classes, and a private routine cannot
      * be named a friend.
+     *
+     * \param ptr
+     * A pointer to the object to be deleted.
      */
     static void _delete(T_ * const ptr)
     {
@@ -159,7 +162,12 @@ namespace FEAST
 
 
   public:
-    /// Returns the instance.
+    /**
+     * \brief Returns the instance.
+     *
+     * \returns
+     * A pointer to the singleton.
+     */
     static T_ * instance()
     {
       T_ ** instance_ptr = _instance_ptr();

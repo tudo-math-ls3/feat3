@@ -423,7 +423,7 @@ namespace FEAST
     int _rank_load_balancer;
 
     /**
-    * \brief process group containing only the worker processes of the main process group #_process_group
+    * \brief process group containing only the worker processes of the main process group #_process_group_main
     *
     * If there is no dedicated load balancer, then the worker process group and the main process group are identical
     */
@@ -626,7 +626,7 @@ namespace FEAST
     /**
     * \brief getter for the base mesh
     *
-    * \return BaseMesh::BM<space_dim_, world_dim_> pointer #_base_mesh
+    * \return A pointer to the base mesh
     */
     inline BaseMesh::BM<space_dim_, world_dim_>* base_mesh() const
     {
