@@ -398,7 +398,7 @@ namespace FEAST
       unsigned int num_processes = _process_group->num_processes();
 
       // shortcut to the number of cells in the base mesh
-      unsigned int num_cells = unsigned int(_base_mesh->num_cells());
+      unsigned int num_cells = (unsigned int)(_base_mesh->num_cells());
 
       // debug output
       Logger::log("num_processes: " + stringify(num_processes) + "\nnum_cells: " + stringify(num_cells) + "\n",
