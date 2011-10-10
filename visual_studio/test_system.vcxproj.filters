@@ -25,26 +25,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test_system\test_system-test.cpp">
-      <Filter>Source Files %28test_system%29</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\work_group-test_1d.cpp">
       <Filter>Source Files %28kernel%29</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\work_group-test_2d_1.cpp">
-      <Filter>Source Files %28kernel%29</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\work_group-test_2d_2.cpp">
-      <Filter>Source Files %28kernel%29</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\util\assertion-test.cpp">
-      <Filter>Source Files %28kernel%29\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\util\inheritance-test.cpp">
-      <Filter>Source Files %28kernel%29\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\util\pretty_printer-test.cpp">
-      <Filter>Source Files %28kernel%29\util</Filter>
+    <ClCompile Include="..\test_system\test_system.cpp">
+      <Filter>Source Files %28test_system%29</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\base_mesh\cell_1d_edge-test_subdivision.cpp">
       <Filter>Source Files %28kernel%29\base_mesh</Filter>
@@ -55,11 +40,26 @@
     <ClCompile Include="..\kernel\base_mesh\cell_3d_hexa-test_subdivision.cpp">
       <Filter>Source Files %28kernel%29\base_mesh</Filter>
     </ClCompile>
-    <ClCompile Include="..\test_system\test_system.cpp">
-      <Filter>Source Files %28test_system%29</Filter>
+    <ClCompile Include="..\kernel\util\assertion-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\inheritance-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\pretty_printer-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\logger-test.cpp">
       <Filter>Source Files %28kernel%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\work_group-test_2d_1.cpp">
+      <Filter>Source Files %28kernel%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\work_group-test_2d_2.cpp">
+      <Filter>Source Files %28kernel%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test_system\test_system-test.cpp">
+      <Filter>Source Files %28test_system%29</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

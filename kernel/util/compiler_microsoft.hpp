@@ -47,6 +47,12 @@
 #    define HAVE_CPP0X_STATIC_ASSERT 1
 #  endif
 
+// disable constant expression warnings
+#pragma warning(disable: 4127)
+
+// disable assignment operator warnings
+#pragma warning(disable: 4512)
+
 // disable CRT security warnings for standard C/C++ library functions
 #pragma warning(disable: 4996)
 
