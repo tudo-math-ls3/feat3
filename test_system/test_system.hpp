@@ -358,27 +358,29 @@ namespace FEAST
      */
     template<
       typename Tag_,
-               typename DataType_>
-                 class TaggedTest
-                 : public BaseTest
-                 {
-                   public:
-                     /**
-                      * \brief CTOR
-                      *
-                      * \param[in] id
-                      * the testcase's id string
-                      */
-                     TaggedTest(const String & id)
-                       : BaseTest(id)
-                     {
-                       _tag_name = TypeTraits<Tag_>::name();
-                       _prec_name = TypeTraits<DataType_>::name();
-                     };
+      typename DataType_>
+    class TaggedTest
+      : public BaseTest
+    {
+    public:
+      /**
+      * \brief CTOR
+      *
+      * \param[in] id
+      * the testcase's id string
+      */
+      TaggedTest(const String & id)
+        : BaseTest(id)
+      {
+        _tag_name = TypeTraits<Tag_>::name();
+        _prec_name = TypeTraits<DataType_>::name();
+      };
 
-                     /// DTOR
-                     virtual ~TaggedTest() {}
-                 };
+      /// DTOR
+      virtual ~TaggedTest()
+      {
+      }
+    }; // class TaggedTest
   } // namespace TestSystem
 } // namespace FEAST
 
@@ -492,7 +494,7 @@ namespace FEAST
       this->check(THIS_FUNCTION, __FILE__, __LINE__, calc.result,  \
           this->_id + "\n" + "Expected '|" #a " - " #b \
           "|' < '" + FEAST::stringify(eps) + "' but was '" + calc.s_diff +"'"); \
-    } catch (const TestFailedException & test_e) { \
+    } catch (const TestFailedException &) { \
       throw;  \
     } catch (const std::exception & test_e) { \
       throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
