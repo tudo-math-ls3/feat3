@@ -35,7 +35,7 @@ namespace FEAST
     * \param[in] line
     * line number of the failed assertion
     *
-    * \param[in] msg
+    * \param[in] message
     * message that shall be displayed
     */
     Assertion(
@@ -98,13 +98,15 @@ namespace FEAST
 * \warning Will only be compiled in when debug support is enabled.
 */
 #if defined (DEBUG)
-#define ASSERT(expr, msg) \
+#  define ASSERT(expr, msg) \
     do { \
         if (! (expr)) \
             throw FEAST::Assertion(THIS_FUNCTION, __FILE__, __LINE__, msg); \
     } while (false)
+#  define ASSERT_(expr) ASSERT(expr, #expr)
 #else
-#define ASSERT(expr, msg)
+#  define ASSERT(expr, msg)
+#  define ASSERT_(expr)
 #endif
 
 // The following static-assert emulation has been disabled. Use the C++0x keyword static_assert instead.

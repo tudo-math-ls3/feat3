@@ -191,7 +191,7 @@ namespace FEAST
      *
      * This method appends a set of strings given by two input iterators, separating them by a delimiter.
      *
-     * \param[in] begin, end
+     * \param[in] first, last
      * Two forward iterators representing the string set.
      *
      * \param[in] delimiter
