@@ -2,6 +2,9 @@
 #ifndef KERNEL_UTIL_ASSERTION_HPP
 #define KERNEL_UTIL_ASSERTION_HPP 1
 
+// The following line is necessary - otherwise doxygen won't document the #define's in this file.
+/** \file */
+
 // includes, FEAST
 #include <kernel/util/exception.hpp>
 
@@ -53,50 +56,30 @@ namespace FEAST
     }
   };
 
-
-
-
-  /**
-  * \brief Simple struct to catch compile time assertions
-  *
-  * \author Dirk Ribbrock
-  */
-  template<bool>
-  struct CompileTimeChecker
-  {
-    /// Constructor accepting any kind of arguments:
-    CompileTimeChecker(...){};
-  };
-
-
-
-
-  /**
-  * \brief 'False' version of CompileTimeChecker struct to catch compile time assertions.
-  *
-  * \author Dirk Ribbrock
-  */
-  template<>
-  struct CompileTimeChecker<false>
-  {
-  };
-
-
-
-
 /**
-* \def ASSERT
-*
-* \brief Convenience definition that provides a way to throw Assertion exceptions.
-*
-* The thrown Assertion will be automatically provided with the correct filename,
-* line number and function name.
-*
-* \param expr Boolean expression that shall be asserted.
-* \param msg Error message that will be display in case that expr evaluates to false.
-*
-* \warning Will only be compiled in when debug support is enabled.
-*/
+ * \def ASSERT
+ * \brief Convenience definition that provides a way to throw Assertion exceptions.
+ *
+ * The thrown Assertion will be automatically provided with the correct filename,
+ * line number and function name.
+ *
+ * \param expr Boolean expression that shall be asserted.
+ * \param msg Error message that will be display in case that expr evaluates to false.
+ *
+ * \note This macro will only be compiled in debug mode; it is an empty macro in no-debug mode.
+ */
+/**
+ * \def ASSERT_
+ * \brief Convenience definition that provides a way to throw Assertion exceptions.
+ *
+ * The thrown Assertion will be automatically provided with the correct filename, line number and function name.\n
+ * In contrast to the #ASSERT macro, this macro has only one parameter, whereas the error message is a stringified
+ * version of the expression to be asserted.
+ *
+ * \param expr Boolean expression that shall be asserted.
+ *
+ * \note This macro will only be compiled in debug mode; it is an empty macro in no-debug mode.
+ */
 #if defined (DEBUG)
 #  define ASSERT(expr, msg) \
     do { \
@@ -109,32 +92,6 @@ namespace FEAST
 #  define ASSERT_(expr)
 #endif
 
-// The following static-assert emulation has been disabled. Use the C++0x keyword static_assert instead.
-/*
-* \def STATIC_ASSERT
-*
-* \brief Convenience definition that provides a way to throw compile-time errors.
-*
-* The thrown Assertion will be automatically provided with the correct filename,
-* line number and function name.
-*
-* \param[in] expr
-* Boolean expression that shall be asserted.
-* \param[in] msg
-* Error message that will be display in case that expr evaluates to false.
-*
-* \note Will only be compiled in when debug support is enabled.
-*/
-/*#if defined (DEBUG)
-#define STATIC_ASSERT(const_expr, msg) \
-    {\
-      class ERROR_##msg {}; \
-      (void) (new FEAST::CompileTimeChecker<\
-        (const_expr) != 0>((ERROR_##msg())));\
-    }
-#else
-#define STATIC_ASSERT(const_expr, msg)
-#endif*/
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_ASSERTION_HPP
