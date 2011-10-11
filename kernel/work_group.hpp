@@ -19,7 +19,8 @@
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
 //#include <kernel/interlevel_group.hpp>
-#include <kernel/graph.hpp>
+//#include <kernel/graph.hpp>
+#include <kernel/neighbourhood.hpp>
 
 // includes, system
 #include <iostream>
@@ -68,7 +69,8 @@ namespace FEAST
     * group ranks of the neighbours of this worker. It can be used to create an MPI topology graph via
     * MPI_Dist_graph_create().
     */
-    GraphDistributed* _graph_distributed;
+    //GraphDistributed* _graph_distributed;
+    Neighbourhood* _neighbourhood;
 
     /// interlevel group this process builds with the processes of the finer grid work group
 //    InterlevelGroup* _group_finer;
@@ -95,7 +97,7 @@ namespace FEAST
       unsigned int const group_id)
       : ProcessGroup(comm, group_id),
 //        _comm_opt(MPI_COMM_NULL),
-        _graph_distributed(nullptr)
+        _neighbourhood(nullptr)
     {
       CONTEXT("WorkGroup::WorkGroup()");
 
@@ -117,10 +119,10 @@ namespace FEAST
     ~WorkGroup()
     {
       CONTEXT("WorkGroup::~WorkGroup()");
-      if(_graph_distributed != nullptr)
+      if(_neighbourhood != nullptr)
       {
-        delete _graph_distributed;
-        _graph_distributed = nullptr;
+        delete _neighbourhood;
+        _neighbourhood = nullptr;
       }
     }
 
@@ -143,14 +145,14 @@ namespace FEAST
 
 
     /**
-    * \brief getter for the distributed graph object
+    * \brief getter for the neighbourhood object
     *
-    * \return pointer to GraphDistributed #_graph_distributed
+    * \return pointer to Neighbourhood #_neighbourhood
     */
-    inline GraphDistributed* graph_distributed() const
+    inline Neighbourhood* neighbourhood() const
     {
-      CONTEXT("WorkGroup::graph_distributed()");
-      return _graph_distributed;
+      CONTEXT("WorkGroup::neighbourhood()");
+      return _neighbourhood;
     }
 
 
@@ -158,7 +160,7 @@ namespace FEAST
     * member functions *
     *******************/
     /**
-    * \brief sets local graph portion of a distributed graph corresponding to one node (=process)
+    * \brief sets local graph portion of a neighbourhood corresponding to one node (=process)
     *
     * \param[in] num_neighbours
     * number of neighbours of one graph node
@@ -169,15 +171,15 @@ namespace FEAST
     * \note Currently, we do not distinguish face-, edge- and vertex-neighbours. The graph structure
     *       simply contains all neighbours.
     */
-    void set_graph_distributed(
-      Index const num_neighbours,
-      Index * neighbours)
+    void set_neighbourhood(
+      int num_neighbours,
+      const int* neighbours)
     {
-      CONTEXT("WorkGroup::set_graph_distributed()");
-      _graph_distributed = new GraphDistributed(num_neighbours, neighbours);
+      CONTEXT("WorkGroup::set_neighbourhood()");
+      _neighbourhood = new Neighbourhood(num_neighbours, neighbours);
 
       // log into process-own log file
-      Logger::log(_graph_distributed->print());
+      Logger::log(_neighbourhood->dump());
 
 // COMMENT_HILMAR, 14.10.2010: The plan was to use MPI_Dist_graph_create(...) to create the MPI graph topology.
 //   Unfortunately, this function has only been introduced with MPI-2.2 and is not yet implemented in OpenMPI yet.
@@ -221,32 +223,32 @@ namespace FEAST
       bool test_result = 0;
 
       // length of the integer arrays to be exchanged
-      Index const n = 10;
+      const int n = 10;
 
-      Index num_neighbours = _graph_distributed->num_neighbours();
-      Index* neighbours = _graph_distributed->neighbours();
+      int num_neighbours = _neighbourhood->num_neighbours();
+      const int* neighbours = _neighbourhood->neighbours();
 
       // arrays for sending and receiving
       // (The MPI standard says that the send buffer given to MPI_Isend(...) should neither be overwritten nor read(!)
       // until the communication has been completed. Hence, we cannot send the same array to all neighbours, but we
       // have to send num_neighbours different arrays.)
-      unsigned long** a = new unsigned long*[num_neighbours];
-      unsigned long** a_recv = new unsigned long*[num_neighbours];
+      int** a = new int*[num_neighbours];
+      int** a_recv = new int*[num_neighbours];
 
       // fill the array to be sent
-      for(Index i(0) ; i < num_neighbours; ++i)
+      for(int i(0) ; i < num_neighbours; ++i)
       {
-        a[i] = new unsigned long[n];
-        a_recv[i] = new unsigned long[n];
-        for(Index j(0) ; j < n; ++j)
+        a[i] = new int[n];
+        a_recv[i] = new int[n];
+        for(int j(0) ; j < n; ++j)
         {
-          a[i][j] = 100000*(unsigned long)(_rank) + 100*(unsigned long)(neighbours[i]) + (unsigned long)(j);
+          a[i][j] = 100000*_rank + 100*neighbours[i] + j;
         }
       }
 
       // debugging output
       String s;
-      for(Index i(0) ; i < num_neighbours; ++i)
+      for(int i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a[i][0]);
         for(Index j(1) ; j < n; ++j)
@@ -262,35 +264,34 @@ namespace FEAST
       MPI_Status* statuses = new MPI_Status[num_neighbours];
 
       // post sends to all neighbours
-      for(Index i(0) ; i < num_neighbours; ++i)
+      for(int i(0) ; i < num_neighbours; ++i)
       {
-        MPI_Isend(a[i], n, MPI_UNSIGNED_LONG, int(neighbours[i]), 0, _comm, &requests[i]);
+        MPI_Isend(a[i], n, MPI_INT, neighbours[i], 0, _comm, &requests[i]);
         // request objects are not needed
         MPI_Request_free(&requests[i]);
       }
       // post receives from all neighbours
-      for(Index i(0) ; i < num_neighbours; ++i)
+      for(int i(0) ; i < num_neighbours; ++i)
       {
-        MPI_Irecv(a_recv[i], n, MPI_UNSIGNED_LONG, int(neighbours[i]), 0, _comm, &requests[i]);
+        MPI_Irecv(a_recv[i], n, MPI_INT, neighbours[i], 0, _comm, &requests[i]);
       }
       // wait for all receives to complete
-      MPI_Waitall(int(num_neighbours), requests, statuses);
+      MPI_Waitall(num_neighbours, requests, statuses);
       delete [] requests;
       delete [] statuses;
 
       // debugging output
-      for(Index i(0) ; i < num_neighbours; ++i)
+      for(int i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a_recv[i][0]);
-        for(Index j(1) ; j < n; ++j)
+        for(int j(1) ; j < n; ++j)
         {
           s += " " + stringify(a_recv[i][j]);
           // We cannot really do a clever check here, so we simply check whether a_recv really contains the value we
           // expect. (The general problem is: When there is something wrong with the communication, then usually MPI
           // crashes completely. On the other hand, when communication is fine then usually correct values are sent.
           // So, it is very unlikely that communication works *AND* this test here returns false.)
-          unsigned long expected_value = 100000*(unsigned long)(neighbours[i]) + 100*(unsigned long)(_rank)
-            + (unsigned long)(j);
+          int expected_value = 100000*neighbours[i] + 100*_rank + j;
           if(expected_value != a_recv[i][j])
           {
             test_result = 1;
@@ -299,7 +300,7 @@ namespace FEAST
         Logger::log("Work group " + stringify(_group_id) + ": Process " + stringify(_rank) + " received [" + s
                     + "] from neighbour " + stringify(neighbours[i]) + ".\n");
       }
-      for(unsigned int i(0) ; i < num_neighbours; ++i)
+      for(int i(0) ; i < num_neighbours; ++i)
       {
         delete [] a[i];
         delete [] a_recv[i];

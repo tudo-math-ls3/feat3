@@ -243,8 +243,6 @@ namespace FEAST
           ASSERT(_work_groups()[igroup]->is_coordinator(), "Routine must be called on the coordinator process.");
           // number of neighbours of the graph node corresponding to this process (use unsigned int datatype here
           // instead of Index since MPI routines expect it)
-          unsigned int num_neighbours_local;
-          Index* neighbours_local(nullptr);
           int rank_coord = _work_groups()[igroup]->rank_coord();
 
           // set the graph pointer for the current work group
@@ -253,10 +251,10 @@ namespace FEAST
           // since the MPI routines used below expect integer arrays, we have to copy two Index arrays
           // within the graph structures to corresponding int arrays
 // COMMENT_HILMAR: Is there a possibility to avoid this? A reinterpret_cast<int*>(unsigned long) does not work!
-          unsigned int* num_neighbours_aux;
-          unsigned int* index_aux;
+          int* num_neighbours_aux(nullptr);
+          int* index_aux(nullptr);
 
-          Index num_nodes;
+          int num_nodes(0);
           if(_work_groups()[igroup]->contains_extra_coordinator())
           {
             // In case there is an extra coordinator process, we have to add one pseudo node to the graph and the
@@ -265,21 +263,21 @@ namespace FEAST
             // position in the arrays num_neighbours_aux[] and index_aux[] corresponding to the rank of the
             // coordinator. Although we know, that this is rank 0, we do not explicitly exploit this information here
             // since this might be changed in future.
-            num_nodes = _graphs[igroup]->num_nodes() + 1;
-            index_aux = new unsigned int[num_nodes + 1];
+            num_nodes = int(_graphs[igroup]->num_nodes()) + 1;
+            index_aux = new int[num_nodes + 1];
             // copy the first part of the graphs's index array to the aux array, performing implicit cast from
             // Index to unsigned int
-            for(Index i(0) ; i < (Index)rank_coord+1 ; ++i)
+            for(int i(0) ; i < rank_coord+1 ; ++i)
             {
-              index_aux[i] = (unsigned int)(_graphs[igroup]->index()[i]);
+              index_aux[i] = int(_graphs[igroup]->index()[i]);
             }
             // insert the pseudo node
             index_aux[rank_coord+1] = index_aux[rank_coord];
             // copy the remaining part of the graphs's index array to the aux array, performing implicit cast from
             // Index to unsigned int
-            for(Index i(rank_coord+1) ; i < num_nodes ; ++i)
+            for(int i(rank_coord+1) ; i < num_nodes ; ++i)
             {
-              index_aux[i+1] = (unsigned int)(_graphs[igroup]->index()[i]);
+              index_aux[i+1] = int(_graphs[igroup]->index()[i]);
             }
           }
           else
@@ -287,19 +285,19 @@ namespace FEAST
             // in case there is no extra coordinator process, the number of neighbours equals the number of nodes
             // in the graph and the index array does not have to be modified
             num_nodes = _graphs[igroup]->num_nodes();
-            index_aux = new unsigned int[num_nodes + 1];
+            index_aux = new int[num_nodes + 1];
             // copy the graphs's index array to the aux array, performing implicit cast from Index to
             // unsigned int
-            for(Index i(0) ; i < num_nodes+1 ; ++i)
+            for(int i(0) ; i < num_nodes+1 ; ++i)
             {
-              index_aux[i] = (unsigned int)(_graphs[igroup]->index()[i]);
+              index_aux[i] = int(_graphs[igroup]->index()[i]);
             }
           }
 
           // now determine the number of neighbours per node (eventually including the pseudo node for the extra
           // coordinator process)
-          num_neighbours_aux = new unsigned int[num_nodes];
-          for(Index i(0) ; i < num_nodes ; ++i)
+          num_neighbours_aux = new int[num_nodes];
+          for(int i(0) ; i < num_nodes ; ++i)
           {
             num_neighbours_aux[i] = index_aux[i+1] - index_aux[i];
           }
@@ -308,41 +306,46 @@ namespace FEAST
           {
             // send the number of neighbours to the non-coordinator processes (use MPI_IN_PLACE to indicate that the
             // coordinator does not receive/store any data)
-            MPI_Scatter(num_neighbours_aux, 1, MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL,
-                        rank_coord, _work_groups()[igroup]->comm());
+            MPI_Scatter(num_neighbours_aux, 1, MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, rank_coord,
+              _work_groups()[igroup]->comm());
             // send the neighbours to the non-coordinator processes
-            MPI_Scatterv(_graphs[igroup]->neighbours(), reinterpret_cast<int*>(num_neighbours_aux),
-                         reinterpret_cast<int*>(index_aux), MPIType<Index>::value(), MPI_IN_PLACE, 0,
-                         MPI_DATATYPE_NULL, rank_coord, _work_groups()[igroup]->comm());
+            MPI_Scatterv(_graphs[igroup]->neighbours(), num_neighbours_aux, index_aux, MPIType<Index>::value(),
+              MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, rank_coord, _work_groups()[igroup]->comm());
           }
           else
           {
             // When there is no extra coordinator process, then the coordinator is part of the compute work group and
             // also sends data to itself.
+            int num_neighbours_local(0);
 
             // scatter the number of neighbours to the non-coordinator processes and to the coordinator process itself
-            MPI_Scatter(reinterpret_cast<int*>(num_neighbours_aux), 1, MPI_UNSIGNED, &num_neighbours_local, 1,
-                        MPI_INTEGER, rank_coord, _work_groups()[igroup]->comm());
-            neighbours_local = new Index[num_neighbours_local];
+            MPI_Scatter(num_neighbours_aux, 1, MPI_UNSIGNED, &num_neighbours_local, 1, MPI_INTEGER, rank_coord,
+              _work_groups()[igroup]->comm());
+
+            Index* neighbours_local = new Index[num_neighbours_local];
             // scatter the neighbours to the non-coordinator processes and to the coordinator process itself
-            MPI_Scatterv(_graphs[igroup]->neighbours(), reinterpret_cast<int*>(num_neighbours_aux),
-                         reinterpret_cast<int*>(index_aux), MPIType<Index>::value(), neighbours_local,
-                         num_neighbours_local, MPIType<Index>::value(), rank_coord,
-                         _work_groups()[igroup]->comm());
+            MPI_Scatterv(_graphs[igroup]->neighbours(), num_neighbours_aux, index_aux, MPIType<Index>::value(),
+              neighbours_local, num_neighbours_local, MPIType<Index>::value(), rank_coord,
+              _work_groups()[igroup]->comm());
+
+            int* neighbours_local2 = new int[num_neighbours_local];
+            for(int i(0); i < num_neighbours_local; ++i)
+            {
+              neighbours_local2[i] = int(neighbours_local[i]);
+            }
+
+            // now create distributed graph structure within the compute work groups. The coordinater only performs this
+            // task when it is not an extra coordinator process, i.e., only if it actually is a worker process.
+            _work_groups()[igroup]->work_group()->set_neighbourhood(num_neighbours_local, neighbours_local2);
+            // The array neighbours_local is copied inside the constructor of the distributed graph object, hence it
+            // can be deallocated again.
+            delete [] neighbours_local2;
+            delete [] neighbours_local;
           }
+
           // delete aux. arrays again
           delete [] num_neighbours_aux;
           delete [] index_aux;
-
-          // now create distributed graph structure within the compute work groups. The coordinater only performs this
-          // task when it is not an extra coordinator process, i.e., only if it actually is a worker process.
-          if (!_work_groups()[igroup]->contains_extra_coordinator())
-          {
-            _work_groups()[igroup]->work_group()->set_graph_distributed(num_neighbours_local, neighbours_local);
-            // The array neighbours_local is copied inside the constructor of the distributed graph object, hence it
-            // can be deallocated again.
-            delete [] neighbours_local;
-          }
         } // if(_belongs_to_work_group()[igroup])
       } // for(unsigned int igroup(0) ; igroup < _num_work_groups() ; ++igroup)
     } // _transfer_graphs_to_workers()

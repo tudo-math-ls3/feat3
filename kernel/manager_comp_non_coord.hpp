@@ -247,24 +247,32 @@ namespace FEAST
           ASSERT(!_work_groups()[igroup]->is_coordinator(), "Routine must be called on non-coordinator processes.");
           // number of neighbours of the graph node corresponding to this process (use unsigned int datatype here
           // instead of Index since MPI routines expect it)
-          unsigned int num_neighbours_local;
+          int num_neighbours_local(0);
           Index* neighbours_local(nullptr);
           int rank_coord = _work_groups()[igroup]->rank_coord();
 
           // receive the number of neighbours from the coordinator process
           MPI_Scatter(nullptr, 0, MPI_DATATYPE_NULL, &num_neighbours_local, 1, MPI_INTEGER,
-                      rank_coord, _work_groups()[igroup]->comm());
+            rank_coord, _work_groups()[igroup]->comm());
 
           // receive the neighbours
           neighbours_local = new Index[num_neighbours_local];
           MPI_Scatterv(nullptr, nullptr, nullptr, MPI_DATATYPE_NULL, neighbours_local,
-                       num_neighbours_local, MPIType<Index>::value(), rank_coord,
-                       _work_groups()[igroup]->comm());
+            num_neighbours_local, MPIType<Index>::value(), rank_coord, _work_groups()[igroup]->comm());
+
+          // convert neighbours to int
+          int* neighbours_local2 = new int[num_neighbours_local];
+          for(int i(0); i < num_neighbours_local; ++i)
+          {
+            neighbours_local2[i] = int(neighbours_local[i]);
+          }
 
           // now create distributed graph structure within the compute work groups
-          _work_groups()[igroup]->work_group()->set_graph_distributed(num_neighbours_local, neighbours_local);
+          _work_groups()[igroup]->work_group()->set_neighbourhood(num_neighbours_local, neighbours_local2);
+
           // The array neighbours_local is copied inside the constructor of the distributed graph object, hence it
           // can be deallocated again.
+          delete [] neighbours_local2;
           delete [] neighbours_local;
         } // if(_belongs_to_work_group()[igroup])
       } // for(unsigned int igroup(0) ; igroup < _num_work_groups ; ++igroup)
