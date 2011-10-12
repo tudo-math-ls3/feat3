@@ -16,6 +16,7 @@
 #     nothing
 #   buildid_mode:
 #     FEAST_DEBUG_MODE (bool, cached)
+#     FEAST_SERIAL_MODE (bool, cached)
 #     FEAST_BUILD_MODE_NAME (string, debug|release|minsizerel|relwithdebinfo)
 #     CMAKE_BUILD_TYPE (to cmake-equivalents of FEAST_BUILD_MODE_NAME)
 #   buildid_mpi:
@@ -171,6 +172,7 @@ else ()
   message (STATUS "Supplied Build-ID: ${BUILD_ID}")
   set (BUILD_ID "${FEAST_BUILD_MODE_NAME}-${FEAST_MPI_ENV_NAME}-${FEAST_COMPILER_NAME}-${FEAST_CPU_TYPE}")
   message (STATUS "Debug mode         : ${FEAST_DEBUG_MODE}")
+  message (STATUS "Serial mode        : ${FEAST_SERIAL_MODE}")
   if (NOT FEAST_MPI_ENV_NAME STREQUAL "serial")
     message (STATUS "MPI environment    : ${FEAST_MPI_ENV_NAME}")
   else ()

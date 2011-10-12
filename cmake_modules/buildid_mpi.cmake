@@ -4,6 +4,7 @@
 #
 # This module sets the following variables:
 #   FEAST_MPI_ENV_NAME
+#   FEAST_SERIAL_MODE
 #
 # \author Dominik Goeddeke
 # \author Dirk Ribbrock
@@ -24,13 +25,15 @@ if (NOT DISPLAY_HELP_ONLY)
   if ( (BUILD_ID MATCHES "^openmpi-.+|.+-openmpi-.+|.+-openmpi$") OR
        (BUILD_ID MATCHES "^ompi-.+|.+-ompi-.+|.+-ompi$") )
     set (FEAST_MPI_ENV_NAME "openmpi")
+    set (FEAST_SERIAL_MODE OFF CACHE BOOL "" FORCE)
 
   elseif (BUILD_ID MATCHES "^mpich2-.+|.+-mpich2-.+|.+-mpich2$")
     set (FEAST_MPI_ENV_NAME "mpich2")
+    set (FEAST_SERIAL_MODE OFF CACHE BOOL "" FORCE)
 
   elseif (BUILD_ID MATCHES "^serial-.+|.+-serial-.+|.+-serial$")
-    message (FATAL_ERROR ERROR: "Build ID '${BUILD_ID}': Serial mode not supported yet!")
     set (FEAST_MPI_ENV_NAME "serial")
+    set (FEAST_SERIAL_MODE ON CACHE BOOL "" FORCE)
 
   else ()
     # an unsupported "mpi" token has been encountered, so bail out
