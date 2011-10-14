@@ -12,22 +12,34 @@
 
 namespace FEAST
 {
-  template <typename Arch_, typename DT_>
-  class Container
+  class ContainerBase
   {
     protected:
       Index _size;
+
+      ContainerBase(Index size) :
+        _size(size)
+      {
+      }
+
+  };
+
+  template <typename Arch_, typename DT_>
+  class Container : public ContainerBase
+  {
+    protected:
       std::vector<DT_*> _elements;
       std::vector<Index*> _indices;
 
     public:
       Container(Index size) :
-        _size(size)
+        ContainerBase(size)
       {
       }
 
       ~Container()
       {
+        //TODO add arch
         for (Index i(0) ; i < _elements.size() ; ++i)
           MemoryArbiter::instance()->release_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
@@ -35,24 +47,52 @@ namespace FEAST
       }
 
       Container(const Container<Arch_, DT_> & other) :
-        _size(other._size),
+        ContainerBase(other),
         _elements(other._elements),
         _indices(other._indices)
       {
+        //TODO add arch
         for (Index i(0) ; i < _elements.size() ; ++i)
           MemoryArbiter::instance()->increase_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
           MemoryArbiter::instance()->increase_memory(_indices.at(i));
       }
 
-      DT_ * get_elements(Index i = 0)
+      template <typename Arch2_, typename DT2_>
+      Container(const Container<Arch2_, DT2_> & other) :
+        ContainerBase(other)
       {
-        return _elements.at(i);
+        if (typeid(DT_) != typeid(DT2_))
+            throw InternalError("type conversion not supported yet!");
+
+        //TODO add arch
+        for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
+          MemoryArbiter::instance()->allocate_memory(this->_size * sizeof(DT_));
+        for (Index i(0) ; i < other.get_indices().size() ; ++i)
+          MemoryArbiter::instance()->allocate_memory(this->_size * sizeof(Index));
+
+        //TODO copy memory from arch2 to arch
+
       }
 
-      Index * get_indices(Index i = 0)
+      std::vector<DT_*> & get_elements()
       {
-        return _indices.at(i);
+        return _elements;
+      }
+
+      const std::vector<DT_*> & get_elements() const
+      {
+        return _elements;
+      }
+
+      std::vector<Index*> & get_indices()
+      {
+        return _indices;
+      }
+
+      const std::vector<Index*> & get_indices() const
+      {
+        return _indices;
       }
   };
 } // namespace FEAST

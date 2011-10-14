@@ -42,6 +42,7 @@ public:
     DenseVector<Tag_, DT_> a(10);
     DenseVector<Tag_, DT_> b(10, 5.);
     DenseVector<Tag_, DT_> c(b);
+    DenseVector<int, DT_> d(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
   }
 };
