@@ -8,7 +8,6 @@
 #include <kernel/util/instantiation_policy.hpp>
 
 #include <map>
-#include <stdio.h>
 
 
 namespace FEAST
@@ -26,63 +25,25 @@ namespace FEAST
       : public InstantiationPolicy<MemoryArbiter, Singleton>
   {
     private:
-      std::map<void*, Intern::MemoryInfo> _memory;
+      std::map<void*, Intern::MemoryInfo> _memory_pool;
 
       /// default CTOR
-      MemoryArbiter()
-      {
-      }
+      MemoryArbiter();
 
     public:
-      ~MemoryArbiter()
-      {
-        /// \todo throw error if any memory chunks exist
-      }
+      ~MemoryArbiter();
 
       /// pointer to MemoryArbiter singleton
       friend MemoryArbiter* InstantiationPolicy<MemoryArbiter, Singleton>::instance();
 
       /// allocate new memory
-      void * allocate_memory(Index bytes)
-      {
-        void * memory(::malloc(bytes));
-        Intern::MemoryInfo mi;
-        mi.counter = 1;
-        _memory.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
-
-        return memory;
-      }
+      void * allocate_memory(Index bytes);
 
       /// increase memory counter
-      void increase_memory(void * address)
-      {
-        std::map<void*, Intern::MemoryInfo>::iterator it(_memory.find(address));
-        if (it == _memory.end())
-          throw InternalError("Memory address not found!");
-        else
-        {
-          it->second.counter = it->second.counter + 1;
-        }
-      }
+      void increase_memory(void * address);
 
       /// release memory or decrease reference counter
-      void release_memory(void * address)
-      {
-        std::map<void*, Intern::MemoryInfo>::iterator it(_memory.find(address));
-        if (it == _memory.end())
-          throw InternalError("Memory address not found!");
-        else
-        {
-          if(it->second.counter == 1)
-          {
-            ::free(address);
-          }
-          else
-          {
-            it->second.counter = it->second.counter - 1;
-          }
-        }
-      }
+      void release_memory(void * address);
   };
 } // namespace FEAST
 

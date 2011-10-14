@@ -11,7 +11,9 @@ ADD_SUBDIRECTORY( hornet )
 ADD_SUBDIRECTORY( geometry )
 ADD_SUBDIRECTORY( foundation )
 
+#list of kernel source files
 ADD_LIBRARY(feast STATIC)
+#list of libraries to include in libfeast
 TARGET_LINK_LIBRARIES (feast kernel-util kernel-hornet kernel-geometry kernel-foundation)
 
 #list of kernel tests
