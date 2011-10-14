@@ -17,6 +17,7 @@ namespace FEAST
     struct MemoryInfo
     {
       Index counter;
+      Index size;
       /// \todo backend
     };
   }

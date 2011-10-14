@@ -20,6 +20,7 @@ void * MemoryArbiter::allocate_memory(Index bytes)
   void * memory(::malloc(bytes));
   Intern::MemoryInfo mi;
   mi.counter = 1;
+  mi.size = bytes;
   _memory_pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
 
   return memory;
