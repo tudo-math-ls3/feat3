@@ -6,11 +6,11 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 #top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-#list of util source files
-ADD_LIBRARY(kernel-util STATIC exception.cpp logger.cpp param_section.cpp)
+#list of hornet source files
+#ADD_LIBRARY(kernel-hornet STATIC cell.cpp)
 
-#list of util tests
-SET (test_list assertion-test factorial-test graph-test inheritance-test logger-test param_section-test pretty_printer-test)
+#list of hornet tests
+SET (test_list dense_vector-test)
 
 #create all tests
 FOREACH (test ${test_list} )
@@ -24,13 +24,13 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/util/${test}" Nil)
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/hornet/${test}" Nil)
   SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
   SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
   SET_PROPERTY(TEST ${test}_nil PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ENDFOREACH(test)
 
-#add all tests to util_tests
-ADD_CUSTOM_TARGET(util_tests DEPENDS ${test_list})
+#add all tests to hornet_tests
+ADD_CUSTOM_TARGET(hornet_tests DEPENDS ${test_list})
 #build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests util_tests)
+ADD_DEPENDENCIES(tests hornet_tests)
