@@ -137,6 +137,7 @@ namespace FEAST
      */
     class DualIterator
     {
+      // The ComposieAdjunctor class needs to be a friend as it calls the protected constuctors.
       friend class CompositeAdjunctor<Adj1_, Adj2_>;
 
     private:
@@ -146,8 +147,8 @@ namespace FEAST
       /// Dual iterator of second adjunctor
       typedef typename Adj2_::DualIterator Iterator2;
 
-      /// reference to second adjunctor
-      const Adj2_& _adj2;
+      /// pointer to second adjunctor
+      const Adj2_* _adj2;
 
       /// current iterator for first adjunctor
       mutable Iterator1 _cur1;
@@ -159,24 +160,50 @@ namespace FEAST
       mutable Iterator2 _end2;
 
     protected:
+      /// constructor for dual_begin()
       DualIterator(
-        const Adj1_& adj1,
-        const Adj2_& adj2,
-        Index primal_node,
-        bool begin)
+        const Adj1_* adj1,
+        const Adj2_* adj2,
+        Index primal_node)
          :
         _adj2(adj2),
-        _cur1(begin ? adj1.dual_begin(primal_node) : adj1.dual_end(primal_node)),
-        _end1(adj1.dual_end(primal_node)),
-        _cur2(_cur1 != _end1 ? adj2.dual_begin(*_cur1) : adj2.dual_end(0)),
-        _end2(_cur1 != _end1 ? adj2.dual_end(*_cur1) : adj2.dual_end(0))
+        _cur1(adj1->dual_begin(primal_node)),
+        _end1(adj1->dual_end(primal_node)),
+        _cur2(),
+        _end2()
       {
-        // This context macro call is actually pretty useless: if any errors occur in this constructor, then they
-        // will fire in the initialiser list above, which has already been executed before this context call...
+        CONTEXT("CompositeAdjunctor::DualIterator:DualIterator()");
+        if(_cur1 != _end1)
+        {
+          _cur2 = adj2->dual_begin(*_cur1);
+          _cur2 = adj2->dual_end(*_cur1);
+        }
+      }
+
+      /// constructor for dual_end()
+      DualIterator(
+        const Adj1_& adj1,
+        Index primal_node)
+         :
+        _adj2(nullptr),
+        _cur1(adj1.dual_end(primal_node)),
+        _end1(_cur1),
+        _cur2(),
+        _end2()
+      {
         CONTEXT("CompositeAdjunctor::DualIterator:DualIterator()");
       }
 
     public:
+      inline DualIterator() :
+        _adj2(nullptr),
+        _cur1(),
+        _end1(),
+        _cur2(),
+        _end2()
+      {
+      }
+
       /** \copydoc Adjunctor::DualIterator::DualIterator() */
       inline DualIterator(const DualIterator& other) :
         _adj2(other._adj2),
@@ -231,9 +258,9 @@ namespace FEAST
         // If we come out here, then there are no more adjacencies left, so we need to set
         // this iterator to the 'end' position - this setting must be compatible to the iterator
         // returned by the dual_end() function of the CompositeAdjunctor class!
-        // Note: see the protected constructor of this class for the following definition.
-        _cur2 = _adj2.dual_end(0);
-        _end2 = _adj2.dual_end(0);
+        // Note: see the second protected constructor of this class for the following definition.
+        _cur2 = Iterator2();
+        _end2 = _cur2;
 
         return *this;
       }
@@ -253,7 +280,6 @@ namespace FEAST
       // Ensure that the number of dual nodes in the first adjunctor is not greater than the number of primal
       // nodes in the second adjunctor; otherwise the composite adjunctor is ill-formed.
       ASSERT(_adj1.num_nodes_dual() <= _adj2.num_nodes_primal(), "Composite Adjuctor is ill-formed");
-      ASSERT(_adj2.num_nodes_primal() > 0, "Second Adjunctor must have at least one primal node");
     }
 
     /** \copydoc Adjunctor::num_nodes_primal() */
@@ -279,7 +305,7 @@ namespace FEAST
     {
       CONTEXT("CompositeAdjuctor::dual_begin()");
       ASSERT(primal_node < num_nodes_primal(), "primal_node out of valid range");
-      return DualIterator(_adj1, _adj2, primal_node, true);
+      return DualIterator(&_adj1, &_adj2, primal_node);
     }
 
     /** \copydoc Adjunctor::dual_end() */
@@ -287,7 +313,7 @@ namespace FEAST
     {
       CONTEXT("CompositeAdjuctor::dual_end()");
       ASSERT(primal_node < num_nodes_primal(), "primal_node out of valid range");
-      return DualIterator(_adj1, _adj2, primal_node, false);
+      return DualIterator(&_adj1, primal_node);
     }
 
     /**
