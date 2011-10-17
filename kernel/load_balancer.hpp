@@ -553,7 +553,9 @@ namespace FEAST
       neighbours[0] = 1;
       neighbours[1] = 0;
       // Artificially create a graph object here. Usually, this comes from somewhere else.
-      _graphs[0] = new Graph(2, index, neighbours);
+      //_graphs[0] = new Graph(2, index, neighbours);
+      _graphs[0] = new Graph(2, 2, 2, index, nullptr, neighbours);
+
       // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
       delete [] index;
       delete [] neighbours;

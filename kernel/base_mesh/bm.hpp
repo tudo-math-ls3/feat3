@@ -354,7 +354,8 @@ namespace FEAST
           delete _graph;
           _graph = nullptr;
         }
-        _graph = new Graph(n_active_cells, index, neighbours);
+        //_graph = new Graph(n_active_cells, index, neighbours);
+        _graph = new Graph(n_active_cells, n_active_cells, num_neighbours_so_far, index, nullptr, neighbours);
         // arrays index and neighbours are copied within the Graph CTOR, hence they can be deallocated here
         delete [] index;
         delete [] neighbours;
