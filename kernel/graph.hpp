@@ -651,7 +651,6 @@ namespace FEAST
   {
   protected:
     /// \cond internal
-    template<typename Adjunctor_>
     static Index _aux_inj(const Adjunctor_& adj, Index i, Index* idx)
     {
       CONTEXT("GraphRenderer::_aux_inj()");
@@ -681,7 +680,6 @@ namespace FEAST
     }
 
     /// renders adjunctor
-    template<typename Adjunctor_>
     static Graph* _render(const Adjunctor_& adj)
     {
       CONTEXT("GraphRenderer::_render()");
@@ -728,7 +726,6 @@ namespace FEAST
     }
 
     /// renders injectified adjunctor
-    template<typename Adjunctor_>
     static Graph* _render_inj(const Adjunctor_& adj)
     {
       CONTEXT("GraphRenderer::_render_inj()");
@@ -768,7 +765,6 @@ namespace FEAST
     }
 
     /// renders transposed adjunctor
-    template<typename Adjunctor_>
     static Graph* _render_trans(const Adjunctor_& adj)
     {
       CONTEXT("GraphRenderer::_render_trans()");
@@ -833,7 +829,6 @@ namespace FEAST
     }
 
     /// renders transposed injectified adjunctor
-    template<typename Adjunctor_>
     static Graph* _render_trans_inj(const Adjunctor_& adj)
     {
       CONTEXT("GraphRenderer::_render_trans_inj()");
