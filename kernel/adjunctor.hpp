@@ -14,6 +14,8 @@ namespace FEAST
   /**
    * \brief Adjunctor interface
    *
+   * \todo details and terminology
+   *
    * \author Peter Zajac
    */
   class Adjunctor
@@ -21,6 +23,8 @@ namespace FEAST
   public:
     /**
      * \brief Adjunctor dual node iterator class.
+     *
+     * \todo details
      *
      * \warning Please note that an implementation of the DualIterator interface does not necessarily provide
      * a \em default constructor. Take this into account when you develop an algorithm based on adjunctors.
@@ -30,6 +34,11 @@ namespace FEAST
     class DualIterator
     {
     public:
+      /**
+       * \brief Default constructor.
+       */
+      DualIterator();
+
       /**
        * \brief Copy constructor.
        *
@@ -111,7 +120,9 @@ namespace FEAST
 
   /**
    * \brief Composite Adjunctor implementation
+   *
    * \todo detailed description
+   *
    * \author Peter Zajac
    */
   template<
@@ -133,11 +144,12 @@ namespace FEAST
 
     /**
      * \brief Dual Iterator implementation for CompositeAdjunctor
+     *
      * \author Peter Zajac
      */
     class DualIterator
     {
-      // The ComposieAdjunctor class needs to be a friend as it calls the protected constuctors.
+      // The CompositeAdjunctor class needs to be a friend as it calls the protected constuctors.
       friend class CompositeAdjunctor<Adj1_, Adj2_>;
 
     private:

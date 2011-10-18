@@ -22,7 +22,8 @@
 namespace FEAST
 {
 #ifdef OLD_GRAPH
-
+  // Peter: Here comes the old adjacency graph implementation, left as a reference. This implementation will be
+  //        deleted later.
   /*
   * \brief class providing a graph data structure for defining connectivity of subdomains / matrix patches / processes
   *
@@ -226,26 +227,62 @@ namespace FEAST
   }; // class Graph
 #else // OLD_GRAPH
 
+  // forward declaration
+  template<typename Adjunctor_>
+  class GraphRenderer;
+
   /**
    * \brief Adjacency Graph implementation
+   *
    * \todo detailed description
+   *
    * \author Peter Zajac
    */
   class Graph
   {
   public:
     /**
-     * \brief Dual node iterator for Graph class
+     * \brief DualIterator for Graph class
+     *
+     * For the purpose of the Adjunctor interface implementation a const Index-pointer is the optimal choice for
+     * the dual node iterator.
      */
     typedef const Index* DualIterator;
 
+    /**
+     * \brief Share enumeration
+     *
+     * This enumeration is used by the constructor to determine how the arrays passed to the constructor are to be
+     * treated.
+     */
     enum Share
     {
+      /**
+       * \brief Share input arrays
+       *
+       * This value specifies that the Graph object should point directly to the input arrays passed to the
+       * constructor. The Graph object will not delete the arrays upon destruction. It is the responsibility
+       * of the caller to ensure that the input arrays remain valid for the lifetime of the graph object.
+       */
       share,
-      copy,
-      own
-    };
 
+      /**
+       * \brief Own input arrays
+       *
+       * This value specifies that the Graph object should point directly to the input arrays passed to the
+       * constructor. In contrast to #share, the arrays will be deleted by the destructor upon destruction of
+       * the Graph object.
+       */
+      own,
+
+      /**
+       * \brief Copy input arrays
+       *
+       * This value specifies that the Graph object should allocate its own copy of the input arrays passed to
+       * the constructor.
+       */
+      copy
+    };
 
   protected:
     /// total number of primal nodes
@@ -277,13 +314,12 @@ namespace FEAST
     Index* _dual_idx;
 
     /**
-     * \brief Specifies whether the arrays are shared or not
+     * \brief Specifies whether the graph's arrays are shared or not
+     *
+     * This value specifies whether the Graph object will delete the #_primal_ptr, #_primal_end and #_dual_idx
+     * arrays within the destructor.
      */
     bool _shared;
-
-    /// \cond internal
-
-    /// \endcond
 
   public:
 
@@ -369,9 +405,7 @@ namespace FEAST
      * The dual node index array for the graph. Must not be \c nullptr.
      *
      * \param[in] share
-     * If \c false, then the graph will allocate its own #_primal_ptr, #_primal_end and #_dual_idx arrays
-     * and copy the arrays passed to the constructor.\n
-     * If \c true, the graph will use the arrays passed to this constructor.
+     * Specifies how the input arrays are treated. See Graph::Share for details.
      */
     Graph(
       Index num_nodes_primal,
@@ -469,7 +503,7 @@ namespace FEAST
      * \note The degree of the graph might be greater than the total number of dual nodes if the graph is not
      * injective.
      *
-     * \note This function performs a loop over all primal nodes and therefore has linear runtime. It is therefore
+     * \note This function performs a loop over all primal nodes and therefore has linear runtime. It is
      * recommended to store the result of this function in a variable if the degree is needed multiple times.
      *
      * \returns
@@ -502,12 +536,14 @@ namespace FEAST
      */
     inline Index* get_primal_ptr()
     {
+      CONTEXT("Graph::get_primal_ptr()");
       return _primal_ptr;
     }
 
     /** \copydoc get_primal_ptr() */
     inline const Index* get_primal_ptr() const
     {
+      CONTEXT("Graph::get_primal_ptr()");
       return _primal_ptr;
     }
 
@@ -521,12 +557,14 @@ namespace FEAST
      */
     inline Index* get_primal_end()
     {
+      CONTEXT("Graph::get_primal_end()");
       return _primal_end;
     }
 
     /** \copydoc get_primal_end() */
     inline const Index* get_primal_end() const
     {
+      CONTEXT("Graph::get_primal_end()");
       return _primal_end;
     }
 
@@ -536,12 +574,14 @@ namespace FEAST
      */
     inline Index* get_dual_idx()
     {
+      CONTEXT("Graph::get_dual_idx()");
       return _dual_idx;
     }
 
     /** \copydoc get_dual_idx() */
     inline const Index* get_dual_idx() const
     {
+      CONTEXT("Graph::get_dual_idx()");
       return _dual_idx;
     }
 
@@ -552,6 +592,7 @@ namespace FEAST
      */
     inline bool is_shared() const
     {
+      CONTEXT("Graph::is_shared()");
       return _shared;
     }
 
@@ -609,21 +650,87 @@ namespace FEAST
       return oss.str();
     }
 
+    /**
+     * \brief Renders an adjunctor into a graph.
+     *
+     * \tparam Adjunctor_
+     * A class implementing the Adjunctor interface. This parameter is determined automatically.
+     *
+     * \param[in] adj
+     * A reference to the adjunctor which is to be rendered.
+     *
+     * \param[in] transpose
+     * If \c true, then the transposed adjunctor will be rendered into the graph.
+     *
+     * \param[in] injectify
+     * If \c true, then the injectified adjunctor will be rendered into the graph.
+     *
+     * \returns
+     * A pointer to a Graph containing the rendered adjunctor.
+     */
+    template<typename Adjunctor_>
+    static Graph* render(
+      const Adjunctor_& adj,
+      bool injectify = true,
+      bool transpose = false)
+    {
+      CONTEXT("Graph::render()");
+      return GraphRenderer<Adjunctor_>::render(adj, injectify, transpose);
+    }
+
+    /**
+     * \brief Renders a composition of two Adjunctors into a Graph.
+     *
+     * \todo detailed description
+     *
+     * \param[in] adj1
+     * A reference to the first adjunctor of the composition which is to be rendered.
+     *
+     * \param[in] adj2
+     * A reference to the second adjunctor of the composition which is to be rendered.
+     *
+     * \param[in] transpose
+     * If \c true, then the transposed adjunctor will be rendered into the graph.
+     *
+     * \param[in] injectify
+     * If \c true, then the injectified adjunctor will be rendered into the graph.
+     *
+     * \returns
+     * A pointer to a Graph containing the rendered adjunctor composition.
+     */
+    template<
+      typename Adjunctor1_,
+      typename Adjunctor2_>
+    static Graph* render_composite(
+      const Adjunctor1_& adj1,
+      const Adjunctor2_& adj2,
+      bool injectify = true,
+      bool transpose = false)
+    {
+      CONTEXT("Graph::render_composite()");
+      typedef CompositeAdjunctor<Adjunctor1_, Adjunctor2_> CA12;
+      return GraphRenderer<CA12>::render_composite(adj1, adj2, injectify, transpose);
+    }
+
+
     /* ********************************************************************* */
     /*  A D J U N C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
     /* ********************************************************************* */
+    /** \copydoc Adjunctor::num_nodes_primal() */
     inline Index num_nodes_primal() const
     {
       CONTEXT("Graph::num_nodes_primal()");
       return _num_nodes_primal;
     }
 
+    /** \copydoc Adjunctor::num_nodes_dual() */
     inline Index num_nodes_dual() const
     {
       CONTEXT("Graph::num_nodes_dual()");
       return _num_nodes_dual;
     }
 
+    /** \copydoc Adjunctor::dual_begin() */
     inline DualIterator dual_begin(Index primal_node) const
     {
       CONTEXT("Graph::dual_begin()");
@@ -631,6 +738,7 @@ namespace FEAST
       return &_dual_idx[_primal_ptr[primal_node]];
     }
 
+    /** \copydoc Adjunctor::dual_end() */
     inline DualIterator dual_end(Index primal_node) const
     {
       CONTEXT("Graph::dual_end()");
@@ -892,26 +1000,7 @@ namespace FEAST
 
     /// \endcond
   public:
-    /**
-     * \brief Renders an Adjunctor into a Graph.
-     *
-     * \todo detailed description
-     *
-     * \tparam Adjunctor_
-     * A class implementing the Adjunctor interface. This parameter is determined automatically.
-     *
-     * \param[in] adj
-     * A reference to the adjunctor which is to be rendered.
-     *
-     * \param[in] transpose
-     * If \c true, then the transposed adjunctor will be rendered into the graph.
-     *
-     * \param[in] injectify
-     * If \c true, then the injectified adjunctor will be rendered into the graph.
-     *
-     * \returns
-     * A pointer to a Graph containing the rendered adjunctor.
-     */
+    /** \copydoc Graph::render() */
     static Graph* render(
       const Adjunctor_& adj,
       bool injectify = true,
@@ -1237,27 +1326,8 @@ namespace FEAST
     /// \endcond
 
   public:
-    /**
-     * \brief Renders a composition of two Adjunctors into a Graph.
-     *
-     * \todo detailed description
-     *
-     * \param[in] adj1
-     * A reference to the first adjunctor of the composition which is to be rendered.
-     *
-     * \param[in] adj2
-     * A reference to the second adjunctor of the composition which is to be rendered.
-     *
-     * \param[in] transpose
-     * If \c true, then the transposed adjunctor will be rendered into the graph.
-     *
-     * \param[in] injectify
-     * If \c true, then the injectified adjunctor will be rendered into the graph.
-     *
-     * \returns
-     * A pointer to a Graph containing the rendered adjunctor composition.
-     */
-    static Graph* render(
+    /** \copydoc Graph::render_composite() */
+    static Graph* render_composite(
       const Adjunctor1_& adj1,
       const Adjunctor2_& adj2,
       bool injectify = true,
@@ -1311,7 +1381,7 @@ namespace FEAST
       bool transpose = false)
     {
       CONTEXT("GraphRenderer<CompositeAdjunctor>::render()");
-      return render(adj.get_adjunctor1(), adj.get_adjunctor2(), injectify, transpose);
+      return render_composite(adj.get_adjunctor1(), adj.get_adjunctor2(), injectify, transpose);
     }
   }; // class GraphRenderer< CompositeAdjunctor<...> >
 
