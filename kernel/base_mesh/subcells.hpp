@@ -11,12 +11,12 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/graph.hpp>
 #include <kernel/base_mesh/vertex.hpp>
 #include <kernel/base_mesh/cell.hpp>
 #include <kernel/base_mesh/cell_1d_edge.hpp>
 #include <kernel/base_mesh/cell_2d_quad.hpp>
 #include <kernel/base_mesh/cell_2d_tri.hpp>
-#include <kernel/graph.hpp>
 
 // includes, system
 #include <iostream> // for std::ostream

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_ADJUNCTOR_HPP
-#define KERNEL_ADJUNCTOR_HPP 1
+#ifndef KERNEL_UTIL_ADJUNCTOR_HPP
+#define KERNEL_UTIL_ADJUNCTOR_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -350,4 +350,4 @@ namespace FEAST
   }; // class CompositeAdjunctor
 } // namespace FEAST
 
-#endif // KERNEL_ADJUNCTOR_HPP
+#endif // KERNEL_UTIL_ADJUNCTOR_HPP

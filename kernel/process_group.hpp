@@ -12,9 +12,9 @@
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/graph.hpp>
 #include <kernel/logger.hpp>
 #include <kernel/process.hpp>
-#include <kernel/graph.hpp>
 
 // includes, system
 #include <iostream>

@@ -10,10 +10,10 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
+#include <kernel/util/graph.hpp>
 #include <kernel/process.hpp>
 #include <kernel/process_group.hpp>
 #include <kernel/work_group.hpp>
-#include <kernel/graph.hpp>
 
 // includes, system
 #include <iostream>

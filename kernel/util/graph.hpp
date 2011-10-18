@@ -7,12 +7,12 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_GRAPH_HPP
-#define KERNEL_GRAPH_HPP 1
+#ifndef KERNEL_UTIL_GRAPH_HPP
+#define KERNEL_UTIL_GRAPH_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/adjunctor.hpp>
+#include <kernel/util/adjunctor.hpp>
 #include <kernel/util/assertion.hpp>
 
 // includes, system
@@ -1388,4 +1388,4 @@ namespace FEAST
 #endif // OLD_GRAPH
 } // namespace FEAST
 
-#endif // KERNEL_GRAPH_HPP
+#endif // KERNEL_UTIL_GRAPH_HPP

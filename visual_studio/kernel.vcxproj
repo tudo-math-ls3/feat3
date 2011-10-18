@@ -510,7 +510,6 @@
     <ClInclude Include="..\kernel\comm.hpp" />
     <ClInclude Include="..\kernel\constants.hpp" />
     <ClInclude Include="..\kernel\error_handler.hpp" />
-    <ClInclude Include="..\kernel\graph.hpp" />
     <ClInclude Include="..\kernel\interlevel_group.hpp" />
     <ClInclude Include="..\kernel\load_balancer.hpp" />
     <ClInclude Include="..\kernel\load_balancer_dedicated.hpp" />
@@ -520,11 +519,13 @@
     <ClInclude Include="..\kernel\manager_comp_coord.hpp" />
     <ClInclude Include="..\kernel\manager_comp_non_coord.hpp" />
     <ClInclude Include="..\kernel\master.hpp" />
+    <ClInclude Include="..\kernel\neighbourhood.hpp" />
     <ClInclude Include="..\kernel\process.hpp" />
     <ClInclude Include="..\kernel\process_group.hpp" />
     <ClInclude Include="..\kernel\service_ids.hpp" />
     <ClInclude Include="..\kernel\universe.hpp" />
     <ClInclude Include="..\kernel\util\abort.hpp" />
+    <ClInclude Include="..\kernel\util\adjunctor.hpp" />
     <ClInclude Include="..\kernel\util\assertion.hpp" />
     <ClInclude Include="..\kernel\util\compiler_gnu.hpp" />
     <ClInclude Include="..\kernel\util\compiler_intel.hpp" />
@@ -534,6 +535,7 @@
     <ClInclude Include="..\kernel\util\compiler_pgi.hpp" />
     <ClInclude Include="..\kernel\util\exception.hpp" />
     <ClInclude Include="..\kernel\util\file_reader_ascii.hpp" />
+    <ClInclude Include="..\kernel\util\graph.hpp" />
     <ClInclude Include="..\kernel\util\inheritance.hpp" />
     <ClInclude Include="..\kernel\util\instantiation_policy.hpp" />
     <ClInclude Include="..\kernel\util\mpi_utils.hpp" />
