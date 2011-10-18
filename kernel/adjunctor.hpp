@@ -176,17 +176,17 @@ namespace FEAST
         if(_cur1 != _end1)
         {
           _cur2 = adj2->dual_begin(*_cur1);
-          _cur2 = adj2->dual_end(*_cur1);
+          _end2 = adj2->dual_end(*_cur1);
         }
       }
 
       /// constructor for dual_end()
       DualIterator(
-        const Adj1_& adj1,
+        const Adj1_* adj1,
         Index primal_node)
          :
         _adj2(nullptr),
-        _cur1(adj1.dual_end(primal_node)),
+        _cur1(adj1->dual_end(primal_node)),
         _end1(_cur1),
         _cur2(),
         _end2()
@@ -245,8 +245,8 @@ namespace FEAST
         while(++_cur1 != _end1)
         {
           // reset second iterator
-          _cur2 = _adj2.dual_begin(*_cur1);
-          _end2 = _adj2.dual_end(*_cur1);
+          _cur2 = _adj2->dual_begin(*_cur1);
+          _end2 = _adj2->dual_end(*_cur1);
 
           // check whether the second adjacency list is empty, if not then we have a valid position
           if(_cur2 != _end2)
