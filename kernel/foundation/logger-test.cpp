@@ -5,13 +5,13 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
-#include <kernel/logger.hpp>
+#include <kernel/foundation/logger.hpp>
 #include <test_system/test_system.hpp>
 #ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/process.hpp>
-#include <kernel/universe.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/universe.hpp>
 #endif // PARALLEL
 
 using namespace FEAST;

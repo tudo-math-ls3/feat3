@@ -13,16 +13,16 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_COMM_HPP
-#define KERNEL_COMM_HPP 1
+#ifndef KERNEL_FOUNDATION_COMM_HPP
+#define KERNEL_FOUNDATION_COMM_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/process.hpp>
-#include <kernel/service_ids.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/service_ids.hpp>
 
 // includes, system
 #include <mpi.h>
@@ -226,4 +226,4 @@ namespace FEAST
 
 #endif // PARALLEL
 
-#endif // KERNEL_COMM_HPP
+#endif // KERNEL_FOUNDATION_COMM_HPP

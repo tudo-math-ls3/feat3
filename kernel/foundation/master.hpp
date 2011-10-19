@@ -14,17 +14,17 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_MASTER_HPP
-#define KERNEL_MASTER_HPP 1
+#ifndef KERNEL_FOUNDATION_MASTER_HPP
+#define KERNEL_FOUNDATION_MASTER_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
-#include <kernel/comm.hpp>
-#include <kernel/service_ids.hpp>
-#include <kernel/process_group.hpp>
-#include <kernel/logger.hpp>
+#include <kernel/foundation/comm.hpp>
+#include <kernel/foundation/service_ids.hpp>
+#include <kernel/foundation/process_group.hpp>
+#include <kernel/foundation/logger.hpp>
 
 // includes, system
 #include <iostream>
@@ -147,4 +147,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_MASTER_HPP
+#endif // KERNEL_FOUNDATION_MASTER_HPP

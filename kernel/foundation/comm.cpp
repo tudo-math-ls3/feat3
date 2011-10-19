@@ -1,4 +1,4 @@
-#include <kernel/comm.hpp>
+#include <kernel/foundation/comm.hpp>
 #ifdef PARALLEL
 
 namespace FEAST

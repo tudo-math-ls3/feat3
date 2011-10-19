@@ -8,14 +8,14 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_ERROR_HANDLER_HHP
-#define KERNEL_ERROR_HANDLER_HHP 1
+#ifndef KERNEL_FOUNDATION_ERROR_HANDLER_HHP
+#define KERNEL_FOUNDATION_ERROR_HANDLER_HHP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
-#include <kernel/logger.hpp>
 #include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/foundation/logger.hpp>
 
 // includes, system
 
@@ -105,4 +105,4 @@ function:
   };
 } // namespace FEAST
 
-#endif // KERNEL_UTIL_ERROR_HANDLER_HPP
+#endif // KERNEL_FOUNDATION_ERROR_HANDLER_HPP

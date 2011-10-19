@@ -10,13 +10,13 @@
  */
 
 #pragma once
-#ifndef KERNEL_LOAD_BALANCER_DEDICATED_HPP
-#define KERNEL_LOAD_BALANCER_DEDICATED_HPP 1
+#ifndef KERNEL_FOUNDATION_LOAD_BALANCER_DEDICATED_HPP
+#define KERNEL_FOUNDATION_LOAD_BALANCER_DEDICATED_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
-#include <kernel/process_group.hpp>
+#include <kernel/foundation/process_group.hpp>
 
 // includes, system
 
@@ -63,4 +63,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_LOAD_BALANCER_DEDICATED_HPP
+#endif // KERNEL_FOUNDATION_LOAD_BALANCER_DEDICATED_HPP

@@ -1,6 +1,6 @@
 
 // includes, FEAST
-#include <kernel/constants.hpp>
+#include <kernel/foundation/constants.hpp>
 
 // includes, system
 #include <limits> // for numeric_limits

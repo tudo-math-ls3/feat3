@@ -9,18 +9,16 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_WORK_GROUP_HPP
-#define KERNEL_WORK_GROUP_HPP 1
+#ifndef KERNEL_FOUNDATION_WORK_GROUP_HPP
+#define KERNEL_FOUNDATION_WORK_GROUP_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
-#include <kernel/logger.hpp>
-#include <kernel/process.hpp>
-#include <kernel/process_group.hpp>
-//#include <kernel/interlevel_group.hpp>
-//#include <kernel/graph.hpp>
-#include <kernel/neighbourhood.hpp>
+#include <kernel/foundation/logger.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/process_group.hpp>
+#include <kernel/foundation/neighbourhood.hpp>
 
 // includes, system
 #include <iostream>
@@ -314,4 +312,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_WORK_GROUP_HPP
+#endif // KERNEL_FOUNDATION_WORK_GROUP_HPP

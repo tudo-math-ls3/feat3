@@ -5,20 +5,20 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_MANAGER_HPP
-#define KERNEL_MANAGER_HPP 1
+#ifndef KERNEL_FOUNDATION_MANAGER_HPP
+#define KERNEL_FOUNDATION_MANAGER_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/process_group.hpp>
-#include <kernel/load_balancer.hpp>
-#include <kernel/load_balancer_dedicated.hpp>
-#include <kernel/manager_comp.hpp>
-#include <kernel/manager_comp_coord.hpp>
-#include <kernel/manager_comp_non_coord.hpp>
+#include <kernel/foundation/process_group.hpp>
+#include <kernel/foundation/load_balancer.hpp>
+#include <kernel/foundation/load_balancer_dedicated.hpp>
+#include <kernel/foundation/manager_comp.hpp>
+#include <kernel/foundation/manager_comp_coord.hpp>
+#include <kernel/foundation/manager_comp_non_coord.hpp>
 
 // includes, system
 #include <mpi.h>
@@ -796,4 +796,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_MANAGER_HPP
+#endif // KERNEL_FOUNDATION_MANAGER_HPP

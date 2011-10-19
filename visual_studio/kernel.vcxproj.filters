@@ -21,63 +21,15 @@
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{fc956664-a3a9-45df-92e4-c5631ac60774}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\foundation">
+      <UniqueIdentifier>{25bab0b8-78df-496b-8a22-f7a86c416aa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\foundation">
+      <UniqueIdentifier>{00d9dcec-fec5-4be2-a18f-c5f9362b916a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\comm.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\constants.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\error_handler.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\interlevel_group.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\load_balancer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\load_balancer_dedicated.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\logger.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\manager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\manager_comp.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\manager_comp_coord.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\manager_comp_non_coord.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\master.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\process.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\process_group.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\service_ids.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\universe.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\work_group.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\work_group_ext.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\base_mesh\bm.hpp">
@@ -174,34 +126,88 @@
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="feast_config.hpp" />
-    <ClInclude Include="..\kernel\neighbourhood.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\util\adjunctor.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\util\graph.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\foundation\comm.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\constants.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\error_handler.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\interlevel_group.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\load_balancer.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\load_balancer_dedicated.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\logger.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\manager.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\manager_comp.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\manager_comp_coord.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\manager_comp_non_coord.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\master.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\neighbourhood.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\process.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\process_group.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\service_ids.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\universe.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\work_group.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\work_group_ext.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\comm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\constants.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\process.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\base_mesh\cell.cpp">
       <Filter>Source Files\base_mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\util\exception.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\comm.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\constants.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\logger.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\process.cpp">
+      <Filter>Source Files\foundation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

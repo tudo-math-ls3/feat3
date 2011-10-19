@@ -4,17 +4,17 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_MANAGER_COMP_COORD_HPP
-#define KERNEL_MANAGER_COMP_COORD_HPP 1
+#ifndef KERNEL_FOUNDATION_MANAGER_COMP_COORD_HPP
+#define KERNEL_FOUNDATION_MANAGER_COMP_COORD_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/error_handler.hpp>
-#include <kernel/manager_comp.hpp>
-#include <kernel/load_balancer.hpp>
+#include <kernel/foundation/error_handler.hpp>
+#include <kernel/foundation/manager_comp.hpp>
+#include <kernel/foundation/load_balancer.hpp>
 #include <kernel/base_mesh/file_parser.hpp>
 #include <kernel/base_mesh/bm.hpp>
 
@@ -485,4 +485,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_MANAGER_COMP_COORD_HPP
+#endif // KERNEL_FOUNDATION_MANAGER_COMP_COORD_HPP

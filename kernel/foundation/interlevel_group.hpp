@@ -6,15 +6,15 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_INTERLEVEL_GROUP_HPP
-#define KERNEL_INTERLEVEL_GROUP_HPP 1
+#ifndef KERNEL_FOUNDATION_INTERLEVEL_GROUP_HPP
+#define KERNEL_FOUNDATION_INTERLEVEL_GROUP_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
-#include <kernel/logger.hpp>
-#include <kernel/process.hpp>
-#include <kernel/process_group.hpp>
+#include <kernel/foundation/logger.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/process_group.hpp>
 
 // includes, system
 #include <iostream>
@@ -325,4 +325,4 @@ namespace FEAST
 
 #endif // PARALLEL
 
-#endif // KERNEL_INTERLEVEL_GROUP_HPP
+#endif // KERNEL_FOUNDATION_INTERLEVEL_GROUP_HPP

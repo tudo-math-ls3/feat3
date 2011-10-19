@@ -1,4 +1,4 @@
-#include <kernel/process.hpp>
+#include <kernel/foundation/process.hpp>
 #ifdef PARALLEL
 
 namespace FEAST

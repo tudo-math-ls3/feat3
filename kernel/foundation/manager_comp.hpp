@@ -4,19 +4,19 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_MANAGER_COMP_HPP
-#define KERNEL_MANAGER_COMP_HPP 1
+#ifndef KERNEL_FOUNDATION_MANAGER_COMP_HPP
+#define KERNEL_FOUNDATION_MANAGER_COMP_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/error_handler.hpp>
-#include <kernel/process.hpp>
-#include <kernel/process_group.hpp>
-#include <kernel/work_group_ext.hpp>
-#include <kernel/interlevel_group.hpp>
+#include <kernel/foundation/error_handler.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/process_group.hpp>
+#include <kernel/foundation/work_group_ext.hpp>
+#include <kernel/foundation/interlevel_group.hpp>
 
 // includes, system
 #include <mpi.h>
@@ -428,4 +428,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_MANAGER_COMP_HPP
+#endif // KERNEL_FOUNDATION_MANAGER_COMP_HPP

@@ -4,16 +4,16 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_WORK_GROUP_EXT_HPP
-#define KERNEL_WORK_GROUP_EXT_HPP 1
+#ifndef KERNEL_FOUNDATION_WORK_GROUP_EXT_HPP
+#define KERNEL_FOUNDATION_WORK_GROUP_EXT_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
 #include <kernel/util/graph.hpp>
-#include <kernel/process.hpp>
-#include <kernel/process_group.hpp>
-#include <kernel/work_group.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/process_group.hpp>
+#include <kernel/foundation/work_group.hpp>
 
 // includes, system
 #include <iostream>
@@ -234,4 +234,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_WORK_GROUP_EXT_HPP
+#endif // KERNEL_FOUNDATION_WORK_GROUP_EXT_HPP

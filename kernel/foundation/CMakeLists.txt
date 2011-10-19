@@ -6,15 +6,12 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 #top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-ADD_SUBDIRECTORY( util )
-ADD_SUBDIRECTORY( base_mesh )
-ADD_SUBDIRECTORY( foundation )
 
-ADD_LIBRARY(feast STATIC)
-TARGET_LINK_LIBRARIES (feast kernel-base_mesh kernel-util kernel-foundation)
+ADD_LIBRARY(kernel-foundation STATIC comm.cpp process.cpp logger.cpp constants.cpp)
+TARGET_LINK_LIBRARIES (kernel-foundation kernel-base_mesh kernel-util)
 
 #list of kernel tests
-SET (test_list)
+SET (test_list logger-test work_group-test_1d work_group-test_2d_1 work_group-test_2d_2)
 
 #create all tests
 FOREACH (test ${test_list} )
@@ -28,13 +25,13 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/${test}" Nil)
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/foundation/${test}" Nil)
   SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
   SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
   SET_PROPERTY(TEST ${test}_nil PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ENDFOREACH(test)
 
-#add all tests to kernel_tests
-ADD_CUSTOM_TARGET(kernel_tests DEPENDS ${test_list})
+#add all tests to foundation_tests
+ADD_CUSTOM_TARGET(foundation_tests DEPENDS ${test_list})
 #build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests kernel_tests)
+ADD_DEPENDENCIES(tests foundation_tests)

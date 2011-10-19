@@ -3,8 +3,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_UNIVERSE_HPP
-#define KERNEL_UNIVERSE_HPP 1
+#ifndef KERNEL_FOUNDATION_UNIVERSE_HPP
+#define KERNEL_FOUNDATION_UNIVERSE_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -12,12 +12,12 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/instantiation_policy.hpp>
-#include <kernel/process.hpp>
-#include <kernel/master.hpp>
-#include <kernel/error_handler.hpp>
-#include <kernel/manager.hpp>
-//#include <kernel/manager_coord.hpp>
-//#include <kernel/manager_non_coord.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/master.hpp>
+#include <kernel/foundation/error_handler.hpp>
+#include <kernel/foundation/manager.hpp>
+//#include <kernel/foundation/manager_coord.hpp>
+//#include <kernel/foundation/manager_non_coord.hpp>
 
 // includes, system
 #include <iostream>
@@ -570,4 +570,4 @@ namespace FEAST
 } // namespace FEAST
 
 #endif // PARALLEL
-#endif // KERNEL_UNIVERSE_HPP
+#endif // KERNEL_FOUNDATION_UNIVERSE_HPP

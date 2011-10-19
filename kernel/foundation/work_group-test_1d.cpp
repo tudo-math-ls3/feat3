@@ -8,9 +8,9 @@
 #include <kernel/util/graph.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/comm.hpp>
-#include <kernel/process.hpp>
-#include <kernel/universe.hpp>
+#include <kernel/foundation/comm.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/universe.hpp>
 #include <test_system/test_system.hpp>
 
 using namespace FEAST;

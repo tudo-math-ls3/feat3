@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_NEIGHBOURHOOD_HPP
-#define KERNEL_NEIGHBOURHOOD_HPP
+#ifndef KERNEL_FOUNDATION_NEIGHBOURHOOD_HPP
+#define KERNEL_FOUNDATION_NEIGHBOURHOOD_HPP
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -124,4 +124,4 @@ namespace FEAST
   }; // class Neighbourhood
 } // namespace FEAST
 
-#endif // KERNEL_NEIGHBOURHOOD_HPP
+#endif // KERNEL_FOUNDATION_NEIGHBOURHOOD_HPP

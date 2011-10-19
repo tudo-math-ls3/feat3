@@ -4,8 +4,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_LOGGER_HPP
-#define KERNEL_LOGGER_HPP 1
+#ifndef KERNEL_FOUNDATION_LOGGER_HPP
+#define KERNEL_FOUNDATION_LOGGER_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
@@ -13,7 +13,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/string.hpp>
 #ifdef PARALLEL
-#include <kernel/comm.hpp>
+#include <kernel/foundation/comm.hpp>
 #endif
 
 // includes, system
@@ -964,4 +964,4 @@ namespace FEAST
 #endif // OLD_LOGGER
 } // namespace FEAST
 
-#endif // KERNEL_LOGGER_HPP
+#endif // KERNEL_FOUNDATION_LOGGER_HPP

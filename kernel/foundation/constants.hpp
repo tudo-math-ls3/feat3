@@ -6,8 +6,8 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_CONSTANTS_HPP
-#define KERNEL_CONSTANTS_HPP 1
+#ifndef KERNEL_FOUNDATION_CONSTANTS_HPP
+#define KERNEL_FOUNDATION_CONSTANTS_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -30,4 +30,4 @@ namespace FEAST
 } // namespace FEAST
 
 
-#endif // KERNEL_CONSTANTS_HPP
+#endif // KERNEL_FOUNDATION_CONSTANTS_HPP
