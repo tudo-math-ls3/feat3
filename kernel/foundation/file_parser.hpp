@@ -13,9 +13,10 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/file_reader_ascii.hpp>
-#include <kernel/logger.hpp>
-#include <kernel/base_mesh/cell_3d_hexa.hpp>
-#include <kernel/base_mesh/bm.hpp>
+#include <kernel/foundation/logger.hpp>
+
+#include <kernel/foundation/cell_3d_hexa.hpp>
+#include <kernel/foundation/bm.hpp>
 
 // includes, system
 #include <iostream> // for std::ostream

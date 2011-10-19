@@ -7,11 +7,10 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 ADD_SUBDIRECTORY( util )
-ADD_SUBDIRECTORY( base_mesh )
 ADD_SUBDIRECTORY( foundation )
 
 ADD_LIBRARY(feast STATIC)
-TARGET_LINK_LIBRARIES (feast kernel-base_mesh kernel-util kernel-foundation)
+TARGET_LINK_LIBRARIES (feast kernel-util kernel-foundation)
 
 #list of kernel tests
 SET (test_list)

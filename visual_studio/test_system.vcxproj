@@ -424,9 +424,9 @@
     <ClInclude Include="..\test_system\test_system.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\base_mesh\cell_1d_edge-test_subdivision.cpp" />
-    <ClCompile Include="..\kernel\base_mesh\cell_2d_quad-test_subdivision.cpp" />
-    <ClCompile Include="..\kernel\base_mesh\cell_3d_hexa-test_subdivision.cpp" />
+    <ClCompile Include="..\kernel\foundation\cell_1d_edge-test_subdivision.cpp" />
+    <ClCompile Include="..\kernel\foundation\cell_2d_quad-test_subdivision.cpp" />
+    <ClCompile Include="..\kernel\foundation\cell_3d_hexa-test_subdivision.cpp" />
     <ClCompile Include="..\kernel\foundation\logger-test.cpp" />
     <ClCompile Include="..\kernel\foundation\work_group-test_1d.cpp" />
     <ClCompile Include="..\kernel\foundation\work_group-test_2d_1.cpp" />

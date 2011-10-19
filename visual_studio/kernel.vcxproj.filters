@@ -9,14 +9,8 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files\base_mesh">
-      <UniqueIdentifier>{c91d9cea-cb44-4cc8-8eed-2e8b0ceece43}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\util">
       <UniqueIdentifier>{09524e05-8107-4f0a-b5f7-c473b2106d8d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\base_mesh">
-      <UniqueIdentifier>{e1d9298f-51d5-4664-81c5-40d3d3081b8d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{fc956664-a3a9-45df-92e4-c5631ac60774}</UniqueIdentifier>
@@ -27,52 +21,16 @@
     <Filter Include="Source Files\foundation">
       <UniqueIdentifier>{00d9dcec-fec5-4be2-a18f-c5f9362b916a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\foundation\base_mesh">
+      <UniqueIdentifier>{ba3e4b95-bce6-4dc2-bf42-b654127bf689}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\foundation\base_mesh">
+      <UniqueIdentifier>{8328183f-1fbb-4af5-b8f0-43910a7b4bb2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\bm.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_1d_edge.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_2d_quad.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_2d_tri.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_3d_hexa.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_3d_tetra.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_data.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_data_validation.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\cell_subdivision.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\file_parser.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\item.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\subcells.hpp">
-      <Filter>Header Files\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\base_mesh\vertex.hpp">
-      <Filter>Header Files\base_mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\util\abort.hpp">
       <Filter>Header Files\util</Filter>
@@ -189,11 +147,50 @@
     <ClInclude Include="..\kernel\foundation\work_group_ext.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\foundation\bm.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_1d_edge.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_2d_quad.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_2d_tri.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_3d_hexa.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_3d_tetra.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_data.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_data_validation.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\cell_subdivision.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\file_parser.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\item.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\subcells.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\vertex.hpp">
+      <Filter>Header Files\foundation\base_mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\base_mesh\cell.cpp">
-      <Filter>Source Files\base_mesh</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\util\exception.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
@@ -208,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="..\kernel\foundation\process.cpp">
       <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\cell.cpp">
+      <Filter>Source Files\foundation\base_mesh</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

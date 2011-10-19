@@ -5,22 +5,23 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <test_system/test_system.hpp>
 #ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
-#include <test_system/test_system.hpp>
-#include <kernel/comm.hpp>
-#include <kernel/process.hpp>
-#include <kernel/universe.hpp>
-#include <kernel/base_mesh/cell_subdivision.hpp>
+#include <kernel/foundation/comm.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/universe.hpp>
+
+#include <kernel/foundation/cell_subdivision.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief testing subdivision of a hexa in 3D
+* \brief testing subdivision of a quad in 2D
 *
 * \test
-* This test creates a universe, reads a 3D mesh (currently hard coded), builds a base mesh and subdivides a hexa.
+* This test creates a universe, reads a 2D mesh, builds a base mesh and subdivides a quad.
 *
 * \tparam Tag_
 * description missing
@@ -41,15 +42,21 @@ template<
   typename DT_,
   unsigned char space_dim_,
   unsigned char world_dim_>
-class Cell3DHexaTestSubdivision
+class Cell2DQuadTestSubdivision
   : public TaggedTest<Tag_, DT_>
 {
+
+private:
+
+  /// name of the mesh file to be read
+  String _mesh_file;
 
 public:
 
   /// CTOR
-  Cell3DHexaTestSubdivision()
-    : TaggedTest<Tag_, DT_>("cell_3d_hexa_test_subdivision")
+  Cell2DQuadTestSubdivision(String const mesh_file)
+    : TaggedTest<Tag_, DT_>("cell_2d_quad_test_subdivision"),
+      _mesh_file(mesh_file)
   {
   }
 
@@ -77,7 +84,7 @@ public:
 
     // create universe consisting of one process group without dedicated load balancer,
     // let the outer test system catch eventual exceptions
-    universe->create("cell_3d_hexa-test_subdivision");
+    universe->create("cell_2d_quad-test_subdivision");
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
@@ -89,8 +96,8 @@ public:
       // get pointer to the process group this process belongs to
       ProcessGroup* process_group = manager->process_group_main();
 
-      // let the manager "read" the mesh, which currently means: create a hard-wired mesh consisting of 4 hexas
-      manager->read_mesh("dummy");
+      // let the manager read the mesh
+      manager->read_mesh(_mesh_file);
 
       // get pointer to the base mesh
       BaseMesh::BM<space_dim_, world_dim_>* bm = manager->base_mesh();
@@ -100,22 +107,20 @@ public:
       {
        // subdivide cell 0
         Logger::log("******************\n");
-        Logger::log("Subdividing cell 0\n");
+        Logger::log("Subdividing cell 2\n");
         Logger::log("******************\n");
         BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data
           = new BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>(BaseMesh::NONCONFORM_SAME_TYPE);
-        bm->cell(0)->subdivide(subdiv_data);
+        bm->cell(2)->subdivide(subdiv_data);
 
         // add created cells and subcells to the corresponding base mesh vectors
-        bm->add_created_items(bm->cell(0)->subdiv_data());
+        bm->add_created_items(bm->cell(2)->subdiv_data());
         // set cell numbers (now they differ from indices)
         bm->set_cell_numbers();
         // print base mesh
-        Logger::log(bm->print());
-       // validate base mesh
-        std::ostringstream strstream;
-        bm->validate(strstream);
-        Logger::log(strstream.str());
+        Logger::log(bm->print(), Logger::local_file_0);
+        // validate base mesh
+        Logger::log(bm->validate(), Logger::local_file_0);
 
         // COMMENT_HILMAR: neighbourhood update
 
@@ -144,8 +149,9 @@ public:
     }
   } // run()
 
-}; // Cell3DHexaTestSubdivision
+}; // Cell2DQuadTestSubdivision
 
-// create test instance, using space and world dimension 3
-Cell3DHexaTestSubdivision<Nil, Nil, 3, 3> cell_3d_hexa_test_subdivision;
+// create test instance, using space and world dimension 2
+Cell2DQuadTestSubdivision<Nil, Nil, 2, 2>
+  cell_2d_quad_test_subdivision(stringify(FEAST_SRC_DIR) + "/data/meshes/test_16bmc.feast");
 #endif // PARALLEL

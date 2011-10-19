@@ -15,8 +15,9 @@
 #include <kernel/foundation/error_handler.hpp>
 #include <kernel/foundation/manager_comp.hpp>
 #include <kernel/foundation/load_balancer.hpp>
-#include <kernel/base_mesh/file_parser.hpp>
-#include <kernel/base_mesh/bm.hpp>
+
+#include <kernel/foundation/file_parser.hpp>
+#include <kernel/foundation/bm.hpp>
 
 // includes, system
 #include <mpi.h>

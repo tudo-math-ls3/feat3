@@ -12,8 +12,9 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/error_handler.hpp>
-#include <kernel/base_mesh/item.hpp>
+#include <kernel/foundation/error_handler.hpp>
+
+#include <kernel/foundation/item.hpp>
 
 // includes, system
 #include <iostream> // for std::ostream

@@ -5,22 +5,23 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <test_system/test_system.hpp>
 #ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
-#include <test_system/test_system.hpp>
-#include <kernel/comm.hpp>
-#include <kernel/process.hpp>
-#include <kernel/universe.hpp>
-#include <kernel/base_mesh/cell_subdivision.hpp>
+#include <kernel/foundation/comm.hpp>
+#include <kernel/foundation/process.hpp>
+#include <kernel/foundation/universe.hpp>
+
+#include <kernel/foundation/cell_subdivision.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief testing subdivision of a quad in 2D
+* \brief testing subdivision of an edge in 1D
 *
 * \test
-* This test creates a universe, reads a 2D mesh, builds a base mesh and subdivides a quad.
+* This test creates a universe, reads a 1D mesh (currently hard coded), builds a base mesh and subdivides an edge.
 *
 * \tparam Tag_
 * description missing
@@ -41,21 +42,15 @@ template<
   typename DT_,
   unsigned char space_dim_,
   unsigned char world_dim_>
-class Cell2DQuadTestSubdivision
+class Cell1DEdgeTestSubdivision
   : public TaggedTest<Tag_, DT_>
 {
-
-private:
-
-  /// name of the mesh file to be read
-  String _mesh_file;
 
 public:
 
   /// CTOR
-  Cell2DQuadTestSubdivision(String const mesh_file)
-    : TaggedTest<Tag_, DT_>("cell_2d_quad_test_subdivision"),
-      _mesh_file(mesh_file)
+  Cell1DEdgeTestSubdivision()
+    : TaggedTest<Tag_, DT_>("cell_1d_edge-test_subdivision")
   {
   }
 
@@ -83,7 +78,7 @@ public:
 
     // create universe consisting of one process group without dedicated load balancer,
     // let the outer test system catch eventual exceptions
-    universe->create("cell_2d_quad-test_subdivision");
+    universe->create("cell_1d_edge_test_subdivision");
 
     // Get process objects. Note that on each process only one of the following two exists (the other one is the
     // null pointer).
@@ -95,8 +90,8 @@ public:
       // get pointer to the process group this process belongs to
       ProcessGroup* process_group = manager->process_group_main();
 
-      // let the manager read the mesh
-      manager->read_mesh(_mesh_file);
+      // let the manager "read" the mesh, which currently means: create a hard-wired mesh consisting of 3 edges
+      manager->read_mesh("dummy");
 
       // get pointer to the base mesh
       BaseMesh::BM<space_dim_, world_dim_>* bm = manager->base_mesh();
@@ -104,21 +99,21 @@ public:
       // let the coordinator subdivide a cell
       if(process_group->is_coordinator())
       {
-       // subdivide cell 0
+       // subdivide cell 1
         Logger::log("******************\n");
-        Logger::log("Subdividing cell 2\n");
+        Logger::log("Subdividing cell 1\n");
         Logger::log("******************\n");
         BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>* subdiv_data
-          = new BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>(BaseMesh::NONCONFORM_SAME_TYPE);
-        bm->cell(2)->subdivide(subdiv_data);
+          = new BaseMesh::SubdivisionData<space_dim_, space_dim_, world_dim_>(BaseMesh::CONFORM_SAME_TYPE);
+        bm->cell(1)->subdivide(subdiv_data);
 
         // add created cells and subcells to the corresponding base mesh vectors
-        bm->add_created_items(bm->cell(2)->subdiv_data());
+        bm->add_created_items(bm->cell(1)->subdiv_data());
         // set cell numbers (now they differ from indices)
         bm->set_cell_numbers();
         // print base mesh
         Logger::log(bm->print(), Logger::local_file_0);
-        // validate base mesh
+       // validate base mesh
         Logger::log(bm->validate(), Logger::local_file_0);
 
         // COMMENT_HILMAR: neighbourhood update
@@ -148,9 +143,8 @@ public:
     }
   } // run()
 
-}; // Cell2DQuadTestSubdivision
+}; // Cell1DEdgeTestSubdivision
 
-// create test instance, using space and world dimension 2
-Cell2DQuadTestSubdivision<Nil, Nil, 2, 2>
-  cell_2d_quad_test_subdivision(stringify(FEAST_SRC_DIR) + "/data/meshes/test_16bmc.feast");
+// create test instance, using space and world dimension 1
+Cell1DEdgeTestSubdivision<Nil, Nil, 1, 1> cell_1d_edge_test_subdivision;
 #endif // PARALLEL

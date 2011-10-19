@@ -9,7 +9,8 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/base_mesh/vertex.hpp>
+
+#include <kernel/foundation/vertex.hpp>
 
 // includes, system
 #include <iostream> // for std::ostream

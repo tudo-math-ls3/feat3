@@ -25,7 +25,8 @@
 #include <kernel/foundation/error_handler.hpp>
 #include <kernel/foundation/process.hpp>
 #include <kernel/foundation/process_group.hpp>
-#include <kernel/base_mesh/bm.hpp>
+
+#include <kernel/foundation/bm.hpp>
 
 // includes, system
 #include <mpi.h>

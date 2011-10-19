@@ -13,9 +13,10 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/graph.hpp>
-#include <kernel/base_mesh/vertex.hpp>
-#include <kernel/base_mesh/cell.hpp>
-#include <kernel/base_mesh/subcells.hpp>
+
+#include <kernel/foundation/vertex.hpp>
+#include <kernel/foundation/cell.hpp>
+#include <kernel/foundation/subcells.hpp>
 
 // includes, system
 #include <iostream> // for std::ostream

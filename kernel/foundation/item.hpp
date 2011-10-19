@@ -11,7 +11,8 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/constants.hpp>
+
+#include <kernel/foundation/constants.hpp>
 
 // includes, system
 #include <sstream> // for std::ostringstream

@@ -1,4 +1,4 @@
-#include <kernel/base_mesh/cell.hpp>
+#include <kernel/foundation/cell.hpp>
 
 namespace FEAST
 {

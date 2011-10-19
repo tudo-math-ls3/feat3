@@ -12,11 +12,12 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/error_handler.hpp>
-#include <kernel/base_mesh/vertex.hpp>
-#include <kernel/base_mesh/cell.hpp>
-#include <kernel/base_mesh/cell_data_validation.hpp>
-#include <kernel/base_mesh/cell_1d_edge.hpp>
+#include <kernel/foundation/error_handler.hpp>
+
+#include <kernel/foundation/vertex.hpp>
+#include <kernel/foundation/cell.hpp>
+#include <kernel/foundation/cell_data_validation.hpp>
+#include <kernel/foundation/cell_1d_edge.hpp>
 
 // includes, system
 #include <iostream> // for std::ostream

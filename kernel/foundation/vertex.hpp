@@ -10,7 +10,8 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/base_mesh/item.hpp>
+
+#include <kernel/foundation/item.hpp>
 
 // includes, system
 #include <iostream> // for std::ostream
