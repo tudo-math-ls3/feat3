@@ -223,7 +223,7 @@ namespace FEAST
       bool test_result = 0;
 
       // length of the integer arrays to be exchanged
-      const int n = 10;
+      Index n = 10;
 
       int num_neighbours = _neighbourhood->num_neighbours();
       const int* neighbours = _neighbourhood->neighbours();
@@ -240,7 +240,7 @@ namespace FEAST
       {
         a[i] = new int[n];
         a_recv[i] = new int[n];
-        for(int j(0) ; j < n; ++j)
+        for(Index j(0) ; j < n; ++j)
         {
           a[i][j] = 100000*_rank + 100*neighbours[i] + j;
         }
@@ -284,7 +284,7 @@ namespace FEAST
       for(int i(0) ; i < num_neighbours; ++i)
       {
         s = stringify(a_recv[i][0]);
-        for(int j(1) ; j < n; ++j)
+        for(Index j(1) ; j < n; ++j)
         {
           s += " " + stringify(a_recv[i][j]);
           // We cannot really do a clever check here, so we simply check whether a_recv really contains the value we
