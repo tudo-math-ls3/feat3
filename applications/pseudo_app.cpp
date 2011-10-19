@@ -7,8 +7,8 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/mpi_utils.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/graph.hpp>
 #include <kernel/comm.hpp>
-#include <kernel/graph.hpp>
 #include <kernel/process.hpp>
 #include <kernel/manager.hpp>
 #include <kernel/universe.hpp>
