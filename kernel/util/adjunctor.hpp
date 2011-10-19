@@ -26,16 +26,13 @@ namespace FEAST
      *
      * \todo details
      *
-     * \warning Please note that an implementation of the DualIterator interface does not necessarily provide
-     * a \em default constructor. Take this into account when you develop an algorithm based on adjunctors.
-     *
      * \author Peter Zajac
      */
     class DualIterator
     {
     public:
       /**
-       * \brief Default constructor.
+       * \brief Standard constructor.
        */
       DualIterator();
 
@@ -172,7 +169,8 @@ namespace FEAST
       mutable Iterator2 _end2;
 
     protected:
-      /// constructor for dual_begin()
+      /// \cond internal
+      // constructor for dual_begin()
       DualIterator(
         const Adj1_* adj1,
         const Adj2_* adj2,
@@ -192,7 +190,7 @@ namespace FEAST
         }
       }
 
-      /// constructor for dual_end()
+      // constructor for dual_end()
       DualIterator(
         const Adj1_* adj1,
         Index primal_node)
@@ -205,8 +203,10 @@ namespace FEAST
       {
         CONTEXT("CompositeAdjunctor::DualIterator:DualIterator()");
       }
+      /// \endcond
 
     public:
+      /// \brief Standard constructor
       inline DualIterator() :
         _adj2(nullptr),
         _cur1(),
@@ -216,7 +216,7 @@ namespace FEAST
       {
       }
 
-      /** \copydoc Adjunctor::DualIterator::DualIterator() */
+      /** \copydoc Adjunctor::DualIterator::DualIterator(const DualIterator& other) */
       inline DualIterator(const DualIterator& other) :
         _adj2(other._adj2),
         _cur1(other._cur1),
@@ -280,6 +280,12 @@ namespace FEAST
 
     /**
      * \brief Constructor.
+     *
+     * \param[in] adjunctor1
+     * The first adjunctor for the composition.
+     *
+     * \param[in] adjunctor2
+     * The second adjunctor for the composition.
      */
     inline CompositeAdjunctor(
       const Adj1_& adjunctor1,
@@ -331,7 +337,7 @@ namespace FEAST
     /**
      * \brief Returns the first adjunctor
      * \returns
-     * A reference to the first adjunctor.
+     * A reference to the first adjunctor in the composition.
      */
     inline const Adjunctor1& get_adjunctor1() const
     {
@@ -341,7 +347,7 @@ namespace FEAST
     /**
      * \brief Returns the second adjunctor.
      * \returns
-     * A reference to the second adjunctor.
+     * A reference to the second adjunctor in the composition.
      */
     inline const Adjunctor2& get_adjunctor2() const
     {
