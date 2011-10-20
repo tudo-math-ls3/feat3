@@ -6,7 +6,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 #top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-ADD_LIBRARY(kernel-util STATIC exception.cpp)
+ADD_LIBRARY(kernel-util STATIC exception.cpp logger.cpp)
 
 #list of util tests
 SET (test_list assertion-test inheritance-test pretty_printer-test)

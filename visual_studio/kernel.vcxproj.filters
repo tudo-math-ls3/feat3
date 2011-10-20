@@ -108,9 +108,6 @@
     <ClInclude Include="..\kernel\foundation\load_balancer_dedicated.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\foundation\logger.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\foundation\manager.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
@@ -189,6 +186,9 @@
     <ClInclude Include="..\kernel\foundation\vertex.hpp">
       <Filter>Header Files\foundation\base_mesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\logger.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
@@ -200,14 +200,14 @@
     <ClCompile Include="..\kernel\foundation\constants.cpp">
       <Filter>Source Files\foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\foundation\logger.cpp">
-      <Filter>Source Files\foundation</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\foundation\process.cpp">
       <Filter>Source Files\foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\foundation\cell.cpp">
       <Filter>Source Files\foundation\base_mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\logger.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

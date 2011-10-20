@@ -511,7 +511,6 @@
     <ClInclude Include="..\kernel\foundation\item.hpp" />
     <ClInclude Include="..\kernel\foundation\load_balancer.hpp" />
     <ClInclude Include="..\kernel\foundation\load_balancer_dedicated.hpp" />
-    <ClInclude Include="..\kernel\foundation\logger.hpp" />
     <ClInclude Include="..\kernel\foundation\manager.hpp" />
     <ClInclude Include="..\kernel\foundation\manager_comp.hpp" />
     <ClInclude Include="..\kernel\foundation\manager_comp_coord.hpp" />
@@ -540,6 +539,7 @@
     <ClInclude Include="..\kernel\util\graph.hpp" />
     <ClInclude Include="..\kernel\util\inheritance.hpp" />
     <ClInclude Include="..\kernel\util\instantiation_policy.hpp" />
+    <ClInclude Include="..\kernel\util\logger.hpp" />
     <ClInclude Include="..\kernel\util\mpi_utils.hpp" />
     <ClInclude Include="..\kernel\util\prefix.hpp" />
     <ClInclude Include="..\kernel\util\pretty_printer.hpp" />
@@ -551,9 +551,9 @@
     <ClCompile Include="..\kernel\foundation\cell.cpp" />
     <ClCompile Include="..\kernel\foundation\comm.cpp" />
     <ClCompile Include="..\kernel\foundation\constants.cpp" />
-    <ClCompile Include="..\kernel\foundation\logger.cpp" />
     <ClCompile Include="..\kernel\foundation\process.cpp" />
     <ClCompile Include="..\kernel\util\exception.cpp" />
+    <ClCompile Include="..\kernel\util\logger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
