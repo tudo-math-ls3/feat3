@@ -12,7 +12,6 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
 #ifdef PARALLEL
-#include <kernel/foundation/logger.hpp>
 #include <kernel/foundation/process.hpp>
 #include <kernel/foundation/process_group.hpp>
 

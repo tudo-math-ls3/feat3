@@ -5,11 +5,11 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
-#include <kernel/foundation/logger.hpp>
+#include <kernel/util/logger.hpp>
+#include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
 #ifdef PARALLEL
 #include <kernel/util/mpi_utils.hpp>
-#include <kernel/util/assertion.hpp>
 #include <kernel/foundation/process.hpp>
 #include <kernel/foundation/universe.hpp>
 #endif // PARALLEL

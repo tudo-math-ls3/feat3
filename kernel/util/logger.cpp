@@ -1,4 +1,4 @@
-#include <kernel/foundation/logger.hpp>
+#include <kernel/util/logger.hpp>
 
 namespace FEAST
 {
@@ -9,6 +9,10 @@ namespace FEAST
 #else
 
   std::ofstream Logger::_stream[Logger::max_files];
+
+#ifdef PARALLEL
+  Logger::MasterSender* Logger::_master_sender = nullptr;
+#endif // PARALLEL
 
 #endif
 } // namespace FEAST

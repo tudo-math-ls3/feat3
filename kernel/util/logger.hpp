@@ -4,17 +4,14 @@
  * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
  */
 #pragma once
-#ifndef KERNEL_FOUNDATION_LOGGER_HPP
-#define KERNEL_FOUNDATION_LOGGER_HPP 1
+#ifndef KERNEL_UTIL_LOGGER_HPP
+#define KERNEL_UTIL_LOGGER_HPP 1
 
 // includes, Feast
 #include <kernel/base_header.hpp>
 #include <kernel/util/abort.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/string.hpp>
-#ifdef PARALLEL
-#include <kernel/foundation/comm.hpp>
-#endif
 
 // includes, system
 #include <iostream>
@@ -724,9 +721,48 @@ namespace FEAST
       max_files = 4
     };
 
+#ifdef PARALLEL
+    /**
+     * \brief Master sender interface
+     *
+     * This abstract class acts as an interface for the master sender in a parallel build, which implements
+     * the functionality of sending log messages to the master process.
+     *
+     * \author Peter Zajac
+     */
+    class MasterSender
+    {
+    public:
+      /**
+       * \brief virtual destructor
+       */
+      virtual ~MasterSender()
+      {
+      }
+
+      /**
+       * \brief Sends a message to the master.
+       *
+       * \param[in] message
+       * The message to be sent.
+       *
+       * \param[in] channels
+       * The channels to be logged.
+       */
+      virtual void send(
+        const String& message,
+        Channel channels) = 0;
+    }; // class MasterSender
+#endif // PARALLEL
+
   private:
+
     /// local log file streams
     static std::ofstream _stream[max_files];
+
+#ifdef PARALLEL
+    static MasterSender* _master_sender;
+#endif // PARALLEL
 
   public:
     /**
@@ -734,18 +770,15 @@ namespace FEAST
      *
      * This function opens a local log file, which can then be targeted by the <c>log_channel_<index></c> channel
      * for logging.
-     * \li In a parallel build, each process has its own local log file, whose file name is assembled as
-     * <c><base-name>_<world-rank>.log</c>.
-     * \li In a serial build, the log file name is simply given as <c><base-name>.log</c>.
      *
-     * \param[in] base_name
-     * The base name of the log file name.
+     * \param[in] file_name
+     * The file name of the log file.
      *
      * \param[in] index
      * The index of the log file that is to be opened. Must be in range {0, ..., Logger::max_files - 1}.
      */
     static void open(
-      const String& base_name,
+      const String& file_name,
       int index = 0)
     {
       CONTEXT("Logger::open()");
@@ -758,29 +791,6 @@ namespace FEAST
       {
         abort("Log file stream is already open!");
       }
-
-      // build the file name
-      String file_name(base_name);
-
-#ifdef PARALLEL
-      // count number of decimal digits
-      int num_digits(0);
-      unsigned int i = Process::num_processes;
-      while(i != 0)
-      {
-        ++num_digits;
-        i /= 10;
-      }
-      num_digits = std::max(3, num_digits);
-      // print rank suffix
-      char* tmp = new char[num_digits+3];
-      sprintf(tmp, "_%0*i", num_digits, Process::rank);
-      file_name.append(tmp);
-      delete [] tmp;
-#endif // PARALLEL
-
-      // append file extension
-      file_name.append(".log");
 
       // try to open the desired log file stream
       _stream[index].open(file_name.c_str());
@@ -824,6 +834,13 @@ namespace FEAST
       }
     }
 
+#ifdef PARALLEL
+    static void set_master_sender(MasterSender* master_sender)
+    {
+      _master_sender = master_sender;
+    }
+#endif // PARALLEL
+
     /**
      * \brief Returns a log file channel.
      *
@@ -851,6 +868,50 @@ namespace FEAST
 
       // encode channel
       return (Channel)(1 << (index + (master ? 16 : 0)));
+    }
+
+    /**
+     * \brief Builds a filename.
+     *
+     * This auxiliary function can be used to generate unique file names for log files in a parallel
+     * build.
+     *
+     * \param[in] base_name
+     * The base name of the file name.
+     *
+     * \param[in] rank
+     * The rank of the calling process.
+     *
+     * \param[in] num_ranks
+     * The total number of ranks.
+     *
+     * \returns
+     * The file name of the form <c>\<base-name\>_\<rank\>.log</c> as a String.
+     */
+    static String build_name(
+      const String& base_name,
+      unsigned int rank = 0,
+      unsigned int num_ranks = 0)
+    {
+      String file_name(base_name);
+
+      // count number of decimal digits
+      unsigned int num_digits(0);
+      unsigned int i = num_ranks;
+      while(i != 0)
+      {
+        ++num_digits;
+        i /= 10u;
+      }
+      num_digits = std::max(3u, num_digits);
+      // print rank suffix
+      char* tmp = new char[num_digits+3u];
+      sprintf(tmp, "_%0*i", num_digits, rank);
+      file_name.append(tmp);
+      delete [] tmp;
+
+      file_name.append(".log");
+      return file_name;
     }
 
     /**
@@ -899,27 +960,9 @@ namespace FEAST
       if((channels & master_mask) == none)
         return;
 
-      // <insert-MPI-magic-here>
+      if(_master_sender != nullptr)
+        _master_sender->send(message, channels);
 #endif // PARALLEL
-    }
-
-    /**
-     * \brief recieves a log message and processes it
-     *
-     * This function is called on the master to process log messages which have been sent by the Logger::log() function
-     * on the slave processes.
-     * \note In a serial build this function does nothing.
-     */
-    static void receive()
-    {
-      // Peter: In the log() function above one should send the channels parameter via MPI to the master.
-      // After reading the data from the MPI buffer, one can simply perform a right shift of the channel by
-      // 16 bits to translate a master_* channel to the corresponding local_* channel and, unless another approach
-      // seems more feasible, call the log() function with the shifted channel mask to let the master log into its
-      // own local files and/or stdout.
-#ifdef PARALLEL
-      // <insert-MPI-magic-here>
-#endif
     }
 
     /**
@@ -964,4 +1007,4 @@ namespace FEAST
 #endif // OLD_LOGGER
 } // namespace FEAST
 
-#endif // KERNEL_FOUNDATION_LOGGER_HPP
+#endif // KERNEL_UTIL_LOGGER_HPP

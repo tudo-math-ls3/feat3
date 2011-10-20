@@ -13,7 +13,7 @@
 #ifdef PARALLEL
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/graph.hpp>
-#include <kernel/foundation/logger.hpp>
+#include <kernel/util/logger.hpp>
 #include <kernel/foundation/process.hpp>
 
 // includes, system

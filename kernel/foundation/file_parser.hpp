@@ -13,7 +13,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/file_reader_ascii.hpp>
-#include <kernel/foundation/logger.hpp>
+#include <kernel/util/logger.hpp>
 
 #include <kernel/foundation/cell_3d_hexa.hpp>
 #include <kernel/foundation/bm.hpp>

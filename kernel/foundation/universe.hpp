@@ -225,7 +225,11 @@ namespace FEAST
       Process::is_master = (Process::rank == Process::rank_master);
 
       // open local log file 0
-      Logger::open(_logfile_base_name, 0);
+      String log_file_name = Logger::build_name(_logfile_base_name, (unsigned int)my_rank, _num_processes);
+      Logger::open(log_file_name, 0);
+
+      /// \todo Create an instance of a class implementing the Logger::MasterSender interface and call
+      /// Logger::set_master_sender(\<object\>) to enable master logging.
 
       // calculate the number of processes needed; and check whether there are enough MPI processes available:
       unsigned int num_processes_needed;

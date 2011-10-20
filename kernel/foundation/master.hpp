@@ -24,7 +24,6 @@
 #include <kernel/foundation/comm.hpp>
 #include <kernel/foundation/service_ids.hpp>
 #include <kernel/foundation/process_group.hpp>
-#include <kernel/foundation/logger.hpp>
 
 // includes, system
 #include <iostream>
@@ -116,7 +115,7 @@ namespace FEAST
         {
           case(ServiceIDs::LOG_RECEIVE):
           {
-            Logger::receive();
+            //Logger::receive();
             break;
           }
           /*case(ServiceIDs::LOG_RECEIVE_ARRAY):
