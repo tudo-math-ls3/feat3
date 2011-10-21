@@ -5,6 +5,7 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
+using namespace FEAST::GeometrY::Shape;
 
 /**
  * \brief Test class for the Shape and FaceTraits class templates.

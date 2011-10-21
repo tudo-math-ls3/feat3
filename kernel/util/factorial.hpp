@@ -22,6 +22,8 @@ namespace FEAST
     static_assert(m_ >= 0, "parameter m_ must be non-negative");
     // Ensure that n_ >= m_. The case m_ = n_ is handled by partial specialisation below.
     static_assert(n_ > m_, "parameter m_ must not be greater than parameter n_");
+
+    /// dummy enumeration
     enum
     {
       /// value of the factorial
@@ -67,6 +69,8 @@ namespace FEAST
     // note: the valid cases k_ = 0 and k_ = n_ are specialised below
     static_assert(k_ > 0, "parameter k_ must be non-negative");
     static_assert(n_ > k_, "parameter k_ must not be greater than parameter n_");
+
+    /// dummy enumeration
     enum
     {
       // (n,k) = (n-1,k-1) + (n-1, k)
