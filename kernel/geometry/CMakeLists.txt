@@ -1,22 +1,18 @@
 cmake_minimum_required (VERSION 2.8)
 
-#enable compiler output
+# enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-#top lvl include dir
+# top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-ADD_SUBDIRECTORY( util )
-ADD_SUBDIRECTORY( geometry )
-ADD_SUBDIRECTORY( foundation )
+ADD_LIBRARY(kernel-geometry STATIC)
+TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
 
-ADD_LIBRARY(feast STATIC)
-TARGET_LINK_LIBRARIES (feast kernel-util kernel-geometry kernel-foundation)
-
-#list of kernel tests
+# list of util tests
 SET (test_list)
 
-#create all tests
+# create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feast test_system)
@@ -28,13 +24,14 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/${test}" Nil)
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/util/${test}" Nil)
   SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
   SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
   SET_PROPERTY(TEST ${test}_nil PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ENDFOREACH(test)
 
-#add all tests to kernel_tests
-ADD_CUSTOM_TARGET(kernel_tests DEPENDS ${test_list})
-#build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests kernel_tests)
+# add all tests to util_tests
+ADD_CUSTOM_TARGET(geometry_tests DEPENDS ${test_list})
+
+# build all tests through top lvl target tests
+ADD_DEPENDENCIES(tests geometry_tests)

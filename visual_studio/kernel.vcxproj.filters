@@ -27,6 +27,12 @@
     <Filter Include="Source Files\foundation\base_mesh">
       <UniqueIdentifier>{8328183f-1fbb-4af5-b8f0-43910a7b4bb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\geometry">
+      <UniqueIdentifier>{afa0f642-9c74-4cd2-8b23-ee88d771792b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\geometry">
+      <UniqueIdentifier>{3b03ffb2-b0f2-4738-8adb-b4e0ebd0d74e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
@@ -187,6 +193,15 @@
       <Filter>Header Files\foundation\base_mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\util\logger.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\mesh_unstructured.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\shape.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\factorial.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
