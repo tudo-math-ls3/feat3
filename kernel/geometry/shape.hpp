@@ -95,7 +95,7 @@ namespace FEAST
          * For an <em>n</em>-Simplex, the number of <em>m</em>-faces is given by
          * \f[ {n+1\choose m+1} \f]
          */
-        count = Binomial<cell_dim_+1, face_dim_+1>::value;
+        count = Binomial<cell_dim_+1, face_dim_+1>::value
       };
     }; // struct FaceTraits<Simplex>
 
@@ -107,7 +107,7 @@ namespace FEAST
     template<
       int cell_dim_,
       int face_dim_>
-    struct FaceTraits<Hypercube<cell_dim_>, face_dim>
+    struct FaceTraits<Hypercube<cell_dim_>, face_dim_>
     {
       static_assert(face_dim_ > 0, "parameter face_dim_ must be greater than 0");
       static_assert(cell_dim_ >= face_dim_, "face_dim_ must not be greater than cell_dim_");
@@ -123,7 +123,7 @@ namespace FEAST
          * For an <em>n</em>-Hypercube, the number of <em>m</em>-faces is given by
          * \f[ 2^{(n-m)}\cdot {n\choose m} \f]
          */
-        count = (1 << (cell_dim_ - face_dim_)) * Binomial<cell_dim_,face_dim_>::value;
+        count = (1 << (cell_dim_ - face_dim_)) * Binomial<cell_dim_,face_dim_>::value
       };
     }; // struct FaceTraits<Hypercube>
 

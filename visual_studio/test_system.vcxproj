@@ -427,12 +427,14 @@
     <ClCompile Include="..\kernel\foundation\cell_1d_edge-test_subdivision.cpp" />
     <ClCompile Include="..\kernel\foundation\cell_2d_quad-test_subdivision.cpp" />
     <ClCompile Include="..\kernel\foundation\cell_3d_hexa-test_subdivision.cpp" />
-    <ClCompile Include="..\kernel\foundation\logger-test.cpp" />
     <ClCompile Include="..\kernel\foundation\work_group-test_1d.cpp" />
     <ClCompile Include="..\kernel\foundation\work_group-test_2d_1.cpp" />
     <ClCompile Include="..\kernel\foundation\work_group-test_2d_2.cpp" />
+    <ClCompile Include="..\kernel\geometry\shape-test.cpp" />
     <ClCompile Include="..\kernel\util\assertion-test.cpp" />
+    <ClCompile Include="..\kernel\util\factorial-test.cpp" />
     <ClCompile Include="..\kernel\util\inheritance-test.cpp" />
+    <ClCompile Include="..\kernel\util\logger-test.cpp" />
     <ClCompile Include="..\kernel\util\pretty_printer-test.cpp" />
     <ClCompile Include="..\test_system\test_system-test.cpp" />
     <ClCompile Include="..\test_system\test_system.cpp" />

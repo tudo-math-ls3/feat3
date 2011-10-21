@@ -10,24 +10,15 @@ using namespace FEAST::TestSystem;
  *
  * \test Tests the Factorial class template.
  *
- * \tparam Tag_
- * unused tag class
- *
- * \tparam DT_
- * unused data type class
- *
  * \author Peter Zajac
  */
-template<
-  typename Tag_,
-  typename DT_>
 class FactorialTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Nil, Nil>
 {
 public:
 
   FactorialTest() :
-    TaggedTest<Tag_, DT_>("factorial_test")
+    TaggedTest<Nil, Nil>("factorial_test")
   {
   }
 
@@ -54,34 +45,22 @@ public:
     int fact_7_5 = Factorial<7,5>::value;
     TEST_CHECK_EQUAL(fact_7_5, 210);
   }
-};
-
-FactorialTest<Nil, Nil> factorial_test;
-
+} factorial_test;
 
 /**
  * \brief Test class for the Binomial class template.
  *
  * \test Tests the Binomial class template.
  *
- * \tparam Tag_
- * unused tag class
- *
- * \tparam DT_
- * unused data type class
- *
  * \author Peter Zajac
  */
-template<
-  typename Tag_,
-  typename DT_>
 class BinomialTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Nil, Nil>
 {
 public:
 
   BinomialTest() :
-    TaggedTest<Tag_, DT_>("binomial_test")
+    TaggedTest<Nil, Nil>("binomial_test")
   {
   }
 
@@ -107,6 +86,4 @@ public:
     int bin_49_6 = Binomial<49, 6>::value;
     TEST_CHECK_EQUAL(bin_49_6, 13983816);
   }
-};
-
-BinomialTest<Nil, Nil> binomial_test;
+} binomial_test;
