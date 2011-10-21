@@ -142,7 +142,7 @@ namespace FEAST
         enum
         {
           /** \brief Number of vertices per cell */
-          count = Simplex<cell_dim_>::num_verts;
+          count = Simplex<cell_dim_>::num_verts
         };
       }; // struct FaceTraits<Simplex<...>, 0>
 
@@ -192,7 +192,7 @@ namespace FEAST
         enum
         {
           /** \brief Number of vertices per cell */
-          count = Hypercube<cell_dim_>::num_verts;
+          count = Hypercube<cell_dim_>::num_verts
         };
       }; // struct FaceTraits<HyperCube<...>, 0>
     } // namespace Shape
