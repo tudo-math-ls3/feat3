@@ -761,6 +761,7 @@ namespace FEAST
     static std::ofstream _stream[max_files];
 
 #ifdef PARALLEL
+    /// master sender object pointer
     static MasterSender* _master_sender;
 #endif // PARALLEL
 
@@ -835,6 +836,12 @@ namespace FEAST
     }
 
 #ifdef PARALLEL
+    /**
+     * \brief Sets the MasterSender object.
+     *
+     * \param[in] master_sender
+     * A pointer to a class implementing the MasterSender interface.
+     */
     static void set_master_sender(MasterSender* master_sender)
     {
       _master_sender = master_sender;
