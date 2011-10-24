@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 ADD_LIBRARY(kernel-util STATIC exception.cpp logger.cpp)
 
 #list of util tests
-SET (test_list assertion-test factorial-test inheritance-test logger-test pretty_printer-test)
+SET (test_list assertion-test factorial-test graph-test inheritance-test logger-test pretty_printer-test)
 
 #create all tests
 FOREACH (test ${test_list} )
