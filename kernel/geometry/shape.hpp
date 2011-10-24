@@ -25,7 +25,6 @@ namespace FEAST
        */
       struct Vertex
       {
-
         /// dummy enumeration
         enum
         {
@@ -53,6 +52,23 @@ namespace FEAST
           /// number of vertices per cell
           num_verts = dimension_+1
         };
+
+        /**
+         * \brief Returns the number of faces.
+         *
+         * \param[in] face_dim
+         * The dimension of the faces whose count is to be returned.
+         *
+         * \returns
+         * The number of faces of dimension \p face_dim per simplex.
+         */
+        static inline int num_faces(int face_dim)
+        {
+          CONTEXT("Simplex::num_faces()");
+          ASSERT(face_dim <= dimension, "invalid face_dim parameter");
+          ASSERT(face_dim >= 0, "invalid face_dim parameter");
+          return int(binomial(dimension+1, face_dim+1));
+        }
       }; // class Simplex
 
       /**
@@ -74,6 +90,23 @@ namespace FEAST
           /// number of vertices per cell
           num_verts = (1 << dimension_) // = 2^n
         };
+
+        /**
+         * \brief Returns the number of faces.
+         *
+         * \param[in] face_dim
+         * The dimension of the faces whose count is to be returned.
+         *
+         * \returns
+         * The number of faces of dimension \p face_dim per hypercube.
+         */
+        static inline int num_faces(int face_dim)
+        {
+          CONTEXT("Hypercube::num_faces()");
+          ASSERT(face_dim <= dimension, "invalid face_dim parameter");
+          ASSERT(face_dim >= 0, "invalid face_dim parameter");
+          return (1 << (dimension - face_dim)) * int(binomial(dimension, face_dim));
+        }
       }; // struct Hypercube
 
       /// 2-Simplex: Triangle
