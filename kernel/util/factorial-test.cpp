@@ -32,18 +32,22 @@ public:
     // 0! = 1 (by definition)
     int fact_0_0 = Factorial<0>::value;
     TEST_CHECK_EQUAL(fact_0_0, 1);
+    TEST_CHECK_EQUAL(factorial(0), 1ull);
 
     // 1! = 1
     int fact_1_0 = Factorial<1,0>::value;
     TEST_CHECK_EQUAL(fact_1_0, 1);
+    TEST_CHECK_EQUAL(factorial(1,0), 1ull);
 
     // 5! = 120
     int fact_5 = Factorial<5>::value;
     TEST_CHECK_EQUAL(fact_5, 120);
+    TEST_CHECK_EQUAL(factorial(5), 120ull);
 
     // 5*6*7 = 210
     int fact_7_5 = Factorial<7,5>::value;
     TEST_CHECK_EQUAL(fact_7_5, 210);
+    TEST_CHECK_EQUAL(factorial(7,5), 210ull);
   }
 } factorial_test;
 
@@ -73,17 +77,22 @@ public:
 
     int bin_0_0 = Binomial<0, 0>::value;
     TEST_CHECK_EQUAL(bin_0_0, 1);
+    TEST_CHECK_EQUAL(binomial(0,0), 1ull);
 
     int bin_3_0 = Binomial<3, 0>::value;
     TEST_CHECK_EQUAL(bin_3_0, 1);
+    TEST_CHECK_EQUAL(binomial(3,0), 1ull);
 
     int bin_3_3 = Binomial<3, 3>::value;
     TEST_CHECK_EQUAL(bin_3_3, 1);
+    TEST_CHECK_EQUAL(binomial(3,3), 1ull);
 
     int bin_5_2 = Binomial<5, 2>::value;
     TEST_CHECK_EQUAL(bin_5_2, 10);
+    TEST_CHECK_EQUAL(binomial(5,2), 10ull);
 
     int bin_49_6 = Binomial<49, 6>::value;
     TEST_CHECK_EQUAL(bin_49_6, 13983816);
+    TEST_CHECK_EQUAL(binomial(49,6), 13983816ull);
   }
 } binomial_test;

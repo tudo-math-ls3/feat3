@@ -2,7 +2,7 @@
 #ifndef KERNEL_UTIL_FACTORIAL_HPP
 #define KERNEL_UTIL_FACTORIAL_HPP 1
 
-#include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 
 namespace FEAST
 {
@@ -53,6 +53,45 @@ namespace FEAST
     };
   }; // struct Factorial<0,0>
   /// \endcond
+
+  /**
+   * \brief Calculates the (partial) factorial.
+   *
+   * This function calculates the coefficient
+   * \f[ f(n,m) := \prod_{k=m}^n k \f]
+   * The factorial <em>n!</em> is given by <em>f(n,0)</em>.
+   *
+   * \param[in] n, m
+   * The coefficients for the (partial) factorial. It must hold \e m <= \e n <= 20.
+   *
+   * \warning
+   * The parameter \e n must not be greater than 20, since for \e n > 20 the resulting factorial \e n! is greater
+   * than 2^64, thus leading to integer overflow!
+   *
+   * \returns
+   * The partial factorial from \e m to \e n.
+   */
+  inline unsigned long long factorial(
+    unsigned long long n,
+    unsigned long long m = 0ull)
+  {
+    CONTEXT("factorial()");
+
+    // n > 20 ==> n! > 2^64 ==> integer overflow!
+    ASSERT(n <= 20, "parameter n must be less than 21");
+    ASSERT(m <= n, "parameter m must not be greater than n");
+
+    if(n <= 1ull)
+      return 1ull;
+
+    // calculate the factorial
+    unsigned long long k = 1ull;
+    for(m = std::max(1ull, m); m <= n; ++m)
+    {
+      k *= m;
+    }
+    return k;
+  }
 
   /**
    * \brief Binomial template meta-program
@@ -112,6 +151,44 @@ namespace FEAST
   };
   /// \endcond
 
+  /**
+   * \brief Calculates the binomial coefficient.
+   *
+   * This function calculates the binomial coefficient
+   * \f[ {n \choose k} := \frac{n!}{k!(n-k)!} \f]
+   *
+   * \param[in] n,k
+   * The parameters for the binomial coefficient.
+   *
+   * \returns
+   * The binomial coefficient <em>n choose k</em>.
+   */
+  inline unsigned long long binomial(
+    unsigned long long n,
+    unsigned long long k)
+  {
+    if(k > n)
+    {
+      return 0; // by definition
+    }
+    else if((k == 0ull) || (k == n))
+    {
+      return 1; // by definition
+    }
+
+    // exploit symmetry: (n \choose k) = (n \choose n-k)
+    k = std::min(k, n-k);
+
+    // use multiplicative formula: (n \choose k+1) = (n - k) * (n \choose k) / (k + 1)
+    unsigned long long m = n;
+    for(unsigned long long i(1); i < k; ++i)
+    {
+      m *= (n - i);
+      m /= (i + 1);
+    }
+
+    return m;
+  }
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_FACTORIAL_HPP
