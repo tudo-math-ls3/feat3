@@ -65,14 +65,14 @@ check_tab() {
 check_file() {
 	case "$1" in
 		*.c)		check_tab "$1" ;;
-		*.h)		check_tab "$1" ;;
-		*.cxx)		check_tab "$1" ;;
-		*.txx)		check_tab "$1" ;;
-		*.hxx)		check_tab "$1" ;;
-		*.htm)		check_tab "$1" ;;
-		*.html)		check_tab "$1" ;;
-		*.txt)		check_tab "$1" ;;
 		*.cmake)	check_tab "$1" ;;
+		*.cpp)		check_tab "$1" ;;
+		*.cxx)		check_tab "$1" ;;
+		*.h)		check_tab "$1" ;;
+		*.hpp)		check_tab "$1" ;;
+		*.hxx)		check_tab "$1" ;;
+		*.txt)		check_tab "$1" ;;
+		*.txx)		check_tab "$1" ;;
 	esac
 }
 bad=$(git diff-index --name-only --cached $against -- |
