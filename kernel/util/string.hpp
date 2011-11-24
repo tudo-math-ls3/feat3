@@ -81,16 +81,22 @@ namespace FEAST
 
       // remove trailing chars
       size_type pos = find_last_not_of(charset);
-      if(pos != npos)
+      if(pos == npos)
       {
-        erase(pos+1, npos);
+        // the whole string consists only of characters to be trimmed, so clear the whole string
+        clear();
       }
-
-      // remove leading chars
-      pos = find_first_not_of(charset);
-      if(pos != npos)
+      else
       {
-        erase(0, pos);
+        // remove trailing chars
+        erase(pos+1, npos);
+
+        // remove leading chars
+        pos = find_first_not_of(charset);
+        if(pos > 0)
+        {
+          erase(0, pos);
+        }
       }
 
       return *this;
