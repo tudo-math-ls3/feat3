@@ -51,9 +51,12 @@ doc/*
 # Ignore Visual Studio output files
 lib/*
 obj/*
+win/*
 
 # Ignore Visual Studio solution files
 visual_studio/*.opensdf
 visual_studio/*.sdf
 visual_studio/*.suo
-visual_studio/*.sln
+
+# Ignore Windows Links
+*.lnk
