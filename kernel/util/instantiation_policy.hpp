@@ -123,8 +123,20 @@ namespace FEAST
     /// Returns a pointer to our instance pointer.
     static T_ * * _instance_ptr()
     {
+      // The Microsoft compiler warns that creating a local static object is not thread-safe.
+      // The corresponding warning is enabled by default, so we'll only disable it for the following
+      // code and restore the warning state afterwards.
+#ifdef FEAST_COMPILER_MICROSOFT
+#  pragma warning(push)
+#  pragma warning(disable: 4640)
+#endif
+
       static T_ * instance(nullptr);
       static DeleteOnDestruction delete_instance(&instance);
+
+#ifdef FEAST_COMPILER_MICROSOFT
+#  pragma warning(pop)
+#endif
 
       return &instance;
     }
