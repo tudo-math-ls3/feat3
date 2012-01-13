@@ -97,32 +97,94 @@ namespace FEAST
     return _what_str.c_str();
   }
 
+#if !defined(FEAST_NO_CONTEXT) || defined(FEAST_TRACE_CONTEXT)
 
-#ifndef FEAST_NO_CONTEXT
+#  ifdef FEAST_TRACE_CONTEXT
+  // the prefix is initially empty
+  String Context::_prefix("");
+
+  // by default, disable context livetracting
+  bool Context::live_trace(false);
+#  endif // defined(FEAST_TRACE_CONTEXT)
+
+  // by default, disable file names and line numbers
+  bool Context::file_line(false);
+
   Context::Context(const char * const file, const long line, const String & context)
   {
-    if (! context_stack)
+    // format the trace message
+    String msg;
+    if(file_line)
     {
-      context_stack = new std::list<String>;
+      msg = String(file) + "[" + stringify(line) + "]: " + context;
+    }
+    else
+    {
+      msg = context;
     }
 
-    context_stack->push_back(context + " (" + stringify(file) + ":" + stringify(line) +")");
-  }
+#  ifndef FEAST_NO_CONTEXT
+    {
+      // create a context stack if we don't already have one
+      if(context_stack == nullptr)
+      {
+        context_stack = new std::list<String>;
+      }
+
+      // push the context onto the stack
+      context_stack->push_back(msg);
+    }
+#  endif // !defined(FEAST_NO_CONTEXT)
+
+#  ifdef FEAST_TRACE_CONTEXT
+    {
+      // increment prefix
+      _prefix.push_back('*');
+
+      // trace context
+      if(live_trace)
+      {
+        std::clog << _prefix << " " << msg << std::endl;
+      }
+    }
+#  endif // defined(FEAST_TRACE_CONTEXT)
+  } // Context::Context()
 
   Context::~Context()
   {
-    if (! context_stack)
-      throw InternalError("no context!");
-
-    context_stack->pop_back();
-
-    if (context_stack->empty())
+#  ifndef FEAST_NO_CONTEXT
     {
-      delete context_stack;
-      context_stack = 0;
-    }
-  }
+      // ensure that we have a context stack
+      if (context_stack == nullptr)
+        throw InternalError("no context!");
 
+      // remove the last context from the stack
+      context_stack->pop_back();
+
+      // and delete the stack if its empty
+      if (context_stack->empty())
+      {
+        delete context_stack;
+        context_stack = nullptr;
+      }
+    }
+#  endif // !defined(FEAST_NO_CONTEXT)
+
+#  ifdef FEAST_TRACE_CONTEXT
+    {
+      // decrement prefix
+      // Note: In C++03, the std::string has a push_back function but misses a pop_back function,
+      // so we'll use erase() here.
+      if(!_prefix.empty())
+      {
+        _prefix.erase(_prefix.size() - 1);
+      }
+    }
+#  endif // defined(FEAST_TRACE_CONTEXT)
+  } // Context::~Context()
+
+
+#  ifndef FEAST_NO_CONTEXT
   String Context::backtrace(const String & delimiter)
   {
     if (! context_stack)
@@ -131,5 +193,7 @@ namespace FEAST
     String str;
     return str.join(context_stack->begin(), context_stack->end(), delimiter);
   }
-#endif // FEAST_NO_CONTEXT
+#  endif // !defined(FEAST_NO_CONTEXT)
+#endif // !defined(FEAST_NO_CONTEXT) || defined(FEAST_TRACE_CONTEXT)
+
 } // namespace FEAST

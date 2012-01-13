@@ -2,6 +2,9 @@
 #ifndef KERNEL_UTIL_EXCEPTION_HPP
 #define KERNEL_UTIL_EXCEPTION_HPP 1
 
+// The following line is necessary - otherwise doxygen won't document the #define's in this file.
+/** \file */
+
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/instantiation_policy.hpp>
@@ -95,15 +98,30 @@ namespace FEAST
     }
   };
 
-#ifndef FEAST_NO_CONTEXT
+#if !defined(FEAST_NO_CONTEXT) || defined(FEAST_TRACE_CONTEXT)
   /**
   * \brief Backtrace class context.
   *
   * \author Dirk Ribbrock
+  * \author Peter Zajac
   */
   class Context
     : public InstantiationPolicy<Context, NonCopyable>
   {
+#  ifdef FEAST_TRACE_CONTEXT
+  private:
+    /// context livetrace prefix string
+    static String _prefix;
+
+  public:
+    /// specifies whether context live-tracing is enabled
+    static bool live_trace;
+#  endif // defined(FEAST_TRACE_CONTEXT)
+
+  public:
+    /// specifies whether to print file names and line numbers
+    static bool file_line;
+
   public:
     /**
     * \brief Constructor.
@@ -120,6 +138,7 @@ namespace FEAST
     /// DTOR
     ~Context();
 
+#  ifndef FEAST_NO_CONTEXT
     /**
     * \brief Current context
     *
@@ -127,31 +146,47 @@ namespace FEAST
     * A delimiter added between to context strings
     */
     static String backtrace(const String & delimiter);
-  };
-#endif // FEAST_NO_CONTEXT
+#endif // !defined(FEAST_NO_CONTEXT)
+  }; // class Context
+#endif // !defined(FEAST_NO_CONTEXT) || defined(FEAST_TRACE_CONTEXT)
 
-  /**
-  * \def CONTEXT
-  *
-  * \brief Convenience definition that provides a way to declare uniquely-named instances of class Context.
-  *
-  * The created Context will be automatically provided with the correct filename and line number.
-  *
-  * \param s
-  * Context message that can be display by an exception-triggered backtrace.
-  *
-  * \warning Will only be compiled in when debug support is enabled.
-  */
-#if defined (DEBUG) && !defined(FEAST_NO_CONTEXT)
+/**
+ * \def CONTEXT
+ * \brief Convenience definition that provides a way to declare uniquely-named instances of class Context.
+ *
+ * \param msg
+ * Context message that is to be displayed by an exception-triggered backtrace or during livetracing.
+ */
+/**
+ * \def CONTEXT_FILE_LINE
+ * \brief Enables or disables decoration of context strings with file names and line numbers.
+ *
+ * \param enable
+ * Specifies whether to enable (\c true) or disable (\c false) file name and line number decoration.
+ */
+#if (defined (DEBUG) && !defined(FEAST_NO_CONTEXT)) || defined(FEAST_TRACE_CONTEXT)
   // C preprocessor abomination following...
-#define CONTEXT_NAME_(x) ctx_##x
-#define CONTEXT_NAME(x) CONTEXT_NAME_(x)
-#define CONTEXT(s) \
-  Context CONTEXT_NAME(__LINE__)(__FILE__, __LINE__, (s))
+#  define CONTEXT_NAME_(x) ctx_##x
+#  define CONTEXT_NAME(x) CONTEXT_NAME_(x)
+#  define CONTEXT(msg) Context CONTEXT_NAME(__LINE__)(__FILE__, __LINE__, (msg))
+#  define CONTEXT_FILE_LINE(enable) Context::file_line = (enable)
 #else
-#define CONTEXT(s)
-#endif
+#  define CONTEXT(msg)
+#  define CONTEXT_FILE_LINE(enable)
+#endif // (defined (DEBUG) && !defined(FEAST_NO_CONTEXT)) || defined(FEAST_TRACE_CONTEXT)
 
+/**
+ * \def CONTEXT_LIVE_TRACE
+ * \brief Enables or disables context livetracing.
+ *
+ * \param enable
+ * Specifies whether to enable (\c true) or disable (\c false) context livetracing.
+ */
+#ifdef FEAST_TRACE_CONTEXT
+#  define CONTEXT_LIVE_TRACE(enable) Context::live_trace = (enable)
+#else
+#  define CONTEXT_LIVE_TRACE(enable)
+#endif // defined(FEAST_TRACE_CONTEXT)
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_EXCEPTION_HPP
