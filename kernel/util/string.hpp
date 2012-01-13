@@ -28,6 +28,37 @@ namespace FEAST
     : virtual public std::string
   {
   public:
+    /**
+     * \brief A class implementing case-insensitive String comparison.
+     *
+     * \details
+     * This class implements an STL-conforming function object for case-insensitive comparison of Strings
+     * which can be used in associative containers as e.g. \c std::map or \c std::set.
+     *
+     * \author Peter Zajac
+     */
+    class NoCaseLess
+      : public std::binary_function<String, String, bool>
+    {
+    public:
+      /**
+       * \brief Compares two Strings without regard to case.
+       *
+       * \param[in] left, right
+       * The two Strings which are to be compared.
+       *
+       * \returns
+       * \c true, if \p left is less than \p right without regard to case, otherwise \c false.
+       *
+       * \sa String::compare_no_case()
+       */
+      bool operator()(const String& left, const String& right) const
+      {
+        return left.compare_no_case(right) < 0;
+      }
+    }; // class NoCaseLess
+
+  public:
     /// default constructor
     inline String()
       : std::string()
