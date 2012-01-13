@@ -10,6 +10,8 @@ namespace FEAST
   /**
    * \brief Index table implementation
    *
+   * \todo detailed description
+   *
    * \author Peter Zajac
    */
   class IndexTable
@@ -88,16 +90,16 @@ namespace FEAST
     }
 
     /**
-     * \brief Returns a table index.
+     * \brief Returns a table entry.
      *
      * \param[in] row
-     * The row index of the table index.
+     * The row index of the table entry.
      *
      * \param[in] col
-     * The column index of the table index.
+     * The column index of the table entry.
      *
      * \returns
-     * A reference to the table index.
+     * A reference to the table entry.
      */
     inline Index& at(
       Index row,
