@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 /* ************************************************************************************* */
 /*   -  S E R I A L   T E S T   D R I V E R  *  S E R I A L   T E S T   D R I V E R   -  */
 /* ************************************************************************************* */
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
   int result(EXIT_SUCCESS);
 
@@ -114,6 +114,13 @@ int main(int argc, char** argv)
 
   TestList::Iterator it(TestList::instance()->begin_tests());
   TestList::Iterator jt(TestList::instance()->end_tests());
+
+  // Check whether the test list is empty; this might happen if a test can only run in parallel mode.
+  if(it == jt)
+  {
+    std::cout << "PASSED" << std::endl;
+    return result;
+  }
 
   while(it != jt)
   {

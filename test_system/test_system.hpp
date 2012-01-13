@@ -389,17 +389,17 @@ namespace FEAST
   do { \
     try { \
       BaseTest::TwoVarHolder test_h(a, b); \
-      this->check(THIS_FUNCTION, __FILE__, __LINE__, test_h.result, \
+      this->check(__func__, __FILE__, __LINE__, test_h.result, \
           this->_id + "\n" +  "Expected '" #a "' to equal \n'" + test_h.s_b + \
           "'\nbut got\n'" + test_h.s_a + "'"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_EQUAL block"); \
     } catch (...) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_EQUAL block"); \
     } \
   } while (false)
@@ -409,17 +409,17 @@ namespace FEAST
   do { \
     try { \
       BaseTest::TwoVarHolder2 test_h(a, b); \
-      this->check(THIS_FUNCTION, __FILE__, __LINE__, !test_h.result, \
+      this->check(__func__, __FILE__, __LINE__, !test_h.result, \
           this->_id + "\n" +  "Expected '" #a "' that is'" + test_h.s_a + \
           "' to equal not '" + test_h.s_b + "'"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_NOT_EQUAL block"); \
     } catch (...) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_NOT_EQUAL block"); \
     } \
   } while (false)
@@ -430,17 +430,17 @@ namespace FEAST
     try { \
       String s_a(FEAST::stringify(a)); \
       String s_b(FEAST::stringify(b)); \
-      this->check(THIS_FUNCTION, __FILE__, __LINE__, s_a == s_b, \
+      this->check(__func__, __FILE__, __LINE__, s_a == s_b, \
           this->_id + "\n" +  "Expected '" #a "' to equal '" + s_b + \
           "'\nbut got\n'" + s_a + "'"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_STRINGIFY_EQUAL block"); \
     } catch (...) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_STRINGIFY_EQUAL block"); \
     } \
   } while (false)
@@ -449,16 +449,34 @@ namespace FEAST
 #define TEST_CHECK(a) \
   do { \
     try { \
-      this->check(THIS_FUNCTION, __FILE__, __LINE__, a, \
+      this->check(__func__, __FILE__, __LINE__, a, \
           this->_id + "\n" +  "Check '" #a "' failed"); \
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK block"); \
     } catch (...) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
+          "Test threw unexpected unknown exception inside a TEST_CHECK block"); \
+    } \
+  } while (false)
+
+/// checks if \c a is true; prints \c msg if \c a is false
+#define TEST_CHECK_MSG(a,msg) \
+  do { \
+    try { \
+      this->check(__func__, __FILE__, __LINE__, a, \
+          this->_id + "\n" + (msg)); \
+    } catch (const TestFailedException &) { \
+      throw; \
+    } catch (const std::exception & test_e) { \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
+          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
+          " inside a TEST_CHECK block"); \
+    } catch (...) { \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK block"); \
     } \
   } while (false)
@@ -469,7 +487,7 @@ namespace FEAST
     try { \
       try { \
         a; \
-        this->check(THIS_FUNCTION, __FILE__, __LINE__, false, \
+        this->check(__func__, __FILE__, __LINE__, false, \
             this->_id + "\n" +  "Expected exception of type '" #b "' not thrown"); \
       } catch (b &) { \
         TEST_CHECK(true); \
@@ -477,11 +495,11 @@ namespace FEAST
     } catch (const TestFailedException &) { \
       throw; \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_THROWS block"); \
     } catch (...) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_THROWS block"); \
     } \
   } while (false)
@@ -491,17 +509,17 @@ namespace FEAST
   do { \
     try { \
       BaseTest::WithinEpsCalculator calc(a, b, eps); \
-      this->check(THIS_FUNCTION, __FILE__, __LINE__, calc.result,  \
+      this->check(__func__, __FILE__, __LINE__, calc.result,  \
           this->_id + "\n" + "Expected '|" #a " - " #b \
           "|' < '" + FEAST::stringify(eps) + "' but was '" + calc.s_diff +"'"); \
     } catch (const TestFailedException &) { \
       throw;  \
     } catch (const std::exception & test_e) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
           " inside a TEST_CHECK_EQUAL_WITHIN_EPS block"); \
     } catch (...) { \
-      throw TestFailedException(THIS_FUNCTION, __FILE__, __LINE__, \
+      throw TestFailedException(__func__, __FILE__, __LINE__, \
           "Test threw unexpected unknown exception inside a TEST_CHECK_EQUAL_WITHIN_EPS block"); \
     } \
   } while (false)
