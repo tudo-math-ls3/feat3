@@ -209,8 +209,8 @@ public:
     CONTEXT("LoggerTest::run()");
 
     // open two log files
-    Logger::open("./logger_test_0", 0);
-    Logger::open("./logger_test_1", 1);
+    Logger::open("./logger_test_0.log", 0);
+    Logger::open("./logger_test_1.log", 1);
 
     // print something
     Logger::log("This should appear on the screen and nowhere else\n", Logger::screen);
