@@ -84,7 +84,7 @@ namespace FEAST
 #  define ASSERT(expr, msg) \
     do { \
         if (! (expr)) \
-            throw FEAST::Assertion(THIS_FUNCTION, __FILE__, __LINE__, msg); \
+            throw FEAST::Assertion(__func__, __FILE__, __LINE__, msg); \
     } while (false)
 #  define ASSERT_(expr) ASSERT(expr, #expr)
 #else
