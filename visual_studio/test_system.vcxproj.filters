@@ -73,5 +73,8 @@
     <ClCompile Include="..\kernel\geometry\shape-test.cpp">
       <Filter>Source Files %28kernel%29\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\util\graph-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

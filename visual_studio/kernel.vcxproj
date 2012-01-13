@@ -525,10 +525,9 @@
     <ClInclude Include="..\kernel\foundation\vertex.hpp" />
     <ClInclude Include="..\kernel\foundation\work_group.hpp" />
     <ClInclude Include="..\kernel\foundation\work_group_ext.hpp" />
-    <ClInclude Include="..\kernel\geometry\mesh_unstructured.hpp" />
     <ClInclude Include="..\kernel\geometry\shape.hpp" />
     <ClInclude Include="..\kernel\util\abort.hpp" />
-    <ClInclude Include="..\kernel\util\adjunctor.hpp" />
+    <ClInclude Include="..\kernel\util\adjactor.hpp" />
     <ClInclude Include="..\kernel\util\assertion.hpp" />
     <ClInclude Include="..\kernel\util\compiler_gnu.hpp" />
     <ClInclude Include="..\kernel\util\compiler_intel.hpp" />
@@ -538,6 +537,7 @@
     <ClInclude Include="..\kernel\util\compiler_pgi.hpp" />
     <ClInclude Include="..\kernel\util\exception.hpp" />
     <ClInclude Include="..\kernel\util\factorial.hpp" />
+    <ClInclude Include="..\kernel\util\file_error.hpp" />
     <ClInclude Include="..\kernel\util\file_reader_ascii.hpp" />
     <ClInclude Include="..\kernel\util\graph.hpp" />
     <ClInclude Include="..\kernel\util\inheritance.hpp" />

@@ -264,13 +264,13 @@ namespace FEAST
             // position in the arrays num_neighbours_aux[] and index_aux[] corresponding to the rank of the
             // coordinator. Although we know, that this is rank 0, we do not explicitly exploit this information here
             // since this might be changed in future.
-            num_nodes = int(_graphs[igroup]->num_nodes_primal()) + 1;
+            num_nodes = int(_graphs[igroup]->num_nodes_domain()) + 1;
             index_aux = new int[num_nodes + 1];
             // copy the first part of the graphs's index array to the aux array, performing implicit cast from
             // Index to unsigned int
             for(int i(0) ; i < rank_coord+1 ; ++i)
             {
-              index_aux[i] = int(_graphs[igroup]->get_primal_ptr()[i]);
+              index_aux[i] = int(_graphs[igroup]->get_domain_ptr()[i]);
             }
             // insert the pseudo node
             index_aux[rank_coord+1] = index_aux[rank_coord];
@@ -278,20 +278,20 @@ namespace FEAST
             // Index to unsigned int
             for(int i(rank_coord+1) ; i < num_nodes ; ++i)
             {
-              index_aux[i+1] = int(_graphs[igroup]->get_primal_ptr()[i]);
+              index_aux[i+1] = int(_graphs[igroup]->get_domain_ptr()[i]);
             }
           }
           else
           {
             // in case there is no extra coordinator process, the number of neighbours equals the number of nodes
             // in the graph and the index array does not have to be modified
-            num_nodes = _graphs[igroup]->num_nodes_primal();
+            num_nodes = _graphs[igroup]->num_nodes_domain();
             index_aux = new int[num_nodes + 1];
             // copy the graphs's index array to the aux array, performing implicit cast from Index to
             // unsigned int
             for(int i(0) ; i < num_nodes+1 ; ++i)
             {
-              index_aux[i] = int(_graphs[igroup]->get_primal_ptr()[i]);
+              index_aux[i] = int(_graphs[igroup]->get_domain_ptr()[i]);
             }
           }
 
@@ -310,7 +310,7 @@ namespace FEAST
             MPI_Scatter(num_neighbours_aux, 1, MPI_UNSIGNED, MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, rank_coord,
               _work_groups()[igroup]->comm());
             // send the neighbours to the non-coordinator processes
-            MPI_Scatterv(_graphs[igroup]->get_dual_idx(), num_neighbours_aux, index_aux, MPIType<Index>::value(),
+            MPI_Scatterv(_graphs[igroup]->get_image_idx(), num_neighbours_aux, index_aux, MPIType<Index>::value(),
               MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, rank_coord, _work_groups()[igroup]->comm());
           }
           else
@@ -325,7 +325,7 @@ namespace FEAST
 
             Index* neighbours_local = new Index[num_neighbours_local];
             // scatter the neighbours to the non-coordinator processes and to the coordinator process itself
-            MPI_Scatterv(_graphs[igroup]->get_dual_idx(), num_neighbours_aux, index_aux, MPIType<Index>::value(),
+            MPI_Scatterv(_graphs[igroup]->get_image_idx(), num_neighbours_aux, index_aux, MPIType<Index>::value(),
               neighbours_local, num_neighbours_local, MPIType<Index>::value(), rank_coord,
               _work_groups()[igroup]->comm());
 

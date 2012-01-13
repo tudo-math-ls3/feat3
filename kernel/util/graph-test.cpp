@@ -5,7 +5,7 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-typedef CompositeAdjunctor<Graph,Graph> CAGG;
+typedef CompositeAdjactor<Graph,Graph> CAGG;
 
 /**
  * \brief Test class for the Graph class.
@@ -28,8 +28,8 @@ public:
     CONTEXT("GraphTest::test_f()");
 
     // fetch the graph's arrays
-    Index* f_pp = f->get_primal_ptr();
-    Index* f_di = f->get_dual_idx();
+    Index* f_pp = f->get_domain_ptr();
+    Index* f_di = f->get_image_idx();
 
     // check against analytic solution
     //      0  1  2  3  4
@@ -83,8 +83,8 @@ public:
     CONTEXT("GraphTest::test_fg()");
 
     // fetch the graph's arrays
-    Index* fg_pp = fg->get_primal_ptr();
-    Index* fg_di = fg->get_dual_idx();
+    Index* fg_pp = fg->get_domain_ptr();
+    Index* fg_di = fg->get_image_idx();
 
     // check against analytic solution
     //      0  1  2  3  4  5  6
@@ -138,8 +138,8 @@ public:
     CONTEXT("GraphTest::test_gf()");
 
     // fetch the graph's arrays
-    Index* gf_pp = gf->get_primal_ptr();
-    Index* gf_di = gf->get_dual_idx();
+    Index* gf_pp = gf->get_domain_ptr();
+    Index* gf_di = gf->get_image_idx();
 
     // check against analytic solution
     //      0  1  2  3  4

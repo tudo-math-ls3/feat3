@@ -90,9 +90,6 @@
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="feast_config.hpp" />
-    <ClInclude Include="..\kernel\util\adjunctor.hpp">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\util\graph.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
@@ -195,13 +192,16 @@
     <ClInclude Include="..\kernel\util\logger.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\mesh_unstructured.hpp">
-      <Filter>Header Files\geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\geometry\shape.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\util\factorial.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\file_error.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\adjactor.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>

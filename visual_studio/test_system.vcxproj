@@ -433,6 +433,7 @@
     <ClCompile Include="..\kernel\geometry\shape-test.cpp" />
     <ClCompile Include="..\kernel\util\assertion-test.cpp" />
     <ClCompile Include="..\kernel\util\factorial-test.cpp" />
+    <ClCompile Include="..\kernel\util\graph-test.cpp" />
     <ClCompile Include="..\kernel\util\inheritance-test.cpp" />
     <ClCompile Include="..\kernel\util\logger-test.cpp" />
     <ClCompile Include="..\kernel\util\pretty_printer-test.cpp" />
