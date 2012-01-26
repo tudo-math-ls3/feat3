@@ -24,6 +24,9 @@ namespace FEAST
       Exception(message)
     {
     }
+    virtual ~FileError() throw()
+    {
+    }
   }; // class FileError
 
   /**
@@ -44,6 +47,9 @@ namespace FEAST
      */
     explicit FileNotFound(const String& filename) :
       FileError("File not found: '" + filename + "'")
+    {
+    }
+    virtual ~FileNotFound() throw()
     {
     }
   }; // class FileNotFound
