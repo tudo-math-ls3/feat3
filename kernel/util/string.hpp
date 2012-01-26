@@ -29,11 +29,15 @@ namespace FEAST
   {
   public:
     /**
-     * \brief A class implementing case-insensitive String comparison.
+     * \brief A class providing case-insensitive String comparison.
      *
      * \details
-     * This class implements an STL-conforming function object for case-insensitive comparison of Strings
+     * This class provides an STL-conforming function object for case-insensitive comparison of Strings
      * which can be used in associative containers as e.g. \c std::map or \c std::set.
+     *
+     * \note
+     * This class does not implement the String comparison itself but calls the String::compare_no_case()
+     * member function for the dirty work instead.
      *
      * \author Peter Zajac
      */
@@ -49,8 +53,6 @@ namespace FEAST
        *
        * \returns
        * \c true, if \p left is less than \p right without regard to case, otherwise \c false.
-       *
-       * \sa String::compare_no_case()
        */
       bool operator()(const String& left, const String& right) const
       {
