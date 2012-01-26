@@ -127,7 +127,7 @@ namespace FEAST
       }
 
       // if there is a "&", get the next line, too
-      while (s.size()>1 && s.back() == '&')
+      while (s.size()>1 && s.at(s.size()-1) == '&')
       {
         s.erase(s.length()-1);
         getline(f, t);
@@ -142,7 +142,7 @@ namespace FEAST
       }
 
       // if its a section
-      if((s.front() == '[') && (s.back() == ']'))
+      if((s.at(0) == '[') && (s.at(s.size()-1) == ']'))
       {
         // removing brackets and empty spaces
         s.erase(0, 1);
