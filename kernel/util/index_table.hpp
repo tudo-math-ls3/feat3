@@ -17,8 +17,8 @@ namespace FEAST
   class IndexTable
   {
   public:
-    /// DualIterator typedef for Adjunctor interface implementation
-    typedef const Index* DualIterator;
+    /// ImageIterator typedef for Adjactor interface implementation
+    typedef const Index* ImageIterator;
 
   private:
     /// number of rows in the table
@@ -35,6 +35,7 @@ namespace FEAST
       _num_cols(0),
       _table(nullptr)
     {
+      CONTEXT("IndexTable::IndexTable()");
     }
 
     /**
@@ -51,7 +52,7 @@ namespace FEAST
       _num_cols(num_cols),
       _table(nullptr)
     {
-      CONTEXT("IndexTable::IndexTable()");
+      CONTEXT("IndexTable::IndexTable(Index,Index)");
       ASSERT(num_rows > 0, "num_rows must be greater than 0");
       ASSERT(num_cols > 0, "num_cols must be greater than 0");
       _table = new Index[num_rows * num_cols];
@@ -77,7 +78,7 @@ namespace FEAST
       Index num_rows,
       Index num_cols)
     {
-      CONTEXT("IndexTable::IndexTable()");
+      CONTEXT("IndexTable::create()");
       ASSERT(num_rows > 0, "num_rows must be greater than 0");
       ASSERT(num_cols > 0, "num_cols must be greater than 0");
       if(_table != nullptr)
@@ -116,7 +117,7 @@ namespace FEAST
       Index row,
       Index col) const
     {
-      CONTEXT("IndexTable::at()");
+      CONTEXT("IndexTable::at() [const]");
       ASSERT(row < _num_rows, "row index out of range");
       ASSERT(col < _num_cols, "column index out of range");
       return _table[row * _num_cols + col];
@@ -186,37 +187,37 @@ namespace FEAST
       return &_table[row * _num_cols];
     }
 
-    /* ********************************************************************* */
-    /*  A D J U N C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
-    /* ********************************************************************* */
-    /** \copydoc Adjunctor::num_nodes_primal() */
-    inline Index num_nodes_primal() const
+    /* ******************************************************************* */
+    /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
+    /* ******************************************************************* */
+    /** \copydoc Adjactor::num_nodes_domain() */
+    inline Index num_nodes_domain() const
     {
-      CONTEXT("IndexTable::num_nodes_primal()");
+      CONTEXT("IndexTable::num_nodes_domain()");
       return _num_rows;
     }
 
-    /** \copydoc Adjunctor::num_nodes_dual() */
-    inline Index num_nodes_dual() const
+    /** \copydoc Adjactor::num_nodes_image() */
+    inline Index num_nodes_image() const
     {
-      CONTEXT("IndexTable::num_nodes_dual()");
+      CONTEXT("IndexTable::num_nodes_image()");
       return _num_cols;
     }
 
-    /** \copydoc Adjunctor::dual_begin() */
-    inline DualIterator dual_begin(Index primal_node) const
+    /** \copydoc Adjactor::image_begin() */
+    inline ImageIterator image_begin(Index domain_node) const
     {
-      CONTEXT("IndexTable::dual_begin()");
-      ASSERT(primal_node < _num_rows, "Primal node index out of range");
-      return &_table[primal_node * _num_cols];
+      CONTEXT("IndexTable::image_begin()");
+      ASSERT(domain_node < _num_rows, "Domain node index out of range");
+      return &_table[domain_node * _num_cols];
     }
 
-    /** \copydoc Adjunctor::dual_end() */
-    inline DualIterator dual_end(Index primal_node) const
+    /** \copydoc Adjactor::image_end() */
+    inline ImageIterator image_end(Index domain_node) const
     {
-      CONTEXT("IndexTable::dual_end()");
-      ASSERT(primal_node < _num_rows, "Primal node index out of range");
-      return &_table[(primal_node+1) * _num_cols];
+      CONTEXT("IndexTable::image_end()");
+      ASSERT(domain_node < _num_rows, "Domain node index out of range");
+      return &_table[(domain_node+1) * _num_cols];
     }
   }; // class IndexTable
 } // namespace FEAST
