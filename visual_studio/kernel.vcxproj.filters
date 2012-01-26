@@ -204,6 +204,9 @@
     <ClInclude Include="..\kernel\util\adjactor.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\index_table.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
