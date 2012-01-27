@@ -207,6 +207,9 @@
     <ClInclude Include="..\kernel\util\index_table.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\param_section.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
@@ -225,6 +228,9 @@
       <Filter>Source Files\foundation\base_mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\util\logger.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\param_section.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>

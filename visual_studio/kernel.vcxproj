@@ -545,6 +545,7 @@
     <ClInclude Include="..\kernel\util\instantiation_policy.hpp" />
     <ClInclude Include="..\kernel\util\logger.hpp" />
     <ClInclude Include="..\kernel\util\mpi_utils.hpp" />
+    <ClInclude Include="..\kernel\util\param_section.hpp" />
     <ClInclude Include="..\kernel\util\prefix.hpp" />
     <ClInclude Include="..\kernel\util\pretty_printer.hpp" />
     <ClInclude Include="..\kernel\util\string.hpp" />
@@ -558,6 +559,7 @@
     <ClCompile Include="..\kernel\foundation\process.cpp" />
     <ClCompile Include="..\kernel\util\exception.cpp" />
     <ClCompile Include="..\kernel\util\logger.cpp" />
+    <ClCompile Include="..\kernel\util\param_section.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

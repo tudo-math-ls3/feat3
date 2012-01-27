@@ -1,15 +1,17 @@
 #include <kernel/util/param_section.hpp>
 
+#include <fstream>
+#include <stack>
+
 namespace FEAST
 {
-
   ParamSection::ParamSection()
   {
   }
 
-
   ParamSection::~ParamSection()
   {
+    // delete all sub-sections
     SectionMap::iterator it = _sections.begin();
     SectionMap::iterator jt = _sections.end();
     for(; it != jt ; ++it)
@@ -17,10 +19,6 @@ namespace FEAST
       delete (*it).second;
     }
   }
-
-  /////////////////////////////////////////////////////
-  /////////// Input functions (parsing etc) ///////////
-  /////////////////////////////////////////////////////
 
   bool ParamSection::add_entry(String key, String value, bool replace)
   {
@@ -41,8 +39,6 @@ namespace FEAST
     return true;
   }
 
-
-
   ParamSection* ParamSection::add_section(String name)
   {
     // try to find the entry
@@ -60,16 +56,32 @@ namespace FEAST
     return sub_section;
   }
 
+  void ParamSection::erase_section(String name)
+  {
+    SectionMap::iterator it = _sections.find(name);
+    if(it != _sections.end())
+    {
+      _sections.erase (it);
+    }
+  }
+
+
+  void ParamSection::erase_entry(String key)
+  {
+    ValueMap::iterator it = _values.find(key);
+    if(it != _values.end())
+    {
+      _values.erase (it);
+    }
+  }
 
   void ParamSection::parse(String filename)
   {
-    std::ifstream f;
-
-    //open file
-    f.open(filename, std::ios::in);
+    // try to open the file
+    std::ifstream ifs(filename.c_str(), std::ios::in);
 
     // if something went wrong
-    if(!f.is_open())
+    if(!ifs.is_open())
     {
       throw FileNotFound(filename);
     }
@@ -77,21 +89,26 @@ namespace FEAST
     //parsing
     try
     {
-      parse(f);
-      f.close();
+      parse(ifs);
+      ifs.close();
     }
-    catch(ParamSection::SyntaxError& e)
+    catch(ParamSection::SyntaxError& exc)
     {
-      if(e.get_filename().empty())
+      // If the exception does not contain a filename, we'll recycle the exception
+      // and include our filename now.
+      if(exc.get_filename().empty())
       {
-        throw(SyntaxError(e.message(), filename));
+        throw(SyntaxError(exc.message(), filename));
       }
-      throw e;
+      else
+      {
+        throw exc;
+      }
     }
   }
 
 
-  void ParamSection::parse(std::istream& f)
+  void ParamSection::parse(std::istream& ifs)
   {
     // Initialize stack etc.
     String s, t;
@@ -104,11 +121,11 @@ namespace FEAST
 
     stack.push(current);
 
-    while(!f.eof() && f.good())  // while the end is not reached and nothing went wrong
+    while(!ifs.eof() && ifs.good())  // while the end is not reached and nothing went wrong
     {
       // get a line
-      getline(f, s);
-      line++;
+      getline(ifs, s);
+      ++line;
 
       // erasing comments
       found = s.find("#");
@@ -130,8 +147,8 @@ namespace FEAST
       while (s.size()>1 && s.at(s.size()-1) == '&')
       {
         s.erase(s.length()-1);
-        getline(f, t);
-        line++;
+        getline(ifs, t);
+        ++line;
         found = t.find("#");
         if(found != std::string::npos)
         {
@@ -231,70 +248,31 @@ namespace FEAST
     }
   }
 
-  void ParamSection::merge(ParamSection* section, bool replace)
+  void ParamSection::merge(const ParamSection& section, bool replace)
   {
-    ValueMap::iterator valiter;
+    ValueMap::const_iterator valiter(section._values.cbegin());
+    ValueMap::const_iterator valend(section._values.cend());
 
     // merging _values of the two sections
-    for(valiter = section->_values.begin(); valiter != section->_values.end(); valiter++)
+    for(; valiter != valend; ++valiter)
     {
       add_entry(valiter->first, valiter->second, replace);
     }
 
-    SectionMap::iterator seciter;
+    SectionMap::const_iterator seciter(section._sections.cbegin());
+    SectionMap::const_iterator secend(section._sections.cend());
 
     // merging _sections of the two ParamSections
-    for(seciter = section->_sections.begin(); seciter != section->_sections.end(); seciter++)
+    for(; seciter != secend; ++seciter)
     {
       // get ParamSection pointer to the section corresponding to iter and merge again
-      add_section(seciter->first)->merge(seciter->second, replace);
+      add_section(seciter->first)->merge(*seciter->second, replace);
     }
   }
 
   ////////////////////////////////////////////////////////
   /////////// Output functions (into file etc.) //////////
   ////////////////////////////////////////////////////////
-
-
-  std::pair<String, bool> ParamSection::get_entry(String key, String::size_type pos, String sep) const
-  {
-    // get position of the array
-    std::pair<String, bool> rtn = get_entry(key);
-    String val = rtn.first;
-    String::size_type found;
-
-    String::size_type count = 0; // counts entries within the array
-
-    // if the array does not exist
-    if (!rtn.second)
-    {
-      return std::make_pair("", false);
-    }
-
-    while (count < pos && val.length() > 0)
-    {
-      found = val.find(sep);
-      //if there are not enough entries within the array
-      if(found == std::string::npos)
-      {
-        return std::make_pair("", false);
-      }
-      val = val.substr(found + sep.size());
-      count++;
-    }
-
-    found = val.find(sep);
-
-    // erasing the following entries
-    if(found != std::string::npos)
-    {
-      val.erase(found);
-    }
-
-    val.trim();
-    return std::make_pair(val, true);
-  }
-
 
   std::pair<String, bool> ParamSection::get_entry(String key) const
   {
@@ -331,35 +309,13 @@ namespace FEAST
     return iter->second;
   }
 
-
-  void ParamSection::display_values() const
-  {
-    ValueMap::const_iterator iter;
-    for(iter = _values.begin() ; iter != _values.end() ; ++iter)
-    {
-      std::cout << "key = " << iter->first << "     value = " << iter->second << std::endl;
-    }
-    std::cout << std::endl;
-  }
-
-  void ParamSection::display_sections() const
-  {
-    SectionMap::const_iterator iter;
-    for(iter = _sections.begin() ; iter !=_sections.end() ; ++iter)
-    {
-      std::cout << "Section = " << iter->first << std::endl;
-    }
-    std::cout << std::endl;
-  }
-
-
   void ParamSection::dump(String filename) const
   {
     // open stream
-    std::ofstream ofs(filename, std::ios_base::out | std::ios_base::trunc);
+    std::ofstream ofs(filename.c_str(), std::ios_base::out | std::ios_base::trunc);
     if(!ofs.is_open())
     {
-      throw FileError("Failed to create '" +filename +"' for dumping!");
+      throw FileError("Failed to create '" + filename +"' for dumping!");
     }
 
     // dump into stream
@@ -368,7 +324,6 @@ namespace FEAST
     // close stream
     ofs.close();
   }
-
 
   void ParamSection::dump(std::ostream& os, String::size_type indent) const
   {
@@ -401,27 +356,4 @@ namespace FEAST
   }
 
 
-  //////////////////////////////////////
-  /////////// erasing entries //////////
-  //////////////////////////////////////
-
-
-  void ParamSection::erase_section(String name)
-  {
-    SectionMap::iterator it = _sections.find(name);
-    if(it!=_sections.end())
-    {
-      _sections.erase (it);
-    }
-  }
-
-
-  void ParamSection::erase_entry(String key)
-  {
-    ValueMap::iterator it = _values.find(key);
-    if(it!=_values.end())
-    {
-      _values.erase (it);
-    }
-  }
 } //namespace FEAST
