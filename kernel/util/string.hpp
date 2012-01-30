@@ -97,6 +97,48 @@ namespace FEAST
     {
     }
 
+    /// Returns a reference to the first character in the string.
+    reference front()
+    {
+      return at(0);
+    }
+
+    /** \copydoc front() */
+    const_reference front() const
+    {
+      return at(0);
+    }
+
+    /// Returns a reference to the last character in the string.
+    reference back()
+    {
+      return at(size() - 1);
+    }
+
+    /** \copydoc back() */
+    const_reference back() const
+    {
+      return at(size() - 1);
+    }
+
+    /// Inserts a character at the front of the string.
+    void push_front(char value)
+    {
+      insert(0, 1, value);
+    }
+
+    /// Removes the first character from the string.
+    void pop_front()
+    {
+      erase(0, 1);
+    }
+
+    /// Removes the last character from the string.
+    void pop_back()
+    {
+      erase(size() - 1, 1);
+    }
+
     /**
      * \brief Trims the string.
      *
