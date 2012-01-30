@@ -250,8 +250,8 @@ namespace FEAST
 
   void ParamSection::merge(const ParamSection& section, bool replace)
   {
-    ValueMap::const_iterator valiter(section._values.cbegin());
-    ValueMap::const_iterator valend(section._values.cend());
+    ValueMap::const_iterator valiter(section._values.begin());
+    ValueMap::const_iterator valend(section._values.end());
 
     // merging _values of the two sections
     for(; valiter != valend; ++valiter)
@@ -259,8 +259,8 @@ namespace FEAST
       add_entry(valiter->first, valiter->second, replace);
     }
 
-    SectionMap::const_iterator seciter(section._sections.cbegin());
-    SectionMap::const_iterator secend(section._sections.cend());
+    SectionMap::const_iterator seciter(section._sections.begin());
+    SectionMap::const_iterator secend(section._sections.end());
 
     // merging _sections of the two ParamSections
     for(; seciter != secend; ++seciter)
