@@ -119,7 +119,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
     # TODO: figure out how to set explicit 64-bit mode in this case
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++0x -Wall -g -Wp64 -mcmodel=large -Wshorten-64-to-32")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -Wall -g -Wp64 -mcmodel=large -Wshorten-64-to-32")
 
   else ()
     # optimised settings for all currently supported archs
