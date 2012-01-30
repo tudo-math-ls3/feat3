@@ -7,23 +7,30 @@ namespace FEAST
 {
   ParamSection::ParamSection()
   {
+    CONTEXT("ParamSection::ParamSection()");
   }
 
   ParamSection::~ParamSection()
   {
+    CONTEXT("ParamSection::~ParamSection()");
     // delete all sub-sections
-    SectionMap::iterator it = _sections.begin();
-    SectionMap::iterator jt = _sections.end();
+    SectionMap::iterator it(_sections.begin());
+    SectionMap::iterator jt(_sections.end());
     for(; it != jt ; ++it)
     {
-      delete (*it).second;
+      if((*it).second != nullptr)
+      {
+        delete (*it).second;
+      }
     }
   }
 
   bool ParamSection::add_entry(String key, String value, bool replace)
   {
+    CONTEXT("ParamSection::add_entry()");
+
     // try to insert the key-value-pair
-    std::pair<ValueMap::iterator, bool> rtn = _values.insert(std::pair<String, String>(key,value));
+    std::pair<ValueMap::iterator, bool> rtn(_values.insert(std::make_pair(key,value)));
     if(!rtn.second)
     {
       // insertion failed, i.e. there already exists a pair with that key - replace it?
@@ -41,8 +48,10 @@ namespace FEAST
 
   ParamSection* ParamSection::add_section(String name)
   {
+    CONTEXT("ParamSection::add_section()");
+
     // try to find the entry
-    SectionMap::iterator it = _sections.find(name);
+    SectionMap::iterator it(_sections.find(name));
 
     // if it has not been found
     if(it != _sections.end())
@@ -52,31 +61,41 @@ namespace FEAST
 
     // if it was found, create a new section
     ParamSection* sub_section = new ParamSection();
-    _sections.insert(std::pair<String,ParamSection*>(name, sub_section));
+    _sections.insert(std::make_pair(name, sub_section));
     return sub_section;
   }
 
-  void ParamSection::erase_section(String name)
+  bool ParamSection::erase_section(String name)
   {
-    SectionMap::iterator it = _sections.find(name);
+    CONTEXT("ParamSection::erase_section()");
+
+    SectionMap::iterator it(_sections.find(name));
     if(it != _sections.end())
     {
-      _sections.erase (it);
+      _sections.erase(it);
+      return true;
     }
+    return false;
   }
 
 
-  void ParamSection::erase_entry(String key)
+  bool ParamSection::erase_entry(String key)
   {
-    ValueMap::iterator it = _values.find(key);
+    CONTEXT("ParamSection::erase_entry()");
+
+    ValueMap::iterator it(_values.find(key));
     if(it != _values.end())
     {
-      _values.erase (it);
+      _values.erase(it);
+      return true;
     }
+    return false;
   }
 
   void ParamSection::parse(String filename)
   {
+    CONTEXT("ParamSection::parse(String)");
+
     // try to open the file
     std::ifstream ifs(filename.c_str(), std::ios::in);
 
@@ -94,8 +113,9 @@ namespace FEAST
     }
     catch(ParamSection::SyntaxError& exc)
     {
-      // If the exception does not contain a filename, we'll recycle the exception
-      // and include our filename now.
+      // If the exception does not contain a filename, we'll recycle the exception and include our filename now.
+      // Note: The exception may indeed already have a filename; this happens when another (erroneous) file is
+      // included via the '@include' keyword.
       if(exc.get_filename().empty())
       {
         throw(SyntaxError(exc.message(), filename));
@@ -107,149 +127,200 @@ namespace FEAST
     }
   }
 
-
   void ParamSection::parse(std::istream& ifs)
   {
-    // Initialize stack etc.
-    String s, t;
-    String::size_type found;
-    bool sec = false; // marks if a section was declared
-    int line = 0; //counts 'lines'
+    CONTEXT("ParamSection::parse(std::ifstream&)");
 
-    ParamSection* current = this; // current section
-    std::stack<ParamSection*> stack; // stores the 'opened' sections
+    // a stack to keep track of all currently open sections
+    std::stack<ParamSection*> stack;
 
+    // a pointer to the currently used section; pushed onto the bottom of the stack
+    ParamSection* current = this;
     stack.push(current);
 
-    while(!ifs.eof() && ifs.good())  // while the end is not reached and nothing went wrong
+    // the string containing the current line
+    String line;
+    line.reserve(256);
+
+    // other auxiliary variables
+    String key, value;
+    String::size_type found;
+    bool sec = false;
+    int cur_line = 0;
+
+    // loop over all lines until we reach the end of the file
+    while(!ifs.eof() && ifs.good())
     {
       // get a line
-      getline(ifs, s);
-      ++line;
+      getline(ifs, line);
+      ++cur_line;
 
-      // erasing comments
-      found = s.find("#");
-      if(found!= std::string::npos)
+      // erase comments
+      if((found = line.find('#')) != std::string::npos)
       {
-        s = s.substr(0, found);
+        line.erase(found);
       }
 
-      // erasing whitespaces
-      s.trim();
-
-      // if its empty
-      if(s.size() == 0)
+      // trim whitespaces; continue with next line if the current one is empty
+      if(line.trim().empty())
       {
         continue;
       }
 
-      // if there is a "&", get the next line, too
-      while (s.size()>1 && s.at(s.size()-1) == '&')
+      // assume that the current line does not declare a section
+      sec = false;
+
+      // check for special keywords; these begin with an @ sign
+      if(line.front() == '@')
       {
-        s.erase(s.length()-1);
-        getline(ifs, t);
-        ++line;
-        found = t.find("#");
-        if(found != std::string::npos)
+        // if its an "@include "
+        if(line.compare(0, 9, "@include ") == 0)
         {
-          t = t.substr(0, found);
+          // erase "@include "
+          line.erase(0, 9);
+
+          // parse the included file
+          current->parse(line.trim());
         }
-        t.trim();
-        s = s + t;
+        else
+        {
+          throw SyntaxError("Unknown keyword in line " + stringify(cur_line));
+        }
       }
 
       // if its a section
-      if((s.at(0) == '[') && (s.at(s.size()-1) == ']'))
+      else if((line.front() == '[') && (line.back() == ']'))
       {
-        // removing brackets and empty spaces
-        s.erase(0, 1);
-        s.erase(s.length()-1);
-        s.trim();
-
-        // if there is nothing left
-        if(s.size() == 0)
-        {
-          throw SyntaxError("Missing section name in line " +stringify(line));
-        }
-        // adding section
+        // this is a section marker
         sec = true;
-        current = current->add_section(s);
-      }
 
-      // if its a value
-      else if(s.find("=") != std::string::npos)
-      {
-        sec = false;
-        // parting the line
-        found = s.find("=");
-        t = s.substr(found + 1);
-        s.erase(found);
-        s.trim();
-        t.trim();
+        // removing brackets
+        line.pop_front();
+        line.pop_back();
 
-        // if there is nothing left
-        if(s.size() == 0)
+        // the section name must not be empty
+        if(line.trim().empty())
         {
-          throw SyntaxError("Missing key in line " +stringify(line));
+          throw SyntaxError("Missing section name in line " + stringify(cur_line));
         }
 
-        current->add_entry (s, t);
+        // adding section
+        current = current->add_section(line);
       }
 
-      // if its an "include@"
-      else if(s.size() > 8 && s.substr(0,8) == "include@")
+      // if its a key-value pair
+      else if((found = line.find('=')) != std::string::npos)
       {
-        sec = false;
-        // erasing "include@"
-        t = s.substr(8);
-        current->parse(t);
+        // extract key
+        key = line.substr(0, found);
+
+        // the key must be not empty after trimming
+        if(key.trim().empty())
+        {
+          throw SyntaxError("Missing key in line " + stringify(cur_line));
+        }
+
+        // extract value string; add it if it's empty
+        value = line.substr(found + 1);
+        if(value.trim().empty())
+        {
+          current->add_entry(key, value);
+          continue;
+        }
+
+        // save current line number
+        int old_line = cur_line;
+
+        // check for line continuation
+        while(value.back() == '&')
+        {
+          // erase the '&' character
+          value.pop_back();
+
+          // read next non empty line
+          line.clear();
+          while(line.empty() && !ifs.eof() && ifs.good())
+          {
+            // read next line
+            getline(ifs, line);
+            ++cur_line;
+
+            // erase comments
+            if((found = line.find('#')) != std::string::npos)
+            {
+              line.erase(found);
+            }
+
+            // erase whitespaces
+            line.trim();
+          }
+
+          // do we have a non-empty string or an eof?
+          if(line.empty())
+          {
+            // file ended before we could find a line continuation
+            throw SyntaxError("Only empty lines from line " + stringify(old_line) + " on for line continuation");
+          }
+
+          // append line to value string
+          value += line;
+
+          // we'll continue the while-loop as the line might be further continued
+        }
+
+        // add the key-value pair
+        current->add_entry(key, value);
       }
 
-      else if(s  == "{")
+      else if(line.compare("{") == 0)
       {
         // if the new section was declared
         if(sec)
         {
           stack.push(current);
+          sec = false;
         }
         // if it was not or there is something in the line above, that is not valid
         else
         {
-          throw SyntaxError("Wrong '{' or '}' or section initialization in line " +stringify(line) +" or above!");
+          throw SyntaxError("Unexpected '{' in line " + stringify(cur_line));
         }
       }
 
-      else if(s  == "}")
+      else if(line.compare("}") == 0)
       {
-        sec = false;
-        stack.pop();
-        // if the stack is not empty, erase the top entry
-        if(stack.size() > 0)
+        // check the number of sections on the stack; the bottom end of the stack is the root section
+        // which cannot be removed from the stack - so trying to empty the stack with a closing brace
+        // is a syntax error
+        if(stack.size() > 1)
         {
-          current=stack.top();
+          stack.pop();
+          current = stack.top();
         }
         else
         {
-          throw SyntaxError("Missing '{' or '}' in line " +stringify(line) +" or above!");
+          throw SyntaxError("Unexpected '}' in line " + stringify(cur_line));
         }
       }
 
       // if its something else
       else
       {
-        throw SyntaxError("Unknown format in line " +stringify(line) +" : " + s);
+        throw SyntaxError("Unknown format in line " +stringify(cur_line) + " : " + line);
       }
     } // end while
 
     // in the end, the stack must contain nothing but the root section
-    if(stack.size() != 1)
+    if(stack.size() > 1)
     {
-      throw SyntaxError("Missing '{' or '}' in line " +stringify(line) +" or above!");
+      throw SyntaxError("Missing '}' in line " + stringify(cur_line) + " or above!");
     }
   }
 
   void ParamSection::merge(const ParamSection& section, bool replace)
   {
+    CONTEXT("ParamSection::merge()");
+
     ValueMap::const_iterator valiter(section._values.begin());
     ValueMap::const_iterator valend(section._values.end());
 
@@ -276,10 +347,9 @@ namespace FEAST
 
   std::pair<String, bool> ParamSection::get_entry(String key) const
   {
-    ValueMap::const_iterator iter;
-    // try to find the entry
-    iter = _values.find(key);
-    // if it was not found
+    CONTEXT("ParamSection::get_entry()");
+
+    ValueMap::const_iterator iter(_values.find(key));
     if(iter == _values.end())
     {
       return std::make_pair("", false);
@@ -287,10 +357,10 @@ namespace FEAST
     return std::make_pair(iter->second, true);
   }
 
-
   const ParamSection* ParamSection::get_section(String name) const
   {
-    SectionMap::const_iterator iter = _sections.find(name);
+    CONTEXT("ParamSection::get_section() [const]");
+    SectionMap::const_iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {
       return nullptr;
@@ -298,10 +368,10 @@ namespace FEAST
     return iter->second;
   }
 
-
   ParamSection* ParamSection::get_section(String name)
   {
-    SectionMap::iterator iter = _sections.find(name);
+    CONTEXT("ParamSection::get_section()");
+    SectionMap::iterator iter(_sections.find(name));
     if(iter == _sections.end())
     {
       return nullptr;
@@ -311,6 +381,8 @@ namespace FEAST
 
   void ParamSection::dump(String filename) const
   {
+    CONTEXT("ParamSection::dump(String)");
+
     // open stream
     std::ofstream ofs(filename.c_str(), std::ios_base::out | std::ios_base::trunc);
     if(!ofs.is_open())
@@ -327,20 +399,21 @@ namespace FEAST
 
   void ParamSection::dump(std::ostream& os, String::size_type indent) const
   {
+    CONTEXT("ParamSection::dump(std::ostream&)");
     // prefix string: 2*indent spaces
     String prefix(2*indent, ' ');
 
     // dump values
-    ValueMap::const_iterator vit = _values.begin();
-    ValueMap::const_iterator vend = _values.end();
+    ValueMap::const_iterator vit(_values.begin());
+    ValueMap::const_iterator vend(_values.end());
     for( ; vit != vend ; ++vit)
     {
       os << prefix << (*vit).first << " = " << (*vit).second << std::endl;
     }
 
     // dump subsections
-    SectionMap::const_iterator sit = _sections.begin();
-    SectionMap::const_iterator send = _sections.end();
+    SectionMap::const_iterator sit(_sections.begin());
+    SectionMap::const_iterator send(_sections.end());
     for( ; sit != send ; ++sit)
     {
       // section name and opening brace
@@ -354,6 +427,5 @@ namespace FEAST
       os << prefix << "} # end of [" << (*sit).first << "]" << std::endl;
     }
   }
-
 
 } //namespace FEAST

@@ -21,35 +21,65 @@ namespace FEAST
    * \brief A class for storing data read from an INI-file
    *
    * \details
-   * This class allows to parse and store data, which is read from an INI-file. The data is saved
-   * within an tree-like structure.
+   * This class organises a tree-like structure of key-value pairs, which is parsed from one or multiple data files
+   * stored in a custom extension of the INI data file format; see e.g. http://en.wikipedia.org/wiki/INI_file.
    *
-   * \internal
+   * The INI data file format is a simple text file which stores data in so-called <em>key-value pairs</em>:
+   * \verbatim key = value\endverbatim
+   * Both the \e key and \e value parts are parsed verbatim and stored as simple strings, where the leading and
+   * trailing whitespaces are trimmed by the parser.
    *
-   * Each section consists of a map called _values (map <String, String, NoCaseLess>), which contains
-   * its key-value pairs, and a map named _sections (map<String, ParamSection*, NoCaseLess>), which
-   * contains the names of the subordinated sections and pointers to these structs.
+   * As an extension of the standard INI format, multiple consecutive lines may be joined by appending a
+   * <c>&</c> character as the last non-whitespace character in a line:
+   * \verbatim key = value1 &
+      value2\endverbatim
+   * is equivalent to
+   * \verbatim key = value1 value2\endverbatim
    *
-   * \endinternal
+   * Several key-value pairs can be grouped together in <em>sections</em>. A section begins with a section name
+   * enclosed in a <c>[ ]</c> bracket pair, followed by a single line containing a <c>{</c> curly brace which
+   * marks the beginning of a section's body. The end of a section's body is marked by a single <c>}</c>
+   * curly brace in a separate line. Please note that a section may not only contain key-value pairs but also
+   * sub-sections:
+     \verbatim
+     [Section]
+     {
+       key = value
+       another_key = another value
+       [SubSection]
+       {
+         key = subsection value
+       }
+     }
+     \endverbatim
    *
-   * The supported INI-file format is as follows:<br>
-   *  - '[ name ]' marks the beginning of a new section called 'name'.
-   *  - '{' marks the beginning of a section's content.
-   *  - '}' marks the end of a section.
-   *  - '=' marks a key-value pair, that is defined by the lefthand side and the righthand side of the equals sign.
-   *  - 'include\@PATH' marks, that an external file given by 'PATH' should be read at this point.
-   *  - '#' marks the beginning of a comment.
-   *  - '&' at the end of a line marks a line break.
+   * The hash sign <c>#</c> denotes the beginning of a comment spanning to the end of the line. A comment may
+   * appear anywhere within a file -- even behind a key-value pair.
+     \verbatim
+     # This is a comment in a separate line
+     [Section] # A comment after a section marker
+     {
+       key = value # a comment behind a key-value pair
+     } # end of [Section]
+     \endverbatim
+   * \note Comments can not be 'split' across several lines by the \c & character.
    *
-   *   \attention
-   *  - a line must not contain more than one statement (e.g., 'a = 1  b = 4' in the same line would provoke an error).
-   *  - each '[ name ]' must be followed by a '{' in the next line.
-   *  - a comment cannot be continued by using '&', each comment line has to start with '#'.
-   *  - a value or an 'include@', that is not assigned to any section (e.g., value1, value10, value11 in the example
-   *    below), is associated with the ParamSection, the 'parse' function is called from.
-   *  - a section's name or a key must not be an empty string.
+   * In analogy to the \c #include keyword of the C preprocessor, an INI file can include another INI file
+   * by using the \c \@include keyword followed by the filename. Please note that the file path must be either
+   * absolute or relative to the application's working directory. If an \c \@include command is encountered
+   * within a section body, the included file's contents parsed into that section.
+     \verbatim
+     # include 'myfile.txt' in the unnamed root section
+     @include myfile.txt
+     [Section]
+     {
+       # include the contents of 'another_file.txt' into [Section]
+       @include another_file.txt
+     }
+     \endverbatim
    *
-   * Example:
+   *
+   * A more complex example:
    *
    * \verbatim
      # This is a comment and the next line is a simple key-value pair in the root section.
@@ -66,20 +96,22 @@ namespace FEAST
        [MySubSection]
        {
          # A value spanning over multiple lines
-         pi = 3.1415926535 &
-                8979323846 &
+         pi = 3.1415926535&
+                8979323846&
                 2643383279...
        }
        # The previous line closed 'MySubSection', the next one will close 'MySection'
      }
 
      # Include another data file.
-     include@ ./mydata.txt
+     include@ /home/feast/my_data.txt
      \endverbatim
    *
+   * \todo further doxygenisation; describe special cases
+   *
    * \author Constantin Christof
+   * \author Peter Zajac
    */
-
   class ParamSection
   {
   public:
@@ -88,6 +120,9 @@ namespace FEAST
      *
      * This class derives from FEAST::Exception and is thrown by the ParamSection parser when a syntax error
      * is detected.
+     *
+     * \author Constantin Christof
+     * \author Peter Zajac
      */
     class SyntaxError :
       public Exception
@@ -126,12 +161,19 @@ namespace FEAST
       }
     }; // class ParamSection::SyntaxError
 
-  private:
+  protected:
     /// value-map type
     typedef std::map<String, String, String::NoCaseLess> ValueMap;
     /// section-map type
     typedef std::map<String, ParamSection*, String::NoCaseLess> SectionMap;
 
+  public:
+    typedef ValueMap::iterator EntryIterator;
+    typedef ValueMap::const_iterator ConstEntryIterator;
+    typedef SectionMap::iterator SectionIterator;
+    typedef SectionMap::const_iterator ConstSectionIterator;
+
+  protected:
     /// a map storing the key-value-pairs
     ValueMap _values;
 
@@ -187,16 +229,78 @@ namespace FEAST
      *
      * \param[in] name
      * The name of the sub-section to be erased.
+     *
+     * \returns
+     * \c true if the section was erased or \c false if no section with that name was found.
      */
-    void erase_section(String name);
+    bool erase_section(String name);
 
     /**
      * \brief Erases a key-value pair.
      *
      * \param[in] key
      * The key of the entry to be erased.
+     *
+     * \returns
+     * \c true if the entry was erased or \c false if no entry with that key was found.
      */
-    void erase_entry(String key);
+    bool erase_entry(String key);
+
+    /// Returns the first entry iterator.
+    EntryIterator begin_entry()
+    {
+      CONTEXT("ParamSection::begin_entry()");
+      return _values.begin();
+    }
+
+    /** \copydoc begin_entry() */
+    ConstEntryIterator begin_entry() const
+    {
+      CONTEXT("ParamSection::begin_entry() [const]");
+      return _values.begin();
+    }
+
+    /// Returns the last entry iterator.
+    EntryIterator end_entry()
+    {
+      CONTEXT("ParamSection::end_entry()");
+      return _values.end();
+    }
+
+    /** \copydoc end_entry() */
+    ConstEntryIterator end_entry() const
+    {
+      CONTEXT("ParamSection::end_entry() const");
+      return _values.end();
+    }
+
+    /// Returns the first section iterator.
+    SectionIterator begin_section()
+    {
+      CONTEXT("ParamSection::begin_section()");
+      return _sections.begin();
+    }
+
+    /** \copydoc begin_section() */
+    ConstSectionIterator begin_section() const
+    {
+      CONTEXT("ParamSection::begin_section() [const]");
+      return _sections.begin();
+    }
+
+    /// Returns the last section iterator
+    SectionIterator end_section()
+    {
+      CONTEXT("ParamSection::end_section()");
+      return _sections.end();
+    }
+
+    /** \copydoc end_section() */
+    ConstSectionIterator end_section() const
+    {
+      CONTEXT("ParamSection::end_section() [const]");
+      return _sections.end();
+    }
 
     /**
      * \brief Parses a file in INI-format.
