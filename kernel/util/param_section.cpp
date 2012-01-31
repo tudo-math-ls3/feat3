@@ -167,12 +167,12 @@ namespace FEAST
         continue;
       }
 
-      // assume that the current line does not declare a section
-      sec = false;
-
       // check for special keywords; these begin with an @ sign
       if(line.front() == '@')
       {
+        // this is not a section marker
+        sec = false;
+
         // if its an "@include "
         if(line.compare(0, 9, "@include ") == 0)
         {
@@ -211,6 +211,9 @@ namespace FEAST
       // if its a key-value pair
       else if((found = line.find('=')) != std::string::npos)
       {
+        // this is not a section marker
+        sec = false;
+
         // extract key
         key = line.substr(0, found);
 
@@ -289,6 +292,8 @@ namespace FEAST
 
       else if(line.compare("}") == 0)
       {
+        sec = false;
+
         // check the number of sections on the stack; the bottom end of the stack is the root section
         // which cannot be removed from the stack - so trying to empty the stack with a closing brace
         // is a syntax error

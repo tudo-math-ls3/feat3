@@ -338,9 +338,9 @@ namespace FEAST
      * The key of the entry whose value is to be returned.
      *
      * \returns
-     * A pair<String, bool>, where the second component marks, whether an entry with the \c key has been found or not.
-     * If the \c bool-component is \c true, then the String-component contains the value associated with the key,
-     * otherwise the String-component is empty.
+     * A <c>pair<String, bool></c>, where the second component marks, whether an entry with the \c key has been
+     * found or not. If the <c>bool</c>-component is \c true, then the <c>String</c>-component contains the value
+     * associated with the key, otherwise the <c>String</c>-component is empty.
      */
     std::pair<String, bool> get_entry(String key) const;
 
