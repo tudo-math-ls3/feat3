@@ -76,5 +76,8 @@
     <ClCompile Include="..\kernel\util\graph-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\util\param_section-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

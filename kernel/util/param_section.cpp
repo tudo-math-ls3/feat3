@@ -30,7 +30,7 @@ namespace FEAST
     CONTEXT("ParamSection::add_entry()");
 
     // try to insert the key-value-pair
-    std::pair<ValueMap::iterator, bool> rtn(_values.insert(std::make_pair(key,value)));
+    std::pair<EntryMap::iterator, bool> rtn(_values.insert(std::make_pair(key,value)));
     if(!rtn.second)
     {
       // insertion failed, i.e. there already exists a pair with that key - replace it?
@@ -65,6 +65,19 @@ namespace FEAST
     return sub_section;
   }
 
+  bool ParamSection::erase_entry(String key)
+  {
+    CONTEXT("ParamSection::erase_entry()");
+
+    EntryMap::iterator it(_values.find(key));
+    if(it != _values.end())
+    {
+      _values.erase(it);
+      return true;
+    }
+    return false;
+  }
+
   bool ParamSection::erase_section(String name)
   {
     CONTEXT("ParamSection::erase_section()");
@@ -78,18 +91,38 @@ namespace FEAST
     return false;
   }
 
-
-  bool ParamSection::erase_entry(String key)
+  std::pair<String, bool> ParamSection::get_entry(String key) const
   {
-    CONTEXT("ParamSection::erase_entry()");
+    CONTEXT("ParamSection::get_entry()");
 
-    ValueMap::iterator it(_values.find(key));
-    if(it != _values.end())
+    EntryMap::const_iterator iter(_values.find(key));
+    if(iter == _values.end())
     {
-      _values.erase(it);
-      return true;
+      return std::make_pair("", false);
     }
-    return false;
+    return std::make_pair(iter->second, true);
+  }
+
+  const ParamSection* ParamSection::get_section(String name) const
+  {
+    CONTEXT("ParamSection::get_section() [const]");
+    SectionMap::const_iterator iter(_sections.find(name));
+    if(iter == _sections.end())
+    {
+      return nullptr;
+    }
+    return iter->second;
+  }
+
+  ParamSection* ParamSection::get_section(String name)
+  {
+    CONTEXT("ParamSection::get_section()");
+    SectionMap::iterator iter(_sections.find(name));
+    if(iter == _sections.end())
+    {
+      return nullptr;
+    }
+    return iter->second;
   }
 
   void ParamSection::parse(String filename)
@@ -105,7 +138,7 @@ namespace FEAST
       throw FileNotFound(filename);
     }
 
-    //parsing
+    // parsing
     try
     {
       parse(ifs);
@@ -145,8 +178,21 @@ namespace FEAST
     // other auxiliary variables
     String key, value;
     String::size_type found;
-    bool sec = false;
     int cur_line = 0;
+
+    // an enumeration for keeping track what was read
+    enum LastRead
+    {
+      None,       // nothing read until now
+      Entry,      // last entity was a key-value pair
+      Section,    // last entity was a section marker
+      BraceOpen,  // last entity was an open curly brace
+      BraceClose, // last entity was a closed curly brace
+      Include     // last entity was an include
+    };
+
+    // keep track of what was the last thing we read
+    LastRead last_read = None;
 
     // loop over all lines until we reach the end of the file
     while(!ifs.eof() && ifs.good())
@@ -154,12 +200,6 @@ namespace FEAST
       // get a line
       getline(ifs, line);
       ++cur_line;
-
-      // erase comments
-      if((found = line.find('#')) != std::string::npos)
-      {
-        line.erase(found);
-      }
 
       // trim whitespaces; continue with next line if the current one is empty
       if(line.trim().empty())
@@ -170,29 +210,43 @@ namespace FEAST
       // check for special keywords; these begin with an @ sign
       if(line.front() == '@')
       {
-        // this is not a section marker
-        sec = false;
-
         // if its an "@include "
         if(line.compare(0, 9, "@include ") == 0)
         {
+          // an include may appear anywhere in a file
+          last_read = Include;
+
           // erase "@include "
           line.erase(0, 9);
 
           // parse the included file
           current->parse(line.trim());
+
+          // okay
+          continue;
         }
         else
         {
-          throw SyntaxError("Unknown keyword in line " + stringify(cur_line));
+          throw SyntaxError("Unknown keyword in line " + stringify(cur_line) + " : " + line);
+        }
+      }
+      else if((found = line.find('#')) != std::string::npos)
+      {
+        // erase comment
+        line.erase(found);
+
+        // trim whitespaces; continue with next line if the current one is empty
+        if(line.trim().empty())
+        {
+          continue;
         }
       }
 
       // if its a section
-      else if((line.front() == '[') && (line.back() == ']'))
+      if((line.front() == '[') && (line.back() == ']'))
       {
-        // this is a section marker
-        sec = true;
+        // a section may appear anywhere
+        last_read = Section;
 
         // removing brackets
         line.pop_front();
@@ -205,14 +259,18 @@ namespace FEAST
         }
 
         // adding section
-        current = current->add_section(line);
+        current = stack.top()->add_section(line);
       }
 
       // if its a key-value pair
       else if((found = line.find('=')) != std::string::npos)
       {
-        // this is not a section marker
-        sec = false;
+        // an entry must not appear after a closing brace
+        if(last_read == BraceClose)
+        {
+          throw SyntaxError("Unexpected key-value pair in line " + stringify(cur_line) + " after '}'");
+        }
+        last_read = Entry;
 
         // extract key
         key = line.substr(0, found);
@@ -275,13 +333,14 @@ namespace FEAST
         current->add_entry(key, value);
       }
 
-      else if(line.compare("{") == 0)
+      else if(line == "{")
       {
-        // if the new section was declared
-        if(sec)
+        // an open curly brace is allowed only after a section marker
+        if(last_read == Section)
         {
+          // push section onto the stack
           stack.push(current);
-          sec = false;
+          last_read = BraceOpen;
         }
         // if it was not or there is something in the line above, that is not valid
         else
@@ -290,17 +349,18 @@ namespace FEAST
         }
       }
 
-      else if(line.compare("}") == 0)
+      else if(line == "}")
       {
-        sec = false;
-
-        // check the number of sections on the stack; the bottom end of the stack is the root section
-        // which cannot be removed from the stack - so trying to empty the stack with a closing brace
-        // is a syntax error
-        if(stack.size() > 1)
+        // a closed curly brace is allowed anywhere except at the beginning of the file; in addition
+        // to that the stack must contain at least 2 entries as the root section always is the bottom
+        // entry of the stack and cannot be removed.
+        if((last_read != None) && (stack.size() > 1))
         {
+          // remove top section from stack
           stack.pop();
+          // and get the section underneath it
           current = stack.top();
+          last_read = BraceClose;
         }
         else
         {
@@ -326,8 +386,8 @@ namespace FEAST
   {
     CONTEXT("ParamSection::merge()");
 
-    ValueMap::const_iterator valiter(section._values.begin());
-    ValueMap::const_iterator valend(section._values.end());
+    EntryMap::const_iterator valiter(section._values.begin());
+    EntryMap::const_iterator valend(section._values.end());
 
     // merging _values of the two sections
     for(; valiter != valend; ++valiter)
@@ -344,44 +404,6 @@ namespace FEAST
       // get ParamSection pointer to the section corresponding to iter and merge again
       add_section(seciter->first)->merge(*seciter->second, replace);
     }
-  }
-
-  ////////////////////////////////////////////////////////
-  /////////// Output functions (into file etc.) //////////
-  ////////////////////////////////////////////////////////
-
-  std::pair<String, bool> ParamSection::get_entry(String key) const
-  {
-    CONTEXT("ParamSection::get_entry()");
-
-    ValueMap::const_iterator iter(_values.find(key));
-    if(iter == _values.end())
-    {
-      return std::make_pair("", false);
-    }
-    return std::make_pair(iter->second, true);
-  }
-
-  const ParamSection* ParamSection::get_section(String name) const
-  {
-    CONTEXT("ParamSection::get_section() [const]");
-    SectionMap::const_iterator iter(_sections.find(name));
-    if(iter == _sections.end())
-    {
-      return nullptr;
-    }
-    return iter->second;
-  }
-
-  ParamSection* ParamSection::get_section(String name)
-  {
-    CONTEXT("ParamSection::get_section()");
-    SectionMap::iterator iter(_sections.find(name));
-    if(iter == _sections.end())
-    {
-      return nullptr;
-    }
-    return iter->second;
   }
 
   void ParamSection::dump(String filename) const
@@ -409,8 +431,8 @@ namespace FEAST
     String prefix(2*indent, ' ');
 
     // dump values
-    ValueMap::const_iterator vit(_values.begin());
-    ValueMap::const_iterator vend(_values.end());
+    EntryMap::const_iterator vit(_values.begin());
+    EntryMap::const_iterator vend(_values.end());
     for( ; vit != vend ; ++vit)
     {
       os << prefix << (*vit).first << " = " << (*vit).second << std::endl;
@@ -432,5 +454,4 @@ namespace FEAST
       os << prefix << "} # end of [" << (*sit).first << "]" << std::endl;
     }
   }
-
 } //namespace FEAST

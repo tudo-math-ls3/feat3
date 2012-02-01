@@ -436,6 +436,7 @@
     <ClCompile Include="..\kernel\util\graph-test.cpp" />
     <ClCompile Include="..\kernel\util\inheritance-test.cpp" />
     <ClCompile Include="..\kernel\util\logger-test.cpp" />
+    <ClCompile Include="..\kernel\util\param_section-test.cpp" />
     <ClCompile Include="..\kernel\util\pretty_printer-test.cpp" />
     <ClCompile Include="..\test_system\test_system-test.cpp" />
     <ClCompile Include="..\test_system\test_system.cpp" />

@@ -1,0 +1,225 @@
+/** \page ini_format FEAST INI Data File Format
+
+The data format used by the parser of the ParamSection class is a custom extension of the well-known INI format.
+INI files are simple ASCII text files whose contents are basically made up from \e properties and \e sections.
+\see http://en.wikipedia.org/wiki/INI_file
+
+<b>Contents:</b>\n
+- \ref sec_comment
+- \ref sec_property
+- \ref sec_section
+- \ref sec_include
+- \ref sec_example
+
+
+\section sec_comment Comments
+The hash sign <c>#</c> denotes the beginning of a comment spanning to the end of the line.
+\verbatim
+# This is a comment that will be ignored\endverbatim
+<b>Notes:</b>
+- Comments do \e not necessarily need to stand alone in a line, e.g. a comment may begin after a key-value pair in
+  the same line.
+- The only exception where the hash sign \c # is \e not interpreted as a comment marker is after an <c>\@include</c>
+  statement; see \ref sec_include for more details.
+
+
+\section sec_property Properties
+Properties (data) are declared as so-called 'key-value pairs'
+\verbatim
+key = value\endverbatim
+where the first equals sign \c = is used as a delimiter to separate the \c key and \c value parts.
+Both the \c key and \c value strings are trimmed from leading and trailing whitespaces -- and, in the case
+of the \c value part, also comments -- but are except for that parsed verbatim.\n
+Furthermore, the \e value part of the declaration may be split across multiple consecutive lines by appending
+an ampersand symbol \c & as the last non-whitespace character in a line. In this case the parser will append
+the next (semantically) non-empty line and, if this line also ends with an ampersand, continue the line
+continuation process iteratively, e.g. the three lines
+\verbatim
+message = Hello &
+          World&
+          !\endverbatim
+are equivalent to
+\verbatim
+message = Hello World!\endverbatim
+<b>Notes:</b>
+- As mentioned before, the hash sign \c # is recognised as a comment identifier even in a key-value pair,
+  e.g. the line
+\verbatim
+key = value # and a comment in the same line\endverbatim
+  is equivalent to
+\verbatim
+key = value\endverbatim
+- As an obvious consequence there is (currently) no way to declare a value which contains a hash sign \c #.
+- Although keys and values are parsed verbatim, the parser handles the key string in case-insensitive manner,
+  e.g. the three declarations
+\verbatim
+key = value
+KEY = value
+Key = value\endverbatim
+  are all equivalent.
+- The value string of a declaration may be empty, e.g. the two lines
+\verbatim
+Foo =
+Bar = # comment\endverbatim
+  are both legal declarations that will assign empty strings to the keys \c Foo and \c Bar.
+- If multiple declarations specify the same key and (possibly) different values, the parser will 'forget'
+  any of these declarations except for the last one, e.g. the three declarations
+\verbatim
+key = This value
+key = was defined
+key = more than once\endverbatim
+  will be boiled down to
+\verbatim
+key = more than once\endverbatim
+- In the line continuation process the parser
+  - does not trim whitespaces between the value part the ampersand symbol \c & , e.g.
+\verbatim
+message = Hello   &
+          World!\endverbatim
+  is equivalent to
+\verbatim
+message = Hello   World!\endverbatim
+  - skips semantically empty lines, e.g. the four lines
+\verbatim
+message = Hello &
+
+    # comment
+    World!\endverbatim
+    boil down to
+\verbatim
+message = Hello World!\endverbatim
+  - does not further analyse the line to be appended, e.g. the three lines
+\verbatim
+key = my &
+    # value
+date = 2012-12-21\endverbatim
+    boil down to
+\verbatim
+key = my date = 2012-12-21\endverbatim
+    which yields (as the value string is allowed to contain an equals sign) a syntatically correct declaration
+    but does most probably \e not represent the author's intention.
+
+\section sec_section Sections
+Several key-value pairs can be grouped together in sections. A section is declared by a single line containing
+the section name enclosed in a <c>[ ]</c> bracket pair. Any key-value pair following a section declaration is
+placed inside that section until another section declaration appears, e.g.
+\verbatim
+[Section]
+# a key-value pair within 'Section'
+Hello = World!
+
+[AnotherSection]
+# a key-value pair within 'AnotherSection'
+Foo = Bar\endverbatim
+Furthermore, by using pairs of curly braces <c>{</c> <c>}</c> one can also \e nest sections:
+\verbatim
+[Section]
+{
+  Hello = World!      # a key-value pair within 'Section'
+
+  [SubSection]
+  Foo = Bar           # a key-value pair within 'Section.SubSection'
+
+  [AnotherSubSection]
+  {
+    answer = 42       # a key-value pair within 'Section.AnotherSubSection'
+  } # end of [AnotherSubSection]
+} # end of [Section]\endverbatim
+<b>Notes:</b>\n
+- The section name is trimmed of whitespaces by the parser, e.g. the two lines
+\verbatim
+[Section]
+   [  Section    ]\endverbatim
+  are equivalent.
+- In analogy to the handling of keys, section names are handled in case-insensitive manner.
+- If multiple section declarations specify the same section name, their contents are merged, e.g.
+\verbatim
+[A]
+foo = bar
+[B]
+key = value
+[A]
+Hello = World!\endverbatim
+  is merged into
+\verbatim
+[A]
+foo = bar
+Hello = World!
+[B]
+key = value\endverbatim
+- If no section nesting is required, the use of curly braces \c { \c } is optional and can even be mixed
+  within one file, e.g.
+\verbatim
+[A]
+{
+  key = value
+}
+[B]
+foo = bar\endverbatim
+  is syntactically legal.
+- If curly braces are used, then no key-value pair must be declared between the section marker and its
+  opening curly brace or after the closing curly brace, e.g.
+\verbatim
+[A]
+key = value       # error: key-value pair before '{' in next line
+{
+  foo = bar       # okay: inside curly braces
+}
+Hello = World!    # error: key-value pair after '}' in previous line\endverbatim
+- Each curly brace must stand alone (modulo comments) in a separate line, e.g. the commonly used "C" style
+\verbatim
+[A] {
+  key = value
+}\endverbatim
+  is illegal.
+
+\section sec_include File Inclusion
+By using the <c>\@include</c> keyword followed by a filepath, one can also include other files, e.g.
+\verbatim
+@include /home/data/myfile.txt\endverbatim
+will tell the parser to parse a file named \c myfile.txt lying in the path \c /home/data/.
+\warning
+The line containing the <c>\@include</c> statement must \e not contain comments, as the hash sign \c # does
+\e not denote the beginning of a comment in this case but is interpreted as part of the file's path instead.
+
+<b>Notes:</b>\n
+- Despite the obvious similarity to the <c>#include</c> statement of the C/C++ preprocessor, the INI parser does
+  not copy-&-paste the to-be-included-file's contents into the file containing the <c>\@include</c> statement,
+  but instead separately parses the to-be-included-file and afterwards continues parsing the file containing the
+  <c>\@include</c> statement (unless an error occured)
+- As a consequence, each INI file must be self-contained.
+- The filepath is trimmed of leading and trailing whitespaces.
+- The contents of a file included by an <c>\@include</c> statement will be parsed into the currently active section,
+  e.g. the statement
+\verbatim
+[TheSection]
+@include somefile.txt\endverbatim
+will parse the contents of \c somefile.txt into \c TheSection.
+
+\section sec_example Examples
+\verbatim
+# This is a comment and the next line is a simple key-value pair in the root section
+key = value
+
+# The next two lines open a new section named 'MySection'
+[MySection]
+{
+  # Two key-value pairs in 'MySection'
+  date = 1985-05-08
+  message = Hello World! # This is a comment after a key-value pair
+
+  # A subsection named 'MySubSection' nested in 'MySection'
+  [MySubSection]
+  pi = 3.1415926535&   # pi is in 'MySection.MySubSection'
+         8979323846&   # and pi has a lot of digits...
+         2643383279... # ...which need several lines
+
+  # The next line will close both 'MySubSection' and 'MySection'
+}
+
+# Include another data file.
+include@ /home/feast/my_data.txt
+\endverbatim
+
+\author Peter Zajac
+**/
