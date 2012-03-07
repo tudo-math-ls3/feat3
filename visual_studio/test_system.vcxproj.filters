@@ -79,5 +79,11 @@
     <ClCompile Include="..\kernel\util\param_section-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-quad.cpp">
+      <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-quad.cpp">
+      <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

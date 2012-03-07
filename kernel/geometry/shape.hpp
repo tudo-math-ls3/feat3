@@ -31,6 +31,12 @@ namespace FEAST
           /// Vertex dimension
           dimension = 0
         };
+
+        /// Returns the name of the class as a String.
+        static String name()
+        {
+          return "Vertex";
+        }
       }; // struct Vertex
 
       /**
@@ -48,26 +54,12 @@ namespace FEAST
         {
           /// Simplex dimension
           dimension = dimension_,
-
-          /// number of vertices per cell
-          num_verts = dimension_+1
         };
 
-        /**
-         * \brief Returns the number of faces.
-         *
-         * \param[in] face_dim
-         * The dimension of the faces whose count is to be returned.
-         *
-         * \returns
-         * The number of faces of dimension \p face_dim per simplex.
-         */
-        static inline int num_faces(int face_dim)
+        /// Returns the name of the class as a String.
+        static String name()
         {
-          CONTEXT("Simplex::num_faces()");
-          ASSERT(face_dim <= dimension, "invalid face_dim parameter");
-          ASSERT(face_dim >= 0, "invalid face_dim parameter");
-          return int(binomial(dimension+1, face_dim+1));
+          return "Simplex<" + stringify(dimension_) + ">";
         }
       }; // class Simplex
 
@@ -86,26 +78,12 @@ namespace FEAST
         {
           /// Hypercube dimension
           dimension = dimension_,
-
-          /// number of vertices per cell
-          num_verts = (1 << dimension_) // = 2^n
         };
 
-        /**
-         * \brief Returns the number of faces.
-         *
-         * \param[in] face_dim
-         * The dimension of the faces whose count is to be returned.
-         *
-         * \returns
-         * The number of faces of dimension \p face_dim per hypercube.
-         */
-        static inline int num_faces(int face_dim)
+        /// Returns the name of the class as a String.
+        static String name()
         {
-          CONTEXT("Hypercube::num_faces()");
-          ASSERT(face_dim <= dimension, "invalid face_dim parameter");
-          ASSERT(face_dim >= 0, "invalid face_dim parameter");
-          return (1 << (dimension - face_dim)) * int(binomial(dimension, face_dim));
+          return "Hypercube<" + stringify(dimension_) + ">";
         }
       }; // struct Hypercube
 
@@ -122,13 +100,36 @@ namespace FEAST
       /**
        * \brief Face traits tag struct template
        *
+       * \tparam Shape_
+       * A shape tag class whose face information is to be determined.
+       *
+       * \tparam face_dim_
+       * The dimension of the faces whose information is to be determined.
+       * Must be 0 <= \p face_dim_ <= \p Shape_::dimension.
+       *
        * \author Peter Zajac
        */
       template<
         typename Shape_,
         int face_dim_>
+#ifndef DOXYGEN
       struct FaceTraits;
+#else
+      struct FaceTraits
+      {
+        /// Shape type of the face
+        typedef ... ShapeType;
 
+        /// dummy enum
+        enum
+        {
+          /// Number of faces of dimension \p face_dim_
+          count = ...
+        };
+      };
+#endif // DOXYGEN
+
+      /// \cond internal
       /**
        * \brief partial FaceTraits specialisation for Simplex shape
        *
@@ -154,7 +155,7 @@ namespace FEAST
            * For an <em>n</em>-Simplex, the number of <em>m</em>-faces is given by
            * \f[ {n+1\choose m+1} \f]
            */
-          count = Binomial<cell_dim_+1, face_dim_+1>::value
+          count = Binomial<cell_dim_ + 1, face_dim_ + 1>::value
         };
       }; // struct FaceTraits<Simplex<...>, ...>
 
@@ -175,7 +176,7 @@ namespace FEAST
         enum
         {
           /** \brief Number of vertices per cell */
-          count = Simplex<cell_dim_>::num_verts
+          count = cell_dim_ + 1
         };
       }; // struct FaceTraits<Simplex<...>, 0>
 
@@ -204,7 +205,7 @@ namespace FEAST
            * For an <em>n</em>-Hypercube, the number of <em>m</em>-faces is given by
            * \f[ 2^{(n-m)}\cdot {n\choose m} \f]
            */
-          count = (1 << (cell_dim_ - face_dim_)) * Binomial<cell_dim_,face_dim_>::value
+          count = (1 << (cell_dim_ - face_dim_)) * Binomial<cell_dim_, face_dim_>::value
         };
       }; // struct FaceTraits<Hypercube<...>, ...>
 
@@ -225,9 +226,10 @@ namespace FEAST
         enum
         {
           /** \brief Number of vertices per cell */
-          count = Hypercube<cell_dim_>::num_verts
+          count = (1 << cell_dim_)
         };
       }; // struct FaceTraits<HyperCube<...>, 0>
+      /// \endcond
     } // namespace Shape
   } // namespace Geometry
 } // namespace FEAST

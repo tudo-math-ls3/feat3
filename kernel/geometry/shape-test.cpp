@@ -28,30 +28,30 @@ public:
     // test simplex vertex counts
 
     // 1-Simplex (line): 2 vertices
-    int simplex1_nverts = Simplex<1>::num_verts;
+    int simplex1_nverts = FaceTraits<Simplex<1>,0>::count;
     TEST_CHECK_EQUAL(simplex1_nverts, 2);
 
     // 2-Simplex (triangle): 3 vertices
-    int simplex2_nverts = Simplex<2>::num_verts;
+    int simplex2_nverts = FaceTraits<Simplex<2>,0>::count;
     TEST_CHECK_EQUAL(simplex2_nverts, 3);
 
     // 3-Simplex (tetrahedron): 4 vertices
-    int simplex3_nverts = Simplex<3>::num_verts;
+    int simplex3_nverts = FaceTraits<Simplex<3>,0>::count;
     TEST_CHECK_EQUAL(simplex3_nverts, 4);
 
 
     // test hypercube vertex counts
 
     // 1-Hypercube (line): 2 vertices
-    int hcube1_nverts = Hypercube<1>::num_verts;
+    int hcube1_nverts = FaceTraits<Hypercube<1>,0>::count;
     TEST_CHECK_EQUAL(hcube1_nverts, 2);
 
     // 2-Hypercube (quadrilateral): 4 vertices
-    int hcube2_nverts = Hypercube<2>::num_verts;
+    int hcube2_nverts = FaceTraits<Hypercube<2>,0>::count;
     TEST_CHECK_EQUAL(hcube2_nverts, 4);
 
     // 3-Hypercube (hexahedron): 8 vertices
-    int hcube3_nverts = Hypercube<3>::num_verts;
+    int hcube3_nverts = FaceTraits<Hypercube<3>,0>::count;
     TEST_CHECK_EQUAL(hcube3_nverts, 8);
 
 

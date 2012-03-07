@@ -431,6 +431,8 @@
     <ClCompile Include="..\kernel\foundation\work_group-test_2d_1.cpp" />
     <ClCompile Include="..\kernel\foundation\work_group-test_2d_2.cpp" />
     <ClCompile Include="..\kernel\geometry\shape-test.cpp" />
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-quad.cpp" />
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-quad.cpp" />
     <ClCompile Include="..\kernel\util\assertion-test.cpp" />
     <ClCompile Include="..\kernel\util\factorial-test.cpp" />
     <ClCompile Include="..\kernel\util\graph-test.cpp" />

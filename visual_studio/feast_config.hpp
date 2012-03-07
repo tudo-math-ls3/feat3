@@ -15,6 +15,9 @@
 // disable the context stack - in VS we can use a *real* debugger for that...
 #define FEAST_NO_CONTEXT 1
 
+// uncomment the following line to enable context tracing
+//#define FEAST_TRACE_CONTEXT 1
+
 // set the root directory - as we do not want to use environment variables, we'll set it to "."
 // this works as long as the application is launched in the FEAST root directory
 #define FEAST_SRC_DIR "."
