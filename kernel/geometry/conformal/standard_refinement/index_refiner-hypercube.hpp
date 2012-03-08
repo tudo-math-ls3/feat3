@@ -28,7 +28,6 @@ namespace FEAST
           typedef Shape::Hypercube<shape_dim> ShapeType;
           typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
           typedef IndexSet<Shape::FaceTraits<CellType, face_dim>::count> IndexSetType;
-          typedef IndexSetType::IndexVectorType IdxVecType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -41,8 +40,17 @@ namespace FEAST
             const Index iov = index_offsets[0];
             const Index ioe = index_offsets[1];
 
-            // fetch the edge-vertex index set
-            const IndexSetType& index_set_e_v = index_set_holder_in.get_index_set<1,0>();
+            // typedef index set vector reference for output index set
+            typedef IndexSetType::IndexVectorReference IndexVectorReference;
+
+            // typedef index set type; an edge has 2 vertices, so we need an IndexSet<2>
+            typedef IndexSet<2> IndexSetTypeEV;
+
+            // typedef index vector reference type
+            typedef IndexSetTypeEV::ConstIndexVectorReference ConstIndexVectorReferenceEV;
+
+            // fetch the vertices-at-edge index set
+            const IndexSetTypeEV& index_set_e_v = index_set_holder_in.get_index_set<1,0>();
 
             // fetch number of coarse mesh edges
             const Index num_edges = index_set_e_v.get_num_entities();
@@ -50,12 +58,12 @@ namespace FEAST
             // loop over all coarse mesh edges
             for(Index i(0); i < num_edges; ++i)
             {
-              // fetch coarse mesh edge-vertex index vector
-              const IdxVecType& e_v = index_set_e_v[i];
+              // fetch coarse mesh vertices-at-edge index vector
+              ConstIndexVectorReferenceEV e_v = index_set_e_v[i];
 
-              // fetch fine mesh edge-vertex index vectors
-              IdxVecType& idx0 = index_set_out[offset + 2*i + 0];
-              IdxVecType& idx1 = index_set_out[offset + 2*i + 1];
+              // fetch fine mesh vertices-at-edge index vectors
+              IndexVectorReference idx0 = index_set_out[offset + 2*i + 0];
+              IndexVectorReference idx1 = index_set_out[offset + 2*i + 1];
 
               // calculate fine edge-vertex indices
               idx0[0] = iov + e_v[0];
@@ -86,7 +94,6 @@ namespace FEAST
           typedef Shape::Hypercube<shape_dim> ShapeType;
           typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
           typedef IndexSet<Shape::FaceTraits<CellType, face_dim>::count> IndexSetType;
-          typedef IndexSetType::IndexVectorType IdxVecType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -99,13 +106,16 @@ namespace FEAST
             const Index ioe = index_offsets[1];
             const Index ioq = index_offsets[2];
 
-            // typedef index set types
+            // typedef index set vector reference for output index set
+            typedef IndexSetType::IndexVectorReference IndexVectorReference;
+
+            // typedef index set type; a quad has 4 edges, so we need an IndexSet<4>
             typedef IndexSet<4> IndexSetTypeQE;
 
             // typedef index vector type
-            typedef IndexSetTypeQE::IndexVectorType IndexVectorTypeQE;
+            typedef IndexSetTypeQE::ConstIndexVectorReference ConstIndexVectorReferenceQE;
 
-            // fetch the quad-vertex index set
+            // fetch the edges-at-quad index set
             const IndexSetTypeQE& index_set_q_e = index_set_holder_in.get_index_set<2,1>();
 
             // fetch number of coarse mesh quads
@@ -133,14 +143,14 @@ namespace FEAST
             // loop over all coarse mesh edges
             for(Index i(0); i < num_quads; ++i)
             {
-              // fetch coarse mesh quad-edge index vector
-              const IndexVectorTypeQE& q_e = index_set_q_e[i];
+              // fetch coarse mesh edges-at-quad index vector
+              ConstIndexVectorReferenceQE q_e = index_set_q_e[i];
 
-              // fetch fine mesh quad-edge index vectors
-              IdxVecType& e_0 = index_set_out[offset + 4*i + 0];
-              IdxVecType& e_1 = index_set_out[offset + 4*i + 1];
-              IdxVecType& e_2 = index_set_out[offset + 4*i + 2];
-              IdxVecType& e_3 = index_set_out[offset + 4*i + 3];
+              // fetch fine mesh vertices-at-edge index vectors
+              IndexVectorReference e_0 = index_set_out[offset + 4*i + 0];
+              IndexVectorReference e_1 = index_set_out[offset + 4*i + 1];
+              IndexVectorReference e_2 = index_set_out[offset + 4*i + 2];
+              IndexVectorReference e_3 = index_set_out[offset + 4*i + 3];
 
               e_0[0] = ioe + q_e[0]; // v_0
               e_0[1] = ioq + i;      // x
@@ -173,7 +183,6 @@ namespace FEAST
           typedef Shape::Hypercube<shape_dim> ShapeType;
           typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
           typedef IndexSet<Shape::FaceTraits<CellType, face_dim>::count> IndexSetType;
-          typedef IndexSetType::IndexVectorType IdxVecType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -187,13 +196,16 @@ namespace FEAST
             const Index ioe = index_offsets[1];
             const Index ioq = index_offsets[2];
 
-            // typedef index set types
+            // typedef index set vector reference for output index set
+            typedef IndexSetType::IndexVectorReference IndexVectorReference;
+
+            // typedef index set types; a quad has 4 vertices and 4 edges, so both need an IndexSet<4>
             typedef IndexSet<4> IndexSetTypeQV;
             typedef IndexSet<4> IndexSetTypeQE;
 
             // typedef index vector type
-            typedef IndexSetTypeQV::IndexVectorType IndexVectorTypeQV;
-            typedef IndexSetTypeQE::IndexVectorType IndexVectorTypeQE;
+            typedef IndexSetTypeQV::ConstIndexVectorReference ConstIndexVectorReferenceQV;
+            typedef IndexSetTypeQE::ConstIndexVectorReference ConstIndexVectorReferenceQE;
 
             // fetch the quad-vertex index set
             const IndexSetTypeQV& index_set_q_v = index_set_holder_in.get_index_set<2,0>();
@@ -224,15 +236,15 @@ namespace FEAST
             // loop over all coarse mesh edges
             for(Index i(0); i < num_quads; ++i)
             {
-              // fetch coarse mesh quad-vertex index vector
-              const IndexVectorTypeQV& q_v = index_set_q_v[i];
-              const IndexVectorTypeQE& q_e = index_set_q_e[i];
+              // fetch coarse mesh vertices-at-quad and edges-at-quad index vectors
+              ConstIndexVectorReferenceQV q_v = index_set_q_v[i];
+              ConstIndexVectorReferenceQE q_e = index_set_q_e[i];
 
-              // fetch fine mesh quad-vertex index vectors
-              IdxVecType& q_0 = index_set_out[offset + 4*i + 0];
-              IdxVecType& q_1 = index_set_out[offset + 4*i + 1];
-              IdxVecType& q_2 = index_set_out[offset + 4*i + 2];
-              IdxVecType& q_3 = index_set_out[offset + 4*i + 3];
+              // fetch fine mesh vertices-at-quad index vectors
+              IndexVectorReference q_0 = index_set_out[offset + 4*i + 0];
+              IndexVectorReference q_1 = index_set_out[offset + 4*i + 1];
+              IndexVectorReference q_2 = index_set_out[offset + 4*i + 2];
+              IndexVectorReference q_3 = index_set_out[offset + 4*i + 3];
 
               // calculate fine quad-vertex indices
               q_0[0] = iov + q_v[0]; // v_0
@@ -274,7 +286,6 @@ namespace FEAST
           typedef Shape::Hypercube<shape_dim> ShapeType;
           typedef Shape::FaceTraits<ShapeType, cell_dim>::ShapeType CellType;
           typedef IndexSet<Shape::FaceTraits<CellType, face_dim>::count> IndexSetType;
-          typedef IndexSetType::IndexVectorType IdxVecType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -283,21 +294,21 @@ namespace FEAST
             const Index index_offsets[],
             const IndexSetHolderType& index_set_holder_in)
           {
-            typedef Congruency::SubIndexMapping<ShapeType, face_dim, 0> SubIndexMappingType;
-
             // fetch vertex index offsets
             const Index ioe = index_offsets[1];
             const Index ioq = index_offsets[2];
 
-            // typedef index set types
-            typedef IndexSet<2> IndexSetTypeEV;
-            typedef IndexSet<4> IndexSetTypeQV;
-            typedef IndexSet<4> IndexSetTypeQE;
+            // typedef index set vector reference for output index set
+            typedef IndexSetType::IndexVectorReference IndexVectorReference;
+
+            // typedef index set types;
+            typedef IndexSet<2> IndexSetTypeEV; // an edge has 2 vertices
+            typedef IndexSet<4> IndexSetTypeQV; // a quad has 4 vertices
+            typedef IndexSet<4> IndexSetTypeQE; // a quad has 4 edges
 
             // typedef index vector type
-            typedef IndexSetTypeEV::IndexVectorType IndexVectorTypeEV;
-            typedef IndexSetTypeQV::IndexVectorType IndexVectorTypeQV;
-            typedef IndexSetTypeQE::IndexVectorType IndexVectorTypeQE;
+            typedef IndexSetTypeQV::ConstIndexVectorReference ConstIndexVectorReferenceQV;
+            typedef IndexSetTypeQE::ConstIndexVectorReference ConstIndexVectorReferenceQE;
 
             // fetch the quad-vertex index set
             const IndexSetTypeEV& index_set_e_v = index_set_holder_in.get_index_set<1,0>();
@@ -306,6 +317,9 @@ namespace FEAST
 
             // fetch number of coarse mesh quads
             const Index num_quads = index_set_q_v.get_num_entities();
+
+            // typedef the sub-index mapping
+            typedef Congruency::SubIndexMapping<ShapeType, face_dim, 0> SubIndexMappingType;
 
             /// \todo some text for fancy ASCII-art
             //
@@ -326,20 +340,20 @@ namespace FEAST
             // loop over all coarse mesh edges
             for(Index i(0); i < num_quads; ++i)
             {
-              // fetch coarse mesh quad-vertex index vector
-              const IndexVectorTypeQV& q_v = index_set_q_v[i];
-              const IndexVectorTypeQE& q_e = index_set_q_e[i];
+              // fetch coarse mesh vertices-at-quad and edges-at-quad index vectors
+              ConstIndexVectorReferenceQV q_v = index_set_q_v[i];
+              ConstIndexVectorReferenceQE q_e = index_set_q_e[i];
 
               // create a sub-index mapping object
               SubIndexMappingType sim(q_v, q_e, index_set_e_v);
 
-              // fetch fine mesh quad-vertex index vectors
-              IdxVecType& q_0 = index_set_out[offset + 4*i + 0];
-              IdxVecType& q_1 = index_set_out[offset + 4*i + 1];
-              IdxVecType& q_2 = index_set_out[offset + 4*i + 2];
-              IdxVecType& q_3 = index_set_out[offset + 4*i + 3];
+              // fetch fine mesh edges-at-quad index vectors
+              IndexVectorReference q_0 = index_set_out[offset + 4*i + 0];
+              IndexVectorReference q_1 = index_set_out[offset + 4*i + 1];
+              IndexVectorReference q_2 = index_set_out[offset + 4*i + 2];
+              IndexVectorReference q_3 = index_set_out[offset + 4*i + 3];
 
-              // calculate fine quad-vertex indices
+              // calculate fine edges-at-quad indices
               q_0[0] = ioe + 2*q_e[0] + sim.map(0, 0);  // e_0_0
               q_0[1] = ioq + 4*i + 2;                   // f_2
               q_0[2] = ioe + 2*q_e[2] + sim.map(2, 0);  // e_2_0
