@@ -213,9 +213,9 @@ namespace FEAST
         typedef Intern::VTKHelper<typename MeshType::ShapeType> VTKHelperType;
 
         // fetch index set
-        const typename MeshType::template IndexSet<_mesh.shape_dim,0>::Type& idx =
-          _mesh.get_index_set<_mesh.shape_dim, 0>();
-        Index num_cells = _mesh.get_num_entities(_mesh.shape_dim);
+        const typename MeshType::template IndexSet<MeshType::shape_dim,0>::Type& idx =
+          _mesh.template get_index_set<MeshType::shape_dim, 0>();
+        Index num_cells = _mesh.get_num_entities(MeshType::shape_dim);
         int num_idx = idx.get_num_indices();
 
         // write cells
