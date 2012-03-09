@@ -119,38 +119,6 @@ namespace FEAST
       /// reference to mesh to be exported
       const MeshType& _mesh;
 
-      /// \cond internal
-      void write_vtx_1(std::ofstream& ofs, const VertexSetType& vtx) const
-      {
-        CONTEXT("ExportVTK::write_vtx_1()");
-        Index n = vtx.get_num_vertices();
-        for(Index i(0); i < n; ++i)
-        {
-          ofs << vtx[i][0] << " 0.0 0.0" << std::endl;
-        }
-      }
-
-      void write_vtx_2(std::ofstream& ofs, const VertexSetType& vtx) const
-      {
-        CONTEXT("ExportVTK::write_vtx_2()");
-        Index n = vtx.get_num_vertices();
-        for(Index i(0); i < n; ++i)
-        {
-          ofs << vtx[i][0] << " " << vtx[i][1] << " 0.0" << std::endl;
-        }
-      }
-
-      void write_vtx_3(std::ofstream& ofs, const VertexSetType& vtx) const
-      {
-        CONTEXT("ExportVTK::write_vtx_3()");
-        Index n = vtx.get_num_vertices();
-        for(Index i(0); i < n; ++i)
-        {
-          ofs << vtx[i][0] << " " << vtx[i][1] << " " << vtx[i][2] << std::endl;
-        }
-      }
-      /// \endcond
-
     public:
       explicit ExportVTK(const MeshType& mesh) :
         _mesh(mesh)
@@ -183,31 +151,20 @@ namespace FEAST
         // write vertex coordinates
         const typename MeshType::VertexSetType& vtx = _mesh.get_vertex_set();
         Index num_verts = vtx.get_num_vertices();
-        switch(vtx.get_num_coords())
+        int num_coords = vtx.get_num_coords();
+        ASSERT_((num_coords >= 1) && (num_coords <= 3));
+        for(Index i(0); i < num_verts; ++i)
         {
-        case 1:
-          for(Index i(0); i < num_verts; ++i)
+          ofs << vtx[i][0];
+          for(int j(1); j < num_coords; ++j)
           {
-            ofs << vtx[i][0] <<  " 0.0 0.0" << std::endl;
+            ofs << " " << vtx[i][j];
           }
-          break;
-
-        case 2:
-          for(Index i(0); i < num_verts; ++i)
+          for(int j(num_coords); j < 3; ++j)
           {
-            ofs << vtx[i][0] << " " << vtx[i][1] << " 0.0" << std::endl;
+            ofs << " 0.0";
           }
-          break;
-
-        case 3:
-          for(Index i(0); i < num_verts; ++i)
-          {
-            ofs << vtx[i][0] << " " << vtx[i][1] << " " << vtx[i][2] << std::endl;
-          }
-          break;
-
-        default:
-          ASSERT(false, "invalid coordinate count");
+          ofs << std::endl;
         }
 
         typedef Intern::VTKHelper<typename MeshType::ShapeType> VTKHelperType;
