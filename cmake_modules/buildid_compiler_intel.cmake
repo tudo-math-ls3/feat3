@@ -120,7 +120,15 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
     # unoptimised settings for all archs
     # TODO: figure out how to set explicit 64-bit mode in this case
     set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -Wall -g -Wp64 -mcmodel=large -Wshorten-64-to-32")
-
+    # on Linux, use very very pedantic settings to detect (at run time)
+    # bugs like out-of-bounds accesses. Warning: These settings result
+    # in very slow execution, but they are occasionally worth it.
+    # Since they already complain inside UMFPACK, leave them commented
+    # out for the time being.
+    # if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    #   set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -check all -debug -fp-stack-check -traceback -ftrapuv")
+    # endif ()
+    #
   else ()
     # optimised settings for all currently supported archs
     # please try to maintain the same order as in the buildid_arch module
