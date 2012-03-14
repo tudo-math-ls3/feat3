@@ -112,7 +112,7 @@ namespace FEAST
             // typedef index set type; a quad has 4 edges, so we need an IndexSet<4>
             typedef IndexSet<4> IndexSetTypeQE;
 
-            // typedef index vector type
+            // typedef index vector references
             typedef IndexSetTypeQE::ConstIndexVectorReference ConstIndexVectorReferenceQE;
 
             // fetch the edges-at-quad index set
@@ -203,7 +203,7 @@ namespace FEAST
             typedef IndexSet<4> IndexSetTypeQV;
             typedef IndexSet<4> IndexSetTypeQE;
 
-            // typedef index vector type
+            // typedef index vector references
             typedef IndexSetTypeQV::ConstIndexVectorReference ConstIndexVectorReferenceQV;
             typedef IndexSetTypeQE::ConstIndexVectorReference ConstIndexVectorReferenceQE;
 
