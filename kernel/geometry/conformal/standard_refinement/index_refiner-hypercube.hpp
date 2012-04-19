@@ -1002,11 +1002,11 @@ namespace FEAST
               q_6[0] = ioc + 6*i + 4;                   // q_4-x
               q_6[1] = ioq + 4*c_q[1] + sim.map(1, 2);  // e_6-q_1
               q_6[2] = ioq + 4*c_q[4] + sim.map(4, 1);  // q_4-e_6
-              q_6[3] = ioc + 6*i + 2;                   // x-q_1
+              q_6[3] = ioc + 6*i + 1;                   // x-q_1
 
               q_7[0] = ioc + 6*i + 5;                   // x-q_5
               q_7[1] = ioq + 4*c_q[1] + sim.map(1, 3);  // q_1-e_7
-              q_7[2] = ioc + 6*i + 2;                   // x-q_1
+              q_7[2] = ioc + 6*i + 1;                   // x-q_1
               q_7[3] = ioq + 4*c_q[5] + sim.map(5, 1);  // q_5-e_7
 
               // z-normal
@@ -1017,8 +1017,8 @@ namespace FEAST
 
               q_9[0] = ioq + 4*c_q[2] + sim.map(2, 3);  // q_2-e_9
               q_9[1] = ioc + 6*i + 5;                   // x-q_5
-              q_9[3] = ioc + 6*i + 2;                   // q_2-x
-              q_9[2] = ioq + 4*c_q[5] + sim.map(5, 2);  // e_9-q_5
+              q_9[2] = ioc + 6*i + 2;                   // q_2-x
+              q_9[3] = ioq + 4*c_q[5] + sim.map(5, 2);  // e_9-q_5
 
               q_10[0] = ioc + 6*i + 4;                   // q_4-x
               q_10[1] = ioq + 4*c_q[3] + sim.map(3, 2);  // e_10-q_3
@@ -1027,8 +1027,8 @@ namespace FEAST
 
               q_11[0] = ioc + 6*i + 5;                   // x-q_5
               q_11[1] = ioq + 4*c_q[3] + sim.map(3, 3);  // q_3-e_11
-              q_11[3] = ioc + 6*i + 3;                   // x-q_3
-              q_11[2] = ioq + 4*c_q[5] + sim.map(5, 3);  // q_5-e_11
+              q_11[2] = ioc + 6*i + 3;                   // x-q_3
+              q_11[3] = ioq + 4*c_q[5] + sim.map(5, 3);  // q_5-e_11
             }
             // return fine quad count
             return 12*num_cubes;
@@ -1208,7 +1208,7 @@ namespace FEAST
               c_4[8] = ioe + 2*c_e[8] + edgesim.map(8, 1);    // e_8-v_4
               c_4[9] = ioq + 4*c_q[2] + sim.map(2, 1);        // q_2-e_2
               c_4[10] = ioq + 4*c_q[4] + sim.map(4, 1);       // q_4-e_6
-              c_4[5] = ioc + 6*i + 1;                         // x-q_1
+              c_4[11] = ioc + 6*i + 1;                         // x-q_1
 
               // v_5-cube
               c_5[0] = ioq + 4*c_q[2] + sim.map(2, 3);        // q_2-e_9
@@ -1359,6 +1359,7 @@ namespace FEAST
               c_0[3] = ioc + 12*i + 4;                  // e_4-q_0-q_4-x
               c_0[4] = ioq + 4*c_q[4] + sim.map(4, 0);  // v_0-e_4-e_8-q_4
               c_0[5] = ioc + 12*i + 0;                  // e_0-q_0-q_2-x
+
 
               // v_1-cube
               c_1[0] = ioq + 4*c_q[0] + sim.map(0, 1);  // e_0-v_1-q_0-e_5

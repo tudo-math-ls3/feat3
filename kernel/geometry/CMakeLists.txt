@@ -10,7 +10,7 @@ ADD_LIBRARY(kernel-geometry STATIC)
 TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
 
 # list of util tests
-SET (test_list shape-test standard_refinery-test-conf-quad standard_refinery-test-struct-quad)
+SET (test_list shape-test standard_refinery-test-conf-quad standard_refinery-test-struct-quad standard_refinery-test-conf-hexa)
 
 # create all tests
 FOREACH (test ${test_list} )

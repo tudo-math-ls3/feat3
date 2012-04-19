@@ -532,6 +532,7 @@
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\target_set.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp" />
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_abacus.hpp" />

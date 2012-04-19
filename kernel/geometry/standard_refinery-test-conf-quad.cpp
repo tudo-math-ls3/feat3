@@ -12,7 +12,7 @@ typedef ConformalMeshPolicy<Shape::Quadrilateral> RootMeshPolicy;
 typedef ConformalSubMeshPolicy<Shape::Quadrilateral> SubMeshPolicy;
 
 typedef ConformalMesh<RootMeshPolicy> RootMesh;
-typedef ConformalSubMesh<SubMeshPolicy>  SubMesh;
+typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
 typedef StandardRefinery<SubMesh> SubMeshRefinery;
@@ -34,6 +34,12 @@ public:
   }
 
   virtual void run() const
+  {
+    quad_tetristest();
+    quad_refinementtest();
+  }
+
+  void quad_tetristest() const
   {
     // create a 2D tetris mesh
     RootMesh* quad_mesh_coarse = TestAux::create_tetris_mesh_2d();
@@ -77,4 +83,38 @@ public:
     delete edge_submesh_coarse;
     delete quad_mesh_coarse;
   }
+
+  void quad_refinementtest() const
+  {
+    RootMesh* quad_mesh_coarse;
+    RootMeshRefinery* quad_mesh_refinery;
+    RootMesh* quad_mesh_fine;
+    try
+    {
+      for(Index i(0); i < 4; ++i) //loop over all possible orientations (max. 8)
+      {
+        // create a 2D quad element mesh
+        quad_mesh_coarse = TestAux::create_quadrefinement_mesh_2d(i);
+
+        // create refineries
+        quad_mesh_refinery = new RootMeshRefinery(*quad_mesh_coarse);
+
+        // refine the meshes
+        quad_mesh_fine = quad_mesh_refinery->refine();
+
+        // validate refined meshes
+        TestAux::validate_refined_quadrefinement_mesh_2d(*quad_mesh_fine,i);
+
+        // clean up
+        delete quad_mesh_fine;
+        delete quad_mesh_refinery;
+        delete quad_mesh_coarse;
+      }
+    }
+    catch(const String& msg)
+        {
+          TEST_CHECK_MSG(false, msg);
+        }
+  }
+
 } standard_refinery_test_conf_quad;
