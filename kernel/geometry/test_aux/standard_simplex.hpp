@@ -1,0 +1,737 @@
+#pragma once
+#ifndef KERNEL_GEOMETRY_TEST_AUX_STANDARD_SIMPLEX_HPP
+#define KERNEL_GEOMETRY_TEST_AUX_STANDARD_SIMPLEX_HPP 1
+
+// includes, FEAST
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/test_aux/copy_comp_set.hpp>
+
+namespace FEAST
+{
+  namespace Geometry
+  {
+    /// \cond internal
+    namespace TestAux
+    {
+
+      typedef ConformalMesh< ConformalMeshPolicy< Shape::Triangle > > TriangleMesh;
+
+      TriangleMesh* create_trianglerefinement_mesh_2d(int orientation)
+      {
+
+        Index num_entities[] =
+        {
+          3, // vertices
+          3, // edges
+          1, // triangles
+        };
+
+        // create mesh
+        TriangleMesh* mesh = new TriangleMesh(num_entities);
+
+        // first possibility (standard)
+
+        //
+        //   v_2
+        //    |\
+        //    | \
+        //    |  ^
+        //    v   \
+        //    |    \
+        //   e_1   e_0
+        //    |      \
+        //    |       \
+        //    |        ^
+        //    v         \
+        //    |          \
+        //   v_0->-e_2-->-v_1
+        //
+        //   triangle orientation: 0-1-2
+
+        // set up vertex coordinates array
+        static const Real vtx0[3*8] =
+        {
+          0.0, 0.0,
+          1.0, 0.0,
+          0.0, 1.0
+        };
+
+        // set up vertices-at-edge array
+        static const Index v_e0[12*2] =
+        {
+          1, 2,
+          2, 0,
+          0, 1
+        };
+
+        // set up vertices-at-triangle array
+        static const Index v_t0[6*4] =
+        {
+          0, 1, 2
+        };
+
+        // set up edges-at-triangle array
+        static const Index e_t0[6*4] =
+        {
+          0, 1, 2
+        };
+
+        // second possibility
+
+        //
+        //   v_2
+        //    |\
+        //    | \
+        //    |  v
+        //    v   \
+        //    |    \
+        //   e_1   e_0
+        //    |      \
+        //    |       \
+        //    |        v
+        //    v         \
+        //    |          \
+        //   v_0->-e_2-->-v_1
+        //
+        //   triangle orientation: 0-1-2
+
+        // set up vertex coordinates array
+        static const Real vtx1[3*8] =
+        {
+          0.0, 0.0,
+          1.0, 0.0,
+          0.0, 1.0
+        };
+
+        // set up vertices-at-edge array
+        static const Index v_e1[12*2] =
+        {
+          2, 1,
+          2, 0,
+          0, 1
+        };
+
+        // set up vertices-at-triangle array
+        static const Index v_t1[6*4] =
+        {
+          0, 1, 2
+        };
+
+        // set up edges-at-triangle array
+        static const Index e_t1[6*4] =
+        {
+          0, 1, 2
+        };
+
+        // third possibility
+
+        //
+        //   v_2
+        //    |\
+        //    | \
+        //    |  v
+        //    v   \
+        //    |    \
+        //   e_1   e_2
+        //    |      \
+        //    |       \
+        //    |        v
+        //    v         \
+        //    |          \
+        //   v_1-<-e_0--<-v_0
+        //
+        //   triangle orientation: 1-0-2
+
+        // set up vertex coordinates array
+        static const Real vtx2[3*8] =
+        {
+          1.0, 0.0,
+          0.0, 0.0,
+          0.0, 1.0
+        };
+
+        // set up vertices-at-edge array
+        static const Index v_e2[12*2] =
+        {
+          0, 1,
+          2, 1,
+          2, 0
+        };
+
+        // set up vertices-at-triangle array
+        static const Index v_t2[6*4] =
+        {
+          1, 0, 2
+        };
+
+        // set up edges-at-triangle array
+        static const Index e_t2[6*4] =
+        {
+          2, 1, 0
+        };
+
+        // fourth possibility
+
+        //
+        //   v_0
+        //    |\
+        //    | \
+        //    |  v
+        //    v   \
+        //    |    \
+        //   e_0   e_2
+        //    |      \
+        //    |       \
+        //    |        v
+        //    v         \
+        //    |          \
+        //   v_2-<-e_1--<-v_1
+        //
+        //   triangle orientation: 0-1-2
+
+        // set up vertex coordinates array
+        static const Real vtx3[3*8] =
+        {
+          0.0, 1.0,
+          1.0, 0.0,
+          0.0, 0.0
+        };
+
+        // set up vertices-at-edge array
+        static const Index v_e3[12*2] =
+        {
+          2, 0,
+          1, 2,
+          0, 1
+        };
+
+        // set up vertices-at-triangle array
+        static const Index v_t3[6*4] =
+        {
+          2, 1, 0
+        };
+
+        // set up edges-at-triangle array
+        static const Index e_t3[6*4] =
+        {
+          2, 0, 1
+        };
+
+        switch(orientation)
+        {
+          case 0:
+            copy_vtx(mesh->get_vertex_set(), vtx0);
+            copy_idx(mesh->get_index_set<1,0>(), v_e0);
+            copy_idx(mesh->get_index_set<2,0>(), v_t0);
+            copy_idx(mesh->get_index_set<2,1>(), e_t0);
+            break;
+          case 1:
+            copy_vtx(mesh->get_vertex_set(), vtx1);
+            copy_idx(mesh->get_index_set<1,0>(), v_e1);
+            copy_idx(mesh->get_index_set<2,0>(), v_t1);
+            copy_idx(mesh->get_index_set<2,1>(), e_t1);
+            break;
+          case 2:
+            copy_vtx(mesh->get_vertex_set(), vtx2);
+            copy_idx(mesh->get_index_set<1,0>(), v_e2);
+            copy_idx(mesh->get_index_set<2,0>(), v_t2);
+            copy_idx(mesh->get_index_set<2,1>(), e_t2);
+            break;
+          case 3:
+            copy_vtx(mesh->get_vertex_set(), vtx3);
+            copy_idx(mesh->get_index_set<1,0>(), v_e3);
+            copy_idx(mesh->get_index_set<2,0>(), v_t3);
+            copy_idx(mesh->get_index_set<2,1>(), e_t3);
+            break;
+        }
+        // okay
+        return mesh;
+      } // create_trianglerefinement_mesh_2d
+
+      void validate_refined_trianglerefinement_mesh_2d(const TriangleMesh& mesh, int orientation)
+      {
+
+        // validate sizes
+        if(mesh.get_num_entities(0) != 6)
+          throw String("Vertex count mismatch");
+        if(mesh.get_num_entities(1) != 9)
+          throw String("Edge count mismatch");
+        if(mesh.get_num_entities(2) != 4)
+          throw String("Triangle count mismatch");
+
+
+        // first possibility (standard)
+
+        // vertex coordinates array
+        static const Real vtx0[] =
+        {
+          0.0, 0.0,
+          1.0, 0.0,
+          0.0, 1.0,
+          0.5, 0.5,
+          0.0, 0.5,
+          0.5, 0.0
+        };
+
+        // vertices-at-edge array
+        static const Index v_e0[] =
+        {
+          1, 3,
+          3, 2,
+          2, 4,
+          4, 0,
+          0, 5,
+          5, 1,
+          5, 4,
+          3, 5,
+          4, 3
+        };
+
+        // vertices-at-triangle
+        static const Index v_t0[] =
+        {
+          0, 5, 4,
+          5, 1, 3,
+          4, 3, 2,
+          3, 4, 5
+        };
+
+        // edges-at-triangle
+        static const Index e_t0[] =
+        {
+          6, 3, 4,
+          0, 7, 5,
+          1, 2, 8,
+          6, 7, 8
+        };
+
+        // second possibility
+
+        // vertex coordinates array
+        static const Real vtx1[] =
+        {
+          0.0, 0.0,
+          1.0, 0.0,
+          0.0, 1.0,
+          0.5, 0.5,
+          0.0, 0.5,
+          0.5, 0.0
+        };
+
+        // vertices-at-edge array
+        static const Index v_e1[] =
+        {
+          2, 3,
+          3, 1,
+          2, 4,
+          4, 0,
+          0, 5,
+          5, 1,
+          5, 4,
+          3, 5,
+          4, 3
+        };
+
+        // vertices-at-triangle
+        static const Index v_t1[] =
+        {
+          0, 5, 4,
+          5, 1, 3,
+          4, 3, 2,
+          3, 4, 5
+        };
+
+        // edges-at-triangle
+        static const Index e_t1[] =
+        {
+          6, 3, 4,
+          1, 7, 5,
+          0, 2, 8,
+          6, 7, 8
+        };
+
+        // third possibility
+
+        // vertex coordinates array
+        static const Real vtx2[] =
+        {
+          1.0, 0.0,
+          0.0, 0.0,
+          0.0, 1.0,
+          0.5, 0.0,
+          0.0, 0.5,
+          0.5, 0.5
+        };
+
+        // vertices-at-edge array
+        static const Index v_e2[] =
+        {
+          0, 3,
+          3, 1,
+          2, 4,
+          4, 1,
+          2, 5,
+          5, 0,
+          3, 4,
+          5, 3,
+          4, 5
+        };
+
+        // vertices-at-triangle
+        static const Index v_t2[] =
+        {
+          1, 3, 4,
+          3, 0, 5,
+          4, 5, 2,
+          5, 4, 3
+        };
+
+        // edges-at-triangle
+        static const Index e_t2[] =
+        {
+          6, 3, 1,
+          5, 7, 0,
+          4, 2, 8,
+          6, 7, 8
+        };
+
+        // fourth possibility
+
+        // vertex coordinates array
+        static const Real vtx3[] =
+        {
+          0.0, 1.0,
+          1.0, 0.0,
+          0.0, 0.0,
+          0.0, 0.5,
+          0.5, 0.0,
+          0.5, 0.5
+        };
+
+        // vertices-at-edge array
+        static const Index v_e3[] =
+        {
+          2, 3,
+          3, 0,
+          1, 4,
+          4, 2,
+          0, 5,
+          5, 1,
+          4, 3,
+          5, 4,
+          3, 5
+        };
+
+        // vertices-at-triangle
+        static const Index v_t3[] =
+        {
+          2, 4, 3,
+          4, 1, 5,
+          3, 5, 0,
+          5, 3, 4
+        };
+
+        // edges-at-triangle
+        static const Index e_t3[] =
+        {
+          6, 0, 3,
+          5, 7, 2,
+          4, 1, 8,
+          6, 7, 8
+        };
+
+        switch(orientation)
+        {
+          case 0:
+            // check vertex coordinates array
+            if(!comp_vtx(mesh.get_vertex_set(), vtx0))
+              throw String("Vertex coordinate refinement failure");
+
+            // check vertices-at-edge array
+            if(!comp_idx(mesh.get_index_set<1,0>(), v_e0))
+              throw String("Vertex-At-Edge index set refinement failure");
+
+            // check vertices-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,0>(), v_t0))
+              throw String("Vertex-At-Triangle index set refinement failure");
+
+            // check edges-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,1>(), e_t0))
+              throw String("Edge-At-Triangle index set refinement failure");
+            break;
+
+           case 1:
+            // check vertex coordinates array
+            if(!comp_vtx(mesh.get_vertex_set(), vtx1))
+              throw String("Vertex coordinate refinement failure");
+
+            // check vertices-at-edge array
+            if(!comp_idx(mesh.get_index_set<1,0>(), v_e1))
+              throw String("Vertex-At-Edge index set refinement failure");
+
+            // check vertices-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,0>(), v_t1))
+              throw String("Vertex-At-Triangle index set refinement failure");
+
+            // check edges-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,1>(), e_t1))
+              throw String("Edge-At-Triangle index set refinement failure");
+            break;
+
+          case 2:
+            // check vertex coordinates array
+            if(!comp_vtx(mesh.get_vertex_set(), vtx2))
+              throw String("Vertex coordinate refinement failure");
+
+            // check vertices-at-edge array
+            if(!comp_idx(mesh.get_index_set<1,0>(), v_e2))
+              throw String("Vertex-At-Edge index set refinement failure");
+
+            // check vertices-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,0>(), v_t2))
+              throw String("Vertex-At-Triangle index set refinement failure");
+
+            // check edges-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,1>(), e_t2))
+              throw String("Edge-At-Triangle index set refinement failure");
+            break;
+
+          case 3:
+            // check vertex coordinates array
+            if(!comp_vtx(mesh.get_vertex_set(), vtx3))
+              throw String("Vertex coordinate refinement failure");
+
+            // check vertices-at-edge array
+            if(!comp_idx(mesh.get_index_set<1,0>(), v_e3))
+              throw String("Vertex-At-Edge index set refinement failure");
+
+            // check vertices-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,0>(), v_t3))
+              throw String("Vertex-At-Triangle index set refinement failure");
+
+            // check edges-at-triangle
+            if(!comp_idx(mesh.get_index_set<2,1>(), e_t3))
+              throw String("Edge-At-Triangle index set refinement failure");
+            break;
+
+        } //switch
+      } // validate_refined_trianglerefinement_mesh_2d
+
+      TriangleMesh* create_triangle_quad_refinement_mesh_2d()
+      {
+
+        Index num_entities[] =
+        {
+          5, // vertices
+          8, // edges
+          4,   // triangles
+        };
+
+        // create mesh
+        TriangleMesh* mesh = new TriangleMesh(num_entities);
+
+        //
+        //   v_3________<________v_4(10,10)
+        //     |\      e_2      /|
+        //     | \             / |
+        //     |  \   t_2     /  |
+        //     |   \         /   |
+        //     |    \    e_6/    |
+        //     |  e_7v     v     |
+        //     |      \   / t_1  |
+        //     | t_3   \ /       |
+        //  e_3v     v_2(6,7)    ^e_1
+        //     |       / \       |
+        //     |      /   \      |
+        //     |     /     \e_5  |
+        //     |    ^e_4    ^    |
+        //     |   /         \   |
+        //     |  /    t_0    \  |
+        //     | /             \ |
+        //     |/_______>_______\|
+        //  v_0(0,0)   e_0      v_1
+        //
+        // triangle orientation:
+        //     t_0: v_0-v_1-v_2
+        //     t_1: v_2-v_4-v_1
+        //     t_2: v_3-v_4-v_2
+        //     t_3: v_2-v_3-v_0
+
+        // set up vertex coordinates array
+        static const Real vtx0[3*8] =
+        {
+          0.0, 0.0,
+          10.0, 0.0,
+          6.0, 7.0,
+          0.0, 10.0,
+          10.0, 10.0
+        };
+
+        // set up vertices-at-edge array
+        static const Index v_e0[12*2] =
+        {
+          0, 1,
+          1, 4,
+          4, 3,
+          3, 0,
+          0, 2,
+          1, 2,
+          4, 2,
+          3, 2
+        };
+
+        // set up vertices-at-triangle array
+        static const Index v_t0[6*4] =
+        {
+          0, 1, 2,
+          2, 4, 1,
+          3, 4, 2,
+          2, 3, 0
+        };
+
+        // set up edges-at-triangle array
+        static const Index e_t0[6*4] =
+        {
+          5, 4, 0,
+          1, 5, 6,
+          6, 7, 2,
+          3, 4, 7
+        };
+
+        copy_vtx(mesh->get_vertex_set(), vtx0);
+        copy_idx(mesh->get_index_set<1,0>(), v_e0);
+        copy_idx(mesh->get_index_set<2,0>(), v_t0);
+        copy_idx(mesh->get_index_set<2,1>(), e_t0);
+
+        // okay
+        return mesh;
+      } // create_triangle_quad_refinement_mesh_2d
+
+      void validate_refined_triangle_quad_refinement_mesh_2d(const TriangleMesh& mesh)
+      {
+
+        // validate sizes
+        if(mesh.get_num_entities(0) != 13)
+          throw String("Vertex count mismatch");
+        if(mesh.get_num_entities(1) != 28)
+          throw String("Edge count mismatch");
+        if(mesh.get_num_entities(2) != 16)
+          throw String("Triangle count mismatch");
+
+        // vertex coordinates array
+        static const Real vtx0[] =
+        {
+          0.0, 0.0,
+          10.0, 0.0,
+          6.0, 7.0,
+          0.0, 10.0,
+          10.0, 10.0,
+          5.0, 0.0,
+          10.0, 5.0,
+          5.0, 10.0,
+          0.0, 5.0,
+          3.0, 3.5,
+          8.0, 3.5,
+          8.0, 8.5,
+          3.0, 8.5
+        };
+
+        // vertices-at-edge array
+        static const Index v_e0[] =
+        {
+          0, 5,
+          5, 1,
+          1, 6,
+          6, 4,
+          4, 7,
+          7, 3,
+          3, 8,
+          8, 0,
+          0, 9,
+          9, 2,
+          1, 10,
+          10, 2,
+          4, 11,
+          11, 2,
+          3, 12,
+          12, 2,
+          5, 9,
+          10, 5,
+          9, 10,
+          11, 10,
+          6, 11,
+          10, 6,
+          7, 12,
+          11, 7,
+          12, 11,
+          12, 9,
+          8, 12,
+          9, 8
+        };
+
+        // vertices-at-triangle
+        static const Index v_t0[] =
+        {
+          0, 5, 9,
+          5, 1, 10,
+          9, 10, 2,
+          10, 9, 5,
+          2, 11, 10,
+          11, 4, 6,
+          10, 6, 1,
+          6, 10, 11,
+          3, 7, 12,
+          7, 4, 11,
+          12, 11, 2,
+          11, 12, 7,
+          2, 12, 9,
+          12, 3, 8,
+          9, 8, 0,
+          8, 9, 12
+        };
+
+        // edges-at-triangle
+        static const Index e_t0[] =
+        {
+          16, 8, 0,
+          10, 17, 1,
+          11, 9, 18,
+          16, 17, 18,
+          19, 11, 13,
+          3, 20, 12,
+          2, 10, 21,
+          19, 20, 21,
+          22, 14, 5,
+          12, 23, 4,
+          13, 15, 24,
+          22, 23, 24,
+          25, 9, 15,
+          6, 26, 14,
+          7, 8, 27,
+          25, 26, 27
+        };
+
+        // check vertex coordinates array
+        if(!comp_vtx(mesh.get_vertex_set(), vtx0))
+          throw String("Vertex coordinate refinement failure");
+
+        // check vertices-at-edge array
+        if(!comp_idx(mesh.get_index_set<1,0>(), v_e0))
+          throw String("Vertex-At-Edge index set refinement failure");
+
+        // check vertices-at-triangle
+        if(!comp_idx(mesh.get_index_set<2,0>(), v_t0))
+          throw String("Vertex-At-Triangle index set refinement failure");
+
+        // check edges-at-triangle
+        if(!comp_idx(mesh.get_index_set<2,1>(), e_t0))
+          throw String("Edge-At-Triangle index set refinement failure");
+
+      } // validate_refined_triangle_quad_refinement_mesh_2d
+
+    } // namespace TestAux
+    /// \endcond
+  } // namespace Geometry
+} // namespace FEAST
+
+#endif // KERNEL_GEOMETRY_TEST_AUX_STANDARD_SIMPLEX_HPP
