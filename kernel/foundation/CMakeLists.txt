@@ -7,11 +7,11 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 
-ADD_LIBRARY(kernel-foundation STATIC comm.cpp process.cpp constants.cpp cell.cpp mesh_error.cpp)
+ADD_LIBRARY(kernel-foundation STATIC comm.cpp process.cpp constants.cpp cell.cpp mesh_error.cpp communication_error.cpp)
 TARGET_LINK_LIBRARIES (kernel-foundation kernel-util)
 
 #list of kernel tests
-SET (test_list work_group-test_1d work_group-test_2d_1 work_group-test_2d_2 cell_1d_edge-test_subdivision cell_2d_quad-test_subdivision cell_3d_hexa-test_subdivision topology-test dense_data_wrapper-test mesh-test mesh_data-test halo-test halo_data-test)
+SET (test_list work_group-test_1d work_group-test_2d_1 work_group-test_2d_2 cell_1d_edge-test_subdivision cell_2d_quad-test_subdivision cell_3d_hexa-test_subdivision topology-test dense_data_wrapper-test mesh-test mesh_data-test halo-test halo_data-test communication-test)
 
 #create all tests
 FOREACH (test ${test_list} )

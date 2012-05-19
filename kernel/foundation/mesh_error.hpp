@@ -18,7 +18,7 @@ namespace FEAST
     public MeshError
   {
     public:
-      MeshInternalIndexOutOfBounds(unsigned long index, unsigned long max_index) throw ();
+      MeshInternalIndexOutOfBounds(Index index, Index max_index) throw ();
   };
 }
 

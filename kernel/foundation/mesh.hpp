@@ -209,7 +209,7 @@ namespace FEAST
         void add_polytope(const unsigned level)
         {
           CONTEXT("When adding polytope");
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
           if(level > _num_levels - 1)
             throw MeshInternalIndexOutOfBounds(level, _num_levels - 1);
 #endif
@@ -227,7 +227,7 @@ namespace FEAST
               const IndexT_ value)
           {
             CONTEXT("When adding adjacency");
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
             if(_level_difference(from_level, to_level) > 1)
               throw MeshError("Level difference too large.");
 
@@ -243,7 +243,7 @@ namespace FEAST
 
             if(from_level < to_level)
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_upward_index(from_level) == -1)
                 throw MeshError("Invalid impairment of levels.");
 #endif
@@ -254,7 +254,7 @@ namespace FEAST
             }
             else if(from_level > to_level)
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_downward_index(from_level) == -1)
                 throw MeshError("Invalid impairment of levels.");
 #endif
@@ -270,7 +270,7 @@ namespace FEAST
           {
             CONTEXT("When calculating adjacent polytopes");
 
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
             if(from_level > _num_levels - 1)
               throw MeshInternalIndexOutOfBounds(from_level, _num_levels - 1);
             if(to_level > _num_levels - 1)
@@ -292,7 +292,7 @@ namespace FEAST
                 return _topologies[_downward_index(from_level)].at(i);
               else if(sweepdir == 1) //sweep up
                 return _topologies[_upward_index(from_level)].at(i);
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               else
                 throw MeshError("Sweep direction / sweep length mismatch.");
 #endif
@@ -383,7 +383,7 @@ namespace FEAST
           {
             if(typeid(AT_) == typeid(AttributeType1_))
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_num_attributes_of_type_1 == 0)
                 throw MeshInternalIndexOutOfBounds(attribute_index, 0);
 #endif
@@ -394,7 +394,7 @@ namespace FEAST
             }
             else if(typeid(AT_) == typeid(AttributeType2_))
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_num_attributes_of_type_2 == 0)
                 throw MeshInternalIndexOutOfBounds(attribute_index, 0);
 #endif
@@ -405,7 +405,7 @@ namespace FEAST
             }
             else if(typeid(AT_) == typeid(AttributeType3_))
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_num_attributes_of_type_3 == 0)
                 throw MeshInternalIndexOutOfBounds(attribute_index, 0);
 #endif
@@ -422,7 +422,7 @@ namespace FEAST
           {
             if(typeid(AT_) == typeid(AttributeType1_))
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_num_attributes_of_type_1 == 0)
                 throw MeshInternalIndexOutOfBounds(attribute_index, 0);
 #endif
@@ -433,7 +433,7 @@ namespace FEAST
             }
             else if(typeid(AT_) == typeid(AttributeType2_))
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_num_attributes_of_type_2 == 0)
                 throw MeshInternalIndexOutOfBounds(attribute_index, 0);
 #endif
@@ -444,7 +444,7 @@ namespace FEAST
             }
             else if(typeid(AT_) == typeid(AttributeType3_))
             {
-#ifdef FEM_MESH_DEBUG
+#ifdef FOUNDATION_DEBUG
               if(_num_attributes_of_type_3 == 0)
                 throw MeshInternalIndexOutOfBounds(attribute_index, 0);
 #endif
