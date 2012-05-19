@@ -11,6 +11,20 @@ namespace FEAST
 {
   namespace Foundation
   {
+    /**
+     * \brief Attribute registration operation wrapper class template
+     *
+     * See specialisations.
+     *
+     * \tparam MeshType_
+     * type of mesh
+     *
+     * \tparam ExplicitType__
+     * attribute type
+     *
+     *
+     * \author Markus Geveler
+     */
     template<typename MeshType_, typename ExplicitType_>
     class MeshAttributeRegistration
     {
@@ -20,6 +34,15 @@ namespace FEAST
     class MeshAttributeRegistration<MeshType_, typename MeshType_::attr_type_1_>
     {
       public:
+        /**
+         * \brief member function executes a registration of an attribute with a mesh
+         *
+         * \param[in] mesh
+         * target mesh reference
+         *
+         * \param[in] polytope_level
+         * polytope level associated with the attribute
+         */
         static unsigned execute(MeshType_ & mesh, const unsigned polytope_level)
         {
           typename MeshType_::attribute_storage_type_1_ storage;
@@ -35,6 +58,15 @@ namespace FEAST
     class MeshAttributeRegistration<MeshType_, typename MeshType_::attr_type_2_>
     {
       public:
+        /**
+         * \brief member function executes a registration of an attribute with a mesh
+         *
+         * \param[in] mesh
+         * target mesh reference
+         *
+         * \param[in] polytope_level
+         * polytope level associated with the attribute
+         */
         static unsigned execute(MeshType_ & mesh, const unsigned polytope_level)
         {
           typename MeshType_::attribute_storage_type_2_ storage;
@@ -50,6 +82,15 @@ namespace FEAST
     class MeshAttributeRegistration<MeshType_, typename MeshType_::attr_type_3_>
     {
       public:
+        /**
+         * \brief member function executes a registration of an attribute with a mesh
+         *
+         * \param[in] mesh
+         * target mesh reference
+         *
+         * \param[in] polytope_level
+         * polytope level associated with the attribute
+         */
         static unsigned execute(MeshType_ & mesh, const unsigned polytope_level)
         {
           typename MeshType_::attribute_storage_type_3_ storage;
@@ -61,6 +102,7 @@ namespace FEAST
         }
     };
 
+    ///required tnumber of topologies for given number of spatial dimensions
     enum RequiredNumTopologies
     {
       rnt_1D = 2,
@@ -68,6 +110,7 @@ namespace FEAST
       rnt_3D = 6
     };
 
+    ///polytope level identifiers
     enum PolytopeLevels
     {
       pl_vertex = 0,
@@ -76,6 +119,7 @@ namespace FEAST
       pl_polyhedron
     };
 
+    ///indices of the polytopelevel-to-polytopelevel topologies
     enum InternalPolytopeIndices
     {
       ipi_vertex_edge = 0,
@@ -86,8 +130,38 @@ namespace FEAST
       ipi_polyhedron_face
     };
 
+    /**
+     * \brief Mesh class template is the base mesh type for all top-level FEAST meshes
+     *
+     * Mesh relies on a Render Dynamic Mesh technique that is modified to grant explicit (pseudo-constant) time
+     * access from every polytope level to any other polytope level without storing all topologies explicitly.
+     * Mesh builds a ring of topologies each representing adjacencies from polytope-level k to level k-1 or k+1.
+     *
+     * \tparam i_
+     * required number of topologies (current policy implements the ring but is generally dimension-independent)
+     *
+     * \tparam TopologyType_
+     * type of topology
+     *
+     * \tparam AttributeStorageType_
+     * type for inner storage of attributes
+     *
+     * \tparam OuterAttributeStorageType_
+     * type for storing the attribute lists
+     *
+     * \tparam AttributeType1_
+     * type tparam for floating point attributes
+     *
+     * \tparam AttributeType2_
+     * type tparam for integer attributes
+     *
+     * \tparam AttributeType3_
+     * type tparam for compound attributes
+     *
+     * \author Markus Geveler
+     */
     template<
-      RequiredNumTopologies _i = rnt_2D,
+      RequiredNumTopologies i_ = rnt_2D,
       typename TopologyType_ = Topology<>,
       template<typename, typename> class AttributeStorageType_ = std::vector,
       template<typename, typename> class OuterAttributeStorageType_ = std::vector,
@@ -97,10 +171,11 @@ namespace FEAST
     class Mesh
     {
       public:
-        friend class MeshAttributeRegistration< Mesh<_i, TopologyType_, AttributeStorageType_, OuterAttributeStorageType_, AttributeType1_, AttributeType2_>, AttributeType1_>;
-        friend class MeshAttributeRegistration< Mesh<_i, TopologyType_, AttributeStorageType_, OuterAttributeStorageType_, AttributeType1_, AttributeType2_>, AttributeType2_>;
-        friend class MeshAttributeRegistration< Mesh<_i, TopologyType_, AttributeStorageType_, OuterAttributeStorageType_, AttributeType1_, AttributeType3_>, AttributeType3_>;
+        friend class MeshAttributeRegistration< Mesh<i_, TopologyType_, AttributeStorageType_, OuterAttributeStorageType_, AttributeType1_, AttributeType2_>, AttributeType1_>;
+        friend class MeshAttributeRegistration< Mesh<i_, TopologyType_, AttributeStorageType_, OuterAttributeStorageType_, AttributeType1_, AttributeType2_>, AttributeType2_>;
+        friend class MeshAttributeRegistration< Mesh<i_, TopologyType_, AttributeStorageType_, OuterAttributeStorageType_, AttributeType1_, AttributeType3_>, AttributeType3_>;
 
+        ///type exports
         typedef TopologyType_ topology_type_;
         typedef typename TopologyType_::index_type_ index_type_;
         typedef typename TopologyType_::storage_type_ storage_type_;
@@ -151,13 +226,14 @@ namespace FEAST
           AttributeType3_,
           std::allocator<AttributeType3_> > attribute_storage_type_3_;
 
+        ///CTOR
         Mesh(const typename TopologyType_::index_type_ id, const typename TopologyType_::index_type_ pp_rank = 0, const typename TopologyType_::index_type_ mp_rank = 0) :
           _id(id),
           _pp_rank(pp_rank),
           _mp_rank(mp_rank),
-          _num_inter_topologies(_i),
-          _num_levels((unsigned)(_i/2u) + 1u),
-          _topologies(new TopologyType_[_i]),
+          _num_inter_topologies(i_),
+          _num_levels((unsigned)(i_/2u) + 1u),
+          _topologies(new TopologyType_[i_]),
           _num_attributes_of_type_1(0),
           _num_attributes_of_type_2(0),
           _num_attributes_of_type_3(0),
@@ -170,13 +246,14 @@ namespace FEAST
       {
       }
 
+        ///Copy CTOR
         Mesh(const typename TopologyType_::index_type_ new_id, Mesh & other) :
           _id(new_id),
           _pp_rank(other._pp_rank),
           _mp_rank(other._mp_rank),
           _num_inter_topologies(other._num_inter_topologies),
           _num_levels(other._num_levels),
-          _topologies(new TopologyType_[_i]),
+          _topologies(new TopologyType_[i_]),
           _num_attributes_of_type_1(other._num_attributes_of_type_1),
           _num_attributes_of_type_2(other._num_attributes_of_type_2),
           _num_attributes_of_type_3(other._num_attributes_of_type_3),
@@ -201,6 +278,7 @@ namespace FEAST
         _attributes_of_type_3 = other._attributes_of_type_3;
       }
 
+        ///DTOR
         ~Mesh()
         {
           delete[] _topologies;
@@ -220,6 +298,7 @@ namespace FEAST
             _topologies[_downward_index(level)].push_back();
         }
 
+        ///Add an adjacency
         template<typename IndexT_>
           void add_adjacency(const unsigned from_level,
               const unsigned to_level,
@@ -265,6 +344,7 @@ namespace FEAST
             }
           }
 
+        ///get all adjacent polytopes at level to_level for polytope i on level from_level
         template<typename IndexType_>
           typename TopologyType_::storage_type_ get_adjacent_polytopes(const unsigned from_level, const unsigned to_level, IndexType_ i)
           {
@@ -363,6 +443,7 @@ namespace FEAST
             return search_data.at(search_data.size() - 1);
           }
 
+        ///needed public access functions
         typename TopologyType_::index_type_ get_num_levels()
         {
           return _num_levels;
@@ -378,6 +459,7 @@ namespace FEAST
           return _upward_index(pl);
         }
 
+        ///alter value for an attribute
         template<typename AT_>
           void set_attribute_value(const unsigned attribute_index, const typename TopologyType_::index_type_ index, const AT_ value)
           {
@@ -417,6 +499,7 @@ namespace FEAST
             //todo catch index out of bounds
           }
 
+        ///add an attribute value
         template<typename AT_>
           void add_attribute_value(const unsigned attribute_index, const AT_ value)
           {
@@ -455,6 +538,7 @@ namespace FEAST
             }
           }
 
+        ///get primary communication neighbours for element polytope i (that is only non-diagonal)
         template<typename IndexType_>
           typename TopologyType_::storage_type_ get_primary_comm_neighbours(IndexType_ i)
           {
@@ -469,6 +553,7 @@ namespace FEAST
             return result;
           }
 
+        ///get all communication neighbours for element polytope i
         template<typename IndexType_>
           typename TopologyType_::storage_type_ get_all_comm_neighbours(IndexType_ i)
           {
@@ -543,6 +628,7 @@ namespace FEAST
             return result;
           }
 
+        ///Further needed access functions
         unsigned get_num_attributes_of_type_1()
         {
           return _num_attributes_of_type_1;
