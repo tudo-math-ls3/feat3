@@ -8,25 +8,48 @@ namespace FEAST
 {
   namespace Foundation
   {
-    template<unsigned delta_, typename MeshType_, template<typename, typename> class StorageType_ = std::vector, typename IndexType_ = unsigned long>
+    /**
+     * \brief Halo class template represents the interface between two meshes or patches of any kind
+     *
+     * A Halo is used for communication between patches of any kind. Currently, its policy is inspired by mesh patches.
+     * The overlap parameter is used in communication routines to destinct between minimal overlap and element layer overlap.
+     *
+     * \tparam delta_
+     * overlap parameter: delta = 0 => minimal overlap, delta = k > 0 => element layer overlap with k layers.
+     *
+     * \tparam MeshType_
+     * type of the mesh or patch
+     *
+     * \tparam StorageType_
+     * type for inner storage of indices
+     *
+     * \tparam IndexType_
+     * type of the indices
+     *
+     * \author Markus Geveler
+     */
+    template<unsigned delta_, typename MeshType_, template<typename, typename> class StorageType_ = std::vector, typename IndexType_ = Index>
     class Halo
     {
       public:
+        ///type exports:
         typedef IndexType_ index_type_;
         typedef MeshType_ mesh_type_;
         typedef typename MeshType_::attr_type_1_ attr_type_1_;
         typedef typename MeshType_::attr_type_2_ attr_type_2_;
         typedef typename MeshType_::attr_type_3_ attr_type_3_;
 
+        ///CTOR
         Halo(MeshType_ & mesh, IndexType_ other) :
           _halo_elements(StorageType_<IndexType_, std::allocator<IndexType_> >()),
           _halo_element_counterparts(StorageType_<IndexType_, std::allocator<IndexType_> >()),
           _mesh(mesh),
           _other(other),
           _overlap(delta_)
-      {
-      }
+        {
+        }
 
+        ///DTOR
         ~Halo()
         {
         }
@@ -38,6 +61,7 @@ namespace FEAST
           _halo_element_counterparts.push_back(j);
         }
 
+        ///public access functions:
         IndexType_ get_element_counterpart(IndexType_ index)
         {
           return _halo_element_counterparts.at(index);
