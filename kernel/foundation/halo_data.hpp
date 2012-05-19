@@ -10,6 +10,22 @@ namespace FEAST
 {
   namespace Foundation
   {
+    /**
+     * \brief HaloData class template represents a static halo
+     *
+     * HaloData is used for storing static halos.
+     *
+     * \tparam HaloType_
+     * type of halo
+     *
+     * \tparam VectorType_
+     * type for storing the dense data
+     *
+     * \tparam IndexType_
+     * type of the indices
+     *
+     * \author Markus Geveler
+     */
     template<
       typename HaloType_,
       template<typename> class VectorType_,
@@ -17,6 +33,7 @@ namespace FEAST
     class HaloData
     {
       public:
+        ///CTOR
         HaloData(HaloType_ & halo) :
           _halo(halo),
           _halo_elements(VectorType_<IndexType_>(halo.size())),
@@ -29,10 +46,12 @@ namespace FEAST
           }
         }
 
+        ///DTOR
         ~HaloData()
         {
         }
 
+        ///public access functions
         HaloType_ & get_halo()
         {
           return _halo;
