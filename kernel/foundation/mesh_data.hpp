@@ -10,17 +10,45 @@ namespace FEAST
 {
   namespace Foundation
   {
+
+    /**
+     * \brief Mesh data class template is the base class for static meshes
+     *
+     * \tparam MeshType_
+     * type of the dynamic mesh counterpart
+     *
+     * \tparam VectorType_
+     * type of the dense container used to store the data
+     *
+     * \tparam OuterStorageType_
+     * type to store all vectors
+     *
+     * \tparam IndexType_
+     * index type
+     *
+     * \tparam DataType1_
+     * attribute data type
+     *
+     * \tparam DataType2_
+     * attribute data type
+     *
+     * \tparam DataType3_
+     * attribute data type
+     *
+     * \author Markus Geveler
+     */
     template<
       typename MeshType_,
       template<typename>  class VectorType_,
       template<typename, typename> class OuterStorageType_ = std::vector,
-      typename IndexType_ = unsigned long,
+      typename IndexType_ = Index,
       typename DataType1_ = double,
-      typename DataType2_ = unsigned long,
+      typename DataType2_ = Index,
       typename DataType3_ = float>
     class MeshData
     {
       public:
+        ///CTOR from mesh
         MeshData(MeshType_ & mesh) :
           _mesh(mesh),
           _num_attributes_of_type_1(mesh.get_num_attributes_of_type_1()),
@@ -39,7 +67,7 @@ namespace FEAST
 
           _attribute_polytopelevel_relations_1[i] = (IndexType_)_mesh.get_attribute_polytopelevel_relations_1().at(i);
 
-          for(unsigned long j(0) ; j < (IndexType_)_mesh.get_attributes_of_type_1().at(i).size() ; ++j)
+          for(IndexType_ j(0) ; j < (IndexType_)_mesh.get_attributes_of_type_1().at(i).size() ; ++j)
           {
             attr_i[j] = _mesh.get_attributes_of_type_1().at(i).at(j);
           }
@@ -53,7 +81,7 @@ namespace FEAST
 
           _attribute_polytopelevel_relations_2[i] = (IndexType_)_mesh.get_attribute_polytopelevel_relations_2().at(i);
 
-          for(unsigned long j(0) ; j < (IndexType_)_mesh.get_attributes_of_type_2().at(i).size() ; ++j)
+          for(IndexType_ j(0) ; j < (IndexType_)_mesh.get_attributes_of_type_2().at(i).size() ; ++j)
           {
             attr_i[j] = _mesh.get_attributes_of_type_2().at(i).at(j);
           }
@@ -67,7 +95,7 @@ namespace FEAST
 
           _attribute_polytopelevel_relations_3[i] = (IndexType_)_mesh.get_attribute_polytopelevel_relations_3().at(i);
 
-          for(unsigned long j(0) ; j < (IndexType_)_mesh.get_attributes_of_type_3().at(i).size() ; ++j)
+          for(IndexType_ j(0) ; j < (IndexType_)_mesh.get_attributes_of_type_3().at(i).size() ; ++j)
           {
             attr_i[j] = _mesh.get_attributes_of_type_3().at(i).at(j);
           }
@@ -76,10 +104,12 @@ namespace FEAST
         }
       }
 
+        ///DTOR
         ~MeshData()
         {
         }
 
+        ///public access functions
         MeshType_ & get_mesh()
         {
           return _mesh;
