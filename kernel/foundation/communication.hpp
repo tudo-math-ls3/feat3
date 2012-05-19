@@ -11,6 +11,7 @@ namespace FEAST
 {
   namespace Foundation
   {
+    ///Communication modes used in Comm implementation or pass-over to backends
     enum CommModes
     {
       com_send = 0,
@@ -20,12 +21,22 @@ namespace FEAST
         //TODO...
     };
 
+    /**
+     * \brief Communication implementation or backend pass-over
+     *
+     * See specialisations.
+     *
+     * \tparam Tag_
+     * backend specifier
+     *
+     * \author Markus Geveler
+     */
     template<typename Tag_>
     class Comm
     {
     };
 
-    //example shared-mem exchange
+    ///example shared-mem exchange (Nil is the temporary for archs::CPU)
     template<>
     class Comm<Nil>
     {
@@ -46,8 +57,26 @@ namespace FEAST
         //TODO
     };
 
-    //overlap is a compile-time decision now, if not feasible, move to inner function template
-    template<unsigned i_ = 1, CommModes j_ = com_send_receive, typename AttributeType_ = double, typename Tag_ = Nil>
+    /**
+     * \brief Communication implementation or backend pass-over
+     *
+     * See specialisations.
+     *
+     * \tparam i_
+     * overlap of the patches
+     *
+     * \tparam j_
+     * communication mode
+     *
+     * \tparam AttributeType_
+     * data type to be transferred
+     *
+     * \tparam Tag_
+     * backend specifier
+     *
+     * \author Markus Geveler
+     */
+    template<unsigned i_ = 1, CommModes j_ = com_send_receive, typename AttributeType_ = double, typename Tag_ = Nil> //overlap is a compile-time decision now, if not feasible, move to inner function template
     class Communication
     {
       public:
@@ -74,7 +103,7 @@ namespace FEAST
                   {
                     if(typeid(AttributeType_) == typeid(typename MeshType_::attr_type_1_))
                     {
-                      sendbuf[i] = halo.get_mesh().get_attributes_of_type_1().at(attr_index).at(halo.get_element(i)); //TODO maybe mixed up send/recv
+                      sendbuf[i] = halo.get_mesh().get_attributes_of_type_1().at(attr_index).at(halo.get_element(i));
                       recvbuf[i] = other_mesh.get_attributes_of_type_1().at(attr_index).at(halo.get_element_counterpart(i));
                     }
                   }
@@ -84,7 +113,7 @@ namespace FEAST
                   {
                     if(typeid(AttributeType_) == typeid(typename MeshType_::attr_type_1_))
                     {
-                      halo.get_mesh().get_attributes_of_type_1().at(attr_index).at(halo.get_element(i)) = sendbuf[i]; //TODO maybe mixed up send/recv
+                      halo.get_mesh().get_attributes_of_type_1().at(attr_index).at(halo.get_element(i)) = sendbuf[i];
                       other_mesh.get_attributes_of_type_1().at(attr_index).at(halo.get_element_counterpart(i)) = recvbuf[i];
                     }
                   }
