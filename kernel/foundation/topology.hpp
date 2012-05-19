@@ -12,7 +12,11 @@ namespace FEAST
     /**
      * \brief Topology is a dynamic, generic adjacency list
      *
-     * long desc missing
+     * Topology is used in many ways:
+     * (1) Contains polytope adjacencies for a set of polytopes without caring for the polytope level relation in top-level meshes.
+     * (2) Describes Network topologies.
+     * (3) Describes patch topologies.
+     * (4) Describes top-level mesh topologies in parallel environment.
      *
      * \tparam IndexType_
      * index type
@@ -33,41 +37,72 @@ namespace FEAST
     class Topology
     {
       public:
+        ///type exports
         typedef IndexType_ index_type_;
         typedef StorageType_ storage_type_;
         typedef OuterStorageType_<StorageType_, std::allocator<StorageType_> > compound_storage_type_;
 
+        ///CTOR
         Topology() :
           _num_polytopes(0),
           _topology(OuterStorageType_<StorageType_, std::allocator<StorageType_> >())
-      {
-      };
+        {
+        };
 
+        ///DTOR
         ~Topology()
         {
         }
 
+        /**
+         * \brief member function retrieves number of polytopes / size of the topology
+         */
         Index size()
         {
           return _num_polytopes;
         }
 
+
+        /**
+         * \brief member function inserts a given polytope list to end of topology
+         *
+         * \param[in] s
+         * The polytope list to be inserted
+         */
         void push_back(const StorageType_ s)
         {
           _topology.push_back(s);
           ++_num_polytopes;
         }
 
+        /**
+         * \brief member function retrieves polytope list for given polytope
+         *
+         * \param[in] i
+         * The index of the polytope whose adjacency list is to be returned
+         */
         StorageType_ & at(Index i)
         {
           return _topology.at(i);
         }
 
+        /**
+         * \brief operator overload to [] retrieves polytope list for given polytope
+         *
+         * \param[in] i
+         * The index of the polytope whose adjacency list is to be returned
+         */
         StorageType_ & operator[] (Index i)
         {
           return _topology.at(i);
         }
 
+        /**
+         * \brief member function inserts an empty list to end of topology
+         *
+         * \param[in] s
+         * The polytope list to be inserted
+         */
         void push_back()
         {
           StorageType_ s;
@@ -76,7 +111,9 @@ namespace FEAST
         }
 
       private:
+        ///current size of the topology
         Index _num_polytopes;
+        ///data
         OuterStorageType_<StorageType_, std::allocator<StorageType_> > _topology;
     };
 
