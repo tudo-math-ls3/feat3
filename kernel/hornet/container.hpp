@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/hornet/memory_arbiter.hpp>
+#include <kernel/hornet/memory_pool.hpp>
 
 #include <vector>
 
@@ -41,9 +41,9 @@ namespace FEAST
       {
         //TODO add arch
         for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryArbiter::instance()->release_memory(_elements.at(i));
+          MemoryPool::instance()->release_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryArbiter::instance()->release_memory(_indices.at(i));
+          MemoryPool::instance()->release_memory(_indices.at(i));
       }
 
       Container(const Container<Arch_, DT_> & other) :
@@ -53,9 +53,9 @@ namespace FEAST
       {
         //TODO add arch
         for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryArbiter::instance()->increase_memory(_elements.at(i));
+          MemoryPool::instance()->increase_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryArbiter::instance()->increase_memory(_indices.at(i));
+          MemoryPool::instance()->increase_memory(_indices.at(i));
       }
 
       template <typename Arch2_, typename DT2_>
@@ -67,9 +67,9 @@ namespace FEAST
 
         //TODO add arch
         for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
-          MemoryArbiter::instance()->allocate_memory(this->_size * sizeof(DT_));
+          MemoryPool::instance()->allocate_memory(this->_size * sizeof(DT_));
         for (Index i(0) ; i < other.get_indices().size() ; ++i)
-          MemoryArbiter::instance()->allocate_memory(this->_size * sizeof(Index));
+          MemoryPool::instance()->allocate_memory(this->_size * sizeof(Index));
 
         //TODO copy memory from arch2 to arch
 

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_HORNET_MEMORY_ARBITER_HPP
-#define KERNEL_HORNET_MEMORY_ARBITER_HPP 1
+#ifndef KERNEL_HORNET_MEMORY_POOL_HPP
+#define KERNEL_HORNET_MEMORY_POOL_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -18,24 +18,23 @@ namespace FEAST
     {
       Index counter;
       Index size;
-      /// \todo backend
     };
   }
 
-  class MemoryArbiter
-      : public InstantiationPolicy<MemoryArbiter, Singleton>
+  class MemoryPool
+      : public InstantiationPolicy<MemoryPool, Singleton>
   {
     private:
-      std::map<void*, Intern::MemoryInfo> _memory_pool;
+      std::map<void*, Intern::MemoryInfo> _pool;
 
       /// default CTOR
-      MemoryArbiter();
+      MemoryPool();
 
     public:
-      ~MemoryArbiter();
+      ~MemoryPool();
 
-      /// pointer to MemoryArbiter singleton
-      friend MemoryArbiter* InstantiationPolicy<MemoryArbiter, Singleton>::instance();
+      /// pointer to MemoryPool singleton
+      friend MemoryPool* InstantiationPolicy<MemoryPool, Singleton>::instance();
 
       /// allocate new memory
       void * allocate_memory(Index bytes);
@@ -48,4 +47,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // KERNEL_HORNET_MEMORY_ARBITER_HPP
+#endif // KERNEL_HORNET_MEMORY_POOL_HPP
