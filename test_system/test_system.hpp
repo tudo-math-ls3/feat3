@@ -9,6 +9,7 @@
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/mpi_utils.hpp>
+#include <kernel/archs.hpp>
 
 // includes, system
 #include <string>
@@ -170,8 +171,8 @@ namespace FEAST
         */
       BaseTest(const String& id)
         : _id(id),
-        _tag_name(TypeTraits<Nil>::name()),
-        _prec_name(TypeTraits<Nil>::name())
+        _tag_name(TypeTraits<Archs::Nil>::name()),
+        _prec_name(TypeTraits<Archs::Nil>::name())
       {
         TestList::instance()->register_test(this);
       }

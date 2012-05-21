@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/hornet/memory_pool.hpp>
+#include <kernel/archs.hpp>
 
 #include <vector>
 
@@ -41,9 +42,9 @@ namespace FEAST
       {
         //TODO add arch
         for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryPool::instance()->release_memory(_elements.at(i));
+          MemoryPool<Arch_>::instance()->release_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryPool::instance()->release_memory(_indices.at(i));
+          MemoryPool<Arch_>::instance()->release_memory(_indices.at(i));
       }
 
       Container(const Container<Arch_, DT_> & other) :
@@ -51,11 +52,10 @@ namespace FEAST
         _elements(other._elements),
         _indices(other._indices)
       {
-        //TODO add arch
         for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryPool::instance()->increase_memory(_elements.at(i));
+          MemoryPool<Arch_>::instance()->increase_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryPool::instance()->increase_memory(_indices.at(i));
+          MemoryPool<Arch_>::instance()->increase_memory(_indices.at(i));
       }
 
       template <typename Arch2_, typename DT2_>
@@ -65,11 +65,10 @@ namespace FEAST
         if (typeid(DT_) != typeid(DT2_))
             throw InternalError("type conversion not supported yet!");
 
-        //TODO add arch
         for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
-          MemoryPool::instance()->allocate_memory(this->_size * sizeof(DT_));
+          MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_));
         for (Index i(0) ; i < other.get_indices().size() ; ++i)
-          MemoryPool::instance()->allocate_memory(this->_size * sizeof(Index));
+          MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(Index));
 
         //TODO copy memory from arch2 to arch
 

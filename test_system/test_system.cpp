@@ -98,6 +98,8 @@ int main(int argc, char** argv)
     i = TestList::instance()->erase(i);
   }
 
+  if (result == EXIT_SUCCESS && rank == 0)
+    std::cout<<"All " << list_size << " tests PASSED!" << std::endl;
   finalise_mpi();
   return result;
 }
@@ -139,6 +141,9 @@ int main(int /*argc*/, char** /*argv*/)
     it = TestList::instance()->erase(it);
     ++iterator_index;
   }
+
+  if (result == EXIT_SUCCESS)
+    std::cout<<"All " << list_size << " tests PASSED!" << std::endl;
 
   return result;
 }

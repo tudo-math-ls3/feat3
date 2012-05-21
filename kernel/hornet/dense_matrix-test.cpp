@@ -42,7 +42,6 @@ public:
     DenseMatrix<Tag_, DT_> a(10, 10);
     DenseMatrix<Tag_, DT_> b(10, 10, 5.);
     DenseMatrix<Tag_, DT_> c(b);
-    DenseMatrix<int, DT_> d(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.size(), b.size());
     DenseMatrix<Tag_, DT_> e(11, 12, 5.);
@@ -50,4 +49,4 @@ public:
     TEST_CHECK_EQUAL(e.columns(), 12);
   }
 };
-DenseMatrixTest<Nil, double> dense_matrix_test_double;
+DenseMatrixTest<Archs::CPU, double> dense_matrix_test_double;

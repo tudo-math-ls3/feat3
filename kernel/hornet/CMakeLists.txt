@@ -7,7 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 #list of hornet source files
-ADD_LIBRARY(kernel-hornet STATIC memory_pool.cpp archs.cpp)
+ADD_LIBRARY(kernel-hornet STATIC memory_pool.cpp)
 
 #list of hornet tests
 SET (test_list dense_vector-test dense_matrix-test)
@@ -26,8 +26,8 @@ FOREACH (test ${test_list} )
     --build-exe-dir "${CURRENT_BINARY_DIR}"
     --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/hornet/${test}" Nil)
   SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
-  SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
   SET_PROPERTY(TEST ${test}_nil PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
 ENDFOREACH(test)
 
 #add all tests to hornet_tests

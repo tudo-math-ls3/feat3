@@ -6,16 +6,17 @@
 
 using namespace FEAST;
 
-MemoryPool::MemoryPool()
+MemoryPool<Archs::CPU>::MemoryPool()
 {
 }
 
-MemoryPool::~MemoryPool()
+MemoryPool<Archs::CPU>::~MemoryPool()
 {
   /// \todo throw error if any memory chunks exist
 }
 
-void * MemoryPool::allocate_memory(Index bytes)
+//template<>
+void * MemoryPool<Archs::CPU>::allocate_memory(Index bytes)
 {
   void * memory(::malloc(bytes));
   Intern::MemoryInfo mi;
@@ -26,7 +27,7 @@ void * MemoryPool::allocate_memory(Index bytes)
   return memory;
 }
 
-void MemoryPool::increase_memory(void * address)
+void MemoryPool<Archs::CPU>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
@@ -37,7 +38,7 @@ void MemoryPool::increase_memory(void * address)
   }
 }
 
-void MemoryPool::release_memory(void * address)
+void MemoryPool<Archs::CPU>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())

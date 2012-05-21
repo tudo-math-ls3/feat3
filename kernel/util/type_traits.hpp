@@ -21,7 +21,8 @@ namespace FEAST
     /// returns a string identifying the datatype
     static String name()
     {
-      return stringify(typeid(DT_).name());
+      //return stringify(typeid(DT_).name());
+      return DT_::name;
     }
   };
 
@@ -97,21 +98,6 @@ namespace FEAST
     static String name()
     {
       return "int";
-    }
-  };
-
-  /**
-  * \brief TypeTraits specialisation for Nil tag class
-  *
-  * \author Dirk Ribbrock
-  */
-  template<>
-  struct TypeTraits<Nil>
-  {
-    /// returns a string identifying the datatype
-    static String name()
-    {
-      return "Nil";
     }
   };
 } // FEAST

@@ -7,7 +7,7 @@
 /// Should the build include DEBUG support?
 #cmakedefine FEAST_DEBUG_MODE
 
-/// Should the build include DEBUG support?
+/// Should the build include serial support only?
 #cmakedefine FEAST_SERIAL_MODE
 
 /// Path to the FEAST source dir

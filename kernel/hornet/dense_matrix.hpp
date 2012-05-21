@@ -27,8 +27,7 @@ namespace FEAST
         this->_rows = rows;
         this->_columns = columns;
 
-        //TODO add arch
-        this->_elements.push_back((DT_*)MemoryPool::instance()->allocate_memory(this->_size * sizeof(DT_)));
+        this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
         _pelements = this->_elements.at(0);
       }
 
@@ -38,8 +37,7 @@ namespace FEAST
         this->_size = rows * columns;
         this->_rows = rows;
         this->_columns = columns;
-        //TODO add arch
-        this->_elements.push_back((DT_*)MemoryPool::instance()->allocate_memory(this->_size * sizeof(DT_)));
+        this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
         _pelements = this->_elements.at(0);
 
         //TODO add arch, use memory pool set memory function

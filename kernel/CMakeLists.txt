@@ -12,7 +12,7 @@ ADD_SUBDIRECTORY( geometry )
 ADD_SUBDIRECTORY( foundation )
 
 #list of kernel source files
-ADD_LIBRARY(feast STATIC)
+ADD_LIBRARY(feast STATIC archs.cpp)
 #list of libraries to include in libfeast
 TARGET_LINK_LIBRARIES (feast kernel-util kernel-hornet kernel-geometry kernel-foundation)
 

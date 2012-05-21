@@ -67,7 +67,7 @@ public:
     TEST_CHECK_THROWS(String("0").at(10), std::exception);
   }
 };
-TaggedUnitTest<Nil, float> taggedunittestf ("TaggedUnitTest-test float");
-TaggedUnitTest<Nil, double> taggedunittestd ("TaggedUnitTest-test double");
-TaggedUnitTest<Nil, unsigned long> taggedunittestul ("TaggedUnitTest-test unsigned long");
-TaggedUnitTest<Nil, int> taggedunittesti ("TaggedUnitTest-test int");
+TaggedUnitTest<Archs::Nil, float> taggedunittestf ("TaggedUnitTest-test float");
+TaggedUnitTest<Archs::Nil, double> taggedunittestd ("TaggedUnitTest-test double");
+TaggedUnitTest<Archs::Nil, unsigned long> taggedunittestul ("TaggedUnitTest-test unsigned long");
+TaggedUnitTest<Archs::Nil, int> taggedunittesti ("TaggedUnitTest-test int");

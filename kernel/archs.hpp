@@ -8,8 +8,6 @@
 
 namespace FEAST
 {
-  namespace HOrNET
-  {
     namespace Archs
     {
       /**
@@ -17,7 +15,8 @@ namespace FEAST
        */
       enum TagValue
       {
-        tv_cpu = 1,
+        tv_nil = 0,
+        tv_cpu,
         tv_gpu_cuda,
         tv_opencl_cpu,
         tv_opencl_gpu,
@@ -25,9 +24,19 @@ namespace FEAST
       };
 
       /**
+       * This is an empty tag class which may be used for templates with optional parameters.\n
+       * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
+       */
+      struct Nil :
+        public InstantiationPolicy<Nil, NonCopyable>
+      {
+        const static TagValue tag_value = tv_nil;
+        const static TagValue memory_value = tv_nil;
+        const static String name;
+      };
+
+      /**
        * Tag-type for generic/C++-based operations.
-       *
-       * \ingroup grptagscpu
        */
       struct CPU :
         public InstantiationPolicy<CPU, NonCopyable>
@@ -43,6 +52,5 @@ namespace FEAST
      * Output operator for tags::TagValue.
      */
     std::ostream & operator<< (std::ostream & left, Archs::TagValue value);
-  }
 }
 #endif

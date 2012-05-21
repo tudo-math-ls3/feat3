@@ -18,16 +18,14 @@ namespace FEAST
         Container<Arch_, DT_>(size)
       {
         this->_size = size;
-        //TODO add arch
-        this->_elements.push_back((DT_*)MemoryPool::instance()->allocate_memory(size * sizeof(DT_)));
+        this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
       }
 
       DenseVector(Index size, DT_ value) :
         Container<Arch_, DT_>(size)
       {
         this->_size = size;
-        //TODO add arch
-        this->_elements.push_back((DT_*)MemoryPool::instance()->allocate_memory(size * sizeof(DT_)));
+        this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
 
         //TODO add arch, use memory arbiter set memory function
         DT_ * elements(this->_elements.at(0));
