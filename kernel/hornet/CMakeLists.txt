@@ -7,7 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 #list of hornet source files
-ADD_LIBRARY(kernel-hornet STATIC memory_pool.cpp)
+ADD_LIBRARY(kernel-hornet STATIC memory_pool.cpp archs.cpp)
 
 #list of hornet tests
 SET (test_list dense_vector-test dense_matrix-test)
