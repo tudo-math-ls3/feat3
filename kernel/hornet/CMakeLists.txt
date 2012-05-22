@@ -16,6 +16,7 @@ SET (test_list dense_vector-test dense_matrix-test)
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feast test_system)
+
   ADD_TEST(${test}_nil ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -24,10 +25,23 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/hornet/${test}" Nil)
-  SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/hornet/${test}" nil)
+  SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "nil")
   SET_PROPERTY(TEST ${test}_nil PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
   SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
+
+  ADD_TEST(${test}_cpu ${CMAKE_CTEST_COMMAND}
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-generator ${CMAKE_GENERATOR}
+    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+    --build-target ${test}
+    --build-nocmake
+    --build-noclean
+    --build-exe-dir "${CURRENT_BINARY_DIR}"
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/hornet/${test}" cpu)
+  SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "cpu")
+  SET_PROPERTY(TEST ${test}_cpu PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  SET_PROPERTY(TEST ${test}_cpu PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
 ENDFOREACH(test)
 
 #add all tests to hornet_tests

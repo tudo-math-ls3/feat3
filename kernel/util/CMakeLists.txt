@@ -24,8 +24,8 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/util/${test}" Nil)
-  SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "Nil")
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/util/${test}" nil)
+  SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "nil")
   SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
   SET_PROPERTY(TEST ${test}_nil PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ENDFOREACH(test)

@@ -4,7 +4,7 @@
 
 using namespace FEAST;
 
-const String Archs::Nil::name = "Nil";
+const String Archs::Nil::name = "nil";
 const String Archs::CPU::name = "cpu";
 
 std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
