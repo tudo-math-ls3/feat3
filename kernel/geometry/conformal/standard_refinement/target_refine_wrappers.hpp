@@ -25,7 +25,7 @@ namespace FEAST
         public:
           typedef Shape_ ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<shape_dim_> TargetSetHolderType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static String name()
@@ -75,7 +75,8 @@ namespace FEAST
         public:
           typedef Shape_ ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<cell_dim_> TargetSetHolderType;
+          typedef typename Shape::FaceTraits<ShapeType, cell_dim_>::ShapeType CellType;
+          typedef TargetSetHolder<CellType> TargetSetHolderType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static String name()
@@ -113,7 +114,8 @@ namespace FEAST
         public:
           typedef Shape::Vertex ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<cell_dim_> TargetSetHolderType;
+          typedef typename Shape::FaceTraits<ShapeType, cell_dim_>::ShapeType CellType;
+          typedef TargetSetHolder<CellType> TargetSetHolderType;
           typedef IndexSetHolder<Shape::Vertex> IndexSetHolderType;
 
           static String name()
@@ -146,8 +148,9 @@ namespace FEAST
         public:
           typedef Shape_ ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<cell_dim_> TargetSetHolderTypeOut;
-          typedef TargetSetHolder<Shape_::dimension> TargetSetHolderTypeIn;
+          typedef typename Shape::FaceTraits<ShapeType, cell_dim_>::ShapeType CellType;
+          typedef TargetSetHolder<CellType> TargetSetHolderTypeOut;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderTypeIn;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static String name()
@@ -192,8 +195,8 @@ namespace FEAST
         public:
           typedef Shape_ ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<0> TargetSetHolderTypeOut;
-          typedef TargetSetHolder<Shape_::dimension> TargetSetHolderTypeIn;
+          typedef TargetSetHolder<Shape::Vertex> TargetSetHolderTypeOut;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderTypeIn;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static String name()

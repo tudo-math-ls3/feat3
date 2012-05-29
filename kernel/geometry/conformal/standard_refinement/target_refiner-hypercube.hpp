@@ -20,7 +20,7 @@ namespace FEAST
         {
           typedef Shape::Hypercube<shape_dim_> ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<ShapeType::dimension> TargetSetHolderType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -50,7 +50,7 @@ namespace FEAST
         {
           typedef Shape::Hypercube<1> ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<ShapeType::dimension> TargetSetHolderType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -115,7 +115,7 @@ namespace FEAST
         {
           typedef Shape::Hypercube<2> ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<ShapeType::dimension> TargetSetHolderType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -183,7 +183,7 @@ namespace FEAST
         {
           typedef Shape::Hypercube<2> ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<ShapeType::dimension> TargetSetHolderType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
@@ -251,7 +251,7 @@ namespace FEAST
         {
           typedef Shape::Hypercube<3> ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<ShapeType::dimension> TargetSetHolderType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(

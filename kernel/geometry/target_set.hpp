@@ -106,19 +106,26 @@ namespace FEAST
 
     /* ***************************************************************************************** */
     /// \cond internal
-    template<int dim_>
+    template<typename Shape_>
     class TargetSetHolder :
-      public TargetSetHolder<dim_ - 1>
+      public TargetSetHolder<typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType>
     {
+    public:
+      typedef Shape_ ShapeType;
+      enum
+      {
+        shape_dim = ShapeType::dimension
+      };
+
     protected:
-      typedef TargetSetHolder<dim_ - 1> BaseClass;
+      typedef TargetSetHolder<typename Shape::FaceTraits<ShapeType, shape_dim - 1>::ShapeType> BaseClass;
 
       TargetSet _target_set;
 
     public:
       explicit TargetSetHolder(const Index num_entities[]) :
         BaseClass(num_entities),
-        _target_set(num_entities[dim_])
+        _target_set(num_entities[shape_dim])
       {
         CONTEXT(name() + "::TargetSetHolder(const Index[])");
       }
@@ -128,29 +135,31 @@ namespace FEAST
         CONTEXT(name() + "::~TargetSetHolder()");
       }
 
-      template<int dim__>
+      template<int dim_>
       TargetSet& get_target_set()
       {
         CONTEXT(name() + "::get_target_set()");
-        static_assert(dim__ >= 0, "invalid dimension");
-        static_assert(dim__ <= dim_, "invalid dimension");
-        return TargetSetHolder<dim__>::_target_set;
+        static_assert(dim_ >= 0, "invalid dimension");
+        static_assert(dim_ <= shape_dim, "invalid dimension");
+        typedef Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
+        return TargetSetHolder<CellType>::_target_set;
       }
 
-      template<int dim__>
+      template<int dim_>
       const TargetSet& get_target_set() const
       {
         CONTEXT(name() + "::get_target_set() [const]");
-        static_assert(dim__ >= 0, "invalid dimension");
-        static_assert(dim__ <= dim_, "invalid dimension");
-        return TargetSetHolder<dim__>::_target_set;
+        static_assert(dim_ >= 0, "invalid dimension");
+        static_assert(dim_ <= shape_dim, "invalid dimension");
+        typedef Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
+        return TargetSetHolder<CellType>::_target_set;
       }
 
       Index get_num_entities(int dim) const
       {
         CONTEXT(name() + "::get_num_entities()");
-        ASSERT(dim <= dim_, "invalid dimension parameter");
-        if(dim == dim_)
+        ASSERT(dim <= shape_dim, "invalid dimension parameter");
+        if(dim == shape_dim)
         {
           return _target_set.get_num_entities();
         }
@@ -159,13 +168,20 @@ namespace FEAST
 
       static String name()
       {
-        return "TargetSetHolder<" + stringify(dim_) + ">";
+        return "TargetSetHolder<" + Shape_::name() + ">";
       }
     };
 
     template<>
-    class TargetSetHolder<0>
+    class TargetSetHolder<Shape::Vertex>
     {
+    public:
+      typedef Shape::Vertex ShapeType;
+      enum
+      {
+        shape_dim = ShapeType::dimension
+      };
+
     protected:
       TargetSet _target_set;
 
@@ -187,19 +203,19 @@ namespace FEAST
         CONTEXT(name() + "::~TargetSetHolder()");
       }
 
-      template<int dim__>
+      template<int dim_>
       TargetSet& get_target_set()
       {
         CONTEXT(name() + "::get_target_set()");
-        static_assert(dim__ == 0, "invalid dimension");
+        static_assert(dim_ == 0, "invalid dimension");
         return _target_set;
       }
 
-      template<int dim__>
+      template<int dim_>
       const TargetSet& get_target_set() const
       {
         CONTEXT(name() + "::get_target_set() [const]");
-        static_assert(dim__ == 0, "invalid dimension");
+        static_assert(dim_ == 0, "invalid dimension");
         return _target_set;
       }
 
@@ -212,7 +228,7 @@ namespace FEAST
 
       static String name()
       {
-        return "TargetSetHolder<0>";
+        return "TargetSetHolder<Vertex>";
       }
     };
     /// \endcond

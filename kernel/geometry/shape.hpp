@@ -131,6 +131,23 @@ namespace FEAST
 
       /// \cond internal
       /**
+       * \brief explicit FaceTraits specialisation for Vertex shape
+       */
+      template<>
+      struct FaceTraits<Vertex, 0>
+      {
+        /// Shape type of face
+        typedef Vertex ShapeType;
+
+        /// dummy enumeration
+        enum
+        {
+          /// Number of faces per cell
+          count = 1
+        };
+      }; // struct FaceTraits<Vertex,0>
+
+      /**
        * \brief partial FaceTraits specialisation for Simplex shape
        *
        * \author Peter Zajac

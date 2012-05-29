@@ -25,7 +25,7 @@ namespace FEAST
         {
           typedef Shape::Vertex ShapeType;
           typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<0> TargetSetHolderType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
 
           static Index refine(
             TargetSetType& target_set_out,

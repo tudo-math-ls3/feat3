@@ -274,7 +274,7 @@ namespace FEAST
       typedef ConformalMesh<Policy_> BaseClass;
 
       /// target set holder type
-      typedef TargetSetHolder<BaseClass::shape_dim> TargetSetHolderType;
+      typedef TargetSetHolder<typename BaseClass::ShapeType> TargetSetHolderType;
 
       /**
        * \brief Target set type class template.
