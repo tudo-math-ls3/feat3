@@ -141,7 +141,7 @@ namespace FEAST
         CONTEXT(name() + "::get_target_set()");
         static_assert(dim_ >= 0, "invalid dimension");
         static_assert(dim_ <= shape_dim, "invalid dimension");
-        typedef Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
+        typedef typename Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
         return TargetSetHolder<CellType>::_target_set;
       }
 
@@ -151,7 +151,7 @@ namespace FEAST
         CONTEXT(name() + "::get_target_set() [const]");
         static_assert(dim_ >= 0, "invalid dimension");
         static_assert(dim_ <= shape_dim, "invalid dimension");
-        typedef Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
+        typedef typename Shape::FaceTraits<Shape_, dim_>::ShapeType CellType;
         return TargetSetHolder<CellType>::_target_set;
       }
 
