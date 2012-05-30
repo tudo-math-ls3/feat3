@@ -1,6 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
+#include <kernel/geometry/test_aux/standard_quad.hpp>
 #include <kernel/geometry/standard_refinery.hpp>
 
 using namespace FEAST;
@@ -13,9 +14,12 @@ typedef ConformalSubMeshPolicy<Shape::Quadrilateral> SubMeshPolicy;
 
 typedef ConformalMesh<RootMeshPolicy> RootMesh;
 typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
+typedef CellSubSet<Shape::Quadrilateral> SubSet;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
 typedef StandardRefinery<SubMesh> SubMeshRefinery;
+typedef StandardRefinery<SubSet> SubSetRefinery;
+
 
 /**
  * \brief Test class for the StandardRefinery class template.
@@ -50,15 +54,20 @@ public:
     // create a quad submesh
     SubMesh* quad_submesh_coarse = TestAux::create_tetris_quad_submesh_2d();
 
+    // create a cell sub-set
+    SubSet* cell_subset_coarse = TestAux::create_tetris_quad_cellsubset_2d();
+
     // create refineries
     RootMeshRefinery* quad_mesh_refinery = new RootMeshRefinery(*quad_mesh_coarse);
     SubMeshRefinery* edge_submesh_refinery = new SubMeshRefinery(*edge_submesh_coarse);
     SubMeshRefinery* quad_submesh_refinery = new SubMeshRefinery(*quad_submesh_coarse);
+    SubSetRefinery* cell_subset_refinery = new SubSetRefinery(*cell_subset_coarse);
 
     // refine the meshes
     RootMesh* quad_mesh_fine = quad_mesh_refinery->refine();
     SubMesh* edge_submesh_fine = edge_submesh_refinery->refine(*quad_mesh_coarse);
     SubMesh* quad_submesh_fine = quad_submesh_refinery->refine(*quad_mesh_coarse);
+    SubSet* cell_subset_fine = cell_subset_refinery->refine(*quad_mesh_coarse);
 
     // validate refined meshes
     try
@@ -66,6 +75,7 @@ public:
       TestAux::validate_refined_tetris_mesh_2d(*quad_mesh_fine);
       TestAux::validate_refined_tetris_edge_submesh_2d(*edge_submesh_fine);
       TestAux::validate_refined_tetris_quad_submesh_2d(*quad_submesh_fine);
+      TestAux::validate_refined_tetris_quad_cellsubset_2d(*cell_subset_fine);
     }
     catch(const String& msg)
     {
@@ -73,12 +83,15 @@ public:
     }
 
     // clean up
+    delete cell_subset_fine;
     delete quad_submesh_fine;
     delete edge_submesh_fine;
     delete quad_mesh_fine;
+    delete cell_subset_refinery;
     delete quad_submesh_refinery;
     delete edge_submesh_refinery;
     delete quad_mesh_refinery;
+    delete cell_subset_coarse;
     delete quad_submesh_coarse;
     delete edge_submesh_coarse;
     delete quad_mesh_coarse;

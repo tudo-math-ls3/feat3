@@ -225,6 +225,18 @@
     <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp">
       <Filter>Header Files\geometry\test_aux</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\subset_refiner.hpp">
+      <Filter>Header Files\geometry\conformal\standard_refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_quad.hpp">
+      <Filter>Header Files\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_simplex.hpp">
+      <Filter>Header Files\geometry\test_aux</Filter>
+    </ClInclude>
     <ClInclude Include="..\kernel\foundation\communication.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>

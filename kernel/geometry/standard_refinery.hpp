@@ -3,6 +3,7 @@
 #define KERNEL_GEOMETRY_STANDARD_REFINERY_HPP 1
 
 // includes, FEAST
+#include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 
@@ -139,6 +140,50 @@ namespace FEAST
         return "StandardRefinery<ConformalSubMesh<...>>";
       }
     }; // class StandardRefinery<ConformalSubMesh<...>>
+
+    /* ************************************************************************************************************* */
+
+    /**
+     * \brief Standard Refinery implementation for CellSubSet
+     *
+     * \author Peter Zajac
+     */
+    template<typename Shape_>
+    class StandardRefinery< CellSubSet<Shape_> >
+    {
+    public:
+      typedef CellSubSet<Shape_> MeshType;
+      typedef typename MeshType::ShapeType ShapeType;
+
+    protected:
+      const MeshType& _coarse_mesh;
+      MeshType* _fine_mesh;
+
+    public:
+      explicit StandardRefinery(const MeshType& coarse_mesh) :
+        _coarse_mesh(coarse_mesh),
+        _fine_mesh(nullptr)
+      {
+        CONTEXT(name() + "::StandardRefinery()");
+      }
+
+      virtual ~StandardRefinery()
+      {
+        CONTEXT(name() + "::~StandardRefinery()");
+      }
+
+      template<typename ParentMesh_>
+      MeshType* refine(const ParentMesh_& parent_mesh)
+      {
+        CONTEXT(name() + "::refine()");
+        return (_fine_mesh = _coarse_mesh.refine(parent_mesh));
+      }
+
+      static String name()
+      {
+        return "StandardRefinery<CellSubSet<...>>";
+      }
+    }; // class StandardRefinery<CellSubSet<...>>
 
     /* ************************************************************************************************************* */
 

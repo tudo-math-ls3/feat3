@@ -505,12 +505,14 @@
     <ClInclude Include="..\kernel\foundation\mesh_data.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
     <ClInclude Include="..\kernel\foundation\topology.hpp" />
+    <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\index_set.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\entity_counter.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\index_refiner-hypercube.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\index_refiner-simplex.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\index_refiner.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\index_refine_wrappers.hpp" />
+    <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\subset_refiner.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\target_refiner-hypercube.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\target_refiner-simplex.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\target_refiner.hpp" />
@@ -533,6 +535,8 @@
     <ClInclude Include="..\kernel\geometry\target_set.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp" />
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_quad.hpp" />
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_simplex.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_abacus.hpp" />
