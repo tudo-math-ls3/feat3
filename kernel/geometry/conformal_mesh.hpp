@@ -6,6 +6,9 @@
 #include <kernel/geometry/target_set.hpp>
 #include <kernel/geometry/vertex_set.hpp>
 #include <kernel/geometry/conformal/index_set.hpp>
+#include <kernel/geometry/conformal/standard_refinement/index_refine_wrappers.hpp>
+#include <kernel/geometry/conformal/standard_refinement/target_refine_wrappers.hpp>
+#include <kernel/geometry/conformal/standard_refinement/vertex_refine_wrappers.hpp>
 
 namespace FEAST
 {
@@ -90,7 +93,7 @@ namespace FEAST
       enum
       {
         /// shape dimension
-        shape_dim = ShapeType::dimension,
+        shape_dim = ShapeType::dimension
       };
 
       /**
@@ -249,6 +252,38 @@ namespace FEAST
       }
       /// \endcond
 
+      ConformalMesh* refine() const
+      {
+        CONTEXT(name() + "::refine()");
+        using namespace Conformal::StandardRefinement;
+
+        // get number of coordinates and vertex stride
+        int num_coords = _vertex_set.get_num_coords();
+        int vertex_stride = _vertex_set.get_stride();
+
+        // get number of entities in coarse mesh
+        Index num_entities_fine[shape_dim + 1];
+        for(int i(0); i <= shape_dim; ++i)
+        {
+          num_entities_fine[i] = _num_entities[i];
+        }
+
+        // calculate number of entities in fine mesh
+        EntityCountWrapper<ShapeType>::query(num_entities_fine);
+
+        // allocate a fine mesh
+        ConformalMesh* fine_mesh = new ConformalMesh(num_entities_fine, num_coords, vertex_stride);
+
+        // refine vertices
+        VertexRefineWrapper<ShapeType, VertexSetType>::refine(fine_mesh->_vertex_set, _vertex_set, _index_set_holder);
+
+        // refine indices
+        IndexRefineWrapper<ShapeType>::refine(fine_mesh->_index_set_holder, _num_entities, _index_set_holder);
+
+        // return fine mesh
+        return fine_mesh;
+      }
+
       /// Returns the name of the class.
       static String name()
       {
@@ -371,6 +406,51 @@ namespace FEAST
         return _target_set_holder;
       }
       /// \endcond
+
+
+      template<typename ParentMesh_>
+      ConformalSubMesh* refine(const ParentMesh_& parent_mesh) const
+      {
+        CONTEXT(name() + "::refine()");
+        using namespace Conformal::StandardRefinement;
+
+        typedef typename BaseClass::ShapeType ShapeType;
+        typedef typename BaseClass::VertexSetType VertexSetType;
+
+        // get number of coordinates and vertex stride
+        int num_coords = BaseClass::_vertex_set.get_num_coords();
+        int vertex_stride = BaseClass::_vertex_set.get_stride();
+
+        // get number of entities in coarse mesh
+        Index num_entities_fine[BaseClass::shape_dim + 1];
+        Index num_entities_parent[BaseClass::shape_dim + 1];
+        for(int i(0); i <= BaseClass::shape_dim; ++i)
+        {
+          num_entities_fine[i] = BaseClass::_num_entities[i];
+          num_entities_parent[i] = parent_mesh.get_num_entities(i);
+        }
+
+        // calculate number of entities in fine mesh
+        EntityCountWrapper<ShapeType>::query(num_entities_fine);
+
+        // allocate a fine mesh
+        ConformalSubMesh* fine_mesh = new ConformalSubMesh(num_entities_fine, num_coords, vertex_stride);
+
+        // refine vertices
+        VertexRefineWrapper<ShapeType, VertexSetType>::refine(fine_mesh->_vertex_set,
+          this->_vertex_set, this->_index_set_holder);
+
+        // refine indices
+        IndexRefineWrapper<ShapeType>::refine(fine_mesh->_index_set_holder,
+          this->_num_entities, this->_index_set_holder);
+
+        // refine target indices
+        TargetRefineWrapper<ShapeType>::refine(fine_mesh->_target_set_holder, num_entities_parent,
+          this->_target_set_holder, this->_index_set_holder, parent_mesh.get_index_set_holder());
+
+        // return fine mesh
+        return fine_mesh;
+      }
 
       /// Returns the name of the class.
       static String name()

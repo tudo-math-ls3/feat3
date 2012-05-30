@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/vertex_set.hpp>
+#include <kernel/geometry/structured/vertex_refiner.hpp>
 
 namespace FEAST
 {
@@ -225,6 +226,29 @@ namespace FEAST
       {
         CONTEXT(name() + "::get_vertex_set() [const]");
         return _vertex_set;
+      }
+
+      StructuredMesh* refine() const
+      {
+        CONTEXT(name() + "::refine()");
+
+        using namespace Structured;
+
+        // calculate number of slices in fine mesh
+        Index num_slices_fine[shape_dim];
+        for(int i(0); i < shape_dim; ++i)
+        {
+          num_slices_fine[i] = 2 * _num_slices[i];
+        }
+
+        // allocate a fine mesh
+        StructuredMesh* fine_mesh = new StructuredMesh(num_slices_fine);
+
+        // refine vertices
+        VertexRefiner<ShapeType, VertexSetType>::refine(fine_mesh->_vertex_set, _vertex_set, _num_slices);
+
+        // return fine mesh
+        return fine_mesh;
       }
 
       /// Returns the name of the class.
