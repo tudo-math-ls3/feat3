@@ -125,9 +125,9 @@ public:
       }
     }
     catch(const String& msg)
-        {
-          TEST_CHECK_MSG(false, msg);
-        }
+    {
+      TEST_CHECK_MSG(false, msg);
+    }
   }
 
 } standard_refinery_test_conf_quad;

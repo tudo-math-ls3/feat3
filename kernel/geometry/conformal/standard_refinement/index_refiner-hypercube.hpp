@@ -1255,7 +1255,7 @@ namespace FEAST
             // return fine cube count
             return 8*num_cubes;
           }
-        }; // IndexRefiner<Hypercube<3>,2,1>
+        }; // IndexRefiner<Hypercube<3>,3,1>
 
         template<>
         struct IndexRefiner<Shape::Hypercube<3>, 3, 2> //3dim: quads at cubes
@@ -1420,7 +1420,7 @@ namespace FEAST
             // return fine cube count
             return 8*num_cubes;
           }
-        }; // IndexRefiner<Hypercube<3>,2,1>
+        }; // IndexRefiner<Hypercube<3>,3,2>
 
       } // namespace StandardRefinement
       /// \endcond

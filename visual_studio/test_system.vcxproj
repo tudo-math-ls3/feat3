@@ -434,6 +434,8 @@
     <ClCompile Include="..\kernel\geometry\shape-test.cpp" />
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-hexa.cpp" />
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-quad.cpp" />
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-tetra.cpp" />
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-tria.cpp" />
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-quad.cpp" />
     <ClCompile Include="..\kernel\hornet\dense_matrix-test.cpp" />
     <ClCompile Include="..\kernel\hornet\dense_vector-test.cpp" />

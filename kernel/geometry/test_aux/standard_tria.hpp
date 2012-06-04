@@ -15,6 +15,7 @@ namespace FEAST
     {
 
       typedef ConformalMesh< ConformalMeshPolicy< Shape::Triangle > > TriangleMesh;
+      typedef ConformalMesh< ConformalMeshPolicy< Shape::Tetrahedron > > TetrahedronMesh;
 
       TriangleMesh* create_trianglerefinement_mesh_2d(int orientation)
       {
@@ -49,7 +50,7 @@ namespace FEAST
         //   triangle orientation: 0-1-2
 
         // set up vertex coordinates array
-        static const Real vtx0[3*8] =
+        static const Real vtx0[3*2] =
         {
           0.0, 0.0,
           1.0, 0.0,
@@ -57,7 +58,7 @@ namespace FEAST
         };
 
         // set up vertices-at-edge array
-        static const Index v_e0[12*2] =
+        static const Index v_e0[3*2] =
         {
           1, 2,
           2, 0,
@@ -65,13 +66,13 @@ namespace FEAST
         };
 
         // set up vertices-at-triangle array
-        static const Index v_t0[6*4] =
+        static const Index v_t0[3] =
         {
           0, 1, 2
         };
 
         // set up edges-at-triangle array
-        static const Index e_t0[6*4] =
+        static const Index e_t0[3] =
         {
           0, 1, 2
         };
@@ -96,7 +97,7 @@ namespace FEAST
         //   triangle orientation: 0-1-2
 
         // set up vertex coordinates array
-        static const Real vtx1[3*8] =
+        static const Real vtx1[3*2] =
         {
           0.0, 0.0,
           1.0, 0.0,
@@ -104,7 +105,7 @@ namespace FEAST
         };
 
         // set up vertices-at-edge array
-        static const Index v_e1[12*2] =
+        static const Index v_e1[3*2] =
         {
           2, 1,
           2, 0,
@@ -112,13 +113,13 @@ namespace FEAST
         };
 
         // set up vertices-at-triangle array
-        static const Index v_t1[6*4] =
+        static const Index v_t1[3*1] =
         {
           0, 1, 2
         };
 
         // set up edges-at-triangle array
-        static const Index e_t1[6*4] =
+        static const Index e_t1[1*3] =
         {
           0, 1, 2
         };
@@ -143,7 +144,7 @@ namespace FEAST
         //   triangle orientation: 1-0-2
 
         // set up vertex coordinates array
-        static const Real vtx2[3*8] =
+        static const Real vtx2[3*2] =
         {
           1.0, 0.0,
           0.0, 0.0,
@@ -151,7 +152,7 @@ namespace FEAST
         };
 
         // set up vertices-at-edge array
-        static const Index v_e2[12*2] =
+        static const Index v_e2[3*2] =
         {
           0, 1,
           2, 1,
@@ -159,13 +160,13 @@ namespace FEAST
         };
 
         // set up vertices-at-triangle array
-        static const Index v_t2[6*4] =
+        static const Index v_t2[3*1] =
         {
           1, 0, 2
         };
 
         // set up edges-at-triangle array
-        static const Index e_t2[6*4] =
+        static const Index e_t2[3*1] =
         {
           2, 1, 0
         };
@@ -190,7 +191,7 @@ namespace FEAST
         //   triangle orientation: 0-1-2
 
         // set up vertex coordinates array
-        static const Real vtx3[3*8] =
+        static const Real vtx3[3*2] =
         {
           0.0, 1.0,
           1.0, 0.0,
@@ -198,7 +199,7 @@ namespace FEAST
         };
 
         // set up vertices-at-edge array
-        static const Index v_e3[12*2] =
+        static const Index v_e3[3*2] =
         {
           2, 0,
           1, 2,
@@ -206,13 +207,13 @@ namespace FEAST
         };
 
         // set up vertices-at-triangle array
-        static const Index v_t3[6*4] =
+        static const Index v_t3[3*1] =
         {
           2, 1, 0
         };
 
         // set up edges-at-triangle array
-        static const Index e_t3[6*4] =
+        static const Index e_t3[3] =
         {
           2, 0, 1
         };
@@ -517,7 +518,7 @@ namespace FEAST
         } //switch
       } // validate_refined_trianglerefinement_mesh_2d
 
-      TriangleMesh* create_triangle_quad_refinement_mesh_2d()
+      TriangleMesh* create_triangle_refinement_mesh_2d()
       {
 
         Index num_entities[] =
@@ -607,7 +608,7 @@ namespace FEAST
         return mesh;
       } // create_triangle_quad_refinement_mesh_2d
 
-      void validate_refined_triangle_quad_refinement_mesh_2d(const TriangleMesh& mesh)
+      void validate_refined_triangle_refinement_mesh_2d(const TriangleMesh& mesh)
       {
 
         // validate sizes

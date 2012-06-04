@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/geometry/test_aux/standard_simplex.hpp>
+#include <kernel/geometry/test_aux/standard_tria.hpp>
 #include <kernel/geometry/standard_refinery.hpp>
 
 using namespace FEAST;
@@ -63,9 +63,9 @@ public:
       }
     }
     catch(const String& msg)
-        {
-          TEST_CHECK_MSG(false, msg);
-        }
+    {
+      TEST_CHECK_MSG(false, msg);
+    }
   }
 
   void triangle_quad_refinementtest() const
@@ -78,7 +78,7 @@ public:
     {
 
         // create a 2D triangle element mesh
-        triangle_mesh_coarse = TestAux::create_triangle_quad_refinement_mesh_2d();
+        triangle_mesh_coarse = TestAux::create_triangle_refinement_mesh_2d();
 
         // create refineries
         triangle_mesh_refinery = new RootMeshRefinery(*triangle_mesh_coarse);
@@ -87,7 +87,7 @@ public:
         triangle_mesh_fine = triangle_mesh_refinery->refine();
 
         // validate refined meshes
-        TestAux::validate_refined_triangle_quad_refinement_mesh_2d(*triangle_mesh_fine);
+        TestAux::validate_refined_triangle_refinement_mesh_2d(*triangle_mesh_fine);
 
         // clean up
         delete triangle_mesh_fine;
@@ -96,9 +96,9 @@ public:
 
     }
     catch(const String& msg)
-        {
-          TEST_CHECK_MSG(false, msg);
-        }
+    {
+      TEST_CHECK_MSG(false, msg);
+    }
   }
 
 } standard_refinery_test_conf_triangle;

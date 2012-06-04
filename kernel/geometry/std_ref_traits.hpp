@@ -128,6 +128,250 @@ namespace FEAST
         return "StdRefTraits<" + ShapeType::name() + "," + stringify(face_dim_) + ">";
       }
     }; // struct StdRefTraits<Hypercube<...>,...>
+
+    ///////////////////////////////////////////////////////////////////////
+
+    template<
+      int face_dim_>
+    struct StdRefTraits<Shape::Simplex<1>, face_dim_>
+    {
+      // validate dimensions
+      static_assert(face_dim_ >= 0, "invalid face dimension");
+      static_assert(1 >= face_dim_, "invalid cell dimension");
+
+      /// Shape type
+      typedef Shape::Simplex<1> ShapeType;
+
+      /// Face type
+      typedef typename Shape::FaceTraits<ShapeType, face_dim_>::ShapeType FaceType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 1,
+
+        /// face dimension
+        face_dim = face_dim_,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = Shape::FaceTraits<ShapeType, cell_dim - face_dim>::count
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(face_dim_) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+    template<>
+    struct StdRefTraits<Shape::Simplex<2>, 0>
+    {
+
+      /// Shape type
+      typedef Shape::Simplex<2> ShapeType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 2,
+
+        /// face dimension
+        face_dim = 0,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = 0
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(0) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+    template<>
+    struct StdRefTraits<Shape::Simplex<2>, 1>
+    {
+
+      /// Shape type
+      typedef Shape::Simplex<2> ShapeType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 2,
+
+        /// face dimension
+        face_dim = 1,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = 3
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(1) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+    template<>
+    struct StdRefTraits<Shape::Simplex<2>, 2>
+    {
+
+      /// Shape type
+      typedef Shape::Simplex<2> ShapeType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 2,
+
+        /// face dimension
+        face_dim = 2,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = 4
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(2) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+    template<>
+    struct StdRefTraits<Shape::Simplex<3>, 0>
+    {
+
+      /// Shape type
+      typedef Shape::Simplex<3> ShapeType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 3,
+
+        /// face dimension
+        face_dim = 0,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = 1
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(1) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+    template<>
+    struct StdRefTraits<Shape::Simplex<3>, 1>
+    {
+
+      /// Shape type
+      typedef Shape::Simplex<3> ShapeType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 3,
+
+        /// face dimension
+        face_dim = 1,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = 6
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(1) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+    template<>
+    struct StdRefTraits<Shape::Simplex<3>, 2>
+    {
+
+      /// Shape type
+      typedef Shape::Simplex<3> ShapeType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 3,
+
+        /// face dimension
+        face_dim = 2,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = 16
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(1) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+        template<>
+    struct StdRefTraits<Shape::Simplex<3>, 3>
+    {
+
+      /// Shape type
+      typedef Shape::Simplex<3> ShapeType;
+
+      /// dummy enumeration
+      enum
+      {
+        /// cell dimension
+        cell_dim = 3,
+
+        /// face dimension
+        face_dim = 3,
+
+        /**
+         * Number of faces generated upon refinement
+         */
+        count = 12
+      };
+
+      /// \brief Returns the name of the class.
+      static inline String name()
+      {
+        return "StdRefTraits<" + ShapeType::name() + "," + stringify(1) + ">";
+      }
+    }; // struct StdRefTraits<Simplex<...>,...>
+
+    ///////////////////////////////////////////////////////////////////// by CC
+
     /// \endcond
   } // namespace Geometry
 } // namespace FEAST

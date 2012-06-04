@@ -67,6 +67,12 @@
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-hexa.cpp">
       <Filter>Source Files %28kernel%29\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-tetra.cpp">
+      <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-tria.cpp">
+      <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
     <ClCompile Include="..\kernel\foundation\dense_data_wrapper-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>

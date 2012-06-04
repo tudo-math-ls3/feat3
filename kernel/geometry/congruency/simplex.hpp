@@ -63,6 +63,7 @@ namespace FEAST
       template<>
       class Sampler< Shape::Simplex<2> >
       {
+      public:
         template<
           typename Source_,
           typename Target_>
@@ -161,11 +162,28 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
+
       template<>
       class IndexMapping<Shape::Simplex<2>, 1>
       {
-        /// \todo implement me
+      public:
+        static int map(int orient, int idx)
+        {
+          static const int indices[7][3] =
+          {
+            {0, 1, 2},
+            {1, 2, 0},
+            {2, 0, 1},
+            {0, 0, 0}, // unused
+            {0, 2, 1},
+            {1, 0, 2},
+            {2, 1, 0}
+          };
+
+          return indices[orient][idx];
+        };
       };
+
       /// \endcond
     } // namespace Congruency
   } // namespace Geometry

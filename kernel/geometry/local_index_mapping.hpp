@@ -40,9 +40,9 @@ namespace FEAST
         ASSERT((0 <= face) && (face < 2), "invalid face index");
         static const int indices[3][2] =
         {
-          {0, 1},
-          {0, 2},
-          {1, 2}
+          {1, 2},
+          {2, 0},
+          {0, 1}
         };
         return indices[cell][face];
       }
@@ -62,8 +62,8 @@ namespace FEAST
           {0, 2},
           {0, 3},
           {1, 2},
-          {2, 3},
-          {3, 1}
+          {1, 3},
+          {2, 3}
         };
         return indices[cell][face];
       }
@@ -79,10 +79,10 @@ namespace FEAST
         ASSERT((0 <= face) && (face < 3), "invalid face index");
         static const int indices[4][3] =
         {
-          {0, 1, 2},
+          {1, 2, 3},
           {0, 2, 3},
-          {0, 3, 1},
-          {1, 2, 3}
+          {0, 1, 3},
+          {0, 1, 2}
         };
         return indices[cell][face];
       }
@@ -98,10 +98,10 @@ namespace FEAST
         ASSERT((0 <= face) && (face < 3), "invalid face index");
         static const int indices[4][3] =
         {
-          {0, 1, 3},
-          {1, 2, 4},
-          {2, 0, 5},
-          {3, 5, 4}
+          {5, 4, 3},
+          {5, 2, 1},
+          {4, 2, 0},
+          {3, 1, 0}
         };
         return indices[cell][face];
       }
