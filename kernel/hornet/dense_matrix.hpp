@@ -48,7 +48,9 @@ namespace FEAST
       }
 
       DenseMatrix(const DenseMatrix<Arch_, DT_> & other) :
-        Container<Arch_, DT_>(other)
+        Container<Arch_, DT_>(other),
+        _rows(other._rows),
+        _columns(other._columns)
       {
       }
 

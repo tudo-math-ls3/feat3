@@ -11,7 +11,7 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for the assertion class.
+* \brief Test class for the dense vector class.
 *
 * \test test description missing
 *

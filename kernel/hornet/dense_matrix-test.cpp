@@ -11,7 +11,7 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for the assertion class.
+* \brief Test class for the dense matrix class.
 *
 * \test test description missing
 *
@@ -33,7 +33,7 @@ class DenseMatrixTest
 public:
 
   DenseMatrixTest()
-    : TaggedTest<Tag_, DT_>("dense_vector_test")
+    : TaggedTest<Tag_, DT_>("dense_matrix_test")
   {
   }
 
@@ -43,7 +43,7 @@ public:
     DenseMatrix<Tag_, DT_> b(10, 10, 5.);
     DenseMatrix<Tag_, DT_> c(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
-    TEST_CHECK_EQUAL(c.size(), b.size());
+    TEST_CHECK_EQUAL(c.rows(), b.rows());
     DenseMatrix<Tag_, DT_> e(11, 12, 5.);
     TEST_CHECK_EQUAL(e.rows(), 11);
     TEST_CHECK_EQUAL(e.columns(), 12);
