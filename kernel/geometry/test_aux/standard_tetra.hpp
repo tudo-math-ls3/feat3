@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_TEST_AUX_STANDARD_SIMPLEX_HPP
-#define KERNEL_GEOMETRY_TEST_AUX_STANDARD_SIMPLEX_HPP 1
+#ifndef KERNEL_GEOMETRY_TEST_AUX_STANDARD_TETRA_HPP
+#define KERNEL_GEOMETRY_TEST_AUX_STANDARD_TETRA_HPP 1
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -1669,4 +1669,4 @@ namespace FEAST
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_TEST_AUX_STANDARD_Tetrahedron_HPP
+#endif // KERNEL_GEOMETRY_TEST_AUX_STANDARD_TETRA_HPP
