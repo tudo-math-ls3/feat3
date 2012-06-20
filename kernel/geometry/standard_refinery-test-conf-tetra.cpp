@@ -8,8 +8,13 @@ using namespace FEAST::Geometry;
 using namespace FEAST::Geometry::Conformal;
 
 typedef ConformalMeshPolicy<Shape::Tetrahedron> TetRootMeshPolicy;
+typedef ConformalSubMeshPolicy<Shape::Tetrahedron> SubMeshPolicy;
+
 typedef ConformalMesh<TetRootMeshPolicy> TetRootMesh;
+typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
+
 typedef StandardRefinery<TetRootMesh> TetRootMeshRefinery;
+typedef StandardRefinery<SubMesh> SubMeshRefinery;
 
 /**
  * \brief Test class for the StandardRefinery class template.
@@ -81,19 +86,28 @@ public:
       // create a 3D tetrahedron element mesh
       tetrahedron_mesh_coarse = TestAux::create_bigtetrahedronrefinement_mesh_3d();
 
+      // create tria submesh
+      SubMesh* tria_submesh_coarse = TestAux::create_tetra_tria_submesh_3d();
+
       // create refineries
       tetrahedron_mesh_refinery = new TetRootMeshRefinery(*tetrahedron_mesh_coarse);
+      SubMeshRefinery* tria_submesh_refinery = new SubMeshRefinery(*tria_submesh_coarse);
 
       // refine the meshes
       tetrahedron_mesh_fine = tetrahedron_mesh_refinery->refine();
+      SubMesh* tria_submesh_fine = tria_submesh_refinery->refine(*tetrahedron_mesh_coarse);
 
       // validate refined meshes
       TestAux::validate_refined_bigtetrahedronrefinement_mesh_3d(*tetrahedron_mesh_fine);
+      TestAux::validate_refined_triangle_cell_submesh_3d(*tria_submesh_fine);
 
       // clean up
       delete tetrahedron_mesh_fine;
+      delete tria_submesh_fine;
       delete tetrahedron_mesh_refinery;
+      delete tria_submesh_refinery;
       delete tetrahedron_mesh_coarse;
+      delete tria_submesh_coarse;
     }
     catch(const String& msg)
     {

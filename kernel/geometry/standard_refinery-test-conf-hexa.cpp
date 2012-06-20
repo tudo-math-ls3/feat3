@@ -9,8 +9,13 @@ using namespace FEAST::Geometry;
 using namespace FEAST::Geometry::Conformal;
 
 typedef ConformalMeshPolicy<Shape::Hexahedron> HexaMeshPolicy;
+typedef ConformalSubMeshPolicy<Shape::Hexahedron> SubMeshPolicy;
+
 typedef ConformalMesh<HexaMeshPolicy> HexaMesh;
+typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
+
 typedef StandardRefinery<HexaMesh> HexaMeshRefinery;
+typedef StandardRefinery<SubMesh> SubMeshRefinery;
 
 /**
  * \brief Test class for the StandardRefinery class template.
@@ -72,16 +77,22 @@ public:
     // create a 3D tetris mesh
     HexaMesh* hexa_mesh_coarse = TestAux::create_tetris_mesh_3d();
 
-    // create refinery
+    // create a quad submesh
+    SubMesh* quad_submesh_coarse = TestAux::create_tetris_quad_submesh_3d();
+
+    // create refineries
     HexaMeshRefinery* hexa_mesh_refinery = new HexaMeshRefinery(*hexa_mesh_coarse);
+    SubMeshRefinery* quad_submesh_refinery = new SubMeshRefinery(*quad_submesh_coarse);
 
     // refine the meshes
     HexaMesh* hexa_mesh_fine = hexa_mesh_refinery->refine();
+    SubMesh* quad_submesh_fine = quad_submesh_refinery->refine(*hexa_mesh_coarse);
 
     // validate refined meshes
     try
     {
       TestAux::validate_refined_tetris_mesh_3d(*hexa_mesh_fine);
+      TestAux::validate_refined_tetris_quad_submesh_3d(*quad_submesh_fine);
     }
     catch(const String& msg)
     {
@@ -90,8 +101,11 @@ public:
 
     // clean up
     delete hexa_mesh_fine;
+    delete quad_submesh_fine;
     delete hexa_mesh_refinery;
+    delete quad_submesh_refinery;
     delete hexa_mesh_coarse;
+    delete quad_submesh_coarse;
   }
 
 } standard_refinery_test_conf_hexa;

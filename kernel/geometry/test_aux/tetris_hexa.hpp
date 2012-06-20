@@ -971,6 +971,270 @@ namespace FEAST
 
       } // validate_refined_tetris_mesh_3d
 
+      HexaSubMesh* create_tetris_quad_submesh_3d()
+      {
+
+       /* Creates the 3D tetris quad submesh.
+
+                                    14
+                                   /|
+                                  / |
+                                 P  |
+                                /   X
+                               /    |
+                              6     |
+                              |     |
+                              |----11---------V--------12
+                              |    /|                  /|
+                              F   / |                 / |
+                              |  M  |                N  |
+                              | /   S               /   T
+                              |/    |              /    |
+                              3---------D---------4     |
+                                    |                   |
+                                    8---------R---------9
+          y
+          ^
+          |
+          |
+         11---->x
+         /
+       z/
+       v
+      */
+
+        Index num_entities[] =
+        {
+          8, // vertices
+          10, // edges
+          3,  // quads
+          0 // hexas
+        };
+
+        // create mesh
+        HexaSubMesh* mesh = new HexaSubMesh(num_entities, 2);
+
+        // set up vertex coordinates array
+        Real vtx[] =
+        {
+          0.0, 0.0,
+          1.0, 1.0,
+          2.0, 2.0,
+          1.0, 2.0,
+          2.0, 1.0,
+          2.0, 0.0,
+          1.0, 0.0,
+          0.0, 1.0
+        };
+        copy_vtx(mesh->get_vertex_set(), vtx);
+
+        // set up vertices-at-edge array
+        Index v_e[] =
+        {
+          6, 0,
+          5, 6,
+          7, 1,
+          1, 4,
+          0, 7,
+          6, 1,
+          4, 5,
+          3, 1,
+          2, 4,
+          3, 2
+        };
+        copy_idx(mesh->get_index_set<1,0>(), v_e);
+
+        // set up vertices-at-quad array
+        Index v_q[] =
+        {
+          0, 6, 7, 1,
+          5, 4, 6, 1,
+          3, 2, 1, 4
+        };
+        copy_idx(mesh->get_index_set<2,0>(), v_q);
+
+        // set up edges-at-quad array
+        Index e_q[] =
+        {
+          0, 2, 4, 5,
+          6, 5, 1, 3,
+          9, 3, 7, 8
+        };
+        copy_idx(mesh->get_index_set<2,1>(), e_q);
+
+        // set up vertex-target indices
+        Index vti[] =
+        {
+          6, 11, 9, 8, 12, 4, 3, 14
+        };
+        copy_trg(mesh->get_target_set<0>(), vti);
+
+        // set up edge-target indices
+        Index eqi[] =
+        {
+          6, 4, 24, 22, 16, 13, 14, 19, 20, 18
+        };
+        copy_trg(mesh->get_target_set<1>(), eqi);
+
+        // set up quad-target indices
+        Index qti[] =
+        {
+          9, 7, 13
+        };
+        copy_trg(mesh->get_target_set<2>(), qti);
+        // okay
+        return mesh;
+      } // create_tetris_quad_submesh_3d()
+
+      void validate_refined_tetris_quad_submesh_3d(const HexaSubMesh& mesh)
+      {
+
+        // validate sizes
+        if(mesh.get_num_entities(0) != 21)
+          throw String("Vertex count mismatch");
+        if(mesh.get_num_entities(1) != 32)
+          throw String("Edge count mismatch");
+        if(mesh.get_num_entities(2) != 12)
+          throw String("Quad count mismatch");
+
+        // check vertex coordinates array
+        Real vtx[] =
+        {
+          0.0, 0.0,
+          1.0, 1.0,
+          2.0, 2.0,
+          1.0, 2.0,
+          2.0, 1.0,
+          2.0, 0.0,
+          1.0, 0.0,
+          0.0, 1.0,
+
+          0.5, 0.0,
+          1.5, 0.0,
+          0.5, 1.0,
+          1.5, 1.0,
+          0.0, 0.5,
+          1.0, 0.5,
+          2.0, 0.5,
+          1.0, 1.5,
+          2.0, 1.5,
+          1.5, 2.0,
+          0.5, 0.5,
+          1.5, 0.5,
+          1.5, 1.5
+        };
+        if(!comp_vtx(mesh.get_vertex_set(), vtx))
+          throw String("Vertex coordinate refinement failure");
+
+        // check vertices-at-edge array
+        Index v_e[] =
+        {
+          6, 8,
+          8, 0,
+          5, 9,
+          9, 6,
+          7, 10,
+          10, 1,
+          1, 11,
+          11, 4,
+          0, 12,
+          12, 7,
+          6, 13,
+          13, 1,
+          4, 14,
+          14, 5,
+          3, 15,
+          15, 1,
+          2, 16,
+          16, 4,
+          3, 17,
+          17, 2,
+          8, 18,
+          18, 10,
+          12, 18,
+          18, 13,
+          14, 19,
+          19, 13,
+          9, 19,
+          19, 11,
+          17, 20,
+          20, 11,
+          15, 20,
+          20, 16
+        };
+        if(!comp_idx(mesh.get_index_set<1,0>(), v_e))
+          throw String("Vertex-At-Edge index set refinement failure");
+
+        // check vertices-at-quad
+        Index v_q[] =
+        {
+          0, 8, 12, 18,
+          8, 6, 18, 13,
+          12, 18, 7, 10,
+          18, 13, 10, 1,
+          5, 14, 9, 19,
+          14, 4, 19, 11,
+          9, 19, 6, 13,
+          19, 11, 13, 1,
+          3, 17, 15, 20,
+          17, 2, 20, 16,
+          15, 20, 1, 11,
+          20, 16, 11, 4
+        };
+        if(!comp_idx(mesh.get_index_set<2,0>(), v_q))
+          throw String("Vertex-At-Quad index set refinement failure");
+
+        // check edges-at-quad
+        Index e_q[] =
+        {
+          1, 22, 8, 20,
+          0, 23, 20, 10,
+          22, 4, 9, 21,
+          23, 5, 21, 11,
+          13, 26, 2, 24,
+          12, 27, 24, 7,
+          26, 10, 3, 25,
+          27, 11, 25, 6,
+          18, 30, 14, 28,
+          19, 31, 28, 16,
+          30, 6, 15, 29,
+          31, 7, 29, 17
+        };
+        if(!comp_idx(mesh.get_index_set<2,1>(), e_q))
+          throw String("Edges-At-Quad refinement failure");
+
+        // check vertex-target indices
+        Index vti[] =
+        {
+          6, 11, 9, 8, 12, 4, 3, 14,
+          26, 24, 44, 42, 36, 33, 34,
+          39, 40, 38, 65, 63, 69
+        };
+        if(!comp_trg(mesh.get_target_set<0>(), vti))
+          throw String("Vertex-Target-Indices refinement failure");
+
+        // check edge-target indices
+        Index eti[] =
+        {
+          12, 13, 9, 8, 49, 48, 44, 45,
+          33, 32, 27, 26, 28, 29, 38, 39,
+          40, 41, 36, 37, 109, 108, 111, 110,
+          103, 102, 101, 100, 124, 125, 126, 127
+        };
+        if(!comp_trg(mesh.get_target_set<1>(), eti))
+          throw String("Edge-Target-Indices refinement failure");
+
+        // check quad-target indices
+        Index qti[] =
+        {
+          39, 38, 37, 36,
+          31, 29, 30, 28,
+          52, 53, 54, 55
+        };
+        if(!comp_trg(mesh.get_target_set<2>(), qti))
+          throw String("Quad-Target-Indices refinement failure");
+      } //validate_refined_tetris_quad_submesh_3d
+
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry

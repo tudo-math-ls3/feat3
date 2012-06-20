@@ -8,8 +8,13 @@ using namespace FEAST::Geometry;
 using namespace FEAST::Geometry::Conformal;
 
 typedef ConformalMeshPolicy<Shape::Triangle> RootMeshPolicy;
+typedef ConformalSubMeshPolicy<Shape::Triangle> SubMeshPolicy;
+
 typedef ConformalMesh<RootMeshPolicy> RootMesh;
+typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
+
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
+typedef StandardRefinery<SubMesh> SubMeshRefinery;
 
 /**
  * \brief Test class for the StandardRefinery class template.
@@ -74,6 +79,12 @@ public:
     RootMeshRefinery* triangle_mesh_refinery;
     RootMesh* triangle_mesh_fine;
 
+    // create an edge submesh
+    SubMesh* edge_submesh_coarse = TestAux::create_edge_cell_submesh_2d();
+
+    // create a tria submesh
+    SubMesh* tria_submesh_coarse = TestAux::create_triangle_cell_submesh_2d();
+
     try
     {
 
@@ -82,17 +93,29 @@ public:
 
         // create refineries
         triangle_mesh_refinery = new RootMeshRefinery(*triangle_mesh_coarse);
+        SubMeshRefinery* edge_submesh_refinery = new SubMeshRefinery(*edge_submesh_coarse);
+        SubMeshRefinery* tria_submesh_refinery = new SubMeshRefinery(*tria_submesh_coarse);
 
         // refine the meshes
         triangle_mesh_fine = triangle_mesh_refinery->refine();
+        SubMesh* edge_submesh_fine = edge_submesh_refinery->refine(*triangle_mesh_coarse);
+        SubMesh* tria_submesh_fine = tria_submesh_refinery->refine(*triangle_mesh_coarse);
 
         // validate refined meshes
         TestAux::validate_refined_triangle_refinement_mesh_2d(*triangle_mesh_fine);
+        TestAux::validate_refined_edge_cell_submesh_2d(*edge_submesh_fine);
+        TestAux::validate_refined_triangle_cell_submesh_2d(*tria_submesh_fine);
 
         // clean up
         delete triangle_mesh_fine;
+        delete tria_submesh_fine;
+        delete edge_submesh_fine;
         delete triangle_mesh_refinery;
+        delete tria_submesh_refinery;
+        delete edge_submesh_refinery;
         delete triangle_mesh_coarse;
+        delete tria_submesh_coarse;
+        delete edge_submesh_coarse;
 
     }
     catch(const String& msg)
@@ -100,5 +123,4 @@ public:
       TEST_CHECK_MSG(false, msg);
     }
   }
-
 } standard_refinery_test_conf_triangle;

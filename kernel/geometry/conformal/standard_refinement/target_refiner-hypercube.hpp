@@ -270,13 +270,34 @@ namespace FEAST
             Index num_cells = target_set_holder_in.get_target_set<3>().get_num_entities();
             if(num_cells != 0)
             {
-              throw Exception("TargetSet refinement not implemented for Hexahedra");
+              throw InternalError("TargetSet refinement not implemented for Hexahedra");
             }
 
             // okay, no hexahedra to be refined...
             return 0;
           }
         }; // TargetRefiner<Shape::Hypercube<3>,...>
+
+        template<>
+        struct TargetRefiner<Shape::Hypercube<3>,0>
+        {
+          typedef Shape::Hypercube<3> ShapeType;
+          typedef TargetSet TargetSetType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
+          typedef IndexSetHolder<ShapeType> IndexSetHolderType;
+
+          static Index refine(
+            TargetSetType& /*target_set_out*/,
+            const Index /*offset*/,
+            const Index* /*index_offsets*/,
+            const TargetSetHolderType& /*target_set_holder_in*/,
+            const IndexSetHolderType& /*index_set_holder_src*/,
+            const IndexSetHolderType& /*index_set_holder_trg*/)
+          {
+            return 0;
+          }
+        }; // TargetRefiner<Shape::Hypercube<3>,...>
+
       } // namespace StandardRefinement
       /// \endcond
     } // namespace Conformal

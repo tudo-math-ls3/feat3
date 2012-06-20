@@ -347,7 +347,7 @@ namespace FEAST
        * The number of coordinates per vertex. This parameter is passed to the constructor of the vertex set.
        *
        * \param[in] vertex_stride
-       * The vertex stride. This paramete is passed to the constructor of the vertex set.
+       * The vertex stride. This parameter is passed to the constructor of the vertex set.
        */
       explicit ConformalSubMesh(const Index num_entities[],
         int num_coords /*= BaseClass::shape_dim*/,

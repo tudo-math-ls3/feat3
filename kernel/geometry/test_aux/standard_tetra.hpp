@@ -15,6 +15,7 @@ namespace FEAST
     {
 
       typedef ConformalMesh< ConformalMeshPolicy< Shape::Tetrahedron > > TetrahedronMesh;
+      typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Tetrahedron > > TetraSubMesh;
 
       TetrahedronMesh* create_tetrahedronrefinement_mesh_3d(int orientation)
       {
@@ -1663,6 +1664,207 @@ namespace FEAST
           throw String("Triangle-At-Tetrahedron index set refinement failure");
 
       } // validate_refined_bigtetrahedronrefinement_mesh_3d
+
+      TetraSubMesh* create_tetra_tria_submesh_3d()
+      {
+
+        Index num_entities[] =
+        {
+          4, // vertices
+          6, // edges
+          3, // tria
+          0 // tetra
+        };
+
+        // create mesh
+        TetraSubMesh* mesh = new TetraSubMesh(num_entities, 2);
+
+        // set up vertex coordinates array
+        Real vtx[] =
+        {
+          2.0, 2.0,
+          0.0, 0.0,
+          2.0, 4.0,
+          4.0, 0.0
+        };
+        copy_vtx(mesh->get_vertex_set(), vtx);
+
+        // set up vertices-at-edge array
+        Index v_e[] =
+        {
+          3, 1,
+          3, 0,
+          2, 3,
+          0, 2,
+          2, 1,
+          1, 0
+        };
+        copy_idx(mesh->get_index_set<1,0>(), v_e);
+
+        // set up vertices-at-tria array
+        Index v_t[] =
+        {
+          0, 3, 1,
+          2, 1, 0,
+          2, 0, 3
+        };
+        copy_idx(mesh->get_index_set<2,0>(), v_t);
+
+        // set up edges-at-tria array
+        Index e_t[] =
+        {
+          0, 5, 1,
+          5, 3, 4,
+          1, 2, 3
+        };
+        copy_idx(mesh->get_index_set<2,1>(), e_t);
+
+        // set up vertex-target indices
+        Index vti[] =
+        {
+          4, 0, 3, 2
+        };
+        copy_trg(mesh->get_target_set<0>(), vti);
+
+        // set up edge-target indices
+        Index eqi[] =
+        {
+          9, 3, 6, 0, 4, 1
+        };
+        copy_trg(mesh->get_target_set<1>(), eqi);
+
+        // set up tria-target indices
+        Index tti[] =
+        {
+          5, 8, 7
+        };
+        copy_trg(mesh->get_target_set<2>(), tti);
+        // okay
+        return mesh;
+      } // create_tetra_tria_submesh_3d()
+
+      void validate_refined_triangle_cell_submesh_3d(const TetraSubMesh& mesh)
+      {
+
+        // validate sizes
+        if(mesh.get_num_entities(0) != 10)
+          throw String("Vertex count mismatch");
+        if(mesh.get_num_entities(1) != 21)
+          throw String("Edge count mismatch");
+        if(mesh.get_num_entities(2) != 12)
+          throw String("Triangle count mismatch");
+
+        // check vertex coordinates array
+        Real vtx[] =
+        {
+          2.0, 2.0,
+          0.0, 0.0,
+          2.0, 4.0,
+          4.0, 0.0,
+
+          2.0, 0.0,
+          3.0, 1.0,
+          3.0, 2.0,
+          2.0, 3.0,
+          1.0, 2.0,
+          1.0, 1.0
+        };
+        if(!comp_vtx(mesh.get_vertex_set(), vtx))
+          throw String("Vertex coordinate refinement failure");
+
+        // check vertices-at-edge array
+        Index v_e[] =
+        {
+          3, 4,
+          4, 1,
+          3, 5,
+          5, 0,
+          2, 6,
+          6, 3,
+          0, 7,
+          7, 2,
+          2, 8,
+          8, 1,
+          1, 9,
+          9, 0,
+          5, 9,
+          4, 5,
+          9, 4,
+          8, 7,
+          9, 8,
+          7, 9,
+          7, 6,
+          5, 7,
+          6, 5
+        };
+        if(!comp_idx(mesh.get_index_set<1,0>(), v_e))
+          throw String("Vertex-At-Edge index set refinement failure");
+
+        // check vertices-at-tria
+        Index v_t[] =
+        {
+          0, 5, 9,
+          5, 3, 4,
+          9, 4, 1,
+          4, 9, 5,
+          2, 8, 7,
+          8, 1, 9,
+          7, 9, 0,
+          9, 7, 8,
+          2, 7, 6,
+          7, 0, 5,
+          6, 5, 3,
+          5, 6, 7
+        };
+        if(!comp_idx(mesh.get_index_set<2,0>(), v_t))
+          throw String("Vertex-At-Triangle index set refinement failure");
+
+        // check edges-at-tria
+        Index e_t[] =
+        {
+          12, 11, 3,
+          0, 13, 2,
+          1, 10, 14,
+          12, 13, 14,
+          15, 7, 8,
+          10, 16, 9,
+          11, 6, 17,
+          15, 16, 17,
+          18, 4, 7,
+          3, 19, 6,
+          2, 5, 20,
+          18, 19, 20
+        };
+        if(!comp_idx(mesh.get_index_set<2,1>(), e_t))
+          throw String("Edges-At-Triangle refinement failure");
+
+        // check vertex-target indices
+        Index vti[] =
+        {
+          4, 0, 3, 2, 14, 8, 11, 5, 9, 6
+        };
+        if(!comp_trg(mesh.get_target_set<0>(), vti))
+          throw String("Vertex-Target-Indices refinement failure");
+
+        // check edge-target indices
+        Index eti[] =
+        {
+          18, 19, 6, 7, 12, 13, 1, 0, 8, 9, 2, 3,
+          37, 35, 36, 46, 44, 45, 42, 43, 41
+        };
+        if(!comp_trg(mesh.get_target_set<1>(), eti))
+          throw String("Edge-Target-Indices refinement failure");
+
+        // check tria-target indices
+        Index tti[] =
+        {
+          22, 20, 21, 23,
+          34, 32, 33, 35,
+          29, 30, 28, 31
+        };
+        if(!comp_trg(mesh.get_target_set<2>(), tti))
+          throw String("Triangle-Target-Indices refinement failure");
+      } //validate_refined_triangle_cell_submesh_3d
 
     } // namespace TestAux
     /// \endcond
