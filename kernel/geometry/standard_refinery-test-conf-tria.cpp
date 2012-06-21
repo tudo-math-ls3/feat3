@@ -35,11 +35,11 @@ public:
 
   virtual void run() const
   {
-    triangle_refinementtest();
-    triangle_quad_refinementtest();
+    tria_std_test();
+    tria_patch_test();
   }
 
-  void triangle_refinementtest() const
+  void tria_std_test() const
   {
     RootMesh* triangle_mesh_coarse;
     RootMeshRefinery* triangle_mesh_refinery;
@@ -50,7 +50,7 @@ public:
       for(Index i(0); i < 4; ++i) //loop over all possible orientations
       {
         // create a 2D triangle element mesh
-        triangle_mesh_coarse = TestAux::create_trianglerefinement_mesh_2d(i);
+        triangle_mesh_coarse = TestAux::create_tria_mesh_2d(i);
 
         // create refineries
         triangle_mesh_refinery = new RootMeshRefinery(*triangle_mesh_coarse);
@@ -59,7 +59,7 @@ public:
         triangle_mesh_fine = triangle_mesh_refinery->refine();
 
         // validate refined meshes
-        TestAux::validate_refined_trianglerefinement_mesh_2d(*triangle_mesh_fine,i);
+        TestAux::validate_refined_tria_mesh_2d(*triangle_mesh_fine,i);
 
         // clean up
         delete triangle_mesh_fine;
@@ -73,23 +73,23 @@ public:
     }
   }
 
-  void triangle_quad_refinementtest() const
+  void tria_patch_test() const
   {
     RootMesh* triangle_mesh_coarse;
     RootMeshRefinery* triangle_mesh_refinery;
     RootMesh* triangle_mesh_fine;
 
     // create an edge submesh
-    SubMesh* edge_submesh_coarse = TestAux::create_edge_cell_submesh_2d();
+    SubMesh* edge_submesh_coarse = TestAux::create_patch_edge_submesh_2d();
 
     // create a tria submesh
-    SubMesh* tria_submesh_coarse = TestAux::create_triangle_cell_submesh_2d();
+    SubMesh* tria_submesh_coarse = TestAux::create_patch_tria_submesh_2d();
 
     try
     {
 
         // create a 2D triangle element mesh
-        triangle_mesh_coarse = TestAux::create_triangle_refinement_mesh_2d();
+        triangle_mesh_coarse = TestAux::create_patch_tria_mesh_2d();
 
         // create refineries
         triangle_mesh_refinery = new RootMeshRefinery(*triangle_mesh_coarse);
@@ -102,9 +102,9 @@ public:
         SubMesh* tria_submesh_fine = tria_submesh_refinery->refine(*triangle_mesh_coarse);
 
         // validate refined meshes
-        TestAux::validate_refined_triangle_refinement_mesh_2d(*triangle_mesh_fine);
-        TestAux::validate_refined_edge_cell_submesh_2d(*edge_submesh_fine);
-        TestAux::validate_refined_triangle_cell_submesh_2d(*tria_submesh_fine);
+        TestAux::validate_refined_patch_tria_mesh_2d(*triangle_mesh_fine);
+        TestAux::validate_refined_patch_edge_submesh_2d(*edge_submesh_fine);
+        TestAux::validate_refined_patch_tria_submesh_2d(*tria_submesh_fine);
 
         // clean up
         delete triangle_mesh_fine;

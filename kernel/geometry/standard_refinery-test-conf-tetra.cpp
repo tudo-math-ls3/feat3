@@ -35,11 +35,11 @@ public:
 
   virtual void run() const
   {
-    tetrahedron_refinementtest();
-    tetrahedron_refinementtest2();
+    tetra_std_test();
+    tetra_block_test();
   }
 
-  void tetrahedron_refinementtest() const
+  void tetra_std_test() const
   {
 
     TetRootMesh* tetrahedron_mesh_coarse;
@@ -51,7 +51,7 @@ public:
       for(Index i(0); i < 3; ++i) //loop over all possible orientations
       {
         // create a 3D tetrahedron element mesh
-        tetrahedron_mesh_coarse = TestAux::create_tetrahedronrefinement_mesh_3d(i);
+        tetrahedron_mesh_coarse = TestAux::create_tetra_mesh_3d(i);
 
         // create refineries
         tetrahedron_mesh_refinery = new TetRootMeshRefinery(*tetrahedron_mesh_coarse);
@@ -60,7 +60,7 @@ public:
         tetrahedron_mesh_fine = tetrahedron_mesh_refinery->refine();
 
         // validate refined meshes
-        TestAux::validate_refined_tetrahedronrefinement_mesh_3d(*tetrahedron_mesh_fine,i);
+        TestAux::validate_refined_tetra_mesh_3d(*tetrahedron_mesh_fine,i);
 
         // clean up
         delete tetrahedron_mesh_fine;
@@ -74,7 +74,7 @@ public:
     }
   }
 
-  void tetrahedron_refinementtest2() const
+  void tetra_block_test() const
   {
 
     TetRootMesh* tetrahedron_mesh_coarse;
@@ -84,10 +84,10 @@ public:
     try
     {
       // create a 3D tetrahedron element mesh
-      tetrahedron_mesh_coarse = TestAux::create_bigtetrahedronrefinement_mesh_3d();
+      tetrahedron_mesh_coarse = TestAux::create_block_tetra_mesh_3d();
 
       // create tria submesh
-      SubMesh* tria_submesh_coarse = TestAux::create_tetra_tria_submesh_3d();
+      SubMesh* tria_submesh_coarse = TestAux::create_block_tria_submesh_3d();
 
       // create refineries
       tetrahedron_mesh_refinery = new TetRootMeshRefinery(*tetrahedron_mesh_coarse);
@@ -98,8 +98,8 @@ public:
       SubMesh* tria_submesh_fine = tria_submesh_refinery->refine(*tetrahedron_mesh_coarse);
 
       // validate refined meshes
-      TestAux::validate_refined_bigtetrahedronrefinement_mesh_3d(*tetrahedron_mesh_fine);
-      TestAux::validate_refined_triangle_cell_submesh_3d(*tria_submesh_fine);
+      TestAux::validate_refined_block_tetra_mesh_3d(*tetrahedron_mesh_fine);
+      TestAux::validate_refined_block_tria_submesh_3d(*tria_submesh_fine);
 
       // clean up
       delete tetrahedron_mesh_fine;

@@ -39,11 +39,11 @@ public:
 
   virtual void run() const
   {
-    quad_tetristest();
-    quad_refinementtest();
+    quad_std_test();
+    quad_tetris_test();
   }
 
-  void quad_tetristest() const
+  void quad_tetris_test() const
   {
     // create a 2D tetris mesh
     RootMesh* quad_mesh_coarse = TestAux::create_tetris_mesh_2d();
@@ -97,7 +97,7 @@ public:
     delete quad_mesh_coarse;
   }
 
-  void quad_refinementtest() const
+  void quad_std_test() const
   {
     RootMesh* quad_mesh_coarse;
     RootMeshRefinery* quad_mesh_refinery;
@@ -107,7 +107,7 @@ public:
       for(Index i(0); i < 4; ++i) //loop over all possible orientations (max. 8)
       {
         // create a 2D quad element mesh
-        quad_mesh_coarse = TestAux::create_quadrefinement_mesh_2d(i);
+        quad_mesh_coarse = TestAux::create_quad_mesh_2d(i);
 
         // create refineries
         quad_mesh_refinery = new RootMeshRefinery(*quad_mesh_coarse);
@@ -116,7 +116,7 @@ public:
         quad_mesh_fine = quad_mesh_refinery->refine();
 
         // validate refined meshes
-        TestAux::validate_refined_quadrefinement_mesh_2d(*quad_mesh_fine,i);
+        TestAux::validate_refined_quad_mesh_2d(*quad_mesh_fine,i);
 
         // clean up
         delete quad_mesh_fine;

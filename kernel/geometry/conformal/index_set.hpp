@@ -9,6 +9,11 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /**
+     * \brief Conformal namespace
+     *
+     * This namespace encapsulates classes related to the implementation of the conformal mesh.
+     */
     namespace Conformal
     {
       /**

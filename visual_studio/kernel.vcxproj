@@ -537,7 +537,6 @@
     <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\standard_tetra.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\standard_tria.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\standard_quad.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp" />

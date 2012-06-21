@@ -16,7 +16,7 @@ namespace FEAST
       typedef ConformalMesh< ConformalMeshPolicy< Shape::Quadrilateral > > QuadMesh;
       typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Quadrilateral > > QuadSubMesh;
 
-      QuadMesh* create_quadrefinement_mesh_2d(int orientation)
+      QuadMesh* create_quad_mesh_2d(int orientation)
       {
         Index num_entities[] =
         {
@@ -237,9 +237,9 @@ namespace FEAST
         }
         // okay
         return mesh;
-      } //´create_quadrefinement_mesh_2d
+      } // create_quad_mesh_2d
 
-      void validate_refined_quadrefinement_mesh_2d(const QuadMesh& mesh, int orientation)
+      void validate_refined_quad_mesh_2d(const QuadMesh& mesh, int orientation)
       {
         // validate sizes
         if(mesh.get_num_entities(0) != 9)
@@ -528,7 +528,7 @@ namespace FEAST
               throw String("Edge-At-Quad index set refinement failure");
             break;
         } //switch
-      } // validate_refined_quadrefinement_mesh_2d
+      } // validate_refined_quad_mesh_2d
 
     } // namespace TestAux
     /// \endcond

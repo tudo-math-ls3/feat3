@@ -19,23 +19,45 @@ namespace FEAST
       public TargetSetHolder<Shape_>
     {
     public:
+      /// shape type
       typedef Shape_ ShapeType;
+      /// base class typedef
       typedef TargetSetHolder<ShapeType> BaseClass;
 
     public:
+      /**
+       * \brief Constructor.
+       *
+       * \param[in] num_entities
+       * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
+       * Must not be \c nullptr.
+       */
       explicit CellSubSet(const Index num_entities[]) :
         BaseClass(num_entities)
       {
         CONTEXT(name() + "::CellSubSet()");
       }
 
+      /// virtual destructor
       virtual ~CellSubSet()
       {
         CONTEXT(name() + "::~CellSubSet()");
       }
 
-      template<typename ParentMesh_>
-      CellSubSet* refine(const ParentMesh_& parent_mesh) const
+      /**
+       * \brief Refines the cell subset.
+       *
+       * This function applies the standard refinement algorithm onto the cell subset and returns the
+       * refined cell subset.
+       *
+       * \param[in] parent
+       * A reference to the (coarse) parent mesh or cell subset that this cell subset refers to.
+       *
+       * \returns
+       * A pointer to the refined cell subset.
+       */
+      template<typename Parent_>
+      CellSubSet* refine(const Parent_& parent) const
       {
         CONTEXT(name() + "::refine()");
         using namespace Conformal::StandardRefinement;
@@ -46,7 +68,7 @@ namespace FEAST
         for(int i(0); i <= BaseClass::shape_dim; ++i)
         {
           num_entities_fine[i] = BaseClass::get_num_entities(i);
-          num_entities_parent[i] = parent_mesh.get_num_entities(i);
+          num_entities_parent[i] = parent.get_num_entities(i);
         }
 
         // calculate number of entities in fine mesh
@@ -62,6 +84,11 @@ namespace FEAST
         return fine_set;
       }
 
+      /**
+       * \brief Returns the name of the class.
+       * \returns
+       * The name of the class as a String.
+       */
       static String name()
       {
         return "CellSubSet<" + ShapeType::name() + ">";

@@ -183,7 +183,7 @@ namespace FEAST
        * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
        *
        * \returns
-       * The nubmer of entities of dimension \p dim.
+       * The number of entities of dimension \p dim.
        */
       Index get_num_entities(int dim) const
       {
@@ -252,6 +252,14 @@ namespace FEAST
       }
       /// \endcond
 
+      /**
+       * \brief Refines the mesh.
+       *
+       * This function applies the standard refinement algorithm onto the mesh and returns the refined mesh.
+       *
+       * \returns
+       * A pointer to the refined mesh.
+       */
       ConformalMesh* refine() const
       {
         CONTEXT(name() + "::refine()");
@@ -284,7 +292,11 @@ namespace FEAST
         return fine_mesh;
       }
 
-      /// Returns the name of the class.
+      /**
+       * \brief Returns the name of the class.
+       * \returns
+       * The name of the class as a String.
+       */
       static String name()
       {
         return "ConformalMesh<...>";
@@ -407,7 +419,17 @@ namespace FEAST
       }
       /// \endcond
 
-
+      /**
+       * \brief Refines the submesh.
+       *
+       * This function applies the standard refinement algorithm onto the submesh and returns the refined submesh.
+       *
+       * \param[in] parent_mesh
+       * A reference to the (coarse) parent mesh that this submesh refers to.
+       *
+       * \returns
+       * A pointer to the refined submesh.
+       */
       template<typename ParentMesh_>
       ConformalSubMesh* refine(const ParentMesh_& parent_mesh) const
       {
@@ -452,7 +474,11 @@ namespace FEAST
         return fine_mesh;
       }
 
-      /// Returns the name of the class.
+      /**
+       * \brief Returns the name of the class.
+       * \returns
+       * The name of the class as a String.
+       */
       static String name()
       {
         return "ConformalSubMesh<...>";

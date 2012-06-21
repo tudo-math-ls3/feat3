@@ -15,8 +15,13 @@ namespace FEAST
       /// \cond internal
       namespace StandardRefinement
       {
+        /**
+         * \brief IndexRefiner implementation for Simplex<1>: Vertices-at-Edges
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<1>, 1, 0> // 1dim: edges at vertices
+        struct IndexRefiner<Shape::Simplex<1>, 1, 0>
         {
           enum
           {
@@ -81,8 +86,13 @@ namespace FEAST
         /* ************************************************************************************* */
         /* ************************************************************************************* */
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<2>: Vertices-at-Edges
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<2>, 1, 0> // 2dim: edges at vertices
+        struct IndexRefiner<Shape::Simplex<2>, 1, 0>
         {
           enum
           {
@@ -163,8 +173,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Simplex<2>,1,0>
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<2>: Vertices-at-Tris
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<2>, 2, 0> // 2dim: simplices at vertices
+        struct IndexRefiner<Shape::Simplex<2>, 2, 0>
         {
           enum
           {
@@ -258,8 +273,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Simplex<2>,2,0>
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<2>: Edges-at-Tris
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<2>, 2, 1> // 2dim: simplices at edges
+        struct IndexRefiner<Shape::Simplex<2>, 2, 1>
         {
           enum
           {
@@ -366,8 +386,13 @@ namespace FEAST
         /* ************************************************************************************* */
         /* ************************************************************************************* */
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<3>: Vertices-at-Edges
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<3>, 1, 0> // 3dim: edges at vertices
+        struct IndexRefiner<Shape::Simplex<3>, 1, 0>
         {
           enum
           {
@@ -480,8 +505,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Simplex<3>,1,0>
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<3>: Vertices-at-Tris
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<3>, 2, 0> //3dim: triangles at vertices
+        struct IndexRefiner<Shape::Simplex<3>, 2, 0>
         {
           enum
           {
@@ -656,8 +686,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Simplex<3>,2,0>
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<3>: Vertices-at-Tetras
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<3>, 3, 0> //3dim: simplices at vertices
+        struct IndexRefiner<Shape::Simplex<3>, 3, 0>
         {
           enum
           {
@@ -834,8 +869,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Simplex<3>,3,0>
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<3>: Edges-at-Tris
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<3>, 2, 1> //3dim: edges at triangles
+        struct IndexRefiner<Shape::Simplex<3>, 2, 1>
         {
           enum
           {
@@ -991,8 +1031,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Simplex<3>,2,1>
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<3>: Edges-at-Tetras
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<3>, 3, 1> //3dim: edges at simplices
+        struct IndexRefiner<Shape::Simplex<3>, 3, 1>
         {
           enum
           {
@@ -1171,8 +1216,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Simplex<3>,3,1>
 
+        /**
+         * \brief IndexRefiner implementation for Simplex<3>: Tris-at-Tetras
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Simplex<3>, 3, 2> //3dim: triangles at simplices
+        struct IndexRefiner<Shape::Simplex<3>, 3, 2>
         {
           enum
           {

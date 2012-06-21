@@ -15,8 +15,13 @@ namespace FEAST
       /// \cond internal
       namespace StandardRefinement
       {
+        /**
+         * \brief IndexRefiner implementation for Hypercube<1>: Vertices-at-Edges
+         *
+         * \author Peter Zajac
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<1>, 1, 0> // 1dim: edges at vertices
+        struct IndexRefiner<Shape::Hypercube<1>, 1, 0>
         {
           enum
           {
@@ -81,8 +86,13 @@ namespace FEAST
         /* ************************************************************************************* */
         /* ************************************************************************************* */
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<2>: Vertices-at-Edges
+         *
+         * \author Peter Zajac
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<2>, 1, 0> // 2dim: edges at vertices
+        struct IndexRefiner<Shape::Hypercube<2>, 1, 0>
         {
           enum
           {
@@ -170,8 +180,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Hypercube<2>,1,0>
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<2>: Vertices-at-Quads
+         *
+         * \author Peter Zajac
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<2>, 2, 0> // 2dim: quads at vertices
+        struct IndexRefiner<Shape::Hypercube<2>, 2, 0>
         {
           enum
           {
@@ -273,8 +288,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Hypercube<2>,2,0>
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<2>: Edges-at-Quads
+         *
+         * \author Peter Zajac
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<2>, 2, 1> // 2dim: quads at edges
+        struct IndexRefiner<Shape::Hypercube<2>, 2, 1>
         {
           enum
           {
@@ -384,8 +404,13 @@ namespace FEAST
         /* ************************************************************************************* */
         /* ************************************************************************************* */
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<3>: Vertices-at-Edges
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<3>, 1, 0> // 3dim: edges at vertices
+        struct IndexRefiner<Shape::Hypercube<3>, 1, 0>
         {
           enum
           {
@@ -478,8 +503,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Hypercube<3>,1,0>
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<3>: Vertices-at-Quads
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<3>, 2, 0> //3dim: quads at vertices
+        struct IndexRefiner<Shape::Hypercube<3>, 2, 0>
         {
           enum
           {
@@ -668,8 +698,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Hypercube<3>,2,0>
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<3>: Vertices-at-Hexas
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<3>, 3, 0> //3dim: cubes at vertices
+        struct IndexRefiner<Shape::Hypercube<3>, 3, 0>
         {
           enum
           {
@@ -837,8 +872,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Hypercube<3>,3,0>
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<3>: Edges-at-Quads
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<3>, 2, 1> //3dim: edges at quads
+        struct IndexRefiner<Shape::Hypercube<3>, 2, 1>
         {
           enum
           {
@@ -1035,8 +1075,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Hypercube<3>,2,1>
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<3>: Edges-at-Hexas
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<3>, 3, 1> //3dim: edges at cubes
+        struct IndexRefiner<Shape::Hypercube<3>, 3, 1>
         {
           enum
           {
@@ -1257,8 +1302,13 @@ namespace FEAST
           }
         }; // IndexRefiner<Hypercube<3>,3,1>
 
+        /**
+         * \brief IndexRefiner implementation for Hypercube<3>: Quads-at-Hexas
+         *
+         * \author Constantin Christof
+         */
         template<>
-        struct IndexRefiner<Shape::Hypercube<3>, 3, 2> //3dim: quads at cubes
+        struct IndexRefiner<Shape::Hypercube<3>, 3, 2>
         {
           enum
           {

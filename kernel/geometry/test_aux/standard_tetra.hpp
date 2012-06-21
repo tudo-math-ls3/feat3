@@ -14,10 +14,10 @@ namespace FEAST
     namespace TestAux
     {
 
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Tetrahedron > > TetrahedronMesh;
+      typedef ConformalMesh< ConformalMeshPolicy< Shape::Tetrahedron > > TetraMesh;
       typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Tetrahedron > > TetraSubMesh;
 
-      TetrahedronMesh* create_tetrahedronrefinement_mesh_3d(int orientation)
+      TetraMesh* create_tetra_mesh_3d(int orientation)
       {
 
         Index num_entities[] =
@@ -29,7 +29,7 @@ namespace FEAST
         };
 
         // create mesh
-        TetrahedronMesh* mesh = new TetrahedronMesh(num_entities);
+        TetraMesh* mesh = new TetraMesh(num_entities);
 
         // first possibility (standard)
 
@@ -314,9 +314,9 @@ namespace FEAST
         }
         // okay
         return mesh;
-      } // create_tetrahedronrefinement_mesh_3d
+      } // create_tetra_mesh_3d
 
-      void validate_refined_tetrahedronrefinement_mesh_3d(const TetrahedronMesh& mesh, int orientation)
+      void validate_refined_tetra_mesh_3d(const TetraMesh& mesh, int orientation)
       {
 
         // validate sizes
@@ -1067,9 +1067,9 @@ namespace FEAST
             break;
 
         } //switch
-      } // validate_refined_tetrahedronrefinement_mesh_3d
+      } // validate_refined_tetra_mesh_3d
 
-      TetrahedronMesh* create_bigtetrahedronrefinement_mesh_3d()
+      TetraMesh* create_block_tetra_mesh_3d()
       {
 
         Index num_entities[] =
@@ -1081,7 +1081,7 @@ namespace FEAST
         };
 
         // create mesh
-        TetrahedronMesh* mesh = new TetrahedronMesh(num_entities);
+        TetraMesh* mesh = new TetraMesh(num_entities);
 
         // set up vertex coordinates array
         static const Real vtx0[3*5] =
@@ -1170,9 +1170,9 @@ namespace FEAST
 
         // okay
         return mesh;
-      } // create_bigtetrahedronrefinement_mesh_3d
+      } // create_block_tetra_mesh_3d
 
-      void validate_refined_bigtetrahedronrefinement_mesh_3d(const TetrahedronMesh& mesh)
+      void validate_refined_block_tetra_mesh_3d(const TetraMesh& mesh)
       {
 
         // validate sizes
@@ -1663,9 +1663,9 @@ namespace FEAST
         if(!comp_idx(mesh.get_index_set<3,2>(), t_s0))
           throw String("Triangle-At-Tetrahedron index set refinement failure");
 
-      } // validate_refined_bigtetrahedronrefinement_mesh_3d
+      } // validate_refined_block_tetra_mesh_3d
 
-      TetraSubMesh* create_tetra_tria_submesh_3d()
+      TetraSubMesh* create_block_tria_submesh_3d()
       {
 
         Index num_entities[] =
@@ -1743,7 +1743,7 @@ namespace FEAST
         return mesh;
       } // create_tetra_tria_submesh_3d()
 
-      void validate_refined_triangle_cell_submesh_3d(const TetraSubMesh& mesh)
+      void validate_refined_block_tria_submesh_3d(const TetraSubMesh& mesh)
       {
 
         // validate sizes
@@ -1864,7 +1864,7 @@ namespace FEAST
         };
         if(!comp_trg(mesh.get_target_set<2>(), tti))
           throw String("Triangle-Target-Indices refinement failure");
-      } //validate_refined_triangle_cell_submesh_3d
+      } //validate_refined_block_tria_submesh_3d
 
     } // namespace TestAux
     /// \endcond

@@ -15,6 +15,11 @@ namespace FEAST
       /// \cond internal
       namespace StandardRefinement
       {
+        /**
+         * \brief TargetRefiner implementation for Simplex<...> shape: Vertex indices
+         *
+         * \author Constantin Christof
+         */
         template<int shape_dim_>
         struct TargetRefiner<Shape::Simplex<shape_dim_>, 0>
         {
@@ -45,26 +50,11 @@ namespace FEAST
           }
         }; // TargetRefiner<Shape::Simplex<...>, 0>
 
-        template<>
-        struct TargetRefiner<Shape::Simplex<2>, 0>
-        {
-          typedef Shape::Simplex<2> ShapeType;
-          typedef TargetSet TargetSetType;
-          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
-          typedef IndexSetHolder<ShapeType> IndexSetHolderType;
-
-          static Index refine(
-            TargetSetType& /*target_set_out*/,
-            const Index /*offset*/,
-            const Index* /*index_offsets*/,
-            const TargetSetHolderType& /*target_set_holder_in*/,
-            const IndexSetHolderType& /*index_set_holder_src*/,
-            const IndexSetHolderType& /*index_set_holder_trg*/)
-          {
-            return 0;
-          }
-        }; // TargetRefiner<Shape::Simplex<...>, 0> for triangles
-
+        /**
+         * \brief TargetRefiner implementation for Simplex<1> shape: Edge indices
+         *
+         * \author Constantin Christof
+         */
         template<>
         struct TargetRefiner<Shape::Simplex<1>, 1>
         {
@@ -128,6 +118,36 @@ namespace FEAST
           }
         }; // TargetRefiner<Shape::Simplex<1>,1>
 
+        /**
+         * \brief TargetRefiner implementation for Simplex<2> shape: Vertex indices
+         *
+         * \author Constantin Christof
+         */
+        template<>
+        struct TargetRefiner<Shape::Simplex<2>, 0>
+        {
+          typedef Shape::Simplex<2> ShapeType;
+          typedef TargetSet TargetSetType;
+          typedef TargetSetHolder<ShapeType> TargetSetHolderType;
+          typedef IndexSetHolder<ShapeType> IndexSetHolderType;
+
+          static Index refine(
+            TargetSetType& /*target_set_out*/,
+            const Index /*offset*/,
+            const Index* /*index_offsets*/,
+            const TargetSetHolderType& /*target_set_holder_in*/,
+            const IndexSetHolderType& /*index_set_holder_src*/,
+            const IndexSetHolderType& /*index_set_holder_trg*/)
+          {
+            return 0;
+          }
+        }; // TargetRefiner<Shape::Simplex<2>, 0>
+
+        /**
+         * \brief TargetRefiner implementation for Simplex<2> shape: Edge indices
+         *
+         * \author Constantin Christof
+         */
         template<>
         struct TargetRefiner<Shape::Simplex<2>, 1>
         {
@@ -193,6 +213,11 @@ namespace FEAST
           }
         }; // TargetRefiner<Shape::Simplex<2>,1>
 
+        /**
+         * \brief TargetRefiner implementation for Simplex<2> shape: Tri indices
+         *
+         * \author Constantin Christof
+         */
         template<>
         struct TargetRefiner<Shape::Simplex<2>, 2>
         {
@@ -261,6 +286,11 @@ namespace FEAST
           }
         }; // TargetRefiner<Shape::Simplex<2>,2>
 
+        /**
+         * \brief TargetRefiner implementation for Simplex<3> shape
+         *
+         * \author Constantin Christof
+         */
         template<int cell_dim_>
         struct TargetRefiner<Shape::Simplex<3>, cell_dim_>
         {
@@ -270,14 +300,14 @@ namespace FEAST
           typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
           static Index refine(
-            TargetSetType& target_set_out,
-            const Index offset,
-            const Index* index_offsets,
+            TargetSetType& /*target_set_out*/,
+            const Index /*offset*/,
+            const Index* /*index_offsets*/,
             const TargetSetHolderType& target_set_holder_in,
-            const IndexSetHolderType& index_set_holder_src,
-            const IndexSetHolderType& index_set_holder_trg)
+            const IndexSetHolderType& /*index_set_holder_src*/,
+            const IndexSetHolderType& /*index_set_holder_trg*/)
           {
-            // We do not have an implementation of 3D tetrahedron submeshes yet due to the lack of a
+            // We do not have an implementation of 3D tetrahedral submeshes yet due to the lack of a
             // tetrahedral congruency sampler (see Congruency::Sampler<...> class template) which is needed
             // to implement this function. However, this function will also be called when refining a
             // 2D submesh of a 3D tetrahedral mesh -- in this case the number of tetrahedra is zero,
@@ -293,6 +323,13 @@ namespace FEAST
           }
         }; // TargetRefiner<Shape::Simplex<3>,...>
 
+        /**
+         * \brief TargetRefiner implementation for Simplex<3> shape: Vertex indices
+         *
+         * \note This class is only necessary to resolve the ambiguity of the previous specialisations.
+         *
+         * \author Constantin Christof
+         */
         template<>
         struct TargetRefiner<Shape::Simplex<3>,0>
         {

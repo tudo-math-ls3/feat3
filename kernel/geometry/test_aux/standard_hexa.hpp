@@ -16,7 +16,7 @@ namespace FEAST
 
       typedef ConformalMesh< ConformalMeshPolicy< Shape::Hexahedron > > HexaMesh;
 
-      HexaMesh* create_hexarefinement_mesh_3d(int orientation)
+      HexaMesh* create_hexa_mesh_3d(int orientation)
       {
         Index num_entities[] =
         {
@@ -356,9 +356,9 @@ namespace FEAST
         }
         // okay
         return mesh;
-      } // create_hexarefinement_mesh_3d
+      } // create_hexa_mesh_3d
 
-      void validate_refined_hexarefinement_mesh_3d(const HexaMesh& mesh, int orientation)
+      void validate_refined_hexa_mesh_3d(const HexaMesh& mesh, int orientation)
       {
         // validate sizes
         if(mesh.get_num_entities(0) != 27)
@@ -1240,7 +1240,7 @@ namespace FEAST
             break;
 
         } //switch
-      } // validate_refined_hexarefinement_mesh_3d
+      } // validate_refined_hexa_mesh_3d
 
     } // namespace TestAux
     /// \endcond

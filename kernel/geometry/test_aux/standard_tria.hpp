@@ -14,11 +14,10 @@ namespace FEAST
     namespace TestAux
     {
 
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Triangle > > TriangleMesh;
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Tetrahedron > > TetrahedronMesh;
+      typedef ConformalMesh< ConformalMeshPolicy< Shape::Triangle > > TriaMesh;
       typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Triangle > > TriaSubMesh;
 
-      TriangleMesh* create_trianglerefinement_mesh_2d(int orientation)
+      TriaMesh* create_tria_mesh_2d(int orientation)
       {
 
         Index num_entities[] =
@@ -29,7 +28,7 @@ namespace FEAST
         };
 
         // create mesh
-        TriangleMesh* mesh = new TriangleMesh(num_entities);
+        TriaMesh* mesh = new TriaMesh(num_entities);
 
         // first possibility (standard)
 
@@ -250,7 +249,7 @@ namespace FEAST
         return mesh;
       } // create_trianglerefinement_mesh_2d
 
-      void validate_refined_trianglerefinement_mesh_2d(const TriangleMesh& mesh, int orientation)
+      void validate_refined_tria_mesh_2d(const TriaMesh& mesh, int orientation)
       {
 
         // validate sizes
@@ -519,7 +518,7 @@ namespace FEAST
         } //switch
       } // validate_refined_trianglerefinement_mesh_2d
 
-      TriangleMesh* create_triangle_refinement_mesh_2d()
+      TriaMesh* create_patch_tria_mesh_2d()
       {
 
         Index num_entities[] =
@@ -530,7 +529,7 @@ namespace FEAST
         };
 
         // create mesh
-        TriangleMesh* mesh = new TriangleMesh(num_entities);
+        TriaMesh* mesh = new TriaMesh(num_entities);
 
         //
         //   v_3________<________v_4(10,10)
@@ -607,9 +606,9 @@ namespace FEAST
 
         // okay
         return mesh;
-      } // create_triangle_quad_refinement_mesh_2d
+      } // create_patch_tria_mesh_2d
 
-      void validate_refined_triangle_refinement_mesh_2d(const TriangleMesh& mesh)
+      void validate_refined_patch_tria_mesh_2d(const TriaMesh& mesh)
       {
 
         // validate sizes
@@ -729,9 +728,9 @@ namespace FEAST
         if(!comp_idx(mesh.get_index_set<2,1>(), e_t0))
           throw String("Edge-At-Triangle index set refinement failure");
 
-      } // validate_refined_triangle_quad_refinement_mesh_2d
+      } // validate_refined_patch_tria_mesh_2d
 
-      TriaSubMesh* create_triangle_cell_submesh_2d()
+      TriaSubMesh* create_patch_tria_submesh_2d()
       {
         //
         //   v_0(0,10)
@@ -828,9 +827,9 @@ namespace FEAST
         copy_trg(mesh->get_target_set<2>(), tti);
         // okay
         return mesh;
-      } // create_triangle_cell_submesh_2d
+      } // create_patch_tria_submesh_2d
 
-      void validate_refined_triangle_cell_submesh_2d(const TriaSubMesh& mesh)
+      void validate_refined_patch_tria_submesh_2d(const TriaSubMesh& mesh)
       {
 
         // validate sizes
@@ -933,9 +932,9 @@ namespace FEAST
         };
         if(!comp_trg(mesh.get_target_set<2>(), tti))
           throw String("Tria-Target-Indices refinement failure");
-      } // validate_refined_triangle_cell_submesh_2d
+      } // validate_refined_patch_tria_submesh_2d
 
-      TriaSubMesh* create_edge_cell_submesh_2d()
+      TriaSubMesh* create_patch_edge_submesh_2d()
       {
 
         Index num_entities[] =
@@ -985,9 +984,9 @@ namespace FEAST
 
         // okay
         return mesh;
-      } // create_edge_cell_submesh_2d
+      } // create_patch_edge_submesh_2d
 
-      void validate_refined_edge_cell_submesh_2d(const TriaSubMesh& mesh)
+      void validate_refined_patch_edge_submesh_2d(const TriaSubMesh& mesh)
       {
 
         // validate sizes
@@ -1043,7 +1042,7 @@ namespace FEAST
         if(!comp_trg(mesh.get_target_set<1>(), eti))
           throw String("Edge-Target-Indices refinement failure");
 
-      } // validate_refined_edge_cell_submesh_2d
+      } // validate_refined_patch_edge_submesh_2d
 
     } // namespace TestAux
     /// \endcond

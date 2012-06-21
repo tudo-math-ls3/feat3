@@ -22,6 +22,11 @@ namespace FEAST
           typename VertexSet_>
         struct VertexRefiner;
 
+        /**
+         * \brief Vertex refiner implementation for Vertex shape
+         *
+         * \author Peter Zajac
+         */
         template<typename VertexSet_>
         struct VertexRefiner<Shape::Vertex, VertexSet_>
         {
@@ -53,6 +58,11 @@ namespace FEAST
           }
         }; // class VertexRefiner<Vertex,...>
 
+        /**
+         * \brief Vertex refiner implementation for Hypercube<...> shape
+         *
+         * \author Peter Zajac
+         */
         template<
           int cell_dim_,
           typename VertexSet_>
@@ -110,9 +120,11 @@ namespace FEAST
           }
         }; // struct VertexRefiner<Hypercube<...>,...>
 
-        //////////////////////////////////////////////////
-
-        // specialisation for "simplex edges"
+        /**
+         * \brief Vertex refiner implementation for Simplex<1> shape
+         *
+         * \author Constantin Christof
+         */
         template<
           typename VertexSet_>
         struct VertexRefiner<Shape::Simplex<1>, VertexSet_>
@@ -169,7 +181,11 @@ namespace FEAST
           }
         }; // struct VertexRefiner<Simplex<...>,...>
 
-        // specialisation for triangles
+        /**
+         * \brief Vertex refiner implementation for Simplex<2> shape
+         *
+         * \author Constantin Christof
+         */
         template<
           typename VertexSet_>
         struct VertexRefiner<Shape::Simplex<2>, VertexSet_>
@@ -191,8 +207,11 @@ namespace FEAST
           }
         }; // struct VertexRefiner<Simplex<...>,...>
 
-        // specialisation for tetraeder
-
+        /**
+         * \brief Vertex refiner implementation for Simplex<3> shape
+         *
+         * \author Constantin Christof
+         */
         template<
           typename VertexSet_>
         struct VertexRefiner<Shape::Simplex<3>, VertexSet_>
@@ -248,8 +267,6 @@ namespace FEAST
             return num_cells;
           }
         }; // struct VertexRefiner<Simplex<...>,...>
-
-        ////////////////////////////////////////////////////// by CC
 
       } // namespace StandardRefinement
       /// \endcond

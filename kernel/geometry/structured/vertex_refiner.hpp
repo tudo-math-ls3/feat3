@@ -10,6 +10,11 @@ namespace FEAST
 {
   namespace Geometry
   {
+    /**
+     * \brief Structured namespace
+     *
+     * This namespace encapsulates classes relates to the implementation of the structured mesh.
+     */
     namespace Structured
     {
       /// \cond internal

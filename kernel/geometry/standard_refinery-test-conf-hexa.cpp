@@ -35,11 +35,11 @@ public:
 
   virtual void run() const
   {
-    hexa_refinementtest();
-    hexa_tetristest();
+    hexa_std_test();
+    hexa_tetris_test();
   }
 
-  void hexa_refinementtest() const
+  void hexa_std_test() const
   {
     HexaMesh* hexa_mesh_coarse;
     HexaMeshRefinery* hexa_mesh_refinery;
@@ -49,7 +49,7 @@ public:
       for(Index i(0); i < 3; ++i) //loop over all possible orientations
       {
         // create a 3D hex-element mesh
-        hexa_mesh_coarse = TestAux::create_hexarefinement_mesh_3d(i);
+        hexa_mesh_coarse = TestAux::create_hexa_mesh_3d(i);
 
         // create refineries
         hexa_mesh_refinery = new HexaMeshRefinery(*hexa_mesh_coarse);
@@ -58,7 +58,7 @@ public:
         hexa_mesh_fine = hexa_mesh_refinery->refine();
 
         // validate refined meshes
-        TestAux::validate_refined_hexarefinement_mesh_3d(*hexa_mesh_fine,i);
+        TestAux::validate_refined_hexa_mesh_3d(*hexa_mesh_fine,i);
 
         // clean up
         delete hexa_mesh_fine;
@@ -72,7 +72,7 @@ public:
         }
   }
 
-  void hexa_tetristest() const
+  void hexa_tetris_test() const
   {
     // create a 3D tetris mesh
     HexaMesh* hexa_mesh_coarse = TestAux::create_tetris_mesh_3d();
