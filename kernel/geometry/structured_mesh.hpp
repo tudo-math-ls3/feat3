@@ -79,11 +79,11 @@ namespace FEAST
         static void apply(Index num_entities[], const Index num_slices[])
         {
           num_entities[0] = (num_slices[0] + 1) * (num_slices[1] + 1) * (num_slices[2] + 1);
-          num_entities[0] =
+          num_entities[1] =
             num_slices[0] * (num_slices[1] + 1) * (num_slices[2] + 1) +
             num_slices[1] * (num_slices[0] + 1) * (num_slices[2] + 1) +
             num_slices[2] * (num_slices[0] + 1) * (num_slices[1] + 1);
-          num_entities[0] =
+          num_entities[2] =
             (num_slices[0] + 1) * num_slices[1] * num_slices[2] +
             (num_slices[1] + 1) * num_slices[0] * num_slices[2] +
             (num_slices[2] + 1) * num_slices[0] * num_slices[1];
