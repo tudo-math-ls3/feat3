@@ -52,33 +52,27 @@ namespace FEAST
         _rows(other._rows),
         _columns(other._columns)
       {
+        _pelements = this->_elements.at(0);
       }
 
       template <typename Arch2_, typename DT2_>
       DenseMatrix(const DenseMatrix<Arch2_, DT2_> & other) :
-        Container<Arch_, DT_>(other)
+        Container<Arch_, DT_>(other),
+        _rows(other._rows),
+        _columns(other._columns)
       {
-      }
-
-      void operator()(Index index, DT_ val)
-      {
-        _pelements[index] = val;
+        _pelements = this->_elements.at(0);
       }
 
       void operator()(Index row, Index col, DT_ val)
       {
-        _pelements[row * this->rows + col] = val;
+        _pelements[row * this->_rows + col] = val;
       }
 
-      const DT_ & operator[](Index index) const
+      const DT_ & operator()(Index row, Index col) const
       {
-        return _pelements[index];
+        return _pelements[row * this->_rows + col];
       }
-
-      /*const DT_ & operator[](Index row, Index col) const
-      {
-        return _pelements[row * this->rows + col];
-      }*/
 
       virtual const Index & size() const
       {

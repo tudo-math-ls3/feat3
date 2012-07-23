@@ -41,12 +41,14 @@ public:
   {
     DenseMatrix<Tag_, DT_> a(10, 10);
     DenseMatrix<Tag_, DT_> b(10, 10, 5.);
+    b(7, 6, DT_(42));
     DenseMatrix<Tag_, DT_> c(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.rows(), b.rows());
     DenseMatrix<Tag_, DT_> e(11, 12, 5.);
     TEST_CHECK_EQUAL(e.rows(), 11);
     TEST_CHECK_EQUAL(e.columns(), 12);
+    TEST_CHECK_EQUAL(c(7,6), b(7,6));
   }
 };
 DenseMatrixTest<Archs::CPU, double> dense_matrix_test_double;
