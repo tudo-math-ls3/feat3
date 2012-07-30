@@ -7,10 +7,10 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 #list of util source files
-ADD_LIBRARY(kernel-util STATIC exception.cpp logger.cpp param_section.cpp)
+ADD_LIBRARY(kernel-util STATIC exception.cpp param_section.cpp)
 
 #list of util tests
-SET (test_list assertion-test factorial-test graph-test inheritance-test logger-test param_section-test pretty_printer-test)
+SET (test_list assertion-test factorial-test graph-test inheritance-test param_section-test pretty_printer-test)
 
 #create all tests
 FOREACH (test ${test_list} )

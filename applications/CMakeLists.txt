@@ -10,5 +10,5 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # applications to build
-ADD_EXECUTABLE(pseudo_app pseudo_app.cpp)
-TARGET_LINK_LIBRARIES(pseudo_app feast)
+#ADD_EXECUTABLE(pseudo_app )
+#TARGET_LINK_LIBRARIES(pseudo_app feast)
