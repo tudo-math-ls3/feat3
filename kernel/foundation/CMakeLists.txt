@@ -7,7 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 
-ADD_LIBRARY(kernel-foundation STATIC comm.cpp process.cpp constants.cpp cell.cpp mesh_error.cpp communication_error.cpp)
+ADD_LIBRARY(kernel-foundation STATIC mesh_error.cpp communication_error.cpp)
 TARGET_LINK_LIBRARIES (kernel-foundation kernel-util)
 
 #list of kernel tests
