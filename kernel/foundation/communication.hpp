@@ -36,9 +36,9 @@ namespace FEAST
     {
     };
 
-    ///example shared-mem exchange (Nil is the temporary for archs::CPU)
+    ///example shared-mem exchange
     template<>
-    class Comm<Nil>
+    class Comm<Archs::None>
     {
       public:
         template<typename DataType_>

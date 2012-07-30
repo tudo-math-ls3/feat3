@@ -3,6 +3,7 @@
 
 #include <kernel/foundation/mesh.hpp>
 #include <kernel/foundation/halo.hpp>
+#include <kernel/archs.hpp>
 #include<deque>
 
 using namespace FEAST;
@@ -112,7 +113,7 @@ class HaloTest:
       TEST_CHECK_EQUAL(h.get_element_counterpart(1u), 1u);
     }
 };
-HaloTest<Nil, Index, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");
-HaloTest<Nil, Index, std::deque, std::vector<Index> > halo_test_cpu_d_v("std::deque, std::vector");
-HaloTest<Nil, Index, std::vector, std::deque<Index> > halo_test_cpu_v_d("std::vector, std::deque");
-HaloTest<Nil, Index, std::deque, std::deque<Index> > halo_test_cpu_d_d("std::deque, std::deque");
+HaloTest<Archs::None, Index, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");
+HaloTest<Archs::None, Index, std::deque, std::vector<Index> > halo_test_cpu_d_v("std::deque, std::vector");
+HaloTest<Archs::None, Index, std::vector, std::deque<Index> > halo_test_cpu_v_d("std::vector, std::deque");
+HaloTest<Archs::None, Index, std::deque, std::deque<Index> > halo_test_cpu_d_d("std::deque, std::deque");

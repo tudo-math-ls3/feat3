@@ -4,6 +4,7 @@
 #include <kernel/foundation/mesh.hpp>
 #include <kernel/foundation/halo.hpp>
 #include <kernel/foundation/halo_data.hpp>
+#include <kernel/archs.hpp>
 #include<deque>
 
 using namespace FEAST;
@@ -144,7 +145,7 @@ class HaloDataTest:
 
     }
 };
-HaloDataTest<Nil, unsigned long, std::vector, std::vector<unsigned long> > halo_test_cpu_v_v("std::vector, std::vector");
-HaloDataTest<Nil, unsigned long, std::deque, std::vector<unsigned long> > halo_test_cpu_d_v("std::deque, std::vector");
-HaloDataTest<Nil, unsigned long, std::vector, std::deque<unsigned long> > halo_test_cpu_v_d("std::vector, std::deque");
-HaloDataTest<Nil, unsigned long, std::deque, std::deque<unsigned long> > halo_test_cpu_d_d("std::deque, std::deque");
+HaloDataTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_cpu_v_v("std::vector, std::vector");
+HaloDataTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > halo_test_cpu_d_v("std::deque, std::vector");
+HaloDataTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halo_test_cpu_v_d("std::vector, std::deque");
+HaloDataTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > halo_test_cpu_d_d("std::deque, std::deque");

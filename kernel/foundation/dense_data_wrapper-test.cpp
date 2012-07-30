@@ -2,6 +2,8 @@
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/dense_data_wrapper.hpp>
+#include <kernel/archs.hpp>
+
 #include<deque>
 
 using namespace FEAST;
@@ -54,4 +56,4 @@ class DenseDataWrapperTest:
       Foundation::DenseDataWrapper<15u, DataType_, ContType_> test;
     }
 };
-DenseDataWrapperTest<Nil, double> ddw_test("Array<double>");
+DenseDataWrapperTest<Archs::None, double> ddw_test("Array<double>");

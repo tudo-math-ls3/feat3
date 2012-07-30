@@ -3,6 +3,7 @@
 
 #include <kernel/foundation/mesh_data.hpp>
 #include <kernel/foundation/dense_data_wrapper.hpp>
+#include <kernel/archs.hpp>
 #include<deque>
 
 using namespace FEAST;
@@ -116,7 +117,7 @@ class MeshDataTest:
       TEST_CHECK_EQUAL(vertex_attr.size(), 6u);
     }
 };
-MeshDataTest<Nil, unsigned long, std::vector, std::vector<unsigned long> > meshdata_test_cpu_v_v("std::vector, std::vector");
-MeshDataTest<Nil, unsigned long, std::deque, std::vector<unsigned long> > meshdata_test_cpu_d_v("std::deque, std::vector");
-MeshDataTest<Nil, unsigned long, std::vector, std::deque<unsigned long> > meshdata_test_cpu_v_d("std::vector, std::deque");
-MeshDataTest<Nil, unsigned long, std::deque, std::deque<unsigned long> > meshdata_test_cpu_d_d("std::deque, std::deque");
+MeshDataTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshdata_test_cpu_v_v("std::vector, std::vector");
+MeshDataTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > meshdata_test_cpu_d_v("std::deque, std::vector");
+MeshDataTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshdata_test_cpu_v_d("std::vector, std::deque");
+MeshDataTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > meshdata_test_cpu_d_d("std::deque, std::deque");

@@ -4,6 +4,7 @@
 #include <kernel/foundation/mesh.hpp>
 #include <kernel/foundation/topology.hpp>
 #include <kernel/foundation/dense_data_wrapper.hpp>
+#include <kernel/archs.hpp>
 #include<deque>
 
 using namespace FEAST;
@@ -410,9 +411,9 @@ class MeshTest:
 
     }
 };
-MeshTest<Nil, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");
-MeshTest<Nil, unsigned long, std::deque, std::vector<unsigned long> > topology_test_cpu_d_v("std::deque, std::vector");
-MeshTest<Nil, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
-MeshTest<Nil, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
+MeshTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");
+MeshTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > topology_test_cpu_d_v("std::deque, std::vector");
+MeshTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
+MeshTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
 
-MeshTest<Nil, unsigned long, std::vector, Foundation::DenseDataWrapper<100, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, DV");
+MeshTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<100, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, DV");

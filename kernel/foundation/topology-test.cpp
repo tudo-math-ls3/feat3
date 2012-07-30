@@ -3,6 +3,7 @@
 
 #include <kernel/foundation/topology.hpp>
 #include <kernel/foundation/dense_data_wrapper.hpp>
+#include <kernel/archs.hpp>
 #include<deque>
 
 using namespace FEAST;
@@ -73,10 +74,10 @@ class TopologyTest:
       TEST_CHECK_EQUAL(t2.size(), 1ul);
     }
 };
-TopologyTest<Nil, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");
-TopologyTest<Nil, unsigned long, std::deque, std::vector<unsigned long> > topology_test_cpu_d_v("std::deque, std::vector");
-TopologyTest<Nil, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
-TopologyTest<Nil, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
+TopologyTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");
+TopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > topology_test_cpu_d_v("std::deque, std::vector");
+TopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
+TopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
 
-TopologyTest<Nil, unsigned long, std::vector, Foundation::DenseDataWrapper<15, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, DV");
-TopologyTest<Nil, unsigned long, std::deque, Foundation::DenseDataWrapper<15, unsigned long, TestArrayClass> > topology_test_cpu_d_ddw("std::deque, DV");
+TopologyTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<15, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, DV");
+TopologyTest<Archs::None, unsigned long, std::deque, Foundation::DenseDataWrapper<15, unsigned long, TestArrayClass> > topology_test_cpu_d_ddw("std::deque, DV");
