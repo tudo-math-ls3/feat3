@@ -100,8 +100,6 @@ namespace FEAST
         /**
          * \brief member function inserts an empty list to end of topology
          *
-         * \param[in] s
-         * The polytope list to be inserted
          */
         void push_back()
         {
