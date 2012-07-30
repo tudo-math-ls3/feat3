@@ -5,6 +5,7 @@
  */
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/logger.hpp>
 #include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
@@ -187,19 +188,19 @@ public:
 }; // LoggerTest
 
 // create test instance, using space and world dimension 1
-LoggerTest<Nil, Nil, 1, 1> logger_test;
+LoggerTest<Archs::None, Nil, 1, 1> logger_test;
 
 #else
 /* ************************************************************************************* */
 /*   -  S E R I A L   T E S T   D R I V E R  *  S E R I A L   T E S T   D R I V E R   -  */
 /* ************************************************************************************* */
 class LoggerTest
-  : public TaggedTest<Nil, Nil>
+  : public TaggedTest<Archs::None, Nil>
 {
 public:
   /// CTOR
   LoggerTest()
-    : TaggedTest<Nil, Nil>("logger_test (serial)")
+    : TaggedTest<Archs::None, Nil>("logger_test (serial)")
   {
   }
 

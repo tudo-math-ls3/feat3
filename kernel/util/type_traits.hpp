@@ -100,6 +100,21 @@ namespace FEAST
       return "int";
     }
   };
+
+  /**
+  * \brief TypeTraits specialisation for Nil tag class
+  *
+  * \author Dirk Ribbrock
+  */
+  template<>
+  struct TypeTraits<Nil>
+  {
+    /// returns a string identifying the datatype
+    static String name()
+    {
+      return "Nil";
+    }
+  };
 } // FEAST
 
 #endif // KERNEL_UTIL_TYPE_TRAITS_HPP

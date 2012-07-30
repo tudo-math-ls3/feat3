@@ -1,4 +1,5 @@
 #include <kernel/util/param_section.hpp>
+#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <sstream>
 
@@ -13,11 +14,11 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 class ParamSectionTest
-  : public TaggedTest<Nil, Nil>
+  : public TaggedTest<Archs::None, Nil>
 {
 public:
   ParamSectionTest() :
-    TaggedTest<Nil, Nil>("param_section_test")
+    TaggedTest<Archs::None, Nil>("param_section_test")
   {
   }
 

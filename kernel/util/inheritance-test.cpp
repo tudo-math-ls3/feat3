@@ -5,6 +5,7 @@
 
 // includes, FEAST
 #include <kernel/util/inheritance.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/util/assertion.hpp>
@@ -53,4 +54,4 @@ public:
     static_assert(SUPERSUBCLASS(A,B), "Wrong inheritance detected");
   }
 };
-InheritanceTest<Nil, Nil> inheritance_test;
+InheritanceTest<Archs::None, Nil> inheritance_test;

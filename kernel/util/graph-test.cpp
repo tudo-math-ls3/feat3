@@ -1,4 +1,5 @@
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/graph.hpp>
 #include <test_system/test_system.hpp>
 
@@ -15,11 +16,11 @@ typedef CompositeAdjactor<Graph,Graph> CAGG;
  * \author Peter Zajac
  */
 class GraphTest
-  : public TaggedTest<Nil, Nil>
+  : public TaggedTest<Archs::None, Nil>
 {
 public:
   GraphTest() :
-    TaggedTest<Nil, Nil>("graph_test")
+    TaggedTest<Archs::None, Nil>("graph_test")
   {
   }
 

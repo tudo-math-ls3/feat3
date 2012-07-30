@@ -1,4 +1,5 @@
 #include <test_system/test_system.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
 #include <kernel/geometry/standard_refinery.hpp>
 
@@ -24,11 +25,11 @@ typedef StandardRefinery<SubMesh> SubMeshRefinery;
  * \author Peter Zajac
  */
 class StandardRefineryTestConfQuad
-  : public TestSystem::TaggedTest<Nil, Nil>
+  : public TestSystem::TaggedTest<Archs::None, Nil>
 {
 public:
   StandardRefineryTestConfQuad() :
-    TestSystem::TaggedTest<Nil, Nil>("standard_refinery-test-conf-quad")
+    TestSystem::TaggedTest<Archs::None, Nil>("standard_refinery-test-conf-quad")
   {
   }
 

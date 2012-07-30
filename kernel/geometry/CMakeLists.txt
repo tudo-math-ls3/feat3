@@ -16,7 +16,7 @@ SET (test_list shape-test standard_refinery-test-conf-quad standard_refinery-tes
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feast test_system)
-  ADD_TEST(${test}_nil ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -24,10 +24,10 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/geometry/${test}" nil)
-  SET_PROPERTY(TEST ${test}_nil PROPERTY LABELS "nil")
-  SET_PROPERTY(TEST ${test}_nil PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
-  SET_PROPERTY(TEST ${test}_nil PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/geometry/${test}" none)
+  SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
+  SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
+  SET_PROPERTY(TEST ${test}_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ENDFOREACH(test)
 
 # add all tests to util_tests

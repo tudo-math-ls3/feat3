@@ -1,4 +1,6 @@
 #include <test_system/test_system.hpp>
+#include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 #include <kernel/geometry/standard_refinery.hpp>
 
@@ -21,11 +23,11 @@ typedef StandardRefinery<StructMesh> StructMeshRefinery;
  * \author Peter Zajac
  */
 class StandardRefineryTestStructQuad
-  : public TestSystem::TaggedTest<Nil, Nil>
+  : public TestSystem::TaggedTest<Archs::None, Nil>
 {
 public:
   StandardRefineryTestStructQuad() :
-    TestSystem::TaggedTest<Nil, Nil>("standard_refinery-test-struct-quad")
+    TestSystem::TaggedTest<Archs::None, Nil>("standard_refinery-test-struct-quad")
   {
   }
 

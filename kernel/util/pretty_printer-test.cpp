@@ -1,5 +1,6 @@
 // includes, Feast
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/pretty_printer.hpp>
 #include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
@@ -81,4 +82,4 @@ public:
 }; // PrettyPrinterTest
 
 // create test instance
-PrettyPrinterTest<Nil, Nil> pretty_printer_test;
+PrettyPrinterTest<Archs::None, Nil> pretty_printer_test;

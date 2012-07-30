@@ -4,6 +4,7 @@
 #endif
 
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/hornet/dense_vector.hpp>
 

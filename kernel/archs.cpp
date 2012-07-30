@@ -4,7 +4,7 @@
 
 using namespace FEAST;
 
-const String Archs::Nil::name = "nil";
+const String Archs::None::name = "none";
 const String Archs::CPU::name = "cpu";
 
 std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
@@ -14,7 +14,7 @@ std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
     switch (value)
     {
       case Archs::tv_nil:
-        left << Archs::Nil::name;
+        left << Archs::None::name;
         continue;
 
       case Archs::tv_cpu:

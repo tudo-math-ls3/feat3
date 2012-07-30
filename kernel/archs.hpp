@@ -25,10 +25,10 @@ namespace FEAST
 
       /**
        * This is an empty tag class which may be used for templates with optional parameters.\n
-       * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
+       * Some template implementations might recognise the usage of a \c None parameter as <em>parameter not given</em>.
        */
-      struct Nil :
-        public InstantiationPolicy<Nil, NonCopyable>
+      struct None :
+        public InstantiationPolicy<None, NonCopyable>
       {
         const static TagValue tag_value = tv_nil;
         const static TagValue memory_value = tv_nil;

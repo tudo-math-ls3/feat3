@@ -4,6 +4,7 @@
 #endif
 
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
 
@@ -59,4 +60,4 @@ public:
 
   }
 };
-AssertionTest<Nil, Nil> assertion_test;
+AssertionTest<Archs::None, Nil> assertion_test;

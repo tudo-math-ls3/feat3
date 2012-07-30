@@ -1,4 +1,5 @@
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/factorial.hpp>
 #include <test_system/test_system.hpp>
 
@@ -13,12 +14,12 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 class FactorialTest
-  : public TaggedTest<Nil, Nil>
+  : public TaggedTest<Archs::None, Nil>
 {
 public:
 
   FactorialTest() :
-    TaggedTest<Nil, Nil>("factorial_test")
+    TaggedTest<Archs::None, Nil>("factorial_test")
   {
   }
 
