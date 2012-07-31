@@ -28,7 +28,10 @@ namespace FEAST
      *
      * \author Markus Geveler
      */
-    template<unsigned delta_, typename MeshType_, template<typename, typename> class StorageType_ = std::vector, typename IndexType_ = Index>
+    template<unsigned delta_,
+             typename MeshType_,
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IndexType_ = Index>
     class Halo
     {
       public:

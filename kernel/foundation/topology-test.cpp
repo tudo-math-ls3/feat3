@@ -4,13 +4,14 @@
 #include <kernel/foundation/topology.hpp>
 #include <kernel/foundation/dense_data_wrapper.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/hornet/dense_vector.hpp>
 #include<deque>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 //Test container
-template<typename DT_>
+template<typename Arch_, typename DT_>
 class TestArrayClass
 {
   public:
@@ -79,5 +80,6 @@ TopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> 
 TopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
 TopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
 
-TopologyTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<15, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, DV");
-TopologyTest<Archs::None, unsigned long, std::deque, Foundation::DenseDataWrapper<15, unsigned long, TestArrayClass> > topology_test_cpu_d_ddw("std::deque, DV");
+TopologyTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, TAC");
+TopologyTest<Archs::None, unsigned long, std::deque, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > topology_test_cpu_d_ddw("std::deque, TAC");
+TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");

@@ -2,6 +2,7 @@
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/dense_data_wrapper.hpp>
+#include <kernel/hornet/dense_vector.hpp>
 #include <kernel/archs.hpp>
 
 #include<deque>
@@ -10,7 +11,7 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 //Test container
-template<typename DT_>
+template<typename Arch_, typename DT_>
 class TestArrayClass
 {
   public:
@@ -41,7 +42,9 @@ class TestArrayClass
 
 };
 
-template<typename Tag_, typename DataType_, template<typename> class ContType_ = TestArrayClass>
+template<typename Tag_,
+  typename DataType_,
+  template<typename, typename> class ContType_ = TestArrayClass>
 class DenseDataWrapperTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -53,7 +56,8 @@ class DenseDataWrapperTest:
 
     void run() const
     {
-      Foundation::DenseDataWrapper<15u, DataType_, ContType_> test;
+      Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> test;
     }
 };
-DenseDataWrapperTest<Archs::None, double> ddw_test("Array<double>");
+DenseDataWrapperTest<Archs::None, double> ddw_test_TAC("Array<double>");
+DenseDataWrapperTest<Archs::CPU, double, DenseVector> ddw_test_DV("Hornet::DenseVector<double>");

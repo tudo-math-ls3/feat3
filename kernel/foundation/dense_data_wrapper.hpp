@@ -7,15 +7,16 @@ namespace FEAST
   namespace Foundation
   {
     template<unsigned long _i,
+             typename Arch_,
              typename DT_,
-             template<typename> class ContType_>
+             template<typename, typename> class ContType_>
       class DenseDataWrapper
       {
         public:
           DenseDataWrapper() :
             _size(_i),
             _num_non_zeros(0),
-            _data(ContType_<DT_>(_i))
+            _data(ContType_<Arch_, DT_>(_i))
         {
         }
 
@@ -55,7 +56,7 @@ namespace FEAST
         private:
           unsigned long _size;
           unsigned long _num_non_zeros;
-          ContType_<DT_> _data;
+          ContType_<Arch_, DT_> _data;
       };
   }
 }

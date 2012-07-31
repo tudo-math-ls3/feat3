@@ -9,7 +9,9 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_,
+         typename IndexType_,
+         template<typename, typename> class OT_, typename IT_>
 class HaloTest:
   public TaggedTest<Tag_, IndexType_>
 {
