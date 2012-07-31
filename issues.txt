@@ -1,4 +1,4 @@
-NEWEST: 00038
+NEWEST: 00039
 ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |SHORT DESCRIPTION
 00010 |feature_request      |assigned    |markus |hilmar_markus     |high     |add_mp_and_pp_layers
 00012 |feature_request      |assigned    |markus |hilmar_dom        |high     |parsing_FPROP_and_FPART_meshfilesections
@@ -28,6 +28,7 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00036 |feature_request      |unassigned  |dom    |                  |low      |sync_cmake_and_baseheader
 00037 |feature_request      |unassigned  |hilmar |                  |low      |diversify_manager_class
 00038 |feature_request      |unassigned  |dom    |                  |low      |oracle_version_detection
+00039 |feature_request      |unassigned  |markus |                  |low      |display_all_backends_in_ctest
 
 
 00000 |feature_request      |resolved    |markus |dirk              |high     |implement_test_system
