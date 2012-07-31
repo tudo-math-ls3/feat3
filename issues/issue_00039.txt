@@ -1,11 +1,12 @@
 ID          00039
 TYPE        feature_request
-STATUS      unassigned
+STATUS      resolved
 AUTHOR      markus
-ASSIGNED TO
+ASSIGNED TO markus
 SEVERITY    low
 
 FULL TEXT
 When having more backends tested within one file (this is instantiation of the same test template with different backends) only the first backend is displayed in the output of ctest (or make test).
 
 SOLUTION
+Added missing cpu part in CMakeList

@@ -28,7 +28,6 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00036 |feature_request      |unassigned  |dom    |                  |low      |sync_cmake_and_baseheader
 00037 |feature_request      |unassigned  |hilmar |                  |low      |diversify_manager_class
 00038 |feature_request      |unassigned  |dom    |                  |low      |oracle_version_detection
-00039 |feature_request      |unassigned  |markus |                  |low      |display_all_backends_in_ctest
 
 
 00000 |feature_request      |resolved    |markus |dirk              |high     |implement_test_system
@@ -42,3 +41,4 @@ ID    |TYPE                 |STATUS      |AUTHOR |ASSIGNED TO       |SEVERITY |S
 00029 |optimisation_request |resolved    |hilmar |hilmar            |high     |separate_loadbal_and_coordinator_process
 00033 |bug_report           |resolved    |hilmar |hilmar            |high     |log_comm_to_master_faulty_with_mpich
 00034 |feature_request      |resolved    |dom    |dirk_dom          |medium   |proper_compiler_version_detection
+00039 |feature_request      |resolved    |markus |markus            |low      |display_all_backends_in_ctest
