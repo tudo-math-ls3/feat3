@@ -22,7 +22,7 @@ namespace FEAST
     static String name()
     {
       //return stringify(typeid(DT_).name());
-      return DT_::name;
+      return DT_::name();
     }
   };
 

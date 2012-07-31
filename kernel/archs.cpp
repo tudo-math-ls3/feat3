@@ -4,30 +4,24 @@
 
 using namespace FEAST;
 
-const String Archs::None::name = "none";
-const String Archs::CPU::name = "cpu";
-
 std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
 {
-  do
+  switch (value)
   {
-    switch (value)
-    {
-      case Archs::tv_nil:
-        left << Archs::None::name;
-        continue;
+    case Archs::tv_nil:
+      left << Archs::None::name();
+      break;
 
-      case Archs::tv_cpu:
-        left << Archs::CPU::name;
-        continue;
+    case Archs::tv_cpu:
+      left << Archs::CPU::name();
+      break;
 
-      default:
-        left << "Unknown Backend";
-        continue;
-    }
+    default:
+      left << "Unknown Backend";
+      break;
+  }
 
-    throw InternalError("Unexpected value for Arch::TagValue '" + stringify(long(value)) + "'");
-  } while (false);
+  //throw InternalError("Unexpected value for Arch::TagValue '" + stringify(long(value)) + "'");
 
   return left;
 }

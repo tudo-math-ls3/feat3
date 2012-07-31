@@ -492,39 +492,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\kernel\archs.hpp" />
     <ClInclude Include="..\kernel\base_header.hpp" />
-    <ClInclude Include="..\kernel\foundation\bm.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_1d_edge.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_2d_quad.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_2d_tri.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_3d_hexa.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_3d_tetra.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_data.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_data_validation.hpp" />
-    <ClInclude Include="..\kernel\foundation\cell_subdivision.hpp" />
-    <ClInclude Include="..\kernel\foundation\comm.hpp" />
-    <ClInclude Include="..\kernel\foundation\constants.hpp" />
-    <ClInclude Include="..\kernel\foundation\error_handler.hpp" />
+    <ClInclude Include="..\kernel\foundation\communication.hpp" />
+    <ClInclude Include="..\kernel\foundation\communication_error.hpp" />
+    <ClInclude Include="..\kernel\foundation\dense_data_wrapper.hpp" />
     <ClInclude Include="..\kernel\foundation\file_parser.hpp" />
-    <ClInclude Include="..\kernel\foundation\interlevel_group.hpp" />
-    <ClInclude Include="..\kernel\foundation\item.hpp" />
-    <ClInclude Include="..\kernel\foundation\load_balancer.hpp" />
-    <ClInclude Include="..\kernel\foundation\load_balancer_dedicated.hpp" />
-    <ClInclude Include="..\kernel\foundation\manager.hpp" />
-    <ClInclude Include="..\kernel\foundation\manager_comp.hpp" />
-    <ClInclude Include="..\kernel\foundation\manager_comp_coord.hpp" />
-    <ClInclude Include="..\kernel\foundation\manager_comp_non_coord.hpp" />
+    <ClInclude Include="..\kernel\foundation\halo.hpp" />
+    <ClInclude Include="..\kernel\foundation\halo_data.hpp" />
     <ClInclude Include="..\kernel\foundation\master.hpp" />
-    <ClInclude Include="..\kernel\foundation\neighbourhood.hpp" />
-    <ClInclude Include="..\kernel\foundation\process.hpp" />
-    <ClInclude Include="..\kernel\foundation\process_group.hpp" />
-    <ClInclude Include="..\kernel\foundation\service_ids.hpp" />
-    <ClInclude Include="..\kernel\foundation\subcells.hpp" />
-    <ClInclude Include="..\kernel\foundation\universe.hpp" />
-    <ClInclude Include="..\kernel\foundation\vertex.hpp" />
-    <ClInclude Include="..\kernel\foundation\work_group.hpp" />
-    <ClInclude Include="..\kernel\foundation\work_group_ext.hpp" />
+    <ClInclude Include="..\kernel\foundation\mesh.hpp" />
+    <ClInclude Include="..\kernel\foundation\mesh_data.hpp" />
+    <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
+    <ClInclude Include="..\kernel\foundation\topology.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\index_set.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\entity_counter.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\index_refiner-hypercube.hpp" />
@@ -556,6 +536,11 @@
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_abacus.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp" />
+    <ClInclude Include="..\kernel\hornet\container.hpp" />
+    <ClInclude Include="..\kernel\hornet\dense_matrix.hpp" />
+    <ClInclude Include="..\kernel\hornet\dense_vector.hpp" />
+    <ClInclude Include="..\kernel\hornet\memory_pool.hpp" />
+    <ClInclude Include="..\kernel\hornet\sparse_matrix_coo.hpp" />
     <ClInclude Include="..\kernel\util\abort.hpp" />
     <ClInclude Include="..\kernel\util\adjactor.hpp" />
     <ClInclude Include="..\kernel\util\assertion.hpp" />
@@ -584,10 +569,10 @@
     <ClInclude Include="feast_config.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\foundation\cell.cpp" />
-    <ClCompile Include="..\kernel\foundation\comm.cpp" />
-    <ClCompile Include="..\kernel\foundation\constants.cpp" />
-    <ClCompile Include="..\kernel\foundation\process.cpp" />
+    <ClCompile Include="..\kernel\archs.cpp" />
+    <ClCompile Include="..\kernel\foundation\communication_error.cpp" />
+    <ClCompile Include="..\kernel\foundation\mesh_error.cpp" />
+    <ClCompile Include="..\kernel\hornet\memory_pool.cpp" />
     <ClCompile Include="..\kernel\util\exception.cpp" />
     <ClCompile Include="..\kernel\util\logger.cpp" />
     <ClCompile Include="..\kernel\util\param_section.cpp" />

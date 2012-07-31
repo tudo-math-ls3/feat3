@@ -18,11 +18,11 @@
     <Filter Include="Source Files %28kernel%29\foundation">
       <UniqueIdentifier>{24b16e61-c4ce-44bb-a292-84def0e7ad1c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files %28kernel%29\foundation\base_mesh">
-      <UniqueIdentifier>{2d3a3709-610e-49d2-91eb-133b1c06b806}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files %28kernel%29\geometry">
       <UniqueIdentifier>{9f3c1970-15c2-489b-b72e-4eccd6e1ef8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files %28kernel%29\hornet">
+      <UniqueIdentifier>{50c3921f-e491-45d7-a44b-fe364a52d763}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,34 +40,10 @@
     <ClCompile Include="..\kernel\util\inheritance-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\util\pretty_printer-test.cpp">
-      <Filter>Source Files %28kernel%29\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\test_system\test_system-test.cpp">
       <Filter>Source Files %28test_system%29</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\foundation\work_group-test_1d.cpp">
-      <Filter>Source Files %28kernel%29\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\work_group-test_2d_1.cpp">
-      <Filter>Source Files %28kernel%29\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\work_group-test_2d_2.cpp">
-      <Filter>Source Files %28kernel%29\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\cell_1d_edge-test_subdivision.cpp">
-      <Filter>Source Files %28kernel%29\foundation\base_mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\cell_3d_hexa-test_subdivision.cpp">
-      <Filter>Source Files %28kernel%29\foundation\base_mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\cell_2d_quad-test_subdivision.cpp">
-      <Filter>Source Files %28kernel%29\foundation\base_mesh</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\util\factorial-test.cpp">
-      <Filter>Source Files %28kernel%29\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\util\logger-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\geometry\shape-test.cpp">
@@ -84,6 +60,36 @@
     </ClCompile>
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-quad.cpp">
       <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\communication-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\dense_data_wrapper-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\halo_data-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\halo-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\mesh_data-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\mesh-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\topology-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\dense_matrix-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\dense_vector-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\sparse_matrix_coo-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

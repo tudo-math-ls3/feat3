@@ -21,12 +21,6 @@
     <Filter Include="Source Files\foundation">
       <UniqueIdentifier>{00d9dcec-fec5-4be2-a18f-c5f9362b916a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\foundation\base_mesh">
-      <UniqueIdentifier>{ba3e4b95-bce6-4dc2-bf42-b654127bf689}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\foundation\base_mesh">
-      <UniqueIdentifier>{8328183f-1fbb-4af5-b8f0-43910a7b4bb2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\geometry">
       <UniqueIdentifier>{afa0f642-9c74-4cd2-8b23-ee88d771792b}</UniqueIdentifier>
     </Filter>
@@ -47,6 +41,12 @@
     </Filter>
     <Filter Include="Header Files\geometry\conformal\standard_refinement">
       <UniqueIdentifier>{c64aae21-06f4-4c15-b7ad-d942cb509592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hornet">
+      <UniqueIdentifier>{08767830-bd99-4b65-9e34-4236e97eb027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hornet">
+      <UniqueIdentifier>{af4ad484-97dc-4b11-af95-7e185af1d196}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -107,102 +107,6 @@
     <ClInclude Include="feast_config.hpp" />
     <ClInclude Include="..\kernel\util\graph.hpp">
       <Filter>Header Files\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\comm.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\constants.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\error_handler.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\interlevel_group.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\load_balancer.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\load_balancer_dedicated.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\manager.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\manager_comp.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\manager_comp_coord.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\manager_comp_non_coord.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\master.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\neighbourhood.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\process.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\process_group.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\service_ids.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\universe.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\work_group.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\work_group_ext.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\bm.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_1d_edge.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_2d_quad.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_2d_tri.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_3d_hexa.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_3d_tetra.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_data.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_data_validation.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\cell_subdivision.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\file_parser.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\item.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\subcells.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\vertex.hpp">
-      <Filter>Header Files\foundation\base_mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\util\logger.hpp">
       <Filter>Header Files\util</Filter>
@@ -318,28 +222,79 @@
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\foundation\communication.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\communication_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\dense_data_wrapper.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\file_parser.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\halo.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\halo_data.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\master.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\mesh.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\mesh_data.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\mesh_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\topology.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\dense_vector.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\memory_pool.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\sparse_matrix_coo.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\container.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\dense_matrix.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\archs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
       <Filter>Source Files\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\comm.cpp">
-      <Filter>Source Files\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\constants.cpp">
-      <Filter>Source Files\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\process.cpp">
-      <Filter>Source Files\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\cell.cpp">
-      <Filter>Source Files\foundation\base_mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\util\logger.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\util\param_section.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\communication_error.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\mesh_error.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\memory_pool.cpp">
+      <Filter>Source Files\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\archs.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

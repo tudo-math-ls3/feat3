@@ -726,12 +726,12 @@ namespace FEAST
 
         inline int _downward_index(const unsigned pl)
         {
-          return (pl == 0u || pl >= _num_levels) ? - 1 : (pl == 3u ? 5 : (unsigned)pow(2, pl) - 1);
+          return (pl == 0u || pl >= _num_levels) ? - 1 : (pl == 3u ? 5 : (1 << pl) - 1);
         }
 
         inline int _upward_index(const unsigned pl)
         {
-          return pl >= _num_levels - 1? -1 : ( pl > 0 ? (unsigned)pow(2, pl) : 0);
+          return pl >= _num_levels - 1? -1 : ( pl > 0 ? (1 << pl) : 0);
         }
 
         inline int _sweep_direction(const unsigned from_level, const unsigned to_level)

@@ -32,7 +32,10 @@ namespace FEAST
       {
         const static TagValue tag_value = tv_nil;
         const static TagValue memory_value = tv_nil;
-        const static String name;
+        static String name()
+        {
+          return "none";
+        }
       };
 
       /**
@@ -43,7 +46,10 @@ namespace FEAST
       {
         const static TagValue tag_value = tv_cpu;
         const static TagValue memory_value = tv_cpu;
-        const static String name;
+        static String name()
+        {
+          return "cpu";
+        }
       };
 
     }

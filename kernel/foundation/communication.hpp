@@ -2,9 +2,11 @@
 #ifndef KERNEL_FOUNDATION_COMMUNICATION_HH
 #define KERNEL_FOUNDATION_COMMUNICATION_HH 1
 
-#include<kernel/foundation/halo.hpp>
-#include<kernel/foundation/communication_error.hpp>
-#include<vector>
+#include <kernel/archs.hpp>
+#include <kernel/foundation/halo.hpp>
+#include <kernel/foundation/communication_error.hpp>
+
+#include <vector>
 
 
 namespace FEAST
