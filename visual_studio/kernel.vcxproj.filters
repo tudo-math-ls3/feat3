@@ -240,9 +240,6 @@
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp">
       <Filter>Header Files\geometry\test_aux</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_simplex.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\foundation\communication.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
