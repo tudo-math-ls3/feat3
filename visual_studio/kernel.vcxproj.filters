@@ -249,16 +249,10 @@
     <ClInclude Include="..\kernel\foundation\dense_data_wrapper.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\foundation\file_parser.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\foundation\halo.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\foundation\halo_data.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\master.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\foundation\mesh.hpp">

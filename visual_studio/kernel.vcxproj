@@ -497,10 +497,8 @@
     <ClInclude Include="..\kernel\foundation\communication.hpp" />
     <ClInclude Include="..\kernel\foundation\communication_error.hpp" />
     <ClInclude Include="..\kernel\foundation\dense_data_wrapper.hpp" />
-    <ClInclude Include="..\kernel\foundation\file_parser.hpp" />
     <ClInclude Include="..\kernel\foundation\halo.hpp" />
     <ClInclude Include="..\kernel\foundation\halo_data.hpp" />
-    <ClInclude Include="..\kernel\foundation\master.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_data.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
