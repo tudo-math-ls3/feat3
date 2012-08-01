@@ -1,5 +1,4 @@
 #include <test_system/test_system.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
 #include <kernel/geometry/test_aux/standard_quad.hpp>
 #include <kernel/geometry/standard_refinery.hpp>

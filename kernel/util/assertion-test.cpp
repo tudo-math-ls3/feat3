@@ -3,10 +3,8 @@
 #define DEBUG 1
 #endif
 
-#include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
-#include <kernel/util/assertion.hpp>
 #include <test_system/test_system.hpp>
+#include <kernel/util/assertion.hpp>
 
 #include <string>
 

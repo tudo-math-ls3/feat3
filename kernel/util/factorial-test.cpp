@@ -1,7 +1,5 @@
-#include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
-#include <kernel/util/factorial.hpp>
 #include <test_system/test_system.hpp>
+#include <kernel/util/factorial.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -60,12 +58,12 @@ public:
  * \author Peter Zajac
  */
 class BinomialTest
-  : public TaggedTest<Nil, Nil>
+  : public TaggedTest<Archs::None, Nil>
 {
 public:
 
   BinomialTest() :
-    TaggedTest<Nil, Nil>("binomial_test")
+    TaggedTest<Archs::None, Nil>("binomial_test")
   {
   }
 

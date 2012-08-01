@@ -1,6 +1,6 @@
-#include <kernel/util/param_section.hpp>
-#include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
+#include <kernel/util/param_section.hpp>
+
 #include <sstream>
 
 using namespace FEAST;

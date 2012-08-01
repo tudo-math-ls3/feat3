@@ -4,10 +4,8 @@
 #endif
 
 // includes, FEAST
-#include <kernel/util/inheritance.hpp>
-#include <kernel/archs.hpp>
-#include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
+#include <kernel/util/inheritance.hpp>
 #include <kernel/util/assertion.hpp>
 
 class A{};

@@ -1,6 +1,4 @@
 #include <test_system/test_system.hpp>
-#include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
 #include <kernel/geometry/standard_refinery.hpp>
 

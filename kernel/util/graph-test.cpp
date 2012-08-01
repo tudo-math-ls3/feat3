@@ -1,7 +1,5 @@
-#include <kernel/base_header.hpp>
-#include <kernel/archs.hpp>
-#include <kernel/util/graph.hpp>
 #include <test_system/test_system.hpp>
+#include <kernel/util/graph.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
