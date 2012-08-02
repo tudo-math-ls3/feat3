@@ -233,7 +233,7 @@ namespace FEAST
           _mp_rank(mp_rank),
           _num_inter_topologies(i_),
           _num_levels((unsigned)(i_/2u) + 1u),
-          _topologies(new TopologyType_[i_]),
+          //_topologies(TopologyType_[i_]),
           _num_attributes_of_type_1(0),
           _num_attributes_of_type_2(0),
           _num_attributes_of_type_3(0),
@@ -253,7 +253,7 @@ namespace FEAST
           _mp_rank(other._mp_rank),
           _num_inter_topologies(other._num_inter_topologies),
           _num_levels(other._num_levels),
-          _topologies(new TopologyType_[i_]),
+          //_topologies(new TopologyType_[i_]),
           _num_attributes_of_type_1(other._num_attributes_of_type_1),
           _num_attributes_of_type_2(other._num_attributes_of_type_2),
           _num_attributes_of_type_3(other._num_attributes_of_type_3),
@@ -281,7 +281,7 @@ namespace FEAST
         ///DTOR
         ~Mesh()
         {
-          delete[] _topologies;
+          //delete[] _topologies;
         }
 
         void add_polytope(const unsigned level)
@@ -705,7 +705,7 @@ namespace FEAST
         const typename TopologyType_::index_type_ _mp_rank;
         const unsigned _num_inter_topologies;
         const unsigned _num_levels;
-        TopologyType_* _topologies;
+        TopologyType_ _topologies[i_];
 
         unsigned _num_attributes_of_type_1;
         unsigned _num_attributes_of_type_2;
