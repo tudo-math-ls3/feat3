@@ -45,6 +45,16 @@ namespace FEAST
       ImageIterator(const ImageIterator& other);
 
       /**
+       * \brief Assignment operator.
+       *
+       * \param[in] other
+       * The image node iteration that is to be assigned.
+       *
+       * \returns <c>*this</c>
+       */
+      ImageIterator& operator=(const ImageIterator& other);
+
+      /**
        * \brief Dereferentiation operator.
        *
        * \returns
@@ -80,7 +90,7 @@ namespace FEAST
      * \returns
      * The total number of domain nodes in the adjactor.
      */
-    Index num_nodes_domain() const;
+    Index get_num_nodes_domain() const;
 
     /**
      * \brief Returns the number of image nodes.
@@ -88,7 +98,7 @@ namespace FEAST
      * \returns
      * The total number of image nodes in the adjactor.
      */
-    Index num_nodes_image() const;
+    Index get_num_nodes_image() const;
 
     /**
      * \brief Returns an iterator for the first adjacent image node.
@@ -297,32 +307,32 @@ namespace FEAST
       CONTEXT("CompositeAdjactor::CompositeAdjactor()");
       // Ensure that the number of image nodes in the first adjactor is not greater than the number of domain
       // nodes in the second adjactor; otherwise the composite adjactor is ill-formed.
-      ASSERT(_adj1.num_nodes_image() <= _adj2.num_nodes_domain(), "Composite Adjuctor is ill-formed");
+      ASSERT(_adj1.get_num_nodes_image() <= _adj2.get_num_nodes_domain(), "Composite Adjuctor is ill-formed");
     }
 
     /** \copydoc Adjactor::num_nodes_domain() */
-    inline Index num_nodes_domain() const
+    inline Index get_num_nodes_domain() const
     {
       CONTEXT("CompositeAdjactor::num_nodes_domain()");
       // The number of domain nodes of the composite adjactor is given by the number of domain nodes of the
       // first adjactor in the composition.
-      return _adj1.num_nodes_domain();
+      return _adj1.get_num_nodes_domain();
     }
 
     /** \copydoc Adjactor::num_nodes_image() */
-    inline Index num_nodes_image() const
+    inline Index get_num_nodes_image() const
     {
       CONTEXT("CompositeAdjactor::num_nodes_image()");
       // The number of image nodes of the composite adjactor is given by the number of image nodes of the
       // second adjactor in the composition.
-      return _adj2.num_nodes_image();
+      return _adj2.get_num_nodes_image();
     }
 
     /** \copydoc Adjactor::image_begin() */
     inline ImageIterator image_begin(Index domain_node) const
     {
       CONTEXT("CompositeAdjuctor::image_begin()");
-      ASSERT(domain_node < num_nodes_domain(), "domain_node out of valid range");
+      ASSERT(domain_node < get_num_nodes_domain(), "domain_node out of valid range");
       return ImageIterator(&_adj1, &_adj2, domain_node);
     }
 
@@ -330,7 +340,7 @@ namespace FEAST
     inline ImageIterator image_end(Index domain_node) const
     {
       CONTEXT("CompositeAdjuctor::image_end()");
-      ASSERT(domain_node < num_nodes_domain(), "domain_node out of valid range");
+      ASSERT(domain_node < get_num_nodes_domain(), "domain_node out of valid range");
       return ImageIterator(&_adj1, domain_node);
     }
 

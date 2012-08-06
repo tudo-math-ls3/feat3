@@ -53,9 +53,6 @@
     <ClInclude Include="..\kernel\base_header.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\util\abort.hpp">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\util\assertion.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
@@ -123,13 +120,7 @@
     <ClInclude Include="..\kernel\util\adjactor.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\util\index_table.hpp">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\util\param_section.hpp">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\util\string_map.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\geometry\conformal\index_set.hpp">
@@ -284,6 +275,9 @@
     </ClInclude>
     <ClInclude Include="..\kernel\archs.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\abort.hpp">
+      <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

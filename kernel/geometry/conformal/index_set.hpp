@@ -211,14 +211,14 @@ namespace FEAST
         /* *************************************************************************************** */
         /*          A D J A C T O R     I N T E R F A C E     I M P L E M E N T A T I O N          */
         /* *************************************************************************************** */
-        /** \copydoc Adjactor::num_nodes_domain() */
-        Index num_nodes_domain() const
+        /** \copydoc Adjactor::get_num_nodes_domain() */
+        Index get_num_nodes_domain() const
         {
           return _num_entities;
         }
 
-        /** \copydoc Adjactor::num_nodes_image() */
-        Index num_nodes_image() const
+        /** \copydoc Adjactor::get_num_nodes_image() */
+        Index get_num_nodes_image() const
         {
           return _index_bound;
         }

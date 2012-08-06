@@ -52,6 +52,12 @@ public:
       1, 3
     };
 
+    // check dimensions
+    if(f->get_num_nodes_domain() != 7)
+      return false;
+    if(f->get_num_nodes_image() != 5)
+      return false;
+
     // check degree
     if(f->degree() != 3)
       return false;
@@ -107,6 +113,12 @@ public:
       2, 4, 6, 1, 3
     };
 
+    // check dimensions
+    if(fg->get_num_nodes_domain() != 7)
+      return false;
+    if(fg->get_num_nodes_image() != 7)
+      return false;
+
     // check degree
     if(fg->degree() != 7)
       return false;
@@ -157,6 +169,12 @@ public:
       2, 3, 0, 4, 1,
       0, 2, 4, 3, 1
     };
+
+    // check dimensions
+    if(gf->get_num_nodes_domain() != 5)
+      return false;
+    if(gf->get_num_nodes_image() != 5)
+      return false;
 
     // check degree
     if(gf->degree() != 5)

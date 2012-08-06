@@ -1,11 +1,3 @@
-/* GENERAL_REMARK_BY_HILMAR:
- * This class is really just a rudimentary graph implementation which I needed for testing MPI stuff.
- * As far as I remember Peter wants to take a closer look and merge it with his more sophisticated graph
- * implementation. (Feel free to throw my implementation away completely, Peter!) Also see my comments
- * below.
- *
- * HILMAR WON'T TOUCH THIS FILE ANYMORE! Please remove this comment-block as soon as possible... :-)
- */
 #pragma once
 #ifndef KERNEL_UTIL_GRAPH_HPP
 #define KERNEL_UTIL_GRAPH_HPP 1
@@ -21,212 +13,6 @@
 
 namespace FEAST
 {
-#ifdef OLD_GRAPH
-  // Peter: Here comes the old adjacency graph implementation, left as a reference. This implementation will be
-  //        deleted later.
-  /*
-  * \brief class providing a graph data structure for defining connectivity of subdomains / matrix patches / processes
-  *
-  * This data structure is very similar to that described in the MPI-2.2 standard (p. 250ff) for creating process
-  * topologies (for the difference, see description of member #_index).
-  *
-  * In the case this data structure is used for storing the MPI communication graph, it is a \em global representation,
-  * i.e. a process storing this graph knows the \em complete communication graph. (For a distributed representation, see
-  * data structure GraphDistributed.) To construct a corresponding MPI communicator, one can use the function
-  *   int MPI_Graph_create(MPI_Comm comm_old, int num_nodes, int *_index, int *_neighbours, int reorder,
-  *                        MPI_Comm *comm_graph)
-  * (see MPI-2.2 standard, p. 250). When passing the array #_index to this routine, remember to omit the first entry
-  * (see description of the array #_index).
-  *
-  * The data structure can also be used to create distributed graph data structures via the MPI routine
-  * MPI_Dist_graph_create(...), (see MPI-2.2 standard, example 7.3 on page 256).
-  *
-  * COMMENT_HILMAR: This is only a very rough first version, which will be surely adapted to our needs...
-  *
-  * COMMENT_HILMAR:
-  * This graph structure is the most general one. When it comes to MPI communication, we surely have to
-  * distinguish face, edge and vertex neighbours, i.e., making this distinction within an enhanced graph class
-  * or using more than one graph.
-  *
-  * \author Hilmar Wobker
-  */
-  class Graph
-  {
-
-  private:
-
-    /* *****************
-    * member variables *
-    *******************/
-    /// number of nodes in the graph, which are numbered from 0 to num_nodes-1
-    Index const _num_nodes;
-
-    /**
-    * \brief access information for the array #_neighbours
-    *
-    * The i-th entry of this array stores the total number of neighbours of the graph nodes 0, ..., i-1, where
-    * index[0] = 0. So, the i-th entry gives the position in the array #_neighbours, in which the subarray storing the
-    * node neighbours of node i starts. The degree (=number of neighbours) of node i is given by
-    * _index[i+1] - _index[i]. (Difference to the data structure described in the MPI-2.2 standard: There, the 0-th
-    * entry is omitted. However, adding this entry eases array access since the first node does not have to be handled
-    * in a special way.) For an example see #_neighbours.
-    *
-    * Dimension: [#_num_nodes+1]
-    */
-    Index* _index;
-
-    /**
-    * \brief node neighbours within the graph (i.e. edges of the graph), represented as a list of node numbers
-    *
-    * The neighbours of node i are stored in the subarray _neighbours[#_index[i]], ..., _neighbours[#_index[i+1]-1].
-    * The order of the neighbours within the subarrays is arbitrary.
-    *
-    * Example: domain consisting of 7 subdomains, each subdomain is a node in the graph. Graph edges represent
-    * neighbouring subdomains, including diagonal neighbours.
-    * \verbatim
-    *   -----------------
-    *   | 0 | 1 | 2 | 3 |
-    *   -----------------
-    *   | 4 | 5 |
-    *   ---------
-    *   | 6 |
-    *   -----
-    *   nodes     neighbours
-    *   0         4,5,1
-    *   1         0,4,5,2
-    *   2         1,5,3
-    *   3         2
-    *   4         0,1,5,6
-    *   5         0,1,2,4,6
-    *   6         4,5
-    * _num_nodes = 7
-    * _index      = [0,        3,           7,      10, 11,          15,              20,   22]
-    * _neighbours = [4, 5, 1,  0, 4, 5, 2,  1, 5, 3, 2,  0, 1, 5, 6,  0, 1, 2, 4,  6,  4, 5]
-    * \endverbatim
-    *
-    * Dimension: [total number of neighbours] = [number of edges] = [#_index[#_num_nodes]]
-    */
-    Index* _neighbours;
-
-
-  public:
-
-    /* *****************
-    * member variables *
-    *******************/
-
-    /* *************************
-    * constructor & destructor *
-    ***************************/
-    /// CTOR
-    Graph(
-      Index const num_nodes,
-      Index const* index,
-      Index const* neighbours)
-      : _num_nodes(num_nodes),
-        _index(nullptr),
-        _neighbours(nullptr)
-    {
-      CONTEXT("Graph::Graph()");
-      // copy index array
-      _index = new Index[num_nodes+1];
-      for(Index i(0) ; i < num_nodes+1 ; ++i)
-      {
-        _index[i] = index[i];
-      }
-
-      // copy neighbour array (its size is given by _index[_num_nodes])
-      _neighbours = new Index[_index[_num_nodes]];
-      for(Index i(0) ; i < _index[_num_nodes] ; ++i)
-      {
-        _neighbours[i] = neighbours[i];
-      }
-    }
-
-    /// DTOR
-    ~Graph()
-    {
-      CONTEXT("Graph::~Graph()");
-      delete [] _index;
-      _index = nullptr;
-      delete [] _neighbours;
-      _neighbours = nullptr;
-    }
-
-    /* ******************
-    * getters & setters *
-    ********************/
-    /**
-    * \brief getter for the number of nodes
-    *
-    * \return number of nodes #_num_nodes
-    */
-    inline Index num_nodes() const
-    {
-      CONTEXT("Graph::num_nodes()");
-      return _num_nodes;
-    }
-
-    /**
-    * \brief getter for the index array
-    *
-    * \return pointer to the index array #_index
-    */
-    inline Index* index() const
-    {
-      CONTEXT("Graph::index()");
-      return _index;
-    }
-
-    /**
-    * \brief getter for the neighbours array
-    *
-    * \return pointer to the edge array #_neighbours
-    */
-    inline Index* neighbours() const
-    {
-      CONTEXT("Graph::neighbours()");
-      return _neighbours;
-    }
-
-    /* *****************
-    * member functions *
-    *******************/
-    /// print the graph to the given stream
-    void print(std::ostream& stream) const
-    {
-      CONTEXT("Graph::print()");
-      stream << "number of nodes: " << _num_nodes << std::endl;
-      if (_num_nodes > 0)
-      {
-        stream << "node | degree | neighbours: " << std::endl;
-        for(Index i(0) ; i < _num_nodes ; ++i)
-        {
-          stream << i << " | " << _index[i+1] - _index[i];
-          if (_index[i+1] - _index[i] > 0)
-          {
-            stream << " | " << _neighbours[_index[i]];
-            for(Index j(_index[i]+1) ; j < _index[i+1] ; ++j)
-            {
-              stream << ", " << _neighbours[j];
-            }
-          }
-          stream << std::endl;
-        }
-      }
-    }
-
-    /// returns the graph print as string
-    inline String print() const
-    {
-      CONTEXT("Graph::print()");
-      std::ostringstream oss;
-      print(oss);
-      return oss.str();
-    }
-  }; // class Graph
-#else // OLD_GRAPH
-
   // forward declaration
   template<typename Adjactor_>
   class GraphRenderer;
@@ -262,7 +48,7 @@ namespace FEAST
        *
        * This value specifies that the Graph object should point directly to the input arrays passed to the
        * constructor. The Graph object will not delete the arrays upon destruction. It is the responsibility
-       * of the caller to ensure that the input arrays remain valid for the lifetime of the graph object.
+       * of the caller to ensure that the input arrays remain valid for the lifetime of the Graph object.
        */
       share,
 
@@ -278,8 +64,8 @@ namespace FEAST
       /**
        * \brief Copy input arrays
        *
-       * This value specifies that the Graph object should allocate its own copy of the input arrays passed to
-       * the constructor.
+       * This value specifies that the Graph object should allocate and maintain its own copy of the input
+       * arrays passed to the constructor.
        */
       copy
     };
@@ -293,21 +79,21 @@ namespace FEAST
     Index _num_indices_image;
 
     /**
-     * \brief Primal pointer array
+     * \brief Domain pointer array
      *
      * Dimension: #_num_nodes_domain+1
      */
     Index* _domain_ptr;
 
     /**
-     * \brief Primal end-pointer array
+     * \brief Domain end-pointer array
      *
      * Dimension: #_num_nodes_domain
      */
     Index* _domain_end;
 
     /**
-     * \brief Dual node index array
+     * \brief Image node index array
      *
      * Dimension: #_num_indices_image
      */
@@ -462,13 +248,6 @@ namespace FEAST
         if(_domain_end != nullptr)
           delete [] _domain_end;
       }
-      /*_num_nodes_domain = 0;
-      _num_nodes_image = 0;
-      _num_indices_image = 0;
-      _domain_ptr = nullptr;
-      _domain_end = nullptr;
-      _image_idx = nullptr;
-      _shared = false;*/
     }
 
     /**
@@ -716,17 +495,17 @@ namespace FEAST
     /* ********************************************************************* */
     /*  A D J U N C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
     /* ********************************************************************* */
-    /** \copydoc Adjactor::num_nodes_domain() */
-    inline Index num_nodes_domain() const
+    /** \copydoc Adjactor::get_num_nodes_domain() */
+    inline Index get_num_nodes_domain() const
     {
-      CONTEXT("Graph::num_nodes_domain()");
+      CONTEXT("Graph::get_num_nodes_domain()");
       return _num_nodes_domain;
     }
 
-    /** \copydoc Adjactor::num_nodes_image() */
-    inline Index num_nodes_image() const
+    /** \copydoc Adjactor::get_num_nodes_image() */
+    inline Index get_num_nodes_image() const
     {
-      CONTEXT("Graph::num_nodes_image()");
+      CONTEXT("Graph::get_num_nodes_image()");
       return _num_nodes_image;
     }
 
@@ -753,6 +532,8 @@ namespace FEAST
 
   /**
    * \brief Graph renderer implementation
+   *
+   * \author Peter Zajac
    */
   template<typename Adjactor_>
   class GraphRenderer
@@ -795,8 +576,8 @@ namespace FEAST
       typedef typename Adjactor_::ImageIterator AImIt;
 
       // get counts
-      Index num_nodes_domain = adj.num_nodes_domain();
-      Index num_nodes_image = adj.num_nodes_image();
+      Index num_nodes_domain = adj.get_num_nodes_domain();
+      Index num_nodes_image = adj.get_num_nodes_image();
       Index num_indices_image = 0;
 
       // allocate pointer array
@@ -839,8 +620,8 @@ namespace FEAST
       CONTEXT("GraphRenderer::_render_inj()");
 
       // get counts
-      Index num_nodes_domain = adj.num_nodes_domain();
-      Index num_nodes_image = adj.num_nodes_image();
+      Index num_nodes_domain = adj.get_num_nodes_domain();
+      Index num_nodes_image = adj.get_num_nodes_image();
       Index num_indices_image = 0;
 
       // allocate pointer array
@@ -880,8 +661,8 @@ namespace FEAST
       typedef typename Adjactor_::ImageIterator AImIt;
 
       // get counts
-      Index num_nodes_domain = adj.num_nodes_image();
-      Index num_nodes_image = adj.num_nodes_domain();
+      Index num_nodes_domain = adj.get_num_nodes_image();
+      Index num_nodes_image = adj.get_num_nodes_domain();
       Index num_indices_image = 0;
 
       // allocate and format pointer array
@@ -942,8 +723,8 @@ namespace FEAST
       CONTEXT("GraphRenderer::_render_trans_inj()");
 
       // get counts
-      Index num_nodes_domain = adj.num_nodes_image();
-      Index num_nodes_image = adj.num_nodes_domain();
+      Index num_nodes_domain = adj.get_num_nodes_image();
+      Index num_nodes_image = adj.get_num_nodes_domain();
       Index num_indices_image = 0;
 
       // allocate pointer array
@@ -1034,6 +815,8 @@ namespace FEAST
 
   /**
    * \brief Partial specialisation of GraphRenderer for CompositeAdjactor
+   *
+   * \author Peter Zajac
    */
   template<
     typename Adjactor1_,
@@ -1091,8 +874,8 @@ namespace FEAST
       typedef typename Adjactor2_::ImageIterator AImIt2;
 
       // get counts
-      Index num_nodes_domain = adj1.num_nodes_domain();
-      Index num_nodes_image = adj2.num_nodes_image();
+      Index num_nodes_domain = adj1.get_num_nodes_domain();
+      Index num_nodes_image = adj2.get_num_nodes_image();
       Index num_indices_image = 0;
 
       // allocate pointer array
@@ -1150,8 +933,8 @@ namespace FEAST
       typedef typename Adjactor2_::ImageIterator AImIt2;
 
       // get counts
-      Index num_nodes_domain = adj1.num_nodes_domain();
-      Index num_nodes_image = adj2.num_nodes_image();
+      Index num_nodes_domain = adj1.get_num_nodes_domain();
+      Index num_nodes_image = adj2.get_num_nodes_image();
       Index num_indices_image = 0;
 
       // allocate pointer array
@@ -1194,8 +977,8 @@ namespace FEAST
       typedef typename Adjactor2_::ImageIterator AImIt2;
 
       // get counts
-      Index num_nodes_domain = adj2.num_nodes_image();
-      Index num_nodes_image = adj1.num_nodes_domain();
+      Index num_nodes_domain = adj2.get_num_nodes_image();
+      Index num_nodes_image = adj1.get_num_nodes_domain();
       Index num_indices_image = 0;
 
       // allocate and format pointer array
@@ -1268,8 +1051,8 @@ namespace FEAST
       CONTEXT("GraphRenderer<CompositeAdjactor>::_render_trans_inj()");
 
       // get counts
-      Index num_nodes_domain = adj2.num_nodes_image();
-      Index num_nodes_image = adj1.num_nodes_domain();
+      Index num_nodes_domain = adj2.get_num_nodes_image();
+      Index num_nodes_image = adj1.get_num_nodes_domain();
       Index num_indices_image = 0;
 
       // allocate pointer array
@@ -1384,8 +1167,6 @@ namespace FEAST
       return render_composite(adj.get_adjactor1(), adj.get_adjactor2(), injectify, transpose);
     }
   }; // class GraphRenderer< CompositeAdjactor<...> >
-
-#endif // OLD_GRAPH
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_GRAPH_HPP

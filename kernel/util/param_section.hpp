@@ -3,11 +3,11 @@
 #define KERNEL_UTIL_PARAM_SECTION_HPP 1
 
 // includes, FEAST
-#include <kernel/util/string_map.hpp>
 #include <kernel/util/file_error.hpp>
 
 // includes, system
 #include <iostream>
+#include <map>
 
 namespace FEAST
 {
@@ -70,7 +70,7 @@ namespace FEAST
 
   public:
     /// entry-map type
-    typedef StringMap EntryMap;
+    typedef std::map<String, String, String::NoCaseLess> EntryMap;
     /// section-map type
     typedef std::map<String, ParamSection*, String::NoCaseLess> SectionMap;
 
