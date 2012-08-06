@@ -10,9 +10,8 @@ namespace FEAST
   namespace Foundation
   {
     /**
-     * \brief bla
+     * \brief AttributeBase wraps STL containers in a polimorphic way
      *
-     * bla
      *
      * \tparam StorageType_
      * storage type must be STL conformal
@@ -25,19 +24,27 @@ namespace FEAST
     {
       public:
         virtual Index size() = 0;
-
-      protected:
-        unsigned long _size;
     };
 
+    /**
+     * \brief Attribute wraps STL containers in a polimorphic way
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam StorageType_
+     * storage type must be STL conformal
+     *
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_, template<typename, typename> class StorageType_ = std::vector>
     class Attribute : public AttributeBase<StorageType_>
     {
       public:
-        Attribute(unsigned long s) :
+        Attribute() :
           _data(StorageType_<DataType_, std::allocator<DataType_> >())
         {
-          this->_size = s;
         }
 
         StorageType_<DataType_, std::allocator<DataType_> >& get_data()
@@ -47,13 +54,22 @@ namespace FEAST
 
         virtual Index size()
         {
-          return this->_size;
+          return _data.size();
         }
 
-      private:
+        void push_back(DataType_ d)
+        {
+          _data.push_back(d);
+        }
+
+        DataType_ at(Index i)
+        {
+          return _data.at(i);
+        }
+
+      protected:
         StorageType_<DataType_, std::allocator<DataType_> > _data;
     };
-
   }
 }
 #endif
