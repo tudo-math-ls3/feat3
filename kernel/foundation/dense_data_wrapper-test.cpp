@@ -10,41 +10,10 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-//Test container
-template<typename Arch_, typename DT_>
-class TestArrayClass
-{
-  public:
-    TestArrayClass(Index size) :
-      _size(size),
-      _data(new DT_[size])
-    {
-    }
-
-    ~TestArrayClass()
-    {
-      delete[] _data;
-    }
-
-    DT_ & operator[] (Index i)
-    {
-      return _data[i];
-    }
-
-    Index size()
-    {
-      return _size;
-    }
-
-  private:
-    Index _size;
-    DT_ * _data;
-
-};
 
 template<typename Tag_,
   typename DataType_,
-  template<typename, typename> class ContType_ = TestArrayClass>
+  template<typename, typename> class ContType_>
 class DenseDataWrapperTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -59,5 +28,4 @@ class DenseDataWrapperTest:
       Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> test;
     }
 };
-DenseDataWrapperTest<Archs::None, double> ddw_test_TAC("Array<double>");
 DenseDataWrapperTest<Archs::CPU, double, DenseVector> ddw_test_DV("Hornet::DenseVector<double>");

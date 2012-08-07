@@ -12,32 +12,6 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-//Test container
-template<typename Arch_, typename DT_>
-class TestArrayClass
-{
-  public:
-    TestArrayClass(Index size) :
-      _size(size),
-      _data(new DT_[size])
-    {
-    }
-
-    DT_ & operator[] (Index i)
-    {
-      return _data[i];
-    }
-
-    Index size()
-    {
-      return _size;
-    }
-
-  private:
-    Index _size;
-    DT_ * _data;
-
-};
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestAttr:

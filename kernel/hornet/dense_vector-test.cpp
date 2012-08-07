@@ -42,10 +42,10 @@ public:
   {
     DenseVector<Tag_, DT_> a(10);
     DenseVector<Tag_, DT_> b(10, 5.);
-    b[7] = DT_(42);
+    b(7, DT_(42));
     DenseVector<Tag_, DT_> c(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
-    TEST_CHECK_EQUAL(c[7], b[7]);
+    TEST_CHECK_EQUAL(c(7), b(7));
   }
 };
 DenseVectorTest<Archs::CPU, double> dense_vector_test_double;

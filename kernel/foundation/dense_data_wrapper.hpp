@@ -37,20 +37,20 @@ namespace FEAST
           void push_back(DT_ value)
           {
             //todo capacity check
-            _data[_num_non_zeros] = value;
+            _data(_num_non_zeros, value);
             ++_num_non_zeros;
           }
 
-          DT_ & at(unsigned long i)
+          const DT_ & at(unsigned long i)
           {
             //todo in non-zero range check
-            return _data[i];
+            return _data(i);
           }
 
-          DT_ & operator[](unsigned long i)
+          const DT_ & operator[](unsigned long i)
           {
             //todo in non-zero range check
-            return _data[i];
+            return _data(i);
           }
 
           DenseDataWrapper& operator=(DenseDataWrapper& rhs)

@@ -63,12 +63,13 @@ namespace FEAST
         _elements.at(row)[col] = val;
       }
 
-      const DT_ & operator()(Index row, Index col)
+      const DT_ & operator()(Index row, Index col) const
       {
-        if (_elements.at(row).count(col) == 1)
-          return _elements.at(row)[col];
-        else
+        typename std::map<unsigned long, DT_>::const_iterator it(_elements.at(row).find(col));
+        if (it == _elements.at(row).end())
           return _zero_element;
+        else
+          return it->second;
       }
 
       virtual const Index & size() const

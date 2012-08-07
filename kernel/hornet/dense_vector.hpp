@@ -46,9 +46,14 @@ namespace FEAST
       {
       }
 
-      DT_ & operator[](Index index)
+      const DT_ & operator()(Index index) const
       {
         return (this->_elements.at(0))[index];
+      }
+
+      void operator()(Index index, DT_ value)
+      {
+        (this->_elements.at(0))[index] = value;
       }
 
       Index size()
