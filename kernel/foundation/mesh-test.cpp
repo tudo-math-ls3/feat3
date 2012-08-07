@@ -39,12 +39,12 @@ class TestArrayClass
 };
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
-class MeshTest:
+class MeshTestAttr:
   public TaggedTest<Tag_, IndexType_>
 {
   public:
-    MeshTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshTest<" + tag + ">")
+    MeshTestAttr(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("MeshTestAttr<" + tag + ">")
     {
     }
 
@@ -78,7 +78,8 @@ class MeshTest:
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
 
       //configure attribute
-      unsigned my_attribute_index(Foundation::MeshAttributeRegistration<Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> >, double>::execute(m3, Foundation::pl_vertex));
+      Foundation::Attribute<double, std::vector> attr;
+      unsigned my_attribute_i(Foundation::MeshAttributeRegistration<Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > >::execute(m3, Foundation::pl_vertex, attr));
 
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);
@@ -87,12 +88,12 @@ class MeshTest:
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
-      m3.add_attribute_value(my_attribute_index, double(0));
-      m3.add_attribute_value(my_attribute_index, double(0.5));
-      m3.add_attribute_value(my_attribute_index, double(1));
-      m3.add_attribute_value(my_attribute_index, double(0));
-      m3.add_attribute_value(my_attribute_index, double(0.5));
-      m3.add_attribute_value(my_attribute_index, double(1));
+      m3.add_attribute_value(my_attribute_i, double(0));
+      m3.add_attribute_value(my_attribute_i, double(0.5));
+      m3.add_attribute_value(my_attribute_i, double(1));
+      m3.add_attribute_value(my_attribute_i, double(0));
+      m3.add_attribute_value(my_attribute_i, double(0.5));
+      m3.add_attribute_value(my_attribute_i, double(1));
 
       //add edges
       m3.add_polytope(Foundation::pl_edge);
@@ -412,10 +413,10 @@ class MeshTest:
 
     }
 };
-MeshTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");
-MeshTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > topology_test_cpu_d_v("std::deque, std::vector");
-MeshTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
-MeshTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
+MeshTestAttr<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_cpu_v_v("std::vector, std::vector");
+MeshTestAttr<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > mesh_test_cpu_d_v("std::deque, std::vector");
+MeshTestAttr<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_cpu_v_d("std::vector, std::deque");
+MeshTestAttr<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > mesh_test_cpu_d_d("std::deque, std::deque");
 
-MeshTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::None, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, TAC");
-//MeshTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //topology* delete from DTOR fails wih ouble free due to heap allocation
+MeshTestAttr<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::None, unsigned long, TestArrayClass> > mesh_test_cpu_v_ddw("std::vector, TAC");
+//MeshTestAttr<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::CPU, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //topology* delete from DTOR fails wih ouble free due to heap allocation
