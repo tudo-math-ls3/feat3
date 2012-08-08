@@ -48,6 +48,7 @@ void MemoryPool<Archs::CPU>::release_memory(void * address)
     if(it->second.counter == 1)
     {
       ::free(address);
+      _pool.erase(it);
     }
     else
     {

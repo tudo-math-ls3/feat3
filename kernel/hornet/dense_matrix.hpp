@@ -64,6 +64,43 @@ namespace FEAST
         _pelements = this->_elements.at(0);
       }
 
+      DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch_, DT_> & other)
+      {
+        this->_size = other.size();
+        this->_rows = other.rows();
+        this->_columns = other.columns();
+
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool<Arch_>::instance()->release_memory(this->_indices.at(i));
+
+        this->_elements.clear();
+        this->_indices.clear();
+
+        std::vector<DT_ *> new_elements = other.get_elements();
+        std::vector<unsigned long *> new_indices = other.get_indices();
+
+        this->_elements.assign(new_elements.begin(), new_elements.end());
+        this->_indices.assign(new_indices.begin(), new_indices.end());
+
+        _pelements = this->_elements.at(0);
+
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+
+        return *this;
+      }
+
+      template <typename Arch2_, typename DT2_>
+      DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
+      {
+        //TODO copy memory from arch2 to arch
+        return *this;
+      }
+
       void operator()(Index row, Index col, DT_ val)
       {
         _pelements[row * this->_rows + col] = val;
