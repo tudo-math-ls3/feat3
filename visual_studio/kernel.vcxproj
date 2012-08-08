@@ -494,11 +494,14 @@
   <ItemGroup>
     <ClInclude Include="..\kernel\archs.hpp" />
     <ClInclude Include="..\kernel\base_header.hpp" />
+    <ClInclude Include="..\kernel\foundation\attribute.hpp" />
+    <ClInclude Include="..\kernel\foundation\attribute_error.hpp" />
     <ClInclude Include="..\kernel\foundation\communication.hpp" />
     <ClInclude Include="..\kernel\foundation\communication_error.hpp" />
     <ClInclude Include="..\kernel\foundation\dense_data_wrapper.hpp" />
     <ClInclude Include="..\kernel\foundation\halo.hpp" />
     <ClInclude Include="..\kernel\foundation\halo_data.hpp" />
+    <ClInclude Include="..\kernel\foundation\mapped_topology.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_data.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
@@ -575,6 +578,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\archs.cpp" />
+    <ClCompile Include="..\kernel\foundation\attribute_error.cpp" />
     <ClCompile Include="..\kernel\foundation\communication_error.cpp" />
     <ClCompile Include="..\kernel\foundation\mesh_error.cpp" />
     <ClCompile Include="..\kernel\hornet\memory_pool.cpp" />

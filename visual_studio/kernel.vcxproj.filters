@@ -288,6 +288,15 @@
     <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp">
       <Filter>Header Files\geometry\test_aux</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\foundation\attribute.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\attribute_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\mapped_topology.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
@@ -310,6 +319,9 @@
     </ClCompile>
     <ClCompile Include="..\kernel\archs.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\attribute_error.cpp">
+      <Filter>Source Files\foundation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

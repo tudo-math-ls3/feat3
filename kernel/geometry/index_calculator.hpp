@@ -261,12 +261,12 @@ namespace FEAST
      */
     template<
       typename Shape_,
-      int face_dim>
+      int face_dim_>
     class IndexCalculator
     {
     public:
       // cell-type (e.g. edge), Shape_ = shape-type (e.g quad)
-      typedef typename Shape::FaceTraits<Shape_, face_dim>::ShapeType CellType;
+      typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType CellType;
       typedef IndexTree<CellType> IndexTreeType;
 
     public:
@@ -285,7 +285,7 @@ namespace FEAST
 
         // index vector reference
         typedef typename IndexSetIn_::ConstIndexVectorReference ConstIndexVectorRefIn;
-        typedef Congruency::LocalIndexMapping<Shape_, face_dim, 0> Lim;
+        typedef Congruency::LocalIndexMapping<Shape_, face_dim_, 0> Lim;
 
         // fetch number of shapes
         const Index num_entities = index_set_in.get_num_entities();

@@ -424,12 +424,13 @@
     <ClInclude Include="..\test_system\test_system.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\kernel\foundation\attribute-test.cpp" />
     <ClCompile Include="..\kernel\foundation\communication-test.cpp" />
     <ClCompile Include="..\kernel\foundation\dense_data_wrapper-test.cpp" />
     <ClCompile Include="..\kernel\foundation\halo-test.cpp" />
     <ClCompile Include="..\kernel\foundation\halo_data-test.cpp" />
+    <ClCompile Include="..\kernel\foundation\mapped_topology-test.cpp" />
     <ClCompile Include="..\kernel\foundation\mesh-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\mesh_data-test.cpp" />
     <ClCompile Include="..\kernel\foundation\topology-test.cpp" />
     <ClCompile Include="..\kernel\geometry\index_calculator-test.cpp" />
     <ClCompile Include="..\kernel\geometry\shape-test.cpp" />
