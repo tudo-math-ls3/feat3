@@ -520,11 +520,13 @@
     <ClInclude Include="..\kernel\geometry\conformal_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\congruency\base.hpp" />
     <ClInclude Include="..\kernel\geometry\congruency\hypercube.hpp" />
+    <ClInclude Include="..\kernel\geometry\congruency\index_representative.hpp" />
+    <ClInclude Include="..\kernel\geometry\congruency\local_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\congruency\simplex.hpp" />
     <ClInclude Include="..\kernel\geometry\congruency\sub_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\congruency\target_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\export_vtk.hpp" />
-    <ClInclude Include="..\kernel\geometry\local_index_mapping.hpp" />
+    <ClInclude Include="..\kernel\geometry\index_calculator.hpp" />
     <ClInclude Include="..\kernel\geometry\shape.hpp" />
     <ClInclude Include="..\kernel\geometry\standard_refinery.hpp" />
     <ClInclude Include="..\kernel\geometry\std_ref_traits.hpp" />
@@ -532,6 +534,7 @@
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\target_set.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp" />
+    <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\standard_tetra.hpp" />
     <ClInclude Include="..\kernel\geometry\test_aux\standard_tria.hpp" />

@@ -189,9 +189,6 @@
     <ClInclude Include="..\kernel\geometry\export_vtk.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\local_index_mapping.hpp">
-      <Filter>Header Files\geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\geometry\standard_refinery.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
@@ -278,6 +275,18 @@
     </ClInclude>
     <ClInclude Include="..\kernel\util\abort.hpp">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\congruency\local_index_mapping.hpp">
+      <Filter>Header Files\geometry\congruency</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\congruency\index_representative.hpp">
+      <Filter>Header Files\geometry\congruency</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\index_calculator.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp">
+      <Filter>Header Files\geometry\test_aux</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

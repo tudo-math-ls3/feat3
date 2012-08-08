@@ -50,11 +50,11 @@ namespace FEAST
         // orientation: v_0-v_1-v_2-v_3-v_4-v_5-v_6-v_7
         // quad orientation:
         // q_0 : v_0-v_1-v_2-v_3
-        // q_1 : v_5-v_6-v_7-v_8
-        // q_2 : v_1-v_2-v_5-v_6
-        // q_3 : v_3-v_4-v_7-v_8
-        // q_4 : v_1-v_3-v_5-v_7
-        // q_5 : v_2-v_4-v_6-v_8
+        // q_1 : v_4-v_5-v_6-v_7
+        // q_2 : v_0-v_1-v_4-v_5
+        // q_3 : v_2-v_3-v_6-v_7
+        // q_4 : v_0-v_2-v_4-v_6
+        // q_5 : v_1-v_3-v_5-v_7
 
         // set up vertex coordinates array
         static const Real vtx0[3*8] =

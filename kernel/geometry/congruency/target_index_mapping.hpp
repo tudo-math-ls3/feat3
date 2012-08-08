@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_CONGRUENCY_TARGET_INDEX_MAPPING_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/local_index_mapping.hpp>
+#include <kernel/geometry/congruency/local_index_mapping.hpp>
 #include <kernel/geometry/congruency/hypercube.hpp>
 #include <kernel/geometry/congruency/simplex.hpp>
 

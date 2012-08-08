@@ -36,7 +36,7 @@ public:
   virtual void run() const
   {
     tetra_std_test();
-    tetra_block_test();
+    big_tetra_mesh_test();
   }
 
   void tetra_std_test() const
@@ -74,7 +74,7 @@ public:
     }
   }
 
-  void tetra_block_test() const
+  void big_tetra_mesh_test() const
   {
 
     TetRootMesh* tetrahedron_mesh_coarse;
@@ -84,10 +84,10 @@ public:
     try
     {
       // create a 3D tetrahedron element mesh
-      tetrahedron_mesh_coarse = TestAux::create_block_tetra_mesh_3d();
+      tetrahedron_mesh_coarse = TestAux::create_big_tetra_mesh_3d();
 
       // create tria submesh
-      SubMesh* tria_submesh_coarse = TestAux::create_block_tria_submesh_3d();
+      SubMesh* tria_submesh_coarse = TestAux::create_tria_submesh_3d();
 
       // create refineries
       tetrahedron_mesh_refinery = new TetRootMeshRefinery(*tetrahedron_mesh_coarse);
@@ -98,8 +98,8 @@ public:
       SubMesh* tria_submesh_fine = tria_submesh_refinery->refine(*tetrahedron_mesh_coarse);
 
       // validate refined meshes
-      TestAux::validate_refined_block_tetra_mesh_3d(*tetrahedron_mesh_fine);
-      TestAux::validate_refined_block_tria_submesh_3d(*tria_submesh_fine);
+      TestAux::validate_refined_big_tetra_mesh_3d(*tetrahedron_mesh_fine);
+      TestAux::validate_refined_tria_submesh_3d(*tria_submesh_fine);
 
       // clean up
       delete tetrahedron_mesh_fine;

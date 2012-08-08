@@ -103,5 +103,8 @@
     <ClCompile Include="..\kernel\hornet\sparse_matrix_coo-test.cpp">
       <Filter>Source Files %28kernel%29\hornet</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\geometry\index_calculator-test.cpp">
+      <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

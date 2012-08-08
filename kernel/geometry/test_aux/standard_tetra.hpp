@@ -17,7 +17,7 @@ namespace FEAST
       typedef ConformalMesh< ConformalMeshPolicy< Shape::Tetrahedron > > TetraMesh;
       typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Tetrahedron > > TetraSubMesh;
 
-      TetraMesh* create_tetra_mesh_3d(int orientation)
+      inline TetraMesh* create_tetra_mesh_3d(int orientation)
       {
 
         Index num_entities[] =
@@ -316,7 +316,7 @@ namespace FEAST
         return mesh;
       } // create_tetra_mesh_3d
 
-      void validate_refined_tetra_mesh_3d(const TetraMesh& mesh, int orientation)
+      inline void validate_refined_tetra_mesh_3d(const TetraMesh& mesh, int orientation)
       {
 
         // validate sizes
@@ -1069,7 +1069,7 @@ namespace FEAST
         } //switch
       } // validate_refined_tetra_mesh_3d
 
-      TetraMesh* create_block_tetra_mesh_3d()
+      inline TetraMesh* create_big_tetra_mesh_3d()
       {
 
         Index num_entities[] =
@@ -1170,9 +1170,9 @@ namespace FEAST
 
         // okay
         return mesh;
-      } // create_block_tetra_mesh_3d
+      } // create_big_tetra_mesh_3d
 
-      void validate_refined_block_tetra_mesh_3d(const TetraMesh& mesh)
+      inline void validate_refined_big_tetra_mesh_3d(const TetraMesh& mesh)
       {
 
         // validate sizes
@@ -1663,9 +1663,290 @@ namespace FEAST
         if(!comp_idx(mesh.get_index_set<3,2>(), t_s0))
           throw String("Triangle-At-Tetrahedron index set refinement failure");
 
-      } // validate_refined_block_tetra_mesh_3d
+      } // validate_refined_big_tetra_mesh_3d
 
-      TetraSubMesh* create_block_tria_submesh_3d()
+      inline TetraMesh* create_really_big_tetra_mesh_3d()
+      {
+
+        Index num_entities[] =
+        {
+          18, // vertices
+          65, // edges
+          84, // triangles
+          36  // tetrahedron
+        };
+
+        // create mesh
+        TetraMesh* mesh = new TetraMesh(num_entities);
+
+        // set up vertex coordinates array
+        static const Real vtx0[3*18] =
+        {
+          -2.0, -4.0,  0.0,
+          -2.0,  4.0,  0.0,
+           4.0,  0.0,  0.0,
+           0.0,  0.0,  42.0,
+           0.0,  0.0,  0.0,
+
+           0.0,  0.0,  21.0,
+          -1.0, -2.0,  0.0,
+          -1.0,  2.0,  0.0,
+           2.0,  0.0,  0.0,
+          -1.0, -2.0,  21.0,
+          -1.0,  2.0,  21.0,
+           2.0,  0.0,  21.0,
+          -2.0,  0.0,  0.0,
+           1.0,  2.0,  0.0,
+           1.0, -2.0,  0.0,
+
+          -1.0,  0.0,  10.5,
+           0.5,  1.0,  10.5,
+           0.5, -1.0,  10.5
+        };
+
+        // set up vertices-at-edge array
+        static const Index v_e0[65*2] =
+        {
+          //edges
+          3, 5, //0
+          5, 4,
+          0, 6,
+          6, 4,
+          1, 7,
+          7, 4, //5
+          2, 8,
+          8, 4,
+          3, 9,
+          9, 0,
+          3, 10,//10
+          10, 1,
+          3, 11,
+          11, 2,
+          0, 12,
+          12, 1,//15
+          1, 13,
+          13, 2,
+          2, 14,
+          14, 0,
+
+          //triangles
+          7, 10,//20
+          5, 7,
+          10, 5,
+
+          13, 10,
+          11, 13,
+          10, 11,//25
+
+          12, 10,
+          9, 12,
+          10, 9,
+
+          9, 11,
+          14, 9,//30
+          11, 14,
+
+          13, 7,
+          8, 13,
+          7, 8,
+
+          14, 8,//35
+          6, 14,
+          8, 6,
+
+          12, 7,
+          6, 12,
+          7, 6,//40
+
+          11, 8,
+          5, 11,
+          8, 5,
+
+          6, 9,
+          5, 6,//45
+          9, 5,
+
+          //tetrahedron
+          12, 15,
+          9, 15,
+          6, 15,
+          10, 15,//50
+          7, 15,
+          5, 15,
+
+          11, 16,
+          8, 16,
+          13, 16,//55
+          5, 16,
+          10, 16,
+          7, 16,
+
+          11, 17,
+          14, 17,//60
+          8, 17,
+          9, 17,
+          5, 17,
+          6, 17 //64
+        };
+
+        // set up vertices-at-triangle array
+        static const Index v_t0[84*3] =
+        {
+          //triangles
+          1, 7, 10, //0
+          7, 4, 5,
+          10, 5, 3,
+          5, 10, 7,
+
+          1, 13, 10,
+          13, 2, 11, //5
+          10, 11, 3,
+          11, 10, 13,
+
+          1, 12, 10,
+          12, 0, 9,
+          10, 9, 3,//10
+          9, 10, 12,
+
+          3, 9, 11,
+          9, 0, 14,
+          11, 14, 2,
+          14, 11, 9,//15
+
+          1, 13, 7,
+          13, 2, 8,
+          7, 8, 4,
+          8, 7, 13,
+
+          2, 14, 8,//20
+          14, 0, 6,
+          8, 6, 4,
+          6, 8, 14,
+
+          1, 12, 7,
+          12, 0, 6,//25
+          7, 6, 4,
+          6, 7, 12,
+
+          2, 11, 8,
+          11, 3, 5,
+          8, 5, 4,//30
+          5, 8, 11,
+
+          0, 6, 9,
+          6, 4, 5,
+          9, 5, 3,
+          5, 9, 6,//35
+
+          //tetrahedron
+          12, 9, 6,
+          12, 10, 7,
+          9, 10, 5,
+          6, 7, 5,
+
+          12, 9, 15,//40
+          12, 6, 15,
+          12, 10, 15,
+          12, 7, 15,
+          9, 6, 15,
+          9, 10, 15,//45
+          9, 5, 15,
+          6, 7, 15,
+          6, 5, 15,
+          10, 7, 15,
+          10, 5, 15,//50
+          7, 5, 15,
+
+          11, 8, 13,
+          11, 5, 10,
+          8, 5, 7,
+          13, 10, 7,//55
+
+          11, 8, 16,
+          11, 13, 16,
+          11, 5, 16,
+          11, 10, 16,
+          8, 13, 16,//60
+          8, 5, 16,
+          8, 7, 16,
+          13, 10, 16,
+          13, 7, 16,
+          5, 10, 16,//65
+          5, 7, 16,
+          10, 7, 16,
+
+          11, 14, 8,
+          11, 9, 5,
+          14, 9, 6,//70
+          8, 5, 6,
+
+          11, 14, 17,
+          11, 8, 17,
+          11, 9, 17,
+          11, 5, 17,//75
+          14, 8, 17,
+          14, 9, 17,
+          14, 6, 17,
+          8, 5, 17,
+          8, 6, 17,//80
+          9, 5, 17,
+          9, 6, 17,
+          5, 6, 17
+        };
+
+        // set up vertices-at-tetrahedron array
+        static const Index v_s0[36*4] =
+        {
+          12, 9, 6, 0,//0
+          12, 9, 6, 15,
+          12, 10, 7, 1,
+          12, 10, 7, 15,
+          9, 10, 5, 3,
+          9, 10, 5, 15,//5
+          6, 7, 5, 4,
+          6, 7, 5, 15,
+          5, 7, 10, 15,
+          5, 6, 9, 15,
+          7, 6, 12, 15,//10
+          10, 9, 12, 15,
+
+          11, 8, 13, 2,
+          11, 8, 13, 16,
+          11, 5, 10, 3,
+          11, 5, 10, 16,//15
+          8, 5, 7, 4,
+          8, 5, 7, 16,
+          13, 10, 7, 1,
+          13, 10, 7, 16,
+          7, 10, 5, 16,//20
+          7, 13, 8, 16,
+          10, 13, 11, 16,
+          5, 8, 11, 16,
+
+          11, 14, 8, 2,
+          11, 14, 8, 17,//25
+          11, 9, 5, 3,
+          11, 9, 5, 17,
+          14, 9, 6, 0,
+          14, 9, 6, 17,
+          8, 5, 6, 4,//30
+          8, 5, 6, 17,
+          6, 5, 9, 17,
+          6, 8, 14, 17,
+          5, 8, 11, 17,
+          9, 14, 11, 17//35
+        };
+
+        copy_vtx(mesh->get_vertex_set(), vtx0);
+        copy_idx(mesh->get_index_set<1,0>(), v_e0);
+        copy_idx(mesh->get_index_set<2,0>(), v_t0);
+        copy_idx(mesh->get_index_set<3,0>(), v_s0);
+
+        // okay
+        return mesh;
+      } // create_really_big_tetra_mesh_3d
+
+      inline TetraSubMesh* create_tria_submesh_3d()
       {
 
         Index num_entities[] =
@@ -1741,9 +2022,9 @@ namespace FEAST
         copy_trg(mesh->get_target_set<2>(), tti);
         // okay
         return mesh;
-      } // create_tetra_tria_submesh_3d()
+      } // create_tria_submesh_3d()
 
-      void validate_refined_block_tria_submesh_3d(const TetraSubMesh& mesh)
+      inline void validate_refined_tria_submesh_3d(const TetraSubMesh& mesh)
       {
 
         // validate sizes
@@ -1864,7 +2145,7 @@ namespace FEAST
         };
         if(!comp_trg(mesh.get_target_set<2>(), tti))
           throw String("Triangle-Target-Indices refinement failure");
-      } //validate_refined_block_tria_submesh_3d
+      } //validate_refined_tria_submesh_3d
 
     } // namespace TestAux
     /// \endcond
