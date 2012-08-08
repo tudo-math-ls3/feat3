@@ -38,9 +38,6 @@ namespace FEAST
         ///type exports:
         typedef IndexType_ index_type_;
         typedef MeshType_ mesh_type_;
-        typedef typename MeshType_::attr_type_1_ attr_type_1_;
-        typedef typename MeshType_::attr_type_2_ attr_type_2_;
-        typedef typename MeshType_::attr_type_3_ attr_type_3_;
 
         ///CTOR
         Halo(MeshType_ & mesh, IndexType_ other) :

@@ -60,7 +60,8 @@ class HaloDataTest:
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(0);
 
       //configure attribute
-      unsigned my_attribute_index(Foundation::MeshAttributeRegistration<Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> >, double>::execute(m3, Foundation::pl_vertex));
+      Foundation::Attribute<double, std::vector> attr;
+      unsigned my_attribute_i(Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex));
 
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);
@@ -69,12 +70,12 @@ class HaloDataTest:
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
-      m3.add_attribute_value(my_attribute_index, double(0));
-      m3.add_attribute_value(my_attribute_index, double(0.5));
-      m3.add_attribute_value(my_attribute_index, double(1));
-      m3.add_attribute_value(my_attribute_index, double(0));
-      m3.add_attribute_value(my_attribute_index, double(0.5));
-      m3.add_attribute_value(my_attribute_index, double(1));
+      attr.push_back(double(0));
+      attr.push_back(double(0.5));
+      attr.push_back(double(1));
+      attr.push_back(double(0));
+      attr.push_back(double(0.5));
+      attr.push_back(double(1));
 
       //add edges
       m3.add_polytope(Foundation::pl_edge);

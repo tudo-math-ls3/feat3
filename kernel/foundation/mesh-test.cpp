@@ -79,7 +79,7 @@ class MeshTestAttr:
 
       //configure attribute
       Foundation::Attribute<double, std::vector> attr;
-      unsigned my_attribute_i(Foundation::MeshAttributeRegistration<Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > >::execute(m3, Foundation::pl_vertex, attr));
+      unsigned my_attribute_i(Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex));
 
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);
@@ -88,12 +88,12 @@ class MeshTestAttr:
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
-      m3.add_attribute_value(my_attribute_i, double(0));
-      m3.add_attribute_value(my_attribute_i, double(0.5));
-      m3.add_attribute_value(my_attribute_i, double(1));
-      m3.add_attribute_value(my_attribute_i, double(0));
-      m3.add_attribute_value(my_attribute_i, double(0.5));
-      m3.add_attribute_value(my_attribute_i, double(1));
+      attr.push_back(double(0));
+      attr.push_back(double(0.5));
+      attr.push_back(double(1));
+      attr.push_back(double(0));
+      attr.push_back(double(0.5));
+      attr.push_back(double(1));
 
       //add edges
       m3.add_polytope(Foundation::pl_edge);

@@ -11,7 +11,7 @@ ADD_LIBRARY(kernel-foundation STATIC mesh_error.cpp communication_error.cpp attr
 TARGET_LINK_LIBRARIES (kernel-foundation kernel-util)
 
 #list of kernel tests
-SET (test_list topology-test dense_data_wrapper-test mesh-test mesh_data-test halo-test halo_data-test communication-test mapped_topology-test attribute-test)
+SET (test_list topology-test dense_data_wrapper-test mesh-test halo-test halo_data-test communication-test mapped_topology-test attribute-test)
 
 #create all tests
 FOREACH (test ${test_list} )
