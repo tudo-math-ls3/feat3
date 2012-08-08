@@ -61,7 +61,7 @@ class HaloDataTest:
 
       //configure attribute
       Foundation::Attribute<double, std::vector> attr;
-      unsigned my_attribute_i(Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex));
+      Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
 
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);

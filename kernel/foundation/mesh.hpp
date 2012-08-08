@@ -91,6 +91,7 @@ namespace FEAST
     template<
       RequiredNumTopologies i_ = rnt_2D,
       typename TopologyType_ = Topology<>,
+      template <typename, typename> class OuterStorageType_ = std::vector,
       template <typename, typename> class AttributeStorageType_ = std::vector,
       template <typename, typename> class OuterAttributeStorageType_ = std::vector
       >
@@ -114,10 +115,16 @@ namespace FEAST
           _mp_rank(mp_rank),
           _num_inter_topologies(i_),
           _num_levels((unsigned)(i_/2u) + 1u),
+          _topologies(OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >()),
           _attrs(attrbase),
           _num_attributes(0),
           _attribute_polytopelevel_relations(typename TopologyType_::storage_type_())
       {
+        for(Index i(0) ; i < i_ ; ++i)
+        {
+          TopologyType_ t;
+          _topologies.push_back(t);
+        }
       }
 
         ///Copy CTOR
@@ -132,7 +139,7 @@ namespace FEAST
       {
         for(Index i(0) ; i < _num_inter_topologies ; ++i)
         {
-          _topologies[i] = other._topologies[i];
+          _topologies.push_back(other._topologies.at(i));
         }
 
         _attribute_polytopelevel_relations = other._attribute_polytopelevel_relations;
@@ -151,10 +158,14 @@ namespace FEAST
             throw MeshInternalIndexOutOfBounds(level, _num_levels - 1);
 #endif
           if(_upward_index(level) != -1)
-            _topologies[_upward_index(level)].push_back();
+          {
+            _topologies.at(_upward_index(level)).push_back();
+          }
 
           if(_downward_index(level) != -1)
-            _topologies[_downward_index(level)].push_back();
+          {
+            _topologies.at(_downward_index(level)).push_back();
+          }
         }
 
         ///Add an adjacency
@@ -185,10 +196,10 @@ namespace FEAST
               if(_upward_index(from_level) == -1)
                 throw MeshError("Invalid impairment of levels.");
 #endif
-              _topologies[_upward_index(from_level)].at(polytope_index).push_back(value);
+              _topologies.at(_upward_index(from_level)).at(polytope_index).push_back(value);
 
               if(_downward_index(to_level) != -1)
-                _topologies[_downward_index(to_level)].at(value).push_back(polytope_index);
+                _topologies.at(_downward_index(to_level)).at(value).push_back(polytope_index);
             }
             else if(from_level > to_level)
             {
@@ -196,10 +207,10 @@ namespace FEAST
               if(_downward_index(from_level) == -1)
                 throw MeshError("Invalid impairment of levels.");
 #endif
-              _topologies[_downward_index(from_level)].at(polytope_index).push_back(value);
+              _topologies.at(_downward_index(from_level)).at(polytope_index).push_back(value);
 
               if(_upward_index(to_level) != -1)
-                _topologies[_upward_index(to_level)].at(value).push_back(polytope_index);
+                _topologies.at(_upward_index(to_level)).at(value).push_back(polytope_index);
             }
           }
 
@@ -228,9 +239,9 @@ namespace FEAST
             if(level_diff == 0u) //we can directly give the neighbours
             {
               if(sweepdir == -1) //sweep down
-                return _topologies[_downward_index(from_level)].at(i);
+                return _topologies.at(_downward_index(from_level)).at(i);
               else if(sweepdir == 1) //sweep up
-                return _topologies[_upward_index(from_level)].at(i);
+                return _topologies.at(_upward_index(from_level)).at(i);
 #ifdef FOUNDATION_DEBUG
               else
                 throw MeshError("Sweep direction / sweep length mismatch.");
@@ -248,8 +259,8 @@ namespace FEAST
                 //fill current datastructure:
                 if(j == 0)
                 {
-                  search_data.at(0) = current_sweepdir == -1 ? _topologies[_downward_index(current_level)].at(i)
-                    : _topologies[_upward_index(current_level)].at(i);
+                  search_data.at(0) = current_sweepdir == -1 ? _topologies.at(_downward_index(current_level)).at(i)
+                    : _topologies.at(_upward_index(current_level)).at(i);
 
                   current_level = current_sweepdir == 1 ? current_level + 1
                     : (current_sweepdir == 0 ? current_level + 1
@@ -266,16 +277,16 @@ namespace FEAST
                   for(IndexType_ k(0) ; k < (IndexType_)search_data.at(j - 1).size(); ++k)
                   {
                     IndexType_ l_upper(
-                        current_sweepdir == -1 ? (IndexType_)_topologies[_downward_index(current_level)].at(search_data.at(j - 1).at(k)).size()
-                        : (IndexType_)_topologies[_upward_index(current_level)].at(search_data.at(j - 1).at(k)).size()
+                        current_sweepdir == -1 ? (IndexType_)_topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
+                        : (IndexType_)_topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
                         );
 
                     for(IndexType_ l(0) ; l < l_upper ; ++l)
                     {
                       //TODO optimise search
                       IndexType_ to_insert(
-                          current_sweepdir == -1 ? _topologies[_downward_index(current_level)].at(search_data.at(j - 1).at(k)).at(l)
-                          : _topologies[_upward_index(current_level)].at(search_data.at(j - 1).at(k)).at(l)
+                          current_sweepdir == -1 ? _topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
+                          : _topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
                           );
 
                       bool insert(true);
@@ -352,7 +363,7 @@ namespace FEAST
               //fill current datastructure:
               if(j == 0)
               {
-                search_data.at(0) = _topologies[_downward_index(current_level)].at(i);
+                search_data.at(0) = _topologies.at(_downward_index(current_level)).at(i);
 
                 --current_level;
 
@@ -364,16 +375,16 @@ namespace FEAST
                 for(IndexType_ k(0) ; k < (IndexType_)search_data.at(j - 1).size(); ++k)
                 {
                   IndexType_ l_upper(
-                      current_sweepdir == -1 ? (IndexType_)_topologies[_downward_index(current_level)].at(search_data.at(j - 1).at(k)).size()
-                      : (IndexType_)_topologies[_upward_index(current_level)].at(search_data.at(j - 1).at(k)).size()
+                      current_sweepdir == -1 ? (IndexType_)_topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
+                      : (IndexType_)_topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
                       );
 
                   for(IndexType_ l(0) ; l < l_upper ; ++l)
                   {
                     //TODO optimise search
                     IndexType_ to_insert(
-                        current_sweepdir == -1 ? _topologies[_downward_index(current_level)].at(search_data.at(j - 1).at(k)).at(l)
-                        : _topologies[_upward_index(current_level)].at(search_data.at(j - 1).at(k)).at(l)
+                        current_sweepdir == -1 ? _topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
+                        : _topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
                         );
 
                     bool insert(true);
@@ -456,7 +467,7 @@ namespace FEAST
         const typename TopologyType_::index_type_ _mp_rank;
         const unsigned _num_inter_topologies;
         const unsigned _num_levels;
-        TopologyType_ _topologies[i_];
+        OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
 
         attr_base_type_* _attrs;
 

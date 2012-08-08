@@ -69,7 +69,7 @@ namespace FEAST
          * \param[in] s
          * The polytope list to be inserted
          */
-        void push_back(const StorageType_ s)
+        void push_back(const StorageType_& s)
         {
           _topology.push_back(s);
           ++_num_polytopes;

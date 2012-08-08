@@ -1,3 +1,4 @@
+#define FOUNDATION_DEBUG 1
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
@@ -79,7 +80,7 @@ class MeshTestAttr:
 
       //configure attribute
       Foundation::Attribute<double, std::vector> attr;
-      unsigned my_attribute_i(Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex));
+      Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
 
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);
@@ -361,6 +362,8 @@ class MeshTestAttr:
       TEST_CHECK_EQUAL(test_39.at(1), 6ul);
 
       //testing vertex-face access
+      try
+      {
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_40(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_face, 0));
       TEST_CHECK_EQUAL(test_40.size(), 1ul);
       TEST_CHECK_EQUAL(test_40.at(0), 0ul);
@@ -386,8 +389,15 @@ class MeshTestAttr:
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_45(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_face, 5));
       TEST_CHECK_EQUAL(test_45.size(), 1ul);
       TEST_CHECK_EQUAL(test_45.at(0), 1ul);
+      }
+      catch(std::exception e)
+      {
+        std::cout << "testing v f" << std::endl;
+      }
 
       //testing primary comm neighbours
+      try
+      {
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_46(m3.get_primary_comm_neighbours(0));
       TEST_CHECK_EQUAL(test_46.size(), 1ul);
       TEST_CHECK_EQUAL(test_46.at(0), 1ul);
@@ -395,21 +405,40 @@ class MeshTestAttr:
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_47(m3.get_primary_comm_neighbours(1));
       TEST_CHECK_EQUAL(test_47.size(), 1ul);
       TEST_CHECK_EQUAL(test_47.at(0), 0ul);
+      }
+      catch(std::exception e)
+      {
+        std::cout << "primary comm neighbours" << std::endl;
+      }
 
       //testing all comm neighbours
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_48(m3.get_all_comm_neighbours(0));
       TEST_CHECK_EQUAL(test_48.size(), 1ul);
       TEST_CHECK_EQUAL(test_48.at(0), 1ul);
 
+      try
+      {
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_49(m3.get_all_comm_neighbours(1));
       TEST_CHECK_EQUAL(test_49.size(), 1ul);
       TEST_CHECK_EQUAL(test_49.at(0), 0ul);
+      }
+      catch(std::exception e)
+      {
+        std::cout << "all comm neighbours" << std::endl;
+      }
 
       //testing copy-ctor
+      try
+      {
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(3, m3);
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_50(m4.get_all_comm_neighbours(1));
       TEST_CHECK_EQUAL(test_50.size(), 1ul);
       TEST_CHECK_EQUAL(test_50.at(0), 0ul);
+      }
+      catch(std::exception e)
+      {
+        std::cout << "copy" << std::endl;
+      }
 
     }
 };

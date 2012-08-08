@@ -68,7 +68,7 @@ class CommunicationTest:
       Foundation::Attribute<double, std::vector> attr_m3;
       all_attributes_m3.push_back(&attr_m3);
 
-      unsigned my_attribute_i(Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex));
+      Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
 
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);
@@ -124,7 +124,7 @@ class CommunicationTest:
       Foundation::Attribute<double, std::vector> attr_m4;
       all_attributes_m4.push_back(&attr_m4);
 
-      unsigned my_attribute_i2(Foundation::MeshAttributeRegistration::execute(m4, Foundation::pl_vertex));
+      Foundation::MeshAttributeRegistration::execute(m4, Foundation::pl_vertex);
       //alter m4's attribute values
       attr_m4.push_back(3333.);
       attr_m4.push_back(4444.);
