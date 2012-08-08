@@ -19,7 +19,7 @@ namespace FEAST
     private:
       Index _rows;
       Index _columns;
-      std::vector<std::map<unsigned long, DT_> > _elements;
+      std::map<unsigned long, DT_> _elements;
       DT_ _zero_element;
 
     public:
@@ -27,7 +27,6 @@ namespace FEAST
 
       SparseMatrixCOO(Index rows, Index columns) :
         Container<Arch_, DT_>(rows * columns),
-        _elements(rows),
         _zero_element(0.)
       {
         this->_size = rows * columns;
@@ -39,11 +38,9 @@ namespace FEAST
         Container<Arch_, DT_>(other),
         _rows(other._rows),
         _columns(other._columns),
-        _elements(_rows),
         _zero_element(other._zero_element)
       {
-        for (unsigned long i(0) ; i < _rows ; ++i)
-          _elements.at(i).insert(other._elements.at(i).begin(), other._elements.at(i).end());
+          _elements.insert(other._elements.begin(), other._elements.end());
       }
 
       template <typename Arch2_, typename DT2_>
@@ -51,22 +48,20 @@ namespace FEAST
         Container<Arch_, DT_>(other),
         _rows(other._rows),
         _columns(other._columns),
-        _elements(_rows),
         _zero_element(other._zero_element)
       {
-        for (unsigned long i(0) ; i < _rows ; ++i)
-          _elements.at(i).insert(other._elements.at(i).begin(), other._elements.at(i).end());
+          _elements.insert(other._elements.begin(), other._elements.end());
       }
 
       void operator()(Index row, Index col, DT_ val)
       {
-        _elements.at(row)[col] = val;
+        _elements[row * _columns + col] = val;
       }
 
       const DT_ & operator()(Index row, Index col) const
       {
-        typename std::map<unsigned long, DT_>::const_iterator it(_elements.at(row).find(col));
-        if (it == _elements.at(row).end())
+        typename std::map<unsigned long, DT_>::const_iterator it(_elements.find(row * _columns + col));
+        if (it == _elements.end())
           return _zero_element;
         else
           return it->second;
