@@ -33,6 +33,6 @@ endif ( NOT (${FEAST_SOURCE_DIR} STREQUAL ${FEAST_BINARY_DIR}) AND UNIX)
 
 
 # directories to scan recursively
-ADD_SUBDIRECTORY( kernel )
 ADD_SUBDIRECTORY( test_system )
+ADD_SUBDIRECTORY( kernel )
 ADD_SUBDIRECTORY( applications )
