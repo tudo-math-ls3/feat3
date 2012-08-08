@@ -4,6 +4,7 @@
 
 #include <kernel/archs.hpp>
 #include <kernel/foundation/halo.hpp>
+#include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/communication_error.hpp>
 
 #include <vector>
@@ -84,7 +85,8 @@ namespace FEAST
       public:
         //example: Halo-based
         template<typename HaloType_, typename MeshType_>
-          static void execute(HaloType_ & halo,
+          static void execute(
+              HaloType_ & halo,
               unsigned attr_index,
               MeshType_ & other_mesh,
               Index other_rank) //TODO other_mesh resolved by process mesh list (mesh by id), needs to be a local thing
@@ -103,28 +105,21 @@ namespace FEAST
                   AttributeType_* recvbuf(new AttributeType_[halo.size()]);
                   for(Index i(0) ; i < halo.size() ; ++i)
                   {
-                    if(typeid(AttributeType_) == typeid(typename MeshType_::attr_type_1_))
-                    {
-                      sendbuf[i] = halo.get_mesh().get_attributes_of_type_1().at(attr_index).at(halo.get_element(i));
-                      recvbuf[i] = other_mesh.get_attributes_of_type_1().at(attr_index).at(halo.get_element_counterpart(i));
-                    }
+                    sendbuf[i] = ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index)))->at(halo.get_element(i));
+                    recvbuf[i] = ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index)))->at(halo.get_element_counterpart(i));
                   }
                   //'post'
                   Foundation::Comm<Tag_>::send_recv(sendbuf, other_rank, halo.size(), recvbuf, halo.get_mesh().get_pp_rank());
                   for(Index i(0) ; i < halo.size() ; ++i)
                   {
-                    if(typeid(AttributeType_) == typeid(typename MeshType_::attr_type_1_))
-                    {
-                      halo.get_mesh().get_attributes_of_type_1().at(attr_index).at(halo.get_element(i)) = sendbuf[i];
-                      other_mesh.get_attributes_of_type_1().at(attr_index).at(halo.get_element_counterpart(i)) = recvbuf[i];
-                    }
+                    ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index)))->at(halo.get_element(i)) = sendbuf[i];
+                    ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index)))->at(halo.get_element_counterpart(i)) = recvbuf[i];
                   }
                 }
             }
           }
         //TODO
     };
-
   }
 }
 #endif

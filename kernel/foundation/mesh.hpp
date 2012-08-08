@@ -445,6 +445,11 @@ namespace FEAST
           _mp_rank = rank;
         }
 
+        attr_base_type_* get_attributes()
+        {
+          return _attrs;
+        }
+
       private:
         const typename TopologyType_::index_type_ _id;
         const typename TopologyType_::index_type_ _pp_rank;

@@ -155,7 +155,7 @@ class CommunicationTest:
         Foundation::Halo<0, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > >, TestArrayClass > hd(h);
 
       //reference to m4 would have been resolved locally
-      /*Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
+      Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
       TEST_CHECK_EQUAL(attr_m3.at(0), 3333.);
       TEST_CHECK_EQUAL(attr_m3.at(1), 4444.);
       TEST_CHECK_EQUAL(attr_m4.at(0), 42.);
@@ -165,7 +165,7 @@ class CommunicationTest:
       TEST_CHECK_EQUAL(attr_m3.at(0), 42.);
       TEST_CHECK_EQUAL(attr_m3.at(1), 47.);
       TEST_CHECK_EQUAL(attr_m4.at(0), 3333.);
-      TEST_CHECK_EQUAL(attr_m4.at(1), 4444.);*/
+      TEST_CHECK_EQUAL(attr_m4.at(1), 4444.);
 
     }
 };
