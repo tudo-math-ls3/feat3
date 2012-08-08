@@ -47,8 +47,8 @@ public:
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.rows(), b.rows());
     DenseMatrix<Tag_, DT_> e(11, 12, 5.);
-    TEST_CHECK_EQUAL(e.rows(), 11);
-    TEST_CHECK_EQUAL(e.columns(), 12);
+    TEST_CHECK_EQUAL(e.rows(), 11ul);
+    TEST_CHECK_EQUAL(e.columns(), 12ul);
     TEST_CHECK_EQUAL(c(7,6), b(7,6));
   }
 };

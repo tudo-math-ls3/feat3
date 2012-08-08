@@ -11,33 +11,6 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-//Test container
-template<typename Arch_, typename DT_>
-class TestArrayClass
-{
-  public:
-    TestArrayClass(Index size) :
-      _size(size),
-      _data(new DT_[size])
-    {
-    }
-
-    DT_ & operator[] (Index i)
-    {
-      return _data[i];
-    }
-
-    Index size()
-    {
-      return _size;
-    }
-
-  private:
-    Index _size;
-    DT_ * _data;
-
-};
-
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MappedTopologyTest:
@@ -63,6 +36,4 @@ MappedTopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned 
 MappedTopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mappedtopology_test_cpu_v_d("std::vector, std::deque");
 MappedTopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > mappedtopology_test_cpu_d_d("std::deque, std::deque");
 
-MappedTopologyTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > mappedtopology_test_cpu_v_ddw("std::vector, TAC");
-MappedTopologyTest<Archs::None, unsigned long, std::deque, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > mappedtopology_test_cpu_d_ddw("std::deque, TAC");
 MappedTopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > mappedtopology_test_cpu_v_ddwdv("std::vector, DV");
