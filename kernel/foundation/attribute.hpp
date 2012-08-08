@@ -25,10 +25,6 @@ namespace FEAST
     {
       public:
         virtual Index size() = 0;
-        /*virtual void push_back(float dt) = 0;
-        virtual void push_back(double dt) = 0;
-        virtual void push_back(unsigned long dt) = 0;
-        virtual void push_back(int dt) = 0;*/
     };
 
     /**
@@ -66,30 +62,6 @@ namespace FEAST
         {
             _data.push_back(d);
         }
-
-        /*virtual void push_back(double d)
-        {
-          if(typeid(DataType_) == typeid(double))
-            _data.push_back(d);
-          else
-            throw AttributeTypeMismatch();
-        }
-
-        virtual void push_back(unsigned long d)
-        {
-          if(typeid(DataType_) == typeid(unsigned long))
-            _data.push_back(d);
-          else
-            throw AttributeTypeMismatch();
-        }
-
-        virtual void push_back(int d)
-        {
-          if(typeid(DataType_) == typeid(int))
-            _data.push_back(d);
-          else
-            throw AttributeTypeMismatch();
-        }*/
 
         DataType_& at(Index i)
         {
