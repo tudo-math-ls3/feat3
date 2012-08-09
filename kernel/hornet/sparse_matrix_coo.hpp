@@ -67,21 +67,68 @@ namespace FEAST
           return it->second;
       }
 
-      virtual const Index & size() const
-      {
-        return this->_size;
-      }
-
-      virtual const Index & rows() const
+      const Index & rows() const
       {
         return this->_rows;
       }
 
-      virtual const Index & columns() const
+      const Index & columns() const
       {
         return this->_columns;
       }
   };
+
+  template <typename Arch_, typename DT_> bool operator== (const SparseMatrixCOO<Arch_, DT_> & a, const SparseMatrixCOO<Arch_, DT_> & b)
+  {
+    if (a.rows() != b.rows())
+      return false;
+    if (a.columns() != b.columns())
+      return false;
+
+    if (typeid(DT_) == typeid(Index))
+    {
+      for (Index i(0) ; i < a.rows() ; ++i)
+      {
+        for (Index j(0) ; j < a.columns() ; ++j)
+        {
+          if (a(i, j) != b(i, j))
+            return false;
+        }
+      }
+    }
+    else
+    {
+      for (Index i(0) ; i < a.rows() ; ++i)
+      {
+        for (Index j(0) ; j < a.columns() ; ++j)
+        {
+          if (fabs(a(i, j) - b(i, j) > std::numeric_limits<DT_>::epsilon()))
+            return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  template <typename Arch_, typename DT_>
+  std::ostream &
+  operator<< (std::ostream & lhs, const SparseMatrixCOO<Arch_, DT_> & b)
+  {
+    lhs << "[" << std::endl;
+    for (Index i(0) ; i < b.rows() ; ++i)
+    {
+      lhs << "[";
+      for (Index j(0) ; j < b.columns() ; ++j)
+      {
+        lhs << "  " << b(i, j);
+      }
+      lhs << "]" << std::endl;
+    }
+    lhs << "]" << std::endl;
+
+    return lhs;
+  }
 } // namespace FEAST
 
 #endif // KERNEL_HORNET_DENSE_VECTOR_HPP

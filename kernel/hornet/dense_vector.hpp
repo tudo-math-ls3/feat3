@@ -54,6 +54,9 @@ namespace FEAST
 
       DenseVector<Arch_, DT_> & operator= (DenseVector<Arch_, DT_> & other)
       {
+        if (this == &other)
+          return *this;
+
         this->_size = other.size();
 
         for (Index i(0) ; i < this->_elements.size() ; ++i)
@@ -83,6 +86,9 @@ namespace FEAST
       template <typename Arch2_, typename DT2_>
       DenseVector<Arch_, DT_> & operator= (DenseVector<Arch2_, DT2_> & other)
       {
+        if (this == &other)
+          return *this;
+
         //TODO copy memory from arch2 to arch
         return *this;
       }
@@ -96,12 +102,22 @@ namespace FEAST
       {
         _pelements[index] = value;
       }
-
-      Index size()
-      {
-        return this->_size;
-      }
   };
+
+  template <typename Arch_, typename DT_>
+  std::ostream &
+  operator<< (std::ostream & lhs, const DenseVector<Arch_, DT_> & b)
+  {
+    lhs << "[";
+    for (Index i(0) ; i < b.size() ; ++i)
+    {
+      lhs << "  " << b(i);
+    }
+    lhs << "]" << std::endl;
+
+    return lhs;
+  }
+
 } // namespace FEAST
 
 #endif // KERNEL_HORNET_DENSE_VECTOR_HPP

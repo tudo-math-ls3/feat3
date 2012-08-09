@@ -66,6 +66,9 @@ namespace FEAST
 
       DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch_, DT_> & other)
       {
+        if (this == &other)
+          return *this;
+
         this->_size = other.size();
         this->_rows = other.rows();
         this->_columns = other.columns();
@@ -97,6 +100,9 @@ namespace FEAST
       template <typename Arch2_, typename DT2_>
       DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
       {
+        if (this == &other)
+          return *this;
+
         //TODO copy memory from arch2 to arch
         return *this;
       }
@@ -111,21 +117,35 @@ namespace FEAST
         return _pelements[row * this->_rows + col];
       }
 
-      virtual const Index & size() const
-      {
-        return this->_size;
-      }
-
-      virtual const Index & rows() const
+      const Index & rows() const
       {
         return this->_rows;
       }
 
-      virtual const Index & columns() const
+      const Index & columns() const
       {
         return this->_columns;
       }
   };
+
+  template <typename Arch_, typename DT_>
+  std::ostream &
+  operator<< (std::ostream & lhs, const DenseMatrix<Arch_, DT_> & b)
+  {
+    lhs << "[" << std::endl;
+    for (Index i(0) ; i < b.rows() ; ++i)
+    {
+      lhs << "[";
+      for (Index j(0) ; j < b.columns() ; ++j)
+      {
+        lhs << "  " << b(i, j);
+      }
+      lhs << "]" << std::endl;
+    }
+    lhs << "]" << std::endl;
+
+    return lhs;
+  }
 } // namespace FEAST
 
 #endif // KERNEL_HORNET_DENSE_VECTOR_HPP

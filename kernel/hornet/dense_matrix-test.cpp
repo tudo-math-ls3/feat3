@@ -47,6 +47,7 @@ public:
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.rows(), b.rows());
     TEST_CHECK_EQUAL(c(7,6), b(7,6));
+    TEST_CHECK_EQUAL(c, b);
 
     DenseMatrix<Tag_, DT_> e(11, 12, 5.);
     TEST_CHECK_EQUAL(e.rows(), 11ul);
@@ -55,6 +56,8 @@ public:
     DenseMatrix<Tag_, DT_> f(11, 12, 42.);
     f = e;
     TEST_CHECK_EQUAL(f(7,8), e(7,8));
+    TEST_CHECK_EQUAL(f, e);
+    std::cout<<f;
   }
 };
 DenseMatrixTest<Archs::CPU, float> dense_matrix_test_float;

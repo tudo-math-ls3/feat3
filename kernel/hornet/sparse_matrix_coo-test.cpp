@@ -43,10 +43,13 @@ public:
     TEST_CHECK_EQUAL(b.rows(), a.rows());
     TEST_CHECK_EQUAL(a(1,2), b(1,2));
     TEST_CHECK_EQUAL(a(0,2), b(0,2));
+    TEST_CHECK_EQUAL(a, b);
 
     SparseMatrixCOO<Tag_, DT_> c(10, 10);
     c = b;
     TEST_CHECK_EQUAL(c(0,2), b(0,2));
+    TEST_CHECK_EQUAL(c, b);
+    std::cout<<c;
   }
 };
 SparseMatrixCOOTest<Archs::CPU, double> sparse_matrix_coo_test_double;

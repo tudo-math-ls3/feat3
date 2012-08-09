@@ -47,6 +47,7 @@ public:
     DenseVector<Tag_, DT_> c(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));
+    TEST_CHECK_EQUAL(c, b);
     std::list<DenseVector<Tag_, DT_> > list;
     list.push_back(a);
     list.push_back(b);
@@ -56,7 +57,10 @@ public:
     DenseVector<Tag_, DT_> e(10, 42.);
     e = a;
     TEST_CHECK_EQUAL(e(5), a(5));
+    TEST_CHECK_EQUAL(e, a);
+    std::cout<<e;
   }
 };
 DenseVectorTest<Archs::CPU, float> dense_vector_test_float;
 DenseVectorTest<Archs::CPU, double> dense_vector_test_double;
+DenseVectorTest<Archs::CPU, Index> dense_vector_test_index;
