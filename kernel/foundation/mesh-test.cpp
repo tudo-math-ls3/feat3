@@ -59,29 +59,13 @@ class MeshTestAttr:
       TEST_CHECK_EQUAL(m.get_num_levels(), 3ul);
       TEST_CHECK_EQUAL(m2.get_num_levels(), 3ul);
 
-      TEST_CHECK_EQUAL(m2.get_downward_index(Foundation::pl_vertex), -1);
-      TEST_CHECK_EQUAL(m2.get_downward_index(Foundation::pl_edge), Foundation::ipi_edge_vertex);
-      TEST_CHECK_EQUAL(m2.get_downward_index(Foundation::pl_face), Foundation::ipi_face_edge);
-      TEST_CHECK_EQUAL(m2.get_downward_index(Foundation::pl_polyhedron), -1);
-
-      TEST_CHECK_EQUAL(m2.get_upward_index(Foundation::pl_vertex), Foundation::ipi_vertex_edge);
-      TEST_CHECK_EQUAL(m2.get_upward_index(Foundation::pl_edge), Foundation::ipi_edge_face);
-      TEST_CHECK_EQUAL(m2.get_upward_index(Foundation::pl_face), -1);
-      TEST_CHECK_EQUAL(m2.get_upward_index(Foundation::pl_polyhedron), -1);
-
       //##################################################################
-      //     0  1
-      //   0--1--2     *--*--*
-      // 2 | 3|  |4    | 0| 1|
-      //   3--4--5     *--*--*
-      //    5  6
 
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
 
       //configure attribute
       Foundation::Attribute<double, std::vector> attr;
       Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
-
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
@@ -95,7 +79,6 @@ class MeshTestAttr:
       attr.push_back(double(0));
       attr.push_back(double(0.5));
       attr.push_back(double(1));
-
       //add edges
       m3.add_polytope(Foundation::pl_edge);
       m3.add_polytope(Foundation::pl_edge);
@@ -109,44 +92,201 @@ class MeshTestAttr:
       m3.add_polytope(Foundation::pl_face);
       m3.add_polytope(Foundation::pl_face);
 
+      /*     0  1
+           0--1--2     *--*--*
+         2 | 3|  |4    | 0| 1|
+           3--4--5     *--*--*
+            5  6
+      */
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 2);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 0);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 3);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 1);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 4);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 2);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 5);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 3);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 4);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
-      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 0));
+      TEST_CHECK_EQUAL(test_0.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0.at(0), 0ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 0));
+      TEST_CHECK_EQUAL(test_0_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0_.at(0), 0ul);
 
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 0);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 2);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 3);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 5);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 1);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 3);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 4);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 6);
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0a(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 0));
+      TEST_CHECK_EQUAL(test_0a.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0a.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_0a.at(1), 1ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0a_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 1));
+      TEST_CHECK_EQUAL(test_0a_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0a_.at(0), 0ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0b(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 1));
+      TEST_CHECK_EQUAL(test_0b.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0b.at(0), 1ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0b_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 1));
+      TEST_CHECK_EQUAL(test_0b_.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0b_.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_0b_.at(1), 1ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 2);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0c(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 1));
+      TEST_CHECK_EQUAL(test_0c.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0c.at(0), 1ul);
+      TEST_CHECK_EQUAL(test_0c.at(1), 2ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0c_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 2));
+      TEST_CHECK_EQUAL(test_0c_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0c_.at(0), 1ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 0);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0d(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 2));
+      TEST_CHECK_EQUAL(test_0d.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0d.at(0), 0ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0d_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 0));
+      TEST_CHECK_EQUAL(test_0d_.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0d_.at(1), 2ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 3);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0e(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 2));
+      TEST_CHECK_EQUAL(test_0e.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0e.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_0e.at(1), 3ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0e_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 3));
+      TEST_CHECK_EQUAL(test_0e_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0e_.at(0), 2ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 1);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0f(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 3));
+      TEST_CHECK_EQUAL(test_0f.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0f.at(0), 1ul);
+
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0f_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 1));
+      TEST_CHECK_EQUAL(test_0f_.size(), 3ul);
+      TEST_CHECK_EQUAL(test_0f_.at(2), 3ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 4);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0g(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 3));
+      TEST_CHECK_EQUAL(test_0g.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0g.at(0), 1ul);
+      TEST_CHECK_EQUAL(test_0g.at(1), 4ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0g_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 4));
+      TEST_CHECK_EQUAL(test_0g_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0g_.at(0), 3ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 2);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0h(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 4));
+      TEST_CHECK_EQUAL(test_0h.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0h.at(0), 2ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0h_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 2));
+      TEST_CHECK_EQUAL(test_0h_.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0h_.at(1), 4ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 5);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0i(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 4));
+      TEST_CHECK_EQUAL(test_0i.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0i.at(0), 2ul);
+      TEST_CHECK_EQUAL(test_0i.at(1), 5ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0i_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 5));
+      TEST_CHECK_EQUAL(test_0i_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0i_.at(0), 4ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 3);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0j(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 5));
+      TEST_CHECK_EQUAL(test_0j.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0j.at(0), 3ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0j_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 3));
+      TEST_CHECK_EQUAL(test_0j_.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0j_.at(1), 5ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 4);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0k(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 5));
+      TEST_CHECK_EQUAL(test_0k.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0k.at(0), 3ul);
+      TEST_CHECK_EQUAL(test_0k.at(1), 4ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0k_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 4));
+      TEST_CHECK_EQUAL(test_0k_.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0k_.at(1), 5ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0l(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 6));
+      TEST_CHECK_EQUAL(test_0l.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0l.at(0), 4ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0l_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 4));
+      TEST_CHECK_EQUAL(test_0l_.size(), 3ul);
+      TEST_CHECK_EQUAL(test_0l_.at(2), 6ul);
+
+      m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0m(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 6));
+      TEST_CHECK_EQUAL(test_0m.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0m.at(0), 4ul);
+      TEST_CHECK_EQUAL(test_0m.at(1), 5ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0m_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 5));
+      TEST_CHECK_EQUAL(test_0m_.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0m_.at(1), 6ul);
+
+//---------------------------------------------------------------------------------------------------
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0n(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 0));
+      TEST_CHECK_EQUAL(test_0n.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0n.at(0), 0ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0n_(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_face, 0));
+      TEST_CHECK_EQUAL(test_0n_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0n_.at(0), 0ul);
+
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0o(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 0));
+      TEST_CHECK_EQUAL(test_0o.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0o.at(1), 1ul);
+
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0p(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 0));
+      TEST_CHECK_EQUAL(test_0p.size(), 3ul);
+      TEST_CHECK_EQUAL(test_0p.at(2), 3ul);
+
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 4); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0q(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 0));
+      TEST_CHECK_EQUAL(test_0q.size(), 4ul);
+      TEST_CHECK_EQUAL(test_0q.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_0q.at(1), 1ul);
+      TEST_CHECK_EQUAL(test_0q.at(2), 3ul);
+      TEST_CHECK_EQUAL(test_0q.at(3), 4ul);
+
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 1); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0r(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 1));
+      TEST_CHECK_EQUAL(test_0r.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0r.at(0), 1ul);
+
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 2); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0s(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 1));
+      TEST_CHECK_EQUAL(test_0s.size(), 2ul);
+      TEST_CHECK_EQUAL(test_0s.at(1), 2ul);
+
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 4); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0t(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 1));
+      TEST_CHECK_EQUAL(test_0t.size(), 3ul);
+      TEST_CHECK_EQUAL(test_0t.at(2), 4ul);
+
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0u(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 1));
+      TEST_CHECK_EQUAL(test_0u.size(), 4ul);
+      TEST_CHECK_EQUAL(test_0u.at(0), 1ul);
+      TEST_CHECK_EQUAL(test_0u.at(1), 2ul);
+      TEST_CHECK_EQUAL(test_0u.at(2), 4ul);
+      TEST_CHECK_EQUAL(test_0u.at(3), 5ul);
+
 
       //testing face-edge access
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_1(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_edge, 0));
-      TEST_CHECK_EQUAL(test_1.size(), 4ul);
+      TEST_CHECK_EQUAL(test_1.size(), 6ul);
       TEST_CHECK_EQUAL(test_1.at(0), 0ul);
       TEST_CHECK_EQUAL(test_1.at(1), 2ul);
-      TEST_CHECK_EQUAL(test_1.at(2), 3ul);
-      TEST_CHECK_EQUAL(test_1.at(3), 5ul);
-
+      TEST_CHECK_EQUAL(test_1.at(2), 1ul);
+      TEST_CHECK_EQUAL(test_1.at(3), 3ul);
+      TEST_CHECK_EQUAL(test_1.at(4), 5ul);
+      TEST_CHECK_EQUAL(test_1.at(5), 6ul);
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_2(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_edge, 1));
-      TEST_CHECK_EQUAL(test_2.size(), 4ul);
-      TEST_CHECK_EQUAL(test_2.at(0), 1ul);
-      TEST_CHECK_EQUAL(test_2.at(1), 3ul);
-      TEST_CHECK_EQUAL(test_2.at(2), 4ul);
-      TEST_CHECK_EQUAL(test_2.at(3), 6ul);
+      TEST_CHECK_EQUAL(test_2.size(), 6ul);
+      TEST_CHECK_EQUAL(test_2.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_2.at(1), 1ul);
+      TEST_CHECK_EQUAL(test_2.at(2), 3ul);
+      TEST_CHECK_EQUAL(test_2.at(3), 4ul);
+      TEST_CHECK_EQUAL(test_2.at(4), 5ul);
+      TEST_CHECK_EQUAL(test_2.at(5), 6ul);
 
       //testing face-face access
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_3(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_face, 0));
@@ -156,8 +296,8 @@ class MeshTestAttr:
 
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_4(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_face, 1));
       TEST_CHECK_EQUAL(test_4.size(), 2ul);
-      TEST_CHECK_EQUAL(test_4.at(0), 1ul);
-      TEST_CHECK_EQUAL(test_4.at(1), 0ul);
+      TEST_CHECK_EQUAL(test_4.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_4.at(1), 1ul);
 
       //testing face-vertex access
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_5(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, 0));
@@ -261,12 +401,14 @@ class MeshTestAttr:
 
       //testing edge-face access
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_21(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_face, 0));
-      TEST_CHECK_EQUAL(test_21.size(), 1ul);
+      TEST_CHECK_EQUAL(test_21.size(), 2ul);
       TEST_CHECK_EQUAL(test_21.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_21.at(1), 1ul);
 
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_22(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_face, 1));
-      TEST_CHECK_EQUAL(test_22.size(), 1ul);
-      TEST_CHECK_EQUAL(test_22.at(0), 1ul);
+      TEST_CHECK_EQUAL(test_22.size(), 2ul);
+      TEST_CHECK_EQUAL(test_22.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_22.at(1), 1ul);
 
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_23(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_face, 2));
       TEST_CHECK_EQUAL(test_23.size(), 1ul);
@@ -282,12 +424,14 @@ class MeshTestAttr:
       TEST_CHECK_EQUAL(test_25.at(0), 1ul);
 
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_26(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_face, 5));
-      TEST_CHECK_EQUAL(test_26.size(), 1ul);
+      TEST_CHECK_EQUAL(test_26.size(), 2ul);
       TEST_CHECK_EQUAL(test_26.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_26.at(1), 1ul);
 
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_27(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_face, 6));
-      TEST_CHECK_EQUAL(test_27.size(), 1ul);
-      TEST_CHECK_EQUAL(test_27.at(0), 1ul);
+      TEST_CHECK_EQUAL(test_27.size(), 2ul);
+      TEST_CHECK_EQUAL(test_27.at(0), 0ul);
+      TEST_CHECK_EQUAL(test_27.at(1), 1ul);
 
       //testing vertex-vertex access
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_28(m3.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_vertex, 0));
@@ -395,6 +539,7 @@ class MeshTestAttr:
         std::cout << "testing v f" << std::endl;
       }
 
+/*
       //testing primary comm neighbours
       try
       {
@@ -416,6 +561,7 @@ class MeshTestAttr:
       TEST_CHECK_EQUAL(test_48.size(), 1ul);
       TEST_CHECK_EQUAL(test_48.at(0), 1ul);
 
+      */
       try
       {
       typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_49(m3.get_all_comm_neighbours(1));
@@ -439,6 +585,7 @@ class MeshTestAttr:
       {
         std::cout << "copy" << std::endl;
       }
+
 
     }
 };

@@ -105,14 +105,14 @@ class HaloDataTest:
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
 
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 0);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 2);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 3);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 0, 5);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 1);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 3);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 4);
-      m3.add_adjacency(Foundation::pl_face, Foundation::pl_edge, 1, 6);
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 4); //v->f is set automagically
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 1); //v->f is set automagically
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 2); //v->f is set automagically
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 4); //v->f is set automagically
+      m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
 
       //clone mesh
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(1, m3);
