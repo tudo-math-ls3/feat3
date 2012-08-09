@@ -256,10 +256,6 @@ namespace FEAST
 #endif
           InternalPrimaryAccess ipa(_get_primary_index(from_level, to_level));
 
-          std::cout << "from: " << from_level << std::endl;
-          std::cout << "to: " << to_level << std::endl;
-          std::cout << "IPA: " << ipa << std::endl;
-
           if(!_secondary_access_needed(from_level, to_level))
             return _topologies.at(ipa).at(i);
           else
@@ -267,18 +263,11 @@ namespace FEAST
             typename TopologyType_::storage_type_ result;
 
             InternalSecondaryAccess isa(_get_secondary_index(from_level, to_level));
-            std::cout << "ISA: " << isa << std::endl;
-
-            std::cout << "i: " << i << std::endl;
-            std::cout << "_topologies.at(ipa).at(i).size() = " << _topologies.at(ipa).at(i).size() << std::endl;
             for(index_type_ j(0) ; j < _topologies.at(ipa).at(i).size() ; ++j)
             {
-              std::cout << "j: " << j << std::endl;
-              std::cout << "_topologies.at(isa).at(j).size() = " << _topologies.at(isa).at(j).size() << std::endl;
               for(index_type_ k(0) ; k < _topologies.at(isa).at(_topologies.at(ipa).at(i).at(j)).size() ; ++k)
               {
                 index_type_ to_insert(_topologies.at(isa).at(_topologies.at(ipa).at(i).at(j)).at(k));
-                std::cout << "Candidate: " << to_insert << std::endl;
 
                 bool insert(true);
                 for(index_type_ search_index(0) ; search_index < result.size(); ++search_index)
@@ -297,93 +286,6 @@ namespace FEAST
             }
             return result;
           }
-
-          /*
-          const int sweepdir(_sweep_direction(from_level, to_level));
-          int current_sweepdir(sweepdir == 0 ? -1 : sweepdir);
-          current_sweepdir = from_level == 0 && sweepdir == 0 ? 1 : current_sweepdir;
-          const unsigned level_diff(_level_difference(from_level, to_level));
-          const unsigned path_length(level_diff + 1);
-          unsigned current_level(from_level);
-          typename TopologyType_::compound_storage_type_ search_data;
-
-
-          if(level_diff == 0u) //we can directly give the neighbours
-          {
-            if(sweepdir == -1) //sweep down
-              return _topologies.at(_downward_index(from_level)).at(i);
-            else if(sweepdir == 1) //sweep up
-              return _topologies.at(_upward_index(from_level)).at(i);
-#ifdef FOUNDATION_DEBUG
-            else
-              throw MeshError("Sweep direction / sweep length mismatch.");
-#endif
-          }
-          else
-          {
-
-            for(unsigned j(0) ; j < path_length ; ++j)
-            {
-              //create current search datastructure
-              typename TopologyType_::storage_type_ temp;
-              search_data.push_back(temp);
-
-              //fill current datastructure:
-              if(j == 0)
-              {
-                search_data.at(0) = current_sweepdir == -1 ? _topologies.at(_downward_index(current_level)).at(i)
-                  : _topologies.at(_upward_index(current_level)).at(i);
-
-                current_level = current_sweepdir == 1 ? current_level + 1
-                  : (current_sweepdir == 0 ? current_level + 1
-                      : current_level - 1);
-
-
-                current_sweepdir = sweepdir == 0 && current_sweepdir == -1 ? 1
-                  : (sweepdir == 0 && current_sweepdir == 1 ? -1
-                      : current_sweepdir);
-              }
-              else
-              {
-                //for all entries in previous polytope list get all polytope lists and store sequentially
-                for(IndexType_ k(0) ; k < (IndexType_)search_data.at(j - 1).size(); ++k)
-                {
-                  IndexType_ l_upper(
-                      current_sweepdir == -1 ? (IndexType_)_topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
-                      : (IndexType_)_topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
-                      );
-
-                  for(IndexType_ l(0) ; l < l_upper ; ++l)
-                  {
-                    //TODO optimise search
-                    IndexType_ to_insert(
-                        current_sweepdir == -1 ? _topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
-                        : _topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
-                        );
-
-                    bool insert(true);
-                    for(IndexType_ search_index(0) ; search_index < (IndexType_)search_data.at(j).size() ; ++search_index)
-                    {
-                      if((IndexType_)search_data.at(j).at(search_index) == (IndexType_)to_insert)
-                      {
-                        insert = false;
-                        break;
-                      }
-                    }
-                    if(insert)
-                    {
-                      search_data.at(j).push_back(to_insert);
-                    }
-                  }
-                }
-                current_level = current_sweepdir == 1 ? current_level + 1
-                  : current_level - 1;
-              }
-            }
-            return search_data.at(search_data.size() - 1);
-          }
-          return search_data.at(search_data.size() - 1);
-          */
         }
 
         ///needed public access functions
@@ -391,106 +293,6 @@ namespace FEAST
         {
           return _num_levels;
         }
-
-        int get_downward_index(const unsigned pl)
-        {
-          return _downward_index(pl);
-        }
-
-        int get_upward_index(const unsigned pl)
-        {
-          return _upward_index(pl);
-        }
-
-        ///get primary communication neighbours for element polytope i (that is only non-diagonal)
-        template<typename IndexType_>
-          typename TopologyType_::storage_type_ get_primary_comm_neighbours(IndexType_ i)
-          {
-            typename TopologyType_::storage_type_ pre_result(this->get_adjacent_polytopes(_num_levels - 1, _num_levels - 1, i));
-            typename TopologyType_::storage_type_ result;
-
-            //remove self
-            for(IndexType_ j(0) ; j < (IndexType_)pre_result.size() ; ++j)
-              if((IndexType_)pre_result.at(j) != i)
-                result.push_back(pre_result.at(j));
-
-            return result;
-          }
-
-        ///get all communication neighbours for element polytope i
-        template<typename IndexType_>
-          typename TopologyType_::storage_type_ get_all_comm_neighbours(IndexType_ i)
-          {
-            const int sweepdir(-1);
-            int current_sweepdir(sweepdir);
-            const unsigned path_length(_num_inter_topologies);
-            unsigned current_level(_num_levels - 1);
-            typename TopologyType_::compound_storage_type_ search_data;
-
-            for(unsigned j(0) ; j < path_length ; ++j)
-            {
-              //create current search datastructure
-              typename TopologyType_::storage_type_ temp;
-              search_data.push_back(temp);
-
-              //fill current datastructure:
-              if(j == 0)
-              {
-                search_data.at(0) = _topologies.at(_downward_index(current_level)).at(i);
-
-                --current_level;
-
-                current_sweepdir = current_level == 0 ? 1 : current_sweepdir;
-              }
-              else
-              {
-                //for all entries in previous polytope list get all polytope lists and store sequentially
-                for(IndexType_ k(0) ; k < (IndexType_)search_data.at(j - 1).size(); ++k)
-                {
-                  IndexType_ l_upper(
-                      current_sweepdir == -1 ? (IndexType_)_topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
-                      : (IndexType_)_topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).size()
-                      );
-
-                  for(IndexType_ l(0) ; l < l_upper ; ++l)
-                  {
-                    //TODO optimise search
-                    IndexType_ to_insert(
-                        current_sweepdir == -1 ? _topologies.at(_downward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
-                        : _topologies.at(_upward_index(current_level)).at(search_data.at(j - 1).at(k)).at(l)
-                        );
-
-                    bool insert(true);
-                    for(IndexType_ search_index(0) ; search_index < (IndexType_)search_data.at(j).size() ; ++search_index)
-                    {
-                      if((IndexType_)search_data.at(j).at(search_index) == (IndexType_)to_insert)
-                      {
-                        insert = false;
-                        break;
-                      }
-                    }
-                    if(insert)
-                    {
-                      search_data.at(j).push_back(to_insert);
-                    }
-                  }
-                }
-                current_level = current_sweepdir == 1 ? current_level + 1
-                  : current_level - 1;
-
-                current_sweepdir = current_level == 0 ? 1 : current_sweepdir;
-              }
-            }
-
-            typename TopologyType_::storage_type_ result;
-
-            //remove self
-            for(IndexType_ j(0) ; j < (IndexType_)search_data.at(search_data.size() - 1).size() ; ++j)
-              if((IndexType_)search_data.at(search_data.size() - 1).at(j) != i)
-                result.push_back(search_data.at(search_data.size() - 1).at(j));
-
-            return result;
-          }
 
         ///Further needed access functions
         unsigned get_num_attributes()
@@ -551,21 +353,6 @@ namespace FEAST
         inline unsigned _level_difference(const unsigned from, const unsigned to)
         {
           return from == to ? 1u : ( from > to ? (unsigned)std::abs((double)(from - to)) - 1u : (unsigned)std::abs((double)(to - from)) - 1u);
-        }
-
-        inline int _downward_index(const unsigned pl)
-        {
-          return (pl == 0u || pl >= _num_levels) ? - 1 : (pl == 3u ? 5 : (1 << pl) - 1);
-        }
-
-        inline int _upward_index(const unsigned pl)
-        {
-          return pl >= _num_levels - 1? -1 : ( pl > 0 ? (1 << pl) : 0);
-        }
-
-        inline int _sweep_direction(const unsigned from_level, const unsigned to_level)
-        {
-          return from_level == to_level ? 0 : (from_level > to_level ? -1 : 1);
         }
 
         InternalPrimaryAccess _get_primary_index(PolytopeLevels from, PolytopeLevels to)

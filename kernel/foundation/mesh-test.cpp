@@ -539,47 +539,10 @@ class MeshTestAttr:
         std::cout << "testing v f" << std::endl;
       }
 
-/*
-      //testing primary comm neighbours
-      try
-      {
-      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_46(m3.get_primary_comm_neighbours(0));
-      TEST_CHECK_EQUAL(test_46.size(), 1ul);
-      TEST_CHECK_EQUAL(test_46.at(0), 1ul);
-
-      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_47(m3.get_primary_comm_neighbours(1));
-      TEST_CHECK_EQUAL(test_47.size(), 1ul);
-      TEST_CHECK_EQUAL(test_47.at(0), 0ul);
-      }
-      catch(std::exception e)
-      {
-        std::cout << "primary comm neighbours" << std::endl;
-      }
-
-      //testing all comm neighbours
-      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_48(m3.get_all_comm_neighbours(0));
-      TEST_CHECK_EQUAL(test_48.size(), 1ul);
-      TEST_CHECK_EQUAL(test_48.at(0), 1ul);
-
-      */
-      try
-      {
-      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_49(m3.get_all_comm_neighbours(1));
-      TEST_CHECK_EQUAL(test_49.size(), 1ul);
-      TEST_CHECK_EQUAL(test_49.at(0), 0ul);
-      }
-      catch(std::exception e)
-      {
-        std::cout << "all comm neighbours" << std::endl;
-      }
-
       //testing copy-ctor
       try
       {
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(3, m3);
-      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_50(m4.get_all_comm_neighbours(1));
-      TEST_CHECK_EQUAL(test_50.size(), 1ul);
-      TEST_CHECK_EQUAL(test_50.at(0), 0ul);
       }
       catch(std::exception e)
       {
@@ -594,5 +557,4 @@ MeshTestAttr<Archs::None, unsigned long, std::deque, std::vector<unsigned long> 
 MeshTestAttr<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_cpu_v_d("std::vector, std::deque");
 MeshTestAttr<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > mesh_test_cpu_d_d("std::deque, std::deque");
 
-MeshTestAttr<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::None, unsigned long, TestArrayClass> > mesh_test_cpu_v_ddw("std::vector, TAC");
 //MeshTestAttr<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::CPU, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //topology* delete from DTOR fails wih ouble free due to heap allocation
