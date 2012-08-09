@@ -22,13 +22,13 @@ public:
   {
   }
 
-  bool test_f(Graph* f) const
+  bool test_f(Graph& f) const
   {
     CONTEXT("GraphTest::test_f()");
 
     // fetch the graph's arrays
-    Index* f_pp = f->get_domain_ptr();
-    Index* f_di = f->get_image_idx();
+    Index* f_pp = f.get_domain_ptr();
+    Index* f_di = f.get_image_idx();
 
     // check against analytic solution
     //      0  1  2  3  4
@@ -53,13 +53,13 @@ public:
     };
 
     // check dimensions
-    if(f->get_num_nodes_domain() != 7)
+    if(f.get_num_nodes_domain() != 7)
       return false;
-    if(f->get_num_nodes_image() != 5)
+    if(f.get_num_nodes_image() != 5)
       return false;
 
     // check degree
-    if(f->degree() != 3)
+    if(f.degree() != 3)
       return false;
 
     // compare pointer arrays
@@ -83,13 +83,13 @@ public:
     return true;
   }
 
-  bool test_fg(Graph* fg) const
+  bool test_fg(Graph& fg) const
   {
     CONTEXT("GraphTest::test_fg()");
 
     // fetch the graph's arrays
-    Index* fg_pp = fg->get_domain_ptr();
-    Index* fg_di = fg->get_image_idx();
+    Index* fg_pp = fg.get_domain_ptr();
+    Index* fg_di = fg.get_image_idx();
 
     // check against analytic solution
     //      0  1  2  3  4  5  6
@@ -114,13 +114,13 @@ public:
     };
 
     // check dimensions
-    if(fg->get_num_nodes_domain() != 7)
+    if(fg.get_num_nodes_domain() != 7)
       return false;
-    if(fg->get_num_nodes_image() != 7)
+    if(fg.get_num_nodes_image() != 7)
       return false;
 
     // check degree
-    if(fg->degree() != 7)
+    if(fg.degree() != 7)
       return false;
 
     // compare pointer arrays
@@ -144,13 +144,13 @@ public:
     return true;
   }
 
-  bool test_gf(Graph* gf) const
+  bool test_gf(Graph& gf) const
   {
     CONTEXT("GraphTest::test_gf()");
 
     // fetch the graph's arrays
-    Index* gf_pp = gf->get_domain_ptr();
-    Index* gf_di = gf->get_image_idx();
+    Index* gf_pp = gf.get_domain_ptr();
+    Index* gf_di = gf.get_image_idx();
 
     // check against analytic solution
     //      0  1  2  3  4
@@ -171,13 +171,13 @@ public:
     };
 
     // check dimensions
-    if(gf->get_num_nodes_domain() != 5)
+    if(gf.get_num_nodes_domain() != 5)
       return false;
-    if(gf->get_num_nodes_image() != 5)
+    if(gf.get_num_nodes_image() != 5)
       return false;
 
     // check degree
-    if(gf->degree() != 5)
+    if(gf.degree() != 5)
       return false;
 
     // compare pointer arrays
@@ -220,25 +220,19 @@ public:
       1, 3, 6,
       0, 3, 4
     };
-    Graph* g = new Graph(5, 7, 17, g_ptr, nullptr, g_idx);
+    Graph g(5, 7, 17, g_ptr, nullptr, g_idx);
 
     // transpose the graph G
-    Graph* f = Graph::render(*g, false, true);
+    Graph f(Graph::rt_transpose, g);
     TEST_CHECK(test_f(f));
 
     // render and test fg
-    Graph* fg = Graph::render_composite(*f, *g, true, false);
+    Graph fg(Graph::rt_injectify, f, g);
     TEST_CHECK(test_fg(fg));
 
     // render and test gf
-    Graph* gf = Graph::render_composite(*g, *f, true, false);
+    Graph gf(Graph::rt_injectify, g, f);
     TEST_CHECK(test_gf(gf));
-
-    // clean up the mess
-    delete gf;
-    delete fg;
-    delete f;
-    delete g;
   }
 
 } graph_test;

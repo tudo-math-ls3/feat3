@@ -48,7 +48,7 @@ namespace FEAST
        * \brief Assignment operator.
        *
        * \param[in] other
-       * The image node iteration that is to be assigned.
+       * The image node iterator that is to be assigned.
        *
        * \returns <c>*this</c>
        */
@@ -150,7 +150,7 @@ namespace FEAST
     typedef Adj2_ Adjactor2;
 
     /**
-     * \brief Dual Iterator implementation for CompositeAdjactor
+     * \brief Image Node Iterator implementation for CompositeAdjactor
      *
      * \author Peter Zajac
      */
@@ -310,19 +310,19 @@ namespace FEAST
       ASSERT(_adj1.get_num_nodes_image() <= _adj2.get_num_nodes_domain(), "Composite Adjuctor is ill-formed");
     }
 
-    /** \copydoc Adjactor::num_nodes_domain() */
+    /** \copydoc Adjactor::get_num_nodes_domain() */
     inline Index get_num_nodes_domain() const
     {
-      CONTEXT("CompositeAdjactor::num_nodes_domain()");
+      CONTEXT("CompositeAdjactor::get_num_nodes_domain()");
       // The number of domain nodes of the composite adjactor is given by the number of domain nodes of the
       // first adjactor in the composition.
       return _adj1.get_num_nodes_domain();
     }
 
-    /** \copydoc Adjactor::num_nodes_image() */
+    /** \copydoc Adjactor::get_num_nodes_image() */
     inline Index get_num_nodes_image() const
     {
-      CONTEXT("CompositeAdjactor::num_nodes_image()");
+      CONTEXT("CompositeAdjactor::get_num_nodes_image()");
       // The number of image nodes of the composite adjactor is given by the number of image nodes of the
       // second adjactor in the composition.
       return _adj2.get_num_nodes_image();
