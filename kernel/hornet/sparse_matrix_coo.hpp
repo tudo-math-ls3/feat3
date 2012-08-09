@@ -21,13 +21,15 @@ namespace FEAST
       Index _columns;
       std::map<unsigned long, DT_> _elements;
       DT_ _zero_element;
+      Index _used_elements;
 
     public:
       typedef DT_ data_type;
 
       SparseMatrixCOO(Index rows, Index columns) :
         Container<Arch_, DT_>(rows * columns),
-        _zero_element(0.)
+        _zero_element(0.),
+        _used_elements(0)
       {
         this->_size = rows * columns;
         this->_rows = rows;
@@ -38,7 +40,8 @@ namespace FEAST
         Container<Arch_, DT_>(other),
         _rows(other._rows),
         _columns(other._columns),
-        _zero_element(other._zero_element)
+        _zero_element(other._zero_element),
+        _used_elements(other.used_elements())
       {
           _elements.insert(other._elements.begin(), other._elements.end());
       }
@@ -48,13 +51,18 @@ namespace FEAST
         Container<Arch_, DT_>(other),
         _rows(other._rows),
         _columns(other._columns),
-        _zero_element(other._zero_element)
+        _zero_element(other._zero_element),
+        _used_elements(other.used_elements())
       {
           _elements.insert(other._elements.begin(), other._elements.end());
       }
 
       void operator()(Index row, Index col, DT_ val)
       {
+        typename std::map<unsigned long, DT_>::const_iterator it(_elements.find(row * _columns + col));
+        if (it == _elements.end())
+          ++_used_elements;
+
         _elements[row * _columns + col] = val;
       }
 
@@ -75,6 +83,11 @@ namespace FEAST
       const Index & columns() const
       {
         return this->_columns;
+      }
+
+      const Index & used_elements() const
+      {
+        return this->_used_elements;
       }
   };
 

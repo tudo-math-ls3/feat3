@@ -17,6 +17,8 @@ namespace FEAST
       DT_ * _pelements;
 
     public:
+      typedef DT_ data_type;
+
       DenseVector(Index size) :
         Container<Arch_, DT_>(size)
       {
