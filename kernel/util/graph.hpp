@@ -32,41 +32,6 @@ namespace FEAST
     typedef const Index* ImageIterator;
 
     /**
-     * \brief Share enumeration
-     *
-     * This enumeration is used by the constructor to determine how the arrays passed to the constructor are to be
-     * treated.
-     */
-    enum Share
-    {
-      /**
-       * \brief Share input arrays
-       *
-       * This value specifies that the Graph object should point directly to the input arrays passed to the
-       * constructor. The Graph object will not delete the arrays upon destruction. It is the responsibility
-       * of the caller to ensure that the input arrays remain valid for the lifetime of the Graph object.
-       */
-      share,
-
-      /**
-       * \brief Own input arrays
-       *
-       * This value specifies that the Graph object should point directly to the input arrays passed to the
-       * constructor. In contrast to #share, the arrays will be deleted by the destructor upon destruction of
-       * the Graph object.
-       */
-      own,
-
-      /**
-       * \brief Copy input arrays
-       *
-       * This value specifies that the Graph object should allocate and maintain its own copy of the input
-       * arrays passed to the constructor.
-       */
-      copy
-    };
-
-    /**
      * \brief Render type enumeration
      *
      * This enumeration specifies the different render modes available for the render constructors.
@@ -143,7 +108,7 @@ namespace FEAST
     /**
      * \brief Specifies whether the graph's arrays are shared or not
      *
-     * This mem´ber specifies whether the Graph object will delete the #_domain_ptr, #_domain_end and #_image_idx
+     * This member specifies whether the Graph object will delete the #_domain_ptr, #_domain_end and #_image_idx
      * arrays within the destructor.
      */
     bool _shared;
@@ -164,15 +129,15 @@ namespace FEAST
       _image_idx(nullptr),
       _shared(false)
     {
-      CONTEXT("Graph::Graph()");
+      CONTEXT("Graph::Graph() [default]");
     }
 
     /**
-     * \brief Constructor.
+     * \brief Allocation Constructor.
      *
      * This constructor creates a new graph and allocates the Graph's arrays to the corresponding lengths.
      *
-     * \warning This constructor does not initialise the allocated arrays -- they have to be modified by the user
+     * \note This constructor does not initialise the allocated arrays -- they have to be initialised by the user
      * after construction.
      *
      * \param[in] num_nodes_domain
@@ -201,7 +166,7 @@ namespace FEAST
       _image_idx(nullptr),
       _shared(false)
     {
-      CONTEXT("Graph::Graph()");
+      CONTEXT("Graph::Graph() [alloc]");
       _domain_ptr = new Index[_num_nodes_domain+1];
       if(alloc_domain_end)
       {
@@ -211,9 +176,9 @@ namespace FEAST
     }
 
     /**
-     * \brief Constructor
+     * \brief "Using-Arrays" Constructor
      *
-     * This constructor creates a new graph based on the arrays given.
+     * This constructor creates a new graph using the arrays given to this constructor.
      *
      * \param[in] num_nodes_domain
      * The total number of domain nodes for the graph.
@@ -233,8 +198,11 @@ namespace FEAST
      * \param[in] image_idx
      * The image node index array for the graph. Must not be \c nullptr.
      *
-     * \param[in] share
-     * Specifies how the input arrays are treated. See Graph::Share for details.
+     * \param[in] shared
+     * Specifies whether the graph's arrays are shared or not.
+     *  - If set to \c false then the graph will deallocate all arrays passed to this constructor
+     *    upon destruction.
+     *  - If set to \c true then the caller remains responsible for the deallocation of the arrays.
      */
     Graph(
       Index num_nodes_domain,
@@ -243,7 +211,7 @@ namespace FEAST
       Index* domain_ptr,
       Index* domain_end,
       Index* image_idx,
-      Share share = Graph::copy)
+      bool shared)
        :
       _num_nodes_domain(num_nodes_domain),
       _num_nodes_image(num_nodes_image),
@@ -251,30 +219,69 @@ namespace FEAST
       _domain_ptr(domain_ptr),
       _domain_end(domain_end),
       _image_idx(image_idx),
-      _shared(share == Graph::share)
+      _shared(shared)
     {
-      CONTEXT("Graph::Graph()");
-      if(share == Graph::copy)
+      CONTEXT("Graph::Graph() [using-arrays]");
+    }
+
+    /**
+     * \brief "Copy-Arrays" Constructor
+     *
+     * This constructor creates a new graph using copies of the arrays passed to this function.
+     *
+     * \param[in] num_nodes_domain
+     * The total number of domain nodes for the graph.
+     *
+     * \param[in] num_nodes_image
+     * The total number of image nodes for the graph.
+     *
+     * \param[in] num_indices_image
+     * The total number of image node indices for the graph.
+     *
+     * \param[in] domain_ptr
+     * The domain pointer array for the graph. Must not be \c nullptr.
+     *
+     * \param[in] domain_end
+     * The domain end-pointer array for the graph. May be \c nullptr.
+     *
+     * \param[in] image_idx
+     * The image node index array for the graph. Must not be \c nullptr.
+     */
+    Graph(
+      Index num_nodes_domain,
+      Index num_nodes_image,
+      Index num_indices_image,
+      const Index* domain_ptr,
+      const Index* domain_end,
+      const Index* image_idx)
+       :
+      _num_nodes_domain(num_nodes_domain),
+      _num_nodes_image(num_nodes_image),
+      _num_indices_image(num_indices_image),
+      _domain_ptr(nullptr),
+      _domain_end(nullptr),
+      _image_idx(nullptr),
+      _shared(false)
+    {
+      CONTEXT("Graph::Graph() [copy-arrays]");
+
+      _domain_ptr = new Index[num_nodes_domain+1];
+      for(Index i(0); i <= num_nodes_domain; ++i)
       {
-        // we need to make copies of the arrays
-        _domain_ptr = new Index[num_nodes_domain+1];
-        for(Index i(0); i <= num_nodes_domain; ++i)
+        _domain_ptr[i] = domain_ptr[i];
+      }
+      if(domain_end != nullptr)
+      {
+        _domain_end = new Index[num_nodes_domain];
+        for(Index i(0); i < num_nodes_domain; ++i)
         {
-          _domain_ptr[i] = domain_ptr[i];
+          _domain_end[i] = domain_end[i];
         }
-        if(domain_end != nullptr)
-        {
-          _domain_end = new Index[num_nodes_domain];
-          for(Index i(0); i < num_nodes_domain; ++i)
-          {
-            _domain_end[i] = domain_end[i];
-          }
-        }
-        _image_idx = new Index[num_indices_image];
-        for(Index i(0); i < num_indices_image; ++i)
-        {
-          _image_idx[i] = image_idx[i];
-        }
+      }
+      _image_idx = new Index[num_indices_image];
+      for(Index i(0); i < num_indices_image; ++i)
+      {
+        _image_idx[i] = image_idx[i];
       }
     }
 
@@ -302,7 +309,7 @@ namespace FEAST
       _image_idx(nullptr),
       _shared(false)
     {
-      CONTEXT("Graph::Graph() [render ctor]");
+      CONTEXT("Graph::Graph() [render]");
       switch(render_type)
       {
       case rt_as_is:
@@ -327,7 +334,7 @@ namespace FEAST
     }
 
     /**
-     * \brief Composition Render constructor
+     * \brief Composite-Render constructor
      *
      * This constructor renders a composition of two objects implementing the Adjactor interface into a graph.
      *
@@ -356,7 +363,7 @@ namespace FEAST
       _image_idx(nullptr),
       _shared(false)
     {
-      CONTEXT("Graph::Graph() [composite render ctor]");
+      CONTEXT("Graph::Graph() [composite render]");
       switch(render_type)
       {
       case rt_as_is:
@@ -409,7 +416,7 @@ namespace FEAST
      * \returns
      * The degree of the specified domain node.
      */
-    inline Index degree(Index domain_node) const
+    Index degree(Index domain_node) const
     {
       CONTEXT("Graph::degree()");
       ASSERT(domain_node < _num_nodes_domain, "Domain node index out of range");
@@ -433,7 +440,7 @@ namespace FEAST
      * \returns
      * The degree of the graph.
      */
-    inline Index degree() const
+    Index degree() const
     {
       CONTEXT("Graph::degree()");
       Index deg = 0;
@@ -458,14 +465,14 @@ namespace FEAST
      * \brief Returns the domain pointer array.
      * \returns The domain pointer array.
      */
-    inline Index* get_domain_ptr()
+    Index* get_domain_ptr()
     {
       CONTEXT("Graph::get_domain_ptr()");
       return _domain_ptr;
     }
 
     /** \copydoc get_domain_ptr() */
-    inline const Index* get_domain_ptr() const
+    const Index* get_domain_ptr() const
     {
       CONTEXT("Graph::get_domain_ptr()");
       return _domain_ptr;
@@ -479,14 +486,14 @@ namespace FEAST
      *
      * \returns The domain end-pointer array.
      */
-    inline Index* get_domain_end()
+    Index* get_domain_end()
     {
       CONTEXT("Graph::get_domain_end()");
       return _domain_end;
     }
 
     /** \copydoc get_domain_end() */
-    inline const Index* get_domain_end() const
+    const Index* get_domain_end() const
     {
       CONTEXT("Graph::get_domain_end()");
       return _domain_end;
@@ -496,14 +503,14 @@ namespace FEAST
      * \brief Returns the image node index array.
      * \returns The image node index array.
      */
-    inline Index* get_image_idx()
+    Index* get_image_idx()
     {
       CONTEXT("Graph::get_image_idx()");
       return _image_idx;
     }
 
     /** \copydoc get_image_idx() */
-    inline const Index* get_image_idx() const
+    const Index* get_image_idx() const
     {
       CONTEXT("Graph::get_image_idx()");
       return _image_idx;
@@ -514,7 +521,7 @@ namespace FEAST
      *
      * \returns \c true, if the graph's arrays are shared, otherwise \c false.
      */
-    inline bool is_shared() const
+    bool is_shared() const
     {
       CONTEXT("Graph::is_shared()");
       return _shared;
