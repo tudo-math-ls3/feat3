@@ -87,6 +87,16 @@ namespace FEAST
           return _halo.get_overlap();
         }
 
+        HaloData& operator=(HaloData& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_halo = rhs._halo;
+          this->_halo_elements = rhs._halo_elements;
+          this->_halo_element_counterparts = rhs._halo_element_counterparts;
+          return *this;
+        }
 
       private:
         HaloType_ & _halo;
