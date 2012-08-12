@@ -92,6 +92,20 @@ namespace FEAST
           return _overlap;
         }
 
+        Halo& operator=(Halo& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_halo_elements = rhs._halo_elements;
+          this->_halo_element_counterparts = rhs._halo_element_counterparts;
+          this->_mesh = rhs._mesh;
+          this->_other = rhs._other;
+          this->_overlap = rhs._overlap;
+
+          return *this;
+        }
+
       private:
         StorageType_<IndexType_, std::allocator<IndexType_> > _halo_elements;
         StorageType_<IndexType_, std::allocator<IndexType_> > _halo_element_counterparts;
@@ -101,9 +115,7 @@ namespace FEAST
 
         unsigned _overlap;
     };
-
   }
-
 }
 
 

@@ -108,6 +108,17 @@ namespace FEAST
           ++_num_polytopes;
         }
 
+        Topology& operator=(Topology& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this-> _num_polytopes = rhs._num_polytopes;
+          this-> _topology = rhs._topology;
+
+          return *this;
+        }
+
       private:
         ///current size of the topology
         Index _num_polytopes;

@@ -71,6 +71,15 @@ namespace FEAST
           return _data.at(i);
         }
 
+        Attribute& operator=(Attribute& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_data = rhs._data;
+          return *this;
+        }
+
 
       protected:
         StorageType_<DataType_, std::allocator<DataType_> > _data;
