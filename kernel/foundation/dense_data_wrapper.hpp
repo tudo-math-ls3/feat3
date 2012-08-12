@@ -53,6 +53,18 @@ namespace FEAST
             return _data[i];
           }
 
+          DenseDataWrapper& operator=(DenseDataWrapper& rhs)
+          {
+            if(this == &rhs)
+              return *this;
+
+            this->_size = rhs._size;
+            this->_num_non_zeros = rhs._num_non_zeros;
+            this->_data = rhs._data;
+
+            return *this;
+          }
+
         private:
           unsigned long _size;
           unsigned long _num_non_zeros;
