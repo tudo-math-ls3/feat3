@@ -25,6 +25,9 @@ namespace FEAST
     {
       public:
         virtual Index size() = 0;
+        virtual ~AttributeBase()
+        {
+        }
     };
 
     /**
@@ -67,6 +70,7 @@ namespace FEAST
         {
           return _data.at(i);
         }
+
 
       protected:
         StorageType_<DataType_, std::allocator<DataType_> > _data;
