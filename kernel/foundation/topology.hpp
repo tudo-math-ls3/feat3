@@ -38,6 +38,8 @@ namespace FEAST
     class Topology
     {
       public:
+        friend class TopologyElementErasure;
+
         ///type exports
         typedef IndexType_ index_type_;
         typedef StorageType_ storage_type_;

@@ -19,13 +19,13 @@ namespace FEAST
       template<typename TopologyType_>
       static inline void execute(TopologyType_& target, typename TopologyType_::index_type_ position)
       {
-        std::cout << "boo" << std::endl;
+        target.erase(target.begin() + position);
       }
 
       template<typename TopologyType_>
       static inline void execute(TopologyType_& target)
       {
-        std::cout << "boo" << std::endl;
+        target.erase(target.end());
       }
     };
   }
