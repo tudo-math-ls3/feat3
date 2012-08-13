@@ -4,7 +4,6 @@
 
 #include <vector>
 #include<kernel/base_header.hpp>
-#include<kernel/foundation/topology_operations.hpp>
 #include<kernel/foundation/functor_error.hpp>
 
 namespace FEAST
@@ -29,7 +28,7 @@ namespace FEAST
 
 
     /**
-     * \brief STL conformal wrapper for push_back(i) functor
+     * \brief STL conformal push_back(i) functor
      *
      * \author Markus Geveler
      */
@@ -37,10 +36,10 @@ namespace FEAST
       typename ContainerType_,
       typename IndexType_,
       typename ValueType_>
-    class ContainerPushBackFunctor : public FunctorBase
+    class PushBackFunctor : public FunctorBase
     {
       public:
-        ContainerPushBackFunctor(ContainerType_& target, IndexType_ position, ValueType_ value) :
+        PushBackFunctor(ContainerType_& target, IndexType_ position, ValueType_ value) :
           _target(target),
           _position(position),
           _value(value)
@@ -89,35 +88,43 @@ namespace FEAST
     };
 
     /**
-     * \brief wrapper for Topology<...>::push_back() functor
+     * \brief push_back() functor
      *
      * \author Markus Geveler
      */
-    template<typename TopologyType_>
-    class TopologyEmptyPushBackFunctor : public FunctorBase
+    template<typename ContainerType_>
+    class EmptyPushBackFunctor : public FunctorBase
     {
       public:
-        TopologyEmptyPushBackFunctor(TopologyType_ target, typename TopologyType_::index_type_ position) :
+        EmptyPushBackFunctor(ContainerType_ target, typename ContainerType_::index_type_ position) :
           _target(target),
           _position(position)
         {
+          this->_executed = false;
+          this->_undone = false;
         }
 
         virtual void execute()
         {
-          //TODO
+          if(this->_executed)
+            throw FunctorError("Already executed!");
+
           _target.push_back();
+          this->_executed = true;
         }
 
         virtual void undo()
         {
-          //TODO
-          TopologyElementErasure::execute(_target, _position);
+          if(this->_undone)
+            throw FunctorError("Already undone!");
+
+          _target.erase(_target.begin() + _position);
+          this->_undone = true;
         }
 
       private:
-        TopologyType_& _target;
-        typename TopologyType_::index_type_ _position;
+        ContainerType_& _target;
+        typename ContainerType_::index_type_ _position;
     };
   }
 }

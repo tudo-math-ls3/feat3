@@ -25,7 +25,7 @@ class FunctorTest:
       vector.push_back(IndexType_(0));
       vector.push_back(IndexType_(42));
 
-      Foundation::ContainerPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func(vector, IndexType_(2), IndexType_(3));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func(vector, IndexType_(2), IndexType_(3));
       TEST_CHECK_EQUAL(func.get_position(), IndexType_(2));
       TEST_CHECK_EQUAL(func.get_value(), IndexType_(3));
 

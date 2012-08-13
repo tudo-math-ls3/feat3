@@ -4,6 +4,7 @@
 
 #include <vector>
 #include<kernel/base_header.hpp>
+#include<kernel/foundation/topology_operations.hpp>
 
 namespace FEAST
 {
@@ -76,8 +77,7 @@ namespace FEAST
 
         void erase(IndexType_ i)
         {
-          _topology.erase(_topology.begin() + i);
-          --_num_polytopes;
+          TopologyElementErasure::execute(*this, i);
         }
 
         /**
@@ -115,8 +115,7 @@ namespace FEAST
 
         void erase()
         {
-          _topology.erase(_topology.end());
-          --_num_polytopes;
+          TopologyElementErasure::execute(*this);
         }
 
         Topology& operator=(Topology& rhs)

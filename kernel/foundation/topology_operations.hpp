@@ -21,6 +21,12 @@ namespace FEAST
       {
         std::cout << "boo" << std::endl;
       }
+
+      template<typename TopologyType_>
+      static inline void execute(TopologyType_& target)
+      {
+        std::cout << "boo" << std::endl;
+      }
     };
   }
 }
