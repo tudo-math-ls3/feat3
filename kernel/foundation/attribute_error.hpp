@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEM_GUARD_COMMUNICATION_ERROR_HH
-#define FEM_GUARD_COMMUNICATION_ERROR_HH 1
+#ifndef FEM_GUARD_ATTRIBUTE_ERROR_HH
+#define FEM_GUARD_ATTRIBUTE_ERROR_HH 1
 
 #include <kernel/util/exception.hpp>
 

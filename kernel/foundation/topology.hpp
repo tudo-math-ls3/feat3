@@ -62,7 +62,6 @@ namespace FEAST
           return _num_polytopes;
         }
 
-
         /**
          * \brief member function inserts a given polytope list to end of topology
          *
@@ -73,6 +72,12 @@ namespace FEAST
         {
           _topology.push_back(s);
           ++_num_polytopes;
+        }
+
+        void erase(IndexType_ i)
+        {
+          _topology.erase(_topology.begin() + i);
+          --_num_polytopes;
         }
 
         /**
@@ -106,6 +111,12 @@ namespace FEAST
           StorageType_ s;
           _topology.push_back(s);
           ++_num_polytopes;
+        }
+
+        void erase()
+        {
+          _topology.erase(_topology.end());
+          --_num_polytopes;
         }
 
         Topology& operator=(Topology& rhs)

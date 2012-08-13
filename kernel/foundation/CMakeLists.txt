@@ -7,11 +7,11 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 
-ADD_LIBRARY(kernel-foundation STATIC mesh_error.cpp communication_error.cpp attribute_error.cpp)
+ADD_LIBRARY(kernel-foundation STATIC mesh_error.cpp communication_error.cpp attribute_error.cpp functor_error.cpp)
 TARGET_LINK_LIBRARIES (kernel-foundation kernel-util)
 
 #list of kernel tests
-SET (test_list topology-test dense_data_wrapper-test mesh-test halo-test halo_data-test communication-test mapped_topology-test attribute-test)
+SET (test_list topology-test dense_data_wrapper-test mesh-test halo-test halo_data-test communication-test mapped_topology-test attribute-test functor-test)
 
 #create all tests
 FOREACH (test ${test_list} )
