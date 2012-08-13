@@ -25,7 +25,7 @@ namespace FEAST
       template<typename TopologyType_>
       static inline void execute(TopologyType_& target)
       {
-        target.erase(target.end());
+        target.erase(target.end() - 1);
       }
     };
   }

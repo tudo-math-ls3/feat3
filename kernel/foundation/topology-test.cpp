@@ -47,6 +47,10 @@ class TopologyTest:
       TEST_CHECK_EQUAL(t2[0][1], 878ul);
 
       TEST_CHECK_EQUAL(t2.size(), 1ul);
+
+      TEST_CHECK_EQUAL(t2.get_history().size(), 1ul);
+      for(unsigned long i(0) ; i < t2.get_history().size() ; ++i)
+        TEST_CHECK_EQUAL(t2.get_history().at(i)->name(), "push_back()");
     }
 };
 TopologyTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");
@@ -54,4 +58,6 @@ TopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> 
 TopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
 TopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
 
-TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");
+/*TopologyTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, TAC");
+TopologyTest<Archs::None, unsigned long, std::deque, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > topology_test_cpu_d_ddw("std::deque, TAC");
+TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV"); */

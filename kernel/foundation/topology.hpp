@@ -4,6 +4,7 @@
 
 #include <vector>
 #include<kernel/base_header.hpp>
+#include<kernel/foundation/functor.hpp>
 #include<kernel/foundation/topology_operations.hpp>
 
 namespace FEAST
@@ -74,12 +75,16 @@ namespace FEAST
         void push_back(const StorageType_& s)
         {
           _topology.push_back(s);
+          _history.push_back(new PushBackFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes, s));
           ++_num_polytopes;
+
         }
 
         void erase(IndexType_ i)
         {
-          TopologyElementErasure::execute(*this, i);
+          _history.push_back(new EraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, i, _topology.at(i)));
+          TopologyElementErasure::execute(_topology, i);
+          --_num_polytopes;
         }
 
         /**
@@ -112,12 +117,19 @@ namespace FEAST
         {
           StorageType_ s;
           _topology.push_back(s);
+          _history.push_back(new EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>(_topology, _num_polytopes, s));
           ++_num_polytopes;
         }
 
         void erase()
         {
-          TopologyElementErasure::execute(*this);
+          std::cout << "Pushing back EmptyErase" << std::endl;
+          _history.push_back(new EmptyEraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes - 1, _topology.at(_num_polytopes - 1)));
+          std::cout << "Executing" << std::endl;
+          TopologyElementErasure::execute(_topology);
+          std::cout << "Decrementing" << std::endl;
+          --_num_polytopes;
+          std::cout << "Done" << std::endl;
         }
 
         Topology& operator=(Topology& rhs)
@@ -131,13 +143,29 @@ namespace FEAST
           return *this;
         }
 
+        OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> >& get_history()
+        {
+          return _history;
+        }
+
+        Index end()
+        {
+          return _num_polytopes;
+        }
+
+        Index begin()
+        {
+          return 0;
+        }
+
       private:
         ///current size of the topology
         Index _num_polytopes;
         ///data
         OuterStorageType_<StorageType_, std::allocator<StorageType_> > _topology;
+        ///history
+        OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> > _history;
     };
-
   }
 }
 #endif
