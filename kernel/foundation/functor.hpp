@@ -106,7 +106,7 @@ namespace FEAST
     class EmptyPushBackFunctor : public FunctorBase
     {
       public:
-        EmptyPushBackFunctor(ContainerType_ target, IndexType_ position, ValueType_ value) :
+        EmptyPushBackFunctor(ContainerType_& target, IndexType_ position, ValueType_ value) :
           _target(target),
           _position(position),
           _value(value)
@@ -215,12 +215,11 @@ namespace FEAST
     class EmptyEraseFunctor : public FunctorBase
     {
       public:
-        EmptyEraseFunctor(ContainerType_ target, IndexType_ position, ValueType_ value) :
+        EmptyEraseFunctor(ContainerType_& target, IndexType_ position, ValueType_ value) :
           _target(target),
           _position(position),
           _value(value)
         {
-          std::cout << "EmptErase" << std::endl;
           this->_executed = true;
           this->_undone = false;
           this->_name = "erase()";
@@ -250,6 +249,70 @@ namespace FEAST
         ContainerType_& _target;
         IndexType_ _position;
         ValueType_ _value;
+    };
+
+    /**
+     * \brief compound functor
+     *
+     * \author Markus Geveler
+     */
+    template<template<typename, typename> class StorageType_>
+    class CompoundFunctor : public FunctorBase
+    {
+      public:
+        typedef StorageType_<FunctorBase*, std::allocator<FunctorBase*> > storage_type_;
+
+        CompoundFunctor() :
+          _functors(storage_type_())
+        {
+          this->_executed = true;
+          this->_undone = false;
+          this->_name = "compound functor";
+        }
+
+        /*void add_functor(FunctorBase* functor)
+        {
+          _functors->push_back(functor);
+        }*/
+
+        virtual void execute()
+        {
+          if(this->_executed)
+            throw FunctorError("Already executed!");
+
+          for(Index i(0) ; i < _functors.size() ; ++i)
+          {
+            _functors.at(i)->execute();
+          }
+          this->_undone = false;
+          this->_executed = true;
+        }
+
+        virtual void undo()
+        {
+          if(this->_undone)
+            throw FunctorError("Already undone!");
+
+          for(Index i(_functors.size() - 1) ; i > 0 ; --i)
+          {
+            _functors.at(i)->undo();
+          }
+          this->_undone = true;
+          this->_executed = false;
+        }
+
+        storage_type_& get_functors()
+        {
+          return _functors;
+        }
+
+        Index size()
+        {
+          return _functors.size();
+        }
+
+      private:
+        storage_type_ _functors;
     };
   }
 }

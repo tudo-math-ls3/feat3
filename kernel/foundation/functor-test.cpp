@@ -57,6 +57,22 @@ class FunctorTest:
       TEST_CHECK_EQUAL(topology.get_history().at(3)->name(), "erase()");
       TEST_CHECK_EQUAL(topology.get_history().at(4)->name(), "erase()");
       TEST_CHECK_EQUAL(topology.get_history().at(5)->name(), "erase()");
+
+      //---------------------------------------------
+      std::vector<IndexType_> vector2;
+      vector2.push_back(0);
+      vector2.push_back(1);
+      vector2.push_back(2);
+
+      Foundation::CompoundFunctor<std::vector> cfunc;
+
+      cfunc.get_functors().push_back(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(0), IndexType_(0)));
+      cfunc.get_functors().push_back(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(1), IndexType_(1)));
+      cfunc.get_functors().push_back(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(2), IndexType_(2)));
+
+      TEST_CHECK_EQUAL(cfunc.size(), 3);
+
+      cfunc.undo();
     }
 };
 FunctorTest<> simple_functor_test("None, Index");
