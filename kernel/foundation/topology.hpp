@@ -38,8 +38,6 @@ namespace FEAST
     class Topology
     {
       public:
-        friend class TopologyElementErasure;
-
         ///type exports
         typedef IndexType_ index_type_;
         typedef StorageType_ storage_type_;
@@ -48,7 +46,8 @@ namespace FEAST
         ///CTOR
         Topology() :
           _num_polytopes(0),
-          _topology(OuterStorageType_<StorageType_, std::allocator<StorageType_> >())
+          _topology(OuterStorageType_<StorageType_, std::allocator<StorageType_> >()),
+          _history(OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> >())
         {
         };
 
@@ -76,13 +75,11 @@ namespace FEAST
           _topology.push_back(s);
           _history.push_back(new PushBackFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes, s));
           ++_num_polytopes;
-
         }
 
         void erase(IndexType_ i)
         {
           _history.push_back(new EraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, i, _topology.at(i)));
-          //TopologyElementErasure::execute(_topology, i);
           _topology.erase(_topology.begin() + i);
           --_num_polytopes;
         }
@@ -124,7 +121,6 @@ namespace FEAST
         void erase()
         {
           _history.push_back(new EmptyEraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes - 1, _topology.at(_num_polytopes - 1)));
-          //TopologyElementErasure::execute(_topology);
           _topology.erase(_topology.end() - 1);
           --_num_polytopes;
         }

@@ -15,12 +15,6 @@ namespace FEAST
     /**
      * \brief Attribute registration operation wrapper class template
      *
-     * See specialisations.
-     *
-     * \tparam MeshType_
-     * type of mesh
-     *
-     *
      * \author Markus Geveler
      */
     class MeshAttributeRegistration
@@ -99,7 +93,6 @@ namespace FEAST
      *
      * Mesh relies on a Render Dynamic Mesh technique that is modified to grant explicit (pseudo-constant) time
      * access from every polytope level to any other polytope level without storing all topologies explicitly.
-     * Mesh builds a ring of topologies each representing adjacencies from polytope-level k to level k-1 or k+1.
      *
      * \tparam i_
      * required number of topologies (current policy implements the ring but is generally dimension-independent)
@@ -137,6 +130,7 @@ namespace FEAST
           _num_inter_topologies(i_),
           _num_levels((unsigned)(i_/2u) + 1u),
           _topologies(OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >()),
+          _history(OuterStorageType_<CompoundFunctor<OuterStorageType_>, std::allocator<CompoundFunctor<OuterStorageType_> > >()),
           _attrs(attrbase),
           _num_attributes(0),
           _attribute_polytopelevel_relations(typename TopologyType_::storage_type_())
@@ -155,6 +149,7 @@ namespace FEAST
           _mp_rank(other._mp_rank),
           _num_inter_topologies(other._num_inter_topologies),
           _num_levels(other._num_levels),
+          _history(other._history),
           _attrs(attrbase),
           _num_attributes(0)
       {
@@ -209,7 +204,10 @@ namespace FEAST
               }
               break;
           }
+        }
 
+        void remove_polytope(const PolytopeLevels level, index_type_ i)
+        {
         }
 
         ///Add an adjacency to the associated topology and automatically add it to its transpose
@@ -342,7 +340,9 @@ namespace FEAST
         const typename TopologyType_::index_type_ _mp_rank;
         const unsigned _num_inter_topologies;
         const unsigned _num_levels;
+
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
+        OuterStorageType_<CompoundFunctor<OuterStorageType_>, std::allocator<CompoundFunctor<OuterStorageType_> > > _history;
 
         attr_base_type_* _attrs;
 
