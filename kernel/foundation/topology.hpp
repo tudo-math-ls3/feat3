@@ -5,7 +5,6 @@
 #include <vector>
 #include<kernel/base_header.hpp>
 #include<kernel/foundation/functor.hpp>
-#include<kernel/foundation/topology_operations.hpp>
 
 namespace FEAST
 {
@@ -83,7 +82,8 @@ namespace FEAST
         void erase(IndexType_ i)
         {
           _history.push_back(new EraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, i, _topology.at(i)));
-          TopologyElementErasure::execute(_topology, i);
+          //TopologyElementErasure::execute(_topology, i);
+          _topology.erase(_topology.begin() + i);
           --_num_polytopes;
         }
 
@@ -123,13 +123,10 @@ namespace FEAST
 
         void erase()
         {
-          std::cout << "Pushing back EmptyErase" << std::endl;
           _history.push_back(new EmptyEraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes - 1, _topology.at(_num_polytopes - 1)));
-          std::cout << "Executing" << std::endl;
-          TopologyElementErasure::execute(_topology);
-          std::cout << "Decrementing" << std::endl;
+          //TopologyElementErasure::execute(_topology);
+          _topology.erase(_topology.end() - 1);
           --_num_polytopes;
-          std::cout << "Done" << std::endl;
         }
 
         Topology& operator=(Topology& rhs)
