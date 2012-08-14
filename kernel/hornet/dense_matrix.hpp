@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/hornet/container.hpp>
 
 
@@ -109,11 +110,15 @@ namespace FEAST
 
       void operator()(Index row, Index col, DT_ val)
       {
+        ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds dense matrix row size " + stringify(this->_rows) + " !");
+        ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds dense matrix column size " + stringify(this->_columns) + " !");
         _pelements[row * this->_rows + col] = val;
       }
 
       const DT_ & operator()(Index row, Index col) const
       {
+        ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds dense matrix row size " + stringify(this->_rows) + " !");
+        ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds dense matrix column size " + stringify(this->_columns) + " !");
         return _pelements[row * this->_rows + col];
       }
 

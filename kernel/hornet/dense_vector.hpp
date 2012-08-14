@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/hornet/container.hpp>
 
 
@@ -97,11 +98,13 @@ namespace FEAST
 
       const DT_ & operator()(Index index) const
       {
+        ASSERT(index < this->_size, "Error: " + stringify(index) + "exceeds dense vector size " + stringify(this->_size) + " !");
         return _pelements[index];
       }
 
       void operator()(Index index, DT_ value)
       {
+        ASSERT(index < this->_size, "Error: " + stringify(index) + "exceeds dense vector size " + stringify(this->_size) + " !");
         _pelements[index] = value;
       }
   };

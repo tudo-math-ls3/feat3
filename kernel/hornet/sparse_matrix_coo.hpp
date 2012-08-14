@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/assertion.hpp>
 #include <kernel/hornet/container.hpp>
 
 #include <vector>
@@ -59,6 +60,9 @@ namespace FEAST
 
       void operator()(Index row, Index col, DT_ val)
       {
+        ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
+        ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
+
         typename std::map<unsigned long, DT_>::const_iterator it(_elements.find(row * _columns + col));
         if (it == _elements.end())
           ++_used_elements;
@@ -68,6 +72,9 @@ namespace FEAST
 
       const DT_ & operator()(Index row, Index col) const
       {
+        ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
+        ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
+
         typename std::map<unsigned long, DT_>::const_iterator it(_elements.find(row * _columns + col));
         if (it == _elements.end())
           return _zero_element;
