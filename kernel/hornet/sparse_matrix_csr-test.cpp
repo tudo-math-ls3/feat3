@@ -7,6 +7,7 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/hornet/sparse_matrix_coo.hpp>
+#include <kernel/hornet/sparse_matrix_csr.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -27,14 +28,14 @@ using namespace FEAST::TestSystem;
 template<
   typename Tag_,
   typename DT_>
-class SparseMatrixCOOTest
+class SparseMatrixCSRTest
   : public TaggedTest<Tag_, DT_>
 {
 
 public:
 
-  SparseMatrixCOOTest()
-    : TaggedTest<Tag_, DT_>("sparse_matrix_coo_test")
+  SparseMatrixCSRTest()
+    : TaggedTest<Tag_, DT_>("sparse_matrix_csr_test")
   {
   }
 
@@ -43,25 +44,22 @@ public:
     SparseMatrixCOO<Tag_, DT_> a(10, 10);
     a(1,2,7);
     a(5,5,2);
-    TEST_CHECK_EQUAL(a.used_elements(), 2ul);
-    TEST_CHECK_EQUAL(a(1, 2), 7.);
-    TEST_CHECK_EQUAL(a(5, 5), 2.);
-    SparseMatrixCOO<Tag_, DT_> b(a);
+    SparseMatrixCSR<Tag_, DT_> b(a);
+    TEST_CHECK_EQUAL(b.used_elements(), 2ul);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
     TEST_CHECK_EQUAL(b.columns(), a.columns());
-    TEST_CHECK_EQUAL(a(1,2), b(1,2));
-    TEST_CHECK_EQUAL(a(0,2), b(0,2));
-    TEST_CHECK_EQUAL(a, b);
+    TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
+    TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
 
-    SparseMatrixCOO<Tag_, DT_> c(10, 10);
+    SparseMatrixCSR<Tag_, DT_> c;
     c = b;
+    TEST_CHECK_EQUAL(c.used_elements(), b.used_elements());
     TEST_CHECK_EQUAL(c(0,2), b(0,2));
     TEST_CHECK_EQUAL(c(1,2), b(1,2));
     TEST_CHECK_EQUAL(c, b);
-    TEST_CHECK_EQUAL(c.used_elements(), b.used_elements());
     std::cout<<c;
   }
 };
-SparseMatrixCOOTest<Archs::CPU, float> sparse_matrix_coo_test_float;
-SparseMatrixCOOTest<Archs::CPU, double> sparse_matrix_coo_test_double;
+SparseMatrixCSRTest<Archs::CPU, float> sparse_matrix_csr_test_float;
+SparseMatrixCSRTest<Archs::CPU, double> sparse_matrix_csr_test_double;

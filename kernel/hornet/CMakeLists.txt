@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 ADD_LIBRARY(kernel-hornet STATIC memory_pool.cpp)
 
 #list of hornet tests
-SET (test_list dense_vector-test dense_matrix-test sparse_matrix_coo-test)
+SET (test_list dense_vector-test dense_matrix-test sparse_matrix_coo-test sparse_matrix_csr-test)
 
 #create all tests
 FOREACH (test ${test_list} )

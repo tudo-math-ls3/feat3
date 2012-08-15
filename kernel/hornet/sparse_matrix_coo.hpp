@@ -20,16 +20,25 @@ namespace FEAST
     private:
       Index _rows;
       Index _columns;
-      std::map<unsigned long, DT_> _elements;
+      std::map<Index, DT_> _elements;
       DT_ _zero_element;
       Index _used_elements;
 
     public:
       typedef DT_ data_type;
 
+      explicit SparseMatrixCOO() :
+        Container<Arch_, DT_> (0),
+        _rows(0),
+        _columns(0),
+        _zero_element(DT_(0)),
+        _used_elements(0)
+      {
+      }
+
       SparseMatrixCOO(Index rows, Index columns) :
         Container<Arch_, DT_>(rows * columns),
-        _zero_element(0.),
+        _zero_element(DT_(0)),
         _used_elements(0)
       {
         this->_size = rows * columns;
@@ -63,7 +72,7 @@ namespace FEAST
         ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
         ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
 
-        typename std::map<unsigned long, DT_>::const_iterator it(_elements.find(row * _columns + col));
+        typename std::map<Index, DT_>::const_iterator it(_elements.find(row * _columns + col));
         if (it == _elements.end())
           ++_used_elements;
 
@@ -75,7 +84,7 @@ namespace FEAST
         ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
         ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
 
-        typename std::map<unsigned long, DT_>::const_iterator it(_elements.find(row * _columns + col));
+        typename std::map<Index, DT_>::const_iterator it(_elements.find(row * _columns + col));
         if (it == _elements.end())
           return _zero_element;
         else
@@ -96,6 +105,12 @@ namespace FEAST
       {
         return this->_used_elements;
       }
+
+      const std::map<Index, DT_> & elements() const
+      {
+        return _elements;
+      }
+
   };
 
   template <typename Arch_, typename DT_> bool operator== (const SparseMatrixCOO<Arch_, DT_> & a, const SparseMatrixCOO<Arch_, DT_> & b)

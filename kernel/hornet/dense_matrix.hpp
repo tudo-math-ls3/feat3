@@ -21,6 +21,13 @@ namespace FEAST
     public:
       typedef DT_ data_type;
 
+      explicit DenseMatrix() :
+        Container<Arch_, DT_> (0),
+        _rows(0),
+        _columns(0)
+      {
+      }
+
       DenseMatrix(Index rows, Index columns) :
         Container<Arch_, DT_>(rows * columns)
       {
@@ -83,7 +90,7 @@ namespace FEAST
         this->_indices.clear();
 
         std::vector<DT_ *> new_elements = other.get_elements();
-        std::vector<unsigned long *> new_indices = other.get_indices();
+        std::vector<Index *> new_indices = other.get_indices();
 
         this->_elements.assign(new_elements.begin(), new_elements.end());
         this->_indices.assign(new_indices.begin(), new_indices.end());
@@ -132,6 +139,46 @@ namespace FEAST
         return this->_columns;
       }
   };
+
+  template <typename Arch_, typename DT_> bool operator== (const DenseMatrix<Arch_, DT_> & a, const DenseMatrix<Arch_, DT_> & b)
+  {
+    if (a.size() != b.size())
+      return false;
+    if (a.get_elements().size() != b.get_elements().size())
+      return false;
+    if (a.get_indices().size() != b.get_indices().size())
+      return false;
+
+    for (Index i(0) ; i < a.get_indices().size() ; ++i)
+    {
+      for (Index j(0) ; j < a.size() ; ++j)
+        if (a.get_indices().at(i)[j] != b.get_indices().at(i)[j])
+          return false;
+    }
+
+    if (typeid(DT_) == typeid(Index))
+    {
+      for (Index i(0) ; i < a.get_elements().size() ; ++i)
+      {
+        for (Index j(0) ; j < a.size() ; ++j)
+          if (a.get_elements().at(i)[j] != b.get_elements().at(i)[j])
+        return false;
+      }
+    }
+    else
+    {
+
+
+      for (Index i(0) ; i < a.get_elements().size() ; ++i)
+      {
+        for (Index j(0) ; j < a.size() ; ++j)
+          if (fabs(a.get_elements().at(i)[j] - b.get_elements().at(i)[j]) > std::numeric_limits<DT_>::epsilon())
+            return false;
+      }
+    }
+
+    return true;
+  }
 
   template <typename Arch_, typename DT_>
   std::ostream &

@@ -20,6 +20,11 @@ namespace FEAST
     public:
       typedef DT_ data_type;
 
+      explicit DenseVector() :
+        Container<Arch_, DT_> (0)
+      {
+      }
+
       DenseVector(Index size) :
         Container<Arch_, DT_>(size)
       {
@@ -108,6 +113,47 @@ namespace FEAST
         _pelements[index] = value;
       }
   };
+
+  template <typename Arch_, typename DT_> bool operator== (const DenseVector<Arch_, DT_> & a, const DenseVector<Arch_, DT_> & b)
+  {
+    if (a.size() != b.size())
+      return false;
+    if (a.get_elements().size() != b.get_elements().size())
+      return false;
+    if (a.get_indices().size() != b.get_indices().size())
+      return false;
+
+    for (Index i(0) ; i < a.get_indices().size() ; ++i)
+    {
+      for (Index j(0) ; j < a.size() ; ++j)
+        if (a.get_indices().at(i)[j] != b.get_indices().at(i)[j])
+          return false;
+    }
+
+    if (typeid(DT_) == typeid(Index))
+    {
+      for (Index i(0) ; i < a.get_elements().size() ; ++i)
+      {
+        for (Index j(0) ; j < a.size() ; ++j)
+          if (a.get_elements().at(i)[j] != b.get_elements().at(i)[j])
+        return false;
+      }
+    }
+    else
+    {
+
+
+      for (Index i(0) ; i < a.get_elements().size() ; ++i)
+      {
+        for (Index j(0) ; j < a.size() ; ++j)
+          if (fabs(a.get_elements().at(i)[j] - b.get_elements().at(i)[j]) > std::numeric_limits<DT_>::epsilon())
+            return false;
+      }
+    }
+
+    return true;
+  }
+
 
   template <typename Arch_, typename DT_>
   std::ostream &
