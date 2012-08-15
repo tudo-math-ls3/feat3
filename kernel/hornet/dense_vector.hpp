@@ -151,8 +151,6 @@ namespace FEAST
     }
     else
     {
-
-
       for (Index i(0) ; i < a.get_elements().size() ; ++i)
       {
         for (Index j(0) ; j < a.size() ; ++j)

@@ -1,0 +1,48 @@
+#pragma once
+#ifndef KERNEL_HORNET_PRODUCT_HPP
+#define KERNEL_HORNET_PRODUCT_HPP 1
+
+// includes, FEAST
+#include <kernel/base_header.hpp>
+#include <kernel/util/exception.hpp>
+#include <kernel/hornet/dense_vector.hpp>
+#include <kernel/hornet/sparse_matrix_csr.hpp>
+
+
+
+namespace FEAST
+{
+  template <typename Arch_, typename BType_>
+  struct Product
+  {
+    template <typename DT_>
+    static void value(DenseVector<Arch_, DT_> & r, const SparseMatrixCSR<Arch_, DT_> & a, const DenseVector<Arch_, DT_> & b)
+    {
+      if (b.size() != a.columns())
+        throw InternalError("Vector size does not match!");
+      if (a.rows() != r.size())
+        throw InternalError("Vector size does not match!");
+
+      const DT_ * bp(b.elements());
+      const Index * Aj(a.Aj());
+      const DT_ * Ax(a.Ax());
+      const Index * Ar(a.Ar());
+      DT_ * rp(r.elements());
+      const Index rows(a.rows());
+
+      for (Index row(0) ; row < rows ; ++row)
+      {
+        DT_ sum(0);
+        const Index end(Ar[row + 1]);
+        for (Index i(Ar[row]) ; i < end ; ++i)
+        {
+          sum += Ax[i] * bp[Aj[i]];
+        }
+        rp[row] = sum;
+      }
+    }
+  };
+
+} // namespace FEAST
+
+#endif // KERNEL_HORNET_PRODUCT_HPP
