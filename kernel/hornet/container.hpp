@@ -10,7 +10,7 @@
 #include <vector>
 #include <limits>
 #include <cmath>
-
+#include <typeinfo>
 
 
 namespace FEAST

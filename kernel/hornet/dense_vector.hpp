@@ -101,6 +101,16 @@ namespace FEAST
         return *this;
       }
 
+      DT_ * elements()
+      {
+        return _pelements;
+      }
+
+      const DT_ * elements() const
+      {
+        return _pelements;
+      }
+
       const DT_ & operator()(Index index) const
       {
         ASSERT(index < this->_size, "Error: " + stringify(index) + "exceeds dense vector size " + stringify(this->_size) + " !");

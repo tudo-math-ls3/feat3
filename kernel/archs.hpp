@@ -17,9 +17,7 @@ namespace FEAST
       {
         tv_nil = 0,
         tv_cpu,
-        tv_gpu_cuda,
-        tv_opencl_cpu,
-        tv_opencl_gpu,
+        tv_generic,
         tv_none
       };
 
@@ -39,7 +37,7 @@ namespace FEAST
       };
 
       /**
-       * Tag-type for generic/C++-based operations.
+       * Tag-type for operations in main (CPU) memory
        */
       struct CPU :
         public InstantiationPolicy<CPU, NonCopyable>
@@ -49,6 +47,20 @@ namespace FEAST
         static String name()
         {
           return "cpu";
+        }
+      };
+
+      /**
+       * Tag-type for generic/C++-based operations.
+       */
+      struct Generic :
+        public InstantiationPolicy<Generic, NonCopyable>
+      {
+        const static TagValue tag_value = tv_generic;
+        const static TagValue memory_value = tv_generic;
+        static String name()
+        {
+          return "generic";
         }
       };
 

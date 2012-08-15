@@ -12,7 +12,8 @@ MemoryPool<Archs::CPU>::MemoryPool()
 
 MemoryPool<Archs::CPU>::~MemoryPool()
 {
-  /// \todo throw error if any memory chunks exist
+  if (_pool.size() > 0)
+    throw InternalError("Memory Pool still contains memory chunks!");
 }
 
 //template<>
