@@ -30,7 +30,7 @@ public:
       DT_ ref(0);
       for (Index i(0) ; i < size ; ++i)
       {
-        a(i, DT_(i * DT_(1.234)));
+        a(i, DT_((i * DT_(1.234) / size)));
         ref += a(i) * a(i);
       }
       ref = sqrt(ref);

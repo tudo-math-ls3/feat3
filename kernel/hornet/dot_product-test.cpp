@@ -31,8 +31,8 @@ public:
       DT_ ref(0);
       for (Index i(0) ; i < size ; ++i)
       {
-        a(i, DT_(i * DT_(1.234)));
-        b(i, DT_(size*2 - i));
+        a(i, DT_((i * DT_(1.234)) / size));
+        b(i, DT_((size*2 - i) / size));
         ref += a(i) * b(i);
       }
 

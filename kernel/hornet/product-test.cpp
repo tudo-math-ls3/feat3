@@ -37,13 +37,13 @@ public:
         for (unsigned long col(0) ; col < ac.columns() ; ++col)
         {
           if (col % 5 == 0)
-            ac(row, col, row * 5 + col);
+            ac(row, col, row * 5 / (col + 1));
         }
       }
       SparseMatrixCSR<Arch_, DT_> a(ac);
       for (Index i(0) ; i < size ; ++i)
       {
-        b(i, DT_(size*2 - i * 1.23));
+        b(i, DT_(size*2 - i/((i+3)/2) * 1.23));
       }
       for (Index i(0) ; i < size ; ++i)
       {
