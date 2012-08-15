@@ -297,6 +297,39 @@
     <ClInclude Include="..\kernel\foundation\mapped_topology.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\hornet\absolute.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\axpy.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\difference.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\dot_product.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\element_product.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\norm.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\product.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\sparse_matrix_csr.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\hornet\sum.hpp">
+      <Filter>Header Files\hornet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\functor.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\functor_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
@@ -321,6 +354,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\foundation\attribute_error.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\functor_error.cpp">
       <Filter>Source Files\foundation</Filter>
     </ClCompile>
   </ItemGroup>

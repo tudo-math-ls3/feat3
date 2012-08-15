@@ -109,5 +109,32 @@
     <ClCompile Include="..\kernel\foundation\mapped_topology-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\hornet\axpy-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\difference-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\dot_product-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\element_product-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\norm-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\product-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\sparse_matrix_csr-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\hornet\sum-test.cpp">
+      <Filter>Source Files %28kernel%29\hornet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\functor-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

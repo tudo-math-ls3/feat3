@@ -427,6 +427,7 @@
     <ClCompile Include="..\kernel\foundation\attribute-test.cpp" />
     <ClCompile Include="..\kernel\foundation\communication-test.cpp" />
     <ClCompile Include="..\kernel\foundation\dense_data_wrapper-test.cpp" />
+    <ClCompile Include="..\kernel\foundation\functor-test.cpp" />
     <ClCompile Include="..\kernel\foundation\halo-test.cpp" />
     <ClCompile Include="..\kernel\foundation\halo_data-test.cpp" />
     <ClCompile Include="..\kernel\foundation\mapped_topology-test.cpp" />
@@ -440,9 +441,17 @@
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-tria.cpp" />
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-hexa.cpp" />
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-quad.cpp" />
+    <ClCompile Include="..\kernel\hornet\axpy-test.cpp" />
     <ClCompile Include="..\kernel\hornet\dense_matrix-test.cpp" />
     <ClCompile Include="..\kernel\hornet\dense_vector-test.cpp" />
+    <ClCompile Include="..\kernel\hornet\difference-test.cpp" />
+    <ClCompile Include="..\kernel\hornet\dot_product-test.cpp" />
+    <ClCompile Include="..\kernel\hornet\element_product-test.cpp" />
+    <ClCompile Include="..\kernel\hornet\norm-test.cpp" />
+    <ClCompile Include="..\kernel\hornet\product-test.cpp" />
     <ClCompile Include="..\kernel\hornet\sparse_matrix_coo-test.cpp" />
+    <ClCompile Include="..\kernel\hornet\sparse_matrix_csr-test.cpp" />
+    <ClCompile Include="..\kernel\hornet\sum-test.cpp" />
     <ClCompile Include="..\kernel\util\assertion-test.cpp" />
     <ClCompile Include="..\kernel\util\factorial-test.cpp" />
     <ClCompile Include="..\kernel\util\graph-test.cpp" />

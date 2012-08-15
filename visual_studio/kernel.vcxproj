@@ -499,6 +499,8 @@
     <ClInclude Include="..\kernel\foundation\communication.hpp" />
     <ClInclude Include="..\kernel\foundation\communication_error.hpp" />
     <ClInclude Include="..\kernel\foundation\dense_data_wrapper.hpp" />
+    <ClInclude Include="..\kernel\foundation\functor.hpp" />
+    <ClInclude Include="..\kernel\foundation\functor_error.hpp" />
     <ClInclude Include="..\kernel\foundation\halo.hpp" />
     <ClInclude Include="..\kernel\foundation\halo_data.hpp" />
     <ClInclude Include="..\kernel\foundation\mapped_topology.hpp" />
@@ -546,11 +548,20 @@
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_abacus.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp" />
+    <ClInclude Include="..\kernel\hornet\absolute.hpp" />
+    <ClInclude Include="..\kernel\hornet\axpy.hpp" />
     <ClInclude Include="..\kernel\hornet\container.hpp" />
     <ClInclude Include="..\kernel\hornet\dense_matrix.hpp" />
     <ClInclude Include="..\kernel\hornet\dense_vector.hpp" />
+    <ClInclude Include="..\kernel\hornet\difference.hpp" />
+    <ClInclude Include="..\kernel\hornet\dot_product.hpp" />
+    <ClInclude Include="..\kernel\hornet\element_product.hpp" />
     <ClInclude Include="..\kernel\hornet\memory_pool.hpp" />
+    <ClInclude Include="..\kernel\hornet\norm.hpp" />
+    <ClInclude Include="..\kernel\hornet\product.hpp" />
     <ClInclude Include="..\kernel\hornet\sparse_matrix_coo.hpp" />
+    <ClInclude Include="..\kernel\hornet\sparse_matrix_csr.hpp" />
+    <ClInclude Include="..\kernel\hornet\sum.hpp" />
     <ClInclude Include="..\kernel\util\abort.hpp" />
     <ClInclude Include="..\kernel\util\adjactor.hpp" />
     <ClInclude Include="..\kernel\util\assertion.hpp" />
@@ -580,6 +591,7 @@
     <ClCompile Include="..\kernel\archs.cpp" />
     <ClCompile Include="..\kernel\foundation\attribute_error.cpp" />
     <ClCompile Include="..\kernel\foundation\communication_error.cpp" />
+    <ClCompile Include="..\kernel\foundation\functor_error.cpp" />
     <ClCompile Include="..\kernel\foundation\mesh_error.cpp" />
     <ClCompile Include="..\kernel\hornet\memory_pool.cpp" />
     <ClCompile Include="..\kernel\util\exception.cpp" />
