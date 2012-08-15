@@ -45,7 +45,7 @@ namespace FEAST
     {
       public:
         template<typename DataType_>
-        static inline void send_recv(DataType_ * sendbuf, Index dest_rank, Index num_elements, DataType_* recvbuf, Index source_rank)
+        static inline void send_recv(DataType_ * sendbuf, Index /*dest_rank*/, Index num_elements, DataType_* recvbuf, Index /*source_rank*/)
           {
             DataType_ buf;
             const Index i_end(num_elements);
