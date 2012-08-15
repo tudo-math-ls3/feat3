@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/hornet/container.hpp>
+#include <kernel/hornet/absolute.hpp>
 
 #include <vector>
 #include <map>
@@ -137,7 +138,7 @@ namespace FEAST
       {
         for (Index j(0) ; j < a.columns() ; ++j)
         {
-          if (fabs(a(i, j) - b(i, j)) > std::numeric_limits<DT_>::epsilon())
+          if (Absolute<DT_>::value(a(i, j) - b(i, j)) > std::numeric_limits<DT_>::epsilon())
             return false;
         }
       }
