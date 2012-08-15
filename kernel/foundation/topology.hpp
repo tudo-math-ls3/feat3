@@ -46,14 +46,35 @@ namespace FEAST
         ///CTOR
         Topology() :
           _num_polytopes(0),
-          _topology(OuterStorageType_<StorageType_, std::allocator<StorageType_> >()),
-          _history(OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> >())
+          _topology(),
+          _history()
+          //_topology(OuterStorageType_<StorageType_, std::allocator<StorageType_> >()),
+          //_history(OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> >())
         {
+          std::cout << "TOPO CTOR" << std::endl;
         };
 
         ///DTOR
         ~Topology()
         {
+          /*std::cout << "TOPO DTOR" << std::endl;
+          if(_history.size() != 0)
+          {
+            IndexType_ i(_history.size() - 1);
+            while(i >= 0)
+            {
+              std::cout << i << std::endl;
+              FunctorBase* functor(_history.at(i));
+              delete functor;
+              _history.pop_back();
+
+              if(i != 0)
+                --i;
+              else
+                break;
+            }
+          }
+          std::cout << "END TOPO DTOR" << std::endl;*/
         }
 
         /**

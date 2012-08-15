@@ -47,7 +47,7 @@ namespace FEAST
     {
       public:
         Attribute() :
-          _data(StorageType_<DataType_, std::allocator<DataType_> >())
+          _data()
         {
         }
 

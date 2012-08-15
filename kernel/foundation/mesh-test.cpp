@@ -25,18 +25,24 @@ class MeshTestAttr:
 
     void run() const
     {
+      std::cout << "########################################################################" << std::endl;
       //basic tests
+      std::cout << "Creating mesh" << std::endl;
       Foundation::Mesh<> m(0);
+      std::cout << "mesh created" << std::endl;
 
+      std::cout << "########################################################################" << std::endl;
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m2(1);
 
       TEST_CHECK_EQUAL(m.get_num_levels(), 3ul);
       TEST_CHECK_EQUAL(m2.get_num_levels(), 3ul);
 
+      std::cout << "########################################################################" << std::endl;
       //##################################################################
 
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
 
+      std::cout << "########################################################################" << std::endl;
       //configure attribute
       Foundation::Attribute<double, std::vector> attr;
       Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
@@ -62,10 +68,12 @@ class MeshTestAttr:
       m3.add_polytope(Foundation::pl_edge);
       m3.add_polytope(Foundation::pl_edge);
 
+      std::cout << "########################################################################" << std::endl;
       //add faces
       m3.add_polytope(Foundation::pl_face);
       m3.add_polytope(Foundation::pl_face);
 
+      std::cout << "########################################################################" << std::endl;
       /*     0  1
            0--1--2     *--*--*
          2 | 3|  |4    | 0| 1|
@@ -242,6 +250,7 @@ class MeshTestAttr:
       TEST_CHECK_EQUAL(test_0u.at(1), 2ul);
       TEST_CHECK_EQUAL(test_0u.at(2), 4ul);
       TEST_CHECK_EQUAL(test_0u.at(3), 5ul);
+      std::cout << "########################################################################" << std::endl;
 
 
       //testing face-edge access
@@ -523,7 +532,7 @@ class MeshTestAttr:
         std::cout << "copy" << std::endl;
       }
 
-
+      std::cout << "END OF MESH TEST" << std::endl;
     }
 };
 MeshTestAttr<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_cpu_v_v("std::vector, std::vector");

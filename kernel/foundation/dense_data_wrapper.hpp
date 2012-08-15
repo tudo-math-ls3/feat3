@@ -16,7 +16,7 @@ namespace FEAST
           DenseDataWrapper() :
             _size(_i),
             _num_non_zeros(0),
-            _data(ContType_<Arch_, DT_>(_i))
+            _data(_i)
         {
         }
 

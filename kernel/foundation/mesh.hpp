@@ -129,11 +129,13 @@ namespace FEAST
           _mp_rank(mp_rank),
           _num_inter_topologies(i_),
           _num_levels((unsigned)(i_/2u) + 1u),
-          _topologies(OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >()),
-          _history(OuterStorageType_<CompoundFunctor<OuterStorageType_>, std::allocator<CompoundFunctor<OuterStorageType_> > >()),
+          _topologies(), //TODO initialise with repetitor CTOR
+          _history(),
+          //_topologies(OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >()), //initialise with repetitor CTOR
+          //_history(OuterStorageType_<CompoundFunctor<OuterStorageType_>, std::allocator<CompoundFunctor<OuterStorageType_> > >()),
           _attrs(attrbase),
           _num_attributes(0),
-          _attribute_polytopelevel_relations(typename TopologyType_::storage_type_())
+          _attribute_polytopelevel_relations()
       {
         for(Index i(0) ; i < i_ ; ++i)
         {
@@ -149,7 +151,7 @@ namespace FEAST
           _mp_rank(other._mp_rank),
           _num_inter_topologies(other._num_inter_topologies),
           _num_levels(other._num_levels),
-          _history(other._history),
+          _history(),
           _attrs(attrbase),
           _num_attributes(0)
       {

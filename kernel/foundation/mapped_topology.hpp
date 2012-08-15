@@ -36,8 +36,8 @@ namespace FEAST
         ///CTOR
         MappedTopology() :
           Topology<IndexType_, OuterStorageType_, StorageType_>(),
-          _keys(StorageType_()),
-          _values(OuterStorageType_<ValueType_, std::allocator<ValueType_> >())
+          _keys(),
+          _values()
         {
         }
 

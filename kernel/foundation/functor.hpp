@@ -263,7 +263,7 @@ namespace FEAST
         typedef StorageType_<FunctorBase*, std::allocator<FunctorBase*> > storage_type_;
 
         CompoundFunctor() :
-          _functors(storage_type_())
+          _functors()
         {
           this->_executed = true;
           this->_undone = false;
@@ -293,12 +293,21 @@ namespace FEAST
           if(this->_undone)
             throw FunctorError("Already undone!");
 
-          for(Index i(_functors.size() - 1) ; i > 0 ; --i)
+          if(_functors.size() != 0)
           {
-            _functors.at(i)->undo();
+            Index i(_functors.size() - 1);
+            while(i >= 0)
+            {
+              _functors.at(i)->undo();
+
+              if(i != 0)
+                --i;
+              else
+                break;
+            }
+            this->_undone = true;
+            this->_executed = false;
           }
-          this->_undone = true;
-          this->_executed = false;
         }
 
         storage_type_& get_functors()

@@ -24,6 +24,7 @@ class HaloTest:
     void run() const
     {
 
+      std::cout << "FIN" << std::endl;
       //##################################################################
       //     0  1
       //   0--1--2     *--*--*
@@ -31,13 +32,17 @@ class HaloTest:
       //   3--4--5     *--*--*
       //    5  6
 
+      std::cout << "FIN" << std::endl;
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(0);
+      std::cout << "FIN" << std::endl;
 
       //configure attribute
+      std::cout << "FIN" << std::endl;
       Foundation::Attribute<double, std::vector> attr;
       Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
 
       //add vertices
+      std::cout << "FIN" << std::endl;
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
@@ -52,6 +57,7 @@ class HaloTest:
       attr.push_back(double(1));
 
       //add edges
+      std::cout << "FIN" << std::endl;
       m3.add_polytope(Foundation::pl_edge);
       m3.add_polytope(Foundation::pl_edge);
       m3.add_polytope(Foundation::pl_edge);
@@ -61,9 +67,11 @@ class HaloTest:
       m3.add_polytope(Foundation::pl_edge);
 
       //add faces
+      std::cout << "FIN" << std::endl;
       m3.add_polytope(Foundation::pl_face);
       m3.add_polytope(Foundation::pl_face);
 
+      std::cout << "FIN" << std::endl;
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
@@ -79,6 +87,7 @@ class HaloTest:
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
 
+      std::cout << "FIN" << std::endl;
       m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
       m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
       m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically

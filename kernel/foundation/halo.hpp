@@ -41,8 +41,8 @@ namespace FEAST
 
         ///CTOR
         Halo(MeshType_ & mesh, IndexType_ other) :
-          _halo_elements(StorageType_<IndexType_, std::allocator<IndexType_> >()),
-          _halo_element_counterparts(StorageType_<IndexType_, std::allocator<IndexType_> >()),
+          _halo_elements(),
+          _halo_element_counterparts(),
           _mesh(mesh),
           _other(other),
           _overlap(delta_)

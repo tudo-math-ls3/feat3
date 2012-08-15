@@ -36,8 +36,8 @@ namespace FEAST
         ///CTOR
         HaloData(HaloType_ & halo) :
           _halo(halo),
-          _halo_elements(VectorType_<IndexType_>(halo.size())),
-          _halo_element_counterparts(VectorType_<IndexType_>(halo.size()))
+          _halo_elements(halo.size()),
+          _halo_element_counterparts(halo.size())
         {
           for(IndexType_ i(0) ; i < halo.size() ; ++i)
           {
