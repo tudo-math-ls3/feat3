@@ -225,7 +225,7 @@ namespace FEAST
       {
         for (Index j(0) ; j < a.columns() ; ++j)
         {
-          if (fabs(a(i, j) - b(i, j) > std::numeric_limits<DT_>::epsilon()))
+          if (fabs(a(i, j) - b(i, j)) > std::numeric_limits<DT_>::epsilon())
             return false;
         }
       }
