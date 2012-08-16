@@ -1,12 +1,11 @@
-// This test needs DEBUG defined.
-#ifndef DEBUG
-#define DEBUG 1
-#endif
 
 #include <test_system/test_system.hpp>
 #include <kernel/util/assertion.hpp>
 
 #include <string>
+
+// This test needs DEBUG defined.
+#ifdef DEBUG
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -59,3 +58,5 @@ public:
   }
 };
 AssertionTest<Archs::None, Nil> assertion_test;
+
+#endif // DEBUG

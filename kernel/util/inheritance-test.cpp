@@ -1,8 +1,3 @@
-// This test needs DEBUG defined.
-#ifndef DEBUG
-#define DEBUG 1
-#endif
-
 // includes, FEAST
 #include <test_system/test_system.hpp>
 #include <kernel/util/inheritance.hpp>
