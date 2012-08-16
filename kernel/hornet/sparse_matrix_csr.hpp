@@ -200,6 +200,11 @@ namespace FEAST
       {
         return _Ar;
       }
+
+      const DT_ zero_element() const
+      {
+        return _zero_element;
+      }
   };
 
   template <typename Arch_, typename DT_> bool operator== (const SparseMatrixCSR<Arch_, DT_> & a, const SparseMatrixCSR<Arch_, DT_> & b)
@@ -208,27 +213,39 @@ namespace FEAST
       return false;
     if (a.columns() != b.columns())
       return false;
+    if (a.used_elements() != b.used_elements())
+      return false;
+    if (a.zero_element() != b.zero_element())
+      return false;
 
     if (typeid(DT_) == typeid(Index))
     {
-      for (Index i(0) ; i < a.rows() ; ++i)
+      for (Index i(0) ; i < a.used_elements() ; ++i)
       {
-        for (Index j(0) ; j < a.columns() ; ++j)
-        {
-          if (a(i, j) != b(i, j))
+          if (a.Ax()[i] != b.Ax()[i])
             return false;
-        }
+          if (a.Aj()[i] != b.Aj()[i])
+            return false;
+      }
+      for (Index i(0) ; i < a.rows() + 1 ; ++i)
+      {
+          if (a.Ar()[i] != b.Ar()[i])
+            return false;
       }
     }
     else
     {
-      for (Index i(0) ; i < a.rows() ; ++i)
+      for (Index i(0) ; i < a.used_elements() ; ++i)
       {
-        for (Index j(0) ; j < a.columns() ; ++j)
-        {
-          if (Absolute<DT_>::value(a(i, j) - b(i, j)) > std::numeric_limits<DT_>::epsilon())
+          if (Absolute<DT_>::value(a.Ax()[i] - b.Ax()[i]) > std::numeric_limits<DT_>::epsilon())
             return false;
-        }
+          if (a.Aj()[i] != b.Aj()[i])
+            return false;
+      }
+      for (Index i(0) ; i < a.rows() + 1 ; ++i)
+      {
+          if (a.Ar()[i] != b.Ar()[i])
+            return false;
       }
     }
 
