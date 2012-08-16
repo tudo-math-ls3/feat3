@@ -12,34 +12,38 @@
 
 namespace FEAST
 {
-  template <typename Arch_, typename BType_>
-  struct DotProduct
+  namespace LAFEM
   {
-  };
-
-  template <>
-  struct DotProduct<Archs::CPU, Archs::Generic>
-  {
-    template <typename DT_>
-    static DT_ value(const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
+    template <typename Arch_, typename BType_>
+    struct DotProduct
     {
-      if (x.size() != y.size())
-        throw InternalError("Vector size does not match!");
+    };
 
-      const DT_ * xp(x.elements());
-      const DT_ * yp(y.elements());
-      DT_ r(0);
-      const Index size(x.size());
-
-      for (Index i(0) ; i < size ; ++i)
+    template <>
+    struct DotProduct<Archs::CPU, Archs::Generic>
+    {
+      template <typename DT_>
+      static DT_ value(const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {
-        r += xp[i] * yp[i];
+        if (x.size() != y.size())
+          throw InternalError("Vector size does not match!");
+
+        const DT_ * xp(x.elements());
+        const DT_ * yp(y.elements());
+        DT_ r(0);
+        const Index size(x.size());
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          r += xp[i] * yp[i];
+        }
+
+        return r;
       }
+    };
 
-      return r;
-    }
-  };
 
+  } // namespace LAFEM
 } // namespace FEAST
 
 #endif // KERNEL_LAFEM_DOT_PRODUCT_HPP

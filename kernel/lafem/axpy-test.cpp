@@ -5,6 +5,7 @@
 #include <kernel/lafem/axpy.hpp>
 
 using namespace FEAST;
+using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<

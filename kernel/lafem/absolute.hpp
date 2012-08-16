@@ -12,25 +12,28 @@
 
 namespace FEAST
 {
-  template<typename DT_>
-  struct Absolute
+  namespace LAFEM
   {
-    static DT_ value(DT_ val)
+    template<typename DT_>
+    struct Absolute
     {
-      return std::abs(val);
-    }
-  };
+      static DT_ value(DT_ val)
+      {
+        return std::abs(val);
+      }
+    };
 
-  template<>
-  struct Absolute<Index>
-  {
-    static Index value(Index val)
+    template<>
+    struct Absolute<Index>
     {
-      return val;
-    }
+      static Index value(Index val)
+      {
+        return val;
+      }
 
-  };
+    };
 
+  } // namespace LAFEM
 } // namespace FEAST
 
 #endif // KERNEL_LAFEM_ABSOLUTE_HPP

@@ -4,6 +4,7 @@
 #include <kernel/lafem/dense_matrix.hpp>
 
 using namespace FEAST;
+using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**

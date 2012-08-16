@@ -10,6 +10,7 @@
 #include<deque>
 
 using namespace FEAST;
+using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 

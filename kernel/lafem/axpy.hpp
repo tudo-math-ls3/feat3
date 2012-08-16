@@ -12,54 +12,57 @@
 
 namespace FEAST
 {
-  template <typename Arch_, typename BType_>
-  struct Axpy
+  namespace LAFEM
   {
-  };
-
-  template <>
-  struct Axpy <Archs::CPU, Archs::Generic>
-  {
-    template <typename DT_>
-    static void value(DenseVector<Archs::CPU, DT_> & r, const DT_ a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
+    template <typename Arch_, typename BType_>
+    struct Axpy
     {
-      if (x.size() != y.size())
-        throw InternalError("Vector size does not match!");
-      if (x.size() != r.size())
-        throw InternalError("Vector size does not match!");
+    };
 
-      const DT_ * xp(x.elements());
-      const DT_ * yp(y.elements());
-      DT_ * rp(r.elements());
-      const Index size(r.size());
-
-      for (Index i(0) ; i < size ; ++i)
-      {
-        rp[i] = a * xp[i] + yp[i];
-      }
-    }
-
-    template <typename DT_>
-    static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
+    template <>
+    struct Axpy <Archs::CPU, Archs::Generic>
     {
-      if (x.size() != y.size())
-        throw InternalError("Vector size does not match!");
-      if (x.size() != r.size())
-        throw InternalError("Vector size does not match!");
-
-      const DT_ * ap(a.elements());
-      const DT_ * xp(x.elements());
-      const DT_ * yp(y.elements());
-      DT_ * rp(r.elements());
-      const Index size(r.size());
-
-      for (Index i(0) ; i < size ; ++i)
+      template <typename DT_>
+      static void value(DenseVector<Archs::CPU, DT_> & r, const DT_ a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {
-        rp[i] = ap[i] * xp[i] + yp[i];
-      }
-    }
-  };
+        if (x.size() != y.size())
+          throw InternalError("Vector size does not match!");
+        if (x.size() != r.size())
+          throw InternalError("Vector size does not match!");
 
+        const DT_ * xp(x.elements());
+        const DT_ * yp(y.elements());
+        DT_ * rp(r.elements());
+        const Index size(r.size());
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          rp[i] = a * xp[i] + yp[i];
+        }
+      }
+
+      template <typename DT_>
+      static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
+      {
+        if (x.size() != y.size())
+          throw InternalError("Vector size does not match!");
+        if (x.size() != r.size())
+          throw InternalError("Vector size does not match!");
+
+        const DT_ * ap(a.elements());
+        const DT_ * xp(x.elements());
+        const DT_ * yp(y.elements());
+        DT_ * rp(r.elements());
+        const Index size(r.size());
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          rp[i] = ap[i] * xp[i] + yp[i];
+        }
+      }
+    };
+
+  } // namespace LAFEM
 } // namespace FEAST
 
 #endif // KERNEL_LAFEM_AXPY_HPP

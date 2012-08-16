@@ -15,28 +15,29 @@
 
 namespace FEAST
 {
-  class ContainerBase
+  namespace LAFEM
   {
-    protected:
-      Index _size;
+    class ContainerBase
+    {
+      protected:
+        Index _size;
 
-      ContainerBase(Index size) :
-        _size(size)
+        ContainerBase(Index size) :
+          _size(size)
       {
       }
+    };
 
-  };
+    template <typename Arch_, typename DT_>
+    class Container : public ContainerBase
+    {
+      protected:
+        std::vector<DT_*> _elements;
+        std::vector<Index*> _indices;
 
-  template <typename Arch_, typename DT_>
-  class Container : public ContainerBase
-  {
-    protected:
-      std::vector<DT_*> _elements;
-      std::vector<Index*> _indices;
-
-    public:
-      Container(Index size) :
-        ContainerBase(size)
+      public:
+        Container(Index size) :
+          ContainerBase(size)
       {
       }
 
@@ -65,7 +66,7 @@ namespace FEAST
         ContainerBase(other)
       {
         if (typeid(DT_) != typeid(DT2_))
-            throw InternalError("type conversion not supported yet!");
+          throw InternalError("type conversion not supported yet!");
 
         for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
           MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_));
@@ -100,8 +101,9 @@ namespace FEAST
       {
         return this->_size;
       }
-  };
+    };
 
+  } // namespace LAFEM
 } // namespace FEAST
 
 #endif // KERNEL_LAFEM_CONTAINER_HPP

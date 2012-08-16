@@ -4,6 +4,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 
 using namespace FEAST;
+using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**

@@ -13,32 +13,35 @@
 
 namespace FEAST
 {
-  template <typename Arch_, typename BType_>
-  struct Norm2
+  namespace LAFEM
   {
-  };
-
-  template <>
-  struct Norm2<Archs::CPU, Archs::Generic>
-  {
-    template <typename DT_>
-    static DT_ value(const DenseVector<Archs::CPU, DT_> & x)
+    template <typename Arch_, typename BType_>
+    struct Norm2
     {
-      const DT_ * xp(x.elements());
-      DT_ r(0);
-      const Index size(x.size());
+    };
 
-      DT_ xpv;
-      for (Index i(0) ; i < size ; ++i)
+    template <>
+    struct Norm2<Archs::CPU, Archs::Generic>
+    {
+      template <typename DT_>
+      static DT_ value(const DenseVector<Archs::CPU, DT_> & x)
       {
-        xpv = xp[i];
-        r += xpv * xpv;
+        const DT_ * xp(x.elements());
+        DT_ r(0);
+        const Index size(x.size());
+
+        DT_ xpv;
+        for (Index i(0) ; i < size ; ++i)
+        {
+          xpv = xp[i];
+          r += xpv * xpv;
+        }
+
+        return sqrt(r);
       }
+    };
 
-      return sqrt(r);
-    }
-  };
-
+  } // namespace LAFEM
 } // namespace FEAST
 
 #endif // KERNEL_LAFEM_NORM2_HPP

@@ -5,6 +5,7 @@
 
 
 using namespace FEAST;
+using namespace FEAST::LAFEM;
 
 MemoryPool<Archs::CPU>::MemoryPool()
 {
