@@ -26,7 +26,7 @@ public:
 
   virtual void run() const
   {
-    for (Index size(1) ; size < 1.5e3 ; size*=2)
+    for (Index size(1) ; size < 1e3 ; size*=2)
     {
       SparseMatrixCOO<Arch_, DT_> ac(size, size + 2);
       DenseVector<Arch_, DT_> b(size + 2);
