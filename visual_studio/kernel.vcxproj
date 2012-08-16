@@ -584,6 +584,7 @@
     <ClInclude Include="..\kernel\util\prefix.hpp" />
     <ClInclude Include="..\kernel\util\pretty_printer.hpp" />
     <ClInclude Include="..\kernel\util\string.hpp" />
+    <ClInclude Include="..\kernel\util\time_stamp.hpp" />
     <ClInclude Include="..\kernel\util\type_traits.hpp" />
     <ClInclude Include="feast_config.hpp" />
   </ItemGroup>

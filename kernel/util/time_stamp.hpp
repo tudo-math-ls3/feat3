@@ -6,71 +6,112 @@
 #include <kernel/base_header.hpp>
 
 // includes, system
-#include <limits>
-#ifdef __linux
+#if defined(__linux) || defined(__unix__)
+#  define FEAST_HAVE_GETTIMEOFDAY 1
 #  include <sys/time.h>
+#elif defined(_WIN32)
+// Do not include <windows.h> to avoid namespace pollution -- define the necessary prototypes by hand instead.
+extern "C" int __stdcall QueryPerformanceCounter(long long int*);
+extern "C" int __stdcall QueryPerformanceFrequency(long long int*);
 #else
-#  error "TimeStamp is not yet supported on your platform!"
+#  include <ctime>
 #endif
-
 
 namespace FEAST
 {
+  /**
+   * \brief Time stamp class
+   *
+   * This class is used to store time stamps and compute elapsed times. The implementation of this
+   * class depends on the current platform:
+   *  - For unix/linux systems, this class makes use of the \c gettimeofday() function.
+   *  - For Windows systems, this class makes use of the \c QueryPerformanceCounter() function.
+   *  - For other systems, this class makes use of the ANSI-C \c clock() function as a fallback implementation.
+   *
+   * \author Dirk Ribbrock
+   * \author Peter Zajac
+   */
   class TimeStamp
   {
-    private:
-      /// Our time-stamp.
-      timeval _time;
-
-    public:
-      /// Constructor.
-      TimeStamp()
-      {
-        _time.tv_sec = std::numeric_limits<typeof(_time.tv_sec)>::max();
-        _time.tv_usec = std::numeric_limits<typeof(_time.tv_usec)>::max();
-      }
-
-      /// Take a new time stamp.
-      TimeStamp take()
-      {
-        gettimeofday(&_time, 0);
-
-        return *this;
-      }
-
-      /// Returns our seconds.
-      unsigned long sec() const
-      {
-        return _time.tv_sec;
-      }
-
-      /// Returns our useconds.
-      long usec() const
-      {
-        return _time.tv_usec;
-      }
-
-      /// Return total time in seconds.
-      double total() const
-      {
-        return _time.tv_sec + (_time.tv_usec / 1e6);
-      }
-
-      /**
-       * Our comparison operator.
-       *
-       * Return true if our time-stamp has been taken earlier than the
-       * other.
-       *
-       * \param other Another time-stamp.
-       */
-      bool operator< (const TimeStamp & other)
-      {
-        double this_time(_time.tv_sec + (_time.tv_usec / 1e6));
-        double other_time(other._time.tv_sec + (other._time.tv_usec / 1e6));
-        return this_time < other_time;
-      }
-  };
-}
-
+  private:
+    /// Our time-stamp.
+#if defined(FEAST_HAVE_GETTIMEOFDAY)
+    timeval _time;
+#elif defined(_WIN32)
+    long long int _counter;
+#elif
+    clock_t _clock;
 #endif
+
+  public:
+    /// Constructor.
+    TimeStamp()
+    {
+      stamp();
+    }
+
+    /**
+     * \brief Stamps the current time-stamp.
+     *
+     * This function updates the time-stamp to the current time.
+     *
+     * \returns \c *this
+     */
+    TimeStamp& stamp()
+    {
+#if defined(FEAST_HAVE_GETTIMEOFDAY)
+      gettimeofday(&_time, 0);
+#elif defined(_WIN32)
+      QueryPerformanceCounter(&_counter);
+#else
+      _clock = ::clock();
+#endif
+      return *this;
+    }
+
+    /**
+     * \brief Calculates the time elapsed between two time stamps.
+     *
+     * \param[in] before
+     * A time stamp that represents a previous moment.
+     *
+     * \returns
+     * The time elapsed between the time stamps \p before and \c this in seconds.
+     */
+    double elapsed(const TimeStamp& before) const
+    {
+#if defined(FEAST_HAVE_GETTIMEOFDAY)
+      return double(_time.tv_sec - before._time.tv_sec) + 1E-6 * double(_time.tv_usec - before._time.tv_usec);
+#elif defined(_WIN32)
+      long long int freq = 0;
+      QueryPerformanceFrequency(&freq);
+      return (freq == 0) ? 0.0 : (double(_counter - before._counter) / double(freq));
+#else
+      return double(_clock - before._clock) / double(CLOCKS_PER_SEC);
+#endif
+    }
+
+    /**
+     * \brief Comparison operator.
+     *
+     * \param[int] other
+     * Another time-stamp.
+     *
+     * \returns
+     * \c true, if \c this time-stamp has been taken earlier than \p other, otherwise \c false.
+     */
+    bool operator< (const TimeStamp & other) const
+    {
+#if defined(FEAST_HAVE_GETTIMEOFDAY)
+      return (_time.tv_sec < other._time.tv_sec) ||
+        ((_time.tv_sec == other._time.tv_sec) && (_time.tv_usec < other._time.tv_usec));
+#elif defined(_WIN32)
+      return (_counter < other._counter);
+#else
+      return (_clock < other._clock);
+#endif
+    }
+  }; // class TimeStamp
+} // namespace FEAST
+
+#endif // KERNEL_UTIL_TIMESTAMP_HPP

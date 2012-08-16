@@ -330,6 +330,9 @@
     <ClInclude Include="..\kernel\foundation\functor_error.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\time_stamp.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
