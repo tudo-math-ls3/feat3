@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/hornet/dense_vector.hpp>
 #include <kernel/hornet/sparse_matrix_csr.hpp>
@@ -15,8 +16,13 @@ namespace FEAST
   template <typename Arch_, typename BType_>
   struct Product
   {
+  };
+
+  template <>
+  struct Product<Archs::CPU, Archs::Generic>
+  {
     template <typename DT_>
-    static void value(DenseVector<Arch_, DT_> & r, const SparseMatrixCSR<Arch_, DT_> & a, const DenseVector<Arch_, DT_> & b)
+    static void value(DenseVector<Archs::CPU, DT_> & r, const SparseMatrixCSR<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & b)
     {
       if (b.size() != a.columns())
         throw InternalError("Vector size does not match!");

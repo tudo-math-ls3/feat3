@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/hornet/dense_vector.hpp>
 
@@ -14,8 +15,13 @@ namespace FEAST
   template <typename Arch_, typename BType_>
   struct Axpy
   {
+  };
+
+  template <>
+  struct Axpy <Archs::CPU, Archs::Generic>
+  {
     template <typename DT_>
-    static void value(DenseVector<Arch_, DT_> & r, const DT_ a, const DenseVector<Arch_, DT_> & x, const DenseVector<Arch_, DT_> & y)
+    static void value(DenseVector<Archs::CPU, DT_> & r, const DT_ a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
     {
       if (x.size() != y.size())
         throw InternalError("Vector size does not match!");
@@ -34,7 +40,7 @@ namespace FEAST
     }
 
     template <typename DT_>
-    static void value(DenseVector<Arch_, DT_> & r, const DenseVector<Arch_, DT_> & a, const DenseVector<Arch_, DT_> & x, const DenseVector<Arch_, DT_> & y)
+    static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
     {
       if (x.size() != y.size())
         throw InternalError("Vector size does not match!");

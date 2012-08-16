@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/hornet/dense_vector.hpp>
 
@@ -15,8 +16,13 @@ namespace FEAST
   template <typename Arch_, typename BType_>
   struct Norm2
   {
+  };
+
+  template <>
+  struct Norm2<Archs::CPU, Archs::Generic>
+  {
     template <typename DT_>
-    static DT_ value(const DenseVector<Arch_, DT_> & x)
+    static DT_ value(const DenseVector<Archs::CPU, DT_> & x)
     {
       const DT_ * xp(x.elements());
       DT_ r(0);

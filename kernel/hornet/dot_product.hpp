@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/hornet/dense_vector.hpp>
 
@@ -14,8 +15,13 @@ namespace FEAST
   template <typename Arch_, typename BType_>
   struct DotProduct
   {
+  };
+
+  template <>
+  struct DotProduct<Archs::CPU, Archs::Generic>
+  {
     template <typename DT_>
-    static DT_ value(const DenseVector<Arch_, DT_> & x, const DenseVector<Arch_, DT_> & y)
+    static DT_ value(const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
     {
       if (x.size() != y.size())
         throw InternalError("Vector size does not match!");
