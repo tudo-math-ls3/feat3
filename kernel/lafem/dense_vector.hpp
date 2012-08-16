@@ -72,7 +72,7 @@ namespace FEAST
           this->_pelements = this->_elements.at(0);
         }
 
-        DenseVector<Arch_, DT_> & operator= (DenseVector<Arch_, DT_> & other)
+        DenseVector<Arch_, DT_> & operator= (const DenseVector<Arch_, DT_> & other)
         {
           if (this == &other)
             return *this;
@@ -104,7 +104,7 @@ namespace FEAST
         }
 
         template <typename Arch2_, typename DT2_>
-        DenseVector<Arch_, DT_> & operator= (DenseVector<Arch2_, DT2_> & other)
+        DenseVector<Arch_, DT_> & operator= (const DenseVector<Arch2_, DT2_> & other)
         {
           if (this == &other)
             return *this;
