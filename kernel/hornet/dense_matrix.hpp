@@ -29,7 +29,7 @@ namespace FEAST
       {
       }
 
-      DenseMatrix(Index rows, Index columns) :
+      explicit DenseMatrix(Index rows, Index columns) :
         Container<Arch_, DT_>(rows * columns)
       {
         this->_size = rows * columns;
@@ -40,7 +40,7 @@ namespace FEAST
         _pelements = this->_elements.at(0);
       }
 
-      DenseMatrix(Index rows, Index columns, DT_ value) :
+      explicit DenseMatrix(Index rows, Index columns, DT_ value) :
         Container<Arch_, DT_>(rows * columns)
       {
         this->_size = rows * columns;

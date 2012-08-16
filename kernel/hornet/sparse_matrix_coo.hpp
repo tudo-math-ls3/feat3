@@ -37,7 +37,7 @@ namespace FEAST
       {
       }
 
-      SparseMatrixCOO(Index rows, Index columns) :
+      explicit SparseMatrixCOO(Index rows, Index columns) :
         Container<Arch_, DT_>(rows * columns),
         _zero_element(DT_(0)),
         _used_elements(0)

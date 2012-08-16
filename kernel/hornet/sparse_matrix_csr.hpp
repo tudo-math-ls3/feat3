@@ -75,9 +75,31 @@ namespace FEAST
           _Ar[i] = _used_elements;
       }
 
-      /*explicit SparseMatrixCSR(const DenseVector<Arch_, Index> & Aj, const DenseVector<Arch_, DT_> & Ax)
+      explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & Aj, const DenseVector<Arch_, DT_> & Ax, const DenseVector<Arch_, Index> & Ar) :
+        Container<Arch_, DT_>(rows * columns),
+        _rows(rows),
+        _columns(columns),
+        _zero_element(DT_(0)),
+        _used_elements(Ax.size())
       {
-      }*/
+        // \TODO create real copies
+        DenseVector<Arch_, Index> tAj(Aj);
+        DenseVector<Arch_, DT_> tAx(Ax);
+        DenseVector<Arch_, Index> tAr(Ar);
+
+        this->_elements.push_back(tAx.get_elements().at(0));
+        this->_indices.push_back(tAj.get_elements().at(0));
+        this->_indices.push_back(tAr.get_elements().at(0));
+
+        this->_Ax = this->_elements.at(0);
+        this->_Aj = this->_indices.at(0);
+        this->_Ar = this->_indices.at(1);
+
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+      }
 
       SparseMatrixCSR(const SparseMatrixCSR<Arch_, DT_> & other) :
         Container<Arch_, DT_>(other),

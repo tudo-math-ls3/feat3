@@ -25,18 +25,16 @@ namespace FEAST
       {
       }
 
-      DenseVector(Index size) :
+      explicit DenseVector(Index size) :
         Container<Arch_, DT_>(size)
       {
-        this->_size = size;
         this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
         this->_pelements = this->_elements.at(0);
       }
 
-      DenseVector(Index size, DT_ value) :
+      explicit DenseVector(Index size, DT_ value) :
         Container<Arch_, DT_>(size)
       {
-        this->_size = size;
         this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
         this->_pelements = this->_elements.at(0);
 
@@ -45,6 +43,18 @@ namespace FEAST
         {
           _pelements[i] = value;
         }
+      }
+
+      explicit DenseVector(Index size, DT_ * data) :
+        Container<Arch_, DT_>(size)
+      {
+        this->_elements.push_back(data);
+        this->_pelements = this->_elements.at(0);
+
+        for (Index i(0) ; i < this->_elements.size() ; ++i)
+          MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
+        for (Index i(0) ; i < this->_indices.size() ; ++i)
+          MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
       }
 
       DenseVector(const DenseVector<Arch_, DT_> & other) :
