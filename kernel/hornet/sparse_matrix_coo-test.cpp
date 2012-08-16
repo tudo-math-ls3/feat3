@@ -1,8 +1,3 @@
-// This test needs DEBUG defined.
-#ifndef DEBUG
-#define DEBUG 1
-#endif
-
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
