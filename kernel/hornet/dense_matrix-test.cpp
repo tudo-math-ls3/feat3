@@ -57,7 +57,6 @@ public:
     f = e;
     TEST_CHECK_EQUAL(f(7,8), e(7,8));
     TEST_CHECK_EQUAL(f, e);
-    std::cout<<f;
   }
 };
 DenseMatrixTest<Archs::CPU, float> dense_matrix_test_float;

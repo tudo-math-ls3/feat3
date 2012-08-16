@@ -60,7 +60,6 @@ public:
     TEST_CHECK_EQUAL(c(1,2), b(1,2));
     TEST_CHECK_EQUAL(c, b);
     TEST_CHECK_EQUAL(c.used_elements(), b.used_elements());
-    std::cout<<c;
   }
 };
 SparseMatrixCOOTest<Archs::CPU, float> sparse_matrix_coo_test_float;

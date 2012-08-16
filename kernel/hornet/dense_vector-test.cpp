@@ -58,7 +58,6 @@ public:
     e = a;
     TEST_CHECK_EQUAL(e(5), a(5));
     TEST_CHECK_EQUAL(e, a);
-    std::cout<<e;
   }
 };
 DenseVectorTest<Archs::CPU, float> dense_vector_test_float;
