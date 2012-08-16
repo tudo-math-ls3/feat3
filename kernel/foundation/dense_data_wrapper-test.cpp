@@ -2,7 +2,7 @@
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/dense_data_wrapper.hpp>
-#include <kernel/hornet/dense_vector.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/archs.hpp>
 
 #include<deque>

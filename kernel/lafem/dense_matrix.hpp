@@ -1,12 +1,12 @@
 #pragma once
-#ifndef KERNEL_HORNET_DENSE_MATRIX_HPP
-#define KERNEL_HORNET_DENSE_MATRIX_HPP 1
+#ifndef KERNEL_LAFEM_DENSE_MATRIX_HPP
+#define KERNEL_LAFEM_DENSE_MATRIX_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/hornet/container.hpp>
-#include <kernel/hornet/absolute.hpp>
+#include <kernel/lafem/container.hpp>
+#include <kernel/lafem/absolute.hpp>
 
 
 namespace FEAST
@@ -201,4 +201,4 @@ namespace FEAST
   }
 } // namespace FEAST
 
-#endif // KERNEL_HORNET_DENSE_VECTOR_HPP
+#endif // KERNEL_LAFEM_DENSE_VECTOR_HPP

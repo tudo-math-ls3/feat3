@@ -1,8 +1,8 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
-#include <kernel/hornet/sparse_matrix_coo.hpp>
-#include <kernel/hornet/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;

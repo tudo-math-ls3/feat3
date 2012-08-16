@@ -1,5 +1,5 @@
 // includes, FEAST
-#include <kernel/hornet/memory_pool.hpp>
+#include <kernel/lafem/memory_pool.hpp>
 
 #include <stdio.h>
 

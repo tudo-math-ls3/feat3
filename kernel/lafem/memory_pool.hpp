@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_HORNET_MEMORY_POOL_HPP
-#define KERNEL_HORNET_MEMORY_POOL_HPP 1
+#ifndef KERNEL_LAFEM_MEMORY_POOL_HPP
+#define KERNEL_LAFEM_MEMORY_POOL_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -55,4 +55,4 @@ namespace FEAST
   };
 } // namespace FEAST
 
-#endif // KERNEL_HORNET_MEMORY_POOL_HPP
+#endif // KERNEL_LAFEM_MEMORY_POOL_HPP

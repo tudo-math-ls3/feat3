@@ -7,14 +7,14 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 ADD_SUBDIRECTORY( util )
-ADD_SUBDIRECTORY( hornet )
+ADD_SUBDIRECTORY( lafem )
 ADD_SUBDIRECTORY( geometry )
 ADD_SUBDIRECTORY( foundation )
 
 #list of kernel source files
 ADD_LIBRARY(feast STATIC archs.cpp)
 #list of libraries to include in libfeast
-TARGET_LINK_LIBRARIES (feast kernel-util kernel-hornet kernel-geometry kernel-foundation)
+TARGET_LINK_LIBRARIES (feast kernel-util kernel-lafem kernel-geometry kernel-foundation)
 
 #list of kernel tests
 SET (test_list)

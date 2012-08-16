@@ -4,7 +4,7 @@
 #include <kernel/foundation/topology.hpp>
 #include <kernel/foundation/dense_data_wrapper.hpp>
 #include <kernel/archs.hpp>
-#include <kernel/hornet/dense_vector.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include<deque>
 
 using namespace FEAST;

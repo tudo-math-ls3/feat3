@@ -1,11 +1,11 @@
 #pragma once
-#ifndef KERNEL_HORNET_ABSOLUTE_HPP
-#define KERNEL_HORNET_ABSOLUTE_HPP 1
+#ifndef KERNEL_LAFEM_ABSOLUTE_HPP
+#define KERNEL_LAFEM_ABSOLUTE_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/hornet/container.hpp>
+#include <kernel/lafem/container.hpp>
 
 #include <cmath>
 
@@ -33,4 +33,4 @@ namespace FEAST
 
 } // namespace FEAST
 
-#endif // KERNEL_HORNET_ABSOLUTE_HPP
+#endif // KERNEL_LAFEM_ABSOLUTE_HPP

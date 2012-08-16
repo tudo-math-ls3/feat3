@@ -1,8 +1,8 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
-#include <kernel/hornet/dense_vector.hpp>
-#include <kernel/hornet/axpy.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/axpy.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;

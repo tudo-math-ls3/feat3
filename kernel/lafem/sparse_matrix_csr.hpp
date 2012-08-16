@@ -1,14 +1,14 @@
 #pragma once
-#ifndef KERNEL_HORNET_SPARSE_MATRIX_CSR_HPP
-#define KERNEL_HORNET_SPARSE_MATRIX_CSR_HPP 1
+#ifndef KERNEL_LAFEM_SPARSE_MATRIX_CSR_HPP
+#define KERNEL_LAFEM_SPARSE_MATRIX_CSR_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/hornet/container.hpp>
-#include <kernel/hornet/dense_vector.hpp>
-#include <kernel/hornet/sparse_matrix_coo.hpp>
-#include <kernel/hornet/absolute.hpp>
+#include <kernel/lafem/container.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
+#include <kernel/lafem/absolute.hpp>
 
 
 
@@ -295,4 +295,4 @@ namespace FEAST
 
 } // namespace FEAST
 
-#endif // KERNEL_HORNET_SPARSE_MATRIX_CSR_HPP
+#endif // KERNEL_LAFEM_SPARSE_MATRIX_CSR_HPP
