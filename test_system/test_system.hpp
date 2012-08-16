@@ -8,7 +8,6 @@
 #include <kernel/util/type_traits.hpp>
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/util/exception.hpp>
-#include <kernel/util/mpi_utils.hpp>
 #include <kernel/archs.hpp>
 
 // includes, system
@@ -184,12 +183,6 @@ namespace FEAST
       virtual const String id() const
       {
         return _id;
-      }
-
-      /// returns the mpi proc count to use
-      virtual unsigned long mpi_proc_count() const
-      {
-        return 1;
       }
 
       /// utility method used bei TEST_CHECK_*

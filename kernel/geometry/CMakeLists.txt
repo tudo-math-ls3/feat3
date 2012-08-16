@@ -24,10 +24,8 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/geometry/${test}" none)
+    --test-command "${FEAST_BINARY_DIR}/kernel/geometry/${test}" none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
-  SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
-  SET_PROPERTY(TEST ${test}_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ENDFOREACH(test)
 
 # add all tests to util_tests

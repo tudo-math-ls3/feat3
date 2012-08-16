@@ -26,10 +26,8 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/lafem/${test}" none)
+    --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
-  SET_PROPERTY(TEST ${test}_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
 
   ADD_TEST(${test}_cpu ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
@@ -39,10 +37,8 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_SOURCE_DIR}/test_system/run_mpi" "${FEAST_BINARY_DIR}/kernel/lafem/${test}" cpu)
+    --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" cpu)
   SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "cpu")
-  SET_PROPERTY(TEST ${test}_cpu PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  SET_PROPERTY(TEST ${test}_cpu PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
 ENDFOREACH(test)
 
 #add all tests to lafem_tests
