@@ -58,6 +58,4 @@ TopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> 
 TopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
 TopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
 
-/*TopologyTest<Archs::None, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > topology_test_cpu_v_ddw("std::vector, TAC");
-TopologyTest<Archs::None, unsigned long, std::deque, Foundation::DenseDataWrapper<15, Archs::None, unsigned long, TestArrayClass> > topology_test_cpu_d_ddw("std::deque, TAC");
-TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV"); */
+//TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV"); //problem: is DV then is used too in history and hence created with new operator

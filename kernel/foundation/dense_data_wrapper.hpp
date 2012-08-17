@@ -53,7 +53,7 @@ namespace FEAST
             return _data(i);
           }
 
-          DenseDataWrapper& operator=(DenseDataWrapper& rhs)
+          DenseDataWrapper operator=(const DenseDataWrapper& rhs)
           {
             if(this == &rhs)
               return *this;

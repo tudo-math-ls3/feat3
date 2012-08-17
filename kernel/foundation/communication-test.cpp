@@ -11,34 +11,6 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-
-//Test container
-template<typename DT_>
-class TestArrayClass
-{
-  public:
-    TestArrayClass(Index size) :
-      _size(size),
-      _data(new DT_[size])
-    {
-    }
-
-    DT_ & operator[] (Index i)
-    {
-      return _data[i];
-    }
-
-    Index size()
-    {
-      return _size;
-    }
-
-  private:
-    Index _size;
-    DT_ * _data;
-
-};
-
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class CommunicationTest:
   public TaggedTest<Tag_, IndexType_>
@@ -151,21 +123,12 @@ class CommunicationTest:
       TEST_CHECK_EQUAL(h.get_element_counterpart(0u), 0u);
       TEST_CHECK_EQUAL(h.get_element_counterpart(1u), 1u);
 
-      Foundation::HaloData<
-        Foundation::Halo<0, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > >, TestArrayClass > hd(h);
-
       //reference to m4 would have been resolved locally
       Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
       TEST_CHECK_EQUAL(attr_m3.at(0), 3333.);
       TEST_CHECK_EQUAL(attr_m3.at(1), 4444.);
       TEST_CHECK_EQUAL(attr_m4.at(0), 42.);
       TEST_CHECK_EQUAL(attr_m4.at(1), 47.);
-
-      Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(hd, 0u, m4, 0u);
-      TEST_CHECK_EQUAL(attr_m3.at(0), 42.);
-      TEST_CHECK_EQUAL(attr_m3.at(1), 47.);
-      TEST_CHECK_EQUAL(attr_m4.at(0), 3333.);
-      TEST_CHECK_EQUAL(attr_m4.at(1), 4444.);
 
     }
 };

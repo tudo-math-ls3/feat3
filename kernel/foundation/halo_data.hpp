@@ -87,7 +87,7 @@ namespace FEAST
           return _halo.get_overlap();
         }
 
-        HaloData& operator=(HaloData& rhs)
+        HaloData& operator=(const HaloData& rhs)
         {
           if(this == &rhs)
             return *this;

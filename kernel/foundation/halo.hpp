@@ -92,7 +92,7 @@ namespace FEAST
           return _overlap;
         }
 
-        Halo& operator=(Halo& rhs)
+        Halo& operator=(const Halo& rhs)
         {
           if(this == &rhs)
             return *this;

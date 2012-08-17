@@ -71,7 +71,7 @@ namespace FEAST
           return _data.at(i);
         }
 
-        Attribute& operator=(Attribute& rhs)
+        Attribute& operator=(const Attribute& rhs)
         {
           if(this == &rhs)
             return *this;

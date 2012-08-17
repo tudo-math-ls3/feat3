@@ -51,7 +51,6 @@ namespace FEAST
           //_topology(OuterStorageType_<StorageType_, std::allocator<StorageType_> >()),
           //_history(OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> >())
         {
-          std::cout << "TOPO CTOR" << std::endl;
         };
 
         ///DTOR
@@ -135,7 +134,8 @@ namespace FEAST
         {
           StorageType_ s;
           _topology.push_back(s);
-          _history.push_back(new EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>(_topology, _num_polytopes, s));
+          EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>* temp = new EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>(_topology, _num_polytopes, s);
+          _history.push_back(temp);
           ++_num_polytopes;
         }
 
@@ -146,7 +146,7 @@ namespace FEAST
           --_num_polytopes;
         }
 
-        Topology& operator=(Topology& rhs)
+        Topology& operator=(const Topology& rhs)
         {
           if(this == &rhs)
             return *this;

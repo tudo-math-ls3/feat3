@@ -155,10 +155,8 @@ namespace FEAST
           _attrs(attrbase),
           _num_attributes(0)
       {
-        for(Index i(0) ; i < _num_inter_topologies ; ++i)
-        {
-          _topologies.push_back(other._topologies.at(i));
-        }
+        //OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > temp(other._topologies);
+        _topologies = other._topologies;
 
         _attribute_polytopelevel_relations = other._attribute_polytopelevel_relations;
       }
