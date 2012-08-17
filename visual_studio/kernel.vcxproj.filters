@@ -42,11 +42,11 @@
     <Filter Include="Header Files\geometry\conformal\standard_refinement">
       <UniqueIdentifier>{c64aae21-06f4-4c15-b7ad-d942cb509592}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\hornet">
-      <UniqueIdentifier>{08767830-bd99-4b65-9e34-4236e97eb027}</UniqueIdentifier>
+    <Filter Include="Header Files\lafem">
+      <UniqueIdentifier>{57056c45-eab0-4391-ad11-accbf758f9d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\hornet">
-      <UniqueIdentifier>{af4ad484-97dc-4b11-af95-7e185af1d196}</UniqueIdentifier>
+    <Filter Include="Source Files\lafem">
+      <UniqueIdentifier>{d65d2c66-7cd9-4785-8f88-46c3ca28c73e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -255,21 +255,6 @@
     <ClInclude Include="..\kernel\foundation\topology.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\hornet\dense_vector.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\memory_pool.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\sparse_matrix_coo.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\container.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\dense_matrix.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\archs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -297,33 +282,6 @@
     <ClInclude Include="..\kernel\foundation\mapped_topology.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\hornet\absolute.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\axpy.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\difference.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\dot_product.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\element_product.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\norm.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\product.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\sparse_matrix_csr.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\hornet\sum.hpp">
-      <Filter>Header Files\hornet</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\foundation\functor.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
@@ -332,6 +290,48 @@
     </ClInclude>
     <ClInclude Include="..\kernel\util\time_stamp.hpp">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\dense_matrix.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\dense_vector.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\difference.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\dot_product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\element_product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\memory_pool.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\norm.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\sparse_matrix_coo.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\sparse_matrix_csr.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\sum.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\absolute.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\axpy.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\container.hpp">
+      <Filter>Header Files\lafem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -350,9 +350,6 @@
     <ClCompile Include="..\kernel\foundation\mesh_error.cpp">
       <Filter>Source Files\foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\hornet\memory_pool.cpp">
-      <Filter>Source Files\hornet</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\archs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -361,6 +358,9 @@
     </ClCompile>
     <ClCompile Include="..\kernel\foundation\functor_error.cpp">
       <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\memory_pool.cpp">
+      <Filter>Source Files\lafem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

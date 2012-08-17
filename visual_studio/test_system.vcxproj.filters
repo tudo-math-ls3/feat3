@@ -21,8 +21,8 @@
     <Filter Include="Source Files %28kernel%29\geometry">
       <UniqueIdentifier>{9f3c1970-15c2-489b-b72e-4eccd6e1ef8c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files %28kernel%29\hornet">
-      <UniqueIdentifier>{50c3921f-e491-45d7-a44b-fe364a52d763}</UniqueIdentifier>
+    <Filter Include="Source Files %28kernel%29\lafem">
+      <UniqueIdentifier>{6254dac9-2899-4861-8c87-0c7f16d90aa6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -91,15 +91,6 @@
     <ClCompile Include="..\kernel\foundation\topology-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\hornet\dense_matrix-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\dense_vector-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\sparse_matrix_coo-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\geometry\index_calculator-test.cpp">
       <Filter>Source Files %28kernel%29\geometry</Filter>
     </ClCompile>
@@ -109,32 +100,41 @@
     <ClCompile Include="..\kernel\foundation\mapped_topology-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\hornet\axpy-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\difference-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\dot_product-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\element_product-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\norm-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\product-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\sparse_matrix_csr-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\hornet\sum-test.cpp">
-      <Filter>Source Files %28kernel%29\hornet</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\foundation\functor-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\axpy-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\dense_matrix-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\dense_vector-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\difference-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\dot_product-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\element_product-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\norm-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\product-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\sparse_matrix_coo-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\sparse_matrix_csr-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\sum-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

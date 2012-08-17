@@ -25,22 +25,25 @@ public:
 
   virtual void run() const
   {
-    for (Index size(1) ; size < 1e5 ; size*=2)
+    const DT_ eps = std::pow(std::numeric_limits<DT_>::epsilon(), DT_(0.8));
+
+    for (Index size(1) ; size < 1e3 ; size*=2)
     {
       DenseVector<Arch_, DT_> a(size);
       DenseVector<Arch_, DT_> b(size);
-      DT_ ref(0);
+      const DT_ den(DT_(1) / DT_(size));
       for (Index i(0) ; i < size ; ++i)
       {
-        a(i, DT_((i * DT_(1.234)) / size));
-        b(i, DT_((size*2 - i) / size));
-        ref += a(i) * b(i);
+        a(i, DT_(i+1) * den);    // a[i] = (i+1) / n
+        b(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
       }
 
+      // a*b = 1
+      const DT_ ref(DT_(1));
       DT_ c = DotProduct<Arch_, BType_>::value(a, b);
-      TEST_CHECK_EQUAL(c, ref);
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
       c = DotProduct<Arch_, BType_>::value(b, a);
-      TEST_CHECK_EQUAL(c, ref);
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }
   }
 };
