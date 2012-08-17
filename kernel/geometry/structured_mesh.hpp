@@ -123,7 +123,7 @@ namespace FEAST
       enum
       {
         /// shape dimension
-        shape_dim = ShapeType::dimension,
+        shape_dim = ShapeType::dimension
       };
 
     protected:

@@ -53,7 +53,7 @@ namespace FEAST
         enum
         {
           /// Simplex dimension
-          dimension = dimension_,
+          dimension = dimension_
         };
 
         /// Returns the name of the class as a String.
@@ -77,7 +77,7 @@ namespace FEAST
         enum
         {
           /// Hypercube dimension
-          dimension = dimension_,
+          dimension = dimension_
         };
 
         /// Returns the name of the class as a String.

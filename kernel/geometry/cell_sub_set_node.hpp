@@ -133,7 +133,7 @@ namespace FEAST
       CellSubSetType* find_subset(Index id)
       {
         CONTEXT(name() + "::find_subset()");
-        CellSubSetNode* node = find_subset_node(id);
+        CellSubSetNodeType* node = find_subset_node(id);
         return (node != nullptr) ? node.get_subset() : nullptr;
       }
 
@@ -141,7 +141,7 @@ namespace FEAST
       const CellSubSetType* find_subset(Index id) const
       {
         CONTEXT(name() + "::find_subset() [const]");
-        const CellSubSetNode* node = find_subset_node(id);
+        const CellSubSetNodeType* node = find_subset_node(id);
         return (node != nullptr) ? node.get_subset() : nullptr;
       }
 
@@ -302,12 +302,12 @@ namespace FEAST
        * \param[in,out] refined_node
        * A reference to the node generated from refinement of this node.
        */
-      void refine_subsets(CellSubSetParent& refined_node) const
+      void refine_subsets(CellSubSetNode& refined_node) const
       {
         CONTEXT(name() + "::refine_subsets()");
 
-        typename CellSubSetParent<Policy_>::CellSubSetNodeConstIterator it(_subset_nodes.begin());
-        typename CellSubSetParent<Policy_>::CellSubSetNodeConstIterator jt(_subset_nodes.end());
+        typename BaseClass::CellSubSetNodeConstIterator it(this->_subset_nodes.begin());
+        typename BaseClass::CellSubSetNodeConstIterator jt(this->_subset_nodes.end());
         for(; it != jt; ++it)
         {
           refined_node.add_subset_node(it->first, it->second->refine(*_subset));
