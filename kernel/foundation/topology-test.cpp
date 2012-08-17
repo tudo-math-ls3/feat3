@@ -9,6 +9,7 @@
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
+using namespace FEAST::LAFEM;
 
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
