@@ -434,6 +434,7 @@
     <ClCompile Include="..\kernel\foundation\mesh-test.cpp" />
     <ClCompile Include="..\kernel\foundation\topology-test.cpp" />
     <ClCompile Include="..\kernel\geometry\index_calculator-test.cpp" />
+    <ClCompile Include="..\kernel\geometry\mesh_node-test-conf-quad.cpp" />
     <ClCompile Include="..\kernel\geometry\shape-test.cpp" />
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-hexa.cpp" />
     <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-quad.cpp" />

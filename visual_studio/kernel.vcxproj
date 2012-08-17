@@ -509,6 +509,7 @@
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
     <ClInclude Include="..\kernel\foundation\topology.hpp" />
     <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp" />
+    <ClInclude Include="..\kernel\geometry\cell_sub_set_node.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\index_set.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\entity_counter.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\index_refiner-hypercube.hpp" />
@@ -532,6 +533,7 @@
     <ClInclude Include="..\kernel\geometry\congruency\target_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\export_vtk.hpp" />
     <ClInclude Include="..\kernel\geometry\index_calculator.hpp" />
+    <ClInclude Include="..\kernel\geometry\mesh_node.hpp" />
     <ClInclude Include="..\kernel\geometry\shape.hpp" />
     <ClInclude Include="..\kernel\geometry\standard_refinery.hpp" />
     <ClInclude Include="..\kernel\geometry\std_ref_traits.hpp" />

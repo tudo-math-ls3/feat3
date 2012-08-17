@@ -333,6 +333,12 @@
     <ClInclude Include="..\kernel\lafem\container.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\geometry\cell_sub_set_node.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\mesh_node.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

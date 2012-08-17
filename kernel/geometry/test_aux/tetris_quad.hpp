@@ -40,7 +40,7 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      QuadMesh* create_tetris_mesh_2d()
+      inline QuadMesh* create_tetris_mesh_2d()
       {
         Index num_entities[] =
         {
@@ -135,7 +135,7 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      void validate_refined_tetris_mesh_2d(const QuadMesh& mesh)
+      inline void validate_refined_tetris_mesh_2d(const QuadMesh& mesh)
       {
         // validate sizes
         if(mesh.get_num_entities(0) != 27)
@@ -275,7 +275,7 @@ namespace FEAST
           throw String("Edge-At-Quad index set refinement failure");
       }
 
-      QuadSubMesh* create_tetris_edge_submesh_2d()
+      inline QuadSubMesh* create_tetris_edge_submesh_2d()
       {
         Index num_entities[] =
         {
@@ -324,7 +324,7 @@ namespace FEAST
         return mesh;
       }
 
-      void validate_refined_tetris_edge_submesh_2d(const QuadSubMesh& mesh)
+      inline void validate_refined_tetris_edge_submesh_2d(const QuadSubMesh& mesh)
       {
         // validate sizes
         if(mesh.get_num_entities(0) != 7)
@@ -378,7 +378,7 @@ namespace FEAST
           throw String("Edge target set refinement failure");
       }
 
-      QuadSubMesh* create_tetris_quad_submesh_2d()
+      inline QuadSubMesh* create_tetris_quad_submesh_2d()
       {
         //  2<---C----4
         //  ^        ||
@@ -469,7 +469,7 @@ namespace FEAST
         return mesh;
       }
 
-      void validate_refined_tetris_quad_submesh_2d(const QuadSubMesh& mesh)
+      inline void validate_refined_tetris_quad_submesh_2d(const QuadSubMesh& mesh)
       {
         //  2<---F----8<---E----4
         //  ^        ||        ||
@@ -603,7 +603,111 @@ namespace FEAST
           throw String("Quad-Target-Indices refinement failure");
       }
 
-      QuadCellSubSet* create_tetris_quad_cellsubset_2d()
+      inline QuadSubMesh* create_tetris_quad_edge_submesh_2d()
+      {
+        Index num_entities[] =
+        {
+          4, // vertices
+          3, // edges
+          0  // quads
+        };
+
+        // create mesh
+        QuadSubMesh* mesh = new QuadSubMesh(num_entities, 1, 1);
+
+        // set up vertex coordinates array
+        Real vtx[] =
+        {
+          0.0,
+          1.0,
+          2.0,
+          3.0
+        };
+        copy_vtx(mesh->get_vertex_set(), vtx);
+
+        // set up vertices-at-edge array
+        Index v_e[] =
+        {
+          0, 1,
+          1, 2,
+          2, 3
+        };
+        copy_idx(mesh->get_index_set<1,0>(), v_e);
+
+        // set up vertex-target-indices
+        Index vti[] =
+        {
+          5, 1, 3, 2
+        };
+        copy_trg(mesh->get_target_set<0>(), vti);
+
+        // set up edge-target-indices
+        Index eti[] =
+        {
+          3, 6, 1
+        };
+        copy_trg(mesh->get_target_set<1>(), eti);
+
+        // okay
+        return mesh;
+      }
+
+      inline void validate_refined_tetris_quad_edge_submesh_2d(const QuadSubMesh& mesh)
+      {
+        // validate sizes
+        if(mesh.get_num_entities(0) != 7)
+          throw String("Vertex count mismatch");
+        if(mesh.get_num_entities(1) != 6)
+          throw String("Edge count mismatch");
+        if(mesh.get_num_entities(2) != 0)
+          throw String("Quad count mismatch");
+
+        // check vertex coordinates array
+        Real vtx[] =
+        {
+          0.0,
+          1.0,
+          2.0,
+          3.0,
+          0.5,
+          1.5,
+          2.5
+        };
+        if(!comp_vtx(mesh.get_vertex_set(), vtx))
+          throw String("Vertex coordinate refinement failure");
+
+        // check vertices-at-edge array
+        Index v_e[] =
+        {
+          0, 4,
+          4, 1,
+          1, 5,
+          5, 2,
+          2, 6,
+          6, 3
+        };
+        if(!comp_idx(mesh.get_index_set<1,0>(), v_e))
+          throw String("Vertex-At-Edge index set refinement failure");
+
+        // check vertex-target incides
+        Index vti[] =
+        {
+          5, 1, 3, 2, 9, 12, 7
+        };
+        if(!comp_trg(mesh.get_target_set<0>(), vti))
+          throw String("Vertex target set refinement failure");
+
+        // check edge indices
+        Index eti[] =
+        {
+          // H,G, M, N, C, D
+          7, 6, 12, 13, 2, 3
+        };
+        if(!comp_trg(mesh.get_target_set<1>(), eti))
+          throw String("Edge target set refinement failure");
+      }
+
+      inline QuadCellSubSet* create_tetris_quad_cellsubset_2d()
       {
         // 3---------+
         // |         |
@@ -653,7 +757,7 @@ namespace FEAST
         return subset;
       }
 
-      void validate_refined_tetris_quad_cellsubset_2d(const QuadCellSubSet& subset)
+      inline void validate_refined_tetris_quad_cellsubset_2d(const QuadCellSubSet& subset)
       {
         // validate sizes
         if(subset.get_num_entities(0) != 9)
@@ -693,6 +797,69 @@ namespace FEAST
         };
         if(!comp_trg(subset.get_target_set<2>(), qti))
           throw String("Quad-Target-Indices refinement failure");
+      }
+
+      inline QuadCellSubSet* create_tetris_quad_edge_cellsubset_2d()
+      {
+        // 2
+        // |
+        // |   Q_0
+        // |
+        // 0----A----1
+        Index num_entities[] =
+        {
+          3, // vertices
+          1, // edges
+          0  // quads
+        };
+        QuadCellSubSet* subset = new QuadCellSubSet(num_entities);
+
+        // set vertex target indices
+        Index t_v[] =
+        {
+          2,
+          1,
+          3
+        };
+        copy_trg(subset->get_target_set<0>(), t_v);
+
+        // set edge target indices
+        Index t_e[] =
+        {
+          1
+        };
+        copy_trg(subset->get_target_set<1>(), t_e);
+
+        // okay
+        return subset;
+      }
+
+      inline void validate_refined_tetris_quad_edge_cellsubset_2d(const QuadCellSubSet& subset)
+      {
+        // validate sizes
+        if(subset.get_num_entities(0) != 4)
+          throw String("Vertex count mismatch");
+        if(subset.get_num_entities(1) != 2)
+          throw String("Edge count mismatch");
+        if(subset.get_num_entities(2) != 0)
+          throw String("Quad count mismatch");
+
+        // validate vertex target indices
+        Index vti[] =
+        {
+          2, 1, 3,
+          5
+        };
+        if(!comp_trg(subset.get_target_set<0>(), vti))
+          throw String("Vertex-Target-Indices refinement failure");
+
+        // validate edge target indices
+        Index eti[] =
+        {
+          2, 3
+        };
+        if(!comp_trg(subset.get_target_set<1>(), eti))
+          throw String("Edge-Target-Indices refinement failure");
       }
     } // namespace TestAux
     /// \endcond
