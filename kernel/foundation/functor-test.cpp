@@ -51,12 +51,6 @@ class FunctorTest:
       topology.erase();
 
       TEST_CHECK_EQUAL(topology.get_history().size(), 6ul);
-      TEST_CHECK_EQUAL(topology.get_history().at(0)->name(), "push_back()");
-      TEST_CHECK_EQUAL(topology.get_history().at(1)->name(), "push_back()");
-      TEST_CHECK_EQUAL(topology.get_history().at(2)->name(), "push_back()");
-      TEST_CHECK_EQUAL(topology.get_history().at(3)->name(), "erase()");
-      TEST_CHECK_EQUAL(topology.get_history().at(4)->name(), "erase()");
-      TEST_CHECK_EQUAL(topology.get_history().at(5)->name(), "erase()");
 
       //---------------------------------------------
       std::vector<IndexType_> vector2;

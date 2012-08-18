@@ -2,9 +2,10 @@
 #ifndef KERNEL_FOUNDATION_TOPOLOGY_HH
 #define KERNEL_FOUNDATION_TOPOLOGY_HH 1
 
-#include <vector>
+#include<vector>
 #include<kernel/base_header.hpp>
 #include<kernel/foundation/functor.hpp>
+#include<kernel/foundation/smart_pointer.hpp>
 
 namespace FEAST
 {
@@ -48,32 +49,12 @@ namespace FEAST
           _num_polytopes(0),
           _topology(),
           _history()
-          //_topology(OuterStorageType_<StorageType_, std::allocator<StorageType_> >()),
-          //_history(OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> >())
         {
         };
 
         ///DTOR
         ~Topology()
         {
-          /*std::cout << "TOPO DTOR" << std::endl;
-          if(_history.size() != 0)
-          {
-            IndexType_ i(_history.size() - 1);
-            while(i >= 0)
-            {
-              std::cout << i << std::endl;
-              FunctorBase* functor(_history.at(i));
-              delete functor;
-              _history.pop_back();
-
-              if(i != 0)
-                --i;
-              else
-                break;
-            }
-          }
-          std::cout << "END TOPO DTOR" << std::endl;*/
         }
 
         /**
@@ -93,13 +74,13 @@ namespace FEAST
         void push_back(const StorageType_& s)
         {
           _topology.push_back(s);
-          _history.push_back(new PushBackFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes, s));
+          _history.push_back(SmartPointer<FunctorBase>(new PushBackFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes, s)));
           ++_num_polytopes;
         }
 
         void erase(IndexType_ i)
         {
-          _history.push_back(new EraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, i, _topology.at(i)));
+          _history.push_back(SmartPointer<FunctorBase>(new EraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, i, _topology.at(i))));
           _topology.erase(_topology.begin() + i);
           --_num_polytopes;
         }
@@ -134,14 +115,13 @@ namespace FEAST
         {
           StorageType_ s;
           _topology.push_back(s);
-          EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>* temp = new EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>(_topology, _num_polytopes, s);
-          _history.push_back(temp);
+          _history.push_back(SmartPointer<FunctorBase>(new EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>(_topology, _num_polytopes, s)));
           ++_num_polytopes;
         }
 
         void erase()
         {
-          _history.push_back(new EmptyEraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes - 1, _topology.at(_num_polytopes - 1)));
+          _history.push_back(SmartPointer<FunctorBase>(new EmptyEraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes - 1, _topology.at(_num_polytopes - 1))));
           _topology.erase(_topology.end() - 1);
           --_num_polytopes;
         }
@@ -157,7 +137,7 @@ namespace FEAST
           return *this;
         }
 
-        OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> >& get_history()
+        OuterStorageType_<SmartPointer<FunctorBase>, std::allocator<SmartPointer<FunctorBase> > >& get_history()
         {
           return _history;
         }
@@ -178,7 +158,7 @@ namespace FEAST
         ///data
         OuterStorageType_<StorageType_, std::allocator<StorageType_> > _topology;
         ///history
-        OuterStorageType_<FunctorBase*, std::allocator<FunctorBase*> > _history;
+        OuterStorageType_<SmartPointer<FunctorBase>, std::allocator<SmartPointer<FunctorBase> > > _history;
     };
   }
 }

@@ -50,8 +50,6 @@ class TopologyTest:
       TEST_CHECK_EQUAL(t2.size(), 1ul);
 
       TEST_CHECK_EQUAL(t2.get_history().size(), 1ul);
-      for(unsigned long i(0) ; i < t2.get_history().size() ; ++i)
-        TEST_CHECK_EQUAL(t2.get_history().at(i)->name(), "push_back()");
     }
 };
 TopologyTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");

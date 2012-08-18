@@ -21,15 +21,9 @@ namespace FEAST
         virtual void execute() = 0;
         virtual void undo() = 0;
 
-        std::string name()
-        {
-          return _name;
-        }
-
       protected:
         bool _executed;
         bool _undone;
-        std::string _name;
     };
 
 
@@ -52,8 +46,6 @@ namespace FEAST
         {
           this->_executed = true;
           this->_undone = false;
-
-          this->_name = "push_back(i)";
         }
 
         virtual void execute()
@@ -113,7 +105,6 @@ namespace FEAST
         {
           this->_executed = true;
           this->_undone = false;
-          this->_name = "push_back()";
         }
 
         virtual void execute()
@@ -161,8 +152,6 @@ namespace FEAST
         {
           this->_executed = true;
           this->_undone = false;
-
-          this->_name = "erase(i)";
         }
 
         virtual void execute()
@@ -222,7 +211,6 @@ namespace FEAST
         {
           this->_executed = true;
           this->_undone = false;
-          this->_name = "erase()";
         }
 
         virtual void execute()
@@ -267,7 +255,6 @@ namespace FEAST
         {
           this->_executed = true;
           this->_undone = false;
-          this->_name = "compound functor";
         }
 
         /*void add_functor(FunctorBase* functor)
