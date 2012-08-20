@@ -38,7 +38,6 @@ class FunctorTest:
       func.undo();
 
       TEST_CHECK_EQUAL(vector.size(), 2);
-
       TEST_CHECK_THROWS(func.undo(), FunctorError);
 
       //-------------------------------------------
@@ -67,6 +66,33 @@ class FunctorTest:
       TEST_CHECK_EQUAL(cfunc.size(), 3);
 
       cfunc.undo();
+      TEST_CHECK_THROWS(cfunc.undo(), FunctorError);
+      TEST_CHECK_EQUAL(cfunc.size(), 3);
+      TEST_CHECK_EQUAL(vector2.size(), 0);
+
+      cfunc.execute();
+      TEST_CHECK_EQUAL(cfunc.size(), 3);
+      TEST_CHECK_EQUAL(vector2.size(), 3);
+      TEST_CHECK_THROWS(cfunc.execute(), FunctorError);
+
+      vector2.push_back(3);
+      vector2.push_back(4);
+      vector2.push_back(5);
+      cfunc.add_functor(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(3), IndexType_(3)));
+      cfunc.add_functor(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(4), IndexType_(4)));
+      cfunc.add_functor(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(5), IndexType_(5)));
+
+      TEST_CHECK_EQUAL(cfunc.size(), 6);
+      cfunc.undo();
+      TEST_CHECK_THROWS(cfunc.undo(), FunctorError);
+      TEST_CHECK_EQUAL(cfunc.size(), 6);
+      TEST_CHECK_EQUAL(vector2.size(), 0);
+
+      cfunc.execute();
+      TEST_CHECK_EQUAL(cfunc.size(), 6);
+      TEST_CHECK_EQUAL(vector2.size(), 6);
+      TEST_CHECK_THROWS(cfunc.execute(), FunctorError);
+
     }
 };
 FunctorTest<> simple_functor_test("None, Index");

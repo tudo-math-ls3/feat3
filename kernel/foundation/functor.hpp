@@ -260,7 +260,7 @@ namespace FEAST
 
         void add_functor(FunctorBase* functor)
         {
-          _functors->push_back(SmartPointer<FunctorBase>(functor));
+          _functors.push_back(SmartPointer<FunctorBase>(functor));
         }
 
         virtual void execute()
