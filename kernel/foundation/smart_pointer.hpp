@@ -11,7 +11,19 @@ namespace FEAST
 
 #define NO_MEMBER_TEMPLATES 1
 
-    template <class T_> class SmartPointer
+    /**
+     * \brief smart pointer proxy pattern implementation
+     *
+     * SmartPointer is a counted pointer and designed for use with STL or foundation containers.
+     *
+     * \tparam T_
+     * actual object type
+     *
+     *
+     * \author Markus Geveler
+     */
+    template <class T_>
+    class SmartPointer
     {
       public:
         typedef T_ element_type;
@@ -44,13 +56,17 @@ namespace FEAST
         }
 
 #ifndef NO_MEMBER_TEMPLATES
-        template <class Y> friend class SmartPointer<Y>;
-        template <class Y> SmartPointer(const SmartPointer<Y>& r) throw()
+        template <class Y_>
+        friend class SmartPointer<Y_>;
+
+        template <class Y_>
+        SmartPointer(const SmartPointer<Y_>& r) throw()
         {
           _acquire(r._count);
         }
 
-        template <class Y> SmartPointer& operator=(const SmartPointer<Y>& r)
+        template <class Y_>
+        SmartPointer& operator=(const SmartPointer<Y_>& r)
         {
           if (this != &r)
           {
@@ -85,7 +101,7 @@ namespace FEAST
 
         struct _Counter
         {
-          _Counter(T_* p = 0, unsigned c = 1) :
+          _Counter(T_* p = nullptr, unsigned c = 1) :
             __ptr(p),
             __count(c)
           {
@@ -96,7 +112,7 @@ namespace FEAST
         }* _count;
 
         void _acquire(_Counter* c) throw()
-        { // increment the count
+        {
           _count = c;
           if (c)
             ++c->__count;
@@ -104,7 +120,6 @@ namespace FEAST
 
         void _release()
         {
-          // decrement the count, delete if it is 0
           if (_count)
           {
             if (--_count->__count == 0) {
