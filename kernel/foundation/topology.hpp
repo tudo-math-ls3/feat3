@@ -52,6 +52,14 @@ namespace FEAST
         {
         };
 
+        ///Copy CTOR
+        Topology(const Topology& other) :
+          _num_polytopes(other._num_polytopes),
+          _topology(other._topology),
+          _history()
+        {
+        };
+
         ///DTOR
         ~Topology()
         {
