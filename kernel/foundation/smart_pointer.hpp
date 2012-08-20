@@ -26,7 +26,7 @@ namespace FEAST
     class SmartPointer
     {
       public:
-        typedef T_ element_type;
+        typedef T_ element_type_;
 
         explicit SmartPointer(T_* p = nullptr) :
           _count(0)
