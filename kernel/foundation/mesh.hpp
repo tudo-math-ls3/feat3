@@ -129,20 +129,13 @@ namespace FEAST
           _mp_rank(mp_rank),
           _num_inter_topologies(i_),
           _num_levels((unsigned)(i_/2u) + 1u),
-          _topologies(), //TODO initialise with repetitor CTOR
+          _topologies(i_),
           _history(),
-          //_topologies(OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >()), //initialise with repetitor CTOR
-          //_history(OuterStorageType_<CompoundFunctor<OuterStorageType_>, std::allocator<CompoundFunctor<OuterStorageType_> > >()),
           _attrs(attrbase),
           _num_attributes(0),
           _attribute_polytopelevel_relations()
-      {
-        for(Index i(0) ; i < i_ ; ++i)
         {
-          TopologyType_ t;
-          _topologies.push_back(t);
         }
-      }
 
         ///Copy CTOR
         Mesh(const typename TopologyType_::index_type_ new_id, Mesh & other, attr_base_type_* attrbase = nullptr) :
@@ -154,12 +147,12 @@ namespace FEAST
           _history(),
           _attrs(attrbase),
           _num_attributes(0)
-      {
+        {
         //OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > temp(other._topologies);
         _topologies = other._topologies;
 
         _attribute_polytopelevel_relations = other._attribute_polytopelevel_relations;
-      }
+        }
 
         ///DTOR
         ~Mesh()
