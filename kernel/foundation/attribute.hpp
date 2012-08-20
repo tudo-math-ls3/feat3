@@ -80,7 +80,6 @@ namespace FEAST
           return *this;
         }
 
-
       protected:
         StorageType_<DataType_, std::allocator<DataType_> > _data;
     };

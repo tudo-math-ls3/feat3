@@ -105,15 +105,15 @@ namespace FEAST
                   AttributeType_* recvbuf(new AttributeType_[halo.size()]);
                   for(Index i(0) ; i < halo.size() ; ++i)
                   {
-                    sendbuf[i] = ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index)))->at(halo.get_element(i));
-                    recvbuf[i] = ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index)))->at(halo.get_element_counterpart(i));
+                    sendbuf[i] = ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element(i));
+                    recvbuf[i] = ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element_counterpart(i));
                   }
                   //'post'
                   Foundation::Comm<Tag_>::send_recv(sendbuf, other_rank, halo.size(), recvbuf, halo.get_mesh().get_pp_rank());
                   for(Index i(0) ; i < halo.size() ; ++i)
                   {
-                    ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index)))->at(halo.get_element(i)) = sendbuf[i];
-                    ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index)))->at(halo.get_element_counterpart(i)) = recvbuf[i];
+                    ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element(i)) = sendbuf[i];
+                    ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element_counterpart(i)) = recvbuf[i];
                   }
                 }
             }

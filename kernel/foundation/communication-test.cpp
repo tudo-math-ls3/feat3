@@ -1,11 +1,12 @@
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
-#include <kernel/foundation/mesh.hpp>
-#include <kernel/foundation/halo.hpp>
-#include <kernel/foundation/halo_data.hpp>
-#include <kernel/foundation/communication.hpp>
-#include <kernel/archs.hpp>
+#include<kernel/foundation/mesh.hpp>
+#include<kernel/foundation/halo.hpp>
+#include<kernel/foundation/halo_data.hpp>
+#include<kernel/foundation/communication.hpp>
+#include<kernel/foundation/smart_pointer.hpp>
+#include<kernel/archs.hpp>
 #include<deque>
 
 using namespace FEAST;
@@ -37,9 +38,7 @@ class CommunicationTest:
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(0, &all_attributes_m3);
 
       //configure attribute
-      Foundation::Attribute<double, std::vector> attr_m3;
-      all_attributes_m3.push_back(&attr_m3);
-
+      all_attributes_m3.push_back(Foundation::SmartPointer<Foundation::AttributeBase<> >(new Foundation::Attribute<double>()));
       Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
 
       //add vertices
@@ -62,8 +61,8 @@ class CommunicationTest:
       //add faces
       m3.add_polytope(Foundation::pl_face);
       m3.add_polytope(Foundation::pl_face);
-      attr_m3.push_back(double(42.));
-      attr_m3.push_back(double(47.));
+      ((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().push_back(double(42.));
+      ((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().push_back(double(47.));
 
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
       m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
@@ -93,13 +92,12 @@ class CommunicationTest:
       typename Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> >::attr_base_type_ all_attributes_m4;
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(1, m3, &all_attributes_m4);
       //configure attribute
-      Foundation::Attribute<double, std::vector> attr_m4;
-      all_attributes_m4.push_back(&attr_m4);
-
+      all_attributes_m4.push_back(Foundation::SmartPointer<Foundation::AttributeBase<> >(new Foundation::Attribute<double>()));
       Foundation::MeshAttributeRegistration::execute(m4, Foundation::pl_vertex);
+
       //alter m4's attribute values
-      attr_m4.push_back(3333.);
-      attr_m4.push_back(4444.);
+      ((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->push_back(3333.);
+      ((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->push_back(4444.);
 
       //init simple halo
       Foundation::Halo<0, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m3, 1);
@@ -125,10 +123,10 @@ class CommunicationTest:
 
       //reference to m4 would have been resolved locally
       Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
-      TEST_CHECK_EQUAL(attr_m3.at(0), 3333.);
-      TEST_CHECK_EQUAL(attr_m3.at(1), 4444.);
-      TEST_CHECK_EQUAL(attr_m4.at(0), 42.);
-      TEST_CHECK_EQUAL(attr_m4.at(1), 47.);
+      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(0), 3333.);
+      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(1), 4444.);
+      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->get_data().at(0), 42.);
+      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->get_data().at(1), 47.);
 
     }
 };

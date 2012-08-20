@@ -2,6 +2,7 @@
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/attribute.hpp>
+#include <kernel/foundation/smart_pointer.hpp>
 #include <kernel/archs.hpp>
 #include<deque>
 
@@ -21,23 +22,20 @@ class AttributeTest:
 
     virtual void run() const
     {
-      std::vector<Foundation::AttributeBase<ST_>*> attrs;
+      std::vector<Foundation::SmartPointer<Foundation::AttributeBase<ST_> > > attrs;
 
-      Foundation::Attribute<DataType1_, ST_> attr1;
-      Foundation::Attribute<DataType2_, ST_> attr2;
-
-      attrs.push_back(&attr1);
-      attrs.push_back(&attr2);
+      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<ST_> >(new Foundation::Attribute<DataType1_, ST_>));
+      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<ST_> >(new Foundation::Attribute<DataType2_, ST_>));
       for(unsigned long j(0) ; j < 1000 ; ++j)
       {
-        attr1.push_back(DataType1_(DataType1_(5) + j));
-        attr2.push_back(DataType2_(DataType2_(5) * j));
+        ((Foundation::Attribute<DataType1_, ST_>*)(attrs.at(0).get()))->get_data().push_back(DataType1_(DataType1_(5) + j));
+        ((Foundation::Attribute<DataType2_, ST_>*)(attrs.at(1).get()))->get_data().push_back(DataType2_(DataType2_(5) * j));
       }
 
       for(unsigned long j(0) ; j < 1000 ; ++j)
       {
-        TEST_CHECK_EQUAL(((Foundation::Attribute<DataType1_, ST_>*)attrs.at(0))->at(j), DataType1_(5 + j));
-        TEST_CHECK_EQUAL(((Foundation::Attribute<DataType2_, ST_>*)attrs.at(1))->at(j), DataType2_(5 * j));
+        TEST_CHECK_EQUAL(((Foundation::Attribute<DataType1_, ST_>*)attrs.at(0).get())->at(j), DataType1_(5 + j));
+        TEST_CHECK_EQUAL(((Foundation::Attribute<DataType2_, ST_>*)attrs.at(1).get())->at(j), DataType2_(5 * j));
       }
     }
 };

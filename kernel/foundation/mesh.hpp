@@ -120,7 +120,7 @@ namespace FEAST
         typedef typename TopologyType_::storage_type_ storage_type_;
 
         typedef OuterAttributeStorageType_<
-          AttributeBase<AttributeStorageType_>*, std::allocator<AttributeBase<AttributeStorageType_>* > > attr_base_type_;
+          SmartPointer<AttributeBase<AttributeStorageType_> >, std::allocator<SmartPointer<AttributeBase<AttributeStorageType_> > > > attr_base_type_;
 
         ///CTOR
         Mesh(const typename TopologyType_::index_type_ id, attr_base_type_* attrbase = nullptr, const typename TopologyType_::index_type_ pp_rank = 0, const typename TopologyType_::index_type_ mp_rank = 0) :
