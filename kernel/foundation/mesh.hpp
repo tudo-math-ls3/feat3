@@ -161,7 +161,7 @@ namespace FEAST
         {
           CONTEXT("When adding polytope");
 #ifdef FOUNDATION_DEBUG
-          if(level > _num_levels - 1)
+          if(level + 1 > _num_levels)
             throw MeshInternalIndexOutOfBounds(level, _num_levels - 1);
 #endif
           switch(level)
@@ -210,10 +210,10 @@ namespace FEAST
         {
           CONTEXT("When adding adjacency");
 #ifdef FOUNDATION_DEBUG
-          if(from_level > _num_levels - 1)
+          if(from_level + 1 > _num_levels)
             throw MeshInternalIndexOutOfBounds(from_level, _num_levels - 1);
 
-          if(to_level > _num_levels - 1)
+          if(to_level + 1 > _num_levels)
             throw MeshInternalIndexOutOfBounds(to_level, _num_levels - 1);
 
           if(from_level == to_level)
@@ -238,9 +238,9 @@ namespace FEAST
           CONTEXT("When calculating adjacent polytopes");
 
 #ifdef FOUNDATION_DEBUG
-          if(from_level > _num_levels - 1)
+          if(from_level + 1 > _num_levels)
             throw MeshInternalIndexOutOfBounds(from_level, _num_levels - 1);
-          if(to_level > _num_levels - 1)
+          if(to_level + 1 > _num_levels)
             throw MeshInternalIndexOutOfBounds(to_level, _num_levels - 1);
 #endif
           InternalPrimaryAccess ipa(_get_primary_index(from_level, to_level));

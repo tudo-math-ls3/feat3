@@ -79,22 +79,22 @@ namespace FEAST
 
         T_& operator*()  const throw()
         {
-          return *_count->ptr;
+          return *_count->__ptr;
         }
 
         T_* operator->() const throw()
         {
-          return _count->ptr;
+          return _count->__ptr;
         }
 
         T_* get() const throw()
         {
-          return _count ? _count->ptr : 0;
+          return _count ? _count->__ptr : 0;
         }
 
         bool unique()   const throw()
         {
-          return (_count ? _count->count == 1 : true);
+          return (_count ? _count->__count == 1 : true);
         }
 
       private:
@@ -107,8 +107,8 @@ namespace FEAST
           {
           }
 
-          T_*          __ptr;
-          unsigned    __count;
+          T_* __ptr;
+          unsigned __count;
         }* _count;
 
         void _acquire(_Counter* c) throw()

@@ -5,6 +5,7 @@
 #include <vector>
 #include<kernel/base_header.hpp>
 #include<kernel/foundation/functor_error.hpp>
+#include<kernel/foundation/smart_pointer.hpp>
 
 namespace FEAST
 {
@@ -248,7 +249,7 @@ namespace FEAST
     class CompoundFunctor : public FunctorBase
     {
       public:
-        typedef StorageType_<FunctorBase*, std::allocator<FunctorBase*> > storage_type_;
+        typedef StorageType_<SmartPointer<FunctorBase>, std::allocator<SmartPointer<FunctorBase> > > storage_type_;
 
         CompoundFunctor() :
           _functors()
@@ -257,10 +258,10 @@ namespace FEAST
           this->_undone = false;
         }
 
-        /*void add_functor(FunctorBase* functor)
+        void add_functor(FunctorBase* functor)
         {
-          _functors->push_back(functor);
-        }*/
+          _functors->push_back(SmartPointer<FunctorBase>(functor));
+        }
 
         virtual void execute()
         {

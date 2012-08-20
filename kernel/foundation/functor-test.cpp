@@ -60,9 +60,9 @@ class FunctorTest:
 
       Foundation::CompoundFunctor<std::vector> cfunc;
 
-      cfunc.get_functors().push_back(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(0), IndexType_(0)));
-      cfunc.get_functors().push_back(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(1), IndexType_(1)));
-      cfunc.get_functors().push_back(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(2), IndexType_(2)));
+      cfunc.get_functors().push_back(Foundation::SmartPointer<Foundation::FunctorBase>(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(0), IndexType_(0))));
+      cfunc.get_functors().push_back(Foundation::SmartPointer<Foundation::FunctorBase>(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(1), IndexType_(1))));
+      cfunc.get_functors().push_back(Foundation::SmartPointer<Foundation::FunctorBase>(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(2), IndexType_(2))));
 
       TEST_CHECK_EQUAL(cfunc.size(), 3);
 
