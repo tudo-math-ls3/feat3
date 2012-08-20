@@ -169,29 +169,56 @@ namespace FEAST
             case pl_vertex:
               {
                 if(_num_levels > pl_edge)
+                {
                   _topologies.at(ipi_vertex_edge).push_back();
+
+                  CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
+                  cfunc->add_functor(_topologies.at(ipi_vertex_edge).get_history().at(_topologies.at(ipi_vertex_edge).get_history().size() - 1).get());
+                  _history.push_back(SmartPointer<FunctorBase>(cfunc));
+                }
                 if(_num_levels > pl_face)
+                {
                   _topologies.at(ipi_vertex_face).push_back();
+
+                  CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
+                  cfunc->add_functor(_topologies.at(ipi_vertex_face).get_history().at(_topologies.at(ipi_vertex_face).get_history().size() - 1).get());
+                  _history.push_back(SmartPointer<FunctorBase>(cfunc));
+                }
                 if(_num_levels > pl_polyhedron)
+                {
                   _topologies.at(ipi_vertex_polyhedron).push_back();
+
+                  CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
+                  cfunc->add_functor(_topologies.at(ipi_vertex_polyhedron).get_history().at(_topologies.at(ipi_vertex_polyhedron).get_history().size() - 1).get());
+                  _history.push_back(SmartPointer<FunctorBase>(cfunc));
+                }
               }
               break;
 
             case pl_edge:
               {
                 _topologies.at(ipi_edge_vertex).push_back();
+                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
+                cfunc->add_functor(_topologies.at(ipi_edge_vertex).get_history().at(_topologies.at(ipi_edge_vertex).get_history().size() - 1).get());
+                _history.push_back(SmartPointer<FunctorBase>(cfunc));
               }
               break;
 
             case pl_face:
               {
                 _topologies.at(ipi_face_vertex).push_back();
+                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
+                cfunc->add_functor(_topologies.at(ipi_face_vertex).get_history().at(_topologies.at(ipi_face_vertex).get_history().size() - 1).get());
+                _history.push_back(SmartPointer<FunctorBase>(cfunc));
               }
               break;
 
             case pl_polyhedron:
               {
                 _topologies.at(ipi_polyhedron_vertex).push_back();
+                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
+                cfunc->add_functor(_topologies.at(ipi_polyhedron_vertex).get_history().at(_topologies.at(ipi_polyhedron_vertex).get_history().size() - 1).get());
+                _history.push_back(SmartPointer<FunctorBase>(cfunc));
               }
               break;
           }
