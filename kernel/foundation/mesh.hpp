@@ -144,14 +144,12 @@ namespace FEAST
           _mp_rank(other._mp_rank),
           _num_inter_topologies(other._num_inter_topologies),
           _num_levels(other._num_levels),
+          _topologies(other._topologies),
           _history(),
           _attrs(attrbase),
-          _num_attributes(0)
+          _num_attributes(0),
+          _attribute_polytopelevel_relations(other._attribute_polytopelevel_relations)
         {
-        //OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > temp(other._topologies);
-        _topologies = other._topologies;
-
-        _attribute_polytopelevel_relations = other._attribute_polytopelevel_relations;
         }
 
         ///DTOR
@@ -335,7 +333,7 @@ namespace FEAST
         const unsigned _num_levels;
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
-        OuterStorageType_<CompoundFunctor<OuterStorageType_>, std::allocator<CompoundFunctor<OuterStorageType_> > > _history;
+        OuterStorageType_<SmartPointer<FunctorBase>, std::allocator<SmartPointer<FunctorBase> > > _history;
 
         attr_base_type_* _attrs;
 
