@@ -25,7 +25,7 @@ namespace FEAST
    * \author Peter Zajac
    */
   class String
-    : virtual public std::string
+    : public std::string
   {
   public:
     /**
