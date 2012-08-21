@@ -168,30 +168,26 @@ namespace FEAST
           {
             case pl_vertex:
               {
+                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>());
                 if(_num_levels > pl_edge)
                 {
                   _topologies.at(ipi_vertex_edge).push_back();
 
-                  CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
                   cfunc->add_functor(_topologies.at(ipi_vertex_edge).get_history().at(_topologies.at(ipi_vertex_edge).get_history().size() - 1).get());
-                  _history.push_back(SmartPointer<FunctorBase>(cfunc));
                 }
                 if(_num_levels > pl_face)
                 {
                   _topologies.at(ipi_vertex_face).push_back();
 
-                  CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
                   cfunc->add_functor(_topologies.at(ipi_vertex_face).get_history().at(_topologies.at(ipi_vertex_face).get_history().size() - 1).get());
-                  _history.push_back(SmartPointer<FunctorBase>(cfunc));
                 }
                 if(_num_levels > pl_polyhedron)
                 {
                   _topologies.at(ipi_vertex_polyhedron).push_back();
 
-                  CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
                   cfunc->add_functor(_topologies.at(ipi_vertex_polyhedron).get_history().at(_topologies.at(ipi_vertex_polyhedron).get_history().size() - 1).get());
-                  _history.push_back(SmartPointer<FunctorBase>(cfunc));
                 }
+                _history.push_back(SmartPointer<FunctorBase>(cfunc));
               }
               break;
 
@@ -356,6 +352,22 @@ namespace FEAST
         attr_base_type_* get_attributes()
         {
           return _attrs;
+        }
+
+        SmartPointer<FunctorBase> undo()
+        {
+          if(_history.size() == 0)
+            throw MeshError("Already cleared!");
+
+          _history.at(_history.size() - 1).get()->undo();
+          SmartPointer<FunctorBase> func(_history.at(_history.size() - 1));
+          _history.pop_back();
+          return func;
+        }
+
+        OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
+        {
+          return _topologies;
         }
 
       private:

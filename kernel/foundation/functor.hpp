@@ -281,6 +281,7 @@ namespace FEAST
           if(this->_undone)
             throw FunctorError("Already undone!");
 
+
           if(_functors.size() != 0)
           {
             Index i(_functors.size() - 1);

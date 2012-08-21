@@ -43,6 +43,7 @@ namespace FEAST
         typedef IndexType_ index_type_;
         typedef StorageType_ storage_type_;
         typedef OuterStorageType_<StorageType_, std::allocator<StorageType_> > compound_storage_type_;
+        typedef Topology<IndexType_, OuterStorageType_, StorageType_> exact_type_;
 
         ///CTOR
         Topology() :
@@ -82,13 +83,13 @@ namespace FEAST
         void push_back(const StorageType_& s)
         {
           _topology.push_back(s);
-          _history.push_back(SmartPointer<FunctorBase>(new PushBackFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes, s)));
+          _history.push_back(SmartPointer<FunctorBase>(new PushBackFunctor<exact_type_, index_type_, StorageType_>(*this, _num_polytopes, _topology.at(_topology.size() - 1))));
           ++_num_polytopes;
         }
 
         void erase(IndexType_ i)
         {
-          _history.push_back(SmartPointer<FunctorBase>(new EraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, i, _topology.at(i))));
+          _history.push_back(SmartPointer<FunctorBase>(new EraseFunctor<exact_type_, index_type_, StorageType_>(*this, i, _topology.at(i))));
           _topology.erase(_topology.begin() + i);
           --_num_polytopes;
         }
@@ -123,13 +124,13 @@ namespace FEAST
         {
           StorageType_ s;
           _topology.push_back(s);
-          _history.push_back(SmartPointer<FunctorBase>(new EmptyPushBackFunctor<compound_storage_type_, index_type_, storage_type_>(_topology, _num_polytopes, s)));
+          _history.push_back(SmartPointer<FunctorBase>(new EmptyPushBackFunctor<exact_type_, index_type_, storage_type_>(*this, _num_polytopes, _topology.at(_topology.size() - 1))));
           ++_num_polytopes;
         }
 
         void erase()
         {
-          _history.push_back(SmartPointer<FunctorBase>(new EmptyEraseFunctor<compound_storage_type_, index_type_, StorageType_>(_topology, _num_polytopes - 1, _topology.at(_num_polytopes - 1))));
+          _history.push_back(SmartPointer<FunctorBase>(new EmptyEraseFunctor<exact_type_, index_type_, StorageType_>(*this, _num_polytopes - 1, _topology.at(_num_polytopes - 1))));
           _topology.erase(_topology.end() - 1);
           --_num_polytopes;
         }
@@ -158,6 +159,13 @@ namespace FEAST
         Index begin()
         {
           return 0;
+        }
+
+        void insert(IndexType_ pos, const StorageType_& value)
+        {
+          //TODO functor
+          _topology.insert(_topology.begin() + pos, value);
+          ++_num_polytopes;
         }
 
       private:

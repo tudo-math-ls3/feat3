@@ -532,3 +532,83 @@ MeshTestAttr<Archs::None, unsigned long, std::vector, std::deque<unsigned long> 
 MeshTestAttr<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > mesh_test_cpu_d_d("std::deque, std::deque");
 #endif
 //MeshTestAttr<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::CPU, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: see topology test
+
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+class MeshTestHistory:
+  public TaggedTest<Tag_, IndexType_>
+{
+  public:
+    MeshTestHistory(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("MeshTestHistory<" + tag + ">")
+    {
+    }
+
+    void run() const
+    {
+      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
+
+      //add vertices
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      //add edges
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+
+      //add faces
+      m.add_polytope(Foundation::pl_face);
+      m.add_polytope(Foundation::pl_face);
+
+      /*     0  1
+           0--1--2     *--*--*
+         2 | 3|  |4    | 0| 1|
+           3--4--5     *--*--*
+            5  6
+      */
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0(m.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 0));
+      TEST_CHECK_EQUAL(test_0.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0.at(0), 0ul);
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_0_(m.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 0));
+      TEST_CHECK_EQUAL(test_0_.size(), 1ul);
+      TEST_CHECK_EQUAL(test_0_.at(0), 0ul);
+
+      //undo the adjacency
+      m.undo();
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_1(m.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 0));
+      typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ test_1_(m.get_adjacent_polytopes(Foundation::pl_vertex, Foundation::pl_edge, 0));
+      TEST_CHECK_EQUAL(test_1.size(), 0ul);
+      TEST_CHECK_EQUAL(test_1_.size(), 0ul);
+
+      //clear all manually
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+      m.undo();
+
+      TEST_CHECK_EQUAL(m.get_topologies().at(0).size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(1).size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(2).size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(3).size(), 0ul);
+    }
+};
+MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
