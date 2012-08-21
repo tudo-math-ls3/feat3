@@ -253,6 +253,10 @@ namespace FEAST
           _topologies.at(ipi).at(polytope_index).push_back(value);
           _topologies.at(ipit).at(value).push_back(polytope_index);
 
+          CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
+          PushBackFunctor<storage_type_, index_type_, index_type_>* pbfunc1(new PushBackFunctor<storage_type_, index_type_, index_type_>(_topologies.at(ipi).at(polytope_index), _topologies.at(ipi).at(polytope_index).size() - 1, value));
+          PushBackFunctor<storage_type_, index_type_, index_type_>* pbfunc2(new PushBackFunctor<storage_type_, index_type_, index_type_>(_topologies.at(ipit).at(value), _topologies.at(ipit).at(value).size() - 1, polytope_index));
+          _history.push_back(SmartPointer<FunctorBase>(cfunc));
         }
 
         ///get all adjacent polytopes at level to_level for polytope i on level from_level
