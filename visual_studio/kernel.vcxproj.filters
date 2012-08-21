@@ -77,16 +77,10 @@
     <ClInclude Include="..\kernel\util\exception.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\util\file_reader_ascii.hpp">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\util\inheritance.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\util\instantiation_policy.hpp">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\util\mpi_utils.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\util\prefix.hpp">

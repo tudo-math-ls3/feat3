@@ -576,12 +576,10 @@
     <ClInclude Include="..\kernel\util\exception.hpp" />
     <ClInclude Include="..\kernel\util\factorial.hpp" />
     <ClInclude Include="..\kernel\util\file_error.hpp" />
-    <ClInclude Include="..\kernel\util\file_reader_ascii.hpp" />
     <ClInclude Include="..\kernel\util\graph.hpp" />
     <ClInclude Include="..\kernel\util\inheritance.hpp" />
     <ClInclude Include="..\kernel\util\instantiation_policy.hpp" />
     <ClInclude Include="..\kernel\util\logger.hpp" />
-    <ClInclude Include="..\kernel\util\mpi_utils.hpp" />
     <ClInclude Include="..\kernel\util\param_section.hpp" />
     <ClInclude Include="..\kernel\util\prefix.hpp" />
     <ClInclude Include="..\kernel\util\pretty_printer.hpp" />
