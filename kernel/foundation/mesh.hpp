@@ -256,6 +256,8 @@ namespace FEAST
           CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
           PushBackFunctor<storage_type_, index_type_, index_type_>* pbfunc1(new PushBackFunctor<storage_type_, index_type_, index_type_>(_topologies.at(ipi).at(polytope_index), _topologies.at(ipi).at(polytope_index).size() - 1, value));
           PushBackFunctor<storage_type_, index_type_, index_type_>* pbfunc2(new PushBackFunctor<storage_type_, index_type_, index_type_>(_topologies.at(ipit).at(value), _topologies.at(ipit).at(value).size() - 1, polytope_index));
+          cfunc->add_functor(pbfunc1);
+          cfunc->add_functor(pbfunc2);
           _history.push_back(SmartPointer<FunctorBase>(cfunc));
         }
 
