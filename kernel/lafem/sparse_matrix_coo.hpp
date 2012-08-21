@@ -123,26 +123,12 @@ namespace FEAST
       if (a.columns() != b.columns())
         return false;
 
-      if (typeid(DT_) == typeid(Index))
+      for (Index i(0) ; i < a.rows() ; ++i)
       {
-        for (Index i(0) ; i < a.rows() ; ++i)
+        for (Index j(0) ; j < a.columns() ; ++j)
         {
-          for (Index j(0) ; j < a.columns() ; ++j)
-          {
-            if (a(i, j) != b(i, j))
-              return false;
-          }
-        }
-      }
-      else
-      {
-        for (Index i(0) ; i < a.rows() ; ++i)
-        {
-          for (Index j(0) ; j < a.columns() ; ++j)
-          {
-            if (Absolute<DT_>::value(a(i, j) - b(i, j)) > std::numeric_limits<DT_>::epsilon())
-              return false;
-          }
+          if (a(i, j) != b(i, j))
+            return false;
         }
       }
 

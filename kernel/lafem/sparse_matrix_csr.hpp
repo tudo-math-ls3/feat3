@@ -132,8 +132,6 @@ namespace FEAST
           if (this == &other)
             return *this;
 
-          std::cout<<"BUM!"<<std::endl;
-
           this->_size = other.size();
           this->_rows = other.rows();
           this->_columns = other.columns();
