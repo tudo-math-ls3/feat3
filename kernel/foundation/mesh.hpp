@@ -365,6 +365,31 @@ namespace FEAST
           return func;
         }
 
+        SmartPointer<FunctorBase> clear()
+        {
+          if(_history.size() == 0)
+            throw MeshError("Already cleared!");
+
+          SmartPointer<FunctorBase> result(new CompoundFunctor<OuterStorageType_>());
+
+          for(index_type_ i(_history.size() - 1) ; i >= 0 ; --i)
+          {
+            ((CompoundFunctor<OuterStorageType_>*)(result.get()))->add_functor(_history.at(i).get());
+            _history.pop_back();
+
+            if(i == 0)
+              break;
+          }
+          result.get()->undo();
+          return result;
+        }
+
+        void redo(const SmartPointer<FunctorBase>& func)
+        {
+          func.get()->execute();
+          _history.push_back(func);
+        }
+
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
         {
           return _topologies;

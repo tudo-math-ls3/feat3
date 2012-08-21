@@ -589,26 +589,56 @@ class MeshTestHistory:
       TEST_CHECK_EQUAL(test_1_.size(), 0ul);
 
       //clear all manually
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
-      m.undo();
+      Foundation::SmartPointer<Foundation::FunctorBase> f1(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f2(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f3(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f4(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f5(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f6(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f7(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f8(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f9(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f10(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f11(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f12(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f13(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f14(m.undo());
+      Foundation::SmartPointer<Foundation::FunctorBase> f15(m.undo());
 
       TEST_CHECK_EQUAL(m.get_topologies().at(0).size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(1).size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(2).size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(3).size(), 0ul);
+
+      //redo all manually
+      m.redo(f1);
+      m.redo(f2);
+      m.redo(f3);
+      m.redo(f4);
+      m.redo(f5);
+      m.redo(f6);
+      m.redo(f7);
+      m.redo(f8);
+      m.redo(f9);
+      m.redo(f10);
+      m.redo(f11);
+      m.redo(f12);
+      m.redo(f13);
+      m.redo(f14);
+      m.redo(f15);
+
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_edge).size(), 6ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_face).size(), 6ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).size(), 7ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).size(), 2ul);
+
+      //clear all again
+      m.clear();
+
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_edge).size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_face).size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).size(), 0ul);
     }
 };
 MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
