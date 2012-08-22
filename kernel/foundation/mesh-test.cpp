@@ -1,17 +1,17 @@
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
-#include <kernel/foundation/mesh.hpp>
-#include <kernel/foundation/topology.hpp>
-#include <kernel/foundation/dense_data_wrapper.hpp>
-#include <kernel/lafem/dense_vector.hpp>
-#include <kernel/archs.hpp>
+#include<kernel/foundation/mesh.hpp>
+#include<kernel/foundation/topology.hpp>
+#include<kernel/foundation/dense_data_wrapper.hpp>
+#include<kernel/lafem/dense_vector.hpp>
+#include<kernel/archs.hpp>
+#include<kernel/geometry/conformal_mesh.hpp>
 #include<deque>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
-
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestAttr:
@@ -642,3 +642,104 @@ class MeshTestHistory:
     }
 };
 MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
+
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+class MeshTestGeometryInterface:
+  public TaggedTest<Tag_, IndexType_>
+{
+  public:
+    MeshTestGeometryInterface(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("MeshTestGeometryInterface<" + tag + ">")
+    {
+    }
+
+    void run() const
+    {
+      /*  2    3
+       *  *-1--*
+       *  2    |
+       *  |    3
+       *  *--0-*
+       *  0    1
+       */
+
+      //creating foundation mesh
+      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+
+      m.add_polytope(Foundation::pl_face);
+
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 0, 0);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 0, 2);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_face, 0, 0);
+
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 1, 0);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 1, 3);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_face, 1, 0);
+
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 2, 1);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 2, 2);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_face, 2, 0);
+
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 3, 1);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 3, 3);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_face, 3, 0);
+
+      //creating conformal geometry mesh
+      IndexType_ index_set[] = {4, 4, 1};
+      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Geometry::Shape::Hypercube<2> > > confmeshtype_;
+      confmeshtype_ geo_m(index_set);
+
+      //transfer data
+      //Edge->Vertex
+      typename confmeshtype_::template IndexSet<1,0>::Type& geo_vertex_at_edge(geo_m.template get_index_set<1,0>());
+      for(IndexType_ i(0) ; i < m.get_topologies().at(Foundation::ipi_edge_vertex).size() ; ++i)
+      {
+        //get all adjacencies Edge->Vertex from foundation mesh
+        typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ found_vertex_at_edge_i(m.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, i));
+
+        for(IndexType_ j(0) ; j < found_vertex_at_edge_i.size() ; ++j)
+        {
+          geo_vertex_at_edge[i][j] = found_vertex_at_edge_i.at(j); //edge i, adjacent vertex j
+        }
+      }
+      //Face->Vertex
+      typename confmeshtype_::template IndexSet<2,0>::Type& geo_vertex_at_face(geo_m.template get_index_set<2,0>());
+      for(IndexType_ i(0) ; i < m.get_topologies().at(Foundation::ipi_face_vertex).size() ; ++i)
+      {
+        //get all adjacencies Face->Vertex from foundation mesh
+        typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ found_vertex_at_face_i(m.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_vertex, i));
+
+        for(IndexType_ j(0) ; j < found_vertex_at_face_i.size() ; ++j)
+        {
+          geo_vertex_at_face[i][j] = found_vertex_at_face_i.at(j); //face i, adjacent vertex j
+        }
+      }
+
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][0], 0);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][1], 1);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][0], 2);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][1], 3);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][0], 0);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][1], 2);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][0], 1);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][1], 3);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][0], 0);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][1], 1);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][2], 2);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][3], 3);
+
+      //typename confmeshtype_::VertexSetType& bla(geo_m.get_vertex_set());
+      //bla[0][0] = double(0.5);//xcoord of first node
+
+    }
+};
+MeshTestGeometryInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
