@@ -11,7 +11,7 @@ ADD_LIBRARY(kernel-lafem STATIC memory_pool.cpp)
 
 #list of lafem tests
 SET (test_list dense_vector-test dense_matrix-test sparse_matrix_coo-test sparse_matrix_csr-test sum-test
-  element_product-test difference-test axpy-test dot_product-test norm-test product-test defect-test scale-test richardson-test)
+  element_product-test difference-test axpy-test dot_product-test norm-test product-test defect-test scale-test richardson-test bicgstab-test)
 
 #create all tests
 FOREACH (test ${test_list} )
