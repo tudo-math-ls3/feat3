@@ -36,9 +36,6 @@
     <Filter Include="Header Files\geometry\structured">
       <UniqueIdentifier>{16f668af-6343-4c89-970c-d943d72f32c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\geometry\test_aux">
-      <UniqueIdentifier>{033740ca-b3d0-4996-811b-54f544094edd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\geometry\conformal\standard_refinement">
       <UniqueIdentifier>{c64aae21-06f4-4c15-b7ad-d942cb509592}</UniqueIdentifier>
     </Filter>
@@ -171,12 +168,6 @@
     <ClInclude Include="..\kernel\geometry\structured\vertex_refiner.hpp">
       <Filter>Header Files\geometry\structured</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\geometry\conformal_mesh.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
@@ -201,26 +192,11 @@
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_tetra.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_tria.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\geometry\conformal\standard_refinement\subset_refiner.hpp">
       <Filter>Header Files\geometry\conformal\standard_refinement</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_quad.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\foundation\communication.hpp">
       <Filter>Header Files\foundation</Filter>
@@ -263,9 +239,6 @@
     </ClInclude>
     <ClInclude Include="..\kernel\geometry\index_calculator.hpp">
       <Filter>Header Files\geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp">
-      <Filter>Header Files\geometry\test_aux</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\foundation\attribute.hpp">
       <Filter>Header Files\foundation</Filter>

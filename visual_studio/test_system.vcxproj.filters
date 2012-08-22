@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Source Files %28test_system%29">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
@@ -24,10 +20,50 @@
     <Filter Include="Source Files %28kernel%29\lafem">
       <UniqueIdentifier>{6254dac9-2899-4861-8c87-0c7f16d90aa6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files %28kernel%29\geometry\test_aux">
+      <UniqueIdentifier>{4eb0bace-ded0-453c-8c55-89bf6ee2f3cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files %28test_system%29">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files %28kernel%29">
+      <UniqueIdentifier>{9c33e884-53b1-49ef-a551-b626c9b5ba49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files %28kernel%29\geometry">
+      <UniqueIdentifier>{d3dad62a-eca5-4500-b07e-915ba788f382}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files %28kernel%29\geometry\test_aux">
+      <UniqueIdentifier>{1f2442b1-d969-4158-97fe-98e7f7659887}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\test_system\test_system.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files %28test_system%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_quad.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_tetra.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_tria.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +174,27 @@
     </ClCompile>
     <ClCompile Include="..\kernel\geometry\mesh_node-test-conf-quad.cpp">
       <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\test_aux\index_calculator_meshes.cpp">
+      <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\test_aux\standard_hexa.cpp">
+      <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\test_aux\standard_quad.cpp">
+      <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\test_aux\standard_tetra.cpp">
+      <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\test_aux\standard_tria.cpp">
+      <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\test_aux\tetris_hexa.cpp">
+      <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\geometry\test_aux\tetris_quad.cpp">
+      <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

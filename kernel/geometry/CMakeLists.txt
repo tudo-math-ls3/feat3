@@ -6,16 +6,32 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
+# include test_aux subdirectory
+ADD_SUBDIRECTORY( test_aux )
+
+# list of geometry source files and depenencies
 ADD_LIBRARY(kernel-geometry STATIC)
 TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
 
-# list of util tests
-SET (test_list shape-test standard_refinery-test-conf-quad standard_refinery-test-struct-quad standard_refinery-test-conf-hexa standard_refinery-test-conf-tria standard_refinery-test-conf-tetra standard_refinery-test-struct-hexa index_calculator-test mesh_node-test-conf-quad)
+
+# list of geometry tests
+SET (test_list
+  shape-test
+  standard_refinery-test-conf-quad
+  standard_refinery-test-conf-hexa
+  standard_refinery-test-conf-tria
+  standard_refinery-test-conf-tetra
+  standard_refinery-test-struct-quad
+  standard_refinery-test-struct-hexa
+  index_calculator-test
+  mesh_node-test-conf-quad
+)
+
 
 # create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  TARGET_LINK_LIBRARIES(${test} feast test_system)
+  TARGET_LINK_LIBRARIES(${test} feast test_system kernel-geometry-test-aux)
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -28,7 +44,7 @@ FOREACH (test ${test_list} )
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 ENDFOREACH(test)
 
-# add all tests to util_tests
+# add all tests to geometry_tests
 ADD_CUSTOM_TARGET(geometry_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
