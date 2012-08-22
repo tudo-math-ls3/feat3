@@ -21,7 +21,7 @@ class CSRProductTest
 public:
 
   CSRProductTest()
-    : TaggedTest<Arch_, DT_>("dv_product_test")
+    : TaggedTest<Arch_, DT_>("product_test")
   {
   }
 
