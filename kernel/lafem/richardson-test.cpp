@@ -5,6 +5,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/product.hpp>
 #include <kernel/lafem/richardson.hpp>
+#include <kernel/lafem/preconditioner.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -46,9 +47,11 @@ public:
       csys(i + 1, i, DT_(-1));
     SparseMatrixCSR<Arch_, DT_> sys(csys);
 
+    JacobiPreconditioner<BType_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(0.7));
+
     Product<Arch_, BType_>::value(b, sys, ref);
 
-    Richardson<BType_>::value(x, sys, b, 1000, DT_(1e-16));
+    Richardson<BType_>::value(x, sys, b, jac, 1000, DT_(1e-16));
 
     TEST_CHECK_EQUAL(x, ref);
   }

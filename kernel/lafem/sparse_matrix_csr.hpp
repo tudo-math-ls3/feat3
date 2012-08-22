@@ -30,6 +30,7 @@ namespace FEAST
 
       public:
         typedef DT_ data_type;
+        typedef Arch_ arch_type;
 
         explicit SparseMatrixCSR() :
           Container<Arch_, DT_> (0),

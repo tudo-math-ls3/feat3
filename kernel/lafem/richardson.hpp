@@ -13,6 +13,7 @@
 #include <kernel/lafem/defect.hpp>
 #include <kernel/lafem/norm.hpp>
 #include <kernel/lafem/element_product.hpp>
+#include <kernel/lafem/preconditioner.hpp>
 
 
 
@@ -23,9 +24,12 @@ namespace FEAST
     template <typename BType_>
     struct Richardson
     {
-      template <typename Arch_, typename DT_>
-      static void value(DenseVector<Arch_, DT_> & x, const SparseMatrixCSR<Arch_, DT_> & A, const DenseVector<Arch_, DT_> & b, Index max_iters, DT_ eps_relative)
+      template <typename MT_, typename VT_>
+      static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<BType_, MT_, VT_> & precon, Index max_iters, typename VT_::data_type eps_relative)
       {
+        typedef typename VT_::data_type DT_;
+        typedef typename VT_::arch_type Arch_;
+
         DenseVector<Arch_, DT_> temp_0(x.size());
         DenseVector<Arch_, DT_> temp_1(x.size());
 
@@ -39,14 +43,8 @@ namespace FEAST
 
           Defect<Arch_, BType_>::value(temp_0, b, A, x);
           DT_ current_defect = Norm2<Arch_, BType_>::value(temp_0);
-
-          DenseVector<Arch_, DT_> P(x.size());
-          for (Index i(0) ; i < x.size() ; ++i)
-            P(i, 0.7 / A(i, i));
-
-          ElementProduct<Arch_, BType_>::value(temp_1, P, temp_0);
+          precon.apply(temp_1, temp_0);
           Sum<Arch_, BType_>::value(x, x, temp_1);
-
 
           if(current_defect < eps_relative * initial_defect || current_defect < eps_relative || used_iters >= max_iters)
           {
