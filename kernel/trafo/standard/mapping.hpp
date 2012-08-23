@@ -1,0 +1,74 @@
+#pragma once
+#ifndef KERNEL_TRAFO_STANDARD_MAPPING_HPP
+#define KERNEL_TRAFO_STANDARD_MAPPING_HPP 1
+
+// includes, FEAST
+#include <kernel/trafo/mapping_base.hpp>
+#include <kernel/trafo/standard/evaluator.hpp>
+
+namespace FEAST
+{
+  namespace Trafo
+  {
+    /**
+     * \brief Standard Transformation namespace
+     *
+     * This namespace encapsulates all classes related to the implementation of the standard first-order
+     * (i.e. P1/Q1) transformation mapping.
+     */
+    namespace Standard
+    {
+      /**
+       * \brief Standard transformation mapping class template
+       *
+       * This class implements the standard first-order transformation mapping for any sort of mesh.
+       *
+       * \tparam Mesh_
+       * The mesh class that this transformation is to be defined on.
+       *
+       * \author Peter Zajac
+       */
+      template<typename Mesh_>
+      class Mapping :
+        public MappingBase<Mesh_>
+      {
+      public:
+        /// base-class typedef
+        typedef MappingBase<Mesh_> BaseClass;
+        /// mesh type
+        typedef Mesh_ MeshType;
+        /// shape type
+        typedef typename MeshType::ShapeType ShapeType;
+
+        /** \copydoc MappingBase::Evaluator */
+        template<
+          typename Shape_ = ShapeType,
+          typename DataType_ = Real>
+        class Evaluator
+        {
+        private:
+          /// evaluation policy
+          typedef Trafo::StandardEvalPolicy<Shape_, DataType_, MeshType::world_dim> EvalPolicy;
+
+        public:
+          /// evaluator type
+          typedef Trafo::Standard::Evaluator<Mapping, EvalPolicy> Type;
+        };
+
+      public:
+        /**
+         * \brief Constructor
+         *
+         * \param[in] mesh
+         * A reference to the mesh that this trafo mapping is to be defined on.
+         */
+        explicit Mapping(const MeshType& mesh) :
+          BaseClass(mesh)
+        {
+        }
+      }; // class Mapping<...>
+    } // namespace Standard
+  } // namespace Trafo
+} // namespace FEAST
+
+#endif // KERNEL_TRAFO_STANDARD_MAPPING_HPP

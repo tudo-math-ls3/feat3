@@ -6,26 +6,14 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-# include test_aux subdirectory
-ADD_SUBDIRECTORY( test_aux )
+#ADD_LIBRARY(kernel-space STATIC)
+#TARGET_LINK_LIBRARIES (kernel-space kernel-util)
 
-# list of geometry source files and depenencies
-#ADD_LIBRARY(kernel-geometry STATIC)
-#TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
-
-
-# list of geometry tests
+# list of util tests
 SET (test_list
-  standard_refinery-test-conf-quad
-  standard_refinery-test-conf-hexa
-  standard_refinery-test-conf-tria
-  standard_refinery-test-conf-tetra
-  standard_refinery-test-struct-quad
-  standard_refinery-test-struct-hexa
-  index_calculator-test
-  mesh_node-test-conf-quad
+  lagrange1-test
+  rannacher_turek-test
 )
-
 
 # create all tests
 FOREACH (test ${test_list} )
@@ -39,12 +27,12 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/geometry/${test}" none)
+    --test-command "${FEAST_BINARY_DIR}/kernel/space/${test}" none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 ENDFOREACH(test)
 
-# add all tests to geometry_tests
-ADD_CUSTOM_TARGET(geometry_tests DEPENDS ${test_list})
+# add all tests to util_tests
+ADD_CUSTOM_TARGET(space_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests geometry_tests)
+ADD_DEPENDENCIES(tests space_tests)

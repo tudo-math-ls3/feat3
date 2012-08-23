@@ -114,22 +114,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_32sd</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_64sd</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Parallel-Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_32pd</TargetName>
     <GenerateManifest>false</GenerateManifest>
     <ExecutablePath>$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(MPI_DIR_X86)\bin;$(FxCopDir);$(PATH);</ExecutablePath>
@@ -138,8 +138,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Parallel-Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_64pd</TargetName>
     <ExecutablePath>$(VCInstallDir)bin\x86_amd64;$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(FrameworkSDKDir)\lib\win64;$(MSBuildToolsPath32);$(MPI_DIR_X64)\bin;$(FxCopDir);$(PATH);</ExecutablePath>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;$(MPI_DIR_X64)\include;</IncludePath>
@@ -148,22 +148,22 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_32s</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_64s</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Parallel-Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_32p</TargetName>
     <GenerateManifest>false</GenerateManifest>
     <ExecutablePath>$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(MPI_DIR_X86)\bin;$(FxCopDir);$(PATH);</ExecutablePath>
@@ -172,8 +172,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Parallel-Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)..\win\</OutDir>
-    <IntDir>$(ProjectDir)..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\win\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_64p</TargetName>
     <ExecutablePath>$(VCInstallDir)bin\x86_amd64;$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(FrameworkSDKDir)\lib\win64;$(MSBuildToolsPath32);$(MPI_DIR_X64)\bin;$(FxCopDir);$(PATH);</ExecutablePath>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;$(MPI_DIR_X64)\include;</IncludePath>
@@ -186,7 +186,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>SERIAL;DEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <SmallerTypeCheck>true</SmallerTypeCheck>
@@ -203,7 +203,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
   </ItemDefinitionGroup>
@@ -213,7 +213,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>SERIAL;DEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <SmallerTypeCheck>true</SmallerTypeCheck>
@@ -230,8 +230,9 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Parallel-Debug|Win32'">
@@ -240,7 +241,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>PARALLEL;DEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <SmallerTypeCheck>true</SmallerTypeCheck>
@@ -257,7 +258,7 @@
       <AdditionalDependencies>mpi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
   </ItemDefinitionGroup>
@@ -267,7 +268,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>PARALLEL;DEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <SmallerTypeCheck>true</SmallerTypeCheck>
@@ -284,8 +285,9 @@
       <AdditionalDependencies>mpi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|Win32'">
@@ -296,7 +298,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SERIAL;NDEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -317,8 +319,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|x64'">
@@ -329,7 +332,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SERIAL;NDEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -345,13 +348,15 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
+      <LargeAddressAware>true</LargeAddressAware>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Parallel-Release|Win32'">
@@ -362,7 +367,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>PARALLEL;NDEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -383,7 +388,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>mpi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
   </ItemDefinitionGroup>
@@ -395,7 +400,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>PARALLEL;NDEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -416,81 +421,18 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>mpi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <FixedBaseAddress>true</FixedBaseAddress>
+      <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_quad.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_tetra.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_tria.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\tetris_hexa.hpp" />
-    <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp" />
-    <ClInclude Include="..\test_system\test_system.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\kernel\assembly\grid_transfer-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\attribute-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\communication-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\dense_data_wrapper-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\functor-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\halo-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\mapped_topology-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\mesh-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\mesh_control-test.cpp" />
-    <ClCompile Include="..\kernel\foundation\topology-test.cpp" />
-    <ClCompile Include="..\kernel\geometry\index_calculator-test.cpp" />
-    <ClCompile Include="..\kernel\geometry\mesh_node-test-conf-quad.cpp" />
-    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-hexa.cpp" />
-    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-quad.cpp" />
-    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-tetra.cpp" />
-    <ClCompile Include="..\kernel\geometry\standard_refinery-test-conf-tria.cpp" />
-    <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-hexa.cpp" />
-    <ClCompile Include="..\kernel\geometry\standard_refinery-test-struct-quad.cpp" />
-    <ClCompile Include="..\kernel\geometry\test_aux\index_calculator_meshes.cpp" />
-    <ClCompile Include="..\kernel\geometry\test_aux\standard_hexa.cpp" />
-    <ClCompile Include="..\kernel\geometry\test_aux\standard_quad.cpp" />
-    <ClCompile Include="..\kernel\geometry\test_aux\standard_tetra.cpp" />
-    <ClCompile Include="..\kernel\geometry\test_aux\standard_tria.cpp" />
-    <ClCompile Include="..\kernel\geometry\test_aux\tetris_hexa.cpp" />
-    <ClCompile Include="..\kernel\geometry\test_aux\tetris_quad.cpp" />
-    <ClCompile Include="..\kernel\lafem\axpy-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\bicgstab-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\defect-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\dense_matrix-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\dense_vector-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\difference-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\dot_product-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\element_product-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\norm-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\product-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\richardson-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\scale-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\sparse_matrix_coo-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\sparse_matrix_csr-test.cpp" />
-    <ClCompile Include="..\kernel\lafem\sum-test.cpp" />
-    <ClCompile Include="..\kernel\shape-test.cpp" />
-    <ClCompile Include="..\kernel\space\lagrange1-test.cpp" />
-    <ClCompile Include="..\kernel\space\rannacher_turek-test.cpp" />
-    <ClCompile Include="..\kernel\util\assertion-test.cpp" />
-    <ClCompile Include="..\kernel\util\factorial-test.cpp" />
-    <ClCompile Include="..\kernel\util\graph-test.cpp" />
-    <ClCompile Include="..\kernel\util\inheritance-test.cpp" />
-    <ClCompile Include="..\kernel\util\linear_algebra-test.cpp" />
-    <ClCompile Include="..\kernel\util\param_section-test.cpp" />
-    <ClCompile Include="..\kernel\util\permutation-test.cpp" />
-    <ClCompile Include="..\kernel\util\string-test.cpp" />
-    <ClCompile Include="..\kernel\util\tiny_algebra-test.cpp" />
-    <ClCompile Include="..\test_system\test_system-test.cpp" />
-    <ClCompile Include="..\test_system\test_system.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="kernel.vcxproj">
+    <ProjectReference Include="..\..\visual_studio\kernel.vcxproj">
       <Project>{98608c16-f806-46be-bdb4-77ba4023dc38}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dbg_fe_asm_1.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

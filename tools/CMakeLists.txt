@@ -12,3 +12,6 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 # applications to build
 ADD_EXECUTABLE(dbg-cub dbg_cub/dbg_cub.cpp)
 TARGET_LINK_LIBRARIES(dbg-cub feast)
+
+ADD_EXECUTABLE(dbg-fe-asm-1 dbg_fe_asm_1/dbg_fe_asm_1.cpp)
+TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)

@@ -1,25 +1,41 @@
 cmake_minimum_required (VERSION 2.8)
 
-#enable compiler output
+# enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-#top lvl include dir
+# top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-ADD_SUBDIRECTORY( util )
-ADD_SUBDIRECTORY( lafem )
-ADD_SUBDIRECTORY( geometry )
+# include kernel subdirectories
+ADD_SUBDIRECTORY( assembly )
+ADD_SUBDIRECTORY( cubature )
 ADD_SUBDIRECTORY( foundation )
+ADD_SUBDIRECTORY( geometry )
+ADD_SUBDIRECTORY( lafem )
+ADD_SUBDIRECTORY( space )
+ADD_SUBDIRECTORY( trafo )
+ADD_SUBDIRECTORY( util )
 
-#list of kernel source files
+# list of kernel source files
 ADD_LIBRARY(feast STATIC archs.cpp)
-#list of libraries to include in libfeast
-TARGET_LINK_LIBRARIES (feast kernel-util kernel-lafem kernel-geometry kernel-foundation)
+
+# list of libraries to include in feast lib
+TARGET_LINK_LIBRARIES (feast
+# kernel-assembly
+# kernel-cubature
+  kernel-foundation
+# kernel-geometry
+  kernel-lafem
+# kernel-space
+# kernel-trafo
+  kernel-util
+)
+
 if (FEAST_BACKENDS_CUDA)
   TARGET_LINK_LIBRARIES (feast kernel-lafem-cuda)
 endif(FEAST_BACKENDS_CUDA)
 
-#list of kernel tests
+# list of kernel tests
 SET (test_list
   shape-test
 )
@@ -51,7 +67,8 @@ FOREACH (test ${test_list} )
   SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "cpu")
 ENDFOREACH(test)
 
-#add all tests to kernel_tests
+# add all tests to kernel_tests
 ADD_CUSTOM_TARGET(kernel_tests DEPENDS ${test_list})
-#build all tests through top lvl target tests
+
+# build all tests through top lvl target tests
 ADD_DEPENDENCIES(tests kernel_tests)

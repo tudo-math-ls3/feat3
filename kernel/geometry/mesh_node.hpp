@@ -12,7 +12,7 @@ namespace FEAST
 {
   namespace Geometry
   {
-    /// \cond interal
+    /// \cond internal
     // dummy chart class; will be replaced by 'real' charts later...
     class DummyChart
     {
@@ -75,11 +75,11 @@ namespace FEAST
       typedef typename MeshNodePolicy_::SubMeshRefineryType RefineryType;
       typedef typename MeshNodePolicy_::SubMeshChartType ChartType;
     };
-    /// \endcond
 
     // forward declarations
     template<typename Policy_>
     class SubMeshNode DOXY({});
+    /// \endcond
 
     /**
      * \brief Mesh Node base class

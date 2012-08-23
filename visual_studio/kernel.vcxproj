@@ -493,6 +493,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\archs.hpp" />
+    <ClInclude Include="..\kernel\assembly\asm_traits.hpp" />
+    <ClInclude Include="..\kernel\assembly\base.hpp" />
+    <ClInclude Include="..\kernel\assembly\bilinear_functor_base.hpp" />
+    <ClInclude Include="..\kernel\assembly\bilinear_operator.hpp" />
+    <ClInclude Include="..\kernel\assembly\grid_transfer.hpp" />
+    <ClInclude Include="..\kernel\assembly\linear_functional.hpp" />
+    <ClInclude Include="..\kernel\assembly\linear_functor_base.hpp" />
+    <ClInclude Include="..\kernel\assembly\lafem_backend.hpp" />
+    <ClInclude Include="..\kernel\assembly\standard_functionals.hpp" />
+    <ClInclude Include="..\kernel\assembly\standard_operators.hpp" />
     <ClInclude Include="..\kernel\base_header.hpp" />
     <ClInclude Include="..\kernel\cubature\auto_alias.hpp" />
     <ClInclude Include="..\kernel\cubature\avail_functor.hpp" />
@@ -580,6 +590,24 @@
     <ClInclude Include="..\kernel\lafem\sparse_matrix_csr.hpp" />
     <ClInclude Include="..\kernel\lafem\sum.hpp" />
     <ClInclude Include="..\kernel\shape.hpp" />
+    <ClInclude Include="..\kernel\space\base.hpp" />
+    <ClInclude Include="..\kernel\space\dof_adjacency.hpp" />
+    <ClInclude Include="..\kernel\space\dof_mapping_base.hpp" />
+    <ClInclude Include="..\kernel\space\dof_mapping_common.hpp" />
+    <ClInclude Include="..\kernel\space\element_base.hpp" />
+    <ClInclude Include="..\kernel\space\evaluator_base.hpp" />
+    <ClInclude Include="..\kernel\space\eval_data.hpp" />
+    <ClInclude Include="..\kernel\space\lagrange1\element.hpp" />
+    <ClInclude Include="..\kernel\space\lagrange1\evaluator.hpp" />
+    <ClInclude Include="..\kernel\space\rannacher_turek\element.hpp" />
+    <ClInclude Include="..\kernel\space\rannacher_turek\evaluator.hpp" />
+    <ClInclude Include="..\kernel\space\rannacher_turek\variant.hpp" />
+    <ClInclude Include="..\kernel\trafo\base.hpp" />
+    <ClInclude Include="..\kernel\trafo\evaluator_base.hpp" />
+    <ClInclude Include="..\kernel\trafo\eval_data.hpp" />
+    <ClInclude Include="..\kernel\trafo\mapping_base.hpp" />
+    <ClInclude Include="..\kernel\trafo\standard\evaluator.hpp" />
+    <ClInclude Include="..\kernel\trafo\standard\mapping.hpp" />
     <ClInclude Include="..\kernel\util\abort.hpp" />
     <ClInclude Include="..\kernel\util\adjactor.hpp" />
     <ClInclude Include="..\kernel\util\assertion.hpp" />

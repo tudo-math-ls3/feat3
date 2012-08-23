@@ -1,0 +1,172 @@
+#pragma once
+#ifndef KERNEL_SPACE_DOF_MAPPING_BASE_HPP
+#define KERNEL_SPACE_DOF_MAPPING_BASE_HPP 1
+
+// includes, FEAST
+#include <kernel/space/base.hpp>
+
+namespace FEAST
+{
+  namespace Space
+  {
+    /**
+     * \brief Finite-Element Dof-Mapping base-class template
+     *
+     * This class acts as a base-class and interface documentation for Finite-Element Dof-Mapping implementations.
+     *
+     * \tparam Space_
+     * The finite-element space that this dof-mapping is used by.
+     *
+     * \tparam shape_dim_
+     * The dimension of the shape that his dof-mapping is defined on.
+     *
+     * \author Peter Zajac
+     */
+    template<
+      typename Space_,
+      int shape_dim_>
+    class DofMappingBase
+    {
+    public:
+      /// space typedef
+      typedef Space_ SpaceType;
+
+#ifdef DOXYGEN
+      /**
+       * \brief ImageIterator typedef
+       *
+       * This typedef is necessary for the implementation of the Adjactor interface.
+       */
+      typedef ... ImageIterator;
+#endif // DOXYGEN
+
+    protected:
+      /// space reference
+      const SpaceType& _space;
+      /// currently active cell index
+      Index _cell_index;
+
+      /// constructor
+      explicit DofMappingBase(const SpaceType& space) :
+        _space(space),
+        _cell_index(~Index(0))
+      {
+      }
+
+    public:
+
+      /**
+       * \brief Prepares the dof-mapping for a given cell.
+       *
+       * \param[in] cell_index
+       * The index of the cell that is to be used by the dof-mapping.
+       */
+      void prepare(Index cell_index)
+      {
+        _cell_index = cell_index;
+      }
+
+      /**
+       * \brief Releases the dof-mapping from the current cell.
+       */
+      void finish()
+      {
+        // reset cell index
+        _cell_index = ~Index(0);
+      }
+
+#ifdef DOXYGEN
+      /**
+       * \brief Returns the number of local dofs.
+       *
+       * \returns
+       * The total number of local degrees of freedom for the currently active cell.
+       */
+      Index get_num_local_dofs() const;
+
+      /** \copydoc get_num_local_dofs() */
+      Index get_num_entries() const;
+#endif // DOXYGEN
+
+      /**
+       * \brief Returns the maximum number of dof contributions.
+       */
+      Index get_max_contribs() const
+      {
+        return 1;
+      }
+
+      /**
+       * \brief Returns the number of dof contributions.
+       *
+       * \param[in] local_dof_idx
+       * The index of the local dof whose contribution count is to be returned.
+       *
+       * \returns
+       * The number of global dof contributions for the specified local dof.
+       */
+      Index get_num_contribs(Index local_dof_idx) const
+      {
+        return 1;
+      }
+
+#ifdef DOXYGEN
+      /**
+       * \brief Returns the mapped dof contribution index.
+       *
+       * \param[in] local_dof_idx
+       * The index of the local dof whose mapped contribution index is to be returned.
+       *
+       * \param[in] contrib_idx
+       * The contribution index for the local dof.
+       *
+       * \returns
+       * The mapped dof contribution index.
+       */
+      Index get_index(Index local_dof_idx, Index contrib_idx = 0) const;
+#endif // DOXYGEN
+
+      /**
+       * \brief Returns the mapped dof contribution weight.
+       *
+       * \param[in] local_dof_idx
+       * The index of the local dof whose mapped contribution index is to be returned.
+       *
+       * \param[in] contrib_idx
+       * The contribution index for the local dof.
+       *
+       * \returns
+       * The mapped dof contribution index.
+       */
+      Real get_weight(Index local_dof_idx, Index contrib_idx = 0) const
+      {
+        return Real(1.0);
+      }
+
+      /* ******************************************************************* */
+      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
+      /* ******************************************************************* */
+      /** \copydoc Adjactor::get_num_nodes_domain() */
+      Index get_num_nodes_domain() const
+      {
+        return _space.get_trafo().get_mesh().get_num_entities(shape_dim_);
+      }
+
+      /** \copydoc Adjactor::get_num_nodes_image() */
+      Index get_num_nodes_image() const
+      {
+        return _space.get_num_dofs();
+      }
+
+#ifdef DOXYGEN
+      /** \copydoc Adjactor::image_begin() */
+      ImageIterator image_begin(Index domain_node) const;
+
+      /** \copydoc Adjactor::image_end() */
+      ImageIterator image_end(Index domain_node) const;
+#endif // DOXYGEN
+    }; // class DofMappingBase<...>
+  } // namespace Space
+} // namespace FEAST
+
+#endif // KERNEL_SPACE_DOF_MAPPING_BASE_HPP

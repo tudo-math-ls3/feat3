@@ -241,6 +241,20 @@ namespace FEAST
       }
 
       /**
+       * \brief Clears the vector.
+       *
+       * \param[in] alpha
+       * The value that the vector is to be set to.
+       */
+      void clear(T_ alpha = T_(0))
+      {
+        for(int i(0); i < n_; ++i)
+        {
+          v[i] = alpha;
+        }
+      }
+
+      /**
        * \brief Sets this vector to the result of a matrix-vector product.
        *
        * \param[in] a
@@ -541,6 +555,23 @@ namespace FEAST
           }
         }
         return *this;
+      }
+
+      /**
+       * \brief Clears the matrix.
+       *
+       * \param[in] alpha
+       * The value that the matrix is to be set to.
+       */
+      void clear(T_ alpha = T_(0))
+      {
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            v[i][j] = alpha;
+          }
+        }
       }
 
       /**

@@ -13,10 +13,10 @@ namespace FEAST
     namespace Intern
     {
       /**
-        * \brief Entity counter class template
-        *
-        * \author Peter Zajac
-        */
+       * \brief Entity counter class template
+       *
+       * \author Peter Zajac
+       */
       template<
         typename Shape_,
         int face_dim_,
@@ -47,7 +47,6 @@ namespace FEAST
         }
       }; // struct EntityCounter<...>
 
-      /// \cond internal
       template<
         typename Shape_,
         int cell_dim_>
@@ -73,7 +72,6 @@ namespace FEAST
           offsets[cell_dim_] = 0;
         }
       }; // struct EntityCounter<Shape_, cell_dim_, cell_dim_>
-      /// \endcond
 
       /**
         * \brief Entity count wrapper class template
@@ -114,7 +112,6 @@ namespace FEAST
         }
       }; // struct EntityCounter<...>
 
-      /// \cond internal
       template<typename Shape_>
       struct EntityCountWrapper<Shape_, 0>
       {

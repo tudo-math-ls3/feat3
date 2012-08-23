@@ -20,6 +20,9 @@
     <Filter Include="Source Files %28kernel%29\lafem">
       <UniqueIdentifier>{6254dac9-2899-4861-8c87-0c7f16d90aa6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files %28kernel%29\geometry\test_aux">
+      <UniqueIdentifier>{4eb0bace-ded0-453c-8c55-89bf6ee2f3cc}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files %28test_system%29">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -35,6 +38,12 @@
     </Filter>
     <Filter Include="Header Files %28kernel%29\geometry\test_aux">
       <UniqueIdentifier>{6dc7740c-0b09-4e18-99bf-ff2aac3f5ea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files %28kernel%29\space">
+      <UniqueIdentifier>{fe4f7671-50fc-4280-93be-1bee86d29484}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files %28kernel%29\assembly">
+      <UniqueIdentifier>{b0c19f70-61f0-439b-8d37-a18ba0707a7b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +228,15 @@
     </ClCompile>
     <ClCompile Include="..\kernel\util\permutation-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\space\lagrange1-test.cpp">
+      <Filter>Source Files %28kernel%29\space</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\space\rannacher_turek-test.cpp">
+      <Filter>Source Files %28kernel%29\space</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\assembly\grid_transfer-test.cpp">
+      <Filter>Source Files %28kernel%29\assembly</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

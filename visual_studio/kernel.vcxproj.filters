@@ -24,9 +24,6 @@
     <Filter Include="Header Files\geometry">
       <UniqueIdentifier>{afa0f642-9c74-4cd2-8b23-ee88d771792b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\geometry">
-      <UniqueIdentifier>{3b03ffb2-b0f2-4738-8adb-b4e0ebd0d74e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\lafem">
       <UniqueIdentifier>{57056c45-eab0-4391-ad11-accbf758f9d2}</UniqueIdentifier>
     </Filter>
@@ -41,6 +38,24 @@
     </Filter>
     <Filter Include="Header Files\cubature\scalar">
       <UniqueIdentifier>{ede68e81-08b1-4807-995e-3ed656810995}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\trafo">
+      <UniqueIdentifier>{13b83348-7a23-4d9e-92d3-08397ec96d73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\space">
+      <UniqueIdentifier>{318e4975-1d41-4437-882f-f9b7a142d16e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\assembly">
+      <UniqueIdentifier>{df60bb8b-2287-4ce4-86b3-7f6d79d40499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\space\lagrange1">
+      <UniqueIdentifier>{984e2d06-40de-44f1-aed8-7100e383d835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\space\rannacher_turek">
+      <UniqueIdentifier>{30b37baa-6716-4545-b0ee-188c78b72b3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\trafo\standard">
+      <UniqueIdentifier>{c45aa492-ab12-4335-8ce3-7d763adae5d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -392,6 +407,90 @@
     </ClInclude>
     <ClInclude Include="..\kernel\util\permutation.hpp">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\trafo\base.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\trafo\eval_data.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\trafo\evaluator_base.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\trafo\mapping_base.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\dof_mapping_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\dof_mapping_common.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\element_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\eval_data.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\evaluator_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\base.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\dof_adjacency.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\lafem_backend.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\bilinear_functor_base.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\linear_functor_base.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\grid_transfer.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\asm_traits.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\bilinear_operator.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\linear_functional.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\standard_functionals.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\standard_operators.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\lagrange1\element.hpp">
+      <Filter>Header Files\space\lagrange1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\lagrange1\evaluator.hpp">
+      <Filter>Header Files\space\lagrange1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\rannacher_turek\element.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\rannacher_turek\evaluator.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\rannacher_turek\variant.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\trafo\standard\evaluator.hpp">
+      <Filter>Header Files\trafo\standard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\trafo\standard\mapping.hpp">
+      <Filter>Header Files\trafo\standard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

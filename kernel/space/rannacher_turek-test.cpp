@@ -1,0 +1,182 @@
+#include <test_system/test_system.hpp>
+#include <kernel/geometry/test_aux/standard_quad.hpp>
+#include <kernel/geometry/test_aux/tetris_quad.hpp>
+#include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/space/rannacher_turek/element.hpp>
+#include <kernel/cubature/dynamic_factory.hpp>
+//#include <kernel/util/graph.hpp>
+
+#include <limits>
+#include <cmath>
+
+using namespace FEAST;
+using namespace FEAST::TestSystem;
+using namespace FEAST::Geometry;
+
+/**
+ * \brief Ranancher-Turek Element test
+ *
+ * \test Tests the Ranancher-Turek Finite-Element space
+ *
+ * \tparam DataType_
+ * The data type for the test. Shall be either double or float.
+ *
+ * \author Peter Zajac
+ */
+template<typename DataType_>
+class RannacherTurekTest
+  : public TestSystem::TaggedTest<Archs::None, DataType_>
+{
+  typedef Shape::Quadrilateral ShapeType;
+  typedef ConformalMesh< ConformalMeshPolicy<ShapeType> > QuadMesh;
+
+  typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
+
+  typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceStdNonPar;
+
+  typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 2> > CubatureRule;
+  typedef typename Cubature::DynamicFactorySelect<CubatureRule>::Type CubatureFactory;
+
+  struct UnitTrafoConfig : public Trafo::ConfigBase
+  {
+    enum
+    {
+      need_img_point = 1,
+      need_jac_det = 1
+    };
+  };
+
+  struct UnitSpaceConfig : public Space::ConfigBase
+  {
+    enum
+    {
+      need_value = 1,
+      need_grad = 1
+    };
+  };
+
+public:
+  RannacherTurekTest() :
+    TestSystem::TaggedTest<Archs::None, DataType_>("Rannacher-Turek Test")
+  {
+  }
+
+  virtual void run() const
+  {
+    // test assembly on unit quad
+    asm_unit_quad_std_non_par();
+  }
+
+  void asm_unit_quad_std_non_par() const
+  {
+    // compute eps
+    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
+
+    // create a quad mesh
+    QuadMesh *mesh = TestAux::create_quad_mesh_2d(0);
+
+    // open a new scope to ensure that the mesh survives the objects relying on it
+    {
+      // create a quad-trafo
+      QuadTrafo trafo(*mesh);
+
+      // create a Q1~ space, standard non-parametric
+      QuadSpaceStdNonPar space(trafo);
+
+      // create a trafo evaluator
+      typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
+      TrafoEvaluator trafo_eval(trafo);
+      Trafo::EvalData<TrafoEvaluator, UnitTrafoConfig> trafo_data;
+
+      // create a space evaluator
+      typedef typename QuadSpaceStdNonPar::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+      SpaceEvaluator space_eval(space);
+      Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
+
+      // create a 3x3 Gauss-Legendre cubature formula
+      CubatureRule cubature_rule(CubatureFactory::create("gauss-legendre:3"));
+
+      // prepare trafo evaluator
+      trafo_eval.prepare(0);
+
+      // prepare space evaluator
+      space_eval.prepare(trafo_eval);
+
+      // check the number of local DOFs
+      Index num_loc_dofs = space_eval.get_num_local_dofs();
+      TEST_CHECK_EQUAL(num_loc_dofs, 4u);
+
+      // create local matrix assembly data
+      Tiny::Matrix<DataType_, 4, 4> L, M;
+      L = DataType_(0);
+      M = DataType_(0);
+
+      // loop over all 4 quadrature points and integrate
+      for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+      {
+        // compute trafo data
+        trafo_data(trafo_eval, cubature_rule.get_point(k));
+
+        // compute space data
+        space_data(space_eval, trafo_data);
+
+        // test function loop
+        for(Index i(0); i < num_loc_dofs; ++i)
+        {
+          // trial function loop
+          for(Index j(0); j < num_loc_dofs; ++j)
+          {
+            // mass matrix entry
+            M(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
+              space_data.values[i] * space_data.values[j]);
+
+            // laplace matrix entry
+            L(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
+              space_data.grads[i][0] * space_data.grads[j][0] +
+              space_data.grads[i][1] * space_data.grads[j][1]);
+            // continue with next trial function
+          }
+          // continue with next test function
+        }
+        // continue with next cubature point
+      }
+
+      // finish evaluators
+      space_eval.finish();
+      trafo_eval.finish();
+
+      // test function loop
+      for(Index i(0); i < num_loc_dofs; ++i)
+      {
+        // trial function loop
+        for(Index j(0); j < num_loc_dofs; ++j)
+        {
+          // check entries
+          if(i == j)
+          {
+            TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(41) / DataType_(240), eps); // = 1.708p3e-1
+            TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(5) / DataType_(2), eps); // = 2.5
+          }
+          else if((int(i >> 1)) == int(j >> 1)) // i-j-pairs: (0-1) and (2-3)
+          {
+            TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(5) / DataType_(1200), eps); // = 4.1p6e-3
+            TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(1) / DataType_(2), eps); // = 0.5
+          }
+          else
+          {
+            TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(3) / DataType_(80), eps); // = 3.75e-2
+            TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(-3) / DataType_(2), eps); // = -1.5
+          }
+          // continue with next trial function
+        }
+        // continue with next test function
+      }
+    }
+
+    // delete the quad mesh
+    delete mesh;
+  }
+};
+
+RannacherTurekTest<double> rannacher_turek_test_double;
+RannacherTurekTest<float> rannacher_turek_test_float;
