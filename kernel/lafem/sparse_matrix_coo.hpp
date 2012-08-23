@@ -73,8 +73,8 @@ namespace FEAST
 
         void operator()(Index row, Index col, DT_ val)
         {
-          ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
-          ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
+          ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
+          ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
 
           typename std::map<Index, DT_>::const_iterator it(_elements.find(row * _columns + col));
           if (it == _elements.end())
@@ -85,8 +85,8 @@ namespace FEAST
 
         const DT_ & operator()(Index row, Index col) const
         {
-          ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
-          ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
+          ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
+          ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
 
           typename std::map<Index, DT_>::const_iterator it(_elements.find(row * _columns + col));
           if (it == _elements.end())

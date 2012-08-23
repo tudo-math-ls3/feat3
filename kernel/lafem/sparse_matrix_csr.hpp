@@ -150,10 +150,6 @@ namespace FEAST
           std::vector<DT_ *> new_elements = other.get_elements();
           std::vector<Index *> new_indices = other.get_indices();
 
-          /*_Aj = other.Aj();
-          _Ax = other.Ax();
-          _Ar = other.Ar();*/
-
           this->_elements.assign(new_elements.begin(), new_elements.end());
           this->_indices.assign(new_indices.begin(), new_indices.end());
 
@@ -181,8 +177,8 @@ namespace FEAST
 
         const DT_ & operator()(Index row, Index col) const
         {
-          ASSERT(row < this->_rows, "Error: " + stringify(row) + "exceeds sparse matrix csr row size " + stringify(this->_rows) + " !");
-          ASSERT(col < this->_columns, "Error: " + stringify(col) + "exceeds sparse matrix csr column size " + stringify(this->_columns) + " !");
+          ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_rows) + " !");
+          ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_columns) + " !");
 
           for (unsigned long i(_Ar[row]) ; i < _Ar[row + 1] ; ++i)
           {
