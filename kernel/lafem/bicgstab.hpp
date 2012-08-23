@@ -17,6 +17,7 @@
 #include <kernel/lafem/axpy.hpp>
 #include <kernel/lafem/dot_product.hpp>
 #include <kernel/lafem/scale.hpp>
+#include <kernel/lafem/algorithm.hpp>
 
 
 
@@ -57,7 +58,6 @@ namespace FEAST
           Defect<Arch_, BType_>::value(r, b, A, x);
           defnorm_0 = Norm2<Arch_, BType_>::value(r);
           defnorm = defnorm_0;
-          //Product<Arch_, BType_>::value(r_tilde_0, P, r);
           precon.apply(r_tilde_0, r);
           nrm_r_tilde_0 = Norm2<Arch_, BType_>::value(r_tilde_0);
 
@@ -66,14 +66,8 @@ namespace FEAST
             defnorm_00 = defnorm_0;
             nrm_tilde_00 = nrm_r_tilde_0;
           }
-          //copy<Arch_, BType_>(r_tilde_0, r_tilde);
-          //copy<Arch_, BType_>(r_tilde_0, p_tilde);
-          //TODO use copy operation
-          for (Index i(0) ; i < r_tilde.size() ; ++i)
-          {
-            r_tilde(i, r_tilde_0(i));
-            p_tilde(i, r_tilde_0(i));
-          }
+          copy(r_tilde, r_tilde_0);
+          copy(p_tilde, r_tilde_0);
 
           rho_tilde = DotProduct<Arch_, BType_>::value(r_tilde_0, r_tilde_0);
 
@@ -83,7 +77,6 @@ namespace FEAST
             iter = iter + 1;
 
             Product<Arch_, BType_>::value(v, A, p_tilde);
-            //Product<Arch_, BType_>::value(v_tilde, P, v);
             precon.apply(v_tilde, v);
 
             gamma_tilde = DotProduct<Arch_, BType_>::value(v_tilde, r_tilde_0);
@@ -106,13 +99,11 @@ namespace FEAST
             }
 
             DT_ malpha_tilde(-alpha_tilde);
-            //ScaledSum<Arch_, BType_>::value(s, r, v, malpha_tilde);
             Axpy<Arch_, BType_>::value(s, malpha_tilde, v, r);
 
             defnorm = Norm2<Arch_, BType_>::value(s);
             if (defnorm < eps_relative * defnorm_00)
             {
-              //ScaledSum<Arch_, BType_>::value(x, p_tilde, alpha_tilde);
               Axpy<Arch_, BType_>::value(x, alpha_tilde, p_tilde, x);
 
               early_exit = 1;
@@ -120,12 +111,10 @@ namespace FEAST
               //std::cout << "Breakpoint 3 (converged)" << std::endl;
               break;
             }
-            //ScaledSum<Arch_, BType_>::value(s_tilde, r_tilde, v_tilde, malpha_tilde);
             Axpy<Arch_, BType_>::value(s_tilde, malpha_tilde, v_tilde, r_tilde);
 
             Product<Arch_, BType_>::value(t, A, s_tilde);
 
-            //Product<Arch_, BType_>::value(t_tilde, P, t);
             precon.apply(t_tilde, t);
 
             gamma_tilde = DotProduct<Arch_, BType_>::value(t_tilde, t_tilde);
@@ -139,13 +128,10 @@ namespace FEAST
             }
             omega_tilde = omega_tilde / gamma_tilde;
 
-            //ScaledSum<Arch_, BType_>::value(x, s_tilde, omega_tilde);
             Axpy<Arch_, BType_>::value(x, omega_tilde, s_tilde, x);
-            //ScaledSum<Arch_, BType_>::value(x, p_tilde, alpha_tilde);
             Axpy<Arch_, BType_>::value(x, alpha_tilde, p_tilde, x);
 
             DT_ momega_tilde(-omega_tilde);
-            //ScaledSum<Arch_, BType_>::value(r, s, t, momega_tilde);
             Axpy<Arch_, BType_>::value(r, momega_tilde, t, s);
 
             defnorm = Norm2<Arch_, BType_>::value(r);
@@ -156,7 +142,6 @@ namespace FEAST
               break;
             }
 
-            //ScaledSum<Arch_, BType_>::value(r_tilde, s_tilde, t_tilde, momega_tilde);
             Axpy<Arch_, BType_>::value(r_tilde,  momega_tilde, t_tilde, s_tilde);
 
             rho_tilde_old = rho_tilde;
@@ -164,7 +149,6 @@ namespace FEAST
 
             beta_tilde = (alpha_tilde / omega_tilde) * (rho_tilde / rho_tilde_old);
 
-            //ScaledSum<Arch_, BType_>::value(p_tilde, v_tilde, momega_tilde);
             Axpy<Arch_, BType_>::value(p_tilde, momega_tilde, v_tilde, p_tilde);
             Scale<Arch_, BType_>::value(p_tilde, p_tilde, beta_tilde);
             Sum<Arch_, BType_>::value(p_tilde, p_tilde, r_tilde);

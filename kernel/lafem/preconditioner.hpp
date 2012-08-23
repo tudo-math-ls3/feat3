@@ -8,7 +8,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/element_product.hpp>
-
+#include <kernel/lafem/algorithm.hpp>
 
 
 namespace FEAST
@@ -32,7 +32,7 @@ namespace FEAST
 
         virtual void apply(VT_ & out, const VT_ & in)
         {
-          out = in;
+          copy(out, in);
         }
     };
 
