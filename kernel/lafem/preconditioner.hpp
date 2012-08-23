@@ -23,6 +23,20 @@ namespace FEAST
     };
 
     template <typename BType_, typename MT_, typename VT_>
+    class NonePreconditioner : public virtual Preconditioner<BType_, MT_, VT_>
+    {
+      public:
+        NonePreconditioner()
+        {
+        }
+
+        virtual void apply(VT_ & out, const VT_ & in)
+        {
+          out = in;
+        }
+    };
+
+    template <typename BType_, typename MT_, typename VT_>
     class JacobiPreconditioner : public virtual Preconditioner<BType_, MT_, VT_>
     {
       private:
@@ -39,7 +53,7 @@ namespace FEAST
         virtual void apply(VT_ & out, const VT_ & in)
         {
           ElementProduct<typename VT_::arch_type, BType_>::value(out, _jac, in);
-        };
+        }
     };
 
 

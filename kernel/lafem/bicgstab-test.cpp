@@ -47,7 +47,8 @@ public:
       csys(i + 1, i, DT_(-1));
     SparseMatrixCSR<Arch_, DT_> sys(csys);
 
-    JacobiPreconditioner<BType_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(0.7));
+    JacobiPreconditioner<BType_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(1));
+    //NonePreconditioner<BType_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac;
 
     Product<Arch_, BType_>::value(b, sys, ref);
 

@@ -35,20 +35,20 @@ int main(int argc, char** argv)
     CONTEXT("When running test case '" + (*i)->id() + ":");
     try
     {
-        std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Backend: "
-          << (*i)->get_tag_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
+      std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Backend: "
+        << (*i)->get_tag_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
       (*i)->run();
-        std::cout << "PASSED" << std::endl;
+      std::cout << "PASSED" << std::endl;
     }
     catch (TestFailedException & e)
     {
-        std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
+      std::cout << "FAILED: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl;
       result = EXIT_FAILURE;
     }
     catch (InternalError & e)
     {
-        std::cout << "FAILED with InternalError: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
-          << stringify(e.message()) << std::endl;
+      std::cout << "FAILED with InternalError: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
+        << stringify(e.message()) << std::endl;
       result = EXIT_FAILURE;
     }
     catch (std::exception & e)
