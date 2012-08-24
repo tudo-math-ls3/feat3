@@ -115,6 +115,9 @@ namespace FEAST
                     ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element(i)) = sendbuf[i];
                     ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element_counterpart(i)) = recvbuf[i];
                   }
+
+                  delete[] sendbuf;
+                  delete[] recvbuf;
                 }
             }
           }
