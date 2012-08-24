@@ -168,53 +168,52 @@ namespace FEAST
           {
             case pl_vertex:
               {
-                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>());
+                _history.add_functor(new CompoundFunctor<OuterStorageType_>(true)); //do not execute since this is done by low-level functor
+
                 if(_num_levels > pl_edge)
                 {
                   _topologies.at(ipi_vertex_edge).push_back();
 
-                  cfunc->add_functor(_topologies.at(ipi_vertex_edge).get_history().at(_topologies.at(ipi_vertex_edge).get_history().size() - 1).get());
+                  ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_edge).get_history().get_functors().at(_topologies.at(ipi_vertex_edge).get_history().size() - 1));
                 }
                 if(_num_levels > pl_face)
                 {
                   _topologies.at(ipi_vertex_face).push_back();
 
-                  cfunc->add_functor(_topologies.at(ipi_vertex_face).get_history().at(_topologies.at(ipi_vertex_face).get_history().size() - 1).get());
+                  ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_face).get_history().get_functors().at(_topologies.at(ipi_vertex_face).get_history().size() - 1));
                 }
                 if(_num_levels > pl_polyhedron)
                 {
                   _topologies.at(ipi_vertex_polyhedron).push_back();
 
-                  cfunc->add_functor(_topologies.at(ipi_vertex_polyhedron).get_history().at(_topologies.at(ipi_vertex_polyhedron).get_history().size() - 1).get());
+                  ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_polyhedron).get_history().get_functors().at(_topologies.at(ipi_vertex_polyhedron).get_history().size() - 1));
                 }
-                _history.push_back(SmartPointer<FunctorBase>(cfunc));
               }
               break;
 
             case pl_edge:
               {
-                _topologies.at(ipi_edge_vertex).push_back();
-                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
-                cfunc->add_functor(_topologies.at(ipi_edge_vertex).get_history().at(_topologies.at(ipi_edge_vertex).get_history().size() - 1).get());
-                _history.push_back(SmartPointer<FunctorBase>(cfunc));
+                  _topologies.at(ipi_edge_vertex).push_back();
+
+                  _history.add_functor(_topologies.at(ipi_edge_vertex).get_history().get_functors().at(_topologies.at(ipi_edge_vertex).get_history().size() - 1));
               }
               break;
 
             case pl_face:
               {
-                _topologies.at(ipi_face_vertex).push_back();
-                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
-                cfunc->add_functor(_topologies.at(ipi_face_vertex).get_history().at(_topologies.at(ipi_face_vertex).get_history().size() - 1).get());
-                _history.push_back(SmartPointer<FunctorBase>(cfunc));
+                  _topologies.at(ipi_face_vertex).push_back();
+
+                  _history.add_functor(_topologies.at(ipi_face_vertex).get_history().get_functors().at(_topologies.at(ipi_face_vertex).get_history().size() - 1));
               }
               break;
 
             case pl_polyhedron:
               {
-                _topologies.at(ipi_polyhedron_vertex).push_back();
-                CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
-                cfunc->add_functor(_topologies.at(ipi_polyhedron_vertex).get_history().at(_topologies.at(ipi_polyhedron_vertex).get_history().size() - 1).get());
-                _history.push_back(SmartPointer<FunctorBase>(cfunc));
+                  typename TopologyType_::storage_type_ s;
+                  _topologies.at(ipi_polyhedron_vertex).get_history().add_functor(new PushBackFunctor<typename TopologyType_::compound_storage_type_, index_type_, typename TopologyType_::storage_type_>(_topologies.at(ipi_polyhedron_vertex).get_topology(), _topologies.at(ipi_polyhedron_vertex).size(), s) );
+
+                  _history.add_functor(_topologies.at(ipi_polyhedron_vertex).get_history().get_functors().at(_topologies.at(ipi_polyhedron_vertex).get_history().size() - 1));
+                  _history.get_functors().at(_history.size() - 1).get()->execute();
               }
               break;
           }
@@ -222,6 +221,7 @@ namespace FEAST
 
         void remove_polytope(const PolytopeLevels level, index_type_ i)
         {
+          //TODO
         }
 
         ///Add an adjacency to the associated topology and automatically add it to its transpose
@@ -249,12 +249,10 @@ namespace FEAST
           _topologies.at(ipi).at(polytope_index).push_back(value);
           _topologies.at(ipit).at(value).push_back(polytope_index);
 
-          CompoundFunctor<OuterStorageType_>* cfunc(new CompoundFunctor<OuterStorageType_>);
-          PushBackFunctor<storage_type_, index_type_, index_type_>* pbfunc1(new PushBackFunctor<storage_type_, index_type_, index_type_>(_topologies.at(ipi).at(polytope_index), _topologies.at(ipi).at(polytope_index).size() - 1, value));
-          PushBackFunctor<storage_type_, index_type_, index_type_>* pbfunc2(new PushBackFunctor<storage_type_, index_type_, index_type_>(_topologies.at(ipit).at(value), _topologies.at(ipit).at(value).size() - 1, polytope_index));
-          cfunc->add_functor(pbfunc1);
-          cfunc->add_functor(pbfunc2);
-          _history.push_back(SmartPointer<FunctorBase>(cfunc));
+          _history.add_functor(new CompoundFunctor<OuterStorageType_>(true));
+          ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi).get_history().get_functors().at(_topologies.at(ipi).get_history().size() - 1));
+
+          ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipit).get_history().get_functors().at(_topologies.at(ipit).get_history().size() - 1));
         }
 
         ///get all adjacent polytopes at level to_level for polytope i on level from_level
@@ -403,7 +401,7 @@ namespace FEAST
         const unsigned _num_levels;
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
-        OuterStorageType_<SmartPointer<FunctorBase>, std::allocator<SmartPointer<FunctorBase> > > _history;
+        CompoundFunctor<OuterStorageType_> _history;
 
         attr_base_type_* _attrs;
 

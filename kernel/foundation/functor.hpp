@@ -22,9 +22,12 @@ namespace FEAST
         virtual void execute() = 0;
         virtual void undo() = 0;
 
+        virtual ~FunctorBase()
+        {
+        }
+
       protected:
         bool _executed;
-        bool _undone;
     };
 
 
@@ -45,8 +48,7 @@ namespace FEAST
           _position(position),
           _value(value)
         {
-          this->_executed = true;
-          this->_undone = false;
+          this->_executed = false;
         }
 
         virtual void execute()
@@ -56,76 +58,35 @@ namespace FEAST
 
           _target.push_back(_value);
           this->_executed = true;
-          this->_undone = false;
         }
 
         virtual void undo()
         {
-          if(this->_undone)
+          if(!(this->_executed))
             throw FunctorError("Already undone!");
 
           _target.erase(_target.begin() + _position);
-          this->_undone = true;
           this->_executed = false;
         }
 
-        ContainerType_& get_target()
+        PushBackFunctor& operator=(const PushBackFunctor& rhs)
         {
-          return _target;
+          if(this == &rhs)
+            return *this;
+
+          this->_target = rhs._target;
+          this->_position = rhs._position;
+          this->_value = rhs._value;
+          this->_executed = rhs._executed;
+          return *this;
         }
 
-        IndexType_ get_position()
+        PushBackFunctor(const PushBackFunctor& other) :
+          _target(other._target),
+          _position(other._position),
+          _value(other._value)
         {
-          return _position;
-        }
-
-        ValueType_ get_value()
-        {
-          return _value;
-        }
-
-      private:
-        ContainerType_& _target;
-        IndexType_ _position;
-        ValueType_ _value;
-    };
-
-    /**
-     * \brief push_back() functor
-     *
-     * \author Markus Geveler
-     */
-    template<typename ContainerType_, typename IndexType_, typename ValueType_>
-    class EmptyPushBackFunctor : public FunctorBase
-    {
-      public:
-        EmptyPushBackFunctor(ContainerType_& target, IndexType_ position, ValueType_ value) :
-          _target(target),
-          _position(position),
-          _value(value)
-        {
-          this->_executed = true;
-          this->_undone = false;
-        }
-
-        virtual void execute()
-        {
-          if(this->_executed)
-            throw FunctorError("Already executed!");
-
-          _target.push_back(_value);
-          this->_executed = true;
-          this->_undone = false;
-        }
-
-        virtual void undo()
-        {
-          if(this->_undone)
-            throw FunctorError("Already undone!");
-
-          _target.erase(_target.begin() + _position);
-          this->_undone = true;
-          this->_executed = false;
+          this->_executed = other._executed;
         }
 
       private:
@@ -151,8 +112,7 @@ namespace FEAST
           _position(position),
           _value(value)
         {
-          this->_executed = true;
-          this->_undone = false;
+          this->_executed = false;
         }
 
         virtual void execute()
@@ -162,76 +122,35 @@ namespace FEAST
 
           _target.erase(_target.begin() + _position);
           this->_executed = true;
-          this->_undone = false;
         }
 
         virtual void undo()
         {
-          if(this->_undone)
+          if(!(this->_executed))
             throw FunctorError("Already undone!");
 
           _target.insert(_target.begin() + _position, _value);
-          this->_undone = true;
           this->_executed = false;
         }
 
-        ContainerType_& get_target()
+        EraseFunctor& operator=(const EraseFunctor& rhs)
         {
-          return _target;
+          if(this == &rhs)
+            return *this;
+
+          this->_target = rhs._target;
+          this->_position = rhs._position;
+          this->_value = rhs._value;
+          this->_executed = rhs._executed;
+          return *this;
         }
 
-        IndexType_ get_position()
+        EraseFunctor(const EraseFunctor& other) :
+          _target(other._target),
+          _position(other._position),
+          _value(other._value)
         {
-          return _position;
-        }
-
-        ValueType_ get_value()
-        {
-          return _value;
-        }
-
-      private:
-        ContainerType_& _target;
-        IndexType_ _position;
-        ValueType_ _value;
-    };
-
-    /**
-     * \brief push_back() functor
-     *
-     * \author Markus Geveler
-     */
-    template<typename ContainerType_, typename IndexType_, typename ValueType_>
-    class EmptyEraseFunctor : public FunctorBase
-    {
-      public:
-        EmptyEraseFunctor(ContainerType_& target, IndexType_ position, ValueType_ value) :
-          _target(target),
-          _position(position),
-          _value(value)
-        {
-          this->_executed = true;
-          this->_undone = false;
-        }
-
-        virtual void execute()
-        {
-          if(this->_executed)
-            throw FunctorError("Already executed!");
-
-          _target.erase(_target.end() - 1);
-          this->_executed = true;
-          this->_undone = false;
-        }
-
-        virtual void undo()
-        {
-          if(this->_undone)
-            throw FunctorError("Already undone!");
-
-          _target.push_back(_value);
-          this->_undone = true;
-          this->_executed = false;
+          this->_executed = other._executed;
         }
 
       private:
@@ -245,22 +164,26 @@ namespace FEAST
      *
      * \author Markus Geveler
      */
-    template<template<typename, typename> class StorageType_>
+    template<template<typename, typename> class StorageType_ = std::vector>
     class CompoundFunctor : public FunctorBase
     {
       public:
         typedef StorageType_<SmartPointer<FunctorBase>, std::allocator<SmartPointer<FunctorBase> > > storage_type_;
 
-        CompoundFunctor() :
+        CompoundFunctor(bool executed = false) :
           _functors()
         {
-          this->_executed = true;
-          this->_undone = false;
+          this->_executed = executed;
         }
 
         void add_functor(FunctorBase* functor)
         {
           _functors.push_back(SmartPointer<FunctorBase>(functor));
+        }
+
+        void add_functor(SmartPointer<FunctorBase>& functor)
+        {
+          _functors.push_back(functor);
         }
 
         virtual void execute()
@@ -272,13 +195,12 @@ namespace FEAST
           {
             _functors.at(i)->execute();
           }
-          this->_undone = false;
           this->_executed = true;
         }
 
         virtual void undo()
         {
-          if(this->_undone)
+          if(!(this->_executed))
             throw FunctorError("Already undone!");
 
 
@@ -294,7 +216,6 @@ namespace FEAST
               else
                 break;
             }
-            this->_undone = true;
             this->_executed = false;
           }
         }
@@ -307,6 +228,22 @@ namespace FEAST
         Index size()
         {
           return _functors.size();
+        }
+
+        CompoundFunctor& operator=(const CompoundFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_functors = rhs._functors;
+          this->_executed = rhs._executed;
+          return *this;
+        }
+
+        CompoundFunctor(const CompoundFunctor& other) :
+          _functors(other._functors)
+        {
+          this->_executed = other._executed;
         }
 
       private:

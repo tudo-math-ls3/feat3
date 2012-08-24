@@ -26,13 +26,13 @@ class MeshTestAttr:
     void run() const
     {
       //basic tests
-      Foundation::Mesh<> m(0);
+      /*Foundation::Mesh<> m(0);
 
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m2(1);
 
       TEST_CHECK_EQUAL(m.get_num_levels(), 3ul);
       TEST_CHECK_EQUAL(m2.get_num_levels(), 3ul);
-
+*/
       //##################################################################
 
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
@@ -65,6 +65,13 @@ class MeshTestAttr:
       //add faces
       m3.add_polytope(Foundation::pl_face);
       m3.add_polytope(Foundation::pl_face);
+
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_edge).get_history().get_functors().size(), 6);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_edge).size(), 6);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_face).size(), 6);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_edge_vertex).size(), 7);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_face_vertex).size(), 2);
+
 
       /*     0  1
            0--1--2     *--*--*
@@ -522,7 +529,6 @@ class MeshTestAttr:
       {
         std::cout << "copy" << std::endl;
       }
-
     }
 };
 MeshTestAttr<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_cpu_v_v("std::vector, std::vector");
@@ -641,7 +647,7 @@ class MeshTestHistory:
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).size(), 0ul);
     }
 };
-MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
+//MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestGeometryInterface:

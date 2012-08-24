@@ -22,76 +22,86 @@ class FunctorTest:
 
     virtual void run() const
     {
-      std::vector<IndexType_> vector;
-      vector.push_back(IndexType_(0));
-      vector.push_back(IndexType_(42));
-      vector.push_back(IndexType_(3));
+      //Testing with simple stl container
+      std::vector<IndexType_> vector_0;
+      std::vector<std::vector<IndexType_> > vector_vector_0;
 
-      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func(vector, IndexType_(2), IndexType_(3));
-      TEST_CHECK_EQUAL(func.get_position(), IndexType_(2));
-      TEST_CHECK_EQUAL(func.get_value(), IndexType_(3));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_0(vector_0, IndexType_(0), IndexType_(42));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_1(vector_0, IndexType_(1), IndexType_(43));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_2(vector_0, IndexType_(2), IndexType_(44));
 
-      TEST_CHECK_THROWS(func.execute(), FunctorError);
+      TEST_CHECK_THROWS(func_0.undo(), FunctorError);
+      TEST_CHECK_THROWS(func_1.undo(), FunctorError);
+      TEST_CHECK_THROWS(func_2.undo(), FunctorError);
+      func_0.execute();
+      func_1.execute();
+      func_2.execute();
+      TEST_CHECK_THROWS(func_0.execute(), FunctorError);
+      TEST_CHECK_THROWS(func_1.execute(), FunctorError);
+      TEST_CHECK_THROWS(func_2.execute(), FunctorError);
+      TEST_CHECK_EQUAL(vector_0.at(0), IndexType_(42));
+      TEST_CHECK_EQUAL(vector_0.at(1), IndexType_(43));
+      TEST_CHECK_EQUAL(vector_0.at(2), IndexType_(44));
 
-      TEST_CHECK_EQUAL(vector.at(IndexType_(2)), IndexType_(3));
+      Foundation::EraseFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_3(vector_0, IndexType_(0), IndexType_(vector_0.at(0)));
+      Foundation::EraseFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_4(vector_0, IndexType_(1), IndexType_(vector_0.at(1)));
+      Foundation::EraseFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_5(vector_0, IndexType_(2), IndexType_(vector_0.at(2)));
+      TEST_CHECK_THROWS(func_5.undo(), FunctorError);
+      TEST_CHECK_THROWS(func_4.undo(), FunctorError);
+      TEST_CHECK_THROWS(func_3.undo(), FunctorError);
+      func_5.execute();
+      func_4.execute();
+      func_3.execute();
+      TEST_CHECK_THROWS(func_3.execute(), FunctorError);
+      TEST_CHECK_THROWS(func_4.execute(), FunctorError);
+      TEST_CHECK_THROWS(func_5.execute(), FunctorError);
+      TEST_CHECK_EQUAL(vector_0.size(), IndexType_(0));
 
-      func.undo();
+      //testing with complex STL container
+      std::vector<IndexType_> vector_1;
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_6(vector_1, IndexType_(0), IndexType_(42));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_7(vector_1, IndexType_(1), IndexType_(43));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_8(vector_1, IndexType_(2), IndexType_(44));
+      func_6.execute();
+      func_7.execute();
+      func_8.execute();
 
-      TEST_CHECK_EQUAL(vector.size(), 2);
-      TEST_CHECK_THROWS(func.undo(), FunctorError);
+      Foundation::PushBackFunctor<std::vector<std::vector<IndexType_> >, IndexType_, std::vector<IndexType_> > func_9(vector_vector_0, IndexType_(0), vector_1);
+      func_9.execute();
+      TEST_CHECK_EQUAL(vector_vector_0.at(0).at(0), IndexType_(42));
+      TEST_CHECK_EQUAL(vector_vector_0.at(0).at(1), IndexType_(43));
+      TEST_CHECK_EQUAL(vector_vector_0.at(0).at(2), IndexType_(44));
+      Foundation::EraseFunctor<std::vector<std::vector<IndexType_> >, IndexType_, std::vector<IndexType_> > func_10(vector_vector_0, IndexType_(0), vector_vector_0.at(0));
+      func_10.execute();
+      TEST_CHECK_EQUAL(vector_vector_0.size(), IndexType_(0));
 
-      //-------------------------------------------
-      Foundation::Topology<> topology;
-      topology.push_back();
-      topology.push_back();
-      topology.push_back();
-      topology.erase();
-      topology.erase();
-      topology.erase();
+      //testing compound functor with simple STL container
+      Foundation::CompoundFunctor<> cfunc_0;
+      cfunc_0.add_functor(new Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector_0, IndexType_(0), IndexType_(42)));
+      cfunc_0.add_functor(new Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector_0, IndexType_(1), IndexType_(43)));
+      cfunc_0.add_functor(new Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector_0, IndexType_(2), IndexType_(44)));
+      cfunc_0.execute();
+      TEST_CHECK_EQUAL(vector_0.at(0), IndexType_(42));
+      TEST_CHECK_EQUAL(vector_0.at(1), IndexType_(43));
+      TEST_CHECK_EQUAL(vector_0.at(2), IndexType_(44));
+      cfunc_0.undo();
+      TEST_CHECK_EQUAL(vector_0.size(), IndexType_(0));
 
-      TEST_CHECK_EQUAL(topology.get_history().size(), 6ul);
-
-      //---------------------------------------------
-      std::vector<IndexType_> vector2;
-      vector2.push_back(0);
-      vector2.push_back(1);
-      vector2.push_back(2);
-
-      Foundation::CompoundFunctor<std::vector> cfunc;
-
-      cfunc.get_functors().push_back(Foundation::SmartPointer<Foundation::FunctorBase>(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(0), IndexType_(0))));
-      cfunc.get_functors().push_back(Foundation::SmartPointer<Foundation::FunctorBase>(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(1), IndexType_(1))));
-      cfunc.get_functors().push_back(Foundation::SmartPointer<Foundation::FunctorBase>(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(2), IndexType_(2))));
-
-      TEST_CHECK_EQUAL(cfunc.size(), 3);
-
-      cfunc.undo();
-      TEST_CHECK_THROWS(cfunc.undo(), FunctorError);
-      TEST_CHECK_EQUAL(cfunc.size(), 3);
-      TEST_CHECK_EQUAL(vector2.size(), 0);
-
-      cfunc.execute();
-      TEST_CHECK_EQUAL(cfunc.size(), 3);
-      TEST_CHECK_EQUAL(vector2.size(), 3);
-      TEST_CHECK_THROWS(cfunc.execute(), FunctorError);
-
-      vector2.push_back(3);
-      vector2.push_back(4);
-      vector2.push_back(5);
-      cfunc.add_functor(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(3), IndexType_(3)));
-      cfunc.add_functor(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(4), IndexType_(4)));
-      cfunc.add_functor(new Foundation::EmptyPushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_>(vector2, IndexType_(5), IndexType_(5)));
-
-      TEST_CHECK_EQUAL(cfunc.size(), 6);
-      cfunc.undo();
-      TEST_CHECK_THROWS(cfunc.undo(), FunctorError);
-      TEST_CHECK_EQUAL(cfunc.size(), 6);
-      TEST_CHECK_EQUAL(vector2.size(), 0);
-
-      cfunc.execute();
-      TEST_CHECK_EQUAL(cfunc.size(), 6);
-      TEST_CHECK_EQUAL(vector2.size(), 6);
-      TEST_CHECK_THROWS(cfunc.execute(), FunctorError);
+      //testing compound functor with complex STL container
+      Foundation::CompoundFunctor<> cfunc_1;
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_11(vector_0, IndexType_(0), IndexType_(42));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_12(vector_0, IndexType_(1), IndexType_(43));
+      Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_13(vector_0, IndexType_(2), IndexType_(44));
+      func_11.execute();
+      func_12.execute();
+      func_13.execute();
+      cfunc_1.add_functor(new Foundation::PushBackFunctor<std::vector<std::vector<IndexType_> >, IndexType_, std::vector<IndexType_> >(vector_vector_0, IndexType_(0), vector_0));
+      cfunc_1.execute();
+      TEST_CHECK_EQUAL(vector_vector_0.at(0).at(0), IndexType_(42));
+      TEST_CHECK_EQUAL(vector_vector_0.at(0).at(1), IndexType_(43));
+      TEST_CHECK_EQUAL(vector_vector_0.at(0).at(2), IndexType_(44));
+      cfunc_1.undo();
+      TEST_CHECK_EQUAL(vector_vector_0.size(), IndexType_(0));
 
     }
 };
