@@ -80,6 +80,11 @@ namespace FEAST
           return *this;
         }
 
+        Attribute(const Attribute& other) :
+          _data(other._data)
+        {
+        }
+
       protected:
         StorageType_<DataType_, std::allocator<DataType_> > _data;
     };
