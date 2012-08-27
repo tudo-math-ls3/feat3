@@ -64,7 +64,6 @@ namespace FEAST
         {
           if(!(this->_executed))
             throw FunctorError("Already undone!");
-
           _target.erase(_target.begin() + _position);
           this->_executed = false;
         }
@@ -90,7 +89,7 @@ namespace FEAST
         }
 
       private:
-        ContainerType_& _target;
+        ContainerType_& _target ;
         IndexType_ _position;
         ValueType_ _value;
     };
@@ -181,7 +180,7 @@ namespace FEAST
           _functors.push_back(SmartPointer<FunctorBase>(functor));
         }
 
-        void add_functor(SmartPointer<FunctorBase>& functor)
+        void add_functor(const SmartPointer<FunctorBase>& functor)
         {
           _functors.push_back(functor);
         }
@@ -207,7 +206,7 @@ namespace FEAST
           if(_functors.size() != 0)
           {
             Index i(_functors.size() - 1);
-            while(i >= 0)
+            while(true)
             {
               _functors.at(i)->undo();
 

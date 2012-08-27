@@ -81,7 +81,7 @@ namespace FEAST
          */
         void push_back(const StorageType_& s)
         {
-          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, _num_polytopes, _topology.at(_topology.size() - 1)));
+          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, _num_polytopes, s));
           _history.get_functors().at(_history.size() - 1).get()->execute();
           ++_num_polytopes;
         }
@@ -91,6 +91,12 @@ namespace FEAST
           _history.add_functor(new EraseFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, i, _topology.at(i)));
           _history.get_functors().at(_history.size() - 1).get()->execute();
           --_num_polytopes;
+        }
+
+        void insert(IndexType_ i, IndexType_ value)
+        {
+          _history.add_functor(new PushBackFunctor<storage_type_, IndexType_, IndexType_>(_topology.at(i), _topology.at(i).size(), value));
+          _history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
         /**
@@ -141,6 +147,7 @@ namespace FEAST
 
           this-> _num_polytopes = rhs._num_polytopes;
           this-> _topology = rhs._topology;
+          this-> _history = CompoundFunctor<OuterStorageType_>();
 
           return *this;
         }
@@ -160,18 +167,10 @@ namespace FEAST
           return 0;
         }
 
-        void insert(IndexType_ pos, const StorageType_& value)
-        {
-          //TODO functor
-          _topology.insert(_topology.begin() + pos, value);
-          ++_num_polytopes;
-        }
-
         OuterStorageType_<StorageType_, std::allocator<StorageType_> >& get_topology()
         {
           return _topology;
         }
-
 
       private:
         ///current size of the topology

@@ -209,11 +209,9 @@ namespace FEAST
 
             case pl_polyhedron:
               {
-                  typename TopologyType_::storage_type_ s;
-                  _topologies.at(ipi_polyhedron_vertex).get_history().add_functor(new PushBackFunctor<typename TopologyType_::compound_storage_type_, index_type_, typename TopologyType_::storage_type_>(_topologies.at(ipi_polyhedron_vertex).get_topology(), _topologies.at(ipi_polyhedron_vertex).size(), s) );
+                  _topologies.at(ipi_polyhedron_vertex).push_back();
 
                   _history.add_functor(_topologies.at(ipi_polyhedron_vertex).get_history().get_functors().at(_topologies.at(ipi_polyhedron_vertex).get_history().size() - 1));
-                  _history.get_functors().at(_history.size() - 1).get()->execute();
               }
               break;
           }
@@ -246,8 +244,8 @@ namespace FEAST
           InternalPolytopeIndices ipi(_get_internal_index(from_level, to_level));
           InternalPolytopeIndices ipit(_transpose_internal_index(ipi));
 
-          _topologies.at(ipi).at(polytope_index).push_back(value);
-          _topologies.at(ipit).at(value).push_back(polytope_index);
+          _topologies.at(ipi).insert(polytope_index, value);
+          _topologies.at(ipit).insert(value, polytope_index);
 
           _history.add_functor(new CompoundFunctor<OuterStorageType_>(true));
           ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi).get_history().get_functors().at(_topologies.at(ipi).get_history().size() - 1));
@@ -357,35 +355,25 @@ namespace FEAST
           if(_history.size() == 0)
             throw MeshError("Already cleared!");
 
-          _history.at(_history.size() - 1).get()->undo();
-          SmartPointer<FunctorBase> func(_history.at(_history.size() - 1));
-          _history.pop_back();
+          _history.get_functors().at(_history.size() - 1).get()->undo();
+          SmartPointer<FunctorBase> func(_history.get_functors().at(_history.size() - 1));
+          _history.get_functors().pop_back();
           return func;
         }
 
-        SmartPointer<FunctorBase> clear()
+        CompoundFunctor<OuterStorageType_> clear()
         {
           if(_history.size() == 0)
             throw MeshError("Already cleared!");
 
-          SmartPointer<FunctorBase> result(new CompoundFunctor<OuterStorageType_>());
+          _history.undo();
 
-          for(index_type_ i(_history.size() - 1) ; i >= 0 ; --i)
-          {
-            ((CompoundFunctor<OuterStorageType_>*)(result.get()))->add_functor(_history.at(i).get());
-            _history.pop_back();
-
-            if(i == 0)
-              break;
-          }
-          result.get()->undo();
-          return result;
+          return _history;
         }
 
-        void redo(const SmartPointer<FunctorBase>& func)
+        void redo(const SmartPointer<FunctorBase> func)
         {
-          func.get()->execute();
-          _history.push_back(func);
+          //TODO
         }
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
