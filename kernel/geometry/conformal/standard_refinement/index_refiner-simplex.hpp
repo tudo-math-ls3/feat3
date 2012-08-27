@@ -800,8 +800,8 @@ namespace FEAST
 
               // v_0
               s_0[0] = ioe + s_e[0]; // e_0
-              s_0[1] = ioe + s_e[1]; // e_1
-              s_0[2] = ioe + s_e[2]; // e_2
+              s_0[1] = ioe + s_e[2]; // e_2
+              s_0[2] = ioe + s_e[1]; // e_1
               s_0[3] = iov + s_v[0]; // v_0
 
               s_1[0] = ioe + s_e[0]; // e_0
@@ -816,14 +816,14 @@ namespace FEAST
               s_2[3] = iov + s_v[1]; // v_0
 
               s_3[0] = ioe + s_e[0]; // e_0
-              s_3[1] = ioe + s_e[3]; // e_3
-              s_3[2] = ioe + s_e[4]; // e_4
+              s_3[1] = ioe + s_e[4]; // e_4
+              s_3[2] = ioe + s_e[3]; // e_3
               s_3[3] = ios + i;      // s
 
               // v_2
               s_4[0] = ioe + s_e[1]; // e_1
-              s_4[1] = ioe + s_e[3]; // e_3
-              s_4[2] = ioe + s_e[5]; // e_5
+              s_4[1] = ioe + s_e[5]; // e_5
+              s_4[2] = ioe + s_e[3]; // e_3
               s_4[3] = iov + s_v[2]; // v_2
 
               s_5[0] = ioe + s_e[1]; // e_1
@@ -838,30 +838,30 @@ namespace FEAST
               s_6[3] = iov + s_v[3]; // v_3
 
               s_7[0] = ioe + s_e[2]; // e_2
-              s_7[1] = ioe + s_e[4]; // e_4
-              s_7[2] = ioe + s_e[5]; // e_5
+              s_7[1] = ioe + s_e[5]; // e_5
+              s_7[2] = ioe + s_e[4]; // e_4
               s_7[3] = ios + i;      // s
 
               // simplices at the coarse mesh faces
 
-              s_8[0] = ioe + s_e[5]; // e_5
+              s_8[0] = ioe + s_e[3]; // e_3
               s_8[1] = ioe + s_e[4]; // e_4
-              s_8[2] = ioe + s_e[3]; // e_3
+              s_8[2] = ioe + s_e[5]; // e_5
               s_8[3] = ios + i;      // s
 
-              s_9[0] = ioe + s_e[5]; // e_5
-              s_9[1] = ioe + s_e[2]; // e_2
-              s_9[2] = ioe + s_e[1]; // e_1
+              s_9[0] = ioe + s_e[1]; // e_1
+              s_9[1] = ioe + s_e[5]; // e_5
+              s_9[2] = ioe + s_e[2]; // e_2
               s_9[3] = ios + i;      // s
 
-              s_10[0] = ioe + s_e[4]; // e_4
+              s_10[0] = ioe + s_e[0]; // e_0
               s_10[1] = ioe + s_e[2]; // e_2
-              s_10[2] = ioe + s_e[0]; // e_0
+              s_10[2] = ioe + s_e[4]; // e_4
               s_10[3] = ios + i;      // s
 
-              s_11[0] = ioe + s_e[3]; // e_3
-              s_11[1] = ioe + s_e[1]; // e_1
-              s_11[2] = ioe + s_e[0]; // e_0
+              s_11[0] = ioe + s_e[0]; // e_0
+              s_11[1] = ioe + s_e[3]; // e_3
+              s_11[2] = ioe + s_e[1]; // e_1
               s_11[3] = ios + i;      // s
             }
             // return fine simplex count
@@ -1122,12 +1122,12 @@ namespace FEAST
               // calculate fine edges-at-simplex indices
 
               // v_0-simplices
-              s_0[0] = iot + 3*s_t[3] + sim.map(3, 0); //
-              s_0[1] = iot + 3*s_t[2] + sim.map(2, 0); //
+              s_0[0] = iot + 3*s_t[2] + sim.map(2, 0); //
+              s_0[1] = iot + 3*s_t[3] + sim.map(3, 0); //
               s_0[2] = ioe + 2*s_e[0] + edgesim.map(0, 0);//
               s_0[3] = iot + 3*s_t[1] + sim.map(1, 0); //
-              s_0[4] = ioe + 2*s_e[1] + edgesim.map(1, 0);//
-              s_0[5] = ioe + 2*s_e[2] + edgesim.map(2, 0);//
+              s_0[4] = ioe + 2*s_e[2] + edgesim.map(2, 0);//
+              s_0[5] = ioe + 2*s_e[1] + edgesim.map(1, 0);//
 
               s_1[0] = iot + 3*s_t[3] + sim.map(3, 0); //
               s_1[1] = iot + 3*s_t[2] + sim.map(2, 0); //
@@ -1144,20 +1144,20 @@ namespace FEAST
               s_2[4] = ioe + 2*s_e[3] + edgesim.map(3, 0);//
               s_2[5] = ioe + 2*s_e[4] + edgesim.map(4, 0);//
 
-              s_3[0] = iot + 3*s_t[3] + sim.map(3, 1); //
-              s_3[1] = iot + 3*s_t[2] + sim.map(2, 1); //
+              s_3[0] = iot + 3*s_t[2] + sim.map(2, 1); //
+              s_3[1] = iot + 3*s_t[3] + sim.map(3, 1); //
               s_3[2] = ios + 6*i + 0;//
               s_3[3] = iot + 3*s_t[0] + sim.map(0, 0); //
-              s_3[4] = ios + 6*i + 3;//
-              s_3[5] = ios + 6*i + 4;//
+              s_3[5] = ios + 6*i + 3;//
+              s_3[4] = ios + 6*i + 4;//
 
               // v_2-simplices
-              s_4[0] = iot + 3*s_t[3] + sim.map(3, 2); //
-              s_4[1] = iot + 3*s_t[1] + sim.map(1, 1); //
+              s_4[0] = iot + 3*s_t[1] + sim.map(1, 1); //
+              s_4[1] = iot + 3*s_t[3] + sim.map(3, 2); //
               s_4[2] = ioe + 2*s_e[1] + edgesim.map(1, 1);//
               s_4[3] = iot + 3*s_t[0] + sim.map(0, 1); //
-              s_4[4] = ioe + 2*s_e[3] + edgesim.map(3, 1);//
-              s_4[5] = ioe + 2*s_e[5] + edgesim.map(5, 0);//
+              s_4[4] = ioe + 2*s_e[5] + edgesim.map(5, 0);//
+              s_4[5] = ioe + 2*s_e[3] + edgesim.map(3, 1);//
 
               s_5[0] = iot + 3*s_t[3] + sim.map(3, 2); //
               s_5[1] = iot + 3*s_t[1] + sim.map(1, 1); //
@@ -1174,42 +1174,43 @@ namespace FEAST
               s_6[4] = ioe + 2*s_e[4] + edgesim.map(4, 1);//
               s_6[5] = ioe + 2*s_e[5] + edgesim.map(5, 1);//
 
-              s_7[0] = iot + 3*s_t[2] + sim.map(2, 2); //
-              s_7[1] = iot + 3*s_t[1] + sim.map(1, 2); //
+              s_7[0] = iot + 3*s_t[1] + sim.map(1, 2); //
+              s_7[1] = iot + 3*s_t[2] + sim.map(2, 2); //
               s_7[2] = ios + 6*i + 2;//
               s_7[3] = iot + 3*s_t[0] + sim.map(0, 2); //
-              s_7[4] = ios + 6*i + 4;//
-              s_7[5] = ios + 6*i + 5;//
+              s_7[4] = ios + 6*i + 5;//
+              s_7[5] = ios + 6*i + 4;//
 
               //triangle simplices
 
-              s_8[0] = iot + 3*s_t[0] + sim.map(0, 2); //
+              s_8[0] = iot + 3*s_t[0] + sim.map(0, 0); //
               s_8[1] = iot + 3*s_t[0] + sim.map(0, 1); //
-              s_8[2] = ios + 6*i + 5;//
-              s_8[3] = iot + 3*s_t[0] + sim.map(0, 0); //
+              s_8[2] = ios + 6*i + 3;//
+              s_8[3] = iot + 3*s_t[0] + sim.map(0, 2); //
               s_8[4] = ios + 6*i + 4;//
-              s_8[5] = ios + 6*i + 3;//
+              s_8[5] = ios + 6*i + 5;//
 
-              s_9[0] = iot + 3*s_t[1] + sim.map(1, 2); //
-              s_9[1] = iot + 3*s_t[1] + sim.map(1, 1); //
-              s_9[2] = ios + 6*i + 5;//
-              s_9[3] = iot + 3*s_t[1] + sim.map(1, 0); //
-              s_9[4] = ios + 6*i + 2;//
-              s_9[5] = ios + 6*i + 1;//
+              s_9[0] = iot + 3*s_t[1] + sim.map(1, 1); //
+              s_9[1] = iot + 3*s_t[1] + sim.map(1, 0); //
+              s_9[2] = ios + 6*i + 1;//
+              s_9[3] = iot + 3*s_t[1] + sim.map(1, 2); //
+              s_9[4] = ios + 6*i + 5;//
+              s_9[5] = ios + 6*i + 2;//
 
-              s_10[0] = iot + 3*s_t[2] + sim.map(2, 2); //
+              s_10[0] = iot + 3*s_t[2] + sim.map(2, 0); //
               s_10[1] = iot + 3*s_t[2] + sim.map(2, 1); //
-              s_10[2] = ios + 6*i + 4;//
-              s_10[3] = iot + 3*s_t[2] + sim.map(2, 0); //
+              s_10[2] = ios + 6*i + 0;//
+              s_10[3] = iot + 3*s_t[2] + sim.map(2, 2); //
               s_10[4] = ios + 6*i + 2;//
-              s_10[5] = ios + 6*i + 0;//
+              s_10[5] = ios + 6*i + 4;//
 
-              s_11[0] = iot + 3*s_t[3] + sim.map(3, 2); //
-              s_11[1] = iot + 3*s_t[3] + sim.map(3, 1); //
-              s_11[2] = ios + 6*i + 3;//
-              s_11[3] = iot + 3*s_t[3] + sim.map(3, 0); //
-              s_11[4] = ios + 6*i + 1;//
-              s_11[5] = ios + 6*i + 0;//
+              s_11[0] = iot + 3*s_t[3] + sim.map(3, 1); //
+              s_11[1] = iot + 3*s_t[3] + sim.map(3, 0); //
+              s_11[2] = ios + 6*i + 0;//
+              s_11[3] = iot + 3*s_t[3] + sim.map(3, 2); //
+              s_11[4] = ios + 6*i + 3;//
+              s_11[5] = ios + 6*i + 1;//
+
             }
             // return fine simplex count
             return 12*num_simps;
@@ -1298,8 +1299,8 @@ namespace FEAST
 
               // v_0-cube
               s_0[0] = iot + 4*s_t[1] + sim.map(1, 0); //
-              s_0[1] = iot + 4*s_t[2] + sim.map(2, 0); //
-              s_0[2] = iot + 4*s_t[3] + sim.map(3, 0);//
+              s_0[2] = iot + 4*s_t[2] + sim.map(2, 0); //
+              s_0[1] = iot + 4*s_t[3] + sim.map(3, 0);//
               s_0[3] = ios + 16*i + 0;//
 
               s_1[0] = ios + 16*i + 8; //
@@ -1314,14 +1315,14 @@ namespace FEAST
               s_2[3] = ios + 16*i + 1;//
 
               s_3[0] = ios + 16*i + 13; //
-              s_3[1] = ios + 16*i + 7;//
-              s_3[2] = ios + 16*i + 6;//
+              s_3[2] = ios + 16*i + 7;//
+              s_3[1] = ios + 16*i + 6;//
               s_3[3] = ios + 16*i + 1;//
 
               // v_2-cube
               s_4[0] = iot + 4*s_t[0] + sim.map(0, 1); //
-              s_4[1] = iot + 4*s_t[1] + sim.map(1, 1); //
-              s_4[2] = iot + 4*s_t[3] + sim.map(3, 2);//
+              s_4[2] = iot + 4*s_t[1] + sim.map(1, 1); //
+              s_4[1] = iot + 4*s_t[3] + sim.map(3, 2);//
               s_4[3] = ios + 16*i + 2;//
 
               s_5[0] = ios + 16*i + 14; //
@@ -1336,30 +1337,30 @@ namespace FEAST
               s_6[3] = ios + 16*i + 3;//
 
               s_7[0] = ios + 16*i + 15; //
-              s_7[1] = ios + 16*i + 12;//
-              s_7[2] = ios + 16*i + 11;//
+              s_7[2] = ios + 16*i + 12;//
+              s_7[1] = ios + 16*i + 11;//
               s_7[3] = ios + 16*i + 3;//
 
               //triangle simplices
 
-              s_8[0] = ios + 16*i + 13; //
+              s_8[0] = ios + 16*i + 15;//
               s_8[1] = ios + 16*i + 14;//
-              s_8[2] = ios + 16*i + 15;//
+              s_8[2] = ios + 16*i + 13; //
               s_8[3] = iot + 4*s_t[0] + 3;//
 
-              s_9[0] = ios + 16*i + 8; //
-              s_9[1] = ios + 16*i + 10;//
-              s_9[2] = ios + 16*i + 12;//
+              s_9[0] = ios + 16*i + 12;//
+              s_9[1] = ios + 16*i + 8; //
+              s_9[2] = ios + 16*i + 10;//
               s_9[3] = iot + 4*s_t[1] + 3;//
 
-              s_10[0] = ios + 16*i + 5; //
+              s_10[0] = ios + 16*i + 11;//
               s_10[1] = ios + 16*i + 7;//
-              s_10[2] = ios + 16*i + 11;//
+              s_10[2] = ios + 16*i + 5; //
               s_10[3] = iot + 4*s_t[2] + 3;//
 
-              s_11[0] = ios + 16*i + 4; //
-              s_11[1] = ios + 16*i + 6;//
-              s_11[2] = ios + 16*i + 9;//
+              s_11[0] = ios + 16*i + 9;//
+              s_11[1] = ios + 16*i + 4; //
+              s_11[2] = ios + 16*i + 6;//
               s_11[3] = iot + 4*s_t[3] + 3;//
 
             }
