@@ -196,5 +196,11 @@
     <ClCompile Include="..\kernel\geometry\test_aux\tetris_quad.cpp">
       <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\lafem\defect-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\richardson-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

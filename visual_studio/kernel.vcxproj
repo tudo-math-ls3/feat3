@@ -507,6 +507,7 @@
     <ClInclude Include="..\kernel\foundation\mesh.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_data.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
+    <ClInclude Include="..\kernel\foundation\smart_pointer.hpp" />
     <ClInclude Include="..\kernel\foundation\topology.hpp" />
     <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp" />
     <ClInclude Include="..\kernel\geometry\cell_sub_set_node.hpp" />
@@ -545,6 +546,7 @@
     <ClInclude Include="..\kernel\lafem\absolute.hpp" />
     <ClInclude Include="..\kernel\lafem\axpy.hpp" />
     <ClInclude Include="..\kernel\lafem\container.hpp" />
+    <ClInclude Include="..\kernel\lafem\defect.hpp" />
     <ClInclude Include="..\kernel\lafem\dense_matrix.hpp" />
     <ClInclude Include="..\kernel\lafem\dense_vector.hpp" />
     <ClInclude Include="..\kernel\lafem\difference.hpp" />
@@ -552,7 +554,9 @@
     <ClInclude Include="..\kernel\lafem\element_product.hpp" />
     <ClInclude Include="..\kernel\lafem\memory_pool.hpp" />
     <ClInclude Include="..\kernel\lafem\norm.hpp" />
+    <ClInclude Include="..\kernel\lafem\preconditioner.hpp" />
     <ClInclude Include="..\kernel\lafem\product.hpp" />
+    <ClInclude Include="..\kernel\lafem\richardson.hpp" />
     <ClInclude Include="..\kernel\lafem\sparse_matrix_coo.hpp" />
     <ClInclude Include="..\kernel\lafem\sparse_matrix_csr.hpp" />
     <ClInclude Include="..\kernel\lafem\sum.hpp" />
