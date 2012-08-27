@@ -50,7 +50,7 @@ namespace FEAST
         {
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows+1) * sizeof(Index)));
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((2 * _rows) * sizeof(Index)));
 
           _Aj = this->_indices.at(0);
           _Ax = this->_elements.at(0);
@@ -58,7 +58,7 @@ namespace FEAST
 
           Index ait(0);
           Index current_row(0);
-          _Ar[current_row] = 0;
+          _Ar[current_row * 2] = 0;
           for (typename std::map<unsigned long, DT_>::const_iterator it(other.elements().begin()) ; it != other.elements().end() ; ++it)
           {
             Index row(it->first / _columns);
@@ -66,16 +66,25 @@ namespace FEAST
 
             if (current_row < row)
             {
-              for (unsigned long i(current_row + 1) ; i <=row ; ++i)
-                _Ar[i] = ait;
+              _Ar[current_row * 2 + 1] = ait;
+              for (unsigned long i(current_row + 1) ; i < row ; ++i)
+              {
+                _Ar[i * 2] = ait;
+                _Ar[(i * 2) + 1] = ait;
+              }
               current_row = row;
+              _Ar[current_row * 2] = ait;
             }
             _Ax[ait] = it->second;
             _Aj[ait] = column;
             ++ait;
           }
-          for (unsigned long i(current_row + 1) ; i <=_rows ; ++i)
-            _Ar[i] = _used_elements;
+          _Ar[current_row * 2 + 1] = ait;
+          for (unsigned long i(current_row + 1) ; i < _rows ; ++i)
+          {
+            _Ar[i * 2] = ait;
+            _Ar[i * 2 + 1] = ait;
+          }
         }
 
         explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & Aj, const DenseVector<Arch_, DT_> & Ax, const DenseVector<Arch_, Index> & Ar) :
@@ -180,7 +189,7 @@ namespace FEAST
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_columns) + " !");
 
-          for (unsigned long i(_Ar[row]) ; i < _Ar[row + 1] ; ++i)
+          for (unsigned long i(_Ar[row * 2]) ; i < _Ar[(row * 2) + 1] ; ++i)
           {
             if (_Aj[i] == col)
               return _Ax[i];
@@ -237,34 +246,12 @@ namespace FEAST
       if (a.zero_element() != b.zero_element())
         return false;
 
-      if (typeid(DT_) == typeid(Index))
+      for (Index i(0) ; i < a.rows() ; ++i)
       {
-        for (Index i(0) ; i < a.used_elements() ; ++i)
+        for (Index j(0) ; j < a.columns() ; ++j)
         {
-            if (a.Ax()[i] != b.Ax()[i])
-              return false;
-            if (a.Aj()[i] != b.Aj()[i])
-              return false;
-        }
-        for (Index i(0) ; i < a.rows() + 1 ; ++i)
-        {
-            if (a.Ar()[i] != b.Ar()[i])
-              return false;
-        }
-      }
-      else
-      {
-        for (Index i(0) ; i < a.used_elements() ; ++i)
-        {
-            if (Absolute<DT_>::value(a.Ax()[i] - b.Ax()[i]) > std::numeric_limits<DT_>::epsilon())
-              return false;
-            if (a.Aj()[i] != b.Aj()[i])
-              return false;
-        }
-        for (Index i(0) ; i < a.rows() + 1 ; ++i)
-        {
-            if (a.Ar()[i] != b.Ar()[i])
-              return false;
+          if (a(i, j) != b(i, j))
+            return false;
         }
       }
 

@@ -57,7 +57,7 @@ public:
 
     DenseVector<Tag_, Index> Aj(c.used_elements(), c.Aj());
     DenseVector<Tag_, DT_> Ax(c.used_elements(), c.Ax());
-    DenseVector<Tag_, Index> Ar(c.rows() + 1, c.Ar());
+    DenseVector<Tag_, Index> Ar(2 * c.rows(), c.Ar());
     SparseMatrixCSR<Tag_, DT_> d(c.rows(), c.columns(), Aj, Ax, Ar);
     TEST_CHECK_EQUAL(d, c);
   }

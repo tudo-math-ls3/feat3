@@ -44,8 +44,8 @@ namespace FEAST
         for (Index row(0) ; row < rows ; ++row)
         {
           DT_ sum(0);
-          const Index end(Ar[row + 1]);
-          for (Index i(Ar[row]) ; i < end ; ++i)
+          const Index end(Ar[row * 2 + 1]);
+          for (Index i(Ar[row * 2]) ; i < end ; ++i)
           {
             sum += Ax[i] * bp[Aj[i]];
           }
