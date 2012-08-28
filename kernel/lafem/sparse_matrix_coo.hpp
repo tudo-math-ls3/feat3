@@ -6,7 +6,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/absolute.hpp>
 
 #include <vector>
 #include <map>

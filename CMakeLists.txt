@@ -12,6 +12,11 @@ ENABLE_TESTING()
 # BUILD_ID mechanism
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
 
+if (FEAST_BACKENDS_CUDA)
+  FIND_PACKAGE(CUDA)
+endif(FEAST_BACKENDS_CUDA)
+
+
 # store all variables describing the build in a custom header file
 # to use later on in the real code
 configure_file (${FEAST_SOURCE_DIR}/feast_config.hpp.in ${FEAST_BINARY_DIR}/feast_config.hpp)

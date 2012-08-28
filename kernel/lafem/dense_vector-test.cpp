@@ -54,8 +54,20 @@ public:
     e = a;
     TEST_CHECK_EQUAL(e(5), a(5));
     TEST_CHECK_EQUAL(e, a);
+
+    DenseVector<Archs::CPU, DT_> f(e);
+    DenseVector<Archs::CPU, DT_> g;
+    g = e;
+    TEST_CHECK_EQUAL(f, e);
+    TEST_CHECK_EQUAL(g, f);
+    TEST_CHECK_EQUAL(g, e);
   }
 };
-DenseVectorTest<Archs::CPU, float> dense_vector_test_float;
-DenseVectorTest<Archs::CPU, double> dense_vector_test_double;
-DenseVectorTest<Archs::CPU, Index> dense_vector_test_index;
+DenseVectorTest<Archs::CPU, float> cpu_dense_vector_test_float;
+DenseVectorTest<Archs::CPU, double> cpu_dense_vector_test_double;
+DenseVectorTest<Archs::CPU, Index> cpu_dense_vector_test_index;
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorTest<Archs::GPU, float> gpu_dense_vector_test_float;
+DenseVectorTest<Archs::GPU, double> gpu_dense_vector_test_double;
+DenseVectorTest<Archs::GPU, Index> gpu_dense_vector_test_index;
+#endif

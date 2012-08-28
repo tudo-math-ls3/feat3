@@ -8,7 +8,7 @@
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/absolute.hpp>
+#include <kernel/lafem/algorithm.hpp>
 
 
 
@@ -49,8 +49,11 @@ namespace FEAST
           _used_elements(other.used_elements())
         {
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+          this->_elements_size.push_back(_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((2 * _rows) * sizeof(Index)));
+          this->_indices_size.push_back(2 * _rows);
 
           _Aj = this->_indices.at(0);
           _Ax = this->_elements.at(0);
@@ -92,16 +95,23 @@ namespace FEAST
           _rows(rows),
           _columns(columns),
           _zero_element(DT_(0)),
+          // \TODO use real element count - be aware of non used elements
           _used_elements(Ax.size())
         {
           // \TODO create real copies
-          DenseVector<Arch_, Index> tAj(Aj);
-          DenseVector<Arch_, DT_> tAx(Ax);
-          DenseVector<Arch_, Index> tAr(Ar);
+          DenseVector<Arch_, Index> tAj(Aj.size());
+          copy(tAj, Aj);
+          DenseVector<Arch_, DT_> tAx(Ax.size());
+          copy(tAx, Ax);
+          DenseVector<Arch_, Index> tAr(Ar.size());
+          copy(tAr, Ar);
 
           this->_elements.push_back(tAx.get_elements().at(0));
+          this->_elements_size.push_back(tAx.size());
           this->_indices.push_back(tAj.get_elements().at(0));
+          this->_indices_size.push_back(tAj.size());
           this->_indices.push_back(tAr.get_elements().at(0));
+          this->_indices_size.push_back(tAr.size());
 
           this->_Ax = this->_elements.at(0);
           this->_Aj = this->_indices.at(0);
@@ -155,12 +165,16 @@ namespace FEAST
 
           this->_elements.clear();
           this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
 
           std::vector<DT_ *> new_elements = other.get_elements();
           std::vector<Index *> new_indices = other.get_indices();
 
           this->_elements.assign(new_elements.begin(), new_elements.end());
           this->_indices.assign(new_indices.begin(), new_indices.end());
+          this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
+          this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
 
           _Aj = this->_indices.at(0);
           _Ax = this->_elements.at(0);

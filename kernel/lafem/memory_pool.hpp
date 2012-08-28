@@ -54,6 +54,74 @@ namespace FEAST
 
         /// release memory or decrease reference counter
         void release_memory(void * address);
+
+        /// download memory chunk to host memory
+        static void download(void * dest, void * src, Index bytes);
+
+        /// upload memory chunk from host memory to device memory
+        static void upload(void * dest, void * src, Index bytes);
+
+        /// recieve element
+        template <typename DT_>
+        inline static DT_ get_element(const DT_ * data, Index index)
+        {
+          return data[index];
+        }
+
+        /// modify element
+        template <typename DT_>
+        inline static void modify_element(DT_ * data, Index index, DT_ value)
+        {
+          data[index] = value;
+        }
+
+        /// set memory to specific value
+        template <typename DT_>
+        void set_memory(DT_ * address, const DT_ val, const Index count);
+    };
+
+    template <>
+    class MemoryPool<Archs::GPU>
+        : public InstantiationPolicy<MemoryPool<Archs::GPU>, Singleton>
+    {
+      private:
+        std::map<void*, Intern::MemoryInfo> _pool;
+
+        /// default CTOR
+        MemoryPool();
+
+      public:
+        ~MemoryPool();
+
+        /// pointer to MemoryPool singleton
+        friend MemoryPool* InstantiationPolicy<MemoryPool<Archs::GPU>, Singleton>::instance();
+
+        /// allocate new memory
+        void * allocate_memory(Index bytes);
+
+        /// increase memory counter
+        void increase_memory(void * address);
+
+        /// release memory or decrease reference counter
+        void release_memory(void * address);
+
+        /// download memory chunk to host memory
+        static void download(void * dest, void * src, Index bytes);
+
+        /// upload memory chunk from host memory to device memory
+        static void upload(void * dest, void * src, Index bytes);
+
+        /// recieve element
+        template <typename DT_>
+        static DT_ get_element(const DT_ * data, Index index);
+
+        /// modify element
+        template <typename DT_>
+        static void modify_element(DT_ * data, Index index, DT_ value);
+
+        /// set memory to specific value
+        template <typename DT_>
+        void set_memory(DT_ * address, const DT_ val, const Index count);
     };
   } // namespace LAFEM
 } // namespace FEAST

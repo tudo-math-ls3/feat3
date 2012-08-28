@@ -18,6 +18,7 @@ namespace FEAST
         tv_nil = 0,
         tv_cpu,
         tv_generic,
+        tv_gpu,
         tv_none
       };
 
@@ -61,6 +62,20 @@ namespace FEAST
         static String name()
         {
           return "generic";
+        }
+      };
+
+      /**
+       * Tag-type for operations in GPU memory
+       */
+      struct GPU :
+        public InstantiationPolicy<GPU, NonCopyable>
+      {
+        const static TagValue tag_value = tv_gpu;
+        const static TagValue memory_value = tv_gpu;
+        static String name()
+        {
+          return "gpu";
         }
       };
 

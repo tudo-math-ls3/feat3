@@ -27,6 +27,8 @@
 #     FEAST_COMPILER_NAME (string, gnu|intel|oracle|open64|pgi)
 #     CMAKE_CXX_COMPILER (string)
 #     FEAST_COMPILER_FLAGS (string, also passed automatically to add_definitions())
+#   buildid_backends:
+#     FEAST_BACKENDS_CUDA (bool, cached)
 #
 # Documentation on using the build system is available in the  "provide help"
 # section below (actually implemented in the module buildid_help.cmake).
@@ -165,6 +167,9 @@ else ()
 
   # parse compiler token
   include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_compiler.cmake )
+
+  # parse "backends" token
+  include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_backends.cmake )
 
   # ok, all fine so far, so re-map BUILD_ID to our standard ordering of tokens
   # and print out a summary

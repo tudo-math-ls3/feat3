@@ -34,6 +34,8 @@ namespace FEAST
       protected:
         std::vector<DT_*> _elements;
         std::vector<Index*> _indices;
+        std::vector<Index> _elements_size;
+        std::vector<Index> _indices_size;
 
       public:
         Container(Index size) :
@@ -43,7 +45,6 @@ namespace FEAST
 
       ~Container()
       {
-        //TODO add arch
         for (Index i(0) ; i < _elements.size() ; ++i)
           MemoryPool<Arch_>::instance()->release_memory(_elements.at(i));
         for (Index i(0) ; i < _indices.size() ; ++i)
@@ -69,11 +70,28 @@ namespace FEAST
           throw InternalError("type conversion not supported yet!");
 
         for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
-          MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_));
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(other.get_elements_size().at(i) * sizeof(DT_)));
         for (Index i(0) ; i < other.get_indices().size() ; ++i)
-          MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(Index));
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(other.get_indices_size().at(i) * sizeof(Index)));
 
-        //TODO copy memory from arch2 to arch
+        for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
+        {
+          Index src_size(other.get_elements_size().at(i) * sizeof(DT2_));
+          Index dest_size(other.get_elements_size().at(i) * sizeof(DT_));
+          void * temp(::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, other.get_elements().at(i), src_size);
+          MemoryPool<Arch_>::upload(this->get_elements().at(i), temp, dest_size);
+          ::free(temp);
+        }
+        for (Index i(0) ; i < other.get_indices().size() ; ++i)
+        {
+          Index src_size(other.get_indices_size().at(i) * sizeof(DT2_));
+          Index dest_size(other.get_indices_size().at(i) * sizeof(DT_));
+          void * temp(::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, other.get_indices().at(i), src_size);
+          MemoryPool<Arch_>::upload(this->get_indices().at(i), temp, dest_size);
+          ::free(temp);
+        }
 
       }
 
@@ -95,6 +113,26 @@ namespace FEAST
       const std::vector<Index*> & get_indices() const
       {
         return _indices;
+      }
+
+      std::vector<Index> & get_elements_size()
+      {
+        return _elements_size;
+      }
+
+      const std::vector<Index> & get_elements_size() const
+      {
+        return _elements_size;
+      }
+
+      std::vector<Index> & get_indices_size()
+      {
+        return _indices_size;
+      }
+
+      const std::vector<Index> & get_indices_size() const
+      {
+        return _indices_size;
       }
 
       const Index & size() const

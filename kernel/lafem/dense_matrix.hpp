@@ -6,7 +6,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/absolute.hpp>
 
 
 namespace FEAST
@@ -40,6 +39,7 @@ namespace FEAST
           this->_columns = columns;
 
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
+          this->_elements_size.push_back(this->_size);
           _pelements = this->_elements.at(0);
         }
 
@@ -50,6 +50,7 @@ namespace FEAST
           this->_rows = rows;
           this->_columns = columns;
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
+          this->_elements_size.push_back(this->_size);
           _pelements = this->_elements.at(0);
 
           //TODO add arch, use memory pool set memory function
@@ -92,12 +93,16 @@ namespace FEAST
 
           this->_elements.clear();
           this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
 
           std::vector<DT_ *> new_elements = other.get_elements();
           std::vector<Index *> new_indices = other.get_indices();
 
           this->_elements.assign(new_elements.begin(), new_elements.end());
           this->_indices.assign(new_indices.begin(), new_indices.end());
+          this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
+          this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
 
           _pelements = this->_elements.at(0);
 

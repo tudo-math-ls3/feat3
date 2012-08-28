@@ -15,6 +15,9 @@ ADD_SUBDIRECTORY( foundation )
 ADD_LIBRARY(feast STATIC archs.cpp)
 #list of libraries to include in libfeast
 TARGET_LINK_LIBRARIES (feast kernel-util kernel-lafem kernel-geometry kernel-foundation)
+if (FEAST_BACKENDS_CUDA)
+  TARGET_LINK_LIBRARIES (feast kernel-lafem-cuda)
+endif(FEAST_BACKENDS_CUDA)
 
 #list of kernel tests
 SET (test_list)

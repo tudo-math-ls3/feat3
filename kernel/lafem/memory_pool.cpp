@@ -1,7 +1,8 @@
 // includes, FEAST
 #include <kernel/lafem/memory_pool.hpp>
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstring>
 
 
 using namespace FEAST;
@@ -17,7 +18,6 @@ MemoryPool<Archs::CPU>::~MemoryPool()
     throw InternalError("Memory Pool still contains memory chunks!");
 }
 
-//template<>
 void * MemoryPool<Archs::CPU>::allocate_memory(Index bytes)
 {
   void * memory(::malloc(bytes));
@@ -58,3 +58,26 @@ void MemoryPool<Archs::CPU>::release_memory(void * address)
     }
   }
 }
+
+void MemoryPool<Archs::CPU>::download(void * dest, void * src, Index bytes)
+{
+  memcpy(dest, src, bytes);
+}
+
+void MemoryPool<Archs::CPU>::upload(void * dest, void * src, Index bytes)
+{
+  memcpy(dest, src, bytes);
+}
+
+template <typename DT_>
+void MemoryPool<Archs::CPU>::set_memory(DT_ * address, const DT_ val, const Index count)
+{
+  for (Index i(0) ; i < count ; ++i)
+  {
+    address[i] = val;
+  }
+}
+
+template void MemoryPool<Archs::CPU>::set_memory(float * address , const float val, const Index count);
+template void MemoryPool<Archs::CPU>::set_memory(double * address , const double val, const Index count);
+template void MemoryPool<Archs::CPU>::set_memory(Index * address , const Index val, const Index count);

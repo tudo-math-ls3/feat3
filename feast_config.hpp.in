@@ -32,4 +32,7 @@
 /// TODO this is redundant
 #define FEAST_BUILD_MODE "${FEAST_BUILD_MODE}"
 
+/// Do we have CUDA support enabled?
+#cmakedefine FEAST_BACKENDS_CUDA
+
 #endif // FEAST_CONFIG_HPP

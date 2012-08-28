@@ -20,6 +20,10 @@ std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
       left << Archs::Generic::name();
       break;
 
+    case Archs::tv_gpu:
+      left << Archs::GPU::name();
+      break;
+
     default:
       left << "Unknown Backend";
       break;
