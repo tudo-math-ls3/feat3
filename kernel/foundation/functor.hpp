@@ -21,9 +21,15 @@ namespace FEAST
       public:
         virtual void execute() = 0;
         virtual void undo() = 0;
+        virtual const std::string type_name() = 0;
 
         virtual ~FunctorBase()
         {
+        }
+
+        bool is_executed()
+        {
+          return _executed;
         }
 
       protected:
@@ -51,6 +57,11 @@ namespace FEAST
           this->_executed = false;
         }
 
+        virtual const std::string type_name()
+        {
+          return "PushBackFunctor";
+        }
+
         virtual void execute()
         {
           if(this->_executed)
@@ -64,6 +75,7 @@ namespace FEAST
         {
           if(!(this->_executed))
             throw FunctorError("Already undone!");
+
           _target.erase(_target.begin() + _position);
           this->_executed = false;
         }
@@ -112,6 +124,11 @@ namespace FEAST
           _value(value)
         {
           this->_executed = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "EraseFunctor";
         }
 
         virtual void execute()
@@ -173,6 +190,11 @@ namespace FEAST
           _functors()
         {
           this->_executed = executed;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "CompoundFunctor";
         }
 
         void add_functor(FunctorBase* functor)

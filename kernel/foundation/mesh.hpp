@@ -130,7 +130,7 @@ namespace FEAST
           _num_inter_topologies(i_),
           _num_levels((unsigned)(i_/2u) + 1u),
           _topologies(i_),
-          _history(),
+          _history(true),
           _attrs(attrbase),
           _num_attributes(0),
           _attribute_polytopelevel_relations()
@@ -373,12 +373,18 @@ namespace FEAST
 
         void redo(const SmartPointer<FunctorBase> func)
         {
-          //TODO
+          func.get()->execute();
+          _history.add_functor(func);
         }
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
         {
           return _topologies;
+        }
+
+        CompoundFunctor<OuterStorageType_>& get_history()
+        {
+          return _history;
         }
 
       private:

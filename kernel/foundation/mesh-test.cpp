@@ -15,36 +15,36 @@ using namespace FEAST::TestSystem;
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestAttr:
-  public TaggedTest<Tag_, IndexType_>
+public TaggedTest<Tag_, IndexType_>
 {
-  public:
-    MeshTestAttr(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshTestAttr<" + tag + ">")
-    {
-    }
+public:
+  MeshTestAttr(const std::string & tag) :
+    TaggedTest<Tag_, IndexType_>("MeshTestAttr<" + tag + ">")
+  {
+  }
 
-    void run() const
-    {
-      //basic tests
-      Foundation::Mesh<> m(0);
+  void run() const
+  {
+    //basic tests
+    Foundation::Mesh<> m(0);
 
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m2(1);
+    Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m2(1);
 
-      TEST_CHECK_EQUAL(m.get_num_levels(), 3ul);
-      TEST_CHECK_EQUAL(m2.get_num_levels(), 3ul);
-      //##################################################################
+    TEST_CHECK_EQUAL(m.get_num_levels(), 3ul);
+    TEST_CHECK_EQUAL(m2.get_num_levels(), 3ul);
+    //##################################################################
 
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
+    Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
 
-      //configure attribute
-      Foundation::Attribute<double, std::vector> attr;
-      Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
-      //add vertices
-      m3.add_polytope(Foundation::pl_vertex);
-      m3.add_polytope(Foundation::pl_vertex);
-      m3.add_polytope(Foundation::pl_vertex);
-      m3.add_polytope(Foundation::pl_vertex);
-      m3.add_polytope(Foundation::pl_vertex);
+    //configure attribute
+    Foundation::Attribute<double, std::vector> attr;
+    Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
+    //add vertices
+    m3.add_polytope(Foundation::pl_vertex);
+    m3.add_polytope(Foundation::pl_vertex);
+    m3.add_polytope(Foundation::pl_vertex);
+    m3.add_polytope(Foundation::pl_vertex);
+    m3.add_polytope(Foundation::pl_vertex);
       m3.add_polytope(Foundation::pl_vertex);
       attr.push_back(double(0));
       attr.push_back(double(0.5));
@@ -611,13 +611,15 @@ class MeshTestHistory:
       Foundation::SmartPointer<Foundation::FunctorBase> f14(m.undo());
       Foundation::SmartPointer<Foundation::FunctorBase> f15(m.undo());
 
+      TEST_CHECK_EQUAL(m.get_history().get_functors().size(), 0);
+
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_edge).get_topology().size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).get_topology().size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).get_topology().size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_face).get_topology().size(), 0ul);
 
       //redo all manually
-      /*m.redo(f1);
+      m.redo(f1);
       m.redo(f2);
       m.redo(f3);
       m.redo(f4);
@@ -638,13 +640,15 @@ class MeshTestHistory:
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).get_topology().size(), 7ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).get_topology().size(), 2ul);
 
+      TEST_CHECK_EQUAL(m.get_history().get_functors().size(), 15);
       //clear all again
       m.clear();
 
-      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_edge).size(), 0ul);
-      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_face).size(), 0ul);
-      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).size(), 0ul);
-      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).size(), 0ul);*/
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_edge).get_topology().size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_face).get_topology().size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).get_topology().size(), 0ul);
+      TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).get_topology().size(), 0ul);
+
     }
 };
 MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
