@@ -224,6 +224,8 @@ namespace FEAST
           if(!(this->_executed))
             throw FunctorError("Already undone!");
 
+          if(_functors.size() == 0)
+            throw FunctorError("Already cleared!");
 
           if(_functors.size() != 0)
           {

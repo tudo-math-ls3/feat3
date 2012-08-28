@@ -366,7 +366,10 @@ namespace FEAST
           if(_history.size() == 0)
             throw MeshError("Already cleared!");
 
-          _history.undo();
+          _history.get_functors().clear();
+
+          for(index_type_ i(0) ; i < i_ ; ++i)
+            _topologies.at(i).get_topology().clear();
 
           return _history;
         }

@@ -635,12 +635,12 @@ class MeshTestHistory:
       m.redo(f14);
       m.redo(f15);
 
+      TEST_CHECK_EQUAL(m.get_history().get_functors().size(), 15);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_edge).get_topology().size(), 6ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_face).get_topology().size(), 6ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).get_topology().size(), 7ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).get_topology().size(), 2ul);
 
-      TEST_CHECK_EQUAL(m.get_history().get_functors().size(), 15);
       //clear all again
       m.clear();
 
@@ -648,7 +648,6 @@ class MeshTestHistory:
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_vertex_face).get_topology().size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_edge_vertex).get_topology().size(), 0ul);
       TEST_CHECK_EQUAL(m.get_topologies().at(Foundation::ipi_face_vertex).get_topology().size(), 0ul);
-
     }
 };
 MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
