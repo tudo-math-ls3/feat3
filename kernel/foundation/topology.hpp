@@ -93,6 +93,7 @@ namespace FEAST
           --_num_polytopes;
         }
 
+        ///insert value into list i (not an insert in the STL-sense)
         void insert(IndexType_ i, IndexType_ value)
         {
           _history.add_functor(new PushBackFunctor<storage_type_, IndexType_, IndexType_>(_topology.at(i), _topology.at(i).size(), value));
