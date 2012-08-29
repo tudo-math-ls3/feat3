@@ -544,7 +544,9 @@
     <ClInclude Include="..\kernel\geometry\vertex_abacus.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp" />
     <ClInclude Include="..\kernel\lafem\absolute.hpp" />
+    <ClInclude Include="..\kernel\lafem\algorithm.hpp" />
     <ClInclude Include="..\kernel\lafem\axpy.hpp" />
+    <ClInclude Include="..\kernel\lafem\bicgstab.hpp" />
     <ClInclude Include="..\kernel\lafem\container.hpp" />
     <ClInclude Include="..\kernel\lafem\defect.hpp" />
     <ClInclude Include="..\kernel\lafem\dense_matrix.hpp" />
@@ -557,6 +559,7 @@
     <ClInclude Include="..\kernel\lafem\preconditioner.hpp" />
     <ClInclude Include="..\kernel\lafem\product.hpp" />
     <ClInclude Include="..\kernel\lafem\richardson.hpp" />
+    <ClInclude Include="..\kernel\lafem\scale.hpp" />
     <ClInclude Include="..\kernel\lafem\sparse_matrix_coo.hpp" />
     <ClInclude Include="..\kernel\lafem\sparse_matrix_csr.hpp" />
     <ClInclude Include="..\kernel\lafem\sum.hpp" />

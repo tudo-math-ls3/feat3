@@ -115,9 +115,6 @@
     <ClCompile Include="..\kernel\foundation\dense_data_wrapper-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\foundation\halo_data-test.cpp">
-      <Filter>Source Files %28kernel%29\foundation</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\foundation\halo-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
@@ -200,6 +197,12 @@
       <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\lafem\richardson-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\bicgstab-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\scale-test.cpp">
       <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
   </ItemGroup>
