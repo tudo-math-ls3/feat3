@@ -420,7 +420,7 @@ namespace FEAST
           return from == to ? 1u : ( from > to ? (unsigned)std::abs((double)(from - to)) - 1u : (unsigned)std::abs((double)(to - from)) - 1u);
         }
 
-        InternalPrimaryAccess _get_primary_index(PolytopeLevels from, PolytopeLevels to)
+        InternalPrimaryAccess _get_primary_index(const PolytopeLevels from, const PolytopeLevels to)
         {
           switch(from)
           {
