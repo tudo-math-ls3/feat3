@@ -76,7 +76,7 @@ namespace FEAST
           if(!(this->_executed))
             throw FunctorError("Already undone!");
 
-          _target.erase(_target.begin() + _position);
+          _target.pop_back();
           this->_executed = false;
         }
 

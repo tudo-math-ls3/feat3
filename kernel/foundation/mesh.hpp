@@ -361,6 +361,14 @@ namespace FEAST
           return func;
         }
 
+        void reset()
+        {
+          if(_history.size() == 0)
+            throw MeshError("Already cleared!");
+
+          _history.undo();
+        }
+
         CompoundFunctor<OuterStorageType_> clear()
         {
           if(_history.size() == 0)
@@ -373,6 +381,7 @@ namespace FEAST
 
           return _history;
         }
+
 
         void redo(const SmartPointer<FunctorBase> func)
         {
