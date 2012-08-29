@@ -95,6 +95,6 @@ class MeshControlTest:
     }
 };
 MeshControlTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol_testvv("std::vector, std::vector");
-MeshControlTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrol_testvd("std::vector, std::vector");
-MeshControlTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > meshcontrol_testdd("std::vector, std::vector");
-MeshControlTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > meshcontrol_testdv("std::vector, std::vector");
+MeshControlTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrol_testvd("std::vector, std::deque");
+MeshControlTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > meshcontrol_testdd("std::deque, std::deque");
+MeshControlTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > meshcontrol_testdv("std::deque, std::vector");
