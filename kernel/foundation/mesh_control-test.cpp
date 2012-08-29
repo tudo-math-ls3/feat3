@@ -94,4 +94,7 @@ class MeshControlTest:
       delete[] size_set;
     }
 };
-MeshControlTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol_test("std::vector, std::vector");
+MeshControlTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol_testvv("std::vector, std::vector");
+MeshControlTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrol_testvd("std::vector, std::vector");
+MeshControlTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > meshcontrol_testdd("std::vector, std::vector");
+MeshControlTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > meshcontrol_testdv("std::vector, std::vector");
