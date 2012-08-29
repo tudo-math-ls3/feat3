@@ -90,6 +90,8 @@ class MeshControlTest:
       TEST_CHECK_EQUAL(geo_vertex_at_face[0][1], 1);
       TEST_CHECK_EQUAL(geo_vertex_at_face[0][2], 2);
       TEST_CHECK_EQUAL(geo_vertex_at_face[0][3], 3);
+
+      delete[] size_set;
     }
 };
 MeshControlTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol_test("std::vector, std::vector");
