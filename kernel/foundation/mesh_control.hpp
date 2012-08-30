@@ -27,7 +27,7 @@ namespace FEAST
     struct MeshControl<dim_1D>
     {
       template<typename SourceMeshType_>
-      static typename SourceMeshType_::index_type_ fill(SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target) //TODO const param
+      static void fill(SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target) //TODO const param
       {
         target[0] = mesh.get_topologies().at(0).get_topology().size();
         target[1] = mesh.get_topologies().at(1).get_topology().size();
@@ -55,7 +55,7 @@ namespace FEAST
     struct MeshControl<dim_2D>
     {
       template<typename SourceMeshType_>
-      static typename SourceMeshType_::index_type_ fill(SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target)
+      static void fill(SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target)
       {
         target[0] = mesh.get_topologies().at(0).get_topology().size();
         target[1] = mesh.get_topologies().at(1).get_topology().size();
@@ -97,12 +97,12 @@ namespace FEAST
     struct MeshControl<dim_3D>
     {
       template<typename SourceMeshType_>
-      static typename SourceMeshType_::index_type_ fill(SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target)
+      static void fill(SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target)
       {
         target[0] = mesh.get_topologies().at(0).get_topology().size();
         target[1] = mesh.get_topologies().at(1).get_topology().size();
         target[2] = mesh.get_topologies().at(3).get_topology().size();
-        target[5] = mesh.get_topologies().at(5).get_topology().size();
+        target[3] = mesh.get_topologies().at(5).get_topology().size();
       }
 
       template<typename SourceMeshType_, typename TargetMeshType_>
