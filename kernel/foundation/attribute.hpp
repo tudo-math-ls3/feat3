@@ -51,6 +51,8 @@ namespace FEAST
         {
         }
 
+        typedef Attribute<DataType_, StorageType_> exact_type_;
+
         StorageType_<DataType_, std::allocator<DataType_> >& get_data()
         {
           return _data;
