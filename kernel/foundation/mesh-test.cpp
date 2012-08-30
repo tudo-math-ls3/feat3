@@ -796,3 +796,4 @@ class MeshTestGeometryInterface:
     }
 };
 MeshTestGeometryInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
+MeshTestGeometryInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");
