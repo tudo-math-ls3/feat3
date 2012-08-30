@@ -502,10 +502,9 @@
     <ClInclude Include="..\kernel\foundation\functor.hpp" />
     <ClInclude Include="..\kernel\foundation\functor_error.hpp" />
     <ClInclude Include="..\kernel\foundation\halo.hpp" />
-    <ClInclude Include="..\kernel\foundation\halo_data.hpp" />
     <ClInclude Include="..\kernel\foundation\mapped_topology.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh.hpp" />
-    <ClInclude Include="..\kernel\foundation\mesh_data.hpp" />
+    <ClInclude Include="..\kernel\foundation\mesh_control.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
     <ClInclude Include="..\kernel\foundation\smart_pointer.hpp" />
     <ClInclude Include="..\kernel\foundation\topology.hpp" />

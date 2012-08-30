@@ -210,13 +210,7 @@
     <ClInclude Include="..\kernel\foundation\halo.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\foundation\halo_data.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\foundation\mesh.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\foundation\mesh_data.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp">
@@ -326,6 +320,9 @@
     </ClInclude>
     <ClInclude Include="..\kernel\lafem\scale.hpp">
       <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\mesh_control.hpp">
+      <Filter>Header Files\foundation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

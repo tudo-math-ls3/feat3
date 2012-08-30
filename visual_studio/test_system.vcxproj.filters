@@ -205,5 +205,8 @@
     <ClCompile Include="..\kernel\lafem\scale-test.cpp">
       <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\foundation\mesh_control-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
