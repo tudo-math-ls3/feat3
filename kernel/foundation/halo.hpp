@@ -3,6 +3,7 @@
 #define KERNEL_FOUNDATION_HALO_HH 1
 
 #include<vector>
+#include<kernel/foundation/mesh.hpp>
 
 namespace FEAST
 {
@@ -40,12 +41,13 @@ namespace FEAST
         typedef MeshType_ mesh_type_;
 
         ///CTOR
-        Halo(MeshType_ & mesh, IndexType_ other) :
+        Halo(MeshType_ & mesh, IndexType_ other, PolytopeLevels level = pl_edge) : //TODO move to template
           _halo_elements(),
           _halo_element_counterparts(),
           _mesh(mesh),
           _other(other),
-          _overlap(delta_)
+          _overlap(delta_),
+          _level(level)
         {
         }
 
@@ -102,6 +104,7 @@ namespace FEAST
           this->_mesh = rhs._mesh;
           this->_other = rhs._other;
           this->_overlap = rhs._overlap;
+          this->_level = rhs._level;
 
           return *this;
         }
@@ -114,6 +117,8 @@ namespace FEAST
         IndexType_ _other;
 
         unsigned _overlap;
+
+        PolytopeLevels _level;
     };
   }
 }
