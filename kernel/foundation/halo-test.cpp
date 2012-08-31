@@ -258,9 +258,9 @@ class HaloTestGeometryInterface:
       cell_sub_set.template get_target_set<0>()[1] = adjacent_vertices.at(1); //second vertex
       cell_sub_set.template get_target_set<1>()[0] = h.get_element(0); //only edge
 
-      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[0], 1);
-      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[1], 3);
-      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[0], 1ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[1], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);
     }
 };
 HaloTestGeometryInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
