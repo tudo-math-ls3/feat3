@@ -53,7 +53,18 @@ public:
     f = e;
     TEST_CHECK_EQUAL(f(7,8), e(7,8));
     TEST_CHECK_EQUAL(f, e);
+
+    DenseMatrix<Archs::CPU, DT_> g(f);
+    DenseMatrix<Archs::CPU, DT_> h;
+    h = f;
+    TEST_CHECK_EQUAL(g, f);
+    TEST_CHECK_EQUAL(h, g);
+    TEST_CHECK_EQUAL(h, f);
   }
 };
-DenseMatrixTest<Archs::CPU, float> dense_matrix_test_float;
-DenseMatrixTest<Archs::CPU, double> dense_matrix_test_double;
+DenseMatrixTest<Archs::CPU, float> cpu_dense_matrix_test_float;
+DenseMatrixTest<Archs::CPU, double> cpu_dense_matrix_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DenseMatrixTest<Archs::GPU, float> gpu_dense_matrix_test_float;
+DenseMatrixTest<Archs::GPU, double> gpu_dense_matrix_test_double;
+#endif

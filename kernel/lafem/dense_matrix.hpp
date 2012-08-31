@@ -53,11 +53,7 @@ namespace FEAST
           this->_elements_size.push_back(this->_size);
           _pelements = this->_elements.at(0);
 
-          //TODO add arch, use memory pool set memory function
-          for (Index i(0) ; i < this->_size ; ++i)
-          {
-            _pelements[i] = value;
-          }
+          MemoryPool<Arch_>::instance()->set_memory(_pelements, value, this->_size);
         }
 
         DenseMatrix(const DenseMatrix<Arch_, DT_> & other) :
@@ -71,8 +67,8 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         DenseMatrix(const DenseMatrix<Arch2_, DT2_> & other) :
           Container<Arch_, DT_>(other),
-          _rows(other._rows),
-          _columns(other._columns)
+          _rows(other.rows()),
+          _columns(other.columns())
         {
           _pelements = this->_elements.at(0);
         }
@@ -117,25 +113,47 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
         {
-          if (this == &other)
-            return *this;
+          this->_size = other.size();
+          this->_rows = other.rows();
+          this->_columns = other.columns();
 
-          //TODO copy memory from arch2 to arch
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Arch_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
+
+
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(other.size() * sizeof(DT_)));
+          this->_elements_size.push_back(this->_size);
+          this->_pelements = this->_elements.at(0);
+
+          Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
+          Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
+          void * temp(::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, other.get_elements().at(0), src_size);
+          MemoryPool<Arch_>::upload(this->get_elements().at(0), temp, dest_size);
+          ::free(temp);
+
           return *this;
         }
 
-        void operator()(Index row, Index col, DT_ val)
+        void operator()(Index row, Index col, DT_ value)
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
-          _pelements[row * this->_rows + col] = val;
+          MemoryPool<Arch_>::modify_element(_pelements, row * this->_rows + col, value);
         }
 
-        const DT_ & operator()(Index row, Index col) const
+        const DT_ operator()(Index row, Index col) const
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
-          return _pelements[row * this->_rows + col];
+          return MemoryPool<Arch_>::get_element(_pelements, row * this->_rows + col);
         }
 
         const Index & rows() const
@@ -149,7 +167,7 @@ namespace FEAST
         }
     };
 
-    template <typename Arch_, typename DT_> bool operator== (const DenseMatrix<Arch_, DT_> & a, const DenseMatrix<Arch_, DT_> & b)
+    template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const DenseMatrix<Arch_, DT_> & a, const DenseMatrix<Arch2_, DT_> & b)
     {
       if (a.size() != b.size())
         return false;
@@ -157,20 +175,15 @@ namespace FEAST
         return false;
       if (a.get_indices().size() != b.get_indices().size())
         return false;
+      if (a.rows() != b.rows())
+        return false;
+      if (a.columns() != b.columns())
+        return false;
 
-      for (Index i(0) ; i < a.get_indices().size() ; ++i)
-      {
-        for (Index j(0) ; j < a.size() ; ++j)
-          if (a.get_indices().at(i)[j] != b.get_indices().at(i)[j])
-            return false;
-      }
-
-      for (Index i(0) ; i < a.get_elements().size() ; ++i)
-      {
-        for (Index j(0) ; j < a.size() ; ++j)
-          if (a.get_elements().at(i)[j] != b.get_elements().at(i)[j])
-            return false;
-      }
+      for (Index i(0) ; i < a.rows() ; ++i)
+        for (Index j(0) ; j < a.columns() ; ++j)
+        if (a(i, j) != b(i, j))
+          return false;
 
       return true;
     }
