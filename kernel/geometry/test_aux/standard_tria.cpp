@@ -22,22 +22,23 @@ namespace FEAST
 
         // first possibility (standard)
 
-        //
-        //   v_2
-        //    |\
-        //    | \
-        //    |  ^
-        //    v   \
-        //    |    \
-        //   e_1   e_0
-        //    |      \
-        //    |       \
-        //    |        ^
-        //    v         \
-        //    |          \
-        //   v_0->-e_2-->-v_1
-        //
-        //   triangle orientation: 0-1-2
+        /*
+           v_2
+            |\
+            | \
+            |  ^
+            v   \
+            |    \
+           e_1   e_0
+            |      \
+            |       \
+            |        ^
+            v         \
+            |          \
+           v_0->-e_2-->-v_1
+
+           triangle orientation: 0-1-2
+        */
 
         // set up vertex coordinates array
         static const Real vtx0[3*2] =
@@ -69,22 +70,23 @@ namespace FEAST
 
         // second possibility
 
-        //
-        //   v_2
-        //    |\
-        //    | \
-        //    |  v
-        //    v   \
-        //    |    \
-        //   e_1   e_0
-        //    |      \
-        //    |       \
-        //    |        v
-        //    v         \
-        //    |          \
-        //   v_0->-e_2-->-v_1
-        //
-        //   triangle orientation: 0-1-2
+        /*
+           v_2
+            |\
+            | \
+            |  v
+            v   \
+            |    \
+           e_1   e_0
+            |      \
+            |       \
+            |        v
+            v         \
+            |          \
+           v_0->-e_2-->-v_1
+
+           triangle orientation: 0-1-2
+        */
 
         // set up vertex coordinates array
         static const Real vtx1[3*2] =
@@ -116,22 +118,23 @@ namespace FEAST
 
         // third possibility
 
-        //
-        //   v_2
-        //    |\
-        //    | \
-        //    |  v
-        //    v   \
-        //    |    \
-        //   e_1   e_2
-        //    |      \
-        //    |       \
-        //    |        v
-        //    v         \
-        //    |          \
-        //   v_1-<-e_0--<-v_0
-        //
-        //   triangle orientation: 1-0-2
+        /*
+           v_2
+            |\
+            | \
+            |  v
+            v   \
+            |    \
+           e_1   e_2
+            |      \
+            |       \
+            |        v
+            v         \
+            |          \
+           v_1-<-e_0--<-v_0
+
+           triangle orientation: 1-0-2
+        */
 
         // set up vertex coordinates array
         static const Real vtx2[3*2] =
@@ -163,22 +166,23 @@ namespace FEAST
 
         // fourth possibility
 
-        //
-        //   v_0
-        //    |\
-        //    | \
-        //    |  v
-        //    v   \
-        //    |    \
-        //   e_0   e_2
-        //    |      \
-        //    |       \
-        //    |        v
-        //    v         \
-        //    |          \
-        //   v_2-<-e_1--<-v_1
-        //
-        //   triangle orientation: 0-1-2
+        /*
+           v_0
+            |\
+            | \
+            |  v
+            v   \
+            |    \
+           e_0   e_2
+            |      \
+            |       \
+            |        v
+            v         \
+            |          \
+           v_2-<-e_1--<-v_1
+
+           triangle orientation: 0-1-2
+        */
 
         // set up vertex coordinates array
         static const Real vtx3[3*2] =
@@ -722,31 +726,31 @@ namespace FEAST
 
       TriaSubMesh* create_patch_tria_submesh_2d()
       {
-        //
-        //   v_0(0,10)
-        //     |\
-        //     | \
-        //     |  \
-        //     |   \
-        //     |    \
-        //     |  e_3^
-        //     |      \
-        //     | t_0   \
-        //  e_0v     v_3(6,7)
-        //     |       / \
-        //     |      /   \
-        //     |     /     \e_2
-        //     |    ve_1    ^
-        //     |   /         \
-        //     |  /    t_1    \
-        //     | /             \
-        //     |/_______<_______\
-        //  v_1(0,0)   e_4      v_2(10,0)
-        //
-        // triangle orientation:
-        //     t_0: v_0-v_3-v_1
-        //     t_1: v_1-v_3-v_2
+        /*
+           v_0(0,10)
+             |\
+             | \
+             |  \
+             |   \
+             |    \
+             |  e_3^
+             |      \
+             | t_0   \
+          e_0v     v_3(6,7)
+             |       / \
+             |      /   \
+             |     /     \e_2
+             |    ve_1    ^
+             |   /         \
+             |  /    t_1    \
+             | /             \
+             |/_______<_______\
+          v_1(0,0)   e_4      v_2(10,0)
 
+         triangle orientation:
+             t_0: v_0-v_3-v_1
+             t_1: v_1-v_3-v_2
+        */
 
         Index num_entities[] =
         {

@@ -130,22 +130,21 @@ namespace FEAST
             // fetch number of coarse mesh simplices
             const Index num_simps = index_set_s_e.get_num_entities();
 
-            //
-            //   v_2
-            //    |\
-            //    | \
-            //    |  \
-            //    |   \
-            //    |    \
-            //   e_1->-e_0
-            //    |\    |\
-            //    | \   | \
-            //    |  ^  v  \
-            //    |   \ |   \
-            //    |    \|     \
-            //   v_0---e_2----v_1
-            //
-            //
+            /*
+               v_2
+                |\
+                | \
+                |  \
+                |   \
+                |    \
+               e_1->-e_0
+                |\    |\
+                | \   | \
+                |  ^  v  \
+                |   \ |   \
+                |    \|     \
+               v_0---e_2----v_1
+            */
 
             // loop over all coarse mesh simplices
             for(Index i(0); i < num_simps; ++i)
@@ -221,22 +220,21 @@ namespace FEAST
             // fetch number of coarse mesh simplices
             const Index num_simps = index_set_s_v.get_num_entities();
 
-            //
-            //   v_2
-            //    |\
-            //    | \
-            //    |s \
-            //    |2  \
-            //    |    \
-            //   e_1->-e_0
-            //    |\  s |\
-            //    | \ 3 | \
-            //    |  ^  v  \
-            //    |s  \ | s \
-            //    |0   \| 1  \
-            //   v_0---e_2----v_1
-            //
-            //
+            /*
+               v_2
+                |\
+                | \
+                |s \
+                |2  \
+                |    \
+               e_1->-e_0
+                |\  s |\
+                | \ 3 | \
+                |  ^  v  \
+                |s  \ | s \
+                |0   \| 1  \
+               v_0---e_2----v_1
+            */
 
             // loop over all coarse mesh simplices
             for(Index i(0); i < num_simps; ++i)
@@ -326,22 +324,21 @@ namespace FEAST
             // typedef the sub-index mapping
             typedef Congruency::SubIndexMapping<ShapeType, face_dim, 0> SubIndexMappingType;
 
-            //
-            //   v_2
-            //    |\
-            //    | \
-            //    |s \
-            //    |2  ^
-            //    |    \
-            //   e_1->-e_0
-            //    |\  s |\
-            //    v \ 3 | \
-            //    |  ^  v  \
-            //    |s  \ | s \
-            //    |0   \| 1  \
-            //   v_0---e_2-->-v_1
-            //
-            //
+            /*
+               v_2
+                |\
+                | \
+                |s \
+                |2  ^
+                |    \
+               e_1->-e_0
+                |\  s |\
+                v \ 3 | \
+                |  ^  v  \
+                |s  \ | s \
+                |0   \| 1  \
+               v_0---e_2-->-v_1
+            */
 
             // loop over all coarse mesh simplices
             for(Index i(0); i < num_simps; ++i)
@@ -431,40 +428,39 @@ namespace FEAST
             // fetch number of coarse mesh simplices
             const Index num_simps = index_set_s_e.get_num_entities();
 
-            //
-            //                          v_3
-            //                          /\\
-            //                         /  \  \
-            //                        /    \    \
-            //                       /      \      \
-            //                      /        \        \
-            //                     /          \          \
-            //                    /            \            \
-            //                   /              \              x e_5
-            //                  /                \                \
-            //                 /                  \                  \
-            //                /                    \                    \
-            //               /                      \                      \ v_2
-            //          e_2 x                        x e_4             /    /
-            //             /                   s x    \           /        /
-            //            /                            \      /           /
-            //           /                              \ /              /
-            //          /                            /   \              /
-            //         /                        x         \            /
-            //        /                    /    e_1        \          x e_3
-            //       /                /                     \        /
-            //      /            /                           \      /
-            //     /        /                                 \    /
-            //    /    /                                       \  /
-            //   //_______________________x_____________________\/
-            //  v_0                      e_0                    v_1
-            //
-            //
-            // orientation:
-            //    t0: v_1 - v_2 - v_3
-            //    t1: v_0 - v_2 - v_3
-            //    t2: v_0 - v_1 - v_3
-            //    t3: v_0 - v_1 - v_2
+            /*                        v_3
+                                      /\\
+                                     /  \  \
+                                    /    \    \
+                                   /      \      \
+                                  /        \        \
+                                 /          \          \
+                                /            \            \
+                               /              \              x e_5
+                              /                \                \
+                             /                  \                  \
+                            /                    \                    \
+                           /                      \                      \ v_2
+                      e_2 x                        x e_4             /    /
+                         /                   s x    \           /        /
+                        /                            \      /           /
+                       /                              \ /              /
+                      /                            /   \              /
+                     /                        x         \            /
+                    /                    /    e_1        \          x e_3
+                   /                /                     \        /
+                  /            /                           \      /
+                 /        /                                 \    /
+                /    /                                       \  /
+               //_______________________x_____________________\/
+              v_0                      e_0                    v_1
+
+             orientation:
+                t0: v_1 - v_2 - v_3
+                t1: v_0 - v_2 - v_3
+                t2: v_0 - v_1 - v_3
+                t3: v_0 - v_1 - v_2
+            */
 
 
             // loop over all coarse mesh simplices
@@ -553,40 +549,39 @@ namespace FEAST
             // fetch number of coarse mesh simplices
             const Index num_simps = index_set_s_t.get_num_entities();
 
-            //
-            //                          v_3
-            //                          /\\
-            //                         /  \  \
-            //                        /    \    \
-            //                       /      \      \
-            //                      /        \        \
-            //                     /          \          \
-            //                    /            \           x e_5
-            //                   /              \              \
-            //                  /                \                \
-            //                 /                  \                  \
-            //                /                    \                    \
-            //               /                  e_4 \                      \ v_2
-            //          e_2 x\                       x                 /    /
-            //             / \   \             s x    \           /        /
-            //            /   \      \                 \      /           /
-            //           /     \         ^              \ /              /
-            //          /       \            \  e_1  /   \              /
-            //         /         v    s_0        x        \            /
-            //        /           \        /    /          \          x e_3
-            //       /             \  /       /             \        /
-            //      /            /  \       ^                \      /
-            //     /        /        \    /                   \    /
-            //    /    /              \ /                      \  /
-            //   //____________________x________________________\/
-            //  v_0                    e_0                      v_1
-            //
-            //
-            // orientation:
-            //    t0: v_1 - v_2 - v_3
-            //    t1: v_0 - v_2 - v_3
-            //    t2: v_0 - v_1 - v_3
-            //    t3: v_0 - v_1 - v_2
+            /*                        v_3
+                                      /\\
+                                     /  \  \
+                                    /    \    \
+                                   /      \      \
+                                  /        \        \
+                                 /          \          \
+                                /            \           x e_5
+                               /              \              \
+                              /                \                \
+                             /                  \                  \
+                            /                    \                    \
+                           /                  e_4 \                      \ v_2
+                      e_2 x\                       x                 /    /
+                         / \   \             s x    \           /        /
+                        /   \      \                 \      /           /
+                       /     \         ^              \ /              /
+                      /       \            \  e_1  /   \              /
+                     /         v    s_0        x        \            /
+                    /           \        /    /          \          x e_3
+                   /             \  /       /             \        /
+                  /            /  \       ^                \      /
+                 /        /        \    /                   \    /
+                /    /              \ /                      \  /
+               //____________________x________________________\/
+              v_0                    e_0                      v_1
+
+             orientation:
+                t0: v_1 - v_2 - v_3
+                t1: v_0 - v_2 - v_3
+                t2: v_0 - v_1 - v_3
+                t3: v_0 - v_1 - v_2
+            */
 
             // loop over all coarse mesh simplices
             for(Index i(0); i < num_simps; ++i)
@@ -738,40 +733,39 @@ namespace FEAST
             // fetch number of coarse mesh simplices
             const Index num_simps = index_set_s_t.get_num_entities();
 
-            //
-            //                          v_3
-            //                          /\\
-            //                         /  \  \
-            //                        /    \    \
-            //                       /      \      \
-            //                      /        \        \
-            //                     /          \          \
-            //                    /            \           x e_5
-            //                   /              \              \
-            //                  /                \                \
-            //                 /                  \                  \
-            //                /                    \                    \
-            //               /                  e_4 \                      \ v_2
-            //          e_2 x\                       x                 /    /
-            //             / \   \             s x    \           /        /
-            //            /   \      \                 \      /           /
-            //           /     \         ^              \ /              /
-            //          /       \            \  e_1  /   \              /
-            //         /         v    s_0        x        \            /
-            //        /           \        /    /          \          x e_3
-            //       /             \  /       /             \        /
-            //      /            /  \       ^                \      /
-            //     /        /        \    /                   \    /
-            //    /    /              \ /                      \  /
-            //   //____________________x________________________\/
-            //  v_0                    e_0                      v_1
-            //
-            //
-            // orientation:
-            //    t0: v_1 - v_2 - v_3
-            //    t1: v_0 - v_2 - v_3
-            //    t2: v_0 - v_1 - v_3
-            //    t3: v_0 - v_1 - v_2
+            /*                        v_3
+                                      /\\
+                                     /  \  \
+                                    /    \    \
+                                   /      \      \
+                                  /        \        \
+                                 /          \          \
+                                /            \           x e_5
+                               /              \              \
+                              /                \                \
+                             /                  \                  \
+                            /                    \                    \
+                           /                  e_4 \                      \ v_2
+                      e_2 x\                       x                 /    /
+                         / \   \             s x    \           /        /
+                        /   \      \                 \      /           /
+                       /     \         ^              \ /              /
+                      /       \            \  e_1  /   \              /
+                     /         v    s_0        x        \            /
+                    /           \        /    /          \          x e_3
+                   /             \  /       /             \        /
+                  /            /  \       ^                \      /
+                 /        /        \    /                   \    /
+                /    /              \ /                      \  /
+               //____________________x________________________\/
+              v_0                    e_0                      v_1
+
+             orientation:
+                t0: v_1 - v_2 - v_3
+                t1: v_0 - v_2 - v_3
+                t2: v_0 - v_1 - v_3
+                t3: v_0 - v_1 - v_2
+            */
 
             // loop over all coarse mesh simplices
             for(Index i(0); i < num_simps; ++i)
@@ -954,76 +948,76 @@ namespace FEAST
               // calculate fine edges-at-triangle indices
 
               // triangle at the corners
-              t_0[0] = iot + 3*s_t[1] + sim.map(1, 0); //
-              t_0[1] = iot + 3*s_t[2] + sim.map(2, 0); //
-              t_0[2] = iot + 3*s_t[3] + sim.map(3, 0); //
+              t_0[0] = iot + 3*s_t[1] + sim.map(1, 0);
+              t_0[1] = iot + 3*s_t[2] + sim.map(2, 0);
+              t_0[2] = iot + 3*s_t[3] + sim.map(3, 0);
 
-              t_1[0] = iot + 3*s_t[0] + sim.map(0, 0); //
-              t_1[1] = iot + 3*s_t[2] + sim.map(2, 1); //
-              t_1[2] = iot + 3*s_t[3] + sim.map(3, 1); //
+              t_1[0] = iot + 3*s_t[0] + sim.map(0, 0);
+              t_1[1] = iot + 3*s_t[2] + sim.map(2, 1);
+              t_1[2] = iot + 3*s_t[3] + sim.map(3, 1);
 
-              t_2[0] = iot + 3*s_t[0] + sim.map(0, 1); //
-              t_2[1] = iot + 3*s_t[1] + sim.map(1, 1); //
-              t_2[2] = iot + 3*s_t[3] + sim.map(3, 2); //
+              t_2[0] = iot + 3*s_t[0] + sim.map(0, 1);
+              t_2[1] = iot + 3*s_t[1] + sim.map(1, 1);
+              t_2[2] = iot + 3*s_t[3] + sim.map(3, 2);
 
-              t_3[0] = iot + 3*s_t[0] + sim.map(0, 2); //
-              t_3[1] = iot + 3*s_t[1] + sim.map(1, 2); //
-              t_3[2] = iot + 3*s_t[2] + sim.map(2, 2); //
+              t_3[0] = iot + 3*s_t[0] + sim.map(0, 2);
+              t_3[1] = iot + 3*s_t[1] + sim.map(1, 2);
+              t_3[2] = iot + 3*s_t[2] + sim.map(2, 2);
 
               // triangles at the midpoint
 
               //e_0 triangles
-              t_4[0] = ios + 6*i + 1; //
-              t_4[1] = ios + 6*i + 0; //
-              t_4[2] = iot + 3*s_t[3] + sim.map(3, 0); //
+              t_4[0] = ios + 6*i + 1;
+              t_4[1] = ios + 6*i + 0;
+              t_4[2] = iot + 3*s_t[3] + sim.map(3, 0);
 
-              t_5[0] = ios + 6*i + 2; //
-              t_5[1] = ios + 6*i + 0; //
-              t_5[2] = iot + 3*s_t[2] + sim.map(2, 0); //
+              t_5[0] = ios + 6*i + 2;
+              t_5[1] = ios + 6*i + 0;
+              t_5[2] = iot + 3*s_t[2] + sim.map(2, 0);
 
-              t_6[0] = ios + 6*i + 3; //
-              t_6[1] = ios + 6*i + 0; //
-              t_6[2] = iot + 3*s_t[3] + sim.map(3, 1); //
+              t_6[0] = ios + 6*i + 3;
+              t_6[1] = ios + 6*i + 0;
+              t_6[2] = iot + 3*s_t[3] + sim.map(3, 1);
 
-              t_7[0] = ios + 6*i + 4; //
-              t_7[1] = ios + 6*i + 0; //
-              t_7[2] = iot + 3*s_t[2] + sim.map(2, 1); //
+              t_7[0] = ios + 6*i + 4;
+              t_7[1] = ios + 6*i + 0;
+              t_7[2] = iot + 3*s_t[2] + sim.map(2, 1);
 
               //e_1 triangles
-              t_8[0] = ios + 6*i + 2; //
-              t_8[1] = ios + 6*i + 1; //
-              t_8[2] = iot + 3*s_t[1] + sim.map(1, 0); //
+              t_8[0] = ios + 6*i + 2;
+              t_8[1] = ios + 6*i + 1;
+              t_8[2] = iot + 3*s_t[1] + sim.map(1, 0);
 
-              t_9[0] = ios + 6*i + 3; //
-              t_9[1] = ios + 6*i + 1; //
-              t_9[2] = iot + 3*s_t[3] + sim.map(3, 2); //
+              t_9[0] = ios + 6*i + 3;
+              t_9[1] = ios + 6*i + 1;
+              t_9[2] = iot + 3*s_t[3] + sim.map(3, 2);
 
-              t_10[0] = ios + 6*i + 5; //
-              t_10[1] = ios + 6*i + 1; //
-              t_10[2] = iot + 3*s_t[1] + sim.map(1, 1); //
+              t_10[0] = ios + 6*i + 5;
+              t_10[1] = ios + 6*i + 1;
+              t_10[2] = iot + 3*s_t[1] + sim.map(1, 1);
 
               //e_2 triangles
-              t_11[0] = ios + 6*i + 4; //
-              t_11[1] = ios + 6*i + 2; //
-              t_11[2] = iot + 3*s_t[2] + sim.map(2, 2); //
+              t_11[0] = ios + 6*i + 4;
+              t_11[1] = ios + 6*i + 2;
+              t_11[2] = iot + 3*s_t[2] + sim.map(2, 2);
 
-              t_12[0] = ios + 6*i + 5; //
-              t_12[1] = ios + 6*i + 2; //
-              t_12[2] = iot + 3*s_t[1] + sim.map(1, 2); //
+              t_12[0] = ios + 6*i + 5;
+              t_12[1] = ios + 6*i + 2;
+              t_12[2] = iot + 3*s_t[1] + sim.map(1, 2);
 
               //e_3 triangles
-              t_13[0] = ios + 6*i + 4; //
-              t_13[1] = ios + 6*i + 3; //
-              t_13[2] = iot + 3*s_t[0] + sim.map(0, 0); //
+              t_13[0] = ios + 6*i + 4;
+              t_13[1] = ios + 6*i + 3;
+              t_13[2] = iot + 3*s_t[0] + sim.map(0, 0);
 
-              t_14[0] = ios + 6*i + 5; //
-              t_14[1] = ios + 6*i + 3; //
-              t_14[2] = iot + 3*s_t[0] + sim.map(0, 1); //
+              t_14[0] = ios + 6*i + 5;
+              t_14[1] = ios + 6*i + 3;
+              t_14[2] = iot + 3*s_t[0] + sim.map(0, 1);
 
               //e_4 triangles
-              t_15[0] = ios + 6*i + 5; //
-              t_15[1] = ios + 6*i + 4; //
-              t_15[2] = iot + 3*s_t[0] + sim.map(0, 2); //
+              t_15[0] = ios + 6*i + 5;
+              t_15[1] = ios + 6*i + 4;
+              t_15[2] = iot + 3*s_t[0] + sim.map(0, 2);
 
             }
             // return fine triangle count
@@ -1122,94 +1116,94 @@ namespace FEAST
               // calculate fine edges-at-simplex indices
 
               // v_0-simplices
-              s_0[0] = iot + 3*s_t[2] + sim.map(2, 0); //
-              s_0[1] = iot + 3*s_t[3] + sim.map(3, 0); //
-              s_0[2] = ioe + 2*s_e[0] + edgesim.map(0, 0);//
-              s_0[3] = iot + 3*s_t[1] + sim.map(1, 0); //
-              s_0[4] = ioe + 2*s_e[2] + edgesim.map(2, 0);//
-              s_0[5] = ioe + 2*s_e[1] + edgesim.map(1, 0);//
+              s_0[0] = iot + 3*s_t[2] + sim.map(2, 0);
+              s_0[1] = iot + 3*s_t[3] + sim.map(3, 0);
+              s_0[2] = ioe + 2*s_e[0] + edgesim.map(0, 0);
+              s_0[3] = iot + 3*s_t[1] + sim.map(1, 0);
+              s_0[4] = ioe + 2*s_e[2] + edgesim.map(2, 0);
+              s_0[5] = ioe + 2*s_e[1] + edgesim.map(1, 0);
 
-              s_1[0] = iot + 3*s_t[3] + sim.map(3, 0); //
-              s_1[1] = iot + 3*s_t[2] + sim.map(2, 0); //
-              s_1[2] = ios + 6*i + 0;//
-              s_1[3] = iot + 3*s_t[1] + sim.map(1, 0); //
-              s_1[4] = ios + 6*i + 1;//
-              s_1[5] = ios + 6*i + 2;//
+              s_1[0] = iot + 3*s_t[3] + sim.map(3, 0);
+              s_1[1] = iot + 3*s_t[2] + sim.map(2, 0);
+              s_1[2] = ios + 6*i + 0;
+              s_1[3] = iot + 3*s_t[1] + sim.map(1, 0);
+              s_1[4] = ios + 6*i + 1;
+              s_1[5] = ios + 6*i + 2;
 
               // v_1-simplices
-              s_2[0] = iot + 3*s_t[3] + sim.map(3, 1); //
-              s_2[1] = iot + 3*s_t[2] + sim.map(2, 1); //
-              s_2[2] = ioe + 2*s_e[0] + edgesim.map(0, 1);//
-              s_2[3] = iot + 3*s_t[0] + sim.map(0, 0); //
-              s_2[4] = ioe + 2*s_e[3] + edgesim.map(3, 0);//
-              s_2[5] = ioe + 2*s_e[4] + edgesim.map(4, 0);//
+              s_2[0] = iot + 3*s_t[3] + sim.map(3, 1);
+              s_2[1] = iot + 3*s_t[2] + sim.map(2, 1);
+              s_2[2] = ioe + 2*s_e[0] + edgesim.map(0, 1);
+              s_2[3] = iot + 3*s_t[0] + sim.map(0, 0);
+              s_2[4] = ioe + 2*s_e[3] + edgesim.map(3, 0);
+              s_2[5] = ioe + 2*s_e[4] + edgesim.map(4, 0);
 
-              s_3[0] = iot + 3*s_t[2] + sim.map(2, 1); //
-              s_3[1] = iot + 3*s_t[3] + sim.map(3, 1); //
-              s_3[2] = ios + 6*i + 0;//
-              s_3[3] = iot + 3*s_t[0] + sim.map(0, 0); //
-              s_3[5] = ios + 6*i + 3;//
-              s_3[4] = ios + 6*i + 4;//
+              s_3[0] = iot + 3*s_t[2] + sim.map(2, 1);
+              s_3[1] = iot + 3*s_t[3] + sim.map(3, 1);
+              s_3[2] = ios + 6*i + 0;
+              s_3[3] = iot + 3*s_t[0] + sim.map(0, 0);
+              s_3[5] = ios + 6*i + 3;
+              s_3[4] = ios + 6*i + 4;
 
               // v_2-simplices
-              s_4[0] = iot + 3*s_t[1] + sim.map(1, 1); //
-              s_4[1] = iot + 3*s_t[3] + sim.map(3, 2); //
-              s_4[2] = ioe + 2*s_e[1] + edgesim.map(1, 1);//
-              s_4[3] = iot + 3*s_t[0] + sim.map(0, 1); //
-              s_4[4] = ioe + 2*s_e[5] + edgesim.map(5, 0);//
-              s_4[5] = ioe + 2*s_e[3] + edgesim.map(3, 1);//
+              s_4[0] = iot + 3*s_t[1] + sim.map(1, 1);
+              s_4[1] = iot + 3*s_t[3] + sim.map(3, 2);
+              s_4[2] = ioe + 2*s_e[1] + edgesim.map(1, 1);
+              s_4[3] = iot + 3*s_t[0] + sim.map(0, 1);
+              s_4[4] = ioe + 2*s_e[5] + edgesim.map(5, 0);
+              s_4[5] = ioe + 2*s_e[3] + edgesim.map(3, 1);
 
-              s_5[0] = iot + 3*s_t[3] + sim.map(3, 2); //
-              s_5[1] = iot + 3*s_t[1] + sim.map(1, 1); //
-              s_5[2] = ios + 6*i + 1;//
-              s_5[3] = iot + 3*s_t[0] + sim.map(0, 1); //
-              s_5[4] = ios + 6*i + 3;//
-              s_5[5] = ios + 6*i + 5;//
+              s_5[0] = iot + 3*s_t[3] + sim.map(3, 2);
+              s_5[1] = iot + 3*s_t[1] + sim.map(1, 1);
+              s_5[2] = ios + 6*i + 1;
+              s_5[3] = iot + 3*s_t[0] + sim.map(0, 1);
+              s_5[4] = ios + 6*i + 3;
+              s_5[5] = ios + 6*i + 5;
 
               // v_3-simplices
-              s_6[0] = iot + 3*s_t[2] + sim.map(2, 2); //
-              s_6[1] = iot + 3*s_t[1] + sim.map(1, 2); //
-              s_6[2] = ioe + 2*s_e[2] + edgesim.map(2, 1);//
-              s_6[3] = iot + 3*s_t[0] + sim.map(0, 2); //
-              s_6[4] = ioe + 2*s_e[4] + edgesim.map(4, 1);//
-              s_6[5] = ioe + 2*s_e[5] + edgesim.map(5, 1);//
+              s_6[0] = iot + 3*s_t[2] + sim.map(2, 2);
+              s_6[1] = iot + 3*s_t[1] + sim.map(1, 2);
+              s_6[2] = ioe + 2*s_e[2] + edgesim.map(2, 1);
+              s_6[3] = iot + 3*s_t[0] + sim.map(0, 2);
+              s_6[4] = ioe + 2*s_e[4] + edgesim.map(4, 1);
+              s_6[5] = ioe + 2*s_e[5] + edgesim.map(5, 1);
 
-              s_7[0] = iot + 3*s_t[1] + sim.map(1, 2); //
-              s_7[1] = iot + 3*s_t[2] + sim.map(2, 2); //
-              s_7[2] = ios + 6*i + 2;//
-              s_7[3] = iot + 3*s_t[0] + sim.map(0, 2); //
-              s_7[4] = ios + 6*i + 5;//
-              s_7[5] = ios + 6*i + 4;//
+              s_7[0] = iot + 3*s_t[1] + sim.map(1, 2);
+              s_7[1] = iot + 3*s_t[2] + sim.map(2, 2);
+              s_7[2] = ios + 6*i + 2;
+              s_7[3] = iot + 3*s_t[0] + sim.map(0, 2);
+              s_7[4] = ios + 6*i + 5;
+              s_7[5] = ios + 6*i + 4;
 
               //triangle simplices
 
-              s_8[0] = iot + 3*s_t[0] + sim.map(0, 0); //
-              s_8[1] = iot + 3*s_t[0] + sim.map(0, 1); //
-              s_8[2] = ios + 6*i + 3;//
-              s_8[3] = iot + 3*s_t[0] + sim.map(0, 2); //
-              s_8[4] = ios + 6*i + 4;//
-              s_8[5] = ios + 6*i + 5;//
+              s_8[0] = iot + 3*s_t[0] + sim.map(0, 0);
+              s_8[1] = iot + 3*s_t[0] + sim.map(0, 1);
+              s_8[2] = ios + 6*i + 3;
+              s_8[3] = iot + 3*s_t[0] + sim.map(0, 2);
+              s_8[4] = ios + 6*i + 4;
+              s_8[5] = ios + 6*i + 5;
 
-              s_9[0] = iot + 3*s_t[1] + sim.map(1, 1); //
-              s_9[1] = iot + 3*s_t[1] + sim.map(1, 0); //
-              s_9[2] = ios + 6*i + 1;//
-              s_9[3] = iot + 3*s_t[1] + sim.map(1, 2); //
-              s_9[4] = ios + 6*i + 5;//
-              s_9[5] = ios + 6*i + 2;//
+              s_9[0] = iot + 3*s_t[1] + sim.map(1, 1);
+              s_9[1] = iot + 3*s_t[1] + sim.map(1, 0);
+              s_9[2] = ios + 6*i + 1;
+              s_9[3] = iot + 3*s_t[1] + sim.map(1, 2);
+              s_9[4] = ios + 6*i + 5;
+              s_9[5] = ios + 6*i + 2;
 
-              s_10[0] = iot + 3*s_t[2] + sim.map(2, 0); //
-              s_10[1] = iot + 3*s_t[2] + sim.map(2, 1); //
-              s_10[2] = ios + 6*i + 0;//
-              s_10[3] = iot + 3*s_t[2] + sim.map(2, 2); //
-              s_10[4] = ios + 6*i + 2;//
-              s_10[5] = ios + 6*i + 4;//
+              s_10[0] = iot + 3*s_t[2] + sim.map(2, 0);
+              s_10[1] = iot + 3*s_t[2] + sim.map(2, 1);
+              s_10[2] = ios + 6*i + 0;
+              s_10[3] = iot + 3*s_t[2] + sim.map(2, 2);
+              s_10[4] = ios + 6*i + 2;
+              s_10[5] = ios + 6*i + 4;
 
-              s_11[0] = iot + 3*s_t[3] + sim.map(3, 1); //
-              s_11[1] = iot + 3*s_t[3] + sim.map(3, 0); //
-              s_11[2] = ios + 6*i + 0;//
-              s_11[3] = iot + 3*s_t[3] + sim.map(3, 2); //
-              s_11[4] = ios + 6*i + 3;//
-              s_11[5] = ios + 6*i + 1;//
+              s_11[0] = iot + 3*s_t[3] + sim.map(3, 1);
+              s_11[1] = iot + 3*s_t[3] + sim.map(3, 0);
+              s_11[2] = ios + 6*i + 0;
+              s_11[3] = iot + 3*s_t[3] + sim.map(3, 2);
+              s_11[4] = ios + 6*i + 3;
+              s_11[5] = ios + 6*i + 1;
 
             }
             // return fine simplex count
@@ -1298,70 +1292,70 @@ namespace FEAST
               // calculate fine triangle-at-simplex indices
 
               // v_0-cube
-              s_0[0] = iot + 4*s_t[1] + sim.map(1, 0); //
-              s_0[2] = iot + 4*s_t[2] + sim.map(2, 0); //
-              s_0[1] = iot + 4*s_t[3] + sim.map(3, 0);//
-              s_0[3] = ios + 16*i + 0;//
+              s_0[0] = iot + 4*s_t[1] + sim.map(1, 0);
+              s_0[2] = iot + 4*s_t[2] + sim.map(2, 0);
+              s_0[1] = iot + 4*s_t[3] + sim.map(3, 0);
+              s_0[3] = ios + 16*i + 0;
 
-              s_1[0] = ios + 16*i + 8; //
-              s_1[1] = ios + 16*i + 5;//
-              s_1[2] = ios + 16*i + 4;//
-              s_1[3] = ios + 16*i + 0;//
+              s_1[0] = ios + 16*i + 8;
+              s_1[1] = ios + 16*i + 5;
+              s_1[2] = ios + 16*i + 4;
+              s_1[3] = ios + 16*i + 0;
 
               // v_1-cube
-              s_2[0] = iot + 4*s_t[0] + sim.map(0, 0); //
-              s_2[1] = iot + 4*s_t[2] + sim.map(2, 1); //
-              s_2[2] = iot + 4*s_t[3] + sim.map(3, 1);//
-              s_2[3] = ios + 16*i + 1;//
+              s_2[0] = iot + 4*s_t[0] + sim.map(0, 0);
+              s_2[1] = iot + 4*s_t[2] + sim.map(2, 1);
+              s_2[2] = iot + 4*s_t[3] + sim.map(3, 1);
+              s_2[3] = ios + 16*i + 1;
 
-              s_3[0] = ios + 16*i + 13; //
-              s_3[2] = ios + 16*i + 7;//
-              s_3[1] = ios + 16*i + 6;//
-              s_3[3] = ios + 16*i + 1;//
+              s_3[0] = ios + 16*i + 13;
+              s_3[2] = ios + 16*i + 7;
+              s_3[1] = ios + 16*i + 6;
+              s_3[3] = ios + 16*i + 1;
 
               // v_2-cube
-              s_4[0] = iot + 4*s_t[0] + sim.map(0, 1); //
-              s_4[2] = iot + 4*s_t[1] + sim.map(1, 1); //
-              s_4[1] = iot + 4*s_t[3] + sim.map(3, 2);//
-              s_4[3] = ios + 16*i + 2;//
+              s_4[0] = iot + 4*s_t[0] + sim.map(0, 1);
+              s_4[2] = iot + 4*s_t[1] + sim.map(1, 1);
+              s_4[1] = iot + 4*s_t[3] + sim.map(3, 2);
+              s_4[3] = ios + 16*i + 2;
 
-              s_5[0] = ios + 16*i + 14; //
-              s_5[1] = ios + 16*i + 10;//
-              s_5[2] = ios + 16*i + 9;//
-              s_5[3] = ios + 16*i + 2;//
+              s_5[0] = ios + 16*i + 14;
+              s_5[1] = ios + 16*i + 10;
+              s_5[2] = ios + 16*i + 9;
+              s_5[3] = ios + 16*i + 2;
 
               // v_3-cube
-              s_6[0] = iot + 4*s_t[0] + sim.map(0, 2); //
-              s_6[1] = iot + 4*s_t[1] + sim.map(1, 2); //
-              s_6[2] = iot + 4*s_t[2] + sim.map(2, 2);//
-              s_6[3] = ios + 16*i + 3;//
+              s_6[0] = iot + 4*s_t[0] + sim.map(0, 2);
+              s_6[1] = iot + 4*s_t[1] + sim.map(1, 2);
+              s_6[2] = iot + 4*s_t[2] + sim.map(2, 2);
+              s_6[3] = ios + 16*i + 3;
 
-              s_7[0] = ios + 16*i + 15; //
-              s_7[2] = ios + 16*i + 12;//
-              s_7[1] = ios + 16*i + 11;//
-              s_7[3] = ios + 16*i + 3;//
+              s_7[0] = ios + 16*i + 15;
+              s_7[2] = ios + 16*i + 12;
+              s_7[1] = ios + 16*i + 11;
+              s_7[3] = ios + 16*i + 3;
 
               //triangle simplices
 
-              s_8[0] = ios + 16*i + 15;//
-              s_8[1] = ios + 16*i + 14;//
-              s_8[2] = ios + 16*i + 13; //
-              s_8[3] = iot + 4*s_t[0] + 3;//
+              s_8[0] = ios + 16*i + 15;
+              s_8[1] = ios + 16*i + 14;
+              s_8[2] = ios + 16*i + 13;
+              s_8[3] = iot + 4*s_t[0] + 3;
 
-              s_9[0] = ios + 16*i + 12;//
-              s_9[1] = ios + 16*i + 8; //
-              s_9[2] = ios + 16*i + 10;//
-              s_9[3] = iot + 4*s_t[1] + 3;//
+              s_9[0] = ios + 16*i + 12;
+              s_9[1] = ios + 16*i + 8;
+              s_9[2] = ios + 16*i + 10;
+              s_9[3] = iot + 4*s_t[1] + 3;
 
-              s_10[0] = ios + 16*i + 11;//
-              s_10[1] = ios + 16*i + 7;//
-              s_10[2] = ios + 16*i + 5; //
-              s_10[3] = iot + 4*s_t[2] + 3;//
+              s_10[0] = ios + 16*i + 11;
+              s_10[1] = ios + 16*i + 7;
+              s_10[2] = ios + 16*i + 5;
+              s_10[3] = iot + 4*s_t[2] + 3;
 
-              s_11[0] = ios + 16*i + 9;//
-              s_11[1] = ios + 16*i + 4; //
-              s_11[2] = ios + 16*i + 6;//
-              s_11[3] = iot + 4*s_t[3] + 3;//
+              s_11[0] = ios + 16*i + 9;
+              s_11[1] = ios + 16*i + 4;
+              s_11[2] = ios + 16*i + 6;
+              s_11[3] = iot + 4*s_t[3] + 3;
 
             }
             // return fine simplex count
