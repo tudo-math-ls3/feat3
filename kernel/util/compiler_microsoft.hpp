@@ -47,6 +47,11 @@
 #    define HAVE_CPP11_STATIC_ASSERT 1
 #  endif
 
+// C4100: 'identifier': unreferenced formal parameter
+// This warning arises from unused function parameters. As we are using doxygen, parameters always need
+// names to produce useful documentation independent of whether the actual parameter is used or not.
+#  pragma warning(disable: 4100)
+
 // C4127: conditional expression is constant
 #  pragma warning(disable: 4127)
 
