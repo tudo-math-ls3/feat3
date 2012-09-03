@@ -113,6 +113,11 @@ void MemoryPool<Archs::GPU>::set_memory(DT_ * address, const DT_ val, const Inde
   FEAST::LAFEM::Intern::cuda_set_memory<<<grid, blocksize>>>(address, val, count);
 }
 
+void MemoryPool<Archs::GPU>::copy(void * dest, const void * src, const Index bytes)
+{
+  cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToDevice);
+}
+
 template float MemoryPool<Archs::GPU>::get_element(const float * data, Index index);
 template double MemoryPool<Archs::GPU>::get_element(const double * data, Index index);
 template Index MemoryPool<Archs::GPU>::get_element(const Index * data, Index index);

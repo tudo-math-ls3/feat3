@@ -54,7 +54,9 @@ namespace FEAST
       Container(const Container<Arch_, DT_> & other) :
         ContainerBase(other),
         _elements(other._elements),
-        _indices(other._indices)
+        _indices(other._indices),
+        _elements_size(other._elements_size),
+        _indices_size(other._indices_size)
       {
         for (Index i(0) ; i < _elements.size() ; ++i)
           MemoryPool<Arch_>::instance()->increase_memory(_elements.at(i));
@@ -69,10 +71,16 @@ namespace FEAST
         if (typeid(DT_) != typeid(DT2_))
           throw InternalError("type conversion not supported yet!");
 
-        for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
+
+        for (Index i(0) ; i < other.get_elements().size() ; ++i)
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(other.get_elements_size().at(i) * sizeof(DT_)));
         for (Index i(0) ; i < other.get_indices().size() ; ++i)
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(other.get_indices_size().at(i) * sizeof(Index)));
+
+        for (Index i(0) ; i < other.get_elements_size().size() ; ++i)
+          this->_elements_size.push_back(other.get_elements_size().at(i));
+        for (Index i(0) ; i < other.get_indices_size().size() ; ++i)
+          this->_indices_size.push_back(other.get_indices_size().at(i));
 
         for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
         {
@@ -85,8 +93,8 @@ namespace FEAST
         }
         for (Index i(0) ; i < other.get_indices().size() ; ++i)
         {
-          Index src_size(other.get_indices_size().at(i) * sizeof(DT2_));
-          Index dest_size(other.get_indices_size().at(i) * sizeof(DT_));
+          Index src_size(other.get_indices_size().at(i) * sizeof(Index));
+          Index dest_size(other.get_indices_size().at(i) * sizeof(Index));
           void * temp(::malloc(src_size));
           MemoryPool<Arch2_>::download(temp, other.get_indices().at(i), src_size);
           MemoryPool<Arch_>::upload(this->get_indices().at(i), temp, dest_size);

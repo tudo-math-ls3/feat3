@@ -19,6 +19,11 @@ namespace FEAST
     template <typename Arch_, typename DT_>
     class SparseMatrixCOO : public Container<Arch_, DT_>
     {
+    };
+
+    template <typename DT_>
+    class SparseMatrixCOO<Archs::CPU, DT_> : public Container<Archs::CPU, DT_>
+    {
       private:
         Index _rows;
         Index _columns;
@@ -28,10 +33,10 @@ namespace FEAST
 
       public:
         typedef DT_ data_type;
-        typedef Arch_ arch_type;
+        typedef Archs::CPU arch_type;
 
         explicit SparseMatrixCOO() :
-          Container<Arch_, DT_> (0),
+          Container<Archs::CPU, DT_> (0),
           _rows(0),
           _columns(0),
           _zero_element(DT_(0)),
@@ -40,7 +45,7 @@ namespace FEAST
         }
 
         explicit SparseMatrixCOO(Index rows, Index columns) :
-          Container<Arch_, DT_>(rows * columns),
+          Container<Archs::CPU, DT_>(rows * columns),
           _zero_element(DT_(0)),
           _used_elements(0)
         {
@@ -49,8 +54,8 @@ namespace FEAST
           this->_columns = columns;
         }
 
-        SparseMatrixCOO(const SparseMatrixCOO<Arch_, DT_> & other) :
-          Container<Arch_, DT_>(other),
+        SparseMatrixCOO(const SparseMatrixCOO<Archs::CPU, DT_> & other) :
+          Container<Archs::CPU, DT_>(other),
           _rows(other._rows),
           _columns(other._columns),
           _zero_element(other._zero_element),
@@ -61,7 +66,7 @@ namespace FEAST
 
         template <typename Arch2_, typename DT2_>
         SparseMatrixCOO(const SparseMatrixCOO<Arch2_, DT2_> & other) :
-          Container<Arch_, DT_>(other),
+          Container<Archs::CPU, DT_>(other),
           _rows(other._rows),
           _columns(other._columns),
           _zero_element(other._zero_element),
@@ -114,6 +119,10 @@ namespace FEAST
           return _elements;
         }
 
+        const DT_ zero_element() const
+        {
+          return _zero_element;
+        }
     };
 
     template <typename Arch_, typename DT_> bool operator== (const SparseMatrixCOO<Arch_, DT_> & a, const SparseMatrixCOO<Arch_, DT_> & b)

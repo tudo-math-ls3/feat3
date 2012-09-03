@@ -2,7 +2,6 @@
 #include <kernel/lafem/memory_pool.hpp>
 
 #include <cstdio>
-#include <cstring>
 
 
 using namespace FEAST;
@@ -61,12 +60,12 @@ void MemoryPool<Archs::CPU>::release_memory(void * address)
 
 void MemoryPool<Archs::CPU>::download(void * dest, void * src, Index bytes)
 {
-  memcpy(dest, src, bytes);
+  ::memcpy(dest, src, bytes);
 }
 
 void MemoryPool<Archs::CPU>::upload(void * dest, void * src, Index bytes)
 {
-  memcpy(dest, src, bytes);
+  ::memcpy(dest, src, bytes);
 }
 
 template <typename DT_>

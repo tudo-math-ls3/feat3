@@ -90,6 +90,55 @@ namespace FEAST
           }
         }
 
+        template <typename Arch2_>
+        explicit SparseMatrixCSR(const SparseMatrixCOO<Arch2_, DT_> & other) :
+          Container<Arch_, DT_>(other.size()),
+          _rows(other.rows()),
+          _columns(other.columns()),
+          _zero_element(other.zero_element()),
+          _used_elements(other.used_elements())
+        {
+          SparseMatrixCSR<Archs::CPU, DT_> tother(other);
+
+          this->_size = tother.size();
+          this->_rows = tother.rows();
+          this->_columns = tother.columns();
+          this->_used_elements = tother.used_elements();
+          this->_zero_element = tother.zero_element();
+
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(tother.used_elements() * sizeof(DT_)));
+          this->_elements_size.push_back(this->_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(tother.used_elements() * sizeof(Index)));
+          this->_indices_size.push_back(this->_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(2 * _rows * sizeof(Index)));
+          this->_indices_size.push_back(2 * _rows);
+
+          _Aj = this->_indices.at(0);
+          _Ax = this->_elements.at(0);
+          _Ar = this->_indices.at(1);
+
+          Index src_size(tother.get_elements_size().at(0) * sizeof(DT_));
+          Index dest_size(tother.get_elements_size().at(0) * sizeof(DT_));
+          void * temp(::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, tother.get_elements().at(0), src_size);
+          MemoryPool<Arch_>::upload(this->get_elements().at(0), temp, dest_size);
+          ::free(temp);
+
+          src_size = (tother.get_indices_size().at(0) * sizeof(Index));
+          dest_size = (tother.get_indices_size().at(0) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, tother.get_indices().at(0), src_size);
+          MemoryPool<Arch_>::upload(this->get_indices().at(0), temp, dest_size);
+          ::free(temp);
+
+          src_size = (tother.get_indices_size().at(1) * sizeof(Index));
+          dest_size = (tother.get_indices_size().at(1) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, tother.get_indices().at(1), src_size);
+          MemoryPool<Arch_>::upload(this->get_indices().at(1), temp, dest_size);
+          ::free(temp);
+        }
+
         explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & Aj, const DenseVector<Arch_, DT_> & Ax, const DenseVector<Arch_, Index> & Ar) :
           Container<Arch_, DT_>(rows * columns),
           _rows(rows),
@@ -98,7 +147,6 @@ namespace FEAST
           // \TODO use real element count - be aware of non used elements
           _used_elements(Ax.size())
         {
-          // \TODO create real copies
           DenseVector<Arch_, Index> tAj(Aj.size());
           copy(tAj, Aj);
           DenseVector<Arch_, DT_> tAx(Ax.size());
@@ -138,9 +186,10 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         SparseMatrixCSR(const SparseMatrixCSR<Arch2_, DT2_> & other) :
           Container<Arch_, DT_>(other),
-          _rows(other._rows),
-          _columns(other._columns),
-          _used_elements(other._used_elements)
+          _rows(other.rows()),
+          _columns(other.columns()),
+          _zero_element(other.zero_element()),
+          _used_elements(other.used_elements())
         {
           this->_Ax = this->_elements.at(0);
           this->_Aj = this->_indices.at(0);
@@ -191,26 +240,78 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         SparseMatrixCSR<Arch_, DT_> & operator= (const SparseMatrixCSR<Arch2_, DT2_> & other)
         {
-          if (this == &other)
-            return *this;
+          this->_size = other.size();
+          this->_rows = other.rows();
+          this->_columns = other.columns();
+          this->_used_elements = other.used_elements();
+          this->_zero_element = other.zero_element();
 
-          //TODO copy memory from arch2 to arch
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Arch_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
+
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(other.used_elements() * sizeof(DT_)));
+          this->_elements_size.push_back(this->_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(other.used_elements() * sizeof(Index)));
+          this->_indices_size.push_back(this->_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(2 * _rows * sizeof(Index)));
+          this->_indices_size.push_back(2 * _rows);
+
+          _Aj = this->_indices.at(0);
+          _Ax = this->_elements.at(0);
+          _Ar = this->_indices.at(1);
+
+          Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
+          Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
+          void * temp(::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, other.get_elements().at(0), src_size);
+          MemoryPool<Arch_>::upload(this->get_elements().at(0), temp, dest_size);
+          ::free(temp);
+
+          src_size = (other.get_indices_size().at(0) * sizeof(Index));
+          dest_size = (other.get_indices_size().at(0) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, other.get_indices().at(0), src_size);
+          MemoryPool<Arch_>::upload(this->get_indices().at(0), temp, dest_size);
+          ::free(temp);
+
+          src_size = (other.get_indices_size().at(1) * sizeof(Index));
+          dest_size = (other.get_indices_size().at(1) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, other.get_indices().at(1), src_size);
+          MemoryPool<Arch_>::upload(this->get_indices().at(1), temp, dest_size);
+          ::free(temp);
+
           return *this;
         }
 
-        const DT_ & operator()(Index row, Index col) const
+        DT_ operator()(Index row, Index col) const
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_columns) + " !");
 
-          for (unsigned long i(_Ar[row * 2]) ; i < _Ar[(row * 2) + 1] ; ++i)
+          if (typeid(Arch_) == typeid(Archs::CPU))
           {
-            if (_Aj[i] == col)
-              return _Ax[i];
-            if (_Aj[i] > col)
-              return _zero_element;
+            for (unsigned long i(_Ar[row * 2]) ; i < _Ar[(row * 2) + 1] ; ++i)
+            {
+              if (_Aj[i] == col)
+                return _Ax[i];
+              if (_Aj[i] > col)
+                return _zero_element;
+            }
+            return _zero_element;
           }
-          return _zero_element;
+          else
+          {
+            SparseMatrixCSR<Archs::CPU, DT_> temp(*this);
+            return temp(row, col);
+          }
         }
 
         const Index & rows() const
@@ -249,7 +350,7 @@ namespace FEAST
         }
     };
 
-    template <typename Arch_, typename DT_> bool operator== (const SparseMatrixCSR<Arch_, DT_> & a, const SparseMatrixCSR<Arch_, DT_> & b)
+    template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const SparseMatrixCSR<Arch_, DT_> & a, const SparseMatrixCSR<Arch2_, DT_> & b)
     {
       if (a.rows() != b.rows())
         return false;

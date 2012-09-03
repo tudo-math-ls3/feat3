@@ -9,6 +9,7 @@
 #include <kernel/archs.hpp>
 
 #include <map>
+#include <cstring>
 
 
 namespace FEAST
@@ -78,6 +79,12 @@ namespace FEAST
         /// set memory to specific value
         template <typename DT_>
         void set_memory(DT_ * address, const DT_ val, const Index count);
+
+        /// Copy memory area from src to dest
+        static void copy(void * dest, const void * src, const Index bytes)
+        {
+          ::memcpy(dest, src, bytes);
+        }
     };
 
     template <>
@@ -122,6 +129,9 @@ namespace FEAST
         /// set memory to specific value
         template <typename DT_>
         void set_memory(DT_ * address, const DT_ val, const Index count);
+
+        /// Copy memory area from src to dest
+        static void copy(void * dest, const void * src, const Index bytes);
     };
   } // namespace LAFEM
 } // namespace FEAST

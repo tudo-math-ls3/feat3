@@ -20,16 +20,11 @@ namespace FEAST
       if (dest.size() != src.size())
         throw InternalError("Vector size mismatch!");
 
-      const Index size(dest.size());
-      DT_ * pdest(dest.elements());
-      const DT_ * psrc(src.elements());
+      void * pdest(dest.elements());
+      const void * psrc(src.elements());
 
-      for (Index i(0) ; i < size ; ++i)
-      {
-        pdest[i] = psrc[i];
-      }
+      MemoryPool<Arch_>::copy(pdest, psrc, dest.size() * sizeof(DT_));
     }
-
   } // namespace LAFEM
 } // namespace FEAST
 

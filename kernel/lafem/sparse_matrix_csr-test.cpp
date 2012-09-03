@@ -37,11 +37,10 @@ public:
 
   virtual void run() const
   {
-    SparseMatrixCOO<Tag_, DT_> a(10, 10);
+    SparseMatrixCOO<Archs::CPU, DT_> a(10, 10);
     a(1,2,7);
     a(5,5,2);
     SparseMatrixCSR<Tag_, DT_> b(a);
-    SparseMatrixCSR<Tag_, DT_> z(b);
     TEST_CHECK_EQUAL(b.used_elements(), 2ul);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
@@ -49,6 +48,7 @@ public:
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
 
+    SparseMatrixCSR<Tag_, DT_> z(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
@@ -68,7 +68,16 @@ public:
     DenseVector<Tag_, Index> Ar(2 * c.rows(), c.Ar());
     SparseMatrixCSR<Tag_, DT_> d(c.rows(), c.columns(), Aj, Ax, Ar);
     TEST_CHECK_EQUAL(d, c);
+
+    SparseMatrixCSR<Archs::CPU, DT_> e(c);
+    TEST_CHECK_EQUAL(e, c);
+    e = c;
+    TEST_CHECK_EQUAL(e, c);
   }
 };
-SparseMatrixCSRTest<Archs::CPU, float> sparse_matrix_csr_test_float;
-SparseMatrixCSRTest<Archs::CPU, double> sparse_matrix_csr_test_double;
+SparseMatrixCSRTest<Archs::CPU, float> cpu_sparse_matrix_csr_test_float;
+SparseMatrixCSRTest<Archs::CPU, double> cpu_sparse_matrix_csr_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCSRTest<Archs::GPU, float> gpu_sparse_matrix_csr_test_float;
+SparseMatrixCSRTest<Archs::GPU, double> gpu_sparse_matrix_csr_test_double;
+#endif
