@@ -109,7 +109,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
     # the following flag might be useful: -m128bit-long-double
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++98 -pedantic -Wall -Wextra -Wundef -g")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++98 -Wall -Wextra -Wundef -g")
 
   else ()
     # optimised settings for all currently supported archs
