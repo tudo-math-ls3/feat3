@@ -63,10 +63,10 @@ public:
     TEST_CHECK_EQUAL(c(1,2), b(1,2));
     TEST_CHECK_EQUAL(c, b);
 
-    DenseVector<Tag_, Index> Aj(c.used_elements(), c.Aj());
-    DenseVector<Tag_, DT_> Ax(c.used_elements(), c.Ax());
-    DenseVector<Tag_, Index> Ar(2 * c.rows(), c.Ar());
-    SparseMatrixCSR<Tag_, DT_> d(c.rows(), c.columns(), Aj, Ax, Ar);
+    DenseVector<Tag_, Index> col_ind(c.used_elements(), c.col_ind());
+    DenseVector<Tag_, DT_> val(c.used_elements(), c.val());
+    DenseVector<Tag_, Index> row_ptr(2 * c.rows(), c.row_ptr());
+    SparseMatrixCSR<Tag_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
     TEST_CHECK_EQUAL(d, c);
 
     SparseMatrixCSR<Archs::CPU, DT_> e(c);

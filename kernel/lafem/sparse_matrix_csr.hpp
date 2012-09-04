@@ -20,9 +20,9 @@ namespace FEAST
     class SparseMatrixCSR : public Container<Arch_, DT_>
     {
       private:
-        Index * _Aj;
-        DT_ * _Ax;
-        Index * _Ar;
+        Index * _col_ind;
+        DT_ * _val;
+        Index * _row_ptr;
         Index _rows;
         Index _columns;
         DT_ _zero_element;
@@ -55,13 +55,13 @@ namespace FEAST
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((2 * _rows) * sizeof(Index)));
           this->_indices_size.push_back(2 * _rows);
 
-          _Aj = this->_indices.at(0);
-          _Ax = this->_elements.at(0);
-          _Ar = this->_indices.at(1);
+          _col_ind = this->_indices.at(0);
+          _val = this->_elements.at(0);
+          _row_ptr = this->_indices.at(1);
 
           Index ait(0);
           Index current_row(0);
-          _Ar[current_row * 2] = 0;
+          _row_ptr[current_row * 2] = 0;
           for (typename std::map<unsigned long, DT_>::const_iterator it(other.elements().begin()) ; it != other.elements().end() ; ++it)
           {
             Index row(it->first / _columns);
@@ -69,24 +69,24 @@ namespace FEAST
 
             if (current_row < row)
             {
-              _Ar[current_row * 2 + 1] = ait;
+              _row_ptr[current_row * 2 + 1] = ait;
               for (unsigned long i(current_row + 1) ; i < row ; ++i)
               {
-                _Ar[i * 2] = ait;
-                _Ar[(i * 2) + 1] = ait;
+                _row_ptr[i * 2] = ait;
+                _row_ptr[(i * 2) + 1] = ait;
               }
               current_row = row;
-              _Ar[current_row * 2] = ait;
+              _row_ptr[current_row * 2] = ait;
             }
-            _Ax[ait] = it->second;
-            _Aj[ait] = column;
+            _val[ait] = it->second;
+            _col_ind[ait] = column;
             ++ait;
           }
-          _Ar[current_row * 2 + 1] = ait;
+          _row_ptr[current_row * 2 + 1] = ait;
           for (unsigned long i(current_row + 1) ; i < _rows ; ++i)
           {
-            _Ar[i * 2] = ait;
-            _Ar[i * 2 + 1] = ait;
+            _row_ptr[i * 2] = ait;
+            _row_ptr[i * 2 + 1] = ait;
           }
         }
 
@@ -113,9 +113,9 @@ namespace FEAST
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(2 * _rows * sizeof(Index)));
           this->_indices_size.push_back(2 * _rows);
 
-          _Aj = this->_indices.at(0);
-          _Ax = this->_elements.at(0);
-          _Ar = this->_indices.at(1);
+          _col_ind = this->_indices.at(0);
+          _val = this->_elements.at(0);
+          _row_ptr = this->_indices.at(1);
 
           Index src_size(tother.get_elements_size().at(0) * sizeof(DT_));
           Index dest_size(tother.get_elements_size().at(0) * sizeof(DT_));
@@ -139,31 +139,31 @@ namespace FEAST
           ::free(temp);
         }
 
-        explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & Aj, const DenseVector<Arch_, DT_> & Ax, const DenseVector<Arch_, Index> & Ar) :
+        explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & col_ind, const DenseVector<Arch_, DT_> & val, const DenseVector<Arch_, Index> & row_ptr) :
           Container<Arch_, DT_>(rows * columns),
           _rows(rows),
           _columns(columns),
           _zero_element(DT_(0)),
           // \TODO use real element count - be aware of non used elements
-          _used_elements(Ax.size())
+          _used_elements(val.size())
         {
-          DenseVector<Arch_, Index> tAj(Aj.size());
-          copy(tAj, Aj);
-          DenseVector<Arch_, DT_> tAx(Ax.size());
-          copy(tAx, Ax);
-          DenseVector<Arch_, Index> tAr(Ar.size());
-          copy(tAr, Ar);
+          DenseVector<Arch_, Index> tcol_ind(col_ind.size());
+          copy(tcol_ind, col_ind);
+          DenseVector<Arch_, DT_> tval(val.size());
+          copy(tval, val);
+          DenseVector<Arch_, Index> trow_ptr(row_ptr.size());
+          copy(trow_ptr, row_ptr);
 
-          this->_elements.push_back(tAx.get_elements().at(0));
-          this->_elements_size.push_back(tAx.size());
-          this->_indices.push_back(tAj.get_elements().at(0));
-          this->_indices_size.push_back(tAj.size());
-          this->_indices.push_back(tAr.get_elements().at(0));
-          this->_indices_size.push_back(tAr.size());
+          this->_elements.push_back(tval.get_elements().at(0));
+          this->_elements_size.push_back(tval.size());
+          this->_indices.push_back(tcol_ind.get_elements().at(0));
+          this->_indices_size.push_back(tcol_ind.size());
+          this->_indices.push_back(trow_ptr.get_elements().at(0));
+          this->_indices_size.push_back(trow_ptr.size());
 
-          this->_Ax = this->_elements.at(0);
-          this->_Aj = this->_indices.at(0);
-          this->_Ar = this->_indices.at(1);
+          this->_val = this->_elements.at(0);
+          this->_col_ind = this->_indices.at(0);
+          this->_row_ptr = this->_indices.at(1);
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
@@ -178,9 +178,9 @@ namespace FEAST
           _zero_element(other._zero_element),
           _used_elements(other._used_elements)
         {
-          this->_Ax = this->_elements.at(0);
-          this->_Aj = this->_indices.at(0);
-          this->_Ar = this->_indices.at(1);
+          this->_val = this->_elements.at(0);
+          this->_col_ind = this->_indices.at(0);
+          this->_row_ptr = this->_indices.at(1);
         }
 
         template <typename Arch2_, typename DT2_>
@@ -191,9 +191,9 @@ namespace FEAST
           _zero_element(other.zero_element()),
           _used_elements(other.used_elements())
         {
-          this->_Ax = this->_elements.at(0);
-          this->_Aj = this->_indices.at(0);
-          this->_Ar = this->_indices.at(1);
+          this->_val = this->_elements.at(0);
+          this->_col_ind = this->_indices.at(0);
+          this->_row_ptr = this->_indices.at(1);
         }
 
         SparseMatrixCSR<Arch_, DT_> & operator= (const SparseMatrixCSR<Arch_, DT_> & other)
@@ -225,9 +225,9 @@ namespace FEAST
           this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
           this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
 
-          _Aj = this->_indices.at(0);
-          _Ax = this->_elements.at(0);
-          _Ar = this->_indices.at(1);
+          _col_ind = this->_indices.at(0);
+          _val = this->_elements.at(0);
+          _row_ptr = this->_indices.at(1);
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
@@ -263,9 +263,9 @@ namespace FEAST
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(2 * _rows * sizeof(Index)));
           this->_indices_size.push_back(2 * _rows);
 
-          _Aj = this->_indices.at(0);
-          _Ax = this->_elements.at(0);
-          _Ar = this->_indices.at(1);
+          _col_ind = this->_indices.at(0);
+          _val = this->_elements.at(0);
+          _row_ptr = this->_indices.at(1);
 
           Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
           Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
@@ -298,11 +298,11 @@ namespace FEAST
 
           if (typeid(Arch_) == typeid(Archs::CPU))
           {
-            for (unsigned long i(_Ar[row * 2]) ; i < _Ar[(row * 2) + 1] ; ++i)
+            for (unsigned long i(_row_ptr[row * 2]) ; i < _row_ptr[(row * 2) + 1] ; ++i)
             {
-              if (_Aj[i] == col)
-                return _Ax[i];
-              if (_Aj[i] > col)
+              if (_col_ind[i] == col)
+                return _val[i];
+              if (_col_ind[i] > col)
                 return _zero_element;
             }
             return _zero_element;
@@ -329,19 +329,19 @@ namespace FEAST
           return this->_used_elements;
         }
 
-        Index * Aj() const
+        Index * col_ind() const
         {
-          return _Aj;
+          return _col_ind;
         }
 
-        DT_ * Ax() const
+        DT_ * val() const
         {
-          return _Ax;
+          return _val;
         }
 
-        Index * Ar() const
+        Index * row_ptr() const
         {
-          return _Ar;
+          return _row_ptr;
         }
 
         const DT_ zero_element() const

@@ -35,19 +35,19 @@ namespace FEAST
 
         const DT_ * bp(b.elements());
         const DT_ * rhsp(rhs.elements());
-        const Index * Aj(a.Aj());
-        const DT_ * Ax(a.Ax());
-        const Index * Ar(a.Ar());
+        const Index * col_ind(a.col_ind());
+        const DT_ * val(a.val());
+        const Index * row_ptr(a.row_ptr());
         DT_ * rp(r.elements());
         const Index rows(a.rows());
 
         for (Index row(0) ; row < rows ; ++row)
         {
           DT_ sum(0);
-          const Index end(Ar[row * 2 + 1]);
-          for (Index i(Ar[row * 2]) ; i < end ; ++i)
+          const Index end(row_ptr[row * 2 + 1]);
+          for (Index i(row_ptr[row * 2]) ; i < end ; ++i)
           {
-            sum += Ax[i] * bp[Aj[i]];
+            sum += val[i] * bp[col_ind[i]];
           }
           rp[row] = rhsp[row] - sum;
         }
