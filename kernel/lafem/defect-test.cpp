@@ -27,7 +27,10 @@ public:
 
   virtual void run() const
   {
-    for (Index size(1) ; size < 3e2 ; size*=2)
+    const DT_ eps = std::pow(std::numeric_limits<DT_>::epsilon(), DT_(0.8));
+    const DT_ pi = DT_(2) * std::acos(DT_(0));
+
+    for (Index size(2) ; size < 3e2 ; size*=2)
     {
       SparseMatrixCOO<Arch_, DT_> ac(size, size + 2);
       DenseVector<Arch_, DT_> b(size + 2);
@@ -38,26 +41,31 @@ public:
       {
         for (unsigned long col(0) ; col < ac.columns() ; ++col)
         {
-          if (col % 5 == 0)
-            ac(row, col, row * 5 / (col + 1));
+          if(row == col)
+            ac(row, col, DT_(2));
+          else if((row == col+1) || (row+1 == col))
+            ac(row, col, DT_(-1));
         }
       }
       SparseMatrixCSR<Arch_, DT_> a(ac);
       for (Index i(0) ; i < size ; ++i)
       {
-        b(i, DT_(size*2 - i/((i+3)/2) * 1.23));
-        rhs(i, b(i) - 5);
-      }
-      for (Index i(0) ; i < size ; ++i)
-      {
-        DT_ sum(0);
-        for (Index j(0) ; j < a.columns() ; ++j)
-          sum += ac(i, j) * b(j);
-        ref(i, rhs(i) - sum);
+        b(i, std::sin(pi * DT_(i) / DT_(size-1)));
+        rhs(i, b(i) - DT_(5));
       }
 
       Defect<Arch_, BType_>::value(c, rhs, a, b);
-      TEST_CHECK_EQUAL(c, ref);
+
+      DT_ dev(DT_(0));
+      for (Index i(0) ; i < size ; ++i)
+      {
+        DT_ sum(c(i) - rhs(i));
+        for (Index j(0) ; j < a.columns() ; ++j)
+          sum += ac(i, j) * b(j);
+        dev = std::max(dev, std::abs(sum));
+      }
+
+      TEST_CHECK(dev <= eps);
     }
   }
 };
