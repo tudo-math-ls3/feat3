@@ -472,6 +472,8 @@ namespace FEAST
                 return ipa_polyhedron_any;
               }
           }
+
+          throw InternalError("Invalid polytope level combination");
         }
 
         InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to)

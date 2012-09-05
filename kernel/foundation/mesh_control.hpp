@@ -68,9 +68,10 @@ namespace FEAST
       template<typename SourceMeshType_>
       static void fill_sizes(SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target)
       {
-        target[0] = mesh.get_topologies().at(0).get_topology().size();
-        target[1] = mesh.get_topologies().at(1).get_topology().size();
-        target[2] = mesh.get_topologies().at(3).get_topology().size();
+        typedef typename SourceMeshType_::index_type_ IndexType;
+        target[0] = IndexType(mesh.get_topologies().at(0).get_topology().size());
+        target[1] = IndexType(mesh.get_topologies().at(1).get_topology().size());
+        target[2] = IndexType(mesh.get_topologies().at(3).get_topology().size());
       }
 
       template<typename SourceMeshType_, typename TargetMeshType_>

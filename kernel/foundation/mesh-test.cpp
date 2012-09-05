@@ -66,10 +66,10 @@ public:
       m3.add_polytope(Foundation::pl_face);
 
       TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_edge).get_history().get_functors().size(), 6);
-      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_edge).size(), 6);
-      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_face).size(), 6);
-      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_edge_vertex).size(), 7);
-      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_face_vertex).size(), 2);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_edge).size(), 6u);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_vertex_face).size(), 6u);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_edge_vertex).size(), 7u);
+      TEST_CHECK_EQUAL(m3.get_topologies().at(Foundation::ipi_face_vertex).size(), 2u);
 
 
       /*     0  1
@@ -762,18 +762,18 @@ class MeshTestGeometryInterface:
         }
       }
 
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][0], 0);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][1], 1);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][0], 2);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][1], 3);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][0], 0);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][1], 2);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][0], 1);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][1], 3);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][0], 0);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][1], 1);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][2], 2);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][3], 3);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][0], 0u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][1], 1u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][0], 2u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][1], 3u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][0], 0u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][1], 2u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][0], 1u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][1], 3u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][0], 0u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][1], 1u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][2], 2u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][3], 3u);
 
       typename confmeshtype_::VertexSetType& vertex_coord_tuples(geo_m.get_vertex_set());
       vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node

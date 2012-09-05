@@ -25,7 +25,7 @@ public:
 
   virtual void run() const
   {
-    DT_ s(4711.1);
+    DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
       DenseVector<Arch_, DT_> a(size);

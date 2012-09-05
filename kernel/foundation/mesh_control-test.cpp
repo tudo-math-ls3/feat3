@@ -96,9 +96,9 @@ class MeshControlTest:
       IndexType_* size_set(new IndexType_[3]);
       MeshControl<dim_2D>::fill_sizes(m, size_set);
 
-      TEST_CHECK_EQUAL(size_set[0], 4);
-      TEST_CHECK_EQUAL(size_set[1], 4);
-      TEST_CHECK_EQUAL(size_set[2], 1);
+      TEST_CHECK_EQUAL(size_set[0], 4u);
+      TEST_CHECK_EQUAL(size_set[1], 4u);
+      TEST_CHECK_EQUAL(size_set[2], 1u);
 
       confmeshtype_ confmesh(size_set);
       MeshControl<dim_2D>::fill_adjacencies(m, confmesh);
@@ -106,29 +106,29 @@ class MeshControlTest:
       typename confmeshtype_::template IndexSet<1,0>::Type& geo_vertex_at_edge(confmesh.template get_index_set<1,0>());
       typename confmeshtype_::template IndexSet<2,0>::Type& geo_vertex_at_face(confmesh.template get_index_set<2,0>());
 
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][0], 0);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][1], 1);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][0], 2);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][1], 3);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][0], 0);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][1], 2);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][0], 1);
-      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][1], 3);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][0], 0);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][1], 1);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][2], 2);
-      TEST_CHECK_EQUAL(geo_vertex_at_face[0][3], 3);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][0], 0u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[0][1], 1u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][0], 2u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[1][1], 3u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][0], 0u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[2][1], 2u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][0], 1u);
+      TEST_CHECK_EQUAL(geo_vertex_at_edge[3][1], 3u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][0], 0u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][1], 1u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][2], 2u);
+      TEST_CHECK_EQUAL(geo_vertex_at_face[0][3], 3u);
 
       MeshControl<dim_2D>::fill_vertex_sets(m, confmesh, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
       typename confmeshtype_::VertexSetType& vertex_coord_tuples(confmesh.get_vertex_set());
-      TEST_CHECK_EQUAL(vertex_coord_tuples[0][0], 0);
-      TEST_CHECK_EQUAL(vertex_coord_tuples[0][1], 0);
-      TEST_CHECK_EQUAL(vertex_coord_tuples[1][0], 1);
-      TEST_CHECK_EQUAL(vertex_coord_tuples[1][1], 0);
-      TEST_CHECK_EQUAL(vertex_coord_tuples[2][0], 0);
-      TEST_CHECK_EQUAL(vertex_coord_tuples[2][1], 1);
-      TEST_CHECK_EQUAL(vertex_coord_tuples[3][0], 1);
-      TEST_CHECK_EQUAL(vertex_coord_tuples[3][1], 1);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[0][0], 0u);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[0][1], 0u);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[1][0], 1u);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[1][1], 0u);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[2][0], 0u);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[2][1], 1u);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[3][0], 1u);
+      TEST_CHECK_EQUAL(vertex_coord_tuples[3][1], 1u);
 
       delete[] size_set;
     }

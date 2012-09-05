@@ -76,7 +76,7 @@ namespace FEAST
 
         IndexType_ size()
         {
-          return _halo_elements.size();
+          return IndexType_(_halo_elements.size());
         }
 
         MeshType_ & get_mesh()

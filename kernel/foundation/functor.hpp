@@ -229,7 +229,7 @@ namespace FEAST
 
           if(_functors.size() != 0)
           {
-            Index i(_functors.size() - 1);
+            Index i(Index(_functors.size()) - 1);
             while(true)
             {
               _functors.at(i)->undo();
@@ -250,7 +250,7 @@ namespace FEAST
 
         Index size()
         {
-          return _functors.size();
+          return Index(_functors.size());
         }
 
         CompoundFunctor& operator=(const CompoundFunctor& rhs)

@@ -37,8 +37,8 @@ public:
 
   virtual void run() const
   {
-    DenseVector<Tag_, DT_> a(10, 7.);
-    DenseVector<Tag_, DT_> b(10, 5.);
+    DenseVector<Tag_, DT_> a(10, DT_(7));
+    DenseVector<Tag_, DT_> b(10, DT_(5));
     b(7, DT_(42));
     DenseVector<Tag_, DT_> c(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
@@ -50,7 +50,7 @@ public:
     list.push_back(c);
     DenseVector<Tag_, DT_> d = a;
     list.push_back(d);
-    DenseVector<Tag_, DT_> e(10, 42.);
+    DenseVector<Tag_, DT_> e(10, DT_(42));
     e = a;
     TEST_CHECK_EQUAL(e(5), a(5));
     TEST_CHECK_EQUAL(e, a);

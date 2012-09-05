@@ -60,12 +60,12 @@ namespace FEAST
 
         virtual Index size()
         {
-          return _data.size();
+          return Index(_data.size());
         }
 
         void push_back(DataType_ d)
         {
-            _data.push_back(d);
+          _data.push_back(d);
         }
 
         DataType_& at(Index i)

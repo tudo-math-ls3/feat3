@@ -27,7 +27,7 @@ public:
   {
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
-      DT_ s(4.321);
+      DT_ s(DT_(4.321));
       DenseVector<Arch_, DT_> a(size);
       DenseVector<Arch_, DT_> b(size);
       DenseVector<Arch_, DT_> ref(size);
