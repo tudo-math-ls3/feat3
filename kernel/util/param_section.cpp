@@ -125,7 +125,7 @@ namespace FEAST
     return iter->second;
   }
 
-  void ParamSection::parse(String filename)
+  void ParamSection::parse(String filename, bool replace)
   {
     CONTEXT("ParamSection::parse(String)");
 
@@ -141,7 +141,7 @@ namespace FEAST
     // parsing
     try
     {
-      parse(ifs);
+      parse(ifs, replace);
       ifs.close();
     }
     catch(ParamSection::SyntaxError& exc)
@@ -160,7 +160,7 @@ namespace FEAST
     }
   }
 
-  void ParamSection::parse(std::istream& ifs)
+  void ParamSection::parse(std::istream& ifs, bool replace)
   {
     CONTEXT("ParamSection::parse(std::ifstream&)");
 
@@ -220,7 +220,7 @@ namespace FEAST
           line.erase(0, 9);
 
           // parse the included file
-          current->parse(line.trim());
+          current->parse(line.trim(), replace);
 
           // okay
           continue;
@@ -285,7 +285,7 @@ namespace FEAST
         value = line.substr(found + 1);
         if(value.trim().empty())
         {
-          current->add_entry(key, value);
+          current->add_entry(key, value, replace);
           continue;
         }
 
@@ -330,7 +330,7 @@ namespace FEAST
         }
 
         // add the key-value pair
-        current->add_entry(key, value);
+        current->add_entry(key, value, replace);
       }
 
       else if(line == "{")

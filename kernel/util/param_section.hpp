@@ -265,17 +265,27 @@ namespace FEAST
      * \param[in] filename
      * The name of the file to be parsed.
      *
+     * \param[in] replace
+     * Specifies the behaviour when an entry with the same key already exists:
+     *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
+     *  - If \p replace = \c false, then the old value of the entry is kept.
+     *
      * \see ParamSection::parse(std::istream&)
      */
-    void parse(String filename);
+    void parse(String filename, bool replace = true);
 
     /**
      * \brief Parses an input stream.
      *
      * \param[in] ifs
      * A reference to an input stream to be parsed.
+     *
+     * \param[in] replace
+     * Specifies the behaviour when an entry with the same key already exists:
+     *  - If \p replace = \c true, then the old value of the entry is replaced by the new \p value
+     *  - If \p replace = \c false, then the old value of the entry is kept.
      */
-    void parse(std::istream& ifs);
+    void parse(std::istream& ifs, bool replace = true);
 
     /**
      * \brief Merges another ParamSection into \c this.
