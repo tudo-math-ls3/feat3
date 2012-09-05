@@ -41,13 +41,13 @@ namespace FEAST
             ++_num_non_zeros;
           }
 
-          const DT_ & at(unsigned long i)
+          const DT_ at(unsigned long i)
           {
             //todo in non-zero range check
             return _data(i);
           }
 
-          const DT_ & operator[](unsigned long i)
+          const DT_ operator[](unsigned long i)
           {
             //todo in non-zero range check
             return _data(i);
