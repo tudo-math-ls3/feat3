@@ -324,6 +324,9 @@
     <ClInclude Include="..\kernel\foundation\mesh_control.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\random.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
