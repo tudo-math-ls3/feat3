@@ -23,6 +23,7 @@ namespace FEAST
         Index * _col_ind;
         DT_ * _val;
         Index * _row_ptr;
+        Index * _row_ptr_end;
         Index _rows;
         Index _columns;
         DT_ _zero_element;
@@ -52,16 +53,19 @@ namespace FEAST
           this->_elements_size.push_back(_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
           this->_indices_size.push_back(_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((2 * _rows) * sizeof(Index)));
-          this->_indices_size.push_back(2 * _rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows) * sizeof(Index)));
+          this->_indices_size.push_back(_rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows) * sizeof(Index)));
+          this->_indices_size.push_back(_rows);
 
           _col_ind = this->_indices.at(0);
           _val = this->_elements.at(0);
           _row_ptr = this->_indices.at(1);
+          _row_ptr_end = this->_indices.at(2);
 
           Index ait(0);
           Index current_row(0);
-          _row_ptr[current_row * 2] = 0;
+          _row_ptr[current_row] = 0;
           for (typename std::map<unsigned long, DT_>::const_iterator it(other.elements().begin()) ; it != other.elements().end() ; ++it)
           {
             Index row(it->first / _columns);
@@ -69,24 +73,24 @@ namespace FEAST
 
             if (current_row < row)
             {
-              _row_ptr[current_row * 2 + 1] = ait;
+              _row_ptr_end[current_row] = ait;
               for (unsigned long i(current_row + 1) ; i < row ; ++i)
               {
-                _row_ptr[i * 2] = ait;
-                _row_ptr[(i * 2) + 1] = ait;
+                _row_ptr[i] = ait;
+                _row_ptr_end[i] = ait;
               }
               current_row = row;
-              _row_ptr[current_row * 2] = ait;
+              _row_ptr[current_row] = ait;
             }
             _val[ait] = it->second;
             _col_ind[ait] = column;
             ++ait;
           }
-          _row_ptr[current_row * 2 + 1] = ait;
+          _row_ptr_end[current_row] = ait;
           for (unsigned long i(current_row + 1) ; i < _rows ; ++i)
           {
-            _row_ptr[i * 2] = ait;
-            _row_ptr[i * 2 + 1] = ait;
+            _row_ptr[i] = ait;
+            _row_ptr_end[i] = ait;
           }
         }
 
@@ -110,12 +114,15 @@ namespace FEAST
           this->_elements_size.push_back(this->_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(tother.used_elements() * sizeof(Index)));
           this->_indices_size.push_back(this->_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(2 * _rows * sizeof(Index)));
-          this->_indices_size.push_back(2 * _rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
+          this->_indices_size.push_back(_rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
+          this->_indices_size.push_back(_rows);
 
           _col_ind = this->_indices.at(0);
           _val = this->_elements.at(0);
           _row_ptr = this->_indices.at(1);
+          _row_ptr_end = this->_indices.at(2);
 
           Index src_size(tother.get_elements_size().at(0) * sizeof(DT_));
           Index dest_size(tother.get_elements_size().at(0) * sizeof(DT_));
@@ -137,9 +144,16 @@ namespace FEAST
           MemoryPool<Arch2_>::download(temp, tother.get_indices().at(1), src_size);
           MemoryPool<Arch_>::upload(this->get_indices().at(1), temp, dest_size);
           ::free(temp);
+
+          src_size = (tother.get_indices_size().at(2) * sizeof(Index));
+          dest_size = (tother.get_indices_size().at(2) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, tother.get_indices().at(2), src_size);
+          MemoryPool<Arch_>::upload(this->get_indices().at(2), temp, dest_size);
+          ::free(temp);
         }
 
-        explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & col_ind, const DenseVector<Arch_, DT_> & val, const DenseVector<Arch_, Index> & row_ptr) :
+        explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & col_ind, const DenseVector<Arch_, DT_> & val, const DenseVector<Arch_, Index> & row_ptr, const DenseVector<Arch_, Index> & row_ptr_end) :
           Container<Arch_, DT_>(rows * columns),
           _rows(rows),
           _columns(columns),
@@ -153,6 +167,8 @@ namespace FEAST
           copy(tval, val);
           DenseVector<Arch_, Index> trow_ptr(row_ptr.size());
           copy(trow_ptr, row_ptr);
+          DenseVector<Arch_, Index> trow_ptr_end(row_ptr_end.size());
+          copy(trow_ptr_end, row_ptr_end);
 
           this->_elements.push_back(tval.get_elements().at(0));
           this->_elements_size.push_back(tval.size());
@@ -160,10 +176,13 @@ namespace FEAST
           this->_indices_size.push_back(tcol_ind.size());
           this->_indices.push_back(trow_ptr.get_elements().at(0));
           this->_indices_size.push_back(trow_ptr.size());
+          this->_indices.push_back(trow_ptr_end.get_elements().at(0));
+          this->_indices_size.push_back(trow_ptr_end.size());
 
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
           this->_row_ptr = this->_indices.at(1);
+          this->_row_ptr_end = this->_indices.at(2);
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
@@ -181,6 +200,7 @@ namespace FEAST
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
           this->_row_ptr = this->_indices.at(1);
+          this->_row_ptr_end = this->_indices.at(2);
         }
 
         template <typename Arch2_, typename DT2_>
@@ -194,6 +214,7 @@ namespace FEAST
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
           this->_row_ptr = this->_indices.at(1);
+          this->_row_ptr_end = this->_indices.at(2);
         }
 
         SparseMatrixCSR<Arch_, DT_> & operator= (const SparseMatrixCSR<Arch_, DT_> & other)
@@ -228,6 +249,7 @@ namespace FEAST
           _col_ind = this->_indices.at(0);
           _val = this->_elements.at(0);
           _row_ptr = this->_indices.at(1);
+          _row_ptr_end = this->_indices.at(2);
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
@@ -260,12 +282,15 @@ namespace FEAST
           this->_elements_size.push_back(this->_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(other.used_elements() * sizeof(Index)));
           this->_indices_size.push_back(this->_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(2 * _rows * sizeof(Index)));
-          this->_indices_size.push_back(2 * _rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
+          this->_indices_size.push_back(_rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
+          this->_indices_size.push_back(_rows);
 
           _col_ind = this->_indices.at(0);
           _val = this->_elements.at(0);
           _row_ptr = this->_indices.at(1);
+          _row_ptr_end = this->_indices.at(2);
 
           Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
           Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
@@ -288,6 +313,13 @@ namespace FEAST
           MemoryPool<Arch_>::upload(this->get_indices().at(1), temp, dest_size);
           ::free(temp);
 
+          src_size = (other.get_indices_size().at(2) * sizeof(Index));
+          dest_size = (other.get_indices_size().at(2) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Arch2_>::download(temp, other.get_indices().at(2), src_size);
+          MemoryPool<Arch_>::upload(this->get_indices().at(2), temp, dest_size);
+          ::free(temp);
+
           return *this;
         }
 
@@ -298,7 +330,7 @@ namespace FEAST
 
           if (typeid(Arch_) == typeid(Archs::CPU))
           {
-            for (unsigned long i(_row_ptr[row * 2]) ; i < _row_ptr[(row * 2) + 1] ; ++i)
+            for (unsigned long i(_row_ptr[row]) ; i < _row_ptr_end[row] ; ++i)
             {
               if (_col_ind[i] == col)
                 return _val[i];
@@ -342,6 +374,11 @@ namespace FEAST
         Index * row_ptr() const
         {
           return _row_ptr;
+        }
+
+        Index * row_ptr_end() const
+        {
+          return _row_ptr_end;
         }
 
         const DT_ zero_element() const
