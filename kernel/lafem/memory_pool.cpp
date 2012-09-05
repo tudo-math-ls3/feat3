@@ -14,12 +14,15 @@ MemoryPool<Archs::CPU>::MemoryPool()
 MemoryPool<Archs::CPU>::~MemoryPool()
 {
   if (_pool.size() > 0)
-    throw InternalError("Memory Pool still contains memory chunks!");
+    throw InternalError("MemoryPool<CPU> still contains memory chunks!");
 }
 
 void * MemoryPool<Archs::CPU>::allocate_memory(Index bytes)
 {
-  void * memory(::malloc(bytes));
+  void * memory(NULL);
+  memory = ::malloc(bytes);
+  if (memory == NULL)
+    throw InternalError("MemoryPool<CPU> allocation error!");
   Intern::MemoryInfo mi;
   mi.counter = 1;
   mi.size = bytes;
@@ -32,7 +35,7 @@ void MemoryPool<Archs::CPU>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("Memory address not found!");
+    throw InternalError("MemoryPool<CPU>::increase_memory: Memory address not found!");
   else
   {
     it->second.counter = it->second.counter + 1;
@@ -43,7 +46,7 @@ void MemoryPool<Archs::CPU>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("Memory address not found!");
+    throw InternalError("MemoryPool<CPU>::release_memory: Memory address not found!");
   else
   {
     if(it->second.counter == 1)

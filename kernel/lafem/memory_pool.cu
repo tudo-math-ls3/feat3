@@ -30,19 +30,20 @@ MemoryPool<Archs::GPU>::MemoryPool()
 MemoryPool<Archs::GPU>::~MemoryPool()
 {
   if (_pool.size() > 0)
-    throw InternalError("Memory Pool still contains memory chunks!");
+    throw InternalError("Memory Pool<GPU> still contains memory chunks!");
 }
 
 void * MemoryPool<Archs::GPU>::allocate_memory(Index bytes)
 {
   void * memory(NULL);
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, bytes))
-    throw InternalError("GPU Allocation Error");
+    throw InternalError("MemoryPool<GPU> cuda allocation error");
+  if (memory == NULL)
+    throw InternalError("MemoryPool<GPU> allocation error!");
   Intern::MemoryInfo mi;
   mi.counter = 1;
   mi.size = bytes;
   _pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
-
   return memory;
 }
 
@@ -50,7 +51,7 @@ void MemoryPool<Archs::GPU>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("Memory address not found!");
+    throw InternalError("MemoryPool<GPU>::increase_memory: Memory address not found!");
   else
   {
     it->second.counter = it->second.counter + 1;
@@ -61,7 +62,7 @@ void MemoryPool<Archs::GPU>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("Memory address not found!");
+    throw InternalError("MemoryPool<GPU>::relase_memory: Memory address not found!");
   else
   {
     if(it->second.counter == 1)
