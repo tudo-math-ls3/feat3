@@ -478,7 +478,7 @@ namespace FEAST
 
     /**
      * \brief Calculates the absolute-sum norm of a complex vector.
-     * \copydetails vec_norm_asum(const size_t n, const TypeX_ x[])
+     * \copydetails vec_norm_asum(const TypeSize_ n, const TypeX_ x[])
      */
     template<
       typename TypeReal_,
@@ -538,7 +538,7 @@ namespace FEAST
 
     /**
      * \brief Calculates the euclid norm of a complex vector.
-     * \copydetails vec_norm_euclid(const size_t n, const TypeX_ x[])
+     * \copydetails vec_norm_euclid(const TypeSize_ n, const TypeX_ x[])
      */
     template<
       typename TypeReal_,
@@ -601,7 +601,7 @@ namespace FEAST
 
     /**
      * \brief Calculates the maximum norm of a complex vector.
-     * \copydetails vec_norm_max(const size_t n, const TypeX_ x[])
+     * \copydetails vec_norm_max(const TypeSize_ n, const TypeX_ x[])
      */
     template<
       typename TypeReal_,
@@ -628,6 +628,8 @@ namespace FEAST
     /**
      * \brief Clears a dense matrix.
      *
+     * This function clears a dense matrix, i.e. sets all entries of a matrix to a specified value.
+     *
      * \param[in] m
      * The number of rows of \p a.
      *
@@ -642,6 +644,8 @@ namespace FEAST
      *
      * \param[in] alpha
      * The value to which the entries of \p a are to be set to.
+     *
+     * \see vec_clear
      *
      * \author Peter Zajac
      */
@@ -790,13 +794,13 @@ namespace FEAST
      * Specifies whether the input matrix is to be transposed or not.
      *
      * \li <c>trans_a_ = false</c>: <em>OP(A) = A</em>
-     * \li <c>trans_a_ = true</c>: <em>OP(A) = A^T</em>
+     * \li <c>trans_a_ = true </c>: <em>OP(A) = A^T</em>
      *
      * \param[in] m
-     * The number of rows of \e B.
+     * The number of rows of \e B and the number of rows of <em>OP(A)</em>, respectively.
      *
      * \param[in] n
-     * The number of columns of \e B.
+     * The number of columns of \e B and the number of columns of <em>OP(A)</em>, respectively.
      *
      * \param[in] stride_b
      * The stride of \e B.
@@ -909,11 +913,17 @@ namespace FEAST
      * This function performs a deep swap of two dense matrices.
      * \f[ B :=: OP(A) \f]
      *
+     * \tparam trans_a_
+     * Specifies whether the matrix A is to be transposed or not.
+     *
+     * \li <c>trans_a_ = false</c>: <em>OP(A) = A</em>
+     * \li <c>trans_a_ = true </c>: <em>OP(A) = A^T</em>
+     *
      * \param[in] m
-     * The number of rows of \e B.
+     * The number of rows of \e B and the number of rows of <em>OP(A)</em>, respectively.
      *
      * \param[in] n
-     * The number of columns of \E B.
+     * The number of columns of \e B and the number of columns of <em>OP(A)</em>, respectively.
      *
      * \param[in] stride_a
      * The stride of \e A.
@@ -926,6 +936,8 @@ namespace FEAST
      *
      * \param[in,out] b
      * The m-by-n matrix \e B that is to be swapped with \e A.
+     *
+     * \see vec_swap
      *
      * \author Peter Zajac
      */
@@ -954,6 +966,7 @@ namespace FEAST
     /**
      * \brief Scales a dense matrix.
      *
+     * This function performs the following operation:
      * \f[ A := \alpha\cdot A\f]
      *
      * \param[in] m
@@ -970,6 +983,8 @@ namespace FEAST
      *
      * \param[in] alpha
      * The scaling factor.
+     *
+     * \see vec_scale
      *
      * \author Peter Zajac
      */
@@ -1077,11 +1092,17 @@ namespace FEAST
      * This function performs the following operation:
      *   \f[ B := B + \alpha\cdot OP(A) \f]
      *
+     * \tparam trans_a_
+     * Specifies whether the input matrix is to be transposed or not.
+     *
+     * \li <c>trans_a_ = false</c>: <em>OP(A) = A</em>
+     * \li <c>trans_a_ = true </c>: <em>OP(A) = A^T</em>
+     *
      * \param[in] m
-     * The number of rows of \e B.
+     * The number of rows of \e B and the number of rows of <em>OP(A)</em>, respectively.
      *
      * \param[in] n
-     * The number of columns of \e B.
+     * The number of columns of \e B and the number of columns of <em>OP(A)</em>, respectively.
      *
      * \param[in] stride_b
      * The stride of \e B.
@@ -1097,6 +1118,8 @@ namespace FEAST
      *
      * \param[in] alpha
      * The scaling factor.
+     *
+     * \see vec_axpy
      *
      * \author Peter Zajac
      */
@@ -1282,14 +1305,22 @@ namespace FEAST
      * This function performs the following operation:
      * \f[ C := C + \alpha \cdot OP(A) \cdot OP(B) \f]
      *
+     * \tparam trans_a_, trans_b_
+     * Specifies whether the matrices \p A and \p B are to be transposed or not.
+     *
+     * \li <c>trans_a_ = false</c>: <em>OP(A) = A</em>
+     * \li <c>trans_a_ = true </c>: <em>OP(A) = A^T</em>
+     * \li <c>trans_b_ = false</c>: <em>OP(B) = B</em>
+     * \li <c>trans_b_ = true </c>: <em>OP(B) = B^T</em>
+     *
      * \param[in] m
-     * The number of rows of \e C.
+     * The number of rows of \e C and the number or rows of <em>OP(A)</em>, respectively.
      *
      * \param[in] n
-     * The number of columns of \e C.
+     * The number of columns of \e C and the number or columns of <em>OP(B)</em>, respectively.
      *
      * \param[in] l
-     * TODO
+     * The number of columns of <em>OP(A)</em> and the number of rows of <em>OP(B)</em>, respectively.
      *
      * \param[in] stride_c
      * The stride of \e C.
@@ -1411,11 +1442,17 @@ namespace FEAST
      * This function performs the following operation:
      * \f[ y := y + \alpha \cdot OP(A) \cdot x \f]
      *
+     * \tparam trans_a_
+     * Specifies whether the matrix \e A is to be transposed or not.
+     *
+     * \li <c>trans_a_ = false</c>: <em>OP(A) = A</em>
+     * \li <c>trans_a_ = true </c>: <em>OP(A) = A^T</em>
+     *
      * \param[in] m
-     * The length of \e x.
+     * The length of \e y and the number of rows of <em>OP(A)</em>, respectively.
      *
      * \param[in] n
-     * The length of \e y.
+     * The length of \e x and the number of columns of <em>OP(A)</em>, respectively.
      *
      * \param[in] stride_a
      * The stride of \e A.
@@ -1501,7 +1538,7 @@ namespace FEAST
 
     /**
      * \brief Calculates the row-sum norm of a complex matrix.
-     * \copydetails mat_norm_row_sum(const size_t m, const size_t n, const size_t stride, const TypeA_ a[])
+     * \copydetails mat_norm_row_sum(const TypeSize_ m, const TypeSize_ n, const TypeSize_ stride, const TypeA_ a[])
      */
     template<
       typename TypeReal_,
@@ -1569,7 +1606,7 @@ namespace FEAST
 
     /**
      * \brief Calculates the Forbenius norm of a complex matrix.
-     * \copydetails mat_norm_frobenius(const size_t m, const size_t n, const size_t stride, const TypeA_ a[])
+     * \copydetails mat_norm_frobenius(const TypeSize_ m, const TypeSize_ n, const TypeSize_ stride, const TypeA_ a[])
      */
     template<
       typename TypeReal_,
@@ -1637,7 +1674,7 @@ namespace FEAST
 
     /**
      * \brief Calculates the maximum-norm of a complex matrix.
-     * \copydetails mat_norm_max(const size_t m, const size_t n, const size_t stride, const TypeA_ a[])
+     * \copydetails mat_norm_max(const TypeSize_ m, const TypeSize_ n, const TypeSize_ stride, const TypeA_ a[])
      */
     template<
       typename TypeReal_,
@@ -1888,6 +1925,8 @@ namespace FEAST
      * \param[in] p
      * The pivot array of the PLU factorisation, as returned by #mat_factorise.
      *
+     * \see mat_solve_mat
+     *
      * \author Peter Zajac
      */
     template<
@@ -2043,6 +2082,8 @@ namespace FEAST
      *
      * \param[in] p
      * The pivot array of the PLU factorisation, as returned by #mat_factorise.
+     *
+     * \see mat_solve_vec
      *
      * \author Peter Zajac
      */
@@ -2296,14 +2337,24 @@ namespace FEAST
     /**
      * \brief Calculates the (generalised) matrix determinant.
      *
+     * For square matrices, this function computes the determinant of a matrix.\n
+     * For non-square matrices, this function computes the generalised determinant of a matrix, i.e.
+     * \f[ \sqrt{\det(A^\top \cdot A)} \f]
+     *
+     * Currently, this function supports only the following matrix dimensions:
+     * \li Determinant: <c>n</c>-by-<c>n</c> for <c>1 <= n <= 6</c>
+     * \li Generalised Determinant: 2x1, 3x1, 3x2
+     *
      * \tparam m_, n_
      * The dimensions of the matrix whose determinant is to be computed.
      *
      * \param[in] a
-     * The matrix whose determinant is to be computed.
+     * The matrix whose (generalised) determinant is to be computed.
      *
      * \returns
      * The (generalised) determinant of \p a.
+     *
+     * \author Peter Zajac
      */
     template<
       int m_,

@@ -97,7 +97,11 @@ namespace FEAST
     {
     }
 
-    /// Returns a reference to the first character in the string.
+    /**
+     * \brief Returns a reference to the first character in the string.
+     * \returns
+     * A reference to the first character in the string.
+     */
     reference front()
     {
       return at(0);
@@ -109,7 +113,11 @@ namespace FEAST
       return at(0);
     }
 
-    /// Returns a reference to the last character in the string.
+    /**
+     * \brief Returns a reference to the last character in the string.
+     * \returns
+     * A reference to the last character in the string.
+     */
     reference back()
     {
       return at(size() - 1);
@@ -121,7 +129,12 @@ namespace FEAST
       return at(size() - 1);
     }
 
-    /// Inserts a character at the front of the string.
+    /**
+     * \brief Inserts a character at the front of the string.
+     *
+     * \param[in] value
+     * The character to the pushed.
+     */
     void push_front(char value)
     {
       insert(0, 1, value);

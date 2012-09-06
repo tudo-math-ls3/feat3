@@ -94,7 +94,7 @@ namespace FEAST
     /**
      * \brief Comparison operator.
      *
-     * \param[int] other
+     * \param[in] other
      * Another time-stamp.
      *
      * \returns
