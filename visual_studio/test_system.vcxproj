@@ -476,6 +476,7 @@
     <ClCompile Include="..\kernel\util\factorial-test.cpp" />
     <ClCompile Include="..\kernel\util\graph-test.cpp" />
     <ClCompile Include="..\kernel\util\inheritance-test.cpp" />
+    <ClCompile Include="..\kernel\util\linear_algebra-test.cpp" />
     <ClCompile Include="..\kernel\util\param_section-test.cpp" />
     <ClCompile Include="..\test_system\test_system-test.cpp" />
     <ClCompile Include="..\test_system\test_system.cpp" />

@@ -208,5 +208,8 @@
     <ClCompile Include="..\kernel\foundation\mesh_control-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\util\linear_algebra-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

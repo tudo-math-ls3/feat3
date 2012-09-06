@@ -10,7 +10,14 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 ADD_LIBRARY(kernel-util STATIC exception.cpp param_section.cpp)
 
 #list of util tests
-SET (test_list assertion-test factorial-test graph-test inheritance-test param_section-test)
+SET (test_list
+  assertion-test
+  factorial-test
+  graph-test
+  inheritance-test
+  linear_algebra-test
+  param_section-test
+)
 
 #create all tests
 FOREACH (test ${test_list} )
