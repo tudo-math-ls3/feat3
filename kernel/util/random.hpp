@@ -143,14 +143,14 @@ namespace FEAST
       return *this;
     }
 
-    /** \copydoc operator>>(double&) */
-    Random& operator>>(long double& x)
+    /* \copydoc operator>>(double&) */
+    /*Random& operator>>(long double& x)
     {
       double d(0.0);
       this->operator>>(d);
       x = long double(d);
       return *this;
-    }
+    }*/
 
     /** \copydoc operator>>(double&) */
     Random& operator>>(float& x)
