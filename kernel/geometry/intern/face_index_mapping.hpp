@@ -1,17 +1,19 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_CONGRUENCY_LOCAL_INDEX_MAPPING_HPP
-#define KERNEL_GEOMETRY_CONGRUENCY_LOCAL_INDEX_MAPPING_HPP 1
+#ifndef KERNEL_GEOMETRY_INTERN_FACE_INDEX_MAPPING_HPP
+#define KERNEL_GEOMETRY_INTERN_FACE_INDEX_MAPPING_HPP 1
 
+// includes, FEAST
 #include <kernel/geometry/shape.hpp>
 
 namespace FEAST
 {
   namespace Geometry
   {
-    namespace Congruency
+    /// \cond internal
+    namespace Intern
     {
       /**
-       * \brief Local index mapping class template
+       * \brief Face index mapping class template
        *
        * \todo detailed description
        *
@@ -22,18 +24,17 @@ namespace FEAST
         int cell_dim_,
         int face_dim_>
 #ifndef DOXYGEN
-      class LocalIndexMapping;
+      class FaceIndexMapping;
 #else
-      class LocalIndexMapping
+      class FaceIndexMapping
       {
       public:
         static int map(int cell, int face);
       };
 #endif // DOXYGEN
 
-      /// \cond internal
       template<>
-      class LocalIndexMapping<Shape::Simplex<2>, 1, 0>
+      class FaceIndexMapping<Shape::Simplex<2>, 1, 0>
       {
       public:
         static int map(int cell, int face)
@@ -48,10 +49,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Simplex<2>, 1, 0>
+      }; // FaceIndexMapping<Simplex<2>, 1, 0>
 
       template<>
-      class LocalIndexMapping<Shape::Simplex<3>, 1, 0>
+      class FaceIndexMapping<Shape::Simplex<3>, 1, 0>
       {
       public:
         static int map(int cell, int face)
@@ -69,10 +70,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Simplex<3>, 1, 0>
+      }; // FaceIndexMapping<Simplex<3>, 1, 0>
 
       template<>
-      class LocalIndexMapping<Shape::Simplex<3>, 2, 0>
+      class FaceIndexMapping<Shape::Simplex<3>, 2, 0>
       {
       public:
         static int map(int cell, int face)
@@ -88,10 +89,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Simplex<3>, 2, 0>
+      }; // FaceIndexMapping<Simplex<3>, 2, 0>
 
       template<>
-      class LocalIndexMapping<Shape::Simplex<3>, 2, 1>
+      class FaceIndexMapping<Shape::Simplex<3>, 2, 1>
       {
       public:
         static int map(int cell, int face)
@@ -107,10 +108,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Simplex<3>, 2, 0>
+      }; // FaceIndexMapping<Simplex<3>, 2, 0>
 
       template<>
-      class LocalIndexMapping<Shape::Hypercube<2>, 1, 0>
+      class FaceIndexMapping<Shape::Hypercube<2>, 1, 0>
       {
       public:
         static int map(int cell, int face)
@@ -126,10 +127,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Hypercube<2>, 1, 0>
+      }; // FaceIndexMapping<Hypercube<2>, 1, 0>
 
       template<>
-      class LocalIndexMapping<Shape::Hypercube<3>, 1, 0>
+      class FaceIndexMapping<Shape::Hypercube<3>, 1, 0>
       {
       public:
         static int map(int cell, int face)
@@ -153,10 +154,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Shape::Hypercube<3>, 1, 0>
+      }; // FaceIndexMapping<Shape::Hypercube<3>, 1, 0>
 
       template<>
-      class LocalIndexMapping<Shape::Hypercube<3>, 2, 0>
+      class FaceIndexMapping<Shape::Hypercube<3>, 2, 0>
       {
       public:
         static int map(int cell, int face)
@@ -174,10 +175,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Shape::Hypercube<3>, 2, 0>
+      }; // FaceIndexMapping<Shape::Hypercube<3>, 2, 0>
 
       template<>
-      class LocalIndexMapping<Shape::Hypercube<3>, 2, 1>
+      class FaceIndexMapping<Shape::Hypercube<3>, 2, 1>
       {
       public:
         static int map(int cell, int face)
@@ -195,10 +196,10 @@ namespace FEAST
           };
           return indices[cell][face];
         }
-      }; // LocalIndexMapping<Shape::Hypercube<3>, 2, 1>
-      /// \endcond
-    } // namespace Congruency
+      }; // FaceIndexMapping<Shape::Hypercube<3>, 2, 1>
+    } // namespace Intern
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_CONGRUENCY_LOCAL_INDEX_MAPPING_HPP
+#endif // KERNEL_GEOMETRY_INTERN_FACE_INDEX_MAPPING_HPP

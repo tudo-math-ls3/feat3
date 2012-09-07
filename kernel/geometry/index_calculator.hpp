@@ -3,8 +3,8 @@
 #define KERNEL_GEOMETRY_INDEX_CALCULATOR_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/congruency/index_representative.hpp>
-#include <kernel/geometry/congruency/local_index_mapping.hpp>
+#include <kernel/geometry/intern/index_representative.hpp>
+#include <kernel/geometry/intern/face_index_mapping.hpp>
 #include <kernel/util/exception.hpp>
 
 // includes, system
@@ -153,7 +153,7 @@ namespace FEAST
 
         // calculate representative
         IndexVector representative;
-        Congruency::IndexRepresentative<Shape_>::compute(representative, index_vector);
+        Intern::IndexRepresentative<Shape_>::compute(representative, index_vector);
 
         // get the corresponding representative set
         const RepSet& rep_set = _rep_set_vec[representative[0]];
@@ -182,7 +182,7 @@ namespace FEAST
 
         // calculate representative
         IndexVector representative;
-        Congruency::IndexRepresentative<Shape_>::compute(representative, index_vector);
+        Intern::IndexRepresentative<Shape_>::compute(representative, index_vector);
 
         // insert representative
         Index first_index = representative[0];
@@ -285,7 +285,7 @@ namespace FEAST
 
         // index vector reference
         typedef typename IndexSetIn_::ConstIndexVectorReference ConstIndexVectorRefIn;
-        typedef Congruency::LocalIndexMapping<Shape_, face_dim_, 0> Lim;
+        typedef Intern::FaceIndexMapping<Shape_, face_dim_, 0> FimType;
 
         // fetch number of shapes
         const Index num_entities = index_set_in.get_num_entities();
@@ -305,7 +305,7 @@ namespace FEAST
             // loop over all indices of the cell-vertex-vector
             for(int k(0); k < IndexTreeType::num_indices; ++k)
             {
-              current_face_indices[k]  = current_cell_in[Lim::map(j, k)];
+              current_face_indices[k]  = current_cell_in[FimType::map(j, k)];
             }
 
             // try to find the index of the vector within the tree

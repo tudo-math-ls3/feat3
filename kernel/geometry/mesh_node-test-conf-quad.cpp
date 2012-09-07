@@ -5,6 +5,7 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
+using namespace FEAST::Geometry::TestAux;
 
 
 typedef StandardConformalMeshNodePolicy<Shape::Quadrilateral> MeshNodePolicy;
@@ -39,22 +40,22 @@ public:
   void refine_tree_test() const
   {
     // create coarse root mesh
-    RootMeshType* root_mesh_c = TestAux::create_tetris_mesh_2d();
+    RootMeshType* root_mesh_c = create_tetris_mesh_2d();
 
     // create coarse quad submesh
-    SubMeshType* submesh_quad_c = TestAux::create_tetris_quad_submesh_2d();
+    SubMeshType* submesh_quad_c = create_tetris_quad_submesh_2d();
 
     // create coarse edge submesh
-    SubMeshType* submesh_edge_c = TestAux::create_tetris_edge_submesh_2d();
+    SubMeshType* submesh_edge_c = create_tetris_edge_submesh_2d();
 
     // create coarse edge submesh
-    SubMeshType* submesh_quad_edge_c = TestAux::create_tetris_quad_edge_submesh_2d();
+    SubMeshType* submesh_quad_edge_c = create_tetris_quad_edge_submesh_2d();
 
     // create coarse cell subset
-    CellSubSetType* subset_quad_c = TestAux::create_tetris_quad_cellsubset_2d();
+    CellSubSetType* subset_quad_c = create_tetris_quad_cellsubset_2d();
 
     // create coarse cell subset
-    CellSubSetType* subset_quad_edge_c = TestAux::create_tetris_quad_edge_cellsubset_2d();
+    CellSubSetType* subset_quad_edge_c = create_tetris_quad_edge_cellsubset_2d();
 
     /* ********************************************************************* */
 
@@ -113,22 +114,22 @@ public:
     try
     {
       // validate refined root mesh
-      TestAux::validate_refined_tetris_mesh_2d(*root_node_f->get_mesh());
+      validate_refined_tetris_mesh_2d(*root_node_f->get_mesh());
 
       // validate refined quad submesh
-      TestAux::validate_refined_tetris_quad_submesh_2d(*subnode_quad_f->get_mesh());
+      validate_refined_tetris_quad_submesh_2d(*subnode_quad_f->get_mesh());
 
       // validate refined edge submesh
-      TestAux::validate_refined_tetris_edge_submesh_2d(*subnode_edge_f->get_mesh());
+      validate_refined_tetris_edge_submesh_2d(*subnode_edge_f->get_mesh());
 
       // validate refined quad-edge submesh
-      TestAux::validate_refined_tetris_quad_edge_submesh_2d(*subnode_quad_edge_f->get_mesh());
+      validate_refined_tetris_quad_edge_submesh_2d(*subnode_quad_edge_f->get_mesh());
 
       // validate refined quad cell subset
-      TestAux::validate_refined_tetris_quad_cellsubset_2d(*subsetnode_quad_f->get_subset());
+      validate_refined_tetris_quad_cellsubset_2d(*subsetnode_quad_f->get_subset());
 
       // validate refined quad-edge cell subset
-      TestAux::validate_refined_tetris_quad_edge_cellsubset_2d(*subsetnode_quad_edge_f->get_subset());
+      validate_refined_tetris_quad_edge_cellsubset_2d(*subsetnode_quad_edge_f->get_subset());
     }
     catch(const String& msg)
     {

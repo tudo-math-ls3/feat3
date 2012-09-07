@@ -5,7 +5,6 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
-using namespace FEAST::Geometry::Structured;
 
 typedef StructuredMeshPolicy<2> StructMeshPolicy;
 

@@ -1,17 +1,17 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_CONGRUENCY_TARGET_INDEX_MAPPING_HPP
-#define KERNEL_GEOMETRY_CONGRUENCY_TARGET_INDEX_MAPPING_HPP 1
+#ifndef KERNEL_GEOMETRY_INTERN_TARGET_INDEX_MAPPING_HPP
+#define KERNEL_GEOMETRY_INTERN_TARGET_INDEX_MAPPING_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/congruency/local_index_mapping.hpp>
-#include <kernel/geometry/congruency/hypercube.hpp>
-#include <kernel/geometry/congruency/simplex.hpp>
+#include <kernel/geometry/intern/congurency_mapping.hpp>
+//#include <kernel/geometry/intern/face_index_mapping.hpp>
 
 namespace FEAST
 {
   namespace Geometry
   {
-    namespace Congruency
+    /// \cond internal
+    namespace Intern
     {
       /**
        * \brief Target-Index Mapping class template
@@ -69,7 +69,7 @@ namespace FEAST
           const SrcVerts_& source_verts,
           const VertIdx_& vert_idx)
         {
-          typedef Sampler<Shape_> SamplerType;
+          typedef CongruencySampler<Shape_> SamplerType;
 
           CompIndexMap<SrcVerts_, VertIdx_> comp_index_map(source_verts, vert_idx);
 
@@ -78,11 +78,12 @@ namespace FEAST
 
         int map(int face) const
         {
-          return IndexMapping<Shape_, face_dim_>::map(_cell_orient, face);
+          return CongruencyMapping<Shape_, face_dim_>::map(_cell_orient, face);
         }
       }; // class TargetIndexMapping
-    } // namespace Congruency
+    } // namespace Intern
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_CONGRUENCY_TARGET_INDEX_MAPPING_HPP
+#endif // KERNEL_GEOMETRY_INTERN_TARGET_INDEX_MAPPING_HPP

@@ -1,10 +1,9 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_STRUCTURED_VERTEX_REFINER_HPP
-#define KERNEL_GEOMETRY_STRUCTURED_VERTEX_REFINER_HPP 1
+#ifndef KERNEL_GEOMETRY_INTERN_STRUCTURED_VERTEX_REFINER_HPP
+#define KERNEL_GEOMETRY_INTERN_STRUCTURED_VERTEX_REFINER_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/vertex_set.hpp>
-#include <kernel/geometry/vertex_abacus.hpp>
+#include <kernel/geometry/intern/vertex_abacus.hpp>
 
 namespace FEAST
 {
@@ -15,21 +14,21 @@ namespace FEAST
      *
      * This namespace encapsulates classes relates to the implementation of the structured mesh.
      */
-    namespace Structured
+    namespace Intern
     {
       /// \cond internal
       template<
         typename Shape_,
         typename VertexSet_>
-      class VertexRefiner;
+      class StructuredVertexRefiner;
 
       /**
-       * \brief Structured VertexRefiner implementation for Hypercube<1>
+       * \brief Structured StructuredVertexRefiner implementation for Hypercube<1>
        *
        * \author Peter Zajac
        */
       template<typename VertexSet_>
-      class VertexRefiner<Shape::Hypercube<1>, VertexSet_>
+      class StructuredVertexRefiner<Shape::Hypercube<1>, VertexSet_>
       {
       public:
         typedef VertexSet_ VertexSetType;
@@ -39,7 +38,7 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const Index num_slices_coarse[])
         {
-          CONTEXT("VertexRefiner<Hypercube<1>,...>::refine");
+          CONTEXT("StructuredVertexRefiner<Hypercube<1>,...>::refine");
 
           // create a vertex-abacus object
           VertexAbacus<VertexSetType> abacus(vertex_set_in);
@@ -60,16 +59,16 @@ namespace FEAST
             abacus.copy(vertex_set_out[2*i + 2], vertex_set_in[i + 1]);
           }
         }
-      }; // class VertexRefiner<Hypercube<1>,...>
+      }; // class StructuredVertexRefiner<Hypercube<1>,...>
 
 
       /**
-       * \brief Structured VertexRefiner implementation for Hypercube<2>
+       * \brief Structured StructuredVertexRefiner implementation for Hypercube<2>
        *
        * \author Peter Zajac
        */
       template<typename VertexSet_>
-      class VertexRefiner<Shape::Hypercube<2>, VertexSet_>
+      class StructuredVertexRefiner<Shape::Hypercube<2>, VertexSet_>
       {
       public:
         typedef VertexSet_ VertexSetType;
@@ -79,7 +78,7 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const Index num_slices_coarse[])
         {
-          CONTEXT("VertexRefiner<Hypercube<2>,...>::refine");
+          CONTEXT("StructuredVertexRefiner<Hypercube<2>,...>::refine");
 
           // create a vertex-abacus object
           VertexAbacus<VertexSetType> abacus(vertex_set_in);
@@ -135,13 +134,13 @@ namespace FEAST
             }
           }
         }
-      }; // class VertexRefiner<Hypercube<2>,...>
+      }; // class StructuredVertexRefiner<Hypercube<2>,...>
 
        /**
-       * \brief Structured VertexRefiner implementation for Hypercube<3>
+       * \brief Structured StructuredVertexRefiner implementation for Hypercube<3>
        */
       template<typename VertexSet_>
-      class VertexRefiner<Shape::Hypercube<3>, VertexSet_>
+      class StructuredVertexRefiner<Shape::Hypercube<3>, VertexSet_>
       {
       public:
         typedef VertexSet_ VertexSetType;
@@ -151,7 +150,7 @@ namespace FEAST
           const VertexSetType& vertex_set_in,
           const Index num_slices_coarse[])
         {
-          CONTEXT("VertexRefiner<Hypercube<3>,...>::refine");
+          CONTEXT("StructuredVertexRefiner<Hypercube<3>,...>::refine");
 
           // create a vertex-abacus object
           VertexAbacus<VertexSetType> abacus(vertex_set_in);
@@ -280,11 +279,11 @@ namespace FEAST
             } // j-loop
           } //k-loop
         }
-      }; // class VertexRefiner<Hypercube<3>,...>
+      }; // class StructuredVertexRefiner<Hypercube<3>,...>
 
       /// \endcond
     } // namespace Structured
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_STRUCTURED_VERTEX_REFINER_HPP
+#endif // KERNEL_GEOMETRY_INTERN_STRUCTURED_VERTEX_REFINER_HPP

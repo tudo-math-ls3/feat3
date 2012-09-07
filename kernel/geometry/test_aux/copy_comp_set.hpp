@@ -3,9 +3,9 @@
 #define KERNEL_GEOMETRY_TEST_AUX_COPY_COMP_SET_HPP 1
 
 // includes, FEAST
+#include <kernel/geometry/index_set.hpp>
 #include <kernel/geometry/target_set.hpp>
 #include <kernel/geometry/vertex_set.hpp>
-#include <kernel/geometry/conformal/index_set.hpp>
 
 // includes, CSL
 #include <cmath>
@@ -18,7 +18,7 @@ namespace FEAST
     namespace TestAux
     {
       template<int num_idx_>
-      void copy_idx(Conformal::IndexSet<num_idx_>& idx, const Index jdx[])
+      void copy_idx(IndexSet<num_idx_>& idx, const Index jdx[])
       {
         Index n = idx.get_num_entities();
         size_t k = 0;
@@ -32,7 +32,7 @@ namespace FEAST
       }
 
       template<int num_idx_>
-      bool comp_idx(const Conformal::IndexSet<num_idx_>& idx, const Index jdx[])
+      bool comp_idx(const IndexSet<num_idx_>& idx, const Index jdx[])
       {
         Index n = idx.get_num_entities();
         size_t k = 0;

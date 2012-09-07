@@ -20,9 +20,6 @@
     <Filter Include="Source Files %28kernel%29\lafem">
       <UniqueIdentifier>{6254dac9-2899-4861-8c87-0c7f16d90aa6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files %28kernel%29\geometry\test_aux">
-      <UniqueIdentifier>{4eb0bace-ded0-453c-8c55-89bf6ee2f3cc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files %28test_system%29">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -33,13 +30,25 @@
     <Filter Include="Header Files %28kernel%29\geometry">
       <UniqueIdentifier>{d3dad62a-eca5-4500-b07e-915ba788f382}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files %28kernel%29\geometry\test_aux">
+      <UniqueIdentifier>{ff36d5fd-51a8-4ba8-bd19-be756c22f999}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files %28kernel%29\geometry\test_aux">
-      <UniqueIdentifier>{1f2442b1-d969-4158-97fe-98e7f7659887}</UniqueIdentifier>
+      <UniqueIdentifier>{6dc7740c-0b09-4e18-99bf-ff2aac3f5ea2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\test_system\test_system.hpp">
       <Filter>Header Files %28test_system%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp">
+      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\geometry\test_aux\standard_quad.hpp">
       <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
@@ -54,15 +63,6 @@
       <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\geometry\test_aux\tetris_quad.hpp">
-      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp">
-      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\index_calculator_meshes.hpp">
-      <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\geometry\test_aux\standard_hexa.hpp">
       <Filter>Header Files %28kernel%29\geometry\test_aux</Filter>
     </ClInclude>
   </ItemGroup>
@@ -172,6 +172,24 @@
     <ClCompile Include="..\kernel\geometry\mesh_node-test-conf-quad.cpp">
       <Filter>Source Files %28kernel%29\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\lafem\defect-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\richardson-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\bicgstab-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\scale-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\mesh_control-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\linear_algebra-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
     <ClCompile Include="..\kernel\geometry\test_aux\index_calculator_meshes.cpp">
       <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
     </ClCompile>
@@ -192,24 +210,6 @@
     </ClCompile>
     <ClCompile Include="..\kernel\geometry\test_aux\tetris_quad.cpp">
       <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\lafem\defect-test.cpp">
-      <Filter>Source Files %28kernel%29\lafem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\lafem\richardson-test.cpp">
-      <Filter>Source Files %28kernel%29\lafem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\lafem\bicgstab-test.cpp">
-      <Filter>Source Files %28kernel%29\lafem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\lafem\scale-test.cpp">
-      <Filter>Source Files %28kernel%29\lafem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\foundation\mesh_control-test.cpp">
-      <Filter>Source Files %28kernel%29\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\util\linear_algebra-test.cpp">
-      <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

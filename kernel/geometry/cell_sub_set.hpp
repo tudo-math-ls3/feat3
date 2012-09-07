@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_CELL_SUB_SET_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/conformal/standard_refinement/subset_refiner.hpp>
+#include <kernel/geometry/intern/standard_subset_refiner.hpp>
 
 namespace FEAST
 {
@@ -60,7 +60,6 @@ namespace FEAST
       CellSubSet* refine(const Parent_& parent) const
       {
         CONTEXT(name() + "::refine()");
-        using namespace Conformal::StandardRefinement;
 
         // get number of entities in coarse mesh
         Index num_entities_fine[BaseClass::shape_dim + 1];
@@ -72,13 +71,13 @@ namespace FEAST
         }
 
         // calculate number of entities in fine mesh
-        EntityCountWrapper<ShapeType>::query(num_entities_fine);
+        Intern::EntityCountWrapper<ShapeType>::query(num_entities_fine);
 
         // allocate a fine subset
         CellSubSet* fine_set = new CellSubSet(num_entities_fine);
 
         // refine subset target indices
-        SubSetRefineWrapper<ShapeType>::refine(*fine_set, num_entities_parent, *this);
+        Intern::SubSetRefineWrapper<ShapeType>::refine(*fine_set, num_entities_parent, *this);
 
         // return fine subset
         return fine_set;

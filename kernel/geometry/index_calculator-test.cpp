@@ -6,7 +6,6 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
-using namespace FEAST::Geometry::Conformal;
 using namespace FEAST::Geometry::TestAux;
 
 /**
@@ -183,7 +182,7 @@ public:
         throw String("Failed to compute quads-at-hexa index set");
 
       // check if everything is right
-      TestAux::validate_refined_tetris_mesh_3d(*mesh);
+      validate_refined_tetris_mesh_3d(*mesh);
 
       // clean up
       delete mesh;
@@ -251,7 +250,7 @@ public:
         throw String("Failed to compute trias-at-tetra index set");
 
       // check if everything is right
-      TestAux::validate_refined_big_tetra_mesh_3d(*mesh);
+      validate_refined_big_tetra_mesh_3d(*mesh);
 
       // clean up
       delete mesh;

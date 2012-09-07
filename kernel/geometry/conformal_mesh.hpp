@@ -3,12 +3,9 @@
 #define KERNEL_GEOMETRY_CONFORMAL_MESH_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/target_set.hpp>
-#include <kernel/geometry/vertex_set.hpp>
-#include <kernel/geometry/conformal/index_set.hpp>
-#include <kernel/geometry/conformal/standard_refinement/index_refine_wrappers.hpp>
-#include <kernel/geometry/conformal/standard_refinement/target_refine_wrappers.hpp>
-#include <kernel/geometry/conformal/standard_refinement/vertex_refine_wrappers.hpp>
+#include <kernel/geometry/intern/standard_index_refiner.hpp>
+#include <kernel/geometry/intern/standard_target_refiner.hpp>
+#include <kernel/geometry/intern/standard_vertex_refiner.hpp>
 
 namespace FEAST
 {
@@ -87,7 +84,7 @@ namespace FEAST
       typedef typename PolicyType::VertexSetType VertexSetType;
 
       /// index set holder type
-      typedef Conformal::IndexSetHolder<ShapeType> IndexSetHolderType;
+      typedef IndexSetHolder<ShapeType> IndexSetHolderType;
 
       /// dummy enum
       enum
@@ -116,7 +113,7 @@ namespace FEAST
 
         /// index set type
         typedef
-          FEAST::Geometry::Conformal::IndexSet<
+          FEAST::Geometry::IndexSet<
             Shape::FaceTraits<
               typename Shape::FaceTraits<
                 ShapeType,
@@ -263,7 +260,6 @@ namespace FEAST
       ConformalMesh* refine() const
       {
         CONTEXT(name() + "::refine()");
-        using namespace Conformal::StandardRefinement;
 
         // get number of coordinates and vertex stride
         int num_coords = _vertex_set.get_num_coords();
@@ -277,16 +273,18 @@ namespace FEAST
         }
 
         // calculate number of entities in fine mesh
-        EntityCountWrapper<ShapeType>::query(num_entities_fine);
+        Intern::EntityCountWrapper<ShapeType>::query(num_entities_fine);
 
         // allocate a fine mesh
         ConformalMesh* fine_mesh = new ConformalMesh(num_entities_fine, num_coords, vertex_stride);
 
         // refine vertices
-        VertexRefineWrapper<ShapeType, VertexSetType>::refine(fine_mesh->_vertex_set, _vertex_set, _index_set_holder);
+        Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
+          ::refine(fine_mesh->_vertex_set, _vertex_set, _index_set_holder);
 
         // refine indices
-        IndexRefineWrapper<ShapeType>::refine(fine_mesh->_index_set_holder, _num_entities, _index_set_holder);
+        Intern::IndexRefineWrapper<ShapeType>
+          ::refine(fine_mesh->_index_set_holder, _num_entities, _index_set_holder);
 
         // return fine mesh
         return fine_mesh;
@@ -434,7 +432,6 @@ namespace FEAST
       ConformalSubMesh* refine(const ParentMesh_& parent_mesh) const
       {
         CONTEXT(name() + "::refine()");
-        using namespace Conformal::StandardRefinement;
 
         typedef typename BaseClass::ShapeType ShapeType;
         typedef typename BaseClass::VertexSetType VertexSetType;
@@ -453,21 +450,21 @@ namespace FEAST
         }
 
         // calculate number of entities in fine mesh
-        EntityCountWrapper<ShapeType>::query(num_entities_fine);
+        Intern::EntityCountWrapper<ShapeType>::query(num_entities_fine);
 
         // allocate a fine mesh
         ConformalSubMesh* fine_mesh = new ConformalSubMesh(num_entities_fine, num_coords, vertex_stride);
 
         // refine vertices
-        VertexRefineWrapper<ShapeType, VertexSetType>::refine(fine_mesh->_vertex_set,
-          this->_vertex_set, this->_index_set_holder);
+        Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
+          ::refine(fine_mesh->_vertex_set, this->_vertex_set, this->_index_set_holder);
 
         // refine indices
-        IndexRefineWrapper<ShapeType>::refine(fine_mesh->_index_set_holder,
-          this->_num_entities, this->_index_set_holder);
+        Intern::IndexRefineWrapper<ShapeType>
+          ::refine(fine_mesh->_index_set_holder, this->_num_entities, this->_index_set_holder);
 
         // refine target indices
-        TargetRefineWrapper<ShapeType>::refine(fine_mesh->_target_set_holder, num_entities_parent,
+        Intern::TargetRefineWrapper<ShapeType>::refine(fine_mesh->_target_set_holder, num_entities_parent,
           this->_target_set_holder, this->_index_set_holder, parent_mesh.get_index_set_holder());
 
         // return fine mesh

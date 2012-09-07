@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_CONGRUENCY_INDEX_REPRESENTATIVE_HPP
-#define KERNEL_GEOMETRY_CONGRUENCY_INDEX_REPRESENTATIVE_HPP 1
+#ifndef KERNEL_GEOMETRY_INTERN_INDEX_REPRESENTATIVE_HPP
+#define KERNEL_GEOMETRY_INTERN_INDEX_REPRESENTATIVE_HPP 1
 
 // includes, FEAST
 #include <kernel/geometry/shape.hpp>
@@ -12,9 +12,9 @@ namespace FEAST
 {
   namespace Geometry
   {
-    namespace Congruency
+    /// \cond internal
+    namespace Intern
     {
-
       /**
        * \brief Index representative calculator.
        *
@@ -43,7 +43,6 @@ namespace FEAST
       };
 #endif // DOXYGEN
 
-      /// \cond internal
       // specialisation for Hypercube<1>
       template<>
       struct IndexRepresentative< Shape::Hypercube<1> >
@@ -119,9 +118,9 @@ namespace FEAST
           ivo[1] = ivi[0] + ivi[1] + ivi[2] - ivo[0] - ivo[2];
         }
       }; // IndexRepresentative< Shape::Simplex<2> >
-      /// \endcond
-    } // namespace Congruency
+    } // namespace Intern
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_CONGRUENCY_INDEX_REPRESENTATIVE_HPP
+#endif // KERNEL_GEOMETRY_INTERN_INDEX_REPRESENTATIVE_HPP

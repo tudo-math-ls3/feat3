@@ -5,7 +5,6 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
-using namespace FEAST::Geometry::Conformal;
 
 typedef ConformalMeshPolicy<Shape::Tetrahedron> TetRootMeshPolicy;
 typedef ConformalSubMeshPolicy<Shape::Tetrahedron> SubMeshPolicy;
