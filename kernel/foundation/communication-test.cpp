@@ -5,7 +5,6 @@
 #include<kernel/foundation/halo.hpp>
 #include<kernel/foundation/halo_data.hpp>
 #include<kernel/foundation/communication.hpp>
-#include<kernel/foundation/smart_pointer.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
 
@@ -38,7 +37,7 @@ class CommunicationTest:
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(0, &all_attributes_m3);
 
       //configure attribute
-      all_attributes_m3.push_back(Foundation::SmartPointer<Foundation::AttributeBase<> >(new Foundation::Attribute<double>()));
+      all_attributes_m3.push_back(std::shared_ptr<Foundation::AttributeBase<> >(new Foundation::Attribute<double>()));
       Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
 
       //add vertices
@@ -92,7 +91,7 @@ class CommunicationTest:
       typename Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> >::attr_base_type_ all_attributes_m4;
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(1, m3, &all_attributes_m4);
       //configure attribute
-      all_attributes_m4.push_back(Foundation::SmartPointer<Foundation::AttributeBase<> >(new Foundation::Attribute<double>()));
+      all_attributes_m4.push_back(std::shared_ptr<Foundation::AttributeBase<> >(new Foundation::Attribute<double>()));
       Foundation::MeshAttributeRegistration::execute(m4, Foundation::pl_vertex);
 
       //alter m4's attribute values

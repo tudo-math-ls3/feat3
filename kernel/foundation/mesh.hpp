@@ -120,7 +120,7 @@ namespace FEAST
         typedef typename TopologyType_::storage_type_ storage_type_;
 
         typedef OuterAttributeStorageType_<
-          SmartPointer<AttributeBase<AttributeStorageType_> >, std::allocator<SmartPointer<AttributeBase<AttributeStorageType_> > > > attr_base_type_;
+          std::shared_ptr<AttributeBase<AttributeStorageType_> >, std::allocator<std::shared_ptr<AttributeBase<AttributeStorageType_> > > > attr_base_type_;
 
         ///CTOR
         Mesh(const typename TopologyType_::index_type_ id, attr_base_type_* attrbase = nullptr, const typename TopologyType_::index_type_ pp_rank = 0, const typename TopologyType_::index_type_ mp_rank = 0) :
@@ -350,13 +350,13 @@ namespace FEAST
           return _attrs;
         }
 
-        SmartPointer<FunctorBase> undo()
+        std::shared_ptr<FunctorBase> undo()
         {
           if(_history.size() == 0)
             throw MeshError("Already cleared!");
 
           _history.get_functors().at(_history.size() - 1).get()->undo();
-          SmartPointer<FunctorBase> func(_history.get_functors().at(_history.size() - 1));
+          std::shared_ptr<FunctorBase> func(_history.get_functors().at(_history.size() - 1));
           _history.get_functors().pop_back();
           return func;
         }
@@ -383,7 +383,7 @@ namespace FEAST
         }
 
 
-        void redo(const SmartPointer<FunctorBase> func)
+        void redo(const std::shared_ptr<FunctorBase> func)
         {
           func.get()->execute();
           _history.add_functor(func);

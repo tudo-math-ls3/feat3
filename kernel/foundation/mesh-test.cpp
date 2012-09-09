@@ -595,21 +595,21 @@ class MeshTestHistory:
       TEST_CHECK_EQUAL(test_1_.size(), 0ul);
 
       //clear all manually
-      Foundation::SmartPointer<Foundation::FunctorBase> f1(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f2(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f3(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f4(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f5(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f6(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f7(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f8(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f9(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f10(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f11(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f12(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f13(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f14(m.undo());
-      Foundation::SmartPointer<Foundation::FunctorBase> f15(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f1(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f2(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f3(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f4(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f5(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f6(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f7(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f8(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f9(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f10(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f11(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f12(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f13(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f14(m.undo());
+      std::shared_ptr<Foundation::FunctorBase> f15(m.undo());
 
       TEST_CHECK_EQUAL(m.get_history().get_functors().size(), 0);
 
@@ -673,9 +673,9 @@ class MeshTestGeometryInterface:
        */
 
       //create attributes for vertex coords
-      std::vector<Foundation::SmartPointer<Foundation::AttributeBase<OT_> > > attrs;
-      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex x-coords
-      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex y-coords
+      std::vector<std::shared_ptr<Foundation::AttributeBase<OT_> > > attrs;
+      attrs.push_back(std::shared_ptr<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex x-coords
+      attrs.push_back(std::shared_ptr<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex y-coords
 
       ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().push_back(double(double(0)));
       ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().push_back(double(double(0)));

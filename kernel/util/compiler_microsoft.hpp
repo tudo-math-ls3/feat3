@@ -15,26 +15,20 @@
 #  define FEAST_COMPILER_MICROSOFT _MSC_VER
 
 // detect the compiler verson and define the FEAST_COMPILER macro
-#  if (_MSC_VER >= 1600)
-#    define FEAST_COMPILER "Microsoft Visual C++ .NET 2010 (or newer)"
+#  if (_MSC_VER >= 1700)
+#    define FEAST_COMPILER "Microsoft Visual C++ 2012 (or newer)"
+#  elif (_MSC_VER >= 1600)
+#    define FEAST_COMPILER "Microsoft Visual C++ 2010"
 #  elif (_MSC_VER >= 1500)
-#    define FEAST_COMPILER "Microsoft Visual C++ .NET 2008"
+#    define FEAST_COMPILER "Microsoft Visual C++ 2008"
 #  elif (_MSC_VER >= 1400)
-#    define FEAST_COMPILER "Microsoft Visual C++ .NET 2005"
+#    define FEAST_COMPILER "Microsoft Visual C++ 2005"
 #  elif (_MSC_VER >= 1310)
 #    define FEAST_COMPILER "Microsoft Visual C++ .NET 2003"
 #  elif (_MSC_VER >= 1300)
 #    define FEAST_COMPILER "Microsoft Visual C++ .NET 2002"
 #  elif (_MSC_VER >= 1200)
 #    define FEAST_COMPILER "Microsoft Visual C++ 6"
-#  elif (_MSC_VER >= 1100)
-#    define FEAST_COMPILER "Microsoft Visual C++ 5"
-#  elif (_MSC_VER >= 1000)
-#    define FEAST_COMPILER "Microsoft Visual C++ 4"
-#  elif (_MSC_VER >= 900)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2"
-#  elif (_MSC_VER >= 800)
-#    define FEAST_COMPILER "Microsoft Visual C++"
 #  else
   // old MS C/C++ compiler, the time before Visual Studio,
   // this compiler version won't be able to compile Feast anyway...
@@ -45,6 +39,8 @@
 #  if (_MSC_VER >= 1600)
 #    define HAVE_CPP11_NULLPTR 1
 #    define HAVE_CPP11_STATIC_ASSERT 1
+#    define HAVE_CPP11_SMART_POINTER 1
+#    define HAVE_CPP11_EXTERN_TEMPLATE 1
 #  endif
 
 // C4100: 'identifier': unreferenced formal parameter

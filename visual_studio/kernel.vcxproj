@@ -506,7 +506,6 @@
     <ClInclude Include="..\kernel\foundation\mesh.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_control.hpp" />
     <ClInclude Include="..\kernel\foundation\mesh_error.hpp" />
-    <ClInclude Include="..\kernel\foundation\smart_pointer.hpp" />
     <ClInclude Include="..\kernel\foundation\topology.hpp" />
     <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp" />
     <ClInclude Include="..\kernel\geometry\cell_sub_set_node.hpp" />
@@ -563,6 +562,7 @@
     <ClInclude Include="..\kernel\util\compiler_open64.hpp" />
     <ClInclude Include="..\kernel\util\compiler_oracle.hpp" />
     <ClInclude Include="..\kernel\util\compiler_pgi.hpp" />
+    <ClInclude Include="..\kernel\util\cpp11_smart_pointer.hpp" />
     <ClInclude Include="..\kernel\util\exception.hpp" />
     <ClInclude Include="..\kernel\util\factorial.hpp" />
     <ClInclude Include="..\kernel\util\file_error.hpp" />

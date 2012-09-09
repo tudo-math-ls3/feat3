@@ -145,9 +145,9 @@ class HaloTestGeometryInterface:
        */
 
       //create attributes for vertex coords
-      std::vector<Foundation::SmartPointer<Foundation::AttributeBase<OT_> > > attrs;
-      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex x-coords
-      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex y-coords
+      std::vector<std::shared_ptr<Foundation::AttributeBase<OT_> > > attrs;
+      attrs.push_back(std::shared_ptr<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex x-coords
+      attrs.push_back(std::shared_ptr<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex y-coords
 
       ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().push_back(double(double(0)));
       ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().push_back(double(double(0)));

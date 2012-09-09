@@ -2,7 +2,7 @@
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/attribute.hpp>
-#include <kernel/foundation/smart_pointer.hpp>
+#include <kernel/util/cpp11_smart_pointer.hpp>
 #include <kernel/archs.hpp>
 #include<deque>
 
@@ -22,10 +22,10 @@ class AttributeTest:
 
     virtual void run() const
     {
-      std::vector<Foundation::SmartPointer<Foundation::AttributeBase<ST_> > > attrs;
+      std::vector<std::shared_ptr<Foundation::AttributeBase<ST_> > > attrs;
 
-      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<ST_> >(new Foundation::Attribute<DataType1_, ST_>));
-      attrs.push_back(Foundation::SmartPointer<Foundation::AttributeBase<ST_> >(new Foundation::Attribute<DataType2_, ST_>));
+      attrs.push_back(std::shared_ptr<Foundation::AttributeBase<ST_> >(new Foundation::Attribute<DataType1_, ST_>));
+      attrs.push_back(std::shared_ptr<Foundation::AttributeBase<ST_> >(new Foundation::Attribute<DataType2_, ST_>));
       for(unsigned long j(0) ; j < 1000 ; ++j)
       {
         ((Foundation::Attribute<DataType1_, ST_>*)(attrs.at(0).get()))->get_data().push_back(DataType1_(DataType1_(5) + j));

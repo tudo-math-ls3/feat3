@@ -2,10 +2,11 @@
 #ifndef KERNEL_FOUNDATION_FUNCTOR_HH
 #define KERNEL_FOUNDATION_FUNCTOR_HH 1
 
+#include <kernel/base_header.hpp>
+#include <kernel/foundation/functor_error.hpp>
+#include <kernel/util/cpp11_smart_pointer.hpp>
+
 #include <vector>
-#include<kernel/base_header.hpp>
-#include<kernel/foundation/functor_error.hpp>
-#include<kernel/foundation/smart_pointer.hpp>
 
 namespace FEAST
 {
@@ -184,7 +185,7 @@ namespace FEAST
     class CompoundFunctor : public FunctorBase
     {
       public:
-        typedef StorageType_<SmartPointer<FunctorBase>, std::allocator<SmartPointer<FunctorBase> > > storage_type_;
+        typedef StorageType_<std::shared_ptr<FunctorBase>, std::allocator<std::shared_ptr<FunctorBase> > > storage_type_;
 
         CompoundFunctor(bool executed = false) :
           _functors()
@@ -199,10 +200,10 @@ namespace FEAST
 
         void add_functor(FunctorBase* functor)
         {
-          _functors.push_back(SmartPointer<FunctorBase>(functor));
+          _functors.push_back(std::shared_ptr<FunctorBase>(functor));
         }
 
-        void add_functor(const SmartPointer<FunctorBase>& functor)
+        void add_functor(const std::shared_ptr<FunctorBase>& functor)
         {
           _functors.push_back(functor);
         }

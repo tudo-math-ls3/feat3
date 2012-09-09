@@ -39,6 +39,8 @@
 #  if (_GCC_VER > 40100)
 #    define HAVE_CPP11_EXTERN_TEMPLATE 1
 #  endif
+  // Note: It is unknown since when support for C++11 smart pointers exists.
+#  define HAVE_CPP11_SMART_POINTER 1
 #endif // __GXX_EXPERIMENTAL_CXX0X__
 
 // The __func__ variable is part of both C99 and C++11, and is supported by GCC for a long time.

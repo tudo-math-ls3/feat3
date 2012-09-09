@@ -231,9 +231,6 @@
     <ClInclude Include="..\kernel\lafem\richardson.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\foundation\smart_pointer.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\lafem\algorithm.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
@@ -296,6 +293,9 @@
     </ClInclude>
     <ClInclude Include="..\kernel\geometry\intern\index_representative.hpp">
       <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\cpp11_smart_pointer.hpp">
+      <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
