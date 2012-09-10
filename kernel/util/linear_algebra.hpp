@@ -2366,6 +2366,17 @@ namespace FEAST
       return Intern::MatDet<m_, n_>::compute(a);
     }
 
+    /** \copydoc mat_det(const TypeA_ a[]) */
+    template<
+      int m_,
+      int n_,
+      typename TypeA_>
+    inline TypeA_ mat_det(const TypeA_ (&a)[m_][n_])
+    {
+      CONTEXT("LinAlg::mat_det()");
+      return Intern::MatDet<m_,n_>::compute(&a[0][0]);
+    }
+
     /// \cond internal
     namespace Intern
     {
@@ -2859,6 +2870,21 @@ namespace FEAST
       static_assert(n_ >= 1, "Invalid matrix size");
       static_assert(n_ <= 8, "Matrix size too big; use mat_factorise instead");
       Intern::MatInvert<false, n_>::apply(b, a);
+    }
+
+    /** \copydoc mat_invert(Type_ b[], const Type_ a[]) */
+    template<
+      int n_,
+      typename Type_>
+    inline void mat_invert(
+      Type_ (&b)[n_][n_],
+      const Type_ (&a)[n_][n_])
+    {
+      CONTEXT("LinAlg::mat_invert()");
+      // ensure that the matrix is "small"
+      static_assert(n_ >= 1, "Invalid matrix size");
+      static_assert(n_ <= 8, "Matrix size too big; use mat_factorise instead");
+      Intern::MatInvert<false, n_>::apply(&b[0][0], &a[0][0]);
     }
 
     /// \cond internal
