@@ -1495,6 +1495,52 @@ namespace FEAST
       Intern::MatVecMult<trans_a_>::apply(m, n, stride_a, y, a, x, alpha);
     }
 
+    template<
+      int m_,
+      int n_,
+      typename TypeA_,
+      typename TypeX_,
+      typename TypeY_>
+    inline void mat_vec_mult(
+      TypeY_ (&y)[m_],
+      const TypeA_ (&a)[m_][n_],
+      const TypeX_ (&x)[n_],
+      const TypeY_ alpha = TypeY_(1))
+    {
+      //Intern::MatVecMult<false>::apply(int(m_), int(n_), int(n_), &y[0], &a[0][0], &x[0], alpha);
+      for(int i(0); i < m_; ++i)
+      {
+        y[i] = TypeY_(0);
+        for(int j(0); j < n_; ++j)
+        {
+          y[i] += alpha * TypeY_(a[i][j] * x[j]);
+        }
+      }
+    }
+
+    template<
+      int m_,
+      int n_,
+      typename TypeA_,
+      typename TypeX_,
+      typename TypeY_>
+    inline void vec_mat_mult(
+      TypeY_ (&y)[n_],
+      const TypeA_ (&a)[m_][n_],
+      const TypeX_ (&x)[m_],
+      const TypeY_ alpha = TypeY_(1))
+    {
+      //Intern::MatVecMult<true>::apply(int(n_), int(m_), int(m_), &y[0], &a[0][0], &x[0], alpha);
+      for(int i(0); i < n_; ++i)
+      {
+        y[i] = TypeY_(0);
+        for(int j(0); j < m_; ++j)
+        {
+          y[i] += alpha * TypeY_(a[j][i] * x[j]);
+        }
+      }
+    }
+
     /**
      * \brief Calculates the row-sum norm of a matrix.
      *
