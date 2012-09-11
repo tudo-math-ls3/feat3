@@ -490,6 +490,35 @@ class LinAlgTest :
       TEST_CHECK_EQUAL_WITHIN_EPS(mat_norm_max(n_, n_, n_, c), ZERO, tol);
     }
 
+    template<size_t n_>
+    void test_mat_det_lehmer() const
+    {
+      // set tolerance
+      const DataType_ tol(std::pow(_eps, DataType_(0.8)));
+
+      // initialise a Lehmer-Matrix
+      DataType_ a[n_ * n_];
+      _init_lehmer_mat(n_, a);
+
+      // reference matrix determinants
+      static const DataType_ dets[] =
+      {
+        DataType_(0),
+        DataType_(1),
+        DataType_(3) / DataType_(4),
+        DataType_(5) / DataType_(12),
+        DataType_(35) / DataType_(192),
+        DataType_(21) / DataType_(320),
+        DataType_(77) / DataType_(3840)
+      };
+
+      // calculate matrix determinant
+      DataType_ d = mat_det<n_,n_,DataType_>(a);
+
+      // check determinat
+      TEST_CHECK_EQUAL_WITHIN_EPS(d, dets[n_], tol);
+    }
+
     virtual void run() const
     {
       // test vector operations
@@ -512,6 +541,14 @@ class LinAlgTest :
       test_mat_inv_lehmer<4>();
       test_mat_inv_lehmer<5>();
       test_mat_inv_lehmer<6>();
+
+      // test matrix determinant calculaation
+      test_mat_det_lehmer<1>();
+      test_mat_det_lehmer<2>();
+      test_mat_det_lehmer<3>();
+      test_mat_det_lehmer<4>();
+      test_mat_det_lehmer<5>();
+      test_mat_det_lehmer<6>();
     }
 
 #undef TWO

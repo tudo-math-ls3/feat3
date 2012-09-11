@@ -2218,9 +2218,9 @@ namespace FEAST
 
           return
             + m[0] * (m[5]*w[5] - m[6]*w[4] + m[7]*w[3])
-            - m[1] * (m[4]*w[5] + m[6]*w[2] - m[7]*w[1])
+            - m[1] * (m[4]*w[5] - m[6]*w[2] + m[7]*w[1])
             + m[2] * (m[4]*w[4] - m[5]*w[2] + m[7]*w[0])
-            - m[3] * (m[4]*w[3] + m[5]*w[1] - m[6]*w[0]);
+            - m[3] * (m[4]*w[3] - m[5]*w[1] + m[6]*w[0]);
         }
       };
 
@@ -2261,9 +2261,9 @@ namespace FEAST
 
           return
             + m[0]*(m[6]*w[9] - m[7]*w[8] + m[8]*w[7] - m[9]*w[6])
-            - m[1]*(m[5]*w[9] + m[7]*w[5] - m[8]*w[4] + m[9]*w[3])
+            - m[1]*(m[5]*w[9] - m[7]*w[5] + m[8]*w[4] - m[9]*w[3])
             + m[2]*(m[5]*w[8] - m[6]*w[5] + m[8]*w[2] - m[9]*w[1])
-            - m[3]*(m[5]*w[7] + m[6]*w[4] - m[7]*w[2] + m[9]*w[0])
+            - m[3]*(m[5]*w[7] - m[6]*w[4] + m[7]*w[2] - m[9]*w[0])
             + m[4]*(m[5]*w[6] - m[6]*w[3] + m[7]*w[1] - m[8]*w[0]);
         }
       };
@@ -2336,11 +2336,11 @@ namespace FEAST
 
           return
             + m[0]*(m[ 7]*v[14] - m[ 8]*v[13] + m[ 9]*v[12] - m[10]*v[11] + m[11]*v[10])
-            - m[1]*(m[ 6]*v[14] + m[ 8]*v[ 9] - m[ 9]*v[ 8] + m[10]*v[ 7] - m[11]*v[ 6])
+            - m[1]*(m[ 6]*v[14] - m[ 8]*v[ 9] + m[ 9]*v[ 8] - m[10]*v[ 7] + m[11]*v[ 6])
             + m[2]*(m[ 6]*v[13] - m[ 7]*v[ 9] + m[ 9]*v[ 5] - m[10]*v[ 4] + m[11]*v[ 3])
-            - m[3]*(m[ 6]*v[12] + m[ 7]*v[ 8] - m[ 8]*v[ 5] + m[10]*v[ 2] - m[11]*v[ 1])
+            - m[3]*(m[ 6]*v[12] - m[ 7]*v[ 8] + m[ 8]*v[ 5] - m[10]*v[ 2] + m[11]*v[ 1])
             + m[4]*(m[ 6]*v[11] - m[ 7]*v[ 7] + m[ 8]*v[ 4] - m[ 9]*v[ 2] + m[11]*v[ 0])
-            - m[5]*(m[ 6]*v[10] + m[ 7]*v[ 6] - m[ 8]*v[ 3] + m[ 9]*v[ 1] - m[10]*v[ 0]);
+            - m[5]*(m[ 6]*v[10] - m[ 7]*v[ 6] + m[ 8]*v[ 3] - m[ 9]*v[ 1] + m[10]*v[ 0]);
         }
       };
 
@@ -2426,11 +2426,10 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      // matrix inversion helper class;
-      // note: setting force_plu_u = true will always call the factorisation code below rather than calling the
-      //       direct inversion variants following below.
+      // matrix inversion helper class
       template<
         bool force_plu_,
+        int m_,
         int n_>
       struct MatInvert
       {
@@ -2439,7 +2438,24 @@ namespace FEAST
           Type_ b[],
           const Type_ a[])
         {
-          CONTEXT("LinAlg::Intern::MatInvert<force_plu_,n_>::apply()");
+          CONTEXT("LinAlg::Intern::MatInvert<force_plu_,m_,n_>::apply()");
+          throw InternalError("Cannot invert non-square matrix!");
+        }
+      };
+
+      // note: setting force_plu_u = true will always call the factorisation code below rather than calling the
+      //       direct inversion variants following below.
+      template<
+        bool force_plu_,
+        int n_>
+      struct MatInvert<force_plu_, n_, n_>
+      {
+        template<typename Type_>
+        inline static void apply(
+          Type_ b[],
+          const Type_ a[])
+        {
+          CONTEXT("LinAlg::Intern::MatInvert<force_plu_,n_,n_>::apply()");
 
           // This is a fallback implementation that uses the PLU factorisation.
           // This may be replaced by something more efficient later...
@@ -2465,7 +2481,7 @@ namespace FEAST
       };
 
       template<>
-      struct MatInvert<false, 1>
+      struct MatInvert<false, 1, 1>
       {
         // direct inversion for 1x1
         template<typename Type_>
@@ -2473,13 +2489,13 @@ namespace FEAST
           Type_ B[],
           const Type_ A[])
         {
-          CONTEXT("LinAlg::Intern::MatInvert<false,1>::apply()");
+          CONTEXT("LinAlg::Intern::MatInvert<false,1,1>::apply()");
           B[0] = Type_(1) / A[0];
         }
       };
 
       template<>
-      struct MatInvert<false, 2>
+      struct MatInvert<false, 2, 2>
       {
         // direct inversion for 2x2
         template<typename Type_>
@@ -2487,7 +2503,7 @@ namespace FEAST
           Type_ B[],
           const Type_ A[])
         {
-          CONTEXT("LinAlg::Intern::MatInvert<false,2>::apply()");
+          CONTEXT("LinAlg::Intern::MatInvert<false,2,2>::apply()");
           Type_ d = Type_(1) / (A[0] * A[3] - A[1] * A[2]);
           B[0] =  d * A[3];
           B[1] = -d * A[1];
@@ -2497,7 +2513,7 @@ namespace FEAST
       };
 
       template<>
-      struct MatInvert<false, 3>
+      struct MatInvert<false, 3, 3>
       {
         // direct inversion for 3x3
         template<typename Type_>
@@ -2505,7 +2521,7 @@ namespace FEAST
           Type_ B[],
           const Type_ A[])
         {
-          CONTEXT("LinAlg::Intern::MatInvert<false,3>::apply()");
+          CONTEXT("LinAlg::Intern::MatInvert<false,3,3>::apply()");
           B[0] = A[4] * A[8] - A[5] * A[7];
           B[3] = A[5] * A[6] - A[3] * A[8];
           B[6] = A[3] * A[7] - A[4] * A[6];
@@ -2523,7 +2539,7 @@ namespace FEAST
       };
 
       template<>
-      struct MatInvert<false, 4>
+      struct MatInvert<false, 4, 4>
       {
         // direct inversion for 4x4
         template<typename Type_>
@@ -2531,7 +2547,7 @@ namespace FEAST
           Type_ B[],
           const Type_ A[])
         {
-          CONTEXT("LinAlg::Intern::MatInvert<false,4>::apply()");
+          CONTEXT("LinAlg::Intern::MatInvert<false,4,4>::apply()");
           Type_ W[6];
           W[0] = A[8]*A[13]-A[9]*A[12];
           W[1] = A[8]*A[14]-A[10]*A[12];
@@ -2570,7 +2586,7 @@ namespace FEAST
       };
 
       template<>
-      struct MatInvert<false, 5>
+      struct MatInvert<false, 5, 5>
       {
         // direct inversion for 5x5
         template<typename Type_>
@@ -2578,7 +2594,7 @@ namespace FEAST
           Type_ B[],
           const Type_ A[])
         {
-          CONTEXT("LinAlg::Intern::MatInvert<false,5>::apply()");
+          CONTEXT("LinAlg::Intern::MatInvert<false,5,5>::apply()");
           Type_ W[20];
           W[ 0] = A[15]*A[21]-A[16]*A[20];
           W[ 1] = A[15]*A[22]-A[17]*A[20];
@@ -2665,7 +2681,7 @@ namespace FEAST
       };
 
       template<>
-      struct MatInvert<false, 6>
+      struct MatInvert<false, 6, 6>
       {
         // direct inversion for 6x6
         template<typename Type_>
@@ -2673,7 +2689,7 @@ namespace FEAST
           Type_ B[],
           const Type_ A[])
         {
-          CONTEXT("LinAlg::Intern::MatInvert<false,6>::apply()");
+          CONTEXT("LinAlg::Intern::MatInvert<false,6,6>::apply()");
           Type_ W[35];
           W[ 0] = A[24]*A[31]-A[25]*A[30];
           W[ 1] = A[24]*A[32]-A[26]*A[30];
@@ -2915,22 +2931,26 @@ namespace FEAST
       // ensure that the matrix is "small"
       static_assert(n_ >= 1, "Invalid matrix size");
       static_assert(n_ <= 8, "Matrix size too big; use mat_factorise instead");
-      Intern::MatInvert<false, n_>::apply(b, a);
+      Intern::MatInvert<false, n_, n_>::apply(b, a);
     }
 
     /** \copydoc mat_invert(Type_ b[], const Type_ a[]) */
     template<
+      int m_,
       int n_,
       typename Type_>
     inline void mat_invert(
-      Type_ (&b)[n_][n_],
-      const Type_ (&a)[n_][n_])
+      Type_ (&b)[m_][n_],
+      const Type_ (&a)[m_][n_])
     {
       CONTEXT("LinAlg::mat_invert()");
       // ensure that the matrix is "small"
+      static_assert(m_ >= 1, "Invalid matrix size");
       static_assert(n_ >= 1, "Invalid matrix size");
       static_assert(n_ <= 8, "Matrix size too big; use mat_factorise instead");
-      Intern::MatInvert<false, n_>::apply(&b[0][0], &a[0][0]);
+      // Note: We do not check whether m_ == n_ at compile-time; this is handled by
+      //       an exception within the following apply()-function at runtime.
+      Intern::MatInvert<false, m_, n_>::apply(&b[0][0], &a[0][0]);
     }
 
     /// \cond internal
