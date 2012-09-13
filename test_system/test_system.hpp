@@ -505,7 +505,8 @@ namespace FEAST
       BaseTest::WithinEpsCalculator calc(a, b, eps); \
       this->check(__func__, __FILE__, __LINE__, calc.result,  \
           this->_id + "\n" + "Expected '|" #a " - " #b \
-          "|' < '" + FEAST::stringify(eps) + "' but was '" + calc.s_diff +"'"); \
+          "|' < '" + FEAST::stringify(eps) + "' but was '" + calc.s_diff +"'" \
+          + ", with a=" + FEAST::stringify(a) + " and b=" + FEAST::stringify(b)); \
     } catch (const TestFailedException &) { \
       throw;  \
     } catch (const std::exception & test_e) { \

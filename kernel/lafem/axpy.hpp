@@ -48,6 +48,8 @@ namespace FEAST
           throw InternalError("Vector size does not match!");
         if (x.size() != r.size())
           throw InternalError("Vector size does not match!");
+        if (a.size() != r.size())
+          throw InternalError("Vector size does not match!");
 
         const DT_ * ap(a.elements());
         const DT_ * xp(x.elements());
@@ -60,6 +62,16 @@ namespace FEAST
           rp[i] = ap[i] * xp[i] + yp[i];
         }
       }
+    };
+
+    template <>
+    struct Axpy <Archs::GPU, Archs::CUDA>
+    {
+      template <typename DT_>
+      static void value(DenseVector<Archs::GPU, DT_> & r, const DT_ a, const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y);
+
+      template <typename DT_>
+      static void value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & a, const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y);
     };
 
   } // namespace LAFEM

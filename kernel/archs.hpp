@@ -19,6 +19,7 @@ namespace FEAST
         tv_cpu,
         tv_generic,
         tv_gpu,
+        tv_cuda,
         tv_none
       };
 
@@ -76,6 +77,20 @@ namespace FEAST
         static String name()
         {
           return "gpu";
+        }
+      };
+
+      /**
+       * Tag-type for cuda-based operations.
+       */
+      struct CUDA :
+        public InstantiationPolicy<CUDA, NonCopyable>
+      {
+        const static TagValue tag_value = tv_cuda;
+        const static TagValue memory_value = tv_cuda;
+        static String name()
+        {
+          return "cuda";
         }
       };
 

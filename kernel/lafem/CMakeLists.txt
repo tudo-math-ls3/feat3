@@ -11,7 +11,7 @@ ADD_LIBRARY(kernel-lafem STATIC memory_pool.cpp)
 
 if (FEAST_BACKENDS_CUDA)
   INCLUDE(FindCUDA)
-  CUDA_ADD_LIBRARY(kernel-lafem-cuda STATIC memory_pool.cu)
+  CUDA_ADD_LIBRARY(kernel-lafem-cuda STATIC memory_pool.cu axpy.cu)
   ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
   set(CUDA_NVCC_FLAGS "-arch=sm_13" CACHE STRING "Semi-colon delimit multiple arguments." FORCE)
 endif(FEAST_BACKENDS_CUDA)

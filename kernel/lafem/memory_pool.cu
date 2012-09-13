@@ -111,7 +111,7 @@ void MemoryPool<Archs::GPU>::set_memory(DT_ * address, const DT_ val, const Inde
   dim3 block;
   block.x = blocksize;
   grid.x = (unsigned)ceil((count)/(double)(block.x));
-  FEAST::LAFEM::Intern::cuda_set_memory<<<grid, blocksize>>>(address, val, count);
+  FEAST::LAFEM::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
 }
 
 void MemoryPool<Archs::GPU>::copy(void * dest, const void * src, const Index bytes)
