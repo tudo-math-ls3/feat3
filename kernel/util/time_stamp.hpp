@@ -39,7 +39,7 @@ namespace FEAST
     timeval _time;
 #elif defined(_WIN32)
     long long int _counter;
-#elif
+#else
     clock_t _clock;
 #endif
 
