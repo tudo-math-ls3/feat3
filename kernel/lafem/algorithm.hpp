@@ -25,6 +25,16 @@ namespace FEAST
 
       MemoryPool<Arch_>::copy(pdest, psrc, dest.size() * sizeof(DT_));
     }
+
+    template <typename Arch_, typename Arch2_, typename DT_>
+    void copy(DenseVector<Arch_, DT_> & dest, const DenseVector<Arch2_, DT_> & src)
+    {
+      if (dest.size() != src.size())
+        throw InternalError("Vector size mismatch!");
+
+      DenseVector<Arch_, DT_> temp(src);
+      copy(dest, temp);
+    }
   } // namespace LAFEM
 } // namespace FEAST
 
