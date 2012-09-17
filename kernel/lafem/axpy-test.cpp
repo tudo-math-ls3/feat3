@@ -28,26 +28,28 @@ public:
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
-      DenseVector<Arch_, DT_> a(size);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Archs::CPU, DT_> a_local(size);
+      DenseVector<Archs::CPU, DT_> b_local(size);
       DenseVector<Arch_, DT_> c(size);
       DenseVector<Archs::CPU, DT_> ref(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a(i, DT_(i % 100 * DT_(1.234)));
-        b(i, DT_(2 - i % 100));
-        ref(i, s * a(i) + b(i));
+        a_local(i, DT_(i % 100 * DT_(1.234)));
+        b_local(i, DT_(2 - i % 100));
+        ref(i, s * a_local(i) + b_local(i));
       }
+      DenseVector<Arch_, DT_> a(a_local);
+      DenseVector<Arch_, DT_> b(b_local);
 
       Axpy<Arch_, BType_>::value(c, s, a, b);
-      DenseVector<Archs::CPU, DT_> c2(c);
-      for (Index i(0) ; i < c2.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(c2(i), ref(i), 1e-2);
+      DenseVector<Archs::CPU, DT_> c_local(c);
+      for (Index i(0) ; i < c_local.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(c_local(i), ref(i), 1e-2);
 
       Axpy<Arch_, BType_>::value(a, s, a, b);
-      DenseVector<Archs::CPU, DT_> a2(a);
-      for (Index i(0) ; i < a2.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(a2(i), ref(i), 1e-2);
+      a_local = a;
+      for (Index i(0) ; i < a_local.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(a_local(i), ref(i), 1e-2);
     }
   }
 };
@@ -77,27 +79,30 @@ public:
   {
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
-      DenseVector<Arch_, DT_> a(size);
-      DenseVector<Arch_, DT_> b(size);
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Archs::CPU, DT_> a_local(size);
+      DenseVector<Archs::CPU, DT_> b_local(size);
+      DenseVector<Archs::CPU, DT_> c_local(size);
       DenseVector<Arch_, DT_> d(size);
       DenseVector<Archs::CPU, DT_> ref(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a(i, DT_(i % 100 * DT_(1.234)));
-        b(i, DT_(2 - i % 100));
-        c(i, DT_(1 - i % 100));
-        ref(i, c(i) * a(i) + b(i));
+        a_local(i, DT_(i % 100 * DT_(1.234)));
+        b_local(i, DT_(2 - i % 100));
+        c_local(i, DT_(1 - i % 100));
+        ref(i, c_local(i) * a_local(i) + b_local(i));
       }
+      DenseVector<Arch_, DT_> a(a_local);
+      DenseVector<Arch_, DT_> b(b_local);
+      DenseVector<Arch_, DT_> c(c_local);
 
       Axpy<Arch_, BType_>::value(d, c, a, b);
-      DenseVector<Archs::CPU, DT_> d2(d);
-      for (Index i(0) ; i < d2.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(d2(i), ref(i), 1e-2);
+      DenseVector<Archs::CPU, DT_> d_local(d);
+      for (Index i(0) ; i < d_local.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(d_local(i), ref(i), 1e-2);
       Axpy<Arch_, BType_>::value(a, c, a, b);
-      DenseVector<Archs::CPU, DT_> a2(a);
-      for (Index i(0) ; i < a2.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(a2(i), ref(i), 1e-2);
+      a_local = a;
+      for (Index i(0) ; i < a_local.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(a_local(i), ref(i), 1e-2);
     }
   }
 };

@@ -64,7 +64,7 @@ namespace FEAST
 
         /// recieve element
         template <typename DT_>
-        inline static DT_ get_element(const DT_ * data, Index index)
+        inline static const DT_ & get_element(const DT_ * data, Index index)
         {
           return data[index];
         }

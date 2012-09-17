@@ -35,9 +35,27 @@ namespace FEAST
         DT_ * rp(r.elements());
         const Index size(r.size());
 
-        for (Index i(0) ; i < size ; ++i)
+        if (rp == yp)
         {
-          rp[i] = a * xp[i] + yp[i];
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] += a * xp[i];
+          }
+        }
+        else if (rp == xp)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] *= a;
+            rp[i]+= yp[i];
+          }
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] = a * xp[i] + yp[i];
+          }
         }
       }
 
@@ -57,9 +75,35 @@ namespace FEAST
         DT_ * rp(r.elements());
         const Index size(r.size());
 
-        for (Index i(0) ; i < size ; ++i)
+        if (rp == yp)
         {
-          rp[i] = ap[i] * xp[i] + yp[i];
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] += ap[i] * xp[i];
+          }
+        }
+        else if(rp == xp)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] *= ap[i];
+            rp[i]+= yp[i];
+          }
+        }
+        else if(rp == ap)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] *= xp[i];
+            rp[i] += yp[i];
+          }
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] = ap[i] * xp[i] + yp[i];
+          }
         }
       }
     };
