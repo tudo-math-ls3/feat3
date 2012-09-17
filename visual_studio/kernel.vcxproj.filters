@@ -297,6 +297,9 @@
     <ClInclude Include="..\kernel\util\cpp11_smart_pointer.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\geometry\conformal_sub_mesh.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

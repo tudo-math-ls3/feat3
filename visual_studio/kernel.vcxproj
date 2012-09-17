@@ -510,6 +510,7 @@
     <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp" />
     <ClInclude Include="..\kernel\geometry\cell_sub_set_node.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal_mesh.hpp" />
+    <ClInclude Include="..\kernel\geometry\conformal_sub_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\export_vtk.hpp" />
     <ClInclude Include="..\kernel\geometry\index_calculator.hpp" />
     <ClInclude Include="..\kernel\geometry\index_set.hpp" />

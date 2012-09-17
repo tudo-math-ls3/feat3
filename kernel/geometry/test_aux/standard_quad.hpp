@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/conformal_sub_mesh.hpp>
 
 namespace FEAST
 {

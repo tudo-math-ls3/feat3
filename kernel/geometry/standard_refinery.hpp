@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/conformal_sub_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 
 namespace FEAST
