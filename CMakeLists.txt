@@ -29,7 +29,7 @@ INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake )
 
 # our custom target to build the documentation via doxygen
 # TODO Redirect doxygen output to BINARY_DIR/doc
-ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doc/doxygen_config WORKING_DIRECTORY ${FEAST_SOURCE_DIR} )
+ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doxy_in/doxygen_config WORKING_DIRECTORY ${FEAST_SOURCE_DIR} )
 if ( NOT (${FEAST_SOURCE_DIR} STREQUAL ${FEAST_BINARY_DIR}) AND UNIX)
     ADD_CUSTOM_command( TARGET doc POST_BUILD
       COMMAND mkdir ${FEAST_BINARY_DIR}/doc
