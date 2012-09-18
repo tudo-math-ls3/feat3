@@ -3,6 +3,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/difference.hpp>
+#include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -27,29 +28,35 @@ public:
   {
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
-      DenseVector<Arch_, DT_> a(size);
-      DenseVector<Arch_, DT_> a2(size);
-      DenseVector<Arch_, DT_> b(size);
-      DenseVector<Arch_, DT_> c(size);
-      DenseVector<Arch_, DT_> ref(size);
-      DenseVector<Arch_, DT_> ref2(size);
+      DenseVector<Archs::CPU, DT_> a_local(size);
+      DenseVector<Archs::CPU, DT_> b_local(size);
+      DenseVector<Archs::CPU, DT_> ref(size);
+      DenseVector<Archs::CPU, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
-        a(i, DT_(i * DT_(1.234)));
-        a2(i, DT_(i * DT_(1.234)));
-        b(i, DT_(size*2 - i));
-        ref(i, a(i) - b(i));
-        ref2(i, b(i) - a(i));
+        a_local(i, DT_(i * DT_(1.234)));
+        b_local(i, DT_(size*2 - i));
+        ref(i, a_local(i) - b_local(i));
       }
 
+      DenseVector<Arch_, DT_> a(size);
+      copy(a, a_local);
+      DenseVector<Arch_, DT_> b(size);
+      copy(b, b_local);
+      DenseVector<Arch_, DT_> c(size);
+
       Difference<Arch_, BType_>::value(c, a, b);
-      TEST_CHECK_EQUAL(c, ref);
-      Difference<Arch_, BType_>::value(c, b, a);
-      TEST_CHECK_EQUAL(c, ref2);
+      copy(result_local, c);
+      TEST_CHECK_EQUAL(result_local, ref);
+
       Difference<Arch_, BType_>::value(a, a, b);
-      TEST_CHECK_EQUAL(a, ref);
-      Difference<Arch_, BType_>::value(b, a2, b);
-      TEST_CHECK_EQUAL(b, ref);
+      copy(result_local, a);
+      TEST_CHECK_EQUAL(result_local, ref);
+
+      copy(a, a_local);
+      Difference<Arch_, BType_>::value(b, a, b);
+      copy(result_local, b);
+      TEST_CHECK_EQUAL(result_local, ref);
     }
   }
 };

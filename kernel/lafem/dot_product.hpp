@@ -33,9 +33,19 @@ namespace FEAST
         DT_ r(0);
         const Index size(x.size());
 
-        for (Index i(0) ; i < size ; ++i)
+        if(xp == yp)
         {
-          r += xp[i] * yp[i];
+          for (Index i(0) ; i < size ; ++i)
+          {
+            r += xp[i] * xp[i];
+          }
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            r += xp[i] * yp[i];
+          }
         }
 
         return r;

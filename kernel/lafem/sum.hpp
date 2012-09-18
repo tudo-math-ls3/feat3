@@ -35,9 +35,33 @@ namespace FEAST
         DT_ * rp(r.elements());
         const Index size(r.size());
 
-        for (Index i(0) ; i < size ; ++i)
+        if (rp == xp)
         {
-          rp[i] = xp[i] + yp[i];
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] += yp[i];
+          }
+        }
+        else if (rp == yp)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] += xp[i];
+          }
+        }
+        else if (rp == xp && rp == yp)
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] += rp[i];
+          }
+        }
+        else
+        {
+          for (Index i(0) ; i < size ; ++i)
+          {
+            rp[i] = xp[i] + yp[i];
+          }
         }
       }
     };
