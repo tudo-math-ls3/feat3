@@ -29,15 +29,17 @@ public:
 
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Archs::CPU, DT_> a_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
-        a(i, std::pow(DT_(0.5), DT_(0.5) * DT_(i)));
+        a_local(i, std::pow(DT_(0.5), DT_(0.5) * DT_(i)));
       }
 
       // ||a||_2 = sqrt(2 - 2^{1-n})
       const DT_ ref(std::sqrt(DT_(2) - std::pow(DT_(0.5), DT_(size-1))));
+
+      DenseVector<Arch_, DT_> a(a_local);
       DT_ c = Norm2<Arch_, BType_>::value(a);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }
@@ -45,3 +47,7 @@ public:
 };
 DVNorm2Test<Archs::CPU, Archs::Generic, float> dv_norm2_test_float;
 DVNorm2Test<Archs::CPU, Archs::Generic, double> dv_norm2_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DVNorm2Test<Archs::GPU, Archs::CUDA, float> cuda_dv_norm2_test_float;
+DVNorm2Test<Archs::GPU, Archs::CUDA, double> cuda_dv_norm2_test_double;
+#endif

@@ -60,6 +60,13 @@ namespace FEAST
       }
     };
 
+    template <>
+    struct Difference<Archs::GPU, Archs::CUDA>
+    {
+      template <typename DT_>
+      static void value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y);
+    };
+
   } // namespace LAFEM
 } // namespace FEAST
 

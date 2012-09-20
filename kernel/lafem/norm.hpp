@@ -41,6 +41,13 @@ namespace FEAST
       }
     };
 
+    template <>
+    struct Norm2<Archs::GPU, Archs::CUDA>
+    {
+      template <typename DT_>
+      static DT_ value(const DenseVector<Archs::GPU, DT_> & x);
+    };
+
   } // namespace LAFEM
 } // namespace FEAST
 

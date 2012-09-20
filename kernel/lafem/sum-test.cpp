@@ -69,3 +69,7 @@ public:
 };
 DVSumTest<Archs::CPU, Archs::Generic, float> dv_sum_test_float;
 DVSumTest<Archs::CPU, Archs::Generic, double> dv_sum_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DVSumTest<Archs::GPU, Archs::CUDA, float> gpu_dv_sum_test_float;
+DVSumTest<Archs::GPU, Archs::CUDA, double> gpu_dv_sum_test_double;
+#endif

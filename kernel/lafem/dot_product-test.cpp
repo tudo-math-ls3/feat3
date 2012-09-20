@@ -57,3 +57,7 @@ public:
 };
 DVDotProductTest<Archs::CPU, Archs::Generic, float> dv_dot_product_test_float;
 DVDotProductTest<Archs::CPU, Archs::Generic, double> dv_dot_product_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DVDotProductTest<Archs::GPU, Archs::CUDA, float> cuda_dv_dot_product_test_float;
+DVDotProductTest<Archs::GPU, Archs::CUDA, double> cuda_dv_dot_product_test_double;
+#endif

@@ -69,3 +69,7 @@ public:
 };
 DVElementProductTest<Archs::CPU, Archs::Generic, float> dv_element_product_test_float;
 DVElementProductTest<Archs::CPU, Archs::Generic, double> dv_element_product_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DVElementProductTest<Archs::GPU, Archs::CUDA, float> gpu_dv_element_product_test_float;
+DVElementProductTest<Archs::GPU, Archs::CUDA, double> gpu_dv_element_product_test_double;
+#endif

@@ -62,3 +62,7 @@ public:
 };
 DVDifferenceTest<Archs::CPU, Archs::Generic, float> dv_difference_test_float;
 DVDifferenceTest<Archs::CPU, Archs::Generic, double> dv_difference_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DVDifferenceTest<Archs::GPU, Archs::CUDA, float> gpu_dv_difference_test_float;
+DVDifferenceTest<Archs::GPU, Archs::CUDA, double> gpu_dv_difference_test_double;
+#endif
