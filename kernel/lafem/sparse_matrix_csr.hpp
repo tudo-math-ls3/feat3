@@ -20,9 +20,13 @@ namespace FEAST
     class SparseMatrixCSR : public Container<Arch_, DT_>
     {
       private:
+        /// column indices
         Index * _col_ind;
+        /// non zero values
         DT_ * _val;
+        /// row start indices (including matrix end index)
         Index * _row_ptr;
+        /// row end indices
         Index * _row_ptr_end;
         Index _rows;
         Index _columns;
@@ -53,8 +57,8 @@ namespace FEAST
           this->_elements_size.push_back(_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
           this->_indices_size.push_back(_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows) * sizeof(Index)));
-          this->_indices_size.push_back(_rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1) * sizeof(Index)));
+          this->_indices_size.push_back(_rows + 1);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows) * sizeof(Index)));
           this->_indices_size.push_back(_rows);
 
@@ -92,6 +96,7 @@ namespace FEAST
             _row_ptr[i] = ait;
             _row_ptr_end[i] = ait;
           }
+          _row_ptr[_rows] = ait;
         }
 
         template <typename Arch2_>
@@ -114,8 +119,8 @@ namespace FEAST
           this->_elements_size.push_back(this->_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(tother.used_elements() * sizeof(Index)));
           this->_indices_size.push_back(this->_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
-          this->_indices_size.push_back(_rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1) * sizeof(Index)));
+          this->_indices_size.push_back(_rows + 1);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
           this->_indices_size.push_back(_rows);
 
@@ -282,8 +287,8 @@ namespace FEAST
           this->_elements_size.push_back(this->_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(other.used_elements() * sizeof(Index)));
           this->_indices_size.push_back(this->_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
-          this->_indices_size.push_back(_rows);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1) * sizeof(Index)));
+          this->_indices_size.push_back(_rows + 1);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
           this->_indices_size.push_back(_rows);
 
