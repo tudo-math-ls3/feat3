@@ -153,77 +153,123 @@ namespace FEAST
     }
 
     /**
+     * \brief Trims the front of the string.
+     *
+     * This method removes any leading characters contained in the character set from the string.
+     *
+     * \param[in] charset
+     * The character set which is to be trimmed from the front of the string.
+     *
+     * \returns
+     * The front-trimmed string.
+     */
+    String trim_front(const String& charset = " \a\b\f\n\r\t\v") const
+    {
+      // find first character not to be trimmed
+      size_type pos = find_first_not_of(charset);
+      if(pos == npos)
+        return String();
+      else
+        return substr(pos);
+    }
+
+    /**
+     * \brief Trims the back of the string.
+     *
+     * This method removes any trailing characters contained in the character set from the string.
+     *
+     * \param[in] charset
+     * The character set which is to be trimmed from the back of the string.
+     *
+     * \returns
+     * The back-trimmed string.
+     */
+    String trim_back(const String& charset = " \a\b\f\n\r\t\v") const
+    {
+      // find last character not to be trimmed
+      size_type pos = find_last_not_of(charset);
+      if(pos == npos)
+        return String();
+      else
+        return substr(0, pos + 1);
+    }
+
+    /**
      * \brief Trims the string.
      *
      * This method removes any leading and trailing characters contained in the character set from the string.
      *
-     * \param charset
+     * \note If you want to trim \e this string, use trim_me() instead.
+     *
+     * \param[in] charset
+     * The character set which is to be trimmed from the string.
+     *
+     * \returns
+     * The trimmed string.
+     */
+    String trim(const String& charset = " \a\b\f\n\r\t\v") const
+    {
+      // trim front and back
+      return trim_front(charset).trim_back(charset);
+    }
+
+    /**
+     * \brief Trims this string.
+     *
+     * This method removes any leading and trailing characters contained in the character set from this string.
+     *
+     * \note If you want to have the trimmed string without modifying \e this string, use trim() instead.
+     *
+     * \param[in] charset
      * The character set which is to be trimmed from the string.
      *
      * \returns \p *this
      */
-    String& trim(const String& charset = " \a\b\f\n\r\t\v")
+    String& trim_me(const String& charset = " \a\b\f\n\r\t\v")
     {
-      if(empty() || charset.empty())
-        return *this;
-
-      // remove trailing chars
-      size_type pos = find_last_not_of(charset);
-      if(pos == npos)
-      {
-        // the whole string consists only of characters to be trimmed, so clear the whole string
-        clear();
-      }
-      else
-      {
-        // remove trailing chars
-        erase(pos+1, npos);
-
-        // remove leading chars
-        pos = find_first_not_of(charset);
-        if(pos > 0)
-        {
-          erase(0, pos);
-        }
-      }
-
-      return *this;
+      return (*this = trim());
     }
 
     /**
      * \brief Converts the string to upper case.
      *
-     * \returns \p *this
+     * \returns
+     * The upper-case string.
      */
-    String& make_upper_case()
+    String upper() const
     {
-      for(size_type i = 0; i < size(); ++i)
+      String str;
+      str.reserve(size());
+      for(const_iterator it(begin()); it != end(); ++it)
       {
 #ifdef FEAST_COMPILER_MICROSOFT
-        (*this)[i] = std::toupper((*this)[i], std::locale::classic());
+        str.push_back(std::toupper(*it, std::locale::classic()));
 #else
-        (*this)[i] = std::toupper((*this)[i]);
+        str.push_back(std::toupper(*it);
 #endif
       }
-      return *this;
+      return str;
     }
 
     /**
      * \brief Converts the string to lower case.
      *
-     * \returns \p *this
+     * \returns
+     * The lower-case string.
      */
-    String& make_lower_case()
+    String lower() const
     {
-      for(size_type i = 0; i < size(); ++i)
+      String str;
+      str.reserve(size());
+      for(const_iterator it(begin()); it != end(); ++it)
       {
 #ifdef FEAST_COMPILER_MICROSOFT
-        (*this)[i] = std::tolower((*this)[i], std::locale::classic());
+        str.push_back(std::tolower(*it, std::locale::classic()));
 #else
-        (*this)[i] = std::tolower((*this)[i]);
+        str.push_back(std::tolower(*it);
 #endif
       }
-      return *this;
+      return str;
     }
 
     /**

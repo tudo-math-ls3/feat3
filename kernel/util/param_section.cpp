@@ -202,7 +202,7 @@ namespace FEAST
       ++cur_line;
 
       // trim whitespaces; continue with next line if the current one is empty
-      if(line.trim().empty())
+      if(line.trim_me().empty())
       {
         continue;
       }
@@ -236,7 +236,7 @@ namespace FEAST
         line.erase(found);
 
         // trim whitespaces; continue with next line if the current one is empty
-        if(line.trim().empty())
+        if(line.trim_me().empty())
         {
           continue;
         }
@@ -248,12 +248,12 @@ namespace FEAST
         // a section may appear anywhere
         last_read = Section;
 
-        // removing brackets
+        // removing brackets and trimming
         line.pop_front();
         line.pop_back();
 
         // the section name must not be empty
-        if(line.trim().empty())
+        if(line.trim_me().empty())
         {
           throw SyntaxError("Missing section name in line " + stringify(cur_line));
         }
@@ -276,14 +276,14 @@ namespace FEAST
         key = line.substr(0, found);
 
         // the key must be not empty after trimming
-        if(key.trim().empty())
+        if(key.trim_me().empty())
         {
           throw SyntaxError("Missing key in line " + stringify(cur_line));
         }
 
         // extract value string; add it if it's empty
-        value = line.substr(found + 1);
-        if(value.trim().empty())
+        value = String(line.substr(found + 1)).trim();
+        if(value.empty())
         {
           current->add_entry(key, value, replace);
           continue;
@@ -313,7 +313,7 @@ namespace FEAST
             }
 
             // erase whitespaces
-            line.trim();
+            line.trim_me();
           }
 
           // do we have a non-empty string or an eof?
