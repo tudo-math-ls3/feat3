@@ -227,7 +227,7 @@ namespace FEAST
      */
     String& trim_me(const String& charset = " \a\b\f\n\r\t\v")
     {
-      return (*this = trim());
+      return (*this = trim(charset));
     }
 
     /**
@@ -245,7 +245,7 @@ namespace FEAST
 #ifdef FEAST_COMPILER_MICROSOFT
         str.push_back(std::toupper(*it, std::locale::classic()));
 #else
-        str.push_back(std::toupper(*it);
+        str.push_back(std::toupper(*it));
 #endif
       }
       return str;
@@ -266,7 +266,7 @@ namespace FEAST
 #ifdef FEAST_COMPILER_MICROSOFT
         str.push_back(std::tolower(*it, std::locale::classic()));
 #else
-        str.push_back(std::tolower(*it);
+        str.push_back(std::tolower(*it));
 #endif
       }
       return str;
