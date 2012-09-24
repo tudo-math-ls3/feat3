@@ -402,26 +402,22 @@ namespace FEAST
   }
 
   /// \cond internal
-  template<>
-  inline String stringify<const char*>(const char* const& item)
+  inline String stringify(const char* item)
   {
     return String(item);
   }
 
-  template<>
-  inline String stringify<std::string>(const std::string& item)
+  inline String stringify(const std::string& item)
   {
     return item;
   }
 
-  template<>
-  inline String stringify<char>(const char& item)
+  inline String stringify(char item)
   {
     return String(1, item);
   }
 
-  template<>
-  inline String stringify<bool>(const bool& item)
+  inline String stringify(bool item)
   {
     return String(item ? "true" : "false");
   }
