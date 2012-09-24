@@ -12,7 +12,6 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template<typename Policy_>
       class BarycentreDriverBase
       {
       public:
@@ -31,55 +30,57 @@ namespace FEAST
     /// \endcond
 
     template<
-      typename Policy_,
-      typename Shape_ = typename Policy_::ShapeType>
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
     class BarycentreDriver;
 
     template<
-      typename Policy_,
-      int dim_>
-    class BarycentreDriver<Policy_, Shape::Simplex<dim_> > :
-      public Intern::BarycentreDriverBase<Policy_>
+      int dim_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class BarycentreDriver<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
+      public Intern::BarycentreDriverBase
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
+      typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
 
       static void create(RuleType& rule)
       {
-        rule.get_weight(0) = WeightType(1) / WeightType(Factorial<dim_>::value);
+        rule.get_weight(0) = Weight_(1) / Weight_(Factorial<dim_>::value);
 
         // create coords of barycentre point
         for(int i(0); i < dim_; ++i)
         {
-          rule.get_coord(0, i) = CoordType(1) / CoordType(dim_ + 1);
+          rule.get_coord(0, i) = Coord_(1) / Coord_(dim_ + 1);
         }
       }
-    }; // class BarycentreDriver<...,Simplex<...>>
+    }; // class BarycentreDriver<Simplex<...>,...>
 
     template<
-      typename Policy_,
-      int dim_>
-    class BarycentreDriver<Policy_, Shape::Hypercube<dim_> > :
-      public Intern::BarycentreDriverBase<Policy_>
+      int dim_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class BarycentreDriver<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> :
+      public Intern::BarycentreDriverBase
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
+      typedef Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> RuleType;
 
       static void create(RuleType& rule)
       {
-        rule.get_weight(0) = WeightType(1 << dim_);
+        rule.get_weight(0) = Weight_(1 << dim_);
 
         // create coords of barycentre point
         for(int i(0); i < dim_; ++i)
         {
-          rule.get_coord(0, i) = CoordType(0);
+          rule.get_coord(0, i) = Coord_(0);
         }
       }
-    }; // class BarycentreDriver<...,Hypercube<...>>
+    }; // class BarycentreDriver<Hypercube<...>,...>
   } // namespace Cubature
 } // namespace FEAST
 

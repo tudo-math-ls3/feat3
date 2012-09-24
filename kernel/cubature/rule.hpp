@@ -12,38 +12,26 @@ namespace FEAST
    */
   namespace Cubature
   {
-    template<
-      typename Shape_,
-      typename Real_ = Real>
-    struct StdPolicy
-    {
-      typedef Shape_ ShapeType;
-      typedef Real_ WeightType;
-      typedef Real_ CoordDomainType;
-      typedef Real_ PointDomainType[ShapeType::dimension];
-      enum
-      {
-        domain_dim = ShapeType::dimension
-      };
-    };
-
     /**
      * \brief Cubature Rule class template
      *
      * \author Peter Zajac
      */
-    template<typename Policy_>
+    template<
+      typename Shape_,
+      typename Weight_ = Real,
+      typename Coord_ = Real,
+      typename Point_ = Coord_[Shape_::dimension]>
     class Rule
     {
     public:
-      typedef Policy_ Policy;
-      typedef typename Policy_::ShapeType ShapeType;
-      typedef typename Policy_::WeightType WeightType;
-      typedef typename Policy_::CoordDomainType CoordType;
-      typedef typename Policy_::PointDomainType PointType;
+      typedef Shape_ ShapeType;
+      typedef Weight_ WeightType;
+      typedef Coord_ CoordType;
+      typedef Point_ PointType;
       enum
       {
-        dimension = Policy::domain_dim
+        dimension = ShapeType::dimension
       };
 
       /**

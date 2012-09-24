@@ -12,7 +12,6 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template<typename Policy_>
       class TrapezoidalDriverBase
       {
       public:
@@ -30,20 +29,22 @@ namespace FEAST
     /// \endcond
 
     template<
-      typename Policy_,
-      typename Shape_ = typename Policy_::ShapeType>
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
     class TrapezoidalDriver;
 
     template<
-      typename Policy_,
-      int dim_>
-    class TrapezoidalDriver<Policy_, Shape::Simplex<dim_> > :
-      public Intern::TrapezoidalDriverBase<Policy_>
+      int dim_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TrapezoidalDriver<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
+      public Intern::TrapezoidalDriverBase
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
+      typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
       enum
       {
         num_points = dim_ + 1
@@ -54,27 +55,27 @@ namespace FEAST
         for(Index i(0); i <= Index(dim_); ++i)
         {
           // set weight
-          rule.get_weight(i) = WeightType(1) / WeightType(Factorial<dim_ + 1>::value);
+          rule.get_weight(i) = Weight_(1) / Weight_(Factorial<dim_ + 1>::value);
 
           // set point coords
           for(int j(0); j < dim_; ++j)
           {
-            rule.get_coord(i,j) = Index(j+1) == i ? CoordType(1) : CoordType(0);
+            rule.get_coord(i,j) = Index(j+1) == i ? Coord_(1) : Coord_(0);
           }
         }
       }
-    }; // class TrapezoidalDriver<...,Simplex<...>>
+    }; // class TrapezoidalDriver<Simplex<...>,...>
 
     template<
-      typename Policy_,
-      int dim_>
-    class TrapezoidalDriver<Policy_, Shape::Hypercube<dim_> > :
-      public Intern::TrapezoidalDriverBase<Policy_>
+      int dim_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TrapezoidalDriver<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> :
+      public Intern::TrapezoidalDriverBase
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
+      typedef Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> RuleType;
       enum
       {
         num_points = (1 << dim_)
@@ -85,16 +86,16 @@ namespace FEAST
         for(Index i(0); i < Index(1 << dim_); ++i)
         {
           // set weight
-          rule.get_weight(i) = WeightType(1);
+          rule.get_weight(i) = Weight_(1);
 
           // set point coords
           for(int j(0); j < dim_; ++j)
           {
-            rule.get_coord(i,j) = CoordType(((i >> j) & 1) << 1) - CoordType(1);
+            rule.get_coord(i,j) = Coord_(((i >> j) & 1) << 1) - Coord_(1);
           }
         }
       }
-    }; // class TrapezoidalDriver<...,Hypercube<...>>
+    }; // class TrapezoidalDriver<Hypercube<...>,...>
   } // namespace Cubature
 } // namespace FEAST
 

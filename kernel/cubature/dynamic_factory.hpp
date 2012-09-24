@@ -9,17 +9,21 @@ namespace FEAST
 {
   namespace Cubature
   {
-    template<typename Policy_>
+    template<
+      typename Shape_,
+      typename Weight_ = Real,
+      typename Coord_ = Real,
+      typename Point_ = Coord_[Shape_::dimension]>
     class DynamicFactory :
-      public Rule<Policy_>::Factory
+      public Rule<Shape_, Weight_, Coord_, Point_>::Factory
     {
     public:
-      typedef Policy_ Policy;
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef typename RuleType::PointType PointType;
+      typedef Rule<Shape_, Weight_, Coord_, Point_> RuleType;
       typedef typename RuleType::Factory BaseClass;
+      typedef Shape_ ShapeType;
+      typedef Weight_ WeightType;
+      typedef Coord_ CoordType;
+      typedef Point_ PointType;
 
     private:
       String _name;
@@ -87,7 +91,7 @@ namespace FEAST
       static bool create(const String& name, RuleType& rule)
       {
         CreateFunctor functor(name, rule);
-        FactoryWrapper<Policy_>::factory(functor);
+        FactoryWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
         return functor.okay();
       }
 
@@ -104,7 +108,7 @@ namespace FEAST
       static void avail(std::set<String>& names)
       {
         AvailFunctor functor(names);
-        FactoryWrapper<Policy_>::factory(functor);
+        FactoryWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
       }
     }; // class DynamicFactory<...>
   } // namespace Cubature

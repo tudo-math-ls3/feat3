@@ -26,6 +26,8 @@ namespace FEAST
         public Rule<Weight_, Coord_>::Factory
       {
       public:
+        typedef Weight_ WeightType;
+        typedef Coord_ CoordType;
         typedef Rule<Weight_, Coord_> RuleType;
         typedef Driver_<Weight_, Coord_> DriverType;
         enum
@@ -73,6 +75,8 @@ namespace FEAST
         public Rule<Weight_, Coord_>::Factory
       {
       public:
+        typedef Weight_ WeightType;
+        typedef Coord_ CoordType;
         typedef Rule<Weight_, Coord_> RuleType;
         typedef Driver_<Weight_, Coord_> DriverType;
         enum

@@ -10,25 +10,34 @@ namespace FEAST
   namespace Cubature
   {
     template<
-      template<typename,typename> class Driver_,
-      typename Policy_,
-      bool variadic_ = (Driver_<Policy_, typename Policy_::ShapeType>::variadic != 0)>
+      template<typename,typename,typename,typename> class Driver_,
+      typename Shape_,
+      typename Weight_ = Real,
+      typename Coord_ = Real,
+      typename Point_ = Coord_[Shape_::dimension],
+      bool variadic_ = (Driver_<Shape_, Weight_, Coord_, Point_>::variadic != 0)>
     class DriverFactory;
 
     template<
-      template<typename,typename> class Driver_,
-      typename Policy_>
-    class DriverFactory<Driver_, Policy_, false> :
-      public Rule<Policy_>::Factory
+      template<typename,typename,typename,typename> class Driver_,
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class DriverFactory<Driver_, Shape_, Weight_, Coord_, Point_, false> :
+      public Rule<Shape_, Weight_, Coord_, Point_>::Factory
     {
     public:
-      typedef Policy_ Policy;
-      typedef Rule<Policy_> RuleType;
-      typedef Driver_<Policy_, typename Policy_::ShapeType> DriverType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef typename RuleType::PointType PointType;
-
+      typedef Rule<Shape_, Weight_, Coord_, Point_> RuleType;
+      typedef Driver_<Shape_, Weight_, Coord_, Point_> DriverType;
+      typedef Shape_ ShapeType;
+      typedef Weight_ WeightType;
+      typedef Coord_ CoordType;
+      typedef Point_ PointType;
+      enum
+      {
+        variadic = 0
+      };
 
     public:
       DriverFactory()
@@ -62,18 +71,25 @@ namespace FEAST
     }; // class DriverFactory<...,false>
 
     template<
-      template<typename, typename> class Driver_,
-      typename Policy_>
-    class DriverFactory<Driver_, Policy_, true> :
-      public Rule<Policy_>::Factory
+      template<typename,typename,typename,typename> class Driver_,
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class DriverFactory<Driver_, Shape_, Weight_, Coord_, Point_, true> :
+      public Rule<Shape_, Weight_, Coord_, Point_>::Factory
     {
     public:
-      typedef Policy_ Policy;
-      typedef Rule<Policy_> RuleType;
-      typedef Driver_<Policy_, typename Policy_::ShapeType> DriverType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef typename RuleType::PointType PointType;
+      typedef Rule<Shape_, Weight_, Coord_, Point_> RuleType;
+      typedef Driver_<Shape_, Weight_, Coord_, Point_> DriverType;
+      typedef Shape_ ShapeType;
+      typedef Weight_ WeightType;
+      typedef Coord_ CoordType;
+      typedef Point_ PointType;
+      enum
+      {
+        variadic = 1
+      };
 
     protected:
       Index _num_points;

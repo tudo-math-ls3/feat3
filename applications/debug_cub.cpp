@@ -1,3 +1,4 @@
+#define FEAST_CUBATURE_TENSOR_PREFIX
 #include <kernel/cubature/scalar/dynamic_factory.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <iostream>
@@ -31,7 +32,7 @@ void print_avail_scalar()
 template<typename Shape_>
 void print_avail()
 {
-  typedef DynamicFactory< StdPolicy<Shape_> > Factory;
+  typedef DynamicFactory<Shape_> Factory;
 
   std::cout << "Available cubature names for '" << Shape_::name() << "' :" << std::endl;
   std::set<String> names;
@@ -71,11 +72,10 @@ void test_scalar()
 
 void test_quad()
 {
-  typedef StdPolicy<Shape::Quadrilateral> Policy;
-  typedef Rule<Policy> RuleType;
-  typedef DynamicFactory<Policy> Factory;
-  typedef DriverFactory<BarycentreDriver,Policy> Barycentre;
-  typedef DriverFactory<TrapezoidalDriver,Policy> Trapezoidal;
+  typedef Rule<Shape::Quadrilateral> RuleType;
+  typedef DynamicFactory<Shape::Quadrilateral> Factory;
+  typedef DriverFactory<BarycentreDriver,Shape::Quadrilateral> Barycentre;
+  typedef DriverFactory<TrapezoidalDriver,Shape::Quadrilateral> Trapezoidal;
 
   RuleType barycentre_1(Barycentre::create());
   RuleType trapezoidal_1(Trapezoidal::create());
@@ -86,11 +86,10 @@ void test_quad()
 
 void test_tria()
 {
-  typedef StdPolicy<Shape::Triangle> Policy;
-  typedef Rule<Policy> RuleType;
-  typedef DynamicFactory<Policy> Factory;
-  typedef DriverFactory<BarycentreDriver,Policy> Barycentre;
-  typedef DriverFactory<TrapezoidalDriver,Policy> Trapezoidal;
+  typedef Rule<Shape::Triangle> RuleType;
+  typedef DynamicFactory<Shape::Triangle> Factory;
+  typedef DriverFactory<BarycentreDriver,Shape::Triangle> Barycentre;
+  typedef DriverFactory<TrapezoidalDriver,Shape::Triangle> Trapezoidal;
 
   RuleType barycentre_1(Barycentre::create());
   RuleType trapezoidal_1(Trapezoidal::create());
@@ -102,5 +101,6 @@ void test_tria()
 int main(int argc, char* argv[])
 {
   print_avail_all();
+  //Rule<Shape::Quadrilateral> rule;
   return 0;
 }

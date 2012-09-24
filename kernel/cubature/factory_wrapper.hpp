@@ -17,27 +17,33 @@ namespace FEAST
     namespace Intern
     {
       template<
-        typename Policy_,
-        typename ScalarFactory_,
-        bool tensorise_ = (ScalarFactory_::tensorise != 0)>
+        template<typename,typename> class ScalarDriver_,
+        typename Shape_,
+        typename Weight_,
+        typename Coord_,
+        typename Point_,
+        bool tensorise_ = (ScalarDriver_<Weight_, Coord_>::tensorise != 0)>
       class TensorProductFunctorHelper
       {
       public:
         template<typename Functor_>
-        static void factory(Functor_& functor)
+        static void scalar_driver(Functor_& functor)
         {
-          TensorProductDriver<Policy_>::template factory<ScalarFactory_>(functor);
+          TensorProductDriver<Shape_, Weight_, Coord_, Point_>::template scalar_driver<ScalarDriver_>(functor);
         }
       };
 
       template<
-        typename Policy_,
-        typename ScalarFactory_>
-      class TensorProductFunctorHelper<Policy_, ScalarFactory_, false>
+        template<typename,typename> class ScalarDriver_,
+        typename Shape_,
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
+      class TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_, false>
       {
       public:
         template<typename Functor_>
-        static void factory(Functor_&)
+        static void scalar_driver(Functor_&)
         {
           // do nothing
         }
@@ -45,7 +51,11 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
 
-    template<typename Policy_>
+    template<
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
     class FactoryWrapper
     {
     private:
@@ -61,10 +71,10 @@ namespace FEAST
         {
         }
 
-        template<template<typename,typename> class Driver_>
+        template<template<typename,typename,typename,typename> class Driver_>
         void driver()
         {
-          _functor.template factory< DriverFactory<Driver_, Policy_> >();
+          _functor.template factory< DriverFactory<Driver_, Shape_, Weight_, Coord_, Point_> >();
         }
       };
 
@@ -80,10 +90,10 @@ namespace FEAST
         {
         }
 
-        template<typename ScalarFactory_>
-        void factory()
+        template<template<typename,typename> class ScalarDriver_>
+        void driver()
         {
-          Intern::TensorProductFunctorHelper<Policy_, ScalarFactory_>::factory(_functor);
+          Intern::TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_>::scalar_driver(_functor);
         }
       };
 
@@ -118,12 +128,8 @@ namespace FEAST
       template<typename Functor_>
       static void tensor(TensorProductFunctor<Functor_>& functor)
       {
-        typedef Rule<Policy_> RuleType;
-        typedef typename RuleType::WeightType WeightType;
-        typedef typename RuleType::CoordType CoordType;
-        typedef Scalar::FactoryWrapper<WeightType, CoordType> ScalarFactoryWrapper;
         // call the scalar factory wrapper
-        ScalarFactoryWrapper::factory(functor);
+        Scalar::FactoryWrapper<Weight_, Coord_>::driver(functor);
       }
     }; // class FactoryWrapper<...>
   } // namespace Cubature

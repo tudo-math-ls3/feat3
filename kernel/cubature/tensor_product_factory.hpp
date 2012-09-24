@@ -11,48 +11,58 @@ namespace FEAST
   namespace Cubature
   {
     template<
-      typename Policy_,
-      typename ScalarFactory_,
-      bool variadic = (ScalarFactory_::variadic != 0)>
+      template<typename,typename> class ScalarDriver_,
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_,
+      bool variadic_ = (ScalarDriver_<Weight_, Coord_>::variadic != 0)>
     class TensorProductFactory;
 
-    template<typename Policy_>
+    template<
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
     class TensorProductDriverBase
     {
     public:
       template<
-        typename ScalarFactory_,
+        template<typename,typename> class ScalarDriver_,
         typename Functor_>
-      static void factory(Functor_& functor)
+      static void scalar_driver(Functor_& functor)
       {
-        functor.template factory<TensorProductFactory<Policy_, ScalarFactory_> >();
+        functor.template factory<TensorProductFactory<ScalarDriver_, Shape_, Weight_, Coord_, Point_> >();
       }
     };
 
     template<
-      typename Policy_,
-      typename Shape_ = typename Policy_::ShapeType>
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
     class TensorProductDriver
     {
     public:
       template<
-        typename ScalarFactory_,
+        template<typename,typename> class ScalarDriver_,
         typename Functor_>
-      static void factory(Functor_&)
+      static void scalar_driver(Functor_&)
       {
         // do nothing
       }
     };
 
-    template<typename Policy_>
-    class TensorProductDriver<Policy_, Shape::Simplex<1> > :
-      public TensorProductDriverBase<Policy_>
+    template<
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TensorProductDriver<Shape::Simplex<1>, Weight_, Coord_, Point_> :
+      public TensorProductDriverBase<Shape::Simplex<1>, Weight_, Coord_, Point_>
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef Scalar::Rule<WeightType, CoordType> ScalarRuleType;
+      typedef Rule<Shape::Simplex<1>, Weight_, Coord_, Point_> RuleType;
+      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
 
       static Index count(Index num_points)
       {
@@ -63,21 +73,22 @@ namespace FEAST
       {
         for(Index i(0); i < scalar_rule.get_num_points(); ++i)
         {
-          rule.get_weight(i) = scalar_rule.get_weight(i) * WeightType(0.5);
-          rule.get_coord(i, 0) = (scalar_rule.get_coord(i) + CoordType(1)) * CoordType(0.5);
+          rule.get_weight(i) = scalar_rule.get_weight(i) * Weight_(0.5);
+          rule.get_coord(i, 0) = (scalar_rule.get_coord(i) + Coord_(1)) * Coord_(0.5);
         }
       }
     };
 
-    template<typename Policy_>
-    class TensorProductDriver<Policy_, Shape::Hypercube<1> > :
-      public TensorProductDriverBase<Policy_>
+    template<
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TensorProductDriver<Shape::Hypercube<1>, Weight_, Coord_, Point_> :
+      public TensorProductDriverBase<Shape::Hypercube<1>, Weight_, Coord_, Point_>
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef Scalar::Rule<WeightType, CoordType> ScalarRuleType;
+      typedef Rule<Shape::Hypercube<1>, Weight_, Coord_, Point_> RuleType;
+      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
 
       static Index count(Index num_points)
       {
@@ -94,15 +105,16 @@ namespace FEAST
       }
     };
 
-    template<typename Policy_>
-    class TensorProductDriver<Policy_, Shape::Hypercube<2> > :
-      public TensorProductDriverBase<Policy_>
+    template<
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TensorProductDriver<Shape::Hypercube<2>, Weight_, Coord_, Point_> :
+      public TensorProductDriverBase<Shape::Hypercube<2>, Weight_, Coord_, Point_>
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef Scalar::Rule<WeightType, CoordType> ScalarRuleType;
+      typedef Rule<Shape::Hypercube<2>, Weight_, Coord_, Point_> RuleType;
+      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
 
       static Index count(Index num_points)
       {
@@ -125,15 +137,16 @@ namespace FEAST
       }
     };
 
-    template<typename Policy_>
-    class TensorProductDriver<Policy_, Shape::Hypercube<3> > :
-      public TensorProductDriverBase<Policy_>
+    template<
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TensorProductDriver<Shape::Hypercube<3>, Weight_, Coord_, Point_> :
+      public TensorProductDriverBase<Shape::Hypercube<3>, Weight_, Coord_, Point_>
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef Scalar::Rule<WeightType, CoordType> ScalarRuleType;
+      typedef Rule<Shape::Hypercube<3>, Weight_, Coord_, Point_> RuleType;
+      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
 
       static Index count(Index num_points)
       {
@@ -161,22 +174,24 @@ namespace FEAST
     };
 
     template<
-      typename Policy_,
-      typename ScalarFactory_>
+      template<typename,typename> class ScalarDriver_,
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
     class TensorProductFactoryBase
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef typename RuleType::PointType PointType;
-      typedef Scalar::Rule<WeightType, CoordType> ScalarRuleType;
-      typedef ScalarFactory_ ScalarFactoryType;
+      typedef Rule<Shape_, Weight_, Coord_, Point_> RuleType;
+      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
+
+      //typedef ScalarDriver<Weight_, Coord_> ScalarFactoryType;
+      typedef Scalar::DriverFactory<ScalarDriver_, Weight_, Coord_> ScalarFactoryType;
 
     public:
       static bool create(const String& name, RuleType& rule)
       {
-#ifdef TENSOR_PREFIX
+#ifdef FEAST_CUBATURE_TENSOR_PREFIX
         // try to find a colon within the string
         String::size_type k = name.find_first_of(':');
         if(k == name.npos)
@@ -199,7 +214,7 @@ namespace FEAST
         ScalarRuleType scalar_rule;
         if(!ScalarFactoryType::create(name, scalar_rule))
           return false;
-#endif
+#endif // FEAST_CUBATURE_TENSOR_PREFIX
 
         // convert scalar rule
         rule = create(scalar_rule);
@@ -208,40 +223,44 @@ namespace FEAST
 
       static RuleType create(const ScalarRuleType& scalar_rule)
       {
-        Index num_points = TensorProductDriver<Policy_>::count(scalar_rule.get_num_points());
-#ifdef TENSOR_PREFIX
+        Index num_points = TensorProductDriver<Shape_, Weight_, Coord_, Point_>::count(scalar_rule.get_num_points());
+#ifdef FEAST_CUBATURE_TENSOR_PREFIX
         RuleType rule(num_points, "tensor:" + scalar_rule.get_name());
 #else
         RuleType rule(num_points, scalar_rule.get_name());
-#endif
-        TensorProductDriver<Policy_>::create(scalar_rule, rule);
+#endif // FEAST_CUBATURE_TENSOR_PREFIX
+        TensorProductDriver<Shape_, Weight_, Coord_, Point_>::create(scalar_rule, rule);
         return rule;
       }
 
       static String avail_name()
       {
-#ifdef TENSOR_PREFIX
+#ifdef FEAST_CUBATURE_TENSOR_PREFIX
         return "tensor:" + ScalarFactoryType::avail_name();
 #else
         return ScalarFactoryType::avail_name();
-#endif
+#endif // FEAST_CUBATURE_TENSOR_PREFIX
       }
     };
 
     template<
-      typename Policy_,
-      typename ScalarFactory_>
-    class TensorProductFactory<Policy_, ScalarFactory_, false> :
-      public TensorProductFactoryBase<Policy_, ScalarFactory_>
+      template<typename,typename> class ScalarDriver_,
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TensorProductFactory<ScalarDriver_, Shape_, Weight_, Coord_, Point_, false> :
+      public TensorProductFactoryBase<ScalarDriver_, Shape_, Weight_, Coord_, Point_>
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef TensorProductFactoryBase<Policy_, ScalarFactory_> BaseClass;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef typename RuleType::PointType PointType;
-      typedef Scalar::Rule<WeightType, CoordType> ScalarRuleType;
-      typedef ScalarFactory_ ScalarFactoryType;
+      typedef Rule<Shape_, Weight_, Coord_, Point_> RuleType;
+      typedef TensorProductFactoryBase<ScalarDriver_, Shape_, Weight_, Coord_, Point_> BaseClass;
+      typedef Shape_ ShapeType;
+      typedef Weight_ WeightType;
+      typedef Coord_ CoordType;
+      typedef Point_ PointType;
+      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
+      typedef Scalar::DriverFactory<ScalarDriver_, Weight_, Coord_> ScalarFactoryType;
       enum
       {
         variadic = 0
@@ -266,19 +285,23 @@ namespace FEAST
     };
 
     template<
-      typename Policy_,
-      typename ScalarFactory_>
-    class TensorProductFactory<Policy_, ScalarFactory_, true> :
-      public TensorProductFactoryBase<Policy_, ScalarFactory_>
+      template<typename,typename> class ScalarDriver_,
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class TensorProductFactory<ScalarDriver_, Shape_, Weight_, Coord_, Point_, true> :
+      public TensorProductFactoryBase<ScalarDriver_, Shape_, Weight_, Coord_, Point_>
     {
     public:
-      typedef Rule<Policy_> RuleType;
-      typedef TensorProductFactoryBase<Policy_, ScalarFactory_> BaseClass;
-      typedef typename RuleType::WeightType WeightType;
-      typedef typename RuleType::CoordType CoordType;
-      typedef typename RuleType::PointType PointType;
-      typedef Scalar::Rule<WeightType, CoordType> ScalarRuleType;
-      typedef ScalarFactory_ ScalarFactoryType;
+      typedef Rule<Shape_, Weight_, Coord_, Point_> RuleType;
+      typedef TensorProductFactoryBase<ScalarDriver_, Shape_, Weight_, Coord_, Point_> BaseClass;
+      typedef Shape_ ShapeType;
+      typedef Weight_ WeightType;
+      typedef Coord_ CoordType;
+      typedef Point_ PointType;
+      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
+      typedef Scalar::DriverFactory<ScalarDriver_, Weight_, Coord_> ScalarFactoryType;
       enum
       {
         variadic = 1
