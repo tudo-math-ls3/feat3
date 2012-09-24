@@ -36,6 +36,12 @@
     <Filter Include="Header Files\geometry\intern">
       <UniqueIdentifier>{4298ef81-1db6-4d46-9001-79bf909708b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\cubature">
+      <UniqueIdentifier>{70738fcd-c235-4236-bf68-6e9b8dd8e7b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cubature\scalar">
+      <UniqueIdentifier>{ede68e81-08b1-4807-995e-3ed656810995}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
@@ -299,6 +305,48 @@
     </ClInclude>
     <ClInclude Include="..\kernel\shape.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\driver_factory.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\dynamic_factory.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\factory_wrapper.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\gauss_legendre_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\pulcherima_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\rule.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\trapezoidal_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\rule.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\barycentre_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\driver_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\dynamic_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\factory_wrapper.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\tensor_product_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\trapezoidal_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

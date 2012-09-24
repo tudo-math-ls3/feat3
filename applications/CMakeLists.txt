@@ -12,3 +12,6 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 # applications to build
 ADD_EXECUTABLE(foundation_system_test-app foundation_system_test-app.cpp)
 TARGET_LINK_LIBRARIES(foundation_system_test-app feast)
+
+ADD_EXECUTABLE(debug_cub debug_cub.cpp)
+TARGET_LINK_LIBRARIES(debug_cub feast)
