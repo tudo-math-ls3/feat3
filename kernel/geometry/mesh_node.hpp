@@ -512,7 +512,7 @@ namespace FEAST
         RootMeshNode* fine_node = new RootMeshNode(fine_mesh, refinery);
 
         // refine our children
-        refine_children(*fine_node);
+        this->refine_children(*fine_node);
 
         // okay
         return fine_node;
@@ -596,7 +596,7 @@ namespace FEAST
         SubMeshNode* fine_node = new SubMeshNode(fine_mesh, refinery);
 
         // refine our children
-        refine_children(*fine_node);
+        this->refine_children(*fine_node);
 
         // okay
         return fine_node;
