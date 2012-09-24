@@ -20,7 +20,9 @@ if (FEAST_BACKENDS_CUDA)
 endif(FEAST_BACKENDS_CUDA)
 
 #list of kernel tests
-SET (test_list)
+SET (test_list
+  shape-test
+)
 
 #create all tests
 FOREACH (test ${test_list} )

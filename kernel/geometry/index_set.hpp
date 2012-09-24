@@ -3,10 +3,13 @@
 #define KERNEL_GEOMETRY_INDEX_SET_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/shape.hpp>
+#include <kernel/shape.hpp>
 
 namespace FEAST
 {
+  /**
+   * \brief Geometry namespace
+   */
   namespace Geometry
   {
     /**

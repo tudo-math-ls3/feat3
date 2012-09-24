@@ -1,10 +1,9 @@
 #include <test_system/test_system.hpp>
-#include <kernel/geometry/shape.hpp>
+#include <kernel/shape.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
-using namespace FEAST::Geometry::Shape;
+using namespace FEAST::Shape;
 
 /**
  * \brief Test class for the Shape and FaceTraits class templates.

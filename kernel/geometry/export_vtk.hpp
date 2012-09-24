@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_EXPORT_VTK_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/shape.hpp>
+#include <kernel/shape.hpp>
 
 // includes, STL
 #include <fstream>

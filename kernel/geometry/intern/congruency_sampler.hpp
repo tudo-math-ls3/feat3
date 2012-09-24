@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_INTERN_CONGRUENCY_SAMPLER_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/shape.hpp>
+#include <kernel/shape.hpp>
 
 namespace FEAST
 {

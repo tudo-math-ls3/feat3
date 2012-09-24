@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_TARGET_SET_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/shape.hpp>
+#include <kernel/shape.hpp>
 
 namespace FEAST
 {

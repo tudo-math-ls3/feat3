@@ -90,9 +90,6 @@
     <ClInclude Include="..\kernel\util\logger.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\shape.hpp">
-      <Filter>Header Files\geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\util\factorial.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
@@ -299,6 +296,9 @@
     </ClInclude>
     <ClInclude Include="..\kernel\geometry\conformal_sub_mesh.hpp">
       <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\shape.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

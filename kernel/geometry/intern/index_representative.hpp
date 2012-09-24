@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_INTERN_INDEX_REPRESENTATIVE_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/shape.hpp>
+#include <kernel/shape.hpp>
 
 // includes, system
 #include <algorithm>

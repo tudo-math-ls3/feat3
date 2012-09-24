@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/geometry/intern/congurency_mapping.hpp>
-//#include <kernel/geometry/intern/face_index_mapping.hpp>
 
 namespace FEAST
 {

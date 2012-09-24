@@ -205,7 +205,7 @@ class HaloTestGeometryInterface:
 
       //creating conformal geometry mesh
       IndexType_ index_set[] = {4, 4, 1};
-      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Geometry::Shape::Hypercube<2> > > confmeshtype_;
+      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Shape::Hypercube<2> > > confmeshtype_;
       confmeshtype_ geo_m(index_set);
 
       //transfer data
@@ -250,7 +250,7 @@ class HaloTestGeometryInterface:
 
       //create CellSubSet
       Index polytopes_in_subset[3] = {2, 1, 0}; //no overlap and one edge means two vertices but no faces
-      Geometry::CellSubSet<Geometry::Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+      Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
 
       typename Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> >::storage_type_ adjacent_vertices(h.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, h.get_element(0)));
 

@@ -16,7 +16,6 @@ TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
 
 # list of geometry tests
 SET (test_list
-  shape-test
   standard_refinery-test-conf-quad
   standard_refinery-test-conf-hexa
   standard_refinery-test-conf-tria

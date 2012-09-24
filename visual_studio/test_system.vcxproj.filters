@@ -82,9 +82,6 @@
     <ClCompile Include="..\kernel\util\factorial-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\geometry\shape-test.cpp">
-      <Filter>Source Files %28kernel%29\geometry</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\util\graph-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
@@ -210,6 +207,9 @@
     </ClCompile>
     <ClCompile Include="..\kernel\geometry\test_aux\tetris_quad.cpp">
       <Filter>Source Files %28kernel%29\geometry\test_aux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\shape-test.cpp">
+      <Filter>Source Files %28kernel%29</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
