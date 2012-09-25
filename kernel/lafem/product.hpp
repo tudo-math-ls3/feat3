@@ -52,6 +52,13 @@ namespace FEAST
       }
     };
 
+    template <>
+    struct Product<Archs::GPU, Archs::CUDA>
+    {
+      template <typename DT_>
+      static void value(DenseVector<Archs::GPU, DT_> & r, const SparseMatrixCSR<Archs::GPU, DT_> & a, const DenseVector<Archs::GPU, DT_> & b);
+    };
+
   } // namespace LAFEM
 } // namespace FEAST
 

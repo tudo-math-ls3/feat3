@@ -87,7 +87,7 @@ namespace FEAST
           _elements[row * _columns + col] = val;
         }
 
-        const DT_ & operator()(Index row, Index col) const
+        const DT_ operator()(Index row, Index col) const
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
@@ -96,7 +96,9 @@ namespace FEAST
           if (it == _elements.end())
             return _zero_element;
           else
+          {
             return it->second;
+          }
         }
 
         const Index & rows() const
