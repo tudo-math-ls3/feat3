@@ -6,6 +6,7 @@
 #include <kernel/lafem/product.hpp>
 #include <kernel/lafem/richardson.hpp>
 #include <kernel/lafem/preconditioner.hpp>
+#include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -29,16 +30,13 @@ public:
   virtual void run() const
   {
     Index size(1025);
-    DenseVector<Arch_, DT_> x(size);
+    DenseVector<Arch_, DT_> x(size, DT_(1));
     DenseVector<Arch_, DT_> b(size);
+    DenseVector<Archs::CPU, DT_> ref_local(size, DT_(42));
     DenseVector<Arch_, DT_> ref(size);
-    for (Index i(0) ; i < size ; ++i)
-    {
-      ref(i, DT_(42));
-      x(i, DT_(1));
-    }
+    copy(ref, ref_local);
 
-    SparseMatrixCOO<Arch_, DT_> csys(size, size);
+    SparseMatrixCOO<Archs::CPU, DT_> csys(size, size);
     for (Index i(0) ; i < size ; ++i)
       csys(i, i, DT_(4));
     for (Index i(1) ; i < size ; ++i)
@@ -53,8 +51,14 @@ public:
 
     Richardson<BType_>::value(x, sys, b, jac, 1000, DT_(1e-16));
 
-    TEST_CHECK_EQUAL(x, ref);
+    DenseVector<Archs::CPU, DT_> sol(size);
+    copy(sol, x);
+    TEST_CHECK_EQUAL(sol, ref_local);
   }
 };
 RichardsonTest<Archs::CPU, Archs::Generic, float> richardson_test_float;
 RichardsonTest<Archs::CPU, Archs::Generic, double> richardson_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+RichardsonTest<Archs::GPU, Archs::CUDA, float> cuda_richardson_test_float;
+RichardsonTest<Archs::GPU, Archs::CUDA, double> cuda_richardson_test_double;
+#endif
