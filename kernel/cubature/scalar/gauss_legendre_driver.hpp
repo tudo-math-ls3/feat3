@@ -3,7 +3,7 @@
 #define KERNEL_CUBATURE_SCALAR_GAUSS_LEGENDRE_DRIVER_HPP 1
 
 // includes, FEAST
-#include <kernel/cubature/scalar/rule.hpp>
+#include <kernel/cubature/scalar/driver_base.hpp>
 
 // includes, STL
 #include <cmath>
@@ -17,7 +17,8 @@ namespace FEAST
       template<
         typename Weight_,
         typename Coord_>
-      class GaussLegendreDriver
+      class GaussLegendreDriver :
+        public DriverBase
       {
       public:
         typedef Weight_ WeightType;
@@ -27,7 +28,6 @@ namespace FEAST
         enum
         {
           variadic = 1,
-          tensorise = 1,
           min_points = 1,
           max_points = 5
         };
@@ -37,36 +37,44 @@ namespace FEAST
           return "gauss-legendre";
         }
 
-        static void create(Index num_points, RuleType& rule)
+        template<typename Functor_>
+        static void alias(Functor_& functor)
+        {
+          // midpoint rule -> gauss-legendre:1
+          functor.alias("midpoint", 1);
+        }
+
+        static void fill(RuleType& rule, Index num_points)
         {
           // create the formula
           switch(num_points)
           {
           case 1:
-            create_1(rule);
+            fill_1(rule);
             break;
           case 2:
-            create_2(rule);
+            fill_2(rule);
             break;
           case 3:
-            create_3(rule);
+            fill_3(rule);
             break;
           case 4:
-            create_4(rule);
+            fill_4(rule);
             break;
           case 5:
-            create_5(rule);
+            fill_5(rule);
             break;
           }
         }
 
-        static void create_1(RuleType& rule)
+        /// \cond internal
+        static void fill_1(RuleType& rule)
         {
           rule.get_coord(0) = CoordType(0);
           rule.get_weight(0) = WeightType(2);
         }
 
-        static void create_2(RuleType& rule)
+        static void fill_2(RuleType& rule)
         {
           rule.get_coord(0) = -std::sqrt(CoordType(1) / CoordType(3));
           rule.get_coord(1) = +std::sqrt(CoordType(1) / CoordType(3));
@@ -75,7 +83,7 @@ namespace FEAST
           rule.get_weight(1) = WeightType(1);
         }
 
-        static void create_3(RuleType& rule)
+        static void fill_3(RuleType& rule)
         {
           rule.get_coord(0) = -std::sqrt(CoordType(3) / CoordType(5));
           rule.get_coord(1) = CoordType(0);
@@ -86,7 +94,7 @@ namespace FEAST
           rule.get_weight(2) = WeightType(5) / WeightType(9);
         }
 
-        static void create_4(RuleType& rule)
+        static void fill_4(RuleType& rule)
         {
           const CoordType dc = std::sqrt(CoordType(24) / CoordType(5));
           rule.get_coord(0) = -std::sqrt((CoordType(3) + dc) / CoordType(7));
@@ -101,7 +109,7 @@ namespace FEAST
           rule.get_weight(3) = (WeightType(18) - dw) / WeightType(36);
         }
 
-        static void create_5(RuleType& rule)
+        static void fill_5(RuleType& rule)
         {
           const CoordType dc = CoordType(2) * std::sqrt(CoordType(10) / CoordType(7));
           rule.get_coord(0) = -std::sqrt(CoordType(5) + dc) / CoordType(3);
@@ -117,6 +125,7 @@ namespace FEAST
           rule.get_weight(3) = (WeightType(322) + dw) / WeightType(900);
           rule.get_weight(4) = (WeightType(322) - dw) / WeightType(900);
         }
+        /// \endcond
       }; // class GaussLegendreDriver<...>
     } // namespace Scalar
   } // namespace Cubature

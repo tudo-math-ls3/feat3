@@ -3,7 +3,7 @@
 #define KERNEL_CUBATURE_TRAPEZOIDAL_DRIVER_HPP 1
 
 // includes, FEAST
-#include <kernel/cubature/rule.hpp>
+#include <kernel/cubature/driver_base.hpp>
 
 namespace FEAST
 {
@@ -12,7 +12,8 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      class TrapezoidalDriverBase
+      class TrapezoidalDriverBase :
+        public DriverBase
       {
       public:
         enum
@@ -50,7 +51,7 @@ namespace FEAST
         num_points = dim_ + 1
       };
 
-      static void create(RuleType& rule)
+      static void fill(RuleType& rule)
       {
         for(Index i(0); i <= Index(dim_); ++i)
         {
@@ -81,7 +82,7 @@ namespace FEAST
         num_points = (1 << dim_)
       };
 
-      static void create(RuleType& rule)
+      static void fill(RuleType& rule)
       {
         for(Index i(0); i < Index(1 << dim_); ++i)
         {

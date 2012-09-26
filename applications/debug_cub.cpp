@@ -14,18 +14,10 @@
 using namespace FEAST;
 using namespace FEAST::Cubature;
 
-void print_avail_scalar()
+void print_avail_scalar(bool aliases = true)
 {
-  typedef Scalar::DynamicFactory<> Factory;
-
   std::cout << "Available scalar cubature names:" << std::endl;
-  std::set<String> names;
-  Factory::avail(names);
-  std::set<String>::iterator it(names.begin()), jt(names.end());
-  for(; it != jt; ++it)
-  {
-    std::cout << "> " << *it << std::endl;
-  }
+  Scalar::DynamicFactory<>::print_avail(true);
   std::cout << std::endl;
 }
 
@@ -35,13 +27,7 @@ void print_avail()
   typedef DynamicFactory<Shape_> Factory;
 
   std::cout << "Available cubature names for '" << Shape_::name() << "' :" << std::endl;
-  std::set<String> names;
-  Factory::avail(names);
-  std::set<String>::iterator it(names.begin()), jt(names.end());
-  for(; it != jt; ++it)
-  {
-    std::cout << "> " << *it << std::endl;
-  }
+  DynamicFactory<Shape_>::print_avail(true);
   std::cout << std::endl;
 }
 
@@ -60,14 +46,15 @@ void test_scalar()
 {
   typedef Scalar::Rule<> RuleType;
   typedef Scalar::DynamicFactory<> Factory;
-  typedef Scalar::DriverFactory<Scalar::PulcherimaDriver> Pulcherima;
+  typedef Scalar::DriverFactory<Scalar::PulcherrimaDriver> Pulcherrima;
   typedef Scalar::DriverFactory<Scalar::GaussLegendreDriver> GaussLegendre;
 
-  RuleType pulcherima_1(Pulcherima::create());
+  RuleType pulcherrima_1(Pulcherrima::create());
   RuleType gauss2_1(GaussLegendre::create(2));
 
-  RuleType pulcherima_2(Factory::create("pulcherima"));
+  RuleType pulcherrima_2(Factory::create("pulcherrima"));
   RuleType gauss2_2(Factory::create("gauss-legendre:2"));
+  RuleType midpoint(Factory::create("midpoint"));
 }
 
 void test_quad()
@@ -101,6 +88,5 @@ void test_tria()
 int main(int argc, char* argv[])
 {
   print_avail_all();
-  //Rule<Shape::Quadrilateral> rule;
   return 0;
 }

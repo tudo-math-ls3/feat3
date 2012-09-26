@@ -5,7 +5,7 @@
 // includes, FEAST
 #include <kernel/cubature/scalar/driver_factory.hpp>
 #include <kernel/cubature/scalar/gauss_legendre_driver.hpp>
-#include <kernel/cubature/scalar/pulcherima_driver.hpp>
+#include <kernel/cubature/scalar/pulcherrima_driver.hpp>
 #include <kernel/cubature/scalar/trapezoidal_driver.hpp>
 
 namespace FEAST
@@ -14,33 +14,6 @@ namespace FEAST
   {
     namespace Scalar
     {
-      /// \cond internal
-      namespace Intern
-      {
-        template<
-          typename Weight_,
-          typename Coord_,
-          typename Functor_>
-        class DriverFactoryFunctor
-        {
-        protected:
-          Functor_& _functor;
-
-        public:
-          explicit DriverFactoryFunctor(Functor_& functor) :
-            _functor(functor)
-          {
-          }
-
-          template<template<typename,typename> class Driver_>
-          void driver()
-          {
-            _functor.template factory< DriverFactory<Driver_, Weight_, Coord_> >();
-          }
-        };
-      } // namespace Intern
-      /// \endcond
-
       /**
        * \brief Scalar Cubature Factory Wrapper class template
        *
@@ -59,7 +32,7 @@ namespace FEAST
           // TODO: add you new scalar cubature driver at the end of the list below, e.g.
           // functor.template driver<YourDriverName>();
           functor.template driver<GaussLegendreDriver>();
-          functor.template driver<PulcherimaDriver>();
+          functor.template driver<PulcherrimaDriver>();
           functor.template driver<TrapezoidalDriver>();
 
           // <<< END OF CUBATURE DRIVER LIST <<<
@@ -75,9 +48,31 @@ namespace FEAST
           // <<< END OF CUBATURE FACTORY LIST <<<
 
           // call driver factory functor
-          Intern::DriverFactoryFunctor<Weight_, Coord_, Functor_> driver_functor(functor);
+          DriverFactoryFunctor<Functor_> driver_functor(functor);
           driver(driver_functor);
         }
+
+        /// \cond internal
+      private:
+        template<typename Functor_>
+        class DriverFactoryFunctor
+        {
+        protected:
+          Functor_& _functor;
+
+        public:
+          explicit DriverFactoryFunctor(Functor_& functor) :
+            _functor(functor)
+          {
+          }
+
+          template<template<typename,typename> class Driver_>
+          void driver()
+          {
+            _functor.template factory< DriverFactory<Driver_, Weight_, Coord_> >();
+          }
+        };
+        /// \endcond
       };
     } // namespace Scalar
   } // namespace Cubature

@@ -318,9 +318,6 @@
     <ClInclude Include="..\kernel\cubature\scalar\gauss_legendre_driver.hpp">
       <Filter>Header Files\cubature\scalar</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\cubature\scalar\pulcherima_driver.hpp">
-      <Filter>Header Files\cubature\scalar</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\cubature\scalar\rule.hpp">
       <Filter>Header Files\cubature\scalar</Filter>
     </ClInclude>
@@ -346,6 +343,18 @@
       <Filter>Header Files\cubature</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\cubature\trapezoidal_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\pulcherrima_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\driver_base.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\driver_base.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\internal_functors.hpp">
       <Filter>Header Files\cubature</Filter>
     </ClInclude>
   </ItemGroup>

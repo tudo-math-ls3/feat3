@@ -47,55 +47,7 @@ namespace FEAST
         typename Coord_,
         typename Point_,
         bool tensorise_ = (ScalarDriver_<Weight_, Coord_>::tensorise != 0)>
-      class TensorProductFunctorHelper
-      {
-      public:
-        template<typename Functor_>
-        static void scalar_driver(Functor_& functor)
-        {
-          TensorProductDriver<Shape_, Weight_, Coord_, Point_>::template scalar_driver<ScalarDriver_>(functor);
-        }
-      };
-
-      template<
-        template<typename,typename> class ScalarDriver_,
-        typename Shape_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_>
-      class TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_, false>
-      {
-      public:
-        template<typename Functor_>
-        static void scalar_driver(Functor_&)
-        {
-          // do nothing
-        }
-      };
-
-      template<
-        typename Shape_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_,
-        typename Functor_>
-      class TensorProductFunctor
-      {
-      protected:
-        Functor_& _functor;
-
-      public:
-        explicit TensorProductFunctor(Functor_& functor) :
-          _functor(functor)
-        {
-        }
-
-        template<template<typename,typename> class ScalarDriver_>
-        void driver()
-        {
-          Intern::TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_>::scalar_driver(_functor);
-        }
-      };
+      class TensorProductFunctorHelper;
     } // namespace Intern
     /// \endcond
 
@@ -497,10 +449,69 @@ namespace FEAST
         driver(driver_functor);
 
         // call tensor-product functor
-        Intern::TensorProductFunctor<Shape_, Weight_, Coord_, Point_, Functor_> tensor_functor(functor);
+        TensorProductFunctor<Functor_> tensor_functor(functor);
         Scalar::FactoryWrapper<Weight_, Coord_>::driver(tensor_functor);
       }
+
+      /// \cond internal
+    private:
+      template<typename Functor_>
+      class TensorProductFunctor
+      {
+      protected:
+        Functor_& _functor;
+
+      public:
+        explicit TensorProductFunctor(Functor_& functor) :
+          _functor(functor)
+        {
+        }
+
+        template<template<typename,typename> class ScalarDriver_>
+        void driver()
+        {
+          Intern::TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_>::scalar_driver(_functor);
+        }
+      };
+      /// \endcond
     }; // class FactoryWrapper<...>
+    /// \cond internal
+    namespace Intern
+    {
+      template<
+        template<typename,typename> class ScalarDriver_,
+        typename Shape_,
+        typename Weight_,
+        typename Coord_,
+        typename Point_,
+        bool tensorise_>
+      class TensorProductFunctorHelper
+      {
+      public:
+        template<typename Functor_>
+        static void scalar_driver(Functor_& functor)
+        {
+          TensorProductDriver<Shape_, Weight_, Coord_, Point_>::template scalar_driver<ScalarDriver_>(functor);
+        }
+      };
+
+      template<
+        template<typename,typename> class ScalarDriver_,
+        typename Shape_,
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
+      class TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_, false>
+      {
+      public:
+        template<typename Functor_>
+        static void scalar_driver(Functor_&)
+        {
+          // do nothing
+        }
+      };
+    } // namespace Intern
+    /// \endcond
   } // namespace Cubature
 } // namespace FEAST
 

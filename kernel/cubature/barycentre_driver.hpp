@@ -3,7 +3,7 @@
 #define KERNEL_CUBATURE_BARYCENTRE_DRIVER_HPP 1
 
 // includes, FEAST
-#include <kernel/cubature/rule.hpp>
+#include <kernel/cubature/driver_base.hpp>
 
 namespace FEAST
 {
@@ -12,7 +12,8 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      class BarycentreDriverBase
+      class BarycentreDriverBase :
+        public DriverBase
       {
       public:
         enum
@@ -47,7 +48,7 @@ namespace FEAST
     public:
       typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
 
-      static void create(RuleType& rule)
+      static void fill(RuleType& rule)
       {
         rule.get_weight(0) = Weight_(1) / Weight_(Factorial<dim_>::value);
 
@@ -70,7 +71,7 @@ namespace FEAST
     public:
       typedef Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> RuleType;
 
-      static void create(RuleType& rule)
+      static void fill(RuleType& rule)
       {
         rule.get_weight(0) = Weight_(1 << dim_);
 

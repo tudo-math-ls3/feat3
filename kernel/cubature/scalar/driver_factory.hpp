@@ -11,6 +11,16 @@ namespace FEAST
   {
     namespace Scalar
     {
+      /// \cond internal
+      namespace Intern
+      {
+        template<
+          typename Driver_,
+          bool variadic_ = (Driver_::variadic != 0)>
+        class DriverFactoryAliasFunctor;
+      } // namespace Intern
+      /// \endcond
+
       template<
         template<typename, typename> class Driver_,
         typename Weight_ = Real,
@@ -33,7 +43,8 @@ namespace FEAST
         enum
         {
           variadic = 0,
-          tensorise = DriverType::tensorise
+          tensorise = DriverType::tensorise,
+          num_points = DriverType::num_points
         };
 
       public:
@@ -49,21 +60,35 @@ namespace FEAST
         static RuleType create()
         {
           RuleType rule(DriverType::num_points, DriverType::name());
-          DriverType::create(rule);
+          DriverType::fill(rule);
           return rule;
+        }
+
+        static String name()
+        {
+          return DriverType::name();
+        }
+
+        template<typename Functor_>
+        static void alias(Functor_& functor)
+        {
+          DriverType::alias(functor);
         }
 
         static bool create(const String& name, RuleType& rule)
         {
-          if(name.trim().compare_no_case(DriverType::name()) != 0)
+          // map alias names
+          Intern::DriverFactoryAliasFunctor<DriverType> functor(name);
+          DriverType::alias(functor);
+          String mapped_name(functor.name());
+
+          // check mapped name
+          if(mapped_name.trim().compare_no_case(DriverType::name()) != 0)
             return false;
+
+          // create the rule
           rule = create();
           return true;
-        }
-
-        static String avail_name()
-        {
-          return DriverType::name();
         }
       }; // class DriverFactory<...>
 
@@ -82,7 +107,9 @@ namespace FEAST
         enum
         {
           variadic = 1,
-          tensorise = DriverType::tensorise
+          tensorise = DriverType::tensorise,
+          min_points = DriverType::min_points,
+          max_points = DriverType::max_points
         };
 
       protected:
@@ -107,20 +134,36 @@ namespace FEAST
           ASSERT_(num_points <= DriverType::max_points);
 
           RuleType rule(num_points, (DriverType::name() + ":" + stringify(num_points)));
-          DriverType::create(num_points, rule);
+          DriverType::fill(rule, num_points);
           return rule;
+        }
+
+        static String name()
+        {
+          return DriverType::name();
+        }
+
+        template<typename Functor_>
+        static void alias(Functor_& functor)
+        {
+          DriverType::alias(functor);
         }
 
         static bool create(const String& name, RuleType& rule)
         {
+          // map alias names
+          Intern::DriverFactoryAliasFunctor<DriverType> functor(name);
+          DriverType::alias(functor);
+          String mapped_name(functor.name());
+
           // try to find a colon within the string
-          String::size_type k = name.find_first_of(':');
-          if(k == name.npos)
+          String::size_type k = mapped_name.find_first_of(':');
+          if(k == mapped_name.npos)
             return false;
 
           // extract substrings until the colon
-          String head(name.substr(0, k));
-          String tail(name.substr(k + 1));
+          String head(mapped_name.substr(0, k));
+          String tail(mapped_name.substr(k + 1));
 
           // check head - this is the name of the formula
           if(head.trim().compare_no_case(DriverType::name()) != 0)
@@ -146,14 +189,76 @@ namespace FEAST
           num_points = Index(atoi(tail.c_str()));
           return true;
         }
-
-        static String avail_name()
-        {
-          return DriverType::name() + ":<"
-            + stringify(int(DriverType::min_points)) + "-"
-            + stringify(int(DriverType::max_points)) + ">";
-        }
       }; // class DriverFactory<...>
+
+      /// \cond internal
+      namespace Intern
+      {
+        template<typename Driver_>
+        class DriverFactoryAliasFunctor<Driver_, false>
+        {
+        private:
+          String _name;
+          bool _mapped;
+
+        public:
+          explicit DriverFactoryAliasFunctor(const String& name) :
+            _name(name),
+            _mapped(false)
+          {
+          }
+
+          void alias(const String& alias_name)
+          {
+            if(!_mapped)
+            {
+              if(_name.compare_no_case(alias_name) == 0)
+              {
+                _name = Driver_::name();
+                _mapped = true;
+              }
+            }
+          }
+
+          String name()
+          {
+            return _name;
+          }
+        };
+
+        template<typename Driver_>
+        class DriverFactoryAliasFunctor<Driver_, true>
+        {
+        private:
+          String _name;
+          bool _mapped;
+
+        public:
+          explicit DriverFactoryAliasFunctor(const String& name) :
+            _name(name),
+            _mapped(false)
+          {
+          }
+
+          void alias(const String& alias_name, Index num_points)
+          {
+            if(!_mapped)
+            {
+              if(_name.compare_no_case(alias_name) == 0)
+              {
+                _name = Driver_::name() + ":" + stringify(num_points);
+                _mapped = true;
+              }
+            }
+          }
+
+          String name()
+          {
+            return _name;
+          }
+        };
+      } // namespace Intern
+      /// \endcond
     } // namespace Scalar
   } // namespace Cubature
 } // namespace FEAST

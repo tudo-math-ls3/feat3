@@ -3,7 +3,7 @@
 #define KERNEL_CUBATURE_SCALAR_TRAPEZOIDAL_DRIVER_HPP 1
 
 // includes, FEAST
-#include <kernel/cubature/scalar/rule.hpp>
+#include <kernel/cubature/scalar/driver_base.hpp>
 
 namespace FEAST
 {
@@ -14,14 +14,16 @@ namespace FEAST
       template<
         typename Weight_,
         typename Coord_>
-      class TrapezoidalDriver
+      class TrapezoidalDriver :
+        public DriverBase
       {
       public:
         enum
         {
           variadic = 0,
-          tensorise = 0,
-          num_points = 2
+          num_points = 2,
+          // disable tensorisation
+          tensorise = 0
         };
 
         static String name()
@@ -29,7 +31,7 @@ namespace FEAST
           return "trapezoidal";
         }
 
-        static void create(Rule<Weight_, Coord_>& rule)
+        static void fill(Rule<Weight_, Coord_>& rule)
         {
           rule.get_coord(0) = -Coord_(1);
           rule.get_coord(1) =  Coord_(1);

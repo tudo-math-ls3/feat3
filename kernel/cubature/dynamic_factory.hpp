@@ -4,6 +4,10 @@
 
 // includes, FEAST
 #include <kernel/cubature/factory_wrapper.hpp>
+#include <kernel/cubature/internal_functors.hpp>
+
+// includes, STL
+#include <set>
 
 namespace FEAST
 {
@@ -28,54 +32,6 @@ namespace FEAST
     private:
       String _name;
 
-      class CreateFunctor
-      {
-      private:
-        const String& _name;
-        RuleType& _rule;
-        bool _okay;
-
-      public:
-        CreateFunctor(const String& name, RuleType& rule) :
-          _name(name),
-          _rule(rule),
-          _okay(false)
-        {
-        }
-
-        template<typename Factory_>
-        void factory()
-        {
-          if(!_okay)
-          {
-            _okay = Factory_::create(_name, _rule);
-          }
-        }
-
-        bool okay() const
-        {
-          return _okay;
-        }
-      };
-
-      class AvailFunctor
-      {
-      private:
-        std::set<String>& _names;
-
-      public:
-        explicit AvailFunctor(std::set<String>& names) :
-          _names(names)
-        {
-        }
-
-        template<typename Factory_>
-        void factory()
-        {
-          _names.insert(Factory_::avail_name());
-        }
-      };
-
     public:
       explicit DynamicFactory(const String& name) :
         BaseClass(),
@@ -90,8 +46,8 @@ namespace FEAST
 
       static bool create(const String& name, RuleType& rule)
       {
-        CreateFunctor functor(name, rule);
-        FactoryWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
+        Intern::CreateFunctor<RuleType> functor(name, rule);
+        FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory(functor);
         return functor.okay();
       }
 
@@ -105,10 +61,27 @@ namespace FEAST
         throw InternalError("Unrecognised cubature rule name: '" + name + "'");
       }
 
-      static void avail(std::set<String>& names)
+      static void avail(
+        std::set<String>& names,
+        bool list_aliases = true,
+        bool map_aliases = true)
       {
-        AvailFunctor functor(names);
-        FactoryWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
+        Intern::AvailFunctor functor(names, list_aliases, map_aliases);
+        FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory(functor);
+      }
+
+      static void print_avail(
+        bool list_aliases = true,
+        bool map_aliases = true,
+        std::ostream& stream = std::cout)
+      {
+        std::set<String> names;
+        avail(names, list_aliases, map_aliases);
+        std::set<String>::iterator it(names.begin()), jt(names.end());
+        for(; it != jt; ++it)
+        {
+          stream << *it << std::endl;
+        }
       }
     }; // class DynamicFactory<...>
   } // namespace Cubature
