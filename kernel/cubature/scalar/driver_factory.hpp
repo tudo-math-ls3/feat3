@@ -21,6 +21,27 @@ namespace FEAST
       } // namespace Intern
       /// \endcond
 
+      /**
+       * \brief Scalar Cubature Driver-Factory class template
+       *
+       * This template acts as a wrapper around a scalar cubature driver to implement
+       * the scalar cubature factory interface.
+       *
+       * \tparam Driver_
+       * The scalar cubature driver class template to be used.
+       *
+       * \tparam Weight_
+       * The data type for the cubature weights.
+       *
+       * \tparam Coord_
+       * The data type for the cubature point coordinates.
+       *
+       * \tparam variadic_
+       * Specifies whether the driver is variadic. This template parameter is chosen automatically
+       * based on the driver's \p variadic member and shall therefore not be specified explicitly.
+       *
+       * \author Peter Zajac
+       */
       template<
         template<typename, typename> class Driver_,
         typename Weight_ = Real,
@@ -28,6 +49,11 @@ namespace FEAST
         bool variadic_ = (Driver_<Weight_, Coord_>::variadic != 0)>
       class DriverFactory;
 
+      /**
+       * \brief DriverFactory specialisation for non-variadic drivers.
+       *
+       * \author Peter Zajac
+       */
       template<
         template<typename, typename> class Driver_,
         typename Weight_,
@@ -52,11 +78,25 @@ namespace FEAST
         {
         }
 
+        /**
+         * \brief Produces the cubature rule.
+         *
+         * This is an implementation of the scalar cubature factory interface.
+         *
+         * \returns
+         * The cubature rule.
+         */
         virtual RuleType produce() const
         {
           return create();
         }
 
+        /**
+         * \brief Creates the cubature rule.
+         *
+         * \returns
+         * The cubature rule.
+         */
         static RuleType create()
         {
           RuleType rule(DriverType::num_points, DriverType::name());
@@ -64,17 +104,22 @@ namespace FEAST
           return rule;
         }
 
-        static String name()
-        {
-          return DriverType::name();
-        }
-
-        template<typename Functor_>
-        static void alias(Functor_& functor)
-        {
-          DriverType::alias(functor);
-        }
-
+        /**
+         * \brief Creates the cubature rule from a string.
+         *
+         * This function creates the cubature rule if the string in \p name represents a valid
+         * representation of the cubature rule's name.
+         *
+         * \param[in] name
+         * The name of the cubature rule to create.
+         *
+         * \param[out] rule
+         * The rule to be created.
+         *
+         * \returns
+         * \c true, if the cubature rule was created successfully, or \c false, if \p name is not
+         * a valid name of the cubature rule implemented by this factory.
+         */
         static bool create(RuleType& rule, const String& name)
         {
           // map alias names
@@ -90,8 +135,30 @@ namespace FEAST
           rule = create();
           return true;
         }
+
+        /**
+         * \brief Returns the name of the cubature rule.
+         */
+        static String name()
+        {
+          return DriverType::name();
+        }
+
+        /**
+         * \brief Calls the driver's alias function.
+         */
+        template<typename Functor_>
+        static void alias(Functor_& functor)
+        {
+          DriverType::alias(functor);
+        }
       }; // class DriverFactory<...>
 
+      /**
+       * \brief DriverFactory specialisation for variadic drivers.
+       *
+       * \author Peter Zajac
+       */
       template<
         template<typename,typename> class Driver_,
         typename Weight_,
@@ -123,11 +190,28 @@ namespace FEAST
           ASSERT_(num_points <= DriverType::max_points);
         }
 
+        /**
+         * \brief Produces the cubature rule.
+         *
+         * This is an implementation of the scalar cubature factory interface.
+         *
+         * \returns
+         * The cubature rule.
+         */
         virtual RuleType produce() const
         {
           return create(_num_points);
         }
 
+        /**
+         * \brief Creates the cubature rule.
+         *
+         * \param[in] num_points
+         * The number of points for the cubature rule.
+         *
+         * \returns
+         * The cubature rule.
+         */
         static RuleType create(Index num_points)
         {
           ASSERT_(num_points >= DriverType::min_points);
@@ -138,17 +222,22 @@ namespace FEAST
           return rule;
         }
 
-        static String name()
-        {
-          return DriverType::name();
-        }
-
-        template<typename Functor_>
-        static void alias(Functor_& functor)
-        {
-          DriverType::alias(functor);
-        }
-
+        /**
+         * \brief Creates the cubature rule from a string.
+         *
+         * This function creates the cubature rule if the string in \p name represents a valid
+         * representation of the cubature rule's name.
+         *
+         * \param[in] name
+         * The name of the cubature rule to create.
+         *
+         * \param[out] rule
+         * The rule to be created.
+         *
+         * \returns
+         * \c true, if the cubature rule was created successfully, or \c false, if \p name is not
+         * a valid name of the cubature rule implemented by this factory.
+         */
         static bool create(RuleType& rule, const String& name)
         {
           // map alias names
@@ -171,7 +260,7 @@ namespace FEAST
 
           // check substring
           Index num_points = 0;
-          if(!parse_tail(tail.trim(), num_points))
+          if(!_parse_tail(tail.trim(), num_points))
             return false;
 
           // try to create the rule
@@ -179,7 +268,25 @@ namespace FEAST
           return true;
         }
 
-        static bool parse_tail(const String& tail, Index& num_points)
+        /**
+         * \brief Returns the name of the cubature rule.
+         */
+        static String name()
+        {
+          return DriverType::name();
+        }
+
+        /**
+         * \brief Calls the driver's alias function.
+         */
+        template<typename Functor_>
+        static void alias(Functor_& functor)
+        {
+          DriverType::alias(functor);
+        }
+
+      private:
+        static bool _parse_tail(const String& tail, Index& num_points)
         {
           // must be a numerical string
           if(tail.empty() || (tail.find_first_not_of("0123456789") != tail.npos))

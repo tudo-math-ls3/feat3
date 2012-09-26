@@ -74,11 +74,11 @@ namespace FEAST
       typename Point_>
     class FactoryExplicitWrapper<Shape::Simplex<1>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Simplex<1> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -88,17 +88,32 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Simplex<1>,...>
 
@@ -113,11 +128,11 @@ namespace FEAST
       typename Point_>
     class FactoryExplicitWrapper<Shape::Simplex<2>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Simplex<2> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -127,17 +142,32 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Simplex<2>,...>
 
@@ -152,11 +182,11 @@ namespace FEAST
       typename Point_>
     class FactoryExplicitWrapper<Shape::Simplex<3>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Simplex<3> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -166,17 +196,32 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Simplex<3>,...>
 
@@ -191,11 +236,11 @@ namespace FEAST
       typename Point_>
     class FactoryExplicitWrapper<Shape::Hypercube<1>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Hypercube<1> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -205,17 +250,32 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Hypercube<1>,...>
 
@@ -230,11 +290,11 @@ namespace FEAST
       typename Point_>
     class FactoryExplicitWrapper<Shape::Hypercube<2>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Hypercube<2> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -244,17 +304,32 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Hypercube<2>,...>
 
@@ -269,11 +344,11 @@ namespace FEAST
       typename Point_>
     class FactoryExplicitWrapper<Shape::Hypercube<3>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Hypercube<3> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -283,17 +358,32 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Hypercube<3>,...>
 
@@ -322,15 +412,12 @@ namespace FEAST
     class FactoryPartialWrapper<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
       public FactoryExplicitWrapper<Shape::Simplex<dim_>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Simplex<dim_> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
-        // first: call the base class driver function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::driver(functor);
-
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
@@ -339,20 +426,38 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
-        // first: call the base class factory function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::factory(functor);
-
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // first: call the base class driver function template
+        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::driver(functor);
+
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // first: call the base class factory function template
+        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::factory(functor);
+
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryPartialWrapper<Simplex<...>,...>
 
@@ -369,15 +474,12 @@ namespace FEAST
     class FactoryPartialWrapper<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> :
       public FactoryExplicitWrapper<Shape::Hypercube<dim_>, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       typedef Shape::Hypercube<dim_> ShapeType;
 
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
-        // first: call the base class driver function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::driver(functor);
-
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
@@ -386,20 +488,38 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
-        // first: call the base class factory function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::factory(functor);
-
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // first: call the base class driver function template
+        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::driver(functor);
+
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // first: call the base class factory function template
+        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::factory(functor);
+
+        // call factory list
+        _factory_list(functor);
 
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
       }
     }; // class FactoryPartialWrapper<Hypercube<...>,...>
 
@@ -416,13 +536,10 @@ namespace FEAST
     class FactoryWrapper :
       public FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>
     {
-    public:
+    protected:
       template<typename Functor_>
-      static void driver(Functor_& functor)
+      static void _driver_list(Functor_& functor)
       {
-        // first: call the base class driver function template
-        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::driver(functor);
-
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
@@ -433,20 +550,38 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void _factory_list(Functor_& functor)
       {
-        // first: call the base class factory function template
-        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
-
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
         // functor.template factory<YourFactoryName>();
 
         // <<< END OF CUBATURE FACTORY LIST <<<
+      }
+
+    public:
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // first: call the base class driver function template
+        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::driver(functor);
+
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // first: call the base class factory function template
+        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
+
+        // call factory list
+        _factory_list(functor);
 
         // call driver factory functor
         Intern::DriverFactoryFunctor<Shape_, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
-        driver(driver_functor);
+        _driver_list(driver_functor);
 
         // call tensor-product functor
         TensorProductFunctor<Functor_> tensor_functor(functor);
@@ -475,6 +610,7 @@ namespace FEAST
       };
       /// \endcond
     }; // class FactoryWrapper<...>
+
     /// \cond internal
     namespace Intern
     {

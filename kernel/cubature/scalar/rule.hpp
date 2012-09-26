@@ -17,16 +17,24 @@ namespace FEAST
       /**
        * \brief Scalar Cubature Rule class template
        *
+       * \tparam Weight_
+       * The datatype for the cubature weights.
+       *
+       * \tparam Coord_
+       * The datatype for the cubature point coordinates.
+       *
        * \author Peter Zajac
        */
       template<
-        typename WeightType_ = Real,
-        typename CoordType_ = Real>
+        typename Weight_ = Real,
+        typename Coord_ = Real>
       class Rule
       {
       public:
-        typedef WeightType_ WeightType;
-        typedef CoordType_ CoordType;
+        /// Weight typedef
+        typedef Weight_ WeightType;
+        /// Coord typedef
+        typedef Coord_ CoordType;
 
         /**
          * \brief Scalar cubature rule factory interface
@@ -40,12 +48,17 @@ namespace FEAST
         }; // class Rule<...>::Factory
 
       protected:
+        /// The name of the cubature rule.
         String _name;
+        /// The total number of points in the cubature rule.
         Index _num_points;
+        /// Cubature weights array.
         WeightType* _weights;
+        /// Cubature point coordinates array.
         CoordType* _coords;
 
       public:
+        /// default constructor
         Rule() :
           _name(),
           _num_points(0),
@@ -67,6 +80,7 @@ namespace FEAST
           }
         }
 
+        /// copy constructor
         Rule(const Rule& other) :
           _name(),
           _num_points(0),
@@ -85,11 +99,13 @@ namespace FEAST
           clone(factory.produce());
         }
 
+        /// virtual destructor
         virtual ~Rule()
         {
           clear();
         }
 
+        /// assignment operator
         Rule& operator=(const Rule& other)
         {
           clone(other);

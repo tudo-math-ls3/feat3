@@ -24,9 +24,9 @@ namespace FEAST
         typename Coord_>
       class FactoryWrapper
       {
-      public:
+      protected:
         template<typename Functor_>
-        static void driver(Functor_& functor)
+        static void _driver_list(Functor_& functor)
         {
           // >>> CUBATURE DRIVER LIST >>>
           // TODO: add you new scalar cubature driver at the end of the list below, e.g.
@@ -39,13 +39,28 @@ namespace FEAST
         }
 
         template<typename Functor_>
-        static void factory(Functor_& functor)
+        static void _factory_list(Functor_& functor)
         {
           // >>> CUBATURE FACTORY LIST >>>
           // TODO: add you new scalar cubature factory at the end of the list below, e.g.
           // functor.template factory<YourFactoryName>();
 
           // <<< END OF CUBATURE FACTORY LIST <<<
+        }
+
+      public:
+        template<typename Functor_>
+        static void driver(Functor_& functor)
+        {
+          // call driver list
+          _driver_list(functor);
+        }
+
+        template<typename Functor_>
+        static void factory(Functor_& functor)
+        {
+          // call factory list
+          _factory_list(functor);
 
           // call driver factory functor
           DriverFactoryFunctor<Functor_> driver_functor(functor);

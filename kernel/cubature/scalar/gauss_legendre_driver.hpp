@@ -14,6 +14,21 @@ namespace FEAST
   {
     namespace Scalar
     {
+      /**
+       * \brief Gauss-Legendre Rule driver class template
+       *
+       * This driver implements the Gauss-Legendre rule.
+       * \see http://en.wikipedia.org/wiki/Gaussian_quadrature
+       * \see http://mathworld.wolfram.com/GaussianQuadrature.html
+       *
+       * \tparam Weight_
+       * The data type for the cubature weights.
+       *
+       * \tparam Coord_
+       * The data type for the cubature point coordinates.
+       *
+       * \author Peter Zajac
+       */
       template<
         typename Weight_,
         typename Coord_>
@@ -21,18 +36,29 @@ namespace FEAST
         public DriverBase
       {
       public:
+        /// dummy enum
         enum
         {
+          /// this rule is variadic
           variadic = 1,
+          /// this rule has at least 1 point
           min_points = 1,
+          /// this rule has at most 5 points
           max_points = 5
         };
 
+        /// Returns the name of the cubature rule.
         static String name()
         {
           return "gauss-legendre";
         }
 
+        /**
+         * \brief Adds the driver's aliases.
+         *
+         * \param[in] functor
+         * The functor whose \p alias function is to be called.
+         */
         template<typename Functor_>
         static void alias(Functor_& functor)
         {
@@ -40,6 +66,12 @@ namespace FEAST
           functor.alias("midpoint", 1);
         }
 
+        /**
+         * \brief Fills the cubature rule structure.
+         *
+         * \param[in,out] rule
+         * The cubature rule to be filled.
+         */
         static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
           // auxiliary variables
