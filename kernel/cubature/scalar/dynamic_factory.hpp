@@ -42,9 +42,9 @@ namespace FEAST
           return create(_name);
         }
 
-        static bool create(const String& name, RuleType& rule)
+        static bool create(RuleType& rule, const String& name)
         {
-          Cubature::Intern::CreateFunctor<RuleType> functor(name, rule);
+          Cubature::Intern::CreateFunctor<RuleType> functor(rule, name);
           FactoryWrapper<WeightType, CoordType>::factory(functor);
           return functor.okay();
         }
@@ -52,7 +52,7 @@ namespace FEAST
         static RuleType create(const String& name)
         {
           RuleType rule;
-          if(create(name, rule))
+          if(create(rule, name))
             return rule;
 
           // 'name' does not match any known cubature rule

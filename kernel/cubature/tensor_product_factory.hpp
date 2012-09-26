@@ -69,7 +69,7 @@ namespace FEAST
         return num_points;
       }
 
-      static void fill(const ScalarRuleType& scalar_rule, RuleType& rule)
+      static void fill(RuleType& rule, const ScalarRuleType& scalar_rule)
       {
         for(Index i(0); i < scalar_rule.get_num_points(); ++i)
         {
@@ -95,7 +95,7 @@ namespace FEAST
         return num_points;
       }
 
-      static void fill(const ScalarRuleType& scalar_rule, RuleType& rule)
+      static void fill(RuleType& rule, const ScalarRuleType& scalar_rule)
       {
         for(Index i(0); i < scalar_rule.get_num_points(); ++i)
         {
@@ -121,7 +121,7 @@ namespace FEAST
         return num_points * num_points;
       }
 
-      static void fill(const ScalarRuleType& scalar_rule, RuleType& rule)
+      static void fill(RuleType& rule, const ScalarRuleType& scalar_rule)
       {
         Index num_points = scalar_rule.get_num_points();
         for(Index i(0); i < num_points; ++i)
@@ -153,7 +153,7 @@ namespace FEAST
         return num_points * num_points * num_points;
       }
 
-      static void fill(const ScalarRuleType& scalar_rule, RuleType& rule)
+      static void fill(RuleType& rule, const ScalarRuleType& scalar_rule)
       {
         Index num_points = scalar_rule.get_num_points();
         for(Index i(0); i < num_points; ++i)
@@ -189,7 +189,7 @@ namespace FEAST
       typedef TensorProductDriver<Shape_, Weight_, Coord_, Point_> TensorProductDriverType;
 
     public:
-      static bool create(const String& name, RuleType& rule)
+      static bool create(RuleType& rule, const String& name)
       {
 #ifdef FEAST_CUBATURE_TENSOR_PREFIX
         // try to find a colon within the string
@@ -207,12 +207,12 @@ namespace FEAST
 
         // call scalar factory to create the scalar rule
         ScalarRuleType scalar_rule;
-        if(!ScalarFactoryType::create(tail.trim(), scalar_rule))
+        if(!ScalarFactoryType::create(scalar_rule, tail.trim()))
           return false;
 #else
         // call scalar factory to create the scalar rule
         ScalarRuleType scalar_rule;
-        if(!ScalarFactoryType::create(name, scalar_rule))
+        if(!ScalarFactoryType::create(scalar_rule, name))
           return false;
 #endif // FEAST_CUBATURE_TENSOR_PREFIX
 
@@ -229,7 +229,7 @@ namespace FEAST
 #else
         RuleType rule(num_points, scalar_rule.get_name());
 #endif // FEAST_CUBATURE_TENSOR_PREFIX
-        TensorProductDriverType::fill(scalar_rule, rule);
+        TensorProductDriverType::fill(rule, scalar_rule);
         return rule;
       }
 

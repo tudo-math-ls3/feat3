@@ -21,10 +21,6 @@ namespace FEAST
         public DriverBase
       {
       public:
-        typedef Weight_ WeightType;
-        typedef Coord_ CoordType;
-        typedef Rule<WeightType, CoordType> RuleType;
-
         enum
         {
           variadic = 1,
@@ -44,88 +40,70 @@ namespace FEAST
           functor.alias("midpoint", 1);
         }
 
-        static void fill(RuleType& rule, Index num_points)
+        static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
-          // create the formula
+          // auxiliary variables
+          Coord_ dc;
+          Weight_ dw;
+
+          // how many points do we have?
           switch(num_points)
           {
           case 1:
-            fill_1(rule);
+            rule.get_coord(0) = Coord_(0);
+
+            rule.get_weight(0) = Weight_(2);
             break;
+
           case 2:
-            fill_2(rule);
+            rule.get_coord(0) = -std::sqrt(Coord_(1) / Coord_(3));
+            rule.get_coord(1) = +std::sqrt(Coord_(1) / Coord_(3));
+
+            rule.get_weight(0) = Weight_(1);
+            rule.get_weight(1) = Weight_(1);
             break;
+
           case 3:
-            fill_3(rule);
+            rule.get_coord(0) = -std::sqrt(Coord_(3) / Coord_(5));
+            rule.get_coord(1) = Coord_(0);
+            rule.get_coord(2) = +std::sqrt(Coord_(3) / Coord_(5));
+
+            rule.get_weight(0) = Weight_(5) / Weight_(9);
+            rule.get_weight(1) = Weight_(8) / Weight_(9);
+            rule.get_weight(2) = Weight_(5) / Weight_(9);
             break;
+
           case 4:
-            fill_4(rule);
+            dc = std::sqrt(Coord_(24) / Coord_(5));
+            rule.get_coord(0) = -std::sqrt((Coord_(3) + dc) / Coord_(7));
+            rule.get_coord(1) = -std::sqrt((Coord_(3) - dc) / Coord_(7));
+            rule.get_coord(2) = +std::sqrt((Coord_(3) - dc) / Coord_(7));
+            rule.get_coord(3) = +std::sqrt((Coord_(3) + dc) / Coord_(7));
+
+            dw = std::sqrt(Weight_(30));
+            rule.get_weight(0) = (Weight_(18) - dw) / Weight_(36);
+            rule.get_weight(1) = (Weight_(18) + dw) / Weight_(36);
+            rule.get_weight(2) = (Weight_(18) + dw) / Weight_(36);
+            rule.get_weight(3) = (Weight_(18) - dw) / Weight_(36);
             break;
+
           case 5:
-            fill_5(rule);
+            dc = Coord_(2) * std::sqrt(Coord_(10) / Coord_(7));
+            rule.get_coord(0) = -std::sqrt(Coord_(5) + dc) / Coord_(3);
+            rule.get_coord(1) = -std::sqrt(Coord_(5) - dc) / Coord_(3);
+            rule.get_coord(2) = Coord_(0);
+            rule.get_coord(3) = +std::sqrt(Coord_(5) - dc) / Coord_(3);
+            rule.get_coord(4) = +std::sqrt(Coord_(5) + dc) / Coord_(3);
+
+            dw = Weight_(13) * std::sqrt(Weight_(70));
+            rule.get_weight(0) = (Weight_(322) - dw) / Weight_(900);
+            rule.get_weight(1) = (Weight_(322) + dw) / Weight_(900);
+            rule.get_weight(2) =  Weight_(128)       / Weight_(225);
+            rule.get_weight(3) = (Weight_(322) + dw) / Weight_(900);
+            rule.get_weight(4) = (Weight_(322) - dw) / Weight_(900);
             break;
           }
         }
-
-        /// \cond internal
-        static void fill_1(RuleType& rule)
-        {
-          rule.get_coord(0) = CoordType(0);
-          rule.get_weight(0) = WeightType(2);
-        }
-
-        static void fill_2(RuleType& rule)
-        {
-          rule.get_coord(0) = -std::sqrt(CoordType(1) / CoordType(3));
-          rule.get_coord(1) = +std::sqrt(CoordType(1) / CoordType(3));
-
-          rule.get_weight(0) = WeightType(1);
-          rule.get_weight(1) = WeightType(1);
-        }
-
-        static void fill_3(RuleType& rule)
-        {
-          rule.get_coord(0) = -std::sqrt(CoordType(3) / CoordType(5));
-          rule.get_coord(1) = CoordType(0);
-          rule.get_coord(2) = +std::sqrt(CoordType(3) / CoordType(5));
-
-          rule.get_weight(0) = WeightType(5) / WeightType(9);
-          rule.get_weight(1) = WeightType(8) / WeightType(9);
-          rule.get_weight(2) = WeightType(5) / WeightType(9);
-        }
-
-        static void fill_4(RuleType& rule)
-        {
-          const CoordType dc = std::sqrt(CoordType(24) / CoordType(5));
-          rule.get_coord(0) = -std::sqrt((CoordType(3) + dc) / CoordType(7));
-          rule.get_coord(1) = -std::sqrt((CoordType(3) - dc) / CoordType(7));
-          rule.get_coord(2) = +std::sqrt((CoordType(3) - dc) / CoordType(7));
-          rule.get_coord(3) = +std::sqrt((CoordType(3) + dc) / CoordType(7));
-
-          const WeightType dw = std::sqrt(WeightType(30));
-          rule.get_weight(0) = (WeightType(18) - dw) / WeightType(36);
-          rule.get_weight(1) = (WeightType(18) + dw) / WeightType(36);
-          rule.get_weight(2) = (WeightType(18) + dw) / WeightType(36);
-          rule.get_weight(3) = (WeightType(18) - dw) / WeightType(36);
-        }
-
-        static void fill_5(RuleType& rule)
-        {
-          const CoordType dc = CoordType(2) * std::sqrt(CoordType(10) / CoordType(7));
-          rule.get_coord(0) = -std::sqrt(CoordType(5) + dc) / CoordType(3);
-          rule.get_coord(1) = -std::sqrt(CoordType(5) - dc) / CoordType(3);
-          rule.get_coord(2) = CoordType(0);
-          rule.get_coord(3) = +std::sqrt(CoordType(5) - dc) / CoordType(3);
-          rule.get_coord(4) = +std::sqrt(CoordType(5) + dc) / CoordType(3);
-
-          const WeightType dw = WeightType(13) * std::sqrt(WeightType(70));
-          rule.get_weight(0) = (WeightType(322) - dw) / WeightType(900);
-          rule.get_weight(1) = (WeightType(322) + dw) / WeightType(900);
-          rule.get_weight(2) =  WeightType(128)       / WeightType(225);
-          rule.get_weight(3) = (WeightType(322) + dw) / WeightType(900);
-          rule.get_weight(4) = (WeightType(322) - dw) / WeightType(900);
-        }
-        /// \endcond
       }; // class GaussLegendreDriver<...>
     } // namespace Scalar
   } // namespace Cubature

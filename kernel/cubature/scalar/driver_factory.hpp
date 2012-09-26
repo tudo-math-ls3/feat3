@@ -75,7 +75,7 @@ namespace FEAST
           DriverType::alias(functor);
         }
 
-        static bool create(const String& name, RuleType& rule)
+        static bool create(RuleType& rule, const String& name)
         {
           // map alias names
           Intern::DriverFactoryAliasFunctor<DriverType> functor(name);
@@ -149,7 +149,7 @@ namespace FEAST
           DriverType::alias(functor);
         }
 
-        static bool create(const String& name, RuleType& rule)
+        static bool create(RuleType& rule, const String& name)
         {
           // map alias names
           Intern::DriverFactoryAliasFunctor<DriverType> functor(name);

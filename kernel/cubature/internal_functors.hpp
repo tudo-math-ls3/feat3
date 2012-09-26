@@ -76,14 +76,14 @@ namespace FEAST
       class CreateFunctor
       {
       private:
-        const String& _name;
         RuleType_& _rule;
+        const String& _name;
         bool _okay;
 
       public:
-        CreateFunctor(const String& name, RuleType_& rule) :
-          _name(name),
+        CreateFunctor(RuleType_& rule, const String& name) :
           _rule(rule),
+          _name(name),
           _okay(false)
         {
         }
@@ -93,7 +93,7 @@ namespace FEAST
         {
           if(!_okay)
           {
-            _okay = Factory_::create(_name, _rule);
+            _okay = Factory_::create(_rule, _name);
           }
         }
 
