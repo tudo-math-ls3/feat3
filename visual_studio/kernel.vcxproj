@@ -500,6 +500,7 @@
     <ClInclude Include="..\kernel\cubature\dynamic_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\factory_wrapper.hpp" />
     <ClInclude Include="..\kernel\cubature\internal_functors.hpp" />
+    <ClInclude Include="..\kernel\cubature\refine_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\rule.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\driver_base.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\driver_factory.hpp" />

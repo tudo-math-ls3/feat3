@@ -66,8 +66,9 @@ namespace FEAST
         bool list_aliases = true,
         bool map_aliases = true)
       {
+        // list all factories except for the refine factory
         Intern::AvailFunctor functor(names, list_aliases, map_aliases);
-        FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory(functor);
+        FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory_no_refine(functor);
       }
 
       static void print_avail(

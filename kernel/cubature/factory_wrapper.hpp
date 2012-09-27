@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/cubature/driver_factory.hpp>
+#include <kernel/cubature/refine_factory.hpp>
 #include <kernel/cubature/barycentre_driver.hpp>
 #include <kernel/cubature/trapezoidal_driver.hpp>
 #include <kernel/cubature/tensor_product_factory.hpp>
@@ -561,17 +562,7 @@ namespace FEAST
 
     public:
       template<typename Functor_>
-      static void driver(Functor_& functor)
-      {
-        // first: call the base class driver function template
-        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::driver(functor);
-
-        // call driver list
-        _driver_list(functor);
-      }
-
-      template<typename Functor_>
-      static void factory(Functor_& functor)
+      static void factory_no_refine(Functor_& functor)
       {
         // first: call the base class factory function template
         FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
@@ -586,6 +577,27 @@ namespace FEAST
         // call tensor-product functor
         TensorProductFunctor<Functor_> tensor_functor(functor);
         Scalar::FactoryWrapper<Weight_, Coord_>::driver(tensor_functor);
+      }
+
+      template<typename Functor_>
+      static void driver(Functor_& functor)
+      {
+        // first: call the base class driver function template
+        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::driver(functor);
+
+        // call driver list
+        _driver_list(functor);
+      }
+
+      template<typename Functor_>
+      static void factory(Functor_& functor)
+      {
+        // call non-refine factory list
+        factory_no_refine(functor);
+
+        // call refinement factory functor
+        RefineFactoryFunctor<Functor_> refine_functor(functor);
+        factory_no_refine(refine_functor);
       }
 
       /// \cond internal
@@ -606,6 +618,25 @@ namespace FEAST
         void driver()
         {
           Intern::TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_>::scalar_driver(_functor);
+        }
+      };
+
+      template<typename Functor_>
+      class RefineFactoryFunctor
+      {
+      protected:
+        Functor_& _functor;
+
+      public:
+        explicit RefineFactoryFunctor(Functor_& functor) :
+          _functor(functor)
+        {
+        }
+
+        template<typename Factory_>
+        void factory()
+        {
+          _functor.template factory< RefineFactory<Factory_> >();
         }
       };
       /// \endcond
