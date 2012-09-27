@@ -27,7 +27,7 @@ public:
   virtual void run() const
   {
     DT_ s(DT_(4711.1));
-    for (Index size(1) ; size < 1e5 ; size*=2)
+    for (Index size(1) ; size < 1e3 ; size*=2)
     {
       DenseVector<Archs::CPU, DT_> a_local(size);
       DenseVector<Archs::CPU, DT_> b_local(size);
@@ -87,7 +87,7 @@ public:
 
   virtual void run() const
   {
-    for (Index size(1) ; size < 1e5 ; size*=2)
+    for (Index size(1) ; size < 1e3 ; size*=2)
     {
       DenseVector<Archs::CPU, DT_> a_local(size);
       DenseVector<Archs::CPU, DT_> b_local(size);
