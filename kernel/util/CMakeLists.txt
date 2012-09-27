@@ -17,6 +17,7 @@ SET (test_list
   inheritance-test
   linear_algebra-test
   param_section-test
+  string-test
 )
 
 #create all tests

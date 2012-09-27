@@ -327,6 +327,46 @@ namespace FEAST
     }
 
     /**
+     * \brief Parses the string.
+     *
+     * \param[out] t
+     * The value that is to be parsed.
+     *
+     * \returns
+     * \c true, if the parse succeeds, otherwise \c false.
+     */
+    template<typename T_>
+    bool parse(T_& t) const
+    {
+      std::istringstream iss(trim());
+      iss >> t;
+      return !iss.fail();
+    }
+
+    /// \cond internal
+    bool parse(bool& b) const
+    {
+      if(trim().compare_no_case("true") == 0)
+      {
+        b = true;
+        return true;
+      }
+      if(trim().compare_no_case("false") == 0)
+      {
+        b = false;
+        return true;
+      }
+      return false;
+    }
+
+    bool parse(std::string& s) const
+    {
+      s.assign(*this);
+      return true;
+    }
+    /// \endcond
+
+    /**
      * \brief Appends a set of strings.
      *
      * This method appends a set of strings given by two input iterators, separating them by a delimiter.
