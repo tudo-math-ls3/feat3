@@ -55,7 +55,7 @@ namespace FEAST
         if(k != head.npos)
         {
           // try to parse refine count
-          if(!_parse_tail(head.substr(k+1), num_refines))
+          if(!String(head.substr(k+1)).parse(num_refines))
             return false;
 
           // trim head of refine count
@@ -99,18 +99,6 @@ namespace FEAST
           rule = rule_tmp;
         }
         return rule;
-      }
-
-    private:
-      static bool _parse_tail(const String& tail, Index& num_refines)
-      {
-        // must be a numerical string
-        if(tail.empty() || (tail.find_first_not_of("0123456789") != tail.npos))
-          return false;
-
-        // fetch refine count
-        num_refines = Index(atoi(tail.c_str()));
-        return true;
       }
     };
 

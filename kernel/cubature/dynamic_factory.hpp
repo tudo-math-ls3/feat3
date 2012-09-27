@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/cubature/factory_wrapper.hpp>
 #include <kernel/cubature/internal_functors.hpp>
+#include <kernel/cubature/auto_alias.hpp>
 
 // includes, STL
 #include <set>
@@ -46,7 +47,9 @@ namespace FEAST
 
       static bool create(RuleType& rule, const String& name)
       {
-        Intern::CreateFunctor<RuleType> functor(rule, name);
+        // map auto-aliases
+        String mapped_name(AutoAlias<ShapeType>::map(name));
+        Intern::CreateFunctor<RuleType> functor(rule, mapped_name);
         FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory(functor);
         return functor.okay();
       }

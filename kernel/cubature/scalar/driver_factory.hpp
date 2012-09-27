@@ -260,7 +260,7 @@ namespace FEAST
 
           // check substring
           Index num_points = 0;
-          if(!_parse_tail(tail.trim(), num_points))
+          if(!tail.trim().parse(num_points))
             return false;
 
           // try to create the rule
@@ -283,18 +283,6 @@ namespace FEAST
         static void alias(Functor_& functor)
         {
           DriverType::alias(functor);
-        }
-
-      private:
-        static bool _parse_tail(const String& tail, Index& num_points)
-        {
-          // must be a numerical string
-          if(tail.empty() || (tail.find_first_not_of("0123456789") != tail.npos))
-            return false;
-
-          // fetch point count
-          num_points = Index(atoi(tail.c_str()));
-          return true;
         }
       }; // class DriverFactory<...>
 
