@@ -7,6 +7,10 @@
 #include <kernel/cubature/scalar/gauss_legendre_driver.hpp>
 #include <kernel/cubature/scalar/pulcherrima_driver.hpp>
 #include <kernel/cubature/scalar/trapezoidal_driver.hpp>
+#include <kernel/cubature/scalar/newton_cotes_closed_driver.hpp>
+#include <kernel/cubature/scalar/newton_cotes_open_driver.hpp>
+#include <kernel/cubature/scalar/maclaurin_driver.hpp>
+#include <kernel/cubature/scalar/gauss_lobatto_driver.hpp>
 
 namespace FEAST
 {
@@ -32,6 +36,10 @@ namespace FEAST
           // TODO: add you new scalar cubature driver at the end of the list below, e.g.
           // functor.template driver<YourDriverName>();
           functor.template driver<GaussLegendreDriver>();
+          functor.template driver<GaussLobattoDriver>();
+          functor.template driver<NewtonCotesClosedDriver>();
+          functor.template driver<NewtonCotesOpenDriver>();
+          functor.template driver<MaclaurinDriver>();
           functor.template driver<PulcherrimaDriver>();
           functor.template driver<TrapezoidalDriver>();
 

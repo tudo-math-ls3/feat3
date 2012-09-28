@@ -363,6 +363,18 @@
     <ClInclude Include="..\kernel\cubature\auto_alias.hpp">
       <Filter>Header Files\cubature</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\gauss_lobatto_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\maclaurin_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_closed_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_open_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

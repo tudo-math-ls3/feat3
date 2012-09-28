@@ -508,6 +508,10 @@
     <ClInclude Include="..\kernel\cubature\scalar\dynamic_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\factory_wrapper.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\gauss_legendre_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\scalar\gauss_lobatto_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\scalar\maclaurin_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_closed_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_open_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\pulcherrima_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\rule.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\trapezoidal_driver.hpp" />
