@@ -27,7 +27,9 @@ namespace FEAST
         tv_generic,
         tv_gpu,
         tv_cuda,
-        tv_none
+        tv_none,
+        tv_serial,
+        tv_parallel
       };
 
       /**
@@ -101,6 +103,33 @@ namespace FEAST
         }
       };
 
+      /**
+       * Tag-type for serial operations.
+       */
+      struct Serial :
+        public InstantiationPolicy<Serial, NonCopyable>
+      {
+        const static TagValue tag_value = tv_serial;
+        const static TagValue memory_value = tv_serial;
+        static String name()
+        {
+          return "serial";
+        }
+      };
+
+      /**
+       * Tag-type for Parallel operations.
+       */
+      struct Parallel :
+        public InstantiationPolicy<Parallel, NonCopyable>
+      {
+        const static TagValue tag_value = tv_parallel;
+        const static TagValue memory_value = tv_parallel;
+        static String name()
+        {
+          return "parallel";
+        }
+      };
     }
 
     /**

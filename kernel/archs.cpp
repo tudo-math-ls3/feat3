@@ -28,6 +28,14 @@ std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
       left << Archs::CUDA::name();
       break;
 
+    case Archs::tv_serial:
+      left << Archs::Serial::name();
+      break;
+
+    case Archs::tv_parallel:
+      left << Archs::Parallel::name();
+      break;
+
     default:
       left << "Unknown Backend";
       break;
