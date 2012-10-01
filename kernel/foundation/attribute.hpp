@@ -58,6 +58,11 @@ namespace FEAST
           return _data;
         }
 
+        const StorageType_<DataType_, std::allocator<DataType_> >& get_data() const
+        {
+          return _data;
+        }
+
         virtual Index size()
         {
           return Index(_data.size());

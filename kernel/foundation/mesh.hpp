@@ -254,11 +254,11 @@ namespace FEAST
         }
 
         ///get all adjacent polytopes at level to_level for polytope i on level from_level
-        typename TopologyType_::storage_type_ get_adjacent_polytopes(
+        const typename TopologyType_::storage_type_ get_adjacent_polytopes(
                                                                      const PolytopeLevels from_level,
                                                                      const PolytopeLevels to_level,
                                                                      index_type_ i
-                                                                    )
+                                                                    ) const
         {
           CONTEXT("When calculating adjacent polytopes");
 
@@ -394,6 +394,11 @@ namespace FEAST
           return _topologies;
         }
 
+        const OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies() const
+        {
+          return _topologies;
+        }
+
         CompoundFunctor<OuterStorageType_>& get_history()
         {
           return _history;
@@ -420,7 +425,7 @@ namespace FEAST
           return from == to ? 1u : ( from > to ? (unsigned)std::abs((double)(from - to)) - 1u : (unsigned)std::abs((double)(to - from)) - 1u);
         }
 
-        InternalPrimaryAccess _get_primary_index(const PolytopeLevels from, const PolytopeLevels to)
+        const InternalPrimaryAccess _get_primary_index(const PolytopeLevels from, const PolytopeLevels to) const
         {
           switch(from)
           {
@@ -476,7 +481,7 @@ namespace FEAST
           throw InternalError("Invalid polytope level combination");
         }
 
-        InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to)
+        const InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to) const
         {
           return from == pl_vertex && to == pl_vertex ? InternalSecondaryAccess(1) : InternalSecondaryAccess((to - 1) * 2);
         }
@@ -566,7 +571,7 @@ namespace FEAST
           }
         }
 
-        bool _secondary_access_needed(PolytopeLevels from, PolytopeLevels to)
+        const bool _secondary_access_needed(PolytopeLevels from, PolytopeLevels to) const
         {
           return (from != pl_vertex && to != pl_vertex) || (from == pl_vertex && to == from);
         }

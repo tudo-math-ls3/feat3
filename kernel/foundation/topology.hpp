@@ -73,6 +73,11 @@ namespace FEAST
           return _num_polytopes;
         }
 
+        const Index size() const
+        {
+          return _num_polytopes;
+        }
+
         /**
          * \brief member function inserts a given polytope list to end of topology
          *
@@ -111,6 +116,11 @@ namespace FEAST
           return _topology.at(i);
         }
 
+        const StorageType_ & at(Index i) const
+        {
+          return _topology.at(i);
+        }
+
         /**
          * \brief operator overload to [] retrieves polytope list for given polytope
          *
@@ -118,6 +128,11 @@ namespace FEAST
          * The index of the polytope whose adjacency list is to be returned
          */
         StorageType_ & operator[] (Index i)
+        {
+          return _topology.at(i);
+        }
+
+        const StorageType_ & operator[] (Index i) const
         {
           return _topology.at(i);
         }
@@ -169,6 +184,11 @@ namespace FEAST
         }
 
         OuterStorageType_<StorageType_, std::allocator<StorageType_> >& get_topology()
+        {
+          return _topology;
+        }
+
+        const OuterStorageType_<StorageType_, std::allocator<StorageType_> >& get_topology() const
         {
           return _topology;
         }
