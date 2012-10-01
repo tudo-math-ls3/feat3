@@ -111,8 +111,8 @@ class CommunicationTest:
       // |0 | 1| m4
       // *--*--*
 
-      h.add_halo_element_pair(0u, 0u);
-      h.add_halo_element_pair(1u, 1u);
+      h.add_element_pair(0u, 0u);
+      h.add_element_pair(1u, 1u);
 
       TEST_CHECK_EQUAL(h.size(), 2u);
       TEST_CHECK_EQUAL(h.get_element(0u), 0u);

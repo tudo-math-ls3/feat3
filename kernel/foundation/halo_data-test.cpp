@@ -132,8 +132,8 @@ class HaloDataTest:
       // |0 | 1| m4
       // *--*--*
 
-      h.add_halo_element_pair(5u, 0u);
-      h.add_halo_element_pair(6u, 1u);
+      h.add_element_pair(5u, 0u);
+      h.add_element_pair(6u, 1u);
 
       TEST_CHECK_EQUAL(h.size(), 2u);
       TEST_CHECK_EQUAL(h.get_element(0u), 5u);

@@ -108,8 +108,8 @@ class HaloTest:
       // |0 | 1| m4
       // *--*--*
 
-      h.add_halo_element_pair(5u, 0u);
-      h.add_halo_element_pair(6u, 1u);
+      h.add_element_pair(5u, 0u);
+      h.add_element_pair(6u, 1u);
 
       TEST_CHECK_EQUAL(h.size(), 2u);
       TEST_CHECK_EQUAL(h.get_element(0u), 5u);
@@ -246,7 +246,7 @@ class HaloTestGeometryInterface:
 
       //create halo with one edge-edge pair
       Foundation::Halo<0, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
-      h.add_halo_element_pair(3, 2);
+      h.add_element_pair(3, 2);
 
       //create CellSubSet
       Index polytopes_in_subset[3] = {2, 1, 0}; //no overlap and one edge means two vertices but no faces

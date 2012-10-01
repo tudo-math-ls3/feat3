@@ -57,7 +57,7 @@ namespace FEAST
         }
 
         ///Add correspondence of i
-        void add_halo_element_pair(IndexType_ i, IndexType_ j)
+        void add_element_pair(IndexType_ i, IndexType_ j)
         {
           _halo_elements.push_back(i);
           _halo_element_counterparts.push_back(j);
