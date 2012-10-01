@@ -4,6 +4,9 @@
 
 int main(int argc, char* argv[])
 {
+
+#ifndef FEAST_SERIAL_MODE
+
   MPI_Init(&argc,&argv);
 
   int rank, numprocs;
@@ -39,6 +42,8 @@ int main(int argc, char* argv[])
   }
 
   MPI_Finalize();
+
+#endif
 
   return 0;
 }
