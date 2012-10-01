@@ -16,27 +16,48 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /**
+     * \brief CSR based sparse matrix.
+     *
+     * \tparam Arch_ The memory architecture to be used.
+     * \tparam DT_ The datatype to be used.
+     *
+     * This class represents a sparse matrix, that stores its non zero elements in the compressed sparse row format.
+     *
+     * \author Dirk Ribbrock
+     */
     template <typename Arch_, typename DT_>
     class SparseMatrixCSR : public Container<Arch_, DT_>
     {
       private:
-        /// column indices
+        /// Column indices.
         Index * _col_ind;
-        /// non zero values
+        /// Non zero values.
         DT_ * _val;
-        /// row start indices (including matrix end index)
+        /// Row start indices (including matrix end index).
         Index * _row_ptr;
-        /// row end indices
+        /// Row end indices.
         Index * _row_ptr_end;
+        /// Row count.
         Index _rows;
+        /// Column count.
         Index _columns;
+        /// Our non zero element.
         DT_ _zero_element;
+        /// Our non zero element count.
         Index _used_elements;
 
       public:
+        /// Our datatype
         typedef DT_ data_type;
+        /// Our memory architecture type
         typedef Arch_ arch_type;
 
+        /**
+         * \brief Constructor
+         *
+         * Creates an empty non dimensional matrix.
+         */
         explicit SparseMatrixCSR() :
           Container<Arch_, DT_> (0),
           _rows(0),
@@ -46,6 +67,13 @@ namespace FEAST
         {
         }
 
+        /**
+         * \brief Constructor
+         *
+         * \param[in] other The source matrix in COO format.
+         *
+         * Creates a CSR matrix based on the COO source matrix.
+         */
         explicit SparseMatrixCSR(const SparseMatrixCOO<Arch_, DT_> & other) :
           Container<Arch_, DT_>(other.size()),
           _rows(other.rows()),
@@ -99,6 +127,13 @@ namespace FEAST
           _row_ptr[_rows] = ait;
         }
 
+        /**
+         * \brief Constructor
+         *
+         * \param[in] other The source matrix in COO format.
+         *
+         * Creates a CSR matrix based on the COO source matrix from another memory architecture.
+         */
         template <typename Arch2_>
         explicit SparseMatrixCSR(const SparseMatrixCOO<Arch2_, DT_> & other) :
           Container<Arch_, DT_>(other.size()),
@@ -158,6 +193,19 @@ namespace FEAST
           ::free(temp);
         }
 
+        /**
+         * \brief Constructor
+         *
+         * \param[in] rows The row count of the created matrix.
+         * \param[in] columns The column count of the created matrix.
+         * \param[in] col_ind Vector with column indices.
+         * \param[in] val Vector with non zero elements.
+         * \param[in] row_ptr Vector with start indices of all rows into the val/col_ind arrays.
+         * Note, that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
+         * \param[in] row_ptr_end Vector with end indices of all rows.
+         *
+         * Creates a matrix with given dimensions and content.
+         */
         explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & col_ind, const DenseVector<Arch_, DT_> & val, const DenseVector<Arch_, Index> & row_ptr, const DenseVector<Arch_, Index> & row_ptr_end) :
           Container<Arch_, DT_>(rows * columns),
           _rows(rows),
@@ -195,6 +243,13 @@ namespace FEAST
             MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
         }
 
+        /**
+         * \brief Copy Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Creates a shallow copy of a given matrix.
+         */
         SparseMatrixCSR(const SparseMatrixCSR<Arch_, DT_> & other) :
           Container<Arch_, DT_>(other),
           _rows(other._rows),
@@ -208,6 +263,13 @@ namespace FEAST
           this->_row_ptr_end = this->_indices.at(2);
         }
 
+        /**
+         * \brief Copy Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Creates a copy of a given matrix from another memory architecture.
+         */
         template <typename Arch2_, typename DT2_>
         SparseMatrixCSR(const SparseMatrixCSR<Arch2_, DT2_> & other) :
           Container<Arch_, DT_>(other),
@@ -222,6 +284,13 @@ namespace FEAST
           this->_row_ptr_end = this->_indices.at(2);
         }
 
+        /**
+         * \brief Assignment operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Assigns another matrix to the target matrix.
+         */
         SparseMatrixCSR<Arch_, DT_> & operator= (const SparseMatrixCSR<Arch_, DT_> & other)
         {
           if (this == &other)
@@ -264,6 +333,13 @@ namespace FEAST
           return *this;
         }
 
+        /**
+         * \brief Assignment operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Assigns a matrix from another memory architecture to the target matrix.
+         */
         template <typename Arch2_, typename DT2_>
         SparseMatrixCSR<Arch_, DT_> & operator= (const SparseMatrixCSR<Arch2_, DT2_> & other)
         {
@@ -328,6 +404,14 @@ namespace FEAST
           return *this;
         }
 
+        /**
+         * \brief Retrieve specific matrix element.
+         *
+         * \param[in] row The row of the matrix element.
+         * \param[in] col The column of the matrix element.
+         *
+         * \returns Specific matrix element.
+         */
         DT_ operator()(Index row, Index col) const
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_rows) + " !");
@@ -351,47 +435,93 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Retrieve matrix row count.
+         *
+         * \returns Matrix row count.
+         */
         const Index & rows() const
         {
           return this->_rows;
         }
 
+        /**
+         * \brief Retrieve matrix column count.
+         *
+         * \returns Matrix column count.
+         */
         const Index & columns() const
         {
           return this->_columns;
         }
 
+        /**
+         * \brief Retrieve non zero element count.
+         *
+         * \returns Non zero element count.
+         */
         const Index & used_elements() const
         {
           return this->_used_elements;
         }
 
+        /**
+         * \brief Retrieve column indices array.
+         *
+         * \returns Column indices array.
+         */
         Index * col_ind() const
         {
           return _col_ind;
         }
 
+        /**
+         * \brief Retrieve non zero element array.
+         *
+         * \returns Non zero element array.
+         */
         DT_ * val() const
         {
           return _val;
         }
 
+        /**
+         * \brief Retrieve row start index array.
+         *
+         * \returns Row start index array.
+         */
         Index * row_ptr() const
         {
           return _row_ptr;
         }
 
+        /**
+         * \brief Retrieve row end index array.
+         *
+         * \returns Row end index array.
+         */
         Index * row_ptr_end() const
         {
           return _row_ptr_end;
         }
 
+        /**
+         * \brief Retrieve non zero element.
+         *
+         * \returns Non zero element.
+         */
         const DT_ zero_element() const
         {
           return _zero_element;
         }
     };
 
+    /**
+     * \brief SparseMatrixCSR comparison operator
+     *
+     * \param[in] a A matrix to compare with.
+     * \param[in] b A matrix to compare with.
+     */
     template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const SparseMatrixCSR<Arch_, DT_> & a, const SparseMatrixCSR<Arch2_, DT_> & b)
     {
       if (a.rows() != b.rows())
@@ -415,6 +545,12 @@ namespace FEAST
       return true;
     }
 
+    /**
+     * \brief SparseMatrixCSR streaming operator
+     *
+     * \param[in] lhs The target stream.
+     * \param[in] b The matrix to be streamed.
+     */
     template <typename Arch_, typename DT_>
     std::ostream &
     operator<< (std::ostream & lhs, const SparseMatrixCSR<Arch_, DT_> & b)

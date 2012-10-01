@@ -12,18 +12,38 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    /**
+     * \brief Dense data matrix class template.
+     *
+     * \tparam Arch_ The memory architecture to be used.
+     * \tparam DT_ The datatype to be used.
+     *
+     * This class represents a matrix of continuous data in memory.
+     *
+     * \author Dirk Ribbrock
+     */
     template <typename Arch_, typename DT_>
     class DenseMatrix : public Container<Arch_, DT_>
     {
       private:
+        /// Pointer to our elements.
         DT_ * _pelements;
+        /// Our row count.
         Index _rows;
+        /// Our column count.
         Index _columns;
 
       public:
+        /// Our datatype
         typedef DT_ data_type;
+        /// Our memory architecture type
         typedef Arch_ arch_type;
 
+        /**
+         * \brief Constructor
+         *
+         * Creates an empty non dimensional matrix.
+         */
         explicit DenseMatrix() :
           Container<Arch_, DT_> (0),
           _rows(0),
@@ -31,6 +51,14 @@ namespace FEAST
         {
         }
 
+        /**
+         * \brief Constructor
+         *
+         * \param[in] rows The row count of the created matrix.
+         * \param[in] columns The column count of the created matrix.
+         *
+         * Creates a matrix with given dimensions.
+         */
         explicit DenseMatrix(Index rows, Index columns) :
           Container<Arch_, DT_>(rows * columns)
         {
@@ -43,6 +71,15 @@ namespace FEAST
           _pelements = this->_elements.at(0);
         }
 
+        /**
+         * \brief Constructor
+         *
+         * \param[in] rows The row count of the created matrix.
+         * \param[in] columns The column count of the created matrix.
+         * \param[in] value The value, each element will be set to.
+         *
+         * Creates a matrix with given dimensions and value.
+         */
         explicit DenseMatrix(Index rows, Index columns, DT_ value) :
           Container<Arch_, DT_>(rows * columns)
         {
@@ -56,6 +93,13 @@ namespace FEAST
           MemoryPool<Arch_>::instance()->set_memory(_pelements, value, this->_size);
         }
 
+        /**
+         * \brief Copy Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Creates a shallow copy of a given matrix.
+         */
         DenseMatrix(const DenseMatrix<Arch_, DT_> & other) :
           Container<Arch_, DT_>(other),
           _rows(other._rows),
@@ -64,6 +108,13 @@ namespace FEAST
           _pelements = this->_elements.at(0);
         }
 
+        /**
+         * \brief Copy Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Creates a copy of a given matrix from another memory architecture.
+         */
         template <typename Arch2_, typename DT2_>
         DenseMatrix(const DenseMatrix<Arch2_, DT2_> & other) :
           Container<Arch_, DT_>(other),
@@ -73,6 +124,13 @@ namespace FEAST
           _pelements = this->_elements.at(0);
         }
 
+        /**
+         * \brief Assignment operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Assigns another matrix to the target matrix.
+         */
         DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch_, DT_> & other)
         {
           if (this == &other)
@@ -110,6 +168,13 @@ namespace FEAST
           return *this;
         }
 
+        /**
+         * \brief Assignment operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Assigns a matrix from another memory architecture to the target matrix.
+         */
         template <typename Arch2_, typename DT2_>
         DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
         {
@@ -142,13 +207,14 @@ namespace FEAST
           return *this;
         }
 
-        void operator()(Index row, Index col, DT_ value)
-        {
-          ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
-          ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
-          MemoryPool<Arch_>::modify_element(_pelements, row * this->_rows + col, value);
-        }
-
+        /**
+         * \brief Retrieve specific matrix element.
+         *
+         * \param[in] row The row of the matrix element.
+         * \param[in] col The column of the matrix element.
+         *
+         * \returns Specific matrix element.
+         */
         const DT_ operator()(Index row, Index col) const
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
@@ -156,17 +222,47 @@ namespace FEAST
           return MemoryPool<Arch_>::get_element(_pelements, row * this->_rows + col);
         }
 
+        /**
+         * \brief Set specific matrix element.
+         *
+         * \param[in] row The row of the matrix element.
+         * \param[in] col The column of the matrix element.
+         * \param[in] value The value to be set.
+         */
+        void operator()(Index row, Index col, DT_ value)
+        {
+          ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
+          ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
+          MemoryPool<Arch_>::modify_element(_pelements, row * this->_rows + col, value);
+        }
+
+        /**
+         * \brief Retrieve matrix row count.
+         *
+         * \returns Matrix row count.
+         */
         const Index & rows() const
         {
           return this->_rows;
         }
 
+        /**
+         * \brief Retrieve matrix column count.
+         *
+         * \returns Matrix column count.
+         */
         const Index & columns() const
         {
           return this->_columns;
         }
     };
 
+    /**
+     * \brief DenseMatrix comparison operator
+     *
+     * \param[in] a A matrix to compare with.
+     * \param[in] b A matrix to compare with.
+     */
     template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const DenseMatrix<Arch_, DT_> & a, const DenseMatrix<Arch2_, DT_> & b)
     {
       if (a.size() != b.size())
@@ -188,6 +284,12 @@ namespace FEAST
       return true;
     }
 
+    /**
+     * \brief DenseMatrix streaming operator
+     *
+     * \param[in] lhs The target stream.
+     * \param[in] b The matrix to be streamed.
+     */
     template <typename Arch_, typename DT_>
       std::ostream &
       operator<< (std::ostream & lhs, const DenseMatrix<Arch_, DT_> & b)

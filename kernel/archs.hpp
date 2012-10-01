@@ -2,6 +2,13 @@
 #ifndef KERNEL_HORNET_ARCHS_HPP
 #define KERNEL_HORNET_ARCHS_HPP 1
 
+/**
+ * \file
+ * \brief FEAST Architecture header.
+ *
+ * This file contains all architecture definitions, used in FEAST.
+ */
+
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/instantiation_policy.hpp>

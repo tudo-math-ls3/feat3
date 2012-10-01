@@ -99,7 +99,9 @@
 ///\endcond
 // end of block hidden from doxygen
 
-/// FEAST namespace
+/**
+ * \brief FEAST namespace
+ */
 namespace FEAST
 {
   /// FEAST version

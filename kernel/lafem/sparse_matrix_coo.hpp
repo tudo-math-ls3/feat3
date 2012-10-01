@@ -21,20 +21,42 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Coordinate based sparse matrix.
+     *
+     * \tparam Arch_ The memory architecture to be used.
+     * \tparam DT_ The datatype to be used.
+     *
+     * This class represents a sparse matrix, that stores its non zero elements alongside their coordinates in a single heap.
+     *
+     * \author Dirk Ribbrock
+     */
     template <typename DT_>
     class SparseMatrixCOO<Archs::CPU, DT_> : public Container<Archs::CPU, DT_>
     {
       private:
+        /// Row count.
         Index _rows;
+        /// Column count.
         Index _columns;
+        /// One dimensional mapping of matrix coordinates to non zero elements.
         std::map<Index, DT_> _elements;
+        /// Our non zero element.
         DT_ _zero_element;
+        /// Our non zero element count.
         Index _used_elements;
 
       public:
+        /// Our datatype
         typedef DT_ data_type;
+        /// Our memory architecture type
         typedef Archs::CPU arch_type;
 
+        /**
+         * \brief Constructor
+         *
+         * Creates an empty non dimensional matrix.
+         */
         explicit SparseMatrixCOO() :
           Container<Archs::CPU, DT_> (0),
           _rows(0),
@@ -44,6 +66,14 @@ namespace FEAST
         {
         }
 
+        /**
+         * \brief Constructor
+         *
+         * \param[in] rows The row count of the created matrix.
+         * \param[in] columns The column count of the created matrix.
+         *
+         * Creates a matrix with given dimensions.
+         */
         explicit SparseMatrixCOO(Index rows, Index columns) :
           Container<Archs::CPU, DT_>(rows * columns),
           _zero_element(DT_(0)),
@@ -54,6 +84,13 @@ namespace FEAST
           this->_columns = columns;
         }
 
+        /**
+         * \brief Copy Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Creates a shallow copy of a given matrix.
+         */
         SparseMatrixCOO(const SparseMatrixCOO<Archs::CPU, DT_> & other) :
           Container<Archs::CPU, DT_>(other),
           _rows(other._rows),
@@ -64,6 +101,13 @@ namespace FEAST
             _elements.insert(other._elements.begin(), other._elements.end());
         }
 
+        /**
+         * \brief Copy Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Creates a copy of a given matrix from another memory architecture.
+         */
         template <typename Arch2_, typename DT2_>
         SparseMatrixCOO(const SparseMatrixCOO<Arch2_, DT2_> & other) :
           Container<Archs::CPU, DT_>(other),
@@ -75,6 +119,13 @@ namespace FEAST
             _elements.insert(other._elements.begin(), other._elements.end());
         }
 
+        /**
+         * \brief Set specific matrix element.
+         *
+         * \param[in] row The row of the matrix element.
+         * \param[in] col The column of the matrix element.
+         * \param[in] value The value to be set.
+         */
         void operator()(Index row, Index col, DT_ val)
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
@@ -87,6 +138,14 @@ namespace FEAST
           _elements[row * _columns + col] = val;
         }
 
+        /**
+         * \brief Retrieve specific matrix element.
+         *
+         * \param[in] row The row of the matrix element.
+         * \param[in] col The column of the matrix element.
+         *
+         * \returns Specific matrix element.
+         */
         const DT_ operator()(Index row, Index col) const
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
@@ -101,32 +160,63 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief Retrieve matrix row count.
+         *
+         * \returns Matrix row count.
+         */
         const Index & rows() const
         {
           return this->_rows;
         }
 
+        /**
+         * \brief Retrieve matrix column count.
+         *
+         * \returns Matrix column count.
+         */
         const Index & columns() const
         {
           return this->_columns;
         }
 
+        /**
+         * \brief Retrieve non zero element count.
+         *
+         * \returns Non zero element count.
+         */
         const Index & used_elements() const
         {
           return this->_used_elements;
         }
 
+        /**
+         * \brief Retrieve non zero element map.
+         *
+         * \returns Non zero element map.
+         */
         const std::map<Index, DT_> & elements() const
         {
           return _elements;
         }
 
+        /**
+         * \brief Retrieve non zero element.
+         *
+         * \returns Non zero element.
+         */
         const DT_ zero_element() const
         {
           return _zero_element;
         }
     };
 
+    /**
+     * \brief SparseMatrixCOO comparison operator
+     *
+     * \param[in] a A matrix to compare with.
+     * \param[in] b A matrix to compare with.
+     */
     template <typename Arch_, typename DT_> bool operator== (const SparseMatrixCOO<Arch_, DT_> & a, const SparseMatrixCOO<Arch_, DT_> & b)
     {
       if (a.rows() != b.rows())
@@ -146,6 +236,12 @@ namespace FEAST
       return true;
     }
 
+    /**
+     * \brief SparseMatrixCOO streaming operator
+     *
+     * \param[in] lhs The target stream.
+     * \param[in] b The matrix to be streamed.
+     */
     template <typename Arch_, typename DT_>
     std::ostream &
     operator<< (std::ostream & lhs, const SparseMatrixCOO<Arch_, DT_> & b)
