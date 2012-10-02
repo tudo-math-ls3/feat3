@@ -1,6 +1,20 @@
 #include <mpi.h>
 #include <iostream>
 #include <kernel/base_header.hpp>
+#include <kernel/foundation/control.hpp>
+#include <kernel/foundation/topology.hpp>
+
+using namespace FEAST;
+using namespace Foundation;
+
+/*template<typename DT1_, typename DT2_, typename DT3_>
+void test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ eps)
+{
+  if(abs(l - r) < eps)
+    std::cout << "PASSED" << std::endl;
+  else
+    std::cout << "FAILED" << std::endl;
+}*/
 
 int main(int argc, char* argv[])
 {
@@ -11,37 +25,34 @@ int main(int argc, char* argv[])
 
   int rank, numprocs;
 
-  int tag(99), source(0), target(1), count(1);
-  int buffer(5678);
-  MPI_Status status;
-  MPI_Request request(MPI_REQUEST_NULL);
+  ///TODO dedicated processes only
+  //tell FEAST, how physical compute nodes and mesh patches are connected
+  Topology<> network; //not needed now
+  Topology<> patches; //only needed for letting LB know, how many patches actually exist
+  patches.push_back();
+  patches.push_back();
+  patches.push_back();
+  patches.push_back();
+  LBConfig<Topology<> > lbconf(network, patches);
 
-  MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
-  MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+  Control<Parallel, SimpleLoadBalancingPolicy>::init(lbconf);
 
-  if(rank == source)
+  //### output only ###
+  int me;
+  MPI_Comm_rank(MPI_COMM_WORLD, &me);
+  if(me == 0)
   {
-    buffer = 5678;
-    MPI_Isend(&buffer, count, MPI_INT, target, tag, MPI_COMM_WORLD, &request);
+    for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)
+      for(Index j(0) ; j < lbconf.patch_process_map.at(i).size() ; ++j)
+        std::cout << "Process " << lbconf.patch_process_map.at(i).at(j) << " distributed to patch " << i << "." << std::endl;
   }
-  if(rank == target)
-  {
-    MPI_Irecv(&buffer, count, MPI_INT, source, tag, MPI_COMM_WORLD, &request);
-  }
-
-  MPI_Wait(&request, &status);
-
-  if(rank == source)
-  {
-    std::cout << "Processor " << rank << " sent " << buffer << "!" << std::endl;
-  }
-
-  if(rank == target)
-  {
-    std::cout << "Processor " << rank << " got " << buffer << "!" << std::endl;
-  }
+  //### end output only ###
 
   MPI_Finalize();
+
+#else
+
+  ///TODO
 
 #endif
 
