@@ -1,4 +1,6 @@
+#ifndef FEAST_SERIAL_MODE
 #include <mpi.h>
+#endif
 #include <iostream>
 #include <kernel/base_header.hpp>
 #include <kernel/foundation/control.hpp>
@@ -20,10 +22,8 @@ int main(int argc, char* argv[])
 {
 
 #ifndef FEAST_SERIAL_MODE
-
   MPI_Init(&argc,&argv);
-
-  int rank, numprocs;
+#endif
 
   ///TODO dedicated processes only
   //tell FEAST, how physical compute nodes and mesh patches are connected
@@ -35,11 +35,17 @@ int main(int argc, char* argv[])
   patches.push_back();
   LBConfig<Topology<> > lbconf(network, patches);
 
+#ifndef FEAST_SERIAL_MODE
   Control<Parallel, SimpleLoadBalancingPolicy>::init(lbconf);
+#else
+  Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf);
+#endif
 
   //### output only ###
-  int me;
+  int me(0);
+#ifndef FEAST_SERIAL_MODE
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
+#endif
   if(me == 0)
   {
     for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)
@@ -48,28 +54,8 @@ int main(int argc, char* argv[])
   }
   //### end output only ###
 
+#ifndef FEAST_SERIAL_MODE
   MPI_Finalize();
-
-#else
-
-  ///serial mode does exactly the same
-  //tell FEAST, how physical compute nodes and mesh patches are connected
-  Topology<> network; //not needed for dummy LB
-  Topology<> patches; //only needed for letting dummy LB know, how many patches actually exist
-  patches.push_back();
-  patches.push_back();
-  patches.push_back();
-  patches.push_back();
-  LBConfig<Topology<> > lbconf(network, patches);
-
-  Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf);
-
-  //### output only ###
-  for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)
-    for(Index j(0) ; j < lbconf.patch_process_map.at(i).size() ; ++j)
-      std::cout << "Process " << lbconf.patch_process_map.at(i).at(j) << " distributed to patch " << i << "." << std::endl;
-  //### end output only ###
-
 #endif
 
   return 0;
