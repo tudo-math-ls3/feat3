@@ -29,10 +29,27 @@ int main(int argc, char* argv[])
   //tell FEAST, how physical compute nodes and mesh patches are connected
   Topology<> network; //not needed for dummy LB
   Topology<> patches; //only needed for letting dummy LB know, how many patches actually exist
+  //patch topology: (will be done from file(s) )
+  /*   0---1
+   *   | X |
+   *   2---3
+   */
   patches.push_back();
+  patches.at(0).push_back(1);
+  patches.at(0).push_back(2);
+  patches.at(0).push_back(3);
   patches.push_back();
+  patches.at(1).push_back(0);
+  patches.at(1).push_back(2);
+  patches.at(1).push_back(3);
   patches.push_back();
+  patches.at(2).push_back(0);
+  patches.at(2).push_back(1);
+  patches.at(2).push_back(3);
   patches.push_back();
+  patches.at(3).push_back(0);
+  patches.at(3).push_back(1);
+  patches.at(3).push_back(2);
   LBConfig<Topology<> > lbconf(network, patches);
 
 #ifndef FEAST_SERIAL_MODE
@@ -41,11 +58,13 @@ int main(int argc, char* argv[])
   Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf);
 #endif
 
-  //### output only ###
+  //determine global rank
   int me(0);
 #ifndef FEAST_SERIAL_MODE
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
+
+  //### output only ###
   if(me == 0)
   {
     for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)
