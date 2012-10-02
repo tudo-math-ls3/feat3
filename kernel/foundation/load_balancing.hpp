@@ -51,9 +51,14 @@ namespace FEAST
         }
 
 #else
+        ReturnType_ patch_process_map;
 
-        patch_process_map.at(0).push_back(IndexType_(0));
-
+        ///every patch is processed by our only process 0
+        for(Index i(0) ; i < lbconf.patch_mesh.size() ; ++i)
+        {
+          patch_process_map.push_back();
+          patch_process_map.at(i).push_back(Index(0));
+        }
 #endif
 
         return patch_process_map;

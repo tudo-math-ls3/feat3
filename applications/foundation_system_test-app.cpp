@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 
   ///TODO dedicated processes only
   //tell FEAST, how physical compute nodes and mesh patches are connected
-  Topology<> network; //not needed now
-  Topology<> patches; //only needed for letting LB know, how many patches actually exist
+  Topology<> network; //not needed for dummy LB
+  Topology<> patches; //only needed for letting dummy LB know, how many patches actually exist
   patches.push_back();
   patches.push_back();
   patches.push_back();
@@ -52,7 +52,23 @@ int main(int argc, char* argv[])
 
 #else
 
-  ///TODO
+  ///serial mode does exactly the same
+  //tell FEAST, how physical compute nodes and mesh patches are connected
+  Topology<> network; //not needed for dummy LB
+  Topology<> patches; //only needed for letting dummy LB know, how many patches actually exist
+  patches.push_back();
+  patches.push_back();
+  patches.push_back();
+  patches.push_back();
+  LBConfig<Topology<> > lbconf(network, patches);
+
+  Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf);
+
+  //### output only ###
+  for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)
+    for(Index j(0) ; j < lbconf.patch_process_map.at(i).size() ; ++j)
+      std::cout << "Process " << lbconf.patch_process_map.at(i).at(j) << " distributed to patch " << i << "." << std::endl;
+  //### end output only ###
 
 #endif
 
