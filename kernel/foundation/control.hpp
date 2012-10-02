@@ -32,7 +32,7 @@ namespace FEAST
       template<typename IndexType_, template<typename, typename> class OuterStorageType_, typename StorageType_>
       static void init(LBConfig<Topology<IndexType_, OuterStorageType_, StorageType_> > & lbconf)
       {
-        lbconf.patch_process_map = LBPolicy_::execute(lbconf);
+        LBPolicy_::execute(lbconf);
       }
     };
 
@@ -44,7 +44,7 @@ namespace FEAST
       template<typename IndexType_, template<typename, typename> class OuterStorageType_, typename StorageType_>
       static void init(LBConfig<Topology<IndexType_, OuterStorageType_, StorageType_> > & lbconf)
       {
-        lbconf.patch_process_map = LBPolicy_::execute(lbconf);
+        LBPolicy_::execute(lbconf);
       }
     };
 

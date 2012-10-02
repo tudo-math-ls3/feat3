@@ -51,6 +51,10 @@ int main(int argc, char* argv[])
     for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)
       for(Index j(0) ; j < lbconf.patch_process_map.at(i).size() ; ++j)
         std::cout << "Process " << lbconf.patch_process_map.at(i).at(j) << " distributed to patch " << i << "." << std::endl;
+
+    for(Index i(0) ; i < lbconf.process_patch_map.size() ; ++i)
+      for(Index j(0) ; j < lbconf.process_patch_map.at(i).size() ; ++j)
+        std::cout << "Patch " << lbconf.process_patch_map.at(i).at(j) << " processed by process " << i << "." << std::endl;
   }
   //### end output only ###
 

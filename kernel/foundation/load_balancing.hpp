@@ -21,12 +21,13 @@ namespace FEAST
       const ReturnType_& network;
       const ReturnType_& patch_mesh;
       ReturnType_ patch_process_map;
+      ReturnType_ process_patch_map;
     };
 
     struct SimpleLoadBalancingPolicy
     {
       template<typename ReturnType_>
-      static ReturnType_ execute(const LBConfig<ReturnType_>& lbconf)
+      static void execute(LBConfig<ReturnType_>& lbconf)
       {
 
 #ifndef FEAST_SERIAL_MODE
@@ -35,33 +36,36 @@ namespace FEAST
         int numprocs;
         MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 
-        ReturnType_ patch_process_map;
-
         for(Index i(0) ; i < lbconf.patch_mesh.size() ; ++i)
         {
-          patch_process_map.push_back();
+          lbconf.patch_process_map.push_back();
+        }
+
+        for(Index i(0) ; i < numprocs ; ++i)
+        {
+          lbconf.process_patch_map.push_back();
         }
 
         Index j(0);
         for(Index i(0) ; i < numprocs ; ++i)
         {
-          patch_process_map.at(j).push_back(i);
+          lbconf.patch_process_map.at(j).push_back(i);
+          lbconf.process_patch_map.at(i).push_back(j);
           ++j;
           j = j < lbconf.patch_mesh.size() ? j : Index(0);
         }
 
 #else
-        ReturnType_ patch_process_map;
-
         ///every patch is processed by our only process 0
+        lbconf.process_patch_map.push_back();
         for(Index i(0) ; i < lbconf.patch_mesh.size() ; ++i)
         {
-          patch_process_map.push_back();
-          patch_process_map.at(i).push_back(Index(0));
+          lbconf.patch_process_map.push_back();
+          lbconf.patch_process_map.at(i).push_back(Index(0));
+          lbconf.process_patch_map.at(0).push_back(i);
         }
-#endif
 
-        return patch_process_map;
+#endif
       }
     };
   }
