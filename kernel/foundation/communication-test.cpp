@@ -99,7 +99,7 @@ class CommunicationTest:
       ((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->push_back(4444.);
 
       //init simple halo
-      Foundation::Halo<0, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m3, 1);
+      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m3, 1);
 
       //add connections
       //

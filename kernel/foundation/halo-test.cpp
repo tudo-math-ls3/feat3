@@ -94,7 +94,7 @@ class HaloTest:
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(1, m3);
 
       //init simple halo
-      Foundation::Halo<0, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m3, 1);
+      Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m3, 1);
 
       //add connections
       //
@@ -245,7 +245,7 @@ class HaloTestGeometryInterface:
       vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(3);
 
       //create halo with one edge-edge pair
-      Foundation::Halo<0, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
+      Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
       h.add_element_pair(3, 2);
 
       //create CellSubSet

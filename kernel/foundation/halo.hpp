@@ -30,6 +30,7 @@ namespace FEAST
      * \author Markus Geveler
      */
     template<unsigned delta_,
+             unsigned level_,
              typename MeshType_,
              template<typename, typename> class StorageType_ = std::vector,
              typename IndexType_ = Index>

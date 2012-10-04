@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
   Config<Topology<> > lbconf(network, patches);
 
   //prepare local data for each process (i.t.m. 1 on 1 case only)
-  PatchData<Mesh<rnt_2D>, Halo<0, Mesh<rnt_2D, Topology<> > >, Topology<> > local_data;
+  PatchData<Mesh<rnt_2D>, Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >, Topology<> > local_data;
 
   int me(0);
 #ifndef FEAST_SERIAL_MODE
@@ -64,7 +64,6 @@ int main(int argc, char* argv[])
 #else
   Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf, local_data, me);
 #endif
-
 
   //### output only ###
   if(me == 0)
