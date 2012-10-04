@@ -84,7 +84,7 @@ namespace FEAST
           target.meshes_on_process_patch.at(0).add_adjacency(pl_vertex, pl_edge, 3, 3);
           target.meshes_on_process_patch.at(0).add_adjacency(pl_vertex, pl_face, 3, 0);
 
-          //create halos, every patch has three logical halos (we use vertex-halos) but we drop redundant since we only perform send_recv
+          //create halos, every patch has three logical halos (we use vertex-halos)
           if(rank == 0)
           {
             HaloType_ h1(target.meshes_on_process_patch.at(0), 1); //right
@@ -109,26 +109,69 @@ namespace FEAST
           }
           else if(rank == 1)
           {
-            HaloType_ h1(target.meshes_on_process_patch.at(0), 3); //down
-            h1.add_element_pair(0, 2);
-            h1.add_element_pair(1, 3);
-            HaloType_ h2(target.meshes_on_process_patch.at(0), 2); //diag
-            h2.add_element_pair(0, 3);
+            HaloType_ h1(target.meshes_on_process_patch.at(0), 0); //left
+            h1.add_element_pair(0, 1);
+            h1.add_element_pair(2, 3);
+
+            HaloType_ h2(target.meshes_on_process_patch.at(0), 3); //down
+            h2.add_element_pair(0, 2);
+            h2.add_element_pair(1, 3);
+
+            HaloType_ h3(target.meshes_on_process_patch.at(0), 2); //diag
+            h3.add_element_pair(0, 3);
+
             target.halos_on_process_patch.push_back(h1);
             target.halos_on_process_patch.push_back(h2);
+            target.halos_on_process_patch.push_back(h3);
+
             target.mesh_halo_map.push_back();
             target.mesh_halo_map.get_topology().at(0).push_back(0);
             target.mesh_halo_map.get_topology().at(0).push_back(1);
+            target.mesh_halo_map.get_topology().at(0).push_back(2);
           }
           else if(rank == 2)
           {
-            HaloType_ h1(target.meshes_on_process_patch.at(0), 3); //right
-            h1.add_element_pair(1, 0);
-            h1.add_element_pair(3, 2);
+            HaloType_ h1(target.meshes_on_process_patch.at(0), 0); //up
+            h1.add_element_pair(2, 0);
+            h1.add_element_pair(3, 1);
+
+            HaloType_ h2(target.meshes_on_process_patch.at(0), 3); //right
+            h2.add_element_pair(1, 0);
+            h2.add_element_pair(3, 2);
+
+            HaloType_ h3(target.meshes_on_process_patch.at(0), 1); //diag
+            h3.add_element_pair(3, 0);
+
             target.halos_on_process_patch.push_back(h1);
+            target.halos_on_process_patch.push_back(h2);
+            target.halos_on_process_patch.push_back(h3);
+
             target.mesh_halo_map.push_back();
             target.mesh_halo_map.get_topology().at(0).push_back(0);
             target.mesh_halo_map.get_topology().at(0).push_back(1);
+            target.mesh_halo_map.get_topology().at(0).push_back(2);
+          }
+          else if(rank == 3)
+          {
+            HaloType_ h1(target.meshes_on_process_patch.at(0), 1); //up
+            h1.add_element_pair(2, 0);
+            h1.add_element_pair(3, 1);
+
+            HaloType_ h2(target.meshes_on_process_patch.at(0), 2); //left
+            h2.add_element_pair(0, 1);
+            h2.add_element_pair(2, 3);
+
+            HaloType_ h3(target.meshes_on_process_patch.at(0), 0); //diag
+            h3.add_element_pair(2, 1);
+
+            target.halos_on_process_patch.push_back(h1);
+            target.halos_on_process_patch.push_back(h2);
+            target.halos_on_process_patch.push_back(h3);
+
+            target.mesh_halo_map.push_back();
+            target.mesh_halo_map.get_topology().at(0).push_back(0);
+            target.mesh_halo_map.get_topology().at(0).push_back(1);
+            target.mesh_halo_map.get_topology().at(0).push_back(2);
           }
         }
       }
