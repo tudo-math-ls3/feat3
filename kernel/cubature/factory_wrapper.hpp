@@ -7,6 +7,11 @@
 #include <kernel/cubature/refine_factory.hpp>
 #include <kernel/cubature/barycentre_driver.hpp>
 #include <kernel/cubature/trapezoidal_driver.hpp>
+#include <kernel/cubature/hammer_stroud_d2_driver.hpp>
+#include <kernel/cubature/hammer_stroud_d3_driver.hpp>
+#include <kernel/cubature/hammer_stroud_d5_driver.hpp>
+#include <kernel/cubature/lauffer_d2_driver.hpp>
+#include <kernel/cubature/lauffer_d4_driver.hpp>
 #include <kernel/cubature/tensor_product_factory.hpp>
 #include <kernel/cubature/scalar/factory_wrapper.hpp>
 
@@ -192,6 +197,8 @@ namespace FEAST
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
+        functor.template driver<LaufferD4Driver>();
+        functor.template driver<HammerStroudD5Driver>();
 
         // <<< END OF CUBATURE DRIVER LIST <<<
       }
@@ -422,6 +429,10 @@ namespace FEAST
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
+
+        functor.template driver<HammerStroudD2Driver>();
+        functor.template driver<HammerStroudD3Driver>();
+        functor.template driver<LaufferD2Driver>();
 
         // <<< END OF CUBATURE DRIVER LIST <<<
       }

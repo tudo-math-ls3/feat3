@@ -11,6 +11,20 @@ namespace FEAST
   {
     namespace Scalar
     {
+      /**
+       * \brief Open Newton-Cotes Rule driver class template
+       *
+       * This driver implements the open Newton Cotes cubature rules.
+       * \see http://de.wikipedia.org/wiki/Newton-Cotes-Formeln
+       *
+       * \tparam Weight_
+       * The data type for the cubature weights.
+       *
+       * \tparam Coord_
+       * The data type for the cubature point coordinates.
+       *
+       * \author Constantin Christof
+       */
       template<
         typename Weight_,
         typename Coord_>
@@ -24,25 +38,43 @@ namespace FEAST
 
         enum
         {
+          /// this rule is variadic
           variadic = 1,
+          /// this rule has at least 1 points
           min_points = 1,
+          /// this rule has at most 7 points
           max_points = 7
         };
 
+        ///Returns the name of the cubature rule.
         static String name()
         {
           return "newton-cotes-open";
         }
 
+        /**
+         * \brief Adds the driver's aliases.
+         *
+         * \param[in] functor
+         * The functor whose \p alias function is to be called.
+         */
         template<typename Functor_>
         static void alias(Functor_& functor)
         {
-          // functor.alias("midpoint", 1);
+          functor.alias("midpoint", 1);
         }
 
+        /**
+         * \brief Fills the cubature rule structure.
+         *
+         * \param[in,out] rule
+         * The cubature rule to be filled.
+         * \param[in] num_points
+         * The number of quadrature points.
+         */
         static void fill(RuleType& rule, Index num_points)
         {
-          // create the formula
+          // how many points do we have?
           switch(num_points)
           {
           case 1:
@@ -69,7 +101,7 @@ namespace FEAST
           }
         }
 
-        // midpoint
+        /// Create 1-point open Newton-Cotes rule (alias midpoint rule)
         static void create_1(RuleType& rule)
         {
           rule.get_coord(0) = Coord_(0);
@@ -77,6 +109,7 @@ namespace FEAST
           rule.get_weight(0) = WeightType(2);
         }
 
+        /// Create 2-point open Newton-Cotes rule
         static void create_2(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1) / Coord_(3);
@@ -86,6 +119,7 @@ namespace FEAST
           rule.get_weight(1) = WeightType(1);
         }
 
+        /// Create 3-point open Newton-Cotes rule
         static void create_3(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1) / Coord_(2);
@@ -97,6 +131,7 @@ namespace FEAST
           rule.get_weight(2) = WeightType(4) / WeightType(3);
         }
 
+        /// Create 4-point open Newton-Cotes rule
         static void create_4(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(3) / Coord_(5);
@@ -110,6 +145,7 @@ namespace FEAST
           rule.get_weight(3) = Weight_(11) / Weight_(12);
         }
 
+        /// Create 5-point open Newton-Cotes rule
         static void create_5(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(2) / Coord_(3);
@@ -125,6 +161,7 @@ namespace FEAST
           rule.get_weight(4) = Weight_(11) / Weight_(10);
         }
 
+        /// Create 6-point open Newton-Cotes rule
         static void create_6(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(5) / Coord_(7);
@@ -142,6 +179,7 @@ namespace FEAST
           rule.get_weight(5) = Weight_(611) / Weight_(720);
         }
 
+        /// Create 7-point open Newton-Cotes rule
         static void create_7(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(3) / Coord_(4);

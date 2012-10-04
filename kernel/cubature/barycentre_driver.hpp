@@ -18,10 +18,13 @@ namespace FEAST
       public:
         enum
         {
+          /// this rule is not variadic
           variadic = 0,
+          /// this rule has one point
           num_points = 1
         };
 
+        ///Returns the name of the cubature rule.
         static String name()
         {
           return "barycentre";
@@ -30,6 +33,25 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
 
+    /**
+     * \brief Barycentre Rule driver class template
+     *
+     * This driver implements the barycentre cubature rule.
+     * \see http://de.wikipedia.org/wiki/Mittelpunktsregel
+     *
+     * \tparam Shape_
+     * The shape type of the element.
+     *
+     * \tparam Weight_
+     * The data type for the cubature weights.
+     *
+     * \tparam Coord_
+     * The data type for the cubature point coordinates.
+     *
+     * \tparam Point_
+     *
+     * \author Peter Zajac
+     */
     template<
       typename Shape_,
       typename Weight_,
@@ -37,6 +59,7 @@ namespace FEAST
       typename Point_>
     class BarycentreDriver;
 
+    // Simplex specialisation
     template<
       int dim_,
       typename Weight_,
@@ -48,6 +71,12 @@ namespace FEAST
     public:
       typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
 
+      /**
+       * \brief Fills the cubature rule structure.
+       *
+       * \param[in,out] rule
+       * The cubature rule to be filled.
+       */
       static void fill(RuleType& rule)
       {
         rule.get_weight(0) = Weight_(1) / Weight_(Factorial<dim_>::value);
@@ -60,6 +89,7 @@ namespace FEAST
       }
     }; // class BarycentreDriver<Simplex<...>,...>
 
+    // Hypercube specialisation
     template<
       int dim_,
       typename Weight_,
@@ -71,6 +101,12 @@ namespace FEAST
     public:
       typedef Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> RuleType;
 
+      /**
+       * \brief Fills the cubature rule structure.
+       *
+       * \param[in,out] rule
+       * The cubature rule to be filled.
+       */
       static void fill(RuleType& rule)
       {
         rule.get_weight(0) = Weight_(1 << dim_);

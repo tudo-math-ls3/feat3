@@ -11,6 +11,20 @@ namespace FEAST
   {
     namespace Scalar
     {
+      /**
+       * \brief Closed Newton-Cotes Rule driver class template
+       *
+       * This driver implements the closed Newton Cotes cubature rules.
+       * \see http://de.wikipedia.org/wiki/Newton-Cotes-Formeln
+       *
+       * \tparam Weight_
+       * The data type for the cubature weights.
+       *
+       * \tparam Coord_
+       * The data type for the cubature point coordinates.
+       *
+       * \author Constantin Christof
+       */
       template<
         typename Weight_,
         typename Coord_>
@@ -24,30 +38,47 @@ namespace FEAST
 
         enum
         {
+          /// this rule is variadic
           variadic = 1,
+          /// this rule has at least 2 points
           min_points = 2,
+          /// this rule has at most 7 points
           max_points = 7
         };
 
+        ///Returns the name of the cubature rule.
         static String name()
         {
           return "newton-cotes-closed";
         }
 
+        /**
+         * \brief Adds the driver's aliases.
+         *
+         * \param[in] functor
+         * The functor whose \p alias function is to be called.
+         */
         template<typename Functor_>
         static void alias(Functor_& functor)
         {
-          // functor.alias("trapezoidal", 2);
           functor.alias("simpson", 3);
-          // functor.alias("pulcherrima", 4);
+          functor.alias("pulcherrima", 4);
           functor.alias("milne-bool", 5);
           functor.alias("6-point", 6);
           functor.alias("weddle", 7);
         }
 
+        /**
+         * \brief Fills the cubature rule structure.
+         *
+         * \param[in,out] rule
+         * The cubature rule to be filled.
+         * \param[in] num_points
+         * The number of quadrature points.
+         */
         static void fill(RuleType& rule, Index num_points)
         {
-          // create the formula
+          // how many points do we have?
           switch(num_points)
           {
           case 2:
@@ -71,7 +102,7 @@ namespace FEAST
           }
         }
 
-        // trapezoidal
+        /// Create 2-point closed Newton-Cotes rule (alias trapezoidal rule)
         static void create_2(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1);
@@ -81,7 +112,7 @@ namespace FEAST
           rule.get_weight(1) = WeightType(1);
         }
 
-        // Simpson
+        // Create 3-point closed Newton-Cotes rule (alias Simpson rule)
         static void create_3(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1);
@@ -93,7 +124,7 @@ namespace FEAST
           rule.get_weight(2) = WeightType(1) / WeightType(3);
         }
 
-        // pulcherrima
+        // Create 4-point closed Newton-Cotes rule (alias pulcherrima rule)
         static void create_4(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1);
@@ -107,7 +138,7 @@ namespace FEAST
           rule.get_weight(3) = Weight_(1) / Weight_(4);
         }
 
-        // Milne/Bool
+        /// Create 5-point closed Newton-Cotes rule (alias Milne-Bool rule)
         static void create_5(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1);
@@ -123,7 +154,7 @@ namespace FEAST
           rule.get_weight(4) = Weight_(7) / Weight_(45);
         }
 
-        // 6-point
+        /// Create 6-point closed Newton-Cotes rule
         static void create_6(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1);
@@ -141,7 +172,7 @@ namespace FEAST
           rule.get_weight(5) = Weight_(19) / Weight_(144);
         }
 
-        // Weddle
+        /// Create 7-point closed Newton-Cotes rule (alias Weddle rule)
         static void create_7(RuleType& rule)
         {
           rule.get_coord(0) = -Coord_(1);

@@ -14,6 +14,20 @@ namespace FEAST
   {
     namespace Scalar
     {
+      /**
+       * \brief Gauss-Lobatto Rule driver class template
+       *
+       * This driver implements the Gauss-Lobatto rule.
+       * \see http://en.wikipedia.org/wiki/Gaussian_quadrature
+       *
+       * \tparam Weight_
+       * The data type for the cubature weights.
+       *
+       * \tparam Coord_
+       * The data type for the cubature point coordinates.
+       *
+       * \author Constantin Christof
+       */
       template<
         typename Weight_,
         typename Coord_>
@@ -27,19 +41,31 @@ namespace FEAST
 
         enum
         {
+          /// this rule is variadic
           variadic = 1,
+          /// this rule has at least 3 points
           min_points = 3,
+          /// this rule has at most 6 points
           max_points = 6
         };
 
+        ///Returns the name of the cubature rule.
         static String name()
         {
           return "gauss-lobatto";
         }
 
+        /**
+         * \brief Fills the cubature rule structure.
+         *
+         * \param[in,out] rule
+         * The cubature rule to be filled.
+         * \param[in] num_points
+         * The number of quadrature points.
+         */
         static void fill(RuleType& rule, Index num_points)
         {
-          // create the formula
+          // how many points do we have?
           switch(num_points)
           {
           case 3:
@@ -57,6 +83,7 @@ namespace FEAST
           }
         }
 
+        /// Create 3-point Gauss-Lobatto rule
         static void create_3(RuleType& rule)
         {
           rule.get_coord(0) = - CoordType(1);
@@ -68,6 +95,7 @@ namespace FEAST
           rule.get_weight(2) = WeightType(1) / WeightType(3);
         }
 
+        /// Create 4-point Gauss-Lobatto rule
         static void create_4(RuleType& rule)
         {
           rule.get_coord(0) = - CoordType(1);
@@ -81,6 +109,7 @@ namespace FEAST
           rule.get_weight(3) = WeightType(1) / WeightType(6);
         }
 
+        /// Create 5-point Gauss-Lobatto rule
         static void create_5(RuleType& rule)
         {
           rule.get_coord(0) = - CoordType(1);
@@ -96,6 +125,7 @@ namespace FEAST
           rule.get_weight(4) = WeightType(1) / WeightType(10);
         }
 
+        /// Create 6-point Gauss-Lobatto rule
         static void create_6(RuleType& rule)
         {
           rule.get_coord(0) = - CoordType(1);

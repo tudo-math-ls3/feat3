@@ -76,6 +76,8 @@ namespace FEAST
          *
          * \param[in,out] rule
          * The cubature rule to be filled.
+         * \param[in] num_points
+         * The number of quadrature points.
          */
         static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
