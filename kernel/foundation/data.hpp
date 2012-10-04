@@ -46,10 +46,10 @@ namespace FEAST
           target.meshes_on_process_patch.at(0).add_polytope(Foundation::pl_vertex);
           target.meshes_on_process_patch.at(0).add_polytope(Foundation::pl_vertex);
           target.meshes_on_process_patch.at(0).add_polytope(Foundation::pl_vertex);
-          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(0.));
-          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(0.));
-          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(0.));
-          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(0.));
+          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(rank));
+          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(rank));
+          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(rank));
+          ((Foundation::Attribute<double>*)(target.functions_on_process_patch.at(0).get()))->get_data().push_back(double(rank));
 
           //add edges
           target.meshes_on_process_patch.at(0).add_polytope(Foundation::pl_edge);

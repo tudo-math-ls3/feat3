@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
   PatchData<Mesh<rnt_2D>, Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >, Topology<> > local_data;
 
   int me(0);
+  //build communication structures
 #ifndef FEAST_SERIAL_MODE
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   Control<Parallel, SimpleLoadBalancingPolicy, SimpleDataFillPolicy>::init(lbconf, local_data, me);
