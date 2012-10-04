@@ -5,11 +5,12 @@
 // includes, FEAST
 #include <kernel/cubature/scalar/driver_factory.hpp>
 #include <kernel/cubature/scalar/gauss_legendre_driver.hpp>
-#include <kernel/cubature/scalar/trapezoidal_driver.hpp>
+#include <kernel/cubature/scalar/gauss_lobatto_driver.hpp>
+#include <kernel/cubature/scalar/maclaurin_driver.hpp>
+#include <kernel/cubature/scalar/midpoint_driver.hpp>
 #include <kernel/cubature/scalar/newton_cotes_closed_driver.hpp>
 #include <kernel/cubature/scalar/newton_cotes_open_driver.hpp>
-#include <kernel/cubature/scalar/maclaurin_driver.hpp>
-#include <kernel/cubature/scalar/gauss_lobatto_driver.hpp>
+#include <kernel/cubature/scalar/trapezoidal_driver.hpp>
 
 namespace FEAST
 {
@@ -36,9 +37,10 @@ namespace FEAST
           // functor.template driver<YourDriverName>();
           functor.template driver<GaussLegendreDriver>();
           functor.template driver<GaussLobattoDriver>();
+          functor.template driver<MaclaurinDriver>();
+          functor.template driver<MidpointDriver>();
           functor.template driver<NewtonCotesClosedDriver>();
           functor.template driver<NewtonCotesOpenDriver>();
-          functor.template driver<MaclaurinDriver>();
           functor.template driver<TrapezoidalDriver>();
 
           // <<< END OF CUBATURE DRIVER LIST <<<

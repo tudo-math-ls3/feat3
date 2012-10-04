@@ -500,7 +500,12 @@
     <ClInclude Include="..\kernel\cubature\driver_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\dynamic_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\factory_wrapper.hpp" />
+    <ClInclude Include="..\kernel\cubature\hammer_stroud_d2_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\hammer_stroud_d3_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\hammer_stroud_d5_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\internal_functors.hpp" />
+    <ClInclude Include="..\kernel\cubature\lauffer_d2_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\lauffer_d4_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\refine_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\rule.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\driver_base.hpp" />
@@ -510,9 +515,9 @@
     <ClInclude Include="..\kernel\cubature\scalar\gauss_legendre_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\gauss_lobatto_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\maclaurin_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\scalar\midpoint_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_closed_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_open_driver.hpp" />
-    <ClInclude Include="..\kernel\cubature\scalar\pulcherrima_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\rule.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\trapezoidal_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\tensor_product_factory.hpp" />

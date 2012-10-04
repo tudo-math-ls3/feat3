@@ -29,6 +29,18 @@ namespace FEAST
         {
           return "barycentre";
         }
+
+        /**
+         * \brief Adds the driver's aliases.
+         *
+         * \param[in] functor
+         * The functor whose \p alias function is to be called.
+         */
+        template<typename Functor_>
+        static void alias(Functor_& functor)
+        {
+          functor.alias("midpoint");
+        }
       };
     } // namespace Intern
     /// \endcond

@@ -32,10 +32,6 @@ namespace FEAST
         public DriverBase
       {
       public:
-        typedef Weight_ WeightType;
-        typedef Coord_ CoordType;
-        typedef Rule<WeightType, CoordType> RuleType;
-
         enum
         {
           /// this rule is variadic
@@ -76,122 +72,90 @@ namespace FEAST
          * \param[in] num_points
          * The number of quadrature points.
          */
-        static void fill(RuleType& rule, Index num_points)
+        static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
           // how many points do we have?
           switch(num_points)
           {
           case 2:
-            create_2(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = Coord_(1);
+
+            rule.get_weight(0) = Weight_(1);
+            rule.get_weight(1) = Weight_(1);
             break;
+
           case 3:
-            create_3(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = Coord_(0);
+            rule.get_coord(2) = Coord_(1);
+
+            rule.get_weight(0) = Weight_(1) / Weight_(3);
+            rule.get_weight(1) = Weight_(2) / Weight_(3);
+            rule.get_weight(2) = Weight_(1) / Weight_(3);
             break;
+
           case 4:
-            create_4(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = -Coord_(1) / Coord_(3);
+            rule.get_coord(2) =  Coord_(1) / Coord_(3);
+            rule.get_coord(3) =  Coord_(1);
+
+            rule.get_weight(0) = Weight_(1) / Weight_(4);
+            rule.get_weight(1) = Weight_(3) / Weight_(4);
+            rule.get_weight(2) = Weight_(3) / Weight_(4);
+            rule.get_weight(3) = Weight_(1) / Weight_(4);
             break;
+
           case 5:
-            create_5(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = -Coord_(1) / Coord_(2);
+            rule.get_coord(2) =  Coord_(0);
+            rule.get_coord(3) =  Coord_(1) / Coord_(2);
+            rule.get_coord(4) =  Coord_(1);
+
+            rule.get_weight(0) = Weight_(7)  / Weight_(45);
+            rule.get_weight(1) = Weight_(32) / Weight_(45);
+            rule.get_weight(2) = Weight_(12) / Weight_(45);
+            rule.get_weight(3) = Weight_(32) / Weight_(45);
+            rule.get_weight(4) = Weight_(7)  / Weight_(45);
             break;
+
           case 6:
-            create_6(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = -Coord_(3) / Coord_(5);
+            rule.get_coord(2) = -Coord_(1) / Coord_(5);
+            rule.get_coord(3) =  Coord_(1) / Coord_(5);
+            rule.get_coord(4) =  Coord_(3) / Coord_(5);
+            rule.get_coord(5) =  Coord_(1);
+
+            rule.get_weight(0) = Weight_(19) / Weight_(144);
+            rule.get_weight(1) = Weight_(75) / Weight_(144);
+            rule.get_weight(2) = Weight_(50) / Weight_(144);
+            rule.get_weight(3) = Weight_(50) / Weight_(144);
+            rule.get_weight(4) = Weight_(75) / Weight_(144);
+            rule.get_weight(5) = Weight_(19) / Weight_(144);
             break;
+
           case 7:
-            create_7(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = -Coord_(2) / Coord_(3);
+            rule.get_coord(2) = -Coord_(1) / Coord_(3);
+            rule.get_coord(3) =  Coord_(0);
+            rule.get_coord(4) =  Coord_(1) / Coord_(3);
+            rule.get_coord(5) =  Coord_(2) / Coord_(3);
+            rule.get_coord(6) =  Coord_(1);
+
+            rule.get_weight(0) = Weight_(41)  / Weight_(420);
+            rule.get_weight(1) = Weight_(216) / Weight_(420);
+            rule.get_weight(2) = Weight_(27)  / Weight_(420);
+            rule.get_weight(3) = Weight_(272) / Weight_(420);
+            rule.get_weight(4) = Weight_(27)  / Weight_(420);
+            rule.get_weight(5) = Weight_(216) / Weight_(420);
+            rule.get_weight(6) = Weight_(41)  / Weight_(420);
             break;
           }
         }
-
-        /// Create 2-point closed Newton-Cotes rule (alias trapezoidal rule)
-        static void create_2(RuleType& rule)
-        {
-          rule.get_coord(0) = -Coord_(1);
-          rule.get_coord(1) = Coord_(1);
-
-          rule.get_weight(0) = WeightType(1);
-          rule.get_weight(1) = WeightType(1);
-        }
-
-        // Create 3-point closed Newton-Cotes rule (alias Simpson rule)
-        static void create_3(RuleType& rule)
-        {
-          rule.get_coord(0) = -Coord_(1);
-          rule.get_coord(1) = Coord_(0);
-          rule.get_coord(2) = Coord_(1);
-
-          rule.get_weight(0) = WeightType(1) / WeightType(3);
-          rule.get_weight(1) = WeightType(2) / WeightType(3);
-          rule.get_weight(2) = WeightType(1) / WeightType(3);
-        }
-
-        // Create 4-point closed Newton-Cotes rule (alias pulcherrima rule)
-        static void create_4(RuleType& rule)
-        {
-          rule.get_coord(0) = -Coord_(1);
-          rule.get_coord(1) = -Coord_(1) / Coord_(3);
-          rule.get_coord(2) =  Coord_(1) / Coord_(3);
-          rule.get_coord(3) =  Coord_(1);
-
-          rule.get_weight(0) = Weight_(1) / Weight_(4);
-          rule.get_weight(1) = Weight_(3) / Weight_(4);
-          rule.get_weight(2) = Weight_(3) / Weight_(4);
-          rule.get_weight(3) = Weight_(1) / Weight_(4);
-        }
-
-        /// Create 5-point closed Newton-Cotes rule (alias Milne-Bool rule)
-        static void create_5(RuleType& rule)
-        {
-          rule.get_coord(0) = -Coord_(1);
-          rule.get_coord(1) = -Coord_(1) / Coord_(2);
-          rule.get_coord(2) =  Coord_(0);
-          rule.get_coord(3) =  Coord_(1) / Coord_(2);
-          rule.get_coord(4) =  Coord_(1);
-
-          rule.get_weight(0) = Weight_(7) / Weight_(45);
-          rule.get_weight(1) = Weight_(32) / Weight_(45);
-          rule.get_weight(2) = Weight_(12) / Weight_(45);
-          rule.get_weight(3) = Weight_(32) / Weight_(45);
-          rule.get_weight(4) = Weight_(7) / Weight_(45);
-        }
-
-        /// Create 6-point closed Newton-Cotes rule
-        static void create_6(RuleType& rule)
-        {
-          rule.get_coord(0) = -Coord_(1);
-          rule.get_coord(1) = -Coord_(3) / Coord_(5);
-          rule.get_coord(2) = -Coord_(1) / Coord_(5);
-          rule.get_coord(3) =  Coord_(1) / Coord_(5);
-          rule.get_coord(4) =  Coord_(3) / Coord_(5);
-          rule.get_coord(5) =  Coord_(1);
-
-          rule.get_weight(0) = Weight_(19) / Weight_(144);
-          rule.get_weight(1) = Weight_(75) / Weight_(144);
-          rule.get_weight(2) = Weight_(50) / Weight_(144);
-          rule.get_weight(3) = Weight_(50) / Weight_(144);
-          rule.get_weight(4) = Weight_(75) / Weight_(144);
-          rule.get_weight(5) = Weight_(19) / Weight_(144);
-        }
-
-        /// Create 7-point closed Newton-Cotes rule (alias Weddle rule)
-        static void create_7(RuleType& rule)
-        {
-          rule.get_coord(0) = -Coord_(1);
-          rule.get_coord(1) = -Coord_(2) / Coord_(3);
-          rule.get_coord(2) = -Coord_(1) / Coord_(3);
-          rule.get_coord(3) =  Coord_(0);
-          rule.get_coord(4) =  Coord_(1) / Coord_(3);
-          rule.get_coord(5) =  Coord_(2) / Coord_(3);
-          rule.get_coord(6) =  Coord_(1);
-
-          rule.get_weight(0) = Weight_(41) / Weight_(420);
-          rule.get_weight(1) = Weight_(216) / Weight_(420);
-          rule.get_weight(2) = Weight_(27) / Weight_(420);
-          rule.get_weight(3) = Weight_(272) / Weight_(420);
-          rule.get_weight(4) = Weight_(27) / Weight_(420);
-          rule.get_weight(5) = Weight_(216) / Weight_(420);
-          rule.get_weight(6) = Weight_(41) / Weight_(420);
-        }
-
       }; // class NewtonCotesClosedDriver<...>
     } // namespace Scalar
   } // namespace Cubature

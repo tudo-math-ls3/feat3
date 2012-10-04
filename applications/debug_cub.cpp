@@ -1,4 +1,4 @@
-// #define FEAST_CUBATURE_TENSOR_PREFIX 1
+#define FEAST_CUBATURE_TENSOR_PREFIX 1
 #include <kernel/cubature/scalar/dynamic_factory.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <iostream>
@@ -116,8 +116,8 @@ int main(int argc, char* argv[])
   else
     print_avail_all();
 
-  test_dynamic< Shape::Hypercube<2> >("barycentre");
-  test_dynamic< Shape::Hypercube<2> >("refine*2:barycentre");
+  //test_dynamic< Shape::Hypercube<2> >("barycentre");
+  //test_dynamic< Shape::Hypercube<2> >("refine*2:barycentre");
 
   return 0;
 }

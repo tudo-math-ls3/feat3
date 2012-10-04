@@ -345,9 +345,6 @@
     <ClInclude Include="..\kernel\cubature\trapezoidal_driver.hpp">
       <Filter>Header Files\cubature</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\cubature\scalar\pulcherrima_driver.hpp">
-      <Filter>Header Files\cubature\scalar</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\cubature\scalar\driver_base.hpp">
       <Filter>Header Files\cubature\scalar</Filter>
     </ClInclude>
@@ -374,6 +371,24 @@
     </ClInclude>
     <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_open_driver.hpp">
       <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\scalar\midpoint_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\hammer_stroud_d2_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\hammer_stroud_d3_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\hammer_stroud_d5_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\lauffer_d2_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\cubature\lauffer_d4_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

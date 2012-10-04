@@ -35,10 +35,6 @@ namespace FEAST
         public DriverBase
       {
       public:
-        typedef Weight_ WeightType;
-        typedef Coord_ CoordType;
-        typedef Rule<WeightType, CoordType> RuleType;
-
         enum
         {
           /// this rule is variadic
@@ -49,7 +45,7 @@ namespace FEAST
           max_points = 6
         };
 
-        ///Returns the name of the cubature rule.
+        /// Returns the name of the cubature rule.
         static String name()
         {
           return "gauss-lobatto";
@@ -63,87 +59,65 @@ namespace FEAST
          * \param[in] num_points
          * The number of quadrature points.
          */
-        static void fill(RuleType& rule, Index num_points)
+        static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
           // how many points do we have?
           switch(num_points)
           {
           case 3:
-            create_3(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) =  Coord_(0);
+            rule.get_coord(2) =  Coord_(1);
+
+            rule.get_weight(0) = Weight_(1) / Weight_(3);
+            rule.get_weight(1) = Weight_(4) / Weight_(3);
+            rule.get_weight(2) = Weight_(1) / Weight_(3);
             break;
+
           case 4:
-            create_4(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = -std::sqrt(Coord_(5)) / Coord_(5);
+            rule.get_coord(2) = +std::sqrt(Coord_(5)) / Coord_(5);
+            rule.get_coord(3) = +Coord_(1);
+
+            rule.get_weight(0) = Weight_(1) / Weight_(6);
+            rule.get_weight(1) = Weight_(5) / Weight_(6);
+            rule.get_weight(2) = Weight_(5) / Weight_(6);
+            rule.get_weight(3) = Weight_(1) / Weight_(6);
             break;
+
           case 5:
-            create_5(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = -std::sqrt(Coord_(21)) / Coord_(7);
+            rule.get_coord(2) =  Coord_(0);
+            rule.get_coord(3) = +std::sqrt(Coord_(21)) / Coord_(7);
+            rule.get_coord(4) = +Coord_(1);
+
+            rule.get_weight(0) = Weight_(1) / Weight_(10);
+            rule.get_weight(1) = Weight_(49) / Weight_(90);
+            rule.get_weight(2) = Weight_(32) / Weight_(45);
+            rule.get_weight(3) = Weight_(49) / Weight_(90);
+            rule.get_weight(4) = Weight_(1) / Weight_(10);
             break;
+
           case 6:
-            create_6(rule);
+            rule.get_coord(0) = -Coord_(1);
+            rule.get_coord(1) = -std::sqrt((Coord_(7) + std::sqrt(Coord_(28)))/ Coord_(21));
+            rule.get_coord(2) = -std::sqrt((Coord_(7) - std::sqrt(Coord_(28)))/ Coord_(21));
+            rule.get_coord(3) =  std::sqrt((Coord_(7) - std::sqrt(Coord_(28)))/ Coord_(21));
+            rule.get_coord(4) =  std::sqrt((Coord_(7) + std::sqrt(Coord_(28)))/ Coord_(21));
+            rule.get_coord(5) =  Coord_(1);
+
+
+            rule.get_weight(0) = Weight_(1) / Weight_(15);
+            rule.get_weight(1) = (Weight_(14) - std::sqrt(Weight_(7))) / Weight_(30);
+            rule.get_weight(2) = (Weight_(14) + std::sqrt(Weight_(7))) / Weight_(30);
+            rule.get_weight(3) = (Weight_(14) + std::sqrt(Weight_(7))) / Weight_(30);
+            rule.get_weight(4) = (Weight_(14) - std::sqrt(Weight_(7))) / Weight_(30);
+            rule.get_weight(5) = Weight_(1) / Weight_(15);
             break;
           }
         }
-
-        /// Create 3-point Gauss-Lobatto rule
-        static void create_3(RuleType& rule)
-        {
-          rule.get_coord(0) = - CoordType(1);
-          rule.get_coord(1) = CoordType(0);
-          rule.get_coord(2) = CoordType(1);
-
-          rule.get_weight(0) = WeightType(1) / WeightType(3);
-          rule.get_weight(1) = WeightType(4) / WeightType(3);
-          rule.get_weight(2) = WeightType(1) / WeightType(3);
-        }
-
-        /// Create 4-point Gauss-Lobatto rule
-        static void create_4(RuleType& rule)
-        {
-          rule.get_coord(0) = - CoordType(1);
-          rule.get_coord(1) = -std::sqrt(CoordType(5)) / CoordType(5);
-          rule.get_coord(2) = +std::sqrt(CoordType(5)) / CoordType(5);
-          rule.get_coord(3) =  CoordType(1);
-
-          rule.get_weight(0) = WeightType(1) / WeightType(6);
-          rule.get_weight(1) = WeightType(5) / WeightType(6);
-          rule.get_weight(2) = WeightType(5) / WeightType(6);
-          rule.get_weight(3) = WeightType(1) / WeightType(6);
-        }
-
-        /// Create 5-point Gauss-Lobatto rule
-        static void create_5(RuleType& rule)
-        {
-          rule.get_coord(0) = - CoordType(1);
-          rule.get_coord(1) = -std::sqrt(CoordType(21)) / CoordType(7);
-          rule.get_coord(2) = CoordType(0);
-          rule.get_coord(3) = +std::sqrt(CoordType(21)) / CoordType(7);
-          rule.get_coord(4) = CoordType(1);
-
-          rule.get_weight(0) = WeightType(1) / WeightType(10);
-          rule.get_weight(1) = WeightType(49) / WeightType(90);
-          rule.get_weight(2) = WeightType(32) / WeightType(45);
-          rule.get_weight(3) = WeightType(49) / WeightType(90);
-          rule.get_weight(4) = WeightType(1) / WeightType(10);
-        }
-
-        /// Create 6-point Gauss-Lobatto rule
-        static void create_6(RuleType& rule)
-        {
-          rule.get_coord(0) = - CoordType(1);
-          rule.get_coord(1) = -std::sqrt((CoordType(7) + std::sqrt(CoordType(28)))/ CoordType(21));
-          rule.get_coord(2) = -std::sqrt((CoordType(7) - std::sqrt(CoordType(28)))/ CoordType(21));
-          rule.get_coord(3) = std::sqrt((CoordType(7) - std::sqrt(CoordType(28)))/ CoordType(21));
-          rule.get_coord(4) = std::sqrt((CoordType(7) + std::sqrt(CoordType(28)))/ CoordType(21));
-          rule.get_coord(5) = CoordType(1);
-
-
-          rule.get_weight(0) = WeightType(1) / WeightType(15);
-          rule.get_weight(1) = (WeightType(14) - std::sqrt(WeightType(7))) / WeightType(30);
-          rule.get_weight(2) = (WeightType(14) + std::sqrt(WeightType(7))) / WeightType(30);
-          rule.get_weight(3) = (WeightType(14) + std::sqrt(WeightType(7))) / WeightType(30);
-          rule.get_weight(4) = (WeightType(14) - std::sqrt(WeightType(7))) / WeightType(30);
-          rule.get_weight(5) = WeightType(1) / WeightType(15);
-        }
-
       }; // class GaussLobattoDriver<...>
     } // namespace Scalar
   } // namespace Cubature

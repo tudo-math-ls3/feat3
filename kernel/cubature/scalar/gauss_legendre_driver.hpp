@@ -34,19 +34,6 @@ namespace FEAST
         {
           return "gauss-legendre";
         }
-
-        /**
-         * \brief Adds the driver's aliases.
-         *
-         * \param[in] functor
-         * The functor whose \p alias function is to be called.
-         */
-        template<typename Functor_>
-        static void alias(Functor_& functor)
-        {
-          // midpoint rule -> gauss-legendre:1
-          functor.alias("midpoint", 1);
-        }
       };
 
       /**
