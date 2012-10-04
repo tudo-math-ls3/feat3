@@ -152,6 +152,26 @@ namespace FEAST
         {
         }
 
+        Mesh& operator=(const Mesh& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this-> _id = rhs._id;
+          this-> _pp_rank = rhs._pp_rank;
+          this-> _mp_rank = rhs._mp_rank;
+          this-> _mp_rank = rhs._mp_rank;
+          this-> _num_inter_topologies = rhs._num_inter_topologies;
+          this-> _num_levels = rhs._num_levels;
+          this-> _topologies = rhs._topologies;
+          this-> _history = rhs._history;
+          this-> _attrs = rhs._attrs;
+          this-> _num_attributes = rhs._num_attributes;
+          this-> _attribute_polytopelevel_relations = rhs._attribute_polytopelevel_relations;
+
+          return *this;
+        }
+
         ///DTOR
         ~Mesh()
         {
@@ -405,11 +425,11 @@ namespace FEAST
         }
 
       private:
-        const typename TopologyType_::index_type_ _id;
-        const typename TopologyType_::index_type_ _pp_rank;
-        const typename TopologyType_::index_type_ _mp_rank;
-        const unsigned _num_inter_topologies;
-        const unsigned _num_levels;
+        typename TopologyType_::index_type_ _id;
+        typename TopologyType_::index_type_ _pp_rank;
+        typename TopologyType_::index_type_ _mp_rank;
+        unsigned _num_inter_topologies;
+        unsigned _num_levels;
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
         CompoundFunctor<OuterStorageType_> _history;
