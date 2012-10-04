@@ -4,6 +4,7 @@
 #include <iostream>
 #include <kernel/base_header.hpp>
 #include <kernel/foundation/control.hpp>
+#include <kernel/foundation/data.hpp>
 #include <kernel/foundation/topology.hpp>
 
 using namespace FEAST;
@@ -50,19 +51,20 @@ int main(int argc, char* argv[])
   patches.at(3).push_back(0);
   patches.at(3).push_back(1);
   patches.at(3).push_back(2);
+
   Config<Topology<> > lbconf(network, patches);
 
-#ifndef FEAST_SERIAL_MODE
-  Control<Parallel, SimpleLoadBalancingPolicy>::init(lbconf);
-#else
-  Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf);
-#endif
+  //prepare local data for each process (i.t.m. 1 on 1 case only)
+  PatchData<Mesh<rnt_2D>, Halo<0, Mesh<rnt_2D, Topology<> > >, Topology<> > local_data;
 
-  //determine global rank
   int me(0);
 #ifndef FEAST_SERIAL_MODE
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
+  Control<Parallel, SimpleLoadBalancingPolicy, SimpleDataFillPolicy>::init(lbconf, local_data, me);
+#else
+  Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf, local_data, me);
 #endif
+
 
   //### output only ###
   if(me == 0)
