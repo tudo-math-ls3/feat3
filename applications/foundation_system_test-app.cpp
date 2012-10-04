@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 {
 
 #ifndef FEAST_SERIAL_MODE
-  MPI_Init(&argc,&argv);
+  MPI_Init(&argc, &argv);
 #endif
 
   ///TODO dedicated processes only
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   patches.at(3).push_back(0);
   patches.at(3).push_back(1);
   patches.at(3).push_back(2);
-  LBConfig<Topology<> > lbconf(network, patches);
+  Config<Topology<> > lbconf(network, patches);
 
 #ifndef FEAST_SERIAL_MODE
   Control<Parallel, SimpleLoadBalancingPolicy>::init(lbconf);

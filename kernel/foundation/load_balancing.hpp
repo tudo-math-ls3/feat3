@@ -9,9 +9,9 @@ namespace FEAST
   namespace Foundation
   {
     template<typename ReturnType_>
-    struct LBConfig
+    struct Config
     {
-      LBConfig(const ReturnType_& n, const ReturnType_& p) :
+      Config(const ReturnType_& n, const ReturnType_& p) :
         network(n),
         patch_mesh(p),
         patch_process_map(ReturnType_())
@@ -27,7 +27,7 @@ namespace FEAST
     struct SimpleLoadBalancingPolicy
     {
       template<typename ReturnType_>
-      static void execute(LBConfig<ReturnType_>& lbconf)
+      static void execute(Config<ReturnType_>& lbconf)
       {
 
 #ifndef FEAST_SERIAL_MODE
