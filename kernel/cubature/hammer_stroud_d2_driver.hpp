@@ -71,7 +71,6 @@ namespace FEAST
       public Intern::HammerStroudD2DriverBase
     {
     public:
-      typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
       enum
       {
         num_points = dim_ + 1
@@ -83,7 +82,7 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(RuleType& rule)
+      static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
         Coord_ r = (Coord_(dim_ + 2) - std::sqrt(Coord_(dim_ + 2)))/

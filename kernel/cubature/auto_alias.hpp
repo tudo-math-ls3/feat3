@@ -91,7 +91,7 @@ namespace FEAST
 #endif
             Scalar::GaussLegendreDriverBase::name() + ":" + stringify(k);
           }
-          else if(degree == 1) // barycentre
+          else if(degree <= 1) // barycentre
           {
             return BarycentreDriverBase::name();
           }
@@ -103,19 +103,19 @@ namespace FEAST
           {
             return HammerStroudD3DriverBase::name();
           }
-          else if(degree == 4 && dim_ == 3) // Lauffer formula of degree 4 only for tetrahedron
+          else if(dim_ == 3)
           {
-            return LaufferD4DriverBase::name();
+            if(degree <= 4) // Lauffer formula of degree 4 only for tetrahedron
+            {
+              return LaufferD4DriverBase::name();
+            }
+            else // Hammer-Stroud of degree 5 only for tetrahedra
+            {
+              return HammerStroudD5DriverBase::name();
+            }
           }
-          else if(degree == 5 && dim_ == 3) // Hammer-Stroud of degree 5 only for tetrahedra
-          {
-            return HammerStroudD5DriverBase::name();
-          }
-          else if(dim_ == 3) // Hammer-Stroud of degree 5
-          {
-            return HammerStroudD5DriverBase::name();
-          }
-          return HammerStroudD3DriverBase::name();
+          else
+            return HammerStroudD3DriverBase::name();
         }
       };
 

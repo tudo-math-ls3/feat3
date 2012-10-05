@@ -143,6 +143,9 @@ namespace FEAST
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
+        functor.template driver<HammerStroudD2Driver>();
+        functor.template driver<HammerStroudD3Driver>();
+        functor.template driver<LaufferD2Driver>();
 
         // <<< END OF CUBATURE DRIVER LIST <<<
       }
@@ -197,8 +200,11 @@ namespace FEAST
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
-        functor.template driver<LaufferD4Driver>();
+        functor.template driver<HammerStroudD2Driver>();
+        functor.template driver<HammerStroudD3Driver>();
         functor.template driver<HammerStroudD5Driver>();
+        functor.template driver<LaufferD2Driver>();
+        functor.template driver<LaufferD4Driver>();
 
         // <<< END OF CUBATURE DRIVER LIST <<<
       }
@@ -430,9 +436,6 @@ namespace FEAST
         // TODO: add you new cubature driver at the end of the list below, e.g.
         // functor.template driver<YourDriverName>();
 
-        functor.template driver<HammerStroudD2Driver>();
-        functor.template driver<HammerStroudD3Driver>();
-        functor.template driver<LaufferD2Driver>();
 
         // <<< END OF CUBATURE DRIVER LIST <<<
       }

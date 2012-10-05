@@ -72,7 +72,6 @@ namespace FEAST
       public Intern::HammerStroudD5DriverBase
     {
     public:
-      typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
       enum
       {
         num_points = 15
@@ -84,7 +83,7 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(RuleType& rule)
+      static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
         Weight_ V = Weight_(1) / Weight_(Factorial<dim_>::value);

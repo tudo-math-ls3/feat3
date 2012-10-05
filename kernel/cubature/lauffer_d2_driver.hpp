@@ -5,9 +5,6 @@
 // includes, FEAST
 #include <kernel/cubature/driver_base.hpp>
 
-// includes, STL
-#include <cmath>
-
 namespace FEAST
 {
   namespace Cubature
@@ -72,7 +69,6 @@ namespace FEAST
       public Intern::LaufferD2DriverBase
     {
     public:
-      typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
       enum
       {
         num_points = (dim_ + 1)*(dim_ + 2)/2
@@ -84,7 +80,7 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(RuleType& rule)
+      static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
         Weight_ V = Weight_(1) / Weight_(Factorial<dim_>::value);
