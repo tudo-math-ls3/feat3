@@ -88,6 +88,20 @@ namespace FEAST
         }
       }
     }; // class DynamicFactory<...>
+
+    template<typename Rule_>
+    class DynamicFactorySelect;
+
+    template<
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_>
+    class DynamicFactorySelect< Rule<Shape_, Weight_, Coord_, Point_> >
+    {
+    public:
+      typedef DynamicFactory<Shape_, Weight_, Coord_, Point_> Type;
+    };
   } // namespace Cubature
 } // namespace FEAST
 

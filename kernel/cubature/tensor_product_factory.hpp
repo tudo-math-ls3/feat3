@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/cubature/scalar/rule.hpp>
+#include <kernel/cubature/scalar/driver_factory.hpp>
 #include <kernel/cubature/rule.hpp>
 
 namespace FEAST
