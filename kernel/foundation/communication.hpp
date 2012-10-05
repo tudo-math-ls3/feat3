@@ -24,6 +24,23 @@ namespace FEAST
         //TODO...
     };
 
+    template<typename ReturnType_>
+    struct CommStructures
+    {
+      CommStructures(const ReturnType_& n, const ReturnType_& p) :
+        network(n),
+        patch_mesh(p),
+        patch_process_map(ReturnType_())
+      {
+      }
+
+      const ReturnType_& network;
+      const ReturnType_& patch_mesh;
+      ReturnType_ patch_process_map;
+      ReturnType_ process_patch_map;
+    };
+
+
     /**
      * \brief Communication implementation or backend pass-over
      *

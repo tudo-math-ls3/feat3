@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   patches.at(3).push_back(1);
   patches.at(3).push_back(2);
 
-  Config<Topology<> > lbconf(network, patches);
+  CommStructures<Topology<> > lbconf(network, patches);
 
   //prepare local data for each process (i.t.m. 1 on 1 case only)
   PatchData<Mesh<rnt_2D>, Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >, Topology<> > local_data;
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
   //### begin test output only ###
 
-  //test common data
+  //test common data once
   if(me == 0)
   {
     for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)

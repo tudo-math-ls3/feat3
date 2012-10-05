@@ -3,31 +3,16 @@
 #define KERNEL_FOUNDATION_LOAD_BALANCING_HH 1
 
 #include<kernel/base_header.hpp>
+#include<kernel/foundation/communication.hpp>
 
 namespace FEAST
 {
   namespace Foundation
   {
-    template<typename ReturnType_>
-    struct Config
-    {
-      Config(const ReturnType_& n, const ReturnType_& p) :
-        network(n),
-        patch_mesh(p),
-        patch_process_map(ReturnType_())
-      {
-      }
-
-      const ReturnType_& network;
-      const ReturnType_& patch_mesh;
-      ReturnType_ patch_process_map;
-      ReturnType_ process_patch_map;
-    };
-
     struct SimpleLoadBalancingPolicy
     {
       template<typename ReturnType_>
-      static void execute(Config<ReturnType_>& lbconf)
+      static void execute(CommStructures<ReturnType_>& lbconf)
       {
 
 #ifndef FEAST_SERIAL_MODE
