@@ -74,8 +74,48 @@ namespace FEAST
       public:
         static String choose(Index degree)
         {
-          // \todo select auto-degree rule for simplices
-          return "-- todo --";
+          if(dim_ == 1) // do the same as for hypercubes
+          {
+            // k-point Gauss-Legendre cubature is exact up to a degree of 2*k-1,
+            // so for a degree of n we need k := (n+2)/2 = n/2 + 1
+            Index k = degree/2 + 1;
+
+            // Also, ensure that we respect the currently implemented borders...
+            k = std::max(k, Index(Scalar::GaussLegendreDriverBase::min_points));
+            k = std::min(k, Index(Scalar::GaussLegendreDriverBase::max_points));
+
+            // and build the name
+            return
+#ifdef FEAST_CUBATURE_TENSOR_PREFIX
+            "tensor:" +
+#endif
+            Scalar::GaussLegendreDriverBase::name() + ":" + stringify(k);
+          }
+          else if(degree == 1) // barycentre
+          {
+            return BarycentreDriverBase::name();
+          }
+          else if(degree == 2) // Hammer-Stroud of degree 2
+          {
+            return HammerStroudD2DriverBase::name();
+          }
+          else if(degree == 3) // Hammer-Stroud of degree 3
+          {
+            return HammerStroudD3DriverBase::name();
+          }
+          else if(degree == 4 && dim_ == 3) // Lauffer formula of degree 4 only for tetrahedron
+          {
+            return LaufferD4DriverBase::name();
+          }
+          else if(degree == 5 && dim_ == 3) // Hammer-Stroud of degree 5 only for tetrahedra
+          {
+            return HammerStroudD5DriverBase::name();
+          }
+          else if(dim_ == 3) // Hammer-Stroud of degree 5
+          {
+            return HammerStroudD5DriverBase::name();
+          }
+          return HammerStroudD3DriverBase::name();
         }
       };
 
