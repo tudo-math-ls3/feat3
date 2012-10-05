@@ -63,10 +63,12 @@ int main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   Control<Parallel, SimpleLoadBalancingPolicy, SimpleDataFillPolicy>::init(lbconf, local_data, me);
 #else
-  Control<Serial, SimpleLoadBalancingPolicy>::init(lbconf, local_data, me);
+  Control<Serial, SimpleLoadBalancingPolicy, SimpleDataFillPolicy>::init(lbconf, local_data, me);
 #endif
 
-  //### output only ###
+  //### begin test output only ###
+
+  //test common data
   if(me == 0)
   {
     for(Index i(0) ; i < lbconf.patch_process_map.size() ; ++i)
@@ -77,7 +79,21 @@ int main(int argc, char* argv[])
       for(Index j(0) ; j < lbconf.process_patch_map.at(i).size() ; ++j)
         std::cout << "Patch " << lbconf.process_patch_map.at(i).at(j) << " processed by process " << i << "." << std::endl;
   }
-  //### end output only ###
+
+  //test local data
+  std::cout << "Process " << me << " has: " << std::endl;
+  std::cout << "    " << local_data.meshes_on_process_patch.size() << " meshes," << std::endl;
+  for(Index i(0) ; i < local_data.meshes_on_process_patch.size() ; ++i)
+  {
+    std::cout << "        id: " << local_data.meshes_on_process_patch.at(i).get_id() << std::endl;
+  }
+  std::cout << "    " << local_data.halos_on_process_patch.size() << " halos," << std::endl;
+  for(Index i(0) ; i < local_data.halos_on_process_patch.size() ; ++i)
+  {
+    std::cout << "        halo for comm with patch: " << local_data.halos_on_process_patch.at(i).get_other() << std::endl;
+  }
+
+  //### end test output only ###
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();

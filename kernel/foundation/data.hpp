@@ -10,7 +10,10 @@ namespace FEAST
 {
   namespace Foundation
   {
-    template<typename MeshType_, typename HaloType_, typename TopologyType_, template<typename, typename> class StorageType_ = std::vector>
+    template<typename MeshType_,
+             typename HaloType_,
+             typename TopologyType_,
+             template<typename, typename> class StorageType_ = std::vector>
     struct PatchData
     {
       PatchData() :
@@ -84,7 +87,7 @@ namespace FEAST
           target.meshes_on_process_patch.at(0).add_adjacency(pl_vertex, pl_edge, 3, 3);
           target.meshes_on_process_patch.at(0).add_adjacency(pl_vertex, pl_face, 3, 0);
 
-          //create halos, every patch has three logical halos (we use vertex-halos)
+          //create halos, every patch has three halos (we use vertex-halos)
           if(rank == 0)
           {
             HaloType_ h1(target.meshes_on_process_patch.at(0), 1); //right
