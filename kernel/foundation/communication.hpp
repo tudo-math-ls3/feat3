@@ -24,20 +24,20 @@ namespace FEAST
         //TODO...
     };
 
-    template<typename ReturnType_>
+    template<typename TopologyType_>
     struct CommStructures
     {
-      CommStructures(const ReturnType_& n, const ReturnType_& p) :
+      CommStructures(const TopologyType_& n, const TopologyType_& p) :
         network(n),
         patch_mesh(p),
-        patch_process_map(ReturnType_())
+        patch_process_map(TopologyType_())
       {
       }
 
-      const ReturnType_& network;
-      const ReturnType_& patch_mesh;
-      ReturnType_ patch_process_map;
-      ReturnType_ process_patch_map;
+      const TopologyType_& network;
+      const TopologyType_& patch_mesh;
+      TopologyType_ patch_process_map;
+      TopologyType_ process_patch_map;
     };
 
 
