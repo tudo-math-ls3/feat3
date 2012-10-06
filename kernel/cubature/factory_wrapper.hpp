@@ -532,10 +532,35 @@ namespace FEAST
         // call factory list
         _factory_list(functor);
 
+        // call tensor-product functor
+        TensorProductFunctor<Functor_> tensor_functor(functor);
+        Scalar::FactoryWrapper<Weight_, Coord_>::driver(tensor_functor);
+
         // last: call driver factory functor
         Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
+      /// \cond internal
+    private:
+      template<typename Functor_>
+      class TensorProductFunctor
+      {
+      protected:
+        Functor_& _functor;
+
+      public:
+        explicit TensorProductFunctor(Functor_& functor) :
+          _functor(functor)
+        {
+        }
+
+        template<template<typename,typename> class ScalarDriver_>
+        void driver()
+        {
+          Intern::TensorProductFunctorHelper<ScalarDriver_, Shape::Hypercube<dim_>, Weight_, Coord_, Point_>::scalar_driver(_functor);
+        }
+      };
+      /// \endcond
     }; // class FactoryPartialWrapper<Hypercube<...>,...>
 
     /**
@@ -587,10 +612,6 @@ namespace FEAST
         // call driver factory functor
         Intern::DriverFactoryFunctor<Shape_, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
-
-        // call tensor-product functor
-        TensorProductFunctor<Functor_> tensor_functor(functor);
-        Scalar::FactoryWrapper<Weight_, Coord_>::driver(tensor_functor);
       }
 
       template<typename Functor_>
@@ -616,25 +637,6 @@ namespace FEAST
 
       /// \cond internal
     private:
-      template<typename Functor_>
-      class TensorProductFunctor
-      {
-      protected:
-        Functor_& _functor;
-
-      public:
-        explicit TensorProductFunctor(Functor_& functor) :
-          _functor(functor)
-        {
-        }
-
-        template<template<typename,typename> class ScalarDriver_>
-        void driver()
-        {
-          Intern::TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_>::scalar_driver(_functor);
-        }
-      };
-
       template<typename Functor_>
       class RefineFactoryFunctor
       {

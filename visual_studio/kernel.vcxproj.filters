@@ -351,9 +351,6 @@
     <ClInclude Include="..\kernel\cubature\driver_base.hpp">
       <Filter>Header Files\cubature</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\cubature\internal_functors.hpp">
-      <Filter>Header Files\cubature</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\cubature\refine_factory.hpp">
       <Filter>Header Files\cubature</Filter>
     </ClInclude>

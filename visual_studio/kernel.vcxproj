@@ -503,7 +503,6 @@
     <ClInclude Include="..\kernel\cubature\hammer_stroud_d2_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\hammer_stroud_d3_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\hammer_stroud_d5_driver.hpp" />
-    <ClInclude Include="..\kernel\cubature\internal_functors.hpp" />
     <ClInclude Include="..\kernel\cubature\lauffer_d2_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\lauffer_d4_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\refine_factory.hpp" />
