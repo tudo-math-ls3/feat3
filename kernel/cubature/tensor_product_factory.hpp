@@ -3,7 +3,6 @@
 #define KERNEL_CUBATURE_TENSOR_PRODUCT_FACTORY_HPP 1
 
 // includes, FEAST
-#include <kernel/cubature/scalar/rule.hpp>
 #include <kernel/cubature/scalar/driver_factory.hpp>
 #include <kernel/cubature/rule.hpp>
 
@@ -12,80 +11,17 @@ namespace FEAST
   namespace Cubature
   {
     template<
-      template<typename,typename> class ScalarDriver_,
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_,
-      bool variadic_ = (ScalarDriver_<Weight_, Coord_>::variadic != 0)>
-    class TensorProductFactory;
-
-    template<
       typename Shape_,
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class TensorProductDriverBase
-    {
-    public:
-      template<
-        template<typename,typename> class ScalarDriver_,
-        typename Functor_>
-      static void scalar_driver(Functor_& functor)
-      {
-        functor.template factory<TensorProductFactory<ScalarDriver_, Shape_, Weight_, Coord_, Point_> >();
-      }
-    };
-
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class TensorProductDriver
-    {
-    public:
-      template<
-        template<typename,typename> class ScalarDriver_,
-        typename Functor_>
-      static void scalar_driver(Functor_&)
-      {
-        // do nothing
-      }
-    };
+    class TensorProductDriver;
 
     template<
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class TensorProductDriver<Shape::Simplex<1>, Weight_, Coord_, Point_> :
-      public TensorProductDriverBase<Shape::Simplex<1>, Weight_, Coord_, Point_>
-    {
-    public:
-      typedef Rule<Shape::Simplex<1>, Weight_, Coord_, Point_> RuleType;
-      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
-
-      static Index count(Index num_points)
-      {
-        return num_points;
-      }
-
-      static void fill(RuleType& rule, const ScalarRuleType& scalar_rule)
-      {
-        for(Index i(0); i < scalar_rule.get_num_points(); ++i)
-        {
-          rule.get_weight(i) = scalar_rule.get_weight(i) * Weight_(0.5);
-          rule.get_coord(i, 0) = (scalar_rule.get_coord(i) + Coord_(1)) * Coord_(0.5);
-        }
-      }
-    };
-
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class TensorProductDriver<Shape::Hypercube<1>, Weight_, Coord_, Point_> :
-      public TensorProductDriverBase<Shape::Hypercube<1>, Weight_, Coord_, Point_>
+    class TensorProductDriver<Shape::Hypercube<1>, Weight_, Coord_, Point_>
     {
     public:
       typedef Rule<Shape::Hypercube<1>, Weight_, Coord_, Point_> RuleType;
@@ -110,8 +46,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class TensorProductDriver<Shape::Hypercube<2>, Weight_, Coord_, Point_> :
-      public TensorProductDriverBase<Shape::Hypercube<2>, Weight_, Coord_, Point_>
+    class TensorProductDriver<Shape::Hypercube<2>, Weight_, Coord_, Point_>
     {
     public:
       typedef Rule<Shape::Hypercube<2>, Weight_, Coord_, Point_> RuleType;
@@ -142,8 +77,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class TensorProductDriver<Shape::Hypercube<3>, Weight_, Coord_, Point_> :
-      public TensorProductDriverBase<Shape::Hypercube<3>, Weight_, Coord_, Point_>
+    class TensorProductDriver<Shape::Hypercube<3>, Weight_, Coord_, Point_>
     {
     public:
       typedef Rule<Shape::Hypercube<3>, Weight_, Coord_, Point_> RuleType;
@@ -251,11 +185,12 @@ namespace FEAST
         ScalarFactoryType::alias(prefix_functor);
 #else
         ScalarFactoryType::alias(functor);
-#endif
+#endif // FEAST_CUBATURE_TENSOR_PREFIX
       }
 
       /// \cond internal
     private:
+#ifdef FEAST_CUBATURE_TENSOR_PREFIX
       template<typename Functor_>
       class AliasTensorPrefixFunctor
       {
@@ -278,8 +213,18 @@ namespace FEAST
           _functor.alias("tensor:" + name, num_points);
         }
       };
+#endif // FEAST_CUBATURE_TENSOR_PREFIX
       /// \endcond
     };
+
+    template<
+      template<typename,typename> class ScalarDriver_,
+      typename Shape_,
+      typename Weight_,
+      typename Coord_,
+      typename Point_,
+      bool variadic_ = (ScalarDriver_<Weight_, Coord_>::variadic != 0)>
+    class TensorProductFactory;
 
     template<
       template<typename,typename> class ScalarDriver_,

@@ -519,6 +519,7 @@
     <ClInclude Include="..\kernel\cubature\scalar\newton_cotes_open_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\rule.hpp" />
     <ClInclude Include="..\kernel\cubature\scalar\trapezoidal_driver.hpp" />
+    <ClInclude Include="..\kernel\cubature\simplex_scalar_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\tensor_product_factory.hpp" />
     <ClInclude Include="..\kernel\cubature\trapezoidal_driver.hpp" />
     <ClInclude Include="..\kernel\foundation\attribute.hpp" />
