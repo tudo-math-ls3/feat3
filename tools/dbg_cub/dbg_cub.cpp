@@ -76,7 +76,7 @@ void test_dynamic_scalar(const String& name)
   printf("      Weight          Coord\n");
   for(Index i(0); i < rule.get_num_points(); ++i)
   {
-    printf("%3i: %15.12f %15.12f\n", i, rule.get_weight(i), rule.get_coord(i));
+    printf("%3i: %15.12f %15.12f\n", int(i), rule.get_weight(i), rule.get_coord(i));
   }
 }
 
@@ -102,7 +102,7 @@ void test_dynamic(const String& name)
 
   for(Index i(0); i < rule.get_num_points(); ++i)
   {
-    printf("%3i: %15.12f", i, rule.get_weight(i));
+    printf("%3i: %15.12f", int(i), rule.get_weight(i));
     for(Index j(0); j < Shape_::dimension; ++j)
       printf(" %15.12f", rule.get_coord(i,j));
     printf("\n");
