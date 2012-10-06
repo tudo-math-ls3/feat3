@@ -390,6 +390,9 @@
     <ClInclude Include="..\kernel\cubature\simplex_scalar_factory.hpp">
       <Filter>Header Files\cubature</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\cubature\avail_functor.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

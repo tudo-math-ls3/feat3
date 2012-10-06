@@ -495,6 +495,7 @@
     <ClInclude Include="..\kernel\archs.hpp" />
     <ClInclude Include="..\kernel\base_header.hpp" />
     <ClInclude Include="..\kernel\cubature\auto_alias.hpp" />
+    <ClInclude Include="..\kernel\cubature\avail_functor.hpp" />
     <ClInclude Include="..\kernel\cubature\barycentre_driver.hpp" />
     <ClInclude Include="..\kernel\cubature\driver_base.hpp" />
     <ClInclude Include="..\kernel\cubature\driver_factory.hpp" />
