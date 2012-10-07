@@ -527,6 +527,35 @@ namespace FEAST
       return _shared;
     }
 
+    /**
+     * \brief Sorts the image indices to non-descending order.
+     */
+    void sort_indices()
+    {
+      CONTEXT("Graph::sort_indices()");
+      ASSERT_(_domain_ptr != nullptr);
+      ASSERT_(_image_idx != nullptr);
+
+      // fetch row-end pointer
+      Index* domain_end = _domain_end != nullptr ? _domain_end : &_domain_ptr[1];
+
+      // loop over all domain nodes
+      for(Index i(0); i < _num_nodes_domain; ++i)
+      {
+        // apply linear insertion sort onto the adjacency indices
+        for(Index j(_domain_ptr[i] + 1); j < domain_end[i]; ++j)
+        {
+          Index x = _image_idx[j];
+          Index k(j);
+          for(; (k > _domain_ptr[i]) && (x < _image_idx[k-1]); --k)
+          {
+            _image_idx[k] = _image_idx[k-1];
+          }
+          _image_idx[k] = x;
+        }
+      }
+    }
+
     /* *************************************************** */
     /*  R E N D E R   F U N C T I O N   T E M P L A T E S  */
     /* *************************************************** */

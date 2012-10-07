@@ -201,6 +201,48 @@ public:
     return true;
   }
 
+  bool test_sort() const
+  {
+    // create an unsorted graph
+    Index g_ptr[8] = {0, 6, 12, 19, 26, 31, 36, 41};
+    Index g_idx[41] =
+    {
+      0, 2, 3, 5, 1, 4,
+      0, 1, 2, 5, 3, 6,
+      0, 2, 3, 5, 4, 6, 1,
+      0, 2, 3, 5, 1, 6, 4,
+      2, 4, 6, 0, 3,
+      0, 2, 3, 5, 1,
+      2, 4, 6, 1, 3
+    };
+
+    Graph g(7, 7, 41, g_ptr, nullptr, g_idx);
+
+    // sort the graph
+    g.sort_indices();
+
+    // validate the sorted graph's indices
+    Index s_idx[41] =
+    {
+      0, 1, 2, 3, 4, 5,
+      0, 1, 2, 3, 5, 6,
+      0, 1, 2, 3, 4, 5, 6,
+      0, 1, 2, 3, 4, 5, 6,
+      0, 2, 3, 4, 6,
+      0, 1, 2, 3, 5,
+      1, 2, 3, 4, 6
+    };
+    Index* gsi = g.get_image_idx();
+    for(Index i(0); i < 41; ++i)
+    {
+      if(s_idx[i] != gsi[i])
+        return false;
+    }
+
+    // okay
+    return true;
+  }
+
   virtual void run() const
   {
     // create a graph G
@@ -233,6 +275,9 @@ public:
     // render and test gf
     Graph gf(Graph::rt_injectify, g, f);
     TEST_CHECK(test_gf(gf));
+
+    // test sorting
+    TEST_CHECK(test_sort());
   }
 
 } graph_test;
