@@ -517,6 +517,17 @@ namespace FEAST
     }
 
     /**
+     * \brief Returns the total number indices.
+     *
+     * \returns The total number of indices in the graph.
+     */
+    Index get_num_indices() const
+    {
+      CONTEXT("Graph::get_num_indices()");
+      return _num_indices_image;
+    }
+
+    /**
      * \brief Specifies whether the graph's arrays are shared or not.
      *
      * \returns \c true, if the graph's arrays are shared, otherwise \c false.
