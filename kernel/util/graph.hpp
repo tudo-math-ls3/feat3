@@ -387,6 +387,83 @@ namespace FEAST
       }
     }
 
+    /// copy CTOR
+    Graph(const Graph& other) :
+      _num_nodes_domain(other.get_num_nodes_domain()),
+      _num_nodes_image(other.get_num_nodes_image()),
+      _num_indices_image(other.get_num_indices()),
+      _domain_ptr(nullptr),
+      _domain_end(nullptr),
+      _image_idx(nullptr),
+      _shared(false)
+    {
+      CONTEXT("Graph::Graph() [copy]");
+
+      _domain_ptr = new Index[_num_nodes_domain+1];
+      for(Index i(0); i <= _num_nodes_domain; ++i)
+      {
+        _domain_ptr[i] = other._domain_ptr[i];
+      }
+      if(other._domain_end != nullptr)
+      {
+        _domain_end = new Index[_num_nodes_domain];
+        for(Index i(0); i < _num_nodes_domain; ++i)
+        {
+          _domain_end[i] = other._domain_end[i];
+        }
+      }
+      _image_idx = new Index[_num_indices_image];
+      for(Index i(0); i < _num_indices_image; ++i)
+      {
+        _image_idx[i] = other._image_idx[i];
+      }
+    }
+
+    /// copy CTOR
+    Graph& operator=(const Graph& other)
+    {
+      CONTEXT("Graph::operator=()");
+      if(!_shared)
+      {
+        if(_image_idx != nullptr)
+          delete [] _image_idx;
+        if(_domain_ptr != nullptr)
+          delete [] _domain_ptr;
+        if(_domain_end != nullptr)
+          delete [] _domain_end;
+      }
+
+      _num_nodes_domain = other.get_num_nodes_domain();
+      _num_nodes_image = other.get_num_nodes_image();
+      _num_indices_image = other.get_num_indices();
+      _shared = false;
+
+      _domain_ptr = new Index[_num_nodes_domain+1];
+      for(Index i(0); i <= _num_nodes_domain; ++i)
+      {
+        _domain_ptr[i] = other._domain_ptr[i];
+      }
+      if(other._domain_end != nullptr)
+      {
+        _domain_end = new Index[_num_nodes_domain];
+        for(Index i(0); i < _num_nodes_domain; ++i)
+        {
+          _domain_end[i] = other._domain_end[i];
+        }
+      }
+      else
+      {
+        _domain_end = nullptr;
+      }
+      _image_idx = new Index[_num_indices_image];
+      for(Index i(0); i < _num_indices_image; ++i)
+      {
+        _image_idx[i] = other._image_idx[i];
+      }
+
+      return *this;
+    }
+
     /// virtual destructor
     virtual ~Graph()
     {
