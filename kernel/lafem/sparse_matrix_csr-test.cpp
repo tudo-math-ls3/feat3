@@ -39,6 +39,8 @@ public:
   {
     SparseMatrixCOO<Archs::CPU, DT_> a(10, 10);
     a(1,2,7);
+    a.clear();
+    a(1,2,7);
     a(5,5,2);
     SparseMatrixCSR<Tag_, DT_> b(a);
     TEST_CHECK_EQUAL(b.used_elements(), 2ul);

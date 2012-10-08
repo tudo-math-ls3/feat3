@@ -153,6 +153,15 @@ namespace FEAST
         }
 
         /**
+         * \brief Reset all elements of the container to a given value or zero if missing.
+         */
+        void clear(DT_ value = 0)
+        {
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Arch_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
+        }
+
+        /**
          * \brief Returns a list of all data arrays.
          *
          * \returns A list of all data arrays.
