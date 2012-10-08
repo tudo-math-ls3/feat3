@@ -47,22 +47,25 @@ void check_sendrecv(int rank)
     target[i] = rank;
   }
 
-  Comm<Archs::Parallel>::send_recv(f, 100000, rank == 0 ? 1 : 0, target, rank == 0 ? 1 : 0);
+  if(rank < 2)
+  {
+    Comm<Archs::Parallel>::send_recv(f, 100000, rank == 0 ? 1 : 0, target, rank == 0 ? 1 : 0);
 
-  TestResult<float> res[100000];
-  for(unsigned long i(0) ; i < 100000 ; ++i)
-    res[i] = test_check_equal_within_eps(target[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
+    TestResult<float> res[100000];
+    for(unsigned long i(0) ; i < 100000 ; ++i)
+      res[i] = test_check_equal_within_eps(target[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
 
-  bool passed(true);
-  for(unsigned long i(0) ; i < 100000 ; ++i)
-    if(res[i].passed == false)
-    {
-      std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
-      passed = false;
-      break;
-    }
-  if(passed)
-    std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (sendrecv)" << std::endl;
+    bool passed(true);
+    for(unsigned long i(0) ; i < 100000 ; ++i)
+      if(res[i].passed == false)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (sendrecv)" << std::endl;
+  }
 }
 
 int main(int argc, char* argv[])
