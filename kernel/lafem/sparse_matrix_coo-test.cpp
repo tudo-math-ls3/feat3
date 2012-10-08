@@ -38,7 +38,7 @@ public:
   {
     SparseMatrixCOO<Tag_, DT_> a(10, 10);
     a(1,2,7);
-    a(5,5,2);
+    a.insert(5,5,2);
     TEST_CHECK_EQUAL(a.used_elements(), 2ul);
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);

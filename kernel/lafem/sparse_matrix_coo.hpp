@@ -139,6 +139,18 @@ namespace FEAST
         }
 
         /**
+         * \brief Set specific matrix element.
+         *
+         * \param[in] row The row of the matrix element.
+         * \param[in] col The column of the matrix element.
+         * \param[in] value The value to be set.
+         */
+        void insert(Index row, Index col, DT_ val)
+        {
+          (*this)(row, col, val);
+        }
+
+        /**
          * \brief Retrieve specific matrix element.
          *
          * \param[in] row The row of the matrix element.
