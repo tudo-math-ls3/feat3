@@ -2,6 +2,9 @@
 #ifndef KERNEL_FOUNDATION_COMMUNICATION_HH
 #define KERNEL_FOUNDATION_COMMUNICATION_HH 1
 
+#ifndef FEAST_SERIAL_MODE
+#include<mpi.h>
+#endif
 #include <kernel/archs.hpp>
 #include <kernel/foundation/halo.hpp>
 #include <kernel/foundation/attribute.hpp>
@@ -23,22 +26,58 @@ namespace FEAST
       com_average
         //TODO...
     };
+#ifndef FEAST_SERIAL_MODE
+    template <typename DT_>
+      class MPIType
+      {
+      };
+
+    template <>
+      class MPIType<float>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_FLOAT;
+          }
+      };
+
+    template <>
+      class MPIType<double>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_DOUBLE;
+          }
+      };
+
+    template <>
+      class MPIType<unsigned long>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_UNSIGNED_LONG;
+          }
+      };
+#endif
 
     template<typename TopologyType_>
-    struct CommStructures
-    {
-      CommStructures(const TopologyType_& n, const TopologyType_& p) :
-        network(n),
-        patch_mesh(p),
-        patch_process_map(TopologyType_())
+      struct CommStructures
       {
-      }
+        CommStructures(const TopologyType_& n, const TopologyType_& p) :
+          network(n),
+          patch_mesh(p),
+          patch_process_map(TopologyType_())
+        {
+        }
 
-      const TopologyType_& network;
-      const TopologyType_& patch_mesh;
-      TopologyType_ patch_process_map;
-      TopologyType_ process_patch_map;
-    };
+        const TopologyType_& network;
+        const TopologyType_& patch_mesh;
+        TopologyType_ patch_process_map;
+        TopologyType_ process_patch_map;
+      };
 
 
     /**
@@ -52,33 +91,70 @@ namespace FEAST
      * \author Markus Geveler
      */
     template<typename Tag_>
-    class Comm
-    {
-    };
+      class Comm
+      {
+      };
 
     ///example shared-mem exchange
     template<>
-    class Comm<Archs::None>
-    {
-      public:
-        template<typename DataType_>
-        static inline void send_recv(DataType_ * sendbuf, Index dest_rank, Index num_elements, DataType_* recvbuf, Index source_rank)
-          {
-            if(source_rank <= dest_rank)
+      class Comm<Archs::None>
+      {
+        public:
+          template<typename DataType1_, typename DataType2_>
+            static inline void send_recv(DataType1_ * sendbuf,
+                                         Index num_elements,
+                                         Index dest_rank,
+                                         DataType2_* recvbuf,
+                                         Index source_rank)
             {
-              DataType_ buf;
-              const Index i_end(num_elements);
-              for(Index i(0) ; i < i_end ; ++i)
+              if(source_rank <= dest_rank)
               {
-                buf = sendbuf[i];
-                sendbuf[i] = recvbuf[i];
-                recvbuf[i] = buf;
+                DataType1_ buf;
+                const Index i_end(num_elements);
+                for(Index i(0) ; i < i_end ; ++i)
+                {
+                  buf = (DataType2_)sendbuf[i];
+                  sendbuf[i] = recvbuf[i];
+                  recvbuf[i] = buf;
+                }
               }
             }
-          }
 
-        //TODO
-    };
+          //TODO
+      };
+
+#ifndef FEAST_SERIAL_MODE
+    template<>
+      class Comm<Archs::Parallel>
+      {
+        public:
+          template<typename DataType1_, typename DataType2_>
+            static inline void send_recv(DataType1_ * sendbuf,
+                                         Index num_elements,
+                                         Index dest_rank,
+                                         DataType2_* recvbuf,
+                                         Index source_rank)
+            {
+              MPI_Status status;
+
+              MPI_Sendrecv(sendbuf,
+                           num_elements,
+                           MPIType<DataType1_>::value(),
+                           dest_rank,
+                           0,
+                           recvbuf,
+                           num_elements,
+                           MPIType<DataType2_>::value(),
+                           source_rank,
+                           0,
+                           MPI_COMM_WORLD,
+                           &status);
+            }
+
+          //TODO
+      };
+
+#endif
 
     /**
      * \brief Communication implementation or backend pass-over
@@ -129,7 +205,7 @@ namespace FEAST
                       recvbuf[i] = ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element_counterpart(i));
                     }
                     //'post'
-                    Foundation::Comm<Tag_>::send_recv(sendbuf, other_rank, halo.size(), recvbuf, halo.get_mesh().get_pp_rank());
+                    Foundation::Comm<Tag_>::send_recv(sendbuf, halo.size(), other_rank, recvbuf, halo.get_mesh().get_pp_rank());
                     for(Index i(0) ; i < halo.size() ; ++i)
                     {
                       ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element(i)) = sendbuf[i];

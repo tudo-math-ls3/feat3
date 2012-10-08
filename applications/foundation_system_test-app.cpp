@@ -67,7 +67,6 @@ int main(int argc, char* argv[])
 #endif
 
   //### begin test output only ###
-
   //test common data once
   if(me == 0)
   {
@@ -92,7 +91,6 @@ int main(int argc, char* argv[])
   {
     std::cout << "        halo for comm with patch: " << local_data.halos_on_process_patch.at(i).get_other() << std::endl;
   }
-
   //### end test output only ###
 
 #ifndef FEAST_SERIAL_MODE
