@@ -71,6 +71,7 @@ void check_sendrecv(int rank)
         passed = false;
         break;
       }
+
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (sendrecv)" << std::endl;
   }
@@ -78,7 +79,6 @@ void check_sendrecv(int rank)
 
 int main(int argc, char* argv[])
 {
-
   int me(0);
 #ifndef FEAST_SERIAL_MODE
   MPI_Init(&argc, &argv);

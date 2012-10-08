@@ -28,7 +28,8 @@ namespace FEAST
      */
     template<
       typename HaloType_,
-      template<typename> class VectorType_,
+      template<typename, typename> class VectorType_,
+      typename Arch_,
       typename IndexType_ = Index>
     class HaloData
     {
@@ -37,12 +38,14 @@ namespace FEAST
         HaloData(HaloType_ & halo) :
           _halo(halo),
           _halo_elements(halo.size()),
-          _halo_element_counterparts(halo.size())
+          _halo_element_counterparts(halo.size()),
+          _overlap(halo.get_overlap()),
+          _level(halo.get_level())
         {
           for(IndexType_ i(0) ; i < halo.size() ; ++i)
           {
-            _halo_element_counterparts[i] = halo.get_element_counterpart(i);
-            _halo_elements[i] = halo.get_element(i);
+            _halo_element_counterparts(i, halo.get_element_counterpart(i));
+            _halo_elements(i, halo.get_element(i));
           }
         }
 
@@ -95,14 +98,20 @@ namespace FEAST
           this->_halo = rhs._halo;
           this->_halo_elements = rhs._halo_elements;
           this->_halo_element_counterparts = rhs._halo_element_counterparts;
+          this->_overlap = rhs._overlap;
+          this->_level = rhs.level;
           return *this;
         }
 
       private:
         HaloType_ & _halo;
 
-        VectorType_<IndexType_> _halo_elements;
-        VectorType_<IndexType_> _halo_element_counterparts;
+        VectorType_<Arch_, IndexType_> _halo_elements;
+        VectorType_<Arch_, IndexType_> _halo_element_counterparts;
+
+        unsigned _overlap;
+
+        PolytopeLevels _level;
     };
   }
 }

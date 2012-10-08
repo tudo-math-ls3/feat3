@@ -95,6 +95,11 @@ namespace FEAST
           return _overlap;
         }
 
+        PolytopeLevels get_level()
+        {
+          return _level;
+        }
+
         Halo& operator=(const Halo& rhs)
         {
           if(this == &rhs)
