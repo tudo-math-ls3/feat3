@@ -73,16 +73,6 @@ namespace FEAST
       };
 
     template <>
-      class MPIType<const unsigned long>
-      {
-        public:
-          static inline MPI_Datatype value()
-          {
-            return MPI_UNSIGNED_LONG;
-          }
-      };
-
-    template <>
       class MPIType<unsigned>
       {
         public:

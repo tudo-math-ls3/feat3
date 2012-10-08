@@ -112,10 +112,15 @@ namespace FEAST
                        HaloData<HaloType_, VectorType_, Arch_, IndexType_>& otherdata,
                        int myrank)
         {
-          //Comm<Archs::Parallel>::send_recv(_halo_elements.elements(), _halo_elements.size(), otherrank, otherdata.get_halo_elements().elements(), myrank);
-          //Comm<Archs::Parallel>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), otherrank, otherdata.get_halo_element_counterparts().elements(), myrank);
-          //Comm<Archs::Parallel>::send_recv(&_overlap, 1, otherrank, &otherdata.get_overlap(), myrank);
-          //Comm<Archs::Parallel>::send_recv(&_level, 1, otherrank, &otherdata.get_level(), myrank);
+          Comm<Archs::Parallel>::send_recv(_halo_elements.elements(), _halo_elements.size(), otherrank, otherdata.get_halo_elements().elements(), myrank);
+          Comm<Archs::Parallel>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), otherrank, otherdata.get_halo_element_counterparts().elements(), myrank);
+          //Comm<Archs::Parallel>::send_recv((unsigned *)&_overlap, 1, otherrank, &otherdata.get_overlap(), myrank);
+          //Comm<Archs::Parallel>::send_recv((unsigned *)&_level, 1, otherrank, &otherdata.get_level(), myrank);
+        }
+
+        VectorType_<Arch_, IndexType_>& get_halo_elements()
+        {
+          return _halo_elements;
         }
 
         const VectorType_<Arch_, IndexType_>& get_halo_elements() const
@@ -124,6 +129,11 @@ namespace FEAST
         }
 
         const VectorType_<Arch_, IndexType_>& get_halo_element_counterparts() const
+        {
+          return _halo_element_counterparts;
+        }
+
+        VectorType_<Arch_, IndexType_>& get_halo_element_counterparts()
         {
           return _halo_element_counterparts;
         }
