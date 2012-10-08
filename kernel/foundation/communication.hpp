@@ -26,6 +26,16 @@ namespace FEAST
       com_average
         //TODO...
     };
+
+    template<typename Type_>
+    class Communicateable
+    {
+      public:
+        virtual void send_recv(int destrank,
+                               Type_& recvdata,
+                               int sourcerank) = 0;
+    };
+
 #ifndef FEAST_SERIAL_MODE
     template <typename DT_>
       class MPIType
@@ -59,6 +69,26 @@ namespace FEAST
           static inline MPI_Datatype value()
           {
             return MPI_UNSIGNED_LONG;
+          }
+      };
+
+    template <>
+      class MPIType<const unsigned long>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_UNSIGNED_LONG;
+          }
+      };
+
+    template <>
+      class MPIType<unsigned>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_UNSIGNED;
           }
       };
 #endif

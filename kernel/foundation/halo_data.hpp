@@ -3,6 +3,7 @@
 #define KERNEL_FOUNDATION_HALO_DATA_HH 1
 
 #include <kernel/foundation/halo.hpp>
+#include <kernel/foundation/communication.hpp>
 #include <iostream>
 #include <cmath>
 
@@ -21,8 +22,11 @@ namespace FEAST
      * \tparam VectorType_
      * type for storing the dense data
      *
+     * \tparam Arch_
+     * arch parameter of VectorType_
+     *
      * \tparam IndexType_
-     * type of the indices
+     * type of the indices in VectorType_
      *
      * \author Markus Geveler
      */
@@ -31,7 +35,7 @@ namespace FEAST
       template<typename, typename> class VectorType_,
       typename Arch_,
       typename IndexType_ = Index>
-    class HaloData
+    class HaloData : public Communicateable<HaloData<HaloType_, VectorType_, Arch_, IndexType_> >
     {
       public:
         ///CTOR
@@ -99,8 +103,29 @@ namespace FEAST
           this->_halo_elements = rhs._halo_elements;
           this->_halo_element_counterparts = rhs._halo_element_counterparts;
           this->_overlap = rhs._overlap;
-          this->_level = rhs.level;
+          this->_level = rhs._level;
           return *this;
+        }
+
+        ///Implementation of Communicateable interface
+        void send_recv(int otherrank,
+                       HaloData<HaloType_, VectorType_, Arch_, IndexType_>& otherdata,
+                       int myrank)
+        {
+          //Comm<Archs::Parallel>::send_recv(_halo_elements.elements(), _halo_elements.size(), otherrank, otherdata.get_halo_elements().elements(), myrank);
+          //Comm<Archs::Parallel>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), otherrank, otherdata.get_halo_element_counterparts().elements(), myrank);
+          //Comm<Archs::Parallel>::send_recv(&_overlap, 1, otherrank, &otherdata.get_overlap(), myrank);
+          //Comm<Archs::Parallel>::send_recv(&_level, 1, otherrank, &otherdata.get_level(), myrank);
+        }
+
+        const VectorType_<Arch_, IndexType_>& get_halo_elements() const
+        {
+          return _halo_elements;
+        }
+
+        const VectorType_<Arch_, IndexType_>& get_halo_element_counterparts() const
+        {
+          return _halo_element_counterparts;
         }
 
       private:
