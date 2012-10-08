@@ -54,10 +54,10 @@ obj/*
 win/*
 
 # Ignore Visual Studio solution files
-visual_studio/*.opensdf
-visual_studio/*.sdf
-visual_studio/*.suo
-visual_studio/*.vcxproj.user
+*.opensdf
+*.sdf
+*.suo
+*.vcxproj.user
 
 # Ignore Windows Links
 *.lnk
