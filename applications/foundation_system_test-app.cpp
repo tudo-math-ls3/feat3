@@ -10,15 +10,6 @@
 using namespace FEAST;
 using namespace Foundation;
 
-/*template<typename DT1_, typename DT2_, typename DT3_>
-void test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ eps)
-{
-  if(abs(l - r) < eps)
-    std::cout << "PASSED" << std::endl;
-  else
-    std::cout << "FAILED" << std::endl;
-}*/
-
 int main(int argc, char* argv[])
 {
 
@@ -67,6 +58,7 @@ int main(int argc, char* argv[])
 #endif
 
   //### begin test output only ###
+
   //test common data once
   if(me == 0)
   {
@@ -91,6 +83,7 @@ int main(int argc, char* argv[])
   {
     std::cout << "        halo for comm with patch: " << local_data.halos_on_process_patch.at(i).get_other() << std::endl;
   }
+
   //### end test output only ###
 
 #ifndef FEAST_SERIAL_MODE
