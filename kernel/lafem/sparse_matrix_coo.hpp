@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
+#include <kernel/util/graph.hpp>
 
 #include <vector>
 #include <map>
@@ -79,9 +80,34 @@ namespace FEAST
           _zero_element(DT_(0)),
           _used_elements(0)
         {
-          this->_size = rows * columns;
           this->_rows = rows;
           this->_columns = columns;
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] graph The Graph, the matrix will be created from.
+         *
+         * Creates a matrix from a given graph.
+         */
+        explicit SparseMatrixCOO(const Graph & graph) :
+          Container<Archs::CPU, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image()),
+          _zero_element(DT_(0)),
+          _used_elements(0)
+        {
+          this->_rows = graph.get_num_nodes_domain();
+          this->_columns = graph.get_num_nodes_image();
+
+          for (Index i(0) ; i < this->_rows ; ++i)
+          {
+            typename Graph::ImageIterator it(graph.image_begin(i));
+            typename Graph::ImageIterator jt(graph.image_end(i));
+            for( ; it != jt ; ++it)
+            {
+              (*this)(i, *it, DT_(0));
+            }
+          }
         }
 
         /**
