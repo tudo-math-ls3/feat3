@@ -97,7 +97,7 @@ namespace FEAST
 
     ///example shared-mem exchange
     template<>
-      class Comm<Archs::None>
+      class Comm<Archs::Serial>
       {
         public:
           template<typename DataType1_, typename DataType2_>

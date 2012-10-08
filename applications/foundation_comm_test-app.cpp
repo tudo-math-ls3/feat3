@@ -49,11 +49,19 @@ void check_sendrecv(int rank)
 
   if(rank < 2)
   {
+#ifndef FEAST_SERIAL_MODE
     Comm<Archs::Parallel>::send_recv(f, 100000, rank == 0 ? 1 : 0, target, rank == 0 ? 1 : 0);
+#else
+    Comm<Archs::Serial>::send_recv(f, 100000, 0, target, 0);
+#endif
 
     TestResult<float> res[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
+#ifndef FEAST_SERIAL_MODE
       res[i] = test_check_equal_within_eps(target[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
+#else
+      res[i] = test_check_equal_within_eps(target[i], float(0), std::numeric_limits<float>::epsilon());
+#endif
 
     bool passed(true);
     for(unsigned long i(0) ; i < 100000 ; ++i)
@@ -71,13 +79,15 @@ void check_sendrecv(int rank)
 int main(int argc, char* argv[])
 {
 
+  int me(0);
 #ifndef FEAST_SERIAL_MODE
   MPI_Init(&argc, &argv);
-  int me(0);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
+#endif
 
   check_sendrecv(me);
 
+#ifndef FEAST_SERIAL_MODE
   MPI_Finalize();
 #endif
 
