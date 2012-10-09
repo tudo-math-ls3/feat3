@@ -260,7 +260,12 @@ namespace FEAST
           this->_columns = graph.get_num_nodes_image();
 
           const Index* dom_ptr = graph.get_domain_ptr();
+          const Index* dom_end = graph.get_domain_end();
           const Index* img_idx = graph.get_image_idx();
+          if(dom_end == nullptr)
+          {
+            dom_end = &dom_ptr[1];
+          }
 
           DenseVector<Arch_, Index> col_ind(_used_elements);
           DenseVector<Arch_, DT_> val(_used_elements);
@@ -268,11 +273,15 @@ namespace FEAST
           DenseVector<Arch_, Index> row_ptr_end(_rows);
 
           Index* prow_ptr = row_ptr.elements();
+          for(Index i(0); i <= _rows; ++i)
+          {
+            prow_ptr[i] = dom_ptr[i];
+          }
+
           Index* prow_end = row_ptr_end.elements();
-          prow_ptr[0] = 0;
           for(Index i(0); i < _rows; ++i)
           {
-            prow_end[i] = prow_ptr[i+1] = dom_ptr[i+1];
+            prow_end[i] = dom_end[i];
           }
 
           Index* pcol_ind = col_ind.elements();
