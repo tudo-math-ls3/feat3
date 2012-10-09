@@ -573,6 +573,7 @@ namespace FEAST
 
 
           Index n = rule_in.get_num_points();
+          Weight_ vol;
 
           // refining
           for(Index i(0); i <= 11; ++i)
@@ -586,7 +587,26 @@ namespace FEAST
               rule.get_coord(i*n + j, 0) = w*v[i][0][0] + x*v[i][1][0] + y*v[i][2][0] + z*v[i][3][0];
               rule.get_coord(i*n + j, 1) = w*v[i][0][1] + x*v[i][1][1] + y*v[i][2][1] + z*v[i][3][1];
               rule.get_coord(i*n + j, 2) = w*v[i][0][2] + x*v[i][1][2] + y*v[i][2][2] + z*v[i][3][2];
-              rule.get_weight(i*n + j) = rule_in.get_weight(j)/Weight_(12);
+
+              // adjust the weights
+              /*
+              vol = (v[i][0][0] - v[i][3][0])*(v[i][1][1] - v[i][3][1])*(v[i][2][2] - v[i][3][2])
+                  + (v[i][1][0] - v[i][3][0])*(v[i][2][1] - v[i][3][1])*(v[i][0][2] - v[i][3][2])
+                  + (v[i][2][0] - v[i][3][0])*(v[i][0][1] - v[i][3][1])*(v[i][1][2] - v[i][3][2])
+                  - (v[i][2][0] - v[i][3][0])*(v[i][1][1] - v[i][3][1])*(v[i][0][2] - v[i][3][2])
+                  - (v[i][1][0] - v[i][3][0])*(v[i][0][1] - v[i][3][1])*(v[i][2][2] - v[i][3][2])
+                  - (v[i][0][0] - v[i][3][0])*(v[i][2][1] - v[i][3][1])*(v[i][1][2] - v[i][3][2]);
+              */
+              if(i == 0 || i == 2 || i == 4|| i == 6)
+              {
+                vol = Weight_(1)/Weight_(8);
+              }
+              else
+              {
+                vol = Weight_(1)/Weight_(16);
+              }
+
+              rule.get_weight(i*n + j) = rule_in.get_weight(j)*std::fabs(vol);
             }
           }
         }
