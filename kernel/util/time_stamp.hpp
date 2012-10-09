@@ -92,6 +92,29 @@ namespace FEAST
     }
 
     /**
+     * \brief Calculate the time elapsed between two time stamps in microseconds.
+     *
+     * \param[in] before
+     * A time stamp that represents a previous moment.
+     *
+     * \returns
+     * The time elapsed between the time stamps \p before and \c this in microseconds.
+     */
+    long long int elapsed_micros(const TimeStamp& before) const
+    {
+#if defined(FEAST_HAVE_GETTIMEOFDAY)
+      return 1000000ll * long long int(_time.tv_sec - before._time.tv_sec)
+        + long long int(_time.tv_usec - before._time.tv_usec);
+#elif defined(_WIN32)
+      long long int freq = 0ll;
+      QueryPerformanceFrequency(&freq);
+      return (freq == 0ll) ? 0ll : (1000000ll * (_counter - before._counter) / freq);
+#else
+      return 1000000ll * long long int(_clock - before._clock) / long long int(CLOCKS_PER_SEC);
+#endif
+    }
+
+    /**
      * \brief Comparison operator.
      *
      * \param[in] other
