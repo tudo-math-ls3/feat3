@@ -89,14 +89,19 @@ void check_halo_transfer(int rank)
   HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> hd(h);
   HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> target(h);
 
+#ifndef FEAST_SERIAL_MODE
   hd.send_recv(rank == 0 ? 1 : 0, target, rank == 0 ? 1 : 0);
+#else
+  hd.send_recv(0, target, 0);
+#endif
 
   TestResult<Index> res[2];
 #ifndef FEAST_SERIAL_MODE
   res[0] = test_check_equal_within_eps(target.get_halo_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
   res[1] = test_check_equal_within_eps(target.get_halo_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
 #else
-  //TODO
+  res[0] = test_check_equal_within_eps(target.get_halo_element(0), Index(0), Index(1));
+  res[1] = test_check_equal_within_eps(target.get_halo_element_counterpart(0), Index(0), Index(1));
 #endif
 
   bool passed(true);

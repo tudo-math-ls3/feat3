@@ -120,10 +120,15 @@ namespace FEAST
 #ifndef FEAST_SERIAL_MODE
           Comm<Archs::Parallel>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_halo_elements().elements(), recv_from_rank);
           Comm<Archs::Parallel>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_halo_element_counterparts().elements(), recv_from_rank);
+          //TODO use for check
           //Comm<Archs::Parallel>::send_recv(get_overlap(), 1, send_to_rank, otherdata.get_overlap(), recv_from_rank);
           //Comm<Archs::Parallel>::send_recv(get_level(), 1, send_to_rank, otherdata.get_level(), recv_from_rank);
 #else
-          ///TODO
+          Comm<Archs::Serial>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_halo_elements().elements(), recv_from_rank);
+          Comm<Archs::Serial>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_halo_element_counterparts().elements(), recv_from_rank);
+          //TODO use for check
+          //Comm<Archs::Serial>::send_recv(get_overlap(), 1, send_to_rank, otherdata.get_overlap(), recv_from_rank);
+          //Comm<Archs::Serial>::send_recv(get_level(), 1, send_to_rank, otherdata.get_level(), recv_from_rank);
 #endif
         }
 
