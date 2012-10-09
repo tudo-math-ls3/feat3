@@ -97,13 +97,15 @@ void check_halo_transfer(int rank)
     hd.send_recv(0, recvbuffer, 0);
 #endif
 
+    Halo<0, pl_face, Mesh<> > target(recvbuffer, m, rank == 0 ? 1 : 0);
+
     TestResult<Index> res[2];
 #ifndef FEAST_SERIAL_MODE
-    res[0] = test_check_equal_within_eps(recvbuffer.get_halo_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
-    res[1] = test_check_equal_within_eps(recvbuffer.get_halo_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
+    res[0] = test_check_equal_within_eps(target.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
+    res[1] = test_check_equal_within_eps(target.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
 #else
-    res[0] = test_check_equal_within_eps(recvbuffer.get_halo_element(0), Index(0), Index(1));
-    res[1] = test_check_equal_within_eps(recvbuffer.get_halo_element_counterpart(0), Index(0), Index(1));
+    res[0] = test_check_equal_within_eps(target.get_element(0), Index(0), Index(1));
+    res[1] = test_check_equal_within_eps(target.get_element_counterpart(0), Index(0), Index(1));
 #endif
 
     bool passed(true);

@@ -63,17 +63,17 @@ namespace FEAST
           return _halo;
         }
 
-        IndexType_ get_halo_element_counterpart(IndexType_ index)
+        IndexType_ get_element_counterpart(IndexType_ index) const
         {
           return _halo_element_counterparts(index);
         }
 
-        IndexType_ get_halo_element(IndexType_ index)
+        IndexType_ get_element(IndexType_ index) const
         {
           return _halo_elements(index);
         }
 
-        IndexType_ size()
+        IndexType_ size() const
         {
           return _halo_elements.size();
         }
@@ -84,6 +84,11 @@ namespace FEAST
         }
 
         IndexType_ & get_other()
+        {
+          return _halo.get_other();
+        }
+
+        IndexType_ & get_other() const
         {
           return _halo.get_other();
         }
@@ -118,36 +123,36 @@ namespace FEAST
         {
           //TODO pack into one msg
 #ifndef FEAST_SERIAL_MODE
-          Comm<Archs::Parallel>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_halo_elements().elements(), recv_from_rank);
-          Comm<Archs::Parallel>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_halo_element_counterparts().elements(), recv_from_rank);
+          Comm<Archs::Parallel>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_elements().elements(), recv_from_rank);
+          Comm<Archs::Parallel>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_element_counterparts().elements(), recv_from_rank);
           //TODO use for check
           //Comm<Archs::Parallel>::send_recv(get_overlap(), 1, send_to_rank, otherdata.get_overlap(), recv_from_rank);
           //Comm<Archs::Parallel>::send_recv(get_level(), 1, send_to_rank, otherdata.get_level(), recv_from_rank);
 #else
-          Comm<Archs::Serial>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_halo_elements().elements(), recv_from_rank);
-          Comm<Archs::Serial>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_halo_element_counterparts().elements(), recv_from_rank);
+          Comm<Archs::Serial>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_elements().elements(), recv_from_rank);
+          Comm<Archs::Serial>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_element_counterparts().elements(), recv_from_rank);
           //TODO use for check
           //Comm<Archs::Serial>::send_recv(get_overlap(), 1, send_to_rank, otherdata.get_overlap(), recv_from_rank);
           //Comm<Archs::Serial>::send_recv(get_level(), 1, send_to_rank, otherdata.get_level(), recv_from_rank);
 #endif
         }
 
-        VectorType_<Arch_, IndexType_>& get_halo_elements()
+        VectorType_<Arch_, IndexType_>& get_elements()
         {
           return _halo_elements;
         }
 
-        const VectorType_<Arch_, IndexType_>& get_halo_elements() const
+        const VectorType_<Arch_, IndexType_>& get_elements() const
         {
           return _halo_elements;
         }
 
-        VectorType_<Arch_, IndexType_>& get_halo_element_counterparts()
+        VectorType_<Arch_, IndexType_>& get_element_counterparts()
         {
           return _halo_element_counterparts;
         }
 
-        const VectorType_<Arch_, IndexType_>& get_halo_element_counterparts() const
+        const VectorType_<Arch_, IndexType_>& get_element_counterparts() const
         {
           return _halo_element_counterparts;
         }

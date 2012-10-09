@@ -30,7 +30,7 @@ namespace FEAST
      * \author Markus Geveler
      */
     template<unsigned delta_,
-             unsigned level_,
+             PolytopeLevels level_,
              typename MeshType_,
              template<typename, typename> class StorageType_ = std::vector,
              typename IndexType_ = Index>
@@ -50,6 +50,23 @@ namespace FEAST
           _overlap(delta_),
           _level(level)
         {
+        }
+
+        ///CTOR from buffer
+        template<typename BufferType_>
+        Halo(const BufferType_& buffer, MeshType_& new_mesh, IndexType_ new_other_rank) :
+          _halo_elements(),
+          _halo_element_counterparts(),
+          _mesh(new_mesh),
+          _other(new_other_rank),
+          _overlap(delta_),
+          _level(level_)
+        {
+          for(IndexType_ i(0) ; i < buffer.size() ; ++i)
+          {
+            _halo_elements.push_back(buffer.get_element(i));
+            _halo_element_counterparts.push_back(buffer.get_element_counterpart(i));
+          }
         }
 
         ///DTOR
@@ -114,6 +131,7 @@ namespace FEAST
 
           return *this;
         }
+
 
       private:
         StorageType_<IndexType_, std::allocator<IndexType_> > _halo_elements;
