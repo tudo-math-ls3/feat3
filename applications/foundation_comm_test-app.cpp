@@ -43,27 +43,27 @@ TestResult<DT1_> test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ eps)
 void check_sendrecv(int rank)
 {
   float* f(new float[100000]);
-  float* target(new float[100000]);
+  float* recvbuffer(new float[100000]);
   for(Index i(0) ; i < 100000 ; ++i)
   {
     f[i] = rank;
-    target[i] = rank;
+    recvbuffer[i] = rank;
   }
 
   if(rank < 2)
   {
 #ifndef FEAST_SERIAL_MODE
-    Comm<Archs::Parallel>::send_recv(f, 100000, rank == 0 ? 1 : 0, target, rank == 0 ? 1 : 0);
+    Comm<Archs::Parallel>::send_recv(f, 100000, rank == 0 ? 1 : 0, recvbuffer, rank == 0 ? 1 : 0);
 #else
-    Comm<Archs::Serial>::send_recv(f, 100000, 0, target, 0);
+    Comm<Archs::Serial>::send_recv(f, 100000, 0, recvbuffer, 0);
 #endif
 
     TestResult<float> res[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
 #ifndef FEAST_SERIAL_MODE
-      res[i] = test_check_equal_within_eps(target[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
+      res[i] = test_check_equal_within_eps(recvbuffer[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
 #else
-      res[i] = test_check_equal_within_eps(target[i], float(0), std::numeric_limits<float>::epsilon());
+      res[i] = test_check_equal_within_eps(recvbuffer[i], float(0), std::numeric_limits<float>::epsilon());
 #endif
 
     bool passed(true);
@@ -82,39 +82,42 @@ void check_sendrecv(int rank)
 
 void check_halo_transfer(int rank)
 {
-  Mesh<> m(rank);
-  Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
-  h.add_element_pair(rank, rank);
+  if(rank < 2)
+  {
+    Mesh<> m(rank);
+    Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.add_element_pair(rank, rank);
 
-  HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> hd(h);
-  HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> target(h);
+    HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> hd(h);
+    HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> recvbuffer(h);
 
 #ifndef FEAST_SERIAL_MODE
-  hd.send_recv(rank == 0 ? 1 : 0, target, rank == 0 ? 1 : 0);
+    hd.send_recv(rank == 0 ? 1 : 0, recvbuffer, rank == 0 ? 1 : 0);
 #else
-  hd.send_recv(0, target, 0);
+    hd.send_recv(0, recvbuffer, 0);
 #endif
 
-  TestResult<Index> res[2];
+    TestResult<Index> res[2];
 #ifndef FEAST_SERIAL_MODE
-  res[0] = test_check_equal_within_eps(target.get_halo_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
-  res[1] = test_check_equal_within_eps(target.get_halo_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
+    res[0] = test_check_equal_within_eps(recvbuffer.get_halo_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
+    res[1] = test_check_equal_within_eps(recvbuffer.get_halo_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
 #else
-  res[0] = test_check_equal_within_eps(target.get_halo_element(0), Index(0), Index(1));
-  res[1] = test_check_equal_within_eps(target.get_halo_element_counterpart(0), Index(0), Index(1));
+    res[0] = test_check_equal_within_eps(recvbuffer.get_halo_element(0), Index(0), Index(1));
+    res[1] = test_check_equal_within_eps(recvbuffer.get_halo_element_counterpart(0), Index(0), Index(1));
 #endif
 
-  bool passed(true);
-  for(unsigned long i(0) ; i < 2 ; ++i)
-    if(!res[i].passed)
-    {
-      std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
-      passed = false;
-      break;
-    }
+    bool passed(true);
+    for(unsigned long i(0) ; i < 2 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
 
-  if(passed)
-    std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (halo_transfer)" << std::endl;
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (halo_transfer)" << std::endl;
+  }
 }
 
 int main(int argc, char* argv[])
