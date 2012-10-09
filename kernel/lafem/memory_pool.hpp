@@ -31,11 +31,19 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Memory managment.
+     *
+     * This class manages the used memory chunks and releases them, if neccesary.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     class MemoryPool<Archs::CPU>
         : public InstantiationPolicy<MemoryPool<Archs::CPU>, Singleton>
     {
       private:
+        /// Map of all memory chunks in use.
         std::map<void*, Intern::MemoryInfo> _pool;
 
         /// default CTOR

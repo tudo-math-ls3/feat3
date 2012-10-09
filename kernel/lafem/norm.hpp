@@ -20,9 +20,23 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief L2 norm calculations.
+     *
+     * This class calculates euclidean length (L2 norm) operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct Norm2<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r \leftarrow \sqrt{ \sum\limits_i x_i \cdot x_i } \f$
+       *
+       * \param[in] x The input vector.
+       *
+       * \returns The L2 norm.
+       */
       template <typename DT_>
       static DT_ value(const DenseVector<Archs::CPU, DT_> & x)
       {

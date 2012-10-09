@@ -19,9 +19,23 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Scaling calculations.
+     *
+     * This class calculates scaling operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct Scale<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r \leftarrow x \cdot s\f$
+       *
+       * \param[out] r The scaled vector.
+       * \param[in] x The vector to be scaled.
+       * \param[in] s A scalar to scale x with.
+       */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & x, const DT_ s)
       {

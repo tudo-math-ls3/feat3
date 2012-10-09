@@ -19,9 +19,23 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Elementwise product calculations.
+     *
+     * This class calculates elementwise product operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct ElementProduct<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r_i \leftarrow x_i \cdot y_i\f$
+       *
+       * \param[out] r The elementwise product result.
+       * \param[in] x.The first factor.
+       * \param[in] y The second factor.
+       */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {

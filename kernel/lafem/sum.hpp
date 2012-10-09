@@ -19,9 +19,23 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Summation calculations.
+     *
+     * This class calculates summation operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct Sum<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r \leftarrow x + y\f$
+       *
+       * \param[out] r The summation result.
+       * \param[in] x.The first summand.
+       * \param[in] y The second summand.
+       */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {

@@ -20,9 +20,23 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Product calculations.
+     *
+     * This class calculates product operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct Product<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate Matrix-Vector-Product \f$r \leftarrow Ab\f$
+       *
+       * \param[out] r The product result.
+       * \param[in] A The matrix.
+       * \param[in] b The vector.
+       */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const SparseMatrixCSR<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & b)
       {

@@ -19,9 +19,24 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Axpy calculations.
+     *
+     * This class calculates axpy operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct Axpy <Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r \leftarrow ax + y\f$
+       *
+       * \param[out] r The axpy result.
+       * \param[in] a A scalar to scale x with.
+       * \param[in] x The vector to be scaled.
+       * \param[in] y The other vector
+       */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const DT_ a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {
@@ -59,6 +74,14 @@ namespace FEAST
         }
       }
 
+      /**
+       * \brief Calculate \f$r \leftarrow ax + y\f$
+       *
+       * \param[out] r The axpy result.
+       * \param[in] a A vector to scale x with.
+       * \param[in] x The vector to be scaled.
+       * \param[in] y The other vector
+       */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {

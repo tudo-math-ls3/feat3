@@ -19,9 +19,23 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Inner product calculations.
+     *
+     * This class calculates dot product operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct DotProduct<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r \leftarrow x \cdot y\f$
+       *
+       * \param[out] r The dot product result.
+       * \param[in] x.The first vector.
+       * \param[in] y The second vector.
+       */
       template <typename DT_>
       static DT_ value(const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {

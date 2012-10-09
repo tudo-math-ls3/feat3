@@ -20,9 +20,24 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Defect calculations.
+     *
+     * This class calculates defect operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct Defect<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r \leftarrow rhs - Ab\f$
+       *
+       * \param[out] r The defect result.
+       * \param[in] rhs The right hand side of the system.
+       * \param[in] A The system matrix.
+       * \param[in] b The given solution.
+         */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & rhs, const SparseMatrixCSR<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & b)
       {

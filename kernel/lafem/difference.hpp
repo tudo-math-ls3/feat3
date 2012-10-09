@@ -19,9 +19,23 @@ namespace FEAST
     {
     };
 
+    /**
+     * \brief Difference calculations.
+     *
+     * This class calculates difference operations.
+     *
+     * \author Dirk Ribbrock
+     */
     template <>
     struct Difference<Archs::CPU, Archs::Generic>
     {
+      /**
+       * \brief Calculate \f$r \leftarrow x - y\f$
+       *
+       * \param[out] r The difference result.
+       * \param[in] x.The minuend.
+       * \param[in] y The subtrahend.
+       */
       template <typename DT_>
       static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
       {
