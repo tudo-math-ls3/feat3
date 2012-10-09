@@ -52,6 +52,16 @@ namespace FEAST
           }
         }
 
+        ///Copy-CTOR
+        HaloData(const HaloData & other) :
+          _halo(other._halo),
+          _halo_elements(other._halo_elements),
+          _halo_element_counterparts(other._halo_element_counterparts),
+          _overlap(other._overlap),
+          _level(other._level)
+        {
+        }
+
         ///DTOR
         ~HaloData()
         {
