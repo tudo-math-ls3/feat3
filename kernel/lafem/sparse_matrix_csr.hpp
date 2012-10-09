@@ -9,6 +9,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/algorithm.hpp>
+#include <kernel/util/graph.hpp>
 
 
 
@@ -231,6 +232,63 @@ namespace FEAST
           this->_indices_size.push_back(trow_ptr.size());
           this->_indices.push_back(trow_ptr_end.get_elements().at(0));
           this->_indices_size.push_back(trow_ptr_end.size());
+
+          this->_val = this->_elements.at(0);
+          this->_col_ind = this->_indices.at(0);
+          this->_row_ptr = this->_indices.at(1);
+          this->_row_ptr_end = this->_indices.at(2);
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] graph The Graph, the matrix will be created from.
+         *
+         * Creates a matrix from a given graph.
+         */
+        explicit SparseMatrixCSR(const Graph & graph) :
+          Container<Arch_, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image()),
+          _zero_element(DT_(0)),
+          _used_elements(graph.get_num_indices())
+        {
+          this->_rows = graph.get_num_nodes_domain();
+          this->_columns = graph.get_num_nodes_image();
+
+          const Index* dom_ptr = graph.get_domain_ptr();
+          const Index* img_idx = graph.get_image_idx();
+
+          DenseVector<Arch_, Index> col_ind(_used_elements);
+          DenseVector<Arch_, DT_> val(_used_elements);
+          DenseVector<Arch_, Index> row_ptr(_rows + 1);
+          DenseVector<Arch_, Index> row_ptr_end(_rows);
+
+          Index* prow_ptr = row_ptr.elements();
+          Index* prow_end = row_ptr_end.elements();
+          prow_ptr[0] = 0;
+          for(Index i(0); i < _rows; ++i)
+          {
+            prow_end[i] = prow_ptr[i+1] = dom_ptr[i+1];
+          }
+
+          Index* pcol_ind = col_ind.elements();
+          for(Index i(0); i < _used_elements; ++i)
+          {
+            col_ind[i] = img_idx[i];
+          }
+
+          this->_elements.push_back(val.get_elements().at(0));
+          this->_elements_size.push_back(val.size());
+          this->_indices.push_back(col_ind.get_elements().at(0));
+          this->_indices_size.push_back(col_ind.size());
+          this->_indices.push_back(row_ptr.get_elements().at(0));
+          this->_indices_size.push_back(row_ptr.size());
+          this->_indices.push_back(row_ptr_end.get_elements().at(0));
+          this->_indices_size.push_back(row_ptr_end.size());
 
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);

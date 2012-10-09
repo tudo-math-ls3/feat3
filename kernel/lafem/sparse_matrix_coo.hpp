@@ -94,7 +94,7 @@ namespace FEAST
         explicit SparseMatrixCOO(const Graph & graph) :
           Container<Archs::CPU, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image()),
           _zero_element(DT_(0)),
-          _used_elements(0)
+          _used_elements(graph.get_num_indices())
         {
           this->_rows = graph.get_num_nodes_domain();
           this->_columns = graph.get_num_nodes_image();
