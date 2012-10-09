@@ -161,19 +161,18 @@ namespace FEAST
                            num_elements,
                            MPIType<DataType1_>::value(),
                            dest_rank,
-                           0,
+                           999,
                            recvbuf,
                            num_elements,
                            MPIType<DataType2_>::value(),
                            source_rank,
-                           0,
+                           999,
                            MPI_COMM_WORLD,
                            &status);
             }
 
           //TODO
       };
-
 #endif
 
     /**

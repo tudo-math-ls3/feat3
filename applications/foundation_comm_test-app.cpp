@@ -6,9 +6,12 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
+#include <kernel/foundation/halo_data.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 using namespace FEAST;
 using namespace Foundation;
+using namespace Archs;
 
 template<typename DT_>
 struct TestResult
@@ -65,7 +68,7 @@ void check_sendrecv(int rank)
 
     bool passed(true);
     for(unsigned long i(0) ; i < 100000 ; ++i)
-      if(res[i].passed == false)
+      if(!res[i].passed)
       {
         std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
@@ -77,6 +80,38 @@ void check_sendrecv(int rank)
   }
 }
 
+void check_halo_transfer(int rank)
+{
+  Mesh<> m(rank);
+  Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
+  h.add_element_pair(rank, rank);
+
+  HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> hd(h);
+  HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> target(h);
+
+  hd.send_recv(rank == 0 ? 1 : 0, target, rank == 0 ? 1 : 0);
+
+  TestResult<Index> res[2];
+#ifndef FEAST_SERIAL_MODE
+  res[0] = test_check_equal_within_eps(target.get_halo_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
+  res[1] = test_check_equal_within_eps(target.get_halo_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
+#else
+  //TODO
+#endif
+
+  bool passed(true);
+  for(unsigned long i(0) ; i < 2 ; ++i)
+    if(!res[i].passed)
+    {
+      std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+      passed = false;
+      break;
+    }
+
+  if(passed)
+    std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (halo_transfer)" << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
   int me(0);
@@ -86,6 +121,7 @@ int main(int argc, char* argv[])
 #endif
 
   check_sendrecv(me);
+  check_halo_transfer(me);
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();
