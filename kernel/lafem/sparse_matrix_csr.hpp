@@ -278,7 +278,7 @@ namespace FEAST
           Index* pcol_ind = col_ind.elements();
           for(Index i(0); i < _used_elements; ++i)
           {
-            col_ind[i] = img_idx[i];
+            pcol_ind[i] = img_idx[i];
           }
 
           this->_elements.push_back(val.get_elements().at(0));
