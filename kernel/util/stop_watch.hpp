@@ -19,7 +19,7 @@ namespace FEAST
   private:
     TimeStamp _start_time;
     TimeStamp _stop_time;
-    long long int _micros;
+    long long _micros;
 
   public:
     StopWatch() :
@@ -55,7 +55,7 @@ namespace FEAST
     }
 
     /// Returns the total elapsed time in micro-seconds.
-    long long int elapsed_micros() const
+    long long elapsed_micros() const
     {
       return _micros;
     }

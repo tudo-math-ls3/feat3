@@ -83,9 +83,9 @@ namespace FEAST
 #if defined(FEAST_HAVE_GETTIMEOFDAY)
       return double(_time.tv_sec - before._time.tv_sec) + 1E-6 * double(_time.tv_usec - before._time.tv_usec);
 #elif defined(_WIN32)
-      long long int freq = 0;
+      long long freq = 0ll;
       QueryPerformanceFrequency(&freq);
-      return (freq == 0) ? 0.0 : (double(_counter - before._counter) / double(freq));
+      return (freq == 0ll) ? 0.0 : (double(_counter - before._counter) / double(freq));
 #else
       return double(_clock - before._clock) / double(CLOCKS_PER_SEC);
 #endif
@@ -100,17 +100,17 @@ namespace FEAST
      * \returns
      * The time elapsed between the time stamps \p before and \c this in microseconds.
      */
-    long long int elapsed_micros(const TimeStamp& before) const
+    long long elapsed_micros(const TimeStamp& before) const
     {
 #if defined(FEAST_HAVE_GETTIMEOFDAY)
-      return 1000000ll * long long int(_time.tv_sec - before._time.tv_sec)
-        + long long int(_time.tv_usec - before._time.tv_usec);
+      return 1000000ll * (long long)(_time.tv_sec - before._time.tv_sec)
+        + (long long)(_time.tv_usec - before._time.tv_usec);
 #elif defined(_WIN32)
-      long long int freq = 0ll;
+      long long freq = 0ll;
       QueryPerformanceFrequency(&freq);
-      return (freq == 0ll) ? 0ll : (1000000ll * (_counter - before._counter) / freq);
+      return (freq == 0ll) ? 0ll : (1000000ll * (_counter - before._counter)) / freq;
 #else
-      return 1000000ll * long long int(_clock - before._clock) / long long int(CLOCKS_PER_SEC);
+      return 1000000ll * (long long)(_clock - before._clock) / (long long)CLOCKS_PER_SEC;
 #endif
     }
 
