@@ -68,8 +68,27 @@ namespace FEAST
       virtual void from_buffer(const T_& buffer) = 0;
     };
 
-    class Buffer
+    template<template<typename, typename> class ST_ = std::vector>
+    class BufferedData
     {
+      public:
+        BufferedData() :
+          _data()
+        {
+        }
+
+        ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > >& get()
+        {
+          return _data;
+        }
+
+        ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > >& get() const
+        {
+          return _data;
+        }
+
+      private:
+        ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > > _data;
     };
   }
 }

@@ -29,6 +29,15 @@ class BufferTest:
 
       for(Index i(0) ; i < 20 ; ++i)
         TEST_CHECK_EQUAL((*(Foundation::BufferedSharedArray<DataType_>*)((buffers.at(0).get())))[i], i);
+
+      //------------------------------------------------------------------------------------------------
+      Foundation::BufferedData<> b;
+      b.get().push_back(Foundation::BufferedSharedArray<DataType_>::create(20));
+      for(Index i(0) ; i < 20 ; ++i)
+        (*(Foundation::BufferedSharedArray<DataType_>*)((b.get().at(0).get())))[i] = i;
+
+      for(Index i(0) ; i < 20 ; ++i)
+        TEST_CHECK_EQUAL((*(Foundation::BufferedSharedArray<DataType_>*)((b.get().at(0).get())))[i], i);
     }
 };
 BufferTest<Archs::None, unsigned long> buffer_test_cpu_ulong("ulong");
