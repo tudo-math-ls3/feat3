@@ -4,6 +4,7 @@
 
 #include<kernel/base_header.hpp>
 #include<kernel/util/cpp11_smart_pointer.hpp>
+#include<kernel/foundation/communication.hpp>
 #include<vector>
 
 namespace FEAST
@@ -21,7 +22,7 @@ namespace FEAST
 
     ///does not need to be copy-assignable, since only shared_ptrs are going to be copied externally
     template<typename T_>
-    class BufferedSharedArray : public SharedArrayBase
+    class BufferedSharedArray : public SharedArrayBase, public Communicateable<T_>
     {
       public:
         static std::shared_ptr<SharedArrayBase> create(Index i)
@@ -47,6 +48,14 @@ namespace FEAST
         ~BufferedSharedArray()
         {
           delete[] _data;
+        }
+
+        ///Implementation of Communicateable interface
+        void send_recv(int destrank,
+                       T_& recvdata,
+                       int sourcerank)
+        {
+          ///TODO change semantics of communicateable: THIS can be directly used as a buffer
         }
 
       private:
