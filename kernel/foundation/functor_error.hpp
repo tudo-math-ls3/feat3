@@ -8,12 +8,15 @@
 
 namespace FEAST
 {
+  namespace Foundation
+  {
     class FunctorError :
         public Exception
     {
         public:
             FunctorError(const std::string & message) throw ();
     };
+  }
 }
 
 #endif

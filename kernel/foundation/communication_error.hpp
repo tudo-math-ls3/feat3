@@ -8,6 +8,8 @@
 
 namespace FEAST
 {
+  namespace Foundation
+  {
     class CommunicationError :
         public Exception
     {
@@ -21,6 +23,7 @@ namespace FEAST
         public:
             CommunicationHaloOverlapMismatch(Index comm_overlap, Index halo_overlap) throw ();
     };
+  }
 }
 
 #endif

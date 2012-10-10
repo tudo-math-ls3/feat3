@@ -8,6 +8,8 @@
 
 namespace FEAST
 {
+  namespace Foundation
+  {
     class AttributeError :
         public Exception
     {
@@ -21,6 +23,7 @@ namespace FEAST
         public:
             AttributeTypeMismatch() throw ();
     };
+  }
 }
 
 #endif

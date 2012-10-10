@@ -2,6 +2,7 @@
 #include <string>
 
 using namespace FEAST;
+using namespace Foundation;
 
 MeshError::MeshError(const std::string & message) throw () :
     Exception(message)

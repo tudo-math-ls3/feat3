@@ -30,15 +30,15 @@ class FunctorTest:
       Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_1(vector_0, IndexType_(1), IndexType_(43));
       Foundation::PushBackFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_2(vector_0, IndexType_(2), IndexType_(44));
 
-      TEST_CHECK_THROWS(func_0.undo(), FunctorError);
-      TEST_CHECK_THROWS(func_1.undo(), FunctorError);
-      TEST_CHECK_THROWS(func_2.undo(), FunctorError);
+      TEST_CHECK_THROWS(func_0.undo(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_1.undo(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_2.undo(), Foundation::FunctorError);
       func_0.execute();
       func_1.execute();
       func_2.execute();
-      TEST_CHECK_THROWS(func_0.execute(), FunctorError);
-      TEST_CHECK_THROWS(func_1.execute(), FunctorError);
-      TEST_CHECK_THROWS(func_2.execute(), FunctorError);
+      TEST_CHECK_THROWS(func_0.execute(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_1.execute(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_2.execute(), Foundation::FunctorError);
       TEST_CHECK_EQUAL(vector_0.at(0), IndexType_(42));
       TEST_CHECK_EQUAL(vector_0.at(1), IndexType_(43));
       TEST_CHECK_EQUAL(vector_0.at(2), IndexType_(44));
@@ -46,15 +46,15 @@ class FunctorTest:
       Foundation::EraseFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_3(vector_0, IndexType_(0), IndexType_(vector_0.at(0)));
       Foundation::EraseFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_4(vector_0, IndexType_(1), IndexType_(vector_0.at(1)));
       Foundation::EraseFunctor<std::vector<IndexType_>, IndexType_, IndexType_> func_5(vector_0, IndexType_(2), IndexType_(vector_0.at(2)));
-      TEST_CHECK_THROWS(func_5.undo(), FunctorError);
-      TEST_CHECK_THROWS(func_4.undo(), FunctorError);
-      TEST_CHECK_THROWS(func_3.undo(), FunctorError);
+      TEST_CHECK_THROWS(func_5.undo(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_4.undo(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_3.undo(), Foundation::FunctorError);
       func_5.execute();
       func_4.execute();
       func_3.execute();
-      TEST_CHECK_THROWS(func_3.execute(), FunctorError);
-      TEST_CHECK_THROWS(func_4.execute(), FunctorError);
-      TEST_CHECK_THROWS(func_5.execute(), FunctorError);
+      TEST_CHECK_THROWS(func_3.execute(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_4.execute(), Foundation::FunctorError);
+      TEST_CHECK_THROWS(func_5.execute(), Foundation::FunctorError);
       TEST_CHECK_EQUAL(vector_0.size(), IndexType_(0));
 
       //testing with complex STL container

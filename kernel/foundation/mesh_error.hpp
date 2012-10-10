@@ -7,19 +7,22 @@
 
 namespace FEAST
 {
-  class MeshError :
-    public Exception
+  namespace Foundation
   {
-    public:
-      MeshError(const std::string & message) throw ();
-  };
+    class MeshError :
+      public Exception
+    {
+      public:
+        MeshError(const std::string & message) throw ();
+    };
 
-  class MeshInternalIndexOutOfBounds :
-    public MeshError
-  {
-    public:
-      MeshInternalIndexOutOfBounds(Index index, Index max_index) throw ();
-  };
+    class MeshInternalIndexOutOfBounds :
+      public MeshError
+    {
+      public:
+        MeshInternalIndexOutOfBounds(Index index, Index max_index) throw ();
+    };
+  }
 }
 
 #endif

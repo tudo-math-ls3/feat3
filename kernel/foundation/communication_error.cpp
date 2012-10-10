@@ -2,6 +2,7 @@
 #include <string>
 
 using namespace FEAST;
+using namespace Foundation;
 
 CommunicationError::CommunicationError(const std::string & message) throw () :
     Exception(message)
