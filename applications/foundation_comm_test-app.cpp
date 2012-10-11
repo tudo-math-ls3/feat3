@@ -6,7 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
-#include <kernel/foundation/halo_data.hpp>
+#include <kernel/foundation/halo.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
 using namespace FEAST;
@@ -53,9 +53,14 @@ void check_sendrecv(int rank)
   if(rank < 2)
   {
 #ifndef FEAST_SERIAL_MODE
-    Comm<Archs::Parallel>::send_recv(f, 100000, rank == 0 ? 1 : 0, recvbuffer, rank == 0 ? 1 : 0);
+    Comm<Archs::Parallel>::send_recv(f,
+                                     100000,
+                                     rank == 0 ? 1 : 0,
+                                     recvbuffer,
+                                     100000,
+                                     rank == 0 ? 1 : 0);
 #else
-    Comm<Archs::Serial>::send_recv(f, 100000, 0, recvbuffer, 0);
+    Comm<Archs::Serial>::send_recv(f, 100000, 0, recvbuffer, 100000, 0);
 #endif
 
     TestResult<float> res[100000];
@@ -88,24 +93,25 @@ void check_halo_transfer(int rank)
     Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
     h.add_element_pair(rank, rank);
 
-    HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> hd(h);
-    HaloData< Halo<0, pl_face, Mesh<> >, LAFEM::DenseVector, CPU> recvbuffer(h);
+    Halo<0, pl_face, Mesh<> >::buffer_type_ sendbuf(h.buffer());
+    Halo<0, pl_face, Mesh<> >::buffer_type_ recvbuf(h.buffer());
+    h.to_buffer(sendbuf);
 
-#ifndef FEAST_SERIAL_MODE
-    hd.send_recv(rank == 0 ? 1 : 0, recvbuffer, rank == 0 ? 1 : 0);
-#else
-    hd.send_recv(0, recvbuffer, 0);
-#endif
+    h.send_recv(
+        sendbuf,
+        rank == 0 ? 1 : 0,
+        recvbuf,
+        rank == 0 ? 1 : 0);
 
-    Halo<0, pl_face, Mesh<> > target(recvbuffer, m, rank == 0 ? 1 : 0);
+    h.from_buffer(recvbuf);
 
     TestResult<Index> res[2];
 #ifndef FEAST_SERIAL_MODE
-    res[0] = test_check_equal_within_eps(target.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
-    res[1] = test_check_equal_within_eps(target.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
+    res[0] = test_check_equal_within_eps(h.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
+    res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
 #else
-    res[0] = test_check_equal_within_eps(target.get_element(0), Index(0), Index(1));
-    res[1] = test_check_equal_within_eps(target.get_element_counterpart(0), Index(0), Index(1));
+    res[0] = test_check_equal_within_eps(h.get_element(0), Index(0), Index(1));
+    res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), Index(0), Index(1));
 #endif
 
     bool passed(true);

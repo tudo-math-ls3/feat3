@@ -2,6 +2,7 @@
 #ifndef KERNEL_FOUNDATION_HALO_DATA_HH
 #define KERNEL_FOUNDATION_HALO_DATA_HH 1
 
+#include <kernel/foundation/mesh.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <iostream>
 #include <cmath>

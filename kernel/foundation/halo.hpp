@@ -47,6 +47,7 @@ namespace FEAST
         ///type exports:
         typedef IndexType_ index_type_;
         typedef MeshType_ mesh_type_;
+        typedef BufferedData<StorageType_> buffer_type_;
 
         ///CTOR
         Halo(MeshType_ & mesh, IndexType_ other, PolytopeLevels level = pl_edge) : //TODO move to template
