@@ -6,7 +6,6 @@
 #include<mpi.h>
 #endif
 #include <kernel/archs.hpp>
-#include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/communication_error.hpp>
 
 #include <vector>
@@ -80,6 +79,16 @@ namespace FEAST
           static inline MPI_Datatype value()
           {
             return MPI_UNSIGNED;
+          }
+      };
+
+    template <>
+      class MPIType<int>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_INT;
           }
       };
 #endif
@@ -198,7 +207,7 @@ namespace FEAST
      *
      * \author Markus Geveler
      */
-    template<unsigned i_ = 1, CommModes j_ = com_send_receive, typename AttributeType_ = double, typename Tag_ = Nil> //overlap is a compile-time decision now, if not feasible, move to inner function template
+    /*template<unsigned i_ = 1, CommModes j_ = com_send_receive, typename AttributeType_ = double, typename Tag_ = Nil> //overlap is a compile-time decision now, if not feasible, move to inner function template
       class Communication
       {
         public:
@@ -246,7 +255,7 @@ namespace FEAST
               }
             }
           //TODO
-      };
+      };*/
   }
 }
 #endif

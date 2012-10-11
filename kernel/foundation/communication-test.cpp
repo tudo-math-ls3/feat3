@@ -121,12 +121,12 @@ class CommunicationTest:
       TEST_CHECK_EQUAL(h.get_element_counterpart(1u), 1u);
 
       //reference to m4 would have been resolved locally
-      Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
+      /*Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
       TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(0), 3333.);
       TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(1), 4444.);
       TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->get_data().at(0), 42.);
       TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->get_data().at(1), 47.);
-
+*/
     }
 };
 CommunicationTest<Archs::Serial, unsigned long, std::vector, std::vector<unsigned long> > halo_test_cpu_v_v("std::vector, std::vector");
