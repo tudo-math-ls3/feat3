@@ -32,12 +32,12 @@ namespace FEAST
           return std::shared_ptr<SharedArrayBase>(new BufferedSharedArray<T_>(i));
         }
 
-        T_& operator[](Index i) const
+        T_& operator[](const Index i) const
         {
           return _data[i];
         }
 
-        T_& operator[](Index i)
+        T_& operator[](const Index i)
         {
           return _data[i];
         }
@@ -91,8 +91,7 @@ namespace FEAST
         typedef ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > > compound_storage_type_;
 
         BufferedData() :
-          _data(),
-          _sizes()
+          _data()
         {
         }
 
@@ -106,19 +105,8 @@ namespace FEAST
           return _data;
         }
 
-        ST_<Index, std::allocator<Index> >& get_sizes()
-        {
-          return _sizes;
-        }
-
-        const ST_<Index, std::allocator<Index> >& get_sizes() const
-        {
-          return _sizes;
-        }
-
       private:
         ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > > _data;
-        ST_<Index, std::allocator<Index> > _sizes;
     };
   }
 }
