@@ -22,9 +22,11 @@ namespace FEAST
 
     ///does not need to be copy-assignable, since only shared_ptrs are going to be copied externally
     template<typename T_>
-    class BufferedSharedArray : public SharedArrayBase, public Communicateable<T_>
+    class BufferedSharedArray : public SharedArrayBase
     {
       public:
+        typedef T_ data_type_;
+
         static std::shared_ptr<SharedArrayBase> create(Index i)
         {
           return std::shared_ptr<SharedArrayBase>(new BufferedSharedArray<T_>(i));
@@ -45,17 +47,19 @@ namespace FEAST
           return _size;
         }
 
+        T_* get()
+        {
+          return _data;
+        }
+
+        const T_* get() const
+        {
+          return _data;
+        }
+
         ~BufferedSharedArray()
         {
           delete[] _data;
-        }
-
-        ///Implementation of Communicateable interface
-        void send_recv(int destrank,
-                       T_& recvdata,
-                       int sourcerank)
-        {
-          ///TODO change semantics of communicateable: THIS can be directly used as a buffer
         }
 
       private:
@@ -72,8 +76,11 @@ namespace FEAST
     template<typename T_>
     struct Bufferable
     {
+      ///must implement how buffers are created
       virtual T_ buffer() = 0;
+      ///must implement how buffers are filled
       virtual void to_buffer(T_& buffer) = 0;
+      ///must implement how data is transfered from buffers
       virtual void from_buffer(const T_& buffer) = 0;
     };
 
@@ -81,8 +88,11 @@ namespace FEAST
     class BufferedData
     {
       public:
+        typedef ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > > compound_storage_type_;
+
         BufferedData() :
-          _data()
+          _data(),
+          _sizes()
         {
         }
 
@@ -91,13 +101,24 @@ namespace FEAST
           return _data;
         }
 
-        ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > >& get() const
+        const ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > >& get() const
         {
           return _data;
         }
 
+        ST_<Index, std::allocator<Index> >& get_sizes()
+        {
+          return _sizes;
+        }
+
+        const ST_<Index, std::allocator<Index> >& get_sizes() const
+        {
+          return _sizes;
+        }
+
       private:
         ST_<std::shared_ptr<SharedArrayBase>, std::allocator<std::shared_ptr<SharedArrayBase> > > _data;
+        ST_<Index, std::allocator<Index> > _sizes;
     };
   }
 }

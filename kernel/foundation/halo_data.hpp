@@ -34,7 +34,7 @@ namespace FEAST
       template<typename, typename> class VectorType_,
       typename Arch_,
       typename IndexType_ = Index>
-    class HaloData : public Communicateable<HaloData<HaloType_, VectorType_, Arch_, IndexType_> >
+    class HaloData
     {
       public:
         ///CTOR
@@ -124,27 +124,6 @@ namespace FEAST
           this->_overlap = rhs._overlap;
           this->_level = rhs._level;
           return *this;
-        }
-
-        ///Implementation of Communicateable interface
-        void send_recv(int send_to_rank,
-                       HaloData<HaloType_, VectorType_, Arch_, IndexType_>& otherdata,
-                       int recv_from_rank)
-        {
-          //TODO pack into one msg
-#ifndef FEAST_SERIAL_MODE
-          Comm<Archs::Parallel>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_elements().elements(), recv_from_rank);
-          Comm<Archs::Parallel>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_element_counterparts().elements(), recv_from_rank);
-          //TODO use for check
-          //Comm<Archs::Parallel>::send_recv(get_overlap(), 1, send_to_rank, otherdata.get_overlap(), recv_from_rank);
-          //Comm<Archs::Parallel>::send_recv(get_level(), 1, send_to_rank, otherdata.get_level(), recv_from_rank);
-#else
-          Comm<Archs::Serial>::send_recv(_halo_elements.elements(), _halo_elements.size(), send_to_rank, otherdata.get_elements().elements(), recv_from_rank);
-          Comm<Archs::Serial>::send_recv(_halo_element_counterparts.elements(), _halo_element_counterparts.size(), send_to_rank, otherdata.get_element_counterparts().elements(), recv_from_rank);
-          //TODO use for check
-          //Comm<Archs::Serial>::send_recv(get_overlap(), 1, send_to_rank, otherdata.get_overlap(), recv_from_rank);
-          //Comm<Archs::Serial>::send_recv(get_level(), 1, send_to_rank, otherdata.get_level(), recv_from_rank);
-#endif
         }
 
         VectorType_<Arch_, IndexType_>& get_elements()

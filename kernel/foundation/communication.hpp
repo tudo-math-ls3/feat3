@@ -6,7 +6,6 @@
 #include<mpi.h>
 #endif
 #include <kernel/archs.hpp>
-#include <kernel/foundation/halo.hpp>
 #include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/communication_error.hpp>
 
@@ -27,12 +26,14 @@ namespace FEAST
         //TODO...
     };
 
-    template<typename Type_>
+    ///implemented by Foundation datastructures that can be communicated
+    template<typename BufferType_>
     class Communicateable
     {
       public:
-        virtual void send_recv(int destrank,
-                               Type_& recvdata,
+        virtual void send_recv(BufferType_& senddata,
+                               int destrank,
+                               BufferType_& recvdata,
                                int sourcerank) = 0;
     };
 
@@ -122,15 +123,17 @@ namespace FEAST
         public:
           template<typename DataType1_, typename DataType2_>
             static inline void send_recv(DataType1_ * sendbuf,
-                                         Index num_elements,
+                                         Index num_elements_to_send,
                                          Index dest_rank,
                                          DataType2_* recvbuf,
+                                         Index num_elements_to_recv,
                                          Index source_rank)
             {
+              ///TODO different sizes!
               if(source_rank <= dest_rank)
               {
                 DataType1_ buf;
-                const Index i_end(num_elements);
+                const Index i_end(num_elements_to_send);
                 for(Index i(0) ; i < i_end ; ++i)
                 {
                   buf = (DataType2_)sendbuf[i];
@@ -150,20 +153,21 @@ namespace FEAST
         public:
           template<typename DataType1_, typename DataType2_>
             static inline void send_recv(DataType1_ * sendbuf,
-                                         Index num_elements,
+                                         Index num_elements_to_send,
                                          Index dest_rank,
                                          DataType2_* recvbuf,
+                                         Index num_elements_to_recv,
                                          Index source_rank)
             {
               MPI_Status status;
 
               MPI_Sendrecv(sendbuf,
-                           num_elements,
+                           num_elements_to_send,
                            MPIType<DataType1_>::value(),
                            dest_rank,
                            999,
                            recvbuf,
-                           num_elements,
+                           num_elements_to_recv,
                            MPIType<DataType2_>::value(),
                            source_rank,
                            999,
@@ -224,7 +228,12 @@ namespace FEAST
                       recvbuf[i] = ((Attribute<AttributeType_>*)(other_mesh.get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element_counterpart(i));
                     }
                     //'post'
-                    Foundation::Comm<Tag_>::send_recv(sendbuf, halo.size(), other_rank, recvbuf, halo.get_mesh().get_pp_rank());
+                    Foundation::Comm<Tag_>::send_recv(sendbuf,
+                                                      halo.size(),
+                                                      other_rank,
+                                                      recvbuf,
+                                                      halo.size(),
+                                                      halo.get_mesh().get_pp_rank());
                     for(Index i(0) ; i < halo.size() ; ++i)
                     {
                       ((Attribute<AttributeType_>*)(halo.get_mesh().get_attributes()->at(attr_index).get()))->get_data().at(halo.get_element(i)) = sendbuf[i];
