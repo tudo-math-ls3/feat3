@@ -77,7 +77,7 @@ namespace FEAST
     struct Bufferable
     {
       ///must implement how buffers are created
-      virtual T_ buffer() = 0;
+      virtual T_ buffer(Index estimated_size_increase = 0) = 0;
       ///must implement how buffers are filled
       virtual void to_buffer(T_& buffer) = 0;
       ///must implement how data is transfered from buffers

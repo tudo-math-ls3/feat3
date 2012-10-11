@@ -141,16 +141,16 @@ namespace FEAST
         }
 
         ///implementation of Bufferable interface
-        virtual BufferedData<StorageType_> buffer()
+        virtual BufferedData<StorageType_> buffer(IndexType_ estimated_size_increase = 0)
         {
           BufferedData<StorageType_> result;
           result.get().push_back(BufferedSharedArray<IndexType_>::create(3));
-          result.get().push_back(BufferedSharedArray<IndexType_>::create(_halo_elements.size()));
-          result.get().push_back(BufferedSharedArray<IndexType_>::create(_halo_element_counterparts.size()));
+          result.get().push_back(BufferedSharedArray<IndexType_>::create(_halo_elements.size() + estimated_size_increase));
+          result.get().push_back(BufferedSharedArray<IndexType_>::create(_halo_element_counterparts.size() + estimated_size_increase));
 
           (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[0] = 3;
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = _halo_elements.size();
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[2] = _halo_element_counterparts.size();
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = _halo_elements.size() + estimated_size_increase;
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[2] = _halo_element_counterparts.size() + estimated_size_increase;
 
           return result;
         }
