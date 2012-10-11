@@ -200,10 +200,10 @@ namespace FEAST
 #else
           for(IndexType_ i(0) ; i < sendbuffers.get().size() ; ++i)
           {
-            Comm<Serial>::send_recv(sendbuffers.get().at(i).get(),
+            Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(i).get())->get(),
                                       sendbuffers.get_sizes().at(i),
                                       destrank,
-                                      recvbuffers.get().at(i).get(),
+                                      ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(i).get())->get(),
                                       recvbuffers.get_sizes().at(i),
                                       sourcerank);
           }
