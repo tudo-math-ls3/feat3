@@ -173,12 +173,12 @@ namespace FEAST
           _halo_elements.clear();
           _halo_element_counterparts.clear();
 
-          for(IndexType_ i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[0] ; ++i)
+          for(IndexType_ i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[1] ; ++i)
           {
             _halo_elements.push_back( (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(1).get())))[i] );
           }
 
-          for(IndexType_ i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[1] ; ++i)
+          for(IndexType_ i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[2] ; ++i)
           {
             _halo_element_counterparts.push_back( (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(2).get())))[i] );
           }

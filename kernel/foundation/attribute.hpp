@@ -105,10 +105,10 @@ namespace FEAST
         virtual BufferedData<StorageType_> buffer(Index estimated_size_increase = 0)
         {
           BufferedData<StorageType_> result;
-          result.get().push_back(BufferedSharedArray<Index>::create(1));
+          result.get().push_back(BufferedSharedArray<Index>::create(2));
           result.get().push_back(BufferedSharedArray<DataType_>::create(_data.size() + estimated_size_increase));
 
-          (*(BufferedSharedArray<Index>*)((result.get().at(0).get())))[0] = 1;
+          (*(BufferedSharedArray<Index>*)((result.get().at(0).get())))[0] = 2;
           (*(BufferedSharedArray<DataType_>*)((result.get().at(0).get())))[1] = _data.size() + estimated_size_increase;
 
           return result;
@@ -126,7 +126,7 @@ namespace FEAST
         {
           _data.clear();
 
-          for(Index i(0) ; i < (*(BufferedSharedArray<Index>*)((buffer.get().at(0).get())))[0] ; ++i)
+          for(Index i(0) ; i < (*(BufferedSharedArray<Index>*)((buffer.get().at(0).get())))[1] ; ++i)
           {
             _data.push_back( (*(BufferedSharedArray<DataType_>*)((buffer.get().at(1).get())))[i] );
           }

@@ -72,6 +72,7 @@ namespace FEAST
           return *this;
         }
 
+
         BufferedSharedArray(const BufferedSharedArray& other) :
           _data(other._data),
           _size(other._size)
@@ -79,6 +80,7 @@ namespace FEAST
         }
 
       private:
+
         BufferedSharedArray(Index i) :
           _data(new T_[i]),
           _size(i)
