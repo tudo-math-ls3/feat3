@@ -62,6 +62,22 @@ namespace FEAST
           delete[] _data;
         }
 
+        BufferedSharedArray& operator=(const BufferedSharedArray& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_data = rhs._data;
+          this->_size = rhs._size;
+          return *this;
+        }
+
+        BufferedSharedArray(const BufferedSharedArray& other) :
+          _data(other._data),
+          _size(other._size)
+        {
+        }
+
       private:
         BufferedSharedArray(Index i) :
           _data(new T_[i]),

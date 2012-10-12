@@ -7,6 +7,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/halo.hpp>
+#include <kernel/foundation/attribute.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
 using namespace FEAST;
@@ -128,6 +129,13 @@ void check_halo_transfer(int rank)
   }
 }
 
+void check_attribute_transfer(int rank)
+{
+  if(rank < 2)
+  {
+  }
+}
+
 int main(int argc, char* argv[])
 {
   int me(0);
@@ -138,6 +146,7 @@ int main(int argc, char* argv[])
 
   check_sendrecv(me);
   check_halo_transfer(me);
+  check_attribute_transfer(me);
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();

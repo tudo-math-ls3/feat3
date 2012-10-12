@@ -2,6 +2,7 @@
 #ifndef KERNEL_FOUNDATION_ATTRIBUTE_HH
 #define KERNEL_FOUNDATION_ATTRIBUTE_HH 1
 
+#define FEAST_SERIAL_MODE
 #include<kernel/base_header.hpp>
 #include <vector>
 #include <kernel/foundation/attribute_error.hpp>

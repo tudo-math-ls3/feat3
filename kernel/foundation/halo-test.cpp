@@ -265,3 +265,38 @@ class HaloTestGeometryInterface:
 };
 HaloTestGeometryInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
 HaloTestGeometryInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halo_test_fginter_cpu_v_d("std::vector, std::deque");
+
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+class HaloTestComm:
+  public TaggedTest<Tag_, IndexType_>
+{
+  public:
+    HaloTestComm(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("HaloTestComm<" + tag + ">")
+    {
+    }
+
+    void run() const
+    {
+      Foundation::Mesh<> m(0);
+      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<> > h(m, 0);
+      h.add_element_pair(0, 0);
+
+      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<> >::buffer_type_ sendbuf(h.buffer());
+      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<> >::buffer_type_ recvbuf(h.buffer());
+      h.to_buffer(sendbuf);
+
+      h.send_recv(
+          sendbuf,
+          0,
+          recvbuf,
+          0);
+
+      h.from_buffer(recvbuf);
+
+      TEST_CHECK_EQUAL(h.get_element(0), 0);
+      TEST_CHECK_EQUAL(h.get_element_counterpart(0), 0);
+    }
+};
+HaloTestComm<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_comm_cpu_v_v("std::vector, std::vector");
+HaloTestComm<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halo_test_comm_cpu_v_d("std::vector, std::deque");
