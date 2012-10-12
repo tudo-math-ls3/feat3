@@ -86,7 +86,7 @@ namespace FEAST
           Container<Arch_, DT_>(other.size()),
           _rows(other.rows()),
           _columns(other.columns()),
-          _zero_element(DT_(0)),
+          _zero_element(other.zero_element()),
           _used_elements(other.used_elements())
         {
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));

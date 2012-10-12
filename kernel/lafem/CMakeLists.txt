@@ -20,7 +20,7 @@ endif(FEAST_BACKENDS_CUDA)
 
 
 #list of lafem tests
-SET (test_list dense_vector-test dense_matrix-test sparse_matrix_coo-test sparse_matrix_csr-test sum-test
+SET (test_list dense_vector-test dense_matrix-test sparse_matrix_coo-test sparse_matrix_csr-test sparse_matrix_ell-test sum-test
   element_product-test difference-test axpy-test dot_product-test norm-test product-test defect-test scale-test richardson-test bicgstab-test transposition-test)
 
 #create all tests
