@@ -277,7 +277,7 @@ namespace FEAST
        * \returns \p *this
        */
       template<int m_, int sma_, int sna_, int sx_>
-      Vector& set_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a) const
+      Vector& set_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
         for(int j(0); j < n_; ++j)
         {
