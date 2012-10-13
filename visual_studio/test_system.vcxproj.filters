@@ -214,5 +214,8 @@
     <ClCompile Include="..\kernel\util\string-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\util\tiny_algebra-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

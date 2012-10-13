@@ -18,6 +18,7 @@ SET (test_list
   linear_algebra-test
   param_section-test
   string-test
+  tiny_algebra-test
 )
 
 #create all tests

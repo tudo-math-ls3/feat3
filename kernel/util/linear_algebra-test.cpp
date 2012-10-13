@@ -23,20 +23,6 @@ static inline T_ cub(T_ x)
   return x*x*x;
 }
 
-// helper function: calculates the binomial coefficient n over k
-/*static inline u64 binomial(u64 n, u64 k)
-{
-  u64 a = 1;
-  u64 b = 1;
-
-  for(u64 i = k + 1 ; i <= n ; ++i)
-    a *= i;
-  for(u64 i = n - k ; i >= 2 ; --i)
-    b *= i;
-
-  return a / b;
-}*/
-
 /*
   This list keeps track of which linear algebra functions are tested by which test drivers.
 
@@ -76,7 +62,6 @@ static inline T_ cub(T_ x)
   mat_vec_solve<true>          test_mat_vec_solve
   mat_mat_solve<false>         test_mat_mat_solve
   mat_mat_solve<true>          test_mat_mat_solve
-  mat_invert<n>                test_mat_inv_hilbert
 */
 
 /**
@@ -368,7 +353,6 @@ class LinAlgTest :
       mat_identity(N, N, c);
       mat_mat_mult<true, true>(N, N, N, N, c, N, a, N, b, -ONE);
       TEST_CHECK_EQUAL_WITHIN_EPS(mat_norm_max(N, N, N, c), ZERO, tol);
-
 #undef N
     }
 
@@ -444,81 +428,6 @@ class LinAlgTest :
 #undef M
     }
 
-    /*
-    template<size_t n_>
-    void test_mat_inv_hilbert() const
-    {
-      // check whether to skip this test
-      if(MatInvHilbert<DataType_, n_>::skip)
-        return;
-
-      // initialise a Hilbert-Matrix: a_ij := 1 / (i + j + 1); for i,j = 0,...
-      DataType_ a[n_ * n_], b[n_ * n_];
-      _init_hilbert_mat(n_, a);
-      _init_hilbert_inv(n_, b);
-
-      // invert matrix
-      DataType_ c[n_ * n_];
-      mat_invert<n_>(c, a);
-
-      // subtract analytic inverse
-      mat_axpy<false>(n_, n_, n_, c, n_, b, -ONE);
-
-      // check norm of error
-      TEST_CHECK_EQUAL_WITHIN_EPS(mat_norm_max(n_, n_, n_, c), ZERO, (MatInvHilbert<DataType_, n_>::tol()));
-    }*/
-
-    template<size_t n_>
-    void test_mat_inv_lehmer() const
-    {
-      // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.8)));
-
-      // initialise a Lehmer-Matrix
-      DataType_ a[n_ * n_], b[n_ * n_];
-      _init_lehmer_mat(n_, a);
-      _init_lehmer_inv(n_, b);
-
-      // invert matrix
-      DataType_ c[n_ * n_];
-      mat_invert<n_>(c, a);
-
-      // subtract analytic inverse
-      mat_axpy<false>(n_, n_, n_, c, n_, b, -ONE);
-
-      // check norm of error
-      TEST_CHECK_EQUAL_WITHIN_EPS(mat_norm_max(n_, n_, n_, c), ZERO, tol);
-    }
-
-    template<size_t n_>
-    void test_mat_det_lehmer() const
-    {
-      // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.8)));
-
-      // initialise a Lehmer-Matrix
-      DataType_ a[n_ * n_];
-      _init_lehmer_mat(n_, a);
-
-      // reference matrix determinants
-      static const DataType_ dets[] =
-      {
-        DataType_(0),
-        DataType_(1),
-        DataType_(3) / DataType_(4),
-        DataType_(5) / DataType_(12),
-        DataType_(35) / DataType_(192),
-        DataType_(21) / DataType_(320),
-        DataType_(77) / DataType_(3840)
-      };
-
-      // calculate matrix determinant
-      DataType_ d = mat_det<n_,n_,DataType_>(a);
-
-      // check determinat
-      TEST_CHECK_EQUAL_WITHIN_EPS(d, dets[n_], tol);
-    }
-
     virtual void run() const
     {
       // test vector operations
@@ -534,21 +443,6 @@ class LinAlgTest :
       test_mat_mat_mult();
       test_mat_vec_solve();
       test_mat_mat_solve();
-
-      // test matrix inversion
-      test_mat_inv_lehmer<2>();
-      test_mat_inv_lehmer<3>();
-      test_mat_inv_lehmer<4>();
-      test_mat_inv_lehmer<5>();
-      test_mat_inv_lehmer<6>();
-
-      // test matrix determinant calculaation
-      test_mat_det_lehmer<1>();
-      test_mat_det_lehmer<2>();
-      test_mat_det_lehmer<3>();
-      test_mat_det_lehmer<4>();
-      test_mat_det_lehmer<5>();
-      test_mat_det_lehmer<6>();
     }
 
 #undef TWO
@@ -556,5 +450,5 @@ class LinAlgTest :
 #undef ZERO
 }; // class LinAlgTest
 
-LinAlgTest<double> tagged_linalg_test_d("LinearAlgebra-test double");
-LinAlgTest<float>  tagged_linalg_test_f("LinearAlgebra-test float");
+LinAlgTest<double> tagged_linalg_test_d("LinearAlgebraTest<double>");
+LinAlgTest<float>  tagged_linalg_test_f("LinearAlgebraTest<float>");
