@@ -14,7 +14,13 @@ using std::sin;
 using std::cos;
 using std::min;
 using std::max;
-using Intern::sqr;
+
+// helper function: calculates the quare of a value
+template<typename T_>
+static inline T_ sqr(T_ x)
+{
+  return x*x;
+}
 
 // helper function: calculates the cube of a value
 template<typename T_>

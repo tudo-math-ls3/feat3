@@ -170,8 +170,8 @@ namespace FEAST
         */
       BaseTest(const String& id)
         : _id(id),
-        _tag_name(TypeTraits<Archs::None>::name()),
-        _prec_name(TypeTraits<Nil>::name())
+        _tag_name(Type::Traits<Archs::None>::name()),
+        _prec_name(Type::Traits<Nil>::name())
       {
         TestList::instance()->register_test(this);
       }
@@ -366,8 +366,8 @@ namespace FEAST
       TaggedTest(const String & id)
         : BaseTest(id)
       {
-        _tag_name = TypeTraits<Tag_>::name();
-        _prec_name = TypeTraits<DataType_>::name();
+        _tag_name = Type::Traits<Tag_>::name();
+        _prec_name = Type::Traits<DataType_>::name();
       };
 
       /// DTOR

@@ -8,441 +8,506 @@
 namespace FEAST
 {
   /**
-   * \brief basic TypeTraits struct
+   * \brief Type namespace
    *
-   * \author Dirk Ribbrock
+   * This namespace encapsulates the TypeTraits class template as well as tag classes used by it.
    */
-  template<typename DT_>
-  struct TypeTraits
+  namespace Type
   {
-    /// returns a string identifying the datatype
-    static String name()
-    {
-      return DT_::name();
-    }
-  };
+    /// Tag class for any data type not matching any other type class
+    class AnotherClass {};
+    /// Tag class for integral data types
+    class IntegralClass {};
+    /// Tag class for floating data types
+    class FloatingClass {};
+    /// Tag class for the one and only boolean data type
+    class BooleanClass {};
 
-  /**
-   * \brief TypeTraits specialisation for <c>float</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<float>
-  {
-    /// dummy enum
-    enum
+    /**
+     * \brief basic Type Traits struct
+     *
+     * \author Dirk Ribbrock
+     */
+    template<typename DT_>
+    struct Traits
     {
-      /// this type is not integral
-      is_int = 0,
-      /// this type is floating
-      is_float = 1,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of another class
+      typedef AnotherClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return DT_::name();
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>float</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<float>
     {
-      return "float";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is not integral
+        is_int = 0,
+        /// this type is floating
+        is_float = 1,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>double</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<double>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is not integral
-      is_int = 0,
-      /// this type is floating
-      is_float = 1,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of floating class
+      typedef FloatingClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "float";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>double</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<double>
     {
-      return "double";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is not integral
+        is_int = 0,
+        /// this type is floating
+        is_float = 1,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>long double</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<long double>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is not integral
-      is_int = 0,
-      /// this type is floating
-      is_float = 1,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of floating class
+      typedef FloatingClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "double";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>long double</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<long double>
     {
-      return "long double";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is not integral
+        is_int = 0,
+        /// this type is floating
+        is_float = 1,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>unsigned int</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<unsigned int>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is  integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is unsigned
-      is_signed = 0
+      /// this type is of floating class
+      typedef FloatingClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "long double";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>unsigned int</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<unsigned int>
     {
-      return "unsigned int";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is  integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is unsigned
+        is_signed = 0
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>signed int</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<signed int>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "unsigned int";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>signed int</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<signed int>
     {
-      return "signed int";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>unsigned char</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<unsigned char>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is unsigned
-      is_signed = 0
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "signed int";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>unsigned char</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<unsigned char>
     {
-      return "unsigned char";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is unsigned
+        is_signed = 0
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>signed char</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<signed char>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "unsigned char";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>signed char</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<signed char>
     {
-      return "signed char";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>unsigned short</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<unsigned short>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is unsigned
-      is_signed = 0
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "signed char";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>unsigned short</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<unsigned short>
     {
-      return "unsigned short";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is unsigned
+        is_signed = 0
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>signed short</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<signed short>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "unsigned short";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>signed short</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<signed short>
     {
-      return "signed short";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>unsigned long</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<unsigned long>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is unsigned
-      is_signed = 0
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "signed short";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>unsigned long</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<unsigned long>
     {
-      return "unsigned long";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is unsigned
+        is_signed = 0
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>signed long</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<signed long>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "unsigned long";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>signed long</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<signed long>
     {
-      return "signed long";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>unsigned long long</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<unsigned long long>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is unsigned
-      is_signed = 0
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "signed long";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>unsigned long long</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<unsigned long long>
     {
-      return "unsigned long long";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is unsigned
+        is_signed = 0
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>signed long long</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<signed long long>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is integral
-      is_int = 1,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 0,
-      /// this type is signed
-      is_signed = 1
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "unsigned long long";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>signed long long</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<signed long long>
     {
-      return "signed long long";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is integral
+        is_int = 1,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
 
-  /**
-   * \brief TypeTraits specialisation for <c>bool</c>
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<bool>
-  {
-    /// dummy enum
-    enum
-    {
-      /// this type is not integral
-      is_int = 0,
-      /// this type is not floating
-      is_float = 0,
-      /// this type is not boolean
-      is_bool = 1,
-      /// this type is unsigned
-      is_signed = 0
+      /// this type is of integral class
+      typedef IntegralClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "signed long long";
+      }
     };
 
-    /// returns a string identifying the datatype
-    static String name()
+    /**
+     * \brief Type Traits specialisation for <c>bool</c>
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<bool>
     {
-      return "bool";
-    }
-  };
+      /// dummy enum
+      enum
+      {
+        /// this type is not integral
+        is_int = 0,
+        /// this type is not floating
+        is_float = 0,
+        /// this type is not boolean
+        is_bool = 1,
+        /// this type is unsigned
+        is_signed = 0
+      };
 
-  /**
-   * \brief TypeTraits specialisation for Nil tag class
-   *
-   * \author Dirk Ribbrock
-   * \author Peter Zajac
-   */
-  template<>
-  struct TypeTraits<Nil>
-  {
-    /// returns a string identifying the datatype
-    static String name()
+      /// this type is of boolean class
+      typedef BooleanClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "bool";
+      }
+    };
+
+    /**
+     * \brief Type Traits specialisation for Nil tag class
+     *
+     * \author Dirk Ribbrock
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<Nil>
     {
-      return "Nil";
-    }
-  };
-} // FEAST
+      /// this type is of another class
+      typedef AnotherClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "Nil";
+      }
+    };
+  } // namespace Type
+} // namespace FEAST
 
 #endif // KERNEL_UTIL_TYPE_TRAITS_HPP
