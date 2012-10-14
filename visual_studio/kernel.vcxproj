@@ -599,6 +599,7 @@
     <ClInclude Include="..\kernel\util\linear_algebra.hpp" />
     <ClInclude Include="..\kernel\util\logger.hpp" />
     <ClInclude Include="..\kernel\util\param_section.hpp" />
+    <ClInclude Include="..\kernel\util\permutation.hpp" />
     <ClInclude Include="..\kernel\util\prefix.hpp" />
     <ClInclude Include="..\kernel\util\pretty_printer.hpp" />
     <ClInclude Include="..\kernel\util\random.hpp" />

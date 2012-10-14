@@ -3,13 +3,25 @@
 #define KERNEL_UTIL_RANDOM_HPP 1
 
 // includes, FEAST
-#include <kernel/base_header.hpp>
+#include <kernel/util/type_traits.hpp>
 
 // includes, system
+#include <algorithm>
 #include <stdint.h>
+#include <limits>
 
 namespace FEAST
 {
+  /// \cond interal
+  namespace Intern
+  {
+    // Random number class; this class's gen() function takes a Random object reference and
+    // uses its next() function to generate a random number of the specified type T_.
+    template<typename T_, typename TypeClass_ = typename Type::Traits<T_>::TypeClass>
+    class RandomNumber;
+  } // namespace Intern
+  /// \endcond
+
   /**
    * \brief Pseudo-Random Number Generator
    *
@@ -32,20 +44,26 @@ namespace FEAST
    */
   class Random
   {
-  private:
-    /// \cond internal
-    uint32_t _s, _x, _y, _z;
+  public:
+    /// seed type
+    typedef uint32_t SeedType;
 
-    // Returns the next number in the stream.
-    inline uint32_t _get()
+    /// default seed enumeration
+    enum
     {
-      uint32_t t = _s ^ (_s << 11);
-      _s = _x;
-      _x = _y;
-      _y = _z;
-      return _z = _z ^ (_z >> 19) ^ t ^ (t >> 8);
-    }
-    /// \endcond
+      /// default s-seed value
+      def_seed_s = 428147976,
+      /// default x-seed value
+      def_seed_x = 362436069,
+      /// default y-seed value
+      def_seed_y = 521288629,
+      /// default z-seed value
+      def_seed_z = 88675123
+    };
+
+  private:
+    /// the rng's working values
+    uint32_t _s, _x, _y, _z;
 
   public:
     /**
@@ -54,114 +72,179 @@ namespace FEAST
      * \param[in] seed
      * The seed for the random number generator.
      */
-    explicit Random(uint32_t seed = 428147976u) :
+    explicit Random(SeedType seed = SeedType(def_seed_s)) :
       _s(seed),
-      _x(362436069u),
-      _y(521288629u),
-      _z(88675123u)
+      _x(uint32_t(def_seed_x)),
+      _y(uint32_t(def_seed_y)),
+      _z(uint32_t(def_seed_z))
     {
     }
 
     /**
-     * \brief Integer extraction operator
+     * \brief Returns the next number in the stream.
      *
-     * This function extracts the next random integer in the stream.
-     *
-     * \param[out] x
-     * The value to be extracted.
-     *
-     * \returns \p *this
+     * This function returns the next unsigned 32-bit integer in the random number stream and advances the
+     * stream.
      */
-    Random& operator>>(uint8_t& x)
+    uint32_t next()
     {
-      x = uint8_t(_get() & 0xFFu);
-      return *this;
-    }
-
-    /** \copydoc operator>>(uint8_t&) */
-    Random& operator>>(uint16_t& x)
-    {
-      x = uint16_t(_get() & 0xFFFFu);
-      return *this;
-    }
-
-    /** \copydoc operator>>(uint8_t&) */
-    Random& operator>>(uint32_t& x)
-    {
-      x = _get();
-      return *this;
-    }
-
-    /** \copydoc operator>>(uint8_t&) */
-    Random& operator>>(uint64_t& x)
-    {
-      uint32_t* t = reinterpret_cast<uint32_t*>(&x);
-      t[0] = _get();
-      t[1] = _get();
-      return *this;
-    }
-
-    /** \copydoc operator>>(uint8_t&) */
-    Random& operator>>(int8_t& x)
-    {
-      return this->operator>>(*reinterpret_cast<uint8_t*>(&x));
-    }
-
-    /** \copydoc operator>>(uint8_t&) */
-    Random& operator>>(int16_t& x)
-    {
-      return this->operator>>(*reinterpret_cast<uint16_t*>(&x));
-    }
-
-    /** \copydoc operator>>(uint8_t&) */
-    Random& operator>>(int32_t& x)
-    {
-      return this->operator>>(*reinterpret_cast<uint32_t*>(&x));
-    }
-
-    /** \copydoc operator>>(uint8_t&) */
-    Random& operator>>(int64_t& x)
-    {
-      return this->operator>>(*reinterpret_cast<uint64_t*>(&x));
+      uint32_t t = _s ^ (_s << 11);
+      _s = _x;
+      _x = _y;
+      _y = _z;
+      return _z = _z ^ (_z >> 19) ^ t ^ (t >> 8);
     }
 
     /**
-     * \brief Floating-Point extraction operator
+     * \brief Extraction operator
      *
-     * This function extracts the next random floating point number in the stream.
-     * The value extracted by this operator will be in range [0,1].
+     * This function extracts the next random number in the stream.
+     * - If the type of the value to be extracted is integral, then the value will be within the full range, i.e.
+     *   - for a signed <e>n</e>-bit integer, it will hold <e>-2^(n-1) <= x < 2^(n-1)</e>
+     *   - for an unsigned <e>n</e>-bit integer, it will hol that <e>0 <= x < 2^n</e>
+     * - If the type of the value to be extracted is a floating point type, then the value will be within the
+     *   closed interval [0,1].
+     *
+     * \tparam T_
+     * The type of the value to be extracted. Must be either of integral or floating point type.
      *
      * \param[out] x
-     * The value to be extracted.
+     * The reference to a variable receiving the extracted value.
      *
      * \returns \p *this
      */
-    Random& operator>>(double& x)
+    template<typename T_>
+    Random& operator>>(T_& x)
     {
-      static const double d = 1.0 / double(0xFFFFFFFFul);
-      x = double(_get()) * d;
+      x = Intern::RandomNumber<T_>::gen(*this);
       return *this;
     }
 
-    /* \copydoc operator>>(double&) */
-    /*Random& operator>>(long double& x)
+    /**
+     * \brief Ranged evaluation operator.
+     *
+     * This operator returns a random number in the range passed to this operator.
+     *
+     * \tparam T_
+     * The type of the value to be extracted. Is determined automatically by \p a and \p b.
+     *
+     * \param[in] a, b
+     * The minimum and maximum values for the range of the random number to be generated.
+     * \note If \p b < \p a, then \p a and \p b are swapped.
+     * \note If \p a = \p b, then the returned value will be equal to \p a, however, the
+     *       generator will still advance its position within the random number stream.
+     *
+     * \returns
+     * A random value in the range [a, b].
+     */
+    template<typename T_>
+    T_ operator()(T_ a, T_ b)
     {
-      double d(0.0);
-      this->operator>>(d);
-      x = long double(d);
-      return *this;
-    }*/
-
-    /** \copydoc operator>>(double&) */
-    Random& operator>>(float& x)
-    {
-      double d(0.0);
-      this->operator>>(d);
-      x = float(d);
-      return *this;
+      return Intern::RandomNumber<T_>::gen_ranged(*this, std::min(a, b), std::max(a, b));
     }
   }; // class Random
 
+  /// \cond internal
+  namespace Intern
+  {
+    // Random integer class; this class is the base class for the integer specialisation
+    // of the RandomNumber class defined below.
+    template<typename T_, size_t num_bytes_ = sizeof(T_)>
+    class RandomInteger;
+
+    // specialisation for 8-bit integers
+    template<typename T_>
+    class RandomInteger<T_, 1>
+    {
+    public:
+      static T_ gen(Random& rng)
+      {
+        return (T_)(rng.next() & 0xFFu);
+      }
+    };
+
+    // specialisation for 16-bit integers
+    template<typename T_>
+    class RandomInteger<T_, 2>
+    {
+    public:
+      static T_ gen(Random& rng)
+      {
+        return (T_)(rng.next() & 0xFFFFu);
+      }
+    };
+
+    // specialisation for 32-bit integers
+    template<typename T_>
+    class RandomInteger<T_, 4>
+    {
+    public:
+      static T_ gen(Random& rng)
+      {
+        return (T_)(rng.next());
+      }
+    };
+
+    // specialisation for 64-bit integers
+    template<typename T_>
+    class RandomInteger<T_, 8>
+    {
+    public:
+      static T_ gen(Random& rng)
+      {
+        // the rng works with 32-bit ints, so we need to generate a pair of those
+        // and concatenate them to obtain a random 64-bit integer...
+        uint32_t t[2];
+        t[0] = rng.next();
+        t[1] = rng.next();
+        return *reinterpret_cast<T_*>(&t[0]);
+      }
+    };
+
+    // specialisation for integers
+    template<typename T_>
+    class RandomNumber<T_, Type::IntegralClass> :
+      public RandomInteger<T_>
+    {
+    public:
+      static T_ gen_ranged(Random& rng, T_ a, T_ b)
+      {
+        // call gen() prior to the if-clause to advance the rng in any case
+        T_ x(RandomInteger<T_>::gen(rng));
+        if(a < b)
+          return a + x % (b - a + 1);
+        else
+          return a;
+      }
+    };
+
+    // specialisation for floating point numbers
+    template<typename T_>
+    class RandomNumber<T_, Type::FloatingClass>
+    {
+    public:
+      static T_ gen(Random& rng)
+      {
+        // the rng generates numbers in range [0,2^32-1], so divide by that maximum range
+        static const double d = 1.0 / double(0xFFFFFFFFu);
+        return T_(double(rng.next()) * d);
+      }
+
+      static T_ gen_ranged(Random& rng, T_ a, T_ b)
+      {
+        // machine exactness; we do not want to divide by anything smaller than that...
+        static const T_ eps = std::numeric_limits<T_>::epsilon();
+
+        // call gen() prior to the if-clause to advance the rng in any case
+        T_ x(gen(rng));
+        if(a + eps < b)
+          return a + x / (b - a);
+        else
+          return a;
+      }
+    };
+  } // namespacce Intern
+  /// \endcond
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_RANDOM_HPP
