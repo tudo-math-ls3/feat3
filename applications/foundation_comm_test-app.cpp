@@ -95,8 +95,14 @@ void check_halo_transfer(int rank)
     Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
     h.add_element_pair(rank, rank);
 
+    //halo at rank 1 is bigger
+    if(rank == 1)
+      h.add_element_pair(rank, rank);
+
+
     Halo<0, pl_face, Mesh<> >::buffer_type_ sendbuf(h.buffer());
     Halo<0, pl_face, Mesh<> >::buffer_type_ recvbuf(h.buffer(10));
+
     h.to_buffer(sendbuf);
 
     h.send_recv(
@@ -107,10 +113,15 @@ void check_halo_transfer(int rank)
 
     h.from_buffer(recvbuf);
 
-    TestResult<Index> res[2];
+    TestResult<Index> res[rank == 0 ? 4 : 2];
 #ifndef FEAST_SERIAL_MODE
     res[0] = test_check_equal_within_eps(h.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
     res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
+    if(rank == 0)
+    {
+      res[2] = test_check_equal_within_eps(h.get_element(1), Index(1), Index(1));
+      res[3] = test_check_equal_within_eps(h.get_element_counterpart(1), Index(1), Index(1));
+    }
 #else
     res[0] = test_check_equal_within_eps(h.get_element(0), Index(0), Index(1));
     res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), Index(0), Index(1));
@@ -138,6 +149,9 @@ void check_attribute_transfer(int rank)
     attr.push_back(double(rank));
     attr.push_back(double(rank + 42));
 
+    if(rank == 1)
+      attr.push_back(double(rank + 10000));
+
     Attribute<double>::buffer_type_ sendbuf(attr.buffer());
     Attribute<double>::buffer_type_ recvbuf(attr.buffer(10));
 
@@ -151,10 +165,12 @@ void check_attribute_transfer(int rank)
 
     attr.from_buffer(recvbuf);
 
-    TestResult<double> res[2];
+    TestResult<double> res[rank == 0 ? 3 : 2];
 #ifndef FEAST_SERIAL_MODE
     res[0] = test_check_equal_within_eps(attr.at(0), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(1), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
+    if(rank == 0)
+      res[2] = test_check_equal_within_eps(attr.at(2), double(10000), std::numeric_limits<double>::epsilon());
 #else
     res[0] = test_check_equal_within_eps(attr.at(0), double(0), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(1), double(42), std::numeric_limits<double>::epsilon());
@@ -185,6 +201,9 @@ void check_topology_transfer(int rank)
     t.at(1).push_back(rank == 0 ? 52 : 53);
     t.at(1).push_back(rank == 0 ? 57 : 58);
 
+    if(rank == 1)
+      t.at(1).push_back(100);
+
     Topology<>::buffer_type_ sendbuf(t.buffer());
     Topology<>::buffer_type_ recvbuf(t.buffer(10));
 
@@ -199,12 +218,14 @@ void check_topology_transfer(int rank)
     Foundation::Topology<> t2;
     t2.from_buffer(recvbuf);
 
-    TestResult<Index> res[4];
+    TestResult<Index> res[rank == 0 ? 6 : 5];
 #ifndef FEAST_SERIAL_MODE
     res[0] = test_check_equal_within_eps(t2.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
     res[1] = test_check_equal_within_eps(t2.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
     res[2] = test_check_equal_within_eps(t2.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
     res[3] = test_check_equal_within_eps(t2.at(1).at(1), rank == 0 ? Index(58) : Index(57), Index(1));
+    if(rank == 0)
+      res[4] = test_check_equal_within_eps(t2.at(1).at(2), Index(100), Index(1));
 #else
     res[0] = test_check_equal_within_eps(t2.at(0).at(0), Index(42), Index(1));
     res[1] = test_check_equal_within_eps(t2.at(0).at(1), Index(47), Index(1));
