@@ -96,6 +96,11 @@ class TopologyCommTest:
           0);
 
       t.from_buffer(recvbuf);
+
+      TEST_CHECK_EQUAL(t.at(0).at(0), 42);
+      TEST_CHECK_EQUAL(t.at(0).at(1), 47);
+      TEST_CHECK_EQUAL(t.at(1).at(0), 52);
+      TEST_CHECK_EQUAL(t.at(1).at(1), 57);
     }
 };
 TopologyCommTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_commtest_cpu_v_v("std::vector, std::vector");

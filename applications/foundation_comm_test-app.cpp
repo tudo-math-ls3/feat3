@@ -96,7 +96,7 @@ void check_halo_transfer(int rank)
     h.add_element_pair(rank, rank);
 
     Halo<0, pl_face, Mesh<> >::buffer_type_ sendbuf(h.buffer());
-    Halo<0, pl_face, Mesh<> >::buffer_type_ recvbuf(h.buffer());
+    Halo<0, pl_face, Mesh<> >::buffer_type_ recvbuf(h.buffer(10));
     h.to_buffer(sendbuf);
 
     h.send_recv(
@@ -139,7 +139,7 @@ void check_attribute_transfer(int rank)
     attr.push_back(double(rank + 42));
 
     Attribute<double>::buffer_type_ sendbuf(attr.buffer());
-    Attribute<double>::buffer_type_ recvbuf(attr.buffer());
+    Attribute<double>::buffer_type_ recvbuf(attr.buffer(10));
 
     attr.to_buffer(sendbuf);
 
@@ -186,7 +186,7 @@ void check_topology_transfer(int rank)
     t.at(1).push_back(rank == 0 ? 57 : 58);
 
     Topology<>::buffer_type_ sendbuf(t.buffer());
-    Topology<>::buffer_type_ recvbuf(t.buffer());
+    Topology<>::buffer_type_ recvbuf(t.buffer(10));
 
     t.to_buffer(sendbuf);
 
@@ -196,19 +196,20 @@ void check_topology_transfer(int rank)
         recvbuf,
         rank == 0 ? 1 : 0);
 
-    t.from_buffer(recvbuf);
+    Foundation::Topology<> t2;
+    t2.from_buffer(recvbuf);
 
     TestResult<Index> res[4];
 #ifndef FEAST_SERIAL_MODE
-    res[0] = test_check_equal_within_eps(t.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
-    res[1] = test_check_equal_within_eps(t.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
-    res[2] = test_check_equal_within_eps(t.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
-    res[3] = test_check_equal_within_eps(t.at(1).at(1), rank == 0 ? Index(58) : Index(57), Index(1));
+    res[0] = test_check_equal_within_eps(t2.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
+    res[1] = test_check_equal_within_eps(t2.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
+    res[2] = test_check_equal_within_eps(t2.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
+    res[3] = test_check_equal_within_eps(t2.at(1).at(1), rank == 0 ? Index(58) : Index(57), Index(1));
 #else
-    res[0] = test_check_equal_within_eps(t.at(0).at(0), Index(42), Index(1));
-    res[1] = test_check_equal_within_eps(t.at(0).at(1), Index(47), Index(1));
-    res[2] = test_check_equal_within_eps(t.at(1).at(0), Index(52), Index(1));
-    res[3] = test_check_equal_within_eps(t.at(1).at(1), Index(57), Index(1));
+    res[0] = test_check_equal_within_eps(t2.at(0).at(0), Index(42), Index(1));
+    res[1] = test_check_equal_within_eps(t2.at(0).at(1), Index(47), Index(1));
+    res[2] = test_check_equal_within_eps(t2.at(1).at(0), Index(52), Index(1));
+    res[3] = test_check_equal_within_eps(t2.at(1).at(1), Index(57), Index(1));
 #endif
     bool passed(true);
     for(Index i(0) ; i < 2 ; ++i)

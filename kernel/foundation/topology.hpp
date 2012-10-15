@@ -289,7 +289,33 @@ namespace FEAST
                                     recv_datasize,
                                     sourcerank);
 #else
-          ///TODO
+
+          //get sizes
+          Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
+                                    destrank,
+                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[0],
+                                    sourcerank);
+
+          //get row_ptrs
+          IndexType_ recv_num_polytopes((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1]);
+
+          Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(1).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
+                                    destrank,
+                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(1).get())->get(),
+                                    recv_num_polytopes,
+                                    sourcerank);
+          //get data
+          IndexType_ recv_datasize((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[2]);
+
+          Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(2).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[2],
+                                    destrank,
+                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(2).get())->get(),
+                                    recv_datasize,
+                                    sourcerank);
 #endif
         }
 
