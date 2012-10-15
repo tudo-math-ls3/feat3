@@ -173,16 +173,6 @@ namespace FEAST
           return _history;
         }
 
-        Index end()
-        {
-          return _num_polytopes;
-        }
-
-        Index begin()
-        {
-          return 0;
-        }
-
         OuterStorageType_<StorageType_, std::allocator<StorageType_> >& get_topology()
         {
           return _topology;
