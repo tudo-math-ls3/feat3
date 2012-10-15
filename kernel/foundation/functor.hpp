@@ -254,6 +254,16 @@ namespace FEAST
           return Index(_functors.size());
         }
 
+        const storage_type_& get_functors() const
+        {
+          return _functors;
+        }
+
+        Index size() const
+        {
+          return Index(_functors.size());
+        }
+
         CompoundFunctor& operator=(const CompoundFunctor& rhs)
         {
           if(this == &rhs)
