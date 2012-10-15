@@ -199,31 +199,39 @@ namespace FEAST
         virtual BufferedData<OuterStorageType_> buffer(Index estimated_size_increase = 0)
         {
           BufferedData<OuterStorageType_> result;
-          result.get().push_back(BufferedSharedArray<IndexType_>::create(_topology.size() + estimated_size_increase + 1));
 
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[0] = _topology.size() + 1 + estimated_size_increase;
+          result.get().push_back(BufferedSharedArray<IndexType_>::create(3)); //sizes, 'row pointers', data
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[0] = 3;
+
+          //how many row-pointers?
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = _topology.size() + estimated_size_increase;
+          result.get().push_back(BufferedSharedArray<IndexType_>::create(_topology.size() + estimated_size_increase));
+
+          IndexType_ final_size(0);
           for(IndexType_ i(0) ; i < _topology.size() ; ++i)
           {
-            result.get().push_back(BufferedSharedArray<IndexType_>::create(_topology.at(i).size() + estimated_size_increase));
-            (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[i + 1] = _topology.at(i).size();
+            (*(BufferedSharedArray<IndexType_>*)((result.get().at(1).get())))[i] = _topology.at(i).size() + estimated_size_increase;
+            final_size += _topology.at(i).size() + estimated_size_increase;
           }
+          final_size *= _topology.size() + estimated_size_increase;
 
-          for(IndexType_ i(0) ; i < estimated_size_increase ; ++i)
-          {
-            result.get().push_back(BufferedSharedArray<IndexType_>::create(_topology.at(0).size() + estimated_size_increase));
-            (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[i + _topology.size() + 1] = _topology.at(0).size() + estimated_size_increase;
-          }
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[2] = final_size;;
+
+          result.get().push_back(BufferedSharedArray<IndexType_>::create(final_size));
 
           return result;
         }
 
         virtual void to_buffer(BufferedData<OuterStorageType_>& buffer)
         {
+          IndexType_ head(0);
+
           for(IndexType_ i(0) ; i < _topology.size() ; ++i)
           {
             for(IndexType_ j(0) ; j < _topology.at(i).size() ; ++j)
             {
-              (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(i + 1).get())))[j] = _topology.at(i).at(j);
+              (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(2).get())))[head] = _topology.at(i).at(j);
+              ++head;
             }
           }
         }
@@ -233,13 +241,15 @@ namespace FEAST
           _topology.clear();
           _history.get_functors().clear();
 
-          for(Index i(0) ; i < buffer.get().size() ; ++i)
+          IndexType_ left(0);
+          IndexType_ head(0);
+          for(Index i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[1] ; ++i) //times the real #polytopes
           {
             push_back();
-            for(Index j(0) ; j < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[i] ; ++j)
+            for(Index j(0) ; j < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(1).get())))[i]; ++j)
             {
-              if(i != 0)
-                _topology.at(i - 1).push_back((*(BufferedSharedArray<IndexType_>*)((buffer.get().at(i).get())))[j]);
+              _topology.at(i).push_back((*(BufferedSharedArray<IndexType_>*)((buffer.get().at(2).get())))[head]);
+              ++head;
             }
           }
         }
@@ -252,27 +262,34 @@ namespace FEAST
         {
 #ifndef FEAST_SERIAL_MODE
 
-          for(IndexType_ i(0) ; i < sendbuffers.get().size() ; ++i)
-          {
-            Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(i).get())->get(),
-                (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[i],
-                destrank,
-                ((BufferedSharedArray<Index>*)recvbuffers.get().at(i).get())->get(),
-                (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[i],
-                sourcerank);
-          }
-          ///TODO resolve different numbers of buffers (see estimated_...)!
+          //get sizes
+          Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
+                                    destrank,
+                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[0],
+                                    sourcerank);
+
+          //get row_ptrs
+          IndexType_ recv_num_polytopes((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1]);
+
+          Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(1).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
+                                    destrank,
+                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(1).get())->get(),
+                                    recv_num_polytopes,
+                                    sourcerank);
+          //get data
+          IndexType_ recv_datasize((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[2]);
+
+          Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(2).get())->get(),
+                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[2],
+                                    destrank,
+                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(2).get())->get(),
+                                    recv_datasize,
+                                    sourcerank);
 #else
-          for(IndexType_ i(0) ; i < sendbuffers.get().size() ; ++i)
-          {
-            Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(i).get())->get(),
-                (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[i],
-                destrank,
-                ((BufferedSharedArray<Index>*)recvbuffers.get().at(i).get())->get(),
-                (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[i],
-                sourcerank);
-          }
-          ///TODO resolve different numbers of buffers (see estimated_...)!
+          ///TODO
 #endif
         }
 
