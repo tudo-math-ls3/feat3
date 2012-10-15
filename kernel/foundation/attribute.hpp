@@ -2,7 +2,6 @@
 #ifndef KERNEL_FOUNDATION_ATTRIBUTE_HH
 #define KERNEL_FOUNDATION_ATTRIBUTE_HH 1
 
-#define FEAST_SERIAL_MODE
 #include<kernel/base_header.hpp>
 #include <vector>
 #include <kernel/foundation/attribute_error.hpp>
@@ -61,6 +60,7 @@ namespace FEAST
         }
 
         typedef Attribute<DataType_, StorageType_> exact_type_;
+        typedef BufferedData<StorageType_> buffer_type_;
 
         StorageType_<DataType_, std::allocator<DataType_> >& get_data()
         {
@@ -109,7 +109,7 @@ namespace FEAST
           result.get().push_back(BufferedSharedArray<DataType_>::create(_data.size() + estimated_size_increase));
 
           (*(BufferedSharedArray<Index>*)((result.get().at(0).get())))[0] = 2;
-          (*(BufferedSharedArray<DataType_>*)((result.get().at(0).get())))[1] = _data.size() + estimated_size_increase;
+          (*(BufferedSharedArray<Index>*)((result.get().at(0).get())))[1] = _data.size() + estimated_size_increase;
 
           return result;
         }
@@ -125,10 +125,9 @@ namespace FEAST
         virtual void from_buffer(const BufferedData<StorageType_>& buffer)
         {
           _data.clear();
-
           for(Index i(0) ; i < (*(BufferedSharedArray<Index>*)((buffer.get().at(0).get())))[1] ; ++i)
           {
-            _data.push_back( (*(BufferedSharedArray<DataType_>*)((buffer.get().at(1).get())))[i] );
+            _data.push_back( (DataType_)(*(BufferedSharedArray<DataType_>*)((buffer.get().at(1).get())))[i] );
           }
         }
 
@@ -147,11 +146,12 @@ namespace FEAST
               sourcerank);
 
           Comm<Parallel>::send_recv(((BufferedSharedArray<DataType_>*)sendbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<DataType_>*)((sendbuffers.get().at(0).get())))[1],
+              (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
               destrank,
               ((BufferedSharedArray<DataType_>*)recvbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<DataType_>*)((recvbuffers.get().at(0).get())))[1],
+              (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1],
               sourcerank);
+
 #else
           Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
               (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
@@ -161,11 +161,12 @@ namespace FEAST
               sourcerank);
 
           Comm<Serial>::send_recv(((BufferedSharedArray<DataType_>*)sendbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<DataType_>*)((sendbuffers.get().at(0).get())))[1],
+              (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
               destrank,
               ((BufferedSharedArray<DataType_>*)recvbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<DataType_>*)((recvbuffers.get().at(0).get())))[1],
+              (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1],
               sourcerank);
+
 #endif
         }
 

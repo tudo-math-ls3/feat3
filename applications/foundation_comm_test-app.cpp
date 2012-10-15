@@ -133,6 +133,42 @@ void check_attribute_transfer(int rank)
 {
   if(rank < 2)
   {
+    Attribute<double> attr;
+    attr.push_back(double(rank));
+    attr.push_back(double(rank + 42));
+
+    Attribute<double>::buffer_type_ sendbuf(attr.buffer());
+    Attribute<double>::buffer_type_ recvbuf(attr.buffer());
+
+    attr.to_buffer(sendbuf);
+
+    attr.send_recv(
+        sendbuf,
+        rank == 0 ? 1 : 0,
+        recvbuf,
+        rank == 0 ? 1 : 0);
+
+    attr.from_buffer(recvbuf);
+
+    TestResult<double> res[2];
+#ifndef FEAST_SERIAL_MODE
+    res[0] = test_check_equal_within_eps(attr.at(0), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(attr.at(1), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
+#else
+    res[0] = test_check_equal_within_eps(attr.at(0), double(0), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(attr.at(1), double(42), std::numeric_limits<double>::epsilon());
+#endif
+    bool passed(true);
+    for(unsigned long i(0) ; i < 2 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (attr_transfer)" << std::endl;
   }
 }
 
