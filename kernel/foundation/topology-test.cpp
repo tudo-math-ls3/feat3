@@ -1,3 +1,4 @@
+#define FEAST_SERIAL_MODE
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
@@ -61,4 +62,45 @@ TopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> 
 TopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
 TopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
 
-TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV"); //problem: is DV then is used too in history and hence created with new operator
+TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");
+
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+class TopologyCommTest:
+  public TaggedTest<Tag_, IndexType_>
+{
+  public:
+    TopologyCommTest(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("TopologyCommTest<" + tag + ">")
+    {
+    }
+
+    void run() const
+    {
+      Foundation::Topology<> t;
+      t.push_back();
+      t.at(0).push_back(42);
+      t.at(0).push_back(47);
+      t.push_back();
+      t.at(1).push_back(52);
+      t.at(1).push_back(57);
+
+      Foundation::Topology<>::buffer_type_ sendbuf(t.buffer());
+      Foundation::Topology<>::buffer_type_ recvbuf(t.buffer());
+
+      t.to_buffer(sendbuf);
+
+      t.send_recv(
+          sendbuf,
+          0,
+          recvbuf,
+          0);
+
+      t.from_buffer(recvbuf);
+    }
+};
+TopologyCommTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_commtest_cpu_v_v("std::vector, std::vector");
+TopologyCommTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > topology_commtest_cpu_d_v("std::deque, std::vector");
+TopologyCommTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_commtest_cpu_v_d("std::vector, std::deque");
+TopologyCommTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_commtest_cpu_d_d("std::deque, std::deque");
+
+TopologyCommTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");
