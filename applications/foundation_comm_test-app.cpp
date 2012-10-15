@@ -8,6 +8,7 @@
 #include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/halo.hpp>
 #include <kernel/foundation/attribute.hpp>
+#include <kernel/foundation/topology.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
 using namespace FEAST;
@@ -172,6 +173,57 @@ void check_attribute_transfer(int rank)
   }
 }
 
+void check_topology_transfer(int rank)
+{
+  if(rank < 2)
+  {
+    Foundation::Topology<> t;
+    t.push_back();
+    t.at(0).push_back(rank == 0 ? 42 : 43);
+    t.at(0).push_back(rank == 0 ? 47 : 48);
+    t.push_back();
+    t.at(1).push_back(rank == 0 ? 52 : 53);
+    t.at(1).push_back(rank == 0 ? 57 : 58);
+
+    Topology<>::buffer_type_ sendbuf(t.buffer());
+    Topology<>::buffer_type_ recvbuf(t.buffer());
+
+    t.to_buffer(sendbuf);
+
+    t.send_recv(
+        sendbuf,
+        rank == 0 ? 1 : 0,
+        recvbuf,
+        rank == 0 ? 1 : 0);
+
+    t.from_buffer(recvbuf);
+
+    TestResult<Index> res[4];
+#ifndef FEAST_SERIAL_MODE
+    res[0] = test_check_equal_within_eps(t.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
+    res[1] = test_check_equal_within_eps(t.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
+    res[2] = test_check_equal_within_eps(t.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
+    res[3] = test_check_equal_within_eps(t.at(1).at(1), rank == 0 ? Index(58) : Index(57), Index(1));
+#else
+    res[0] = test_check_equal_within_eps(t.at(0).at(0), Index(42), Index(1));
+    res[1] = test_check_equal_within_eps(t.at(0).at(1), Index(47), Index(1));
+    res[2] = test_check_equal_within_eps(t.at(1).at(0), Index(52), Index(1));
+    res[3] = test_check_equal_within_eps(t.at(1).at(1), Index(57), Index(1));
+#endif
+    bool passed(true);
+    for(Index i(0) ; i < 2 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (topology_transfer)" << std::endl;
+  }
+}
+
 int main(int argc, char* argv[])
 {
   int me(0);
@@ -183,6 +235,7 @@ int main(int argc, char* argv[])
   check_sendrecv(me);
   check_halo_transfer(me);
   check_attribute_transfer(me);
+  check_topology_transfer(me);
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();
