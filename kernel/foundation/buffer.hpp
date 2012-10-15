@@ -20,7 +20,6 @@ namespace FEAST
         }
     };
 
-    ///does not need to be copy-assignable, since only shared_ptrs are going to be copied externally
     template<typename T_>
     class BufferedSharedArray : public SharedArrayBase
     {
