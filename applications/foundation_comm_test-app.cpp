@@ -1,3 +1,4 @@
+#define FEAST_SERIAL_MODE
 #ifndef FEAST_SERIAL_MODE
 #include <mpi.h>
 #endif
@@ -85,6 +86,9 @@ void check_sendrecv(int rank)
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (sendrecv)" << std::endl;
   }
+
+  delete[] f;
+  delete[] recvbuffer;
 }
 
 void check_halo_transfer(int rank)
@@ -113,28 +117,42 @@ void check_halo_transfer(int rank)
 
     h.from_buffer(recvbuf);
 
-    TestResult<Index> res[rank == 0 ? 4 : 2];
+    bool passed(true);
 #ifndef FEAST_SERIAL_MODE
+    TestResult<Index> res[rank == 0 ? 4 : 2];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
     res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
-    if(rank == 0)
+    if(rank == 0) //rank 0 receives more from rank 1
     {
       res[2] = test_check_equal_within_eps(h.get_element(1), Index(1), Index(1));
       res[3] = test_check_equal_within_eps(h.get_element_counterpart(1), Index(1), Index(1));
     }
-#endif
-
-    bool passed(true);
-    for(unsigned long i(0) ; i < 2 ; ++i)
+    for(unsigned long i(0) ; i < (rank == 0 ? 4 : 2) ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "Failed: (rank " << rank << "): " <<  res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
 
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (halo_transfer)" << std::endl;
+#else
+    TestResult<Index> res[2];
+    res[0] = test_check_equal_within_eps(h.get_element(0), rank, Index(1));
+    res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank, Index(1));
+    for(unsigned long i(0) ; i < 2 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (halo_transfer)" << std::endl;
+#endif
+
   }
 }
 
@@ -162,24 +180,39 @@ void check_attribute_transfer(int rank)
 
     attr.from_buffer(recvbuf);
 
-    TestResult<double> res[rank == 0 ? 3 : 2];
+    bool passed(true);
 #ifndef FEAST_SERIAL_MODE
+    TestResult<double> res[rank == 0 ? 3 : 2];
     res[0] = test_check_equal_within_eps(attr.at(0), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(1), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
     if(rank == 0)
-      res[2] = test_check_equal_within_eps(attr.at(2), double(10000), std::numeric_limits<double>::epsilon());
-#endif
-    bool passed(true);
-    for(unsigned long i(0) ; i < 2 ; ++i)
+      res[2] = test_check_equal_within_eps(attr.at(2), double(10001), std::numeric_limits<double>::epsilon());
+
+    for(unsigned long i(0) ; i < (rank == 0 ? 3 : 2) ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "Failed: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
 
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (attr_transfer)" << std::endl;
+#else
+    TestResult<double> res[2];
+    res[0] = test_check_equal_within_eps(attr.at(0), double(0), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(attr.at(1), double(42), std::numeric_limits<double>::epsilon());
+    for(unsigned long i(0) ; i < 2 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (attr_transfer)" << std::endl;
+#endif
   }
 }
 
@@ -212,16 +245,33 @@ void check_topology_transfer(int rank)
     Foundation::Topology<> t2;
     t2.from_buffer(recvbuf);
 
-    TestResult<Index> res[rank == 0 ? 5 : 4];
+    bool passed(true);
 #ifndef FEAST_SERIAL_MODE
+    TestResult<Index> res[rank == 0 ? 5 : 4];
     res[0] = test_check_equal_within_eps(t2.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
     res[1] = test_check_equal_within_eps(t2.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
     res[2] = test_check_equal_within_eps(t2.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
     res[3] = test_check_equal_within_eps(t2.at(1).at(1), rank == 0 ? Index(58) : Index(57), Index(1));
     if(rank == 0)
       res[4] = test_check_equal_within_eps(t2.at(1).at(2), Index(100), Index(1));
-#endif
-    bool passed(true);
+
+    for(Index i(0) ; i < (rank == 0 ? 5 : 4) ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (topology_transfer)" << std::endl;
+#else
+    TestResult<Index> res[4];
+    res[0] = test_check_equal_within_eps(t2.at(0).at(0), Index(42), Index(1));
+    res[1] = test_check_equal_within_eps(t2.at(0).at(1), Index(47), Index(1));
+    res[2] = test_check_equal_within_eps(t2.at(1).at(0), Index(52), Index(1));
+    res[3] = test_check_equal_within_eps(t2.at(1).at(1), Index(57), Index(1));
+
     for(Index i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
       {
@@ -232,6 +282,7 @@ void check_topology_transfer(int rank)
 
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (topology_transfer)" << std::endl;
+#endif
   }
 }
 
