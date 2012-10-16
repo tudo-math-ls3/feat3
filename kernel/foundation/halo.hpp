@@ -191,7 +191,14 @@ namespace FEAST
                        int sourcerank)
         {
 #ifndef FEAST_SERIAL_MODE
-          for(IndexType_ i(0) ; i < sendbuffers.get().size() ; ++i)
+          Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
+              3,
+              destrank,
+              ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(0).get())->get(),
+              3,
+              sourcerank);
+
+          for(IndexType_ i(1) ; i < 3 ; ++i)
           {
             Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(i).get())->get(),
                                       (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[i],
@@ -201,7 +208,14 @@ namespace FEAST
                                       sourcerank);
           }
 #else
-          for(IndexType_ i(0) ; i < sendbuffers.get().size() ; ++i)
+          Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
+              3,
+              destrank,
+              ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(0).get())->get(),
+              3,
+              sourcerank);
+
+          for(IndexType_ i(1) ; i < 3 ; ++i)
           {
             Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(i).get())->get(),
                                       (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[i],

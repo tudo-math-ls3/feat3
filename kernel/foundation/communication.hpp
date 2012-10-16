@@ -138,17 +138,22 @@ namespace FEAST
                                          Index num_elements_to_recv,
                                          Index source_rank)
             {
-              ///TODO different sizes!
-              if(source_rank <= dest_rank)
+              const Index send_end(num_elements_to_send);
+              const Index recv_end(num_elements_to_recv);
+              DataType1_ bufsend(0);
+              DataType2_ bufrecv(0);
+
+              for(Index i(0) ; i < send_end ; ++i)
               {
-                DataType1_ buf;
-                const Index i_end(num_elements_to_send);
-                for(Index i(0) ; i < i_end ; ++i)
-                {
-                  buf = (DataType2_)sendbuf[i];
-                  sendbuf[i] = recvbuf[i];
-                  recvbuf[i] = buf;
-                }
+                bufsend = (DataType1_)recvbuf[i];
+                recvbuf[i] = (DataType2_)sendbuf[i];
+                recvbuf[i] = bufsend;
+              }
+              for(Index i(0) ; i < recv_end ; ++i)
+              {
+                bufrecv = (DataType2_)sendbuf[i];
+                sendbuf[i] = (DataType1_)recvbuf[i];
+                recvbuf[i] = bufrecv;
               }
             }
 
