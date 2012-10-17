@@ -10,6 +10,7 @@
 #include <kernel/foundation/halo.hpp>
 #include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/topology.hpp>
+#include <kernel/foundation/mesh.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
 using namespace FEAST;
@@ -286,6 +287,60 @@ void check_topology_transfer(int rank)
   }
 }
 
+void check_mesh_transfer(int rank)
+{
+  Foundation::Mesh<Foundation::rnt_2D> m(0);
+
+  //add vertices
+  m.add_polytope(Foundation::pl_vertex);
+  m.add_polytope(Foundation::pl_vertex);
+  m.add_polytope(Foundation::pl_vertex);
+  m.add_polytope(Foundation::pl_vertex);
+  m.add_polytope(Foundation::pl_vertex);
+  m.add_polytope(Foundation::pl_vertex);
+
+  //add edges
+  m.add_polytope(Foundation::pl_edge);
+  m.add_polytope(Foundation::pl_edge);
+  m.add_polytope(Foundation::pl_edge);
+  m.add_polytope(Foundation::pl_edge);
+  m.add_polytope(Foundation::pl_edge);
+  m.add_polytope(Foundation::pl_edge);
+  m.add_polytope(Foundation::pl_edge);
+
+  //add faces
+  m.add_polytope(Foundation::pl_face);
+  m.add_polytope(Foundation::pl_face);
+
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 2);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 0);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 3);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 1);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 4);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 2);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 5);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 3);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 4);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
+  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
+
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 4); //v->f is set automagically
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 1); //v->f is set automagically
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 2); //v->f is set automagically
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 4); //v->f is set automagically
+  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
+
+  Mesh<rnt_2D>::buffer_type_ sendbuf(m.buffer());
+  Mesh<rnt_2D>::buffer_type_ recvbuf(m.buffer());
+
+}
+
 int main(int argc, char* argv[])
 {
   int me(0);
@@ -298,6 +353,7 @@ int main(int argc, char* argv[])
   check_halo_transfer(me);
   check_attribute_transfer(me);
   check_topology_transfer(me);
+  check_mesh_transfer(me);
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();
