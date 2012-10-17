@@ -194,10 +194,14 @@ namespace FEAST
       {
         // the rng works with 32-bit ints, so we need to generate a pair of those
         // and concatenate them to obtain a random 64-bit integer...
-        uint32_t t[2];
-        t[0] = rng.next();
-        t[1] = rng.next();
-        return *reinterpret_cast<T_*>(&t[0]);
+        union
+        {
+          uint32_t t[2];
+          uint64_t tq;
+        } x;
+        x.t[0] = rng.next();
+        x.t[1] = rng.next();
+        return (T_)x.tq;;
       }
     };
 
