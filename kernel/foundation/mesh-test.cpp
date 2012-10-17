@@ -1,3 +1,4 @@
+#define FEAST_SERIAL_MODE
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
@@ -821,3 +822,89 @@ class MeshTestGeometryInterface:
 };
 MeshTestGeometryInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
 MeshTestGeometryInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");
+
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+class MeshTestCommInterface:
+  public TaggedTest<Tag_, IndexType_>
+{
+  public:
+    MeshTestCommInterface(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("MeshTestCommInterface<" + tag + ">")
+    {
+    }
+
+    void run() const
+    {
+      TEST_CHECK_MSG(test(), "Test Failed");
+    }
+
+    bool test() const
+    {
+      Foundation::Mesh<Foundation::rnt_2D> m(0);
+
+      //add vertices
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+
+      //add edges
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+      m.add_polytope(Foundation::pl_edge);
+
+      //add faces
+      m.add_polytope(Foundation::pl_face);
+      m.add_polytope(Foundation::pl_face);
+
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 2);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 0);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 3);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 1);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 4);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 2);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 5);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 3);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 4);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
+      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
+
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 4); //v->f is set automagically
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 1); //v->f is set automagically
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 2); //v->f is set automagically
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 4); //v->f is set automagically
+      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
+
+      m.send_recv(m.get_topologies(), 0, 0);
+
+      if(!(m.get_topologies().at(Foundation::ipi_vertex_edge).size() == Index(6))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_vertex_face).size() == Index(6))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_face_vertex).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).size() == Index(7))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(0).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(1).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(2).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(3).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(4).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(5).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(6).size() == Index(2))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_face_vertex).at(0).size() == Index(4))) return false;
+      if(!(m.get_topologies().at(Foundation::ipi_face_vertex).at(1).size() == Index(4))) return false;
+
+      return true;
+    }
+};
+MeshTestCommInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_comminter_cpu_v_v("std::vector, std::vector");
+MeshTestCommInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_comminter_cpu_v_d("std::vector, std::deque");
