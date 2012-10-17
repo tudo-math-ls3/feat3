@@ -1,4 +1,4 @@
-#define FEAST_SERIAL_MODE
+//#define FEAST_SERIAL_MODE
 #ifndef FEAST_SERIAL_MODE
 #include <mpi.h>
 #endif
@@ -243,18 +243,18 @@ void check_topology_transfer(int rank)
         recvbuf,
         rank == 0 ? 1 : 0);
 
-    Foundation::Topology<> t2;
-    t2.from_buffer(recvbuf);
+    //Foundation::Topology<> t2;
+    t.from_buffer(recvbuf);
 
     bool passed(true);
 #ifndef FEAST_SERIAL_MODE
     TestResult<Index> res[rank == 0 ? 5 : 4];
-    res[0] = test_check_equal_within_eps(t2.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
-    res[1] = test_check_equal_within_eps(t2.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
-    res[2] = test_check_equal_within_eps(t2.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
-    res[3] = test_check_equal_within_eps(t2.at(1).at(1), rank == 0 ? Index(58) : Index(57), Index(1));
+    res[0] = test_check_equal_within_eps(t.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
+    res[1] = test_check_equal_within_eps(t.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
+    res[2] = test_check_equal_within_eps(t.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
+    res[3] = test_check_equal_within_eps(t.at(1).at(1), rank == 0 ? Index(58) : Index(57), Index(1));
     if(rank == 0)
-      res[4] = test_check_equal_within_eps(t2.at(1).at(2), Index(100), Index(1));
+      res[4] = test_check_equal_within_eps(t.at(1).at(2), Index(100), Index(1));
 
     for(Index i(0) ; i < (rank == 0 ? 5 : 4) ; ++i)
       if(!res[i].passed)
@@ -268,10 +268,10 @@ void check_topology_transfer(int rank)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (topology_transfer)" << std::endl;
 #else
     TestResult<Index> res[4];
-    res[0] = test_check_equal_within_eps(t2.at(0).at(0), Index(42), Index(1));
-    res[1] = test_check_equal_within_eps(t2.at(0).at(1), Index(47), Index(1));
-    res[2] = test_check_equal_within_eps(t2.at(1).at(0), Index(52), Index(1));
-    res[3] = test_check_equal_within_eps(t2.at(1).at(1), Index(57), Index(1));
+    res[0] = test_check_equal_within_eps(t.at(0).at(0), Index(42), Index(1));
+    res[1] = test_check_equal_within_eps(t.at(0).at(1), Index(47), Index(1));
+    res[2] = test_check_equal_within_eps(t.at(1).at(0), Index(52), Index(1));
+    res[3] = test_check_equal_within_eps(t.at(1).at(1), Index(57), Index(1));
 
     for(Index i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
@@ -289,56 +289,87 @@ void check_topology_transfer(int rank)
 
 void check_mesh_transfer(int rank)
 {
-  Foundation::Mesh<Foundation::rnt_2D> m(0);
+  if(rank < 2)
+  {
+    Foundation::Mesh<Foundation::rnt_2D> m(0);
 
-  //add vertices
-  m.add_polytope(Foundation::pl_vertex);
-  m.add_polytope(Foundation::pl_vertex);
-  m.add_polytope(Foundation::pl_vertex);
-  m.add_polytope(Foundation::pl_vertex);
-  m.add_polytope(Foundation::pl_vertex);
-  m.add_polytope(Foundation::pl_vertex);
+    //add vertices
+    m.add_polytope(Foundation::pl_vertex);
+    m.add_polytope(Foundation::pl_vertex);
+    m.add_polytope(Foundation::pl_vertex);
+    m.add_polytope(Foundation::pl_vertex);
+    m.add_polytope(Foundation::pl_vertex);
+    m.add_polytope(Foundation::pl_vertex);
 
-  //add edges
-  m.add_polytope(Foundation::pl_edge);
-  m.add_polytope(Foundation::pl_edge);
-  m.add_polytope(Foundation::pl_edge);
-  m.add_polytope(Foundation::pl_edge);
-  m.add_polytope(Foundation::pl_edge);
-  m.add_polytope(Foundation::pl_edge);
-  m.add_polytope(Foundation::pl_edge);
+    //add edges
+    m.add_polytope(Foundation::pl_edge);
+    m.add_polytope(Foundation::pl_edge);
+    m.add_polytope(Foundation::pl_edge);
+    m.add_polytope(Foundation::pl_edge);
+    m.add_polytope(Foundation::pl_edge);
+    m.add_polytope(Foundation::pl_edge);
+    m.add_polytope(Foundation::pl_edge);
 
-  //add faces
-  m.add_polytope(Foundation::pl_face);
-  m.add_polytope(Foundation::pl_face);
+    //add faces
+    m.add_polytope(Foundation::pl_face);
+    m.add_polytope(Foundation::pl_face);
 
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 2);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 0);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 3);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 1);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 4);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 2);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 5);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 3);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 4);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
-  m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 2);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 0);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 3);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 1);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 4);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 2);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 5);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 3);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 4);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
+    m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
 
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 4); //v->f is set automagically
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 1); //v->f is set automagically
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 2); //v->f is set automagically
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 4); //v->f is set automagically
-  m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 4); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 1); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 2); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 4); //v->f is set automagically
+    m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
 
-  Mesh<rnt_2D>::buffer_type_ sendbuf(m.buffer());
-  Mesh<rnt_2D>::buffer_type_ recvbuf(m.buffer());
+    m.send_recv(m.get_topologies(),
+                rank == 0 ? 1 : 0,
+                rank == 0 ? 1 : 0);
 
+    TestResult<Index> res[13];
+    res[0] = test_check_equal_within_eps(m.get_topologies().at(ipi_vertex_edge).size(), Index(6), Index(1));
+    res[1] = test_check_equal_within_eps(m.get_topologies().at(ipi_vertex_face).size(), Index(6), Index(1));
+    res[2] = test_check_equal_within_eps(m.get_topologies().at(ipi_face_vertex).size(), Index(2), Index(1));
+    res[3] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).size(), Index(7), Index(1));
+    res[4] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(0).size(), Index(2), Index(1));
+    res[5] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(1).size(), Index(2), Index(1));
+    res[6] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(2).size(), Index(2), Index(1));
+    res[7] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(3).size(), Index(2), Index(1));
+    res[8] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(4).size(), Index(2), Index(1));
+    res[9] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(5).size(), Index(2), Index(1));
+    res[10] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(6).size(), Index(2), Index(1));
+    res[11] = test_check_equal_within_eps(m.get_topologies().at(ipi_face_vertex).at(0).size(), Index(4), Index(1));
+    res[12] = test_check_equal_within_eps(m.get_topologies().at(ipi_face_vertex).at(1).size(), Index(4), Index(1));
+
+    bool passed(true);
+    for(Index i(0) ; i < 13 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (mesh_transfer)" << std::endl;
+
+  }
 }
 
 int main(int argc, char* argv[])

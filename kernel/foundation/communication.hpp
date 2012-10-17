@@ -25,7 +25,8 @@ namespace FEAST
         //TODO...
     };
 
-    ///implemented by Foundation datastructures that can be communicated
+    ///TODO send_recv->tparam CommOp_ ?
+    ///implemented by Bufferable Foundation datastructures that can be communicated
     template<typename BufferType_>
     class Communicateable
     {
@@ -34,6 +35,31 @@ namespace FEAST
                                int destrank,
                                BufferType_& recvdata,
                                int sourcerank) = 0;
+    };
+
+    ///implemented by Foundation datastructures that can be communicated but don't need to be buffered because all their aggregates already are
+    template<typename T_>
+    class CommunicateableByAggregates
+    {
+      public:
+        template<typename AggregateStorageType_>
+        void send_recv(AggregateStorageType_& aggregates_to_communicate,
+                       int destrank,
+                       int sourcerank,
+                       Index estimated_size_increase = 0)
+        {
+          for(Index i(0) ; i < aggregates_to_communicate.size() ; ++i)
+          {
+            typename T_::buffer_type_ sendbuf(aggregates_to_communicate.at(i).buffer());
+            typename T_::buffer_type_ recvbuf(aggregates_to_communicate.at(i).buffer(estimated_size_increase));
+
+            aggregates_to_communicate.at(i).to_buffer(sendbuf);
+
+            aggregates_to_communicate.at(i).send_recv(sendbuf, destrank, recvbuf, sourcerank);
+
+            aggregates_to_communicate.at(i).from_buffer(recvbuf);
+          }
+        }
     };
 
 #ifndef FEAST_SERIAL_MODE

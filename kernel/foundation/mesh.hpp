@@ -112,7 +112,7 @@ namespace FEAST
       template <typename, typename> class OuterAttributeStorageType_ = std::vector
       >
     class Mesh :
-      public Bufferable<typename TopologyType_::buffer_type_>
+      public CommunicateableByAggregates<TopologyType_>
     {
       public:
         friend class MeshAttributeRegistration;
@@ -430,67 +430,6 @@ namespace FEAST
         const CompoundFunctor<OuterStorageType_>& get_history() const
         {
           return _history;
-        }
-
-        ///implementation of Bufferable interface
-        virtual buffer_type_ buffer(typename TopologyType_::index_type_ estimated_size_increase = 0)
-        {
-          buffer_type_ result;
-
-          //add BSA for Topology sizes (aka how many BSAs are there for each Topology)
-          result.get().push_back(BufferedSharedArray<typename TopologyType_::index_type_>::create(_topologies.size() + estimated_size_increase + 1));
-          (*(BufferedSharedArray<typename TopologyType_::index_type_>*)((result.get().at(0).get())))[0] = _topologies.size() + estimated_size_increase + 1;
-
-          for(typename TopologyType_::index_type_ i(0) ; i < _topologies.size() ; ++i)
-          {
-            //add size to sizes BSA
-            (*(BufferedSharedArray<typename TopologyType_::index_type_>*)((result.get().at(0).get())))[i + 1] = _topologies.at(i).size() + estimated_size_increase;
-
-            //get a buffer for each Topology, fill it, add the BSAs to our masterbuffer
-            typename TopologyType_::buffer_type_ localtopobuf(_topologies.at(i).buffer(estimated_size_increase));
-            _topologies.at(i).to_buffer(localtopobuf);
-
-            for(typename TopologyType_::index_type_ j(0) ; j < localtopobuf.get().size() ; ++j)
-            {
-              result.get().push_back(localtopobuf.get().at(j));
-            }
-          }
-
-          for(typename TopologyType_::index_type_ i(0) ; i < estimated_size_increase ; ++i)
-          {
-            (*(BufferedSharedArray<typename TopologyType_::index_type_>*)((result.get().at(0).get())))[i + 1] = _topologies.at(0).size() + estimated_size_increase;
-          }
-
-          return result;
-        }
-
-        virtual void to_buffer(buffer_type_& buffer)
-        {
-          ///nothing left to be done here
-        }
-
-        virtual void from_buffer(const buffer_type_& buffer)
-        {
-          _topologies.clear();
-          _history.get_functors().clear();
-
-          //main loop for all new topologies
-          for(typename TopologyType_::index_type_ i(1) ; i < (*(BufferedSharedArray<typename TopologyType_::index_type_>*)((buffer.get().at(0).get())))[0] - 1; ++i)
-          {
-            buffer_type_ localtopobuf;
-            TopologyType_ localtopo;
-
-            typename TopologyType_::index_type_ head(0);
-            for(typename TopologyType_::index_type_ j(0) ; j < (*(BufferedSharedArray<typename TopologyType_::index_type_>*)((buffer.get().at(0).get())))[i] ; ++j)
-            {
-              localtopobuf.get().push_back(buffer.get().at(head));
-              ++head;
-            }
-
-            localtopo.from_buffer(localtopobuf);
-
-            _topologies.push_back(localtopo);
-          }
         }
 
       private:
