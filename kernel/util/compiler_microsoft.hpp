@@ -43,6 +43,9 @@
 #    define HAVE_CPP11_EXTERN_TEMPLATE 1
 #  endif
 
+// define the noinline specifier
+#define NOINLINE __declspec(noinline)
+
 // C4100: 'identifier': unreferenced formal parameter
 // This warning arises from unused function parameters. As we are using doxygen, parameters always need
 // names to produce useful documentation independent of whether the actual parameter is used or not.

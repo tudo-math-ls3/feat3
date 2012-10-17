@@ -72,6 +72,12 @@
 
 // hide the following block from doxygen
 /// \cond nodoxy
+
+// If the compiler does not support a 'noinline' specifier, we'll define it as an empty macro.
+#ifndef NOINLINE
+#define NOINLINE
+#endif
+
 // If the compiler doesn't support the C++11 nullptr, we have to define it via pre-processor.
 // Be warned that this definition is not 100% compatible, as the "real" nullptr is of type "nullptr_t",
 // whereas this macro definition is of type "int", thus leading to potentially unwanted behaviour,

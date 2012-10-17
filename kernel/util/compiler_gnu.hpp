@@ -28,6 +28,9 @@
 #  define FEAST_COMPILER "GNU C++ compiler 2.x.x (or older)"
 #endif
 
+// define the noinline specifier
+#define NOINLINE __attribute__((noinline))
+
 // Now let's see what C++11 features the compiler offers
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 #  if (_GCC_VER > 40600)
