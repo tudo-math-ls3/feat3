@@ -54,6 +54,12 @@
 // C4127: conditional expression is constant
 #  pragma warning(disable: 4127)
 
+// C4503: 'identifier': decorated name length exceeded, name was truncated
+// This warning arises from heavy template nesting, blowing the compiler's limit on maximal name lengths.
+// Running into this warning does not affect the correctness of the program, however, it might confuse
+// the debugger.
+#  pragma warning(disable: 4503)
+
 // C4512: 'class': assignment operator could not be generated
 #  pragma warning(disable: 4512)
 
