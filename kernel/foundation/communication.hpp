@@ -5,6 +5,7 @@
 #ifndef FEAST_SERIAL_MODE
 #include<mpi.h>
 #endif
+#include <kernel/foundation/base.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication_error.hpp>
 
@@ -21,8 +22,20 @@ namespace FEAST
       com_send = 0,
       com_receive,
       com_send_receive,
-      com_average
+      com_gather,
+      com_scatter,
+      com_reduce_min
         //TODO...
+    };
+
+    enum CommModesInterface
+    {
+      com_send_replace = 0,
+      com_recv_replace,
+      com_exchange,
+      com_average,
+      com_min,
+      com_max
     };
 
     template<typename B_, CommModes c_>
@@ -30,7 +43,6 @@ namespace FEAST
     {
     };
 
-    ///TODO send_recv->tparam CommOp_ ?
     ///implemented by Bufferable Foundation datastructures that can be communicated
     template<typename BufferType_>
     class Communicateable<BufferType_, com_send_receive>
@@ -71,6 +83,40 @@ namespace FEAST
           }
         }
     };
+
+    template<unsigned overlap_, CommModesInterface op_ = com_exchange>
+    class InterfacedComm
+    {
+      template<typename HaloType_>
+      static void execute(const HaloType_& interface)
+      {
+        ///TODO generalize for all other overlaps than 0
+        std::cout << "WARNING: false template instantiation!" << std::endl;
+        ///TODO generalize for all other overlaps than 0
+      }
+    };
+
+    template<CommModesInterface op_>
+    class InterfacedComm<0, op_>
+    {
+      public:
+        template<
+          PolytopeLevels a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+                   PolytopeLevels,
+                   typename,
+                   template<typename, typename> class,
+                   typename>
+           class HaloType_>
+         static void execute(const HaloType_<0, a_, b_, c_, d_>& interface )
+         {
+           ///TODO
+         }
+    };
+
 
 #ifndef FEAST_SERIAL_MODE
     template <typename DT_>

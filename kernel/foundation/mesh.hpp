@@ -2,6 +2,7 @@
 #ifndef KERNEL_FOUNDATION_MESH_HH
 #define KERNEL_FOUNDATION_MESH_HH 1
 
+#include <kernel/foundation/base.hpp>
 #include <kernel/foundation/topology.hpp>
 #include <kernel/foundation/mesh_error.hpp>
 #include <kernel/foundation/attribute.hpp>
@@ -47,15 +48,6 @@ namespace FEAST
       rnt_1D = 2,
       rnt_2D = 4,
       rnt_3D = 6
-    };
-
-    ///polytope level identifiers
-    enum PolytopeLevels
-    {
-      pl_vertex = 0,
-      pl_edge,
-      pl_face,
-      pl_polyhedron
     };
 
     ///indices of the stored polytopelevel-to-polytopelevel topologies

@@ -90,19 +90,24 @@ namespace FEAST
         }
 
         ///public access functions:
-        IndexType_ get_element_counterpart(IndexType_ index)
+        IndexType_ get_element_counterpart(IndexType_ index) const
         {
           return _halo_element_counterparts.at(index);
         }
 
-        IndexType_ get_element(IndexType_ index)
+        IndexType_ get_element(IndexType_ index) const
         {
           return _halo_elements.at(index);
         }
 
-        IndexType_ size()
+        IndexType_ size() const
         {
           return IndexType_(_halo_elements.size());
+        }
+
+        const MeshType_ & get_mesh() const
+        {
+          return _mesh;
         }
 
         MeshType_ & get_mesh()
@@ -110,17 +115,17 @@ namespace FEAST
           return _mesh;
         }
 
-        IndexType_ get_other()
+        IndexType_ get_other() const
         {
           return _other;
         }
 
-        unsigned get_overlap()
+        unsigned get_overlap() const
         {
           return _overlap;
         }
 
-        PolytopeLevels get_level()
+        PolytopeLevels get_level() const
         {
           return _level;
         }
