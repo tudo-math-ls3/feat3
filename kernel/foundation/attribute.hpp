@@ -6,7 +6,6 @@
 #include <vector>
 #include <kernel/foundation/attribute_error.hpp>
 #include <kernel/foundation/communication.hpp>
-#include <kernel/foundation/buffer.hpp>
 #include<kernel/archs.hpp>
 
 using namespace FEAST::Archs;

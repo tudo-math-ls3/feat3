@@ -4,7 +4,6 @@
 
 #include<kernel/base_header.hpp>
 #include<kernel/util/cpp11_smart_pointer.hpp>
-#include<kernel/foundation/communication.hpp>
 #include<vector>
 
 namespace FEAST

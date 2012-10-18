@@ -8,6 +8,7 @@
 #include <kernel/foundation/base.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication_error.hpp>
+#include <kernel/foundation/buffer.hpp>
 
 #include <vector>
 
@@ -17,7 +18,7 @@ namespace FEAST
   namespace Foundation
   {
     ///Communication modes used in Comm implementation or pass-over to backends
-    enum CommModes
+    enum Tier0CommModes
     {
       com_send = 0,
       com_receive,
@@ -28,7 +29,7 @@ namespace FEAST
         //TODO...
     };
 
-    enum CommModesInterface
+    enum Tier1CommModes
     {
       com_send_replace = 0,
       com_recv_replace,
@@ -38,7 +39,7 @@ namespace FEAST
       com_max
     };
 
-    template<typename B_, CommModes c_>
+    template<typename B_, Tier0CommModes c_>
     class Communicateable
     {
     };
@@ -54,12 +55,12 @@ namespace FEAST
                                int sourcerank) = 0;
     };
 
-    template<typename T_, CommModes c_>
+    template<typename T_, Tier0CommModes c_>
     class CommunicateableByAggregates
     {
     };
 
-    ///implemented by Foundation datastructures that can be communicated but don't need to be buffered because all their aggregates already are
+    ///inherited by Foundation datastructures that can be communicated but don't need to be buffered because all their aggregates already are
     template<typename T_>
     class CommunicateableByAggregates<T_, com_send_receive>
     {
@@ -84,11 +85,11 @@ namespace FEAST
         }
     };
 
-    template<unsigned overlap_, CommModesInterface op_>
+    template<unsigned overlap_, Tier1CommModes op_>
     class InterfacedComm
     {
-      template<typename HaloType_>
-      static void execute(const HaloType_& interface)
+      template<typename HaloType_,typename AT_>
+      static void execute(const HaloType_& interface, AT_* fct)
       {
         ///TODO generalize for all other overlaps than 0
         std::cout << "WARNING: false template instantiation!" << std::endl;
@@ -110,10 +111,13 @@ namespace FEAST
                    typename,
                    template<typename, typename> class,
                    typename>
-           class HaloType_>
-         static void execute(const HaloType_<0, a_, b_, c_, d_>& interface )
+           class HaloType_,
+           typename AT_>
+         static void execute(const HaloType_<0, a_, b_, c_, d_>& interface, AT_* fct)
          {
-           ///TODO
+           //acquire buffers
+           //std::shared_ptr<BufferedSharedArray<DT_> > sendbuf(new BufferedSharedArray<DT_>(halo.size()));
+           //std::shared_ptr<BufferedSharedArray<DT_> > recvbuf(new BufferedSharedArray<DT_>(halo.size()));
          }
     };
 
