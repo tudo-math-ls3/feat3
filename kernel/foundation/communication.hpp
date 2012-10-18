@@ -84,7 +84,7 @@ namespace FEAST
         }
     };
 
-    template<unsigned overlap_, CommModesInterface op_ = com_exchange>
+    template<unsigned overlap_, CommModesInterface op_>
     class InterfacedComm
     {
       template<typename HaloType_>
@@ -96,8 +96,8 @@ namespace FEAST
       }
     };
 
-    template<CommModesInterface op_>
-    class InterfacedComm<0, op_>
+    template<>
+    class InterfacedComm<0, com_exchange>
     {
       public:
         template<
