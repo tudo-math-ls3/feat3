@@ -51,7 +51,7 @@ namespace FEAST
     class Attribute :
       public AttributeBase<StorageType_>,
       public Bufferable<BufferedData<StorageType_> >,
-      public Communicateable<BufferedData<StorageType_> >
+      public Communicateable<BufferedData<StorageType_>, com_send_receive >
     {
       public:
         Attribute() :

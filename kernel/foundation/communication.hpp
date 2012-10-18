@@ -25,10 +25,15 @@ namespace FEAST
         //TODO...
     };
 
+    template<typename B_, CommModes c_>
+    class Communicateable
+    {
+    };
+
     ///TODO send_recv->tparam CommOp_ ?
     ///implemented by Bufferable Foundation datastructures that can be communicated
     template<typename BufferType_>
-    class Communicateable
+    class Communicateable<BufferType_, com_send_receive>
     {
       public:
         virtual void send_recv(BufferType_& senddata,
@@ -37,9 +42,14 @@ namespace FEAST
                                int sourcerank) = 0;
     };
 
+    template<typename T_, CommModes c_>
+    class CommunicateableByAggregates
+    {
+    };
+
     ///implemented by Foundation datastructures that can be communicated but don't need to be buffered because all their aggregates already are
     template<typename T_>
-    class CommunicateableByAggregates
+    class CommunicateableByAggregates<T_, com_send_receive>
     {
       public:
         template<typename AggregateStorageType_>

@@ -40,8 +40,8 @@ namespace FEAST
              template<typename, typename> class StorageType_ = std::vector,
              typename IndexType_ = Index>
     class Halo :
-      public Communicateable<BufferedData<StorageType_> >,
-      public Bufferable<BufferedData<StorageType_> >
+      public Bufferable<BufferedData<StorageType_> >,
+      public Communicateable<BufferedData<StorageType_>, com_send_receive>
     {
       public:
         ///type exports:

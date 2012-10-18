@@ -41,7 +41,7 @@ namespace FEAST
       typename StorageType_ = std::vector<IndexType_> >
     class Topology :
       public Bufferable<BufferedData<OuterStorageType_> >,
-      public Communicateable<BufferedData<OuterStorageType_> >
+      public Communicateable<BufferedData<OuterStorageType_>, com_send_receive>
     {
       public:
         ///type exports
@@ -247,7 +247,7 @@ namespace FEAST
           }
         }
 
-        ///implementation of Bufferable interface
+        ///implementation of Communicateable interface
         void send_recv(BufferedData<OuterStorageType_>& sendbuffers,
                        int destrank,
                        BufferedData<OuterStorageType_>& recvbuffers,

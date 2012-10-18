@@ -112,7 +112,7 @@ namespace FEAST
       template <typename, typename> class OuterAttributeStorageType_ = std::vector
       >
     class Mesh :
-      public CommunicateableByAggregates<TopologyType_>
+      public CommunicateableByAggregates<TopologyType_, com_send_receive>
     {
       public:
         friend class MeshAttributeRegistration;
