@@ -392,9 +392,13 @@ void check_halobased_attribute_transfer(int rank)
     InterfacedComm<0, com_exchange>::execute(h, attr);
 
     TestResult<double> res[2];
+#ifndef FEAST_SERIAL_MODE
     res[0] = test_check_equal_within_eps(attr.at(10), rank == 0 ? double(43) : double(42), std::numeric_limits<float>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(100), rank == 0 ? double(48) : double(47), std::numeric_limits<float>::epsilon());
-
+#else
+    res[0] = test_check_equal_within_eps(attr.at(10), double(42), std::numeric_limits<float>::epsilon());
+    res[1] = test_check_equal_within_eps(attr.at(100), double(47), std::numeric_limits<float>::epsilon());
+#endif
     bool passed(true);
     for(Index i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
