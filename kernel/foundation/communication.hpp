@@ -12,6 +12,8 @@
 
 #include <vector>
 
+using namespace FEAST::Archs;
+
 
 namespace FEAST
 {
@@ -38,89 +40,6 @@ namespace FEAST
       com_min,
       com_max
     };
-
-    template<typename B_, Tier0CommModes c_>
-    class Communicateable
-    {
-    };
-
-    ///implemented by Bufferable Foundation datastructures that can be communicated
-    template<typename BufferType_>
-    class Communicateable<BufferType_, com_send_receive>
-    {
-      public:
-        virtual void send_recv(BufferType_& senddata,
-                               int destrank,
-                               BufferType_& recvdata,
-                               int sourcerank) = 0;
-    };
-
-    template<typename T_, Tier0CommModes c_>
-    class CommunicateableByAggregates
-    {
-    };
-
-    ///inherited by Foundation datastructures that can be communicated but don't need to be buffered because all their aggregates already are
-    template<typename T_>
-    class CommunicateableByAggregates<T_, com_send_receive>
-    {
-      public:
-        template<typename AggregateStorageType_>
-        void send_recv(AggregateStorageType_& aggregates_to_communicate,
-                       int destrank,
-                       int sourcerank,
-                       Index estimated_size_increase = 0)
-        {
-          for(Index i(0) ; i < aggregates_to_communicate.size() ; ++i)
-          {
-            typename T_::buffer_type_ sendbuf(aggregates_to_communicate.at(i).buffer());
-            typename T_::buffer_type_ recvbuf(aggregates_to_communicate.at(i).buffer(estimated_size_increase));
-
-            aggregates_to_communicate.at(i).to_buffer(sendbuf);
-
-            aggregates_to_communicate.at(i).send_recv(sendbuf, destrank, recvbuf, sourcerank);
-
-            aggregates_to_communicate.at(i).from_buffer(recvbuf);
-          }
-        }
-    };
-
-    template<unsigned overlap_, Tier1CommModes op_>
-    class InterfacedComm
-    {
-      template<typename HaloType_,typename AT_>
-      static void execute(const HaloType_& interface, AT_* fct)
-      {
-        ///TODO generalize for all other overlaps than 0
-        std::cout << "WARNING: false template instantiation!" << std::endl;
-        ///TODO generalize for all other overlaps than 0
-      }
-    };
-
-    template<>
-    class InterfacedComm<0, com_exchange>
-    {
-      public:
-        template<
-          PolytopeLevels a_,
-          typename b_,
-          template<typename, typename> class c_,
-          typename d_,
-          template<unsigned,
-                   PolytopeLevels,
-                   typename,
-                   template<typename, typename> class,
-                   typename>
-           class HaloType_,
-           typename AT_>
-         static void execute(const HaloType_<0, a_, b_, c_, d_>& interface, AT_* fct)
-         {
-           //acquire buffers
-           //std::shared_ptr<BufferedSharedArray<DT_> > sendbuf(new BufferedSharedArray<DT_>(halo.size()));
-           //std::shared_ptr<BufferedSharedArray<DT_> > recvbuf(new BufferedSharedArray<DT_>(halo.size()));
-         }
-    };
-
 
 #ifndef FEAST_SERIAL_MODE
     template <typename DT_>
@@ -179,25 +98,8 @@ namespace FEAST
       };
 #endif
 
-    template<typename TopologyType_>
-      struct CommStructures
-      {
-        CommStructures(const TopologyType_& n, const TopologyType_& p) :
-          network(n),
-          patch_mesh(p),
-          patch_process_map(TopologyType_())
-        {
-        }
-
-        const TopologyType_& network;
-        const TopologyType_& patch_mesh;
-        TopologyType_ patch_process_map;
-        TopologyType_ process_patch_map;
-      };
-
-
     /**
-     * \brief Communication implementation or backend pass-over
+     * \brief Tier-0 Communication implementation or backend pass-over
      *
      * See specialisations.
      *
@@ -278,6 +180,146 @@ namespace FEAST
           //TODO
       };
 #endif
+
+    template<typename B_, Tier0CommModes c_>
+    class Communicateable
+    {
+    };
+
+    ///implemented by Bufferable Foundation datastructures that can be communicated
+    template<typename BufferType_>
+    class Communicateable<BufferType_, com_send_receive>
+    {
+      public:
+        virtual void send_recv(BufferType_& senddata,
+                               int destrank,
+                               BufferType_& recvdata,
+                               int sourcerank) = 0;
+    };
+
+    template<typename T_, Tier0CommModes c_>
+    class CommunicateableByAggregates
+    {
+    };
+
+    ///inherited by Foundation datastructures that can be communicated but don't need to be buffered because all their aggregates already are
+    template<typename T_>
+    class CommunicateableByAggregates<T_, com_send_receive>
+    {
+      public:
+        template<typename AggregateStorageType_>
+        void send_recv(AggregateStorageType_& aggregates_to_communicate,
+                       int destrank,
+                       int sourcerank,
+                       Index estimated_size_increase = 0)
+        {
+          for(Index i(0) ; i < aggregates_to_communicate.size() ; ++i)
+          {
+            typename T_::buffer_type_ sendbuf(aggregates_to_communicate.at(i).buffer());
+            typename T_::buffer_type_ recvbuf(aggregates_to_communicate.at(i).buffer(estimated_size_increase));
+
+            aggregates_to_communicate.at(i).to_buffer(sendbuf);
+
+            aggregates_to_communicate.at(i).send_recv(sendbuf, destrank, recvbuf, sourcerank);
+
+            aggregates_to_communicate.at(i).from_buffer(recvbuf);
+          }
+        }
+    };
+
+    /**
+     * \brief Tier-1 Communication implementation or backend pass-over
+     *
+     * See specialisations.
+     *
+     * \author Markus Geveler
+     */
+    template<unsigned overlap_, Tier1CommModes op_>
+    class InterfacedComm
+    {
+      template<typename HaloType_,typename AT_>
+      static void execute(const HaloType_& interface, AT_* fct)
+      {
+        ///TODO generalize for all other overlaps than 0
+        std::cout << "WARNING: false template instantiation!" << std::endl;
+        ///TODO generalize for all other overlaps than 0
+      }
+    };
+
+    template<>
+    class InterfacedComm<0, com_exchange>
+    {
+      public:
+        template<
+          PolytopeLevels a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+                   PolytopeLevels,
+                   typename,
+                   template<typename, typename> class,
+                   typename>
+           class HaloType_,
+           typename AT_>
+         static void execute(const HaloType_<0, a_, b_, c_, d_>& interface, AT_* fct)
+         {
+           //acquire buffers
+           std::shared_ptr<SharedArrayBase > sendbuf(BufferedSharedArray<typename AT_::data_type_>::create(interface.size()));
+           std::shared_ptr<SharedArrayBase > recvbuf(BufferedSharedArray<typename AT_::data_type_>::create(interface.size()));
+
+           //collect data
+           for(Index i(0) ; i < interface.size() ; ++i)
+           {
+             (*((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get())))[i] = fct->at(interface.get_element(i));
+           }
+
+           //post send_recv
+           ///TODO validate via mesh reference, that polytope level is correct
+#ifndef FEAST_SERIAL_MODE
+          Comm<Parallel>::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
+              interface.size(),
+              interface.get_other(),
+              ((BufferedSharedArray<typename AT_::data_type_>*)(recvbuf.get()))->get(),
+              interface.size(),
+              interface.get_other());
+#else
+          Comm<Serial>::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
+              interface.size(),
+              interface.get_other(),
+              ((BufferedSharedArray<typename AT_::data_type_>*)(recvbuf.get()))->get(),
+              interface.size(),
+              interface.get_other());
+#endif
+          //reset values
+           for(Index i(0) ; i < interface.size() ; ++i)
+           {
+              fct->at(interface.get_element(i)) = (*((BufferedSharedArray<typename AT_::data_type_>*)(recvbuf.get())))[i];
+           }
+
+           //buffers are destroyed automatically
+         }
+    };
+
+
+
+    template<typename TopologyType_>
+      struct CommStructures
+      {
+        CommStructures(const TopologyType_& n, const TopologyType_& p) :
+          network(n),
+          patch_mesh(p),
+          patch_process_map(TopologyType_())
+        {
+        }
+
+        const TopologyType_& network;
+        const TopologyType_& patch_mesh;
+        TopologyType_ patch_process_map;
+        TopologyType_ process_patch_map;
+      };
+
+
 
     /**
      * \brief Communication implementation or backend pass-over

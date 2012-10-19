@@ -58,6 +58,7 @@ namespace FEAST
         {
         }
 
+        typedef DataType_ data_type_;
         typedef Attribute<DataType_, StorageType_> exact_type_;
         typedef BufferedData<StorageType_> buffer_type_;
 
