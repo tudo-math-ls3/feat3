@@ -239,23 +239,17 @@ namespace FEAST
      *
      * \author Markus Geveler
      */
-    template<unsigned overlap_, Tier1CommModes op_>
+    template<Tier1CommModes op_>
     class InterfacedComm
     {
-      template<typename HaloType_,typename AT_>
-      static void execute(const HaloType_& interface, AT_& fct)
-      {
-        ///TODO generalize for all other overlaps than 0
-        std::cout << "WARNING: false template instantiation!" << std::endl;
-        ///TODO generalize for all other overlaps than 0
-      }
     };
 
     template<>
-    class InterfacedComm<0, com_exchange>
+    class InterfacedComm<com_exchange>
     {
       public:
         template<
+          unsigned delta_,
           PolytopeLevels a_,
           typename b_,
           template<typename, typename> class c_,
@@ -267,7 +261,7 @@ namespace FEAST
                    typename>
            class HaloType_,
            typename AT_>
-         static void execute(const HaloType_<0, a_, b_, c_, d_>& interface, AT_& fct)
+         static void execute(const HaloType_<delta_, a_, b_, c_, d_>& interface, AT_& fct)
          {
            //acquire buffers
            std::shared_ptr<SharedArrayBase > sendbuf(BufferedSharedArray<typename AT_::data_type_>::create(interface.size()));

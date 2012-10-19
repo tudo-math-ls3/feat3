@@ -121,7 +121,7 @@ class CommunicationTest:
       TEST_CHECK_EQUAL(h.get_element_counterpart(0u), 0u);
       TEST_CHECK_EQUAL(h.get_element_counterpart(1u), 1u);
 
-      Foundation::InterfacedComm<0, Foundation::com_exchange>::execute(h, *(Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()));
+      Foundation::InterfacedComm<Foundation::com_exchange>::execute(h, *(Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()));
 
       //reference to m4 would have been resolved locally
       /*Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
