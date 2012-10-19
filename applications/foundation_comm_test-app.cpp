@@ -85,7 +85,7 @@ void check_sendrecv(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (sendrecv)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: sendrecv)" << std::endl;
   }
 
   delete[] f;
@@ -137,7 +137,7 @@ void check_halo_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (halo_transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: halo_transfer)" << std::endl;
 #else
     TestResult<Index> res[2];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank, Index(1));
@@ -151,7 +151,7 @@ void check_halo_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (halo_transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: halo_transfer)" << std::endl;
 #endif
 
   }
@@ -198,7 +198,7 @@ void check_attribute_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (attr_transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: attr_transfer)" << std::endl;
 #else
     TestResult<double> res[2];
     res[0] = test_check_equal_within_eps(attr.at(0), double(0), std::numeric_limits<double>::epsilon());
@@ -212,7 +212,7 @@ void check_attribute_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (attr_transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: attr_transfer)" << std::endl;
 #endif
   }
 }
@@ -265,7 +265,7 @@ void check_topology_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (topology_transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: topology_transfer)" << std::endl;
 #else
     TestResult<Index> res[4];
     res[0] = test_check_equal_within_eps(t.at(0).at(0), Index(42), Index(1));
@@ -282,7 +282,7 @@ void check_topology_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (topology_transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: topology_transfer)" << std::endl;
 #endif
   }
 }
@@ -367,8 +367,45 @@ void check_mesh_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (mesh_transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: mesh_transfer)" << std::endl;
 
+  }
+}
+
+void check_halobased_attribute_transfer(int rank)
+{
+  if(rank < 2)
+  {
+    Attribute<double> attr;
+    for(Index i(0) ; i < 100000 ; ++i)
+    {
+      attr.push_back(double(rank + i));
+    }
+    attr.at(10) = double(42 + rank);
+    attr.at(100) = double(47 + rank);
+
+    Mesh<> m(rank);
+    Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.add_element_pair(10, 999);
+    h.add_element_pair(100, 999);
+
+    InterfacedComm<0, com_exchange>::execute(h, attr);
+
+    TestResult<double> res[2];
+    res[0] = test_check_equal_within_eps(attr.at(10), rank == 0 ? double(43) : double(42), std::numeric_limits<float>::epsilon());
+    res[1] = test_check_equal_within_eps(attr.at(100), rank == 0 ? double(48) : double(47), std::numeric_limits<float>::epsilon());
+
+    bool passed(true);
+    for(Index i(0) ; i < 2 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-2: halo-based attribute transfer)" << std::endl;
   }
 }
 
@@ -385,6 +422,8 @@ int main(int argc, char* argv[])
   check_attribute_transfer(me);
   check_topology_transfer(me);
   check_mesh_transfer(me);
+
+  check_halobased_attribute_transfer(me);
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();
