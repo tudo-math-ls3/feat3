@@ -8,9 +8,6 @@
 
 namespace FEAST
 {
-  // Note: The following class is just an abstract description of an adjactor for the documentation -- it is not
-  // an actual class that should be compiled, therefore the class is inside a block reserved only for doxygen.
-#ifdef DOXYGEN
   /**
    * \brief Adjactor interface
    *
@@ -21,6 +18,9 @@ namespace FEAST
   class Adjactor
   {
   public:
+  // Note: The following class is just an abstract description of an adjactor for the documentation -- it is not
+  // an actual class that should be compiled, therefore the class is inside a block reserved only for doxygen.
+#ifdef DOXYGEN
     /**
      * \brief Adjactor image node iterator class.
      *
@@ -122,8 +122,136 @@ namespace FEAST
      * An iterator representing the first position past the last image node adjacent to \p domain_node.
      */
     ImageIterator image_end(Index domain_node) const;
-  }; // class Adjcuntor
 #endif // DOXYGEN
+
+    /**
+     * \brief Null-Image-Iterator class
+     *
+     * This class implements the ImageIterator interface which represents an empty image node set.
+     *
+     * \attention Trying to increment or dereference this iterator will throw an exception.
+     *
+     * \author Peter Zajac
+     */
+    class NullImageIterator
+    {
+    public:
+      /**
+       * \copydoc ImageIterator::operator++()
+       *
+       * \attention Calling this operator will throw an InternalError exception!
+       */
+      NullImageIterator& operator++()
+      {
+        throw InternalError("cannot increment NullImageIterator");
+      }
+
+      /**
+       * \copydoc ImageIterator::operator*()
+       *
+       * \attention Calling this operator will throw an InternalError exception!
+       */
+      Index operator*() const
+      {
+        throw InternalError("cannot dereference NullImageIterator");
+      }
+
+      /**
+       * \copydoc ImageIterator::operator!=()
+       *
+       * \remark As all NullImageIterators are equal by definition, this operator always returns \c false.
+       */
+      bool operator!=(const NullImageIterator&) const
+      {
+        // NullImageIterators are always equal
+        return false;
+      }
+    }; // class Adjactor::NullImageIterator
+
+    /**
+     * \brief Index-Image-Iterator class
+     *
+     * This class implements the ImageIterator interface which represents a consecutive image node set.
+     *
+     * \author Peter Zajac
+     */
+    class IndexImageIterator
+    {
+    protected:
+      /// the current index of the iterator
+      Index _index;
+
+    public:
+      /// default constructor
+      IndexImageIterator() :
+        _index(0)
+      {
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] index
+       * The index of the iterator
+       */
+      explicit IndexImageIterator(Index index) :
+        _index(index)
+      {
+      }
+
+      /// copy constructor
+      IndexImageIterator(const IndexImageIterator& other) :
+        _index(other._index)
+      {
+      }
+
+      /// assignment operator
+      IndexImageIterator& operator=(const IndexImageIterator& other)
+      {
+        _index = other._index;
+      }
+
+      /**
+       * \brief Pre-increment operator
+       *
+       * This function will increment the iterator's #_index member variable by 1.
+       *
+       * \returns \p *this
+       */
+      IndexImageIterator& operator++()
+      {
+        ++_index;
+        return *this;
+      }
+
+      /**
+       * \brief Dereferentiation operator
+       *
+       * This function will return the index stored in the iterator.
+       *
+       * \returns
+       * The index of the iterator.
+       */
+      Index operator*() const
+      {
+        return _index;
+      }
+
+      /**
+       * \brief Checks two iterators for inequality.
+       *
+       * \param[in] other
+       * The index-iterator to be checked against.
+       *
+       * \returns
+       * \c false if the iterator's #_index member variables are identical, otherwise \c true.
+       */
+      bool operator!=(const IndexImageIterator& other) const
+      {
+        return _index != other._index;
+      }
+    }; // class Adjactor::IndexImageIterator
+  }; // class Adjactor
 
   /**
    * \brief Composite Adjactor implementation
