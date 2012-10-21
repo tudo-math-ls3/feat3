@@ -209,6 +209,7 @@ namespace FEAST
       IndexImageIterator& operator=(const IndexImageIterator& other)
       {
         _index = other._index;
+        return *this;
       }
 
       /**
