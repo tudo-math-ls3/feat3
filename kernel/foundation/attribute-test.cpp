@@ -38,6 +38,8 @@ class AttributeTest:
       {
         TEST_CHECK_EQUAL(((Foundation::Attribute<DataType1_, ST_>*)attrs.at(0).get())->at(j), DataType1_(5 + j));
         TEST_CHECK_EQUAL(((Foundation::Attribute<DataType2_, ST_>*)attrs.at(1).get())->at(j), DataType2_(5 * j));
+        TEST_CHECK_EQUAL((*((Foundation::Attribute<DataType1_, ST_>*)attrs.at(0).get()))[j], DataType1_(5 + j));
+        TEST_CHECK_EQUAL((*((Foundation::Attribute<DataType2_, ST_>*)attrs.at(1).get()))[j], DataType2_(5 * j));
       }
     }
 };

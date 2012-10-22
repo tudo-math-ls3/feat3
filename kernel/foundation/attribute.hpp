@@ -77,12 +77,27 @@ namespace FEAST
           return Index(_data.size());
         }
 
-        void push_back(DataType_ d)
+        void push_back(const DataType_ d)
         {
           _data.push_back(d);
         }
 
-        DataType_& at(Index i)
+        DataType_& at(const Index i)
+        {
+          return _data.at(i);
+        }
+
+        DataType_& at(const Index i) const
+        {
+          return _data.at(i);
+        }
+
+        DataType_& operator[](const Index i) const
+        {
+          return _data.at(i);
+        }
+
+        DataType_& operator[](const Index i)
         {
           return _data.at(i);
         }
