@@ -514,7 +514,6 @@ int main(int argc, char* argv[])
   check_attribute_transfer(me);
   check_topology_transfer(me);
   check_mesh_transfer(me);
-
   check_halobased_attribute_transfer(me);
   check_halobased_dv_transfer(me);
   check_halobased_smcsr_transfer(me);
