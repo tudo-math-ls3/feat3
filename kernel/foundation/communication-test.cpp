@@ -1,3 +1,4 @@
+#define FEAST_SERIAL_MODE
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
@@ -121,18 +122,13 @@ class CommunicationTest:
       TEST_CHECK_EQUAL(h.get_element_counterpart(0u), 0u);
       TEST_CHECK_EQUAL(h.get_element_counterpart(1u), 1u);
 
-      Foundation::InterfacedComm<Foundation::com_exchange>::execute(h, *(Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()));
+      Foundation::InterfacedComm<Tag_, Foundation::com_exchange>::execute(h, *(Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()));
 
-      //reference to m4 would have been resolved locally
-      /*Foundation::Communication<0, Foundation::com_send_receive, double, Tag_>::execute(h, 0u, m4, 0u);
-      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(0), 3333.);
-      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(1), 4444.);
-      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->get_data().at(0), 42.);
-      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m4.at(0).get()))->get_data().at(1), 47.);
-*/
+      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(0), 42.);
+      TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(1), 47.);
     }
 };
-CommunicationTest<Archs::Serial, unsigned long, std::vector, std::vector<unsigned long> > halo_test_cpu_v_v("std::vector, std::vector");
-CommunicationTest<Archs::Serial, unsigned long, std::deque, std::vector<unsigned long> > halo_test_cpu_d_v("std::deque, std::vector");
-CommunicationTest<Archs::Serial, unsigned long, std::vector, std::deque<unsigned long> > halo_test_cpu_v_d("std::vector, std::deque");
-CommunicationTest<Archs::Serial, unsigned long, std::deque, std::deque<unsigned long> > halo_test_cpu_d_d("std::deque, std::deque");
+CommunicationTest<Archs::CPU, unsigned long, std::vector, std::vector<unsigned long> > halo_test_cpu_v_v("std::vector, std::vector");
+CommunicationTest<Archs::CPU, unsigned long, std::deque, std::vector<unsigned long> > halo_test_cpu_d_v("std::deque, std::vector");
+CommunicationTest<Archs::CPU, unsigned long, std::vector, std::deque<unsigned long> > halo_test_cpu_v_d("std::vector, std::deque");
+CommunicationTest<Archs::CPU, unsigned long, std::deque, std::deque<unsigned long> > halo_test_cpu_d_d("std::deque, std::deque");

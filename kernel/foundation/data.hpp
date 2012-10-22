@@ -20,6 +20,8 @@ namespace FEAST
         meshes_on_process_patch(StorageType_<MeshType_, std::allocator<MeshType_> >()),
         halos_on_process_patch(StorageType_<HaloType_, std::allocator<HaloType_> >()),
         mesh_halo_map(TopologyType_()),
+        hierachic_mesh_map(TopologyType_()),
+        local_global_index_map(TopologyType_()),
         functions_on_process_patch(typename MeshType_::attr_base_type_())
       {
       }
@@ -27,6 +29,8 @@ namespace FEAST
       StorageType_<MeshType_, std::allocator<MeshType_> > meshes_on_process_patch;
       StorageType_<HaloType_, std::allocator<HaloType_> > halos_on_process_patch;
       TopologyType_ mesh_halo_map;
+      TopologyType_ hierachic_mesh_map;
+      TopologyType_ local_global_index_map;
       typename MeshType_::attr_base_type_ functions_on_process_patch;
     };
 

@@ -31,7 +31,7 @@ namespace FEAST
         //TODO...
     };
 
-    enum Tier1CommModes
+    enum Tier2CommModes
     {
       com_send_replace = 0,
       com_recv_replace,
@@ -239,15 +239,17 @@ namespace FEAST
      *
      * \author Markus Geveler
      */
-    template<Tier1CommModes op_>
+    template<typename ContainerBackend_, Tier2CommModes op_>
     class InterfacedComm
     {
     };
 
-    template<>
-    class InterfacedComm<com_exchange>
+    template<typename ContainerBackend_>
+    class InterfacedComm<ContainerBackend_, com_exchange>
     {
       public:
+
+        ///implementation for Foundation datastructures (Attribute<.>)
         template<
           unsigned delta_,
           PolytopeLevels a_,
@@ -298,6 +300,7 @@ namespace FEAST
 
            //buffers are destroyed automatically
          }
+
     };
 
     template<typename TopologyType_>

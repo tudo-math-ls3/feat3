@@ -389,7 +389,7 @@ void check_halobased_attribute_transfer(int rank)
     h.add_element_pair(10, 999);
     h.add_element_pair(100, 999);
 
-    InterfacedComm<com_exchange>::execute(h, attr);
+    InterfacedComm<Archs::CPU, com_exchange>::execute(h, attr);
 
     TestResult<double> res[2];
 #ifndef FEAST_SERIAL_MODE
