@@ -10,6 +10,7 @@
 #include <kernel/foundation/communication_error.hpp>
 #include <kernel/foundation/buffer.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 #include <vector>
 
@@ -250,6 +251,7 @@ namespace FEAST
     class InterfacedComm<ContainerBackend_, com_exchange>
     {
       public:
+        ///TODO think Halo<...pl_vertex...> implementations
 
         ///implementation for Foundation datastructures (Attribute<.>)
         template<
@@ -354,6 +356,49 @@ namespace FEAST
            }
          }
 
+        ///implementation for lafem smcsr
+        template<
+          unsigned delta_,
+          PolytopeLevels a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+                   PolytopeLevels,
+                   typename,
+                   template<typename, typename> class,
+                   typename>
+           class HaloType_,
+           typename DT_>
+         static void execute(const HaloType_<delta_, a_, b_, c_, d_>& interface, SparseMatrixCSR<ContainerBackend_, DT_>& mat)
+         {
+           DT_* val(mat.val());
+           Index* row_ptr(mat.row_ptr());
+           Index* row_ptr_end(mat.row_ptr_end());
+           Index* col_ind(mat.col_ind());
+
+           ///TODO: does assume, matrix rows are associated with polytope level a_
+           ///TODO: does assume, interface uses same index set (numbering!!) as matrix
+           //directly replace row i
+           for(Index i(0); i < interface.size() ; ++i)
+           {
+#ifndef FEAST_SERIAL_MODE
+             Comm<Parallel>::send_recv(&val[row_ptr[interface.get_element(i)]],
+                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 interface.get_other(),
+                 &val[row_ptr[interface.get_element(i)]],
+                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 interface.get_other());
+#else
+             Comm<Serial>::send_recv(&val[row_ptr[interface.get_element(i)]],
+                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 interface.get_other(),
+                 &val[row_ptr[interface.get_element(i)]],
+                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 interface.get_other());
+#endif
+           }
+         }
     };
 
     template<typename TopologyType_>

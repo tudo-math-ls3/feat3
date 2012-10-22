@@ -12,6 +12,8 @@
 #include <kernel/foundation/topology.hpp>
 #include <kernel/foundation/mesh.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 using namespace FEAST;
 using namespace Foundation;
@@ -450,7 +452,52 @@ void check_halobased_dv_transfer(int rank)
       }
 
     if(passed)
-      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-2: halo-based dv transfer)" << std::endl;
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-2: halo-based lafem dv transfer)" << std::endl;
+  }
+}
+
+void check_halobased_smcsr_transfer(int rank)
+{
+  if(rank < 2)
+  {
+    SparseMatrixCOO<CPU, float> smcoo(1000, 1000);
+    smcoo(0, 0, float(rank + 42));
+    smcoo(0, 1, float(rank + 43));
+    smcoo(1, 0, float(rank + 47));
+    smcoo(1, 1, float(rank + 48));
+
+    SparseMatrixCSR<CPU, float> smcsr(smcoo);
+
+    Mesh<> m(rank);
+    Halo<0, pl_vertex, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.add_element_pair(0, 999);
+    h.add_element_pair(1, 999);
+
+    InterfacedComm<Archs::CPU, com_exchange>::execute(h, smcsr);
+
+    TestResult<float> res[4];
+#ifndef FEAST_SERIAL_MODE
+    res[0] = test_check_equal_within_eps(smcsr(0, 0), rank == 0 ? float(43) : float(42), std::numeric_limits<float>::epsilon());
+    res[1] = test_check_equal_within_eps(smcsr(0, 1), rank == 0 ? float(44) : float(43), std::numeric_limits<float>::epsilon());
+    res[2] = test_check_equal_within_eps(smcsr(1, 0), rank == 0 ? float(48) : float(47), std::numeric_limits<float>::epsilon());
+    res[3] = test_check_equal_within_eps(smcsr(1, 1), rank == 0 ? float(49) : float(48), std::numeric_limits<float>::epsilon());
+#else
+    res[0] = test_check_equal_within_eps(smcsr(0, 0), float(42), std::numeric_limits<float>::epsilon());
+    res[1] = test_check_equal_within_eps(smcsr(0, 1), float(43), std::numeric_limits<float>::epsilon());
+    res[2] = test_check_equal_within_eps(smcsr(1, 0), float(47), std::numeric_limits<float>::epsilon());
+    res[3] = test_check_equal_within_eps(smcsr(1, 1), float(48), std::numeric_limits<float>::epsilon());
+#endif
+    bool passed(true);
+    for(Index i(0) ; i < 4 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-2: halo-based lafem smcsr transfer)" << std::endl;
   }
 }
 
@@ -470,6 +517,7 @@ int main(int argc, char* argv[])
 
   check_halobased_attribute_transfer(me);
   check_halobased_dv_transfer(me);
+  check_halobased_smcsr_transfer(me);
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();
