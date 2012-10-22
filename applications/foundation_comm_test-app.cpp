@@ -413,6 +413,47 @@ void check_halobased_attribute_transfer(int rank)
   }
 }
 
+void check_halobased_dv_transfer(int rank)
+{
+  if(rank < 2)
+  {
+    DenseVector<CPU, double> attr(100000);
+    for(Index i(0) ; i < 100000 ; ++i)
+    {
+      attr(i, (double(rank + i)));
+    }
+    attr(10, double(42 + rank));
+    attr(100, double(47 + rank));
+
+    Mesh<> m(rank);
+    Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.add_element_pair(10, 999);
+    h.add_element_pair(100, 999);
+
+    InterfacedComm<Archs::CPU, com_exchange>::execute(h, attr);
+
+    TestResult<double> res[2];
+#ifndef FEAST_SERIAL_MODE
+    res[0] = test_check_equal_within_eps(attr(10), rank == 0 ? double(43) : double(42), std::numeric_limits<float>::epsilon());
+    res[1] = test_check_equal_within_eps(attr(100), rank == 0 ? double(48) : double(47), std::numeric_limits<float>::epsilon());
+#else
+    res[0] = test_check_equal_within_eps(attr(10), double(42), std::numeric_limits<float>::epsilon());
+    res[1] = test_check_equal_within_eps(attr(100), double(47), std::numeric_limits<float>::epsilon());
+#endif
+    bool passed(true);
+    for(Index i(0) ; i < 2 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-2: halo-based dv transfer)" << std::endl;
+  }
+}
+
 int main(int argc, char* argv[])
 {
   int me(0);
@@ -428,6 +469,7 @@ int main(int argc, char* argv[])
   check_mesh_transfer(me);
 
   check_halobased_attribute_transfer(me);
+  check_halobased_dv_transfer(me);
 
 #ifndef FEAST_SERIAL_MODE
   MPI_Finalize();

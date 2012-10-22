@@ -9,10 +9,12 @@
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication_error.hpp>
 #include <kernel/foundation/buffer.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 #include <vector>
 
 using namespace FEAST::Archs;
+using namespace FEAST::LAFEM;
 
 
 namespace FEAST
@@ -299,6 +301,56 @@ namespace FEAST
            }
 
            //buffers are destroyed automatically
+         }
+
+        ///implementation for lafem dv
+        template<
+          unsigned delta_,
+          PolytopeLevels a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+                   PolytopeLevels,
+                   typename,
+                   template<typename, typename> class,
+                   typename>
+           class HaloType_,
+           typename DT_>
+         static void execute(const HaloType_<delta_, a_, b_, c_, d_>& interface, DenseVector<ContainerBackend_, DT_>& fct)
+         {
+           //acquire buffers
+           DenseVector<ContainerBackend_, DT_> sendbuf(interface.size());
+           DenseVector<ContainerBackend_, DT_> recvbuf(interface.size());
+
+           //collect data
+           for(Index i(0) ; i < interface.size() ; ++i)
+           {
+             sendbuf(i, fct(interface.get_element(i)));
+           }
+
+           //post send_recv
+           ///TODO validate via mesh reference, that polytope level is correct
+#ifndef FEAST_SERIAL_MODE
+          Comm<Parallel>::send_recv(sendbuf.elements(),
+              interface.size(),
+              interface.get_other(),
+              recvbuf.elements(),
+              interface.size(),
+              interface.get_other());
+#else
+          Comm<Serial>::send_recv(sendbuf.elements(),
+              interface.size(),
+              interface.get_other(),
+              recvbuf.elements(),
+              interface.size(),
+              interface.get_other());
+#endif
+          //reset values
+           for(Index i(0) ; i < interface.size() ; ++i)
+           {
+              fct(interface.get_element(i), recvbuf(i));
+           }
          }
 
     };
