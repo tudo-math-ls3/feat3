@@ -16,6 +16,13 @@ namespace FEAST
       pl_face,
       pl_polyhedron
     };
+
+    enum Dimensions
+    {
+      dim_1D = 1,
+      dim_2D = 2,
+      dim_3D = 3
+    };
   }
 }
 #endif

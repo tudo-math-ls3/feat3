@@ -319,6 +319,7 @@ namespace FEAST
            typename DT_>
          static void execute(const HaloType_<delta_, a_, b_, c_, d_>& interface, DenseVector<ContainerBackend_, DT_>& fct)
          {
+           ///TODO: does assume, attribute for level a_ is stored in fct
            //acquire buffers
            DenseVector<ContainerBackend_, DT_> sendbuf(interface.size());
            DenseVector<ContainerBackend_, DT_> recvbuf(interface.size());

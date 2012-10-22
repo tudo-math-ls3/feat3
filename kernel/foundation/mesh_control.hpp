@@ -2,6 +2,7 @@
 #ifndef KERNEL_FOUNDATION_MESH_CONTROL_HPP
 #define KERNEL_FOUNDATION_MESH_CONTROL_HPP
 
+#include <kernel/foundation/base.hpp>
 #include <kernel/foundation/mesh.hpp>
 #include<kernel/geometry/conformal_mesh.hpp>
 
@@ -11,13 +12,6 @@ namespace FEAST
 {
   namespace Foundation
   {
-    enum Dimensions
-    {
-      dim_1D = 1,
-      dim_2D = 2,
-      dim_3D = 3
-    };
-
     template<Dimensions dim_>
     struct MeshControl
     {
