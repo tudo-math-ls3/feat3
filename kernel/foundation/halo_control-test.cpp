@@ -149,7 +149,7 @@ class HaloControlTest:
       Foundation::Halo<1, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
       h1.add_element_pair(0, 0);
 
-      Index* polytopes_in_subset1 = new Index[3]; //no overlap and one edge means two vertices but no faces
+      Index* polytopes_in_subset1 = new Index[3]; //overlap 1 and one face means 4 vertices and 4 edges
       Foundation::HaloControl<Foundation::dim_2D>::fill_sizes(h1, polytopes_in_subset1);
 
       TEST_CHECK_EQUAL(polytopes_in_subset1[0], Index(4));

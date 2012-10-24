@@ -80,6 +80,8 @@ namespace FEAST
           class HaloType_>
         static void fill_sizes(const HaloType_<a_, pl_face, b_, c_, d_>& halo, typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_* target)
         {
+          ASSERT(a_ != 0, "Error: Faces can not be 0-overlapped in 2D!");
+
           typedef typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_ IndexType;
 
           IndexType num_edges(0);
