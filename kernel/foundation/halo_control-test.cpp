@@ -168,6 +168,7 @@ class HaloControlTest:
       TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);*/
 
       delete[] polytopes_in_subset;
+      delete[] polytopes_in_subset1;
     }
 };
 HaloControlTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol_testvv("std::vector, std::vector");
