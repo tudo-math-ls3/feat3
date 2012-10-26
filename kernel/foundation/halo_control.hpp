@@ -258,6 +258,7 @@ namespace FEAST
         ///delta = i case: in 3D, halos with overlap = i can only be given by polyhedrons
         ///0, pl_polyhedron case
         template<
+          unsigned a_,
           typename b_,
           template<typename, typename> class c_,
           typename d_,
@@ -267,19 +268,19 @@ namespace FEAST
             template<typename, typename> class,
             typename>
           class HaloType_>
-        static void fill_sizes(const HaloType_<0, pl_polyhedron, b_, c_, d_>& halo, typename HaloType_<0, pl_polyhedron, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<a_, pl_polyhedron, b_, c_, d_>& halo, typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_* target)
         {
-          typedef typename HaloType_<0, pl_polyhedron, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_ IndexType;
 
           IndexType num_faces(0);
           IndexType num_edges(0);
           IndexType num_vertices(0);
-          typename HaloType_<0, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_faces;
-          typename HaloType_<0, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<0, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_faces;
+          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
-            typename HaloType_<0, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh().get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
+            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh().get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < faces.size() ; ++j)
             {
@@ -301,7 +302,7 @@ namespace FEAST
           ///for any face computed before, check edge and add if not yet added
           for(IndexType i(0) ; i < all_faces.size() ; ++i)
           {
-            typename HaloType_<0, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, all_faces.at(i)));
+            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, all_faces.at(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
@@ -323,7 +324,7 @@ namespace FEAST
           ///for any edge computed before, check vertex and add if not yet added
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
-            typename HaloType_<0, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
