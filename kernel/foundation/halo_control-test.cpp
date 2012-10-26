@@ -86,7 +86,18 @@ class HaloControlTest1D:
 
       TEST_CHECK_EQUAL(polytopes_in_subset[0], Index(1));
 
+      //create halo with one face-face pair
+      Foundation::Halo<1, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
+      h1.add_element_pair(0, 0);
+
+      Index* polytopes_in_subset1 = new Index[2]; //overlap 1 and one edge means 2 vertices
+      Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(h1, polytopes_in_subset1);
+
+      TEST_CHECK_EQUAL(polytopes_in_subset1[0], Index(2));
+      TEST_CHECK_EQUAL(polytopes_in_subset1[1], Index(1));
+
       delete[] polytopes_in_subset;
+      delete[] polytopes_in_subset1;
     }
 };
 HaloControlTest1D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol1d_testvv("std::vector, std::vector");
