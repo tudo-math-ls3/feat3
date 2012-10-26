@@ -55,7 +55,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class TrapezoidalDriver;
+    class TrapezoidalDriver DOXY({});
 
     // Simplex specialisation
     template<

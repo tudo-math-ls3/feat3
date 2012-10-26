@@ -47,7 +47,7 @@ namespace FEAST
         typename Weight_ = Real,
         typename Coord_ = Real,
         bool variadic_ = (Driver_<Weight_, Coord_>::variadic != 0)>
-      class DriverFactory;
+      class DriverFactory DOXY({});
 
       /**
        * \brief DriverFactory specialisation for non-variadic drivers.

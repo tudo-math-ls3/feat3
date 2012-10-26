@@ -93,7 +93,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class HammerStroudD2Driver;
+    class HammerStroudD2Driver DOXY({});
 
     // Simplex specialisation
     template<
@@ -170,7 +170,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class HammerStroudD3Driver;
+    class HammerStroudD3Driver DOXY({});
 
     // Simplex specialisation
     template<
@@ -259,7 +259,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class HammerStroudD5Driver;
+    class HammerStroudD5Driver DOXY({});
 
     // Simplex specialisation
     template<

@@ -69,7 +69,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class BarycentreDriver;
+    class BarycentreDriver DOXY({});
 
     // Simplex specialisation
     template<

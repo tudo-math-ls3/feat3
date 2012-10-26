@@ -33,7 +33,7 @@ namespace FEAST
       typename T_,
       int n_,
       int s_ = n_>
-    class Vector;
+    class Vector DOXY({});
 
     /**
      * \brief Tiny Matrix class template
@@ -60,7 +60,7 @@ namespace FEAST
       int n_,
       int sm_ = m_,
       int sn_ = n_>
-    class Matrix;
+    class Matrix DOXY({});
 
     /// \cond internal
     namespace Intern
@@ -561,7 +561,7 @@ namespace FEAST
        * \brief Returns the volume of the matrix.
        *
        * The volume of a matrix \e A is defined as:
-       * \f[ \text{vol}(A) := \sqrt{\text{det}(A^\top\cdot A)} \f]
+       * \f[ \textnormal{vol}(A) := \sqrt{\textnormal{det}(A^\top\cdot A)} \f]
        *
        * \note For \p m_ = \p n_, the volume of the matrix equals the absolute of its determinant.
        * \note For \p m_ < \p n_, the volume of the matrix is always zero.

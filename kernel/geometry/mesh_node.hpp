@@ -79,7 +79,7 @@ namespace FEAST
 
     // forward declarations
     template<typename Policy_>
-    class SubMeshNode;
+    class SubMeshNode DOXY({});
 
     /**
      * \brief Mesh Node base class

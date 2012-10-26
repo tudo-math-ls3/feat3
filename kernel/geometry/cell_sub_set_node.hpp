@@ -14,7 +14,7 @@ namespace FEAST
   {
     // forward declarations
     template<typename Policy_>
-    class CellSubSetNode;
+    class CellSubSetNode DOXY({});
 
     /* ***************************************************************************************** */
 

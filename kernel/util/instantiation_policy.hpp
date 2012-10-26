@@ -43,7 +43,7 @@ namespace FEAST
   template<
     typename T_,
     typename Tag_>
-  class InstantiationPolicy;
+  class InstantiationPolicy DOXY({});
 
 
   /**

@@ -127,7 +127,7 @@ namespace FEAST
       typename Coord_,
       typename Point_,
       bool variadic_ = (ScalarDriver_<Weight_, Coord_>::variadic != 0)>
-    class SimplexScalarFactory;
+    class SimplexScalarFactory DOXY({});
 
     template<
       template<typename,typename> class ScalarDriver_,

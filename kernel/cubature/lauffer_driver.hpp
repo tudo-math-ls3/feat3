@@ -73,7 +73,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class LaufferD2Driver;
+    class LaufferD2Driver DOXY({});
 
     // Simplex specialisation
     template<
@@ -177,7 +177,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class LaufferD4Driver;
+    class LaufferD4Driver DOXY({});
 
     // Tetrahedron specialisation
     template<

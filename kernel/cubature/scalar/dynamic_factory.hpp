@@ -108,7 +108,7 @@ namespace FEAST
       }; // class DynamicFactory<...>
 
       template<typename Rule_>
-      class DynamicFactorySelect;
+      class DynamicFactorySelect DOXY({});
 
       template<
         typename Weight_,

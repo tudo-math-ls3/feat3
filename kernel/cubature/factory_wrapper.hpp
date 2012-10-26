@@ -73,7 +73,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class FactoryExplicitWrapper;
+    class FactoryExplicitWrapper DOXY({});
 
     /**
      * \brief Explicit specialisation for Simplex<1> shape
@@ -443,7 +443,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class FactoryPartialWrapper;
+    class FactoryPartialWrapper DOXY({});
 
     /**
      * \brief Partial specialisation for Simplex shapes

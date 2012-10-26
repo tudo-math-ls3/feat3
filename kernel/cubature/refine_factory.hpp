@@ -105,7 +105,7 @@ namespace FEAST
     template<
       typename Factory_,
       bool variadic_ = (Factory_::variadic != 0)>
-    class RefineFactory;
+    class RefineFactory DOXY({});
 
     template<typename Factory_>
     class RefineFactory<Factory_, false> :

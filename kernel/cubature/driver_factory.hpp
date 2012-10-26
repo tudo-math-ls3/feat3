@@ -26,7 +26,7 @@ namespace FEAST
       typename Coord_ = Real,
       typename Point_ = Coord_[Shape_::dimension],
       bool variadic_ = (Driver_<Shape_, Weight_, Coord_, Point_>::variadic != 0)>
-    class DriverFactory;
+    class DriverFactory DOXY({});
 
     template<
       template<typename,typename,typename,typename> class Driver_,

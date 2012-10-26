@@ -15,7 +15,7 @@ namespace FEAST
       typename Weight_,
       typename Coord_,
       typename Point_>
-    class TensorProductDriver;
+    class TensorProductDriver DOXY({});
 
     template<
       typename Weight_,
@@ -224,7 +224,7 @@ namespace FEAST
       typename Coord_,
       typename Point_,
       bool variadic_ = (ScalarDriver_<Weight_, Coord_>::variadic != 0)>
-    class TensorProductFactory;
+    class TensorProductFactory DOXY({});
 
     template<
       template<typename,typename> class ScalarDriver_,

@@ -23,6 +23,8 @@
 // it is reserved for doxygen's preprocessor.
 #ifdef DOXYGEN
 #  error The DOXYGEN macro must not be defined at compile-time
+#else
+#  define DOXY(x)
 #endif
 
 /// \cond nodoxy
