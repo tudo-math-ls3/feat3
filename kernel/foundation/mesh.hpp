@@ -309,7 +309,30 @@ namespace FEAST
                 }
                 if(insert)
                 {
-                  result.push_back(to_insert);
+                  bool match_super(true);
+                  if(to_level < from_level)
+                  {
+                    //check if all vertices of to_insert are in super-polytope's vertex list
+                    typename TopologyType_::storage_type_ vertices(get_adjacent_polytopes(to_level, pl_vertex, to_insert));
+                    for(index_type_ l(0) ; l < vertices.size() ; ++l)
+                    {
+                      bool found(false);
+                      for(index_type_ m(0) ; m < _topologies.at(ipa).at(i).size() ; ++m)
+                      {
+                        if(_topologies.at(ipa).at(i).at(m) == vertices.at(l))
+                        {
+                          found = true;
+                          break;
+                        }
+                      }
+                      if(!found)
+                      {
+                        match_super = false;
+                      }
+                    }
+                  }
+                  if(match_super)
+                    result.push_back(to_insert);
                 }
               }
             }

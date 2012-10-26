@@ -83,7 +83,7 @@ public:
           0--1--2     *--*--*
         2 | 3|  |4    | 0| 1|
           3--4--5     *--*--*
-          5  6
+           5  6
     */
     m3.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
     TopologyStorageType test_0(m3.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, 0));
@@ -259,21 +259,17 @@ public:
 
     //testing face-edge access
     TopologyStorageType test_1(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_edge, 0));
-    if(test_1.size() != 6ul) return false;
+    if(test_1.size() != 4ul) return false;
     if(test_1.at(0) != 0ul) return false;
     if(test_1.at(1) != 2ul) return false;
-    if(test_1.at(2) != 1ul) return false;
-    if(test_1.at(3) != 3ul) return false;
-    if(test_1.at(4) != 5ul) return false;
-    if(test_1.at(5) != 6ul) return false;
+    if(test_1.at(2) != 3ul) return false;
+    if(test_1.at(3) != 5ul) return false;
     TopologyStorageType test_2(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_edge, 1));
-    if(test_2.size() != 6ul) return false;
-    if(test_2.at(0) != 0ul) return false;
-    if(test_2.at(1) != 1ul) return false;
-    if(test_2.at(2) != 3ul) return false;
-    if(test_2.at(3) != 4ul) return false;
-    if(test_2.at(4) != 5ul) return false;
-    if(test_2.at(5) != 6ul) return false;
+    if(test_2.size() != 4ul) return false;
+    if(test_2.at(0) != 1ul) return false;
+    if(test_2.at(1) != 3ul) return false;
+    if(test_2.at(2) != 4ul) return false;
+    if(test_2.at(3) != 6ul) return false;
 
     //testing face-face access
     TopologyStorageType test_3(m3.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_face, 0));

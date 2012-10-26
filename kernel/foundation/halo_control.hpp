@@ -256,7 +256,7 @@ namespace FEAST
         }
 
         ///delta = i case: in 3D, halos with overlap = i can only be given by polyhedrons
-        ///0, pl_polyhedron case
+        ///i, pl_polyhedron case
         template<
           unsigned a_,
           typename b_,
