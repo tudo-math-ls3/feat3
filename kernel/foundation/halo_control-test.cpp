@@ -14,12 +14,93 @@ using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
-class HaloControlTest:
+class HaloControlTest1D:
   public TaggedTest<Tag_, IndexType_>
 {
   public:
-    HaloControlTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("HaloControlTest<" + tag + ">")
+    HaloControlTest1D(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("HaloControlTest1D<" + tag + ">")
+    {
+    }
+
+    void run() const
+    {
+      /* (0)  (1)
+       *  *----*
+       */
+
+      //create attributes for vertex coords
+      std::vector<std::shared_ptr<Foundation::AttributeBase<OT_> > > attrs;
+      attrs.push_back(std::shared_ptr<Foundation::AttributeBase<OT_> >(new Foundation::Attribute<double, OT_>)); //vertex x-coords
+
+      ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().push_back(double(double(0)));
+      ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().push_back(double(double(1)));
+
+      /*
+       *  *--0-*
+       *  0    1
+       */
+
+      //creating foundation mesh
+      Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
+      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+
+      m.add_polytope(Foundation::pl_vertex);
+      m.add_polytope(Foundation::pl_vertex);
+
+      m.add_polytope(Foundation::pl_edge);
+
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 0, 0);
+      m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 1, 0);
+
+      //creating conformal geometry mesh
+      IndexType_ index_set[] = {2, 1};
+      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Shape::Hypercube<1> > > confmeshtype_;
+      confmeshtype_ geo_m(index_set);
+
+      //transfer data
+      //Edge->Vertex
+      typename confmeshtype_::template IndexSet<1,0>::Type& geo_vertex_at_edge(geo_m.template get_index_set<1,0>());
+      for(IndexType_ i(0) ; i < m.get_topologies().at(Foundation::ipi_edge_vertex).size() ; ++i)
+      {
+        //get all adjacencies Edge->Vertex from foundation mesh
+        typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ found_vertex_at_edge_i(m.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, i));
+
+        for(IndexType_ j(0) ; j < found_vertex_at_edge_i.size() ; ++j)
+        {
+          geo_vertex_at_edge[i][j] = found_vertex_at_edge_i.at(j); //edge i, adjacent vertex j
+        }
+      }
+
+      typename confmeshtype_::VertexSetType& vertex_coord_tuples(geo_m.get_vertex_set());
+      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node
+      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(1);
+
+      //create halo with one edge-edge pair
+      Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
+      h.add_element_pair(1, 0);
+
+      //create CellSubSet
+      Index* polytopes_in_subset = new Index[2]; //no overlap and one vertex means one vertex
+      Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(h, polytopes_in_subset);
+
+      TEST_CHECK_EQUAL(polytopes_in_subset[0], Index(1));
+
+      delete[] polytopes_in_subset;
+    }
+};
+HaloControlTest1D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol1d_testvv("std::vector, std::vector");
+HaloControlTest1D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halocontrol1d_testvd("std::vector, std::deque");
+
+
+
+template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+class HaloControlTest2D:
+  public TaggedTest<Tag_, IndexType_>
+{
+  public:
+    HaloControlTest2D(const std::string & tag) :
+      TaggedTest<Tag_, IndexType_>("HaloControlTest2D<" + tag + ">")
     {
     }
 
@@ -171,5 +252,5 @@ class HaloControlTest:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol_testvv("std::vector, std::vector");
-HaloControlTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halocontrol_testvd("std::vector, std::deque");
+HaloControlTest2D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol_testvv("std::vector, std::vector");
+HaloControlTest2D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halocontrol_testvd("std::vector, std::deque");
