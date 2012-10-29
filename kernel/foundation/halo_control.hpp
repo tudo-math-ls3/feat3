@@ -388,6 +388,78 @@ namespace FEAST
           target[3] = IndexType(0);
         }
 
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const HaloType_<0, pl_face, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
+        {
+          typedef typename HaloType_<0, pl_face, b_, c_, d_>::index_type_ IndexType;
+
+          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            ///for any face count edges
+            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
+            IndexType count(0);
+            for(IndexType j(0) ; j < edges.size() ; ++j)
+            {
+              bool already_in(false);
+              for(IndexType k(0) ; k < all_edges.size() ; ++k)
+              {
+                if(all_edges.at(k) == edges.at(j))
+                  already_in = true;
+              }
+              if(!already_in)
+              {
+                all_edges.push_back(edges.at(j));
+              }
+            }
+          }
+
+          ///for any edge computed before, check vertex and add if not yet added
+          for(IndexType i(0) ; i < all_edges.size() ; ++i)
+          {
+            ///for any face count edges
+            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            IndexType count(0);
+            for(IndexType j(0) ; j < vertices.size() ; ++j)
+            {
+              bool already_in(false);
+              for(IndexType k(0) ; k < all_vertices.size() ; ++k)
+              {
+                if(all_vertices.at(k) == vertices.at(j))
+                  already_in = true;
+              }
+              if(!already_in)
+              {
+                all_vertices.push_back(vertices.at(j));
+              }
+            }
+          }
+
+          ///transfer precomputed sets
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            target.template get_target_set<2>()[i] = halo.get_element(i);
+          }
+          for(IndexType i(0) ; i < all_edges.size() ; ++i)
+          {
+            target.template get_target_set<1>()[i] = all_edges.at(i);
+          }
+          for(IndexType i(0) ; i < all_vertices.size() ; ++i)
+          {
+            target.template get_target_set<0>()[i] = all_vertices.at(i);
+          }
+        }
+
         ///delta = i case: in 3D, halos with overlap = i can only be given by polyhedrons
         ///i, pl_polyhedron case
         template<
@@ -480,6 +552,100 @@ namespace FEAST
           target[1] = IndexType(num_edges);
           target[2] = IndexType(num_faces);
           target[3] = IndexType(halo.size());
+        }
+
+        template<
+          unsigned a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const HaloType_<a_, pl_polyhedron, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
+        {
+          typedef typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_ IndexType;
+
+          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_faces;
+          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh().get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
+            IndexType count(0);
+            for(IndexType j(0) ; j < faces.size() ; ++j)
+            {
+              bool already_in(false);
+              for(IndexType k(0) ; k < all_faces.size() ; ++k)
+              {
+                if(all_faces.at(k) == faces.at(j))
+                  already_in = true;
+              }
+              if(!already_in)
+              {
+                all_faces.push_back(faces.at(j));
+              }
+            }
+          }
+
+          ///for any face computed before, check edge and add if not yet added
+          for(IndexType i(0) ; i < all_faces.size() ; ++i)
+          {
+            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, all_faces.at(i)));
+            for(IndexType j(0) ; j < edges.size() ; ++j)
+            {
+              bool already_in(false);
+              for(IndexType k(0) ; k < all_edges.size() ; ++k)
+              {
+                if(all_edges.at(k) == edges.at(j))
+                  already_in = true;
+              }
+              if(!already_in)
+              {
+                all_edges.push_back(edges.at(j));
+              }
+            }
+          }
+
+          ///for any edge computed before, check vertex and add if not yet added
+          for(IndexType i(0) ; i < all_edges.size() ; ++i)
+          {
+            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            for(IndexType j(0) ; j < vertices.size() ; ++j)
+            {
+              bool already_in(false);
+              for(IndexType k(0) ; k < all_vertices.size() ; ++k)
+              {
+                if(all_vertices.at(k) == vertices.at(j))
+                  already_in = true;
+              }
+              if(!already_in)
+              {
+                all_vertices.push_back(vertices.at(j));
+              }
+            }
+          }
+
+          ///transfer precomputed sets
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            target.template get_target_set<3>()[i] = halo.get_element(i);
+          }
+          for(IndexType i(0) ; i < all_faces.size() ; ++i)
+          {
+            target.template get_target_set<2>()[i] = all_faces.at(i);
+          }
+          for(IndexType i(0) ; i < all_edges.size() ; ++i)
+          {
+            target.template get_target_set<1>()[i] = all_edges.at(i);
+          }
+          for(IndexType i(0) ; i < all_vertices.size() ; ++i)
+          {
+            target.template get_target_set<0>()[i] = all_vertices.at(i);
+          }
         }
     };
   }

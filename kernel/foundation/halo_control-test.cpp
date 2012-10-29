@@ -567,7 +567,7 @@ class HaloControlTest3D:
       vertex_coord_tuples[7][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(7);
 
 
-      //create halo with one edge-edge pair
+      //create halo with one face-face pair
       Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
       h.add_element_pair(2, 3);
 
@@ -580,19 +580,69 @@ class HaloControlTest3D:
       TEST_CHECK_EQUAL(polytopes_in_subset[2], Index(1));
       TEST_CHECK_EQUAL(polytopes_in_subset[3], Index(0));
 
-      //create halo with one face-face pair
-      /*Foundation::Halo<1, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
+      CellSubSet<Shape::Hypercube<3> > cell_sub_set(polytopes_in_subset);
+      Foundation::HaloControl<Foundation::dim_3D>::fill_target_set(h, cell_sub_set);
+
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[0], 1ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[1], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[2], 4ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[3], 5ul);
+
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[1], 4ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[2], 5ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[3], 6ul);
+
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<2>()[0], 2ul);
+
+      //create halo with one poly-poly pair
+      Foundation::Halo<1, Foundation::pl_polyhedron, Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
       h1.add_element_pair(0, 0);
 
-      Index* polytopes_in_subset1 = new Index[3]; //overlap 1 and one face means 4 vertices and 4 edges
+      Index* polytopes_in_subset1 = new Index[4]; //overlap 1 and one face means 4 vertices and 4 edges
       Foundation::HaloControl<Foundation::dim_3D>::fill_sizes(h1, polytopes_in_subset1);
 
-      TEST_CHECK_EQUAL(polytopes_in_subset1[0], Index(4));
-      TEST_CHECK_EQUAL(polytopes_in_subset1[1], Index(4));
-      TEST_CHECK_EQUAL(polytopes_in_subset1[2], Index(1));*/
+      TEST_CHECK_EQUAL(polytopes_in_subset1[0], Index(8));
+      TEST_CHECK_EQUAL(polytopes_in_subset1[1], Index(12));
+      TEST_CHECK_EQUAL(polytopes_in_subset1[2], Index(6));
+      TEST_CHECK_EQUAL(polytopes_in_subset1[3], Index(1));
+
+      CellSubSet<Shape::Hypercube<3> > cell_sub_set1(polytopes_in_subset1);
+      Foundation::HaloControl<Foundation::dim_3D>::fill_target_set(h1, cell_sub_set1);
+
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[0], 0ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[1], 1ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[2], 2ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[3], 6ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[4], 7ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[5], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[6], 4ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[7], 5ul);
+
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[0], 0ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[1], 2ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[2], 10ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[3], 11ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[4], 9ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[5], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[6], 4ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[7], 7ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[8], 5ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[9], 6ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[10], 1ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[11], 8ul);
+
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<2>()[0], 0ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<2>()[1], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<2>()[2], 4ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<2>()[3], 2ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<2>()[4], 5ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<2>()[5], 1ul);
+
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<3>()[0], 0ul);
 
       delete[] polytopes_in_subset;
-      //delete[] polytopes_in_subset1;
+      delete[] polytopes_in_subset1;
     }
 };
 HaloControlTest3D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol3d_testvv("std::vector, std::vector");
