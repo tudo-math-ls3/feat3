@@ -3,7 +3,8 @@
 #define KERNEL_FOUNDATION_HALO_CONTROL_HPP
 
 #include <kernel/foundation/halo.hpp>
-#include<kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
 
 using namespace FEAST::Geometry;
 
@@ -33,9 +34,26 @@ namespace FEAST
           class HaloType_>
         static void fill_sizes(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_* target)
         {
+          ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
-          target[0] = IndexType(halo.size());
-          target[1] = IndexType(halo.size() - 1);
+          target[0] = IndexType(1);
+          target[1] = IndexType(0);
+        }
+
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<1> >& target)
+        {
+          ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
+          target.template get_target_set<0>()[0] = halo.get_element(0);
         }
 
         ///delta = i case: in 1D, overlapping meshes have halos given in terms of edges
@@ -55,10 +73,42 @@ namespace FEAST
         {
           ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain edges in 1D!");
 
-          typedef typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_ IndexType;
           target[0] = IndexType(halo.size() + 1);
           target[1] = IndexType(halo.size());
         }
+
+        template<
+          unsigned a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const HaloType_<a_, pl_edge, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<1> >& target)
+        {
+          ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain edges in 1D!");
+
+          typedef typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_ IndexType;
+
+          ///for any edge add vertex adjacencies
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            typename HaloType_<a_, pl_edge, b_, c_, d_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
+
+            target.template get_target_set<1>()[i] = halo.get_element(i); //only edge
+            for(IndexType j(0) ; j < adjacent_vertices.size() ; ++j)
+            {
+              target.template get_target_set<0>()[j] = adjacent_vertices.at(j);
+            }
+
+          }
+        }
+
     };
 
     template<>
@@ -349,7 +399,6 @@ namespace FEAST
           target[3] = IndexType(halo.size());
         }
     };
-
   }
 }
 

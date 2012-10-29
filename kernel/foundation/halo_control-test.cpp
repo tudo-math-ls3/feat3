@@ -3,6 +3,7 @@
 
 #include<kernel/foundation/halo_control.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
+#include<kernel/geometry/cell_sub_set.hpp>
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
@@ -76,7 +77,8 @@ class HaloControlTest1D:
       vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node
       vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(1);
 
-      //create halo with one edge-edge pair
+      //-------------------------------------
+      //create halo with one vertex-vertex pair
       Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
       h.add_element_pair(1, 0);
 
@@ -85,8 +87,15 @@ class HaloControlTest1D:
       Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(h, polytopes_in_subset);
 
       TEST_CHECK_EQUAL(polytopes_in_subset[0], Index(1));
+      TEST_CHECK_EQUAL(polytopes_in_subset[1], Index(0));
 
-      //create halo with one face-face pair
+      CellSubSet<Shape::Hypercube<1> > cell_sub_set(polytopes_in_subset);
+      HaloControl<Foundation::dim_1D>::fill_target_set(h, cell_sub_set);
+
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[0], 1ul);
+      //-------------------------------------
+
+      //create halo with one edge-edge pair
       Foundation::Halo<1, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
       h1.add_element_pair(0, 0);
 
@@ -95,6 +104,14 @@ class HaloControlTest1D:
 
       TEST_CHECK_EQUAL(polytopes_in_subset1[0], Index(2));
       TEST_CHECK_EQUAL(polytopes_in_subset1[1], Index(1));
+
+      CellSubSet<Shape::Hypercube<1> > cell_sub_set1(polytopes_in_subset1);
+      HaloControl<Foundation::dim_1D>::fill_target_set(h1, cell_sub_set1);
+
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[0], 0ul); //edge 0
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[0], 0ul); //vertex 0
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[1], 1ul); //vertex 1
+      //-------------------------------------
 
       delete[] polytopes_in_subset;
       delete[] polytopes_in_subset1;
