@@ -95,12 +95,12 @@ namespace FEAST
 
           typedef typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_ IndexType;
 
-          ///for any edge add vertex adjacencies
+          ///for any edge add vertices
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             typename HaloType_<a_, pl_edge, b_, c_, d_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
 
-            target.template get_target_set<1>()[i] = halo.get_element(i); //only edge
+            target.template get_target_set<1>()[i] = halo.get_element(i);
             for(IndexType j(0) ; j < adjacent_vertices.size() ; ++j)
             {
               target.template get_target_set<0>()[j] = adjacent_vertices.at(j);
@@ -116,26 +116,7 @@ namespace FEAST
     {
       public:
 
-        ///delta = 0 case: in 2D, zero-overlap halos can be given in terms of edges OR in terms of vertices
-        ///0, pl_vertex case
-        template<
-          typename b_,
-          template<typename, typename> class c_,
-          typename d_,
-          template<unsigned,
-            PolytopeLevels,
-            typename,
-            template<typename, typename> class,
-            typename>
-          class HaloType_>
-        static void fill_sizes(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_* target)
-        {
-          typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
-          target[0] = IndexType(halo.size());
-          target[1] = IndexType(halo.size() - 1);
-          target[2] = IndexType(0);
-        }
-
+        ///delta = 0 case: in 2D, zero-overlap halos can be given in terms of edges
         ///0, pl_edge case
         template<
           typename b_,
@@ -153,6 +134,33 @@ namespace FEAST
           target[0] = IndexType(halo.size()  + 1);
           target[1] = IndexType(halo.size());
           target[2] = IndexType(0);
+        }
+
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const HaloType_<0, pl_edge, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
+        {
+          typedef typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_ IndexType;
+
+          ///for any edge add vertices
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            typename HaloType_<0, pl_edge, b_, c_, d_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
+
+            target.template get_target_set<1>()[i] = halo.get_element(i);
+            for(IndexType j(0) ; j < adjacent_vertices.size() ; ++j)
+            {
+              target.template get_target_set<0>()[j] = adjacent_vertices.at(j);
+            }
+          }
         }
 
         ///delta = i case: in 2D, delta > 0 halos must be given in terms of faces
@@ -227,6 +235,81 @@ namespace FEAST
           target[0] = IndexType(num_vertices);
           target[1] = IndexType(num_edges);
           target[2] = IndexType(halo.size());
+        }
+
+        template<
+          unsigned a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const HaloType_<a_, pl_face, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
+        {
+          ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain faces in 2D!");
+
+          typedef typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_ IndexType;
+
+          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            ///for any face count edges
+            typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
+            IndexType count(0);
+            for(IndexType j(0) ; j < edges.size() ; ++j)
+            {
+              bool already_in(false);
+              for(IndexType k(0) ; k < all_edges.size() ; ++k)
+              {
+                if(all_edges.at(k) == edges.at(j))
+                  already_in = true;
+              }
+              if(!already_in)
+              {
+                all_edges.push_back(edges.at(j));
+              }
+            }
+          }
+
+          ///for any edge computed before, check vertex and add if not yet added
+          for(IndexType i(0) ; i < all_edges.size() ; ++i)
+          {
+            ///for any face count edges
+            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            IndexType count(0);
+            for(IndexType j(0) ; j < vertices.size() ; ++j)
+            {
+              bool already_in(false);
+              for(IndexType k(0) ; k < all_vertices.size() ; ++k)
+              {
+                if(all_vertices.at(k) == vertices.at(j))
+                  already_in = true;
+              }
+              if(!already_in)
+              {
+                all_vertices.push_back(vertices.at(j));
+              }
+            }
+          }
+
+          ///transfer precomputed sets
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+            target.template get_target_set<2>()[i] = halo.get_element(i);
+          }
+          for(IndexType i(0) ; i < all_edges.size() ; ++i)
+          {
+            target.template get_target_set<1>()[i] = all_edges.at(i);
+          }
+          for(IndexType i(0) ; i < all_vertices.size() ; ++i)
+          {
+            target.template get_target_set<0>()[i] = all_vertices.at(i);
+          }
         }
     };
 

@@ -242,6 +242,7 @@ class HaloControlTest2D:
       vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(3);
       vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(3);
 
+      //-----------------------------------------
       //create halo with one edge-edge pair
       Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
       h.add_element_pair(3, 2);
@@ -254,6 +255,14 @@ class HaloControlTest2D:
       TEST_CHECK_EQUAL(polytopes_in_subset[1], Index(1));
       TEST_CHECK_EQUAL(polytopes_in_subset[2], Index(0));
 
+      Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+      Foundation::HaloControl<Foundation::dim_2D>::fill_target_set(h, cell_sub_set);
+
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[0], 1ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[1], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);
+
+      //-----------------------------------------
       //create halo with one face-face pair
       Foundation::Halo<1, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
       h1.add_element_pair(0, 0);
@@ -264,17 +273,23 @@ class HaloControlTest2D:
       TEST_CHECK_EQUAL(polytopes_in_subset1[0], Index(4));
       TEST_CHECK_EQUAL(polytopes_in_subset1[1], Index(4));
       TEST_CHECK_EQUAL(polytopes_in_subset1[2], Index(1));
-      /*Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
 
-      typename Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> >::storage_type_ adjacent_vertices(h.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, h.get_element(0)));
+      Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set1(polytopes_in_subset1);
+      Foundation::HaloControl<Foundation::dim_2D>::fill_target_set(h1, cell_sub_set1);
 
-      cell_sub_set.template get_target_set<0>()[0] = adjacent_vertices.at(0); //first vertex
-      cell_sub_set.template get_target_set<0>()[1] = adjacent_vertices.at(1); //second vertex
-      cell_sub_set.template get_target_set<1>()[0] = h.get_element(0); //only edge
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[0], 0ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[1], 1ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[2], 2ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[3], 3ul);
 
-      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[0], 1ul);
-      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<0>()[1], 3ul);
-      TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);*/
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[0], 0ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[1], 2ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[2], 3ul);
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<1>()[3], 1ul);
+
+      TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<2>()[0], 0ul);
+
+      //-----------------------------------------
 
       delete[] polytopes_in_subset;
       delete[] polytopes_in_subset1;
