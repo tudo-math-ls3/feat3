@@ -20,22 +20,45 @@ namespace FEAST
     template<>
     struct MeshControl<dim_1D>
     {
-      template<typename SourceMeshType_>
-      static void fill_sizes(const SourceMeshType_& mesh, typename SourceMeshType_::index_type_* target)
+      template<
+        RequiredNumTopologies a_,
+        typename b_,
+        template <typename, typename> class c_,
+        template <typename, typename> class d_,
+        template <typename, typename> class e_,
+        template<
+          RequiredNumTopologies,
+          typename,
+          template <typename, typename> class,
+          template <typename, typename> class,
+          template <typename, typename> class> class MeshType_>
+      static void fill_sizes(const MeshType_<a_, b_, c_, d_, e_>& mesh, typename MeshType_<a_, b_, c_, d_, e_>::index_type_* target)
       {
         target[0] = mesh.get_topologies().at(0).get_topology().size();
         target[1] = mesh.get_topologies().at(1).get_topology().size();
       }
 
-      template<typename SourceMeshType_, typename TargetMeshType_>
-      static void fill_adjacencies(const SourceMeshType_& source_mesh, TargetMeshType_& target_mesh)
+      template<
+        RequiredNumTopologies a_,
+        typename b_,
+        template <typename, typename> class c_,
+        template <typename, typename> class d_,
+        template <typename, typename> class e_,
+        template<
+          RequiredNumTopologies,
+          typename,
+          template <typename, typename> class,
+          template <typename, typename> class,
+          template <typename, typename> class> class SourceMeshType_,
+        typename TargetMeshType_>
+      static void fill_adjacencies(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh)
       {
         //edge->Vertex
         typename TargetMeshType_::template IndexSet<1, 0>::Type& target_vertex_at_edge(target_mesh.template get_index_set<1, 0>());
         for(Index i(0) ; i < source_mesh.get_topologies().at(ipi_edge_vertex).size() ; ++i)
         {
           //get all adjacencies edge->Vertex from source mesh
-          typename SourceMeshType_::topology_type_::storage_type_ source_vertex_at_edge_i(source_mesh.get_adjacent_polytopes(pl_edge, pl_vertex, i));
+          typename SourceMeshType_<a_, b_, c_, d_, e_>::topology_type_::storage_type_ source_vertex_at_edge_i(source_mesh.get_adjacent_polytopes(pl_edge, pl_vertex, i));
 
           for(Index j(0) ; j < source_vertex_at_edge_i.size() ; ++j)
           {
@@ -44,8 +67,21 @@ namespace FEAST
         }
       }
 
-      template<typename SourceMeshType_, typename TargetMeshType_, typename AttributeType_>
-      static void fill_vertex_sets(const SourceMeshType_& source_mesh, TargetMeshType_& target_mesh, const AttributeType_& attr)
+      template<
+        RequiredNumTopologies a_,
+        typename b_,
+        template <typename, typename> class c_,
+        template <typename, typename> class d_,
+        template <typename, typename> class e_,
+        template<
+          RequiredNumTopologies,
+          typename,
+          template <typename, typename> class,
+          template <typename, typename> class,
+          template <typename, typename> class> class SourceMeshType_,
+        typename TargetMeshType_,
+        typename AttributeType_>
+      static void fill_vertex_sets(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh, const AttributeType_& attr)
       {
         typename TargetMeshType_::VertexSetType& vertex_coord_tuples(target_mesh.get_vertex_set());
         for(Index i(0) ; i < source_mesh.get_topologies().at(0).get_topology().size() ; ++i)
