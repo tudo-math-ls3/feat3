@@ -70,7 +70,7 @@ public:
   void test_mat_inv_lehmer() const
   {
     // set tolerance
-    const DataType_ tol(std::pow(_eps, DataType_(0.8)));
+    const DataType_ tol(std::pow(_eps, DataType_(0.75)));
 
     // initialise a Lehmer-Matrix
     Matrix<DataType_, n_, n_> a, b, c;
@@ -89,7 +89,7 @@ public:
   void test_mat_det_lehmer() const
   {
     // set tolerance
-    const DataType_ tol(std::pow(_eps, DataType_(0.8)));
+    const DataType_ tol(std::pow(_eps, DataType_(0.75)));
 
     // initialise a Lehmer-Matrix
     Matrix<DataType_, n_, n_> a;
