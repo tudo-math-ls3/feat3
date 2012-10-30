@@ -178,9 +178,6 @@ namespace FEAST
         for(Index i(0) ; i < source_mesh.get_topologies().at(0).get_topology().size() ; ++i)
         {
           vertex_coord_tuples[i][0] = attr_0.get_data().at(i);
-        }
-        for(Index i(0) ; i < source_mesh.get_topologies().at(1).get_topology().size() ; ++i)
-        {
           vertex_coord_tuples[i][1] = attr_1.get_data().at(i);
         }
       }
@@ -248,13 +245,7 @@ namespace FEAST
         for(Index i(0) ; i < source_mesh.get_topologies().at(0).get_topology().size() ; ++i)
         {
           vertex_coord_tuples[i][0] = attr_0.get_data().at(i);
-        }
-        for(Index i(0) ; i < source_mesh.get_topologies().at(1).get_topology().size() ; ++i)
-        {
           vertex_coord_tuples[i][1] = attr_1.get_data().at(i);
-        }
-        for(Index i(0) ; i < source_mesh.get_topologies().at(3).get_topology().size() ; ++i)
-        {
           vertex_coord_tuples[i][2] = attr_2.get_data().at(i);
         }
       }
