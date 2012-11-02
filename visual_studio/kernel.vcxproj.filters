@@ -492,6 +492,24 @@
     <ClInclude Include="..\kernel\trafo\standard\mapping.hpp">
       <Filter>Header Files\trafo\standard</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\foundation\base.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\buffer.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\control.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\data.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\halo_control.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\foundation\load_balancing.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

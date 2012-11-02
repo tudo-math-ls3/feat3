@@ -238,5 +238,11 @@
     <ClCompile Include="..\kernel\assembly\grid_transfer-test.cpp">
       <Filter>Source Files %28kernel%29\assembly</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\foundation\buffer-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\foundation\halo_control-test.cpp">
+      <Filter>Source Files %28kernel%29\foundation</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

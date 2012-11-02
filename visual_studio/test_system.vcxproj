@@ -434,10 +434,12 @@
   <ItemGroup>
     <ClCompile Include="..\kernel\assembly\grid_transfer-test.cpp" />
     <ClCompile Include="..\kernel\foundation\attribute-test.cpp" />
+    <ClCompile Include="..\kernel\foundation\buffer-test.cpp" />
     <ClCompile Include="..\kernel\foundation\communication-test.cpp" />
     <ClCompile Include="..\kernel\foundation\dense_data_wrapper-test.cpp" />
     <ClCompile Include="..\kernel\foundation\functor-test.cpp" />
     <ClCompile Include="..\kernel\foundation\halo-test.cpp" />
+    <ClCompile Include="..\kernel\foundation\halo_control-test.cpp" />
     <ClCompile Include="..\kernel\foundation\mapped_topology-test.cpp" />
     <ClCompile Include="..\kernel\foundation\mesh-test.cpp" />
     <ClCompile Include="..\kernel\foundation\mesh_control-test.cpp" />
