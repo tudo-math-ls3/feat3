@@ -16,7 +16,7 @@ namespace FEAST
   {
 
     template<
-      template<typename, typename> class StorageType_
+      template<typename, typename> class StorageType_ = std::vector
       >
     class Matrix : public MatrixBase
     {
@@ -40,8 +40,8 @@ namespace FEAST
         }
 
       private:
-        Index rows;
-        Index columns;
+        Index _rows;
+        Index _columns;
         Topology<Index, StorageType_> _block_topology;
         StorageType_<std::shared_ptr<MatrixBase>, std::allocator<std::shared_ptr<MatrixBase> > > _blocks;
     };
