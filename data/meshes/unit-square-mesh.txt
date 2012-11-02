@@ -1,0 +1,81 @@
+<feast_mesh_file>
+<header>
+ version 1
+ chart_file unit-square-chart.txt
+ submeshes 1
+ cellsets 0
+</header>
+<info>
+ This is the unit-square mesh consisting of a single quadrilateral cell.
+</info>
+<mesh>
+ <header>
+  type conformal
+  shape quad
+  coords 2
+ </header>
+ <counts>
+  verts 4
+  edges 4
+  quads 1
+ </counts>
+ <coords>
+  0 0
+  1 0
+  0 1
+  1 1
+ </coords>
+ <vert@edge>
+  0 1
+  2 3
+  0 2
+  1 3
+ </vert@edge>
+ <vert@quad>
+  0 1 2 3
+ </vert@quad>
+</mesh>
+<submesh>
+ <header>
+  name 1
+  parent root
+  chart 1
+  type conformal
+  shape edge
+  coords 1
+ </header>
+ <info>
+  This submesh defines the outer square boundary component.
+ </info>
+ <counts>
+  verts 5
+  edges 4
+ </counts>
+ <coords>
+  0
+  1
+  2
+  3
+  4
+ </coords>
+ <vert@edge>
+  0 1
+  1 2
+  2 3
+  3 4
+ </vert@edge>
+ <vert_idx>
+  0
+  1
+  3
+  2
+  0
+ </vert_idx>
+ <edge_idx>
+  0
+  3
+  1
+  2
+ </edge_idx>
+</submesh>
+</feast_mesh_file>

@@ -1,0 +1,44 @@
+<feast_chart_file>
+<header>
+ version 1
+ charts 2
+</header>
+<info>
+ This is the bench1 chart-file, which defines the domain
+ for the famous 2D "flow around a cylinder" benchmark.
+</info>
+<chart>
+ <header>
+  name 1
+  type polyline
+  img_dim 2
+ </header>
+ <info>
+  This chart describes the outer rectangular boundary component.
+ </info>
+ <polyline>
+  num_points 5
+  <points>
+   0 0 0
+   1 2.2 0
+   2 2.2 0.41
+   3 0 0.41
+   4 0 0
+  </points>
+ </polyline>
+</chart>
+<chart>
+ <header>
+  name 2
+  type circle
+ </header>
+ <info>
+  This chart describes the inner circular boundary component.
+ </info>
+ <circle>
+  radius 0.05
+  midpoint 0.2 0.2
+  domain 0 1
+ </circle>
+</chart>
+</feast_chart_file>
