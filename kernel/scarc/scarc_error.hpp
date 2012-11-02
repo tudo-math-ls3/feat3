@@ -1,6 +1,6 @@
 #pragma once
-#ifndef FEM_GUARD_SCARC_ERROR_HH
-#define FEM_GUARD_SCARC_ERROR_HH 1
+#ifndef SCARC_GUARD_SCARC_ERROR_HH
+#define SCARC_GUARD_SCARC_ERROR_HH 1
 
 #include <kernel/util/exception.hpp>
 #include <string>

@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
+#include <kernel/lafem/matrix_base.hpp>
 
 
 namespace FEAST
@@ -23,7 +24,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Arch_, typename DT_>
-    class DenseMatrix : public Container<Arch_, DT_>
+    class DenseMatrix : public Container<Arch_, DT_>, public MatrixBase
     {
       private:
         /// Pointer to our elements.

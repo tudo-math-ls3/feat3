@@ -9,6 +9,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/algorithm.hpp>
 #include <kernel/util/graph.hpp>
 
@@ -36,7 +37,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Arch_, typename DT_>
-    class SparseMatrixCSR : public Container<Arch_, DT_>
+    class SparseMatrixCSR : public Container<Arch_, DT_>, public MatrixBase
     {
       public:
         /// ImageIterator typedef for Adjactor interface implementation

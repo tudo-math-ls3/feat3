@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
+#include <kernel/lafem/matrix_base.hpp>
 #include <kernel/util/graph.hpp>
 
 #include <vector>
@@ -37,7 +38,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_>
-    class SparseMatrixCOO : public Container<Mem_, DT_>
+    class SparseMatrixCOO : public Container<Mem_, DT_>, public MatrixBase
     {
       private:
         /// Row count.
