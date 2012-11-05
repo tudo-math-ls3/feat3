@@ -94,6 +94,50 @@ void check_sendrecv(int rank)
   delete[] recvbuffer;
 }
 
+void check_send_and_recv(int rank)
+{
+#ifndef FEAST_SERIAL_MODE
+  float* f(new float[100000]);
+  float* recvbuffer(new float[100000]);
+  for(Index i(0) ; i < 100000 ; ++i)
+  {
+    f[i] = i;
+    recvbuffer[i] = rank;
+  }
+
+  if(rank == 0)
+  {
+    Comm<Archs::Parallel>::send(f,
+                                     100000,
+                                     1);
+  }
+  if(rank == 1)
+  {
+    Comm<Archs::Parallel>::recv(recvbuffer,
+                                     100000,
+                                     0);
+    TestResult<float> res[100000];
+    for(unsigned long i(0) ; i < 100000 ; ++i)
+      res[i] = test_check_equal_within_eps(recvbuffer[i], i, std::numeric_limits<float>::epsilon());
+
+    bool passed(true);
+    for(unsigned long i(0) ; i < 100000 ; ++i)
+      if(!res[i].passed)
+      {
+        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        passed = false;
+        break;
+      }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: send and recv)" << std::endl;
+  }
+
+  delete[] f;
+  delete[] recvbuffer;
+#endif
+}
+
 void check_halo_transfer(int rank)
 {
   if(rank < 2)
@@ -513,6 +557,7 @@ int main(int argc, char* argv[])
 #endif
 
   check_sendrecv(me);
+  check_send_and_recv(me);
   check_halo_transfer(me);
   check_attribute_transfer(me);
   check_topology_transfer(me);

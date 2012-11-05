@@ -126,10 +126,13 @@ namespace FEAST
           template<typename DataType1_, typename DataType2_>
             static inline void send_recv(DataType1_ * sendbuf,
                                          Index num_elements_to_send,
-                                         Index dest_rank,
+                                         Index /*dest_rank*/,
                                          DataType2_* recvbuf,
                                          Index num_elements_to_recv,
-                                         Index source_rank)
+                                         Index /*source_rank*/,
+                                         Index /*send_tag*/ = 0,
+                                         Index /*recv_tag*/ = 0,
+                                         Index /*communicator*/ = 0)
             {
               const Index send_end(num_elements_to_send);
               const Index recv_end(num_elements_to_recv);
@@ -164,7 +167,10 @@ namespace FEAST
                                          Index dest_rank,
                                          DataType2_* recvbuf,
                                          Index num_elements_to_recv,
-                                         Index source_rank)
+                                         Index source_rank,
+                                         Index send_tag = 0,
+                                         Index recv_tag = 0,
+                                         MPI_Comm communicator = MPI_COMM_WORLD)
             {
               MPI_Status status;
 
@@ -172,13 +178,46 @@ namespace FEAST
                            num_elements_to_send,
                            MPIType<DataType1_>::value(),
                            dest_rank,
-                           999,
+                           send_tag,
                            recvbuf,
                            num_elements_to_recv,
                            MPIType<DataType2_>::value(),
                            source_rank,
-                           999,
-                           MPI_COMM_WORLD,
+                           recv_tag,
+                           communicator,
+                           &status);
+            }
+
+          template<typename DataType1_>
+            static inline void send(DataType1_ * sendbuf,
+                Index num_elements_to_send,
+                Index dest_rank,
+                Index send_tag = 0,
+                MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Send(sendbuf,
+                           num_elements_to_send,
+                           MPIType<DataType1_>::value(),
+                           dest_rank,
+                           send_tag,
+                           communicator);
+            }
+
+          template<typename DataType1_>
+            static inline void recv(DataType1_ * recvbuf,
+                Index num_elements_to_recv,
+                Index src_rank,
+                Index recv_tag = 0,
+                MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Status status;
+
+              MPI_Recv(recvbuf,
+                           num_elements_to_recv,
+                           MPIType<DataType1_>::value(),
+                           src_rank,
+                           recv_tag,
+                           communicator,
                            &status);
             }
 
