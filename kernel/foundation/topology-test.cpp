@@ -1,4 +1,4 @@
-#define FEAST_SERIAL_MODE
+#define SERIAL
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 

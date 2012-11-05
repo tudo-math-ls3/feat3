@@ -7,7 +7,7 @@
 #include<kernel/foundation/load_balancing.hpp>
 #include<iostream>
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
 #include<mpi.h>
 #endif
 

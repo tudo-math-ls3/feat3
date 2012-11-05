@@ -2,7 +2,7 @@
 #ifndef KERNEL_FOUNDATION_COMMUNICATION_HH
 #define KERNEL_FOUNDATION_COMMUNICATION_HH 1
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
 #include<mpi.h>
 #endif
 #include <kernel/foundation/base.hpp>
@@ -44,7 +44,7 @@ namespace FEAST
       com_max
     };
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     template <typename DT_>
       class MPIType
       {
@@ -153,7 +153,7 @@ namespace FEAST
           //TODO
       };
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     template<>
       class Comm<Archs::Parallel>
       {
@@ -281,7 +281,7 @@ namespace FEAST
 
            //post send_recv
            ///TODO validate via mesh reference, that polytope level is correct
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
           Comm<Parallel>::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
               interface.size(),
               interface.get_other(),
@@ -334,7 +334,7 @@ namespace FEAST
 
            //post send_recv
            ///TODO validate via mesh reference, that polytope level is correct
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
           Comm<Parallel>::send_recv(sendbuf.elements(),
               interface.size(),
               interface.get_other(),
@@ -382,7 +382,7 @@ namespace FEAST
            //directly replace row i
            for(Index i(0); i < interface.size() ; ++i)
            {
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
              Comm<Parallel>::send_recv(&val[row_ptr[interface.get_element(i)]],
                  row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
                  interface.get_other(),

@@ -1,4 +1,4 @@
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
 #include <mpi.h>
 #endif
 #include <iostream>
@@ -13,7 +13,7 @@ using namespace Foundation;
 int main(int argc, char* argv[])
 {
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
   MPI_Init(&argc, &argv);
 #endif
 
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
   int me(0);
   //build communication structures
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   Control<Parallel, SimpleLoadBalancingPolicy, SimpleDataFillPolicy>::init(lbconf, local_data, me);
 #else
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
   //### end test output only ###
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
   MPI_Finalize();
 #endif
 

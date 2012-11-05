@@ -1,5 +1,5 @@
-//#define FEAST_SERIAL_MODE
-#ifndef FEAST_SERIAL_MODE
+//#define SERIAL
+#ifndef SERIAL
 #include <mpi.h>
 #endif
 #include <iostream>
@@ -58,7 +58,7 @@ void check_sendrecv(int rank)
 
   if(rank < 2)
   {
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     Comm<Archs::Parallel>::send_recv(f,
                                      100000,
                                      rank == 0 ? 1 : 0,
@@ -71,7 +71,7 @@ void check_sendrecv(int rank)
 
     TestResult<float> res[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
       res[i] = test_check_equal_within_eps(recvbuffer[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
 #else
       res[i] = test_check_equal_within_eps(recvbuffer[i], float(0), std::numeric_limits<float>::epsilon());
@@ -121,7 +121,7 @@ void check_halo_transfer(int rank)
     h.from_buffer(recvbuf);
 
     bool passed(true);
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     TestResult<Index> res[rank == 0 ? 4 : 2];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
     res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
@@ -184,7 +184,7 @@ void check_attribute_transfer(int rank)
     attr.from_buffer(recvbuf);
 
     bool passed(true);
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     TestResult<double> res[rank == 0 ? 3 : 2];
     res[0] = test_check_equal_within_eps(attr.at(0), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(1), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
@@ -249,7 +249,7 @@ void check_topology_transfer(int rank)
     t.from_buffer(recvbuf);
 
     bool passed(true);
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     TestResult<Index> res[rank == 0 ? 5 : 4];
     res[0] = test_check_equal_within_eps(t.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
     res[1] = test_check_equal_within_eps(t.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
@@ -394,7 +394,7 @@ void check_halobased_attribute_transfer(int rank)
     InterfacedComm<Archs::CPU, com_exchange>::execute(h, attr);
 
     TestResult<double> res[2];
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     res[0] = test_check_equal_within_eps(attr.at(10), rank == 0 ? double(43) : double(42), std::numeric_limits<float>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(100), rank == 0 ? double(48) : double(47), std::numeric_limits<float>::epsilon());
 #else
@@ -435,7 +435,7 @@ void check_halobased_dv_transfer(int rank)
     InterfacedComm<Archs::CPU, com_exchange>::execute(h, attr);
 
     TestResult<double> res[2];
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     res[0] = test_check_equal_within_eps(attr(10), rank == 0 ? double(43) : double(42), std::numeric_limits<float>::epsilon());
     res[1] = test_check_equal_within_eps(attr(100), rank == 0 ? double(48) : double(47), std::numeric_limits<float>::epsilon());
 #else
@@ -476,7 +476,7 @@ void check_halobased_smcsr_transfer(int rank)
     InterfacedComm<Archs::CPU, com_exchange>::execute(h, smcsr);
 
     TestResult<float> res[4];
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
     res[0] = test_check_equal_within_eps(smcsr(0, 0), rank == 0 ? float(43) : float(42), std::numeric_limits<float>::epsilon());
     res[1] = test_check_equal_within_eps(smcsr(0, 1), rank == 0 ? float(44) : float(43), std::numeric_limits<float>::epsilon());
     res[2] = test_check_equal_within_eps(smcsr(1, 0), rank == 0 ? float(48) : float(47), std::numeric_limits<float>::epsilon());
@@ -504,7 +504,7 @@ void check_halobased_smcsr_transfer(int rank)
 int main(int argc, char* argv[])
 {
   int me(0);
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
@@ -518,7 +518,7 @@ int main(int argc, char* argv[])
   check_halobased_dv_transfer(me);
   check_halobased_smcsr_transfer(me);
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
   MPI_Finalize();
 #endif
 

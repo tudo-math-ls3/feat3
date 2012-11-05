@@ -253,7 +253,7 @@ namespace FEAST
                        BufferedData<OuterStorageType_>& recvbuffers,
                        int sourcerank)
         {
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
 
           //get sizes
           Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),

@@ -195,7 +195,7 @@ namespace FEAST
                        BufferedData<StorageType_>& recvbuffers,
                        int sourcerank)
         {
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
           Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
               3,
               destrank,

@@ -15,7 +15,7 @@ namespace FEAST
       static void execute(CommStructures<ReturnType_>& lbconf)
       {
 
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
 
         ///TODO only lb procs, scatter, apply real LB
         int numprocs;
