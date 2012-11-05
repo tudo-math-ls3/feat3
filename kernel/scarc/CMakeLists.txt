@@ -11,7 +11,7 @@ ADD_LIBRARY(kernel-scarc STATIC scarc_error.cpp)
 TARGET_LINK_LIBRARIES (kernel-scarc kernel-foundation kernel-util kernel-lafem)
 
 #list of kernel tests
-SET (test_list matrix-test)
+SET (test_list matrix-test vector-test)
 
 #create all tests
 FOREACH (test ${test_list} )
