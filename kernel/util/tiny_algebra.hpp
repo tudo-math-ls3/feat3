@@ -99,6 +99,9 @@ namespace FEAST
         s = s_
       };
 
+      /// the data type of the vector
+      typedef T_ DataType;
+
       /// actual vector data
       T_ v[s_];
 
@@ -382,6 +385,22 @@ namespace FEAST
       static_assert(sn_ >= n_, "invalid column stride");
 
     public:
+      /// dummy enum
+      enum
+      {
+        /// the row count of the matrix
+        m = m_,
+        /// the column count of the matrix
+        n = n_,
+        /// the row stride of the matrix
+        sm = sm_,
+        /// the column stride of the matrix
+        sn = sn_
+      };
+
+      /// the data type of the matrix
+      typedef T_ DataType;
+
       /// actual matrix data
       T_ v[sm_][sn_];
 

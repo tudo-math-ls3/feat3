@@ -501,6 +501,7 @@
     <ClInclude Include="..\kernel\assembly\linear_functional.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functor_base.hpp" />
     <ClInclude Include="..\kernel\assembly\lafem_backend.hpp" />
+    <ClInclude Include="..\kernel\assembly\local_system_data.hpp" />
     <ClInclude Include="..\kernel\assembly\standard_functionals.hpp" />
     <ClInclude Include="..\kernel\assembly\standard_operators.hpp" />
     <ClInclude Include="..\kernel\base_header.hpp" />

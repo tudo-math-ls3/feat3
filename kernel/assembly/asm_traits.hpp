@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/assembly/base.hpp>
+#include <kernel/assembly/local_system_data.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 
 namespace FEAST
@@ -168,8 +169,14 @@ namespace FEAST
       typedef LocalVectorType LocalTrialVectorType;
       typedef LocalVectorType LocalMultVectorType;
 
+      /// local vector data type
+      typedef LocalVectorData<LocalVectorType, DofMapping> LocalVectorDataType;
+
       /// local matrix type
       typedef Tiny::Matrix<DataType, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs> LocalMatrixType;
+
+      /// local matrix data type
+      typedef LocalMatrixData<LocalMatrixType, DofMapping, DofMapping> LocalMatrixDataType;
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
@@ -298,6 +305,9 @@ namespace FEAST
 
       /// local matrix type
       typedef Tiny::Matrix<DataType, TestEvaluator::max_local_dofs, TrialEvaluator::max_local_dofs> LocalMatrixType;
+
+      /// local matrix data type
+      typedef LocalMatrixData<LocalMatrixType, TestDofMapping, TrialDofMapping> LocalMatrixDataType;
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;

@@ -83,9 +83,6 @@ namespace FEAST
        * The total number of local degrees of freedom for the currently active cell.
        */
       Index get_num_local_dofs() const;
-
-      /** \copydoc get_num_local_dofs() */
-      Index get_num_entries() const;
 #endif // DOXYGEN
 
       /**

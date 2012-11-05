@@ -510,6 +510,9 @@
     <ClInclude Include="..\kernel\foundation\load_balancing.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\assembly\local_system_data.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

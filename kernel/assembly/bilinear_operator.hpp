@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/assembly/asm_traits.hpp>
+#include <kernel/assembly/local_system_data.hpp>
 
 namespace FEAST
 {
@@ -149,8 +150,8 @@ namespace FEAST
         typename AsmTraits::TestSpaceEvalData test_data;
         typename AsmTraits::TrialSpaceEvalData trial_data;
 
-        // create local matrix
-        typename AsmTraits::LocalMatrixType lmad;
+        // create local matrix data
+        typename AsmTraits::LocalMatrixDataType lmd(test_dof_mapping, trial_dof_mapping);
 
         // create matrix scatter-axpy
         MatrixScatterAxpy<MatrixType> scatter_axpy(matrix);
@@ -173,7 +174,7 @@ namespace FEAST
           Index num_loc_trial_dofs = trial_eval.get_num_local_dofs();
 
           // clear local matrix
-          lmad.clear();
+          lmd.clear();
 
           // loop over all quadrature points and integrate
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
@@ -192,7 +193,7 @@ namespace FEAST
               for(Index j(0); j < num_loc_trial_dofs; ++j)
               {
                 // evaluate functor and integrate
-                lmad(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
+                lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
                   func_eval(trafo_data,
                     typename AsmTraits::TrialFuncData(trial_data, j),
                     typename AsmTraits::TestFuncData(test_data, i));
@@ -215,7 +216,7 @@ namespace FEAST
           trial_dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lmad, test_dof_mapping, trial_dof_mapping, alpha);
+          scatter_axpy(lmd, alpha);
 
           // finish dof-mapping
           trial_dof_mapping.finish();
@@ -343,8 +344,8 @@ namespace FEAST
         // create space evaluation data
         typename AsmTraits::SpaceEvalData space_data;
 
-        // create local matrix
-        typename AsmTraits::LocalMatrixType lmad;
+        // create local matrix data
+        typename AsmTraits::LocalMatrixDataType lmd(dof_mapping, dof_mapping);
 
         // create matrix scatter-axpy
         MatrixScatterAxpy<MatrixType> scatter_axpy(matrix);
@@ -365,7 +366,7 @@ namespace FEAST
           Index num_loc_dofs = space_eval.get_num_local_dofs();
 
           // clear local matrix
-          lmad.clear();
+          lmd.clear();
 
           // loop over all quadrature points and integrate
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
@@ -383,7 +384,7 @@ namespace FEAST
               for(Index j(0); j < num_loc_dofs; ++j)
               {
                 // evaluate functor and integrate
-                lmad(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
+                lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
                   func_eval(trafo_data,
                     typename AsmTraits::FuncData(space_data, j),
                     typename AsmTraits::FuncData(space_data, i));
@@ -404,7 +405,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lmad, dof_mapping, dof_mapping, alpha);
+          scatter_axpy(lmd, alpha);
 
           // finish dof-mapping
           dof_mapping.finish();

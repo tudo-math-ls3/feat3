@@ -46,12 +46,6 @@ namespace FEAST
         return 0;
       }
 
-      /** \copydoc DofMappingBase::get_num_entries() */
-      Index get_num_entries() const
-      {
-        return 0;
-      }
-
       /** \copydoc DofMappingBase::get_num_contribs() */
       Index get_num_contribs(Index /*local_dof_idx*/) const
       {
@@ -124,12 +118,6 @@ namespace FEAST
     public:
       /** \copydoc DofMappingBase::get_num_local_dofs() */
       Index get_num_local_dofs() const
-      {
-        return Index(dofs_per_cell_);
-      }
-
-      /** \copydoc DofMappingBase::get_num_entries() */
-      Index get_num_entries() const
       {
         return Index(dofs_per_cell_);
       }
@@ -262,12 +250,6 @@ namespace FEAST
       Index get_num_local_dofs() const
       {
         return Index(IndexSetType::num_indices) * Index(dofs_per_cell_);
-      }
-
-      /** \copydoc DofMappingBase::get_num_entries() */
-      Index get_num_entries() const
-      {
-        return get_num_local_dofs();
       }
 
       /** \copydoc DofMappingBase::get_index() */

@@ -129,8 +129,11 @@ namespace FEAST
         // create space evaluation data
         typename AsmTraits::SpaceEvalData space_data;
 
-        // create local matrix assembly data
-        typename AsmTraits::LocalVectorType lvad;
+        // create local vector
+        typename AsmTraits::LocalVectorType loc_vec;
+
+        // create local vector data
+        typename AsmTraits::LocalVectorDataType lvad(loc_vec, dof_mapping);
 
         // create matrix scatter-axpy
         VectorScatterAxpy<VectorType> scatter_axpy(vector);
@@ -151,7 +154,7 @@ namespace FEAST
           Index num_loc_dofs = space_eval.get_num_local_dofs();
 
           // clear local matrix
-          lvad.clear();
+          loc_vec.clear();
 
           // loop over all quadrature points and integrate
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
@@ -166,7 +169,7 @@ namespace FEAST
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
-              lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
+              loc_vec(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
                 func_eval(trafo_data, typename AsmTraits::FuncData(space_data, i));
               // continue with next trial function
             }
@@ -184,7 +187,7 @@ namespace FEAST
           dof_mapping.prepare(cell);
 
           // incorporate local matrix
-          scatter_axpy(lvad, dof_mapping, alpha);
+          scatter_axpy(lvad, alpha);
 
           // finish dof-mapping
           dof_mapping.finish();

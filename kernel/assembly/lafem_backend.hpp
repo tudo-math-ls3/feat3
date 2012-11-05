@@ -47,23 +47,22 @@ namespace FEAST
       {
       }
 
-      template<typename LocalVector_, typename Mapping_>
+      template<typename LocalVectorData_>
       void operator()(
-        const LocalVector_& loc_vec,
-        const Mapping_& mapping,
+        const LocalVectorData_& loc_vec,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
-        for(Index i(0); i < mapping.get_num_entries(); ++i)
+        for(Index i(0); i < loc_vec.get_num_entries(); ++i)
         {
           // pre-multiply local entry by alpha
           DataType_ dx(alpha * loc_vec(i));
 
           // loop over all entry contributions
-          for(Index ic(0); ic < mapping.get_num_contribs(i); ++ic)
+          for(Index ic(0); ic < loc_vec.get_num_contribs(i); ++ic)
           {
             // update vector data
-            _data[mapping.get_index(i, ic)] += mapping.get_weight(i, ic) * dx;
+            _data[loc_vec.get_index(i, ic)] += loc_vec.get_weight(i, ic) * dx;
           }
         }
       }
@@ -90,23 +89,22 @@ namespace FEAST
       {
       }
 
-      template<typename LocalVector_, typename Mapping_>
+      template<typename LocalVectorData_>
       void operator()(
-        LocalVector_& loc_vec,
-        const Mapping_& mapping,
+        LocalVectorData_& loc_vec,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
-        for(Index i(0); i < mapping.get_num_entries(); ++i)
+        for(Index i(0); i < loc_vec.get_num_entries(); ++i)
         {
           // clear accumulation entry
           DataType_ dx(DataType_(0));
 
           // loop over all entry contributions
-          for(Index ic(0); ic < mapping.get_num_contribs(i); ++ic)
+          for(Index ic(0); ic < loc_vec.get_num_contribs(i); ++ic)
           {
             // update accumulator
-            dx += mapping.get_weight(i, ic) * _data[mapping.get_index(i, ic)];
+            dx += loc_vec.get_weight(i, ic) * _data[loc_vec.get_index(i, ic)];
           }
 
           // update local vector data
@@ -164,24 +162,22 @@ namespace FEAST
         }
       }
 
-      template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
+      template<typename LocalMatrixData_>
       void operator()(
-        const LocalMatrix_& loc_mat,
-        const RowMapping_& row_mapping,
-        const ColMapping_& col_mapping,
+        const LocalMatrixData_& loc_mat,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_mapping.get_num_entries(); ++i)
+        for(Index i(0); i < loc_mat.get_num_rows(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_mapping.get_num_contribs(i); ++ic)
+          for(Index ic(0); ic < loc_mat.get_num_row_contribs(i); ++ic)
           {
             // fetch row entry weight and pre-multiply by alpha
-            DataType_ iw = alpha * DataType_(row_mapping.get_weight(i, ic));
+            DataType_ iw = alpha * DataType_(loc_mat.get_row_weight(i, ic));
 
             // fetch row index
-            Index ix = row_mapping.get_index(i, ic);
+            Index ix = loc_mat.get_row_index(i, ic);
 
             // build column pointer for this row entry contribution
             for(Index k(_row_ptr[ix]); k < _row_end[ix]; ++k)
@@ -190,16 +186,16 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_mapping.get_num_entries(); ++j)
+            for(Index j(0); j < loc_mat.get_num_cols(); ++j)
             {
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_mapping.get_num_contribs(j); ++jc)
+              for(Index jc(0); jc < loc_mat.get_num_col_contribs(j); ++jc)
               {
                 // fetch trial function dof weight
-                DataType_ jw = DataType_(col_mapping.get_weight(j, jc));
+                DataType_ jw = DataType_(loc_mat.get_col_weight(j, jc));
 
                 // fetch column index
-                Index jx = col_mapping.get_index(j, jc);
+                Index jx = loc_mat.get_col_index(j, jc);
 
 #ifdef DEBUG
                 // ensure that the column pointer is valid for this index
@@ -277,21 +273,19 @@ namespace FEAST
         }
       }
 
-      template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
+      template<typename LocalMatrixData_>
       void operator()(
-        LocalMatrix_& loc_mat,
-        const RowMapping_& row_mapping,
-        const ColMapping_& col_mapping,
+        LocalMatrixData_& loc_mat,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
-        for(Index i(0); i < row_mapping.get_num_entries(); ++i)
+        for(Index i(0); i < loc_mat.get_num_rows(); ++i)
         {
           // loop over all row entry contributations
-          for(Index ic(0); ic < row_mapping.get_num_contribs(i); ++ic)
+          for(Index ic(0); ic < loc_mat.get_num_row_contribs(i); ++ic)
           {
             // fetch row index
-            Index ix = row_mapping.get_index(i, ic);
+            Index ix = loc_mat.get_row_index(i, ic);
 
             // build column pointer for this row entry contribution
             for(Index k(_row_ptr[ix]); k < _row_end[ix]; ++k)
@@ -300,16 +294,16 @@ namespace FEAST
             }
 
             // loop over all local column entries
-            for(Index j(0); j < col_mapping.get_num_entries(); ++j)
+            for(Index j(0); j < loc_mat.get_num_cols(); ++j)
             {
               // clear  accumulation entry
               DataType_ dx(DataType_(0));
 
               // loop over all column entry contributions
-              for(Index jc(0); jc < col_mapping.get_num_contribs(j); ++jc)
+              for(Index jc(0); jc < loc_mat.get_num_col_contribs(j); ++jc)
               {
                 // fetch column index
-                Index jx = col_mapping.get_index(j, jc);
+                Index jx = loc_mat.get_col_index(j, jc);
 
 #ifdef DEBUG
                 // ensure that the column pointer is valid for this index
@@ -317,13 +311,13 @@ namespace FEAST
 #endif
 
                 // update accumulator
-                dx += DataType_(col_mapping.get_weight(j, jc)) * _data[_col_ptr[jx]];
+                dx += DataType_(loc_mat.get_col_weight(j, jc)) * _data[_col_ptr[jx]];
 
                 // continue with next column contribution
               }
 
               // update local matrix data
-              loc_mat(i,j) += alpha * DataType_(row_mapping.get_weight(i, ic)) * dx;
+              loc_mat(i,j) += alpha * DataType_(loc_mat.get_row_weight(i, ic)) * dx;
 
               // continue with next column entry
             }
