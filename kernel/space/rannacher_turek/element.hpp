@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/space/element_base.hpp>
+#include <kernel/space/dof_assignment_common.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
 #include <kernel/space/rannacher_turek/evaluator.hpp>
 
@@ -92,6 +93,15 @@ namespace FEAST
 
         /** \copydoc ElementBase::DofMappingType */
         typedef DofMappingSingleEntity<Element, ShapeType::dimension - 1> DofMappingType;
+
+        /** \copydoc ElementBase::DofAssignment */
+        template<int shape_dim_>
+        class DofAssignment
+        {
+        public:
+          /// Dof-Assignment type
+          typedef DofAssignmentSingleEntity<Element, shape_dim_, ShapeType::dimension - 1> Type;
+        };
 
       public:
         /**

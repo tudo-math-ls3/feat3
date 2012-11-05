@@ -82,7 +82,7 @@ namespace FEAST
        * A string containing the name of the cubature rule to be used for integration.
        *
        * \param[in] alpha
-       * The scaling factor for the bilinearform.
+       * The scaling factor for the bilinear operator.
        */
       static void assemble(
         MatrixType& matrix,
@@ -116,7 +116,7 @@ namespace FEAST
        * A reference to the cubature rule to be used for integration.
        *
        * \param[in] alpha
-       * The scaling factor for the bilinearform.
+       * The scaling factor for the bilinear operator.
        */
       static void assemble(
         MatrixType& matrix,
@@ -284,7 +284,7 @@ namespace FEAST
        * A string containing the name of the cubature rule to be used for integration.
        *
        * \param[in] alpha
-       * The scaling factor for the bilinearform.
+       * The scaling factor for the bilinear operator.
        */
       static void assemble(
         MatrixType& matrix,
@@ -314,7 +314,7 @@ namespace FEAST
        * A reference to the cubature rule to be used for integration.
        *
        * \param[in] alpha
-       * The scaling factor for the bilinearform.
+       * The scaling factor for the bilinear operator.
        */
       static void assemble(
         MatrixType& matrix,

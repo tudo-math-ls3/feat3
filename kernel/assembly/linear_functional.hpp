@@ -69,7 +69,7 @@ namespace FEAST
        * A string containing the name of the cubature rule to be used for integration.
        *
        * \param[in] alpha
-       * The scaling factor for the linearform.
+       * The scaling factor for the linear functional.
        */
       static void assemble(
         VectorType& vector,
@@ -99,7 +99,7 @@ namespace FEAST
        * A reference to the cubature rule to be used for integration.
        *
        * \param[in] alpha
-       * The scaling factor for the linearform.
+       * The scaling factor for the linear functional.
        */
       static void assemble(
         VectorType& vector,
@@ -129,11 +129,8 @@ namespace FEAST
         // create space evaluation data
         typename AsmTraits::SpaceEvalData space_data;
 
-        // create local vector
-        typename AsmTraits::LocalVectorType loc_vec;
-
         // create local vector data
-        typename AsmTraits::LocalVectorDataType lvad(loc_vec, dof_mapping);
+        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
 
         // create matrix scatter-axpy
         VectorScatterAxpy<VectorType> scatter_axpy(vector);
@@ -154,7 +151,7 @@ namespace FEAST
           Index num_loc_dofs = space_eval.get_num_local_dofs();
 
           // clear local matrix
-          loc_vec.clear();
+          lvad.clear();
 
           // loop over all quadrature points and integrate
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
@@ -169,7 +166,7 @@ namespace FEAST
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
-              loc_vec(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
+              lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
                 func_eval(trafo_data, typename AsmTraits::FuncData(space_data, i));
               // continue with next trial function
             }

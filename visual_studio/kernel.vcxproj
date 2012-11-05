@@ -587,6 +587,7 @@
     <ClInclude Include="..\kernel\lafem\difference.hpp" />
     <ClInclude Include="..\kernel\lafem\dot_product.hpp" />
     <ClInclude Include="..\kernel\lafem\element_product.hpp" />
+    <ClInclude Include="..\kernel\lafem\matrix_mirror.hpp" />
     <ClInclude Include="..\kernel\lafem\memory_pool.hpp" />
     <ClInclude Include="..\kernel\lafem\norm.hpp" />
     <ClInclude Include="..\kernel\lafem\preconditioner.hpp" />
@@ -597,11 +598,15 @@
     <ClInclude Include="..\kernel\lafem\sparse_matrix_csr.hpp" />
     <ClInclude Include="..\kernel\lafem\sum.hpp" />
     <ClInclude Include="..\kernel\lafem\transposition.hpp" />
+    <ClInclude Include="..\kernel\lafem\vector_mirror.hpp" />
     <ClInclude Include="..\kernel\shape.hpp" />
     <ClInclude Include="..\kernel\space\base.hpp" />
     <ClInclude Include="..\kernel\space\dof_adjacency.hpp" />
+    <ClInclude Include="..\kernel\space\dof_assignment_base.hpp" />
+    <ClInclude Include="..\kernel\space\dof_assignment_common.hpp" />
     <ClInclude Include="..\kernel\space\dof_mapping_base.hpp" />
     <ClInclude Include="..\kernel\space\dof_mapping_common.hpp" />
+    <ClInclude Include="..\kernel\space\dof_mirror.hpp" />
     <ClInclude Include="..\kernel\space\element_base.hpp" />
     <ClInclude Include="..\kernel\space\evaluator_base.hpp" />
     <ClInclude Include="..\kernel\space\eval_data.hpp" />

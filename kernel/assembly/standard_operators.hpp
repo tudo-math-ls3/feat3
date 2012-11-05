@@ -102,15 +102,22 @@ namespace FEAST
        *
        * \param[in] cubature_name
        * A string containing the name of the cubature rule to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the bilinear operator.
        */
       template<
         typename Matrix_,
         typename Space_>
-      static void assemble(Matrix_& matrix, const Space_& space, const String& cubature_name)
+      static void assemble(
+        Matrix_& matrix,
+        const Space_& space,
+        const String& cubature_name,
+        const typename Matrix_::data_type alpha = typename Matrix_::data_type(1))
       {
         BilinearScalarLaplaceFunctor functor;
         BilinearOperator<Matrix_, BilinearScalarLaplaceFunctor, Space_>::
-          assemble(matrix, functor, space, cubature_name);
+          assemble(matrix, functor, space, cubature_name, alpha);
       }
     }; // class BilinearScalarLaplaceFunctor
 
@@ -205,15 +212,22 @@ namespace FEAST
        *
        * \param[in] cubature_name
        * A string containing the name of the cubature rule to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the bilinear operator.
        */
       template<
         typename Matrix_,
         typename Space_>
-      static void assemble(Matrix_& matrix, const Space_& space, const String& cubature_name)
+      static void assemble(
+        Matrix_& matrix,
+        const Space_& space,
+        const String& cubature_name,
+        const typename Matrix_::data_type alpha = typename Matrix_::data_type(1))
       {
         BilinearScalarIdentityFunctor functor;
         BilinearOperator<Matrix_, BilinearScalarIdentityFunctor, Space_>::
-          assemble(matrix, functor, space, cubature_name);
+          assemble(matrix, functor, space, cubature_name, alpha);
       }
     }; // class BilinearScalarIdentityFunctor
   } // namespace Assembly

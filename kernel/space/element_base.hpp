@@ -28,6 +28,13 @@ namespace FEAST
       /// shape type
       typedef typename TrafoType::ShapeType ShapeType;
 
+      /// dummy enum
+      enum
+      {
+        /// shape dimension
+        shape_dim = ShapeType::dimension
+      };
+
       // Note:
       // The following block serves as an element interface documentation and is therefore only
       // visible to doxygen. The actual functionality has to be supplied by the implementation.
@@ -53,7 +60,7 @@ namespace FEAST
       };
 
       /**
-       * \brief Space evaluator class template.
+       * \brief Space evaluator class wrapper template.
        *
        * \tparam TrafoEvaluator_
        * The trafo evaluator to be used by this space evaluator.
@@ -76,6 +83,20 @@ namespace FEAST
        * \brief Dof-Mapping class.
        */
       typedef ... DofMappingType;
+
+      /**
+       * \brief Dof-Assignment class wrapper template
+       *
+       * \tparam shape_dim_
+       * The dimension of the shape for which the Dof-Assignment is to be defined.
+       */
+      template<int shape_dim_>
+      class DofAssignment
+      {
+      public:
+        /// dof-assignment type
+        typedef ... Type;
+      };
 
       /**
        * \brief Returns the number of dofs.

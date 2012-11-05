@@ -519,6 +519,21 @@
     <ClInclude Include="..\kernel\lafem\transposition.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\space\dof_assignment_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\dof_assignment_common.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\vector_mirror.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\matrix_mirror.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\dof_mirror.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

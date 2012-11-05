@@ -24,6 +24,23 @@ namespace FEAST
       /// base class typedef
       typedef TargetSetHolder<ShapeType> BaseClass;
 
+
+      /**
+       * \brief Target set type class template.
+       *
+       * This nested class template is used to define the return type of the CellSubSet::get_target_set()
+       * function template.
+       *
+       * \tparam cell_dim_
+       * The cell dimesnion parameter as passed to the CellSubSet::get_target_set() function template.
+       */
+      template<int cell_dim_>
+      struct TargetSet
+      {
+        /// target set type
+        typedef FEAST::Geometry::TargetSet Type;
+      }; // struct TargetSet<...>
+
     public:
       /**
        * \brief Constructor.

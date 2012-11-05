@@ -133,15 +133,22 @@ namespace FEAST
        *
        * \param[in] cubature_name
        * A string containing the name of the cubature rule to be used for integration.
+       *
+       * \param[in] alpha
+       * The scaling factor for the linear functional.
        */
       template<
         typename Vector_,
         typename Space_>
-      static void assemble(Vector_& vector, const Space_& space, const String& cubature_name)
+      static void assemble(
+        Vector_& vector,
+        const Space_& space,
+        const String& cubature_name,
+        typename Vector_::data_type alpha = typename Vector_::data_type(1))
       {
         LinearScalarIntegralFunctor functor;
         LinearFunctional<Vector_, LinearScalarIntegralFunctor<Function_>, Space_>::
-          assemble(vector, functor, space, cubature_name);
+          assemble(vector, functor, space, cubature_name, alpha);
       }
     }; // class LinearScalarIntegralFunctor
   } // namespace Assembly
