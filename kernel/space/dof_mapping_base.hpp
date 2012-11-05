@@ -17,19 +17,16 @@ namespace FEAST
      * \tparam Space_
      * The finite-element space that this dof-mapping is used by.
      *
-     * \tparam shape_dim_
-     * The dimension of the shape that his dof-mapping is defined on.
-     *
      * \author Peter Zajac
      */
-    template<
-      typename Space_,
-      int shape_dim_>
+    template<typename Space_>
     class DofMappingBase
     {
     public:
       /// space typedef
       typedef Space_ SpaceType;
+      /// shape typedef
+      typedef typename SpaceType::ShapeType ShapeType;
 
 #ifdef DOXYGEN
       /**
@@ -146,7 +143,7 @@ namespace FEAST
       /** \copydoc Adjactor::get_num_nodes_domain() */
       Index get_num_nodes_domain() const
       {
-        return _space.get_trafo().get_mesh().get_num_entities(shape_dim_);
+        return _space.get_trafo().get_mesh().get_num_entities(ShapeType::dimension);
       }
 
       /** \copydoc Adjactor::get_num_nodes_image() */

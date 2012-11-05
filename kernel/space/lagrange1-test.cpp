@@ -34,7 +34,7 @@ class Lagrange1Test
 
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
-  typedef typename QuadSpaceQ1::template DofMapping<>::Type DofMapping;
+  typedef typename QuadSpaceQ1::DofMappingType DofMapping;
 
   typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 2> > CubatureRule;
   typedef typename Cubature::DynamicFactorySelect<CubatureRule>::Type CubatureFactory;

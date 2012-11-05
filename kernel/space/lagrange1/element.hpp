@@ -81,14 +81,8 @@ namespace FEAST
           typedef Lagrange1::Evaluator<Element, TrafoEvaluator_, Traits> Type;
         };
 
-        /** \copydoc ElementBase::DofMapping */
-        template<int shape_dim_ = ShapeType::dimension>
-        class DofMapping
-        {
-        public:
-          /// Dof-Mapping type
-          typedef DofMappingSingleEntity<Element, shape_dim_, 0> Type;
-        }; // class DofMapper
+        /** \copydoc ElementBase::DofMappingType */
+        typedef DofMappingSingleEntity<Element, 0> DofMappingType;
 
       public:
         /**

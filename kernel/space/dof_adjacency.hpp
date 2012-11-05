@@ -90,8 +90,8 @@ namespace FEAST
       static Graph assemble(const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
         // create test- and trial-dof-mappers
-        typename TestSpace_::template DofMapping<>::Type test_dof_mapping(test_space);
-        typename TrialSpace_::template DofMapping<>::Type trial_dof_mapping(trial_space);
+        typename TestSpace_::DofMappingType test_dof_mapping(test_space);
+        typename TrialSpace_::DofMappingType trial_dof_mapping(trial_space);
 
         // render transposed test-dof-mapping
         Graph test_dof_support(Graph::rt_transpose, test_dof_mapping);
@@ -119,7 +119,7 @@ namespace FEAST
       static Graph assemble(const Space_& space)
       {
         // create dof-mapping
-        typename Space_::template DofMapping<>::Type dof_mapping(space);
+        typename Space_::DofMappingType dof_mapping(space);
 
         // render transposed dof-mapping
         Graph dof_support(Graph::rt_transpose, dof_mapping);
@@ -222,8 +222,8 @@ namespace FEAST
         RefinementAdjactor refine_adjactor(num_elements_coarse, num_children);
 
         // create test- and trial-dof-mappers
-        typename FineTestSpace_::template DofMapping<>::Type test_dof_mapping(fine_test_space);
-        typename CoarseTrialSpace_::template DofMapping<>::Type trial_dof_mapping(coarse_trial_space);
+        typename FineTestSpace_::DofMappingType test_dof_mapping(fine_test_space);
+        typename CoarseTrialSpace_::DofMappingType trial_dof_mapping(coarse_trial_space);
 
         // render transposed test-dof-mapping
         Graph test_dof_support(Graph::rt_injectify_transpose, refine_adjactor, test_dof_mapping);

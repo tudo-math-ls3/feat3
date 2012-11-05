@@ -73,18 +73,9 @@ namespace FEAST
       };
 
       /**
-       * \brief Dof-Mapping class template.
-       *
-       * \tparam shape_dim_
-       * The shape dimension for which the Dof-Mapping shall be defined.
+       * \brief Dof-Mapping class.
        */
-      template<int shape_dim_ = ShapeType::dimension>
-      class DofMapping
-      {
-      public:
-        /// Dof-Mapping type
-        typedef ... Type;
-      }; // class DofMapper
+      typedef ... DofMappingType;
 
       /**
        * \brief Returns the number of dofs.

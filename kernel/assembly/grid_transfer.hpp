@@ -92,8 +92,8 @@ namespace FEAST
         typedef Trafo::ConfigOr<AsmTrafoConfig, FineSpaceTrafoConfig> FineTrafoConfig;
 
         // typedefs for dof-mappings
-        typedef typename FineSpace_::template DofMapping<>::Type FineDofMapping;
-        typedef typename CoarseSpace_::template DofMapping<>::Type CoarseDofMapping;
+        typedef typename FineSpace_::DofMappingType FineDofMapping;
+        typedef typename CoarseSpace_::DofMappingType CoarseDofMapping;
 
         // typedefs for trafo evaluators and data
         typedef typename FineTrafoType::template Evaluator<ShapeType, DataType>::Type FineTrafoEvaluator;

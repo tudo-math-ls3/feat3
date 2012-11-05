@@ -90,14 +90,8 @@ namespace FEAST
           typedef RannacherTurek::Evaluator<Element, Traits, TrafoEvaluator_, VariantTag> Type;
         };
 
-        /** \copydoc ElementBase::DofMapping */
-        template<int shape_dim_ = ShapeType::dimension>
-        class DofMapping
-        {
-        public:
-          /// Dof-Mapping type
-          typedef DofMappingSingleEntity<Element, shape_dim_, ShapeType::dimension - 1> Type;
-        }; // class DofMapper
+        /** \copydoc ElementBase::DofMappingType */
+        typedef DofMappingSingleEntity<Element, ShapeType::dimension - 1> DofMappingType;
 
       public:
         /**

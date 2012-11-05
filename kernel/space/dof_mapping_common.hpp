@@ -11,73 +11,6 @@ namespace FEAST
   namespace Space
   {
     /**
-     * \brief Null-Dof-Mapping class template
-     *
-     * This class template implements the Dof-Mapping interface with an empty dof set.
-     *
-     * \tparam Space_
-     * The finite-element space that this dof-mapping is used by.
-     *
-     * \tparam shape_dim_
-     * The dimension of the shape that his dof-mapping is defined on.
-     *
-     * \author Peter Zajac
-     */
-    template<
-      typename Space_,
-      int shape_dim_>
-    class DofMappingNull :
-      public DofMappingBase<Space_, shape_dim_>
-    {
-    public:
-      /// adjactor image iterator type
-      typedef Adjactor::NullImageIterator ImageIterator;
-
-    public:
-      /// constructor
-      explicit DofMappingNull(const Space_& space) :
-        DofMappingBase<Space_, shape_dim_>(space)
-      {
-      }
-
-      /** \copydoc DofMappingBase::get_num_local_dofs() */
-      Index get_num_local_dofs() const
-      {
-        return 0;
-      }
-
-      /** \copydoc DofMappingBase::get_num_contribs() */
-      Index get_num_contribs(Index /*local_dof_idx*/) const
-      {
-        throw InternalError("invalid call of DofMappingNull::get_num_contribs()");
-      }
-
-      /** \copydoc DofMappingBase::get_index() */
-      Index get_index(Index /*local_dof_idx*/, Index /*contrib_idx*/ = 0) const
-      {
-        throw InternalError("invalid call of DofMappingNull::get_index()");
-      }
-
-      /** \copydoc DofMappingBase::get_weight() */
-      Real get_weight(Index /*local_dof_idx*/, Index /*contrib_idx*/ = 0) const
-      {
-        throw InternalError("invalid call of DofMappingNull::get_weight()");
-      }
-
-      /** \copydoc DofMappingBase::image_begin() */
-      ImageIterator image_begin(Index /*domain_node*/) const
-      {
-        return ImageIterator();
-      }
-
-      /** \copydoc DofMappingBase::image_end() */
-      ImageIterator image_end(Index /*domain_node*/) const
-      {
-        return ImageIterator();
-      }
-    }; // class DofMappingNull<...>
-
-    /**
      * \brief Identity-Dof-Mapping base-class template
      *
      * \note This class is meant to be used as a base-class only, therefore its constructor is protected.
@@ -95,23 +28,18 @@ namespace FEAST
      */
     template<
       typename Space_,
-      int shape_dim_,
       int dofs_per_cell_ = 1>
     class DofMappingIdentity :
-      public DofMappingBase<Space_, shape_dim_>
+      public DofMappingBase<Space_>
     {
     public:
       /// adjactor image iterator type
       typedef Adjactor::IndexImageIterator ImageIterator;
 
-      /// offset of first dof
-      Index _offset;
-
     protected:
       /// constructor
-      explicit DofMappingIdentity(const Space_& space, Index offset = 0) :
-        DofMappingBase<Space_, shape_dim_>(space),
-        _offset(offset)
+      explicit DofMappingIdentity(const Space_& space) :
+        DofMappingBase<Space_>(space)
       {
       }
 
@@ -125,19 +53,19 @@ namespace FEAST
       /** \copydoc DofMappingBase::get_index() */
       Index get_index(Index local_dof_idx, Index /*contrib_idx*/ = 0) const
       {
-        return _offset + Index(dofs_per_cell_) * this->_cell_index + local_dof_idx;
+        return Index(dofs_per_cell_) * this->_cell_index + local_dof_idx;
       }
 
       /** \copydoc DofMappingBase::image_begin() */
       ImageIterator image_begin(Index domain_node) const
       {
-        return ImageIterator(_offset + Index(dofs_per_cell_) * domain_node);
+        return ImageIterator(Index(dofs_per_cell_) * domain_node);
       }
 
       /** \copydoc DofMappingBase::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
-        return ImageIterator(_offset + Index(dofs_per_cell_) * (domain_node + 1));
+        return ImageIterator(Index(dofs_per_cell_) * (domain_node + 1));
       }
     }; // class DofMappingIdentity<...>
 
@@ -163,25 +91,26 @@ namespace FEAST
      */
     template<
       typename Space_,
-      int shape_dim_,
       int dof_dim_,
-      int dofs_per_cell_ = 1,
-      bool have_dof_ = (dof_dim_ <= shape_dim_)>
-    class DofMappingSingleEntity DOXY({});
-
-    /// \cond internal
-    /// partial specialisation for shape_dim_ > dof_dim_
-    template<
-      typename Space_,
-      int shape_dim_,
-      int dof_dim_,
-      int dofs_per_cell_>
-    class DofMappingSingleEntity<Space_, shape_dim_, dof_dim_, dofs_per_cell_, true> :
-      public DofMappingBase<Space_, shape_dim_>
+      int dofs_per_cell_ = 1>
+    class DofMappingSingleEntity :
+      public DofMappingBase<Space_>
     {
     public:
       /// space typedef
       typedef Space_ SpaceType;
+      /// shape type
+      typedef typename SpaceType::ShapeType ShapeType;
+
+      /// dummy enum
+      enum
+      {
+        /// shape dimension
+        shape_dim = ShapeType::dimension
+      };
+
+      // make sure the dof-dimension is less than the shape dimension
+      static_assert(dof_dim_ < shape_dim, "invalid dof dimension");
 
     protected:
       /// trafo type
@@ -189,7 +118,7 @@ namespace FEAST
       /// mesh type
       typedef typename TrafoType::MeshType MeshType;
       /// index-set type
-      typedef typename MeshType::template IndexSet<shape_dim_, dof_dim_>::Type IndexSetType;
+      typedef typename MeshType::template IndexSet<shape_dim, dof_dim_>::Type IndexSetType;
       /// index-vector const-reference
       typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
 
@@ -241,8 +170,8 @@ namespace FEAST
     public:
       /** \copydoc DofMappingBase::DofMappingBase() */
       explicit DofMappingSingleEntity(const Space_& space) :
-        DofMappingBase<Space_, shape_dim_>(space),
-        _index_set(space.get_trafo().get_mesh().template get_index_set<shape_dim_, dof_dim_>())
+        DofMappingBase<Space_>(space),
+        _index_set(space.get_trafo().get_mesh().template get_index_set<shape_dim, dof_dim_>())
       {
       }
 
@@ -272,38 +201,6 @@ namespace FEAST
         return ImageIterator(&_index_set, domain_node, get_num_local_dofs());
       }
     };
-
-    /// partial specialisation for shape_dim_ = dof_dim_: id-dof-mapping
-    template<
-      typename Space_,
-      int shape_dim_,
-      int dofs_per_cell_>
-    class DofMappingSingleEntity<Space_, shape_dim_, shape_dim_, dofs_per_cell_, true> :
-      public DofMappingIdentity<Space_, shape_dim_, dofs_per_cell_>
-    {
-    public:
-      explicit DofMappingSingleEntity(const Space_& space) :
-        DofMappingIdentity<Space_, shape_dim_, dofs_per_cell_>(space)
-      {
-      }
-    };
-
-    /// partial specialisation for shape_dim_ < dof_dim_: null-dof-mapping
-    template<
-      typename Space_,
-      int shape_dim_,
-      int dof_dim_,
-      int dofs_per_cell_>
-    class DofMappingSingleEntity<Space_, shape_dim_, dof_dim_, dofs_per_cell_, false> :
-      public DofMappingNull<Space_, shape_dim_>
-    {
-    public:
-      explicit DofMappingSingleEntity(const Space_& space) :
-        DofMappingNull<Space_, shape_dim_>(space)
-      {
-      }
-    };
-    /// \endcond
   } // namespace Space
 } // namespace FEAST
 

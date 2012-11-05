@@ -158,7 +158,7 @@ namespace FEAST
       typedef SpaceFuncData MultFuncData;
 
       /// dof-mapping types
-      typedef typename SpaceType::template DofMapping<>::Type DofMapping;
+      typedef typename SpaceType::DofMappingType DofMapping;
       typedef DofMapping TestDofMapping;
       typedef DofMapping TrialDofMapping;
       typedef DofMapping MultDofMapping;
@@ -294,8 +294,8 @@ namespace FEAST
       typedef TrialFuncData MultFuncData;
 
       /// dof-mapping types
-      typedef typename TestSpaceType::template DofMapping<>::Type TestDofMapping;
-      typedef typename TrialSpaceType::template DofMapping<>::Type TrialDofMapping;
+      typedef typename TestSpaceType::DofMappingType TestDofMapping;
+      typedef typename TrialSpaceType::DofMappingType TrialDofMapping;
       typedef TrialDofMapping MultDofMapping;
 
       /// local vector type
