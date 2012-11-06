@@ -13,7 +13,7 @@ namespace FEAST
     class VectorBase
     {
       public:
-        virtual const Index & size() const = 0;
+        //virtual const Index & size() const = 0;
 
         virtual ~VectorBase()
         {

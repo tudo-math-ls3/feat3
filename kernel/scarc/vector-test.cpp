@@ -30,6 +30,17 @@ class VectorTest:
       TEST_CHECK_EQUAL(v2.size(), 2000ul);
       TEST_CHECK_EQUAL(v2.num_blocks(), 1ul);
       TEST_CHECK_EQUAL(v1.num_blocks(), 0ul);
+
+      //----------------------------------------
+
+      ScaRC::DynamicVector<> v3(3000);
+      DenseVector<Archs::CPU, double> a(1000);
+      DenseVector<Archs::CPU, double> b(1000);
+      DenseVector<Archs::CPU, double> c(1000);
+
+      v3.add_block(&a, 0);
+      v3.add_block(&b, a.size() - 1);
+      v3.add_block(&c, a.size() + b.size() - 1);
     }
 };
 VectorTest<Archs::None, unsigned long> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: ulong");
