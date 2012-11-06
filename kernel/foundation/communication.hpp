@@ -235,6 +235,30 @@ namespace FEAST
               MPI_Bcast(buf, num_elements, MPIType<DataType_>::value(), root, communicator);
             }
 
+          template<typename DataType1_, typename DataType2_>
+            static inline void scatter(DataType1_ * sendbuf,
+                Index num_elements_to_send,
+                DataType2_ * recvbuf,
+                Index num_elements_to_recv,
+                Index root,
+                MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Scatter(sendbuf, num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, num_elements_to_recv,
+                  MPIType<DataType2_>::value(), root, communicator);
+            }
+
+          template<typename DataType1_, typename DataType2_>
+            static inline void gather(DataType1_ * sendbuf,
+                Index num_elements_to_send,
+                DataType2_ * recvbuf,
+                Index num_elements_to_recv,
+                Index root,
+                MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Gather(sendbuf, num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, num_elements_to_recv,
+                  MPIType<DataType2_>::value(), root, communicator);
+            }
+
           //TODO
       };
 #endif

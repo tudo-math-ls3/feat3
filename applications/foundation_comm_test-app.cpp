@@ -173,6 +173,39 @@ void check_bcast(int rank)
 #endif
 }
 
+void check_scatter_gather(int rank)
+{
+#ifndef FEAST_SERIAL_MODE
+  int size;
+  float value(rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  float* buffer(new float[size]);
+
+  Comm<Archs::Parallel>::gather(&value, 1, buffer, 1, 0);
+  if (rank == 0)
+    for(Index i(0) ; i < size ; ++i)
+    {
+      buffer[i] += 1;
+    }
+  Comm<Archs::Parallel>::scatter(buffer, 1, &value, 1, 0);
+
+  TestResult<float> res;
+  res = test_check_equal_within_eps(value, rank+1, std::numeric_limits<float>::epsilon());
+
+  bool passed(true);
+  if(!res.passed)
+  {
+    std::cout << "Failed (Tier-0: scatter_gather): " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
+    passed = false;
+  }
+
+  if(passed)
+    std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: scatter_gather)" << std::endl;
+
+  delete[] buffer;
+#endif
+}
+
 void check_halo_transfer(int rank)
 {
   if(rank < 2)
@@ -594,6 +627,7 @@ int main(int argc, char* argv[])
   check_sendrecv(me);
   check_send_and_recv(me);
   check_bcast(me);
+  check_scatter_gather(me);
   check_halo_transfer(me);
   check_attribute_transfer(me);
   check_topology_transfer(me);
