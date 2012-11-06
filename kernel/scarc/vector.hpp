@@ -17,7 +17,7 @@ namespace FEAST
 
     template<
       template<typename, typename> class StorageType_ = std::vector
-      >
+    >
     class DynamicVector : public VectorBase
     {
       public:
@@ -107,44 +107,6 @@ namespace FEAST
         {
           return _blocks.at(i);
         }
-    };
-
-
-    template<typename T_>
-    class OffProcessBlock : public MatrixBase
-    {
-      public:
-
-        OffProcessBlock(Index rank, Index rows, Index columns) :
-          _rows(rows),
-          _columns(columns),
-          _rank(rank)
-        {
-        }
-
-        typedef T_ type_;
-
-        const Index & rows() const
-        {
-          return _rows;
-        }
-
-        const Index & columns() const
-        {
-          return _columns;
-        }
-
-        const Index & rank() const
-        {
-          return _rank;
-        }
-
-      private:
-
-        Index _rows;
-        Index _columns;
-
-        Index _rank;
     };
   }
 }

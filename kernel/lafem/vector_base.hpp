@@ -12,7 +12,13 @@ namespace FEAST
   {
     class VectorBase
     {
-      virtual const Index & size() const = 0;
+      public:
+        virtual const Index & size() const = 0;
+
+        virtual ~VectorBase()
+        {
+        }
+
     };
 
   } // namespace LAFEM

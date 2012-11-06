@@ -22,14 +22,14 @@ class VectorTest:
 
     virtual void run() const
     {
-      ScaRC::DynamicVector<> m1(2000);
-      ScaRC::DynamicVector<> m2(m1);
+      ScaRC::DynamicVector<> v1(2000);
+      ScaRC::DynamicVector<> v2(v1);
 
-      m2.add_block(&m1, 100);
+      v2.add_block(&v1, 100);
 
-      TEST_CHECK_EQUAL(m2.size(), 2000ul);
-      TEST_CHECK_EQUAL(m2.num_blocks(), 1ul);
-      TEST_CHECK_EQUAL(m1.num_blocks(), 0ul);
+      TEST_CHECK_EQUAL(v2.size(), 2000ul);
+      TEST_CHECK_EQUAL(v2.num_blocks(), 1ul);
+      TEST_CHECK_EQUAL(v1.num_blocks(), 0ul);
     }
 };
 VectorTest<Archs::None, unsigned long> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: ulong");

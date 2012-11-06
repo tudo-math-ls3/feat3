@@ -12,8 +12,14 @@ namespace FEAST
   {
     class MatrixBase
     {
-      virtual const Index & rows() const = 0;
-      virtual const Index & columns() const = 0;
+      public:
+        virtual const Index & rows() const = 0;
+        virtual const Index & columns() const = 0;
+
+        virtual ~MatrixBase()
+        {
+        }
+
     };
 
   } // namespace LAFEM
