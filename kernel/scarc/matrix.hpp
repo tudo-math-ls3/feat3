@@ -80,11 +80,11 @@ namespace FEAST
           return _num_blocks;
         }
 
-        void add_block(MatrixBase* block, Index row_offset, Index column_offset)
+        void add_block(MatrixBase& block, Index row_offset, Index column_offset)
         {
           _block_row_start.push_back(row_offset);
           _block_column_start.push_back(column_offset);
-          _blocks.push_back(block);
+          _blocks.push_back(&block);
           ++_num_blocks;
         }
 
@@ -114,12 +114,12 @@ namespace FEAST
 
         const MatrixBase& _get_block(Index i) const
         {
-          return _blocks.at(i);
+          return *(_blocks.at(i));
         }
 
         MatrixBase& _get_block(Index i)
         {
-          return _blocks.at(i);
+          return *(_blocks.at(i));
         }
     };
 

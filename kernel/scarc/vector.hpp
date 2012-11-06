@@ -69,10 +69,11 @@ namespace FEAST
           return _num_blocks;
         }
 
-        void add_block(VectorBase* block, Index row_offset)
+        ///row_offset = k => sizeof(block_{i-1}) = k
+        void add_block(VectorBase& block, Index row_offset)
         {
           _block_row_start.push_back(row_offset);
-          _blocks.push_back(block);
+          _blocks.push_back(&block);
           ++_num_blocks;
         }
 
@@ -100,12 +101,12 @@ namespace FEAST
 
         const VectorBase& _get_block(Index i) const
         {
-          return _blocks.at(i);
+          return *(_blocks.at(i));
         }
 
         VectorBase& _get_block(Index i)
         {
-          return _blocks.at(i);
+          return *(_blocks.at(i));
         }
     };
   }

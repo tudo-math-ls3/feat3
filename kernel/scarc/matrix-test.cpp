@@ -25,7 +25,7 @@ class MatrixTest:
       ScaRC::DynamicAOSMatrix<> m1(2000, 3000);
       ScaRC::DynamicAOSMatrix<> m2(m1);
 
-      m2.add_block(&m1, 100, 100);
+      m2.add_block(m1, 100, 100);
 
       TEST_CHECK_EQUAL(m2.rows(), 2000ul);
       TEST_CHECK_EQUAL(m2.columns(), 3000ul);
@@ -33,4 +33,4 @@ class MatrixTest:
       TEST_CHECK_EQUAL(m1.num_blocks(), 0ul);
     }
 };
-MatrixTest<Archs::None, unsigned long> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: ulong");
+MatrixTest<Archs::CPU, double> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: double");
