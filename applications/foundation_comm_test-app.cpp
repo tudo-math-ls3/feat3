@@ -110,6 +110,8 @@ void check_send_and_recv(int rank)
     Comm<Archs::Parallel>::send(f,
                                      100000,
                                      1);
+
+    std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: send and recv)" << std::endl;
   }
   if(rank == 1)
   {
@@ -124,7 +126,7 @@ void check_send_and_recv(int rank)
     for(unsigned long i(0) ; i < 100000 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "Failed (Tier-0: send and recv): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -134,6 +136,39 @@ void check_send_and_recv(int rank)
   }
 
   delete[] f;
+  delete[] recvbuffer;
+#endif
+}
+
+void check_bcast(int rank)
+{
+#ifndef FEAST_SERIAL_MODE
+  int size;
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  float* recvbuffer(new float[size]);
+  for(Index i(0) ; i < size ; ++i)
+  {
+    recvbuffer[i] = i + rank;
+  }
+
+  Comm<Archs::Parallel>::bcast(recvbuffer, size, 0);
+
+  TestResult<float> res[size];
+  for(unsigned long i(0) ; i < size ; ++i)
+    res[i] = test_check_equal_within_eps(recvbuffer[i], i, std::numeric_limits<float>::epsilon());
+
+  bool passed(true);
+  for(unsigned long i(0) ; i < size ; ++i)
+    if(!res[i].passed)
+    {
+      std::cout << "Failed (Tier-0: bcast): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+      passed = false;
+      break;
+    }
+
+  if(passed)
+    std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: bcast)" << std::endl;
+
   delete[] recvbuffer;
 #endif
 }
@@ -558,6 +593,7 @@ int main(int argc, char* argv[])
 
   check_sendrecv(me);
   check_send_and_recv(me);
+  check_bcast(me);
   check_halo_transfer(me);
   check_attribute_transfer(me);
   check_topology_transfer(me);

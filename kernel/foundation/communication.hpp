@@ -188,8 +188,8 @@ namespace FEAST
                            &status);
             }
 
-          template<typename DataType1_>
-            static inline void send(DataType1_ * sendbuf,
+          template<typename DataType_>
+            static inline void send(DataType_ * sendbuf,
                 Index num_elements_to_send,
                 Index dest_rank,
                 Index send_tag = 0,
@@ -197,14 +197,14 @@ namespace FEAST
             {
               MPI_Send(sendbuf,
                            num_elements_to_send,
-                           MPIType<DataType1_>::value(),
+                           MPIType<DataType_>::value(),
                            dest_rank,
                            send_tag,
                            communicator);
             }
 
-          template<typename DataType1_>
-            static inline void recv(DataType1_ * recvbuf,
+          template<typename DataType_>
+            static inline void recv(DataType_ * recvbuf,
                 Index num_elements_to_recv,
                 Index src_rank,
                 Index recv_tag = 0,
@@ -214,11 +214,25 @@ namespace FEAST
 
               MPI_Recv(recvbuf,
                            num_elements_to_recv,
-                           MPIType<DataType1_>::value(),
+                           MPIType<DataType_>::value(),
                            src_rank,
                            recv_tag,
                            communicator,
                            &status);
+            }
+
+          static inline void barrier(MPI_Comm communicator = MPI_COMM_WORLD)
+          {
+            MPI_Barrier(communicator);
+          }
+
+          template<typename DataType_>
+            static inline void bcast(DataType_ * buf,
+                Index num_elements,
+                Index root,
+                MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Bcast(buf, num_elements, MPIType<DataType_>::value(), root, communicator);
             }
 
           //TODO
