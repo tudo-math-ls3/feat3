@@ -206,6 +206,35 @@ void check_scatter_gather(int rank)
 #endif
 }
 
+void check_reduce(int rank)
+{
+#ifndef FEAST_SERIAL_MODE
+  int size;
+  float value(rank + 1);
+  float result(0);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  Comm<Archs::Parallel>::reduce(&value, &result, 1, MPI_SUM, 0);
+
+  if(rank == 0)
+  {
+    TestResult<float> res;
+    res = test_check_equal_within_eps(result, size*(size+1)/2, std::numeric_limits<float>::epsilon());
+
+    bool passed(true);
+    if(!res.passed)
+    {
+      std::cout << "Failed (Tier-0: reduce): " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
+      passed = false;
+    }
+
+    if(passed)
+      std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: reduce)" << std::endl;
+  }
+
+#endif
+}
+
 void check_halo_transfer(int rank)
 {
   if(rank < 2)
@@ -628,6 +657,7 @@ int main(int argc, char* argv[])
   check_send_and_recv(me);
   check_bcast(me);
   check_scatter_gather(me);
+  check_reduce(me);
   check_halo_transfer(me);
   check_attribute_transfer(me);
   check_topology_transfer(me);

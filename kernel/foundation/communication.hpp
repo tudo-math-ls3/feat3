@@ -259,6 +259,17 @@ namespace FEAST
                   MPIType<DataType2_>::value(), root, communicator);
             }
 
+          template<typename DataType_>
+            static inline void reduce(DataType_ * sendbuf,
+                DataType_ * recvbuf,
+                Index num_elements_to_send,
+                MPI_Op op,
+                Index root,
+                MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Reduce(sendbuf, recvbuf, num_elements_to_send, MPIType<DataType_>::value(), op, root, communicator);
+            }
+
           //TODO
       };
 #endif
