@@ -358,7 +358,7 @@ namespace FEAST
       {
         AImIt1 cur1(adj1.image_begin(i));
         AImIt1 end1(adj1.image_end(i));
-        for(; cur != end; ++cur)
+        for(; cur1 != end1; ++cur1)
         {
           AImIt2 cur2(adj2.image_begin(*cur1));
           AImIt2 end2(adj2.image_end(*cur1));
@@ -395,7 +395,7 @@ namespace FEAST
       {
         AImIt1 cur1(adj1.image_begin(i));
         AImIt1 end1(adj1.image_end(i));
-        for(; cur != end; ++cur)
+        for(; cur1 != end1; ++cur1)
         {
           AImIt2 cur2(adj2.image_begin(*cur1));
           AImIt2 end2(adj2.image_end(*cur1));
