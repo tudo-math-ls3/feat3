@@ -625,6 +625,7 @@
     <ClInclude Include="..\kernel\util\compiler_oracle.hpp" />
     <ClInclude Include="..\kernel\util\compiler_pgi.hpp" />
     <ClInclude Include="..\kernel\util\cpp11_smart_pointer.hpp" />
+    <ClInclude Include="..\kernel\util\dynamic_graph.hpp" />
     <ClInclude Include="..\kernel\util\exception.hpp" />
     <ClInclude Include="..\kernel\util\factorial.hpp" />
     <ClInclude Include="..\kernel\util\file_error.hpp" />

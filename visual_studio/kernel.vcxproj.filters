@@ -513,6 +513,9 @@
     <ClInclude Include="..\kernel\assembly\local_system_data.hpp">
       <Filter>Header Files\assembly</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\dynamic_graph.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
