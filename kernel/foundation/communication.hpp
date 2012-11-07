@@ -270,6 +270,17 @@ namespace FEAST
               MPI_Reduce(sendbuf, recvbuf, num_elements_to_send, MPIType<DataType_>::value(), op, root, communicator);
             }
 
+          template<typename DataType1_, typename DataType2_>
+            static inline void allgather(DataType1_ * sendbuf,
+                Index num_elements_to_send,
+                DataType2_ * recvbuf,
+                Index num_elements_to_recv,
+                MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Allgather(sendbuf, num_elements_to_send, MPIType<DataType1_>::value(),
+                  recvbuf, num_elements_to_recv, MPIType<DataType2_>::value(), communicator);
+            }
+
           //TODO
       };
 #endif
