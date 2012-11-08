@@ -148,14 +148,14 @@ namespace FEAST
         T2_& _right;
     };
 
-    class UnitializedProxyPreconApply : public ProxyVector<UnitializedProxyPreconApply >
+    class UninitializedProxyPreconApply : public ProxyVector<UninitializedProxyPreconApply >
     {
       public:
-        UnitializedProxyPreconApply()
+        UninitializedProxyPreconApply()
         {
         }
 
-        UnitializedProxyPreconApply& operator=(const UnitializedProxyPreconApply& rhs)
+        UninitializedProxyPreconApply& operator=(const UninitializedProxyPreconApply& rhs)
         {
           if(this == &rhs)
             return *this;
@@ -163,13 +163,13 @@ namespace FEAST
           return *this;
         }
 
-        UnitializedProxyPreconApply(const UnitializedProxyPreconApply& other)
+        UninitializedProxyPreconApply(const UninitializedProxyPreconApply& other)
         {
         }
 
         virtual const std::string type_name()
         {
-          return "UNINITIALIZED PRECONDITIONER";
+          return "__UNINITIALIZED_PRECONDITIONER__()";
         }
     };
 
@@ -177,7 +177,7 @@ namespace FEAST
     {
       public:
         ProxyPreconApply() :
-          _right(std::shared_ptr<FunctorBase>(new UnitializedProxyPreconApply()))
+          _right(std::shared_ptr<FunctorBase>(new UninitializedProxyPreconApply()))
         {
         }
 
@@ -255,6 +255,7 @@ namespace FEAST
         {
           return "__defect__(" + _left.cast().type_name() + "," + _middle.cast().type_name() + "," + _right.cast().type_name() + ")";
         }
+
       private:
         T1_& _left;
         T2_& _middle;

@@ -54,7 +54,7 @@ class SolverFunctorTest:
 
       ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> richardson2(x2, p2);
 
-      TEST_CHECK_EQUAL(richardson2.type_name(), "ProxyVector + __precon__(UNINITIALIZED PRECONDITIONER)");
+      TEST_CHECK_EQUAL(richardson2.type_name(), "ProxyVector + __precon__(__UNINITIALIZED_PRECONDITIONER__())");
 
       //create layer n-1
       std::shared_ptr<FunctorBase> pr2(new ScaRC::ProxyDefect<ScaRC::VectorData, ScaRC::MatrixData, ScaRC::VectorData>(b2, A2, x2));
