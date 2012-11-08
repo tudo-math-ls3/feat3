@@ -516,6 +516,9 @@
     <ClInclude Include="..\kernel\util\dynamic_graph.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\lafem\transposition.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
