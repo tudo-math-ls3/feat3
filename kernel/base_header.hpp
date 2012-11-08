@@ -134,14 +134,92 @@ namespace FEAST
   typedef double Real;
 
   /**
-  * \brief Nil class definition.
-  *
-  * This is an empty tag class which may be used for templates with optional parameters.\n
-  * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
-  */
+   * \brief Nil class definition.
+   *
+   * This is an empty tag class which may be used for templates with optional parameters.\n
+   * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
+   */
   class Nil
   {
   }; // class Nil
+
+  /**
+   * \brief Modes namespace
+   */
+  namespace Modes
+  {
+    /**
+     * \brief Serial mode tag class
+     */
+    struct Serial
+    {
+      /// Returns the name of the tag class.
+      static const char* name()
+      {
+        return "Serial";
+      }
+    };
+
+    /**
+     * \brief Parallel mode tag class
+     */
+    struct Parallel
+    {
+      /// Returns the name of the tag class.
+      static const char* name()
+      {
+        return "Parallel";
+      }
+    };
+
+    /**
+     * \brief Debug mode tag class
+     */
+    struct Debug
+    {
+      /// Returns the name of the tag class.
+      static const char* name()
+      {
+        return "Debug";
+      }
+    };
+
+    /**
+     * \brief Release mode tag class
+     */
+    struct Release
+    {
+      /// Returns the name of the tag class.
+      static const char* name()
+      {
+        return "Release";
+      }
+    };
+  } // namespace Modes
+
+  /**
+   * \brief Build-Mode typedef
+   *
+   * This typedef specifies the currently active build mode tag.
+   * It is either Modes::Serial or Modes::Parallel, depending on whether the SERIAL macro is defined or not.
+   */
+#ifdef SERIAL
+  typedef Modes::Serial BuildMode;
+#else
+  typedef Modes::Parallel BuildMode;
+#endif
+
+  /**
+   * \brief Debug-Mode typedef
+   *
+   * This typedef specifies the currently active debug mode tag.
+   * It is either Modes::Debug or Modes::Release, depending on whether the DEBUG macro is defined or not.
+   */
+#ifdef DEBUG
+  typedef Modes::Debug DebugMode;
+#else
+  typedef Modes::Release DebugMode;
+#endif
 } // namespace FEAST
 
 #endif // KERNEL_BASE_HEADER_HPP
