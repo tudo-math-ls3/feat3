@@ -148,11 +148,10 @@ namespace FEAST
         T2_& _right;
     };
 
-    template<typename T_>
-    class ProxyPreconApply : public ProxyVector<ProxyPreconApply<T_> >
+    class ProxyPreconApply : public ProxyVector<ProxyPreconApply >
     {
       public:
-        ProxyPreconApply(T_& right) :
+        ProxyPreconApply(std::shared_ptr<FunctorBase>& right) :
           _right(right)
         {
         }
@@ -174,11 +173,11 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "__precon__(" + _right.cast().type_name() + ")";
+          return "__precon__(" + _right.get()->type_name() + ")";
         }
 
       private:
-        T_& _right;
+        std::shared_ptr<FunctorBase>& _right;
     };
 
     template<typename T1_, typename T2_, typename T3_>
