@@ -629,6 +629,7 @@
     <ClInclude Include="..\kernel\util\abort.hpp" />
     <ClInclude Include="..\kernel\util\adjactor.hpp" />
     <ClInclude Include="..\kernel\util\assertion.hpp" />
+    <ClInclude Include="..\kernel\util\colouring.hpp" />
     <ClInclude Include="..\kernel\util\compiler_gnu.hpp" />
     <ClInclude Include="..\kernel\util\compiler_intel.hpp" />
     <ClInclude Include="..\kernel\util\compiler_microsoft.hpp" />
@@ -636,6 +637,7 @@
     <ClInclude Include="..\kernel\util\compiler_oracle.hpp" />
     <ClInclude Include="..\kernel\util\compiler_pgi.hpp" />
     <ClInclude Include="..\kernel\util\cpp11_smart_pointer.hpp" />
+    <ClInclude Include="..\kernel\util\cuthill_mckee.hpp" />
     <ClInclude Include="..\kernel\util\dynamic_graph.hpp" />
     <ClInclude Include="..\kernel\util\exception.hpp" />
     <ClInclude Include="..\kernel\util\factorial.hpp" />
@@ -664,6 +666,7 @@
     <ClCompile Include="..\kernel\foundation\functor_error.cpp" />
     <ClCompile Include="..\kernel\foundation\mesh_error.cpp" />
     <ClCompile Include="..\kernel\lafem\memory_pool.cpp" />
+    <ClCompile Include="..\kernel\util\colouring.cpp" />
     <ClCompile Include="..\kernel\util\exception.cpp" />
     <ClCompile Include="..\kernel\util\logger.cpp" />
     <ClCompile Include="..\kernel\util\param_section.cpp" />

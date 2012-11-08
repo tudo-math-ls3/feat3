@@ -1,5 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/util/graph.hpp>
+#include <kernel/util/colouring.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -40,6 +41,7 @@ public:
     // 4 |  . 11  .  . 12
     // 5 | 13  . 14  .  .
     // 6 |  . 15  . 16  .
+
     Index f_ptr[8] = {0, 3, 5, 8, 11, 13, 15, 17};
     Index f_idx[17] =
     {
@@ -101,6 +103,7 @@ public:
     // 4 | 29  . 26 30 27  . 28
     // 5 | 31 35 32 33  . 34  .
     // 6 |  . 39 36 40 37  . 38
+
     Index fg_ptr[8] = {0, 6, 12, 19, 26, 31, 36, 41};
     Index fg_idx[41] =
     {
@@ -160,6 +163,7 @@ public:
     // 2 | 10 14 11 13 12
     // 3 | 17 19 15 16 18
     // 4 | 20 24 21 23 22
+
     Index gf_ptr[6] = {0, 5, 10, 15, 20, 25};
     Index gf_idx[25] =
     {
@@ -198,6 +202,112 @@ public:
       }
     }
 
+    return true;
+  }
+
+  bool test_constr_perm(Graph& f) const
+  {
+    CONTEXT("GraphTest::test_constr_perm()");
+
+    // fetch the graph's arrays
+    Index* domain_ptr = f.get_domain_ptr();
+    Index* image_ptr = f.get_image_idx();
+
+    // check against analytic solution
+    //      0  1  2  3  4  5  6
+    //   +---------------------
+    // 0 |  0  2  3  .  .  .  1
+    // 1 |  .  4  .  6  5  .  .
+    // 2 |  7  8 10  .  .  9  .
+    // 3 |  .  .  . 13  . 12 11
+    // 4 | 14  .  .  . 16 15  .
+
+    Index domain_ref[6] = {0, 4, 7, 11, 14, 17};
+    Index image_ref[17] =
+    {
+      0, 6, 1, 2, 1, 4, 3, 0, 1, 5, 2, 6, 5, 3, 0, 5, 4
+    };
+
+    // check dimensions
+    if(f.get_num_nodes_domain() != 5)
+      return false;
+    if(f.get_num_nodes_image() != 7)
+      return false;
+
+    // compare pointer arrays
+    for(int i(0); i < 6; ++i)
+    {
+      if(domain_ptr[i] != domain_ref[i])
+      {
+        return false;
+      }
+    }
+
+    // compare index arrays
+    for(int i(0); i < 17; ++i)
+    {
+      if(image_ptr[i] != image_ref[i])
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool test_constr_colour(Graph& f) const
+  {
+    CONTEXT("GraphTest::test_constr_colour()");
+
+    // fetch the graph's arrays
+    Index* domain_ptr = f.get_domain_ptr();
+    Index* image_ptr = f.get_image_idx();
+
+    // check against analytic solution
+    //      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+    //   +---------------------------------------------
+    // 0 |  .  .  .  .  .  .  .  .  .  .  .  0  1  .  .
+    // 1 |  2  .  3  4  .  .  .  .  5  .  .  .  .  6  .
+    // 2 |  .  7  .  .  .  .  8  .  .  .  .  .  .  .  9
+    // 3 |  .  .  .  . 10  .  . 11  .  .  .  .  .  .  .
+    // 4 |  .  .  .  .  . 12  .  .  . 13 14  .  .  .  .
+
+    // corresponding colouring (see run()):
+    // nodes:   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+    // colours: 1, 2, 1, 1, 3, 4, 2, 3, 1, 4, 4, 0, 0, 1, 2
+
+    Index domain_ref[6] = {0, 2, 7, 10, 12, 15};
+    Index image_ref[15] =
+    {
+      11, 12,
+      0, 2, 3, 8, 13,
+      1, 6, 14,
+      4, 7,
+      5, 9, 10
+    };
+
+    // check dimensions
+    if(f.get_num_nodes_domain() != 5)
+      return false;
+    if(f.get_num_nodes_image() != 15)
+      return false;
+
+    // compare pointer arrays
+    for(int i(0); i < 6; ++i)
+    {
+      if(domain_ptr[i] != domain_ref[i])
+      {
+        return false;
+      }
+    }
+
+    // compare index arrays
+    for(int i(0); i < 15; ++i)
+    {
+      if(image_ptr[i] != image_ref[i])
+      {
+        return false;
+      }
+    }
     return true;
   }
 
@@ -253,6 +363,7 @@ public:
     // 2 |  7  8  9  .  . 10  .
     // 3 |  . 11  . 12  .  . 13
     // 4 | 14  .  . 15 16  .  .
+
     Index g_ptr[6] = {0, 4, 7, 11, 14, 17};
     Index g_idx[17] =
     {
@@ -278,6 +389,48 @@ public:
 
     // test sorting
     TEST_CHECK(test_sort());
+
+    // test the construction with a domain- and an image-permutation
+
+    // define domain permutation
+    Index domain_perm_idx[5] =
+    {
+      2, 1, 0, 3, 4
+    };
+
+    Permutation prm_domain(5, Permutation::type_perm, domain_perm_idx);
+
+    // define image permutation
+    Index image_perm_idx[7] =
+    {
+      0, 6, 1, 5, 4, 2, 3
+    };
+
+    Permutation prm_image(7, Permutation::type_perm, image_perm_idx);
+
+    // construct graph
+    Graph fperm(g, prm_domain, prm_image);
+
+    // test
+    TEST_CHECK(test_constr_perm(fperm));
+
+    // test the creation out of a colouring object
+
+    // colouring array
+    Index colour[15] =
+    {
+      1, 2, 1, 1, 3, 4, 2, 3, 1, 4, 4, 0, 0, 1, 2
+    };
+
+    // create colouring object
+    Colouring col(15, colour);
+
+    // construct graph
+    Graph fcol(col);
+
+    // validate
+    TEST_CHECK(test_constr_colour(fcol));
+
   }
 
 } graph_test;

@@ -244,5 +244,11 @@
     <ClCompile Include="..\kernel\lafem\transposition-test.cpp">
       <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\util\cuthill_mckee-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\colouring-test.cpp">
+      <Filter>Source Files %28kernel%29\util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

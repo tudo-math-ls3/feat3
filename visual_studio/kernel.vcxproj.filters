@@ -552,6 +552,12 @@
     <ClInclude Include="..\kernel\geometry\conformal_factories.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\colouring.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\util\cuthill_mckee.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
@@ -580,6 +586,9 @@
     </ClCompile>
     <ClCompile Include="..\kernel\lafem\memory_pool.cpp">
       <Filter>Source Files\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\colouring.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

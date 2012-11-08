@@ -6,6 +6,8 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/adjactor.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/permutation.hpp>
+#include <kernel/util/colouring.hpp>
 
 // includes, system
 #include <iostream>
@@ -286,6 +288,59 @@ namespace FEAST
     }
 
     /**
+     * \brief "Colouring" Constructor
+     *
+     * This constructor creates a new graph out of the colouring object which is passed to this function.
+     * The created graph's image is the set of nodes, the domain is the set of colours.
+     *
+     * \param[in] col
+     * The colouring object the graph is derived from.
+     *
+     */
+    explicit Graph(const Colouring& col)
+    {
+      CONTEXT("Graph::Graph() [colouring]");
+
+      // get 'size' of the graph
+      _num_nodes_domain = col.get_max_colour() + 1;
+      _num_nodes_image = col.get_num_nodes();
+      _num_indices_image = col.get_num_nodes();
+      _shared = false;
+
+      // get colouring
+      const Index* colouring = col.get_colouring();
+
+      // we ignore the domain_end-array of the original graph
+      _domain_end = nullptr;
+
+      // create domain array
+      _domain_ptr = new Index[_num_nodes_domain+1];
+      _domain_ptr[0] = 0;
+
+      // create image array
+      _image_idx = new Index[_num_indices_image];
+
+      // index counter
+      Index idx_counter = 0;
+
+      // loop over all colours
+      for(Index i(0); i < _num_nodes_domain; ++i)
+      {
+        // loop over all nodes
+        for(Index j(0); j < _num_nodes_image; ++j)
+        {
+          // if node j has the colour i
+          if(i == colouring [j])
+          {
+            _image_idx[idx_counter] = j;
+            ++idx_counter;
+          }
+        }
+        _domain_ptr[i+1] = idx_counter;
+      }
+    }
+
+    /**
      * \brief Render constructor
      *
      * This constructor renders an object implementing the Adjactor interface into a graph.
@@ -462,6 +517,60 @@ namespace FEAST
       }
 
       return *this;
+    }
+
+    /**
+     * \brief "Permutation" copy CTOR
+     *
+     * This constructor creates a new graph by permuting the domain and image set
+     * of the graph that is passed to this function.
+     *
+     * \param[in] other
+     * The graph that has to be permuted.
+     *
+     * \param[in] domain_perm
+     * The permutation of the domain set.
+     *
+     * \param[in] image_perm
+     * The permutation of the image set.
+     */
+
+    Graph(const Graph& other, Permutation& domain_perm, Permutation& image_perm) :
+      _num_nodes_domain(other.get_num_nodes_domain()),
+      _num_nodes_image(other.get_num_nodes_image()),
+      _num_indices_image(other.get_num_indices()),
+      _domain_ptr(new Index[_num_nodes_domain+1]),
+      _domain_end(nullptr),
+      _image_idx(new Index[_num_indices_image]),
+      _shared(false)
+    {
+      // get domain permutation
+      Index* domain_perm_pos = domain_perm.get_perm_pos();
+
+      // calculate new domain array
+      _domain_ptr[0] = other._domain_ptr[0];
+      for(Index i(0); i < _num_nodes_domain; ++i)
+      {
+        _domain_ptr[i+1] = other._domain_ptr[domain_perm_pos[i]+1]
+                        - other._domain_ptr[domain_perm_pos[i]]
+                        + _domain_ptr[i];
+      }
+
+      // get image permutation
+      Index* image_perm_pos = image_perm.get_perm_pos();
+
+      // calculate new image array
+      Index count = 0;
+      for(Index i(0); i < _num_nodes_domain; ++i)
+      {
+        Index _offset  = other._domain_ptr[domain_perm_pos[i]];
+        Index _row_end = other._domain_ptr[domain_perm_pos[i]+1];
+        for(Index j(_offset); j < _row_end; ++j)
+        {
+          _image_idx[count] = image_perm_pos[other._image_idx[j]];
+          ++count;
+        }
+      }
     }
 
     /// virtual destructor
