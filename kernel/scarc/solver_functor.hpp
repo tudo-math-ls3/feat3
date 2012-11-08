@@ -148,9 +148,39 @@ namespace FEAST
         T2_& _right;
     };
 
-    class ProxyPreconApply : public ProxyVector<ProxyPreconApply >
+    class UnitializedProxyPreconApply : public ProxyVector<UnitializedProxyPreconApply >
     {
       public:
+        UnitializedProxyPreconApply()
+        {
+        }
+
+        UnitializedProxyPreconApply& operator=(const UnitializedProxyPreconApply& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          return *this;
+        }
+
+        UnitializedProxyPreconApply(const UnitializedProxyPreconApply& other)
+        {
+        }
+
+        virtual const std::string type_name()
+        {
+          return "UNINITIALIZED PRECONDITIONER";
+        }
+    };
+
+    class ProxyPreconApply : public ProxyVector<ProxyPreconApply>
+    {
+      public:
+        ProxyPreconApply() :
+          _right(std::shared_ptr<FunctorBase>(new UnitializedProxyPreconApply()))
+        {
+        }
+
         ProxyPreconApply(std::shared_ptr<FunctorBase>& right) :
           _right(right)
         {
@@ -176,9 +206,20 @@ namespace FEAST
           return "__precon__(" + _right.get()->type_name() + ")";
         }
 
+        std::shared_ptr<FunctorBase>& get()
+        {
+          return _right;
+        }
+
+        const std::shared_ptr<FunctorBase>& get() const
+        {
+          return _right;
+        }
+
       private:
-        std::shared_ptr<FunctorBase>& _right;
+        std::shared_ptr<FunctorBase> _right;
     };
+
 
     template<typename T1_, typename T2_, typename T3_>
     class ProxyDefect : public ProxyVector<ProxyDefect<T1_, T2_, T3_> >
