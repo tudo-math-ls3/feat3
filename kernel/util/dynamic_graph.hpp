@@ -277,6 +277,59 @@ namespace FEAST
       return _indices[domain_node].erase(image_node) > 0;
     }
 
+    /**
+     * \brief Composes this dynamic graph with another adjactor in-situ.
+     *
+     * \param[in] adjactor
+     * An object implementing the Adjactor interface that is to be composed.
+     */
+    template<typename Adjactor_>
+    void compose(const Adjactor_& adjactor)
+    {
+      CONTEXT("DynamicGraph::compose()");
+      ASSERT(_num_nodes_image <= adjactor.get_num_nodes_domain(), "Adjactor dimension mismatch!");
+
+      typedef typename Adjactor_::ImageIterator AImIt;
+
+      // image index buffer vector
+      std::vector<Index> img_idx;
+
+      // loop over all domain nodes
+      for(Index i(0); i < _num_nodes_domain; ++i)
+      {
+        // clear image index buffer
+        img_idx.clear();
+
+        // loop over all image indices of this adjactor and make a backup of them
+        {
+          ImageIterator it(_indices[i].begin());
+          ImageIterator jt(_indices[i].end());
+          for(; it != jt; ++it)
+          {
+            img_idx.push_back(*it);
+          }
+        }
+
+        // clear the current domain node
+        _indices[i].clear();
+
+        // loop over all entries of the index buffer vector
+        for(Index j(0); j < img_idx.size(); ++j)
+        {
+          // iterator over all adjacent nodes
+          AImIt it(adjactor.image_begin(img_idx[j]));
+          AImIt jt(adjactor.image_end(img_idx[j]));
+          for(; it != jt; ++it)
+          {
+            _indices[i].insert(*it);
+          }
+        }
+      }
+
+      // store new image node count
+      _num_nodes_image = adjactor.get_num_nodes_image();
+    }
+
     /* *************************************************** */
     /*  R E N D E R   F U N C T I O N   T E M P L A T E S  */
     /* *************************************************** */
