@@ -606,7 +606,7 @@ namespace FEAST
         inline ImageIterator image_begin(Index domain_node) const
         {
           ASSERT(domain_node < _rows, "Domain node index out of range");
-          return &_col_ind[row_ptr[domain_node]];
+          return &_col_ind[_row_ptr[domain_node]];
         }
 
         /** \copydoc Adjactor::image_end() */
@@ -614,7 +614,7 @@ namespace FEAST
         {
           CONTEXT("Graph::image_end()");
           ASSERT(domain_node < _rows, "Domain node index out of range");
-          return &_col_ind[row_ptr_end[domain_node]];
+          return &_col_ind[_row_ptr_end[domain_node]];
         }
     };
 
