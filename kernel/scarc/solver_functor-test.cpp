@@ -62,6 +62,17 @@ class SolverFunctorTest:
 
       p2.get() = std::shared_ptr<FunctorBase>(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p3));
       TEST_CHECK_EQUAL(richardson2.type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
+      //----------------------------------
+      std::shared_ptr<ScaRC::MatrixData> A3(new ScaRC::MatrixData);
+      std::shared_ptr<ScaRC::VectorData> x3(new ScaRC::VectorData);
+      std::shared_ptr<ScaRC::VectorData> b3(new ScaRC::VectorData);
+      std::shared_ptr<FunctorBase> p3_master;
+      std::shared_ptr<FunctorBase> p3_local;
+
+      std::shared_ptr<FunctorBase> scarc(ScaRC::SolverPatternGeneration<ScaRC::Richardson>::execute(x3, p3_master));
+      ((ScaRC::ProxyPreconApply*)p3_master.get())->get() = ScaRC::SolverPatternGeneration<ScaRC::RichardsonLocal>::execute(A3, x3, b3, p3_local);
+
+      TEST_CHECK_EQUAL(scarc.get()->type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
     }
 };
 SolverFunctorTest<Archs::CPU, double> sf_cpu_double("StorageType: std::vector, DataType: double");
