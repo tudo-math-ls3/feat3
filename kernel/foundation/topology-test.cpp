@@ -1,5 +1,5 @@
-#define SERIAL
 #include <kernel/base_header.hpp>
+#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/topology.hpp>
@@ -109,3 +109,4 @@ TopologyCommTest<Archs::None, unsigned long, std::vector, std::deque<unsigned lo
 TopologyCommTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_commtest_cpu_d_d("std::deque, std::deque");
 
 TopologyCommTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");
+#endif // SERIAL

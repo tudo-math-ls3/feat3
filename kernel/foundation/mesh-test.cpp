@@ -1,5 +1,5 @@
-#define SERIAL
 #include <kernel/base_header.hpp>
+#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
 #include<kernel/foundation/mesh.hpp>
@@ -904,3 +904,4 @@ class MeshTestCommInterface:
 };
 MeshTestCommInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_comminter_cpu_v_v("std::vector, std::vector");
 MeshTestCommInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_comminter_cpu_v_d("std::vector, std::deque");
+#endif // SERIAL

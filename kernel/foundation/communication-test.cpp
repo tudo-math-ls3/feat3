@@ -1,5 +1,5 @@
-#define SERIAL
 #include <kernel/base_header.hpp>
+#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
 #include<kernel/foundation/mesh.hpp>
@@ -132,3 +132,4 @@ CommunicationTest<Archs::CPU, unsigned long, std::vector, std::vector<unsigned l
 CommunicationTest<Archs::CPU, unsigned long, std::deque, std::vector<unsigned long> > halo_test_cpu_d_v("std::deque, std::vector");
 CommunicationTest<Archs::CPU, unsigned long, std::vector, std::deque<unsigned long> > halo_test_cpu_v_d("std::vector, std::deque");
 CommunicationTest<Archs::CPU, unsigned long, std::deque, std::deque<unsigned long> > halo_test_cpu_d_d("std::deque, std::deque");
+#endif // SERIAL

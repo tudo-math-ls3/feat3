@@ -1,6 +1,5 @@
-#define SERIAL
-
 #include <kernel/base_header.hpp>
+#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/attribute.hpp>
@@ -89,3 +88,4 @@ AttributeCommTest<Archs::None, double, int, std::vector> attribute_commtest_cpu_
 AttributeCommTest<Archs::None, unsigned long, float, std::deque> attribute_commtest_cpu_d_ulong_float("StorageType: std::deque, DataTypes: ulong, float");
 AttributeCommTest<Archs::None, double, float, std::deque> attribute_commtest_cpu_d_double_float("StorageType: std::deque, DataTypes: double, float");
 AttributeCommTest<Archs::None, double, int, std::deque> attribute_commtest_cpu_d_double_int("StorageType: std::deque, DataTypes: double, int");
+#endif // SERIAL
