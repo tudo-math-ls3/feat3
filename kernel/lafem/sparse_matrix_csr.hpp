@@ -30,6 +30,10 @@ namespace FEAST
     template <typename Arch_, typename DT_>
     class SparseMatrixCSR : public Container<Arch_, DT_>
     {
+      public:
+        /// ImageIterator typedef for Adjactor interface implementation
+        typedef const Index* ImageIterator;
+
       private:
         /// Column indices.
         Index * _col_ind;
@@ -580,6 +584,37 @@ namespace FEAST
         const DT_ zero_element() const
         {
           return _zero_element;
+        }
+
+        /* ******************************************************************* */
+        /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
+        /* ******************************************************************* */
+      public:
+        /** \copydoc Adjactor::get_num_nodes_domain() */
+        inline Index get_num_nodes_domain() const
+        {
+          return _rows;
+        }
+
+        /** \copydoc Adjactor::get_num_nodes_image() */
+        inline Index get_num_nodes_image() const
+        {
+          return _columns;
+        }
+
+        /** \copydoc Adjactor::image_begin() */
+        inline ImageIterator image_begin(Index domain_node) const
+        {
+          ASSERT(domain_node < _rows, "Domain node index out of range");
+          return &_col_ind[row_ptr[domain_node]];
+        }
+
+        /** \copydoc Adjactor::image_end() */
+        inline ImageIterator image_end(Index domain_node) const
+        {
+          CONTEXT("Graph::image_end()");
+          ASSERT(domain_node < _rows, "Domain node index out of range");
+          return &_col_ind[row_ptr_end[domain_node]];
         }
     };
 
