@@ -40,11 +40,12 @@ namespace FEAST
             std::shared_ptr<MatrixData>& P,
             std::shared_ptr<FunctorBase>& p)
         {
-          std::shared_ptr<FunctorBase> defect(new ProxyDefect<VectorData, MatrixData, VectorData>(b, A, x));
+          /*std::shared_ptr<FunctorBase> defect(new ProxyDefect<VectorData, MatrixData, VectorData>(b, A, x));
 
-          std::shared_ptr<FunctorBase> product(new ProxyMatrixVectorProduct<MatrixData, ProxyDefect<VectorData, MatrixData, VectorData> >(P, (*reinterpret_cast<std::shared_ptr<ProxyDefect<VectorData, MatrixData, VectorData> >* >(&defect))));
+          std::shared_ptr<FunctorBase> product(new ProxyMatrixVectorProduct<MatrixData, ProxyDefect<VectorData, MatrixData, VectorData> >(P, (*reinterpret_cast<std::shared_ptr<ProxyDefect<VectorData, MatrixData, VectorData> >* >(&defect))));*/
 
-          p = std::shared_ptr<FunctorBase>(new ProxyPreconApply(product));
+          std::shared_ptr<FunctorBase> rich(new ProxyRichardson<MatrixData, VectorData, VectorData, MatrixData>(A, x, b, P));
+          p = std::shared_ptr<FunctorBase>(new ProxyPreconApply(rich));
 
           return std::shared_ptr<FunctorBase>(new ProxyVectorSum<ProxyPreconApply, VectorData>(*(reinterpret_cast<std::shared_ptr<ProxyPreconApply>* >(&p)), x));
         }

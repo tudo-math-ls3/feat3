@@ -33,7 +33,7 @@ class SolverFunctorTest:
 
       std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x, p));
 
-      TEST_CHECK_EQUAL(richardson.get()->type_name(), "ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector))");
+      TEST_CHECK_EQUAL(richardson.get()->type_name(), "ProxyVector + (__defect__(ProxyVector,ProxyMatrix,ProxyVector))");
 
       //create layer 0
       std::shared_ptr<ScaRC::MatrixData> A1(new ScaRC::MatrixData);
@@ -47,7 +47,7 @@ class SolverFunctorTest:
 
       std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson1(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x1, p1));
 
-      TEST_CHECK_EQUAL(richardson1.get()->type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
+      TEST_CHECK_EQUAL(richardson1.get()->type_name(), "ProxyVector + (ProxyVector + (__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
 
       //----------------------------------
       //create layer 0
@@ -60,14 +60,14 @@ class SolverFunctorTest:
 
       std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson2(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p2));
 
-      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "ProxyVector + __precon__(__UNINITIALIZED_PRECONDITIONER_APPLICATION__())");
+      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "ProxyVector + (__UNINITIALIZED_PRECONDITIONER_APPLICATION__())");
 
       //create layer n-1
       std::shared_ptr<FunctorBase> pr2(new ScaRC::ProxyDefect<ScaRC::VectorData, ScaRC::MatrixData, ScaRC::VectorData>(b2, A2, x2));
       std::shared_ptr<ScaRC::ProxyPreconApply> p3(new ScaRC::ProxyPreconApply(pr2));
 
       p2.get()->get() = std::shared_ptr<FunctorBase>(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p3));
-      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
+      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "ProxyVector + (ProxyVector + (__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
     }
 };
 SolverFunctorTest<Archs::CPU, double> sf_cpu_double("StorageType: std::vector, DataType: double");

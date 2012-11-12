@@ -203,7 +203,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "__precon__(" + _right.get()->type_name() + ")";
+          return "(" + _right.get()->type_name() + ")";
         }
 
         std::shared_ptr<FunctorBase>& get()
@@ -299,6 +299,55 @@ namespace FEAST
         std::shared_ptr<T2_> _right;
     };
 
+    template<typename T1_, typename T2_, typename T3_, typename T4_>
+    class ProxyRichardson : public ProxyVector<ProxyRichardson<T1_, T2_, T3_, T4_> >
+    {
+      public:
+        ProxyRichardson(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& middle, std::shared_ptr<T3_>& right, std::shared_ptr<T4_>& farright) :
+          _left(left),
+          _middle(middle),
+          _right(right),
+          _farright(farright)
+
+        {
+        }
+
+        ProxyRichardson& operator=(const ProxyRichardson& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_left = rhs._left;
+          this->_middle = rhs._middle;
+          this->_right = rhs._right;
+          this->_farright = rhs._farright;
+
+          return *this;
+        }
+
+        ProxyRichardson(const ProxyRichardson& other) :
+          _left(other._left),
+          _middle(other._middle),
+          _right(other._right),
+          _farright(other._farright)
+        {
+        }
+
+        const std::string type_name()
+        {
+          return "Richardson("
+            + _left.get()->cast().type_name() + ", "
+            + _middle.get()->cast().type_name() + ", "
+            + _right.get()->cast().type_name() + ", "
+            + _farright.get()->cast().type_name() + ")";
+        }
+
+      private:
+        std::shared_ptr<T1_> _left;
+        std::shared_ptr<T2_> _middle;
+        std::shared_ptr<T3_> _right;
+        std::shared_ptr<T4_> _farright;
+    };
     /*template<
       template<typename, typename> class StorageType_ = std::vector
     >
