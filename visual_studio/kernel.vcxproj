@@ -497,7 +497,9 @@
     <ClInclude Include="..\kernel\assembly\base.hpp" />
     <ClInclude Include="..\kernel\assembly\bilinear_functor_base.hpp" />
     <ClInclude Include="..\kernel\assembly\bilinear_operator.hpp" />
+    <ClInclude Include="..\kernel\assembly\dirichlet_bc.hpp" />
     <ClInclude Include="..\kernel\assembly\grid_transfer.hpp" />
+    <ClInclude Include="..\kernel\assembly\intern\dof_set.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functional.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functor_base.hpp" />
     <ClInclude Include="..\kernel\assembly\lafem_backend.hpp" />
@@ -598,6 +600,7 @@
     <ClInclude Include="..\kernel\lafem\sparse_matrix_csr.hpp" />
     <ClInclude Include="..\kernel\lafem\sum.hpp" />
     <ClInclude Include="..\kernel\lafem\transposition.hpp" />
+    <ClInclude Include="..\kernel\lafem\unit_filter.hpp" />
     <ClInclude Include="..\kernel\lafem\vector_mirror.hpp" />
     <ClInclude Include="..\kernel\shape.hpp" />
     <ClInclude Include="..\kernel\space\base.hpp" />
@@ -607,6 +610,7 @@
     <ClInclude Include="..\kernel\space\dof_mapping_base.hpp" />
     <ClInclude Include="..\kernel\space\dof_mapping_common.hpp" />
     <ClInclude Include="..\kernel\space\dof_mirror.hpp" />
+    <ClInclude Include="..\kernel\space\dof_set.hpp" />
     <ClInclude Include="..\kernel\space\element_base.hpp" />
     <ClInclude Include="..\kernel\space\evaluator_base.hpp" />
     <ClInclude Include="..\kernel\space\eval_data.hpp" />

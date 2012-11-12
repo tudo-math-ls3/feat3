@@ -18,3 +18,6 @@ TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)
 
 ADD_EXECUTABLE(dbg-mirror dbg_mirror/dbg_mirror.cpp)
 TARGET_LINK_LIBRARIES(dbg-mirror feast)
+
+ADD_EXECUTABLE(dbg-bcasm dbg_bcasm/dbg_bcasm.cpp)
+TARGET_LINK_LIBRARIES(dbg-bcasm feast)

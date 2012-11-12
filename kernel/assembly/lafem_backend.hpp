@@ -8,6 +8,7 @@
 // includes, FEAST-LAFEM
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/unit_filter.hpp>
 
 namespace FEAST
 {

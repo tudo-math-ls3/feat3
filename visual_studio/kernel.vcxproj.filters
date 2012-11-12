@@ -57,6 +57,9 @@
     <Filter Include="Header Files\trafo\standard">
       <UniqueIdentifier>{c45aa492-ab12-4335-8ce3-7d763adae5d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\assembly\intern">
+      <UniqueIdentifier>{804a8363-5464-4ba2-a792-2807caebb9a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
@@ -533,6 +536,18 @@
     </ClInclude>
     <ClInclude Include="..\kernel\space\dof_mirror.hpp">
       <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\unit_filter.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\dof_set.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\dirichlet_bc.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\intern\dof_set.hpp">
+      <Filter>Header Files\assembly\intern</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
