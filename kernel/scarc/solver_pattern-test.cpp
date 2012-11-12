@@ -30,7 +30,7 @@ class SolverPatternTest:
       std::shared_ptr<FunctorBase> p3_local;
 
       std::shared_ptr<FunctorBase> scarc(ScaRC::SolverPatternGeneration<ScaRC::Richardson>::execute(x3, p3_master));
-      ((ScaRC::ProxyPreconApply*)p3_master.get())->get() = ScaRC::SolverPatternGeneration<ScaRC::RichardsonLocal>::execute(A3, x3, b3, p3_local);
+      ((ScaRC::ProxyPreconApply*)p3_master.get())->get() = ScaRC::SolverPatternGeneration<ScaRC::Richardson>::execute(A3, x3, b3, p3_local);
 
       TEST_CHECK_EQUAL(scarc.get()->type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
     }

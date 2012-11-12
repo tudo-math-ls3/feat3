@@ -15,10 +15,6 @@ namespace FEAST
     {
     };
 
-    class RichardsonLocal
-    {
-    };
-
     template<typename Pattern_>
     class SolverPatternGeneration
     {
@@ -29,30 +25,26 @@ namespace FEAST
     {
       public:
 
+        /// x_{k+1} <- x_k + Pu
         static std::shared_ptr<FunctorBase> execute(std::shared_ptr<VectorData>& x,
             std::shared_ptr<FunctorBase>& p)
         {
           p = std::shared_ptr<FunctorBase>(new ProxyPreconApply);
           return std::shared_ptr<FunctorBase>(new ProxyVectorSum<VectorData, ProxyPreconApply>(*(x.get()), *((ProxyPreconApply*)(p.get()))));
         }
+
+        /// x_{k+1} <- x_k + P(b-Ax_k)
+        static std::shared_ptr<FunctorBase> execute(std::shared_ptr<MatrixData>& A,
+            std::shared_ptr<VectorData>& x,
+            std::shared_ptr<VectorData>& b,
+            std::shared_ptr<FunctorBase>& p)
+        {
+          std::shared_ptr<FunctorBase> defect(new ProxyDefect<VectorData, MatrixData, VectorData>(*(b.get()), *(A.get()), *(x.get())));
+          p = std::shared_ptr<FunctorBase>(new ProxyPreconApply(defect));
+
+          return std::shared_ptr<FunctorBase>(new ProxyVectorSum<VectorData, ProxyPreconApply>(*(x.get()), *((ProxyPreconApply*)(p.get()))));
+        }
     };
-
-    template<>
-      class SolverPatternGeneration<RichardsonLocal>
-      {
-        public:
-
-          static std::shared_ptr<FunctorBase> execute(std::shared_ptr<MatrixData>& A,
-              std::shared_ptr<VectorData>& x,
-              std::shared_ptr<VectorData>& b,
-              std::shared_ptr<FunctorBase>& p)
-          {
-            std::shared_ptr<FunctorBase> defect(new ProxyDefect<VectorData, MatrixData, VectorData>(*(b.get()), *(A.get()), *(x.get())));
-            p = std::shared_ptr<FunctorBase>(new ProxyPreconApply(defect));
-
-            return std::shared_ptr<FunctorBase>(new ProxyVectorSum<VectorData, ProxyPreconApply>(*(x.get()), *((ProxyPreconApply*)(p.get()))));
-          }
-      };
   }
 }
 
