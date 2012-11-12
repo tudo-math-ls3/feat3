@@ -47,7 +47,8 @@ namespace FEAST
           std::shared_ptr<FunctorBase> rich(new ProxyRichardson<MatrixData, VectorData, VectorData, MatrixData>(A, x, b, P));
           p = std::shared_ptr<FunctorBase>(new ProxyPreconApply(rich));
 
-          return std::shared_ptr<FunctorBase>(new ProxyVectorSum<ProxyPreconApply, VectorData>(*(reinterpret_cast<std::shared_ptr<ProxyPreconApply>* >(&p)), x));
+          return p;
+          //return std::shared_ptr<FunctorBase>(new ProxyVectorSum<ProxyPreconApply, VectorData>(*(reinterpret_cast<std::shared_ptr<ProxyPreconApply>* >(&p)), x));
         }
     };
   }
