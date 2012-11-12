@@ -30,19 +30,23 @@ namespace FEAST
             std::shared_ptr<FunctorBase>& p)
         {
           p = std::shared_ptr<FunctorBase>(new ProxyPreconApply);
-          return std::shared_ptr<FunctorBase>(new ProxyVectorSum<ProxyPreconApply, VectorData>(*((ProxyPreconApply*)(p.get())), *(x.get())));
+          return std::shared_ptr<FunctorBase>(new ProxyVectorSum<ProxyPreconApply, VectorData>(*(reinterpret_cast<std::shared_ptr<ProxyPreconApply>* >(&p)), x));
         }
 
         /// x_{k+1} <- P(b-Ax_k) + x_k
         static std::shared_ptr<FunctorBase> execute(std::shared_ptr<MatrixData>& A,
             std::shared_ptr<VectorData>& x,
             std::shared_ptr<VectorData>& b,
+            std::shared_ptr<MatrixData>& P,
             std::shared_ptr<FunctorBase>& p)
         {
-          std::shared_ptr<FunctorBase> defect(new ProxyDefect<VectorData, MatrixData, VectorData>(*(b.get()), *(A.get()), *(x.get())));
-          p = std::shared_ptr<FunctorBase>(new ProxyPreconApply(defect));
+          std::shared_ptr<FunctorBase> defect(new ProxyDefect<VectorData, MatrixData, VectorData>(b, A, x));
 
-          return std::shared_ptr<FunctorBase>(new ProxyVectorSum<ProxyPreconApply, VectorData>(*((ProxyPreconApply*)(p.get())), *(x.get())));
+          std::shared_ptr<FunctorBase> product(new ProxyMatrixVectorProduct<MatrixData, ProxyDefect<VectorData, MatrixData, VectorData> >(P, (*reinterpret_cast<std::shared_ptr<ProxyDefect<VectorData, MatrixData, VectorData> >* >(&defect))));
+
+          p = std::shared_ptr<FunctorBase>(new ProxyPreconApply(product));
+
+          return std::shared_ptr<FunctorBase>(new ProxyVectorSum<ProxyPreconApply, VectorData>(*(reinterpret_cast<std::shared_ptr<ProxyPreconApply>* >(&p)), x));
         }
     };
   }

@@ -2,7 +2,6 @@
 #include <test_system/test_system.hpp>
 
 #include <kernel/scarc/solver_functor.hpp>
-#include <kernel/scarc/solver_pattern.hpp>
 #include <kernel/util/cpp11_smart_pointer.hpp>
 #include <kernel/archs.hpp>
 #include<deque>
@@ -25,44 +24,50 @@ class SolverFunctorTest:
     {
       //-----------------------------------
       //create layer n-1
-      ScaRC::MatrixData A;
-      ScaRC::VectorData b, x;
+      std::shared_ptr<ScaRC::MatrixData> A(new ScaRC::MatrixData);
+      std::shared_ptr<ScaRC::VectorData> b(new ScaRC::VectorData);
+      std::shared_ptr<ScaRC::VectorData> x(new ScaRC::VectorData);
 
       std::shared_ptr<FunctorBase> pr(new ScaRC::ProxyDefect<ScaRC::VectorData, ScaRC::MatrixData, ScaRC::VectorData>(b, A, x));
-      ScaRC::ProxyPreconApply p(pr);
+      std::shared_ptr<ScaRC::ProxyPreconApply> p(new ScaRC::ProxyPreconApply(pr));
 
-      ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> richardson(x, p);
+      std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x, p));
 
-      TEST_CHECK_EQUAL(richardson.type_name(), "ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector))");
+      TEST_CHECK_EQUAL(richardson.get()->type_name(), "ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector))");
 
       //create layer 0
-      ScaRC::MatrixData A1;
-      ScaRC::VectorData b1, x1;
+      std::shared_ptr<ScaRC::MatrixData> A1(new ScaRC::MatrixData);
+      std::shared_ptr<ScaRC::VectorData> b1(new ScaRC::VectorData);
+      std::shared_ptr<ScaRC::VectorData> x1(new ScaRC::VectorData);
 
-      std::shared_ptr<FunctorBase> pr1(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(richardson));
-      ScaRC::ProxyPreconApply p1(pr1);
+      ///only in case, where the master layer is created last, we need to reinterpret the shared ptr because we MUST use its copy-ctor
+      std::shared_ptr<FunctorBase> pr1(*(reinterpret_cast<std::shared_ptr<FunctorBase>* >(&richardson)));
 
-      ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> richardson1(x1, p1);
+      std::shared_ptr<ScaRC::ProxyPreconApply> p1(new ScaRC::ProxyPreconApply(pr1));
 
-      TEST_CHECK_EQUAL(richardson1.type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
+      std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson1(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x1, p1));
+
+      TEST_CHECK_EQUAL(richardson1.get()->type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
 
       //----------------------------------
       //create layer 0
-      ScaRC::MatrixData A2;
-      ScaRC::VectorData b2, x2;
+      ///this is the common case
+      std::shared_ptr<ScaRC::MatrixData> A2(new ScaRC::MatrixData);
+      std::shared_ptr<ScaRC::VectorData> b2(new ScaRC::VectorData);
+      std::shared_ptr<ScaRC::VectorData> x2(new ScaRC::VectorData);
 
-      ScaRC::ProxyPreconApply p2;
+      std::shared_ptr<ScaRC::ProxyPreconApply> p2(new ScaRC::ProxyPreconApply);
 
-      ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> richardson2(x2, p2);
+      std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson2(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p2));
 
-      TEST_CHECK_EQUAL(richardson2.type_name(), "ProxyVector + __precon__(__UNINITIALIZED_PRECONDITIONER_APPLICATION__())");
+      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "ProxyVector + __precon__(__UNINITIALIZED_PRECONDITIONER_APPLICATION__())");
 
       //create layer n-1
       std::shared_ptr<FunctorBase> pr2(new ScaRC::ProxyDefect<ScaRC::VectorData, ScaRC::MatrixData, ScaRC::VectorData>(b2, A2, x2));
-      ScaRC::ProxyPreconApply p3(pr2);
+      std::shared_ptr<ScaRC::ProxyPreconApply> p3(new ScaRC::ProxyPreconApply(pr2));
 
-      p2.get() = std::shared_ptr<FunctorBase>(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p3));
-      TEST_CHECK_EQUAL(richardson2.type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
+      p2.get()->get() = std::shared_ptr<FunctorBase>(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p3));
+      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
     }
 };
 SolverFunctorTest<Archs::CPU, double> sf_cpu_double("StorageType: std::vector, DataType: double");

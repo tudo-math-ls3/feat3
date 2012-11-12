@@ -115,7 +115,7 @@ namespace FEAST
     class ProxyVectorSum : public ProxyVector<ProxyVectorSum<T1_, T2_> >
     {
       public:
-        ProxyVectorSum(T1_& left, T2_& right) :
+        ProxyVectorSum(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& right) :
           _left(left),
           _right(right)
         {
@@ -140,12 +140,12 @@ namespace FEAST
 
         const std::string type_name()
         {
-          return _left.cast().type_name() + " + " + _right.cast().type_name();
+          return _left.get()->cast().type_name() + " + " + _right.get()->cast().type_name();
         }
 
       private:
-        T1_& _left;
-        T2_& _right;
+        std::shared_ptr<T1_> _left;
+        std::shared_ptr<T2_> _right;
     };
 
     class UninitializedProxyPreconApply : public ProxyVector<UninitializedProxyPreconApply >
@@ -225,7 +225,7 @@ namespace FEAST
     class ProxyDefect : public ProxyVector<ProxyDefect<T1_, T2_, T3_> >
     {
       public:
-        ProxyDefect(T1_& left, T2_& middle, T3_& right) :
+        ProxyDefect(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& middle, std::shared_ptr<T3_>& right) :
           _left(left),
           _middle(middle),
           _right(right)
@@ -253,13 +253,50 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "__defect__(" + _left.cast().type_name() + "," + _middle.cast().type_name() + "," + _right.cast().type_name() + ")";
+          return "__defect__(" + _left.get()->cast().type_name() + "," + _middle.get()->cast().type_name() + "," + _right.get()->cast().type_name() + ")";
         }
 
       private:
-        T1_& _left;
-        T2_& _middle;
-        T3_& _right;
+        std::shared_ptr<T1_> _left;
+        std::shared_ptr<T2_> _middle;
+        std::shared_ptr<T3_> _right;
+    };
+
+    template<typename T1_, typename T2_>
+    class ProxyMatrixVectorProduct : public ProxyVector<ProxyMatrixVectorProduct<T1_, T2_> >
+    {
+      public:
+        ProxyMatrixVectorProduct(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& right) :
+          _left(left),
+          _right(right)
+        {
+        }
+
+        ProxyMatrixVectorProduct& operator=(const ProxyMatrixVectorProduct& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_left = rhs._left;
+          this->_right = rhs._right;
+
+          return *this;
+        }
+
+        ProxyMatrixVectorProduct(const ProxyMatrixVectorProduct& other) :
+          _left(other._left),
+          _right(other._right)
+        {
+        }
+
+        const std::string type_name()
+        {
+          return _left.get()->cast().type_name() + " * " + _right.get()->cast().type_name();
+        }
+
+      private:
+        std::shared_ptr<T1_> _left;
+        std::shared_ptr<T2_> _right;
     };
 
     /*template<
