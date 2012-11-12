@@ -34,6 +34,8 @@ class SolverPatternTest:
       ((ScaRC::ProxyPreconApply*)p3_master.get())->get() = ScaRC::SolverPatternGeneration<ScaRC::Richardson>::execute(A3, x3, b3, P3, p3_local);
 
       TEST_CHECK_EQUAL(scarc.get()->type_name(), "((Richardson(ProxyMatrix, ProxyVector, ProxyVector, ProxyMatrix))) + ProxyVector");
+      TEST_CHECK_EQUAL(p3_master.get()->type_name(), "((Richardson(ProxyMatrix, ProxyVector, ProxyVector, ProxyMatrix)))");
+      TEST_CHECK_EQUAL(p3_local.get()->type_name(), "ProxyMatrix * __defect__(ProxyVector,ProxyMatrix,ProxyVector)");
     }
 };
 SolverPatternTest<Archs::CPU, double> sf_cpu_double("StorageType: std::vector, DataType: double");
