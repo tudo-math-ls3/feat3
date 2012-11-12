@@ -32,7 +32,7 @@ class SolverPatternTest:
       std::shared_ptr<FunctorBase> scarc(ScaRC::SolverPatternGeneration<ScaRC::Richardson>::execute(x3, p3_master));
       ((ScaRC::ProxyPreconApply*)p3_master.get())->get() = ScaRC::SolverPatternGeneration<ScaRC::Richardson>::execute(A3, x3, b3, p3_local);
 
-      TEST_CHECK_EQUAL(scarc.get()->type_name(), "ProxyVector + __precon__(ProxyVector + __precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)))");
+      TEST_CHECK_EQUAL(scarc.get()->type_name(), "__precon__(__precon__(__defect__(ProxyVector,ProxyMatrix,ProxyVector)) + ProxyVector) + ProxyVector");
     }
 };
 SolverPatternTest<Archs::CPU, double> sf_cpu_double("StorageType: std::vector, DataType: double");
