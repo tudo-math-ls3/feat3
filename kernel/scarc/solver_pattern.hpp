@@ -25,7 +25,7 @@ namespace FEAST
     {
       public:
 
-        /// x_{k+1} <- Pu + x_k
+        /// x_{k+1} <- [u] + x_k, [u] represents a preconditioner applied to a vector
         static std::shared_ptr<FunctorBase> execute(std::shared_ptr<VectorData>& x,
             std::shared_ptr<FunctorBase>& p)
         {

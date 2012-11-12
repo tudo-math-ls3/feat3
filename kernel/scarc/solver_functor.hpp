@@ -169,7 +169,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "__UNINITIALIZED_PRECONDITIONER__()";
+          return "__UNINITIALIZED_PRECONDITIONER_APPLICATION__()";
         }
     };
 
