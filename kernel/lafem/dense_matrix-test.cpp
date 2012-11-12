@@ -60,6 +60,12 @@ public:
     TEST_CHECK_EQUAL(g, f);
     TEST_CHECK_EQUAL(h, g);
     TEST_CHECK_EQUAL(h, f);
+
+    h = f.clone();
+    TEST_CHECK_EQUAL(h, f);
+    h(1,2,3);
+    TEST_CHECK_NOT_EQUAL(h, f);
+    TEST_CHECK_NOT_EQUAL((unsigned long)h.elements(), (unsigned long)f.elements());
   }
 };
 DenseMatrixTest<Archs::CPU, float> cpu_dense_matrix_test_float;

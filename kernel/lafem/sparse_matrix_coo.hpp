@@ -145,6 +145,17 @@ namespace FEAST
             _elements.insert(other._elements.begin(), other._elements.end());
         }
 
+        /** \brief Clone operation
+         *
+         * Creates a deep copy of this matrix.
+         */
+        SparseMatrixCOO<Archs::CPU, DT_> clone()
+        {
+          SparseMatrixCOO<Archs::CPU, DT_> t(this->_rows, this->_columns);
+          t._elements.insert(this->_elements.begin(), this->_elements.end());
+          return t;
+        }
+
         /**
          * \brief Set specific matrix element.
          *

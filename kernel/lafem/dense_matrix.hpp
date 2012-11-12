@@ -124,6 +124,21 @@ namespace FEAST
           _pelements = this->_elements.at(0);
         }
 
+        /** \brief Clone operation
+         *
+         * Creates a deep copy of this matrix.
+         */
+        DenseMatrix<Arch_, DT_> clone()
+        {
+          DenseMatrix<Arch_, DT_> t(this->_rows, this->_columns);
+
+          void * pdest(t.elements());
+          const void * psrc(this->elements());
+          MemoryPool<Arch_>::copy(pdest, psrc, this->_size * sizeof(DT_));
+
+          return t;
+        }
+
         /**
          * \brief Assignment operator
          *
@@ -205,6 +220,21 @@ namespace FEAST
           ::free(temp);
 
           return *this;
+        }
+
+        /**
+         * \brief Get a pointer to the data array.
+         *
+         * \returns Pointer to the data array.
+         */
+        DT_ * elements()
+        {
+          return _pelements;
+        }
+
+        const DT_ * elements() const
+        {
+          return _pelements;
         }
 
         /**

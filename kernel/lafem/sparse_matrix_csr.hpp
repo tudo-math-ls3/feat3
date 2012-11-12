@@ -355,6 +355,23 @@ namespace FEAST
           this->_row_ptr_end = this->_indices.at(2);
         }
 
+        /** \brief Clone operation
+         *
+         * Creates a deep copy of this matrix.
+         */
+        SparseMatrixCSR<Arch_, DT_> clone()
+        {
+          DenseVector<Arch_, Index> col_ind(this->_used_elements, this->_col_ind);
+          DenseVector<Arch_, DT_> val(this->_used_elements, this->_val);
+          DenseVector<Arch_, Index> row_ptr(this->_rows + 1, this->_row_ptr);
+          DenseVector<Arch_, Index> row_ptr_end(this->_rows, this->_row_ptr_end);
+
+          SparseMatrixCSR<Arch_, DT_> t(this->_rows, this->_columns, col_ind.clone(), val.clone(),
+              row_ptr.clone(), row_ptr_end.clone());
+
+          return t;
+        }
+
         /**
          * \brief Assignment operator
          *

@@ -76,6 +76,10 @@ public:
     TEST_CHECK_EQUAL(e, c);
     e = c;
     TEST_CHECK_EQUAL(e, c);
+    e = c.clone();
+    TEST_CHECK_EQUAL(e, c);
+
+    TEST_CHECK_NOT_EQUAL((unsigned long)e.val(), (unsigned long)c.val());
   }
 };
 SparseMatrixCSRTest<Archs::CPU, float> cpu_sparse_matrix_csr_test_float;

@@ -61,6 +61,12 @@ public:
     TEST_CHECK_EQUAL(f, e);
     TEST_CHECK_EQUAL(g, f);
     TEST_CHECK_EQUAL(g, e);
+
+    DenseVector<Archs::CPU, DT_> h(g.clone());
+    TEST_CHECK_EQUAL(h, g);
+    h(1, DT_(5));
+    TEST_CHECK_NOT_EQUAL(h, g);
+    TEST_CHECK_NOT_EQUAL((unsigned long)h.elements(), (unsigned long)g.elements());
   }
 };
 DenseVectorTest<Archs::CPU, float> cpu_dense_vector_test_float;

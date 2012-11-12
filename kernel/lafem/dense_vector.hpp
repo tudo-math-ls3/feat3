@@ -126,6 +126,21 @@ namespace FEAST
           this->_pelements = this->_elements.at(0);
         }
 
+        /** \brief Clone operation
+         *
+         * Creates a deep copy of this vector.
+         */
+        DenseVector<Arch_, DT_> clone()
+        {
+          DenseVector<Arch_, DT_> t(this->_size);
+
+          void * pdest(t.elements());
+          const void * psrc(this->elements());
+          MemoryPool<Arch_>::copy(pdest, psrc, this->_size * sizeof(DT_));
+
+          return t;
+        }
+
         /**
          * \brief Assignment operator
          *
