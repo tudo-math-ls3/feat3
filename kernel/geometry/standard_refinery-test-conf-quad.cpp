@@ -27,11 +27,11 @@ typedef StandardRefinery<SubSet> SubSetRefinery;
  * \author Peter Zajac
  */
 class StandardRefineryTestConfQuad
-  : public TestSystem::TaggedTest<Archs::None, Nil>
+  : public TestSystem::TaggedTest<Archs::None, Archs::None>
 {
 public:
   StandardRefineryTestConfQuad() :
-    TestSystem::TaggedTest<Archs::None, Nil>("standard_refinery-test-conf-quad")
+    TestSystem::TaggedTest<Archs::None, Archs::None>("standard_refinery-test-conf-quad")
   {
   }
 

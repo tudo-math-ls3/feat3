@@ -47,4 +47,4 @@ public:
     static_assert(SUPERSUBCLASS(A,B), "Wrong inheritance detected");
   }
 };
-InheritanceTest<Archs::None, Nil> inheritance_test;
+InheritanceTest<Archs::None, Archs::None> inheritance_test;

@@ -13,11 +13,11 @@ using namespace FEAST::Shape;
  * \author Peter Zajac
  */
 class ShapeTest
-  : public TaggedTest<Archs::None, Nil>
+  : public TaggedTest<Archs::None, Archs::None>
 {
 public:
   ShapeTest() :
-    TaggedTest<Archs::None, Nil>("shape_test")
+    TaggedTest<Archs::None, Archs::None>("shape_test")
   {
   }
 

@@ -12,11 +12,11 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 class StringTest
-  : public TaggedTest<Archs::None, Nil>
+  : public TaggedTest<Archs::None, Archs::None>
 {
 public:
   StringTest() :
-    TaggedTest<Archs::None, Nil>("string_test")
+    TaggedTest<Archs::None, Archs::None>("string_test")
   {
   }
 

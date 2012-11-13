@@ -20,11 +20,11 @@ typedef StandardRefinery<StructMesh> StructMeshRefinery;
  * \author Peter Zajac
  */
 class StandardRefineryTestStructQuad
-  : public TestSystem::TaggedTest<Archs::None, Nil>
+  : public TestSystem::TaggedTest<Archs::None, Archs::None>
 {
 public:
   StandardRefineryTestStructQuad() :
-    TestSystem::TaggedTest<Archs::None, Nil>("standard_refinery-test-struct-quad")
+    TestSystem::TaggedTest<Archs::None, Archs::None>("standard_refinery-test-struct-quad")
   {
   }
 

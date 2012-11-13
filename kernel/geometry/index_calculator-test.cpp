@@ -17,11 +17,11 @@ using namespace FEAST::Geometry::TestAux;
  */
 
 class IndexCalculatorTest
-  : public TestSystem::TaggedTest<Archs::None, Nil>
+  : public TestSystem::TaggedTest<Archs::None, Archs::None>
 {
 public:
   IndexCalculatorTest() :
-    TestSystem::TaggedTest<Archs::None, Nil>("index_calculator-test")
+    TestSystem::TaggedTest<Archs::None, Archs::None>("index_calculator-test")
   {
   }
 

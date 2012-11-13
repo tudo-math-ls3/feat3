@@ -14,11 +14,11 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 class PermutationTest
-  : public TaggedTest<Archs::None, Nil>
+  : public TaggedTest<Archs::None, Archs::None>
 {
 public:
   PermutationTest() :
-    TaggedTest<Archs::None, Nil>("PermutationTest")
+    TaggedTest<Archs::None, Archs::None>("PermutationTest")
   {
   }
 

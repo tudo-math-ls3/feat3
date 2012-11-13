@@ -24,11 +24,11 @@ typedef CellSubSetNode<MeshNodePolicy> CellSubSetNodeType;
  * \author Peter Zajac
  */
 class MeshNodeTestConfQuad
-  : public TestSystem::TaggedTest<Archs::None, Nil>
+  : public TestSystem::TaggedTest<Archs::None, Archs::None>
 {
 public:
   MeshNodeTestConfQuad() :
-    TestSystem::TaggedTest<Archs::None, Nil>("mesh_node-test-conf-quad")
+    TestSystem::TaggedTest<Archs::None, Archs::None>("mesh_node-test-conf-quad")
   {
   }
 

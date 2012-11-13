@@ -13,11 +13,11 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 class ParamSectionTest
-  : public TaggedTest<Archs::None, Nil>
+  : public TaggedTest<Archs::None, Archs::None>
 {
 public:
   ParamSectionTest() :
-    TaggedTest<Archs::None, Nil>("param_section_test")
+    TaggedTest<Archs::None, Archs::None>("param_section_test")
   {
   }
 

@@ -57,6 +57,6 @@ public:
 
   }
 };
-AssertionTest<Archs::None, Nil> assertion_test;
+AssertionTest<Archs::None, Archs::None> assertion_test;
 
 #endif // DEBUG

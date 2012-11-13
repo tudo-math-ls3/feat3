@@ -24,11 +24,11 @@ typedef StandardRefinery<SubMesh> SubMeshRefinery;
  */
 
 class StandardRefineryTestConfTriangle
-  : public TestSystem::TaggedTest<Archs::None, Nil>
+  : public TestSystem::TaggedTest<Archs::None, Archs::None>
 {
 public:
   StandardRefineryTestConfTriangle() :
-    TestSystem::TaggedTest<Archs::None, Nil>("standard_refinery-test-conf-triangle")
+    TestSystem::TaggedTest<Archs::None, Archs::None>("standard_refinery-test-conf-triangle")
   {
   }
 

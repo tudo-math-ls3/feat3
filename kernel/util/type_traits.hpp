@@ -488,25 +488,6 @@ namespace FEAST
         return "bool";
       }
     };
-
-    /**
-     * \brief Type Traits specialisation for Nil tag class
-     *
-     * \author Dirk Ribbrock
-     * \author Peter Zajac
-     */
-    template<>
-    struct Traits<Nil>
-    {
-      /// this type is of another class
-      typedef AnotherClass TypeClass;
-
-      /// returns a string identifying the datatype
-      static String name()
-      {
-        return "Nil";
-      }
-    };
   } // namespace Type
 } // namespace FEAST
 

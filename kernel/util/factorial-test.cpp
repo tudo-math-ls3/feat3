@@ -12,12 +12,12 @@ using namespace FEAST::TestSystem;
  * \author Peter Zajac
  */
 class FactorialTest
-  : public TaggedTest<Archs::None, Nil>
+  : public TaggedTest<Archs::None, Archs::None>
 {
 public:
 
   FactorialTest() :
-    TaggedTest<Archs::None, Nil>("factorial_test")
+    TaggedTest<Archs::None, Archs::None>("factorial_test")
   {
   }
 
@@ -58,12 +58,12 @@ public:
  * \author Peter Zajac
  */
 class BinomialTest
-  : public TaggedTest<Archs::None, Nil>
+  : public TaggedTest<Archs::None, Archs::None>
 {
 public:
 
   BinomialTest() :
-    TaggedTest<Archs::None, Nil>("binomial_test")
+    TaggedTest<Archs::None, Archs::None>("binomial_test")
   {
   }
 

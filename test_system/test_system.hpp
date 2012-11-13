@@ -171,7 +171,7 @@ namespace FEAST
       BaseTest(const String& id)
         : _id(id),
         _tag_name(Type::Traits<Archs::None>::name()),
-        _prec_name(Type::Traits<Nil>::name())
+        _prec_name(Type::Traits<Archs::None>::name())
       {
         TestList::instance()->register_test(this);
       }
