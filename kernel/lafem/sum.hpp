@@ -7,6 +7,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 
 
@@ -78,6 +79,32 @@ namespace FEAST
           }
         }
       }
+
+      /**
+       * \brief Calculate \f$r \leftarrow x + y\f$
+       *
+       * \param[out] r The summation result.
+       * \param[in] x.The first summand.
+       * \param[in] y The second summand.
+       */
+      template <typename DT_>
+      static void value(SparseMatrixCSR<Archs::CPU, DT_> & r, const SparseMatrixCSR<Archs::CPU, DT_> & x, const SparseMatrixCSR<Archs::CPU, DT_> & y)
+      {
+        if (x.rows() != y.rows())
+          throw InternalError("Matrix rows do not match!");
+        if (x.columns() != y.columns())
+          throw InternalError("Matrix columns do not match!");
+        if (x.rows() != r.rows())
+          throw InternalError("Matrix rows do not match!");
+        if (x.columns() != r.columns())
+          throw InternalError("Matrix columns do not match!");
+
+        DenseVector<Archs::CPU, DT_> xv(x.used_elements(), x.val());
+        DenseVector<Archs::CPU, DT_> yv(y.used_elements(), y.val());
+        DenseVector<Archs::CPU, DT_> rv(r.used_elements(), r.val());
+
+        Sum<Archs::CPU, Archs::Generic>::value(rv, xv, yv);
+      }
     };
 
     template <>
@@ -85,6 +112,25 @@ namespace FEAST
     {
       template <typename DT_>
       static void value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y);
+
+      template <typename DT_>
+      static void value(SparseMatrixCSR<Archs::GPU, DT_> & r, const SparseMatrixCSR<Archs::GPU, DT_> & x, const SparseMatrixCSR<Archs::GPU, DT_> & y)
+      {
+        if (x.rows() != y.rows())
+          throw InternalError("Matrix rows do not match!");
+        if (x.columns() != y.columns())
+          throw InternalError("Matrix columns do not match!");
+        if (x.rows() != r.rows())
+          throw InternalError("Matrix rows do not match!");
+        if (x.columns() != r.columns())
+          throw InternalError("Matrix columns do not match!");
+
+        DenseVector<Archs::GPU, DT_> xv(x.used_elements(), x.val());
+        DenseVector<Archs::GPU, DT_> yv(y.used_elements(), y.val());
+        DenseVector<Archs::GPU, DT_> rv(r.used_elements(), r.val());
+
+        Sum<Archs::GPU, Archs::CUDA>::value(rv, xv, yv);
+      }
     };
 
 

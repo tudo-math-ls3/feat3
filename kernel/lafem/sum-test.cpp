@@ -2,7 +2,10 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sum.hpp>
+#include <kernel/lafem/scale.hpp>
 #include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
@@ -72,4 +75,60 @@ DVSumTest<Archs::CPU, Archs::Generic, double> dv_sum_test_double;
 #ifdef FEAST_BACKENDS_CUDA
 DVSumTest<Archs::GPU, Archs::CUDA, float> gpu_dv_sum_test_float;
 DVSumTest<Archs::GPU, Archs::CUDA, double> gpu_dv_sum_test_double;
+#endif
+
+template<
+  typename Arch_,
+  typename BType_,
+  typename DT_>
+class SMCSRSumTest
+  : public TaggedTest<Arch_, DT_>
+{
+
+public:
+
+  SMCSRSumTest()
+    : TaggedTest<Arch_, DT_>("smcsr_sum_test")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(1) ; size < 3e2 ; size*=2)
+    {
+      SparseMatrixCOO<Archs::CPU, DT_> a_local(size, size + 2);
+      for (unsigned long row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (unsigned long col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+        }
+      }
+      SparseMatrixCSR<Arch_, DT_> a(a_local);
+      SparseMatrixCSR<Arch_, DT_> b(a.clone());
+      DenseVector<Arch_, DT_> b_val(b.used_elements(), b.val());
+      Scale<Arch_, BType_>::value(b_val, b_val, DT_(2));
+
+      SparseMatrixCSR<Arch_, DT_> r(a.clone());
+
+      Sum<Arch_, BType_>::value(r, a, b);
+
+      DenseVector<Arch_, DT_> a_val(a.used_elements(), a.val());
+      DenseVector<Arch_, DT_> r_val(r.used_elements(), r.val());
+
+      for (Index i(0) ; i < r_val.size() ; ++i)
+      {
+        TEST_CHECK_EQUAL(r_val(i), a_val(i) + b_val(i));
+      }
+    }
+  }
+};
+SMCSRSumTest<Archs::CPU, Archs::Generic, float> smcsr_sum_test_float;
+SMCSRSumTest<Archs::CPU, Archs::Generic, double> smcsr_sum_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+SMCSRSumTest<Archs::GPU, Archs::CUDA, float> gpu_smcsr_sum_test_float;
+SMCSRSumTest<Archs::GPU, Archs::CUDA, double> gpu_smcsr_sum_test_double;
 #endif
