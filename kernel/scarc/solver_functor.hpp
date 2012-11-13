@@ -34,7 +34,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "ProxyMatrix";
+          return "[ProxyMatrix]";
         }
 
         virtual void execute()
@@ -60,6 +60,24 @@ namespace FEAST
 
     class MatrixData : public ProxyMatrix<MatrixData>
     {
+      public:
+        MatrixData() :
+          _id("no_id")
+        {
+        }
+
+        MatrixData(const std::string id) :
+          _id(id)
+        {
+        }
+
+        virtual const std::string type_name()
+        {
+          return "[MatrixData " + _id + "]";
+        }
+
+      private:
+        const std::string _id;
     };
 
     template<typename T_>
@@ -82,7 +100,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "ProxyVector";
+          return "[ProxyVector]";
         }
 
         virtual void execute()
@@ -108,6 +126,24 @@ namespace FEAST
 
     class VectorData : public ProxyVector<VectorData>
     {
+      public:
+        VectorData() :
+          _id("no_id")
+        {
+        }
+
+        VectorData(const std::string id) :
+          _id(id)
+        {
+        }
+
+        virtual const std::string type_name()
+        {
+          return "[VectorData " + _id + "]";
+        }
+
+      private:
+        const std::string _id;
     };
 
 
@@ -169,7 +205,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "__UNINITIALIZED_PRECONDITIONER_APPLICATION__()";
+          return "[__UNINITIALIZED_PRECONDITIONER_APPLICATION__()]";
         }
     };
 
@@ -203,7 +239,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "(" + _right.get()->type_name() + ")";
+          return "[PRECON(" + _right.get()->type_name() + ")]";
         }
 
         std::shared_ptr<FunctorBase>& get()
@@ -253,7 +289,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "__defect__(" + _left.get()->cast().type_name() + "," + _middle.get()->cast().type_name() + "," + _right.get()->cast().type_name() + ")";
+          return "[DEFECT(" + _left.get()->cast().type_name() + "," + _middle.get()->cast().type_name() + "," + _right.get()->cast().type_name() + ")]";
         }
 
       private:
@@ -335,11 +371,11 @@ namespace FEAST
 
         const std::string type_name()
         {
-          return "Richardson("
+          return "[RICHARDSON("
             + _left.get()->cast().type_name() + ", "
             + _middle.get()->cast().type_name() + ", "
             + _right.get()->cast().type_name() + ", "
-            + _farright.get()->cast().type_name() + ")";
+            + _farright.get()->cast().type_name() + ")]";
         }
 
       private:
