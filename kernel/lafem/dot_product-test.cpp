@@ -30,8 +30,8 @@ public:
 
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      DenseVector<Archs::CPU, DT_> a_local(size);
-      DenseVector<Archs::CPU, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
       const DT_ den(DT_(1) / DT_(size));
       for (Index i(0) ; i < size ; ++i)
       {
@@ -55,9 +55,9 @@ public:
     }
   }
 };
-DVDotProductTest<Archs::CPU, Archs::Generic, float> dv_dot_product_test_float;
-DVDotProductTest<Archs::CPU, Archs::Generic, double> dv_dot_product_test_double;
+DVDotProductTest<Mem::Main, Algo::Generic, float> dv_dot_product_test_float;
+DVDotProductTest<Mem::Main, Algo::Generic, double> dv_dot_product_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVDotProductTest<Archs::GPU, Archs::CUDA, float> cuda_dv_dot_product_test_float;
-DVDotProductTest<Archs::GPU, Archs::CUDA, double> cuda_dv_dot_product_test_double;
+DVDotProductTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_dot_product_test_float;
+DVDotProductTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_dot_product_test_double;
 #endif

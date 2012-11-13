@@ -116,8 +116,8 @@ namespace FEAST
         typename Tx_,
         typename Ty_>
       void gather_prim(
-        LAFEM::DenseVector<Archs::CPU, Tx_>& buffer,
-        const LAFEM::DenseVector<Archs::CPU, Ty_>& vector) const
+        LAFEM::DenseVector<Mem::Main, Tx_>& buffer,
+        const LAFEM::DenseVector<Mem::Main, Ty_>& vector) const
       {
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
@@ -152,8 +152,8 @@ namespace FEAST
         typename Tx_,
         typename Ty_>
       void scatter_prim(
-        LAFEM::DenseVector<Archs::CPU, Tx_>& vector,
-        const LAFEM::DenseVector<Archs::CPU, Ty_>& buffer) const
+        LAFEM::DenseVector<Mem::Main, Tx_>& vector,
+        const LAFEM::DenseVector<Mem::Main, Ty_>& buffer) const
       {
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
@@ -192,8 +192,8 @@ namespace FEAST
         typename Tx_,
         typename Ty_>
       void gather_dual(
-        LAFEM::DenseVector<Archs::CPU, Tx_>& buffer,
-        const LAFEM::DenseVector<Archs::CPU, Ty_>& vector) const
+        LAFEM::DenseVector<Mem::Main, Tx_>& buffer,
+        const LAFEM::DenseVector<Mem::Main, Ty_>& vector) const
       {
         gather_prim(buffer, vector);
       }
@@ -211,8 +211,8 @@ namespace FEAST
         typename Tx_,
         typename Ty_>
       void scatter_dual(
-        LAFEM::DenseVector<Archs::CPU, Tx_>& vector,
-        const LAFEM::DenseVector<Archs::CPU, Ty_>& buffer) const
+        LAFEM::DenseVector<Mem::Main, Tx_>& vector,
+        const LAFEM::DenseVector<Mem::Main, Ty_>& buffer) const
       {
         scatter_prim(vector, buffer);
       }

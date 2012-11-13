@@ -29,9 +29,9 @@ public:
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
       DT_ s(DT_(4.321));
-      DenseVector<Archs::CPU, DT_> a_local(size);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i * DT_(1.234)));
@@ -52,9 +52,9 @@ public:
     }
   }
 };
-DVScaleTest<Archs::CPU, Archs::Generic, float> dv_scale_test_float;
-DVScaleTest<Archs::CPU, Archs::Generic, double> dv_scale_test_double;
+DVScaleTest<Mem::Main, Algo::Generic, float> dv_scale_test_float;
+DVScaleTest<Mem::Main, Algo::Generic, double> dv_scale_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVScaleTest<Archs::GPU, Archs::CUDA, float> cuda_dv_scale_test_float;
-DVScaleTest<Archs::GPU, Archs::CUDA, double> cuda_dv_scale_test_double;
+DVScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_scale_test_float;
+DVScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_scale_test_double;
 #endif

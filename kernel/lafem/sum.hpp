@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Sum<Archs::CPU, Archs::Generic>
+    struct Sum<Mem::Main, Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow x + y\f$
@@ -38,7 +38,7 @@ namespace FEAST
        * \param[in] y The second summand.
        */
       template <typename DT_>
-      static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
+      static void value(DenseVector<Mem::Main, DT_> & r, const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
       {
         if (x.size() != y.size())
           throw InternalError("Vector size does not match!");
@@ -88,7 +88,7 @@ namespace FEAST
        * \param[in] y The second summand.
        */
       template <typename DT_>
-      static void value(SparseMatrixCSR<Archs::CPU, DT_> & r, const SparseMatrixCSR<Archs::CPU, DT_> & x, const SparseMatrixCSR<Archs::CPU, DT_> & y)
+      static void value(SparseMatrixCSR<Mem::Main, DT_> & r, const SparseMatrixCSR<Mem::Main, DT_> & x, const SparseMatrixCSR<Mem::Main, DT_> & y)
       {
         if (x.rows() != y.rows())
           throw InternalError("Matrix rows do not match!");
@@ -99,22 +99,22 @@ namespace FEAST
         if (x.columns() != r.columns())
           throw InternalError("Matrix columns do not match!");
 
-        DenseVector<Archs::CPU, DT_> xv(x.used_elements(), x.val());
-        DenseVector<Archs::CPU, DT_> yv(y.used_elements(), y.val());
-        DenseVector<Archs::CPU, DT_> rv(r.used_elements(), r.val());
+        DenseVector<Mem::Main, DT_> xv(x.used_elements(), x.val());
+        DenseVector<Mem::Main, DT_> yv(y.used_elements(), y.val());
+        DenseVector<Mem::Main, DT_> rv(r.used_elements(), r.val());
 
-        Sum<Archs::CPU, Archs::Generic>::value(rv, xv, yv);
+        Sum<Mem::Main, Algo::Generic>::value(rv, xv, yv);
       }
     };
 
     template <>
-    struct Sum<Archs::GPU, Archs::CUDA>
+    struct Sum<Mem::CUDA, Algo::CUDA>
     {
       template <typename DT_>
-      static void value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y);
+      static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);
 
       template <typename DT_>
-      static void value(SparseMatrixCSR<Archs::GPU, DT_> & r, const SparseMatrixCSR<Archs::GPU, DT_> & x, const SparseMatrixCSR<Archs::GPU, DT_> & y)
+      static void value(SparseMatrixCSR<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & x, const SparseMatrixCSR<Mem::CUDA, DT_> & y)
       {
         if (x.rows() != y.rows())
           throw InternalError("Matrix rows do not match!");
@@ -125,11 +125,11 @@ namespace FEAST
         if (x.columns() != r.columns())
           throw InternalError("Matrix columns do not match!");
 
-        DenseVector<Archs::GPU, DT_> xv(x.used_elements(), x.val());
-        DenseVector<Archs::GPU, DT_> yv(y.used_elements(), y.val());
-        DenseVector<Archs::GPU, DT_> rv(r.used_elements(), r.val());
+        DenseVector<Mem::CUDA, DT_> xv(x.used_elements(), x.val());
+        DenseVector<Mem::CUDA, DT_> yv(y.used_elements(), y.val());
+        DenseVector<Mem::CUDA, DT_> rv(r.used_elements(), r.val());
 
-        Sum<Archs::GPU, Archs::CUDA>::value(rv, xv, yv);
+        Sum<Mem::CUDA, Algo::CUDA>::value(rv, xv, yv);
       }
     };
 

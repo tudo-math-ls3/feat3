@@ -24,7 +24,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-void Sum<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y)
+void Sum<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y)
 {
   if (x.size() != y.size())
     throw InternalError("Vector size does not match!");
@@ -44,5 +44,5 @@ void Sum<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, DT_> & r, const
   FEAST::LAFEM::Intern::cuda_sum<<<grid, block>>>(r_gpu, x_gpu, y_gpu, r.size());
 }
 
-template void Sum<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, float> &, const DenseVector<Archs::GPU, float> &, const DenseVector<Archs::GPU, float> &);
-template void Sum<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, double>&, const DenseVector<Archs::GPU, double> &, const DenseVector<Archs::GPU, double> &);
+template void Sum<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
+template void Sum<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, double>&, const DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);

@@ -29,7 +29,7 @@ public:
 
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      DenseVector<Archs::CPU, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
@@ -45,9 +45,9 @@ public:
     }
   }
 };
-DVNorm2Test<Archs::CPU, Archs::Generic, float> dv_norm2_test_float;
-DVNorm2Test<Archs::CPU, Archs::Generic, double> dv_norm2_test_double;
+DVNorm2Test<Mem::Main, Algo::Generic, float> dv_norm2_test_float;
+DVNorm2Test<Mem::Main, Algo::Generic, double> dv_norm2_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVNorm2Test<Archs::GPU, Archs::CUDA, float> cuda_dv_norm2_test_float;
-DVNorm2Test<Archs::GPU, Archs::CUDA, double> cuda_dv_norm2_test_double;
+DVNorm2Test<Mem::CUDA, Algo::CUDA, float> cuda_dv_norm2_test_float;
+DVNorm2Test<Mem::CUDA, Algo::CUDA, double> cuda_dv_norm2_test_double;
 #endif

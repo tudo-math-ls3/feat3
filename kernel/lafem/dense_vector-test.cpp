@@ -55,25 +55,25 @@ public:
     TEST_CHECK_EQUAL(e(5), a(5));
     TEST_CHECK_EQUAL(e, a);
 
-    DenseVector<Archs::CPU, DT_> f(e);
-    DenseVector<Archs::CPU, DT_> g;
+    DenseVector<Mem::Main, DT_> f(e);
+    DenseVector<Mem::Main, DT_> g;
     g = e;
     TEST_CHECK_EQUAL(f, e);
     TEST_CHECK_EQUAL(g, f);
     TEST_CHECK_EQUAL(g, e);
 
-    DenseVector<Archs::CPU, DT_> h(g.clone());
+    DenseVector<Mem::Main, DT_> h(g.clone());
     TEST_CHECK_EQUAL(h, g);
     h(1, DT_(5));
     TEST_CHECK_NOT_EQUAL(h, g);
     TEST_CHECK_NOT_EQUAL((unsigned long)h.elements(), (unsigned long)g.elements());
   }
 };
-DenseVectorTest<Archs::CPU, float> cpu_dense_vector_test_float;
-DenseVectorTest<Archs::CPU, double> cpu_dense_vector_test_double;
-DenseVectorTest<Archs::CPU, Index> cpu_dense_vector_test_index;
+DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
+DenseVectorTest<Mem::Main, double> cpu_dense_vector_test_double;
+DenseVectorTest<Mem::Main, Index> cpu_dense_vector_test_index;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorTest<Archs::GPU, float> gpu_dense_vector_test_float;
-DenseVectorTest<Archs::GPU, double> gpu_dense_vector_test_double;
-DenseVectorTest<Archs::GPU, Index> gpu_dense_vector_test_index;
+DenseVectorTest<Mem::CUDA, float> gpu_dense_vector_test_float;
+DenseVectorTest<Mem::CUDA, double> gpu_dense_vector_test_double;
+DenseVectorTest<Mem::CUDA, Index> gpu_dense_vector_test_index;
 #endif

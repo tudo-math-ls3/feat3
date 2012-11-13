@@ -33,7 +33,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename DT_>
-    class SparseMatrixCOO<Archs::CPU, DT_> : public Container<Archs::CPU, DT_>
+    class SparseMatrixCOO<Mem::Main, DT_> : public Container<Mem::Main, DT_>
     {
       private:
         /// Row count.
@@ -51,7 +51,7 @@ namespace FEAST
         /// Our datatype
         typedef DT_ data_type;
         /// Our memory architecture type
-        typedef Archs::CPU arch_type;
+        typedef Mem::Main arch_type;
 
         /**
          * \brief Constructor
@@ -59,7 +59,7 @@ namespace FEAST
          * Creates an empty non dimensional matrix.
          */
         explicit SparseMatrixCOO() :
-          Container<Archs::CPU, DT_> (0),
+          Container<Mem::Main, DT_> (0),
           _rows(0),
           _columns(0),
           _zero_element(DT_(0)),
@@ -76,7 +76,7 @@ namespace FEAST
          * Creates a matrix with given dimensions.
          */
         explicit SparseMatrixCOO(Index rows, Index columns) :
-          Container<Archs::CPU, DT_>(rows * columns),
+          Container<Mem::Main, DT_>(rows * columns),
           _zero_element(DT_(0)),
           _used_elements(0)
         {
@@ -92,7 +92,7 @@ namespace FEAST
          * Creates a matrix from a given graph.
          */
         explicit SparseMatrixCOO(const Graph & graph) :
-          Container<Archs::CPU, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image()),
+          Container<Mem::Main, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image()),
           _zero_element(DT_(0)),
           _used_elements(graph.get_num_indices())
         {
@@ -117,8 +117,8 @@ namespace FEAST
          *
          * Creates a shallow copy of a given matrix.
          */
-        SparseMatrixCOO(const SparseMatrixCOO<Archs::CPU, DT_> & other) :
-          Container<Archs::CPU, DT_>(other),
+        SparseMatrixCOO(const SparseMatrixCOO<Mem::Main, DT_> & other) :
+          Container<Mem::Main, DT_>(other),
           _rows(other._rows),
           _columns(other._columns),
           _zero_element(other._zero_element),
@@ -136,7 +136,7 @@ namespace FEAST
          */
         template <typename Arch2_, typename DT2_>
         SparseMatrixCOO(const SparseMatrixCOO<Arch2_, DT2_> & other) :
-          Container<Archs::CPU, DT_>(other),
+          Container<Mem::Main, DT_>(other),
           _rows(other._rows),
           _columns(other._columns),
           _zero_element(other._zero_element),
@@ -149,9 +149,9 @@ namespace FEAST
          *
          * Creates a deep copy of this matrix.
          */
-        SparseMatrixCOO<Archs::CPU, DT_> clone()
+        SparseMatrixCOO<Mem::Main, DT_> clone()
         {
-          SparseMatrixCOO<Archs::CPU, DT_> t(this->_rows, this->_columns);
+          SparseMatrixCOO<Mem::Main, DT_> t(this->_rows, this->_columns);
           t._elements.insert(this->_elements.begin(), this->_elements.end());
           return t;
         }

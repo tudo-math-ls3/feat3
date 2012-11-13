@@ -33,10 +33,10 @@ public:
 
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
-      SparseMatrixCOO<Archs::CPU, DT_> a_local(size, size + 2);
-      DenseVector<Archs::CPU, DT_> b_local(size + 2);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
+      DenseVector<Mem::Main, DT_> b_local(size + 2);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (unsigned long row(0) ; row < a_local.rows() ; ++row)
       {
         for (unsigned long col(0) ; col < a_local.columns() ; ++col)
@@ -73,9 +73,9 @@ public:
     }
   }
 };
-CSRProductTest<Archs::CPU, Archs::Generic, float> csr_product_test_float;
-CSRProductTest<Archs::CPU, Archs::Generic, double> csr_product_test_double;
+CSRProductTest<Mem::Main, Algo::Generic, float> csr_product_test_float;
+CSRProductTest<Mem::Main, Algo::Generic, double> csr_product_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-CSRProductTest<Archs::GPU, Archs::CUDA, float> cuda_csr_product_test_float;
-CSRProductTest<Archs::GPU, Archs::CUDA, double> cuad_csr_product_test_double;
+CSRProductTest<Mem::CUDA, Algo::CUDA, float> cuda_csr_product_test_float;
+CSRProductTest<Mem::CUDA, Algo::CUDA, double> cuad_csr_product_test_double;
 #endif

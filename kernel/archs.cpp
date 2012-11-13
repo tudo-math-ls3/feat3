@@ -8,24 +8,8 @@ std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
 {
   switch (value)
   {
-    case Archs::tv_nil:
+    case Archs::tv_none:
       left << Archs::None::name();
-      break;
-
-    case Archs::tv_cpu:
-      left << Archs::CPU::name();
-      break;
-
-    case Archs::tv_generic:
-      left << Archs::Generic::name();
-      break;
-
-    case Archs::tv_gpu:
-      left << Archs::GPU::name();
-      break;
-
-    case Archs::tv_cuda:
-      left << Archs::CUDA::name();
       break;
 
     case Archs::tv_serial:
@@ -41,7 +25,45 @@ std::ostream & FEAST::operator<< (std::ostream & left, Archs::TagValue value)
       break;
   }
 
-  //throw InternalError("Unexpected value for Arch::TagValue '" + stringify(long(value)) + "'");
+  return left;
+}
+
+std::ostream & FEAST::operator<< (std::ostream & left, Mem::TagValue value)
+{
+  switch (value)
+  {
+    case Mem::tv_main:
+      left << Mem::Main::name();
+      break;
+
+    case Mem::tv_cuda:
+      left << Mem::CUDA::name();
+      break;
+
+    default:
+      left << "Unknown Backend";
+      break;
+  }
+
+  return left;
+}
+
+std::ostream & FEAST::operator<< (std::ostream & left, Algo::TagValue value)
+{
+  switch (value)
+  {
+    case Algo::tv_generic:
+      left << Algo::Generic::name();
+      break;
+
+    case Algo::tv_cuda:
+      left << Algo::CUDA::name();
+      break;
+
+    default:
+      left << "Unknown Backend";
+      break;
+  }
 
   return left;
 }

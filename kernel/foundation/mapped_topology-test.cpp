@@ -37,4 +37,4 @@ MappedTopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned 
 MappedTopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mappedtopology_test_cpu_v_d("std::vector, std::deque");
 MappedTopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > mappedtopology_test_cpu_d_d("std::deque, std::deque");
 
-//MappedTopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > mappedtopology_test_cpu_v_ddwdv("std::vector, DV");
+//MappedTopologyTest<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, unsigned long, DenseVector> > mappedtopology_test_cpu_v_ddwdv("std::vector, DV");

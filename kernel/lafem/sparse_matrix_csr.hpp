@@ -147,7 +147,7 @@ namespace FEAST
           _zero_element(other.zero_element()),
           _used_elements(other.used_elements())
         {
-          SparseMatrixCSR<Archs::CPU, DT_> tother(other);
+          SparseMatrixCSR<Mem::Main, DT_> tother(other);
 
           this->_size = tother.size();
           this->_rows = tother.rows();
@@ -505,7 +505,7 @@ namespace FEAST
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_columns) + " !");
 
-          if (typeid(Arch_) == typeid(Archs::CPU))
+          if (typeid(Arch_) == typeid(Mem::Main))
           {
             for (unsigned long i(_row_ptr[row]) ; i < _row_ptr_end[row] ; ++i)
             {
@@ -518,7 +518,7 @@ namespace FEAST
           }
           else
           {
-            SparseMatrixCSR<Archs::CPU, DT_> temp(*this);
+            SparseMatrixCSR<Mem::Main, DT_> temp(*this);
             return temp(row, col);
           }
         }

@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Defect<Archs::CPU, Archs::Generic>
+    struct Defect<Mem::Main, Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow rhs - Ab\f$
@@ -39,7 +39,7 @@ namespace FEAST
        * \param[in] b The given solution.
          */
       template <typename DT_>
-      static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & rhs, const SparseMatrixCSR<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & b)
+      static void value(DenseVector<Mem::Main, DT_> & r, const DenseVector<Mem::Main, DT_> & rhs, const SparseMatrixCSR<Mem::Main, DT_> & a, const DenseVector<Mem::Main, DT_> & b)
       {
         if (b.size() != a.columns())
           throw InternalError("Vector size does not match!");
@@ -71,10 +71,10 @@ namespace FEAST
     };
 
     template <>
-    struct Defect<Archs::GPU, Archs::CUDA>
+    struct Defect<Mem::CUDA, Algo::CUDA>
     {
       template <typename DT_>
-      static void value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & rhs, const SparseMatrixCSR<Archs::GPU, DT_> & a, const DenseVector<Archs::GPU, DT_> & b);
+      static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & rhs, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b);
     };
 
   } // namespace LAFEM

@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Difference<Archs::CPU, Archs::Generic>
+    struct Difference<Mem::Main, Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow x - y\f$
@@ -37,7 +37,7 @@ namespace FEAST
        * \param[in] y The subtrahend.
        */
       template <typename DT_>
-      static void value(DenseVector<Archs::CPU, DT_> & r, const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
+      static void value(DenseVector<Mem::Main, DT_> & r, const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
       {
         if (x.size() != y.size())
           throw InternalError("Vector size does not match!");
@@ -75,10 +75,10 @@ namespace FEAST
     };
 
     template <>
-    struct Difference<Archs::GPU, Archs::CUDA>
+    struct Difference<Mem::CUDA, Algo::CUDA>
     {
       template <typename DT_>
-      static void value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y);
+      static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);
     };
 
   } // namespace LAFEM

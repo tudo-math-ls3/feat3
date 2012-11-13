@@ -37,7 +37,7 @@ public:
 
   virtual void run() const
   {
-    SparseMatrixCOO<Archs::CPU, DT_> a(10, 10);
+    SparseMatrixCOO<Mem::Main, DT_> a(10, 10);
     a(1,2,7);
     a.clear();
     a(1,2,7);
@@ -72,7 +72,7 @@ public:
     SparseMatrixCSR<Tag_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr, row_ptr_end);
     TEST_CHECK_EQUAL(d, c);
 
-    SparseMatrixCSR<Archs::CPU, DT_> e(c);
+    SparseMatrixCSR<Mem::Main, DT_> e(c);
     TEST_CHECK_EQUAL(e, c);
     e = c;
     TEST_CHECK_EQUAL(e, c);
@@ -82,9 +82,9 @@ public:
     TEST_CHECK_NOT_EQUAL((unsigned long)e.val(), (unsigned long)c.val());
   }
 };
-SparseMatrixCSRTest<Archs::CPU, float> cpu_sparse_matrix_csr_test_float;
-SparseMatrixCSRTest<Archs::CPU, double> cpu_sparse_matrix_csr_test_double;
+SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;
+SparseMatrixCSRTest<Mem::Main, double> cpu_sparse_matrix_csr_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCSRTest<Archs::GPU, float> gpu_sparse_matrix_csr_test_float;
-SparseMatrixCSRTest<Archs::GPU, double> gpu_sparse_matrix_csr_test_double;
+SparseMatrixCSRTest<Mem::CUDA, float> gpu_sparse_matrix_csr_test_float;
+SparseMatrixCSRTest<Mem::CUDA, double> gpu_sparse_matrix_csr_test_double;
 #endif

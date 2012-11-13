@@ -540,7 +540,7 @@ MeshTestAttr<Archs::None, unsigned long, std::deque, std::vector<unsigned long> 
 MeshTestAttr<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_cpu_v_d("std::vector, std::deque");
 MeshTestAttr<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > mesh_test_cpu_d_d("std::deque, std::deque");
 #endif
-//MeshTestAttr<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Archs::CPU, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: ddw needs erase(i) member
+//MeshTestAttr<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Mem::Main, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: ddw needs erase(i) member
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestHistory:

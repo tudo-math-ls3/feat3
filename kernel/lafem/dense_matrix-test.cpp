@@ -54,8 +54,8 @@ public:
     TEST_CHECK_EQUAL(f(7,8), e(7,8));
     TEST_CHECK_EQUAL(f, e);
 
-    DenseMatrix<Archs::CPU, DT_> g(f);
-    DenseMatrix<Archs::CPU, DT_> h;
+    DenseMatrix<Mem::Main, DT_> g(f);
+    DenseMatrix<Mem::Main, DT_> h;
     h = f;
     TEST_CHECK_EQUAL(g, f);
     TEST_CHECK_EQUAL(h, g);
@@ -68,9 +68,9 @@ public:
     TEST_CHECK_NOT_EQUAL((unsigned long)h.elements(), (unsigned long)f.elements());
   }
 };
-DenseMatrixTest<Archs::CPU, float> cpu_dense_matrix_test_float;
-DenseMatrixTest<Archs::CPU, double> cpu_dense_matrix_test_double;
+DenseMatrixTest<Mem::Main, float> cpu_dense_matrix_test_float;
+DenseMatrixTest<Mem::Main, double> cpu_dense_matrix_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseMatrixTest<Archs::GPU, float> gpu_dense_matrix_test_float;
-DenseMatrixTest<Archs::GPU, double> gpu_dense_matrix_test_double;
+DenseMatrixTest<Mem::CUDA, float> gpu_dense_matrix_test_float;
+DenseMatrixTest<Mem::CUDA, double> gpu_dense_matrix_test_double;
 #endif

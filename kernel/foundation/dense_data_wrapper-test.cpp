@@ -34,4 +34,4 @@ class DenseDataWrapperTest:
       std::vector<Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> > test2(test1);
     }
 };
-DenseDataWrapperTest<Archs::CPU, double, DenseVector> ddw_test_DV("Hornet::DenseVector<double>");
+DenseDataWrapperTest<Mem::Main, double, DenseVector> ddw_test_DV("Hornet::DenseVector<double>");

@@ -39,8 +39,8 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    class MemoryPool<Archs::CPU>
-        : public InstantiationPolicy<MemoryPool<Archs::CPU>, Singleton>
+    class MemoryPool<Mem::Main>
+        : public InstantiationPolicy<MemoryPool<Mem::Main>, Singleton>
     {
       private:
         /// Map of all memory chunks in use.
@@ -53,7 +53,7 @@ namespace FEAST
         ~MemoryPool();
 
         /// pointer to MemoryPool singleton
-        friend MemoryPool* InstantiationPolicy<MemoryPool<Archs::CPU>, Singleton>::instance();
+        friend MemoryPool* InstantiationPolicy<MemoryPool<Mem::Main>, Singleton>::instance();
 
         /// allocate new memory
         void * allocate_memory(Index bytes);
@@ -96,8 +96,8 @@ namespace FEAST
     };
 
     template <>
-    class MemoryPool<Archs::GPU>
-        : public InstantiationPolicy<MemoryPool<Archs::GPU>, Singleton>
+    class MemoryPool<Mem::CUDA>
+        : public InstantiationPolicy<MemoryPool<Mem::CUDA>, Singleton>
     {
       private:
         std::map<void*, Intern::MemoryInfo> _pool;
@@ -109,7 +109,7 @@ namespace FEAST
         ~MemoryPool();
 
         /// pointer to MemoryPool singleton
-        friend MemoryPool* InstantiationPolicy<MemoryPool<Archs::GPU>, Singleton>::instance();
+        friend MemoryPool* InstantiationPolicy<MemoryPool<Mem::CUDA>, Singleton>::instance();
 
         /// allocate new memory
         void * allocate_memory(Index bytes);

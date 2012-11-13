@@ -151,7 +151,7 @@ _end:
 }
 
 template<typename DataType_>
-double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Archs::CPU, DataType_>& matrix)
+double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix)
 {
   FILE* file = fopen(filename, "rb");
   ASSERT_(file != NULL);
@@ -232,7 +232,7 @@ void test_asm(const Space_& space, const String& cubature, const char* matx_name
 
   StopWatch stop_watch;
 
-  LAFEM::SparseMatrixCSR<Archs::CPU, double> matrix_d(dof_adjacency);
+  LAFEM::SparseMatrixCSR<Mem::Main, double> matrix_d(dof_adjacency);
 
   std::cout << "Assembling double precision matrix data..." << std::endl;
   matrix_d.clear(0.0f);

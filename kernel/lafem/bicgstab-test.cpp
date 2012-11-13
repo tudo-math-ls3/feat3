@@ -32,11 +32,11 @@ public:
     Index size(1025);
     DenseVector<Arch_, DT_> x(size, DT_(1));
     DenseVector<Arch_, DT_> b(size);
-    DenseVector<Archs::CPU, DT_> ref_local(size, DT_(42));
+    DenseVector<Mem::Main, DT_> ref_local(size, DT_(42));
     DenseVector<Arch_, DT_> ref(size);
     copy(ref, ref_local);
 
-    SparseMatrixCOO<Archs::CPU, DT_> csys(size, size);
+    SparseMatrixCOO<Mem::Main, DT_> csys(size, size);
     for (Index i(0) ; i < size ; ++i)
       csys(i, i, DT_(4));
     for (Index i(1) ; i < size ; ++i)
@@ -52,14 +52,14 @@ public:
 
     BiCGStab<BType_>::value(x, sys, b, jac, 1000, DT_(1e-15));
 
-    DenseVector<Archs::CPU, DT_> sol(size);
+    DenseVector<Mem::Main, DT_> sol(size);
     copy(sol, x);
 
     for (Index i(0) ; i < sol.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(sol(i), ref_local(i), 1e-10);
   }
 };
-BiCGStabTest<Archs::CPU, Archs::Generic, double> bicgstab_test_double;
+BiCGStabTest<Mem::Main, Algo::Generic, double> bicgstab_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-BiCGStabTest<Archs::GPU, Archs::CUDA, double> cuda_bicgstab_test_double;
+BiCGStabTest<Mem::CUDA, Algo::CUDA, double> cuda_bicgstab_test_double;
 #endif

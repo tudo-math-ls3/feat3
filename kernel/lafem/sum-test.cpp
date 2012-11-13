@@ -31,11 +31,11 @@ public:
   {
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
-      DenseVector<Archs::CPU, DT_> a_local(size);
-      DenseVector<Archs::CPU, DT_> b_local(size);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> ref2(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> ref2(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i * DT_(1.234)));
@@ -70,11 +70,11 @@ public:
     }
   }
 };
-DVSumTest<Archs::CPU, Archs::Generic, float> dv_sum_test_float;
-DVSumTest<Archs::CPU, Archs::Generic, double> dv_sum_test_double;
+DVSumTest<Mem::Main, Algo::Generic, float> dv_sum_test_float;
+DVSumTest<Mem::Main, Algo::Generic, double> dv_sum_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVSumTest<Archs::GPU, Archs::CUDA, float> gpu_dv_sum_test_float;
-DVSumTest<Archs::GPU, Archs::CUDA, double> gpu_dv_sum_test_double;
+DVSumTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_sum_test_float;
+DVSumTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_sum_test_double;
 #endif
 
 template<
@@ -96,7 +96,7 @@ public:
   {
     for (Index size(1) ; size < 3e2 ; size*=2)
     {
-      SparseMatrixCOO<Archs::CPU, DT_> a_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
       for (unsigned long row(0) ; row < a_local.rows() ; ++row)
       {
         for (unsigned long col(0) ; col < a_local.columns() ; ++col)
@@ -126,9 +126,9 @@ public:
     }
   }
 };
-SMCSRSumTest<Archs::CPU, Archs::Generic, float> smcsr_sum_test_float;
-SMCSRSumTest<Archs::CPU, Archs::Generic, double> smcsr_sum_test_double;
+SMCSRSumTest<Mem::Main, Algo::Generic, float> smcsr_sum_test_float;
+SMCSRSumTest<Mem::Main, Algo::Generic, double> smcsr_sum_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-SMCSRSumTest<Archs::GPU, Archs::CUDA, float> gpu_smcsr_sum_test_float;
-SMCSRSumTest<Archs::GPU, Archs::CUDA, double> gpu_smcsr_sum_test_double;
+SMCSRSumTest<Mem::CUDA, Algo::CUDA, float> gpu_smcsr_sum_test_float;
+SMCSRSumTest<Mem::CUDA, Algo::CUDA, double> gpu_smcsr_sum_test_double;
 #endif

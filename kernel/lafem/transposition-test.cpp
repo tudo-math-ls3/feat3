@@ -28,7 +28,7 @@ public:
   {
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
-      SparseMatrixCOO<Archs::CPU, DT_> a_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
       for (unsigned long row(0) ; row < a_local.rows() ; ++row)
       {
         for (unsigned long col(0) ; col < a_local.columns() ; ++col)
@@ -54,5 +54,5 @@ public:
     }
   }
 };
-TranspositionTest<Archs::CPU, Archs::Generic, float> cpu_transposition_test_float;
-TranspositionTest<Archs::CPU, Archs::Generic, double> cpu_transposition_test_double;
+TranspositionTest<Mem::Main, Algo::Generic, float> cpu_transposition_test_float;
+TranspositionTest<Mem::Main, Algo::Generic, double> cpu_transposition_test_double;

@@ -63,5 +63,5 @@ public:
     TEST_CHECK_NOT_EQUAL(c, b);
   }
 };
-SparseMatrixCOOTest<Archs::CPU, float> sparse_matrix_coo_test_float;
-SparseMatrixCOOTest<Archs::CPU, double> sparse_matrix_coo_test_double;
+SparseMatrixCOOTest<Mem::Main, float> sparse_matrix_coo_test_float;
+SparseMatrixCOOTest<Mem::Main, double> sparse_matrix_coo_test_double;

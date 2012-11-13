@@ -23,17 +23,17 @@ namespace FEAST
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 
-MemoryPool<Archs::GPU>::MemoryPool()
+MemoryPool<Mem::CUDA>::MemoryPool()
 {
 }
 
-MemoryPool<Archs::GPU>::~MemoryPool()
+MemoryPool<Mem::CUDA>::~MemoryPool()
 {
   if (_pool.size() > 0)
     throw InternalError("Memory Pool<GPU> still contains memory chunks!");
 }
 
-void * MemoryPool<Archs::GPU>::allocate_memory(Index bytes)
+void * MemoryPool<Mem::CUDA>::allocate_memory(Index bytes)
 {
   void * memory(NULL);
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, bytes))
@@ -47,7 +47,7 @@ void * MemoryPool<Archs::GPU>::allocate_memory(Index bytes)
   return memory;
 }
 
-void MemoryPool<Archs::GPU>::increase_memory(void * address)
+void MemoryPool<Mem::CUDA>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
@@ -58,7 +58,7 @@ void MemoryPool<Archs::GPU>::increase_memory(void * address)
   }
 }
 
-void MemoryPool<Archs::GPU>::release_memory(void * address)
+void MemoryPool<Mem::CUDA>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
@@ -77,18 +77,18 @@ void MemoryPool<Archs::GPU>::release_memory(void * address)
   }
 }
 
-void MemoryPool<Archs::GPU>::download(void * dest, void * src, Index bytes)
+void MemoryPool<Mem::CUDA>::download(void * dest, void * src, Index bytes)
 {
   cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToHost);
 }
 
-void MemoryPool<Archs::GPU>::upload(void * dest, void * src, Index bytes)
+void MemoryPool<Mem::CUDA>::upload(void * dest, void * src, Index bytes)
 {
   cudaMemcpy(dest, src, bytes, cudaMemcpyHostToDevice);
 }
 
 template <typename DT_>
-DT_ MemoryPool<Archs::GPU>::get_element(const DT_ * data, Index index)
+DT_ MemoryPool<Mem::CUDA>::get_element(const DT_ * data, Index index)
 {
   const void * src(data + index);
   DT_ value;
@@ -97,14 +97,14 @@ DT_ MemoryPool<Archs::GPU>::get_element(const DT_ * data, Index index)
 }
 
 template <typename DT_>
-void MemoryPool<Archs::GPU>::modify_element(DT_ * data, Index index, DT_ value)
+void MemoryPool<Mem::CUDA>::modify_element(DT_ * data, Index index, DT_ value)
 {
   void * dest(data + index);
   cudaMemcpy(dest, &value, sizeof(DT_), cudaMemcpyHostToDevice);
 }
 
 template <typename DT_>
-void MemoryPool<Archs::GPU>::set_memory(DT_ * address, const DT_ val, const Index count)
+void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index count)
 {
   Index blocksize(128);
   dim3 grid;
@@ -114,17 +114,17 @@ void MemoryPool<Archs::GPU>::set_memory(DT_ * address, const DT_ val, const Inde
   FEAST::LAFEM::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
 }
 
-void MemoryPool<Archs::GPU>::copy(void * dest, const void * src, const Index bytes)
+void MemoryPool<Mem::CUDA>::copy(void * dest, const void * src, const Index bytes)
 {
   cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToDevice);
 }
 
-template float MemoryPool<Archs::GPU>::get_element(const float * data, Index index);
-template double MemoryPool<Archs::GPU>::get_element(const double * data, Index index);
-template Index MemoryPool<Archs::GPU>::get_element(const Index * data, Index index);
-template void MemoryPool<Archs::GPU>::modify_element(float * data, Index index, float value);
-template void MemoryPool<Archs::GPU>::modify_element(double * data, Index index, double value);
-template void MemoryPool<Archs::GPU>::modify_element(Index * data, Index index, Index value);
-template void MemoryPool<Archs::GPU>::set_memory(float * address , const float val, const Index count);
-template void MemoryPool<Archs::GPU>::set_memory(double * address , const double val, const Index count);
-template void MemoryPool<Archs::GPU>::set_memory(Index * address , const Index val, const Index count);
+template float MemoryPool<Mem::CUDA>::get_element(const float * data, Index index);
+template double MemoryPool<Mem::CUDA>::get_element(const double * data, Index index);
+template Index MemoryPool<Mem::CUDA>::get_element(const Index * data, Index index);
+template void MemoryPool<Mem::CUDA>::modify_element(float * data, Index index, float value);
+template void MemoryPool<Mem::CUDA>::modify_element(double * data, Index index, double value);
+template void MemoryPool<Mem::CUDA>::modify_element(Index * data, Index index, Index value);
+template void MemoryPool<Mem::CUDA>::set_memory(float * address , const float val, const Index count);
+template void MemoryPool<Mem::CUDA>::set_memory(double * address , const double val, const Index count);
+template void MemoryPool<Mem::CUDA>::set_memory(Index * address , const Index val, const Index count);

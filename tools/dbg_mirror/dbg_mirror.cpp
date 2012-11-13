@@ -19,11 +19,11 @@ typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 
-typedef LAFEM::DenseVector<Archs::CPU, double> VectorType;
-typedef LAFEM::SparseMatrixCSR<Archs::CPU, double> MatrixType;
+typedef LAFEM::DenseVector<Mem::Main, double> VectorType;
+typedef LAFEM::SparseMatrixCSR<Mem::Main, double> MatrixType;
 
-typedef LAFEM::VectorMirror<Archs::CPU, double> VectorMirrorType;
-typedef LAFEM::MatrixMirror<Archs::CPU, double> MatrixMirrorType;
+typedef LAFEM::VectorMirror<Mem::Main, double> VectorMirrorType;
+typedef LAFEM::MatrixMirror<Mem::Main, double> MatrixMirrorType;
 
 void fill_cell_set(QuadCellSet& cell, int face);
 void fill_quad_mesh_2d(QuadMesh& mesh, Real x = 0.0, Real y = 0.0);

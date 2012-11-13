@@ -32,11 +32,11 @@ public:
 
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
-      SparseMatrixCOO<Archs::CPU, DT_> a_local(size, size + 2);
-      DenseVector<Archs::CPU, DT_> b_local(size + 2);
-      DenseVector<Archs::CPU, DT_> rhs_local(size);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
+      DenseVector<Mem::Main, DT_> b_local(size + 2);
+      DenseVector<Mem::Main, DT_> rhs_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (unsigned long row(0) ; row < a_local.rows() ; ++row)
       {
         for (unsigned long col(0) ; col < a_local.columns() ; ++col)
@@ -76,9 +76,9 @@ public:
     }
   }
 };
-CSRDefectTest<Archs::CPU, Archs::Generic, float> csrv_defect_test_float;
-CSRDefectTest<Archs::CPU, Archs::Generic, double> csrv_defect_test_double;
+CSRDefectTest<Mem::Main, Algo::Generic, float> csrv_defect_test_float;
+CSRDefectTest<Mem::Main, Algo::Generic, double> csrv_defect_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-CSRDefectTest<Archs::GPU, Archs::CUDA, float> cuda_csrv_defect_test_float;
-CSRDefectTest<Archs::GPU, Archs::CUDA, double> cuda_csrv_defect_test_double;
+CSRDefectTest<Mem::CUDA, Algo::CUDA, float> cuda_csrv_defect_test_float;
+CSRDefectTest<Mem::CUDA, Algo::CUDA, double> cuda_csrv_defect_test_double;
 #endif

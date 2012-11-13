@@ -29,10 +29,10 @@ public:
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      DenseVector<Archs::CPU, DT_> a_local(size);
-      DenseVector<Archs::CPU, DT_> b_local(size);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i % 100 * DT_(1.234)));
@@ -63,11 +63,11 @@ public:
     }
   }
 };
-DVAxpyTest<Archs::CPU, Archs::Generic, float> dv_axpy_test_float;
-DVAxpyTest<Archs::CPU, Archs::Generic, double> dv_axpy_test_double;
+DVAxpyTest<Mem::Main, Algo::Generic, float> dv_axpy_test_float;
+DVAxpyTest<Mem::Main, Algo::Generic, double> dv_axpy_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVAxpyTest<Archs::GPU, Archs::CUDA, float> gpu_dv_axpy_test_float;
-DVAxpyTest<Archs::GPU, Archs::CUDA, double> gpu_dv_axpy_test_double;
+DVAxpyTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_axpy_test_float;
+DVAxpyTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_test_double;
 #endif
 
 template<
@@ -89,11 +89,11 @@ public:
   {
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      DenseVector<Archs::CPU, DT_> a_local(size);
-      DenseVector<Archs::CPU, DT_> b_local(size);
-      DenseVector<Archs::CPU, DT_> c_local(size);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> c_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i % 100 * DT_(1.234)));
@@ -133,9 +133,9 @@ public:
     }
   }
 };
-DVAxpyVTest<Archs::CPU, Archs::Generic, float> dv_axpy_v_test_float;
-DVAxpyVTest<Archs::CPU, Archs::Generic, double> dv_axpy_v_test_double;
+DVAxpyVTest<Mem::Main, Algo::Generic, float> dv_axpy_v_test_float;
+DVAxpyVTest<Mem::Main, Algo::Generic, double> dv_axpy_v_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVAxpyVTest<Archs::GPU, Archs::CUDA, float> gpu_dv_axpy_v_test_float;
-DVAxpyVTest<Archs::GPU, Archs::CUDA, double> gpu_dv_axpy_v_test_double;
+DVAxpyVTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_axpy_v_test_float;
+DVAxpyVTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_v_test_double;
 #endif

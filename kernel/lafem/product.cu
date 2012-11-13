@@ -32,7 +32,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-void Product<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, DT_> & r, const SparseMatrixCSR<Archs::GPU, DT_> & a, const DenseVector<Archs::GPU, DT_> & b)
+void Product<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b)
 {
   if (b.size() != a.columns())
     throw InternalError("Vector size does not match!");
@@ -55,5 +55,5 @@ void Product<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, DT_> & r, c
   FEAST::LAFEM::Intern::cuda_product_csr<<<grid, block>>>(r_gpu, b_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, row_ptr_end_gpu, r.size());
 }
 
-template void Product<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, float> &, const SparseMatrixCSR<Archs::GPU, float> &, const DenseVector<Archs::GPU, float> &);
-template void Product<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, double> &, const SparseMatrixCSR<Archs::GPU, double> &, const DenseVector<Archs::GPU, double> &);
+template void Product<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixCSR<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
+template void Product<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const SparseMatrixCSR<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);

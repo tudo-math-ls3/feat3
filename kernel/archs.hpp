@@ -22,12 +22,7 @@ namespace FEAST
        */
       enum TagValue
       {
-        tv_nil = 0,
-        tv_cpu,
-        tv_generic,
-        tv_gpu,
-        tv_cuda,
-        tv_none,
+        tv_none = 0,
         tv_serial,
         tv_parallel
       };
@@ -39,67 +34,11 @@ namespace FEAST
       struct None :
         public InstantiationPolicy<None, NonCopyable>
       {
-        const static TagValue tag_value = tv_nil;
-        const static TagValue memory_value = tv_nil;
+        const static TagValue tag_value = tv_none;
+        const static TagValue memory_value = tv_none;
         static String name()
         {
           return "none";
-        }
-      };
-
-      /**
-       * Tag-type for operations in main (CPU) memory
-       */
-      struct CPU :
-        public InstantiationPolicy<CPU, NonCopyable>
-      {
-        const static TagValue tag_value = tv_cpu;
-        const static TagValue memory_value = tv_cpu;
-        static String name()
-        {
-          return "cpu";
-        }
-      };
-
-      /**
-       * Tag-type for generic/C++-based operations.
-       */
-      struct Generic :
-        public InstantiationPolicy<Generic, NonCopyable>
-      {
-        const static TagValue tag_value = tv_generic;
-        const static TagValue memory_value = tv_generic;
-        static String name()
-        {
-          return "generic";
-        }
-      };
-
-      /**
-       * Tag-type for operations in GPU memory
-       */
-      struct GPU :
-        public InstantiationPolicy<GPU, NonCopyable>
-      {
-        const static TagValue tag_value = tv_gpu;
-        const static TagValue memory_value = tv_gpu;
-        static String name()
-        {
-          return "gpu";
-        }
-      };
-
-      /**
-       * Tag-type for cuda-based operations.
-       */
-      struct CUDA :
-        public InstantiationPolicy<CUDA, NonCopyable>
-      {
-        const static TagValue tag_value = tv_cuda;
-        const static TagValue memory_value = tv_cuda;
-        static String name()
-        {
-          return "cuda";
         }
       };
 
@@ -132,9 +71,91 @@ namespace FEAST
       };
     }
 
+
+    namespace Mem
+    {
+      /**
+       * Tag values for all supported destinations.
+       */
+      enum TagValue
+      {
+        tv_main,
+        tv_cuda,
+      };
+
+      /**
+       * Tag-type for operations in main (CPU) memory
+       */
+      struct Main :
+        public InstantiationPolicy<Main, NonCopyable>
+      {
+        const static TagValue tag_value = tv_main;
+        const static TagValue memory_value = tv_main;
+        static String name()
+        {
+          return "main (cpu)";
+        }
+      };
+
+      /**
+       * Tag-type for operations in cuda (GPU) memory
+       */
+      struct CUDA :
+        public InstantiationPolicy<CUDA, NonCopyable>
+      {
+        const static TagValue tag_value = tv_cuda;
+        const static TagValue memory_value = tv_cuda;
+        static String name()
+        {
+          return "cuda (gpu)";
+        }
+      };
+    }
+
+    namespace Algo
+    {
+      /**
+       * Tag values for all supported destinations.
+       */
+      enum TagValue
+      {
+        tv_generic,
+        tv_cuda,
+      };
+      /**
+       * Tag-type for generic/C++-based operations.
+       */
+      struct Generic :
+        public InstantiationPolicy<Generic, NonCopyable>
+      {
+        const static TagValue tag_value = tv_generic;
+        const static TagValue memory_value = tv_generic;
+        static String name()
+        {
+          return "generic";
+        }
+      };
+
+      /**
+       * Tag-type for cuda-based operations.
+       */
+      struct CUDA :
+        public InstantiationPolicy<CUDA, NonCopyable>
+      {
+        const static TagValue tag_value = tv_cuda;
+        const static TagValue memory_value = tv_cuda;
+        static String name()
+        {
+          return "cuda";
+        }
+      };
+    }
+
     /**
      * Output operator for tags::TagValue.
      */
     std::ostream & operator<< (std::ostream & left, Archs::TagValue value);
+    std::ostream & operator<< (std::ostream & left, Mem::TagValue value);
+    std::ostream & operator<< (std::ostream & left, Algo::TagValue value);
 }
 #endif

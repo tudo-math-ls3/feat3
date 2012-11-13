@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct DotProduct<Archs::CPU, Archs::Generic>
+    struct DotProduct<Mem::Main, Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow x \cdot y\f$
@@ -37,7 +37,7 @@ namespace FEAST
        * \param[in] y The second vector.
        */
       template <typename DT_>
-      static DT_ value(const DenseVector<Archs::CPU, DT_> & x, const DenseVector<Archs::CPU, DT_> & y)
+      static DT_ value(const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
       {
         if (x.size() != y.size())
           throw InternalError("Vector size does not match!");
@@ -67,10 +67,10 @@ namespace FEAST
     };
 
     template <>
-    struct DotProduct<Archs::GPU, Archs::CUDA>
+    struct DotProduct<Mem::CUDA, Algo::CUDA>
     {
       template <typename DT_>
-      static DT_ value(const DenseVector<Archs::GPU, DT_> & x, const DenseVector<Archs::GPU, DT_> & y);
+      static DT_ value(const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);
     };
 
 

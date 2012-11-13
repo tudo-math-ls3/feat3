@@ -28,11 +28,11 @@ public:
   {
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
-      DenseVector<Archs::CPU, DT_> a_local(size);
-      DenseVector<Archs::CPU, DT_> b_local(size);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> ref2(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> ref2(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i * DT_(1.234)));
@@ -67,9 +67,9 @@ public:
     }
   }
 };
-DVElementProductTest<Archs::CPU, Archs::Generic, float> dv_element_product_test_float;
-DVElementProductTest<Archs::CPU, Archs::Generic, double> dv_element_product_test_double;
+DVElementProductTest<Mem::Main, Algo::Generic, float> dv_element_product_test_float;
+DVElementProductTest<Mem::Main, Algo::Generic, double> dv_element_product_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVElementProductTest<Archs::GPU, Archs::CUDA, float> gpu_dv_element_product_test_float;
-DVElementProductTest<Archs::GPU, Archs::CUDA, double> gpu_dv_element_product_test_double;
+DVElementProductTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_element_product_test_float;
+DVElementProductTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_element_product_test_double;
 #endif

@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Norm2<Archs::CPU, Archs::Generic>
+    struct Norm2<Mem::Main, Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow \sqrt{ \sum\limits_i x_i \cdot x_i } \f$
@@ -38,7 +38,7 @@ namespace FEAST
        * \returns The L2 norm.
        */
       template <typename DT_>
-      static DT_ value(const DenseVector<Archs::CPU, DT_> & x)
+      static DT_ value(const DenseVector<Mem::Main, DT_> & x)
       {
         const DT_ * xp(x.elements());
         DT_ r(0);
@@ -56,10 +56,10 @@ namespace FEAST
     };
 
     template <>
-    struct Norm2<Archs::GPU, Archs::CUDA>
+    struct Norm2<Mem::CUDA, Algo::CUDA>
     {
       template <typename DT_>
-      static DT_ value(const DenseVector<Archs::GPU, DT_> & x);
+      static DT_ value(const DenseVector<Mem::CUDA, DT_> & x);
     };
 
   } // namespace LAFEM

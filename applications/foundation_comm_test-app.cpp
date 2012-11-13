@@ -17,7 +17,6 @@
 
 using namespace FEAST;
 using namespace Foundation;
-using namespace Archs;
 
 template<typename DT_>
 struct TestResult
@@ -391,7 +390,7 @@ void check_halobased_attribute_transfer(int rank)
     h.add_element_pair(10, 999);
     h.add_element_pair(100, 999);
 
-    InterfacedComm<Archs::CPU, com_exchange>::execute(h, attr);
+    InterfacedComm<Mem::Main, com_exchange>::execute(h, attr);
 
     TestResult<double> res[2];
 #ifndef SERIAL
@@ -419,7 +418,7 @@ void check_halobased_dv_transfer(int rank)
 {
   if(rank < 2)
   {
-    DenseVector<CPU, double> attr(100000);
+    DenseVector<Mem::Main, double> attr(100000);
     for(Index i(0) ; i < 100000 ; ++i)
     {
       attr(i, (double(rank + i)));
@@ -432,7 +431,7 @@ void check_halobased_dv_transfer(int rank)
     h.add_element_pair(10, 999);
     h.add_element_pair(100, 999);
 
-    InterfacedComm<Archs::CPU, com_exchange>::execute(h, attr);
+    InterfacedComm<Mem::Main, com_exchange>::execute(h, attr);
 
     TestResult<double> res[2];
 #ifndef SERIAL
@@ -460,20 +459,20 @@ void check_halobased_smcsr_transfer(int rank)
 {
   if(rank < 2)
   {
-    SparseMatrixCOO<CPU, float> smcoo(1000, 1000);
+    SparseMatrixCOO<Mem::Main, float> smcoo(1000, 1000);
     smcoo(0, 0, float(rank + 42));
     smcoo(0, 1, float(rank + 43));
     smcoo(1, 0, float(rank + 47));
     smcoo(1, 1, float(rank + 48));
 
-    SparseMatrixCSR<CPU, float> smcsr(smcoo);
+    SparseMatrixCSR<Mem::Main, float> smcsr(smcoo);
 
     Mesh<> m(rank);
     Halo<0, pl_vertex, Mesh<> > h(m, rank == 0 ? 1 : 0);
     h.add_element_pair(0, 999);
     h.add_element_pair(1, 999);
 
-    InterfacedComm<Archs::CPU, com_exchange>::execute(h, smcsr);
+    InterfacedComm<Mem::Main, com_exchange>::execute(h, smcsr);
 
     TestResult<float> res[4];
 #ifndef SERIAL

@@ -18,7 +18,7 @@ template<typename DataType_>
 class GridTransferTest :
   public TestSystem::TaggedTest<Archs::None, DataType_>
 {
-  typedef LAFEM::SparseMatrixCSR<Archs::CPU, DataType_> MatrixType;
+  typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
 
   typedef Geometry::ConformalMesh< Geometry::ConformalMeshPolicy<Shape::Quadrilateral> > QuadMesh;
 

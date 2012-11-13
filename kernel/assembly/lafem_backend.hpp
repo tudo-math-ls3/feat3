@@ -27,10 +27,10 @@ namespace FEAST
     class MatrixGatherAxpy DOXY({});
 
     template<typename DataType_>
-    class VectorScatterAxpy< LAFEM::DenseVector<Archs::CPU, DataType_> >
+    class VectorScatterAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
     {
     public:
-      typedef LAFEM::DenseVector<Archs::CPU, DataType_> VectorType;
+      typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
 
     private:
       Index _num_entries;
@@ -66,13 +66,13 @@ namespace FEAST
           }
         }
       }
-    }; // class VectorScatterAxpy<LAFEM::DenseVector<Archs::CPU,...>>
+    }; // class VectorScatterAxpy<LAFEM::DenseVector<Mem::Main,...>>
 
     template<typename DataType_>
-    class VectorGatherAxpy< LAFEM::DenseVector<Archs::CPU, DataType_> >
+    class VectorGatherAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
     {
     public:
-      typedef LAFEM::DenseVector<Archs::CPU, DataType_> VectorType;
+      typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
 
     private:
       Index _num_entries;
@@ -111,13 +111,13 @@ namespace FEAST
           loc_vec(i) += alpha * dx;
         }
       }
-    }; // class VectorGatherAxpy<LAFEM::DenseVector<Archs::CPU,...>>
+    }; // class VectorGatherAxpy<LAFEM::DenseVector<Mem::Main,...>>
 
     template<typename DataType_>
-    class MatrixScatterAxpy< LAFEM::SparseMatrixCSR<Archs::CPU, DataType_> >
+    class MatrixScatterAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
     {
     public:
-      typedef LAFEM::SparseMatrixCSR<Archs::CPU, DataType_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
 
     private:
 #ifdef DEBUG
@@ -222,13 +222,13 @@ namespace FEAST
           // continue with next row entry
         }
       }
-    }; // class MatrixScatterAdder<LAFEM::SparseMatrixCSR<Archs::CPU,...>>
+    }; // class MatrixScatterAdder<LAFEM::SparseMatrixCSR<Mem::Main,...>>
 
     template<typename DataType_>
-    class MatrixGatherAxpy< LAFEM::SparseMatrixCSR<Archs::CPU, DataType_> >
+    class MatrixGatherAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
     {
     public:
-      typedef LAFEM::SparseMatrixCSR<Archs::CPU, DataType_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
 
     private:
 #ifdef DEBUG
@@ -335,7 +335,7 @@ namespace FEAST
           // continue with next row entry
         }
       }
-    }; // class MatrixGatherAxpy<LAFEM::SparseMatrixCSR<Archs::CPU,...>>
+    }; // class MatrixGatherAxpy<LAFEM::SparseMatrixCSR<Mem::Main,...>>
 
     /// \cond internal
     namespace Intern
@@ -344,10 +344,10 @@ namespace FEAST
       class RowScaler;
 
       template<typename DataType_>
-      class RowScaler< LAFEM::SparseMatrixCSR<Archs::CPU, DataType_> >
+      class RowScaler< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
       {
       public:
-        typedef LAFEM::SparseMatrixCSR<Archs::CPU, DataType_> MatrixType;
+        typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
 
         static void apply(MatrixType& matrix, const DataType_ x[])
         {

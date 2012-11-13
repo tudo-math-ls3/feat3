@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Transposition<Archs::CPU, Archs::Generic>
+    struct Transposition<Mem::Main, Algo::Generic>
     {
       /**
        * \brief Calculate \f$A^T\f$
@@ -36,14 +36,14 @@ namespace FEAST
        * \returns The transpose of a.
        */
       template <typename DT_>
-      static SparseMatrixCSR<Archs::CPU, DT_> value(const SparseMatrixCSR<Archs::CPU, DT_> & a)
+      static SparseMatrixCSR<Mem::Main, DT_> value(const SparseMatrixCSR<Mem::Main, DT_> & a)
       {
-        /*DenseVector<Archs::CPU, Index> col_ind(a.used_elements());
-        DenseVector<Archs::CPU, DT_> val(a.used_elements());
-        DenseVector<Archs::CPU, Index> row_ptr(a.columns() + 1);
-        DenseVector<Archs::CPU, Index> row_ptr_end(a.columns());*/
+        /*DenseVector<Mem::Main, Index> col_ind(a.used_elements());
+        DenseVector<Mem::Main, DT_> val(a.used_elements());
+        DenseVector<Mem::Main, Index> row_ptr(a.columns() + 1);
+        DenseVector<Mem::Main, Index> row_ptr_end(a.columns());*/
 
-        SparseMatrixCOO<Archs::CPU, DT_> st(a.columns(), a.rows());
+        SparseMatrixCOO<Mem::Main, DT_> st(a.columns(), a.rows());
 
         const Index * col_ind(a.col_ind());
         const DT_ * val(a.val());
@@ -60,8 +60,8 @@ namespace FEAST
           }
         }
 
-        SparseMatrixCSR<Archs::CPU, DT_> t(st);
-        //SparseMatrixCSR<Archs::CPU, DT_> t(a.columns(), a.rows(), col_ind, val, row_ptr, row_ptr_end);
+        SparseMatrixCSR<Mem::Main, DT_> t(st);
+        //SparseMatrixCSR<Mem::Main, DT_> t(a.columns(), a.rows(), col_ind, val, row_ptr, row_ptr_end);
         return t;
       }
     };

@@ -7,17 +7,17 @@
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 
-MemoryPool<Archs::CPU>::MemoryPool()
+MemoryPool<Mem::Main>::MemoryPool()
 {
 }
 
-MemoryPool<Archs::CPU>::~MemoryPool()
+MemoryPool<Mem::Main>::~MemoryPool()
 {
   if (_pool.size() > 0)
     throw InternalError("MemoryPool<CPU> still contains memory chunks!");
 }
 
-void * MemoryPool<Archs::CPU>::allocate_memory(Index bytes)
+void * MemoryPool<Mem::Main>::allocate_memory(Index bytes)
 {
   void * memory(NULL);
   memory = ::malloc(bytes);
@@ -31,7 +31,7 @@ void * MemoryPool<Archs::CPU>::allocate_memory(Index bytes)
   return memory;
 }
 
-void MemoryPool<Archs::CPU>::increase_memory(void * address)
+void MemoryPool<Mem::Main>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
@@ -42,7 +42,7 @@ void MemoryPool<Archs::CPU>::increase_memory(void * address)
   }
 }
 
-void MemoryPool<Archs::CPU>::release_memory(void * address)
+void MemoryPool<Mem::Main>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
@@ -61,18 +61,18 @@ void MemoryPool<Archs::CPU>::release_memory(void * address)
   }
 }
 
-void MemoryPool<Archs::CPU>::download(void * dest, void * src, Index bytes)
+void MemoryPool<Mem::Main>::download(void * dest, void * src, Index bytes)
 {
   ::memcpy(dest, src, bytes);
 }
 
-void MemoryPool<Archs::CPU>::upload(void * dest, void * src, Index bytes)
+void MemoryPool<Mem::Main>::upload(void * dest, void * src, Index bytes)
 {
   ::memcpy(dest, src, bytes);
 }
 
 template <typename DT_>
-void MemoryPool<Archs::CPU>::set_memory(DT_ * address, const DT_ val, const Index count)
+void MemoryPool<Mem::Main>::set_memory(DT_ * address, const DT_ val, const Index count)
 {
   for (Index i(0) ; i < count ; ++i)
   {
@@ -80,6 +80,6 @@ void MemoryPool<Archs::CPU>::set_memory(DT_ * address, const DT_ val, const Inde
   }
 }
 
-template void MemoryPool<Archs::CPU>::set_memory(float * address , const float val, const Index count);
-template void MemoryPool<Archs::CPU>::set_memory(double * address , const double val, const Index count);
-template void MemoryPool<Archs::CPU>::set_memory(Index * address , const Index val, const Index count);
+template void MemoryPool<Mem::Main>::set_memory(float * address , const float val, const Index count);
+template void MemoryPool<Mem::Main>::set_memory(double * address , const double val, const Index count);
+template void MemoryPool<Mem::Main>::set_memory(Index * address , const Index val, const Index count);

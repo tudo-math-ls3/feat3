@@ -62,7 +62,7 @@ TopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> 
 TopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
 TopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
 
-TopologyTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");
+TopologyTest<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class TopologyCommTest:
@@ -108,5 +108,5 @@ TopologyCommTest<Archs::None, unsigned long, std::deque, std::vector<unsigned lo
 TopologyCommTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_commtest_cpu_v_d("std::vector, std::deque");
 TopologyCommTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_commtest_cpu_d_d("std::deque, std::deque");
 
-TopologyCommTest<Archs::CPU, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Archs::CPU, unsigned long, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");
+TopologyCommTest<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, unsigned long, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");
 #endif // SERIAL

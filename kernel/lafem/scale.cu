@@ -24,7 +24,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-void Scale<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, DT_> & r, const DenseVector<Archs::GPU, DT_> & x, const DT_ s)
+void Scale<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DT_ s)
 {
   if (x.size() != r.size())
     throw InternalError("Vector size does not match!");
@@ -41,5 +41,5 @@ void Scale<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, DT_> & r, con
   FEAST::LAFEM::Intern::cuda_scale<<<grid, block>>>(r_gpu, x_gpu, s, r.size());
 }
 
-template void Scale<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, float> &, const DenseVector<Archs::GPU, float> &, const float);
-template void Scale<Archs::GPU, Archs::CUDA>::value(DenseVector<Archs::GPU, double> &, const DenseVector<Archs::GPU, double> &, const double);
+template void Scale<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &, const float);
+template void Scale<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &, const double);

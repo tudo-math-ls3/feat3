@@ -83,8 +83,8 @@ namespace FEAST
        * A new matrix of the same data-type and arch as the template matrix.
        */
       template<typename DataType2_>
-      LAFEM::SparseMatrixCSR<Archs::CPU, DataType2_>
-        create_buffer(const LAFEM::SparseMatrixCSR<Archs::CPU, DataType2_>& tmpl_mat) const
+      LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>
+        create_buffer(const LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>& tmpl_mat) const
       {
         // compute the sparsity pattern of
         //  X := A * Y * B^T,
@@ -96,7 +96,7 @@ namespace FEAST
         DynamicGraph graph(DynamicGraph::rt_as_is, _row_mirror.get_gather_dual());
         graph.compose(tmpl_mat);
         graph.compose(_col_mirror.get_scatter_dual());
-        return LAFEM::SparseMatrixCSR<Archs::CPU, DataType2_>(Graph(Graph::rt_as_is, graph));
+        return LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>(Graph(Graph::rt_as_is, graph));
       }
 
       /**
@@ -112,8 +112,8 @@ namespace FEAST
         typename Tx_,
         typename Ty_>
       void gather_op(
-        LAFEM::SparseMatrixCSR<Archs::CPU, Tx_>& buffer,
-        const LAFEM::SparseMatrixCSR<Archs::CPU, Ty_>& matrix) const
+        LAFEM::SparseMatrixCSR<Mem::Main, Tx_>& buffer,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Ty_>& matrix) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_gather_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_gather_dual());
@@ -216,8 +216,8 @@ namespace FEAST
         typename Ty_,
         typename Tx_>
       void scatter_op(
-        LAFEM::SparseMatrixCSR<Archs::CPU, Ty_>& matrix,
-        const LAFEM::SparseMatrixCSR<Archs::CPU, Tx_>& buffer) const
+        LAFEM::SparseMatrixCSR<Mem::Main, Ty_>& matrix,
+        const LAFEM::SparseMatrixCSR<Mem::Main, Tx_>& buffer) const
       {
         const typename VectorMirrorType::MirrorMatrixType& row_mir_mat(_row_mirror.get_scatter_dual());
         const typename VectorMirrorType::MirrorMatrixType& col_mir_mat(_col_mirror.get_scatter_dual());

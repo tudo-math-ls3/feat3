@@ -28,10 +28,10 @@ public:
   {
     for (Index size(1) ; size < 1e5 ; size*=2)
     {
-      DenseVector<Archs::CPU, DT_> a_local(size);
-      DenseVector<Archs::CPU, DT_> b_local(size);
-      DenseVector<Archs::CPU, DT_> ref(size);
-      DenseVector<Archs::CPU, DT_> result_local(size);
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i * DT_(1.234)));
@@ -60,9 +60,9 @@ public:
     }
   }
 };
-DVDifferenceTest<Archs::CPU, Archs::Generic, float> dv_difference_test_float;
-DVDifferenceTest<Archs::CPU, Archs::Generic, double> dv_difference_test_double;
+DVDifferenceTest<Mem::Main, Algo::Generic, float> dv_difference_test_float;
+DVDifferenceTest<Mem::Main, Algo::Generic, double> dv_difference_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVDifferenceTest<Archs::GPU, Archs::CUDA, float> gpu_dv_difference_test_float;
-DVDifferenceTest<Archs::GPU, Archs::CUDA, double> gpu_dv_difference_test_double;
+DVDifferenceTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_difference_test_float;
+DVDifferenceTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_difference_test_double;
 #endif

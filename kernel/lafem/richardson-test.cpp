@@ -32,11 +32,11 @@ public:
     Index size(1025);
     DenseVector<Arch_, DT_> x(size, DT_(1));
     DenseVector<Arch_, DT_> b(size);
-    DenseVector<Archs::CPU, DT_> ref_local(size, DT_(42));
+    DenseVector<Mem::Main, DT_> ref_local(size, DT_(42));
     DenseVector<Arch_, DT_> ref(size);
     copy(ref, ref_local);
 
-    SparseMatrixCOO<Archs::CPU, DT_> csys(size, size);
+    SparseMatrixCOO<Mem::Main, DT_> csys(size, size);
     for (Index i(0) ; i < size ; ++i)
       csys(i, i, DT_(4));
     for (Index i(1) ; i < size ; ++i)
@@ -51,14 +51,14 @@ public:
 
     Richardson<BType_>::value(x, sys, b, jac, 1000, DT_(1e-16));
 
-    DenseVector<Archs::CPU, DT_> sol(size);
+    DenseVector<Mem::Main, DT_> sol(size);
     copy(sol, x);
     TEST_CHECK_EQUAL(sol, ref_local);
   }
 };
-RichardsonTest<Archs::CPU, Archs::Generic, float> richardson_test_float;
-RichardsonTest<Archs::CPU, Archs::Generic, double> richardson_test_double;
+RichardsonTest<Mem::Main, Algo::Generic, float> richardson_test_float;
+RichardsonTest<Mem::Main, Algo::Generic, double> richardson_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-RichardsonTest<Archs::GPU, Archs::CUDA, float> cuda_richardson_test_float;
-RichardsonTest<Archs::GPU, Archs::CUDA, double> cuda_richardson_test_double;
+RichardsonTest<Mem::CUDA, Algo::CUDA, float> cuda_richardson_test_float;
+RichardsonTest<Mem::CUDA, Algo::CUDA, double> cuda_richardson_test_double;
 #endif

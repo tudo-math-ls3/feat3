@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Product<Archs::CPU, Archs::Generic>
+    struct Product<Mem::Main, Algo::Generic>
     {
       /**
        * \brief Calculate Matrix-Vector-Product \f$r \leftarrow Ab\f$
@@ -38,7 +38,7 @@ namespace FEAST
        * \param[in] b The vector.
        */
       template <typename DT_>
-      static void value(DenseVector<Archs::CPU, DT_> & r, const SparseMatrixCSR<Archs::CPU, DT_> & a, const DenseVector<Archs::CPU, DT_> & b)
+      static void value(DenseVector<Mem::Main, DT_> & r, const SparseMatrixCSR<Mem::Main, DT_> & a, const DenseVector<Mem::Main, DT_> & b)
       {
         if (b.size() != a.columns())
           throw InternalError("Vector size does not match!");
@@ -67,10 +67,10 @@ namespace FEAST
     };
 
     template <>
-    struct Product<Archs::GPU, Archs::CUDA>
+    struct Product<Mem::CUDA, Algo::CUDA>
     {
       template <typename DT_>
-      static void value(DenseVector<Archs::GPU, DT_> & r, const SparseMatrixCSR<Archs::GPU, DT_> & a, const DenseVector<Archs::GPU, DT_> & b);
+      static void value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b);
     };
 
   } // namespace LAFEM
