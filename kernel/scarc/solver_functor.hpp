@@ -348,6 +348,7 @@ namespace FEAST
         std::shared_ptr<T3_> _right;
         std::shared_ptr<T4_> _farright;
     };
+
     /*template<
       template<typename, typename> class StorageType_ = std::vector
     >
