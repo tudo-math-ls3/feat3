@@ -133,6 +133,15 @@ namespace FEAST
    */
   typedef double Real;
 
+  /**
+  * \brief Nil class definition.
+  *
+  * This is an empty tag class which may be used for templates with optional parameters.\n
+  * Some template implementations might recognise the usage of a \c Nil parameter as <em>parameter not given</em>.
+  */
+  class Nil
+  {
+  }; // class Nil
 } // namespace FEAST
 
 #endif // KERNEL_BASE_HEADER_HPP

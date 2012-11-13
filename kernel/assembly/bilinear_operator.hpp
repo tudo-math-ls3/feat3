@@ -25,7 +25,7 @@ namespace FEAST
      * The type of the Finite Element that is to be used as the test space.
      *
      * \tparam TrialSpace_
-     * The type of the Finite Element that is to be used as the trial space. If set to Archs::None, the test
+     * The type of the Finite Element that is to be used as the trial space. If set to Nil, the test
      * space is also used as the trial space for the assembly.
      *
      * \author Peter Zajac
@@ -34,7 +34,7 @@ namespace FEAST
       typename Matrix_,
       typename Functor_,
       typename TestSpace_,
-      typename TrialSpace_ = Archs::None>
+      typename TrialSpace_ = Nil>
     class BilinearOperator
     {
     public:
@@ -238,7 +238,7 @@ namespace FEAST
       typename Matrix_,
       typename Functor_,
       typename Space_>
-    class BilinearOperator<Matrix_, Functor_, Space_, Archs::None>
+    class BilinearOperator<Matrix_, Functor_, Space_, Nil>
     {
     public:
       /// matrix type
@@ -415,7 +415,7 @@ namespace FEAST
 
         // okay, that's it
       }
-    }; // class BilinearOperator<..., Archs::None>
+    }; // class BilinearOperator<..., Nil>
   } // namespace Assembly
 } // namespace FEAST
 
