@@ -49,12 +49,12 @@ namespace FEAST
             idx[i] = iv[i];
         }
 
-        Index& operator[](int i)
+        Index& operator[](Index i)
         {
           return idx[i];
         }
 
-        const Index& operator[](int i) const
+        const Index& operator[](Index i) const
         {
           return idx[i];
         }
@@ -122,7 +122,7 @@ namespace FEAST
       }
 
       /// returns the value of the k-th component of the j-th index-representative in the i-th set
-      Index get_index(int i, int j, int k) const
+      Index get_index(Index i, Index j, Index k) const
       {
         CONTEXT(name() + "::get_index()");
         typename RepSet::const_iterator iter = _rep_set_vec[i].begin();

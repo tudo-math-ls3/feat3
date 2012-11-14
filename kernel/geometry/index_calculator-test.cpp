@@ -57,7 +57,7 @@ public:
       const IndexSetTypeQV& index_set_q_v = mesh->get_index_set<2,0>();
 
       // create index-tree objects
-      int vertex_number = mesh->get_num_entities(0);
+      Index vertex_number = mesh->get_num_entities(0);
       edge_tree = new HEdgeIndexTree(vertex_number);
       quad_tree = new QuadIndexTree(vertex_number);
 
@@ -104,7 +104,7 @@ public:
       const IndexSetTypeTV& index_set_t_v = mesh->get_index_set<2,0>();
 
       // create index-tree objects
-      int vertex_number = mesh->get_num_entities(0);
+      Index vertex_number = mesh->get_num_entities(0);
       edge_tree = new SEdgeIndexTree(vertex_number);
       tria_tree = new TriaIndexTree(vertex_number);
 
@@ -166,7 +166,7 @@ public:
       IndexSetTypeCQ& index_set_c_q = mesh->get_index_set<3,2>();
 
       // create index-tree objects
-      int vertex_number = mesh->get_num_entities(0);
+      Index vertex_number = mesh->get_num_entities(0);
       edge_tree = new HEdgeIndexTree(vertex_number);
       quad_tree = new QuadIndexTree(vertex_number);
 
@@ -233,7 +233,7 @@ public:
       IndexSetTypeST& index_set_s_t = mesh->get_index_set<3,2>();
 
       // create index-calculator objects
-      int vertex_number = mesh->get_num_entities(0);
+      Index vertex_number = mesh->get_num_entities(0);
       edge_tree = new SEdgeIndexTree(vertex_number);
       tria_tree = new TriaIndexTree(vertex_number);
 
