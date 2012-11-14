@@ -27,7 +27,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-DT_ Norm2<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, DT_> & x)
+DT_ Norm2<Algo::CUDA>::value(const DenseVector<Mem::CUDA, DT_> & x)
 {
   const DT_ * x_gpu(x.elements());
   cublasInit();
@@ -36,5 +36,5 @@ DT_ Norm2<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, DT_> & x)
   return result;
 }
 
-template float Norm2<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, float> &);
-template double Norm2<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, double> &);
+template float Norm2<Algo::CUDA>::value(const DenseVector<Mem::CUDA, float> &);
+template double Norm2<Algo::CUDA>::value(const DenseVector<Mem::CUDA, double> &);

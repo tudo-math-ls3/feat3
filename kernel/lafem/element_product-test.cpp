@@ -11,7 +11,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVElementProductTest
   : public TaggedTest<Arch_, DT_>
@@ -47,21 +47,21 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size);
 
-      ElementProduct<Arch_, BType_>::value(c, a, b);
+      ElementProduct<Algo_>::value(c, a, b);
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      ElementProduct<Arch_, BType_>::value(a, a, b);
+      ElementProduct<Algo_>::value(a, a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(a, a_local);
-      ElementProduct<Arch_, BType_>::value(b, a, b);
+      ElementProduct<Algo_>::value(b, a, b);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(b, b_local);
-      ElementProduct<Arch_, BType_>::value(a, a, a);
+      ElementProduct<Algo_>::value(a, a, a);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }

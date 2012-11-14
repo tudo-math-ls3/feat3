@@ -14,7 +14,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Transposition
     {
     };
@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Transposition<Mem::Main, Algo::Generic>
+    struct Transposition<Algo::Generic>
     {
       /**
        * \brief Calculate \f$A^T\f$

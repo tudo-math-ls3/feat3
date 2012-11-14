@@ -11,7 +11,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVDotProductTest
   : public TaggedTest<Arch_, DT_>
@@ -44,12 +44,12 @@ public:
 
       // a*b = 1
       DT_ ref(DT_(1));
-      DT_ c = DotProduct<Arch_, BType_>::value(a, b);
+      DT_ c = DotProduct<Algo_>::value(a, b);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = DotProduct<Arch_, BType_>::value(b, a);
+      c = DotProduct<Algo_>::value(b, a);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = DotProduct<Arch_, BType_>::value(b, b);
-      ref = Norm2<Arch_, BType_>::value(b);
+      c = DotProduct<Algo_>::value(b, b);
+      ref = Norm2<Algo_>::value(b);
       ref *= ref;
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }

@@ -27,7 +27,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-DT_ DotProduct<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y)
+DT_ DotProduct<Algo::CUDA>::value(const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y)
 {
   if (x.size() != y.size())
     throw InternalError("Vector size does not match!");
@@ -40,5 +40,5 @@ DT_ DotProduct<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, DT_> &
   return result;
 }
 
-template float DotProduct<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float>&);
-template double DotProduct<Mem::CUDA, Algo::CUDA>::value(const DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double>&);
+template float DotProduct<Algo::CUDA>::value(const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float>&);
+template double DotProduct<Algo::CUDA>::value(const DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double>&);

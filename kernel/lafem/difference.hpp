@@ -14,7 +14,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Difference
     {
     };
@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Difference<Mem::Main, Algo::Generic>
+    struct Difference<Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow x - y\f$
@@ -75,7 +75,7 @@ namespace FEAST
     };
 
     template <>
-    struct Difference<Mem::CUDA, Algo::CUDA>
+    struct Difference<Algo::CUDA>
     {
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);

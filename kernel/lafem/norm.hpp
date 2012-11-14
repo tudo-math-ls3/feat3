@@ -15,7 +15,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Norm2
     {
     };
@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Norm2<Mem::Main, Algo::Generic>
+    struct Norm2<Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow \sqrt{ \sum\limits_i x_i \cdot x_i } \f$
@@ -56,7 +56,7 @@ namespace FEAST
     };
 
     template <>
-    struct Norm2<Mem::CUDA, Algo::CUDA>
+    struct Norm2<Algo::CUDA>
     {
       template <typename DT_>
       static DT_ value(const DenseVector<Mem::CUDA, DT_> & x);

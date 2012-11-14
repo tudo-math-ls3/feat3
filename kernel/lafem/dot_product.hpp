@@ -14,7 +14,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct DotProduct
     {
     };
@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct DotProduct<Mem::Main, Algo::Generic>
+    struct DotProduct<Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow x \cdot y\f$
@@ -67,7 +67,7 @@ namespace FEAST
     };
 
     template <>
-    struct DotProduct<Mem::CUDA, Algo::CUDA>
+    struct DotProduct<Algo::CUDA>
     {
       template <typename DT_>
       static DT_ value(const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);

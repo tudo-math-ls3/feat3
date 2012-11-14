@@ -15,7 +15,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Product
     {
     };
@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Product<Mem::Main, Algo::Generic>
+    struct Product<Algo::Generic>
     {
       /**
        * \brief Calculate Matrix-Vector-Product \f$r \leftarrow Ab\f$
@@ -67,7 +67,7 @@ namespace FEAST
     };
 
     template <>
-    struct Product<Mem::CUDA, Algo::CUDA>
+    struct Product<Algo::CUDA>
     {
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b);

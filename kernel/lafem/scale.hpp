@@ -14,7 +14,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Scale
     {
     };
@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Scale<Mem::Main, Algo::Generic>
+    struct Scale<Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow x \cdot s\f$
@@ -54,7 +54,7 @@ namespace FEAST
     };
 
     template <>
-    struct Scale<Mem::CUDA, Algo::CUDA>
+    struct Scale<Algo::CUDA>
     {
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DT_ s);

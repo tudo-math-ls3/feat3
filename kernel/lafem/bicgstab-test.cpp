@@ -14,7 +14,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class BiCGStabTest
   : public TaggedTest<Arch_, DT_>
@@ -45,12 +45,12 @@ public:
       csys(i + 1, i, DT_(-1));
     SparseMatrixCSR<Arch_, DT_> sys(csys);
 
-    JacobiPreconditioner<BType_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(1));
-    //NonePreconditioner<BType_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac;
+    JacobiPreconditioner<Algo_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(1));
+    //NonePreconditioner<Algo_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac;
 
-    Product<Arch_, BType_>::value(b, sys, ref);
+    Product<Algo_>::value(b, sys, ref);
 
-    BiCGStab<BType_>::value(x, sys, b, jac, 1000, DT_(1e-15));
+    BiCGStab<Algo_>::value(x, sys, b, jac, 1000, DT_(1e-15));
 
     DenseVector<Mem::Main, DT_> sol(size);
     copy(sol, x);

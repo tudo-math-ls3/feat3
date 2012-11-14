@@ -12,7 +12,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class CSRDefectTest
   : public TaggedTest<Arch_, DT_>
@@ -60,7 +60,7 @@ public:
       copy(rhs, rhs_local);
       DenseVector<Arch_, DT_> c(size, 4711);
 
-      Defect<Arch_, BType_>::value(c, rhs, a, b);
+      Defect<Algo_>::value(c, rhs, a, b);
       copy(result_local, c);
 
       DT_ dev(DT_(0));

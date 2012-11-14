@@ -15,7 +15,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Sum
     {
     };
@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Sum<Mem::Main, Algo::Generic>
+    struct Sum<Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow x + y\f$
@@ -103,12 +103,12 @@ namespace FEAST
         DenseVector<Mem::Main, DT_> yv(y.used_elements(), y.val());
         DenseVector<Mem::Main, DT_> rv(r.used_elements(), r.val());
 
-        Sum<Mem::Main, Algo::Generic>::value(rv, xv, yv);
+        Sum<Algo::Generic>::value(rv, xv, yv);
       }
     };
 
     template <>
-    struct Sum<Mem::CUDA, Algo::CUDA>
+    struct Sum<Algo::CUDA>
     {
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);
@@ -129,7 +129,7 @@ namespace FEAST
         DenseVector<Mem::CUDA, DT_> yv(y.used_elements(), y.val());
         DenseVector<Mem::CUDA, DT_> rv(r.used_elements(), r.val());
 
-        Sum<Mem::CUDA, Algo::CUDA>::value(rv, xv, yv);
+        Sum<Algo::CUDA>::value(rv, xv, yv);
       }
     };
 

@@ -15,7 +15,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Defect
     {
     };
@@ -28,7 +28,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Defect<Mem::Main, Algo::Generic>
+    struct Defect<Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow rhs - Ab\f$
@@ -71,7 +71,7 @@ namespace FEAST
     };
 
     template <>
-    struct Defect<Mem::CUDA, Algo::CUDA>
+    struct Defect<Algo::CUDA>
     {
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & rhs, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b);

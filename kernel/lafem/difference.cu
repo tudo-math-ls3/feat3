@@ -24,7 +24,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-void Difference<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y)
+void Difference<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y)
 {
   if (x.size() != y.size())
     throw InternalError("Vector size does not match!");
@@ -44,5 +44,5 @@ void Difference<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, c
   FEAST::LAFEM::Intern::cuda_difference<<<grid, block>>>(r_gpu, x_gpu, y_gpu, r.size());
 }
 
-template void Difference<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
-template void Difference<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, double>&, const DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);
+template void Difference<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
+template void Difference<Algo::CUDA>::value(DenseVector<Mem::CUDA, double>&, const DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);

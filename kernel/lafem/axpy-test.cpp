@@ -11,7 +11,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVAxpyTest
   : public TaggedTest<Arch_, DT_>
@@ -45,18 +45,18 @@ public:
       copy(b, b_local);
 
       DenseVector<Arch_, DT_> c(size);
-      Axpy<Arch_, BType_>::value(c, s, a, b);
+      Axpy<Algo_>::value(c, s, a, b);
       copy(result_local, c);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      Axpy<Arch_, BType_>::value(a, s, a, b);
+      Axpy<Algo_>::value(a, s, a, b);
       copy(result_local, a);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       copy(a, a_local);
-      Axpy<Arch_, BType_>::value(b, s, a, b);
+      Axpy<Algo_>::value(b, s, a, b);
       copy(result_local, b);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
@@ -72,7 +72,7 @@ DVAxpyTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_test_double;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVAxpyVTest
   : public TaggedTest<Arch_, DT_>
@@ -109,24 +109,24 @@ public:
       copy(c, c_local);
 
       DenseVector<Arch_, DT_> d(size);
-      Axpy<Arch_, BType_>::value(d, c, a, b);
+      Axpy<Algo_>::value(d, c, a, b);
       copy(result_local, d);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      Axpy<Arch_, BType_>::value(a, c, a, b);
+      Axpy<Algo_>::value(a, c, a, b);
       copy(result_local, a);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       copy(a, a_local);
-      Axpy<Arch_, BType_>::value(b, c, a, b);
+      Axpy<Algo_>::value(b, c, a, b);
       copy(result_local, b);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       copy(b, b_local);
-      Axpy<Arch_, BType_>::value(c, c, a, b);
+      Axpy<Algo_>::value(c, c, a, b);
       copy(result_local, c);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);

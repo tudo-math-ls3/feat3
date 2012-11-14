@@ -14,7 +14,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename BType_>
+    template <typename Algo_>
     struct Axpy
     {
     };
@@ -27,7 +27,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <>
-    struct Axpy <Mem::Main, Algo::Generic>
+    struct Axpy <Algo::Generic>
     {
       /**
        * \brief Calculate \f$r \leftarrow ax + y\f$
@@ -132,7 +132,7 @@ namespace FEAST
     };
 
     template <>
-    struct Axpy <Mem::CUDA, Algo::CUDA>
+    struct Axpy <Algo::CUDA>
     {
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const DT_ a, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);

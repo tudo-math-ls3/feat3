@@ -25,14 +25,14 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename BType_>
+    template <typename Algo_>
     struct BiCGStab
     {
       template <typename MT_, typename VT_>
-      static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<BType_, MT_, VT_> & precon, Index max_iters, typename VT_::data_type eps_relative)
+      static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::data_type eps_relative)
       {
         typedef typename VT_::data_type DT_;
-        typedef typename VT_::arch_type Arch_;
+        typedef typename VT_::mem_type Arch_;
 
         DT_ defnorm, defnorm_0, defnorm_00(1e14);
         Index iter = 0;
@@ -55,11 +55,11 @@ namespace FEAST
 
         do
         {
-          Defect<Arch_, BType_>::value(r, b, A, x);
-          defnorm_0 = Norm2<Arch_, BType_>::value(r);
+          Defect<Algo_>::value(r, b, A, x);
+          defnorm_0 = Norm2<Algo_>::value(r);
           defnorm = defnorm_0;
           precon.apply(r_tilde_0, r);
-          nrm_r_tilde_0 = Norm2<Arch_, BType_>::value(r_tilde_0);
+          nrm_r_tilde_0 = Norm2<Algo_>::value(r_tilde_0);
 
           if (restarted == false)
           {
@@ -69,17 +69,17 @@ namespace FEAST
           copy(r_tilde, r_tilde_0);
           copy(p_tilde, r_tilde_0);
 
-          rho_tilde = DotProduct<Arch_, BType_>::value(r_tilde_0, r_tilde_0);
+          rho_tilde = DotProduct<Algo_>::value(r_tilde_0, r_tilde_0);
 
           // main BiCGStab loop
           do
           {
             iter = iter + 1;
 
-            Product<Arch_, BType_>::value(v, A, p_tilde);
+            Product<Algo_>::value(v, A, p_tilde);
             precon.apply(v_tilde, v);
 
-            gamma_tilde = DotProduct<Arch_, BType_>::value(v_tilde, r_tilde_0);
+            gamma_tilde = DotProduct<Algo_>::value(v_tilde, r_tilde_0);
 
             if (std::abs(gamma_tilde) < std::abs(rho_tilde)*1e-14)
             {
@@ -90,7 +90,7 @@ namespace FEAST
 
             alpha_tilde = rho_tilde / gamma_tilde;
 
-            if ((std::abs(alpha_tilde) * Norm2<Arch_, BType_>::value(v_tilde)) / defnorm < 1e-5)
+            if ((std::abs(alpha_tilde) * Norm2<Algo_>::value(v_tilde)) / defnorm < 1e-5)
             {
               restarted = true;;
               //std::cout << "Breakpoint 2" << std::endl;
@@ -99,26 +99,26 @@ namespace FEAST
             }
 
             DT_ malpha_tilde(-alpha_tilde);
-            Axpy<Arch_, BType_>::value(s, malpha_tilde, v, r);
+            Axpy<Algo_>::value(s, malpha_tilde, v, r);
 
-            defnorm = Norm2<Arch_, BType_>::value(s);
+            defnorm = Norm2<Algo_>::value(s);
             if (defnorm < eps_relative * defnorm_00)
             {
-              Axpy<Arch_, BType_>::value(x, alpha_tilde, p_tilde, x);
+              Axpy<Algo_>::value(x, alpha_tilde, p_tilde, x);
 
               early_exit = 1;
               converged = 1;
               //std::cout << "Breakpoint 3 (converged)" << std::endl;
               break;
             }
-            Axpy<Arch_, BType_>::value(s_tilde, malpha_tilde, v_tilde, r_tilde);
+            Axpy<Algo_>::value(s_tilde, malpha_tilde, v_tilde, r_tilde);
 
-            Product<Arch_, BType_>::value(t, A, s_tilde);
+            Product<Algo_>::value(t, A, s_tilde);
 
             precon.apply(t_tilde, t);
 
-            gamma_tilde = DotProduct<Arch_, BType_>::value(t_tilde, t_tilde);
-            omega_tilde = DotProduct<Arch_, BType_>::value(t_tilde, s_tilde);
+            gamma_tilde = DotProduct<Algo_>::value(t_tilde, t_tilde);
+            omega_tilde = DotProduct<Algo_>::value(t_tilde, s_tilde);
 
             if (std::abs(gamma_tilde) < std::abs(omega_tilde) * 1e-14)
             {
@@ -128,13 +128,13 @@ namespace FEAST
             }
             omega_tilde = omega_tilde / gamma_tilde;
 
-            Axpy<Arch_, BType_>::value(x, omega_tilde, s_tilde, x);
-            Axpy<Arch_, BType_>::value(x, alpha_tilde, p_tilde, x);
+            Axpy<Algo_>::value(x, omega_tilde, s_tilde, x);
+            Axpy<Algo_>::value(x, alpha_tilde, p_tilde, x);
 
             DT_ momega_tilde(-omega_tilde);
-            Axpy<Arch_, BType_>::value(r, momega_tilde, t, s);
+            Axpy<Algo_>::value(r, momega_tilde, t, s);
 
-            defnorm = Norm2<Arch_, BType_>::value(r);
+            defnorm = Norm2<Algo_>::value(r);
             if (defnorm < eps_relative * defnorm_00)
             {
               converged = 1;
@@ -142,16 +142,16 @@ namespace FEAST
               break;
             }
 
-            Axpy<Arch_, BType_>::value(r_tilde,  momega_tilde, t_tilde, s_tilde);
+            Axpy<Algo_>::value(r_tilde,  momega_tilde, t_tilde, s_tilde);
 
             rho_tilde_old = rho_tilde;
-            rho_tilde = DotProduct<Arch_, BType_>::value(r_tilde, r_tilde_0);
+            rho_tilde = DotProduct<Algo_>::value(r_tilde, r_tilde_0);
 
             beta_tilde = (alpha_tilde / omega_tilde) * (rho_tilde / rho_tilde_old);
 
-            Axpy<Arch_, BType_>::value(p_tilde, momega_tilde, v_tilde, p_tilde);
-            Scale<Arch_, BType_>::value(p_tilde, p_tilde, beta_tilde);
-            Sum<Arch_, BType_>::value(p_tilde, p_tilde, r_tilde);
+            Axpy<Algo_>::value(p_tilde, momega_tilde, v_tilde, p_tilde);
+            Scale<Algo_>::value(p_tilde, p_tilde, beta_tilde);
+            Sum<Algo_>::value(p_tilde, p_tilde, r_tilde);
 
           } while (iter <= max_iters);
 

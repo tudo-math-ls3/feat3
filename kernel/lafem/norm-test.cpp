@@ -10,7 +10,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVNorm2Test
   : public TaggedTest<Arch_, DT_>
@@ -40,7 +40,7 @@ public:
       const DT_ ref(std::sqrt(DT_(2) - std::pow(DT_(0.5), DT_(size-1))));
 
       DenseVector<Arch_, DT_> a(a_local);
-      DT_ c = Norm2<Arch_, BType_>::value(a);
+      DT_ c = Norm2<Algo_>::value(a);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }
   }

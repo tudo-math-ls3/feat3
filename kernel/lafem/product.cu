@@ -32,7 +32,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-void Product<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b)
+void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b)
 {
   if (b.size() != a.columns())
     throw InternalError("Vector size does not match!");
@@ -55,5 +55,5 @@ void Product<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, cons
   FEAST::LAFEM::Intern::cuda_product_csr<<<grid, block>>>(r_gpu, b_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, row_ptr_end_gpu, r.size());
 }
 
-template void Product<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixCSR<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
-template void Product<Mem::CUDA, Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const SparseMatrixCSR<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);
+template void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixCSR<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
+template void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const SparseMatrixCSR<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);

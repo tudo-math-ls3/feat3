@@ -21,30 +21,30 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename BType_>
+    template <typename Algo_>
     struct Richardson
     {
       template <typename MT_, typename VT_>
-      static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<BType_, MT_, VT_> & precon, Index max_iters, typename VT_::data_type eps_relative)
+      static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::data_type eps_relative)
       {
         typedef typename VT_::data_type DT_;
-        typedef typename VT_::arch_type Arch_;
+        typedef typename VT_::mem_type Arch_;
 
         DenseVector<Arch_, DT_> temp_0(x.size());
         DenseVector<Arch_, DT_> temp_1(x.size());
 
-        Defect<Arch_, BType_>::value(temp_0, b, A, x);
-        DT_ initial_defect = Norm2<Arch_, BType_>::value(temp_0);
+        Defect<Algo_>::value(temp_0, b, A, x);
+        DT_ initial_defect = Norm2<Algo_>::value(temp_0);
 
         Index used_iters = 0;
         while(true)
         {
           ++used_iters;
 
-          Defect<Arch_, BType_>::value(temp_0, b, A, x);
-          DT_ current_defect = Norm2<Arch_, BType_>::value(temp_0);
+          Defect<Algo_>::value(temp_0, b, A, x);
+          DT_ current_defect = Norm2<Algo_>::value(temp_0);
           precon.apply(temp_1, temp_0);
-          Sum<Arch_, BType_>::value(x, x, temp_1);
+          Sum<Algo_>::value(x, x, temp_1);
 
           if(current_defect < eps_relative * initial_defect || current_defect < eps_relative || used_iters >= max_iters)
           {

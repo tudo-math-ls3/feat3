@@ -11,7 +11,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVScaleTest
   : public TaggedTest<Arch_, DT_>
@@ -42,11 +42,11 @@ public:
       copy(a, a_local);
       DenseVector<Arch_, DT_> b(size);
 
-      Scale<Arch_, BType_>::value(b, a, s);
+      Scale<Algo_>::value(b, a, s);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      Scale<Arch_, BType_>::value(a, a, s);
+      Scale<Algo_>::value(a, a, s);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
     }

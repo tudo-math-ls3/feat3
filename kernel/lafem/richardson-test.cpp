@@ -14,7 +14,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class RichardsonTest
   : public TaggedTest<Arch_, DT_>
@@ -45,11 +45,11 @@ public:
       csys(i + 1, i, DT_(-1));
     SparseMatrixCSR<Arch_, DT_> sys(csys);
 
-    JacobiPreconditioner<BType_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(0.7));
+    JacobiPreconditioner<Algo_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(0.7));
 
-    Product<Arch_, BType_>::value(b, sys, ref);
+    Product<Algo_>::value(b, sys, ref);
 
-    Richardson<BType_>::value(x, sys, b, jac, 1000, DT_(1e-16));
+    Richardson<Algo_>::value(x, sys, b, jac, 1000, DT_(1e-16));
 
     DenseVector<Mem::Main, DT_> sol(size);
     copy(sol, x);

@@ -13,7 +13,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class CSRProductTest
   : public TaggedTest<Arch_, DT_>
@@ -57,7 +57,7 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size, 4711);
 
-      Product<Arch_, BType_>::value(c, a, b);
+      Product<Algo_>::value(c, a, b);
       copy(result_local, c);
 
       DT_ dev(DT_(0));

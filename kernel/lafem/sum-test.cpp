@@ -14,7 +14,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVSumTest
   : public TaggedTest<Arch_, DT_>
@@ -50,21 +50,21 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size);
 
-      Sum<Arch_, BType_>::value(c, a, b);
+      Sum<Algo_>::value(c, a, b);
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      Sum<Arch_, BType_>::value(a, a, b);
+      Sum<Algo_>::value(a, a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(a, a_local);
-      Sum<Arch_, BType_>::value(b, a, b);
+      Sum<Algo_>::value(b, a, b);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(b, b_local);
-      Sum<Arch_, BType_>::value(a, a, a);
+      Sum<Algo_>::value(a, a, a);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }
@@ -79,7 +79,7 @@ DVSumTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_sum_test_double;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class SMCSRSumTest
   : public TaggedTest<Arch_, DT_>
@@ -110,11 +110,11 @@ public:
       SparseMatrixCSR<Arch_, DT_> a(a_local);
       SparseMatrixCSR<Arch_, DT_> b(a.clone());
       DenseVector<Arch_, DT_> b_val(b.used_elements(), b.val());
-      Scale<Arch_, BType_>::value(b_val, b_val, DT_(2));
+      Scale<Algo_>::value(b_val, b_val, DT_(2));
 
       SparseMatrixCSR<Arch_, DT_> r(a.clone());
 
-      Sum<Arch_, BType_>::value(r, a, b);
+      Sum<Algo_>::value(r, a, b);
 
       DenseVector<Arch_, DT_> a_val(a.used_elements(), a.val());
       DenseVector<Arch_, DT_> r_val(r.used_elements(), r.val());

@@ -11,7 +11,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Tag_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class TranspositionTest
   : public TaggedTest<Tag_, DT_>
@@ -42,7 +42,7 @@ public:
       SparseMatrixCSR<Tag_, DT_> a(a_local);
 
       SparseMatrixCSR<Tag_, DT_> b;
-      b = Transposition<Tag_, BType_>::value(a);
+      b = Transposition<Algo_>::value(a);
 
       for (Index i(0) ; i < a.rows() ; ++i)
       {

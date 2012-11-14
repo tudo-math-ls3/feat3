@@ -11,7 +11,7 @@ using namespace FEAST::TestSystem;
 
 template<
   typename Arch_,
-  typename BType_,
+  typename Algo_,
   typename DT_>
 class DVDifferenceTest
   : public TaggedTest<Arch_, DT_>
@@ -45,16 +45,16 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size);
 
-      Difference<Arch_, BType_>::value(c, a, b);
+      Difference<Algo_>::value(c, a, b);
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      Difference<Arch_, BType_>::value(a, a, b);
+      Difference<Algo_>::value(a, a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(a, a_local);
-      Difference<Arch_, BType_>::value(b, a, b);
+      Difference<Algo_>::value(b, a, b);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
     }
