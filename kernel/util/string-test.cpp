@@ -24,6 +24,7 @@ public:
   {
     bool b;
     int i;
+    std::vector<String> words;
 
     // test bool stringify/parse
     TEST_CHECK(stringify(b = true).parse(b));
@@ -39,6 +40,23 @@ public:
 
     // should not parse
     TEST_CHECK(!stringify(27).parse(b));
-    TEST_CHECK(!stringify("nonsense").parse(i));
+    TEST_CHECK(!String("nonsense").parse(i));
+
+    // test fork-by-charset
+    String("  0 5 \n 3\tfoo ").fork_by_charset(words);
+    TEST_CHECK_EQUAL(words.size(), 4u);
+    TEST_CHECK_EQUAL(words[0], "0");
+    TEST_CHECK_EQUAL(words[1], "5");
+    TEST_CHECK_EQUAL(words[2], "3");
+    TEST_CHECK_EQUAL(words[3], "foo");
+
+    // test fork-by-string
+    String("0, 4,,7 , ").fork_by_string(words, ",");
+    TEST_CHECK_EQUAL(words.size(), 5u);
+    TEST_CHECK_EQUAL(words[0], "0");
+    TEST_CHECK_EQUAL(words[1], " 4");
+    TEST_CHECK_EQUAL(words[2], "");
+    TEST_CHECK_EQUAL(words[3], "7 ");
+    TEST_CHECK_EQUAL(words[4], " ");
   }
 } string_test;

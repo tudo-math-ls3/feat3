@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <locale>
+#include <vector>
 
 #ifdef FEAST_COMPILER_MICROSOFT
 #  include <string.h> // for _stricmp
@@ -231,6 +232,134 @@ namespace FEAST
     }
 
     /**
+     * \brief Forks the string by a delimiter charset.
+     *
+     * This function separates the string into substrings, where two substrings are separated a delimiter
+     * substring consisting only of delimiter charset characters.
+     *
+     * This function is frequently used by parsers, which fork strings by whitespace characters.
+     *
+     * <b>Example:</b>\n
+     * When using the default whitespace delimiter character set, the string " 5  42\t7 " will be forked
+     * into 3 substrings: "5", "42" and "7".
+     *
+     * \param[out] words
+     * A vector of Strings which receives the substrings.
+     *
+     * \param[in] charset
+     * The character set which is to be treated as the delimiter charset.
+     *
+     * \returns
+     * <c>words.size()</c>
+     */
+    size_t fork_by_charset(
+      std::vector<String>& words,
+      const String& charset = " \a\b\f\n\r\t\v") const
+    {
+      words.clear();
+      if(empty() || charset.empty())
+      {
+        return 0;
+      }
+
+      // find first occurance of fork substring
+      size_t off1(find_first_not_of(charset));
+      if(off1 == npos)
+      {
+        // only delimiter characters; nothing to be extracted
+        return 0;
+      }
+
+      // go forking
+      while(off1 != npos)
+      {
+        // find next occurance of delimiter string
+        size_t off2(find_first_of(charset, off1));
+
+        // add next fork substring to vector
+        if(off2 == npos)
+        {
+          // extract last substring
+          words.push_back(substr(off1));
+          return words.size();
+        }
+        else
+        {
+          // extract next substring
+          words.push_back(substr(off1, (off2 == npos ? npos : off2 - off1)));
+        }
+
+        // find next occurance of fork substring
+        off1 = find_first_not_of(charset, off2);
+      }
+
+      // okay
+      return words.size();
+    }
+
+    /**
+     * \brief Forks the string by a delimiter substring.
+     *
+     * This function separates the string into substrings, where the substrings are separated by a delimiter
+     * string.
+     *
+     * <b><Example:</b>\n
+     * When using "," as a delimiter string, the input string " ,5,,3" will be forked into 4 substrings:
+     * " ", "5", "" and "3".
+     *
+     * \param[out] words
+     * A vector of Strings which receives the substrings.
+     *
+     * \param[in] delimiter
+     * The string that is to be treated as a delimiter.
+     *
+     * \returns
+     * <c>words.size()</c>
+     */
+    size_t fork_by_string(
+      std::vector<String>& words,
+      const String& delimiter = " ") const
+    {
+      words.clear();
+      if(empty() || delimiter.empty())
+        return 0u;
+
+      // find first occurance of delimiter substring
+      size_t off1(find(delimiter));
+      words.push_back(substr(0, off1));
+      if(off1 == npos)
+        return words.size();
+
+      // go forking
+      const size_t dellen(delimiter.size());
+      while(off1 != npos)
+      {
+        // increase leading offset by delimiter length
+        off1 += dellen;
+
+        // find next substring occurance
+        size_t off2 = find(delimiter, off1);
+        if(off2 == npos)
+        {
+          // extract last substring
+          words.push_back(substr(off1));
+          return words.size();
+        }
+        else
+        {
+          // extract next substring
+          words.push_back(substr(off1, off2 - off1));
+        }
+
+        // update offset
+        off1 = off2;
+      }
+
+      // okay
+      return words.size();
+    }
+
+    /**
      * \brief Converts the string to upper case.
      *
      * \returns
@@ -419,6 +548,7 @@ namespace FEAST
     {
       return join(container.cbegin(), container.cend(), delimiter);
     }
+
   }; // class String
 
   /**
