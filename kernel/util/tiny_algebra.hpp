@@ -158,30 +158,30 @@ namespace FEAST
        *
        * \returns A (const) reference to the <c>i</c>-th entry of the vector.
        */
-      T_& operator()(int i)
+      T_& operator()(Index i)
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERT(i < Index(n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
-      const T_& operator()(int i) const
+      const T_& operator()(Index i) const
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERT(i < Index(n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
-      T_& operator[](int i)
+      T_& operator[](Index i)
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERT(i < Index(n_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator()() */
-      const T_& operator[](int i) const
+      const T_& operator[](Index i) const
       {
-        ASSERT((i >= 0) && (i < n_), "index i out-of-bounds");
+        ASSERT(i < Index(n_), "index i out-of-bounds");
         return v[i];
       }
 
@@ -470,18 +470,18 @@ namespace FEAST
        * \returns
        * A (const) reference to the matrix entry at position (i,j).
        */
-      T_& operator()(int i, int j)
+      T_& operator()(Index i, Index j)
       {
-        ASSERT((i >= 0) && (i < m_), "index i out-of-bounds");
-        ASSERT((j >= 0) && (j < n_), "index j out-of-bounds");
+        ASSERT(i < Index(m_), "index i out-of-bounds");
+        ASSERT(j < Index(n_), "index j out-of-bounds");
         return v[i][j];
       }
 
       /** \copydoc operator()() */
-      const T_& operator()(int i, int j) const
+      const T_& operator()(Index i, Index j) const
       {
-        ASSERT((i >= 0) && (i < m_), "index i out-of-bounds");
-        ASSERT((j >= 0) && (j < n_), "index j out-of-bounds");
+        ASSERT(i < Index(m_), "index i out-of-bounds");
+        ASSERT(j < Index(n_), "index j out-of-bounds");
         return v[i][j];
       }
 
@@ -494,16 +494,16 @@ namespace FEAST
        * \returns
        * A (const) pointer to the <c>i</c>-th row of the matrix.S
        */
-      T_* operator[](int i)
+      T_* operator[](Index i)
       {
-        ASSERT((i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERT(i < Index(m_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
-      const T_* operator[](int i) const
+      const T_* operator[](Index i) const
       {
-        ASSERT((i >= 0) && (i < m_), "index i out-of-bounds");
+        ASSERT(i < Index(m_), "index i out-of-bounds");
         return v[i];
       }
 
