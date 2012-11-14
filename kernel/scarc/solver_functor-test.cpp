@@ -70,4 +70,4 @@ class SolverFunctorTest:
       TEST_CHECK_EQUAL(richardson2.get()->type_name(), "[VectorData no_id] + [PRECON([VectorData no_id] + [PRECON([DEFECT([VectorData no_id],[MatrixData no_id],[VectorData no_id])])])]");
     }
 };
-SolverFunctorTest<Archs::CPU, double> sf_cpu_double("StorageType: std::vector, DataType: double");
+SolverFunctorTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");

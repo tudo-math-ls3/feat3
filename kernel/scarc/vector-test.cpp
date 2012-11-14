@@ -43,4 +43,4 @@ class VectorTest:
       v3.add_block(c, a.size() + b.size());
     }
 };
-VectorTest<Archs::CPU, double> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: double");
+VectorTest<Mem::Main, double> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: double");

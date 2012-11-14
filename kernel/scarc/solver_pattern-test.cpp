@@ -50,4 +50,4 @@ class SolverPatternTest:
       TEST_CHECK_EQUAL(solver_layers.get_functors().at(1).get()->type_name(), "[MatrixData P_omega_i] * [VectorData c_omega_i]");
     }
 };
-SolverPatternTest<Archs::CPU, double> sf_cpu_double("StorageType: std::vector, DataType: double");
+SolverPatternTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");

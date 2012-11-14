@@ -33,4 +33,4 @@ class MatrixTest:
       TEST_CHECK_EQUAL(m1.num_blocks(), 0ul);
     }
 };
-MatrixTest<Archs::CPU, double> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: double");
+MatrixTest<Mem::Main, double> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataType: double");
