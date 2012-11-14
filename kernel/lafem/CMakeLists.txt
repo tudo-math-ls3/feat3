@@ -39,7 +39,7 @@ FOREACH (test ${test_list} )
     --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 
-  ADD_TEST(${test}_cpu ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -47,10 +47,10 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" cpu)
-  SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "cpu")
+    --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" main)
+  SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
 
-  ADD_TEST(${test}_gpu ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(${test}_cuda ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -58,8 +58,8 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" gpu)
-  SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "gpu")
+    --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" cuda)
+  SET_PROPERTY(TEST ${test}_cuda PROPERTY LABELS "cuda")
 ENDFOREACH(test)
 
 #add all tests to lafem_tests

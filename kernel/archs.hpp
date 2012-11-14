@@ -93,7 +93,7 @@ namespace FEAST
         const static TagValue memory_value = tv_main;
         static String name()
         {
-          return "main (cpu)";
+          return "main";
         }
       };
 
@@ -107,7 +107,7 @@ namespace FEAST
         const static TagValue memory_value = tv_cuda;
         static String name()
         {
-          return "cuda (gpu)";
+          return "cuda";
         }
       };
     }
@@ -128,6 +128,7 @@ namespace FEAST
       struct Generic :
         public InstantiationPolicy<Generic, NonCopyable>
       {
+        typedef Mem::Main mem_type;
         const static TagValue tag_value = tv_generic;
         const static TagValue memory_value = tv_generic;
         static String name()
@@ -142,6 +143,7 @@ namespace FEAST
       struct CUDA :
         public InstantiationPolicy<CUDA, NonCopyable>
       {
+        typedef Mem::CUDA mem_type;
         const static TagValue tag_value = tv_cuda;
         const static TagValue memory_value = tv_cuda;
         static String name()

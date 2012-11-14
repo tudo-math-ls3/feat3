@@ -55,7 +55,7 @@ FOREACH (test ${test_list} )
     --test-command "${FEAST_BINARY_DIR}/kernel/${test}" none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 
-  ADD_TEST(${test}_cpu ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -63,8 +63,8 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/${test}" cpu)
-  SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "cpu")
+    --test-command "${FEAST_BINARY_DIR}/kernel/${test}" main)
+  SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
 ENDFOREACH(test)
 
 # add all tests to kernel_tests
