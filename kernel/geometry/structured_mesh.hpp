@@ -3,6 +3,7 @@
 #define KERNEL_GEOMETRY_STRUCTURED_MESH_HPP 1
 
 // includes, FEAST
+#include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/intern/structured_vertex_refiner.hpp>
 
 namespace FEAST
@@ -108,6 +109,9 @@ namespace FEAST
     template<typename Policy_>
     class StructuredMesh
     {
+      // friends
+      friend class StandardRefinery<StructuredMesh, Nil>;
+
     public:
       /// policy type
       typedef Policy_ PolicyType;
@@ -171,6 +175,21 @@ namespace FEAST
 
         // calculate number of enitites
         Intern::StructCalcNumEntities<shape_dim>::apply(_num_entities, _num_slices);
+      }
+
+      explicit StructuredMesh(const Factory<StructuredMesh>& factory) :
+        _vertex_set(
+          Intern::StructCalcNumEntities<shape_dim>::num_verts(
+            Intern::NumSlicesWrapper<shape_dim>(factory).num_slices))
+      {
+        // store slice count
+        Intern::NumSlicesWrapper<shape_dim>::apply(factory, _num_slices);
+
+        // calculate number of enitites
+        Intern::StructCalcNumEntities<shape_dim>::apply(_num_entities, _num_slices);
+
+        // fill vertex set
+        factory.fill_vertex_set(_vertex_set);
       }
 
       /// virtual destructor
@@ -239,22 +258,7 @@ namespace FEAST
       {
         CONTEXT(name() + "::refine()");
 
-        // calculate number of slices in fine mesh
-        Index num_slices_fine[shape_dim];
-        for(int i(0); i < shape_dim; ++i)
-        {
-          num_slices_fine[i] = 2 * _num_slices[i];
-        }
-
-        // allocate a fine mesh
-        StructuredMesh* fine_mesh = new StructuredMesh(num_slices_fine);
-
-        // refine vertices
-        Intern::StructuredVertexRefiner<ShapeType, VertexSetType>
-          ::refine(fine_mesh->_vertex_set, _vertex_set, _num_slices);
-
-        // return fine mesh
-        return fine_mesh;
+        return new StructuredMesh(StandardRefinery<StructuredMesh>(*this));
       }
 
       /**
@@ -267,6 +271,116 @@ namespace FEAST
         return "StructuredMesh<...>";
       }
     }; // class StructuredMesh<...>
+
+    /* ************************************************************************************************************* */
+
+    /**
+     * \brief Factory specialisation for StructuredMesh class template
+     *
+     * \author Peter Zajac
+     */
+    template<typename MeshPolicy_>
+    class Factory< StructuredMesh<MeshPolicy_> >
+    {
+    public:
+      /// mesh type
+      typedef StructuredMesh<MeshPolicy_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+
+    public:
+      /// virtual destructor
+      virtual ~Factory()
+      {
+      }
+
+      /**
+       * \brief Returns the number of slices
+       *
+       * \param[in] dir
+       * The direction of the slice whose count is to be returned.
+       *
+       * \returns
+       * The number of slices in direction \p dir.
+       */
+      virtual Index get_num_slices(int dir) const = 0;
+
+      /**
+       * \brief Fills the vertex set.
+       *
+       * \param[in,out] vertex_set
+       * The vertex set whose coordinates are to be filled.
+       */
+      virtual void fill_vertex_set(VertexSetType& vertex_set) const = 0;
+    }; // class Factory<StructuredMesh<...>>
+
+    /* ************************************************************************************************************* */
+
+    /**
+     * \brief StandardRefinery implementation for StructuredMesh
+     */
+    template<typename MeshPolicy_>
+    class StandardRefinery<StructuredMesh<MeshPolicy_>, Nil> :
+      public Factory< StructuredMesh<MeshPolicy_> >
+    {
+    public:
+      /// mesh type
+      typedef StructuredMesh<MeshPolicy_> MeshType;
+      /// shape type
+      typedef typename MeshType::ShapeType ShapeType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+
+      /// dummy enum
+      enum
+      {
+        /// shape dimension
+        shape_dim = ShapeType::dimension
+      };
+
+    protected:
+      /// coarse mesh reference
+      const MeshType& _coarse_mesh;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] coarse_mesh
+       * A reference to the coarse mesh that is to be refined.
+       */
+      explicit StandardRefinery(const MeshType& coarse_mesh) :
+        _coarse_mesh(coarse_mesh)
+      {
+      }
+
+      /**
+       * \brief Returns the number of slices
+       *
+       * \param[in] dir
+       * The direction of the slice whose count is to be returned.
+       *
+       * \returns
+       * The number of slices in direction \p dir.
+       */
+      virtual Index get_num_slices(int dir) const
+      {
+        return 2 * _coarse_mesh.get_num_slices(dir);
+      }
+
+      /**
+       * \brief Fills the vertex set.
+       *
+       * \param[in,out] vertex_set
+       * The vertex set whose coordinates are to be filled.
+       */
+      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      {
+        // refine vertices
+        Intern::StructuredVertexRefiner<ShapeType, VertexSetType>
+          ::refine(vertex_set, _coarse_mesh._vertex_set, _coarse_mesh._num_slices);
+      }
+    }; // class StandardRefinery<StructuredMesh<...>>
   } // namespace Geometry
 } // namespace FEAST
 

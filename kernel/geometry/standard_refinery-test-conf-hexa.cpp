@@ -1,7 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/geometry/test_aux/standard_hexa.hpp>
 #include <kernel/geometry/test_aux/tetris_hexa.hpp>
-#include <kernel/geometry/standard_refinery.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -14,7 +14,7 @@ typedef ConformalMesh<HexaMeshPolicy> HexaMesh;
 typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
 
 typedef StandardRefinery<HexaMesh> HexaMeshRefinery;
-typedef StandardRefinery<SubMesh> SubMeshRefinery;
+typedef StandardRefinery<SubMesh, HexaMesh> SubMeshRefinery;
 
 /**
  * \brief Test class for the StandardRefinery class template.
@@ -40,35 +40,31 @@ public:
 
   void hexa_std_test() const
   {
-    HexaMesh* hexa_mesh_coarse;
-    HexaMeshRefinery* hexa_mesh_refinery;
-    HexaMesh* hexa_mesh_fine;
-    try
+    // loop over all possible orientations
+    for(Index i(0); i < 3; ++i)
     {
-      for(Index i(0); i < 3; ++i) //loop over all possible orientations
-      {
-        // create a 3D hex-element mesh
-        hexa_mesh_coarse = TestAux::create_hexa_mesh_3d(i);
+      // create a 3D hex-element mesh
+      HexaMesh* hexa_mesh_coarse = TestAux::create_hexa_mesh_3d(i);
 
+      try
+      {
         // create refineries
-        hexa_mesh_refinery = new HexaMeshRefinery(*hexa_mesh_coarse);
+        HexaMeshRefinery hexa_mesh_refinery(*hexa_mesh_coarse);
 
         // refine the meshes
-        hexa_mesh_fine = hexa_mesh_refinery->refine();
+        HexaMesh hexa_mesh_fine(hexa_mesh_refinery);
 
         // validate refined meshes
-        TestAux::validate_refined_hexa_mesh_3d(*hexa_mesh_fine,i);
-
-        // clean up
-        delete hexa_mesh_fine;
-        delete hexa_mesh_refinery;
-        delete hexa_mesh_coarse;
+        TestAux::validate_refined_hexa_mesh_3d(hexa_mesh_fine, i);
       }
+      catch(const String& msg)
+      {
+        TEST_CHECK_MSG(false, msg);
+      }
+
+      // clean up
+      delete hexa_mesh_coarse;
     }
-    catch(const String& msg)
-        {
-          TEST_CHECK_MSG(false, msg);
-        }
   }
 
   void hexa_tetris_test() const
@@ -79,19 +75,19 @@ public:
     // create a quad submesh
     SubMesh* quad_submesh_coarse = TestAux::create_tetris_quad_submesh_3d();
 
-    // create refineries
-    HexaMeshRefinery* hexa_mesh_refinery = new HexaMeshRefinery(*hexa_mesh_coarse);
-    SubMeshRefinery* quad_submesh_refinery = new SubMeshRefinery(*quad_submesh_coarse);
-
-    // refine the meshes
-    HexaMesh* hexa_mesh_fine = hexa_mesh_refinery->refine();
-    SubMesh* quad_submesh_fine = quad_submesh_refinery->refine(*hexa_mesh_coarse);
-
-    // validate refined meshes
     try
     {
-      TestAux::validate_refined_tetris_mesh_3d(*hexa_mesh_fine);
-      TestAux::validate_refined_tetris_quad_submesh_3d(*quad_submesh_fine);
+      // create refineries
+      HexaMeshRefinery hexa_mesh_refinery(*hexa_mesh_coarse);
+      SubMeshRefinery quad_submesh_refinery(*quad_submesh_coarse, *hexa_mesh_coarse);
+
+      // refine the meshes
+      HexaMesh hexa_mesh_fine(hexa_mesh_refinery);
+      SubMesh quad_submesh_fine(quad_submesh_refinery);
+
+      // validate refined meshes
+      TestAux::validate_refined_tetris_mesh_3d(hexa_mesh_fine);
+      TestAux::validate_refined_tetris_quad_submesh_3d(quad_submesh_fine);
     }
     catch(const String& msg)
     {
@@ -99,10 +95,6 @@ public:
     }
 
     // clean up
-    delete hexa_mesh_fine;
-    delete quad_submesh_fine;
-    delete hexa_mesh_refinery;
-    delete quad_submesh_refinery;
     delete hexa_mesh_coarse;
     delete quad_submesh_coarse;
   }

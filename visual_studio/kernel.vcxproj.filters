@@ -132,9 +132,6 @@
     <ClInclude Include="..\kernel\geometry\export_vtk.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\standard_refinery.hpp">
-      <Filter>Header Files\geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
@@ -548,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="..\kernel\assembly\intern\dof_set.hpp">
       <Filter>Header Files\assembly\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\factory.hpp">
+      <Filter>Header Files\geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

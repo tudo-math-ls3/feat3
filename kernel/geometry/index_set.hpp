@@ -343,6 +343,23 @@ namespace FEAST
       typedef IndexSetHolder<typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType> BaseClass;
       typedef IndexSetWrapper<Shape_> IndexSetWrapperType;
 
+      template<
+        int cell_dim_,
+        int face_dim_>
+      struct IndexSet
+      {
+        /// index set type
+        typedef
+          Geometry::IndexSet<
+            Shape::FaceTraits<
+              typename Shape::FaceTraits<
+                Shape_,
+                cell_dim_>
+              ::ShapeType,
+              face_dim_>
+            ::count> Type;
+      }; // struct IndexSet<...>
+
     protected:
       IndexSetWrapperType _index_set_wrapper;
 
@@ -382,7 +399,7 @@ namespace FEAST
       template<
         int cell_dim_,
         int face_dim_>
-      IndexSet<
+      Geometry::IndexSet<
         Shape::FaceTraits<
           typename Shape::FaceTraits<
             Shape_,
@@ -402,7 +419,7 @@ namespace FEAST
       template<
         int cell_dim_,
         int face_dim_>
-      const IndexSet<
+      const Geometry::IndexSet<
         Shape::FaceTraits<
           typename Shape::FaceTraits<
             Shape_,

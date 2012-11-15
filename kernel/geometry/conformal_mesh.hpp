@@ -3,8 +3,10 @@
 #define KERNEL_GEOMETRY_CONFORMAL_MESH_HPP 1
 
 // includes, FEAST
+#include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/intern/standard_index_refiner.hpp>
 #include <kernel/geometry/intern/standard_vertex_refiner.hpp>
+
 
 namespace FEAST
 {
@@ -46,6 +48,9 @@ namespace FEAST
     template<typename Policy_>
     class ConformalMesh
     {
+      // friends
+      friend class StandardRefinery<ConformalMesh<Policy_>, Nil>;
+
     public:
       /// policy type
       typedef Policy_ PolicyType;
@@ -127,9 +132,7 @@ namespace FEAST
        * \param[in] vertex_stride
        * The vertex stride. This parameter is passed to the constructor of the vertex set.
        */
-      explicit ConformalMesh(
-        const Index num_entities[])
-          :
+      explicit ConformalMesh(const Index num_entities[]) :
         _vertex_set(num_entities[0]),
         _index_set_holder(num_entities)
       {
@@ -139,6 +142,26 @@ namespace FEAST
           ASSERT(num_entities[i] > 0, "Number of entities must not be zero!");
           _num_entities[i] = num_entities[i];
         }
+      }
+
+      /**
+       * \brief Factory constructor
+       *
+       * \param[in] factory
+       * The factory that is to be used to create the mesh.
+       */
+      explicit ConformalMesh(const Factory<ConformalMesh>& factory) :
+        _vertex_set(factory.get_num_entities(0)),
+        _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
+      {
+        // compute entity counts
+        Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
+
+        // fill vertex set
+        factory.fill_vertex_set(_vertex_set);
+
+        // fill index sets
+        factory.fill_index_sets(_index_set_holder);
       }
 
       /// virtual destructor
@@ -235,29 +258,7 @@ namespace FEAST
       {
         CONTEXT(name() + "::refine()");
 
-        // get number of entities in coarse mesh
-        Index num_entities_fine[shape_dim + 1];
-        for(int i(0); i <= shape_dim; ++i)
-        {
-          num_entities_fine[i] = _num_entities[i];
-        }
-
-        // calculate number of entities in fine mesh
-        Intern::EntityCountWrapper<ShapeType>::query(num_entities_fine);
-
-        // allocate a fine mesh
-        ConformalMesh* fine_mesh = new ConformalMesh(num_entities_fine);
-
-        // refine vertices
-        Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
-          ::refine(fine_mesh->_vertex_set, _vertex_set, _index_set_holder);
-
-        // refine indices
-        Intern::IndexRefineWrapper<ShapeType>
-          ::refine(fine_mesh->_index_set_holder, _num_entities, _index_set_holder);
-
-        // return fine mesh
-        return fine_mesh;
+        return new ConformalMesh(StandardRefinery<ConformalMesh>(*this));
       }
 
       /**
@@ -270,6 +271,159 @@ namespace FEAST
         return "ConformalMesh<...>";
       }
     }; // class ConformalMesh<...>
+
+    /* ************************************************************************************************************* */
+
+    /**
+     * \brief Factory specialisation for ConformalMesh class template
+     *
+     * \author Peter Zajac
+     */
+    template<typename MeshPolicy_>
+    class Factory< ConformalMesh<MeshPolicy_> >
+    {
+    public:
+      /// mesh typedef
+      typedef ConformalMesh<MeshPolicy_> MeshType;
+
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+    public:
+      /// virtual destructor
+      virtual ~Factory()
+      {
+      }
+
+      /**
+       * \brief Returns the number of entities.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      virtual Index get_num_entities(int dim) const = 0;
+
+      /**
+       * \brief Fills the vertex set.
+       *
+       * \param[in,out] vertex_set
+       * The vertex set whose coordinates are to be filled.
+       */
+      virtual void fill_vertex_set(VertexSetType& vertex_set) const = 0;
+
+      /**
+       * \brief Fills the index sets.
+       *
+       * \param[in,out] index_set_holder
+       * The index set holder whose index sets are to be filled.
+       */
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const = 0;
+    }; // class Factory<ConformalMesh<...>>
+
+    /* ************************************************************************************************************* */
+
+    /**
+     * \brief StandardRefinery implementation for ConformalMesh
+     *
+     * \author Peter Zajac
+     */
+    template<typename MeshPolicy_>
+    class StandardRefinery<ConformalMesh<MeshPolicy_>, Nil> :
+      public Factory< ConformalMesh<MeshPolicy_> >
+    {
+    public:
+      /// mesh type
+      typedef ConformalMesh<MeshPolicy_> MeshType;
+      /// shape type
+      typedef typename MeshType::ShapeType ShapeType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+      /// dummy enum
+      enum
+      {
+        /// shape dimension
+        shape_dim = ShapeType::dimension
+      };
+
+    protected:
+      /// coarse mesh reference
+      const MeshType& _coarse_mesh;
+      /// number of entities for fine mesh
+      Index _num_entities_fine[shape_dim + 1];
+
+    public:
+      /**
+       * \brief Constructor.
+       *
+       * \param[in] coarse_mesh
+       * A reference to the coarse mesh that is to be refined.
+       */
+      explicit StandardRefinery(const MeshType& coarse_mesh) :
+        _coarse_mesh(coarse_mesh)
+      {
+        // get number of entities in coarse mesh
+        for(int i(0); i <= shape_dim; ++i)
+        {
+          _num_entities_fine[i] = coarse_mesh.get_num_entities(i);
+        }
+
+        // calculate number of entities in fine mesh
+        Intern::EntityCountWrapper<ShapeType>::query(_num_entities_fine);
+      }
+
+      /// virtual destructor
+      virtual ~StandardRefinery()
+      {
+      }
+
+      /**
+       * \brief Returns the number of entities of the refined mesh.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      virtual Index get_num_entities(int dim) const
+      {
+        return _num_entities_fine[dim];
+      }
+
+      /**
+       * \brief Fills the vertex set of the refined mesh.
+       *
+       * \param[in,out] vertex_set
+       * The vertex set whose coordinates are to be filled.
+       */
+      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      {
+        // refine vertices
+        Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
+          ::refine(vertex_set, _coarse_mesh._vertex_set, _coarse_mesh._index_set_holder);
+      }
+
+      /**
+       * \brief Fills the index sets of the refined mesh.
+       *
+       * \param[in,out] index_set_holder
+       * The index set holder whose index sets are to be filled.
+       */
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const
+      {
+        // refine indices
+        Intern::IndexRefineWrapper<ShapeType>
+          ::refine(index_set_holder, _coarse_mesh._num_entities, _coarse_mesh._index_set_holder);
+      }
+    }; // class StandardRefinery<ConformalMesh<...>,Nil>
   } // namespace Geometry
 } // namespace FEAST
 

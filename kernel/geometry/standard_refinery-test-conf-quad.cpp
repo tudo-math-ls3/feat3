@@ -1,7 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
 #include <kernel/geometry/test_aux/standard_quad.hpp>
-#include <kernel/geometry/standard_refinery.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -15,8 +15,9 @@ typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
 typedef CellSubSet<Shape::Quadrilateral> SubSet;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
-typedef StandardRefinery<SubMesh> SubMeshRefinery;
-typedef StandardRefinery<SubSet> SubSetRefinery;
+typedef StandardRefinery<SubMesh,RootMesh> SubRootMeshRefinery;
+typedef StandardRefinery<SubMesh,SubMesh> SubSubMeshRefinery;
+typedef StandardRefinery<SubSet,RootMesh> SubSetRefinery;
 
 
 /**
@@ -56,24 +57,24 @@ public:
     SubSet* cell_subset_coarse = TestAux::create_tetris_quad_cellsubset_2d();
 
     // create refineries
-    RootMeshRefinery* quad_mesh_refinery = new RootMeshRefinery(*quad_mesh_coarse);
-    SubMeshRefinery* edge_submesh_refinery = new SubMeshRefinery(*edge_submesh_coarse);
-    SubMeshRefinery* quad_submesh_refinery = new SubMeshRefinery(*quad_submesh_coarse);
-    SubSetRefinery* cell_subset_refinery = new SubSetRefinery(*cell_subset_coarse);
+    RootMeshRefinery quad_mesh_refinery(*quad_mesh_coarse);
+    SubRootMeshRefinery edge_submesh_refinery(*edge_submesh_coarse, *quad_mesh_coarse);
+    SubRootMeshRefinery quad_submesh_refinery(*quad_submesh_coarse, *quad_mesh_coarse);
+    SubSetRefinery cell_subset_refinery(*cell_subset_coarse, *quad_mesh_coarse);
 
     // refine the meshes
-    RootMesh* quad_mesh_fine = quad_mesh_refinery->refine();
-    SubMesh* edge_submesh_fine = edge_submesh_refinery->refine(*quad_mesh_coarse);
-    SubMesh* quad_submesh_fine = quad_submesh_refinery->refine(*quad_mesh_coarse);
-    SubSet* cell_subset_fine = cell_subset_refinery->refine(*quad_mesh_coarse);
+    RootMesh quad_mesh_fine(quad_mesh_refinery);
+    SubMesh edge_submesh_fine(edge_submesh_refinery);
+    SubMesh quad_submesh_fine(quad_submesh_refinery);
+    SubSet cell_subset_fine(cell_subset_refinery);
 
     // validate refined meshes
     try
     {
-      TestAux::validate_refined_tetris_mesh_2d(*quad_mesh_fine);
-      TestAux::validate_refined_tetris_edge_submesh_2d(*edge_submesh_fine);
-      TestAux::validate_refined_tetris_quad_submesh_2d(*quad_submesh_fine);
-      TestAux::validate_refined_tetris_quad_cellsubset_2d(*cell_subset_fine);
+      TestAux::validate_refined_tetris_mesh_2d(quad_mesh_fine);
+      TestAux::validate_refined_tetris_edge_submesh_2d(edge_submesh_fine);
+      TestAux::validate_refined_tetris_quad_submesh_2d(quad_submesh_fine);
+      TestAux::validate_refined_tetris_quad_cellsubset_2d(cell_subset_fine);
     }
     catch(const String& msg)
     {
@@ -81,14 +82,6 @@ public:
     }
 
     // clean up
-    delete cell_subset_fine;
-    delete quad_submesh_fine;
-    delete edge_submesh_fine;
-    delete quad_mesh_fine;
-    delete cell_subset_refinery;
-    delete quad_submesh_refinery;
-    delete edge_submesh_refinery;
-    delete quad_mesh_refinery;
     delete cell_subset_coarse;
     delete quad_submesh_coarse;
     delete edge_submesh_coarse;
@@ -97,34 +90,30 @@ public:
 
   void quad_std_test() const
   {
-    RootMesh* quad_mesh_coarse;
-    RootMeshRefinery* quad_mesh_refinery;
-    RootMesh* quad_mesh_fine;
-    try
+    // loop over all possible orientations (max. 8)
+    for(Index i(0); i < 4; ++i)
     {
-      for(Index i(0); i < 4; ++i) //loop over all possible orientations (max. 8)
+      // create a 2D quad element mesh
+      RootMesh* quad_mesh_coarse = TestAux::create_quad_mesh_2d(i);
+
+      try
       {
-        // create a 2D quad element mesh
-        quad_mesh_coarse = TestAux::create_quad_mesh_2d(i);
+        // create refinery
+        RootMeshRefinery quad_mesh_refinery(*quad_mesh_coarse);
 
-        // create refineries
-        quad_mesh_refinery = new RootMeshRefinery(*quad_mesh_coarse);
+        // refine the mesh
+        RootMesh quad_mesh_fine(quad_mesh_refinery);
 
-        // refine the meshes
-        quad_mesh_fine = quad_mesh_refinery->refine();
-
-        // validate refined meshes
-        TestAux::validate_refined_quad_mesh_2d(*quad_mesh_fine,i);
-
-        // clean up
-        delete quad_mesh_fine;
-        delete quad_mesh_refinery;
-        delete quad_mesh_coarse;
+        // validate refined mesh
+        TestAux::validate_refined_quad_mesh_2d(quad_mesh_fine,i);
       }
-    }
-    catch(const String& msg)
-    {
-      TEST_CHECK_MSG(false, msg);
+      catch(const String& msg)
+      {
+        TEST_CHECK_MSG(false, msg);
+      }
+
+      // clean up
+      delete quad_mesh_coarse;
     }
   }
 

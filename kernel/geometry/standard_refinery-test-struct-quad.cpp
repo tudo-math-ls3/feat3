@@ -1,6 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/geometry/test_aux/copy_comp_set.hpp>
-#include <kernel/geometry/standard_refinery.hpp>
+#include <kernel/geometry/structured_mesh.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -56,7 +56,7 @@ public:
     StructMeshRefinery* refinery = new StructMeshRefinery(*mesh_coarse);
 
     // refine the mesh
-    StructMesh* mesh_fine = refinery->refine();
+    StructMesh* mesh_fine = new StructMesh(*refinery);
 
     // validate slice counts
     TEST_CHECK_MSG(mesh_fine->get_num_slices(0) == 4, "invalid fine mesh X-slice count");

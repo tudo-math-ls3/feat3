@@ -3,6 +3,7 @@
 #define KERNEL_GEOMETRY_CELL_SUB_SET_HPP 1
 
 // includes, FEAST
+#include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/intern/standard_subset_refiner.hpp>
 
 namespace FEAST
@@ -18,12 +19,24 @@ namespace FEAST
     class CellSubSet :
       public TargetSetHolder<Shape_>
     {
+      // friends
+      template<typename Mesh_, typename Parent_>
+      friend class StandardRefinery;
+
     public:
       /// shape type
       typedef Shape_ ShapeType;
       /// base class typedef
       typedef TargetSetHolder<ShapeType> BaseClass;
+      /// target set holder type
+      typedef TargetSetHolder<ShapeType> TargetSetHolderType;
 
+      /// dummy enum
+      enum
+      {
+        /// shape dimension
+        shape_dim = ShapeType::dimension
+      };
 
       /**
        * \brief Target set type class template.
@@ -55,6 +68,12 @@ namespace FEAST
         CONTEXT(name() + "::CellSubSet()");
       }
 
+      explicit CellSubSet(const Factory<CellSubSet>& factory) :
+        BaseClass(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
+      {
+        factory.fill_target_sets(*this);
+      }
+
       /// virtual destructor
       virtual ~CellSubSet()
       {
@@ -78,26 +97,7 @@ namespace FEAST
       {
         CONTEXT(name() + "::refine()");
 
-        // get number of entities in coarse mesh
-        Index num_entities_fine[BaseClass::shape_dim + 1];
-        Index num_entities_parent[BaseClass::shape_dim + 1];
-        for(int i(0); i <= BaseClass::shape_dim; ++i)
-        {
-          num_entities_fine[i] = BaseClass::get_num_entities(i);
-          num_entities_parent[i] = parent.get_num_entities(i);
-        }
-
-        // calculate number of entities in fine mesh
-        Intern::EntityCountWrapper<ShapeType>::query(num_entities_fine);
-
-        // allocate a fine subset
-        CellSubSet* fine_set = new CellSubSet(num_entities_fine);
-
-        // refine subset target indices
-        Intern::SubSetRefineWrapper<ShapeType>::refine(*fine_set, num_entities_parent, *this);
-
-        // return fine subset
-        return fine_set;
+        return new CellSubSet(StandardRefinery<CellSubSet, Parent_>(*this, parent));
       }
 
       /**
@@ -110,6 +110,138 @@ namespace FEAST
         return "CellSubSet<" + ShapeType::name() + ">";
       }
     }; // class CellSubSet<...>
+
+    /* ************************************************************************************************************* */
+
+    /**
+     * \brief Factory specialisation for CellSubSet class template.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Shape_>
+    class Factory< CellSubSet<Shape_> >
+    {
+    public:
+      /// mesh type
+      typedef CellSubSet<Shape_> MeshType;
+      /// target set holder type
+      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+
+    public:
+      /// virtual destructor
+      virtual ~Factory()
+      {
+      }
+
+      /**
+       * \brief Returns the number of entities.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      virtual Index get_num_entities(int dim) const = 0;
+
+      /**
+       * \brief Fills the target sets.
+       *
+       * \param[in,out] target_set_holder
+       * The target set holder whose target sets are to be filled.
+       */
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const = 0;
+    }; // class Factory<CellSubSet<...>>
+
+    /* ************************************************************************************************************* */
+
+    template<typename Shape_, typename Parent_>
+    class StandardRefinery<CellSubSet<Shape_>, Parent_> :
+      public Factory< CellSubSet<Shape_> >
+    {
+    public:
+      /// shape type
+      typedef Shape_ ShapeType;
+      /// mesh type
+      typedef CellSubSet<Shape_> MeshType;
+      /// parent type
+      typedef Parent_ ParentType;
+      /// target set holder type
+      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+
+      /// dummy enum
+      enum
+      {
+        /// shape dimension
+        shape_dim = ShapeType::dimension
+      };
+
+    protected:
+      /// coarse cell subset reference
+      const MeshType& _coarse_mesh;
+      /// coarse parent reference
+      const ParentType& _parent;
+      /// number of entities in refined cell subset
+      Index _num_entities_fine[shape_dim + 1];
+      /// number of entities in coarse parent
+      Index _num_entities_parent[shape_dim + 1];
+
+    public:
+      /**
+       * \brief Constructor.
+       *
+       * \param[in] coarse_mesh
+       * A reference to the coarse cell subset that is to be refined.
+       *
+       * \param[in] parent
+       * A reference to the coarse parent.
+       */
+      explicit StandardRefinery(const MeshType& coarse_mesh, const ParentType& parent) :
+        _coarse_mesh(coarse_mesh),
+        _parent(parent)
+      {
+        // get number of entities in coarse mesh
+        for(int i(0); i <= shape_dim; ++i)
+        {
+          _num_entities_fine[i] = coarse_mesh.get_num_entities(i);
+          _num_entities_parent[i] = parent.get_num_entities(i);
+        }
+
+        // calculate number of entities in fine mesh
+        Intern::EntityCountWrapper<ShapeType>::query(_num_entities_fine);
+      }
+
+      /// virtual destructor
+      virtual ~StandardRefinery()
+      {
+      }
+
+      /**
+       * \brief Returns the number of entities of the refined cellset.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      virtual Index get_num_entities(int dim) const
+      {
+        return _num_entities_fine[dim];
+      }
+
+      /**
+       * \brief Fills the target sets of the refined cell subset.
+       *
+       * \param[in,out] target_set_holder
+       * The target set holder whose target sets are to be filled.
+       */
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const
+      {
+        // refine subset target indices
+        Intern::SubSetRefineWrapper<ShapeType>::refine(target_set_holder, _num_entities_parent, _coarse_mesh);
+      }
+    };
   } // namespace Geometry
 } // namespace FEAST
 
