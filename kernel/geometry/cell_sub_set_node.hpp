@@ -3,7 +3,7 @@
 #define KERNEL_GEOMETRY_CELL_SUB_SET_NODE_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/standard_refinery.hpp>
+#include <kernel/geometry/cell_sub_set.hpp>
 
 // includes, STL
 #include <map>
@@ -176,14 +176,10 @@ namespace FEAST
       typedef Policy_ Policy;
       /// cell subset type
       typedef typename Policy_::CellSubSetType CellSubSetType;
-      /// cell subset refinery type
-      typedef typename Policy_::CellSubSetRefineryType RefineryType;
 
     protected:
       /// a pointer to the cell subset of this node
       CellSubSetType* _subset;
-      /// a pointer to the refinery this node's cell subset was created by
-      RefineryType* _refinery;
 
     public:
       /**
@@ -195,13 +191,9 @@ namespace FEAST
        * \param[in] refinery
        * A pointer to the refinery that created \p subset. May be \c nullptr.
        */
-      explicit CellSubSetNode(
-        CellSubSetType* subset,
-        RefineryType* refinery = nullptr)
-         :
-        CellSubSetParent<Policy_>(),
-        _subset(subset),
-        _refinery(refinery)
+      explicit CellSubSetNode(CellSubSetType* subset) :
+        BaseClass(),
+        _subset(subset)
       {
         CONTEXT(name() + "::CellSubSetNode()");
       }
@@ -210,10 +202,6 @@ namespace FEAST
       virtual ~CellSubSetNode()
       {
         CONTEXT(name() + "::~CellSubSetNode()");
-        if(_refinery != nullptr)
-        {
-          delete _refinery;
-        }
         if(_subset != nullptr)
         {
           delete _subset;
@@ -237,43 +225,24 @@ namespace FEAST
       }
 
       /**
-       * \brief Returns the refinery of this node.
-       * \returns
-       * A pointer to the refinery contained in this node. Might be \c nullptr.
-       */
-      RefineryType* get_refinery()
-      {
-        return _refinery;
-      }
-
-      /** \copydoc get_refinery() */
-      const RefineryType* get_refinery() const
-      {
-        return _refinery;
-      }
-
-      /**
        * \brief Refines this node and its sub-tree.
        *
-       * \param[in] parent_mesh
+       * \param[in] parent
        * A reference to the parent mesh/cell subset of this node's cell subset.
        *
        * \returns
        * A pointer to a CellSubSetNode containing the refined cell subset tree.
        */
-      template<typename ParentMeshType_>
-      CellSubSetNode* refine(const ParentMeshType_& parent_mesh) const
+      template<typename ParentType_>
+      CellSubSetNode* refine(const ParentType_& parent) const
       {
         CONTEXT(name() + "::refine()");
 
         // create a refinery
-        RefineryType* refinery = new RefineryType(*_subset);
+        StandardRefinery<CellSubSetType, ParentType_> refinery(*_subset, parent);
 
-        // refine the mesh
-        CellSubSetType* fine_subset = refinery->refine(parent_mesh);
-
-        // create a new sub-mesh node
-        CellSubSetNode* fine_node = new CellSubSetNode(fine_subset, refinery);
+        // create a new cell subset node
+        CellSubSetNode* fine_node = new CellSubSetNode(new CellSubSetType(refinery));
 
         // refine our children
         refine_subsets(*fine_node);

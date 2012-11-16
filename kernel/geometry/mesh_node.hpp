@@ -4,6 +4,8 @@
 
 // includes, FEAST
 #include <kernel/geometry/cell_sub_set_node.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/conformal_sub_mesh.hpp>
 
 // includes, STL
 #include <map>
@@ -33,28 +35,18 @@ namespace FEAST
     template<typename Shape_>
     struct StandardConformalMeshNodePolicy
     {
-      /// mesh policy for the root mesh
-      typedef ConformalMeshPolicy<Shape_> RootMeshPolicy;
       /// root mesh type
-      typedef ConformalMesh<RootMeshPolicy> RootMeshType;
-      /// standard refinery for the root mesh
-      typedef StandardRefinery<RootMeshType> RootMeshRefineryType;
+      typedef ConformalMesh<Shape_> RootMeshType;
       /// chart for the root mesh
       typedef DummyChart RootMeshChartType;
 
-      /// mesh policy for the sub-mesh
-      typedef ConformalSubMeshPolicy<Shape_> SubMeshPolicy;
       /// sub-mesh type
-      typedef ConformalSubMesh<SubMeshPolicy> SubMeshType;
-      /// standard refinery for the sub-mesh
-      typedef StandardRefinery<SubMeshType> SubMeshRefineryType;
+      typedef ConformalSubMesh<Shape_> SubMeshType;
       /// chart for the sub-mesh
       typedef DummyChart SubMeshChartType;
 
       /// cell subset type
       typedef CellSubSet<Shape_> CellSubSetType;
-      /// standard refinery for the cell subset
-      typedef StandardRefinery<CellSubSetType> CellSubSetRefineryType;
     };
 
     /// \cond internal
@@ -63,7 +55,6 @@ namespace FEAST
     struct RootMeshNodePolicy
     {
       typedef typename MeshNodePolicy_::RootMeshType MeshType;
-      typedef typename MeshNodePolicy_::RootMeshRefineryType RefineryType;
       typedef typename MeshNodePolicy_::RootMeshChartType ChartType;
     };
 
@@ -72,7 +63,6 @@ namespace FEAST
     struct SubMeshNodePolicy
     {
       typedef typename MeshNodePolicy_::SubMeshType MeshType;
-      typedef typename MeshNodePolicy_::SubMeshRefineryType RefineryType;
       typedef typename MeshNodePolicy_::SubMeshChartType ChartType;
     };
 
@@ -103,8 +93,6 @@ namespace FEAST
 
       /// mesh type of this node
       typedef typename MeshNodePolicy_::MeshType MeshType;
-      /// mesh refinery type of this node
-      typedef typename MeshNodePolicy_::RefineryType RefineryType;
       /// mesh chart type of this node
       typedef typename MeshNodePolicy_::ChartType MeshChartType;
 
@@ -141,8 +129,6 @@ namespace FEAST
     protected:
       /// a pointer to the mesh of this node
       MeshType* _mesh;
-      /// a pointer to the refinery this node's mesh was created by
-      RefineryType* _refinery;
       /// child submesh nodes
       SubMeshNodeContainer _submesh_nodes;
 
@@ -152,17 +138,10 @@ namespace FEAST
        *
        * \param[in] mesh
        * A pointer to the mesh for this node.
-       *
-       * \param[in] refinery
-       * A pointer to the refinery that created \p mesh. May be \c nullptr.
        */
-      explicit MeshNode(
-        MeshType* mesh,
-        RefineryType* refinery = nullptr)
-         :
-        CellSubSetParent<Policy_>(),
-        _mesh(mesh),
-        _refinery(refinery)
+      explicit MeshNode(MeshType* mesh) :
+        BaseClass(),
+        _mesh(mesh)
       {
         CONTEXT(name() + "::MeshNode()");
       }
@@ -182,12 +161,6 @@ namespace FEAST
           {
             delete it->second.node;
           }
-        }
-
-        // delete refinery
-        if(_refinery != nullptr)
-        {
-          delete _refinery;
         }
 
         // delete mesh
@@ -468,8 +441,6 @@ namespace FEAST
 
       /// the mesh type of this node
       typedef typename BaseClass::MeshType MeshType;
-      /// the refinery type of this node
-      typedef typename BaseClass::RefineryType RefineryType;
 
     public:
       /**
@@ -477,15 +448,9 @@ namespace FEAST
        *
        * \param[in] mesh
        * A pointer to the mesh for this node.
-       *
-       * \param[in] refinery
-       * A pointer to the refinery that created \p mesh. May be \c nullptr.
        */
-      explicit RootMeshNode(
-        MeshType* mesh,
-        RefineryType* refinery = nullptr)
-         :
-        BaseClass(mesh, refinery)
+      explicit RootMeshNode(MeshType* mesh) :
+        BaseClass(mesh)
       {
       }
 
@@ -503,13 +468,10 @@ namespace FEAST
       RootMeshNode* refine() const
       {
         // create a refinery
-        RefineryType* refinery = new RefineryType(*this->_mesh);
-
-        // refine the mesh
-        MeshType* fine_mesh = refinery->refine();
+        StandardRefinery<MeshType> refinery(*this->_mesh);
 
         // create a new root mesh node
-        RootMeshNode* fine_node = new RootMeshNode(fine_mesh, refinery);
+        RootMeshNode* fine_node = new RootMeshNode(new MeshType(refinery));
 
         // refine our children
         this->refine_children(*fine_node);
@@ -548,8 +510,6 @@ namespace FEAST
 
       /// the mesh type of this node
       typedef typename BaseClass::MeshType MeshType;
-      /// the refinery type of this node
-      typedef typename BaseClass::RefineryType RefineryType;
 
     public:
       /**
@@ -557,15 +517,9 @@ namespace FEAST
        *
        * \param[in] mesh
        * A pointer to the mesh for this node.
-       *
-       * \param[in] refinery
-       * A pointer to the refinery that created \p mesh. May be \c nullptr.
        */
-      explicit SubMeshNode(
-        MeshType* mesh,
-        RefineryType* refinery = nullptr)
-         :
-        BaseClass(mesh, refinery)
+      explicit SubMeshNode(MeshType* mesh) :
+        BaseClass(mesh)
       {
       }
 
@@ -577,23 +531,20 @@ namespace FEAST
       /**
        * \brief Refines this node and its sub-tree.
        *
-       * \param[in] parent_mesh
+       * \param[in] parent
        * A reference to the parent mesh of this node's submesh.
        *
        * \returns
        * A pointer to a SubMeshNode containing the refined mesh tree.
        */
-      template<typename ParentMeshType_>
-      SubMeshNode* refine(const ParentMeshType_& parent_mesh) const
+      template<typename ParentType_>
+      SubMeshNode* refine(const ParentType_& parent) const
       {
         // create a refinery
-        RefineryType* refinery = new RefineryType(*this->_mesh);
-
-        // refine the mesh
-        MeshType* fine_mesh = refinery->refine(parent_mesh);
+        StandardRefinery<MeshType, ParentType_> refinery(*this->_mesh, parent);
 
         // create a new sub-mesh node
-        SubMeshNode* fine_node = new SubMeshNode(fine_mesh, refinery);
+        SubMeshNode* fine_node = new SubMeshNode(new MeshType(refinery));
 
         // refine our children
         this->refine_children(*fine_node);

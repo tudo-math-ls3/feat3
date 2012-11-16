@@ -253,5 +253,8 @@
     <ClCompile Include="..\kernel\lafem\sparse_matrix_ell-test.cpp">
       <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\geometry\mesh_node-test-conf-quad.cpp">
+      <Filter>Source Files %28kernel%29\geometry</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

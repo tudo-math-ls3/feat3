@@ -23,7 +23,7 @@ SET (test_list
   standard_refinery-test-struct-quad
   standard_refinery-test-struct-hexa
   index_calculator-test
-#  mesh_node-test-conf-quad
+  mesh_node-test-conf-quad
 )
 
 
