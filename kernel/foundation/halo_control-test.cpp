@@ -56,7 +56,7 @@ class HaloControlTest1D:
 
       //creating conformal geometry mesh
       IndexType_ index_set[] = {2, 1};
-      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Shape::Hypercube<1> > > confmeshtype_;
+      typedef Geometry::ConformalMesh<Shape::Hypercube<1> > confmeshtype_;
       confmeshtype_ geo_m(index_set);
 
       //transfer data
@@ -203,7 +203,7 @@ class HaloControlTest2D:
 
       //creating conformal geometry mesh
       IndexType_ index_set[] = {4, 4, 1};
-      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Shape::Hypercube<2> > > confmeshtype_;
+      typedef Geometry::ConformalMesh<Shape::Hypercube<2> > confmeshtype_;
       confmeshtype_ geo_m(index_set);
 
       //transfer data
@@ -499,7 +499,7 @@ class HaloControlTest3D:
 
       //creating conformal geometry mesh
       IndexType_ index_set[] = {8, 12, 6, 1};
-      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Shape::Hypercube<3> > > confmeshtype_;
+      typedef Geometry::ConformalMesh<Shape::Hypercube<3> > confmeshtype_;
       confmeshtype_ geo_m(index_set);
 
       //transfer data

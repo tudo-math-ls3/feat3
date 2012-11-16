@@ -13,8 +13,8 @@ namespace FEAST
     /// \cond internal
     namespace TestAux
     {
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Hexahedron > > HexaMesh;
-      typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Hexahedron > > HexaSubMesh;
+      typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
+      typedef ConformalSubMesh<Shape::Hexahedron> HexaSubMesh;
 
       /**
        * \brief Creates the 3D tetris mesh.

@@ -20,7 +20,7 @@ class GridTransferTest :
 {
   typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
 
-  typedef Geometry::ConformalMesh< Geometry::ConformalMeshPolicy<Shape::Quadrilateral> > QuadMesh;
+  typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 

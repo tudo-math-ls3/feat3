@@ -13,52 +13,25 @@ namespace FEAST
   namespace Geometry
   {
     /**
-     * \brief Standard conformal sub-mesh policy
-     *
-     * This class defines a default policy for the ConformalSubMesh class template.
+     * \brief Conformal sub-mesh class template
      *
      * \tparam Shape_
      * The shape that is to be used for the mesh. Must be either Shape::Simplex<n> or Shape::Hypercube<n>
      * for some \c n > 0.
      *
-     * \tparam VertexSet_
-     * The vertex set class to be used by the mesh. By default, VertexSetVariable is used.
-     *
      * \author Peter Zajac
      */
     template<
       typename Shape_,
-      typename VertexSet_ = VertexSetVariable<> >
-    struct ConformalSubMeshPolicy
+      typename Coord_ = Real>
+    class ConformalSubMesh
     {
-      /// shape type
+    public:
+      /// Shape type
       typedef Shape_ ShapeType;
 
       /// Vertex set type
-      typedef VertexSet_ VertexSetType;
-    }; // struct ConformalSubMeshPolicy
-
-    /**
-     * \brief Conformal sub-mesh class template
-     *
-     * \author Peter Zajac
-     */
-    template<typename Policy_>
-    class ConformalSubMesh
-    {
-      // friends
-      template<typename Mesh_, typename Parent_>
-      friend class StandardRefinery;
-
-    public:
-      /// policy type
-      typedef Policy_ PolicyType;
-
-      /// Shape type
-      typedef typename PolicyType::ShapeType ShapeType;
-
-      /// Vertex set type
-      typedef typename PolicyType::VertexSetType VertexSetType;
+      typedef VertexSetVariable<Coord_> VertexSetType;
 
       /// index set holder type
       typedef IndexSetHolder<ShapeType> IndexSetHolderType;
@@ -349,12 +322,14 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename MeshPolicy_>
-    class Factory< ConformalSubMesh<MeshPolicy_> >
+    template<
+      typename Shape_,
+      typename Coord_>
+    class Factory< ConformalSubMesh<Shape_, Coord_> >
     {
     public:
       /// mesh typedef
-      typedef ConformalSubMesh<MeshPolicy_> MeshType;
+      typedef ConformalSubMesh<Shape_, Coord_> MeshType;
 
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
@@ -422,13 +397,16 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename MeshPolicy_, typename Parent_>
-    class StandardRefinery<ConformalSubMesh<MeshPolicy_>, Parent_> :
-      public Factory< ConformalSubMesh<MeshPolicy_> >
+    template<
+      typename Shape_,
+      typename Coord_,
+      typename Parent_>
+    class StandardRefinery<ConformalSubMesh<Shape_, Coord_>, Parent_> :
+      public Factory< ConformalSubMesh<Shape_, Coord_> >
     {
     public:
       /// mesh type
-      typedef ConformalSubMesh<MeshPolicy_> MeshType;
+      typedef ConformalSubMesh<Shape_, Coord_> MeshType;
       /// parent type
       typedef Parent_ ParentType;
       /// shape type
@@ -452,6 +430,8 @@ namespace FEAST
       const MeshType& _coarse_mesh;
       /// coarse parent reference
       const ParentType& _parent;
+      /// number of entities for coarse mesh
+      Index _num_entities_coarse[shape_dim + 1];
       /// number of entities for fine mesh
       Index _num_entities_fine[shape_dim + 1];
       /// number of entities in parent
@@ -474,7 +454,7 @@ namespace FEAST
         // get number of entities in coarse mesh
         for(int i(0); i <= shape_dim; ++i)
         {
-          _num_entities_fine[i] = coarse_mesh.get_num_entities(i);
+          _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
           _num_entities_parent[i] = parent.get_num_entities(i);
         }
 
@@ -527,7 +507,7 @@ namespace FEAST
       {
         // refine vertices
         Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
-          ::refine(vertex_set, _coarse_mesh._vertex_set, _coarse_mesh._index_set_holder);
+          ::refine(vertex_set, _coarse_mesh.get_vertex_set(), _coarse_mesh.get_index_set_holder());
       }
 
       /**
@@ -540,7 +520,7 @@ namespace FEAST
       {
         // refine indices
         Intern::IndexRefineWrapper<ShapeType>
-          ::refine(index_set_holder, _coarse_mesh._num_entities, _coarse_mesh._index_set_holder);
+          ::refine(index_set_holder, _num_entities_coarse, _coarse_mesh.get_index_set_holder());
       }
 
       /**
@@ -552,8 +532,9 @@ namespace FEAST
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const
       {
         // refine target indices
-        Intern::TargetRefineWrapper<ShapeType>::refine(target_set_holder, _num_entities_parent,
-          _coarse_mesh._target_set_holder, _coarse_mesh._index_set_holder, _parent.get_index_set_holder());
+        Intern::TargetRefineWrapper<ShapeType>
+          ::refine(target_set_holder, _num_entities_parent, _coarse_mesh.get_target_set_holder(),
+            _coarse_mesh.get_index_set_holder(), _parent.get_index_set_holder());
       }
     }; // class StandardRefinery<ConformalSubMesh<...>,...>
   } // namespace Geometry

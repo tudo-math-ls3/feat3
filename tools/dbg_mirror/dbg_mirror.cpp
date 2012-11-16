@@ -12,7 +12,7 @@
 
 using namespace FEAST;
 
-typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Shape::Quadrilateral> > QuadMesh;
+typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 typedef Geometry::CellSubSet<Shape::Quadrilateral> QuadCellSet;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 

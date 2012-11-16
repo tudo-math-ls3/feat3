@@ -13,7 +13,7 @@ namespace FEAST
     /// \cond internal
     namespace TestAux
     {
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Hexahedron > > HexaMesh;
+      typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
 
       HexaMesh* create_hexa_mesh_3d(int orientation);
 

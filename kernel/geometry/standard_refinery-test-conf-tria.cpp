@@ -6,11 +6,8 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
-typedef ConformalMeshPolicy<Shape::Triangle> RootMeshPolicy;
-typedef ConformalSubMeshPolicy<Shape::Triangle> SubMeshPolicy;
-
-typedef ConformalMesh<RootMeshPolicy> RootMesh;
-typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
+typedef ConformalMesh<Shape::Triangle> RootMesh;
+typedef ConformalSubMesh<Shape::Triangle> SubMesh;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;
 typedef StandardRefinery<SubMesh, RootMesh> SubMeshRefinery;

@@ -14,8 +14,8 @@ namespace FEAST
     namespace TestAux
     {
 
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Triangle > > TriaMesh;
-      typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Triangle > > TriaSubMesh;
+      typedef ConformalMesh<Shape::Triangle> TriaMesh;
+      typedef ConformalSubMesh<Shape::Triangle> TriaSubMesh;
 
       TriaMesh* create_tria_mesh_2d(int orientation);
 

@@ -53,7 +53,7 @@ class MeshControlTest1D:
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 0, 0);
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 1, 0);
 
-      typedef ConformalMesh<ConformalMeshPolicy<Shape::Hypercube<1> > > confmeshtype_;
+      typedef ConformalMesh<Shape::Hypercube<1> > confmeshtype_;
 
       IndexType_* size_set(new IndexType_[2]);
       MeshControl<dim_1D>::fill_sizes(m, size_set);
@@ -157,7 +157,7 @@ class MeshControlTest2D:
       m.add_adjacency(pl_vertex, pl_edge, 3, 3);
       m.add_adjacency(pl_vertex, pl_face, 3, 0);
 
-      typedef ConformalMesh<ConformalMeshPolicy<Shape::Hypercube<dim_2D> > > confmeshtype_;
+      typedef ConformalMesh<Shape::Hypercube<dim_2D> > confmeshtype_;
 
       IndexType_* size_set(new IndexType_[3]);
       MeshControl<dim_2D>::fill_sizes(m, size_set);
@@ -402,7 +402,7 @@ class MeshControlTest3D:
 
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_polyhedron, 7, 0);
 
-      typedef ConformalMesh<ConformalMeshPolicy<Shape::Hypercube<dim_3D> > > confmeshtype_;
+      typedef ConformalMesh<Shape::Hypercube<dim_3D> > confmeshtype_;
 
       IndexType_* size_set(new IndexType_[4]);
       MeshControl<dim_3D>::fill_sizes(m, size_set);

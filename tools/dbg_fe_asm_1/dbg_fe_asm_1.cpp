@@ -11,7 +11,7 @@
 using namespace FEAST;
 using namespace FEAST::Geometry;
 
-typedef ConformalMesh<ConformalMeshPolicy<Shape::Quadrilateral> > QuadMesh;
+typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;
 typedef StandardRefinery<QuadMesh> QuadRefinery;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 

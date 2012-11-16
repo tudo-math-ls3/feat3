@@ -13,53 +13,32 @@ namespace FEAST
   namespace Geometry
   {
     /**
-     * \brief Standard conformal mesh policy
+     * \brief Conformal mesh class template
      *
-     * This class defines a default policy for the ConformalMesh class template.
+     * \todo detailed documentation
      *
      * \tparam Shape_
      * The shape that is to be used for the mesh. Must be either Shape::Simplex<n> or Shape::Hypercube<n>
      * for some \c n > 0.
      *
-     * \tparam VertexSet_
-     * The vertex set class to be used by the mesh. By default, VertexSetFixed is used.
-     *
      * \author Peter Zajac
      */
     template<
       typename Shape_,
-      typename VertexSet_ = VertexSetFixed<Shape_::dimension> >
-    struct ConformalMeshPolicy
+      int num_coords_ = Shape_::dimension,
+      int stride_ = num_coords_,
+      typename Coord_ = Real>
+    class ConformalMesh
     {
-      /// shape type
+      static_assert(num_coords_ >= Shape_::dimension, "invalid number of coordinates");
+      static_assert(stride_ >= num_coords_, "invalid stride");
+
+    public:
+      /// Shape type
       typedef Shape_ ShapeType;
 
       /// Vertex set type
-      typedef VertexSet_ VertexSetType;
-    }; // struct ConformalMeshPolicy
-
-    /**
-     * \brief Conformal mesh class template
-     *
-     * \todo detailed documentation
-     *
-     * \author Peter Zajac
-     */
-    template<typename Policy_>
-    class ConformalMesh
-    {
-      // friends
-      friend class StandardRefinery<ConformalMesh<Policy_>, Nil>;
-
-    public:
-      /// policy type
-      typedef Policy_ PolicyType;
-
-      /// Shape type
-      typedef typename PolicyType::ShapeType ShapeType;
-
-      /// Vertex set type
-      typedef typename PolicyType::VertexSetType VertexSetType;
+      typedef VertexSetFixed<num_coords_, stride_, Coord_> VertexSetType;
 
       /// index set holder type
       typedef IndexSetHolder<ShapeType> IndexSetHolderType;
@@ -154,6 +133,8 @@ namespace FEAST
         _vertex_set(factory.get_num_entities(0)),
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
       {
+        CONTEXT(name() + "::ConformalMesh() [factory]");
+
         // compute entity counts
         Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
@@ -279,12 +260,16 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename MeshPolicy_>
-    class Factory< ConformalMesh<MeshPolicy_> >
+    template<
+      typename Shape_,
+      int num_coords_,
+      int stride_,
+      typename CoordType_>
+    class Factory< ConformalMesh<Shape_, num_coords_, stride_, CoordType_> >
     {
     public:
       /// mesh typedef
-      typedef ConformalMesh<MeshPolicy_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, stride_, CoordType_> MeshType;
 
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
@@ -332,13 +317,17 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename MeshPolicy_>
-    class StandardRefinery<ConformalMesh<MeshPolicy_>, Nil> :
-      public Factory< ConformalMesh<MeshPolicy_> >
+    template<
+      typename Shape_,
+      int num_coords_,
+      int stride_,
+      typename CoordType_>
+    class StandardRefinery<ConformalMesh<Shape_, num_coords_, stride_, CoordType_>, Nil> :
+      public Factory< ConformalMesh<Shape_, num_coords_, stride_, CoordType_> >
     {
     public:
       /// mesh type
-      typedef ConformalMesh<MeshPolicy_> MeshType;
+      typedef ConformalMesh<Shape_, num_coords_, stride_, CoordType_> MeshType;
       /// shape type
       typedef typename MeshType::ShapeType ShapeType;
       /// vertex set type
@@ -356,6 +345,8 @@ namespace FEAST
     protected:
       /// coarse mesh reference
       const MeshType& _coarse_mesh;
+      /// number of entities for coarse mesh
+      Index _num_entities_coarse[shape_dim + 1];
       /// number of entities for fine mesh
       Index _num_entities_fine[shape_dim + 1];
 
@@ -372,7 +363,7 @@ namespace FEAST
         // get number of entities in coarse mesh
         for(int i(0); i <= shape_dim; ++i)
         {
-          _num_entities_fine[i] = coarse_mesh.get_num_entities(i);
+          _num_entities_fine[i] = _num_entities_coarse[i] = coarse_mesh.get_num_entities(i);
         }
 
         // calculate number of entities in fine mesh
@@ -408,7 +399,7 @@ namespace FEAST
       {
         // refine vertices
         Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
-          ::refine(vertex_set, _coarse_mesh._vertex_set, _coarse_mesh._index_set_holder);
+          ::refine(vertex_set, _coarse_mesh.get_vertex_set(), _coarse_mesh.get_index_set_holder());
       }
 
       /**
@@ -421,7 +412,7 @@ namespace FEAST
       {
         // refine indices
         Intern::IndexRefineWrapper<ShapeType>
-          ::refine(index_set_holder, _coarse_mesh._num_entities, _coarse_mesh._index_set_holder);
+          ::refine(index_set_holder, _num_entities_coarse, _coarse_mesh.get_index_set_holder());
       }
     }; // class StandardRefinery<ConformalMesh<...>,Nil>
   } // namespace Geometry

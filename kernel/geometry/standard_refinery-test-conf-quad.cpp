@@ -7,11 +7,8 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
-typedef ConformalMeshPolicy<Shape::Quadrilateral> RootMeshPolicy;
-typedef ConformalSubMeshPolicy<Shape::Quadrilateral> SubMeshPolicy;
-
-typedef ConformalMesh<RootMeshPolicy> RootMesh;
-typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
+typedef ConformalMesh<Shape::Quadrilateral> RootMesh;
+typedef ConformalSubMesh<Shape::Quadrilateral> SubMesh;
 typedef CellSubSet<Shape::Quadrilateral> SubSet;
 
 typedef StandardRefinery<RootMesh> RootMeshRefinery;

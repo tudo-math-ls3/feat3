@@ -206,7 +206,7 @@ class HaloTestGeometryInterface:
 
       //creating conformal geometry mesh
       IndexType_ index_set[] = {4, 4, 1};
-      typedef Geometry::ConformalMesh<Geometry::ConformalMeshPolicy<Shape::Hypercube<2> > > confmeshtype_;
+      typedef Geometry::ConformalMesh<Shape::Hypercube<2> > confmeshtype_;
       confmeshtype_ geo_m(index_set);
 
       //transfer data

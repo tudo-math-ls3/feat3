@@ -6,8 +6,7 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
-typedef StructuredMeshPolicy<3> StructMeshPolicy3d;
-typedef StructuredMesh<StructMeshPolicy3d> StructMesh3d;
+typedef StructuredMesh<3> StructMesh3d;
 typedef StandardRefinery<StructMesh3d> StructMeshRefinery3d;
 
 /**

@@ -28,7 +28,7 @@ class RannacherTurekTest
   : public TestSystem::TaggedTest<Archs::None, DataType_>
 {
   typedef Shape::Quadrilateral ShapeType;
-  typedef ConformalMesh< ConformalMeshPolicy<ShapeType> > QuadMesh;
+  typedef ConformalMesh<ShapeType> QuadMesh;
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 

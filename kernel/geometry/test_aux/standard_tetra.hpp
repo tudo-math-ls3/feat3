@@ -14,8 +14,8 @@ namespace FEAST
     namespace TestAux
     {
 
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Tetrahedron > > TetraMesh;
-      typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Tetrahedron > > TetraSubMesh;
+      typedef ConformalMesh<Shape::Tetrahedron> TetraMesh;
+      typedef ConformalSubMesh<Shape::Tetrahedron> TetraSubMesh;
 
       TetraMesh* create_tetra_mesh_3d(int orientation);
 

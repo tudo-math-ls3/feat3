@@ -14,8 +14,8 @@ namespace FEAST
     /// \cond internal
     namespace TestAux
     {
-      typedef ConformalMesh< ConformalMeshPolicy< Shape::Quadrilateral > > QuadMesh;
-      typedef ConformalSubMesh< ConformalSubMeshPolicy< Shape::Quadrilateral > > QuadSubMesh;
+      typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;
+      typedef ConformalSubMesh<Shape::Quadrilateral> QuadSubMesh;
       typedef CellSubSet<Shape::Quadrilateral> QuadCellSubSet;
 
       /**

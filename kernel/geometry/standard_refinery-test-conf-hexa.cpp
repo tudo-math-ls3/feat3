@@ -7,11 +7,8 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Geometry;
 
-typedef ConformalMeshPolicy<Shape::Hexahedron> HexaMeshPolicy;
-typedef ConformalSubMeshPolicy<Shape::Hexahedron> SubMeshPolicy;
-
-typedef ConformalMesh<HexaMeshPolicy> HexaMesh;
-typedef ConformalSubMesh<SubMeshPolicy> SubMesh;
+typedef ConformalMesh<Shape::Hexahedron> HexaMesh;
+typedef ConformalSubMesh<Shape::Hexahedron> SubMesh;
 
 typedef StandardRefinery<HexaMesh> HexaMeshRefinery;
 typedef StandardRefinery<SubMesh, HexaMesh> SubMeshRefinery;

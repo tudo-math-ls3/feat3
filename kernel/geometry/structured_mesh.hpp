@@ -10,31 +10,6 @@ namespace FEAST
 {
   namespace Geometry
   {
-    /**
-     * \brief Standard structured mesh policy.
-     *
-     * This class defines a default policy for the StructuredMesh class template.
-     *
-     * \tparam shape_dim_
-     * The dimension of the shape (Hypercube) to be used for the mesh.
-     *
-     * \tparam VertexSet_
-     * The vertex set class to be used by the mesh. By default, VertexSetFixed is used.
-     *
-     * \author Peter Zajac
-     */
-    template<
-      int shape_dim_,
-      typename VertexSet_ = VertexSetFixed<shape_dim_> >
-    struct StructuredMeshPolicy
-    {
-      /// shape type; must always be a Hypercube shape
-      typedef Shape::Hypercube<shape_dim_> ShapeType;
-
-      /// Vertex set traits type
-      typedef VertexSet_ VertexSetType;
-    }; // struct StructuredMeshPolicy<...>
-
     /// \cond internal
     namespace Intern
     {
@@ -51,7 +26,7 @@ namespace FEAST
           num_entities[1] = num_slices[0];
         }
 
-        static Index nverts(const Index num_slices[])
+        static Index num_verts(const Index num_slices[])
         {
           return num_slices[0] + 1;
         }
@@ -104,29 +79,34 @@ namespace FEAST
      * \todo detailed documentation
      * \todo define index set type
      *
+     * \tparam shape_dim_
+     * The dimension of the shape (Hypercube) to be used for the mesh.
+     *
      * \author Peter Zajac
      */
-    template<typename Policy_>
+    template<
+      int shape_dim_,
+      int num_coords_ = shape_dim_,
+      int stride_ = num_coords_,
+      typename Coord_ = Real>
     class StructuredMesh
     {
-      // friends
-      friend class StandardRefinery<StructuredMesh, Nil>;
+      static_assert(shape_dim_ > 0, "invalid shape dimension");
+      static_assert(num_coords_ >= shape_dim_, "invalid number of coordinates");
+      static_assert(stride_ >= num_coords_, "invalid stride");
 
     public:
-      /// policy type
-      typedef Policy_ PolicyType;
-
       /// Shape type
-      typedef typename PolicyType::ShapeType ShapeType;
+      typedef Shape::Hypercube<shape_dim_> ShapeType;
 
       /// vertex set type
-      typedef typename PolicyType::VertexSetType VertexSetType;
+      typedef VertexSetFixed<num_coords_, stride_, Coord_> VertexSetType;
 
       /// dummy enum
       enum
       {
         /// shape dimension
-        shape_dim = ShapeType::dimension
+        shape_dim = shape_dim_
       };
 
     protected:
@@ -149,19 +129,9 @@ namespace FEAST
        * \param[in] num_slices
        * An array of length at least #shape_dim holding the number of slices for each direction.
        * Must not be \c nullptr.
-       *
-       * \param[in] num_coords
-       * The number of coordinates per vertex. This parameter is passed to the constructor of the vertex set.
-       *
-       * \param[in] vertex_stride
-       * The vertex stride. This parameter is passed to the constructor of the vertex set.
        */
-      explicit StructuredMesh(
-        const Index num_slices[],
-        int num_coords = shape_dim,
-        int vertex_stride = 0)
-          :
-        _vertex_set(Intern::StructCalcNumEntities<shape_dim>::num_verts(num_slices), num_coords, vertex_stride)
+      explicit StructuredMesh(const Index num_slices[]) :
+        _vertex_set(Intern::StructCalcNumEntities<shape_dim>::num_verts(num_slices))
       {
         CONTEXT(name() + "::StructuredMesh()");
         ASSERT_(num_slices != nullptr);
@@ -177,11 +147,19 @@ namespace FEAST
         Intern::StructCalcNumEntities<shape_dim>::apply(_num_entities, _num_slices);
       }
 
+      /**
+       * \brief Factory constructor
+       *
+       * \param[in] factory
+       * The factory that is to be used to create the mesh.
+       */
       explicit StructuredMesh(const Factory<StructuredMesh>& factory) :
         _vertex_set(
           Intern::StructCalcNumEntities<shape_dim>::num_verts(
             Intern::NumSlicesWrapper<shape_dim>(factory).num_slices))
       {
+        CONTEXT(name() + "::StructuredMesh() [factory]");
+
         // store slice count
         Intern::NumSlicesWrapper<shape_dim>::apply(factory, _num_slices);
 
@@ -279,12 +257,16 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename MeshPolicy_>
-    class Factory< StructuredMesh<MeshPolicy_> >
+    template<
+      int shape_dim_,
+      int num_coords_,
+      int stride_,
+      typename Coord_>
+    class Factory< StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> >
     {
     public:
       /// mesh type
-      typedef StructuredMesh<MeshPolicy_> MeshType;
+      typedef StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> MeshType;
       /// vertex set type
       typedef typename MeshType::VertexSetType VertexSetType;
 
@@ -319,13 +301,17 @@ namespace FEAST
     /**
      * \brief StandardRefinery implementation for StructuredMesh
      */
-    template<typename MeshPolicy_>
-    class StandardRefinery<StructuredMesh<MeshPolicy_>, Nil> :
-      public Factory< StructuredMesh<MeshPolicy_> >
+    template<
+      int shape_dim_,
+      int num_coords_,
+      int stride_,
+      typename Coord_>
+    class StandardRefinery<StructuredMesh<shape_dim_, num_coords_, stride_, Coord_>, Nil> :
+      public Factory< StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> >
     {
     public:
       /// mesh type
-      typedef StructuredMesh<MeshPolicy_> MeshType;
+      typedef StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> MeshType;
       /// shape type
       typedef typename MeshType::ShapeType ShapeType;
       /// vertex set type
@@ -341,6 +327,8 @@ namespace FEAST
     protected:
       /// coarse mesh reference
       const MeshType& _coarse_mesh;
+      /// number of slices in coarse mesh
+      Index _num_slices_coarse[shape_dim];
 
     public:
       /**
@@ -352,6 +340,10 @@ namespace FEAST
       explicit StandardRefinery(const MeshType& coarse_mesh) :
         _coarse_mesh(coarse_mesh)
       {
+        for(int i(0); i < shape_dim; ++i)
+        {
+          _num_slices_coarse[i] = coarse_mesh.get_num_slices(i);
+        }
       }
 
       /**
@@ -378,7 +370,7 @@ namespace FEAST
       {
         // refine vertices
         Intern::StructuredVertexRefiner<ShapeType, VertexSetType>
-          ::refine(vertex_set, _coarse_mesh._vertex_set, _coarse_mesh._num_slices);
+          ::refine(vertex_set, _coarse_mesh.get_vertex_set(), _num_slices_coarse);
       }
     }; // class StandardRefinery<StructuredMesh<...>>
   } // namespace Geometry
