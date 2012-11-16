@@ -16,13 +16,8 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<typename Shape_>
-    class CellSubSet :
-      public TargetSetHolder<Shape_>
+    class CellSubSet
     {
-      // friends
-      template<typename Mesh_, typename Parent_>
-      friend class StandardRefinery;
-
     public:
       /// shape type
       typedef Shape_ ShapeType;
@@ -54,6 +49,14 @@ namespace FEAST
         typedef FEAST::Geometry::TargetSet Type;
       }; // struct TargetSet<...>
 
+    protected:
+      /// the target sets of the cell subset
+      TargetSetHolderType _target_set_holder;
+
+    private:
+      CellSubSet(const CellSubSet&);
+      CellSubSet& operator=(const CellSubSet&);
+
     public:
       /**
        * \brief Constructor.
@@ -63,15 +66,22 @@ namespace FEAST
        * Must not be \c nullptr.
        */
       explicit CellSubSet(const Index num_entities[]) :
-        BaseClass(num_entities)
+        _target_set_holder(num_entities)
       {
         CONTEXT(name() + "::CellSubSet()");
       }
 
+      /**
+       * \brief Factory constructor
+       *
+       * \param[in] factory
+       * The factory that is to be used to create the cell subset.
+       */
       explicit CellSubSet(const Factory<CellSubSet>& factory) :
-        BaseClass(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
+        _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
       {
-        factory.fill_target_sets(*this);
+        CONTEXT(name() + "::CellSubSet() [factory]");
+        factory.fill_target_sets(_target_set_holder);
       }
 
       /// virtual destructor
@@ -79,6 +89,65 @@ namespace FEAST
       {
         CONTEXT(name() + "::~CellSubSet()");
       }
+
+      /**
+       * \brief Returns the number of entities.
+       *
+       * \param[in] dim
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       *
+       * \returns
+       * The number of entities of dimension \p dim.
+       */
+      Index get_num_entities(int dim) const
+      {
+        CONTEXT(name() + "::get_num_entities()");
+        ASSERT_(dim >= 0);
+        ASSERT_(dim <= shape_dim);
+        return _target_set_holder.get_num_entities(dim);
+      }
+
+      /**
+       * \brief Return the reference to a target set.
+       *
+       * \tparam cell_dim_
+       * The dimension fo the entity whose target set is to be returned.
+       *
+       * \returns
+       * A reference to the target set.
+       */
+      template<int cell_dim_>
+      typename TargetSet<cell_dim_>::Type& get_target_set()
+      {
+        CONTEXT(name() + "::get_target_set<" + stringify(cell_dim_) + ">()");
+        static_assert(cell_dim_ >= 0, "invalid cell dimension");
+        static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
+        return _target_set_holder.template get_target_set<cell_dim_>();
+      }
+
+      /** \copydoc get_target_set() */
+      template<int cell_dim_>
+      const typename TargetSet<cell_dim_>::Type& get_target_set() const
+      {
+        CONTEXT(name() + "::get_target_set<" + stringify(cell_dim_) + ">() [const]");
+        static_assert(cell_dim_ >= 0, "invalid cell dimension");
+        static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
+        return _target_set_holder.template get_target_set<cell_dim_>();
+      }
+
+      /// \cond internal
+      TargetSetHolderType& get_target_set_holder()
+      {
+        CONTEXT(name() + "::get_target_set_holder()");
+        return _target_set_holder;
+      }
+
+      const TargetSetHolderType& get_target_set_holder() const
+      {
+        CONTEXT(name() + "::get_target_set_holder() [const]");
+        return _target_set_holder;
+      }
+      /// \endcond
 
       /**
        * \brief Refines the cell subset.
@@ -239,7 +308,8 @@ namespace FEAST
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const
       {
         // refine subset target indices
-        Intern::SubSetRefineWrapper<ShapeType>::refine(target_set_holder, _num_entities_parent, _coarse_mesh);
+        Intern::SubSetRefineWrapper<ShapeType>
+          ::refine(target_set_holder, _num_entities_parent, _coarse_mesh.get_target_set_holder());
       }
     };
   } // namespace Geometry
