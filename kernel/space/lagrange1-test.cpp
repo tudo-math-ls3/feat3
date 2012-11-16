@@ -1,17 +1,16 @@
 #include <test_system/test_system.hpp>
-#include <kernel/geometry/test_aux/standard_quad.hpp>
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/util/graph.hpp>
+#include <kernel/geometry/unit_cube_factory.hpp>
 
 #include <limits>
 #include <cmath>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
-using namespace FEAST::Geometry;
 
 /**
  * \brief Lagrange-1 Element test
@@ -28,7 +27,7 @@ class Lagrange1Test
   : public TestSystem::TaggedTest<Archs::None, DataType_>
 {
   typedef Shape::Quadrilateral ShapeType;
-  typedef ConformalMesh<ShapeType> QuadMesh;
+  typedef Geometry::ConformalMesh<ShapeType> QuadMesh;
 
   typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
@@ -97,77 +96,51 @@ public:
     const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
 
     // create a quad mesh
-    QuadMesh *mesh = TestAux::create_quad_mesh_2d(0);
+    Geometry::UnitCubeFactory<QuadMesh> mesh_factory;
+    QuadMesh mesh(mesh_factory);
 
-    // open a new scope to ensure that the mesh survives the objects relying on it
+    // create a quad-trafo
+    QuadTrafo trafo(mesh);
+
+    // create a Q1 space
+    QuadSpaceQ1 space(trafo);
+
+    // create a trafo evaluator
+    typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
+    TrafoEvaluator trafo_eval(trafo);
+    Trafo::EvalData<TrafoEvaluator, UnitTrafoConfig> trafo_data;
+
+    // create a space evaluator
+    typedef typename QuadSpaceQ1::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+    SpaceEvaluator space_eval(space);
+    Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
+
+    // create a 2x2 Gauss-Legendre cubature formula
+    CubatureRule cubature_rule(CubatureFactory::create("gauss-legendre:2"));
+
+    // prepare trafo evaluator
+    trafo_eval.prepare(0);
+
+    // prepare space evaluator
+    space_eval.prepare(trafo_eval);
+
+    // check the number of local DOFs
+    Index num_loc_dofs = space_eval.get_num_local_dofs();
+    TEST_CHECK_EQUAL(num_loc_dofs, 4u);
+
+    // create local matrix assembly data
+    Tiny::Matrix<DataType_, 4, 4> L, M;
+    L = DataType_(0);
+    M = DataType_(0);
+
+    // loop over all 4 quadrature points and integrate
+    for(Index k(0); k < cubature_rule.get_num_points(); ++k)
     {
-      // create a quad-trafo
-      QuadTrafo trafo(*mesh);
+      // compute trafo data
+      trafo_data(trafo_eval, cubature_rule.get_point(k));
 
-      // create a Q1 space
-      QuadSpaceQ1 space(trafo);
-
-      // create a trafo evaluator
-      typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
-      TrafoEvaluator trafo_eval(trafo);
-      Trafo::EvalData<TrafoEvaluator, UnitTrafoConfig> trafo_data;
-
-      // create a space evaluator
-      typedef typename QuadSpaceQ1::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
-      SpaceEvaluator space_eval(space);
-      Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
-
-      // create a 2x2 Gauss-Legendre cubature formula
-      CubatureRule cubature_rule(CubatureFactory::create("gauss-legendre:2"));
-
-      // prepare trafo evaluator
-      trafo_eval.prepare(0);
-
-      // prepare space evaluator
-      space_eval.prepare(trafo_eval);
-
-      // check the number of local DOFs
-      Index num_loc_dofs = space_eval.get_num_local_dofs();
-      TEST_CHECK_EQUAL(num_loc_dofs, 4u);
-
-      // create local matrix assembly data
-      Tiny::Matrix<DataType_, 4, 4> L, M;
-      L = DataType_(0);
-      M = DataType_(0);
-
-      // loop over all 4 quadrature points and integrate
-      for(Index k(0); k < cubature_rule.get_num_points(); ++k)
-      {
-        // compute trafo data
-        trafo_data(trafo_eval, cubature_rule.get_point(k));
-
-        // compute space data
-        space_data(space_eval, trafo_data);
-
-        // test function loop
-        for(Index i(0); i < num_loc_dofs; ++i)
-        {
-          // trial function loop
-          for(Index j(0); j < num_loc_dofs; ++j)
-          {
-            // mass matrix entry
-            M(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
-              space_data.values[i] * space_data.values[j]);
-
-            // laplace matrix entry
-            L(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
-              space_data.grads[i][0] * space_data.grads[j][0] +
-              space_data.grads[i][1] * space_data.grads[j][1]);
-            // continue with next trial function
-          }
-          // continue with next test function
-        }
-        // continue with next cubature point
-      }
-
-      // finish evaluators
-      space_eval.finish();
-      trafo_eval.finish();
+      // compute space data
+      space_data(space_eval, trafo_data);
 
       // test function loop
       for(Index i(0); i < num_loc_dofs; ++i)
@@ -175,30 +148,51 @@ public:
         // trial function loop
         for(Index j(0); j < num_loc_dofs; ++j)
         {
-          // check entries
-          if(i == j)
-          {
-            TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(1) / DataType_(9), eps);
-            TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(2) / DataType_(3), eps);
-          }
-          else if(3 - int(i) == int(j))
-          {
-            TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(1) / DataType_(36), eps);
-            TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(-1) / DataType_(3), eps);
-          }
-          else
-          {
-            TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(1) / DataType_(18), eps);
-            TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(-1) / DataType_(6), eps);
-          }
+          // mass matrix entry
+          M(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
+            space_data.values[i] * space_data.values[j]);
+
+          // laplace matrix entry
+          L(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
+            space_data.grads[i][0] * space_data.grads[j][0] +
+            space_data.grads[i][1] * space_data.grads[j][1]);
           // continue with next trial function
         }
         // continue with next test function
       }
+      // continue with next cubature point
     }
 
-    // delete the quad mesh
-    delete mesh;
+    // finish evaluators
+    space_eval.finish();
+    trafo_eval.finish();
+
+    // test function loop
+    for(Index i(0); i < num_loc_dofs; ++i)
+    {
+      // trial function loop
+      for(Index j(0); j < num_loc_dofs; ++j)
+      {
+        // check entries
+        if(i == j)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(1) / DataType_(9), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(2) / DataType_(3), eps);
+        }
+        else if(3 - int(i) == int(j))
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(1) / DataType_(36), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(-1) / DataType_(3), eps);
+        }
+        else
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(M(i,j), DataType_(1) / DataType_(18), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(L(i,j), DataType_(-1) / DataType_(6), eps);
+        }
+        // continue with next trial function
+      }
+      // continue with next test function
+    }
   }
 
   void asm_tetris_quad() const
@@ -207,7 +201,7 @@ public:
     const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
 
     // create a quad mesh
-    QuadMesh *mesh = TestAux::create_tetris_mesh_2d();
+    QuadMesh *mesh = Geometry::TestAux::create_tetris_mesh_2d();
 
     // create a quad-trafo
     QuadTrafo* trafo = new QuadTrafo(*mesh);
