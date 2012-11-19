@@ -267,7 +267,7 @@ namespace FEAST
           _build_coeff_matrix(trafo_eval);
         }
 
-        /** \copydoc Trafo::EvaluatorBase::eval_values() */
+        /** \copydoc Space::EvaluatorBase::eval_values() */
         template<typename TrafoEvalData_>
         void eval_values(
           BasisValueVectorRef values,
@@ -289,7 +289,7 @@ namespace FEAST
           }
         }
 
-        /** \copydoc Trafo::EvaluatorBase::Eval_gradients */
+        /** \copydoc Space::EvaluatorBase::Eval_gradients */
         template<typename TrafoEvalData_>
         void eval_gradients(
           BasisGradientVectorRef grads,

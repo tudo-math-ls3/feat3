@@ -609,6 +609,9 @@
     <ClInclude Include="..\kernel\lafem\vector_mirror.hpp" />
     <ClInclude Include="..\kernel\shape.hpp" />
     <ClInclude Include="..\kernel\space\base.hpp" />
+    <ClInclude Include="..\kernel\space\discontinuous\element.hpp" />
+    <ClInclude Include="..\kernel\space\discontinuous\evaluator.hpp" />
+    <ClInclude Include="..\kernel\space\discontinuous\variant.hpp" />
     <ClInclude Include="..\kernel\space\dof_adjacency.hpp" />
     <ClInclude Include="..\kernel\space\dof_assignment_base.hpp" />
     <ClInclude Include="..\kernel\space\dof_assignment_common.hpp" />

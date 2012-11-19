@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # list of util tests
 SET (test_list
+  discontinuous-test
   lagrange1-test
   rannacher_turek-test
 )

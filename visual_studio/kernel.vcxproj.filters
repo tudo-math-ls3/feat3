@@ -60,6 +60,9 @@
     <Filter Include="Header Files\assembly\intern">
       <UniqueIdentifier>{804a8363-5464-4ba2-a792-2807caebb9a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\space\discontinuous">
+      <UniqueIdentifier>{73e07717-b037-4b7d-b92d-85a356654115}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
@@ -569,6 +572,15 @@
     </ClInclude>
     <ClInclude Include="..\kernel\lafem\sparse_matrix_ell.hpp">
       <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\discontinuous\element.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\discontinuous\evaluator.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\discontinuous\variant.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
