@@ -124,6 +124,8 @@ namespace FEAST
           throw InternalError("Matrix rows do not match!");
         if (x.columns() != r.columns())
           throw InternalError("Matrix columns do not match!");
+        if (x.hash() != r.hash() || y.hash() != r.hash())
+          throw InternalError("Matrix layouts do not match!");
 
         DenseVector<Mem::CUDA, DT_> xv(x.used_elements(), x.val());
         DenseVector<Mem::CUDA, DT_> yv(y.used_elements(), y.val());

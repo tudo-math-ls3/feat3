@@ -51,6 +51,8 @@ namespace FEAST
         DT_ _zero_element;
         /// Our non zero element count.
         Index _used_elements;
+        /// Our layout related hash
+        unsigned long _hash;
 
       public:
         /// Our datatype
@@ -68,7 +70,8 @@ namespace FEAST
           _rows(0),
           _columns(0),
           _zero_element(DT_(0)),
-          _used_elements(0)
+          _used_elements(0),
+          _hash(0)
         {
         }
 
@@ -130,6 +133,8 @@ namespace FEAST
             _row_ptr_end[i] = ait;
           }
           _row_ptr[_rows] = ait;
+
+          _hash = MemoryPool<Arch_>::instance()->generate_hash(_row_ptr, (this->_rows + 1) * sizeof(Index));
         }
 
         /**
@@ -154,6 +159,7 @@ namespace FEAST
           this->_columns = tother.columns();
           this->_used_elements = tother.used_elements();
           this->_zero_element = tother.zero_element();
+          this->_hash = tother.hash();
 
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(tother.used_elements() * sizeof(DT_)));
           this->_elements_size.push_back(this->_used_elements);
@@ -246,6 +252,8 @@ namespace FEAST
             MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+
+          _hash = MemoryPool<Arch_>::instance()->generate_hash(_row_ptr, (this->_rows + 1) * sizeof(Index));
         }
 
         /**
@@ -312,6 +320,8 @@ namespace FEAST
             MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+
+          _hash = MemoryPool<Arch_>::instance()->generate_hash(_row_ptr, (this->_rows + 1) * sizeof(Index));
         }
 
         /**
@@ -326,7 +336,8 @@ namespace FEAST
           _rows(other._rows),
           _columns(other._columns),
           _zero_element(other._zero_element),
-          _used_elements(other._used_elements)
+          _used_elements(other._used_elements),
+          _hash(other.hash())
         {
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
@@ -347,7 +358,8 @@ namespace FEAST
           _rows(other.rows()),
           _columns(other.columns()),
           _zero_element(other.zero_element()),
-          _used_elements(other.used_elements())
+          _used_elements(other.used_elements()),
+          _hash(other.hash())
         {
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
@@ -389,6 +401,7 @@ namespace FEAST
           this->_columns = other.columns();
           this->_used_elements = other.used_elements();
           this->_zero_element = other._zero_element;
+          this->_hash = other.hash();
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
@@ -436,6 +449,7 @@ namespace FEAST
           this->_columns = other.columns();
           this->_used_elements = other.used_elements();
           this->_zero_element = other.zero_element();
+          this->_hash = other.hash();
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
@@ -603,6 +617,16 @@ namespace FEAST
           return _zero_element;
         }
 
+        /**
+         * \brief Retrieve layout hash.
+         *
+         * \returns Hash value of matrix layout.
+         */
+        unsigned long hash() const
+        {
+          return _hash;
+        }
+
         /* ******************************************************************* */
         /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
         /* ******************************************************************* */
@@ -650,6 +674,8 @@ namespace FEAST
       if (a.used_elements() != b.used_elements())
         return false;
       if (a.zero_element() != b.zero_element())
+        return false;
+      if (a.hash() != b.hash())
         return false;
 
       for (Index i(0) ; i < a.rows() ; ++i)

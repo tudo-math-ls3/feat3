@@ -13,7 +13,7 @@ using namespace FEAST::TestSystem;
 *
 * \test test description missing
 *
-* \tparam Tag_
+* \tparam Arch_
 * description missing
 *
 * \tparam DT_
@@ -22,16 +22,16 @@ using namespace FEAST::TestSystem;
 * \author Dirk Ribbrock
 */
 template<
-  typename Tag_,
+  typename Arch_,
   typename DT_>
 class SparseMatrixCSRTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Arch_, DT_>
 {
 
 public:
 
   SparseMatrixCSRTest()
-    : TaggedTest<Tag_, DT_>("sparse_matrix_csr_test")
+    : TaggedTest<Arch_, DT_>("sparse_matrix_csr_test")
   {
   }
 
@@ -42,7 +42,7 @@ public:
     a.clear();
     a(1,2,7);
     a(5,5,2);
-    SparseMatrixCSR<Tag_, DT_> b(a);
+    SparseMatrixCSR<Arch_, DT_> b(a);
     TEST_CHECK_EQUAL(b.used_elements(), 2ul);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
@@ -50,7 +50,7 @@ public:
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
 
-    SparseMatrixCSR<Tag_, DT_> z(b);
+    SparseMatrixCSR<Arch_, DT_> z(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
@@ -58,18 +58,18 @@ public:
     TEST_CHECK_EQUAL(z(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
 
-    SparseMatrixCSR<Tag_, DT_> c;
+    SparseMatrixCSR<Arch_, DT_> c;
     c = b;
     TEST_CHECK_EQUAL(c.used_elements(), b.used_elements());
     TEST_CHECK_EQUAL(c(0,2), b(0,2));
     TEST_CHECK_EQUAL(c(1,2), b(1,2));
     TEST_CHECK_EQUAL(c, b);
 
-    DenseVector<Tag_, Index> col_ind(c.used_elements(), c.col_ind());
-    DenseVector<Tag_, DT_> val(c.used_elements(), c.val());
-    DenseVector<Tag_, Index> row_ptr(c.rows() + 1, c.row_ptr());
-    DenseVector<Tag_, Index> row_ptr_end(c.rows(), c.row_ptr_end());
-    SparseMatrixCSR<Tag_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr, row_ptr_end);
+    DenseVector<Arch_, Index> col_ind(c.used_elements(), c.col_ind());
+    DenseVector<Arch_, DT_> val(c.used_elements(), c.val());
+    DenseVector<Arch_, Index> row_ptr(c.rows() + 1, c.row_ptr());
+    DenseVector<Arch_, Index> row_ptr_end(c.rows(), c.row_ptr_end());
+    SparseMatrixCSR<Arch_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr, row_ptr_end);
     TEST_CHECK_EQUAL(d, c);
 
     SparseMatrixCSR<Mem::Main, DT_> e(c);

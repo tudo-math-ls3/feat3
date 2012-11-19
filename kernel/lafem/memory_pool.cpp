@@ -80,6 +80,18 @@ void MemoryPool<Mem::Main>::set_memory(DT_ * address, const DT_ val, const Index
   }
 }
 
+unsigned long MemoryPool<Mem::Main>::generate_hash(void * data, Index bytes)
+{
+  char * cd((char * )data);
+  unsigned long t(0);
+  for (Index i(0) ; i < bytes ; ++i)
+  {
+    t += (cd[i] * i) % bytes;
+  }
+  t = t % bytes;
+  return t;
+}
+
 template void MemoryPool<Mem::Main>::set_memory(float * address , const float val, const Index count);
 template void MemoryPool<Mem::Main>::set_memory(double * address , const double val, const Index count);
 template void MemoryPool<Mem::Main>::set_memory(Index * address , const Index val, const Index count);

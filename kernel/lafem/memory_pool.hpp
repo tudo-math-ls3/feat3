@@ -93,6 +93,9 @@ namespace FEAST
         {
           ::memcpy(dest, src, bytes);
         }
+
+        /// Generate hash value for given byte sequence
+        unsigned long generate_hash(void * address, Index bytes);
     };
 
     template <>
@@ -140,6 +143,9 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         static void copy(void * dest, const void * src, const Index bytes);
+
+        /// Generate hash value for given byte sequence
+        unsigned long generate_hash(void * address, Index bytes);
     };
   } // namespace LAFEM
 } // namespace FEAST
