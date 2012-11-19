@@ -54,8 +54,7 @@ void test_bcasm(
   Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, cubature);
 
   // allocate solution vector
-  VectorType vec_sol(space.get_num_dofs(), Real(0));
-  vec_sol.clear();
+  VectorType vec_sol(space.get_num_dofs(), Real(1));
 
   // assemble homogene Dirichlet BCs
   Assembly::HomogeneDirichletBC<Space_> dirichlet(space);
@@ -123,22 +122,19 @@ int main(int argc, char* argv[])
   if(true)
   {
     // refine meshes
-    QuadMesh* mesh_f(mesh.refine());
+    Geometry::StandardRefinery<QuadMesh> mesh_refinery(mesh);
+    QuadMesh mesh_f(mesh_refinery);
     // refine cell sets
-    QuadCellSet* cell_f(cell.refine(mesh));
-    {
-      // create trafo
-      QuadTrafo trafo_f(*mesh_f);
+    Geometry::StandardRefinery<QuadCellSet, QuadMesh> cell_refinery(cell, mesh);
+    QuadCellSet cell_f(cell_refinery);
+    // create trafo
+    QuadTrafo trafo_f(mesh_f);
 
-      // create space
-      QuadSpace space_f(trafo_f);
+    // create space
+    QuadSpace space_f(trafo_f);
 
-      // test refined
-      test_bcasm(space_f, *cell_f);
-    }
-    // delete stuff
-    delete cell_f;
-    delete mesh_f;
+    // test refined
+    test_bcasm(space_f, cell_f);
   }
 }
 

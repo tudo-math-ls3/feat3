@@ -1,11 +1,10 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_UNIT_CUBE_FACTORY_HPP
-#define KERNEL_GEOMETRY_UNIT_CUBE_FACTORY_HPP 1
+#ifndef KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP
+#define KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP 1
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
-#include <kernel/geometry/intern/face_index_mapping.hpp>
 
 namespace FEAST
 {
@@ -40,18 +39,18 @@ namespace FEAST
       {
       }
 
-      virtual Index get_num_entities(int dim) const
+      virtual Index get_num_entities(int dim)
       {
         return Index(2 - dim);
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
         vertex_set[0][0] = Coord_(0);
         vertex_set[1][0] = Coord_(1);
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         IndexSet<2>& v_e(index_set_holder.template get_index_set<1,0>());
         v_e[0][0] = 0;
@@ -78,7 +77,7 @@ namespace FEAST
       {
       }
 
-      virtual Index get_num_entities(int dim) const
+      virtual Index get_num_entities(int dim)
       {
         switch(dim)
         {
@@ -93,7 +92,7 @@ namespace FEAST
         }
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
         for(Index i(0); i < 4u; ++i)
         {
@@ -104,7 +103,7 @@ namespace FEAST
         }
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         _fill_sub_index_set<1,0>(index_set_holder);
         _fill_cell_index_set<0>(index_set_holder);
@@ -159,7 +158,7 @@ namespace FEAST
       {
       }
 
-      virtual Index get_num_entities(int dim) const
+      virtual Index get_num_entities(int dim)
       {
         switch(dim)
         {
@@ -176,7 +175,7 @@ namespace FEAST
         }
       }
 
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
         for(Index i(0); i < 8u; ++i)
         {
@@ -187,7 +186,7 @@ namespace FEAST
         }
       }
 
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         _fill_sub_index_set<1,0>(index_set_holder);
         _fill_sub_index_set<2,0>(index_set_holder);
@@ -226,7 +225,85 @@ namespace FEAST
       }
     };
     /// \endcond
+
+    /**
+     * \brief ConformalMesh wrapper for StructuredMesh factories
+     *
+     * This class template acts as a wrapper around a factory for StructuredMesh to generate a
+     * ConformalMesh.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Mesh_>
+    class ConformalStructuredFactoryWrapper DOXY({});
+
+    template<
+      int shape_dim_,
+      int num_coords_,
+      int stride_,
+      typename CoordType_>
+    class ConformalStructuredFactoryWrapper<
+      ConformalMesh<Shape::Hypercube<shape_dim_>, num_coords_, stride_, CoordType_> > :
+      public Factory< ConformalMesh<Shape::Hypercube<shape_dim_>, num_coords_, stride_, CoordType_> >
+    {
+    public:
+      /// conformal mesh typedef
+      typedef ConformalMesh<Shape::Hypercube<shape_dim_>, num_coords_, stride_, CoordType_> MeshType;
+      /// structured mesh typedef
+      typedef StructuredMesh<shape_dim_, num_coords_, stride_, CoordType_> StructMeshType;
+      /// structured mesh factory typedef
+      typedef Factory<StructMeshType> StructMeshFactory;
+
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+    private:
+      /// structured mesh factory
+      StructMeshFactory& _factory;
+      /// number of slices
+      Index _num_slices[shape_dim_];
+      /// number of entities
+      Index _num_entities[shape_dim_ + 1];
+
+    public:
+      /**
+       * \brief Constructor.
+       *
+       * \param[in] factory
+       * A reference to the structured-mesh factory that is to be wrapped.
+       */
+      explicit ConformalStructuredFactoryWrapper(StructMeshFactory& factory) :
+        _factory(factory)
+      {
+        // fetch slice counts
+        for(int i(0); i < shape_dim_; ++i)
+        {
+          _num_slices[i] = factory.get_num_slices(i);
+        }
+
+        // compute entity counts
+        Intern::StructCalcNumEntities<shape_dim_>::apply(_num_entities, _num_slices);
+      }
+
+      virtual Index get_num_entities(int dim)
+      {
+        return _num_entities[dim];
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      {
+        // call structured factory's method
+        _factory.fill_vertex_set(vertex_set);
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      {
+        /// TODO
+      }
+    };
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_UNIT_CUBE_FACTORY_HPP
+#endif // KERNEL_GEOMETRY_CONFORMAL_FACTORIES_HPP

@@ -144,7 +144,7 @@ namespace FEAST
        * \param[in] factory
        * The factory that is to be used to create the mesh.
        */
-      explicit ConformalSubMesh(const Factory<ConformalSubMesh>& factory) :
+      explicit ConformalSubMesh(Factory<ConformalSubMesh>& factory) :
         _vertex_set(factory.get_num_entities(0), factory.get_num_coords(), factory.get_vertex_stride()),
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
         _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
@@ -287,24 +287,6 @@ namespace FEAST
       /// \endcond
 
       /**
-       * \brief Refines the submesh.
-       *
-       * This function applies the standard refinement algorithm onto the submesh and returns the refined submesh.
-       *
-       * \param[in] parent_mesh
-       * A reference to the (coarse) parent mesh that this submesh refers to.
-       *
-       * \returns
-       * A pointer to the refined submesh.
-       */
-      template<typename ParentMesh_>
-      ConformalSubMesh* refine(const ParentMesh_& parent_mesh) const
-      {
-        CONTEXT(name() + "::refine()");
-        return new ConformalSubMesh(StandardRefinery<ConformalSubMesh>(*this, parent_mesh));
-      }
-
-      /**
        * \brief Returns the name of the class.
        * \returns
        * The name of the class as a String.
@@ -353,17 +335,17 @@ namespace FEAST
        * \returns
        * The number of entities of dimension \p dim.
        */
-      virtual Index get_num_entities(int dim) const = 0;
+      virtual Index get_num_entities(int dim) = 0;
 
       /**
        * \brief Returns the number of coorindates per vertex.
        */
-      virtual int get_num_coords() const = 0;
+      virtual int get_num_coords() = 0;
 
       /**
        * \brief Returns the vertex stride.
        */
-      virtual int get_vertex_stride() const = 0;
+      virtual int get_vertex_stride() = 0;
 
       /**
        * \brief Fills the vertex set.
@@ -371,7 +353,7 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const = 0;
+      virtual void fill_vertex_set(VertexSetType& vertex_set) = 0;
 
       /**
        * \brief Fills the index sets.
@@ -379,7 +361,7 @@ namespace FEAST
        * \param[in,out] index_set_holder
        * The index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const = 0;
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) = 0;
 
       /**
        * \brief Fills the target sets.
@@ -387,7 +369,7 @@ namespace FEAST
        * \param[in,out] target_set_holder
        * The target set holder whose target sets are to be filled.
        */
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const = 0;
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
     }; // class Factory<ConformalSubMesh<...>>
 
     /* ************************************************************************************************************* */
@@ -476,7 +458,7 @@ namespace FEAST
        * \returns
        * The number of entities of dimension \p dim.
        */
-      virtual Index get_num_entities(int dim) const
+      virtual Index get_num_entities(int dim)
       {
         return _num_entities_fine[dim];
       }
@@ -484,7 +466,7 @@ namespace FEAST
       /**
        * \brief Returns the number of coorindates per vertex.
        */
-      virtual int get_num_coords() const
+      virtual int get_num_coords()
       {
         return _coarse_mesh.get_vertex_set().get_num_coords();
       }
@@ -492,7 +474,7 @@ namespace FEAST
       /**
        * \brief Returns the vertex stride.
        */
-      virtual int get_vertex_stride() const
+      virtual int get_vertex_stride()
       {
         return _coarse_mesh.get_vertex_set().get_stride();
       }
@@ -503,7 +485,7 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
         // refine vertices
         Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
@@ -516,7 +498,7 @@ namespace FEAST
        * \param[in,out] index_set_holder
        * The index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         // refine indices
         Intern::IndexRefineWrapper<ShapeType>
@@ -529,7 +511,7 @@ namespace FEAST
        * \param[in,out] target_set_holder
        * The target set holder whose target sets are to be filled.
        */
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
       {
         // refine target indices
         Intern::TargetRefineWrapper<ShapeType>

@@ -78,7 +78,7 @@ namespace FEAST
         Index num_entities[n_+1];
 
         template<typename Factory_>
-        NumEntitiesWrapper(const Factory_& factory)
+        NumEntitiesWrapper(Factory_& factory)
         {
           for(int i(0); i <= n_; ++i)
           {
@@ -87,7 +87,7 @@ namespace FEAST
         }
 
         template<typename Factory_>
-        static void apply(const Factory_& factory, Index* num_ent)
+        static void apply(Factory_& factory, Index* num_ent)
         {
           for(int i(0); i <= n_; ++i)
           {
@@ -102,7 +102,7 @@ namespace FEAST
         Index num_slices[n_];
 
         template<typename Factory_>
-        NumSlicesWrapper(const Factory_& factory)
+        NumSlicesWrapper(Factory_& factory)
         {
           for(int i(0); i < n_; ++i)
           {
@@ -111,7 +111,7 @@ namespace FEAST
         }
 
         template<typename Factory_>
-        static void apply(const Factory_& factory, Index* num_slic)
+        static void apply(Factory_& factory, Index* num_slic)
         {
           for(int i(0); i < n_; ++i)
           {

@@ -4,7 +4,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/util/graph.hpp>
-#include <kernel/geometry/unit_cube_factory.hpp>
+#include <kernel/geometry/conformal_factories.hpp>
 
 #include <limits>
 #include <cmath>

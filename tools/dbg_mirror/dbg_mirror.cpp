@@ -197,20 +197,16 @@ int main(int argc, char* argv[])
   if(true)
   {
     // refine meshes
-    QuadMesh* mesh_0f(mesh_0.refine());
-    QuadMesh* mesh_1f(mesh_1.refine());
+    Geometry::StandardRefinery<QuadMesh> mesh_refinery0(mesh_0), mesh_refinery1(mesh_1);
+    QuadMesh mesh_0f(mesh_refinery0);
+    QuadMesh mesh_1f(mesh_refinery1);
     // refine cell sets
-    QuadCellSet* cell_0f(cell_0.refine(mesh_0));
-    QuadCellSet* cell_1f(cell_1.refine(mesh_1));
+    Geometry::StandardRefinery<QuadCellSet, QuadMesh> cell_refinery0(cell_0, mesh_0), cell_refinery1(cell_1, mesh_1);
+    QuadCellSet cell_0f(cell_refinery0);
+    QuadCellSet cell_1f(cell_refinery1);
 
     // test refined
-    test_it<QuadSpace>(*mesh_0f, *mesh_1f, *cell_0f, *cell_1f);
-
-    // delete stuff
-    delete cell_1f;
-    delete cell_0f;
-    delete mesh_1f;
-    delete mesh_0f;
+    test_it<QuadSpace>(mesh_0f, mesh_1f, cell_0f, cell_1f);
   }
 }
 

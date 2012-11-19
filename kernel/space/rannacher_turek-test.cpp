@@ -2,7 +2,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
-#include <kernel/geometry/unit_cube_factory.hpp>
+#include <kernel/geometry/conformal_factories.hpp>
 
 #include <limits>
 #include <cmath>

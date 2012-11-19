@@ -549,7 +549,7 @@
     <ClInclude Include="..\kernel\geometry\factory.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\geometry\unit_cube_factory.hpp">
+    <ClInclude Include="..\kernel\geometry\conformal_factories.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
   </ItemGroup>

@@ -77,7 +77,7 @@ namespace FEAST
        * \param[in] factory
        * The factory that is to be used to create the cell subset.
        */
-      explicit CellSubSet(const Factory<CellSubSet>& factory) :
+      explicit CellSubSet(Factory<CellSubSet>& factory) :
         _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
       {
         CONTEXT(name() + "::CellSubSet() [factory]");
@@ -150,26 +150,6 @@ namespace FEAST
       /// \endcond
 
       /**
-       * \brief Refines the cell subset.
-       *
-       * This function applies the standard refinement algorithm onto the cell subset and returns the
-       * refined cell subset.
-       *
-       * \param[in] parent
-       * A reference to the (coarse) parent mesh or cell subset that this cell subset refers to.
-       *
-       * \returns
-       * A pointer to the refined cell subset.
-       */
-      template<typename Parent_>
-      CellSubSet* refine(const Parent_& parent) const
-      {
-        CONTEXT(name() + "::refine()");
-
-        return new CellSubSet(StandardRefinery<CellSubSet, Parent_>(*this, parent));
-      }
-
-      /**
        * \brief Returns the name of the class.
        * \returns
        * The name of the class as a String.
@@ -211,7 +191,7 @@ namespace FEAST
        * \returns
        * The number of entities of dimension \p dim.
        */
-      virtual Index get_num_entities(int dim) const = 0;
+      virtual Index get_num_entities(int dim) = 0;
 
       /**
        * \brief Fills the target sets.
@@ -219,11 +199,16 @@ namespace FEAST
        * \param[in,out] target_set_holder
        * The target set holder whose target sets are to be filled.
        */
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const = 0;
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) = 0;
     }; // class Factory<CellSubSet<...>>
 
     /* ************************************************************************************************************* */
 
+    /**
+     * \brief StandardRefinery implementation for CellSubSet
+     *
+     * \author Peter Zajac
+     */
     template<typename Shape_, typename Parent_>
     class StandardRefinery<CellSubSet<Shape_>, Parent_> :
       public Factory< CellSubSet<Shape_> >
@@ -294,7 +279,7 @@ namespace FEAST
        * \returns
        * The number of entities of dimension \p dim.
        */
-      virtual Index get_num_entities(int dim) const
+      virtual Index get_num_entities(int dim)
       {
         return _num_entities_fine[dim];
       }
@@ -305,7 +290,7 @@ namespace FEAST
        * \param[in,out] target_set_holder
        * The target set holder whose target sets are to be filled.
        */
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder) const
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
       {
         // refine subset target indices
         Intern::SubSetRefineWrapper<ShapeType>

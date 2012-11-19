@@ -129,7 +129,7 @@ namespace FEAST
        * \param[in] factory
        * The factory that is to be used to create the mesh.
        */
-      explicit ConformalMesh(const Factory<ConformalMesh>& factory) :
+      explicit ConformalMesh(Factory<ConformalMesh>& factory) :
         _vertex_set(factory.get_num_entities(0)),
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
       {
@@ -228,21 +228,6 @@ namespace FEAST
       /// \endcond
 
       /**
-       * \brief Refines the mesh.
-       *
-       * This function applies the standard refinement algorithm onto the mesh and returns the refined mesh.
-       *
-       * \returns
-       * A pointer to the refined mesh.
-       */
-      ConformalMesh* refine() const
-      {
-        CONTEXT(name() + "::refine()");
-
-        return new ConformalMesh(StandardRefinery<ConformalMesh>(*this));
-      }
-
-      /**
        * \brief Returns the name of the class.
        * \returns
        * The name of the class as a String.
@@ -291,7 +276,7 @@ namespace FEAST
        * \returns
        * The number of entities of dimension \p dim.
        */
-      virtual Index get_num_entities(int dim) const = 0;
+      virtual Index get_num_entities(int dim) = 0;
 
       /**
        * \brief Fills the vertex set.
@@ -299,7 +284,7 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const = 0;
+      virtual void fill_vertex_set(VertexSetType& vertex_set) = 0;
 
       /**
        * \brief Fills the index sets.
@@ -307,7 +292,7 @@ namespace FEAST
        * \param[in,out] index_set_holder
        * The index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const = 0;
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) = 0;
     }; // class Factory<ConformalMesh<...>>
 
     /* ************************************************************************************************************* */
@@ -384,7 +369,7 @@ namespace FEAST
        * \returns
        * The number of entities of dimension \p dim.
        */
-      virtual Index get_num_entities(int dim) const
+      virtual Index get_num_entities(int dim)
       {
         return _num_entities_fine[dim];
       }
@@ -395,7 +380,7 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
         // refine vertices
         Intern::StandardVertexRefineWrapper<ShapeType, VertexSetType>
@@ -408,7 +393,7 @@ namespace FEAST
        * \param[in,out] index_set_holder
        * The index set holder whose index sets are to be filled.
        */
-      virtual void fill_index_sets(IndexSetHolderType& index_set_holder) const
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         // refine indices
         Intern::IndexRefineWrapper<ShapeType>

@@ -1,12 +1,11 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
-#include <kernel/geometry/test_aux/standard_quad.hpp>
+#include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-#include <kernel/util/graph.hpp>
 
 #include <limits>
 #include <cmath>
@@ -41,18 +40,16 @@ public:
   void test_unit_2d() const
   {
     // create coarse mesh
-    QuadMesh* mesh_coarse = Geometry::TestAux::create_quad_mesh_2d(0);
+    Geometry::UnitCubeFactory<QuadMesh> unit_factory;
+    QuadMesh mesh_coarse(unit_factory);
 
     // refine the mesh
-    QuadMesh* mesh_fine = mesh_coarse->refine();
+    Geometry::StandardRefinery<QuadMesh> refine_factory(mesh_coarse);
+    QuadMesh mesh_fine(refine_factory);
 
     // run tests
-    test_unit_2d_q1(*mesh_fine, *mesh_coarse);
-    test_unit_2d_q1t(*mesh_fine, *mesh_coarse);
-
-    // delete meshes
-    delete mesh_fine;
-    delete mesh_coarse;
+    test_unit_2d_q1(mesh_fine, mesh_coarse);
+    test_unit_2d_q1t(mesh_fine, mesh_coarse);
   }
 
   void test_unit_2d_q1(const QuadMesh& mesh_f, const QuadMesh& mesh_c) const

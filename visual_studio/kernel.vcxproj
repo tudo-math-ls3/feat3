@@ -555,6 +555,7 @@
     <ClInclude Include="..\kernel\geometry\cell_sub_set.hpp" />
     <ClInclude Include="..\kernel\geometry\cell_sub_set_node.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal_mesh.hpp" />
+    <ClInclude Include="..\kernel\geometry\conformal_factories.hpp" />
     <ClInclude Include="..\kernel\geometry\conformal_sub_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\export_vtk.hpp" />
     <ClInclude Include="..\kernel\geometry\factory.hpp" />
@@ -577,7 +578,6 @@
     <ClInclude Include="..\kernel\geometry\mesh_node.hpp" />
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\target_set.hpp" />
-    <ClInclude Include="..\kernel\geometry\unit_cube_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp" />
     <ClInclude Include="..\kernel\lafem\absolute.hpp" />
     <ClInclude Include="..\kernel\lafem\algorithm.hpp" />

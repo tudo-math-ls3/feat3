@@ -153,7 +153,7 @@ namespace FEAST
        * \param[in] factory
        * The factory that is to be used to create the mesh.
        */
-      explicit StructuredMesh(const Factory<StructuredMesh>& factory) :
+      explicit StructuredMesh(Factory<StructuredMesh>& factory) :
         _vertex_set(
           Intern::StructCalcNumEntities<shape_dim>::num_verts(
             Intern::NumSlicesWrapper<shape_dim>(factory).num_slices))
@@ -225,21 +225,6 @@ namespace FEAST
       }
 
       /**
-       * \brief Refines the mesh.
-       *
-       * This function applies the standard refinement algorithm onto the mesh and returns the refined mesh.
-       *
-       * \returns
-       * A pointer to the refined mesh.
-       */
-      StructuredMesh* refine() const
-      {
-        CONTEXT(name() + "::refine()");
-
-        return new StructuredMesh(StandardRefinery<StructuredMesh>(*this));
-      }
-
-      /**
        * \brief Returns the name of the class.
        * \returns
        * The name of the class as a String.
@@ -285,7 +270,7 @@ namespace FEAST
        * \returns
        * The number of slices in direction \p dir.
        */
-      virtual Index get_num_slices(int dir) const = 0;
+      virtual Index get_num_slices(int dir) = 0;
 
       /**
        * \brief Fills the vertex set.
@@ -293,13 +278,15 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const = 0;
+      virtual void fill_vertex_set(VertexSetType& vertex_set) = 0;
     }; // class Factory<StructuredMesh<...>>
 
     /* ************************************************************************************************************* */
 
     /**
      * \brief StandardRefinery implementation for StructuredMesh
+     *
+     * \author Peter Zajac
      */
     template<
       int shape_dim_,
@@ -355,7 +342,7 @@ namespace FEAST
        * \returns
        * The number of slices in direction \p dir.
        */
-      virtual Index get_num_slices(int dir) const
+      virtual Index get_num_slices(int dir)
       {
         return 2 * _coarse_mesh.get_num_slices(dir);
       }
@@ -366,7 +353,7 @@ namespace FEAST
        * \param[in,out] vertex_set
        * The vertex set whose coordinates are to be filled.
        */
-      virtual void fill_vertex_set(VertexSetType& vertex_set) const
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
       {
         // refine vertices
         Intern::StructuredVertexRefiner<ShapeType, VertexSetType>

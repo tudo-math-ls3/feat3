@@ -341,7 +341,10 @@ int main(int argc, char* argv[])
     for(int i = 0; i < nrefs; ++i)
     {
       QuadMesh* mesh2 = mesh;
-      mesh = mesh2->refine();
+      {
+        Geometry::StandardRefinery<QuadMesh> refinery(*mesh2);
+        mesh = new QuadMesh(refinery);
+      }
       delete mesh2;
     }
   }
