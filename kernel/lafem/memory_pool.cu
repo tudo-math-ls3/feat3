@@ -131,6 +131,9 @@ void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index
 
 void MemoryPool<Mem::CUDA>::copy(void * dest, const void * src, const Index bytes)
 {
+  if (dest == src)
+    return;
+
   cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToDevice);
 }
 

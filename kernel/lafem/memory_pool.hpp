@@ -91,6 +91,9 @@ namespace FEAST
         /// Copy memory area from src to dest
         static void copy(void * dest, const void * src, const Index bytes)
         {
+          if (dest == src)
+            return;
+
           ::memcpy(dest, src, bytes);
         }
 
