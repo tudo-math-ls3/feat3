@@ -22,12 +22,12 @@ namespace FEAST
     {
     public:
       /// arch typedef
-      typedef Arch_ Arch;
+      typedef Arch_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
 
       /// corresponding vector-mirror type
-      typedef VectorMirror<Arch, DataType> VectorMirrorType;
+      typedef VectorMirror<MemType, DataType> VectorMirrorType;
 
     protected:
       /// row-mirror reference

@@ -43,7 +43,7 @@ namespace FEAST
         VT_ _jac;
 
       public:
-        JacobiPreconditioner(const MT_ & A, typename VT_::data_type damping) :
+        JacobiPreconditioner(const MT_ & A, typename VT_::DataType damping) :
           _jac(A.rows())
         {
           for (Index i(0) ; i < _jac.size() ; ++i)

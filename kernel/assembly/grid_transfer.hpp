@@ -34,7 +34,7 @@ namespace FEAST
     {
     public:
       /// data type
-      typedef typename Matrix_::data_type DataType;
+      typedef typename Matrix_::DataType DataType;
 
     private:
       /// \cond internal

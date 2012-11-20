@@ -23,7 +23,7 @@ namespace FEAST
     {
     public:
       /// arch typedef
-      typedef Arch_ Arch;
+      typedef Arch_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
 

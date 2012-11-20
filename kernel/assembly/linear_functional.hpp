@@ -41,7 +41,7 @@ namespace FEAST
 
       /// assembly traits
       typedef AsmTraits1<
-        typename Vector_::data_type,
+        typename Vector_::DataType,
         Space_,
         typename Functor_::TrafoConfig,
         typename Functor_::SpaceConfig> AsmTraits;

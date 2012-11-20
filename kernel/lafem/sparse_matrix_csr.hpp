@@ -56,9 +56,9 @@ namespace FEAST
 
       public:
         /// Our datatype
-        typedef DT_ data_type;
+        typedef DT_ DataType;
         /// Our memory architecture type
-        typedef Arch_ mem_type;
+        typedef Arch_ MemType;
 
         /**
          * \brief Constructor

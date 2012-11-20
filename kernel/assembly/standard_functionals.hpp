@@ -144,7 +144,7 @@ namespace FEAST
         Vector_& vector,
         const Space_& space,
         const String& cubature_name,
-        typename Vector_::data_type alpha = typename Vector_::data_type(1))
+        typename Vector_::DataType alpha = typename Vector_::DataType(1))
       {
         LinearScalarIntegralFunctor functor;
         LinearFunctional<Vector_, LinearScalarIntegralFunctor<Function_>, Space_>::

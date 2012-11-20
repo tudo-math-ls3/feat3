@@ -113,7 +113,7 @@ namespace FEAST
         Matrix_& matrix,
         const Space_& space,
         const String& cubature_name,
-        const typename Matrix_::data_type alpha = typename Matrix_::data_type(1))
+        const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         BilinearScalarLaplaceFunctor functor;
         BilinearOperator<Matrix_, BilinearScalarLaplaceFunctor, Space_>::
@@ -223,7 +223,7 @@ namespace FEAST
         Matrix_& matrix,
         const Space_& space,
         const String& cubature_name,
-        const typename Matrix_::data_type alpha = typename Matrix_::data_type(1))
+        const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         BilinearScalarIdentityFunctor functor;
         BilinearOperator<Matrix_, BilinearScalarIdentityFunctor, Space_>::

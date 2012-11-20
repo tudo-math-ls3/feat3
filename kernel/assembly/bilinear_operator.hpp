@@ -49,7 +49,7 @@ namespace FEAST
 
       /// assembly traits
       typedef AsmTraits2<
-        typename MatrixType::data_type,
+        typename MatrixType::DataType,
         TestSpace_,
         TrialSpace_,
         typename FunctorType::TrafoConfig,
@@ -254,7 +254,7 @@ namespace FEAST
 
       /// assembly traits
       typedef AsmTraits1<
-        typename Matrix_::data_type,
+        typename Matrix_::DataType,
         Space_,
         typename Functor_::TrafoConfig,
         Space::ConfigOr<
