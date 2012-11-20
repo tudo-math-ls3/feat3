@@ -78,7 +78,7 @@ namespace FEAST
         _weights(nullptr),
         _points(nullptr)
       {
-        clone(other);
+        *this = other;
       }
 
       Rule(const Factory& factory) :
@@ -87,7 +87,7 @@ namespace FEAST
         _weights(nullptr),
         _points(nullptr)
       {
-        clone(factory.produce());
+        *this = factory.produce();
       }
 
       virtual ~Rule()
@@ -97,7 +97,18 @@ namespace FEAST
 
       Rule& operator=(const Rule& other)
       {
-        clone(other);
+        if(this != &other)
+        {
+          create(other.get_num_points(), other.get_name());
+          for(Index i(0); i < _num_points; ++i)
+          {
+            _weights[i] = other._weights[i];
+            for(int j(0); j < dimension; ++j)
+            {
+              _points[i][j] = other._points[i][j];
+            }
+          }
+        }
         return *this;
       }
 
@@ -132,19 +143,6 @@ namespace FEAST
       {
         create(num_points);
         _name = name;
-      }
-
-      void clone(const Rule& other)
-      {
-        create(other.get_num_points(), other.get_name());
-        for(Index i(0); i < _num_points; ++i)
-        {
-          _weights[i] = other._weights[i];
-          for(int j(0); j < dimension; ++j)
-          {
-            _points[i][j] = other._points[i][j];
-          }
-        }
       }
 
       const String& get_name() const

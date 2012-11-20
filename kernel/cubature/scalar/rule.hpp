@@ -87,7 +87,7 @@ namespace FEAST
           _weights(nullptr),
           _coords(nullptr)
         {
-          clone(other);
+          *this = other;
         }
 
         explicit Rule(const Factory& factory) :
@@ -96,7 +96,7 @@ namespace FEAST
           _weights(nullptr),
           _coords(nullptr)
         {
-          clone(factory.produce());
+          *this = factory.produce();
         }
 
         /// virtual destructor
@@ -108,7 +108,15 @@ namespace FEAST
         /// assignment operator
         Rule& operator=(const Rule& other)
         {
-          clone(other);
+          if(this != &other)
+          {
+            create(other.get_num_points(), other.get_name());
+            for(Index i(0); i < _num_points; ++i)
+            {
+              _weights[i] = other._weights[i];
+              _coords[i] = other._coords[i];
+            }
+          }
           return *this;
         }
 
@@ -143,16 +151,6 @@ namespace FEAST
         {
           create(num_points);
           _name = name;
-        }
-
-        void clone(const Rule& other)
-        {
-          create(other.get_num_points(), other.get_name());
-          for(Index i(0); i < _num_points; ++i)
-          {
-            _weights[i] = other._weights[i];
-            _coords[i] = other._coords[i];
-          }
         }
 
         const String& get_name() const
