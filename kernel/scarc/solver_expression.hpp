@@ -529,6 +529,31 @@ namespace FEAST
           const T2_& _u;
     };
 
+    template<typename T1_, typename T2_>
+    class MatVecProd : public VecExpr<MatVecProd<T1_, T2_> >
+    {
+      public:
+        MatVecProd(const MatExpr<T1_>& l, const VecExpr<T2_>& r) :
+          _left(l.cast()),
+          _right(r.cast())
+        {
+        }
+
+        std::string get_id()
+        {
+          return _left.cast().get_id() + " * " + _right.cast().get_id();
+        }
+
+        const std::string get_id() const
+        {
+          return _left.cast().get_id() + " * " + _right.cast().get_id();
+        }
+
+      private:
+          const T1_& _left;
+          const T2_& _right;
+    };
+
     ///operator overloads and operation shortcuts
     template<typename T1_, typename T2_>
     VecSum<T1_, T2_> operator+(const VecExpr<T1_>& l, const VecExpr<T2_>& r)
@@ -576,6 +601,12 @@ namespace FEAST
     VecPreconApply<T_> vec_preconapply_expr(const VecExpr<T_>& l)
     {
       return VecPreconApply<T_>(l);
+    }
+
+    template<typename T1_, typename T2_>
+    MatVecProd<T1_, T2_> operator*(const MatExpr<T1_>& l, const VecExpr<T2_>& r)
+    {
+      return MatVecProd<T1_, T2_>(l, r);
     }
   }
 }

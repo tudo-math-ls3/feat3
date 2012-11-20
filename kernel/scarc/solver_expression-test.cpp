@@ -56,6 +56,48 @@ class SolverExpressionTest:
       a = vec_preconapply_expr(a);
       TEST_CHECK_EQUAL(a.get_id(), "PRECONAPPLY(ITERATE(SYNCHVEC([a]_chunk) UNTIL b1 < b2))");
 
+      a = A * d;
+      TEST_CHECK_EQUAL(a.get_id(), "A * DEFECT(b, A, a + b)");
+
+      //--------------------------------------------------------------------------------------
+
+      VGVector gx("gx"), gb("gb");
+      VGMatrix gA("gA"), gP("gP");
+
+      Matrix lP(gP), lA(gA);
+      Vector lx(gx), lb(gb);
+
+      VGBool converged_outer("converged_outer");
+      VGBool converged_inner("converged_inner");
+
+      //global solver
+      gx = vec_iterate_expr(vec_preconapply_expr(vec_synch_expr(defect_expr(lb, lA, lx))) + lx, converged_outer);
+      TEST_CHECK_EQUAL(gx.get_id(), "ITERATE(PRECONAPPLY(SYNCHVEC(DEFECT([gb]_chunk, [gA]_chunk, [gx]_chunk))) + [gx]_chunk UNTIL converged_outer)");
+
+      //local jacobi
+      lx = vec_iterate_expr(lx + lP * defect_expr(lb, lA, lx), converged_inner);
+      TEST_CHECK_EQUAL(lx.get_id(), "[ITERATE([gx]_chunk + [gP]_chunk * DEFECT([gb]_chunk, [gA]_chunk, [gx]_chunk) UNTIL converged_inner)]_chunk");
+
+      //gx stays the old value, solvers not connected
+      TEST_CHECK_EQUAL(gx.get_id(), "ITERATE(PRECONAPPLY(SYNCHVEC(DEFECT([gb]_chunk, [gA]_chunk, [gx]_chunk))) + [gx]_chunk UNTIL converged_outer)");
+
+      //lx is substituted, solvers connected, do not do this
+      gx = vec_iterate_expr(vec_preconapply_expr(vec_synch_expr(defect_expr(lb, lA, lx))) + lx, converged_outer);
+      TEST_CHECK_EQUAL(gx.get_id(), "ITERATE(PRECONAPPLY(SYNCHVEC(DEFECT([gb]_chunk, [gA]_chunk, [ITERATE([gx]_chunk + [gP]_chunk * DEFECT([gb]_chunk, [gA]_chunk, [gx]_chunk) UNTIL converged_inner)]_chunk))) + [ITERATE([gx]_chunk + [gP]_chunk * DEFECT([gb]_chunk, [gA]_chunk, [gx]_chunk) UNTIL converged_inner)]_chunk UNTIL converged_outer)");
+
+      //------------------------------------------------------------
+
+      //start over
+      VGVector gx1("gx"), gb1("gb"), scarc_layer_0("VOID"), scarc_precon_0("VOID"), scarc_layer_1("VOID");
+      VGMatrix gA1("gA"), gP1("gP");
+
+      Matrix lP1(gP1), lA1(gA1);
+      Vector lx1(gx1), lb1(gb1);
+
+      scarc_layer_0 = vec_iterate_expr(vec_preconapply_expr(vec_synch_expr(defect_expr(lb1, lA1, lx1)) + lx1), converged_outer);
+      scarc_precon_0 = vec_synch_expr(defect_expr(lb1, lA1, lx1));
+
+      scarc_layer_1 = vec_iterate_expr(lx1 + lP1 * defect_expr(lb1, lA1, lx1), converged_inner);
     }
 };
 SolverExpressionTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");
