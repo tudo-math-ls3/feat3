@@ -103,7 +103,7 @@ namespace FEAST
      * \param[in] sort_type
      * This parameter determines, which sorting is used in each level of the Cuthill-McKee algorithm.
      */
-    CuthillMcKee(
+    explicit CuthillMcKee(
       const Graph& graph,
       bool reverse = false,
       CuthillMcKee::RootType root_type = root_default,
@@ -341,6 +341,12 @@ namespace FEAST
       return _perm;
     }
 
+    /** \copydoc get_permutation() */
+    const Permutation& get_permutation() const
+    {
+      CONTEXT("CuthillMcKee::get_permutation() [const]");
+      return _perm;
+    }
   }; // class CuthillMcKee
 } // namespace FEAST
 
