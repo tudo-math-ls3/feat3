@@ -11,22 +11,9 @@ namespace FEAST
   namespace ScaRC
   {
 
-    class VecExprBase
-    {
-      public:
-        virtual const std::string get_id() const
-        {
-          return "UNINITIALIZED";
-        }
-        virtual std::string get_id()
-        {
-          return "UNINITIALIZED";
-        }
-    };
-
     ///basic expressions
     template<typename T_>
-    class VecExpr : public VecExprBase
+    class VecExpr
     {
       public:
         T_& cast()
@@ -417,30 +404,27 @@ namespace FEAST
           const T1_& _left;
     };
 
-    class VecPreconApply : public VecExpr<VecPreconApply >
+    template<typename T_>
+    class VecPreconApply : public VecExpr<VecPreconApply<T_> >
     {
       public:
-        VecPreconApply()
+        VecPreconApply(const VecExpr<T_>& l) :
+          _left(l.cast())
         {
         }
 
         std::string get_id()
         {
-          return "PRECONAPPLY(" + _left.get()->get_id() + ")";
+          return "PRECONAPPLY(" + _left.cast().get_id() + ")";
         }
 
         const std::string get_id() const
         {
-          return "PRECONAPPLY(" + _left.get()->get_id() + ")";
-        }
-
-        std::shared_ptr<VecExprBase>& get()
-        {
-          return _left;
+          return "PRECONAPPLY(" + _left.cast().get_id() + ")";
         }
 
       private:
-          std::shared_ptr<VecExprBase> _left;
+          const T_& _left;
     };
 
     template<typename T1_, typename T2_>
@@ -588,15 +572,11 @@ namespace FEAST
       return VecIterate<T1_, T2_>(l, u);
     }
 
-    ///solver patterns
-    /*template<typename T_>
-    class SolverPatternGeneration
+    template<typename T_>
+    VecPreconApply<T_> vec_preconapply_expr(const VecExpr<T_>& l)
     {
-      template<typename UT_>
-      static VecIterate<VecSum<>, UT_> execute()
-      {
-      }
-    };*/
+      return VecPreconApply<T_>(l);
+    }
   }
 }
 

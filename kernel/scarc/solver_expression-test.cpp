@@ -52,6 +52,10 @@ class SolverExpressionTest:
 
       a = vec_iterate_expr(a, b3);
       TEST_CHECK_EQUAL(a.get_id(), "ITERATE(SYNCHVEC([a]_chunk) UNTIL b1 < b2)");
+
+      a = vec_preconapply_expr(a);
+      TEST_CHECK_EQUAL(a.get_id(), "PRECONAPPLY(ITERATE(SYNCHVEC([a]_chunk) UNTIL b1 < b2))");
+
     }
 };
 SolverExpressionTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");
