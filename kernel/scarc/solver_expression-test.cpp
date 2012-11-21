@@ -87,6 +87,8 @@ class SolverExpressionTest:
 
       //------------------------------------------------------------
 
+      //test inner-outer schemes
+
       //start over
       VGVector gx1("gx"), gb1("gb"), ld1("ld");
       VGMatrix gA1("gA"), gP1("gP");
@@ -121,6 +123,7 @@ class SolverExpressionTest:
       lx2 = vec_iterate_expr(lx2, converged_inner);
       gx2 = lx2;
       TEST_CHECK_EQUAL(gx2.get_id(), "ITERATE([gx]_chunk + [gP]_chunk * DEFECT([gb]_chunk, [gA]_chunk, [gx]_chunk) UNTIL converged_inner)");
+
     }
 };
 SolverExpressionTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");

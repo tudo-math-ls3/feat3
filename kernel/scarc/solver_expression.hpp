@@ -153,7 +153,7 @@ namespace FEAST
           _id = "[" + other.cast().get_id() +"]_chunk";
         }
 
-        //no chunk generation at assignment
+        ///no chunk generation at assignment
         template<typename T_>
         Vector& operator=(const VecExpr<T_>& other)
         {
@@ -271,6 +271,14 @@ namespace FEAST
           _id = "[" + other.cast().get_id() +"]_fraction";
         }
 
+        ///no chunk generation at assignment
+        template<typename T_>
+        Scalar& operator=(const ScalExpr<T_>& other)
+        {
+          this->_id = other.cast().get_id();
+          return *this;
+        }
+
         std::string get_id()
         {
           return _id;
@@ -292,7 +300,15 @@ namespace FEAST
         template<typename T_>
         Bool(BoolExpr<T_> const& other)
         {
-          _id = "[" + other.cast().get_id() +"]_chunk";
+          _id = "[" + other.cast().get_id() +"]_fraction";
+        }
+
+        ///no chunk generation at assignment
+        template<typename T_>
+        Bool& operator=(const BoolExpr<T_>& other)
+        {
+          this->_id = other.cast().get_id();
+          return *this;
         }
 
         std::string get_id()
