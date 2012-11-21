@@ -12,7 +12,7 @@ using namespace FEAST::ScaRC;
 using namespace FEAST::TestSystem;
 
 
-template<typename Tag_, typename DataType_>
+template<typename Tag_, typename Algo_, typename DataType_>
 class SolverFunctorTest:
   public TaggedTest<Tag_, DataType_>
 {
@@ -24,7 +24,7 @@ class SolverFunctorTest:
 
     virtual void run() const
     {
-      SparseMatrixCOO<Tag_, DataType_> T(1000, 1000);
+      SparseMatrixCOO<Mem::Main, DataType_> T(1000, 1000);
 
       for(Index i(0) ; i < 1000 ; ++i)
         T(i, i, DataType_(1));
@@ -36,9 +36,9 @@ class SolverFunctorTest:
 
       //reference solution
       DenseVector<Tag_, DataType_> c(1000);
-      Defect<Algo::Generic>::value(c, b, A, x);
+      Defect<Algo_>::value(c, b, A, x);
 
-      DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > f(d, b, A, x);
+      DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > f(d, b, A, x);
       f.execute();
 
       TEST_CHECK_EQUAL(d, c);
@@ -47,11 +47,11 @@ class SolverFunctorTest:
 
       DenseVector<Tag_, DataType_> dn(1000);
       CompoundFunctor<> cf;
-      cf.add_functor(new DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
-      cf.add_functor(new DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
-      cf.add_functor(new DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
+      cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
+      cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
+      cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
       cf.execute();
       TEST_CHECK_EQUAL(d, c);
     }
 };
-SolverFunctorTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");
+SolverFunctorTest<Mem::Main, Algo::Generic, double> sf_cpu_double("StorageType: std::vector, DataType: double");
