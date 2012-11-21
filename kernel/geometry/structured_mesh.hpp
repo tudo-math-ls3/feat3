@@ -5,74 +5,12 @@
 // includes, FEAST
 #include <kernel/geometry/factory.hpp>
 #include <kernel/geometry/intern/structured_vertex_refiner.hpp>
+#include <kernel/geometry/intern/struct_num_entities.hpp>
 
 namespace FEAST
 {
   namespace Geometry
   {
-    /// \cond internal
-    namespace Intern
-    {
-      // helper class to calculate the number of entities from the number of slices
-      template<int dim_>
-      struct StructCalcNumEntities;
-
-      template<>
-      struct StructCalcNumEntities<1>
-      {
-        static void apply(Index num_entities[], const Index num_slices[])
-        {
-          num_entities[0] = num_slices[0] + 1;
-          num_entities[1] = num_slices[0];
-        }
-
-        static Index num_verts(const Index num_slices[])
-        {
-          return num_slices[0] + 1;
-        }
-      };
-
-      template<>
-      struct StructCalcNumEntities<2>
-      {
-        static void apply(Index num_entities[], const Index num_slices[])
-        {
-          num_entities[0] = (num_slices[0] + 1) * (num_slices[1] + 1);
-          num_entities[1] = (num_slices[0] + 1) * num_slices[1] + num_slices[0] * (num_slices[1] + 1);
-          num_entities[2] = num_slices[0] * num_slices[1];
-        }
-
-        static Index num_verts(const Index num_slices[])
-        {
-          return (num_slices[0] + 1) * (num_slices[1] + 1);
-        }
-      };
-
-      template<>
-      struct StructCalcNumEntities<3>
-      {
-        static void apply(Index num_entities[], const Index num_slices[])
-        {
-          num_entities[0] = (num_slices[0] + 1) * (num_slices[1] + 1) * (num_slices[2] + 1);
-          num_entities[1] =
-            num_slices[0] * (num_slices[1] + 1) * (num_slices[2] + 1) +
-            num_slices[1] * (num_slices[0] + 1) * (num_slices[2] + 1) +
-            num_slices[2] * (num_slices[0] + 1) * (num_slices[1] + 1);
-          num_entities[2] =
-            (num_slices[0] + 1) * num_slices[1] * num_slices[2] +
-            (num_slices[1] + 1) * num_slices[0] * num_slices[2] +
-            (num_slices[2] + 1) * num_slices[0] * num_slices[1];
-          num_entities[3] = num_slices[0] * num_slices[1] * num_slices[2];
-        }
-
-        static Index num_verts(const Index num_slices[])
-        {
-          return (num_slices[0] + 1) * (num_slices[1] + 1) * (num_slices[2] + 1);
-        }
-      };
-    } // namespace Intern
-    /// \endcond
-
     /**
      * \brief Structured mesh class template
      *
@@ -131,7 +69,7 @@ namespace FEAST
        * Must not be \c nullptr.
        */
       explicit StructuredMesh(const Index num_slices[]) :
-        _vertex_set(Intern::StructCalcNumEntities<shape_dim>::num_verts(num_slices))
+        _vertex_set(Intern::StructNumEntities<shape_dim_, 0>::compute(num_slices))
       {
         CONTEXT(name() + "::StructuredMesh()");
         ASSERT_(num_slices != nullptr);
@@ -144,7 +82,7 @@ namespace FEAST
         }
 
         // calculate number of enitites
-        Intern::StructCalcNumEntities<shape_dim>::apply(_num_entities, _num_slices);
+        Intern::StructNumEntitiesWrapper<shape_dim_>::compute(_num_entities, _num_slices);
       }
 
       /**
@@ -155,7 +93,7 @@ namespace FEAST
        */
       explicit StructuredMesh(Factory<StructuredMesh>& factory) :
         _vertex_set(
-          Intern::StructCalcNumEntities<shape_dim>::num_verts(
+          Intern::StructNumEntities<shape_dim_, 0>::compute(
             Intern::NumSlicesWrapper<shape_dim>(factory).num_slices))
       {
         CONTEXT(name() + "::StructuredMesh() [factory]");
@@ -164,7 +102,7 @@ namespace FEAST
         Intern::NumSlicesWrapper<shape_dim>::apply(factory, _num_slices);
 
         // calculate number of enitites
-        Intern::StructCalcNumEntities<shape_dim>::apply(_num_entities, _num_slices);
+        Intern::StructNumEntitiesWrapper<shape_dim_>::compute(_num_entities, _num_slices);
 
         // fill vertex set
         factory.fill_vertex_set(_vertex_set);
