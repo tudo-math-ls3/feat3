@@ -444,7 +444,7 @@ namespace FEAST
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
         static_assert(face_dim_ < cell_dim_, "invalid face/cell dimension");
         static_assert(face_dim_ >= 0, "invalid face dimension");
-        return get_index_set_wrapper<cell_dim_>().get_index_set<face_dim_>();
+        return get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
       template<
@@ -464,7 +464,7 @@ namespace FEAST
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
         static_assert(face_dim_ < cell_dim_, "invalid face/cell dimension");
         static_assert(face_dim_ >= 0, "invalid face dimension");
-        return get_index_set_wrapper<cell_dim_>().get_index_set<face_dim_>();
+        return get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
       static String name()

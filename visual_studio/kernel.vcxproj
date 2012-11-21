@@ -572,11 +572,14 @@
     <ClInclude Include="..\kernel\geometry\intern\standard_target_refiner.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\standard_vertex_refiner.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\structured_vertex_refiner.hpp" />
+    <ClInclude Include="..\kernel\geometry\intern\struct_index_mapping.hpp" />
+    <ClInclude Include="..\kernel\geometry\intern\struct_num_entities.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\sub_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\target_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\vertex_abacus.hpp" />
     <ClInclude Include="..\kernel\geometry\mesh_node.hpp" />
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp" />
+    <ClInclude Include="..\kernel\geometry\struct_index_set.hpp" />
     <ClInclude Include="..\kernel\geometry\target_set.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp" />
     <ClInclude Include="..\kernel\lafem\absolute.hpp" />

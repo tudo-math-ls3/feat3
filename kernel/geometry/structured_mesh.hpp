@@ -4,8 +4,8 @@
 
 // includes, FEAST
 #include <kernel/geometry/factory.hpp>
+#include <kernel/geometry/struct_index_set.hpp>
 #include <kernel/geometry/intern/structured_vertex_refiner.hpp>
-#include <kernel/geometry/intern/struct_num_entities.hpp>
 
 namespace FEAST
 {
@@ -40,12 +40,39 @@ namespace FEAST
       /// vertex set type
       typedef VertexSetFixed<num_coords_, stride_, Coord_> VertexSetType;
 
+      /// index set holder type
+      typedef StructIndexSetHolder<shape_dim_> IndexSetHolderType;
+
       /// dummy enum
       enum
       {
         /// shape dimension
-        shape_dim = shape_dim_
+        shape_dim = shape_dim_,
+        /// world dimension
+        world_dim = num_coords_
       };
+
+      /**
+       * \brief Index set type class template
+       *
+       * This nested class template is used to define the return type of the StructuredMesh::get_index_set()
+       * function template.
+       *
+       * \tparam cell_dim_, face_dim_
+       * The cell and face dimension parameters as passed to the StructuredMesh::get_index_set() function template.
+       */
+      template<
+        int cell_dim_,
+        int face_dim_>
+      struct IndexSet
+      {
+        static_assert(cell_dim_ <= shape_dim, "invalid cell dimension");
+        static_assert(face_dim_ < cell_dim_, "invalid face/cell dimension");
+        static_assert(face_dim_ >= 0, "invalid face dimension");
+
+        /// index set type
+        typedef StructIndexSet<shape_dim_, cell_dim_, face_dim_> Type;
+      }; // struct IndexSet<...>
 
     protected:
       /// number of slices for each direction
@@ -55,6 +82,9 @@ namespace FEAST
 
       /// the vertex set of the mesh.
       VertexSetType _vertex_set;
+
+      /// index set holder
+      IndexSetHolderType _index_set_holder;
 
     private:
       StructuredMesh(const StructuredMesh&);
@@ -69,7 +99,8 @@ namespace FEAST
        * Must not be \c nullptr.
        */
       explicit StructuredMesh(const Index num_slices[]) :
-        _vertex_set(Intern::StructNumEntities<shape_dim_, 0>::compute(num_slices))
+        _vertex_set(Intern::StructNumEntities<shape_dim_, 0>::compute(num_slices)),
+        _index_set_holder(num_slices)
       {
         CONTEXT(name() + "::StructuredMesh()");
         ASSERT_(num_slices != nullptr);
@@ -94,7 +125,8 @@ namespace FEAST
       explicit StructuredMesh(Factory<StructuredMesh>& factory) :
         _vertex_set(
           Intern::StructNumEntities<shape_dim_, 0>::compute(
-            Intern::NumSlicesWrapper<shape_dim>(factory).num_slices))
+            Intern::NumSlicesWrapper<shape_dim>(factory).num_slices)),
+        _index_set_holder(Intern::NumSlicesWrapper<shape_dim>(factory).num_slices)
       {
         CONTEXT(name() + "::StructuredMesh() [factory]");
 
@@ -160,6 +192,27 @@ namespace FEAST
       {
         CONTEXT(name() + "::get_vertex_set() [const]");
         return _vertex_set;
+      }
+
+      /**
+       * \brief Returns a reference to an index set.
+       *
+       * \tparam cell_dim_
+       * The dimension of the entity whose index set is to be returned.
+       *
+       * \tparam face_dim_
+       * The dimension of the face that the index set refers to.
+       *
+       * \returns
+       * A reference to the index set.
+       */
+      template<
+        int cell_dim_,
+        int face_dim_>
+      StructIndexSet<shape_dim_, cell_dim_, face_dim_> get_index_set() const
+      {
+        CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">()");
+        return StructIndexSet<shape_dim_, cell_dim_, face_dim_>(_num_slices);
       }
 
       /**
