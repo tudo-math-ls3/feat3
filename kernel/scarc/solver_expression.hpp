@@ -153,6 +153,14 @@ namespace FEAST
           _id = "[" + other.cast().get_id() +"]_chunk";
         }
 
+        //no chunk generation at assignment
+        template<typename T_>
+        Vector& operator=(const VecExpr<T_>& other)
+        {
+          this->_id = other.cast().get_id();
+          return *this;
+        }
+
         std::string get_id()
         {
           return _id;
@@ -260,7 +268,7 @@ namespace FEAST
         template<typename T_>
         Scalar(ScalExpr<T_> const& other)
         {
-          _id = "[" + other.cast().get_id() +"]_chunk";
+          _id = "[" + other.cast().get_id() +"]_fraction";
         }
 
         std::string get_id()
@@ -404,6 +412,29 @@ namespace FEAST
           const T1_& _left;
     };
 
+    template<typename T1_>
+    class ScalSynch : public ScalExpr<ScalSynch<T1_> >
+    {
+      public:
+        ScalSynch(const ScalExpr<T1_>& l) :
+          _left(l.cast())
+        {
+        }
+
+        std::string get_id()
+        {
+          return "SYNCHSCAL(" + _left.cast().get_id() + ")";
+        }
+
+        const std::string get_id() const
+        {
+          return "SYNCHSCAL(" + _left.cast().get_id() + ")";
+        }
+
+      private:
+          const T1_& _left;
+    };
+
     template<typename T_>
     class VecPreconApply : public VecExpr<VecPreconApply<T_> >
     {
@@ -453,10 +484,35 @@ namespace FEAST
     };
 
     template<typename T1_, typename T2_>
+    class ScalDiv : public ScalExpr<ScalDiv<T1_, T2_> >
+    {
+      public:
+        ScalDiv(const ScalExpr<T1_>& l, const ScalExpr<T2_>& r) :
+          _left(l.cast()),
+          _right(r.cast())
+        {
+        }
+
+        std::string get_id()
+        {
+          return _left.cast().get_id() + " / " + _right.cast().get_id();
+        }
+
+        const std::string get_id() const
+        {
+          return _left.cast().get_id() + " / " + _right.cast().get_id();
+        }
+
+      private:
+          const T1_& _left;
+          const T2_& _right;
+    };
+
+    template<typename T1_, typename T2_>
     class BoolLess : public BoolExpr<BoolLess<T1_, T2_> >
     {
       public:
-        BoolLess(const BoolExpr<T1_>& l, const BoolExpr<T2_>& r) :
+        BoolLess(const ScalExpr<T1_>& l, const ScalExpr<T2_>& r) :
           _left(l.cast()),
           _right(r.cast())
         {
@@ -567,6 +623,12 @@ namespace FEAST
       return ScalSum<T1_, T2_>(l, r);
     }
 
+    template<typename T1_, typename T2_>
+    ScalDiv<T1_, T2_> operator/(const ScalExpr<T1_>& l, const ScalExpr<T2_>& r)
+    {
+      return ScalDiv<T1_, T2_>(l, r);
+    }
+
     template<typename T1_>
     NormVec<T1_> normvec_expr(const VecExpr<T1_>& l)
     {
@@ -579,8 +641,14 @@ namespace FEAST
       return VecSynch<T1_>(l);
     }
 
+    template<typename T1_>
+    ScalSynch<T1_> scal_synch_expr(const ScalExpr<T1_>& l)
+    {
+      return ScalSynch<T1_>(l);
+    }
+
     template<typename T1_, typename T2_>
-    BoolLess<T1_, T2_> operator<(const BoolExpr<T1_>& l, const BoolExpr<T2_>& r)
+    BoolLess<T1_, T2_> operator<(const ScalExpr<T1_>& l, const ScalExpr<T2_>& r)
     {
       return BoolLess<T1_, T2_>(l, r);
     }
