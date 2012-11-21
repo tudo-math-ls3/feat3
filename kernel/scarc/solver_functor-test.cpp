@@ -7,6 +7,8 @@
 #include<deque>
 
 using namespace FEAST;
+using namespace FEAST::LAFEM;
+using namespace FEAST::ScaRC;
 using namespace FEAST::TestSystem;
 
 
@@ -22,52 +24,23 @@ class SolverFunctorTest:
 
     virtual void run() const
     {
-      //-----------------------------------
-      //create layer n-1
-      std::shared_ptr<ScaRC::MatrixData> A(new ScaRC::MatrixData);
-      std::shared_ptr<ScaRC::VectorData> b(new ScaRC::VectorData);
-      std::shared_ptr<ScaRC::VectorData> x(new ScaRC::VectorData);
+      SparseMatrixCOO<Tag_, DataType_> T(1000, 1000);
 
-      std::shared_ptr<FunctorBase> pr(new ScaRC::ProxyDefect<ScaRC::VectorData, ScaRC::MatrixData, ScaRC::VectorData>(b, A, x));
-      std::shared_ptr<ScaRC::ProxyPreconApply> p(new ScaRC::ProxyPreconApply(pr));
+      for(Index i(0) ; i < 1000 ; ++i)
+        T(i, i, DataType_(1));
 
-      std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x, p));
+      SparseMatrixCSR<Tag_, DataType_> A(T);
+      DenseVector<Tag_, DataType_> b(1000, DataType_(2));
+      DenseVector<Tag_, DataType_> x(1000, DataType_(1));
+      DenseVector<Tag_, DataType_> c(1000);
+      DenseVector<Tag_, DataType_> d(1000);
 
-      TEST_CHECK_EQUAL(richardson.get()->type_name(), "[VectorData no_id] + [PRECON([DEFECT([VectorData no_id],[MatrixData no_id],[VectorData no_id])])]");
+      DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > f(d, b, A, x);
+      f.execute();
 
-      //create layer 0
-      std::shared_ptr<ScaRC::MatrixData> A1(new ScaRC::MatrixData);
-      std::shared_ptr<ScaRC::VectorData> b1(new ScaRC::VectorData);
-      std::shared_ptr<ScaRC::VectorData> x1(new ScaRC::VectorData);
+      Defect<Algo::Generic>::value(c, b, A, x);
 
-      ///only in case, where the master layer is created last, we need to reinterpret the shared ptr because we MUST use its copy-ctor
-      std::shared_ptr<FunctorBase> pr1(*(reinterpret_cast<std::shared_ptr<FunctorBase>* >(&richardson)));
-
-      std::shared_ptr<ScaRC::ProxyPreconApply> p1(new ScaRC::ProxyPreconApply(pr1));
-
-      std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson1(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x1, p1));
-
-      TEST_CHECK_EQUAL(richardson1.get()->type_name(), "[VectorData no_id] + [PRECON([VectorData no_id] + [PRECON([DEFECT([VectorData no_id],[MatrixData no_id],[VectorData no_id])])])]");
-
-      //----------------------------------
-      //create layer 0
-      ///this is the common case
-      std::shared_ptr<ScaRC::MatrixData> A2(new ScaRC::MatrixData);
-      std::shared_ptr<ScaRC::VectorData> b2(new ScaRC::VectorData);
-      std::shared_ptr<ScaRC::VectorData> x2(new ScaRC::VectorData);
-
-      std::shared_ptr<ScaRC::ProxyPreconApply> p2(new ScaRC::ProxyPreconApply);
-
-      std::shared_ptr<ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply> > richardson2(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p2));
-
-      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "[VectorData no_id] + [PRECON([__UNINITIALIZED_PRECONDITIONER_APPLICATION__()])]");
-
-      //create layer n-1
-      std::shared_ptr<FunctorBase> pr2(new ScaRC::ProxyDefect<ScaRC::VectorData, ScaRC::MatrixData, ScaRC::VectorData>(b2, A2, x2));
-      std::shared_ptr<ScaRC::ProxyPreconApply> p3(new ScaRC::ProxyPreconApply(pr2));
-
-      p2.get()->get() = std::shared_ptr<FunctorBase>(new ScaRC::ProxyVectorSum<ScaRC::VectorData, ScaRC::ProxyPreconApply>(x2, p3));
-      TEST_CHECK_EQUAL(richardson2.get()->type_name(), "[VectorData no_id] + [PRECON([VectorData no_id] + [PRECON([DEFECT([VectorData no_id],[MatrixData no_id],[VectorData no_id])])])]");
+      TEST_CHECK_EQUAL(d, c);
     }
 };
 SolverFunctorTest<Mem::Main, double> sf_cpu_double("StorageType: std::vector, DataType: double");

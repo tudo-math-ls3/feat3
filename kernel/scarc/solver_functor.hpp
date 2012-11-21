@@ -3,9 +3,9 @@
 #define SCARC_GUARD_SOLVER_FUNCTOR_HH 1
 
 #include<kernel/base_header.hpp>
+#include<kernel/scarc/scarc_error.hpp>
 #include<kernel/foundation/functor.hpp>
-#include<kernel/scarc/matrix.hpp>
-#include<kernel/scarc/vector.hpp>
+#include<kernel/lafem/defect.hpp>
 
 using namespace FEAST::Foundation;
 using namespace FEAST;
@@ -14,436 +14,59 @@ namespace FEAST
 {
   namespace ScaRC
   {
-    template<typename T_>
-    class ProxyMatrix : public FunctorBase
+    template<typename Algo_, typename VT_, typename MT_>
+    class DefectFunctor : public FunctorBase
     {
       public:
-        ProxyMatrix()
+        DefectFunctor(VT_& d, const VT_& b, const MT_& A, const VT_& x) :
+          _d(d),
+          _b(b),
+          _A(A),
+          _x(x)
         {
-        }
-
-        T_& cast()
-        {
-          return static_cast<T_&>(*this);
-        }
-
-        const T_& cast() const
-        {
-          return static_cast<const T_&>(*this);
         }
 
         virtual const std::string type_name()
         {
-          return "[ProxyMatrix]";
+          return "DefectFunctor";
         }
 
         virtual void execute()
         {
+          LAFEM::Defect<Algo_>::value(_d, _b, _A, _x);
         }
 
         virtual void undo()
         {
+          throw ScaRCError("Error: Numerical functors can not be undone!");
         }
 
-        ProxyMatrix& operator=(const ProxyMatrix& rhs)
+        DefectFunctor& operator=(const DefectFunctor& rhs)
         {
           if(this == &rhs)
             return *this;
 
+          this->_d = rhs._d;
+          this->_b = rhs._b;
+          this->_A = rhs._A;
+          this->_x = rhs._x;
           return *this;
         }
 
-        ProxyMatrix(const ProxyMatrix& other)
-        {
-        }
-    };
-
-    class MatrixData : public ProxyMatrix<MatrixData>
-    {
-      public:
-        MatrixData() :
-          _id("no_id")
-        {
-        }
-
-        MatrixData(const std::string id) :
-          _id(id)
-        {
-        }
-
-        virtual const std::string type_name()
-        {
-          return "[MatrixData " + _id + "]";
-        }
-
-      private:
-        const std::string _id;
-    };
-
-    template<typename T_>
-    class ProxyVector : public FunctorBase
-    {
-      public:
-        ProxyVector()
-        {
-        }
-
-        T_& cast()
-        {
-          return static_cast<T_&>(*this);
-        }
-
-        const T_& cast() const
-        {
-          return static_cast<const T_&>(*this);
-        }
-
-        virtual const std::string type_name()
-        {
-          return "[ProxyVector]";
-        }
-
-        virtual void execute()
-        {
-        }
-
-        virtual void undo()
-        {
-        }
-
-        ProxyVector& operator=(const ProxyVector& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          return *this;
-        }
-
-        ProxyVector(const ProxyVector& other)
-        {
-        }
-    };
-
-    class VectorData : public ProxyVector<VectorData>
-    {
-      public:
-        VectorData() :
-          _id("no_id")
-        {
-        }
-
-        VectorData(const std::string id) :
-          _id(id)
-        {
-        }
-
-        virtual const std::string type_name()
-        {
-          return "[VectorData " + _id + "]";
-        }
-
-      private:
-        const std::string _id;
-    };
-
-
-    template<typename T1_, typename T2_>
-    class ProxyVectorSum : public ProxyVector<ProxyVectorSum<T1_, T2_> >
-    {
-      public:
-        ProxyVectorSum(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& right) :
-          _left(left),
-          _right(right)
-        {
-        }
-
-        ProxyVectorSum& operator=(const ProxyVectorSum& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          this->_left = rhs._left;
-          this->_right = rhs._right;
-
-          return *this;
-        }
-
-        ProxyVectorSum(const ProxyVectorSum& other) :
-          _left(other._left),
-          _right(other._right)
-        {
-        }
-
-        const std::string type_name()
-        {
-          return _left.get()->cast().type_name() + " + " + _right.get()->cast().type_name();
-        }
-
-      private:
-        std::shared_ptr<T1_> _left;
-        std::shared_ptr<T2_> _right;
-    };
-
-    class UninitializedProxyPreconApply : public ProxyVector<UninitializedProxyPreconApply >
-    {
-      public:
-        UninitializedProxyPreconApply()
-        {
-        }
-
-        UninitializedProxyPreconApply& operator=(const UninitializedProxyPreconApply& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          return *this;
-        }
-
-        UninitializedProxyPreconApply(const UninitializedProxyPreconApply& other)
-        {
-        }
-
-        virtual const std::string type_name()
-        {
-          return "[__UNINITIALIZED_PRECONDITIONER_APPLICATION__()]";
-        }
-    };
-
-    class ProxyPreconApply : public ProxyVector<ProxyPreconApply>
-    {
-      public:
-        ProxyPreconApply() :
-          _right(std::shared_ptr<FunctorBase>(new UninitializedProxyPreconApply()))
-        {
-        }
-
-        ProxyPreconApply(std::shared_ptr<FunctorBase>& right) :
-          _right(right)
-        {
-        }
-
-        ProxyPreconApply& operator=(const ProxyPreconApply& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          this->_right = rhs._right;
-
-          return *this;
-        }
-
-        ProxyPreconApply(const ProxyPreconApply& other) :
-          _right(other._right)
-        {
-        }
-
-        virtual const std::string type_name()
-        {
-          return "[PRECON(" + _right.get()->type_name() + ")]";
-        }
-
-        std::shared_ptr<FunctorBase>& get()
-        {
-          return _right;
-        }
-
-        const std::shared_ptr<FunctorBase>& get() const
-        {
-          return _right;
-        }
-
-      private:
-        std::shared_ptr<FunctorBase> _right;
-    };
-
-
-    template<typename T1_, typename T2_, typename T3_>
-    class ProxyDefect : public ProxyVector<ProxyDefect<T1_, T2_, T3_> >
-    {
-      public:
-        ProxyDefect(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& middle, std::shared_ptr<T3_>& right) :
-          _left(left),
-          _middle(middle),
-          _right(right)
-        {
-        }
-
-        ProxyDefect& operator=(const ProxyDefect& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          this->_left = rhs._left;
-          this->_middle = rhs._middle;
-          this->_right = rhs._right;
-
-          return *this;
-        }
-
-        ProxyDefect(const ProxyDefect& other) :
-          _left(other._left),
-          _middle(other._middle),
-          _right(other._right)
-        {
-        }
-
-        virtual const std::string type_name()
-        {
-          return "[DEFECT(" + _left.get()->cast().type_name() + "," + _middle.get()->cast().type_name() + "," + _right.get()->cast().type_name() + ")]";
-        }
-
-      private:
-        std::shared_ptr<T1_> _left;
-        std::shared_ptr<T2_> _middle;
-        std::shared_ptr<T3_> _right;
-    };
-
-    template<typename T1_, typename T2_>
-    class ProxyMatrixVectorProduct : public ProxyVector<ProxyMatrixVectorProduct<T1_, T2_> >
-    {
-      public:
-        ProxyMatrixVectorProduct(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& right) :
-          _left(left),
-          _right(right)
-        {
-        }
-
-        ProxyMatrixVectorProduct& operator=(const ProxyMatrixVectorProduct& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          this->_left = rhs._left;
-          this->_right = rhs._right;
-
-          return *this;
-        }
-
-        ProxyMatrixVectorProduct(const ProxyMatrixVectorProduct& other) :
-          _left(other._left),
-          _right(other._right)
-        {
-        }
-
-        const std::string type_name()
-        {
-          return _left.get()->cast().type_name() + " * " + _right.get()->cast().type_name();
-        }
-
-      private:
-        std::shared_ptr<T1_> _left;
-        std::shared_ptr<T2_> _right;
-    };
-
-    template<typename T1_, typename T2_, typename T3_, typename T4_>
-    class ProxyRichardson : public ProxyVector<ProxyRichardson<T1_, T2_, T3_, T4_> >
-    {
-      public:
-        ProxyRichardson(std::shared_ptr<T1_>& left, std::shared_ptr<T2_>& middle, std::shared_ptr<T3_>& right, std::shared_ptr<T4_>& farright) :
-          _left(left),
-          _middle(middle),
-          _right(right),
-          _farright(farright)
-
-        {
-        }
-
-        ProxyRichardson& operator=(const ProxyRichardson& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          this->_left = rhs._left;
-          this->_middle = rhs._middle;
-          this->_right = rhs._right;
-          this->_farright = rhs._farright;
-
-          return *this;
-        }
-
-        ProxyRichardson(const ProxyRichardson& other) :
-          _left(other._left),
-          _middle(other._middle),
-          _right(other._right),
-          _farright(other._farright)
-        {
-        }
-
-        const std::string type_name()
-        {
-          return "[RICHARDSON("
-            + _left.get()->cast().type_name() + ", "
-            + _middle.get()->cast().type_name() + ", "
-            + _right.get()->cast().type_name() + ", "
-            + _farright.get()->cast().type_name() + ")]";
-        }
-
-      private:
-        std::shared_ptr<T1_> _left;
-        std::shared_ptr<T2_> _middle;
-        std::shared_ptr<T3_> _right;
-        std::shared_ptr<T4_> _farright;
-    };
-
-    /*template<
-      template<typename, typename> class StorageType_ = std::vector
-    >
-    class SolverProxyFunctor : public FunctorBase
-    {
-      public:
-        SolverProxyFunctor(CompoundFunctor<StorageType_>& pattern) :
-          _pattern(pattern),
-        {
-        }
-
-        virtual const std::string type_name()
-        {
-          return "SolverProxyFunctor";
-        }
-
-        virtual void execute()
-        {
-        }
-
-        virtual void undo()
-        {
-        }
-
-        SolverProxyFunctor& operator=(const SolverProxyFunctor& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          this->_pattern = rhs._pattern;
-
-          return *this;
-        }
-
-        SolverProxyFunctor(const SolverProxyFunctor& other) :
-          _pattern(other._pattern),
+        DefectFunctor(const DefectFunctor& other) :
+          _d(other._d),
+          _b(other._b),
+          _A(other._A),
+          _x(other._x)
         {
         }
 
       private:
-        CompoundFunctor<StorageType_> _pattern;
-    };*/
-
-/*
-    template<
-      typename DT_ = double,
-      template<typename, typename> class StorageType_ = std::vector,
-      typename MT_ = DynamicAOSMatrix<StorageType_>,
-      typename DT_ = DynamicVector<StorageType_>,
-      typename IndexType_ = Index
-    >
-    class OpFunctor
-    {
-      private:
-        std::shared_ptr<FunctorBase> _preconditioner_functor;
-        std::shared_ptr<MT_> _A;
-        std::shared_ptr<VT_> _x;
-        std::shared_ptr<VT_> _b;
-    } */
+        VT_& _d;
+        const VT_& _b;
+        const MT_& _A;
+        const VT_& _x;
+    };
   }
 }
 
