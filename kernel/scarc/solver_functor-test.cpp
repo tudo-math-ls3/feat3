@@ -32,14 +32,25 @@ class SolverFunctorTest:
       SparseMatrixCSR<Tag_, DataType_> A(T);
       DenseVector<Tag_, DataType_> b(1000, DataType_(2));
       DenseVector<Tag_, DataType_> x(1000, DataType_(1));
-      DenseVector<Tag_, DataType_> c(1000);
       DenseVector<Tag_, DataType_> d(1000);
+
+      //reference solution
+      DenseVector<Tag_, DataType_> c(1000);
+      Defect<Algo::Generic>::value(c, b, A, x);
 
       DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > f(d, b, A, x);
       f.execute();
 
-      Defect<Algo::Generic>::value(c, b, A, x);
+      TEST_CHECK_EQUAL(d, c);
 
+      //----------------------------------------------------------------------------------------------------------
+
+      DenseVector<Tag_, DataType_> dn(1000);
+      CompoundFunctor<> cf;
+      cf.add_functor(new DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
+      cf.add_functor(new DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
+      cf.add_functor(new DefectFunctor<Algo::Generic, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
+      cf.execute();
       TEST_CHECK_EQUAL(d, c);
     }
 };
