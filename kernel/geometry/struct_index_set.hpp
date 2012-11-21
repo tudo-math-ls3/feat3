@@ -79,7 +79,7 @@ namespace FEAST
         /** \copydoc Adjactor::ImageIterator::operator++() */
         ImageIterator& operator++()
         {
-          ++j;
+          ++_j;
           return *this;
         }
 
@@ -183,14 +183,14 @@ namespace FEAST
       ImageIterator image_begin(Index domain_node) const
       {
         ASSERT_(domain_node < _num_entities);
-        return ImageIterator(_num_slices, domain_node_, 0);
+        return ImageIterator(_num_slices, domain_node, 0);
       }
 
       /** \copydoc Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
         ASSERT_(domain_node < _num_entities);
-        return ImageIterator(_num_slices, domain_node_, num_indices);
+        return ImageIterator(_num_slices, domain_node, num_indices);
       }
     }; // class StructIndexSet<...>
 
