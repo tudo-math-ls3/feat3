@@ -63,9 +63,6 @@ namespace FEAST
         /// facet-index-set type
         typedef typename MeshType::template IndexSet<2,1>::Type FacetIndexSetType;
 
-        /// facet-index-vector type
-        typedef typename FacetIndexSetType::IndexVectorType FacetIndexVectorType;
-
         /// data type
         typedef typename SpaceEvalTraits::DataType DataType;
 
@@ -181,9 +178,6 @@ namespace FEAST
           // fetch the cell index of the currently active cell
           const Index cell = trafo_eval.get_cell_index();
 
-          // fetch the facet-index-vector of the currently active cell
-          const FacetIndexVectorType& facets = facet_index_set[cell];
-
           // create a nodal matrix
           CoeffMatrixType _nodal_mat(DataType(0));
 
@@ -202,7 +196,7 @@ namespace FEAST
           for(int i(0); i < 4; ++i)
           {
             // initialise facet evaluator
-            facet_eval.prepare(facets[i]);
+            facet_eval.prepare(facet_index_set(cell, i));
 
             // map first cubature point
             facet_data(facet_eval, g1);

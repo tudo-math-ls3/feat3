@@ -169,6 +169,37 @@ namespace FEAST
       }
 
       /**
+       * \brief Maps a face index.
+       *
+       * \param[in] i
+       * The index of the entity whose face index is to be returned.
+       *
+       * \param[in] j
+       * The index of the local face that is to be mapped.
+       *
+       * \returns
+       * A (const) reference to the index of the local face \p j on entity \p i.
+       */
+      Index& operator()(Index i, Index j)
+      {
+        CONTEXT(name() + "::operator()()");
+        ASSERT_(_indices != nullptr);
+        ASSERT_(i < _num_entities);
+        ASSERT_(j < num_indices);
+        return _indices[i][j];
+      }
+
+      /** \copydoc operator()() */
+      const Index& operator()(Index i, Index j) const
+      {
+        CONTEXT(name() + "::operator()()");
+        ASSERT_(_indices != nullptr);
+        ASSERT_(i < _num_entities);
+        ASSERT_(j < num_indices);
+        return _indices[i][j];
+      }
+
+      /**
        * \brief Sets the index bound.
        *
        * \param[in] bound

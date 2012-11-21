@@ -126,13 +126,10 @@ namespace FEAST
           typedef typename MeshType::template IndexSet<domain_dim, 0>::Type IndexSetType;
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
-          // fetch the index vector for the cell
-          typename IndexSetType::ConstIndexVectorReference idx = index_set[cell_index];
-
           // fetch the vertices of the edge
           typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[idx[0]];
-          ConstVertexReference v1 = vertex_set[idx[1]];
+          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
+          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
@@ -282,15 +279,12 @@ namespace FEAST
           typedef typename MeshType::template IndexSet<domain_dim, 0>::Type IndexSetType;
           const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
 
-          // fetch the index vector for the cell
-          typename IndexSetType::ConstIndexVectorReference idx = index_set[cell_index];
-
           // fetch the vertices of the edge
           typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
-          ConstVertexReference v0 = vertex_set[idx[0]];
-          ConstVertexReference v1 = vertex_set[idx[1]];
-          ConstVertexReference v2 = vertex_set[idx[2]];
-          ConstVertexReference v3 = vertex_set[idx[3]];
+          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
+          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
+          ConstVertexReference v2 = vertex_set[index_set(cell_index, 2)];
+          ConstVertexReference v3 = vertex_set[index_set(cell_index, 3)];
 
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
