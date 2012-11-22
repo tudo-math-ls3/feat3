@@ -282,7 +282,7 @@ namespace FEAST
         ///implementation of ApplicableAsPrecon interface
         virtual ProductFunctor<Algo_, VT_, MT_> substitute(VT_& arg)
         {
-          return ProductFunctor<Algo_, VT_, MT_>(_y, _A, arg);
+          return ProductFunctor<Algo_, VT_, MT_>(arg, _A, arg);
         }
 
       private:

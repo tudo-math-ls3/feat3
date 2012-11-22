@@ -66,7 +66,7 @@ class SolverFunctorTest:
 
       ///bring up precon
       DenseVector<Tag_, DataType_> dummy;
-      ProductFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > precon(dn, A, dummy);
+      ProductFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > precon(dummy, A, dummy);
       ///substitute
       cf.substitute_first(precon);
       cf.execute();
