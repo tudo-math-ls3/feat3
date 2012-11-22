@@ -280,7 +280,7 @@ namespace FEAST
           this->_executed = other._executed;
         }
 
-      private:
+      protected:
         storage_type_ _functors;
     };
   }

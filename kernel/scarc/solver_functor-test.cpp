@@ -49,13 +49,21 @@ class SolverFunctorTest:
       //----------------------------------------------------------------------------------------------------------
 
       DenseVector<Tag_, DataType_> dn(1000);
-      CompoundFunctor<> cf;
+      CompoundSolverFunctor<> cf;
       cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
       cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
       cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
       cf.add_functor(new SumFunctor<Algo_, DenseVector<Tag_, DataType_> >(dn, dn, dn));
       cf.execute();
       TEST_CHECK_EQUAL(d, c);
+
+      cf.add_functor(new ProxyPreconApplyFunctor<DenseVector<Tag_, DataType_> >(dn));
+
+      ///execution may not work before subsitution
+      TEST_CHECK_THROWS(cf.execute(), ScaRCError);
+
+      ///bring up a 'preconditioner'
+
     }
 };
 SolverFunctorTest<Mem::Main, Algo::Generic, double> sf_cpu_double("StorageType: std::vector, DataType: double");

@@ -15,6 +15,82 @@ namespace FEAST
 {
   namespace ScaRC
   {
+
+    template<template<typename, typename> class StorageType_ = std::vector>
+    class CompoundSolverFunctor : public CompoundFunctor<StorageType_>
+    {
+      public:
+        ///overwrite execute and undo functions
+        virtual void execute()
+        {
+          for(Index i(0) ; i < (this->_functors).size() ; ++i)
+          {
+            (this->_functors).at(i)->execute();
+          }
+        }
+
+        virtual void undo()
+        {
+          throw ScaRCError("Error: Numerical functor lists can not be undone!");
+        }
+
+        ///substitute first ProxyPreconApplyFunctor by new_precon
+        template<template<typename, typename> class StorageTypeOther_>
+        void substitute_precon(std::shared_ptr<CompoundSolverFunctor<StorageTypeOther_> >& new_precon)
+        {
+          for(Index i(0) ; i < (this->_functors).size() ; ++i)
+          {
+            if( (this->_functors).at(i)->type_name() == "ProxyPreconApplyFunctor")
+              (this->_functors).at(i) = new_precon;
+          }
+
+          throw ScaRCError("Error: No ProxyPreconApplyFunctor in functor list!");
+        }
+    };
+
+    template<typename VT_>
+    class ProxyPreconApplyFunctor : public FunctorBase
+    {
+      public:
+        ProxyPreconApplyFunctor(VT_& x) :
+          _x(x)
+        {
+        }
+
+        virtual const std::string type_name()
+        {
+          return "ProxyPreconApplyFunctor";
+        }
+
+        virtual void execute()
+        {
+          throw ScaRCError("Error: Proxy functors can not be executed - substitute first!");
+        }
+
+        virtual void undo()
+        {
+          throw ScaRCError("Error: Numerical functors can not be undone!");
+        }
+
+        ProxyPreconApplyFunctor& operator=(const ProxyPreconApplyFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_x = rhs._x;
+          return *this;
+        }
+
+        ProxyPreconApplyFunctor(const ProxyPreconApplyFunctor& other) :
+          _x(other._x)
+        {
+        }
+
+      private:
+        ///apply preconditioner to what?
+        VT_& _x;
+    };
+
     template<typename Algo_, typename VT_, typename MT_>
     class DefectFunctor : public FunctorBase
     {
