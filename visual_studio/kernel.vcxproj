@@ -602,6 +602,7 @@
     <ClInclude Include="..\kernel\lafem\scale.hpp" />
     <ClInclude Include="..\kernel\lafem\sparse_matrix_coo.hpp" />
     <ClInclude Include="..\kernel\lafem\sparse_matrix_csr.hpp" />
+    <ClInclude Include="..\kernel\lafem\sparse_matrix_ell.hpp" />
     <ClInclude Include="..\kernel\lafem\sum.hpp" />
     <ClInclude Include="..\kernel\lafem\transposition.hpp" />
     <ClInclude Include="..\kernel\lafem\unit_filter.hpp" />

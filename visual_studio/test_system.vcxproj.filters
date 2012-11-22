@@ -250,5 +250,8 @@
     <ClCompile Include="..\kernel\util\colouring-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\lafem\sparse_matrix_ell-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -472,6 +472,7 @@
     <ClCompile Include="..\kernel\lafem\scale-test.cpp" />
     <ClCompile Include="..\kernel\lafem\sparse_matrix_coo-test.cpp" />
     <ClCompile Include="..\kernel\lafem\sparse_matrix_csr-test.cpp" />
+    <ClCompile Include="..\kernel\lafem\sparse_matrix_ell-test.cpp" />
     <ClCompile Include="..\kernel\lafem\sum-test.cpp" />
     <ClCompile Include="..\kernel\lafem\transposition-test.cpp" />
     <ClCompile Include="..\kernel\shape-test.cpp" />
