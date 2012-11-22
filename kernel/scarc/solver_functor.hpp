@@ -6,6 +6,7 @@
 #include<kernel/scarc/scarc_error.hpp>
 #include<kernel/foundation/functor.hpp>
 #include<kernel/lafem/defect.hpp>
+#include<kernel/lafem/sum.hpp>
 
 using namespace FEAST::Foundation;
 using namespace FEAST;
@@ -66,6 +67,57 @@ namespace FEAST
         const VT_& _b;
         const MT_& _A;
         const VT_& _x;
+    };
+
+
+    template<typename Algo_, typename VT_>
+    class SumFunctor : public FunctorBase
+    {
+      public:
+        SumFunctor(VT_& y, const VT_& r, const VT_& l) :
+          _y(y),
+          _r(r),
+          _l(l)
+        {
+        }
+
+        virtual const std::string type_name()
+        {
+          return "SumFunctor";
+        }
+
+        virtual void execute()
+        {
+          LAFEM::Sum<Algo_>::value(_y, _r, _l);
+        }
+
+        virtual void undo()
+        {
+          throw ScaRCError("Error: Numerical functors can not be undone!");
+        }
+
+        SumFunctor& operator=(const SumFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_r = rhs._r;
+          this->_l = rhs._l;
+          return *this;
+        }
+
+        SumFunctor(const SumFunctor& other) :
+          _y(other._y),
+          _r(other._r),
+          _l(other._l)
+        {
+        }
+
+      private:
+        VT_& _y;
+        const VT_& _r;
+        const VT_& _l;
     };
   }
 }

@@ -37,9 +37,12 @@ class SolverFunctorTest:
       //reference solution
       DenseVector<Tag_, DataType_> c(1000);
       Defect<Algo_>::value(c, b, A, x);
+      Sum<Algo_>::value(c, c, c);
 
       DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > f(d, b, A, x);
+      SumFunctor<Algo_, DenseVector<Tag_, DataType_> > f1(d, d, d);
       f.execute();
+      f1.execute();
 
       TEST_CHECK_EQUAL(d, c);
 
@@ -50,6 +53,7 @@ class SolverFunctorTest:
       cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
       cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
       cf.add_functor(new DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> >(dn, b, A, x));
+      cf.add_functor(new SumFunctor<Algo_, DenseVector<Tag_, DataType_> >(dn, dn, dn));
       cf.execute();
       TEST_CHECK_EQUAL(d, c);
     }
