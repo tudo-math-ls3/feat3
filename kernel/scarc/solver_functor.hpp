@@ -16,6 +16,18 @@ namespace FEAST
 {
   namespace ScaRC
   {
+    ///ApplicableAsPrecon interface
+    template<typename MyFunctorType_, typename VT_>
+    class ApplicableAsPrecon
+    {
+      public:
+        ///needed in substitution of CSF
+        typedef VT_ vector_type_;
+
+        ///named copy-CTOR
+        virtual MyFunctorType_ substitute(VT_& arg) = 0;
+    };
+
 
     template<typename VT_>
     class ProxyPreconApplyFunctor : public FunctorBase
@@ -78,6 +90,11 @@ namespace FEAST
           }
         }
 
+        virtual const std::string type_name()
+        {
+          return "CompoundSolverFunctor";
+        }
+
         virtual void undo()
         {
           throw ScaRCError("Error: Numerical functor lists can not be undone!");
@@ -85,14 +102,27 @@ namespace FEAST
 
         ///substitute first ProxyPreconApplyFunctor by new_precon
         template<typename T_>
-        void substitute_precon(T_& new_precon)
+        void substitute_first(T_& new_precon)
         {
-          for(Index i(0) ; i < (this->_functors).size() ; ++i)
+          if(new_precon.type_name() == "CompoundSolverFunctor")
           {
-            if( (this->_functors).at(i)->type_name() == "ProxyPreconApplyFunctor")
+            for(Index i(0) ; i < (this->_functors).size() ; ++i)
             {
-              (this->_functors).at(i) = std::shared_ptr<FunctorBase>(new T_(new_precon.substitute(((ProxyPreconApplyFunctor<typename T_::vector_type_>*)(this->_functors.at(i).get()))->get_argument())));
-              return;
+              if( (this->_functors).at(i)->type_name() == "ProxyPreconApplyFunctor")
+              {
+                ///TODO
+              }
+            }
+          }
+          else
+          {
+            for(Index i(0) ; i < (this->_functors).size() ; ++i)
+            {
+              if( (this->_functors).at(i)->type_name() == "ProxyPreconApplyFunctor")
+              {
+                (this->_functors).at(i) = std::shared_ptr<FunctorBase>(new T_(new_precon.substitute(((ProxyPreconApplyFunctor<typename T_::vector_type_>*)(this->_functors.at(i).get()))->get_argument())));
+                return;
+              }
             }
           }
           throw ScaRCError("Error: No ProxyPreconApplyFunctor in functor list!");
@@ -204,20 +234,9 @@ namespace FEAST
         const VT_& _l;
     };
 
-    ///PreconApplicable interface
-    template<typename MyFunctorType_, typename VT_>
-    class PreconApplicable
-    {
-      public:
-        typedef VT_ vector_type_;
-
-        ///named copy-CTOR
-        virtual MyFunctorType_ substitute(VT_& arg) = 0;
-    };
-
 
     template<typename Algo_, typename VT_, typename MT_>
-    class ProductFunctor : public FunctorBase, public PreconApplicable<ProductFunctor<Algo_, VT_, MT_>, VT_>
+    class ProductFunctor : public FunctorBase, public ApplicableAsPrecon<ProductFunctor<Algo_, VT_, MT_>, VT_>
     {
       public:
         ProductFunctor(VT_& y, const MT_& A, const VT_& x) :
@@ -260,7 +279,7 @@ namespace FEAST
         {
         }
 
-        ///implementation of PreconApplicable interface
+        ///implementation of ApplicableAsPrecon interface
         virtual ProductFunctor<Algo_, VT_, MT_> substitute(VT_& arg)
         {
           return ProductFunctor<Algo_, VT_, MT_>(_y, _A, arg);
