@@ -472,7 +472,7 @@ namespace FEAST
          *
          * \returns Stride.
          */
-        const DT_ stride() const
+        const Index stride() const
         {
           return _stride;
         }
@@ -482,7 +482,7 @@ namespace FEAST
          *
          * \returns Columns per row count.
          */
-        const DT_ num_cols_per_row() const
+        const Index num_cols_per_row() const
         {
           return _num_cols_per_row;
         }
