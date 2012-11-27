@@ -40,7 +40,11 @@ namespace FEAST
                                                                                 Index& num_iter_storage,
                                                                                 Index max_iter)
       {
-        return std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > >(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(y, b, A, x));
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+
+        ((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get()))->add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(y, b, A, x));
+
+        return result;
       }
 
     };
