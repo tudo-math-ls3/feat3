@@ -107,6 +107,21 @@ class SolverFunctorTest:
       TEST_CHECK_EQUAL(u, u_ref);
 
       //---------------------------------------------------------------------------------------------
+
+      //testing iterate functor
+      double dummy_scalar(0);
+      Index used_iters(0);
+
+      DenseVector<Tag_, DataType_> u1(1000, DataType_(1));
+
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > innerfunc(new SumFunctor<Algo_, DenseVector<Tag_, DataType_> >(u1, u1, u1));
+      IterateFunctor<Algo_, DenseVector<Tag_, DataType_>, double> iterfunc(innerfunc, dummy_scalar, dummy_scalar, used_iters, Index(3));
+
+      iterfunc.execute();
+
+      TEST_CHECK_EQUAL(used_iters, 3);
+
+      //---------------------------------------------------------------------------------------------
       /*SparseMatrixCOO<Mem::Main, DataType_> T(1000, 1000);
 
       for(Index i(0) ; i < 1000 ; ++i)

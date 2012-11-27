@@ -484,6 +484,104 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_> > _functor;
     };
 
+    enum ComparisonOpCode
+    {
+      coc_eq = 0,
+      coc_neq,
+      coc_less,
+      coc_greater,
+      coc_leq,
+      coc_geq,
+      coc_countloop
+    };
+
+    template<typename Algo_, typename VT_, typename ST_>
+    class IterateFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        IterateFunctor(std::shared_ptr<SolverFunctorBase<VT_> >& functor,
+                       ST_& arg1,
+                       ST_& arg2,
+                       Index& count,
+                       Index max_iter = 100,
+                       ComparisonOpCode opcode = coc_countloop) :
+          _functor(functor),
+          _arg1(arg1),
+          _arg2(arg2),
+          _count(count),
+          _maxiter(max_iter),
+          _opcode(opcode)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "IterateFunctor";
+        }
+
+        virtual void execute()
+        {
+          Index count(0);
+          while(true)
+          {
+            _functor->execute();
+            ++count;
+
+            bool break_condition( _opcode == coc_eq ? (_arg1 == _arg2) :
+                                 (_opcode == coc_neq ? (_arg1 != _arg2) :
+                                 (_opcode == coc_less ? (_arg1 < _arg2) :
+                                 (_opcode == coc_greater ? (_arg1 > _arg2) :
+                                 (_opcode == coc_leq ? (_arg1 <= _arg2) :
+                                 (_opcode == coc_geq ? (_arg1 >= _arg2) :
+                                 (count == _maxiter))))))
+                                );
+            if(break_condition)
+            {
+              _count = count;
+              break;
+            }
+          }
+        }
+
+        IterateFunctor& operator=(const IterateFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_functor = rhs._functor;
+          this->_arg1 = rhs._arg1;
+          this->_arg2 = rhs._arg2;
+          this->_count = rhs._count;
+          this->_maxiter = rhs._maxiter;
+          this->_opcode = rhs._opcode;
+          return *this;
+        }
+
+        IterateFunctor(const IterateFunctor& other) :
+          _functor(other._functor),
+          _arg1(other._arg1),
+          _arg2(other._arg2),
+          _count(other._count),
+          _maxiter(other._maxiter),
+          _opcode(other._opcode)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _functor->substitute(arg);
+        }
+
+      private:
+        std::shared_ptr<SolverFunctorBase<VT_> > _functor;
+        ST_& _arg1;
+        ST_& _arg2;
+        Index& _count;
+        Index _maxiter;
+        ComparisonOpCode _opcode;
+    };
+
     template<typename Algo_, typename VT_>
     class CopyFunctor : public SolverFunctorBase<VT_>
     {
