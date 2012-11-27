@@ -642,7 +642,8 @@ namespace FEAST
             _functor->execute();
             ++count;
 
-            bool break_condition( _opcode == coc_eq ? (_arg1 == _arg2) :
+            bool break_condition(
+                                 _opcode == coc_eq ? (_arg1 == _arg2) :
                                  (_opcode == coc_neq ? (_arg1 != _arg2) :
                                  (_opcode == coc_less ? (_arg1 < _arg2) :
                                  (_opcode == coc_greater ? (_arg1 > _arg2) :
@@ -816,11 +817,6 @@ namespace FEAST
 
         CompoundSolverFunctor(const CompoundSolverFunctor& other) :
           _functors(other._functors)
-        {
-        }
-
-        template<typename OVT_>
-        void set_preconditioner(SolverFunctorBase<OVT_>* precon_func)
         {
         }
 
