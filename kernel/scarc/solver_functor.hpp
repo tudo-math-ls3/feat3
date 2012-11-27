@@ -428,6 +428,120 @@ namespace FEAST
         const VT_& _r;
     };
 
+    template<typename Algo_, typename VT_, typename MT_>
+    class DefectFunctorProxyRight : public SolverFunctorBase<VT_>
+    {
+      public:
+        DefectFunctorProxyRight(VT_& y, const VT_& l, const MT_& m, VT_& r) :
+          _y(y),
+          _l(l),
+          _m(m),
+          _r(r)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DefectFunctor";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
+
+          LAFEM::Defect<Algo_>::value(_y, _l, _m, _r);
+        }
+
+        DefectFunctorProxyRight& operator=(const DefectFunctorProxyRight& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_m = rhs._r;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DefectFunctorProxyRight(const DefectFunctorProxyRight& other) :
+          _y(other._y),
+          _l(other._l),
+          _m(other._m),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _r = arg;
+          this->_complete = true;
+        }
+
+      private:
+        VT_& _y;
+        const VT_& _l;
+        const MT_& _m;
+        VT_& _r;
+    };
+
+    template<typename Algo_, typename VT_, typename MT_>
+    class DefectFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        DefectFunctor(VT_& y, const VT_& l, const MT_& m, const VT_& r) :
+          _y(y),
+          _l(l),
+          _m(m),
+          _r(r)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DefectFunctor";
+        }
+
+        virtual void execute()
+        {
+          LAFEM::Defect<Algo_>::value(_y, _l, _m, _r);
+        }
+
+        DefectFunctor& operator=(const DefectFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_m = rhs._r;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DefectFunctor(const DefectFunctor& other) :
+          _y(other._y),
+          _l(other._l),
+          _m(other._m),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        VT_& _y;
+        const VT_& _l;
+        const MT_& _m;
+        const VT_& _r;
+    };
+
+
     template<typename Algo_, typename VT_>
     class PreconFunctor : public SolverFunctorBase<VT_>
     {

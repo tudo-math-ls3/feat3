@@ -122,6 +122,27 @@ class SolverFunctorTest:
       TEST_CHECK_EQUAL(used_iters, 3);
 
       //---------------------------------------------------------------------------------------------
+
+      //testing defect functors
+
+      DenseVector<Tag_, DataType_> vb(1000, DataType_(1)), vy(1000), vxdummy;
+      DenseVector<Tag_, DataType_> vy_ref(1000);
+
+      DefectFunctorProxyRight<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > defect(vy, vb, A, vxdummy);
+      DenseVector<Tag_, DataType_> vx(1000, DataType_(1));
+
+      TEST_CHECK_THROWS(defect.execute(), ScaRCError);
+
+      defect.substitute(vx);
+      defect.execute();
+
+      Defect<Algo_>::value(vy_ref, vb, A, vx);
+      TEST_CHECK_EQUAL(vy, vy_ref);
+
+      DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > defect1(vy, vb, A, vx);
+      TEST_CHECK_EQUAL(vy, vy_ref);
+
+      //---------------------------------------------------------------------------------------------
     }
 };
 SolverFunctorTest<Mem::Main, Algo::Generic, double> sf_cpu_double("StorageType: std::vector, DataType: double");
