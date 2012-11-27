@@ -8,6 +8,7 @@
 #include<kernel/lafem/defect.hpp>
 #include<kernel/lafem/sum.hpp>
 #include<kernel/lafem/product.hpp>
+#include<kernel/lafem/norm.hpp>
 
 using namespace FEAST::Foundation;
 using namespace FEAST;
@@ -741,6 +742,103 @@ namespace FEAST
       private:
         VT_& _y;
         const VT_& _x;
+    };
+
+    template<typename Algo_, typename VT_, typename ST_>
+    class NormFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        NormFunctor(ST_& y, const VT_& x) :
+          _y(y),
+          _x(x)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "NormFunctor";
+        }
+
+        virtual void execute()
+        {
+          LAFEM::Norm2<Algo_>(_y, _x);
+        }
+
+        NormFunctor& operator=(const NormFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_x = rhs._x;
+          return *this;
+        }
+
+        NormFunctor(const NormFunctor& other) :
+          _y(other._y),
+          _x(other._x)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        ST_& _y;
+        const VT_& _x;
+    };
+
+    template<typename Algo_, typename VT_, typename HaloStorageType_>
+    class SynchFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        SynchFunctor(VT_& y, const VT_& x, const HaloStorageType_& halos) :
+          _y(y),
+          _x(x),
+          _halos(halos)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "SynchFunctor";
+        }
+
+        virtual void execute()
+        {
+          ///TODO
+          ///Foundation::Synchronisation(_y, _x, _halos);
+        }
+
+        SynchFunctor& operator=(const SynchFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_x = rhs._x;
+          this->_halos = rhs._halos;
+          return *this;
+        }
+
+        SynchFunctor(const SynchFunctor& other) :
+          _y(other._y),
+          _x(other._x),
+          _halos(other._halos)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        VT_& _y;
+        const VT_& _x;
+        const HaloStorageType_& _halos;
     };
 
     template<typename Algo_, typename VT_, template<typename, typename> class StorageType_ = std::vector>
