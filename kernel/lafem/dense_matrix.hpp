@@ -249,7 +249,7 @@ namespace FEAST
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
-          return MemoryPool<Arch_>::get_element(_pelements, row * this->_rows + col);
+          return MemoryPool<Arch_>::get_element(_pelements, row * this->_columns + col);
         }
 
         /**
@@ -263,7 +263,7 @@ namespace FEAST
         {
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
-          MemoryPool<Arch_>::modify_element(_pelements, row * this->_rows + col, value);
+          MemoryPool<Arch_>::modify_element(_pelements, row * this->_columns + col, value);
         }
 
         /**
