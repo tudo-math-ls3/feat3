@@ -39,7 +39,7 @@ namespace FEAST
       {
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
 
-        ((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get()))->add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(y, data.stored_rhs, data.stored_sys, data.stored_sol));
+        ((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get()))->add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(y, data.stored_rhs(), data.stored_sys(), data.stored_sol()));
 
         return result;
       }

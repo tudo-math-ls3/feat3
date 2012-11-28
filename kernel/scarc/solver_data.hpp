@@ -21,27 +21,91 @@ namespace FEAST
              template<typename, typename> class StorageType_ = std::vector>
     struct SolverDataBase
     {
-      ///type exports
-      typedef VectorType_<MemTag_, DataType_> vector_type_;
-      typedef MatrixType_<MemTag_, DataType_> matrix_type_;
-      typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
-      typedef StorageType_<MatrixType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > matrix_storage_type_;
+      public:
 
-      virtual const std::string type_name() = 0;
+        ///type exports
+        typedef VectorType_<MemTag_, DataType_> vector_type_;
+        typedef MatrixType_<MemTag_, DataType_> matrix_type_;
+        typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
+        typedef StorageType_<MatrixType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > matrix_storage_type_;
 
-      ///MemTag_ memory to store matrices and vectors
-      matrix_type_ stored_sys;
-      vector_type_ stored_rhs;
-      vector_type_ stored_sol;
-      vector_storage_type_ stored_temp;
+        virtual const std::string type_name() = 0;
 
-      ///host memory to store global scalars
-      DataType_ stored_norm_0;
-      DataType_ stored_norm;
+        virtual matrix_type_& stored_sys()
+        {
+          return this->_stored_sys;
+        }
 
-      virtual ~SolverDataBase()
-      {
-      }
+        virtual const matrix_type_& stored_sys() const
+        {
+          return this->_stored_sys;
+        }
+
+        virtual vector_type_& stored_rhs()
+        {
+          return this->_stored_rhs;
+        }
+
+        virtual const vector_type_& stored_rhs() const
+        {
+          return this->_stored_rhs;
+        }
+
+        virtual vector_type_& stored_sol()
+        {
+          return this->_stored_sol;
+        }
+
+        virtual const vector_type_& stored_sol() const
+        {
+          return this->_stored_sol;
+        }
+
+        virtual vector_storage_type_& stored_temp()
+        {
+          return _stored_temp;
+        }
+
+        virtual const vector_storage_type_& stored_temp() const
+        {
+          return _stored_temp;
+        }
+
+        virtual DataType_& stored_norm_0()
+        {
+          return _stored_norm_0;
+        }
+
+        virtual const DataType_& stored_norm_0() const
+        {
+          return _stored_norm_0;
+        }
+
+        virtual DataType_& stored_norm()
+        {
+          return _stored_norm;
+        }
+
+        virtual const DataType_& stored_norm() const
+        {
+          return _stored_norm;
+        }
+
+        virtual ~SolverDataBase()
+        {
+        }
+
+      protected:
+        ///MemTag_ memory to store matrices and vectors
+        matrix_type_ _stored_sys;
+        vector_type_ _stored_rhs;
+        vector_type_ _stored_sol;
+        vector_storage_type_ _stored_temp;
+
+        ///host memory to store global scalars
+        DataType_ _stored_norm_0;
+        DataType_ _stored_norm;
+
     };
 
     ///only store data that is *referenced* by solver functors, do not store constants
@@ -67,23 +131,23 @@ namespace FEAST
                  vector_type_& b,
                  Index num_temp_vectors = 0)
       {
-        this->stored_sys = A;
-        this->stored_rhs = b;
-        this->stored_sol = x;
-        this->stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size()));
-        this->stored_norm_0 = DataType_(0);
-        this->stored_norm = DataType_(0);
+        this->_stored_sys = A;
+        this->_stored_rhs = b;
+        this->_stored_sol = x;
+        this->_stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size()));
+        this->_stored_norm_0 = DataType_(0);
+        this->_stored_norm = DataType_(0);
       }
 
       ///copy CTOR
       SolverData(const SolverData& other)
       {
-        this->stored_sys = other.stored_sys;
-        this->stored_rhs = other.stored_rhs;
-        this->stored_sol = other.stored_sol;
-        this->stored_temp = other.stored_temp;
-        this->stored_norm_0 = other.stored_norm_0;
-        this->stored_norm = other.stored_norm;
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
       }
 
       ///assignment operator overload
@@ -92,12 +156,12 @@ namespace FEAST
           if(this == &other)
             return *this;
 
-        this->stored_sys = other.stored_sys;
-        this->stored_rhs = other.stored_rhs;
-        this->stored_sol = other.stored_sol;
-        this->stored_temp = other.stored_temp;
-        this->stored_norm_0 = other.stored_norm_0;
-        this->stored_norm = other.stored_norm;
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
 
         return *this;
       }
@@ -110,12 +174,12 @@ namespace FEAST
                template<typename, typename> class StoreT_>
       SolverData(const SolverDataBase<DT_, Tag_, VT_, MT_, StoreT_>& other)
       {
-        this->stored_sys = other.stored_sys;
-        this->stored_rhs = other.stored_rhs;
-        this->stored_sol = other.stored_sol;
-        this->stored_temp = other.stored_temp;
-        this->stored_norm_0 = other.stored_norm_0;
-        this->stored_norm = other.stored_norm;
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
       }
 
     };
@@ -163,14 +227,14 @@ namespace FEAST
           if(this == &other)
             return *this;
 
-        this->stored_sys = other.stored_sys;
-        this->stored_rhs = other.stored_rhs;
-        this->stored_sol = other.stored_sol;
-        this->stored_temp = other.stored_temp;
-        this->stored_norm_0 = other.stored_norm_0;
-        this->stored_norm = other.stored_norm;
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
 
-        this->stored_prec = other.stored_prec;
+        this->stored_prec = other._stored_prec;
 
         return *this;
       }
@@ -223,14 +287,14 @@ namespace FEAST
           if(this == &other)
             return *this;
 
-        this->stored_sys = other.stored_sys;
-        this->stored_rhs = other.stored_rhs;
-        this->stored_sol = other.stored_sol;
-        this->stored_temp = other.stored_temp;
-        this->stored_norm_0 = other.stored_norm_0;
-        this->stored_norm = other.stored_norm;
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
 
-        this->stored_level_data = other.stored_level_data;
+        this->stored_level_data = other._stored_level_data;
 
         return *this;
       }
