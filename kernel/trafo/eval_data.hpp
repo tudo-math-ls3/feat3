@@ -27,13 +27,15 @@ namespace FEAST
       template<typename Evaluator_, bool need_jac_inv_>
       struct JacInvData
       {
-        void eval(typename Evaluator_::JacMatConstRef) {}
+        template<bool need_jac_mat_>
+        void eval(JacMatData<Evaluator_, need_jac_mat_>&) {}
       };
 
       template<typename Evaluator_, bool need_jac_det_>
       struct JacDetData
       {
-        void eval(typename Evaluator_::JacMatConstRef) {}
+        template<bool need_jac_mat_>
+        void eval(JacMatData<Evaluator_, need_jac_mat_>&) {}
       };
 
       template<typename Evaluator_>
@@ -74,10 +76,10 @@ namespace FEAST
         /// jacobian inverse matrix
         typename Evaluator_::JacMatType jac_inv;
 
-        void eval(typename Evaluator_::JacMatConstRef jac_mat)
+        void eval(JacMatData<Evaluator_, true>& jmd)
         {
           // invert the jacobian matrix
-          jac_inv.set_inverse(jac_mat);
+          jac_inv.set_inverse(jmd.jac_mat);
         }
       };
 
@@ -89,10 +91,10 @@ namespace FEAST
         /// jacobian determinant
         typename Evaluator_::JacDetType jac_det;
 
-        void eval(typename Evaluator_::JacMatConstRef jac_mat)
+        void eval(JacMatData<Evaluator_, true>& jmd)
         {
           // compute volume of jacobian matrix
-          jac_det = jac_mat.vol();
+          jac_det = jmd.jac_mat.vol();
         }
       };
 
@@ -176,8 +178,8 @@ namespace FEAST
         // compute other data
         ImgPointBase::eval(evaluator, dom_point);
         JacMatBase::eval(evaluator, dom_point);
-        JacInvBase::eval(JacMatBase::jac_mat);
-        JacDetBase::eval(JacMatBase::jac_mat);
+        JacInvBase::eval(static_cast<JacMatBase&>(*this));
+        JacDetBase::eval(static_cast<JacMatBase&>(*this));
       }
     }; // class EvalData<...>
   } // namespace Trafo
