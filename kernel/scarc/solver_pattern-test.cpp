@@ -32,10 +32,8 @@ class SolverPatternTest:
         T(i, i, DataType_(1));
       SparseMatrixCSR<Tag_, DataType_> A(T);
 
-      DataType_ norm_0, norm;
-      Index num_iters;
-
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(y, A, x, b, norm_0, norm, num_iters, 20));
+      SolverData<> data(A, x, b);
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(y, data, 20));
       solver->execute();
     }
 };

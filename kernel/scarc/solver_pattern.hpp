@@ -3,6 +3,7 @@
 #define SCARC_GUARD_SOLVER_PATTERN_HH 1
 
 #include<kernel/scarc/solver_functor.hpp>
+#include<kernel/scarc/solver_data.hpp>
 
 using namespace FEAST::Foundation;
 using namespace FEAST;
@@ -30,19 +31,15 @@ namespace FEAST
       template<typename Tag_,
                typename DataType_,
                template<typename, typename> class VT_,
-               template<typename, typename> class MT_>
+               template<typename, typename> class MT_,
+               template<typename, typename> class ST_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(VT_<Tag_, DataType_>& y,
-                                                                                MT_<Tag_, DataType_>& A,
-                                                                                VT_<Tag_, DataType_>& x,
-                                                                                VT_<Tag_, DataType_>& b,
-                                                                                DataType_& norm_init_storage,
-                                                                                DataType_& norm_storage,
-                                                                                Index& num_iter_storage,
+                                                                                SolverDataBase<DataType_, Tag_, VT_, MT_, ST_>& data,
                                                                                 Index max_iter)
       {
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
 
-        ((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get()))->add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(y, b, A, x));
+        ((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get()))->add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(y, data.stored_rhs, data.stored_sys, data.stored_sol));
 
         return result;
       }
