@@ -32,36 +32,39 @@ class SolverDataTest:
 
       SolverData<> sd0(A, x, b);
       TEST_CHECK_EQUAL(sd0.stored_sys, A);
-      TEST_CHECK_EQUAL(sd0.stored_x, x);
-      TEST_CHECK_EQUAL(sd0.stored_b, b);
+      TEST_CHECK_EQUAL(sd0.stored_sol, x);
+      TEST_CHECK_EQUAL(sd0.stored_rhs, b);
       TEST_CHECK_EQUAL(sd0.stored_temp.size(), 0);
 
       SolverData<> sd1(A, x, b, 2);
       TEST_CHECK_EQUAL(sd1.stored_sys, A);
-      TEST_CHECK_EQUAL(sd1.stored_x, x);
-      TEST_CHECK_EQUAL(sd1.stored_b, b);
+      TEST_CHECK_EQUAL(sd1.stored_sol, x);
+      TEST_CHECK_EQUAL(sd1.stored_rhs, b);
       TEST_CHECK_EQUAL(sd1.stored_temp.size(), 2);
       TEST_CHECK_EQUAL(sd1.stored_temp.at(0).size(), x.size());
       TEST_CHECK_EQUAL(sd1.stored_temp.at(1).size(), x.size());
 
-      SolverData<> sd2(A, A, x, b);
-      TEST_CHECK_EQUAL(sd2.stored_sys, A);
-      TEST_CHECK_EQUAL(sd2.stored_precon, A);
-      TEST_CHECK_EQUAL(sd2.stored_x, x);
-      TEST_CHECK_EQUAL(sd2.stored_b, b);
-      TEST_CHECK_EQUAL(sd2.stored_temp.size(), 0);
+      PreconditionedSolverData<> psd(A, A, x, b, 3);
+      TEST_CHECK_EQUAL(psd.stored_sys, A);
+      TEST_CHECK_EQUAL(psd.stored_prec, A);
+      TEST_CHECK_EQUAL(psd.stored_sol, x);
+      TEST_CHECK_EQUAL(psd.stored_rhs, b);
+      TEST_CHECK_EQUAL(psd.stored_temp.size(), 3);
+      TEST_CHECK_EQUAL(psd.stored_temp.at(0).size(), x.size());
+      TEST_CHECK_EQUAL(psd.stored_temp.at(1).size(), x.size());
+      TEST_CHECK_EQUAL(psd.stored_temp.at(2).size(), x.size());
 
-      SolverData<> sd3(A, A, x, b, 2);
-      TEST_CHECK_EQUAL(sd3.stored_sys, A);
-      TEST_CHECK_EQUAL(sd3.stored_precon, A);
-      TEST_CHECK_EQUAL(sd3.stored_x, x);
-      TEST_CHECK_EQUAL(sd3.stored_b, b);
-      TEST_CHECK_EQUAL(sd3.stored_temp.size(), 2);
-      TEST_CHECK_EQUAL(sd3.stored_temp.at(0).size(), x.size());
-      TEST_CHECK_EQUAL(sd3.stored_temp.at(1).size(), x.size());
+      SolverData<> sd2(psd);
+      TEST_CHECK_EQUAL(sd2.stored_sys, A);
+      TEST_CHECK_EQUAL(sd2.stored_sol, x);
+      TEST_CHECK_EQUAL(sd2.stored_rhs, b);
+      TEST_CHECK_EQUAL(sd2.stored_temp.size(), 3);
+      TEST_CHECK_EQUAL(sd2.stored_temp.at(0).size(), x.size());
+      TEST_CHECK_EQUAL(sd2.stored_temp.at(1).size(), x.size());
+      TEST_CHECK_EQUAL(sd2.stored_temp.at(2).size(), x.size());
 
       //-------------------------------------------------------------------------
-      MultiLevelSolverData<> mlsd;
+      MultiLevelSolverData<> mlsd(A, b, x);
     }
 };
 SolverDataTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");
