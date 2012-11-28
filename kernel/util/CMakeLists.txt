@@ -48,5 +48,6 @@ ENDFOREACH(test)
 
 # add all tests to util_tests
 ADD_CUSTOM_TARGET(util_tests DEPENDS ${test_list})
+
 # build all tests through top lvl target tests
 ADD_DEPENDENCIES(tests util_tests)

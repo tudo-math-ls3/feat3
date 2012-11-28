@@ -1,19 +1,36 @@
 cmake_minimum_required (VERSION 2.8)
 
-#enable compiler output
+# enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-#top lvl include dir
+# top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-
-ADD_LIBRARY(kernel-foundation STATIC mesh_error.cpp communication_error.cpp attribute_error.cpp functor_error.cpp)
+ADD_LIBRARY(kernel-foundation STATIC
+  attribute_error.cpp
+  functor_error.cpp
+  communication_error.cpp
+  mesh_error.cpp
+)
 TARGET_LINK_LIBRARIES (kernel-foundation kernel-util kernel-lafem)
 
-#list of kernel tests
-SET (test_list topology-test dense_data_wrapper-test mesh-test halo-test halo_data-test communication-test mapped_topology-test attribute-test functor-test mesh_control-test buffer-test halo_control-test)
+# list of foundation tests
+SET (test_list
+  attribute-test
+  buffer-test
+  communication-test
+  dense_data_wrapper-test
+  functor-test
+  halo-test
+  halo_control-test
+  halo_data-test
+  mapped_topology-test
+  mesh-test
+  mesh_control-test
+  topology-test
+)
 
-#create all tests
+# create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feast test_system)
@@ -40,7 +57,8 @@ FOREACH (test ${test_list} )
   SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
 ENDFOREACH(test)
 
-#add all tests to foundation_tests
+# add all tests to foundation_tests
 ADD_CUSTOM_TARGET(foundation_tests DEPENDS ${test_list})
-#build all tests through top lvl target tests
+
+# build all tests through top lvl target tests
 ADD_DEPENDENCIES(tests foundation_tests)

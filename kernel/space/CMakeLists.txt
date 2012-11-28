@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 #ADD_LIBRARY(kernel-space STATIC)
 #TARGET_LINK_LIBRARIES (kernel-space kernel-util)
 
-# list of util tests
+# list of space tests
 SET (test_list
   discontinuous-test
   lagrange1-test
@@ -32,7 +32,7 @@ FOREACH (test ${test_list} )
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 ENDFOREACH(test)
 
-# add all tests to util_tests
+# add all tests to space_tests
 ADD_CUSTOM_TARGET(space_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests

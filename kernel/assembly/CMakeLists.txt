@@ -6,7 +6,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-#ADD_LIBRARY(kernel-trafo STATIC)
+#ADD_LIBRARY(kernel-assembly STATIC)
 #TARGET_LINK_LIBRARIES (kernel-assembly kernel-util)
 
 # list of assembly tests

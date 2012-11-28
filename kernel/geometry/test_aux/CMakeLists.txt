@@ -17,5 +17,4 @@ ADD_LIBRARY(kernel-geometry-test-aux STATIC
   tetris_hexa.cpp
 )
 
-#TARGET_LINK_LIBRARIES (kernel-geometry-test-aux kernel-geometry kernel-util)
 TARGET_LINK_LIBRARIES (kernel-geometry-test-aux kernel-util)

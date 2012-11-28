@@ -13,19 +13,17 @@ ADD_SUBDIRECTORY( test_aux )
 #ADD_LIBRARY(kernel-geometry STATIC)
 #TARGET_LINK_LIBRARIES (kernel-geometry kernel-util)
 
-
 # list of geometry tests
 SET (test_list
+  index_calculator-test
+  mesh_node-test-conf-quad
   standard_refinery-test-conf-quad
   standard_refinery-test-conf-hexa
   standard_refinery-test-conf-tria
   standard_refinery-test-conf-tetra
   standard_refinery-test-struct-quad
   standard_refinery-test-struct-hexa
-  index_calculator-test
-  mesh_node-test-conf-quad
 )
-
 
 # create all tests
 FOREACH (test ${test_list} )

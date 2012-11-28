@@ -40,7 +40,7 @@ SET (test_list
   shape-test
 )
 
-#create all tests
+# create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feast test_system)
