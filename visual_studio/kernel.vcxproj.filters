@@ -582,6 +582,9 @@
     <ClInclude Include="..\kernel\space\discontinuous\variant.hpp">
       <Filter>Header Files\space\discontinuous</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\assembly\discrete_projector.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

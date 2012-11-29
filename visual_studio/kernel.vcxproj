@@ -498,6 +498,7 @@
     <ClInclude Include="..\kernel\assembly\bilinear_functor_base.hpp" />
     <ClInclude Include="..\kernel\assembly\bilinear_operator.hpp" />
     <ClInclude Include="..\kernel\assembly\dirichlet_bc.hpp" />
+    <ClInclude Include="..\kernel\assembly\discrete_projector.hpp" />
     <ClInclude Include="..\kernel\assembly\grid_transfer.hpp" />
     <ClInclude Include="..\kernel\assembly\intern\dof_set.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functional.hpp" />
