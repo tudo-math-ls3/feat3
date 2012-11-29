@@ -12,14 +12,34 @@ namespace FEAST
 {
   namespace ScaRC
   {
+    ///tag definitions
+
+    ///full local solver
     class Richardson
     {
     };
 
+    ///local solver with preconditioner undefined
     class RichardsonProxy
     {
     };
 
+    ///solver layer with application argument undefined
+    class RichardsonLayer
+    {
+    };
+
+    ///solver layer with both, application argument and preconditioner undefined
+    class RichardsonProxyLayer
+    {
+    };
+
+    ///preconditioner application as SpMV
+    class SpMVPreconApply
+    {
+    };
+
+    ///pattern generation templates
     template<typename Pattern_, typename Algo_>
     struct SolverPatternGeneration
     {
@@ -28,24 +48,54 @@ namespace FEAST
     template<typename Algo_>
     struct SolverPatternGeneration<Richardson, Algo_>
     {
+      static Index min_num_temp_scalars()
+      {
+        return 1;
+      }
+
+      static Index min_num_temp_vectors()
+      {
+        return 0;
+      }
+
       template<typename Tag_,
                typename DataType_,
                template<typename, typename> class VT_,
                template<typename, typename> class MT_,
-               template<typename, typename> class ST_>
-      static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(VT_<Tag_, DataType_>& y,
-                                                                                SolverDataBase<DataType_, Tag_, VT_, MT_, ST_>& data,
-                                                                                Index max_iter)
+               typename PT_,
+               template<typename, typename> class StoreT_>
+      static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data,
+                                                                                Index max_iter,
+                                                                                DataType_ eps)
       {
-        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        ///take over 'logically constant' values
+        data.max_iters() = max_iter;
+        data.eps() = eps;
 
-        ((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get()))->add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(y, data.stored_rhs(), data.stored_sys(), data.stored_sol()));
+        ///create compound functor
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        ///get reference to functor (in order to cast only once)
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
+
+        ///add functors to the solver program:
+        //defect(x, b, A, x)
+        cf.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.sol(), data.rhs(), data.sys(), data.sol()));
+
+        //norm2(norm_0, x)
+        cf.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.sol()));
+
+        //iterate until s < eps: [product(x, P, x), sum(x, x, x), norm(norm, x), div(s, norm, norm_0)] //TODO assumes scaled precon matrix
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.sol(), data.stored_prec, data.sol()));
+        cfiterate.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.sol()));
+        cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
+
+        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
 
         return result;
       }
-
     };
-
   }
 }
 

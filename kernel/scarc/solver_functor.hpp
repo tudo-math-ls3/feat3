@@ -22,7 +22,7 @@ namespace FEAST
     {
       public:
         ///needed in substitution of CSF
-        typedef VT_ vector_type_;
+        typedef VT_ solver_vector_type_;
 
         virtual void substitute(VT_& arg) = 0;
 
@@ -652,7 +652,7 @@ namespace FEAST
                                  (_opcode == coc_geq ? (_arg1 >= _arg2) :
                                  (count == _maxiter))))))
                                 );
-            if(break_condition)
+            if(break_condition || count == _maxiter)
             {
               _count = count;
               break;
@@ -762,7 +762,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          LAFEM::Norm2<Algo_>(_y, _x);
+          _y = LAFEM::Norm2<Algo_>::value(_x);
         }
 
         NormFunctor& operator=(const NormFunctor& rhs)
@@ -839,6 +839,57 @@ namespace FEAST
         VT_& _y;
         const VT_& _x;
         const HaloStorageType_& _halos;
+    };
+
+    ///in scalar functors, we still need a vector type in order to make the functor compatible with SolverFunctorBase<VT_>
+    template<typename VT_, typename DT_>
+    class DivFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        DivFunctor(DT_& y, const DT_& l, const DT_& r) :
+          _y(y),
+          _l(l),
+          _r(r)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DivFunctor";
+        }
+
+        virtual void execute()
+        {
+          _y = _l / _r;
+        }
+
+        DivFunctor& operator=(const DivFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DivFunctor(const DivFunctor& other) :
+          _y(other._y),
+          _l(other._l),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        DT_& _y;
+        const DT_& _l;
+        const DT_& _r;
     };
 
     template<typename Algo_, typename VT_, template<typename, typename> class StorageType_ = std::vector>

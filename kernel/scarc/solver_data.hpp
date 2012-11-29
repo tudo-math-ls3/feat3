@@ -22,73 +22,113 @@ namespace FEAST
     struct SolverDataBase
     {
       public:
-
         ///type exports
         typedef VectorType_<MemTag_, DataType_> vector_type_;
         typedef MatrixType_<MemTag_, DataType_> matrix_type_;
         typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
         typedef StorageType_<MatrixType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > matrix_storage_type_;
+        typedef StorageType_<DataType_, std::allocator<DataType_> > scalar_storage_type_;
 
         virtual const std::string type_name() = 0;
 
-        virtual matrix_type_& stored_sys()
+        virtual matrix_type_& sys()
         {
           return this->_stored_sys;
         }
 
-        virtual const matrix_type_& stored_sys() const
+        virtual const matrix_type_& sys() const
         {
           return this->_stored_sys;
         }
 
-        virtual vector_type_& stored_rhs()
+        virtual vector_type_& rhs()
         {
           return this->_stored_rhs;
         }
 
-        virtual const vector_type_& stored_rhs() const
+        virtual const vector_type_& rhs() const
         {
           return this->_stored_rhs;
         }
 
-        virtual vector_type_& stored_sol()
+        virtual vector_type_& sol()
         {
           return this->_stored_sol;
         }
 
-        virtual const vector_type_& stored_sol() const
+        virtual const vector_type_& sol() const
         {
           return this->_stored_sol;
         }
 
-        virtual vector_storage_type_& stored_temp()
+        virtual vector_storage_type_& temp()
         {
           return _stored_temp;
         }
 
-        virtual const vector_storage_type_& stored_temp() const
+        virtual const vector_storage_type_& temp() const
         {
           return _stored_temp;
         }
 
-        virtual DataType_& stored_norm_0()
+        virtual DataType_& norm_0()
         {
           return _stored_norm_0;
         }
 
-        virtual const DataType_& stored_norm_0() const
+        virtual const DataType_& norm_0() const
         {
           return _stored_norm_0;
         }
 
-        virtual DataType_& stored_norm()
+        virtual DataType_& norm()
         {
           return _stored_norm;
         }
 
-        virtual const DataType_& stored_norm() const
+        virtual const DataType_& norm() const
         {
           return _stored_norm;
+        }
+
+        virtual scalar_storage_type_& scalars()
+        {
+          return _stored_scalars;
+        }
+
+        virtual const scalar_storage_type_& scalars() const
+        {
+          return _stored_scalars;
+        }
+
+        virtual DataType_& eps()
+        {
+          return _stored_eps;
+        }
+
+        virtual const DataType_& eps() const
+        {
+          return _stored_eps;
+        }
+
+        virtual Index& max_iters()
+        {
+          return _stored_max_iters;
+        }
+
+        virtual const Index& max_iters() const
+        {
+          return _stored_max_iters;
+        }
+
+        virtual Index& used_iters()
+        {
+          return _stored_used_iters;
+        }
+
+        virtual const Index& used_iters() const
+        {
+          return _stored_used_iters;
         }
 
         virtual ~SolverDataBase()
@@ -96,15 +136,19 @@ namespace FEAST
         }
 
       protected:
-        ///MemTag_ memory to store matrices and vectors
+        ///MemTag_ memory to store matrices and vectors and scalars
         matrix_type_ _stored_sys;
         vector_type_ _stored_rhs;
         vector_type_ _stored_sol;
         vector_storage_type_ _stored_temp;
+        scalar_storage_type_ _stored_scalars;
 
         ///host memory to store global scalars
         DataType_ _stored_norm_0;
         DataType_ _stored_norm;
+        DataType_ _stored_eps;
+        Index _stored_max_iters;
+        Index _stored_used_iters;
 
     };
 
@@ -119,6 +163,8 @@ namespace FEAST
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::scalar_storage_type_ scalar_storage_type_;
+
       ///fulfill pure virtual
       virtual const std::string type_name()
       {
@@ -129,14 +175,19 @@ namespace FEAST
       SolverData(matrix_type_& A,
                  vector_type_& x,
                  vector_type_& b,
-                 Index num_temp_vectors = 0)
+                 Index num_temp_vectors = 0,
+                 Index num_temp_scalars = 0)
       {
         this->_stored_sys = A;
         this->_stored_rhs = b;
         this->_stored_sol = x;
         this->_stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size()));
+        this->_stored_scalars = scalar_storage_type_(num_temp_scalars, DataType_(0));
         this->_stored_norm_0 = DataType_(0);
         this->_stored_norm = DataType_(0);
+        this->_stored_eps = DataType_(0);
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
       }
 
       ///copy CTOR
@@ -146,8 +197,12 @@ namespace FEAST
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
       }
 
       ///assignment operator overload
@@ -160,8 +215,12 @@ namespace FEAST
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
 
         return *this;
       }
@@ -178,8 +237,12 @@ namespace FEAST
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
       }
 
     };
@@ -208,8 +271,9 @@ namespace FEAST
                               matrix_type_& P,
                               vector_type_& x,
                               vector_type_& b,
-                              Index num_temp_vectors = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors),
+                              Index num_temp_vectors = 0,
+                              Index num_temp_scalars = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
         stored_prec(P)
       {
       }
@@ -231,8 +295,12 @@ namespace FEAST
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_temp;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
 
         this->stored_prec = other._stored_prec;
 
@@ -267,8 +335,9 @@ namespace FEAST
       MultiLevelSolverData(matrix_type_& A,
                            vector_type_& x,
                            vector_type_& b,
-                           Index num_temp_vectors = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors),
+                           Index num_temp_vectors = 0,
+                           Index num_temp_scalars = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
         stored_level_data()
       {
         ///TODO
@@ -291,8 +360,12 @@ namespace FEAST
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
 
         this->stored_level_data = other._stored_level_data;
 

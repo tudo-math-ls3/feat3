@@ -32,8 +32,10 @@ class SolverPatternTest:
         T(i, i, DataType_(1));
       SparseMatrixCSR<Tag_, DataType_> A(T);
 
-      SolverData<> data(A, x, b);
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(y, data, 20));
+      PreconditionedSolverData<> data(A, A, x, b,
+                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
+                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 20, 1e-8));
       solver->execute();
     }
 };
