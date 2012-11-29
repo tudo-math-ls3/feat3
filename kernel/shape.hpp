@@ -222,10 +222,10 @@ namespace FEAST
     }; // struct FaceTraits<Hypercube<...>, ...>
 
     /**
-      * \brief partial FaceTraits specialisation for Hypercube shape and Vertex faces
-      *
-      * \author Peter Zajac
-      */
+     * \brief partial FaceTraits specialisation for Hypercube shape and Vertex faces
+     *
+     * \author Peter Zajac
+     */
     template<int cell_dim_>
     struct FaceTraits<Hypercube<cell_dim_>, 0>
     {
@@ -241,6 +241,86 @@ namespace FEAST
         count = (1 << cell_dim_)
       };
     }; // struct FaceTraits<HyperCube<...>, 0>
+    /// \endcond
+
+    /**
+     * \brief Reference cell traits structure.
+     *
+     * This class template contains information about the reference cell of the corresponding shape,
+     * especially the coordinates of the reference cell's vertices.
+     *
+     * \tparam Shape_
+     * The shape whose reference cell is to be determined.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Shape_>
+#ifndef DOXYGEN
+    struct ReferenceCell;
+#else
+    struct ReferenceCell
+    {
+      /**
+       * \brief Returns the coordinate of a reference cell vertex.
+       *
+       * \note By our definition, all reference vertex coordinates are integral, therefore this function
+       * returns an \p int rather than a floating point type.
+       *
+       * \param[in] vertex_idx
+       * The index of the vertex whose coordinate is to be returned.
+       *
+       * \param[in] coord_idx
+       * The index of the coordinate of the vertex that is to be returned.
+       *
+       * \returns
+       * The desired coordinate of the reference cell vertex.
+       */
+      static int coord(int vertex_idx, int coord_idx);
+    };
+#endif // DOXYGEN
+
+    /// \cond internal
+    /**
+     * \brief ReferenceCell specialisation for Vertex shape
+     *
+     * \author Peter Zajac
+     */
+    template<>
+    struct ReferenceCell<Shape::Vertex>
+    {
+      static int coord(int, int)
+      {
+        return 0;
+      }
+    };
+
+    /**
+     * \brief Partial ReferenceCell specialisation for Simplex shape
+     *
+     * \author Peter Zajac
+     */
+    template<int dim_>
+    struct ReferenceCell< Shape::Simplex<dim_> >
+    {
+      static int coord(int vertex_idx, int coord_idx)
+      {
+        return (coord_idx + 1) == vertex_idx ? 1 : 0;
+      }
+    };
+
+    /**
+     * \brief Partial ReferenceCell specialisation for Hypercube shape
+     *
+     * \author Peter Zajac
+     */
+    template<int dim_>
+    struct ReferenceCell< Shape::Hypercube<dim_> >
+    {
+      static int coord(int vertex_idx, int coord_idx)
+      {
+        return (((vertex_idx >> coord_idx) & 1) << 1) - 1;
+      }
+    };
     /// \endcond
   } // namespace Shape
 } // namespace FEAST
