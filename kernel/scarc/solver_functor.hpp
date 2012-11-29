@@ -599,6 +599,74 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_> > _functor;
     };
 
+    template<typename Algo_, typename VT_>
+    class PreconFunctorProxy : public SolverFunctorBase<VT_>
+    {
+      public:
+        PreconFunctorProxy(VT_& y) :
+          _y(y),
+          _functor(),
+          _precon_complete(false),
+          _substitution_complete(false)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "PreconFunctor";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete PreconFunctor can not be executed!");
+
+          _functor->execute();
+        }
+
+        PreconFunctorProxy& operator=(const PreconFunctorProxy& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_functor = rhs._functor;
+          this->_precon_complete = rhs._precon_complete;
+          this->_substitution_complete = rhs._substitution_complete;
+          return *this;
+        }
+
+        PreconFunctorProxy(const PreconFunctorProxy& other) :
+          _y(other._y),
+          _functor(other._functor),
+          _precon_complete(other._precon_complete),
+          _substitution_complete(other._substitution_complete)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _y = arg;
+          _substitution_complete = true;
+          this->_complete = this->_substitution_complete && _precon_complete;
+        }
+
+        void set_precon_functor(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
+        {
+          functor->substitute(_y);
+          _functor = functor;
+          _precon_complete = true;
+          this->_complete = this->_substitution_complete && _precon_complete;
+        }
+
+      private:
+        VT_& _y;
+        std::shared_ptr<SolverFunctorBase<VT_> > _functor;
+        bool _precon_complete;
+        bool _substitution_complete;
+    };
+
     enum ComparisonOpCode
     {
       coc_eq = 0,

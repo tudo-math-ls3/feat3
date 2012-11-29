@@ -26,7 +26,7 @@ class SolverPatternTest:
 
     virtual void run() const
     {
-      DenseVector<Tag_, DataType_> x(100, DataType_(1)), y(100), b(100, DataType_(1));
+      DenseVector<Tag_, DataType_> x(100, DataType_(1)), b(100, DataType_(1));
       SparseMatrixCOO<Mem::Main, DataType_> T(100, 100);
       for(Index i(0) ; i < 100 ; ++i)
         T(i, i, DataType_(1));
@@ -37,6 +37,14 @@ class SolverPatternTest:
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 20, 1e-8));
       solver->execute();
+      ///TODO test
+
+      //---------------------------------------------------------------------------------------------------------------------------------------------
+      SolverData<> data2(A, x, b, SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_vectors(), SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver2(SolverPatternGeneration<RichardsonProxy, Algo_>::execute(data2, 20, 1e-8));
+      TEST_CHECK_THROWS(solver2->execute(), ScaRCError);
+      ///TODO test
+
     }
 };
 SolverPatternTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");
