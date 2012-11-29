@@ -26,13 +26,13 @@ namespace FEAST
           lbconf.patch_process_map.push_back();
         }
 
-        for(Index i(0) ; i < numprocs ; ++i)
+        for(int i(0) ; i < numprocs ; ++i)
         {
           lbconf.process_patch_map.push_back();
         }
 
         Index j(0);
-        for(Index i(0) ; i < numprocs ; ++i)
+        for(int i(0) ; i < numprocs ; ++i)
         {
           lbconf.patch_process_map.at(j).push_back(i);
           lbconf.process_patch_map.at(i).push_back(j);

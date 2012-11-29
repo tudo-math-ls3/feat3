@@ -22,7 +22,7 @@ namespace FEAST
       template<>
       struct StructIndexMapping<1, 1, 0>
       {
-        static Index compute(Index i, Index j, const Index num_slices[])
+        static Index compute(Index i, Index j, const Index /*num_slices*/[])
         {
           return i + j;
         }

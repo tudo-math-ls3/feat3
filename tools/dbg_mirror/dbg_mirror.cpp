@@ -32,7 +32,7 @@ template<typename T_>
 class RhsFunc
 {
 public:
-  static T_ eval(T_ x, T_ y)
+  static T_ eval(T_ /*x*/, T_ /*y*/)
   {
     return T_(1);
   }
@@ -166,7 +166,7 @@ void test_it(const QuadMesh& mesh_0, const QuadMesh& mesh_1, const QuadCellSet& 
   test_mirror(space_0, space_1, cell_0, cell_1);
 }
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char** /*argv*/)
 {
   static const Index num_entities[] =
   {

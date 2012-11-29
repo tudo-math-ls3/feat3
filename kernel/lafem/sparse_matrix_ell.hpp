@@ -462,7 +462,7 @@ namespace FEAST
          *
          * \returns Non zero element.
          */
-        const DT_ zero_element() const
+        DT_ zero_element() const
         {
           return _zero_element;
         }
@@ -472,7 +472,7 @@ namespace FEAST
          *
          * \returns Stride.
          */
-        const Index stride() const
+        Index stride() const
         {
           return _stride;
         }
@@ -482,7 +482,7 @@ namespace FEAST
          *
          * \returns Columns per row count.
          */
-        const Index num_cols_per_row() const
+        Index num_cols_per_row() const
         {
           return _num_cols_per_row;
         }

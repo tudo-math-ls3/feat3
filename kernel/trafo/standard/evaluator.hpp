@@ -166,7 +166,7 @@ namespace FEAST
          * \param[in] dom_point
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          */
-        void calc_jac_mat(JacMatRef jac_mat, DomainPointConstRef dom_point) const
+        void calc_jac_mat(JacMatRef jac_mat, DomainPointConstRef /*dom_point*/) const
         {
           for(int i(0); i < image_dim; ++i)
           {

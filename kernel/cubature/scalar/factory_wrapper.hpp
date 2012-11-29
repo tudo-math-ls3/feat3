@@ -47,7 +47,7 @@ namespace FEAST
         }
 
         template<typename Functor_>
-        static void _factory_list(Functor_& functor)
+        static void _factory_list(Functor_& /*functor*/)
         {
           // >>> CUBATURE FACTORY LIST >>>
           // TODO: add you new scalar cubature factory at the end of the list below, e.g.

@@ -90,7 +90,7 @@ namespace FEAST
       typedef Shape::Simplex<1> ShapeType;
 
       template<typename Functor_>
-      static void _driver_list(Functor_& functor)
+      static void _driver_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -100,7 +100,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -183,7 +183,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -242,7 +242,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -286,7 +286,7 @@ namespace FEAST
       typedef Shape::Hypercube<1> ShapeType;
 
       template<typename Functor_>
-      static void _driver_list(Functor_& functor)
+      static void _driver_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -296,7 +296,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -340,7 +340,7 @@ namespace FEAST
       typedef Shape::Hypercube<2> ShapeType;
 
       template<typename Functor_>
-      static void _driver_list(Functor_& functor)
+      static void _driver_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -350,7 +350,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -394,7 +394,7 @@ namespace FEAST
       typedef Shape::Hypercube<3> ShapeType;
 
       template<typename Functor_>
-      static void _driver_list(Functor_& functor)
+      static void _driver_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -404,7 +404,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -462,7 +462,7 @@ namespace FEAST
       typedef Shape::Simplex<dim_> ShapeType;
 
       template<typename Functor_>
-      static void _driver_list(Functor_& functor)
+      static void _driver_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -473,7 +473,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -525,7 +525,7 @@ namespace FEAST
       typedef Shape::Hypercube<dim_> ShapeType;
 
       template<typename Functor_>
-      static void _driver_list(Functor_& functor)
+      static void _driver_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE DRIVER LIST >>>
         // TODO: add you new cubature driver at the end of the list below, e.g.
@@ -535,7 +535,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.
@@ -624,7 +624,7 @@ namespace FEAST
       }
 
       template<typename Functor_>
-      static void _factory_list(Functor_& functor)
+      static void _factory_list(Functor_& /*functor*/)
       {
         // >>> CUBATURE FACTORY LIST >>>
         // TODO: add you new cubature factory at the end of the list below, e.g.

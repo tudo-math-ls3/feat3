@@ -58,8 +58,8 @@ class MeshControlTest1D:
       IndexType_* size_set(new IndexType_[2]);
       MeshControl<dim_1D>::fill_sizes(m, size_set);
 
-      TEST_CHECK_EQUAL(size_set[0], 2);
-      TEST_CHECK_EQUAL(size_set[1], 1);
+      TEST_CHECK_EQUAL(size_set[0], Index(2));
+      TEST_CHECK_EQUAL(size_set[1], Index(1));
 
       confmeshtype_ confmesh(size_set);
       MeshControl<dim_1D>::fill_adjacencies(m, confmesh);

@@ -61,7 +61,7 @@ namespace FEAST
         return 1;
       }
 
-      Index get_num_contribs(Index assign_idx) const
+      Index get_num_contribs(Index /*assign_idx*/) const
       {
         return 1;
       }

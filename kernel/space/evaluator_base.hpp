@@ -139,7 +139,7 @@ namespace FEAST
        * \param[in] trafo_eval
        * A reference to the trafo evaluator containing the cell information.
        */
-      void prepare(const TrafoEvaluator& trafo_eval)
+      void prepare(const TrafoEvaluator& /*trafo_eval*/)
       {
       }
 

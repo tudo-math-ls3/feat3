@@ -468,7 +468,7 @@ namespace FEAST
           return from == to ? 1u : ( from > to ? (unsigned)std::abs((double)(from - to)) - 1u : (unsigned)std::abs((double)(to - from)) - 1u);
         }
 
-        const InternalPrimaryAccess _get_primary_index(const PolytopeLevels from, const PolytopeLevels to) const
+        InternalPrimaryAccess _get_primary_index(const PolytopeLevels from, const PolytopeLevels to) const
         {
           switch(from)
           {
@@ -524,7 +524,7 @@ namespace FEAST
           throw InternalError("Invalid polytope level combination");
         }
 
-        const InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to) const
+        InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to) const
         {
           return from == pl_vertex && to == pl_vertex ? InternalSecondaryAccess(1) : InternalSecondaryAccess((to - 1) * 2);
         }
@@ -614,7 +614,7 @@ namespace FEAST
           }
         }
 
-        const bool _secondary_access_needed(PolytopeLevels from, PolytopeLevels to) const
+        bool _secondary_access_needed(PolytopeLevels from, PolytopeLevels to) const
         {
           return (from != pl_vertex && to != pl_vertex) || (from == pl_vertex && to == from);
         }

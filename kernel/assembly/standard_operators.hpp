@@ -78,7 +78,7 @@ namespace FEAST
          * \param[in] functor
          * A reference to the scalar Laplace functor.
          */
-        explicit Evaluator(const BilinearScalarLaplaceFunctor& functor)
+        explicit Evaluator(const BilinearScalarLaplaceFunctor& /*functor*/)
         {
         }
 
@@ -189,7 +189,7 @@ namespace FEAST
          * \param[in] functor
          * A reference to the scalar Identity functor.
          */
-        explicit Evaluator(const BilinearScalarIdentityFunctor& functor)
+        explicit Evaluator(const BilinearScalarIdentityFunctor& /*functor*/)
         {
         }
 

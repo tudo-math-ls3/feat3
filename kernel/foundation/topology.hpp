@@ -78,7 +78,7 @@ namespace FEAST
           return _topology.size();
         }
 
-        const Index size() const
+        Index size() const
         {
           return _topology.size();
         }
@@ -234,7 +234,7 @@ namespace FEAST
           _topology.clear();
           _history.get_functors().clear();
 
-          IndexType_ left(0);
+          //IndexType_ left(0);
           IndexType_ head(0);
           for(Index i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[1] ; ++i) //times the real #polytopes
           {

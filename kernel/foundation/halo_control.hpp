@@ -34,7 +34,8 @@ namespace FEAST
           class HaloType_>
         static void fill_sizes(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_* target)
         {
-          ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
+          if (halo.size() != 1)
+            throw InternalError("Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
           target[0] = IndexType(1);
           target[1] = IndexType(0);
@@ -260,7 +261,6 @@ namespace FEAST
           {
             ///for any face count edges
             typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
-            IndexType count(0);
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
               bool already_in(false);
@@ -281,7 +281,6 @@ namespace FEAST
           {
             ///for any face count edges
             typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
-            IndexType count(0);
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
               bool already_in(false);
@@ -408,7 +407,6 @@ namespace FEAST
           {
             ///for any face count edges
             typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
-            IndexType count(0);
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
               bool already_in(false);
@@ -429,7 +427,6 @@ namespace FEAST
           {
             ///for any face count edges
             typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
-            IndexType count(0);
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
               bool already_in(false);
@@ -575,7 +572,6 @@ namespace FEAST
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh().get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
-            IndexType count(0);
             for(IndexType j(0) ; j < faces.size() ; ++j)
             {
               bool already_in(false);

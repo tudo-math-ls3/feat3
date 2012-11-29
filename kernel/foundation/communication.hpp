@@ -375,7 +375,7 @@ namespace FEAST
            DT_* val(mat.val());
            Index* row_ptr(mat.row_ptr());
            Index* row_ptr_end(mat.row_ptr_end());
-           Index* col_ind(mat.col_ind());
+           //Index* col_ind(mat.col_ind());
 
            ///TODO: does assume, matrix rows are associated with polytope level a_
            ///TODO: does assume, interface uses same index set (numbering!!) as matrix

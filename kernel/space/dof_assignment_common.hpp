@@ -42,13 +42,13 @@ namespace FEAST
         return 0;
       }
 
-      Index get_num_contribs(Index assign_idx) const
+      Index get_num_contribs(Index /*assign_idx*/) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_num_contribs()");
       }
 
       /** \copydoc DofAssignmentBase::get_index() */
-      Index get_index(Index assign_idx, Index contrib_idx = 0) const
+      Index get_index(Index /*assign_idx*/, Index /*contrib_idx*/ = 0) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_index()");
       }

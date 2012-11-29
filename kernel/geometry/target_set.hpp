@@ -219,7 +219,7 @@ namespace FEAST
         return _target_set;
       }
 
-      Index get_num_entities(int dim) const
+      Index get_num_entities(int /*dim*/) const
       {
         CONTEXT(name() + "::get_num_entities()");
         ASSERT(dim == 0, "invalid dimension parameter");

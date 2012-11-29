@@ -283,7 +283,7 @@ namespace FEAST
     class StructIndexSetHolder<shape_dim_, 0>
     {
     public:
-      explicit StructIndexSetHolder(const Index num_slices[])
+      explicit StructIndexSetHolder(const Index /*num_slices*/[])
       {
       }
     };
