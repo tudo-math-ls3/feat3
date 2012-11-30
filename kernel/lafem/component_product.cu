@@ -1,5 +1,5 @@
 // includes, FEAST
-#include <kernel/lafem/element_product.hpp>
+#include <kernel/lafem/component_product.hpp>
 
 namespace FEAST
 {
@@ -8,7 +8,7 @@ namespace FEAST
     namespace Intern
     {
       template <typename DT_>
-      __global__ void cuda_element_product(DT_ * r, const DT_ * x, const DT_ * y, const Index count)
+      __global__ void cuda_component_product(DT_ * r, const DT_ * x, const DT_ * y, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
@@ -24,7 +24,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-void ElementProduct<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y)
+void ComponentProduct<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y)
 {
   if (x.size() != y.size())
     throw InternalError("Vector size does not match!");
@@ -41,8 +41,8 @@ void ElementProduct<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const De
   const DT_ * x_gpu(x.elements());
   const DT_ * y_gpu(y.elements());
 
-  FEAST::LAFEM::Intern::cuda_element_product<<<grid, block>>>(r_gpu, x_gpu, y_gpu, r.size());
+  FEAST::LAFEM::Intern::cuda_component_product<<<grid, block>>>(r_gpu, x_gpu, y_gpu, r.size());
 }
 
-template void ElementProduct<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
-template void ElementProduct<Algo::CUDA>::value(DenseVector<Mem::CUDA, double>&, const DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);
+template void ComponentProduct<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
+template void ComponentProduct<Algo::CUDA>::value(DenseVector<Mem::CUDA, double>&, const DenseVector<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);

@@ -17,7 +17,7 @@ if (FEAST_BACKENDS_CUDA)
     defect.cu
     difference.cu
     dot_product.cu
-    element_product.cu
+    component_product.cu
     norm.cu
     product_matvec.cu
     scale.cu
@@ -38,7 +38,7 @@ SET (test_list
   dense_vector-test
   difference-test
   dot_product-test
-  element_product-test
+  component_product-test
   norm-test
   product_matvec-test
   richardson-test

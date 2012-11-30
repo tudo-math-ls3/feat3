@@ -2,7 +2,7 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/element_product.hpp>
+#include <kernel/lafem/component_product.hpp>
 #include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
@@ -13,14 +13,14 @@ template<
   typename Arch_,
   typename Algo_,
   typename DT_>
-class DVElementProductTest
+class DVComponentProductTest
   : public TaggedTest<Arch_, DT_>
 {
 
 public:
 
-  DVElementProductTest()
-    : TaggedTest<Arch_, DT_>("dv_element_product_test")
+  DVComponentProductTest()
+    : TaggedTest<Arch_, DT_>("dv_component_product_test")
   {
   }
 
@@ -47,29 +47,29 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size);
 
-      ElementProduct<Algo_>::value(c, a, b);
+      ComponentProduct<Algo_>::value(c, a, b);
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      ElementProduct<Algo_>::value(a, a, b);
+      ComponentProduct<Algo_>::value(a, a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(a, a_local);
-      ElementProduct<Algo_>::value(b, a, b);
+      ComponentProduct<Algo_>::value(b, a, b);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(b, b_local);
-      ElementProduct<Algo_>::value(a, a, a);
+      ComponentProduct<Algo_>::value(a, a, a);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }
   }
 };
-DVElementProductTest<Mem::Main, Algo::Generic, float> dv_element_product_test_float;
-DVElementProductTest<Mem::Main, Algo::Generic, double> dv_element_product_test_double;
+DVComponentProductTest<Mem::Main, Algo::Generic, float> dv_component_product_test_float;
+DVComponentProductTest<Mem::Main, Algo::Generic, double> dv_component_product_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVElementProductTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_element_product_test_float;
-DVElementProductTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_element_product_test_double;
+DVComponentProductTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_component_product_test_float;
+DVComponentProductTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_component_product_test_double;
 #endif

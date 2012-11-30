@@ -12,7 +12,7 @@
 #include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/defect.hpp>
 #include <kernel/lafem/norm.hpp>
-#include <kernel/lafem/element_product.hpp>
+#include <kernel/lafem/component_product.hpp>
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/axpy.hpp>
 #include <kernel/lafem/dot_product.hpp>
