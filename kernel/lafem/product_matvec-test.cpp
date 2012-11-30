@@ -5,7 +5,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/product.hpp>
+#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
@@ -23,7 +23,7 @@ class CSRProductTest
 public:
 
   CSRProductTest()
-    : TaggedTest<Arch_, DT_>("csr_product_test")
+    : TaggedTest<Arch_, DT_>("csr_product_matvec_test")
   {
   }
 
@@ -58,7 +58,7 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size, 4711);
 
-      Product<Algo_>::value(c, a, b);
+      ProductMatVec<Algo_>::value(c, a, b);
       copy(result_local, c);
 
       DT_ dev(DT_(0));
@@ -74,11 +74,11 @@ public:
     }
   }
 };
-CSRProductTest<Mem::Main, Algo::Generic, float> csr_product_test_float;
-CSRProductTest<Mem::Main, Algo::Generic, double> csr_product_test_double;
+CSRProductTest<Mem::Main, Algo::Generic, float> csr_product_matvec_test_float;
+CSRProductTest<Mem::Main, Algo::Generic, double> csr_product_matvec_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-CSRProductTest<Mem::CUDA, Algo::CUDA, float> cuda_csr_product_test_float;
-CSRProductTest<Mem::CUDA, Algo::CUDA, double> cuad_csr_product_test_double;
+CSRProductTest<Mem::CUDA, Algo::CUDA, float> cuda_csr_product_matvec_test_float;
+CSRProductTest<Mem::CUDA, Algo::CUDA, double> cuad_csr_product_matvec_test_double;
 #endif
 
 template<
@@ -92,7 +92,7 @@ class ELLProductTest
 public:
 
   ELLProductTest()
-    : TaggedTest<Arch_, DT_>("ell_product_test")
+    : TaggedTest<Arch_, DT_>("ell_product_matvec_test")
   {
   }
 
@@ -128,7 +128,7 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size, 4711);
 
-      Product<Algo_>::value(c, a, b);
+      ProductMatVec<Algo_>::value(c, a, b);
       copy(result_local, c);
 
       DT_ dev(DT_(0));
@@ -144,9 +144,9 @@ public:
     }
   }
 };
-ELLProductTest<Mem::Main, Algo::Generic, float> ell_product_test_float;
-ELLProductTest<Mem::Main, Algo::Generic, double> ell_product_test_double;
+ELLProductTest<Mem::Main, Algo::Generic, float> ell_product_matvec_test_float;
+ELLProductTest<Mem::Main, Algo::Generic, double> ell_product_matvec_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-ELLProductTest<Mem::CUDA, Algo::CUDA, float> cuda_ell_product_test_float;
-ELLProductTest<Mem::CUDA, Algo::CUDA, double> cuad_ell_product_test_double;
+ELLProductTest<Mem::CUDA, Algo::CUDA, float> cuda_ell_product_matvec_test_float;
+ELLProductTest<Mem::CUDA, Algo::CUDA, double> cuad_ell_product_matvec_test_double;
 #endif

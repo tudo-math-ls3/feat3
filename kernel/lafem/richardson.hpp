@@ -9,7 +9,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sum.hpp>
-#include <kernel/lafem/product.hpp>
+#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/defect.hpp>
 #include <kernel/lafem/norm.hpp>
 #include <kernel/lafem/element_product.hpp>

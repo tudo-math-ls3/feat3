@@ -9,7 +9,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sum.hpp>
-#include <kernel/lafem/product.hpp>
+#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/defect.hpp>
 #include <kernel/lafem/norm.hpp>
 #include <kernel/lafem/element_product.hpp>
@@ -76,7 +76,7 @@ namespace FEAST
           {
             iter = iter + 1;
 
-            Product<Algo_>::value(v, A, p_tilde);
+            ProductMatVec<Algo_>::value(v, A, p_tilde);
             precon.apply(v_tilde, v);
 
             gamma_tilde = DotProduct<Algo_>::value(v_tilde, r_tilde_0);
@@ -113,7 +113,7 @@ namespace FEAST
             }
             Axpy<Algo_>::value(s_tilde, malpha_tilde, v_tilde, r_tilde);
 
-            Product<Algo_>::value(t, A, s_tilde);
+            ProductMatVec<Algo_>::value(t, A, s_tilde);
 
             precon.apply(t_tilde, t);
 

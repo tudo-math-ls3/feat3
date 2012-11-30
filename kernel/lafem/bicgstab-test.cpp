@@ -3,7 +3,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/product.hpp>
+#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/bicgstab.hpp>
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/algorithm.hpp>
@@ -48,7 +48,7 @@ public:
     JacobiPreconditioner<Algo_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(1));
     //NonePreconditioner<Algo_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac;
 
-    Product<Algo_>::value(b, sys, ref);
+    ProductMatVec<Algo_>::value(b, sys, ref);
 
     BiCGStab<Algo_>::value(x, sys, b, jac, 1000, DT_(1e-15));
 

@@ -7,7 +7,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/product.hpp>
+#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/sum.hpp>
 #include <kernel/lafem/scale.hpp>
 
@@ -145,7 +145,7 @@ namespace FEAST
       template <typename DT_>
       static void value(DenseVector<Mem::Main, DT_> & r, const DT_ a, const SparseMatrixCSR<Mem::Main, DT_> & P, const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
       {
-        Product<Algo::Generic>::value(r, P, x);
+        ProductMatVec<Algo::Generic>::value(r, P, x);
         Scale<Algo::Generic>::value(r, a, r);
         Sum<Algo::Generic>::value(r, r, y);
       }

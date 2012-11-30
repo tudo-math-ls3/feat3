@@ -19,7 +19,7 @@ if (FEAST_BACKENDS_CUDA)
     dot_product.cu
     element_product.cu
     norm.cu
-    product.cu
+    product_matvec.cu
     scale.cu
     sum.cu
   )
@@ -40,7 +40,7 @@ SET (test_list
   dot_product-test
   element_product-test
   norm-test
-  product-test
+  product_matvec-test
   richardson-test
   scale-test
   sparse_matrix_coo-test

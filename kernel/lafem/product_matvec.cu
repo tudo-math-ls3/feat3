@@ -1,5 +1,5 @@
 // includes, FEAST
-#include <kernel/lafem/product.hpp>
+#include <kernel/lafem/product_matvec.hpp>
 
 namespace FEAST
 {
@@ -8,7 +8,7 @@ namespace FEAST
     namespace Intern
     {
       template <typename DT_>
-      __global__ void cuda_product_csr(DT_ * r, const DT_ * b, const DT_ * val, const Index * col_ind,
+      __global__ void cuda_product_matvec_csr(DT_ * r, const DT_ * b, const DT_ * val, const Index * col_ind,
           const Index * row_ptr, const Index * row_ptr_end, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
@@ -25,7 +25,7 @@ namespace FEAST
       }
 
       template <typename DT_>
-      __global__ void cuda_product_ell(DT_ * r, const DT_ * b, const DT_ * Ax, const Index * Aj,
+      __global__ void cuda_product_matvec_ell(DT_ * r, const DT_ * b, const DT_ * Ax, const Index * Aj,
           const Index * Arl, const Index stride, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
@@ -61,7 +61,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 
 template <typename DT_>
-void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b)
+void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b)
 {
   if (b.size() != a.columns())
     throw InternalError("Vector size does not match!");
@@ -81,14 +81,14 @@ void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMat
   const Index * row_ptr_gpu(a.row_ptr());
   const Index * row_ptr_end_gpu(a.row_ptr_end());
 
-  FEAST::LAFEM::Intern::cuda_product_csr<<<grid, block>>>(r_gpu, b_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, row_ptr_end_gpu, r.size());
+  FEAST::LAFEM::Intern::cuda_product_matvec_csr<<<grid, block>>>(r_gpu, b_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, row_ptr_end_gpu, r.size());
 }
 
-template void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixCSR<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
-template void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const SparseMatrixCSR<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);
+template void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixCSR<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
+template void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const SparseMatrixCSR<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);
 
 template <typename DT_>
-void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixELL<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b)
+void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMatrixELL<Mem::CUDA, DT_> & a, const DenseVector<Mem::CUDA, DT_> & b)
 {
   if (b.size() != a.columns())
     throw InternalError("Vector size does not match!");
@@ -107,8 +107,8 @@ void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const SparseMat
   const Index * Aj_gpu(a.Aj());
   const Index * Arl_gpu(a.Arl());
 
-  FEAST::LAFEM::Intern::cuda_product_ell<<<grid, block>>>(r_gpu, b_gpu, Ax_gpu, Aj_gpu, Arl_gpu, a.stride(), r.size());
+  FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r_gpu, b_gpu, Ax_gpu, Aj_gpu, Arl_gpu, a.stride(), r.size());
 }
 
-template void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixELL<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
-template void Product<Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const SparseMatrixELL<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);
+template void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixELL<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);
+template void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, double> &, const SparseMatrixELL<Mem::CUDA, double> &, const DenseVector<Mem::CUDA, double> &);
