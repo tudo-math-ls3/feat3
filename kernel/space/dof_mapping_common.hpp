@@ -81,8 +81,8 @@ namespace FEAST
      * \tparam shape_dim_
      * The dimension of the shape that his dof-mapping is defined on.
      *
-     * \tparam dof_dim_
-     * The dimension of the shape that the dofs are assigned to.
+     * \tparam codim_
+     * The co-dimension of the shape that the dofs are assigned to.
      *
      * \tparam dofs_per_cell_
      * The number of dofs per entity.
@@ -91,7 +91,7 @@ namespace FEAST
      */
     template<
       typename Space_,
-      int dof_dim_,
+      int codim_,
       int dofs_per_cell_ = 1>
     class DofMappingSingleEntity :
       public DofMappingBase<Space_>
@@ -106,11 +106,13 @@ namespace FEAST
       enum
       {
         /// shape dimension
-        shape_dim = ShapeType::dimension
+        shape_dim = ShapeType::dimension,
+        /// dof dimension
+        dof_dim = shape_dim - codim_
       };
 
       // make sure the dof-dimension is less than the shape dimension
-      static_assert(dof_dim_ < shape_dim, "invalid dof dimension");
+      static_assert((codim_ >= 0) && (codim_ <= shape_dim), "invalid co-dimension");
 
     protected:
       /// trafo type
@@ -118,7 +120,7 @@ namespace FEAST
       /// mesh type
       typedef typename TrafoType::MeshType MeshType;
       /// index-set type
-      typedef typename MeshType::template IndexSet<shape_dim, dof_dim_>::Type IndexSetType;
+      typedef typename MeshType::template IndexSet<shape_dim, dof_dim>::Type IndexSetType;
       /// index-vector const-reference
       typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
 
@@ -171,7 +173,7 @@ namespace FEAST
       /** \copydoc DofMappingBase::DofMappingBase() */
       explicit DofMappingSingleEntity(const Space_& space) :
         DofMappingBase<Space_>(space),
-        _index_set(space.get_trafo().get_mesh().template get_index_set<shape_dim, dof_dim_>())
+        _index_set(space.get_trafo().get_mesh().template get_index_set<shape_dim, dof_dim>())
       {
       }
 
@@ -199,6 +201,25 @@ namespace FEAST
       ImageIterator image_end(Index domain_node) const
       {
         return ImageIterator(&_index_set, domain_node, get_num_local_dofs());
+      }
+    };
+
+    /**
+     * \brief Partial specialisation of DofMappingSingleEntity for co-dimension zero
+     *
+     * \author Peter Zajac
+     */
+    template<
+      typename Space_,
+      int dofs_per_cell_>
+    class DofMappingSingleEntity<Space_, 0, dofs_per_cell_> :
+      public DofMappingIdentity<Space_, dofs_per_cell_>
+    {
+    public:
+      /** \copydoc DofMappingBase::DofMappingBase() */
+      explicit DofMappingSingleEntity(const Space_& space) :
+        DofMappingIdentity<Space_, dofs_per_cell_>(space)
+      {
       }
     };
   } // namespace Space

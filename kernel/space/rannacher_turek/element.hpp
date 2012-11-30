@@ -92,7 +92,7 @@ namespace FEAST
         };
 
         /** \copydoc ElementBase::DofMappingType */
-        typedef DofMappingSingleEntity<Element, ShapeType::dimension - 1> DofMappingType;
+        typedef DofMappingSingleEntity<Element, 1> DofMappingType;
 
         /** \copydoc ElementBase::DofAssignment */
         template<int shape_dim_>
