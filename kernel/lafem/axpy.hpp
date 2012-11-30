@@ -7,6 +7,9 @@
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/product.hpp>
+#include <kernel/lafem/sum.hpp>
+#include <kernel/lafem/scale.hpp>
 
 
 
@@ -30,7 +33,7 @@ namespace FEAST
     struct Axpy <Algo::Generic>
     {
       /**
-       * \brief Calculate \f$r \leftarrow ax + y\f$
+       * \brief Calculate \f$r \leftarrow \alpha x + y\f$
        *
        * \param[out] r The axpy result.
        * \param[in] a A scalar to scale x with.
@@ -75,7 +78,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Calculate \f$r \leftarrow ax + y\f$
+       * \brief Calculate \f$r \leftarrow \alpha x + y\f$
        *
        * \param[out] r The axpy result.
        * \param[in] a A vector to scale x with.
@@ -128,6 +131,23 @@ namespace FEAST
             rp[i] = ap[i] * xp[i] + yp[i];
           }
         }
+      }
+
+      /**
+       * \brief Calculate \f$r \leftarrow \alpha \cdot P \cdot x + y\f$
+       *
+       * \param[out] r The axpy result.
+       * \param[in] a A scalar to scale Px with.
+       * \param[in] x The vector to be multiplied and scaled.
+       * \param[in] P The matrix to be multiplied and scaled.
+       * \param[in] y The other vector
+       */
+      template <typename DT_>
+      static void value(DenseVector<Mem::Main, DT_> & r, const DT_ a, const SparseMatrixCSR<Mem::Main, DT_> & P, const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
+      {
+        Product<Algo::Generic>::value(r, P, x);
+        Scale<Algo::Generic>::value(r, a, r);
+        Sum<Algo::Generic>::value(r, r, y);
       }
     };
 
