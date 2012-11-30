@@ -207,16 +207,10 @@
     <ClInclude Include="..\kernel\lafem\dot_product.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\lafem\element_product.hpp">
-      <Filter>Header Files\lafem</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\lafem\memory_pool.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\lafem\norm.hpp">
-      <Filter>Header Files\lafem</Filter>
-    </ClInclude>
-    <ClInclude Include="..\kernel\lafem\product.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
     <ClInclude Include="..\kernel\lafem\sparse_matrix_coo.hpp">
@@ -540,9 +534,6 @@
     <ClInclude Include="..\kernel\lafem\unit_filter.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
-    <ClInclude Include="..\kernel\space\dof_set.hpp">
-      <Filter>Header Files\space</Filter>
-    </ClInclude>
     <ClInclude Include="..\kernel\assembly\dirichlet_bc.hpp">
       <Filter>Header Files\assembly</Filter>
     </ClInclude>
@@ -584,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="..\kernel\assembly\discrete_projector.hpp">
       <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\component_product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\lafem\product_matvec.hpp">
+      <Filter>Header Files\lafem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

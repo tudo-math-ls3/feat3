@@ -157,13 +157,7 @@
     <ClCompile Include="..\kernel\lafem\dot_product-test.cpp">
       <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
-    <ClCompile Include="..\kernel\lafem\element_product-test.cpp">
-      <Filter>Source Files %28kernel%29\lafem</Filter>
-    </ClCompile>
     <ClCompile Include="..\kernel\lafem\norm-test.cpp">
-      <Filter>Source Files %28kernel%29\lafem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kernel\lafem\product-test.cpp">
       <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\lafem\sparse_matrix_coo-test.cpp">
@@ -258,6 +252,12 @@
     </ClCompile>
     <ClCompile Include="..\kernel\space\discontinuous-test.cpp">
       <Filter>Source Files %28kernel%29\space</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\component_product-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\lafem\product_matvec-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
