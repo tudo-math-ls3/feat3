@@ -7,10 +7,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/product_matvec.hpp>
-#include <kernel/lafem/sum.hpp>
-#include <kernel/lafem/scale.hpp>
-
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 
 namespace FEAST
@@ -145,9 +142,36 @@ namespace FEAST
       template <typename DT_>
       static void value(DenseVector<Mem::Main, DT_> & r, const DT_ a, const SparseMatrixCSR<Mem::Main, DT_> & P, const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
       {
-        ProductMatVec<Algo::Generic>::value(r, P, x);
-        Scale<Algo::Generic>::value(r, a, r);
-        Sum<Algo::Generic>::value(r, r, y);
+        //ProductMatVec<Algo::Generic>::value(r, P, x);
+        //Scale<Algo::Generic>::value(r, r, a);
+        //Sum<Algo::Generic>::value(r, r, y);
+
+        if (x.size() != P.columns())
+          throw InternalError("Vector size does not match!");
+        if (P.rows() != r.size())
+          throw InternalError("Vector size does not match!");
+        if (y.size() != r.size())
+          throw InternalError("Vector size does not match!");
+
+        const DT_ * xp(x.elements());
+        const DT_ * yp(y.elements());
+        const Index * col_ind(P.col_ind());
+        const DT_ * val(P.val());
+        const Index * row_ptr(P.row_ptr());
+        const Index * row_ptr_end(P.row_ptr_end());
+        DT_ * rp(r.elements());
+        const Index rows(P.rows());
+
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          DT_ sum(0);
+          const Index end(row_ptr_end[row]);
+          for (Index i(row_ptr[row]) ; i < end ; ++i)
+          {
+            sum += val[i] * xp[col_ind[i]];
+          }
+          rp[row] = (sum * a)+ yp[row];
+        }
       }
     };
 
