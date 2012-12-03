@@ -218,7 +218,7 @@ namespace FEAST
         {
           v[i] *= alpha;
         }
-        return this;
+        return *this;
       }
 
       /// vector-add operator
