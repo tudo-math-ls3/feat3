@@ -582,6 +582,24 @@
     <ClInclude Include="..\kernel\lafem\product_matvec.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\analytic_functor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\node_functional_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\discontinuous\node_functional.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\lagrange1\node_functional.hpp">
+      <Filter>Header Files\space\lagrange1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\space\rannacher_turek\node_functional.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\assembly\interpolator.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

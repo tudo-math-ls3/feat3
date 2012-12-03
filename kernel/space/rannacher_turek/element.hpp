@@ -7,6 +7,7 @@
 #include <kernel/space/dof_assignment_common.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
 #include <kernel/space/rannacher_turek/evaluator.hpp>
+#include <kernel/space/rannacher_turek/node_functional.hpp>
 
 namespace FEAST
 {
@@ -101,6 +102,26 @@ namespace FEAST
         public:
           /// Dof-Assignment type
           typedef DofAssignmentSingleEntity<Element, shape_dim_, ShapeType::dimension - 1> Type;
+        };
+
+        /** \copydoc ElementBase::NodeFunctional */
+        template<
+          typename Functor_,
+          int shape_dim_,
+          typename DataType_ = Real>
+        class NodeFunctional
+        {
+        private:
+          /// dummy enum
+          enum
+          {
+            /// co-dimension
+            codim = ShapeType::dimension - shape_dim_,
+          };
+
+        public:
+          /// node functional type
+          typedef RannacherTurek::NodeFunctional<Element, Functor_, codim, VariantTag, DataType_> Type;
         };
 
       public:

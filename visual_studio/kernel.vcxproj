@@ -492,6 +492,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\kernel\analytic_functor.hpp" />
     <ClInclude Include="..\kernel\archs.hpp" />
     <ClInclude Include="..\kernel\assembly\asm_traits.hpp" />
     <ClInclude Include="..\kernel\assembly\base.hpp" />
@@ -501,6 +502,7 @@
     <ClInclude Include="..\kernel\assembly\discrete_projector.hpp" />
     <ClInclude Include="..\kernel\assembly\grid_transfer.hpp" />
     <ClInclude Include="..\kernel\assembly\intern\dof_set.hpp" />
+    <ClInclude Include="..\kernel\assembly\interpolator.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functional.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functor_base.hpp" />
     <ClInclude Include="..\kernel\assembly\lafem_backend.hpp" />
@@ -612,6 +614,7 @@
     <ClInclude Include="..\kernel\space\base.hpp" />
     <ClInclude Include="..\kernel\space\discontinuous\element.hpp" />
     <ClInclude Include="..\kernel\space\discontinuous\evaluator.hpp" />
+    <ClInclude Include="..\kernel\space\discontinuous\node_functional.hpp" />
     <ClInclude Include="..\kernel\space\discontinuous\variant.hpp" />
     <ClInclude Include="..\kernel\space\dof_adjacency.hpp" />
     <ClInclude Include="..\kernel\space\dof_assignment_base.hpp" />
@@ -624,8 +627,11 @@
     <ClInclude Include="..\kernel\space\eval_data.hpp" />
     <ClInclude Include="..\kernel\space\lagrange1\element.hpp" />
     <ClInclude Include="..\kernel\space\lagrange1\evaluator.hpp" />
+    <ClInclude Include="..\kernel\space\lagrange1\node_functional.hpp" />
+    <ClInclude Include="..\kernel\space\node_functional_base.hpp" />
     <ClInclude Include="..\kernel\space\rannacher_turek\element.hpp" />
     <ClInclude Include="..\kernel\space\rannacher_turek\evaluator.hpp" />
+    <ClInclude Include="..\kernel\space\rannacher_turek\node_functional.hpp" />
     <ClInclude Include="..\kernel\space\rannacher_turek\variant.hpp" />
     <ClInclude Include="..\kernel\trafo\base.hpp" />
     <ClInclude Include="..\kernel\trafo\evaluator_base.hpp" />

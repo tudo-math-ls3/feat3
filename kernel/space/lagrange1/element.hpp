@@ -7,6 +7,7 @@
 #include <kernel/space/dof_assignment_common.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
 #include <kernel/space/lagrange1/evaluator.hpp>
+#include <kernel/space/lagrange1/node_functional.hpp>
 
 namespace FEAST
 {
@@ -92,6 +93,18 @@ namespace FEAST
         public:
           /// Dof-Assignment type
           typedef DofAssignmentSingleEntity<Element, shape_dim_, 0> Type;
+        };
+
+        /** \copydoc ElementBase::NodeFunctional */
+        template<
+          typename Functor_,
+          int shape_dim_,
+          typename DataType_ = Real>
+        class NodeFunctional
+        {
+        public:
+          /// node functional type
+          typedef Lagrange1::NodeFunctional<Element, Functor_, shape_dim_, DataType_> Type;
         };
 
       public:

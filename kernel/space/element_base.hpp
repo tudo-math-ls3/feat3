@@ -99,6 +99,46 @@ namespace FEAST
       };
 
       /**
+       * \brief Node-Functional class wrapper template
+       *
+       * \tparam Functor_
+       * The class of the functor that is to be evaluated by the node functional.
+       * Must implement the DeriveFunctor interface.
+       *
+       * \tparam shape_dim_
+       * The dimension of the shape for which the node-functional is to be defined.
+       *
+       * \tparam Derive_
+       * The derivative tag class for which the node-functional is to be defined.
+       * Must be one of the tag classes defined in the FEAST::Derivative namespace.
+       *
+       * \tparam DataType_
+       * The data-type that is to be used for evaluation.
+       */
+      template<
+        typename Functor_,
+        int shape_dim_,
+        typename Derive_ = Derivative::Value,
+        typename DataType_ = Real>
+      class NodeFunctional
+      {
+      public:
+        /// dummy enum
+        enum
+        {
+          /**
+           * \brief Specifices whether the element has node functionals for the specified combination
+           * of shape dimension and derivative tag. If a node functional exists, this value is non-zero,
+           * otherwise it is zero.
+           */
+          exists = ...
+        };
+
+        /// node-functional type
+        typedef ... Type;
+      };
+
+      /**
        * \brief Returns the number of dofs.
        *
        * \returns
