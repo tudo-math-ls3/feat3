@@ -25,6 +25,135 @@ namespace FEAST
       /* ************************************************************************************* */
 
       /**
+       * \brief Specialisation of standard trafo evaluator for Vertex shape
+       *
+       * \author Peter Zajac
+       */
+      template<
+        typename Trafo_,
+        typename EvalPolicy_>
+      class Evaluator<Trafo_, EvalPolicy_, Shape::Vertex > :
+        public EvaluatorBase<Trafo_, Evaluator<Trafo_, EvalPolicy_, Shape::Vertex >, EvalPolicy_>
+      {
+      public:
+        /// base-class typedef
+        typedef EvaluatorBase<Trafo_, Evaluator, EvalPolicy_> BaseClass;
+        /// shape type
+        typedef Shape::Vertex ShapeType;
+        /// trafo type using this evaluator
+        typedef Trafo_ TrafoType;
+        /// trafo evaluation traits
+        typedef EvalPolicy_ EvalPolicy;
+
+        /// type of the underlying mesh
+        typedef typename TrafoType::MeshType MeshType;
+
+        /// trafo coefficient type
+        typedef typename EvalPolicy::TrafoCoeffType CoeffType;
+
+        /// const domain point reference
+        typedef typename EvalPolicy::DomainPointConstRef DomainPointConstRef;
+
+        /// image coordinate type
+        typedef typename EvalPolicy::ImageCoordType ImageCoordType;
+        /// image point reference
+        typedef typename EvalPolicy::ImagePointRef ImagePointRef;
+
+        /// jacobian matrix coefficient type
+        typedef typename EvalPolicy::JacMatCoeff JacMatCoeff;
+        /// jacobian matrix reference
+        typedef typename EvalPolicy::JacMatRef JacMatRef;
+
+        /// dummy enumeration
+        enum
+        {
+          /// domain dimension
+          domain_dim = EvalPolicy::domain_dim,
+          /// image dimension
+          image_dim = EvalPolicy::image_dim
+        };
+
+        /// capability enumeration
+        enum EvaluatorCapabilities
+        {
+          /// can compute domain points
+          can_dom_point = 1,
+          /// can compute image points
+          can_img_point = 1,
+          /// can't compute jacobian matrices
+          can_jac_mat = 0,
+          /// can't compute jacobian inverse matrices
+          can_jac_inv = 0,
+          /// can't compute jacobian determinants
+          can_jac_det = 0
+        };
+
+      protected:
+        /// the coefficients of the trafo
+        CoeffType _coeff[image_dim];
+
+      public:
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] trafo
+         * A reference to the trafo using this evaluator.
+         */
+        explicit Evaluator(const TrafoType& trafo) :
+          BaseClass(trafo)
+        {
+        }
+
+        /**
+         * \brief Prepares the evaluator for a given cell.
+         *
+         * \param[in] cell_index
+         * The index of the cell for which the evaluator is to be prepared.
+         */
+        void prepare(Index cell_index)
+        {
+          // prepare base-class
+          BaseClass::prepare(cell_index);
+
+          // fetch the mesh from the trafo
+          const MeshType& mesh = this->_trafo.get_mesh();
+
+          // fetch the vertex set from the mesh
+          typedef typename MeshType::VertexSetType VertexSetType;
+          const VertexSetType& vertex_set = mesh.get_vertex_set();
+
+          // fetch the vertex
+          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
+          ConstVertexReference vtx = vertex_set[cell_index];
+
+          // calculate transformation coefficients
+          for(int i(0); i < image_dim; ++i)
+          {
+            _coeff[i] = CoeffType(vtx[i]);
+          }
+        }
+
+        /**
+         * \brief Maps a point from the reference cell to the selected cell.
+         *
+         * \param[out] img_point
+         * A reference to the point on the selected cell that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the point on the reference cell that is to be mapped.
+         */
+        void map_point(ImagePointRef img_point, DomainPointConstRef DOXY(dom_point)) const
+        {
+          for(int i(0); i < image_dim; ++i)
+          {
+            img_point[i] = ImageCoordType(_coeff[i]);
+          }
+        }
+      }; // class Evaluator<Hypercube<1>,...>
+
+      /* ************************************************************************************* */
+
+      /**
        * \brief Specialisation of standard trafo evaluator for Hypercube<1> shape
        *
        * \author Peter Zajac

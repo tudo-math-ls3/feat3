@@ -40,7 +40,7 @@ namespace FEAST
       enum
       {
         /// domain dimension
-        domain_dim = Shape_::dimension,
+        domain_dim = Shape_::dimension > 0 ? Shape_::dimension : 1,
         /// image dimension
         image_dim = image_dim_
       };
