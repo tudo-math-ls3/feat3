@@ -194,9 +194,9 @@ public:
       Axpy<Algo_>::value(r, s, a, x, y);
       copy(result_local, r);
 
-      ProductMatVec<Algo::Generic>::value(ref, a, x);
-      Scale<Algo::Generic>::value(ref, ref, s);
-      Sum<Algo::Generic>::value(ref, ref, y);
+      ProductMatVec<Algo_>::value(ref, a, x);
+      Scale<Algo_>::value(ref, ref, s);
+      Sum<Algo_>::value(ref, ref, y);
       copy(ref_local, ref);
 
       for (Index i(0) ; i < size ; ++i)
@@ -207,6 +207,6 @@ public:
 DVAxpyMVTest<Mem::Main, Algo::Generic, float> dv_axpy_mv_test_float;
 DVAxpyMVTest<Mem::Main, Algo::Generic, double> dv_axpy_mv_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-//DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_axpy_mv_test_float;
-//DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_mv_test_double;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_axpy_mv_test_float;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_mv_test_double;
 #endif
