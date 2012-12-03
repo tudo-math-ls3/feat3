@@ -225,6 +225,95 @@ namespace FEAST
       }
     };
     /// \endcond
+
+    /**
+     * \brief Refined Unit-Cube mesh factory
+     *
+     * \author Peter Zajac
+     */
+    template<typename Mesh_>
+    class RefinedUnitCubeFactory DOXY({});
+
+    /// \cond internal
+    template<typename Shape_, int num_coords_, int stride_, typename Coord_>
+    class RefinedUnitCubeFactory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
+      public Factory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
+    {
+    public:
+      typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+      typedef typename MeshType::VertexSetType VertexSetType;
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+
+    private:
+      typedef Factory<MeshType> MeshFactory;
+      typedef UnitCubeFactory<MeshType> CubeFactory;
+      typedef StandardRefinery<MeshType> RefineFactory;
+
+      MeshType* _coarse_mesh;
+      MeshFactory* _factory;
+
+    public:
+      explicit RefinedUnitCubeFactory(Index num_refines) :
+        _coarse_mesh(nullptr),
+        _factory(nullptr)
+      {
+        if(num_refines <= 0)
+        {
+          _factory = new CubeFactory();
+          return;
+        }
+
+        // create coarse mesh
+        CubeFactory cube_factory;
+        _coarse_mesh = new MeshType(cube_factory);
+
+        // create refinery
+        _factory = new RefineFactory(*_coarse_mesh);
+
+        // refine n-1 times;
+        for(Index i(1); i < num_refines; ++i)
+        {
+          // backup old mesh
+          MeshType* mesh_old = _coarse_mesh;
+          // refine mesh
+          _coarse_mesh = new MeshType(*_factory);
+          // delete old factory
+          delete _factory;
+          // delete old coarse mesh
+          delete mesh_old;
+          // create new factory
+          _factory = new RefineFactory(*_coarse_mesh);
+        }
+      }
+
+      virtual ~RefinedUnitCubeFactory()
+      {
+        if(_factory != nullptr)
+        {
+          delete _factory;
+        }
+        if(_coarse_mesh != nullptr)
+        {
+          delete _coarse_mesh;
+        }
+      }
+
+      virtual Index get_num_entities(int dim)
+      {
+        return _factory->get_num_entities(dim);
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      {
+        _factory->fill_vertex_set(vertex_set);
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      {
+        _factory->fill_index_sets(index_set_holder);
+      }
+    };
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 
