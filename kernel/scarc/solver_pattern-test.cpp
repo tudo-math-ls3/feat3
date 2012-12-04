@@ -61,7 +61,7 @@ class SolverPatternTest:
                          SolverPatternGeneration<RichardsonProxyLayer, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver4(SolverPatternGeneration<RichardsonProxyLayer, Algo_>::execute(data4, 20, 1e-8));
       TEST_CHECK_THROWS(solver4->execute(), ScaRCError);
-      TEST_CHECK_EQUAL(solver4->type_name(), " ");
+      TEST_CHECK_EQUAL(solver4->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[PreconFunctor[], DefectFunctor, NormFunctor, DivFunctor]]]");
     }
 };
 SolverPatternTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");
