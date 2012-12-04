@@ -146,7 +146,8 @@ DVAxpyVTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_v_test_double;
 template<
   typename Arch_,
   typename Algo_,
-  typename DT_>
+  typename DT_,
+  typename SM_>
 class DVAxpyMVTest
   : public TaggedTest<Arch_, DT_>
 {
@@ -188,7 +189,7 @@ public:
             a_local(row, col, DT_(-1));
         }
       }
-      SparseMatrixCSR<Arch_, DT_> a(a_local);
+      SM_ a(a_local);
 
       DenseVector<Arch_, DT_> r(size);
       Axpy<Algo_>::value(r, s, a, x, y);
@@ -204,9 +205,13 @@ public:
     }
   }
 };
-DVAxpyMVTest<Mem::Main, Algo::Generic, float> dv_axpy_mv_test_float;
-DVAxpyMVTest<Mem::Main, Algo::Generic, double> dv_axpy_mv_test_double;
+DVAxpyMVTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > dv_axpy_mv_csr_test_float;
+DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > dv_axpy_mv_csr_test_double;
+DVAxpyMVTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > dv_axpy_mv_ell_test_float;
+DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > dv_axpy_mv_ell_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_axpy_mv_test_float;
-DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_mv_test_double;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > gpu_dv_axpy_mv_csr_test_float;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > gpu_dv_axpy_mv_csr_test_double;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > gpu_dv_axpy_mv_ell_test_float;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > gpu_dv_axpy_mv_ell_test_double;
 #endif

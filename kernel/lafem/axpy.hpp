@@ -8,6 +8,7 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 
 
 namespace FEAST
@@ -142,10 +143,6 @@ namespace FEAST
       template <typename DT_>
       static void value(DenseVector<Mem::Main, DT_> & r, const DT_ a, const SparseMatrixCSR<Mem::Main, DT_> & P, const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
       {
-        //ProductMatVec<Algo::Generic>::value(r, P, x);
-        //Scale<Algo::Generic>::value(r, r, a);
-        //Sum<Algo::Generic>::value(r, r, y);
-
         if (x.size() != P.columns())
           throw InternalError("Vector size does not match!");
         if (P.rows() != r.size())
@@ -173,6 +170,57 @@ namespace FEAST
           rp[row] = (sum * a)+ yp[row];
         }
       }
+
+      /**
+       * \brief Calculate \f$r \leftarrow \alpha \cdot P \cdot x + y\f$
+       *
+       * \param[out] r The axpy result.
+       * \param[in] a A scalar to scale Px with.
+       * \param[in] x The vector to be multiplied and scaled.
+       * \param[in] P The matrix to be multiplied and scaled.
+       * \param[in] y The other vector
+       */
+      template <typename DT_>
+      static void value(DenseVector<Mem::Main, DT_> & r, const DT_ a, const SparseMatrixELL<Mem::Main, DT_> & P, const DenseVector<Mem::Main, DT_> & x, const DenseVector<Mem::Main, DT_> & y)
+      {
+        if (x.size() != P.columns())
+          throw InternalError("Vector size does not match!");
+        if (P.rows() != r.size())
+          throw InternalError("Vector size does not match!");
+        if (y.size() != r.size())
+          throw InternalError("Vector size does not match!");
+
+        const DT_ * yp(y.elements());
+        DT_ * result(r.elements());
+        const Index * Aj(P.Aj());
+        const DT_ * Ax(P.Ax());
+        const Index * Arl(P.Arl());
+        const DT_ * xp(x.elements());
+        const Index stride(P.stride());
+        const Index rows(P.rows());
+
+        for (Index row(0) ; row < rows ; ++row)
+        {
+          const Index * tAj(Aj);
+          const DT_ * tAx(Ax);
+          DT_ sum(0);
+          tAj += row;
+          tAx += row;
+
+          const Index max(Arl[row]);
+          for(Index n(0); n < max ; n++)
+          {
+              const DT_ A_ij = *tAx;
+
+              const Index col = *tAj;
+              sum += A_ij * xp[col];
+
+              tAj += stride;
+              tAx += stride;
+          }
+          result[row] = (sum * a) + yp[row];
+        }
+      }
     };
 
     template <>
@@ -186,6 +234,9 @@ namespace FEAST
 
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const DT_ a, const SparseMatrixCSR<Mem::CUDA, DT_> & P, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);
+
+      template <typename DT_>
+      static void value(DenseVector<Mem::CUDA, DT_> & r, const DT_ a, const SparseMatrixELL<Mem::CUDA, DT_> & P, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);
     };
 
   } // namespace LAFEM
