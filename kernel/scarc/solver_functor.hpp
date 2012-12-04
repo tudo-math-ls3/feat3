@@ -33,6 +33,11 @@ namespace FEAST
         {
         }
 
+        virtual bool is_preconditioner()
+        {
+          return false;
+        }
+
         virtual bool is_complete()
         {
           return _complete;
@@ -556,7 +561,21 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "PreconFunctor";
+          if(!this->_complete)
+            return "PreconFunctor[]";
+          else
+          {
+            std::string result("PreconFunctor[");
+
+            result.append((const std::string)((this->_functor)->type_name()));
+            result.append("]");
+            return result;
+          }
+        }
+
+        virtual bool is_preconditioner()
+        {
+          return true;
         }
 
         virtual void execute()
@@ -612,9 +631,22 @@ namespace FEAST
           this->_complete = false;
         }
 
+        virtual bool is_preconditioner()
+        {
+          return true;
+        }
+
         virtual const std::string type_name()
         {
-          return "PreconFunctor";
+          if(!_precon_complete)
+            return "PreconFunctor[]";
+          else
+          {
+            std::string result("PreconFunctor[");
+            result.append((const std::string)((this->_functor)->type_name()));
+            result.append("]");
+            return result;
+          }
         }
 
         virtual void execute()
@@ -700,7 +732,11 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "IterateFunctor";
+          std::string result("IterateFunctor[");
+
+          result.append((const std::string)((this->_functor)->type_name()));
+          result.append("]");
+          return result;
         }
 
         virtual void execute()
@@ -990,7 +1026,17 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "CompoundSolverFunctor";
+          std::string result("[");
+
+          for(Index i(0) ; i < (this->_functors).size() ; ++i)
+          {
+            if(i != 0)
+              result.append(", ");
+
+            result.append((const std::string)((this->_functors).at(i)->type_name()));
+          }
+          result.append("]");
+          return result;
         }
 
         void add_functor(SolverFunctorBase<VT_>* functor)
@@ -1008,7 +1054,7 @@ namespace FEAST
           return _functors;
         }
 
-        Index size()
+        const Index size()
         {
           return Index(_functors.size());
         }
@@ -1042,7 +1088,7 @@ namespace FEAST
         {
           for(Index i(0) ; i < (this->_functors).size() ; ++i)
           {
-            if( (this->_functors).at(i)->type_name() == "PreconFunctor")
+            if( (this->_functors).at(i)->is_preconditioner())
             {
               ((PreconFunctor<Algo_, VT_>*)((this->_functors).at(i).get()))->set_precon_functor(functor);
               return;

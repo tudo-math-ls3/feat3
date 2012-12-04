@@ -40,9 +40,12 @@ class SolverPatternTest:
       ///TODO test
 
       //---------------------------------------------------------------------------------------------------------------------------------------------
-      SolverData<> data2(A, x, b, SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_vectors(), SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_scalars());
+      SolverData<> data2(A, x, b,
+                         SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_vectors(),
+                         SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver2(SolverPatternGeneration<RichardsonProxy, Algo_>::execute(data2, 20, 1e-8));
       TEST_CHECK_THROWS(solver2->execute(), ScaRCError);
+      TEST_CHECK_EQUAL(solver2->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[PreconFunctor[], DefectFunctor, NormFunctor, DivFunctor]]]");
       ///TODO test
 
     }

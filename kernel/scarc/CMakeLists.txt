@@ -36,8 +36,8 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/scarc/${test}" cpu)
-  SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "cpu")
+    --test-command "${FEAST_BINARY_DIR}/kernel/scarc/${test}" main)
+  SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "main")
 ENDFOREACH(test)
 
 #add all tests to scarc_tests
