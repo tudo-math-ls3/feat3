@@ -87,10 +87,6 @@ namespace FEAST
       /// basis function gradient vector const-reference
       typedef typename SpaceEvalTraits::BasisGradientVectorConstRef BasisGradientVectorConstRef;
 
-      // Note:
-      // The following block serves as an element interface documentation and is therefore only
-      // visible to doxygen. The actual functionality has to be supplied by the implementation.
-#ifdef DOXYGEN
       /**
        * \brief Capability enumeration
        *
@@ -106,7 +102,7 @@ namespace FEAST
          * If this value is non-zero, the evaluator implements the #eval_values member function.\n
          * See #eval_values for details.
          */
-        can_value = ...,
+        can_value = 0,
 
         /**
          * \brief Basis Gradients capability
@@ -115,9 +111,8 @@ namespace FEAST
          * If this value is non-zero, the evaluator implements the #eval_grads member function.\n
          * See #eval_grads for details.
          */
-        can_grad = ...,
+        can_grad = 0,
       };
-#endif // DOXYGEN
 
     protected:
       /// \cond internal

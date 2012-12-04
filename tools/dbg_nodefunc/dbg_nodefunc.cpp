@@ -8,6 +8,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
+#include <kernel/assembly/error_computer.hpp>
 
 using namespace FEAST;
 
@@ -90,8 +91,47 @@ public:
   }
 }; // class SineBubble<...>
 
+template<typename Space_>
+void test_interpolation(Index level)
+{
+  // define mesh factory
+  QuadMeshFactory mesh_factory(level);
+
+  // create mesh
+  QuadMesh mesh(mesh_factory);
+
+  // create trafo
+  QuadTrafo trafo(mesh);
+
+  // create space
+  Space_ space(trafo);
+
+  // define functor
+  typedef Analytic::StaticWrapperFunctor<SineBubble, true, true> FunctorType;
+  FunctorType functor;
+
+  // interpolate functor into FE space
+  VectorType vector;
+  Assembly::Interpolator::project(vector, functor, space);
+
+  // compute L2-error
+  DataType l2err = Assembly::ScalarErrorComputerL2::compute(functor, vector, space, "auto-degree:10");
+  DataType h1err = Assembly::ScalarErrorComputerH1::compute(functor, vector, space, "auto-degree:10");
+
+  // print error
+  std::cout << "Level: " << level <<
+    " , L2-Error: " << std::scientific << l2err <<
+    " , H1-Error: " << std::scientific << h1err << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
+  for(Index i(0); i < 5; ++i)
+  {
+    test_interpolation<QuadSpaceQ1>(i);
+  }
+
+/*
   // define mesh factory
   QuadMeshFactory mesh_factory(5);
 
@@ -124,13 +164,13 @@ int main(int argc, char* argv[])
   VectorType cell_vector;
   Assembly::DiscreteCellProjector::project(cell_vector, vector, space, "auto-degree:5");
 
-  //*
+  //
   Geometry::ExportVTK<QuadMesh> exporter(mesh);
   exporter.open("test.vtk");
   exporter.write_vertex_scalar("test-vtx", vertex_vector.elements());
   exporter.write_cell_scalar("test-cell", cell_vector.elements());
   exporter.close();
-  //*/
+  */
 
   return 0;
 }

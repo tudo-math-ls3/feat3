@@ -134,6 +134,15 @@ namespace FEAST
       /// trafo evaluator types
       typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
 
+      /// dummy enum
+      enum
+      {
+        /// trafo domain dimension
+        domain_dim = TrafoEvaluator::domain_dim,
+        /// trafo image dimension
+        image_dim = TrafoEvaluator::image_dim
+      };
+
       /// space evaluator types
       typedef typename SpaceType::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
       typedef SpaceEvaluator TestEvaluator;
@@ -273,6 +282,15 @@ namespace FEAST
 
       /// trafo evaluator types
       typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
+
+      /// dummy enum
+      enum
+      {
+        /// trafo domain dimension
+        domain_dim = TrafoEvaluator::domain_dim,
+        /// trafo image dimension
+        image_dim = TrafoEvaluator::image_dim
+      };
 
       /// space evaluator types
       typedef typename TestSpaceType::template Evaluator<TrafoEvaluator>::Type TestEvaluator;
