@@ -7,7 +7,7 @@
 #include<kernel/foundation/functor.hpp>
 #include<kernel/lafem/defect.hpp>
 #include<kernel/lafem/sum.hpp>
-#include<kernel/lafem/product.hpp>
+#include<kernel/lafem/product_matvec.hpp>
 #include<kernel/lafem/norm.hpp>
 
 using namespace FEAST::Foundation;
@@ -289,7 +289,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          LAFEM::Product<Algo_>::value(_y, _l, _r);
+          LAFEM::ProductMatVec<Algo_>::value(_y, _l, _r);
         }
 
         ProductFunctorProxyRight& operator=(const ProductFunctorProxyRight& rhs)
@@ -345,7 +345,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          LAFEM::Product<Algo_>::value(_y, _l, _r);
+          LAFEM::ProductMatVec<Algo_>::value(_y, _l, _r);
         }
 
         ProductFunctorProxyResultRight& operator=(const ProductFunctorProxyResultRight& rhs)
@@ -398,7 +398,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          LAFEM::Product<Algo_>::value(_y, _l, _r);
+          LAFEM::ProductMatVec<Algo_>::value(_y, _l, _r);
         }
 
         ProductFunctor& operator=(const ProductFunctor& rhs)

@@ -73,7 +73,7 @@ class SolverFunctorTest:
       //reference
       DenseVector<Tag_, DataType_> a_ref(1000, DataType_(1));
       DenseVector<Tag_, DataType_> b_ref(1000, DataType_(1));
-      Product<Algo_>::value(b_ref, A, a_ref);
+      ProductMatVec<Algo_>::value(b_ref, A, a_ref);
       Sum<Algo_>::value(a_ref, b_ref, a_ref);
 
       TEST_CHECK_EQUAL(a, a_ref);
@@ -101,7 +101,7 @@ class SolverFunctorTest:
       DenseVector<Tag_, DataType_> v_ref(1000, DataType_(0));
 
       copy(v_ref, u_ref);
-      Product<Algo_>::value(u_ref, A, u_ref);
+      ProductMatVec<Algo_>::value(u_ref, A, u_ref);
       Sum<Algo_>::value(u_ref, v_ref, u_ref);
 
       TEST_CHECK_EQUAL(u, u_ref);
