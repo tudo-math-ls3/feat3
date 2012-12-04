@@ -21,9 +21,6 @@ namespace FEAST
     class SolverFunctorBase
     {
       public:
-        ///needed in substitution of CSF
-        typedef VT_ solver_vector_type_;
-
         virtual void substitute(VT_& arg) = 0;
 
         virtual void execute() = 0;
