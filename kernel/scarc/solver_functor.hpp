@@ -494,6 +494,66 @@ namespace FEAST
     };
 
     template<typename Algo_, typename VT_, typename MT_>
+    class DefectFunctorProxyResultRight : public SolverFunctorBase<VT_>
+    {
+      public:
+        DefectFunctorProxyResultRight(VT_& y, const VT_& l, const MT_& m, VT_& r) :
+          _y(y),
+          _l(l),
+          _m(m),
+          _r(r)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DefectFunctor";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
+
+          LAFEM::Defect<Algo_>::value(_y, _l, _m, _r);
+        }
+
+        DefectFunctorProxyResultRight& operator=(const DefectFunctorProxyResultRight& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_m = rhs._r;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DefectFunctorProxyResultRight(const DefectFunctorProxyResultRight& other) :
+          _y(other._y),
+          _l(other._l),
+          _m(other._m),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _y = arg;
+          _r = arg;
+          this->_complete = true;
+        }
+
+      private:
+        VT_& _y;
+        const VT_& _l;
+        const MT_& _m;
+        VT_& _r;
+    };
+
+    template<typename Algo_, typename VT_, typename MT_>
     class DefectFunctor : public SolverFunctorBase<VT_>
     {
       public:
@@ -892,6 +952,54 @@ namespace FEAST
       private:
         ST_& _y;
         const VT_& _x;
+    };
+
+    template<typename Algo_, typename VT_, typename ST_>
+    class NormFunctorProxyRight : public SolverFunctorBase<VT_>
+    {
+      public:
+        NormFunctorProxyRight(ST_& y, VT_& x) :
+          _y(y),
+          _x(x)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "NormFunctor";
+        }
+
+        virtual void execute()
+        {
+          _y = LAFEM::Norm2<Algo_>::value(_x);
+        }
+
+        NormFunctorProxyRight& operator=(const NormFunctorProxyRight& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_x = rhs._x;
+          return *this;
+        }
+
+        NormFunctorProxyRight(const NormFunctorProxyRight& other) :
+          _y(other._y),
+          _x(other._x)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _x = arg;
+          this->_complete = true;
+        }
+
+      private:
+        ST_& _y;
+        VT_& _x;
     };
 
     template<typename Algo_, typename VT_, typename HaloStorageType_>

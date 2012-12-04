@@ -36,6 +36,7 @@ class SolverPatternTest:
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 20, 1e-8));
+      TEST_CHECK_EQUAL(solver->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[ProductFunctor, DefectFunctor, NormFunctor, DivFunctor]]]");
       solver->execute();
       ///TODO test
 
@@ -48,6 +49,14 @@ class SolverPatternTest:
       TEST_CHECK_EQUAL(solver2->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[PreconFunctor[], DefectFunctor, NormFunctor, DivFunctor]]]");
       ///TODO test
 
+      //---------------------------------------------------------------------------------------------------------------------------------------------
+      PreconditionedSolverData<> data3(A, A, x, b,
+                         SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_vectors(),
+                         SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver3(SolverPatternGeneration<RichardsonLayer, Algo_>::execute(data3, 20, 1e-8));
+      TEST_CHECK_EQUAL(solver3->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[ProductFunctor, DefectFunctor, NormFunctor, DivFunctor]]]");
+      TEST_CHECK_THROWS(solver3->execute(), ScaRCError);
+      ///TODO test
     }
 };
 SolverPatternTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");
