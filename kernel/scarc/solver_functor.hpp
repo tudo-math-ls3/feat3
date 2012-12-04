@@ -33,14 +33,8 @@ namespace FEAST
         {
         }
 
-        virtual bool is_preconditioner()
+        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& precon)
         {
-          return false;
-        }
-
-        virtual bool is_complete()
-        {
-          return _complete;
         }
 
       protected:
@@ -666,7 +660,7 @@ namespace FEAST
         {
         }
 
-        void set_precon_functor(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
+        void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
         {
           functor->substitute(_y);
           _functor = functor;
@@ -744,7 +738,7 @@ namespace FEAST
           this->_complete = this->_substitution_complete && _precon_complete;
         }
 
-        void set_precon_functor(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
+        void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
         {
           functor->substitute(_y);
           _functor = functor;
@@ -799,6 +793,11 @@ namespace FEAST
           return result;
         }
 
+        virtual bool is_solver_loop()
+        {
+          return true;
+        }
+
         virtual void execute()
         {
           Index count(0);
@@ -851,6 +850,11 @@ namespace FEAST
         virtual void substitute(VT_& arg)
         {
           _functor->substitute(arg);
+        }
+
+        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& precon)
+        {
+          _functor->set_preconditioner(precon);
         }
 
       private:
@@ -1191,18 +1195,12 @@ namespace FEAST
         {
         }
 
-        template<typename OVT_>
-        void set_preconditioner(std::shared_ptr<SolverFunctorBase<OVT_> >& functor)
+        void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& functor)
         {
           for(Index i(0) ; i < (this->_functors).size() ; ++i)
           {
-            if( (this->_functors).at(i)->is_preconditioner())
-            {
-              ((PreconFunctor<Algo_, VT_>*)((this->_functors).at(i).get()))->set_precon_functor(functor);
-              return;
-            }
+              ((this->_functors).at(i).get())->set_preconditioner(functor);
           }
-          throw ScaRCError("Error: No PreconFunctor in functor list!");
         }
 
       protected:

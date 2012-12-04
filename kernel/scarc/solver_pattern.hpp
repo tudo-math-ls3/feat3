@@ -124,12 +124,10 @@ namespace FEAST
                typename PT_,
                template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data,
+                                                                                VT_<Tag_, DataType_>& dummy,
                                                                                 Index max_iter = 100,
                                                                                 DataType_ eps = 1e-8)
       {
-        ///define dummy
-        VT_<Tag_, DataType_> dummy;
-
         ///take over 'logically constant' values
         data.max_iters() = max_iter;
         data.eps() = eps;
@@ -231,11 +229,10 @@ namespace FEAST
                template<typename, typename> class MT_,
                template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(SolverDataBase<DataType_, Tag_, VT_, MT_, StoreT_>& data,
+                                                                                VT_<Tag_, DataType_>& dummy,
                                                                                 Index max_iter = 100,
                                                                                 DataType_ eps = 1e-8)
       {
-        ///define dummy
-        VT_<Tag_, DataType_> dummy;
 
         ///take over 'logically constant' values
         data.max_iters() = max_iter;
@@ -320,15 +317,13 @@ namespace FEAST
                template<typename, typename> class MT_,
                typename PT_,
                template<typename, typename> class StoreT_>
-      static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data)
+      static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data,
+                                                                                VT_<Tag_, DataType_>& dummy)
       {
         ///create compound functor
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         ///get reference to functor (in order to cast only once)
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
-
-        ///define dummy
-        VT_<Tag_, DataType_> dummy;
 
         ///add functors to the solver program:
         //product(dummy, P, dummy)
