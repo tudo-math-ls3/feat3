@@ -213,6 +213,61 @@ namespace FEAST
     };
 
     template<typename Algo_>
+    struct SolverPatternGeneration<RichardsonProxyLayer, Algo_>
+    {
+      static Index min_num_temp_scalars()
+      {
+        return 1;
+      }
+
+      static Index min_num_temp_vectors()
+      {
+        return 0;
+      }
+
+      template<typename Tag_,
+               typename DataType_,
+               template<typename, typename> class VT_,
+               template<typename, typename> class MT_,
+               template<typename, typename> class StoreT_>
+      static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(SolverDataBase<DataType_, Tag_, VT_, MT_, StoreT_>& data,
+                                                                                Index max_iter = 100,
+                                                                                DataType_ eps = 1e-8)
+      {
+        ///define dummy
+        VT_<Tag_, DataType_> dummy;
+
+        ///take over 'logically constant' values
+        data.max_iters() = max_iter;
+        data.eps() = eps;
+
+        ///create compound functor
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        ///get reference to functor (in order to cast only once)
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
+
+        ///add functors to the solver program:
+        //defect(x, b, A, x)
+        cf.add_functor(new DefectFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(dummy, data.rhs(), data.sys(), dummy));
+
+        //norm2(norm_0, x)
+        cf.add_functor(new NormFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), dummy));
+
+        //iterate until s < eps: [proxyprecon(x), sum(x, x, x), norm(norm, x), div(s, norm, norm_0)]
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
+        cfiterate.add_functor(new PreconFunctorProxy<Algo_, VT_<Tag_, DataType_> >(dummy));
+        cfiterate.add_functor(new DefectFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(dummy, data.rhs(), data.sys(), dummy));
+        cfiterate.add_functor(new NormFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), dummy));
+        cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
+
+        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
+
+        return result;
+      }
+    };
+
+    template<typename Algo_>
     struct SolverPatternGeneration<SpMVPreconApply, Algo_>
     {
       static Index min_num_temp_scalars()
