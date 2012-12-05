@@ -97,7 +97,7 @@ namespace FEAST
       {
         // build index set
         std::set<Index> idx_set;
-        Intern::DirichletWrapper<shape_dim>::apply(idx_set, _space, _cells);
+        Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
 
         // allocate a filter of the correct size
         LAFEM::UnitFilter<MemType_, DataType_> filter(Index(idx_set.size()));
