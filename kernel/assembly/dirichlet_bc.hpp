@@ -245,12 +245,12 @@ namespace FEAST
             for(Index j(0); j < num_assign; ++j)
             {
               // evaluate node functional
-              DataType value(node_func(j));
+              DataType_ value(node_func(j));
               const Index num_contribs(dof_assign.get_num_contribs(j));
               for(Index k(0); k < num_contribs; ++k)
               {
                 Index index(dof_assign.get_index(j, k));
-                DataType weight(dof_assign.get_weight(j, k));
+                DataType_ weight(dof_assign.get_weight(j, k));
                 idx.insert(std::make_pair(index, (weight*value)));
               }
             }

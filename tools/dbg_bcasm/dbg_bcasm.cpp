@@ -72,10 +72,10 @@ void test_bcasm(
 
   // assemble filter:
   // a) homogene Dirichlet BCs
-  //UnitFilterType filter(dirichlet.assemble<Mem::Main, DataType>());
+  //UnitFilterType filter(dirichlet.template assemble<Mem::Main, DataType>());
   // b) inhomogene Dirichlet BCs
   Analytic::StaticWrapperFunctor<BCFunc> bc_func;
-  UnitFilterType filter(dirichlet.assemble<Mem::Main, DataType>(bc_func));
+  UnitFilterType filter(dirichlet.template assemble<Mem::Main, DataType>(bc_func));
 
   // filter system
   filter.filter_mat(mat_sys);
