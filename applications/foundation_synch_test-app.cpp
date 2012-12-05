@@ -151,13 +151,34 @@ void check_synch_mirror(int rank)
   DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
   DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
-  std::cout << "RANK " << rank << std::endl;
-  std::cout << target << std::endl;
 #ifndef SERIAL
   Synch<Archs::Parallel, com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
 #endif
-  std::cout << "RANK " << rank << std::endl;
-  std::cout << target << std::endl;
+
+  TestResult<double> res[4];
+#ifndef SERIAL
+    res[0] = test_check_equal_within_eps(target(0), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(target(1), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
+    res[2] = test_check_equal_within_eps(target(2), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
+    res[3] = test_check_equal_within_eps(target(3), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
+#else
+    res[0] = test_check_equal_within_eps(target(0), double(0), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(target(1), double(0), std::numeric_limits<double>::epsilon());
+    res[2] = test_check_equal_within_eps(target(2), double(0), std::numeric_limits<double>::epsilon());
+    res[3] = test_check_equal_within_eps(target(3), double(0), std::numeric_limits<double>::epsilon());
+#endif
+
+  bool passed(true);
+  for(unsigned long i(0) ; i < 4 ; ++i)
+    if(!res[i].passed)
+    {
+      std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+      passed = false;
+      break;
+    }
+
+  if(passed)
+    std::cout << "PASSED (rank " << rank <<"): foundation_synch-test (Tier-2: vertex-set based exchange)" << std::endl;
 }
 
 int main(int argc, char* argv[])
