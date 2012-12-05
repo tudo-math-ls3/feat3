@@ -133,8 +133,8 @@ namespace FEAST
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
 
         // create space evaluators
-        typename AsmTraits::TestSpaceEvaluator test_eval(test_space);
-        typename AsmTraits::TrialSpaceEvaluator trial_eval(trial_space);
+        typename AsmTraits::TestEvaluator test_eval(test_space);
+        typename AsmTraits::TrialEvaluator trial_eval(trial_space);
 
         // create dof-mappings
         typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
@@ -147,8 +147,8 @@ namespace FEAST
         typename AsmTraits::TrafoEvalData trafo_data;
 
         // create space evaluation data
-        typename AsmTraits::TestSpaceEvalData test_data;
-        typename AsmTraits::TrialSpaceEvalData trial_data;
+        typename AsmTraits::TestEvalData test_data;
+        typename AsmTraits::TrialEvalData trial_data;
 
         // create local matrix data
         typename AsmTraits::LocalMatrixDataType lmd(test_dof_mapping, trial_dof_mapping);

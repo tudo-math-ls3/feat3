@@ -244,7 +244,6 @@ namespace FEAST
       /// mult-space type
       typedef TrialSpaceType MultSpaceType;
 
-    protected:
       /// trafo type
       typedef typename TestSpaceType::TrafoType TrafoType;
       /// shape type
