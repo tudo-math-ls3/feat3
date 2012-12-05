@@ -73,6 +73,8 @@ public:
     TEST_CHECK_EQUAL(e, c);
     e = c;
     TEST_CHECK_EQUAL(e, c);
+
+    SparseMatrixELL<Tag_, DT_> f("5pt_10x10.ell");
   }
 };
 SparseMatrixELLTest<Mem::Main, float> cpu_sparse_matrix_ell_test_float;
