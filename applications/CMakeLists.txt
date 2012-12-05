@@ -12,9 +12,11 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 # applications to build
 ADD_EXECUTABLE(foundation_system_test-app foundation_system_test-app.cpp)
 ADD_EXECUTABLE(foundation_comm_test-app foundation_comm_test-app.cpp)
+ADD_EXECUTABLE(foundation_synch_test-app foundation_synch_test-app.cpp)
 ADD_EXECUTABLE(scarc_test-app scarc_test-app.cpp)
 TARGET_LINK_LIBRARIES(foundation_system_test-app feast)
 TARGET_LINK_LIBRARIES(foundation_comm_test-app feast)
+TARGET_LINK_LIBRARIES(foundation_synch_test-app feast)
 TARGET_LINK_LIBRARIES(scarc_test-app feast)
 
 if (NOT FEAST_SERIAL_MODE)

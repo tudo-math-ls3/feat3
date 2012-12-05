@@ -82,7 +82,7 @@ namespace FEAST
       /**
        * \brief Returns the number of entries in the mirror.
        */
-      Index get_num_mirror_entries() const
+      Index size() const
       {
         return _mirror_gather.rows();
       }
@@ -101,7 +101,7 @@ namespace FEAST
       LAFEM::DenseVector<Arch_, DataType2_> create_buffer(
         const LAFEM::DenseVector<Arch_, DataType2_>& DOXY(tmpl_vec)) const
       {
-        return LAFEM::DenseVector<Arch_, DataType2_>(get_num_mirror_entries());
+        return LAFEM::DenseVector<Arch_, DataType2_>(size());
       }
 
       /**
