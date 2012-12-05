@@ -38,9 +38,9 @@ namespace FEAST
     {
       private:
         /// The stride is the row count, rounded up to a multiple of the warp size
-        unsigned long _stride;
+        Index _stride;
         /// Column count per row
-        unsigned long _num_cols_per_row;
+        Index _num_cols_per_row;
 
         /// Column indices stored in a (cols_per_row x stride) matrix
         Index * _Aj;
@@ -107,17 +107,19 @@ namespace FEAST
               _num_cols_per_row = _Arl[i];
           }
 
-          unsigned long alignment(32);
+          Index alignment(32);
           _stride = alignment * ((_rows + alignment - 1)/ alignment);
 
 
           _Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(DT_));
+          MemoryPool<Mem::Main>::instance()->set_memory(_Ax, DT_(0), _num_cols_per_row * _stride);
           _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->set_memory(_Aj, Index(0), _num_cols_per_row * _stride);
 
-          for (unsigned long row(0); row < _rows ; ++row)
+          for (Index row(0); row < _rows ; ++row)
           {
-            unsigned long target(0);
-            for (unsigned long i(0) ; i < _Arl[row] ; ++i)
+            Index target(0);
+            for (Index i(0) ; i < _Arl[row] ; ++i)
             {
               const Index row_start(other.row_ptr()[row]);
               //if(other.val()[row_start + i] != DT_(0))
@@ -174,17 +176,19 @@ namespace FEAST
               _num_cols_per_row = _Arl[i];
           }
 
-          unsigned long alignment(32);
+          Index alignment(32);
           _stride = alignment * ((_rows + alignment - 1)/ alignment);
 
 
           _Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(DT_));
+          MemoryPool<Mem::Main>::instance()->set_memory(_Ax, DT_(0), _num_cols_per_row * _stride);
           _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->set_memory(_Aj, Index(0), _num_cols_per_row * _stride);
 
-          for (unsigned long row(0); row < _rows ; ++row)
+          for (Index row(0); row < _rows ; ++row)
           {
-            unsigned long target(0);
-            for (unsigned long i(0) ; i < _Arl[row] ; ++i)
+            Index target(0);
+            for (Index i(0) ; i < _Arl[row] ; ++i)
             {
               const Index row_start(other.row_ptr()[row]);
               //if(other.val()[row_start + i] != DT_(0))
@@ -202,6 +206,7 @@ namespace FEAST
           this->_indices_size.push_back(_num_cols_per_row * _stride);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
           this->_indices_size.push_back(_rows);
+
 
           MemoryPool<Arch_>::upload(this->get_elements().at(0), _Ax, _num_cols_per_row * _stride * sizeof(DT_));
           MemoryPool<Arch_>::upload(this->get_indices().at(0), _Aj, _num_cols_per_row * _stride * sizeof(Index));
@@ -280,10 +285,10 @@ namespace FEAST
           _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
           //compute row length vector
           _used_elements = 0;
-          for (unsigned long row(0) ; row < _rows ; ++row)
+          for (Index row(0) ; row < _rows ; ++row)
           {
             Index count(0);
-            for (unsigned long i(row) ; i < size ; i+=stride)
+            for (Index i(row) ; i < size ; i+=stride)
             {
                 if (_Ax[i] == DT_(0))
                 {
@@ -474,6 +479,50 @@ namespace FEAST
         }
 
         /**
+         * \brief Write out matrix to file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out(String filename) const
+        {
+          if (typeid(DT_) != typeid(double))
+            std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
+
+          Index * Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
+          MemoryPool<Arch_>::download(Aj, _Aj, _num_cols_per_row * _stride * sizeof(Index));
+          uint64_t * cAj = new uint64_t[_num_cols_per_row * _stride];
+          for (Index i(0) ; i < _num_cols_per_row * _stride ; ++i)
+            cAj[i] = Aj[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(Aj);
+
+          DT_ * Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(DT_));
+          MemoryPool<Arch_>::download(Ax, _Ax, _num_cols_per_row * _stride * sizeof(DT_));
+          double * cAx = new double[_num_cols_per_row * _stride];
+          for (Index i(0) ; i < _num_cols_per_row * _stride ; ++i)
+            cAx[i] = Ax[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(Ax);
+
+          FILE* file;
+          file = fopen(filename.c_str(), "wb");
+          uint64_t size(_num_cols_per_row * _stride);
+          uint64_t rows(_rows);
+          uint64_t columns(_columns);
+          uint64_t stride(_stride);
+          uint64_t num_cols_per_row(_num_cols_per_row);
+          fwrite(&size, sizeof(uint64_t), 1, file);
+          fwrite(&rows, sizeof(uint64_t), 1, file);
+          fwrite(&columns, sizeof(uint64_t), 1, file);
+          fwrite(&stride, sizeof(uint64_t), 1, file);
+          fwrite(&num_cols_per_row, sizeof(uint64_t), 1, file);
+          fwrite(cAj, sizeof(uint64_t), size, file);
+          fwrite(cAx, sizeof(double), size, file);
+
+          fclose(file);
+          delete[] cAj;
+          delete[] cAx;
+        }
+
+        /**
          * \brief Retrieve specific matrix element.
          *
          * \param[in] row The row of the matrix element.
@@ -488,8 +537,8 @@ namespace FEAST
 
           if (typeid(Arch_) == typeid(Mem::Main))
           {
-            unsigned long max(this->_Arl[row]);
-            for (unsigned long i(row), j(0) ; j < max && this->_Aj[i] <= col ; i += this->_stride, ++j)
+            Index max(this->_Arl[row]);
+            for (Index i(row), j(0) ; j < max && this->_Aj[i] <= col ; i += this->_stride, ++j)
             {
                 if (this->_Aj[i] == col)
                   return this->_Ax[i];

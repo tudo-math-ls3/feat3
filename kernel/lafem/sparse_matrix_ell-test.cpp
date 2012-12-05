@@ -4,6 +4,8 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 
+#include <cstdio>
+
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
@@ -74,7 +76,23 @@ public:
     e = c;
     TEST_CHECK_EQUAL(e, c);
 
-    SparseMatrixELL<Tag_, DT_> f("5pt_10x10.ell");
+    SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 12);
+    for (unsigned long row(0) ; row < fcoo.rows() ; ++row)
+    {
+      for (unsigned long col(0) ; col < fcoo.columns() ; ++col)
+      {
+        if(row == col)
+          fcoo(row, col, DT_(2));
+        else if((row == col+1) || (row+1 == col))
+          fcoo(row, col, DT_(-1));
+      }
+    }
+    SparseMatrixELL<Tag_, DT_> f(fcoo);
+
+    f.write_out("test.ell");
+    SparseMatrixELL<Tag_, DT_> g("test.ell");
+    TEST_CHECK_EQUAL(g, f);
+    remove("test.ell");
   }
 };
 SparseMatrixELLTest<Mem::Main, float> cpu_sparse_matrix_ell_test_float;
