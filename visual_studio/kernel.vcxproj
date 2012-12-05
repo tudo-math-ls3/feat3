@@ -502,7 +502,6 @@
     <ClInclude Include="..\kernel\assembly\discrete_projector.hpp" />
     <ClInclude Include="..\kernel\assembly\error_computer.hpp" />
     <ClInclude Include="..\kernel\assembly\grid_transfer.hpp" />
-    <ClInclude Include="..\kernel\assembly\intern\dof_set.hpp" />
     <ClInclude Include="..\kernel\assembly\interpolator.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functional.hpp" />
     <ClInclude Include="..\kernel\assembly\linear_functor_base.hpp" />

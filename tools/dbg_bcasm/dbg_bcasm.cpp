@@ -38,6 +38,16 @@ public:
   }
 };
 
+template<typename T_>
+class BCFunc
+{
+public:
+  static T_ eval(T_ /*x*/, T_ /*y*/)
+  {
+    return T_(17);
+  }
+};
+
 template<typename Space_, typename CellSet_>
 void test_bcasm(
   const Space_& space,
@@ -57,12 +67,15 @@ void test_bcasm(
   VectorType vec_sol(space.get_num_dofs(), Real(1));
 
   // assemble homogene Dirichlet BCs
-  Assembly::HomogeneDirichletBC<Space_> dirichlet(space);
+  Assembly::DirichletBC<Space_> dirichlet(space);
   dirichlet.add_cell_set(cell);
 
-  // assemble filter
-  UnitFilterType filter;
-  dirichlet.build_filter(filter);
+  // assemble filter:
+  // a) homogene Dirichlet BCs
+  //UnitFilterType filter(dirichlet.assemble<Mem::Main, DataType>());
+  // b) inhomogene Dirichlet BCs
+  Analytic::StaticWrapperFunctor<BCFunc> bc_func;
+  UnitFilterType filter(dirichlet.assemble<Mem::Main, DataType>(bc_func));
 
   // filter system
   filter.filter_mat(mat_sys);
