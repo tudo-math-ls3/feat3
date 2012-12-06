@@ -3,6 +3,7 @@
 #define SCARC_GUARD_SOLVER_DATA_HH 1
 
 #include<kernel/lafem/dense_vector.hpp>
+#include<kernel/lafem/vector_mirror.hpp>
 #include<kernel/lafem/sparse_matrix_csr.hpp>
 #include<kernel/util/cpp11_smart_pointer.hpp>
 
@@ -308,6 +309,85 @@ namespace FEAST
       }
 
       PreconContType_ stored_prec;
+    };
+
+    template<typename DataType_ = double,
+             typename MemTag_ = Mem::Main,
+             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename> class StorageType_ = std::vector>
+    struct SynchronisedSolverData : public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>
+    {
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+      typedef StorageType_<VectorMirrorType_<MemTag_, DataType_>, std::allocator<VectorMirrorType_<MemTag_, DataType_> > > vector_mirror_storage_type_;
+      typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
+
+      ///fulfill pure virtual
+      virtual const std::string type_name()
+      {
+        return "SynchronisedSolverData";
+      }
+
+      ///CTOR from system data
+      SynchronisedSolverData(matrix_type_& A,
+                             vector_type_& x,
+                             vector_type_& b,
+                             Index num_temp_vectors = 0,
+                             Index num_temp_scalars = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+        stored_mirrors(),
+        stored_mirror_sendbufs(),
+        stored_mirror_recvbufs(),
+        stored_dest_ranks(),
+        stored_source_ranks()
+      {
+      }
+
+      ///copy CTOR
+      SynchronisedSolverData(const SynchronisedSolverData& other) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
+        stored_mirrors(other.stored_mirrors),
+        stored_mirror_sendbufs(other.stored_mirror_sendbufs),
+        stored_mirror_recvbufs(other.stored_mirror_recvbufs),
+        stored_dest_ranks(other.stored_dest_ranks),
+        stored_source_ranks(other.stored_source_ranks)
+      {
+      }
+
+      ///assignment operator overload
+      SynchronisedSolverData& operator=(const SynchronisedSolverData& other)
+      {
+          if(this == &other)
+            return *this;
+
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
+
+        this->stored_mirrors = other.stored_mirrors;
+        this->stored_mirror_sendbufs = other.stored_mirror_sendbufs;
+        this->stored_mirror_recvbufs = other.stored_mirror_recvbufs;
+        this->stored_dest_ranks = other.stored_dest_ranks;
+        this->stored_source_ranks = other.stored_source_ranks;
+
+        return *this;
+      }
+
+      vector_mirror_storage_type_ stored_mirrors;
+      vector_storage_type_ stored_mirror_sendbufs;
+      vector_storage_type_ stored_mirror_recvbufs;
+      index_storage_type_ stored_dest_ranks;
+      index_storage_type_ stored_source_ranks;
     };
 
     template<typename DataType_ = double,

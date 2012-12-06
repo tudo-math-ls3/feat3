@@ -63,6 +63,20 @@ class SolverDataTest:
       TEST_CHECK_EQUAL(sd2.temp().at(1).size(), x.size());
       TEST_CHECK_EQUAL(sd2.temp().at(2).size(), x.size());
 
+      SynchronisedSolverData<> sd3(A, x, b, 3);
+      TEST_CHECK_EQUAL(sd3.sys(), A);
+      TEST_CHECK_EQUAL(sd3.sol(), x);
+      TEST_CHECK_EQUAL(sd3.rhs(), b);
+      TEST_CHECK_EQUAL(sd3.temp().size(), 3);
+      TEST_CHECK_EQUAL(sd3.temp().at(0).size(), x.size());
+      TEST_CHECK_EQUAL(sd3.temp().at(1).size(), x.size());
+      TEST_CHECK_EQUAL(sd3.temp().at(2).size(), x.size());
+      TEST_CHECK_EQUAL(sd3.stored_mirrors.size(), 0);
+      TEST_CHECK_EQUAL(sd3.stored_mirror_sendbufs.size(), 0);
+      TEST_CHECK_EQUAL(sd3.stored_mirror_recvbufs.size(), 0);
+      TEST_CHECK_EQUAL(sd3.stored_dest_ranks.size(), 0);
+      TEST_CHECK_EQUAL(sd3.stored_source_ranks.size(), 0);
+
       //-------------------------------------------------------------------------
       MultiLevelSolverData<> mlsd(A, b, x);
     }
