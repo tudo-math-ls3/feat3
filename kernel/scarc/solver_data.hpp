@@ -393,6 +393,75 @@ namespace FEAST
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
+             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             template<typename, typename> class StorageType_ = std::vector>
+    struct PreconditionedSynchronisedSolverData : public SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>
+    {
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+
+      ///fulfill pure virtual
+      virtual const std::string type_name()
+      {
+        return "PreconditionedSynchronisedSolverData";
+      }
+
+      ///CTOR from system data
+      PreconditionedSynchronisedSolverData(matrix_type_& A,
+                             PreconContType_& P,
+                             vector_type_& x,
+                             vector_type_& b,
+                             Index num_temp_vectors = 0,
+                             Index num_temp_scalars = 0) :
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+        stored_prec(P)
+      {
+      }
+
+      ///copy CTOR
+      PreconditionedSynchronisedSolverData(const PreconditionedSynchronisedSolverData& other) :
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(other),
+        stored_prec(other.stored_prec)
+      {
+      }
+
+      ///assignment operator overload
+      PreconditionedSynchronisedSolverData& operator=(const PreconditionedSynchronisedSolverData& other)
+      {
+          if(this == &other)
+            return *this;
+
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
+
+        this->stored_mirrors = other.stored_mirrors;
+        this->stored_mirror_sendbufs = other.stored_mirror_sendbufs;
+        this->stored_mirror_recvbufs = other.stored_mirror_recvbufs;
+        this->stored_dest_ranks = other.stored_dest_ranks;
+        this->stored_source_ranks = other.stored_source_ranks;
+
+        this->stored_prec = other.stored_prec;
+
+        return *this;
+      }
+
+      PreconContType_ stored_prec;
+    };
+
+    template<typename DataType_ = double,
+             typename MemTag_ = Mem::Main,
+             template<typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
              typename TransferContType_ = SparseMatrixCSR<MemTag_, DataType_>,
              typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
