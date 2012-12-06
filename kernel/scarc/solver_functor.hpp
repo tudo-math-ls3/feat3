@@ -1225,6 +1225,83 @@ namespace FEAST
         const StoreT_<Index, std::allocator<Index> >& _dest_ranks;
         const StoreT_<Index, std::allocator<Index> >& _source_ranks;
     };
+
+    template<typename Algo_,
+             typename VT_,
+             typename VMT_,
+             Tier2CommModes cm_,
+             template<typename, typename> class StoreT_ = std::vector>
+    class SynchFunctorProxy : public SolverFunctorBase<VT_>
+    {
+      public:
+        SynchFunctorProxy(VT_& l,
+                     const StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
+                     const StoreT_<VT_, std::allocator<VT_> >& sendbufs,
+                     const StoreT_<VT_, std::allocator<VT_> >& recvbufs,
+                     const StoreT_<Index, std::allocator<Index> >& dest_ranks,
+                     const StoreT_<Index, std::allocator<Index> >& source_ranks) :
+          _l(l),
+          _mirrors(mirrors),
+          _sendbufs(sendbufs),
+          _recvbufs(recvbufs),
+          _dest_ranks(dest_ranks),
+          _source_ranks(source_ranks)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "SynchFunctor";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete SynchFunctor can not be executed!");
+
+          Synch<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+        }
+
+        SynchFunctorProxy& operator=(const SynchFunctorProxy& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_l = rhs._l;
+          this->_mirrors = rhs._mirrors;
+          this->_sendbufs = rhs._sendbufs;
+          this->_recvbufs = rhs._recvbufs;
+          this->_dest_ranks(_dest_ranks);
+          this->_source_ranks(_source_ranks);
+
+          return *this;
+        }
+
+        SynchFunctorProxy(const SynchFunctorProxy& other) :
+          _l(other._l),
+          _mirrors(other._mirrors),
+          _sendbufs(other._sendbufs),
+          _recvbufs(other._recvbufs),
+          _dest_ranks(other._dest_ranks),
+          _source_ranks(other._source_ranks)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _l = arg;
+          this->_complete = true;
+        }
+
+      private:
+        VT_& _l;
+        const StoreT_<VMT_, std::allocator<VMT_> >& _mirrors;
+        const StoreT_<VT_, std::allocator<VT_> >& _sendbufs;
+        const StoreT_<VT_, std::allocator<VT_> >& _recvbufs;
+        const StoreT_<Index, std::allocator<Index> >& _dest_ranks;
+        const StoreT_<Index, std::allocator<Index> >& _source_ranks;
+    };
   }
 }
 
