@@ -7,6 +7,10 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
 
+#include <iostream>
+#include <fstream>
+#include <string>
+
 
 namespace FEAST
 {
@@ -97,6 +101,58 @@ namespace FEAST
             MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] filename The source file in EXP format.
+         *
+         * Creates a vector from the given source file.
+         */
+        explicit DenseVector(String filename) :
+          Container<Arch_, DT_>(0)
+        {
+          std::vector<DT_> data;
+
+          std::ifstream file(filename.c_str(), std::ifstream::out);
+          if (! file.is_open())
+            throw InternalError("Unable to open Vector file " + filename);
+
+          while(!file.eof())
+          {
+            std::string line;
+            std::getline(file, line);
+            if(line.find("#", 0) < line.npos)
+              continue;
+            if(file.eof())
+              break;
+
+            std::string n_z_s;
+
+            if (line[0] == ' ')
+            {
+              std::string::size_type first_digit(line.find_first_not_of(" "));
+              line.erase(0, first_digit);
+            }
+            std::string::size_type eol(line.length());
+            for(unsigned long i(0) ; i < eol ; ++i)
+            {
+              n_z_s.append(1, line[i]);
+            }
+
+            DT_ n_z = (DT_)atof(n_z_s.c_str());
+
+            data.push_back(n_z);
+
+          }
+          file.close();
+
+          this->_size = data.size();
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(data.size() * sizeof(DT_)));
+          this->_elements_size.push_back(data.size());
+          this->_pelements = this->_elements.at(0);
+          MemoryPool<Arch_>::instance()->upload(this->_pelements, &data[0], data.size() * sizeof(DT_));
         }
 
         /**
@@ -218,6 +274,27 @@ namespace FEAST
           ::free(temp);
 
           return *this;
+        }
+
+        /**
+         * \brief Write out vector to file.
+         *
+         * \param[in] filename The file where the vector shall be stored.
+         */
+        void write_out(String filename) const
+        {
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
+          MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));
+
+          FILE* file;
+          file = fopen(filename.c_str(), "w");
+          for (Index i(0) ; i < this->_size ; ++i)
+          {
+            fprintf(file, "%E\n", (double)temp[i]);
+          }
+
+          fclose(file);
+          MemoryPool<Mem::Main>::instance()->release_memory(temp);
         }
 
         /**

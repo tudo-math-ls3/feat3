@@ -4,6 +4,8 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <list>
 
+#include <cstdio>
+
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
@@ -67,6 +69,17 @@ public:
     h(1, DT_(5));
     TEST_CHECK_NOT_EQUAL(h, g);
     TEST_CHECK_NOT_EQUAL((unsigned long)h.elements(), (unsigned long)g.elements());
+
+    DenseVector<Tag_, DT_> k(123);
+    for (Index i(0) ; i < k.size() ; ++i)
+      k(i, DT_(i) / DT_(12));
+
+    k.write_out("test.exp");
+    DenseVector<Tag_, DT_> l("test.exp");
+    for (Index i(0) ; i < k.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-5);
+
+    remove("test.exp");
   }
 };
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
