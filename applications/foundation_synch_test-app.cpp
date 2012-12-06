@@ -178,7 +178,72 @@ void check_synch_mirror(int rank)
     }
 
   if(passed)
-    std::cout << "PASSED (rank " << rank <<"): foundation_synch-test (Tier-2: vertex-set based exchange)" << std::endl;
+    std::cout << "PASSED (rank " << rank <<"): foundation_synch-test (Tier-2: vertex-set based exchange (single target, single mirror))" << std::endl;
+}
+
+void check_synch_mirrors(int rank)
+{
+
+  static const Index num_entities[] = {4, 4, 1};
+  static const Index num_cellset_entities[] = {2, 1, 0};
+
+  quad_mesh_type_ mesh(num_entities);
+  fill_quad_mesh_2d(mesh, double(-1.0));
+  quad_cell_subset_type_ cell(num_cellset_entities);
+  fill_cell_set(cell, 3);
+
+  quad_trafo_type_ trafo(mesh);
+  quad_space_type_ space(trafo);
+
+  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+  Graph dof_mirror(Space::DofMirror::assemble(space, cell));
+
+  DenseVector<Mem::Main, double> target(space.get_num_dofs(), double(rank));
+  LAFEM::VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
+
+  //dont use create_buffer(..) from mirror
+  DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
+  DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
+
+  std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
+  mirrors.push_back(target_mirror);
+  std::vector<LAFEM::DenseVector<Mem::Main, double> > sendbufs;
+  sendbufs.push_back(sendbuf);
+  std::vector<LAFEM::DenseVector<Mem::Main, double> > recvbufs;
+  recvbufs.push_back(recvbuf);
+  std::vector<Index> destranks;
+  destranks.push_back(rank == 0 ? 1 : 0);
+  std::vector<Index> sourceranks;
+  sourceranks.push_back(rank == 0 ? 1 : 0);
+
+#ifndef SERIAL
+  Synch<Archs::Parallel, com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
+#endif
+
+  TestResult<double> res[4];
+#ifndef SERIAL
+    res[0] = test_check_equal_within_eps(target(0), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(target(1), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
+    res[2] = test_check_equal_within_eps(target(2), rank == 0 ? double(0) : double(1), std::numeric_limits<double>::epsilon());
+    res[3] = test_check_equal_within_eps(target(3), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
+#else
+    res[0] = test_check_equal_within_eps(target(0), double(0), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(target(1), double(0), std::numeric_limits<double>::epsilon());
+    res[2] = test_check_equal_within_eps(target(2), double(0), std::numeric_limits<double>::epsilon());
+    res[3] = test_check_equal_within_eps(target(3), double(0), std::numeric_limits<double>::epsilon());
+#endif
+
+  bool passed(true);
+  for(unsigned long i(0) ; i < 4 ; ++i)
+    if(!res[i].passed)
+    {
+      std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+      passed = false;
+      break;
+    }
+
+  if(passed)
+    std::cout << "PASSED (rank " << rank <<"): foundation_synch-test (Tier-2: vertex-set based exchange (single target, multiple mirrors))" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -190,6 +255,7 @@ int main(int argc, char* argv[])
 #endif
 
   check_synch_mirror(me);
+  check_synch_mirrors(me);
 
 #ifndef SERIAL
   MPI_Finalize();
