@@ -13,14 +13,15 @@ using namespace FEAST::TestSystem;
 template<
   typename Arch_,
   typename Algo_,
-  typename DT_>
-class CSRDefectTest
+  typename DT_,
+  typename SM_>
+class DefectTest
   : public TaggedTest<Arch_, DT_>
 {
 
 public:
 
-  CSRDefectTest()
+  DefectTest()
     : TaggedTest<Arch_, DT_>("defect_test")
   {
   }
@@ -53,7 +54,7 @@ public:
         rhs_local(i, b_local(i) - DT_(5));
       }
 
-      SparseMatrixCSR<Arch_, DT_> a(a_local);
+      SM_ a(a_local);
       DenseVector<Arch_, DT_> b(size + 2);
       copy(b, b_local);
       DenseVector<Arch_, DT_> rhs(size);
@@ -76,9 +77,15 @@ public:
     }
   }
 };
-CSRDefectTest<Mem::Main, Algo::Generic, float> csrv_defect_test_float;
-CSRDefectTest<Mem::Main, Algo::Generic, double> csrv_defect_test_double;
+DefectTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> >csr_defect_test_float;
+DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> >csr_defect_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-CSRDefectTest<Mem::CUDA, Algo::CUDA, float> cuda_csrv_defect_test_float;
-CSRDefectTest<Mem::CUDA, Algo::CUDA, double> cuda_csrv_defect_test_double;
+DefectTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> >cuda_csr_defect_test_float;
+DefectTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> >cuda_csr_defect_test_double;
+#endif
+DefectTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> >ell_defect_test_float;
+DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> >ell_defect_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+DefectTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> >cuda_ell_defect_test_float;
+DefectTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> >cuda_ell_defect_test_double;
 #endif
