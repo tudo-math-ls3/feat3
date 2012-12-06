@@ -295,7 +295,7 @@ namespace FEAST
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;

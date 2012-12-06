@@ -60,7 +60,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 0;
+        return 1;
       }
 
       template<typename Tag_,
@@ -83,19 +83,22 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
 
         ///add functors to the solver program:
-        //defect(x, b, A, x)
-        cf.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.sol(), data.rhs(), data.sys(), data.sol()));
+        //defect(t, b, A, x)
+        cf.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
 
-        //norm2(norm_0, x)
-        cf.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.sol()));
+        //norm2(norm_0, t)
+        cf.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
 
-        //iterate until s < eps: [product(x, P, x), sum(x, x, x), norm(norm, x), div(s, norm, norm_0)]
+        //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.sol(), data.stored_prec, data.sol()));
-        cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.sol(), data.rhs(), data.sys(), data.sol()));
-        cfiterate.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.sol()));
+
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.stored_prec, data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.temp().at(0), data.sol()));
+
+        cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
+        cfiterate.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
@@ -114,7 +117,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 0;
+        return 1;
       }
 
       template<typename Tag_,
@@ -138,22 +141,26 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
 
         ///add functors to the solver program:
-        //defect(x, b, A, x)
-        cf.add_functor(new DefectFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(dummy, data.rhs(), data.sys(), dummy));
+        //defect(t, b, A, x)
+        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
 
-        //norm2(norm_0, x)
-        cf.add_functor(new NormFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), dummy));
+        //norm2(norm_0, t)
+        cf.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
 
-        //iterate until s < eps: [product(x, P, x), sum(x, x, x), norm(norm, x), div(s, norm, norm_0)]
+        //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
-        cfiterate.add_functor(new ProductFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(dummy, data.stored_prec, dummy));
-        cfiterate.add_functor(new DefectFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(dummy, data.rhs(), data.sys(), dummy));
-        cfiterate.add_functor(new NormFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), dummy));
+
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.stored_prec, data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(dummy, dummy, data.temp().at(0)));
+
+        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        cfiterate.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
+
         return result;
       }
     };
@@ -168,7 +175,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 0;
+        return 1;
       }
 
       template<typename Tag_,
@@ -190,18 +197,22 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
 
         ///add functors to the solver program:
-        //defect(x, b, A, x)
-        cf.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.sol(), data.rhs(), data.sys(), data.sol()));
+        //defect(t, b, A, x)
+        cf.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
 
-        //norm2(norm_0, x)
-        cf.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.sol()));
+        //norm2(norm_0, t)
+        cf.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
 
-        //iterate until s < eps: [proxyprecon(x), sum(x, x, x), norm(norm, x), div(s, norm, norm_0)]
+        //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
+        ///TODO assumes scaled precon matrix
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
+
         cfiterate.add_functor(new PreconFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol()));
-        cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.sol(), data.rhs(), data.sys(), data.sol()));
-        cfiterate.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.sol()));
+        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.temp().at(0), data.sol()));
+
+        cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
+        cfiterate.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
@@ -220,7 +231,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 0;
+        return 1;
       }
 
       template<typename Tag_,
@@ -244,18 +255,22 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
 
         ///add functors to the solver program:
-        //defect(x, b, A, x)
-        cf.add_functor(new DefectFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(dummy, data.rhs(), data.sys(), dummy));
+        //defect(t, b, A, x)
+        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
 
-        //norm2(norm_0, x)
-        cf.add_functor(new NormFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), dummy));
+        //norm2(norm_0, t)
+        cf.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
 
-        //iterate until s < eps: [proxyprecon(x), sum(x, x, x), norm(norm, x), div(s, norm, norm_0)]
+        //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
+        ///TODO assumes scaled precon matrix
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
+
         cfiterate.add_functor(new PreconFunctorProxy<Algo_, VT_<Tag_, DataType_> >(dummy));
-        cfiterate.add_functor(new DefectFunctorProxyResultRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(dummy, data.rhs(), data.sys(), dummy));
-        cfiterate.add_functor(new NormFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), dummy));
+        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(dummy, dummy, data.temp().at(0)));
+
+        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        cfiterate.add_functor(new NormFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
