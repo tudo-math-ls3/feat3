@@ -4,7 +4,7 @@
 
 #include<kernel/base_header.hpp>
 #include<kernel/scarc/scarc_error.hpp>
-#include<kernel/foundation/functor.hpp>
+#include<kernel/foundation/synch.hpp>
 #include<kernel/lafem/defect.hpp>
 #include<kernel/lafem/sum.hpp>
 #include<kernel/lafem/product_matvec.hpp>
@@ -1003,57 +1003,6 @@ namespace FEAST
         VT_& _x;
     };
 
-    template<typename Algo_, typename VT_, typename HaloStorageType_>
-    class SynchFunctor : public SolverFunctorBase<VT_>
-    {
-      public:
-        SynchFunctor(VT_& y, const VT_& x, const HaloStorageType_& halos) :
-          _y(y),
-          _x(x),
-          _halos(halos)
-        {
-          this->_complete = true;
-        }
-
-        virtual const std::string type_name()
-        {
-          return "SynchFunctor";
-        }
-
-        virtual void execute()
-        {
-          ///TODO
-          ///Foundation::Synchronisation(_y, _x, _halos);
-        }
-
-        SynchFunctor& operator=(const SynchFunctor& rhs)
-        {
-          if(this == &rhs)
-            return *this;
-
-          this->_y = rhs._y;
-          this->_x = rhs._x;
-          this->_halos = rhs._halos;
-          return *this;
-        }
-
-        SynchFunctor(const SynchFunctor& other) :
-          _y(other._y),
-          _x(other._x),
-          _halos(other._halos)
-        {
-        }
-
-        virtual void substitute(VT_& arg)
-        {
-        }
-
-      private:
-        VT_& _y;
-        const VT_& _x;
-        const HaloStorageType_& _halos;
-    };
-
     ///in scalar functors, we still need a vector type in order to make the functor compatible with SolverFunctorBase<VT_>
     template<typename VT_, typename DT_>
     class DivFunctor : public SolverFunctorBase<VT_>
@@ -1203,6 +1152,78 @@ namespace FEAST
       protected:
         storage_type_ _functors;
 
+    };
+
+    template<typename Algo_,
+             typename VT_,
+             typename VMT_,
+             Tier2CommModes cm_,
+             template<typename, typename> class StoreT_ = std::vector>
+    class SynchFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        SynchFunctor(VT_& l,
+                     const StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
+                     const StoreT_<VT_, std::allocator<VT_> >& sendbufs,
+                     const StoreT_<VT_, std::allocator<VT_> >& recvbufs,
+                     const StoreT_<Index, std::allocator<Index> >& dest_ranks,
+                     const StoreT_<Index, std::allocator<Index> >& source_ranks) :
+          _l(l),
+          _mirrors(mirrors),
+          _sendbufs(sendbufs),
+          _recvbufs(recvbufs),
+          _dest_ranks(dest_ranks),
+          _source_ranks(source_ranks)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "SynchFunctor";
+        }
+
+        virtual void execute()
+        {
+          Synch<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+        }
+
+        SynchFunctor& operator=(const SynchFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_l = rhs._l;
+          this->_mirrors = rhs._mirrors;
+          this->_sendbufs = rhs._sendbufs;
+          this->_recvbufs = rhs._recvbufs;
+          this->_dest_ranks(_dest_ranks);
+          this->_source_ranks(_source_ranks);
+
+          return *this;
+        }
+
+        SynchFunctor(const SynchFunctor& other) :
+          _l(other._l),
+          _mirrors(other._mirrors),
+          _sendbufs(other._sendbufs),
+          _recvbufs(other._recvbufs),
+          _dest_ranks(other._dest_ranks),
+          _source_ranks(other._source_ranks)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        VT_& _l;
+        const StoreT_<VMT_, std::allocator<VMT_> >& _mirrors;
+        const StoreT_<VT_, std::allocator<VT_> >& _sendbufs;
+        const StoreT_<VT_, std::allocator<VT_> >& _recvbufs;
+        const StoreT_<Index, std::allocator<Index> >& _dest_ranks;
+        const StoreT_<Index, std::allocator<Index> >& _source_ranks;
     };
   }
 }
