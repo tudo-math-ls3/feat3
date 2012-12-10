@@ -152,7 +152,7 @@ void check_synch_mirror(int rank)
   DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
 #ifndef SERIAL
-  Synch<Archs::Parallel, com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
+  SynchVec<Archs::Parallel, com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
 #endif
 
   TestResult<double> res[4];
@@ -217,7 +217,7 @@ void check_synch_mirrors(int rank)
   sourceranks.push_back(rank == 0 ? 1 : 0);
 
 #ifndef SERIAL
-  Synch<Archs::Parallel, com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
+  SynchVec<Archs::Parallel, com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
 #endif
 
   TestResult<double> res[4];
@@ -246,6 +246,34 @@ void check_synch_mirrors(int rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_synch-test (Tier-2: vertex-set based exchange (single target, multiple mirrors))" << std::endl;
 }
 
+void check_synch_scal(int rank)
+{
+#ifndef FEAST_SERIAL_MODE
+  int size;
+  float value(rank + 1);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  float* send_buffer(new float[1]);
+  send_buffer[0] = value;
+  float* recv_buffer(new float[1]);
+
+  SynchScal<Parallel, com_allreduce_sqrtsum>::execute(value, *send_buffer, *recv_buffer);
+
+  TestResult<float> res;
+  res = test_check_equal_within_eps(value, float(sqrt(1)), std::numeric_limits<float>::epsilon());
+
+  if(!res.passed)
+  {
+    std::cout << "Failed (Tier-2: synch scalar): " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
+  }
+  else
+    std::cout << "PASSED (rank " << rank <<"): foundation_synch_test (Tier-2: synch scalar)" << std::endl;
+
+  delete[] send_buffer;
+  delete[] recv_buffer;
+#endif
+}
+
 int main(int argc, char* argv[])
 {
   int me(0);
@@ -256,6 +284,7 @@ int main(int argc, char* argv[])
 
   check_synch_mirror(me);
   check_synch_mirrors(me);
+  check_synch_scal(me);
 
 #ifndef SERIAL
   MPI_Finalize();

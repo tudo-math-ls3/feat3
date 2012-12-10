@@ -7,17 +7,18 @@
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 
+///TODO add communicators
 namespace FEAST
 {
   namespace Foundation
   {
     template<typename Arch_, Tier2CommModes cm_>
-    struct Synch
+    struct SynchVec
     {
     };
 
     template<typename Arch_>
-    struct Synch<Arch_, com_exchange>
+    struct SynchVec<Arch_, com_exchange>
     {
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
@@ -51,13 +52,33 @@ namespace FEAST
       {
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          Synch<Arch_, com_exchange>::execute(target,
+          SynchVec<Arch_, com_exchange>::execute(target,
                                               mirrors.at(i),
                                               sendbufs.at(i),
                                               recvbufs.at(i),
                                               dest_ranks.at(i),
                                               source_ranks.at(i));
         }
+      }
+    };
+
+    template<typename Arch_, Tier2CommModes cm_>
+    struct SynchScal
+    {
+    };
+
+    template<typename Arch_>
+    struct SynchScal<Arch_, com_allreduce_sqrtsum>
+    {
+      //single target, single solver per process
+      template<typename DataType_>
+      static inline void execute(DataType_& target,
+                                 DataType_& sendbuf,
+                                 DataType_& recvbuf)
+      {
+        sendbuf = target;
+        Comm<Arch_>::allreduce(&sendbuf, 1, &recvbuf);
+        target = sqrt(recvbuf);
       }
     };
   }

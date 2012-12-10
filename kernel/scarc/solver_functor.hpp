@@ -1159,10 +1159,10 @@ namespace FEAST
              typename VMT_,
              Tier2CommModes cm_,
              template<typename, typename> class StoreT_ = std::vector>
-    class SynchFunctor : public SolverFunctorBase<VT_>
+    class SynchVecFunctor : public SolverFunctorBase<VT_>
     {
       public:
-        SynchFunctor(VT_& l,
+        SynchVecFunctor(VT_& l,
                      const StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
                      const StoreT_<VT_, std::allocator<VT_> >& sendbufs,
                      const StoreT_<VT_, std::allocator<VT_> >& recvbufs,
@@ -1180,19 +1180,19 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "SynchFunctor";
+          return "SynchVecFunctor";
         }
 
         virtual void execute()
         {
 #ifndef SERIAL
-          Synch<Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          SynchVec<Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
 #else
-          Synch<Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          SynchVec<Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
 #endif
         }
 
-        SynchFunctor& operator=(const SynchFunctor& rhs)
+        SynchVecFunctor& operator=(const SynchVecFunctor& rhs)
         {
           if(this == &rhs)
             return *this;
@@ -1207,7 +1207,7 @@ namespace FEAST
           return *this;
         }
 
-        SynchFunctor(const SynchFunctor& other) :
+        SynchVecFunctor(const SynchVecFunctor& other) :
           _l(other._l),
           _mirrors(other._mirrors),
           _sendbufs(other._sendbufs),
@@ -1235,10 +1235,10 @@ namespace FEAST
              typename VMT_,
              Tier2CommModes cm_,
              template<typename, typename> class StoreT_ = std::vector>
-    class SynchFunctorProxy : public SolverFunctorBase<VT_>
+    class SynchVecFunctorProxy : public SolverFunctorBase<VT_>
     {
       public:
-        SynchFunctorProxy(VT_& l,
+        SynchVecFunctorProxy(VT_& l,
                      const StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
                      const StoreT_<VT_, std::allocator<VT_> >& sendbufs,
                      const StoreT_<VT_, std::allocator<VT_> >& recvbufs,
@@ -1256,18 +1256,22 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "SynchFunctor";
+          return "SynchVecFunctor";
         }
 
         virtual void execute()
         {
           if(!this->_complete)
-            throw ScaRCError("Error: Incomplete SynchFunctor can not be executed!");
+            throw ScaRCError("Error: Incomplete SynchVecFunctor can not be executed!");
 
-          Synch<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+#ifndef SERIAL
+          SynchVec<Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+#else
+          SynchVec<Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+#endif
         }
 
-        SynchFunctorProxy& operator=(const SynchFunctorProxy& rhs)
+        SynchVecFunctorProxy& operator=(const SynchVecFunctorProxy& rhs)
         {
           if(this == &rhs)
             return *this;
@@ -1282,7 +1286,7 @@ namespace FEAST
           return *this;
         }
 
-        SynchFunctorProxy(const SynchFunctorProxy& other) :
+        SynchVecFunctorProxy(const SynchVecFunctorProxy& other) :
           _l(other._l),
           _mirrors(other._mirrors),
           _sendbufs(other._sendbufs),
@@ -1305,6 +1309,65 @@ namespace FEAST
         const StoreT_<VT_, std::allocator<VT_> >& _recvbufs;
         const StoreT_<Index, std::allocator<Index> >& _dest_ranks;
         const StoreT_<Index, std::allocator<Index> >& _source_ranks;
+    };
+
+    template<typename Algo_,
+             typename VT_,
+             typename DT_,
+             Tier2CommModes cm_>
+    class SynchScalFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        SynchScalFunctor(DT_& l,
+                         DT_& sendbuf,
+                         DT_& recvbuf) :
+          _l(l),
+          _sendbuf(sendbuf),
+          _recvbuf(recvbuf)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "SynchScalFunctor";
+        }
+
+        virtual void execute()
+        {
+#ifndef SERIAL
+          SynchScal<Parallel, cm_>::execute(_l, _sendbuf, _recvbuf);
+#else
+          SynchScal<Serial, cm_>::execute(_l, _sendbuf, _recvbuf,);
+#endif
+        }
+
+        SynchScalFunctor& operator=(const SynchScalFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_l = rhs._l;
+          this->_sendbuf = rhs._sendbuf;
+          this->_recvbuf = rhs._recvbuf;
+          return *this;
+        }
+
+        SynchScalFunctor(const SynchScalFunctor& other) :
+          _l(other._l),
+          _sendbuf(other._sendbuf),
+          _recvbuf(other._recvbuf)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        DT_& _l;
+        DT_& _sendbuf;
+        DT_& _recvbuf;
     };
   }
 }
