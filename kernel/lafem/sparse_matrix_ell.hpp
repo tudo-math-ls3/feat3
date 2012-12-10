@@ -240,28 +240,28 @@ namespace FEAST
           uint64_t columns;
           uint64_t stride;
           uint64_t num_cols_per_row;
-          int status = fread(&size, sizeof(uint64_t), 1, file);
-          if (status != 1)
+          size_t status = fread(&size, sizeof(uint64_t), 1, file);
+          if (status != 1u)
             throw InternalError("fread error!");
           status = fread(&rows, sizeof(uint64_t), 1, file);
-          if (status != 1)
+          if (status != 1u)
             throw InternalError("fread error!");
           status = fread(&columns, sizeof(uint64_t), 1, file);
-          if (status != 1)
+          if (status != 1u)
             throw InternalError("fread error!");
           status = fread(&stride, sizeof(uint64_t), 1, file);
-          if (status != 1)
+          if (status != 1u)
             throw InternalError("fread error!");
           status = fread(&num_cols_per_row, sizeof(uint64_t), 1, file);
-          if (status != 1)
+          if (status != 1u)
             throw InternalError("fread error!");
 
-          this->_size = rows * columns;
-          _rows = rows;
-          _columns = columns;
-          _stride = stride;
-          _num_cols_per_row = num_cols_per_row;
-          _zero_element = 0;
+          this->_size = Index(rows * columns);
+          _rows = Index(rows);
+          _columns = Index(columns);
+          _stride = Index(stride);
+          _num_cols_per_row = Index(num_cols_per_row);
+          _zero_element = 0u;
 
           uint64_t * cAj = new uint64_t[size];
           status = fread(cAj, sizeof(uint64_t), size, file);
@@ -269,7 +269,7 @@ namespace FEAST
             throw InternalError("fread error!");
           _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
           for (Index i(0) ; i < size ; ++i)
-            _Aj[i] = cAj[i];
+            _Aj[i] = Index(cAj[i]);
           delete[] cAj;
 
           double * cAx = new double[size];
@@ -279,7 +279,7 @@ namespace FEAST
           fclose(file);
           _Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
-            _Ax[i] = cAx[i];
+            _Ax[i] = DT_(cAx[i]);
           delete[] cAx;
 
           _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
@@ -288,11 +288,11 @@ namespace FEAST
           for (Index row(0) ; row < _rows ; ++row)
           {
             Index count(0);
-            for (Index i(row) ; i < size ; i+=stride)
+            for (Index i(row) ; i < Index(size) ; i += Index(stride))
             {
                 if (_Ax[i] == DT_(0))
                 {
-                  i = size;
+                  i = Index(size);
                   break;
                 }
                 ++count;

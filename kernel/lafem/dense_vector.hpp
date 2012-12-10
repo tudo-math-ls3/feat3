@@ -145,11 +145,11 @@ namespace FEAST
           }
           file.close();
 
-          this->_size = data.size();
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(data.size() * sizeof(DT_)));
-          this->_elements_size.push_back(data.size());
+          this->_size = Index(data.size());
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(Index(data.size() * sizeof(DT_))));
+          this->_elements_size.push_back(Index(data.size()));
           this->_pelements = this->_elements.at(0);
-          MemoryPool<Arch_>::instance()->upload(this->_pelements, &data[0], data.size() * sizeof(DT_));
+          MemoryPool<Arch_>::instance()->upload(this->_pelements, &data[0], Index(data.size() * sizeof(DT_)));
         }
 
         /**
