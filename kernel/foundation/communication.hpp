@@ -40,6 +40,7 @@ namespace FEAST
       com_recv_replace,
       com_exchange,
       com_average,
+      com_all_sum,
       com_min,
       com_max
     };
@@ -279,6 +280,22 @@ namespace FEAST
             {
               MPI_Allgather(sendbuf, num_elements_to_send, MPIType<DataType1_>::value(),
                   recvbuf, num_elements_to_recv, MPIType<DataType2_>::value(), communicator);
+            }
+
+          ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
+          template<typename DataType1_>
+            static inline void allreduce(DataType1_ * sendbuf,
+                                         Index num_elements_to_send_and_receive,
+                                         DataType1_ * recvbuf,
+                                         MPI_Op op = MPI_SUM,
+                                         MPI_Comm communicator = MPI_COMM_WORLD)
+            {
+              MPI_Allreduce(sendbuf,
+                            recvbuf,
+                            num_elements_to_send_and_receive,
+                            MPIType<DataType1_>::value(),
+                            op,
+                            communicator);
             }
 
           //TODO

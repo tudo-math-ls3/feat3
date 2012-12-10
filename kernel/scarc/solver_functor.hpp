@@ -1185,7 +1185,11 @@ namespace FEAST
 
         virtual void execute()
         {
-          Synch<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+#ifndef SERIAL
+          Synch<Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+#else
+          Synch<Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+#endif
         }
 
         SynchFunctor& operator=(const SynchFunctor& rhs)

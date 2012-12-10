@@ -236,6 +236,34 @@ void check_allgather(int rank)
 #endif
 }
 
+void check_allreduce(int rank)
+{
+#ifndef FEAST_SERIAL_MODE
+  int size;
+  float value(rank + 1);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  float* send_buffer(new float[1]);
+  send_buffer[0] = value;
+  float* recv_buffer(new float[1]);
+
+  Comm<Archs::Parallel>::allreduce(send_buffer, 1, recv_buffer);
+
+  TestResult<float> res;
+  res = test_check_equal_within_eps(recv_buffer[0], float(3), std::numeric_limits<float>::epsilon());
+
+  if(!res.passed)
+  {
+    std::cout << "Failed (Tier-0: allreduce): " << res.left << " not within range (eps = " << res.epsilon << ") of " << res.right << "!" << std::endl;
+  }
+  else
+    std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: allreduce)" << std::endl;
+
+  delete[] send_buffer;
+  delete[] recv_buffer;
+#endif
+}
+
 void check_reduce(int rank)
 {
 #ifndef FEAST_SERIAL_MODE
@@ -688,6 +716,7 @@ int main(int argc, char* argv[])
   check_bcast(me);
   check_scatter_gather(me);
   check_allgather(me);
+  check_allreduce(me);
   check_reduce(me);
   check_halo_transfer(me);
   check_attribute_transfer(me);
