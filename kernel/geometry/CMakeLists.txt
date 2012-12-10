@@ -23,6 +23,7 @@ SET (test_list
   standard_refinery-test-conf-tetra
   standard_refinery-test-struct-quad
   standard_refinery-test-struct-hexa
+  struct_index_mapping-test
 )
 
 # create all tests

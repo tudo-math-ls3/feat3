@@ -15,6 +15,7 @@ ADD_LIBRARY(kernel-geometry-test-aux STATIC
   standard_tetra.cpp
   tetris_quad.cpp
   tetris_hexa.cpp
+  validate_structured_meshes.cpp
 )
 
 TARGET_LINK_LIBRARIES (kernel-geometry-test-aux kernel-util)
