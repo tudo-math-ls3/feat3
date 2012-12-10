@@ -3,10 +3,12 @@
 #define KERNEL_GEOMETRY_EXPORT_VTK_HPP 1
 
 // includes, FEAST
-#include <kernel/shape.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/structured_mesh.hpp>
 
 // includes, STL
 #include <fstream>
+#include <vector>
 
 namespace FEAST
 {
@@ -97,6 +99,118 @@ namespace FEAST
           return v[i];
         }
       };
+
+      template<typename Mesh_>
+      struct VTKHeader;
+
+      template<
+        typename Shape_,
+        int num_coords_,
+        int stride_,
+        typename Coord_>
+      struct VTKHeader< ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
+      {
+        typedef ConformalMesh<Shape_, num_coords_, stride_, Coord_> MeshType;
+        static void write(std::ostream& os, const MeshType& mesh)
+        {
+          // write mesh type
+          os << "DATASET UNSTRUCTURED_GRID" << std::endl;
+
+          // write vertex coordinates
+          const typename MeshType::VertexSetType& vtx = mesh.get_vertex_set();
+          Index num_verts = vtx.get_num_vertices();
+          int num_coords = vtx.get_num_coords();
+          ASSERT_((num_coords >= 1) && (num_coords <= 3));
+          os << "POINTS " << num_verts << " double" << std::endl;
+          for(Index i(0); i < num_verts; ++i)
+          {
+            os << vtx[i][0];
+            for(int j(1); j < num_coords; ++j)
+            {
+              os << " " << vtx[i][j];
+            }
+            for(int j(num_coords); j < 3; ++j)
+            {
+              os << " 0.0";
+            }
+            os << std::endl;
+          }
+
+          typedef VTKHelper<typename MeshType::ShapeType> VTKHelperType;
+
+          // fetch index set
+          const typename MeshType::template IndexSet<MeshType::shape_dim,0>::Type& idx =
+            mesh.template get_index_set<MeshType::shape_dim, 0>();
+          Index num_cells = mesh.get_num_entities(MeshType::shape_dim);
+          int num_idx = idx.get_num_indices();
+
+          // write cells
+          os << "CELLS " << num_cells << " " << ((num_idx+1)*num_cells) << std::endl;
+          for(Index i(0); i < num_cells; ++i)
+          {
+            os << num_idx;
+            for(int j(0); j < num_idx; ++j)
+            {
+              os << " " << idx[i][VTKHelperType::map(j)];
+            }
+            os << std::endl;
+          }
+
+          // write cell types
+          os << "CELL_TYPES " << num_cells << std::endl;
+          for(Index i(0); i < num_cells; ++i)
+          {
+            os << VTKHelperType::type << std::endl;
+          }
+        }
+      };
+
+      template<
+        int shape_dim_,
+        int num_coords_,
+        int stride_,
+        typename Coord_>
+      struct VTKHeader< StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> >
+      {
+        typedef StructuredMesh<shape_dim_, num_coords_, stride_, Coord_> MeshType;
+        static void write(std::ostream& os, const MeshType& mesh)
+        {
+          // write mesh type
+          os << "DATASET STRUCTURED_GRID" << std::endl;
+
+          // write dimensions
+          os << "DIMENSIONS";
+          for(int i(0); i < shape_dim_; ++i)
+          {
+            os << " " << (mesh.get_num_slices(i) + 1);
+          }
+          for(int i(shape_dim_); i < 3; ++i)
+          {
+            os << " 1";
+          }
+          os << std::endl;
+
+          // write vertex coordinates
+          const typename MeshType::VertexSetType& vtx = mesh.get_vertex_set();
+          Index num_verts = vtx.get_num_vertices();
+          int num_coords = vtx.get_num_coords();
+          ASSERT_((num_coords >= 1) && (num_coords <= 3));
+          os << "POINTS " << num_verts << " double" << std::endl;
+          for(Index i(0); i < num_verts; ++i)
+          {
+            os << vtx[i][0];
+            for(int j(1); j < num_coords; ++j)
+            {
+              os << " " << vtx[i][j];
+            }
+            for(int j(num_coords); j < 3; ++j)
+            {
+              os << " 0.0";
+            }
+            os << std::endl;
+          }
+        }
+      };
     } // namespace Intern
     /// \endcond
 
@@ -116,14 +230,19 @@ namespace FEAST
       typedef typename MeshType::VertexSetType VertexSetType;
 
     protected:
+      typedef std::pair<String, double*> VarPair;
+      typedef std::vector<VarPair> VarVector;
+
       /// reference to mesh to be exported
       const MeshType& _mesh;
-      /// output stream
-      std::ofstream _ofs;
       /// number of vertices in mesh
       Index _num_verts;
       /// number of cells in mesh
       Index _num_cells;
+      /// vertex variable list
+      VarVector _vars_vertex;
+      /// cell variable list
+      VarVector _vars_cell;
 
     public:
       explicit ExportVTK(const MeshType& mesh) :
@@ -137,102 +256,96 @@ namespace FEAST
       virtual ~ExportVTK()
       {
         CONTEXT("ExportVTK::~ExportVTK()");
+        while(!_vars_cell.empty())
+        {
+          delete _vars_cell.back().second;
+          _vars_cell.pop_back();
+        }
+        while(!_vars_vertex.empty())
+        {
+          delete _vars_vertex.back().second;
+          _vars_vertex.pop_back();
+        }
       }
 
-      bool open(const String& filename)
+      template<typename T_>
+      void add_scalar_vertex(const String& name, const T_* data)
+      {
+        ASSERT_(data != nullptr);
+        double* d = new double[_num_verts];
+        for(Index i(0); i < _num_verts; ++i)
+        {
+          d[i] = double(data[i]);
+        }
+        _vars_vertex.push_back(VarPair(name, d));
+      }
+
+      template<typename T_>
+      void add_scalar_cell(const String& name, const T_* data)
+      {
+        ASSERT_(data != nullptr);
+        double* d = new double[_num_cells];
+        for(Index i(0); i < _num_cells; ++i)
+        {
+          d[i] = double(data[i]);
+        }
+        _vars_cell.push_back(VarPair(name, d));
+      }
+
+      bool write(const String& filename) const
       {
         CONTEXT("ExportVTK::begin()");
-        using std::endl;
 
         // try to open a file
-        _ofs.open(filename.c_str());
-        if(!(_ofs.is_open() && _ofs.good()))
+        std::ofstream ofs(filename.c_str());
+        if(!(ofs.is_open() && ofs.good()))
           return false;
 
         // write VTK header
-        _ofs << "# vtk DataFile Version 2.0" << endl;
-        _ofs << "Generated by FEAST v" << version_major << "." << version_minor << "." << version_patch << endl;
-        _ofs << "ASCII" << endl;
-        _ofs << "DATASET UNSTRUCTURED_GRID" << endl;
+        ofs << "# vtk DataFile Version 2.0" << std::endl;
+        ofs << "Generated by FEAST v" << version_major << "." << version_minor << "." << version_patch << std::endl;
+        ofs << "ASCII" << std::endl;
 
-        // write vertex coordinates
-        const typename MeshType::VertexSetType& vtx = _mesh.get_vertex_set();
-        Index num_verts = vtx.get_num_vertices();
-        int num_coords = vtx.get_num_coords();
-        ASSERT_((num_coords >= 1) && (num_coords <= 3));
-        _ofs << "POINTS " << num_verts << " double" << endl;
-        for(Index i(0); i < num_verts; ++i)
+        // write mesh header
+        Intern::VTKHeader<MeshType>::write(ofs, _mesh);
+
+        // write vertex variables
+        if(!_vars_vertex.empty())
         {
-          _ofs << vtx[i][0];
-          for(int j(1); j < num_coords; ++j)
+          ofs << "POINT_DATA " << _num_verts << std::endl;
+          for(Index i(0); i < Index(_vars_vertex.size()); ++i)
           {
-            _ofs << " " << vtx[i][j];
+            const VarPair& var(_vars_vertex[i]);
+            ofs << "SCALARS " << var.first << " double 1" << std::endl;
+            ofs << "LOOKUP_TABLE default" << std::endl;
+            for(Index j(0); j < _num_verts; ++j)
+            {
+              ofs << var.second[j] << std::endl;
+            }
           }
-          for(int j(num_coords); j < 3; ++j)
-          {
-            _ofs << " 0.0";
-          }
-          _ofs << std::endl;
         }
 
-        typedef Intern::VTKHelper<typename MeshType::ShapeType> VTKHelperType;
-
-        // fetch index set
-        const typename MeshType::template IndexSet<MeshType::shape_dim,0>::Type& idx =
-          _mesh.template get_index_set<MeshType::shape_dim, 0>();
-        Index num_cells = _mesh.get_num_entities(MeshType::shape_dim);
-        int num_idx = idx.get_num_indices();
-
-        // write cells
-        _ofs << "CELLS " << num_cells << " " << ((num_idx+1)*num_cells) << endl;
-        for(Index i(0); i < num_cells; ++i)
+        // write cell variables
+        if(!_vars_cell.empty())
         {
-          _ofs << num_idx;
-          for(int j(0); j < num_idx; ++j)
+          ofs << "CELL_DATA " << _num_cells << std::endl;
+          for(Index i(0); i < Index(_vars_cell.size()); ++i)
           {
-            _ofs << " " << idx[i][VTKHelperType::map(j)];
+            const VarPair& var(_vars_cell[i]);
+            ofs << "SCALARS " << var.first << " double 1" << std::endl;
+            ofs << "LOOKUP_TABLE default" << std::endl;
+            for(Index j(0); j < _num_cells; ++j)
+            {
+              ofs << var.second[j] << std::endl;
+            }
           }
-          _ofs << endl;
         }
 
-        // write cell types
-        _ofs << "CELL_TYPES " << num_cells << endl;
-        for(Index i(0); i < num_cells; ++i)
-        {
-          _ofs << VTKHelperType::type << endl;
-        }
+        // close output stream
+        ofs.close();
 
         // okay
         return true;
-      }
-
-      template<typename T_>
-      void write_vertex_scalar(const String& name, const T_* data)
-      {
-        _ofs << "POINT_DATA " << _num_verts << std::endl;
-        _ofs << "SCALARS " << name << " double 1" << std::endl;
-        _ofs << "LOOKUP_TABLE default" << std::endl;
-        for(Index i(0); i < _num_verts; ++i)
-        {
-          _ofs << " " << data[i] << std::endl;
-        }
-      }
-
-      template<typename T_>
-      void write_cell_scalar(const String& name, const T_* data)
-      {
-        _ofs << "CELL_DATA " << _num_cells << std::endl;
-        _ofs << "SCALARS " << name << " double 1" << std::endl;
-        _ofs << "LOOKUP_TABLE default" << std::endl;
-        for(Index i(0); i < _num_cells; ++i)
-        {
-          _ofs << " " << data[i] << std::endl;
-        }
-      }
-
-      void close()
-      {
-        _ofs.close();
       }
     }; // class ExportVTK
   } // namespace Geometry
