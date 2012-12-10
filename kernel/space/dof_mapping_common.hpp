@@ -121,8 +121,6 @@ namespace FEAST
       typedef typename TrafoType::MeshType MeshType;
       /// index-set type
       typedef typename MeshType::template IndexSet<shape_dim, dof_dim>::Type IndexSetType;
-      /// index-vector const-reference
-      typedef typename IndexSetType::ConstIndexVectorReference ConstIndexVectorReference;
 
     public:
       /**
@@ -188,7 +186,8 @@ namespace FEAST
       {
         Index ldi_q = local_dof_idx / dofs_per_cell_;
         Index ldi_r = local_dof_idx % dofs_per_cell_;
-        return Index(dofs_per_cell_) * _index_set[this->_cell_index][ldi_q] + ldi_r;
+        return Index(dofs_per_cell_) * _index_set(this->_cell_index, ldi_q) + ldi_r;
+        //return Index(dofs_per_cell_) * _index_set[this->_cell_index][ldi_q] + ldi_r;
       }
 
       /** \copydoc DofMappingBase::image_begin() */

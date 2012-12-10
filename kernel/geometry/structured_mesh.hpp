@@ -209,10 +209,10 @@ namespace FEAST
       template<
         int cell_dim_,
         int face_dim_>
-      StructIndexSet<shape_dim_, cell_dim_, face_dim_> get_index_set() const
+      const StructIndexSet<shape_dim_, cell_dim_, face_dim_>& get_index_set() const
       {
         CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">()");
-        return StructIndexSet<shape_dim_, cell_dim_, face_dim_>(_num_slices);
+        return _index_set_holder.template get_index_set<cell_dim_, face_dim_>();
       }
 
       /**
