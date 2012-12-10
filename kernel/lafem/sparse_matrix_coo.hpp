@@ -258,6 +258,16 @@ namespace FEAST
         {
           return _zero_element;
         }
+
+        /**
+         * \brief Returns a descriptive string.
+         *
+         * \returns A string describing the container.
+         */
+        static String name()
+        {
+          return "SparseMatrixCOO";
+        }
     };
 
     /**

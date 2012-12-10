@@ -641,6 +641,16 @@ namespace FEAST
         {
           return _num_cols_per_row;
         }
+
+        /**
+         * \brief Returns a descriptive string.
+         *
+         * \returns A string describing the container.
+         */
+        static String name()
+        {
+          return "SparseMatrixELL";
+        }
     };
 
     /**

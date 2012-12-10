@@ -333,6 +333,16 @@ namespace FEAST
           ASSERT(index < this->_size, "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_size) + " !");
           MemoryPool<Arch_>::modify_element(_pelements, index, value);
         }
+
+        /**
+         * \brief Returns a descriptive string.
+         *
+         * \returns A string describing the container.
+         */
+        static String name()
+        {
+          return "DenseVector";
+        }
     };
 
     /**

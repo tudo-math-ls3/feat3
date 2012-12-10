@@ -285,6 +285,16 @@ namespace FEAST
         {
           return this->_columns;
         }
+
+        /**
+         * \brief Returns a descriptive string.
+         *
+         * \returns A string describing the container.
+         */
+        static String name()
+        {
+          return "DenseMatrix";
+        }
     };
 
     /**

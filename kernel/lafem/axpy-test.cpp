@@ -154,7 +154,7 @@ class DVAxpyMVTest
 
 public:
   DVAxpyMVTest()
-    : TaggedTest<Arch_, DT_>("dv_axpy_mv_test")
+    : TaggedTest<Arch_, DT_>("dv_axpy_mv_test: " + SM_::name())
   {
   }
 

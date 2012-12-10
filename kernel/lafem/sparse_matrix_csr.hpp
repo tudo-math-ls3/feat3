@@ -657,6 +657,16 @@ namespace FEAST
           ASSERT(domain_node < _rows, "Domain node index out of range");
           return &_col_ind[_row_ptr_end[domain_node]];
         }
+
+        /**
+         * \brief Returns a descriptive string.
+         *
+         * \returns A string describing the container.
+         */
+        static String name()
+        {
+          return "SparseMatrixCSR";
+        }
     };
 
     /**

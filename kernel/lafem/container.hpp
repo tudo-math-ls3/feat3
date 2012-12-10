@@ -230,6 +230,16 @@ namespace FEAST
         {
           return this->_size;
         }
+
+        /**
+         * \brief Returns a descriptive string.
+         *
+         * \returns A string describing the container.
+         */
+        static String name()
+        {
+          return "Container";
+        }
     };
 
   } // namespace LAFEM
