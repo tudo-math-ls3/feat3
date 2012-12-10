@@ -35,6 +35,7 @@ namespace FEAST
         ContainerBase(Index size) :
           _size(size)
       {
+        CONTEXT("When creating ContainerBase");
       }
     };
 
@@ -72,6 +73,7 @@ namespace FEAST
         Container(Index size) :
           ContainerBase(size)
         {
+          CONTEXT("When creating Container");
         }
 
         /**
@@ -81,6 +83,8 @@ namespace FEAST
          */
         ~Container()
         {
+          CONTEXT("When destroying Container");
+
           for (Index i(0) ; i < _elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->release_memory(_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
@@ -101,10 +105,12 @@ namespace FEAST
           _elements_size(other._elements_size),
           _indices_size(other._indices_size)
         {
-        for (Index i(0) ; i < _elements.size() ; ++i)
-          MemoryPool<Arch_>::instance()->increase_memory(_elements.at(i));
-        for (Index i(0) ; i < _indices.size() ; ++i)
-          MemoryPool<Arch_>::instance()->increase_memory(_indices.at(i));
+          CONTEXT("When copying Container");
+
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Arch_>::instance()->increase_memory(_elements.at(i));
+          for (Index i(0) ; i < _indices.size() ; ++i)
+            MemoryPool<Arch_>::instance()->increase_memory(_indices.at(i));
         }
 
         /**
@@ -118,6 +124,8 @@ namespace FEAST
         Container(const Container<Arch2_, DT2_> & other) :
           ContainerBase(other)
         {
+          CONTEXT("When copying Container");
+
           if (typeid(DT_) != typeid(DT2_))
             throw InternalError("type conversion not supported yet!");
 
@@ -157,6 +165,8 @@ namespace FEAST
          */
         void clear(DT_ value = 0)
         {
+          CONTEXT("When clearing Container");
+
           for (Index i(0) ; i < _elements.size() ; ++i)
             MemoryPool<Arch_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
         }

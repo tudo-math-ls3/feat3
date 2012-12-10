@@ -16,12 +16,13 @@ namespace FEAST
         ptr[idx] = val;
       }
 
-      __global__ void cuda_generate_hash(char * cd, const Index bytes, unsigned long * result)
+      __global__ void cuda_generate_hash(char * cd, const Index bytes, void * resultv)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx != 0)
           return;
 
+        unsigned long * result = (unsigned long *)resultv;
         unsigned long t(0);
         for (Index i(0) ; i < bytes ; ++i)
         {
@@ -142,7 +143,7 @@ unsigned long MemoryPool<Mem::CUDA>::generate_hash(void * data, Index bytes)
   dim3 grid(1,1,1);
   dim3 block(128,1,1);
   unsigned long result(0);
-  unsigned long * result_gpu;
+  void * result_gpu(0);
   cudaMalloc((void**)&result_gpu, sizeof(unsigned long));
   char * datac((char *)data);
   FEAST::LAFEM::Intern::cuda_generate_hash<<<grid, block>>>(datac, bytes, result_gpu);

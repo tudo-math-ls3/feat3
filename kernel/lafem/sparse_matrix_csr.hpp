@@ -73,6 +73,7 @@ namespace FEAST
           _used_elements(0),
           _hash(0)
         {
+          CONTEXT("When creating SparseMatrixCSR");
         }
 
         /**
@@ -89,6 +90,8 @@ namespace FEAST
           _zero_element(other.zero_element()),
           _used_elements(other.used_elements())
         {
+          CONTEXT("When creating SparseMatrixCSR");
+
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
           this->_elements_size.push_back(_used_elements);
           this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
@@ -152,6 +155,8 @@ namespace FEAST
           _zero_element(other.zero_element()),
           _used_elements(other.used_elements())
         {
+          CONTEXT("When creating SparseMatrixCSR");
+
           SparseMatrixCSR<Mem::Main, DT_> tother(other);
 
           this->_size = tother.size();
@@ -225,6 +230,8 @@ namespace FEAST
           // \TODO use real element count - be aware of non used elements
           _used_elements(val.size())
         {
+          CONTEXT("When creating SparseMatrixCSR");
+
           DenseVector<Arch_, Index> tcol_ind(col_ind.size());
           copy(tcol_ind, col_ind);
           DenseVector<Arch_, DT_> tval(val.size());
@@ -268,6 +275,8 @@ namespace FEAST
           _zero_element(DT_(0)),
           _used_elements(graph.get_num_indices())
         {
+          CONTEXT("When creating SparseMatrixCSR");
+
           this->_rows = graph.get_num_nodes_domain();
           this->_columns = graph.get_num_nodes_image();
 
@@ -339,6 +348,8 @@ namespace FEAST
           _used_elements(other._used_elements),
           _hash(other.hash())
         {
+          CONTEXT("When copying SparseMatrixCSR");
+
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
           this->_row_ptr = this->_indices.at(1);
@@ -361,6 +372,8 @@ namespace FEAST
           _used_elements(other.used_elements()),
           _hash(other.hash())
         {
+          CONTEXT("When copying SparseMatrixCSR");
+
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
           this->_row_ptr = this->_indices.at(1);
@@ -373,6 +386,8 @@ namespace FEAST
          */
         SparseMatrixCSR<Arch_, DT_> clone()
         {
+          CONTEXT("When cloning SparseMatrixCSR");
+
           DenseVector<Arch_, Index> col_ind(this->_used_elements, this->_col_ind);
           DenseVector<Arch_, DT_> val(this->_used_elements, this->_val);
           DenseVector<Arch_, Index> row_ptr(this->_rows + 1, this->_row_ptr);
@@ -393,6 +408,8 @@ namespace FEAST
          */
         SparseMatrixCSR<Arch_, DT_> & operator= (const SparseMatrixCSR<Arch_, DT_> & other)
         {
+          CONTEXT("When assigning SparseMatrixCSR");
+
           if (this == &other)
             return *this;
 
@@ -444,6 +461,8 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         SparseMatrixCSR<Arch_, DT_> & operator= (const SparseMatrixCSR<Arch2_, DT2_> & other)
         {
+          CONTEXT("When assigning SparseMatrixCSR");
+
           this->_size = other.size();
           this->_rows = other.rows();
           this->_columns = other.columns();
@@ -516,6 +535,8 @@ namespace FEAST
          */
         DT_ operator()(Index row, Index col) const
         {
+          CONTEXT("When retrieving SparseMatrixCSR element");
+
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_columns) + " !");
 
@@ -677,6 +698,8 @@ namespace FEAST
      */
     template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const SparseMatrixCSR<Arch_, DT_> & a, const SparseMatrixCSR<Arch2_, DT_> & b)
     {
+      CONTEXT("When comparing SparseMatrixCSRs");
+
       if (a.rows() != b.rows())
         return false;
       if (a.columns() != b.columns())

@@ -47,6 +47,7 @@ namespace FEAST
         explicit DenseVector() :
           Container<Arch_, DT_> (0)
         {
+          CONTEXT("When creating DenseVector");
         }
 
         /**
@@ -59,6 +60,8 @@ namespace FEAST
         explicit DenseVector(Index size) :
           Container<Arch_, DT_>(size)
         {
+          CONTEXT("When creating DenseVector");
+
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
           this->_elements_size.push_back(size);
           this->_pelements = this->_elements.at(0);
@@ -75,6 +78,8 @@ namespace FEAST
         explicit DenseVector(Index size, DT_ value) :
           Container<Arch_, DT_>(size)
         {
+          CONTEXT("When creating DenseVector");
+
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
           this->_elements_size.push_back(size);
           this->_pelements = this->_elements.at(0);
@@ -93,6 +98,8 @@ namespace FEAST
         explicit DenseVector(Index size, DT_ * data) :
           Container<Arch_, DT_>(size)
         {
+          CONTEXT("When creating DenseVector");
+
           this->_elements.push_back(data);
           this->_elements_size.push_back(size);
           this->_pelements = this->_elements.at(0);
@@ -113,6 +120,8 @@ namespace FEAST
         explicit DenseVector(String filename) :
           Container<Arch_, DT_>(0)
         {
+          CONTEXT("When creating DenseVector");
+
           std::vector<DT_> data;
 
           std::ifstream file(filename.c_str(), std::ifstream::out);
@@ -162,6 +171,8 @@ namespace FEAST
         DenseVector(const DenseVector<Arch_, DT_> & other) :
           Container<Arch_, DT_>(other)
         {
+          CONTEXT("When copying DenseVector");
+
           this->_pelements = this->_elements.at(0);
         }
 
@@ -176,6 +187,8 @@ namespace FEAST
         DenseVector(const DenseVector<Arch2_, DT2_> & other) :
             Container<Arch_, DT_>(other)
         {
+          CONTEXT("When copying DenseVector");
+
           this->_pelements = this->_elements.at(0);
         }
 
@@ -185,6 +198,8 @@ namespace FEAST
          */
         DenseVector<Arch_, DT_> clone()
         {
+          CONTEXT("When cloning DenseVector");
+
           DenseVector<Arch_, DT_> t(this->_size);
 
           void * pdest(t.elements());
@@ -203,6 +218,8 @@ namespace FEAST
          */
         DenseVector<Arch_, DT_> & operator= (const DenseVector<Arch_, DT_> & other)
         {
+          CONTEXT("When assigning DenseVector");
+
           if (this == &other)
             return *this;
 
@@ -246,6 +263,8 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         DenseVector<Arch_, DT_> & operator= (const DenseVector<Arch2_, DT2_> & other)
         {
+          CONTEXT("When assigning DenseVector");
+
           this->_size = other.size();
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
@@ -280,6 +299,8 @@ namespace FEAST
          */
         void write_out(String filename) const
         {
+          CONTEXT("When writing out DenseVector");
+
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
           MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));
 
@@ -318,6 +339,8 @@ namespace FEAST
          */
         const DT_ operator()(Index index) const
         {
+          CONTEXT("When retrieving DenseVector element");
+
           ASSERT(index < this->_size, "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_size) + " !");
           return MemoryPool<Arch_>::get_element(_pelements, index);
         }
@@ -330,6 +353,8 @@ namespace FEAST
          */
         void operator()(Index index, DT_ value)
         {
+          CONTEXT("When setting DenseVector element");
+
           ASSERT(index < this->_size, "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_size) + " !");
           MemoryPool<Arch_>::modify_element(_pelements, index, value);
         }
@@ -353,6 +378,8 @@ namespace FEAST
      */
     template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const DenseVector<Arch_, DT_> & a, const DenseVector<Arch2_, DT_> & b)
     {
+      CONTEXT("When comparing DenseVectors");
+
       if (a.size() != b.size())
         return false;
       if (a.get_elements().size() != b.get_elements().size())

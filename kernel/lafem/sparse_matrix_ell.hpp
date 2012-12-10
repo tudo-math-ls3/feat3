@@ -79,6 +79,7 @@ namespace FEAST
           _zero_element(DT_(0)),
           _used_elements(0)
         {
+          CONTEXT("When creating SparseMatrixELL");
         }
 
         /**
@@ -95,6 +96,8 @@ namespace FEAST
           _zero_element(other_orig.zero_element()),
           _used_elements(other_orig.used_elements())
         {
+          CONTEXT("When creating SparseMatrixELL");
+
           SparseMatrixCSR<Mem::Main, DT_> other(other_orig);
 
           _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
@@ -164,6 +167,8 @@ namespace FEAST
           _zero_element(other_orig.zero_element()),
           _used_elements(other_orig.used_elements())
         {
+          CONTEXT("When creating SparseMatrixELL");
+
           SparseMatrixCSR<Mem::Main, DT_> other(other_orig);
 
           _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
@@ -231,6 +236,8 @@ namespace FEAST
         explicit SparseMatrixELL(String filename) :
           Container<Arch_, DT_>(0)
         {
+          CONTEXT("When creating SparseMatrixELL");
+
           FILE* file(NULL);
           file = fopen(filename.c_str(), "rb");
           if (file == NULL)
@@ -336,6 +343,8 @@ namespace FEAST
           _zero_element(other._zero_element),
           _used_elements(other._used_elements)
         {
+          CONTEXT("When copying SparseMatrixELL");
+
           this->_Ax = this->_elements.at(0);
           this->_Aj = this->_indices.at(0);
           this->_Arl = this->_indices.at(1);
@@ -358,6 +367,8 @@ namespace FEAST
           _zero_element(other.zero_element()),
           _used_elements(other.used_elements())
         {
+          CONTEXT("When copying SparseMatrixELL");
+
           this->_Ax = this->_elements.at(0);
           this->_Aj = this->_indices.at(0);
           this->_Arl = this->_indices.at(1);
@@ -372,6 +383,8 @@ namespace FEAST
          */
         SparseMatrixELL<Arch_, DT_> & operator= (const SparseMatrixELL<Arch_, DT_> & other)
         {
+          CONTEXT("When assigning SparseMatrixELL");
+
           if (this == &other)
             return *this;
 
@@ -423,6 +436,8 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         SparseMatrixELL<Arch_, DT_> & operator= (const SparseMatrixELL<Arch2_, DT2_> & other)
         {
+          CONTEXT("When assigning SparseMatrixELL");
+
           this->_size = other.size();
           this->_rows = other.rows();
           this->_columns = other.columns();
@@ -485,6 +500,8 @@ namespace FEAST
          */
         void write_out(String filename) const
         {
+          CONTEXT("When writing out SparseMatrixELL");
+
           if (typeid(DT_) != typeid(double))
             std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
 
@@ -532,6 +549,8 @@ namespace FEAST
          */
         DT_ operator()(Index row, Index col) const
         {
+          CONTEXT("When retrieving SparseMatrixELL element");
+
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix ell row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix ell column size " + stringify(this->_columns) + " !");
 
@@ -661,6 +680,8 @@ namespace FEAST
      */
     template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const SparseMatrixELL<Arch_, DT_> & a, const SparseMatrixELL<Arch2_, DT_> & b)
     {
+      CONTEXT("When comparing SparseMatrixELLs");
+
       if (a.rows() != b.rows())
         return false;
       if (a.columns() != b.columns())

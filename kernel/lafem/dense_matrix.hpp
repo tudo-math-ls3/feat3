@@ -49,6 +49,7 @@ namespace FEAST
           _rows(0),
           _columns(0)
         {
+          CONTEXT("When creating DenseMatrix");
         }
 
         /**
@@ -62,6 +63,8 @@ namespace FEAST
         explicit DenseMatrix(Index rows, Index columns) :
           Container<Arch_, DT_>(rows * columns)
         {
+          CONTEXT("When creating DenseMatrix");
+
           this->_size = rows * columns;
           this->_rows = rows;
           this->_columns = columns;
@@ -83,6 +86,8 @@ namespace FEAST
         explicit DenseMatrix(Index rows, Index columns, DT_ value) :
           Container<Arch_, DT_>(rows * columns)
         {
+          CONTEXT("When creating DenseMatrix");
+
           this->_size = rows * columns;
           this->_rows = rows;
           this->_columns = columns;
@@ -105,6 +110,8 @@ namespace FEAST
           _rows(other._rows),
           _columns(other._columns)
         {
+          CONTEXT("When copying DenseMatrix");
+
           _pelements = this->_elements.at(0);
         }
 
@@ -121,6 +128,8 @@ namespace FEAST
           _rows(other.rows()),
           _columns(other.columns())
         {
+          CONTEXT("When copying DenseMatrix");
+
           _pelements = this->_elements.at(0);
         }
 
@@ -130,6 +139,8 @@ namespace FEAST
          */
         DenseMatrix<Arch_, DT_> clone()
         {
+          CONTEXT("When cloning DenseMatrix");
+
           DenseMatrix<Arch_, DT_> t(this->_rows, this->_columns);
 
           void * pdest(t.elements());
@@ -148,6 +159,8 @@ namespace FEAST
          */
         DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch_, DT_> & other)
         {
+          CONTEXT("When assigning DenseMatrix");
+
           if (this == &other)
             return *this;
 
@@ -193,6 +206,8 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
         {
+          CONTEXT("When assigning DenseMatrix");
+
           this->_size = other.size();
           this->_rows = other.rows();
           this->_columns = other.columns();
@@ -247,6 +262,8 @@ namespace FEAST
          */
         const DT_ operator()(Index row, Index col) const
         {
+          CONTEXT("When retrieving DenseMatrix element");
+
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
           return MemoryPool<Arch_>::get_element(_pelements, row * this->_columns + col);
@@ -261,6 +278,8 @@ namespace FEAST
          */
         void operator()(Index row, Index col, DT_ value)
         {
+          CONTEXT("When setting DenseMatrix element");
+
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
           MemoryPool<Arch_>::modify_element(_pelements, row * this->_columns + col, value);
@@ -305,6 +324,8 @@ namespace FEAST
      */
     template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const DenseMatrix<Arch_, DT_> & a, const DenseMatrix<Arch2_, DT_> & b)
     {
+      CONTEXT("When comparing DenseMatrices");
+
       if (a.size() != b.size())
         return false;
       if (a.get_elements().size() != b.get_elements().size())

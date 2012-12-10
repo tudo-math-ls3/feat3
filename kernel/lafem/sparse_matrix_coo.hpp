@@ -65,6 +65,7 @@ namespace FEAST
           _zero_element(DT_(0)),
           _used_elements(0)
         {
+          CONTEXT("When creating SparseMatrixCOO");
         }
 
         /**
@@ -77,11 +78,12 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(Index rows, Index columns) :
           Container<Mem::Main, DT_>(rows * columns),
+          _rows(rows),
+          _columns(columns),
           _zero_element(DT_(0)),
           _used_elements(0)
         {
-          this->_rows = rows;
-          this->_columns = columns;
+          CONTEXT("When creating SparseMatrixCOO");
         }
 
         /**
@@ -96,6 +98,8 @@ namespace FEAST
           _zero_element(DT_(0)),
           _used_elements(graph.get_num_indices())
         {
+          CONTEXT("When creating SparseMatrixCOO");
+
           this->_rows = graph.get_num_nodes_domain();
           this->_columns = graph.get_num_nodes_image();
 
@@ -124,7 +128,9 @@ namespace FEAST
           _zero_element(other._zero_element),
           _used_elements(other.used_elements())
         {
-            _elements.insert(other._elements.begin(), other._elements.end());
+          CONTEXT("When copying SparseMatrixCOO");
+
+          _elements.insert(other._elements.begin(), other._elements.end());
         }
 
         /**
@@ -142,7 +148,9 @@ namespace FEAST
           _zero_element(other._zero_element),
           _used_elements(other.used_elements())
         {
-            _elements.insert(other._elements.begin(), other._elements.end());
+          CONTEXT("When copying SparseMatrixCOO");
+
+          _elements.insert(other._elements.begin(), other._elements.end());
         }
 
         /** \brief Clone operation
@@ -151,6 +159,8 @@ namespace FEAST
          */
         SparseMatrixCOO<Mem::Main, DT_> clone()
         {
+          CONTEXT("When cloning SparseMatrixCOO");
+
           SparseMatrixCOO<Mem::Main, DT_> t(this->_rows, this->_columns);
           t._elements.insert(this->_elements.begin(), this->_elements.end());
           return t;
@@ -165,6 +175,8 @@ namespace FEAST
          */
         void operator()(Index row, Index col, DT_ val)
         {
+          CONTEXT("When setting SparseMatrixCOO element");
+
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
 
@@ -182,10 +194,10 @@ namespace FEAST
          * \param[in] col The column of the matrix element.
          * \param[in] value The value to be set.
          */
-        void insert(Index row, Index col, DT_ val)
+        /*void insert(Index row, Index col, DT_ val)
         {
           (*this)(row, col, val);
-        }
+        }*/
 
         /**
          * \brief Retrieve specific matrix element.
@@ -197,6 +209,8 @@ namespace FEAST
          */
         const DT_ operator()(Index row, Index col) const
         {
+          CONTEXT("When retrieving SparseMatrixCOO element");
+
           ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds sparse matrix coo row size " + stringify(this->_rows) + " !");
           ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->_columns) + " !");
 
@@ -278,6 +292,8 @@ namespace FEAST
      */
     template <typename Arch_, typename DT_> bool operator== (const SparseMatrixCOO<Arch_, DT_> & a, const SparseMatrixCOO<Arch_, DT_> & b)
     {
+      CONTEXT("When comparing SparseMatrixCOOs");
+
       if (a.rows() != b.rows())
         return false;
       if (a.columns() != b.columns())
