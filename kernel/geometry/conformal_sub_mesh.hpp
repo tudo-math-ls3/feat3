@@ -330,7 +330,7 @@ namespace FEAST
        * \brief Returns the number of entities.
        *
        * \param[in] dim
-       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= shape_dim.
        *
        * \returns
        * The number of entities of dimension \p dim.
@@ -453,7 +453,7 @@ namespace FEAST
        * \brief Returns the number of entities of the refined mesh.
        *
        * \param[in] dim
-       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= shape_dim.
        *
        * \returns
        * The number of entities of dimension \p dim.

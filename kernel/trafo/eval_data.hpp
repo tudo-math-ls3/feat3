@@ -164,7 +164,7 @@ namespace FEAST
       /**
        * \brief Evaluation operator
        *
-       * \param[in] evaluator_
+       * \param[in] evaluator
        * The trafo evaluator that is to be used for evaluation.
        *
        * \param[in] dom_point_

@@ -50,14 +50,14 @@ namespace FEAST
      *
      * \param[in] constr_type
      * Specifies the construction type:
-     * - \p type_none\n Create an uninitialised permutation.\n
+     * - \c type_none \n Create an uninitialised permutation.\n
      *   The permutation array has to be set up after the object is created.\n
      *   The input array \p v is ignored.
-     * - \p type_identity\n Create an identity permutation.\nThe input array \p v is ignored.
-     * - \p type_perm\n Interpret the input array as a permute-position array.
-     * - \p type_swap\n Interpret the input array as a swap-position array.
-     * - \p type_inv_perm\n Interpret the input array as an inverse permute-position array.
-     * - \p type_inv_swap\n Interpret the input array as an inverse swap-position array.
+     * - \c type_identity \n Create an identity permutation.\n The input array \p v is ignored.
+     * - \c type_perm \n Interpret the input array as a permute-position array.
+     * - \c type_swap \n Interpret the input array as a swap-position array.
+     * - \c type_inv_perm \n Interpret the input array as an inverse permute-position array.
+     * - \c type_inv_swap \n Interpret the input array as an inverse swap-position array.
      *
      * \param[in] v
      * The input array for the initialisation. The interpretation of the array's content depends on the

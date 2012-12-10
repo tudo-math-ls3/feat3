@@ -274,7 +274,7 @@ namespace FEAST
         }
       };
     } // namespace Intern
-    /// \cond internal
+    /// \endcond
 
     /**
      * \brief StaticFunction wrapper class template for Functor interface

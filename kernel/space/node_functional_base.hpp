@@ -126,19 +126,19 @@ namespace FEAST
       {
       }
 
-      /** \copydoc NullFunctionalBase::get_max_assigned_dofs() */
+      /** \copydoc NodeFunctionalBase::get_max_assigned_dofs() */
       Index get_max_assigned_dofs() const
       {
         return 0;
       }
 
-      /** \copydoc NullFunctionalBase::get_num_assigned_dofs() */
+      /** \copydoc NodeFunctionalBase::get_num_assigned_dofs() */
       Index get_num_assigned_dofs() const
       {
         return 0;
       }
 
-      /** \copydoc NullFunctionalBase::operator()() */
+      /** \copydoc NodeFunctionalBase::operator()() */
       DataType_ operator()(Index) const
       {
         throw InternalError("invalid call of NodeFunctionalNull::operator()()");

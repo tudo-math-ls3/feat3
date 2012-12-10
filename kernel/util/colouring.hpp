@@ -105,7 +105,7 @@ namespace FEAST
      * \param[in] order
      * Permutation array that describes how the algorithm is supposed to proceed through the nodes.
      */
-    explicit Colouring(const Graph& graph, const Index* _order);
+    explicit Colouring(const Graph& graph, const Index* order);
 
     /// virtual destructor
     virtual ~Colouring();

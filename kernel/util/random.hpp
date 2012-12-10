@@ -100,8 +100,8 @@ namespace FEAST
      *
      * This function extracts the next random number in the stream.
      * - If the type of the value to be extracted is integral, then the value will be within the full range, i.e.
-     *   - for a signed <e>n</e>-bit integer, it will hold <e>-2^(n-1) <= x < 2^(n-1)</e>
-     *   - for an unsigned <e>n</e>-bit integer, it will hol that <e>0 <= x < 2^n</e>
+     *   - for a signed <em>n</em>-bit integer, it will hold <em>-2^(n-1) <= x < 2^(n-1)</em>
+     *   - for an unsigned <em>n</em>-bit integer, it will hol that <em>0 <= x < 2^n</em>
      * - If the type of the value to be extracted is a floating point type, then the value will be within the
      *   closed interval [0,1].
      *

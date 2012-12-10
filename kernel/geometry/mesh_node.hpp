@@ -50,7 +50,7 @@ namespace FEAST
     };
 
     /// \cond internal
-    /// helper policy template for RootMeshNode class template
+    // helper policy template for RootMeshNode class template
     template<typename MeshNodePolicy_>
     struct RootMeshNodePolicy
     {
@@ -58,7 +58,7 @@ namespace FEAST
       typedef typename MeshNodePolicy_::RootMeshChartType ChartType;
     };
 
-    /// helper policy template for SubMeshNode class template
+    // helper policy template for SubMeshNode class template
     template<typename MeshNodePolicy_>
     struct SubMeshNodePolicy
     {

@@ -108,8 +108,8 @@ namespace FEAST
          * \brief Basis Gradients capability
          *
          * This entry specifies whether the evaluator is capable of computing basis function gradients.\n
-         * If this value is non-zero, the evaluator implements the #eval_grads member function.\n
-         * See #eval_grads for details.
+         * If this value is non-zero, the evaluator implements the #eval_gradients member function.\n
+         * See #eval_gradients for details.
          */
         can_grad = 0,
       };
@@ -269,7 +269,7 @@ namespace FEAST
         me().eval_ref_values(values, trafo_data.dom_point);
       }
 
-      /** \copydoc EvaluatorBase::eval_grads() */
+      /** \copydoc EvaluatorBase::eval_gradients() */
       template<typename TrafoEvalData_>
       void eval_gradients(
         BasisGradientVectorRef grads,

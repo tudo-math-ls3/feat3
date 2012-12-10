@@ -35,7 +35,7 @@ namespace FEAST
       /// col-mirror reference
       const VectorMirrorType& _col_mirror;
       /// \cond internal
-      /// mutable work array
+      // mutable work array
       mutable DataType* _work;
       /// \endcond
 

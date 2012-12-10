@@ -104,12 +104,6 @@ namespace FEAST
        * \param[in] num_entities
        * An array of length at least #shape_dim + 1 holding the number of entities for each shape dimension.
        * Must not be \c nullptr.
-       *
-       * \param[in] num_coords
-       * The number of coordinates per vertex. This parameter is passed to the constructor of the vertex set.
-       *
-       * \param[in] vertex_stride
-       * The vertex stride. This parameter is passed to the constructor of the vertex set.
        */
       explicit ConformalMesh(const Index num_entities[]) :
         _vertex_set(num_entities[0]),
@@ -271,7 +265,7 @@ namespace FEAST
        * \brief Returns the number of entities.
        *
        * \param[in] dim
-       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= #shape_dim.
+       * The dimension of the entity whose count is to be returned. Must be 0 <= \p dim <= shape_dim.
        *
        * \returns
        * The number of entities of dimension \p dim.

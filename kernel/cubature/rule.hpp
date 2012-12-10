@@ -35,7 +35,7 @@ namespace FEAST
       };
 
       /**
-       * \rief Cubature rule factory interface
+       * \brief Cubature rule factory interface
        */
       class Factory
       {

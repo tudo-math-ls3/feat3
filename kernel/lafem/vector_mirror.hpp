@@ -98,7 +98,8 @@ namespace FEAST
        */
       template<
         typename DataType2_>
-      LAFEM::DenseVector<Arch_, DataType2_> create_buffer(const LAFEM::DenseVector<Arch_, DataType2_>& /*tmpl_vec*/) const
+      LAFEM::DenseVector<Arch_, DataType2_> create_buffer(
+        const LAFEM::DenseVector<Arch_, DataType2_>& DOXY(tmpl_vec)) const
       {
         return LAFEM::DenseVector<Arch_, DataType2_>(get_num_mirror_entries());
       }

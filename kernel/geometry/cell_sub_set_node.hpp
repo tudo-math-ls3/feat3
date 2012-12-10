@@ -187,9 +187,6 @@ namespace FEAST
        *
        * \param[in] subset
        * A pointer to the cell subset for this node.
-       *
-       * \param[in] refinery
-       * A pointer to the refinery that created \p subset. May be \c nullptr.
        */
       explicit CellSubSetNode(CellSubSetType* subset) :
         BaseClass(),

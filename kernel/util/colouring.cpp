@@ -51,11 +51,11 @@ namespace FEAST
   Colouring::Colouring(const Graph& graph)
   {
     // get the graph's data
-    Index _num_nodes_domain = graph.get_num_nodes_domain();
-    const Index* _domain_ptr = graph.get_domain_ptr();
-    const Index* _image_idx = graph.get_image_idx();
+    Index num_nodes_domain = graph.get_num_nodes_domain();
+    const Index* domain_ptr = graph.get_domain_ptr();
+    const Index* image_idx = graph.get_image_idx();
 
-    _num_nodes = _num_nodes_domain;
+    _num_nodes = num_nodes_domain;
 
     // allocate the colouring array
     _colouring = new Index[_num_nodes];
@@ -83,7 +83,7 @@ namespace FEAST
     Index min_colour_index;
 
     // loop over all nodes
-    for(Index i(0); i < _num_nodes_domain; ++i)
+    for(Index i(0); i < num_nodes_domain; ++i)
     {
       // reset the auxiliary array
       for(Index j(0); j < mnc; ++j)
@@ -92,24 +92,24 @@ namespace FEAST
       }
 
       // loop over all adjancies of the i-th node
-      lower_bound = _domain_ptr[i];
-      upper_bound = _domain_ptr[i+1];
+      lower_bound = domain_ptr[i];
+      upper_bound = domain_ptr[i+1];
       for(Index j(lower_bound); j < upper_bound; ++j)
       {
-        if(_image_idx[j] < i)
+        if(image_idx[j] < i)
         {
           // mark the used colour
-          col_aux[_colouring[_image_idx[j]]] = 1;
+          col_aux[_colouring[image_idx[j]]] = 1;
         }
       }
 
       // calculate new colour:
 
       // minimum number of colour uses so far
-      min_colour_uses = _num_nodes_domain + 1;
+      min_colour_uses = num_nodes_domain + 1;
 
       // colour with min_colour_uses
-      min_colour_index = _num_nodes_domain + 1;
+      min_colour_index = num_nodes_domain + 1;
 
       // loop over all colours
       for(Index j(0); j < _num_colours; ++j)
@@ -125,7 +125,7 @@ namespace FEAST
       }
 
       // check if an old colour was found or if a new colour is needed
-      if(min_colour_index != _num_nodes_domain +1)
+      if(min_colour_index != num_nodes_domain +1)
       {
         // if an old colour is acceptable
         _colouring[i] = min_colour_index;
@@ -146,14 +146,14 @@ namespace FEAST
   }
 
   // Creation out of a given Graph with a prescribed order
-  Colouring::Colouring(const Graph& graph, const Index* _order)
+  Colouring::Colouring(const Graph& graph, const Index* order)
   {
     // get the graph's data
-    Index _num_nodes_domain = graph.get_num_nodes_domain();
-    const Index* _domain_ptr = graph.get_domain_ptr();
-    const Index* _image_idx = graph.get_image_idx();
+    Index num_nodes_domain = graph.get_num_nodes_domain();
+    const Index* domain_ptr = graph.get_domain_ptr();
+    const Index* image_idx = graph.get_image_idx();
 
-    _num_nodes = _num_nodes_domain;
+    _num_nodes = num_nodes_domain;
 
     // allocate the colouring array
     _colouring = new Index[_num_nodes];
@@ -184,16 +184,16 @@ namespace FEAST
     Index i;
 
     // initialise colouring data
-    for(Index j(0); j < _num_nodes_domain; ++j)
+    for(Index j(0); j < num_nodes_domain; ++j)
     {
-      _colouring[j] = _num_nodes_domain + 1;
+      _colouring[j] = num_nodes_domain + 1;
     }
 
     // loop over all nodes
-    for(Index k(0); k < _num_nodes_domain; ++k)
+    for(Index k(0); k < num_nodes_domain; ++k)
     {
       // get index of the current node
-      i = _order[k];
+      i = order[k];
 
       // reset the auxiliary array
       for(Index j(0); j < mnc; ++j)
@@ -202,24 +202,24 @@ namespace FEAST
       }
 
       // loop over all adjancies of the i-th node
-      lower_bound = _domain_ptr[i];
-      upper_bound = _domain_ptr[i+1];
+      lower_bound = domain_ptr[i];
+      upper_bound = domain_ptr[i+1];
       for(Index j(lower_bound); j < upper_bound; ++j)
       {
-        if(_colouring[_image_idx[j]] != _num_nodes_domain + 1)
+        if(_colouring[image_idx[j]] != num_nodes_domain + 1)
         {
           // mark the used colour
-          col_aux[_colouring[_image_idx[j]]] = 1;
+          col_aux[_colouring[image_idx[j]]] = 1;
         }
       }
 
       // calculate new colour:
 
       // minimum number of colour uses so far
-      min_colour_uses = _num_nodes_domain + 1;
+      min_colour_uses = num_nodes_domain + 1;
 
       // colour with min_colour_uses
-      min_colour_index = _num_nodes_domain + 1;
+      min_colour_index = num_nodes_domain + 1;
 
       // loop over all colours
       for(Index j(0); j < _num_colours; ++j)
@@ -235,7 +235,7 @@ namespace FEAST
       }
 
       // check if an old colour was found or if a new colour is needed
-      if(min_colour_index != _num_nodes_domain +1)
+      if(min_colour_index != num_nodes_domain +1)
       {
         // if an old colour is acceptable
         _colouring[i] = min_colour_index;

@@ -199,6 +199,7 @@ namespace FEAST
     /* ***************************************************************************************** */
     /* ***************************************************************************************** */
 
+    /// \cond internal
     template<
       int shape_dim_,
       int cell_dim_ = shape_dim_,
@@ -287,6 +288,7 @@ namespace FEAST
       {
       }
     };
+    /// \endcond
   } // namespace Geometry
 } // namespace FEAST
 

@@ -161,7 +161,7 @@ namespace FEAST
        *
        * \remark As all NullImageIterators are equal by definition, this operator always returns \c false.
        */
-      bool operator!=(const NullImageIterator&) const
+      bool operator!=(const NullImageIterator& DOXY(other)) const
       {
         // NullImageIterators are always equal
         return false;

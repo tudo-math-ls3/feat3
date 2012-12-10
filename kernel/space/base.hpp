@@ -18,7 +18,7 @@ namespace FEAST
      * This class implements a simple evaluator traits which should suffice for most scalar elements.
      *
      * \tparam EvalPolicy_
-     * The evaluation policy that is to be used. See #Trafo::StandardEvalPolicy.
+     * The evaluation policy that is to be used. See Trafo::StandardEvalPolicy.
      *
      * \tparam max_local_dofs_
      * The maximum number of local degrees of freedom.

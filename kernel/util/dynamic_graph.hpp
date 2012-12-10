@@ -335,7 +335,7 @@ namespace FEAST
     /* *************************************************** */
   private:
     /// \cond internal
-    /// renders adjactor
+    // renders adjactor
     template<typename Adjactor_>
     void _render_as_is(const Adjactor_& adj)
     {
@@ -360,7 +360,7 @@ namespace FEAST
       }
     }
 
-    /// renders transposed adjactor
+    // renders transposed adjactor
     template<typename Adjactor_>
     void _render_transpose(const Adjactor_& adj)
     {
@@ -385,7 +385,7 @@ namespace FEAST
       }
     }
 
-    /// renders adjactor composition
+    // renders adjactor composition
     template<
       typename Adjactor1_,
       typename Adjactor2_>

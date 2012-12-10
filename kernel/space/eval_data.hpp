@@ -98,7 +98,7 @@ namespace FEAST
       /**
        * \brief Evaluation operator
        *
-       * \param[in] evaluator_
+       * \param[in] evaluator
        * The space evaluator that is to be used for evaluation.
        *
        * \param[in] trafo_data
