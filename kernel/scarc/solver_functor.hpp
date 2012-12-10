@@ -910,10 +910,10 @@ namespace FEAST
     };
 
     template<typename Algo_, typename VT_, typename ST_>
-    class NormFunctor : public SolverFunctorBase<VT_>
+    class NormFunctor2wosqrt : public SolverFunctorBase<VT_>
     {
       public:
-        NormFunctor(ST_& y, const VT_& x) :
+        NormFunctor2wosqrt(ST_& y, const VT_& x) :
           _y(y),
           _x(x)
         {
@@ -922,15 +922,15 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "NormFunctor";
+          return "NormFunctor2wosqrt";
         }
 
         virtual void execute()
         {
-          _y = LAFEM::Norm2<Algo_>::value(_x);
+          _y = LAFEM::Norm2wosqrt<Algo_>::value(_x);
         }
 
-        NormFunctor& operator=(const NormFunctor& rhs)
+        NormFunctor2wosqrt& operator=(const NormFunctor2wosqrt& rhs)
         {
           if(this == &rhs)
             return *this;
@@ -940,7 +940,7 @@ namespace FEAST
           return *this;
         }
 
-        NormFunctor(const NormFunctor& other) :
+        NormFunctor2wosqrt(const NormFunctor2wosqrt& other) :
           _y(other._y),
           _x(other._x)
         {
@@ -956,10 +956,10 @@ namespace FEAST
     };
 
     template<typename Algo_, typename VT_, typename ST_>
-    class NormFunctorProxyRight : public SolverFunctorBase<VT_>
+    class NormFunctor2wosqrtProxyRight : public SolverFunctorBase<VT_>
     {
       public:
-        NormFunctorProxyRight(ST_& y, VT_& x) :
+        NormFunctor2wosqrtProxyRight(ST_& y, VT_& x) :
           _y(y),
           _x(x)
         {
@@ -968,15 +968,15 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          return "NormFunctor";
+          return "NormFunctor2wosqrt";
         }
 
         virtual void execute()
         {
-          _y = LAFEM::Norm2<Algo_>::value(_x);
+          _y = LAFEM::Norm2wosqrt<Algo_>::value(_x);
         }
 
-        NormFunctorProxyRight& operator=(const NormFunctorProxyRight& rhs)
+        NormFunctor2wosqrtProxyRight& operator=(const NormFunctor2wosqrtProxyRight& rhs)
         {
           if(this == &rhs)
             return *this;
@@ -986,7 +986,7 @@ namespace FEAST
           return *this;
         }
 
-        NormFunctorProxyRight(const NormFunctorProxyRight& other) :
+        NormFunctor2wosqrtProxyRight(const NormFunctor2wosqrtProxyRight& other) :
           _y(other._y),
           _x(other._x)
         {
@@ -1003,6 +1003,99 @@ namespace FEAST
         VT_& _x;
     };
 
+    template<typename Algo_, typename VT_, typename ST_>
+    class NormFunctor2 : public SolverFunctorBase<VT_>
+    {
+      public:
+        NormFunctor2(ST_& y, const VT_& x) :
+          _y(y),
+          _x(x)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "NormFunctor2";
+        }
+
+        virtual void execute()
+        {
+          _y = LAFEM::Norm2<Algo_>::value(_x);
+        }
+
+        NormFunctor2& operator=(const NormFunctor2& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_x = rhs._x;
+          return *this;
+        }
+
+        NormFunctor2(const NormFunctor2& other) :
+          _y(other._y),
+          _x(other._x)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        ST_& _y;
+        const VT_& _x;
+    };
+
+    template<typename Algo_, typename VT_, typename ST_>
+    class NormFunctor2ProxyRight : public SolverFunctorBase<VT_>
+    {
+      public:
+        NormFunctor2ProxyRight(ST_& y, VT_& x) :
+          _y(y),
+          _x(x)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "NormFunctor2";
+        }
+
+        virtual void execute()
+        {
+          _y = LAFEM::Norm2<Algo_>::value(_x);
+        }
+
+        NormFunctor2ProxyRight& operator=(const NormFunctor2ProxyRight& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_x = rhs._x;
+          return *this;
+        }
+
+        NormFunctor2ProxyRight(const NormFunctor2ProxyRight& other) :
+          _y(other._y),
+          _x(other._x)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _x = arg;
+          this->_complete = true;
+        }
+
+      private:
+        ST_& _y;
+        VT_& _x;
+    };
     ///in scalar functors, we still need a vector type in order to make the functor compatible with SolverFunctorBase<VT_>
     template<typename VT_, typename DT_>
     class DivFunctor : public SolverFunctorBase<VT_>
@@ -1163,11 +1256,11 @@ namespace FEAST
     {
       public:
         SynchVecFunctor(VT_& l,
-                     const StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
-                     const StoreT_<VT_, std::allocator<VT_> >& sendbufs,
-                     const StoreT_<VT_, std::allocator<VT_> >& recvbufs,
-                     const StoreT_<Index, std::allocator<Index> >& dest_ranks,
-                     const StoreT_<Index, std::allocator<Index> >& source_ranks) :
+                        StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
+                        StoreT_<VT_, std::allocator<VT_> >& sendbufs,
+                        StoreT_<VT_, std::allocator<VT_> >& recvbufs,
+                        StoreT_<Index, std::allocator<Index> >& dest_ranks,
+                        StoreT_<Index, std::allocator<Index> >& source_ranks) :
           _l(l),
           _mirrors(mirrors),
           _sendbufs(sendbufs),
@@ -1223,11 +1316,11 @@ namespace FEAST
 
       private:
         VT_& _l;
-        const StoreT_<VMT_, std::allocator<VMT_> >& _mirrors;
-        const StoreT_<VT_, std::allocator<VT_> >& _sendbufs;
-        const StoreT_<VT_, std::allocator<VT_> >& _recvbufs;
-        const StoreT_<Index, std::allocator<Index> >& _dest_ranks;
-        const StoreT_<Index, std::allocator<Index> >& _source_ranks;
+        StoreT_<VMT_, std::allocator<VMT_> >& _mirrors;
+        StoreT_<VT_, std::allocator<VT_> >& _sendbufs;
+        StoreT_<VT_, std::allocator<VT_> >& _recvbufs;
+        StoreT_<Index, std::allocator<Index> >& _dest_ranks;
+        StoreT_<Index, std::allocator<Index> >& _source_ranks;
     };
 
     template<typename Algo_,
@@ -1239,11 +1332,11 @@ namespace FEAST
     {
       public:
         SynchVecFunctorProxy(VT_& l,
-                     const StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
-                     const StoreT_<VT_, std::allocator<VT_> >& sendbufs,
-                     const StoreT_<VT_, std::allocator<VT_> >& recvbufs,
-                     const StoreT_<Index, std::allocator<Index> >& dest_ranks,
-                     const StoreT_<Index, std::allocator<Index> >& source_ranks) :
+                             StoreT_<VMT_, std::allocator<VMT_> >& mirrors,
+                             StoreT_<VT_, std::allocator<VT_> >& sendbufs,
+                             StoreT_<VT_, std::allocator<VT_> >& recvbufs,
+                             StoreT_<Index, std::allocator<Index> >& dest_ranks,
+                             StoreT_<Index, std::allocator<Index> >& source_ranks) :
           _l(l),
           _mirrors(mirrors),
           _sendbufs(sendbufs),
@@ -1304,11 +1397,11 @@ namespace FEAST
 
       private:
         VT_& _l;
-        const StoreT_<VMT_, std::allocator<VMT_> >& _mirrors;
-        const StoreT_<VT_, std::allocator<VT_> >& _sendbufs;
-        const StoreT_<VT_, std::allocator<VT_> >& _recvbufs;
-        const StoreT_<Index, std::allocator<Index> >& _dest_ranks;
-        const StoreT_<Index, std::allocator<Index> >& _source_ranks;
+        StoreT_<VMT_, std::allocator<VMT_> >& _mirrors;
+        StoreT_<VT_, std::allocator<VT_> >& _sendbufs;
+        StoreT_<VT_, std::allocator<VT_> >& _recvbufs;
+        StoreT_<Index, std::allocator<Index> >& _dest_ranks;
+        StoreT_<Index, std::allocator<Index> >& _source_ranks;
     };
 
     template<typename Algo_,
@@ -1338,7 +1431,7 @@ namespace FEAST
 #ifndef SERIAL
           SynchScal<Parallel, cm_>::execute(_l, _sendbuf, _recvbuf);
 #else
-          SynchScal<Serial, cm_>::execute(_l, _sendbuf, _recvbuf,);
+          SynchScal<Serial, cm_>::execute(_l, _sendbuf, _recvbuf);
 #endif
         }
 

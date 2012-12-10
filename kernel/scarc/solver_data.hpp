@@ -397,7 +397,7 @@ namespace FEAST
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
              typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
              template<typename, typename> class StorageType_ = std::vector>
-    struct PreconditionedSynchronisedSolverData : public SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>
+    struct SynchronisedPreconditionedSolverData : public SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>
     {
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
@@ -406,11 +406,11 @@ namespace FEAST
       ///fulfill pure virtual
       virtual const std::string type_name()
       {
-        return "PreconditionedSynchronisedSolverData";
+        return "SynchronisedPreconditionedSolverData";
       }
 
       ///CTOR from system data
-      PreconditionedSynchronisedSolverData(matrix_type_& A,
+      SynchronisedPreconditionedSolverData(matrix_type_& A,
                              PreconContType_& P,
                              vector_type_& x,
                              vector_type_& b,
@@ -422,14 +422,14 @@ namespace FEAST
       }
 
       ///copy CTOR
-      PreconditionedSynchronisedSolverData(const PreconditionedSynchronisedSolverData& other) :
+      SynchronisedPreconditionedSolverData(const SynchronisedPreconditionedSolverData& other) :
         SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(other),
         stored_prec(other.stored_prec)
       {
       }
 
       ///assignment operator overload
-      PreconditionedSynchronisedSolverData& operator=(const PreconditionedSynchronisedSolverData& other)
+      SynchronisedPreconditionedSolverData& operator=(const SynchronisedPreconditionedSolverData& other)
       {
           if(this == &other)
             return *this;

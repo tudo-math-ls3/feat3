@@ -23,7 +23,7 @@ namespace FEAST
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
       static inline void execute(VectorT_& target,
-                                 const VectorMirrorT_& mirror,
+                                 VectorMirrorT_& mirror,
                                  VectorT_& sendbuf,
                                  VectorT_& recvbuf,
                                  Index dest_rank,
@@ -47,8 +47,8 @@ namespace FEAST
                                  StorageT_<VectorMirrorT_, std::allocator<VectorMirrorT_> >& mirrors,
                                  StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                                  StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
-                                 StorageT_<Index, std::allocator<Index> > dest_ranks,
-                                 StorageT_<Index, std::allocator<Index> > source_ranks)
+                                 StorageT_<Index, std::allocator<Index> >& dest_ranks,
+                                 StorageT_<Index, std::allocator<Index> >& source_ranks)
       {
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
@@ -77,8 +77,21 @@ namespace FEAST
                                  DataType_& recvbuf)
       {
         sendbuf = target;
-        Comm<Arch_>::allreduce(&sendbuf, 1, &recvbuf);
+        Comm<Arch_>::allreduce(&sendbuf, Index(1), &recvbuf);
         target = sqrt(recvbuf);
+      }
+    };
+
+    template<>
+    struct SynchScal<Serial, com_allreduce_sqrtsum>
+    {
+      //single target, single solver per process
+      template<typename DataType_>
+      static inline void execute(DataType_& target,
+                                 DataType_& sendbuf,
+                                 DataType_& recvbuf)
+      {
+        target = sqrt(target);
       }
     };
   }

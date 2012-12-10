@@ -135,7 +135,7 @@ namespace FEAST
                                          Index /*recv_tag*/ = 0,
                                          Index /*communicator*/ = 0)
             {
-              const Index send_end(num_elements_to_send);
+              /*const Index send_end(num_elements_to_send);
               const Index recv_end(num_elements_to_recv);
               DataType1_ bufsend(0);
               DataType2_ bufrecv(0);
@@ -151,7 +151,14 @@ namespace FEAST
                 bufrecv = (DataType2_)sendbuf[i];
                 sendbuf[i] = (DataType1_)recvbuf[i];
                 recvbuf[i] = bufrecv;
-              }
+              }*/
+            }
+
+          template<typename DataType1_>
+            static inline void allreduce(DataType1_ * sendbuf,
+                                         Index num_elements_to_send_and_receive,
+                                         DataType1_ * recvbuf)
+            {
             }
 
           //TODO

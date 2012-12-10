@@ -36,7 +36,7 @@ class SolverPatternTest:
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 20, 1e-8));
-      TEST_CHECK_EQUAL(solver->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor, DivFunctor]]]");
+      TEST_CHECK_EQUAL(solver->type_name(), "[DefectFunctor, NormFunctor2, IterateFunctor[[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
       solver->execute();
 
       //---------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class SolverPatternTest:
                          SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver2(SolverPatternGeneration<RichardsonProxy, Algo_>::execute(data2, 20, 1e-8));
       TEST_CHECK_THROWS(solver2->execute(), ScaRCError);
-      TEST_CHECK_EQUAL(solver2->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[PreconFunctor[], SumFunctor, DefectFunctor, NormFunctor, DivFunctor]]]");
+      TEST_CHECK_EQUAL(solver2->type_name(), "[DefectFunctor, NormFunctor2, IterateFunctor[[PreconFunctor[], SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
 
       //---------------------------------------------------------------------------------------------------------------------------------------------
       DenseVector<Tag_, DataType_> dummy;
@@ -53,7 +53,7 @@ class SolverPatternTest:
                          SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_vectors(),
                          SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver3(SolverPatternGeneration<RichardsonLayer, Algo_>::execute(data3, dummy, 20, 1e-8));
-      TEST_CHECK_EQUAL(solver3->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor, DivFunctor]]]");
+      TEST_CHECK_EQUAL(solver3->type_name(), "[DefectFunctor, NormFunctor2, IterateFunctor[[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
       TEST_CHECK_THROWS(solver3->execute(), ScaRCError);
 
       //---------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,11 +63,11 @@ class SolverPatternTest:
                          SolverPatternGeneration<RichardsonProxyLayer, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver4(SolverPatternGeneration<RichardsonProxyLayer, Algo_>::execute(data4, dummy1, 20, 1e-8));
       TEST_CHECK_THROWS(solver4->execute(), ScaRCError);
-      TEST_CHECK_EQUAL(solver4->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[PreconFunctor[], SumFunctor, DefectFunctor, NormFunctor, DivFunctor]]]");
+      TEST_CHECK_EQUAL(solver4->type_name(), "[DefectFunctor, NormFunctor2, IterateFunctor[[PreconFunctor[], SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
 
       solver4->set_preconditioner(solver);
       solver4->substitute(data.sol());
-      TEST_CHECK_EQUAL(solver4->type_name(), "[DefectFunctor, NormFunctor, IterateFunctor[[PreconFunctor[[DefectFunctor, NormFunctor, IterateFunctor[[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor, DivFunctor]]]], SumFunctor, DefectFunctor, NormFunctor, DivFunctor]]]");
+      TEST_CHECK_EQUAL(solver4->type_name(), "[DefectFunctor, NormFunctor2, IterateFunctor[[PreconFunctor[[DefectFunctor, NormFunctor2, IterateFunctor[[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]], SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
       solver4->execute();
     }
 };

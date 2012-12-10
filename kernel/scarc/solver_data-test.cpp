@@ -77,7 +77,7 @@ class SolverDataTest:
       TEST_CHECK_EQUAL(sd3.stored_dest_ranks.size(), 0);
       TEST_CHECK_EQUAL(sd3.stored_source_ranks.size(), 0);
 
-      PreconditionedSynchronisedSolverData<> sd4(A, A, x, b, 3);
+      SynchronisedPreconditionedSolverData<> sd4(A, A, x, b, 3);
       TEST_CHECK_EQUAL(sd4.sys(), A);
       TEST_CHECK_EQUAL(sd4.sol(), x);
       TEST_CHECK_EQUAL(sd4.rhs(), b);

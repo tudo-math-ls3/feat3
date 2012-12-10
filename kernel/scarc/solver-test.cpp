@@ -1,3 +1,4 @@
+#define SERIAL
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
@@ -59,11 +60,27 @@ class SolverTest:
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 2000, 1e-8));
-
       solver->execute();
 
       for(Index i(0) ; i < x.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(data.sol()(i), x_ref(i), std::numeric_limits<DataType_>::epsilon()*1e9);
+        TEST_CHECK_EQUAL_WITHIN_EPS(data.sol()(i), x_ref(i), 1e-3);
+
+
+      //synchronised version must at least (uses other reduction mechanism) deliver the same
+      DenseVector<Tag_, DataType_> x1(A.rows(), DataType_(0));
+      SynchronisedPreconditionedSolverData<DataType_,
+                                           Tag_,
+                                           DenseVector,
+                                           VectorMirror,
+                                           SparseMatrixELL,
+                                           SparseMatrixELL<Tag_, DataType_> >data1(A, P, x1, b,
+                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
+                        SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
+      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver1(SolverPatternGeneration<Richardson, Algo_>::execute(data1, 2000, 1e-8));
+      solver1->execute();
+
+      for(Index i(0) ; i < x1.size() ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(data1.sol()(i), x_ref(i), 1e-3);
     }
 };
 SolverTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("ELL double");
