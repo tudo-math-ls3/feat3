@@ -22,7 +22,7 @@ class DefectTest
 public:
 
   DefectTest()
-    : TaggedTest<Arch_, DT_>("defect_test: " + SM_::name())
+    : TaggedTest<Arch_, DT_>("defect_test: " + SM_::type_name())
   {
   }
 

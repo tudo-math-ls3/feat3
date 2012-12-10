@@ -24,7 +24,7 @@ class ProductTest
 public:
 
   ProductTest()
-    : TaggedTest<Arch_, DT_>("product_matvec_test: " + SM_::name())
+    : TaggedTest<Arch_, DT_>("product_matvec_test: " + SM_::type_name())
   {
   }
 

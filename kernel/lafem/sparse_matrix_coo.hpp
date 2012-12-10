@@ -264,7 +264,7 @@ namespace FEAST
          *
          * \returns A string describing the container.
          */
-        static String name()
+        static String type_name()
         {
           return "SparseMatrixCOO";
         }
