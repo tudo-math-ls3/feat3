@@ -23,8 +23,6 @@ SET (test_list
   functor-test
   halo-test
   halo_control-test
-  halo_data-test
-  mapped_topology-test
   mesh-test
   mesh_control-test
   topology-test
