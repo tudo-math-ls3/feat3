@@ -63,7 +63,7 @@ class SolverTest:
       solver->execute();
 
       for(Index i(0) ; i < x.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(data.sol()(i), x_ref(i), 1e-3);
+        TEST_CHECK_EQUAL_WITHIN_EPS(data.sol()(i), x_ref(i), 1e-6);
 
 
       //synchronised version must at least (uses other reduction mechanism) deliver the same
@@ -80,7 +80,7 @@ class SolverTest:
       solver1->execute();
 
       for(Index i(0) ; i < x1.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(data1.sol()(i), x_ref(i), 1e-3);
+        TEST_CHECK_EQUAL_WITHIN_EPS(data1.sol()(i), x_ref(i), 1e-6);
     }
 };
 SolverTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("ELL double");

@@ -173,7 +173,7 @@ namespace FEAST
                                                            data.stored_source_ranks));
 
         cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
-        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.scalars().at(0),
+        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
                                                                                                                   data.scalars().at(1),
                                                                                                                   data.scalars().at(2)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
