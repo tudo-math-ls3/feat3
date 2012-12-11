@@ -7,7 +7,19 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # list of lafem source files
-ADD_LIBRARY(kernel-lafem STATIC memory_pool.cpp)
+SET (kernel-lafem-list memory_pool.cpp)
+
+if (FEAST_BACKENDS_MKL)
+  SET (kernel-lafem-list ${kernel-lafem-list}
+    axpy_mkl.cpp component_product_mkl.cpp defect_mkl.cpp difference_mkl.cpp dot_product_mkl.cpp norm_mkl.cpp
+    product_matvec_mkl.cpp scale_mkl.cpp sum_mkl.cpp)
+endif(FEAST_BACKENDS_MKL)
+
+ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
+if (FEAST_BACKENDS_MKL)
+  TARGET_LINK_LIBRARIES(kernel-lafem mkl_intel_ilp64 mkl_sequential mkl_core)
+endif(FEAST_BACKENDS_MKL)
+
 
 if (FEAST_BACKENDS_CUDA)
   INCLUDE(FindCUDA)
@@ -27,7 +39,6 @@ if (FEAST_BACKENDS_CUDA)
   set(CUDA_NVCC_FLAGS "-arch=sm_13" CACHE STRING "Semi-colon delimit multiple arguments." FORCE)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-cuda)
 endif(FEAST_BACKENDS_CUDA)
-
 
 # list of lafem tests
 SET (test_list

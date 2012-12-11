@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
         i != i_end ; )
     {
-      if((find(labels.begin(), labels.end(), (*i)->get_tag_name()) == labels.end()) &&
+      if((find(labels.begin(), labels.end(), (*i)->get_memory_name()) == labels.end()) &&
           (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()))
       {
         i = TestList::instance()->erase(i);
@@ -37,8 +37,8 @@ int main(int argc, char** argv)
     CONTEXT("When running test case '" + (*i)->id() + ":");
     try
     {
-      std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Backend: "
-        << (*i)->get_tag_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
+      std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Memory: "
+        << (*i)->get_memory_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
       (*i)->run();
       std::cout << "PASSED" << std::endl;
       ++tests_passed;

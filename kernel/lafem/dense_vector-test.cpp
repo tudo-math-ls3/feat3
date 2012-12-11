@@ -86,7 +86,7 @@ DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
 DenseVectorTest<Mem::Main, double> cpu_dense_vector_test_double;
 DenseVectorTest<Mem::Main, Index> cpu_dense_vector_test_index;
 #ifdef FEAST_BACKENDS_CUDA
-DenseVectorTest<Mem::CUDA, float> gpu_dense_vector_test_float;
-DenseVectorTest<Mem::CUDA, double> gpu_dense_vector_test_double;
-DenseVectorTest<Mem::CUDA, Index> gpu_dense_vector_test_index;
+DenseVectorTest<Mem::CUDA, float> cuda_dense_vector_test_float;
+DenseVectorTest<Mem::CUDA, double> cuda_dense_vector_test_double;
+DenseVectorTest<Mem::CUDA, Index> cuda_dense_vector_test_index;
 #endif

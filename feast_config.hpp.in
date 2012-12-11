@@ -35,4 +35,7 @@
 /// Do we have CUDA support enabled?
 #cmakedefine FEAST_BACKENDS_CUDA
 
+/// Do we have MKL support enabled?
+#cmakedefine FEAST_BACKENDS_MKL
+
 #endif // FEAST_CONFIG_HPP

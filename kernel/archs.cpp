@@ -56,6 +56,10 @@ std::ostream & FEAST::operator<< (std::ostream & left, Algo::TagValue value)
       left << Algo::Generic::name();
       break;
 
+    case Algo::tv_mkl:
+      left << Algo::MKL::name();
+      break;
+
     case Algo::tv_cuda:
       left << Algo::CUDA::name();
       break;

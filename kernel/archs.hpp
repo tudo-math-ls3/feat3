@@ -120,8 +120,10 @@ namespace FEAST
       enum TagValue
       {
         tv_generic,
+        tv_mkl,
         tv_cuda,
       };
+
       /**
        * Tag-type for generic/C++-based operations.
        */
@@ -130,10 +132,25 @@ namespace FEAST
       {
         typedef Mem::Main mem_type;
         const static TagValue tag_value = tv_generic;
-        const static TagValue memory_value = tv_generic;
+        const static Mem::TagValue memory_value = Mem::tv_main;
         static String name()
         {
           return "generic";
+        }
+      };
+
+      /**
+       * Tag-type for MKL-based operations.
+       */
+      struct MKL :
+        public InstantiationPolicy<Generic, NonCopyable>
+      {
+        typedef Mem::Main mem_type;
+        const static TagValue tag_value = tv_mkl;
+        const static Mem::TagValue memory_value = Mem::tv_main;
+        static String name()
+        {
+          return "mkl";
         }
       };
 
@@ -145,7 +162,7 @@ namespace FEAST
       {
         typedef Mem::CUDA mem_type;
         const static TagValue tag_value = tv_cuda;
-        const static TagValue memory_value = tv_cuda;
+        const static Mem::TagValue memory_value = Mem::tv_cuda;
         static String name()
         {
           return "cuda";

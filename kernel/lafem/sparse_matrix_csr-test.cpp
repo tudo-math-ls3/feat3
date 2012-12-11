@@ -85,6 +85,6 @@ public:
 SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;
 SparseMatrixCSRTest<Mem::Main, double> cpu_sparse_matrix_csr_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCSRTest<Mem::CUDA, float> gpu_sparse_matrix_csr_test_float;
-SparseMatrixCSRTest<Mem::CUDA, double> gpu_sparse_matrix_csr_test_double;
+SparseMatrixCSRTest<Mem::CUDA, float> cuda_sparse_matrix_csr_test_float;
+SparseMatrixCSRTest<Mem::CUDA, double> cuda_sparse_matrix_csr_test_double;
 #endif

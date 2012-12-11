@@ -75,15 +75,19 @@ public:
     }
   }
 };
-ProductTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> >csr_product_matvec_test_float;
-ProductTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> >csr_product_matvec_test_double;
-#ifdef FEAST_BACKENDS_CUDA
-ProductTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> >cuda_csr_product_matvec_test_float;
-ProductTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> >cuda_csr_product_matvec_test_double;
+ProductTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > csr_product_matvec_test_float;
+ProductTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > csr_product_matvec_test_double;
+#ifdef FEAST_BACKENDS_MKL
+ProductTest<Mem::Main, Algo::MKL, float, SparseMatrixCSR<Mem::Main, float> > mkl_csr_product_matvec_test_float;
+ProductTest<Mem::Main, Algo::MKL, double, SparseMatrixCSR<Mem::Main, double> > mkl_csr_product_matvec_test_double;
 #endif
-ProductTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> >ell_product_matvec_test_float;
-ProductTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> >ell_product_matvec_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-ProductTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> >cuda_ell_product_matvec_test_float;
-ProductTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> >cuda_ell_product_matvec_test_double;
+ProductTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > cuda_csr_product_matvec_test_float;
+ProductTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_product_matvec_test_double;
+#endif
+ProductTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_product_matvec_test_float;
+ProductTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_product_matvec_test_double;
+#ifdef FEAST_BACKENDS_CUDA
+ProductTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_ell_product_matvec_test_float;
+ProductTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_product_matvec_test_double;
 #endif

@@ -62,7 +62,11 @@ public:
 };
 DVDifferenceTest<Mem::Main, Algo::Generic, float> dv_difference_test_float;
 DVDifferenceTest<Mem::Main, Algo::Generic, double> dv_difference_test_double;
+#ifdef FEAST_BACKENDS_MKL
+DVDifferenceTest<Mem::Main, Algo::MKL, float> mkl_dv_difference_test_float;
+DVDifferenceTest<Mem::Main, Algo::MKL, double> mkl_dv_difference_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
-DVDifferenceTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_difference_test_float;
-DVDifferenceTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_difference_test_double;
+DVDifferenceTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_difference_test_float;
+DVDifferenceTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_difference_test_double;
 #endif

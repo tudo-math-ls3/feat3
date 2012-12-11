@@ -68,9 +68,13 @@ public:
 };
 DVAxpyTest<Mem::Main, Algo::Generic, float> dv_axpy_test_float;
 DVAxpyTest<Mem::Main, Algo::Generic, double> dv_axpy_test_double;
+#ifdef FEAST_BACKENDS_MKL
+DVAxpyTest<Mem::Main, Algo::MKL, float> mkl_dv_axpy_test_float;
+DVAxpyTest<Mem::Main, Algo::MKL, double> mkl_dv_axpy_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
-DVAxpyTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_axpy_test_float;
-DVAxpyTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_test_double;
+DVAxpyTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_axpy_test_float;
+DVAxpyTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_axpy_test_double;
 #endif
 
 template<
@@ -139,8 +143,8 @@ public:
 DVAxpyVTest<Mem::Main, Algo::Generic, float> dv_axpy_v_test_float;
 DVAxpyVTest<Mem::Main, Algo::Generic, double> dv_axpy_v_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVAxpyVTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_axpy_v_test_float;
-DVAxpyVTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_axpy_v_test_double;
+DVAxpyVTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_axpy_v_test_float;
+DVAxpyVTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_axpy_v_test_double;
 #endif
 
 template<
@@ -210,8 +214,8 @@ DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double
 DVAxpyMVTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > dv_axpy_mv_ell_test_float;
 DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > dv_axpy_mv_ell_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > gpu_dv_axpy_mv_csr_test_float;
-DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > gpu_dv_axpy_mv_csr_test_double;
-DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > gpu_dv_axpy_mv_ell_test_float;
-DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > gpu_dv_axpy_mv_ell_test_double;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > cuda_dv_axpy_mv_csr_test_float;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > cuda_dv_axpy_mv_csr_test_double;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_dv_axpy_mv_ell_test_float;
+DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_dv_axpy_mv_ell_test_double;
 #endif

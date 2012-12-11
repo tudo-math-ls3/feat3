@@ -71,6 +71,6 @@ public:
 DenseMatrixTest<Mem::Main, float> cpu_dense_matrix_test_float;
 DenseMatrixTest<Mem::Main, double> cpu_dense_matrix_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-DenseMatrixTest<Mem::CUDA, float> gpu_dense_matrix_test_float;
-DenseMatrixTest<Mem::CUDA, double> gpu_dense_matrix_test_double;
+DenseMatrixTest<Mem::CUDA, float> cuda_dense_matrix_test_float;
+DenseMatrixTest<Mem::CUDA, double> cuda_dense_matrix_test_double;
 #endif

@@ -120,6 +120,13 @@ namespace FEAST
     };
 
     template <>
+    struct Defect<Algo::MKL>
+    {
+      static void value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & rhs, const SparseMatrixCSR<Mem::Main, float> & a, const DenseVector<Mem::Main, float> & b);
+      static void value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & rhs, const SparseMatrixCSR<Mem::Main, double> & a, const DenseVector<Mem::Main, double> & b);
+    };
+
+    template <>
     struct Defect<Algo::CUDA>
     {
       template <typename DT_>

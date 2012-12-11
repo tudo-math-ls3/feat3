@@ -69,7 +69,11 @@ public:
 };
 DVComponentProductTest<Mem::Main, Algo::Generic, float> dv_component_product_test_float;
 DVComponentProductTest<Mem::Main, Algo::Generic, double> dv_component_product_test_double;
+#ifdef FEAST_BACKENDS_MKL
+DVComponentProductTest<Mem::Main, Algo::MKL, float> mkl_dv_component_product_test_float;
+DVComponentProductTest<Mem::Main, Algo::MKL, double> mkl_dv_component_product_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
-DVComponentProductTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_component_product_test_float;
-DVComponentProductTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_component_product_test_double;
+DVComponentProductTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_component_product_test_float;
+DVComponentProductTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_component_product_test_double;
 #endif

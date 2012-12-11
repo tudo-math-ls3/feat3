@@ -56,6 +56,13 @@ namespace FEAST
     };
 
     template <>
+    struct Norm2<Algo::MKL>
+    {
+      static float value(const DenseVector<Mem::Main, float> & x);
+      static double value(const DenseVector<Mem::Main, double> & x);
+    };
+
+    template <>
     struct Norm2<Algo::CUDA>
     {
       template <typename DT_>

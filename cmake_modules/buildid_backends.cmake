@@ -2,6 +2,7 @@
 #
 # This module sets the following variables:
 #   FEAST_BACKEND_CUDA (bool, cached)
+#   FEAST_BACKEND_MKL  (bool, cached)
 #
 # \author Dirk Ribbrock
 
@@ -22,6 +23,19 @@ if (NOT DISPLAY_HELP_ONLY)
 
   endif ()
 
+  if (BUILD_ID MATCHES "^mkl-.+|.+-mkl-.+|.+-mkl$")
+    set (FEAST_BACKENDS_MKL ON CACHE BOOL "" FORCE)
+    # finally, pass all compiler flags to cmake
+    if (FEAST_BUILD_MODE_NAME STREQUAL "debug")
+      set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DMKL_ILP64")
+    elseif (FEAST_BUILD_MODE_NAME STREQUAL "opt")
+      set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DMKL_ILP64")
+    endif ()
+    # and store them in our variable as well for proper screen output
+    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -DMKL_ILP64")
+
+  endif ()
+
 endif ()
 
 
@@ -30,5 +44,6 @@ if (DISPLAY_HELP_ONLY)
   message (STATUS "##############################################################")
   message (STATUS "Valid settings for token \"backend\"                             ")
   message (STATUS "cuda   : enable cuda support                     ")
+  message (STATUS "mkl    : enable mkl support                     ")
 
 endif ()

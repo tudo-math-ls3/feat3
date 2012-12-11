@@ -98,6 +98,6 @@ public:
 SparseMatrixELLTest<Mem::Main, float> cpu_sparse_matrix_ell_test_float;
 SparseMatrixELLTest<Mem::Main, double> cpu_sparse_matrix_ell_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixELLTest<Mem::CUDA, float> gpu_sparse_matrix_ell_test_float;
-SparseMatrixELLTest<Mem::CUDA, double> gpu_sparse_matrix_ell_test_double;
+SparseMatrixELLTest<Mem::CUDA, float> cuda_sparse_matrix_ell_test_float;
+SparseMatrixELLTest<Mem::CUDA, double> cuda_sparse_matrix_ell_test_double;
 #endif

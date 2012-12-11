@@ -29,6 +29,7 @@
 #     FEAST_COMPILER_FLAGS (string, also passed automatically to add_definitions())
 #   buildid_backends:
 #     FEAST_BACKENDS_CUDA (bool, cached)
+#     FEAST_BACKENDS_MKL (bool, cached)
 #
 # Documentation on using the build system is available in the  "provide help"
 # section below (actually implemented in the module buildid_help.cmake).

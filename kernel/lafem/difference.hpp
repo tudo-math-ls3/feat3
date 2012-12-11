@@ -75,6 +75,13 @@ namespace FEAST
     };
 
     template <>
+    struct Difference<Algo::MKL>
+    {
+      static void value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & x, const DenseVector<Mem::Main, float> & y);
+      static void value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & x, const DenseVector<Mem::Main, double> & y);
+    };
+
+    template <>
     struct Difference<Algo::CUDA>
     {
       template <typename DT_>

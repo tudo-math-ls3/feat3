@@ -54,6 +54,13 @@ namespace FEAST
     };
 
     template <>
+    struct Scale<Algo::MKL>
+    {
+      static void value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & x, const float s);
+      static void value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & x, const double s);
+    };
+
+    template <>
     struct Scale<Algo::CUDA>
     {
       template <typename DT_>

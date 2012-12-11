@@ -47,6 +47,10 @@ public:
 };
 DVNorm2Test<Mem::Main, Algo::Generic, float> dv_norm2_test_float;
 DVNorm2Test<Mem::Main, Algo::Generic, double> dv_norm2_test_double;
+#ifdef FEAST_BACKENDS_MKL
+DVNorm2Test<Mem::Main, Algo::MKL, float> mkl_dv_norm2_test_float;
+DVNorm2Test<Mem::Main, Algo::MKL, double> mkl_dv_norm2_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 DVNorm2Test<Mem::CUDA, Algo::CUDA, float> cuda_dv_norm2_test_float;
 DVNorm2Test<Mem::CUDA, Algo::CUDA, double> cuda_dv_norm2_test_double;

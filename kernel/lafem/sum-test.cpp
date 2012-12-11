@@ -72,9 +72,13 @@ public:
 };
 DVSumTest<Mem::Main, Algo::Generic, float> dv_sum_test_float;
 DVSumTest<Mem::Main, Algo::Generic, double> dv_sum_test_double;
+#ifdef FEAST_BACKENDS_MKL
+DVSumTest<Mem::Main, Algo::MKL, float> mkl_dv_sum_test_float;
+DVSumTest<Mem::Main, Algo::MKL, double> mkl_dv_sum_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
-DVSumTest<Mem::CUDA, Algo::CUDA, float> gpu_dv_sum_test_float;
-DVSumTest<Mem::CUDA, Algo::CUDA, double> gpu_dv_sum_test_double;
+DVSumTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_sum_test_float;
+DVSumTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_sum_test_double;
 #endif
 
 template<
@@ -129,6 +133,6 @@ public:
 SMCSRSumTest<Mem::Main, Algo::Generic, float> smcsr_sum_test_float;
 SMCSRSumTest<Mem::Main, Algo::Generic, double> smcsr_sum_test_double;
 #ifdef FEAST_BACKENDS_CUDA
-SMCSRSumTest<Mem::CUDA, Algo::CUDA, float> gpu_smcsr_sum_test_float;
-SMCSRSumTest<Mem::CUDA, Algo::CUDA, double> gpu_smcsr_sum_test_double;
+SMCSRSumTest<Mem::CUDA, Algo::CUDA, float> cuda_smcsr_sum_test_float;
+SMCSRSumTest<Mem::CUDA, Algo::CUDA, double> cuda_smcsr_sum_test_double;
 #endif

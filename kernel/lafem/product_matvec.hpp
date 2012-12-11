@@ -114,6 +114,13 @@ namespace FEAST
     };
 
     template <>
+    struct ProductMatVec<Algo::MKL>
+    {
+      static void value(DenseVector<Mem::Main, float> & r, const SparseMatrixCSR<Mem::Main, float> & a, const DenseVector<Mem::Main, float> & b);
+      static void value(DenseVector<Mem::Main, double> & r, const SparseMatrixCSR<Mem::Main, double> & a, const DenseVector<Mem::Main, double> & b);
+    };
+
+    template <>
     struct ProductMatVec<Algo::CUDA>
     {
       template <typename DT_>

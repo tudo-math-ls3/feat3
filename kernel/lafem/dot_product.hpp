@@ -67,6 +67,13 @@ namespace FEAST
     };
 
     template <>
+    struct DotProduct<Algo::MKL>
+    {
+      static float value(const DenseVector<Mem::Main, float> & x, const DenseVector<Mem::Main, float> & y);
+      static double value(const DenseVector<Mem::Main, double> & x, const DenseVector<Mem::Main, double> & y);
+    };
+
+    template <>
     struct DotProduct<Algo::CUDA>
     {
       template <typename DT_>

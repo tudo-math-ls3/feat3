@@ -54,6 +54,10 @@ public:
 };
 DVScaleTest<Mem::Main, Algo::Generic, float> dv_scale_test_float;
 DVScaleTest<Mem::Main, Algo::Generic, double> dv_scale_test_double;
+#ifdef FEAST_BACKENDS_MKL
+DVScaleTest<Mem::Main, Algo::MKL, float> mkl_dv_scale_test_float;
+DVScaleTest<Mem::Main, Algo::MKL, double> mkl_dv_scale_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 DVScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_scale_test_float;
 DVScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_scale_test_double;

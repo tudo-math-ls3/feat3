@@ -201,7 +201,7 @@ namespace FEAST
       virtual void run() const = 0;
 
       /// returns our target platform
-      virtual String get_tag_name()
+      virtual String get_memory_name()
       {
         return _tag_name;
       }

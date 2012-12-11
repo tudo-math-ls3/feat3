@@ -57,6 +57,10 @@ public:
 };
 DVDotProductTest<Mem::Main, Algo::Generic, float> dv_dot_product_test_float;
 DVDotProductTest<Mem::Main, Algo::Generic, double> dv_dot_product_test_double;
+#ifdef FEAST_BACKENDS_MKL
+DVDotProductTest<Mem::Main, Algo::MKL, float> mkl_dv_dot_product_test_float;
+DVDotProductTest<Mem::Main, Algo::MKL, double> mkl_dv_dot_product_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 DVDotProductTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_dot_product_test_float;
 DVDotProductTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_dot_product_test_double;

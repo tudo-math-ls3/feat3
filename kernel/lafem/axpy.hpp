@@ -10,7 +10,6 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 
-
 namespace FEAST
 {
   namespace LAFEM
@@ -221,6 +220,13 @@ namespace FEAST
           result[row] = (sum * a) + yp[row];
         }
       }
+    };
+
+    template <>
+    struct Axpy <Algo::MKL>
+    {
+      static void value(DenseVector<Mem::Main, float> & r, const float a, const DenseVector<Mem::Main, float> & x, const DenseVector<Mem::Main, float> & y);
+      static void value(DenseVector<Mem::Main, double> & r, const double a, const DenseVector<Mem::Main, double> & x, const DenseVector<Mem::Main, double> & y);
     };
 
     template <>
