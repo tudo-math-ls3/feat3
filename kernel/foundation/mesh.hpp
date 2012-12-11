@@ -42,7 +42,11 @@ namespace FEAST
         }
     };
 
-    ///required tnumber of topologies for given number of spatial dimensions
+    /**
+     * \brief Required number of topologies for given number of spatial dimensions
+     *
+     * \author Markus Geveler
+     */
     enum RequiredNumTopologies
     {
       rnt_1D = 2,
@@ -50,7 +54,11 @@ namespace FEAST
       rnt_3D = 6
     };
 
-    ///indices of the stored polytopelevel-to-polytopelevel topologies
+    /**
+     * \brief Indices of the stored polytopelevel-to-polytopelevel topologies
+     *
+     * \author Markus Geveler
+     */
     enum InternalPolytopeIndices
     {
       ipi_vertex_edge = 0,
@@ -61,7 +69,11 @@ namespace FEAST
       ipi_polyhedron_vertex
     };
 
-    ///indices of primary access when searching for adjacencies
+    /**
+     * \brief Indices of primary access when searching for adjacencies
+     *
+     * \author Markus Geveler
+     */
     enum InternalPrimaryAccess
     {
       ipa_vertex_vertex = 0,
@@ -73,7 +85,11 @@ namespace FEAST
       ipa_polyhedron_any = 5
     };
 
-    ///indices of secondary access
+    /**
+     * \brief Indices of secondary access
+     *
+     * \author Markus Geveler
+     */
     enum InternalSecondaryAccess
     {
       isa_vertex_vertex = 1,
@@ -89,10 +105,19 @@ namespace FEAST
      * access from every polytope level to any other polytope level without storing all topologies explicitly.
      *
      * \tparam i_
-     * required number of topologies (current policy implements the ring but is generally dimension-independent)
+     * required number of topologies
      *
      * \tparam TopologyType_
      * type of topology
+     *
+     * \tparam OuterStorageType_
+     * STL conformal container template type storing the topologies
+     *
+     * \tparam AttributeStorageType_
+     * STL conformal container template type storing the attributes' data
+     *
+     * \tparam OuterAttributeStorageType_
+     * STL conformal container template type storing the attributes
      *
      * \author Markus Geveler
      */
@@ -148,6 +173,7 @@ namespace FEAST
         {
         }
 
+        ///assignment operator overload needed for copy-assignability
         Mesh& operator=(const Mesh& rhs)
         {
           if(this == &rhs)
@@ -173,9 +199,16 @@ namespace FEAST
         {
         }
 
+        /**
+         * \brief adds a polytope to the mesh
+         *
+         * \param[in] level
+         * level to add a polytope to anonymously
+         *
+         */
         void add_polytope(const PolytopeLevels level)
         {
-          CONTEXT("When adding polytope");
+          CONTEXT("When adding polytope to Mesh<>");
 #ifdef FOUNDATION_DEBUG
           if(level + 1 > _num_levels)
             throw MeshInternalIndexOutOfBounds(level, _num_levels - 1);
@@ -233,19 +266,42 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief removes a polytope from the mesh
+         *
+         * \param[in] level
+         * polytope level from which a polytope is to be removed
+         *
+         * \param[in] index
+         * index of the polytope to be removed
+         */
         void remove_polytope(const PolytopeLevels level, index_type_ i)
         {
           //TODO
         }
 
-        ///Add an adjacency to the associated topology and automatically add it to its transpose
+        /**
+         * \brief adds an adjacency to the associated topology and automatically adds it to its transpose
+         *
+         * \param[in] from_level
+         * polytope level (source of the relation)
+         *
+         * \param[in] to_level
+         * polytope level (target of the relation)
+         *
+         * \param[in] polytope_index
+         * index of the polytope (source)
+         *
+         * \param[in] value
+         * index of the polytope (target)
+         */
         void add_adjacency(
             const PolytopeLevels from_level,
             const PolytopeLevels to_level,
             const index_type_ polytope_index,
             const index_type_ value)
         {
-          CONTEXT("When adding adjacency");
+          CONTEXT("When adding adjacency in Mesh<>");
 #ifdef FOUNDATION_DEBUG
           if(from_level + 1 > _num_levels)
             throw MeshInternalIndexOutOfBounds(from_level, _num_levels - 1);
@@ -269,13 +325,25 @@ namespace FEAST
           ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipit).get_history().get_functors().at(_topologies.at(ipit).get_history().size() - 1));
         }
 
-        ///get all adjacent polytopes at level to_level for polytope i on level from_level
+        /**
+         * \brief get all adjacent polytopes at level to_level for polytope i on level from_level
+         *
+         * \param[in] from_level
+         * polytope level of polytope i
+         *
+         * \param[in] to_level
+         * polytope level of the target adjacencies
+         *
+         * \param[in] i
+         * index of the polytope for which the adjacencies are to be computed
+         *
+         */
         const typename TopologyType_::storage_type_ get_adjacent_polytopes(
                                                                      const PolytopeLevels from_level,
                                                                      const PolytopeLevels to_level,
                                                                      index_type_ i) const
         {
-          CONTEXT("When calculating adjacent polytopes");
+          CONTEXT("When calculating adjacent polytopes in Mesh<>");
 
 #ifdef FOUNDATION_DEBUG
           if(from_level + 1 > _num_levels)
@@ -388,6 +456,10 @@ namespace FEAST
           return _attrs;
         }
 
+        /**
+         * \brief undo last insertion or removal of polytopes or their adjacencies
+         *
+         */
         std::shared_ptr<FunctorBase> undo()
         {
           if(_history.size() == 0)
@@ -399,6 +471,10 @@ namespace FEAST
           return func;
         }
 
+        /**
+         * \brief reset all data (undo the complete history)
+         *
+         */
         void reset()
         {
           if(_history.size() == 0)
@@ -407,6 +483,10 @@ namespace FEAST
           _history.undo();
         }
 
+        /**
+         * \brief clear all data (undo the complete history) but return it
+         *
+         */
         CompoundFunctor<OuterStorageType_> clear()
         {
           if(_history.size() == 0)
@@ -421,12 +501,17 @@ namespace FEAST
         }
 
 
+        /**
+         * \brief redo last undone action
+         *
+         */
         void redo(const std::shared_ptr<FunctorBase> func)
         {
           func.get()->execute();
           _history.add_functor(func);
         }
 
+        ///further needed getter fcts
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
         {
           return _topologies;
