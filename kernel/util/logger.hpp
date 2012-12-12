@@ -49,7 +49,7 @@ namespace FEAST
        * \li In a serial build, this channel is an OR-ed combination of \link local_file_0\endlink and
        *     \link local_standard\endlink.
        */
-#ifdef PARALLEL
+#ifndef SERIAL
       local                   = 0x00000001, // = local_file_0
 #else
       local                   = 0x00008001, // = local_file_0 | local_standard
@@ -61,7 +61,7 @@ namespace FEAST
        *     \link master_standard\endlink.
        * \li In a serial build, this channel is (currently) equivalent to \link none\endlink.
        */
-#ifdef PARALLEL
+#ifndef SERIAL
       master                  = 0x80010000, // = master_file_0 | master_standard
 #else
       master                  = 0,          // = none; maybe change that...
@@ -114,7 +114,7 @@ namespace FEAST
        * \li In a parallel build, this channel refers to the master standard output stream.\n
        * \li In a serial build, this channel refers to the local standard output stream.
        */
-#ifdef PARALLEL
+#ifndef SERIAL
       screen                  = master_standard,
 #else
       screen                  = local_standard,
@@ -135,7 +135,7 @@ namespace FEAST
       max_files = 4
     };
 
-#ifdef PARALLEL
+#ifndef SERIAL
     /**
      * \brief Master sender interface
      *
@@ -167,17 +167,17 @@ namespace FEAST
         const String& message,
         Channel channels) = 0;
     }; // class MasterSender
-#endif // PARALLEL
+#endif // SERIAL
 
   private:
 
     /// local log file streams
     static std::ofstream _stream[max_files];
 
-#ifdef PARALLEL
+#ifndef SERIAL
     /// master sender object pointer
     static MasterSender* _master_sender;
-#endif // PARALLEL
+#endif // SERIAL
 
   public:
     /**
@@ -249,7 +249,7 @@ namespace FEAST
       }
     }
 
-#ifdef PARALLEL
+#ifndef SERIAL
     /**
      * \brief Sets the MasterSender object.
      *
@@ -260,7 +260,7 @@ namespace FEAST
     {
       _master_sender = master_sender;
     }
-#endif // PARALLEL
+#endif // SERIAL
 
     /**
      * \brief Returns a log file channel.
@@ -376,14 +376,14 @@ namespace FEAST
       }
 
       /// \todo implement sending to master
-#ifdef PARALLEL
+#ifndef SERIAL
       // check whether we need to send something to the master, otherwise return here
       if((channels & master_mask) == none)
         return;
 
       if(_master_sender != nullptr)
         _master_sender->send(message, channels);
-#endif // PARALLEL
+#endif // SERIAL
     }
 
     /**

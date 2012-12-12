@@ -7,9 +7,9 @@
 #include <kernel/util/string.hpp>
 #include <kernel/util/pretty_printer.hpp>
 
-#ifdef PARALLEL
+#ifndef SERIAL
 #include <mpi.h>
-#endif // PARALLEL
+#endif // SERIAL
 
 namespace FEAST
 {
@@ -53,7 +53,7 @@ namespace FEAST
     pp.print(std::cerr);
     std::cerr.flush();
 
-#ifdef PARALLEL
+#ifndef SERIAL
     // shut down
     int mpi_is_initialised;
     MPI_Initialized(&mpi_is_initialised);
@@ -62,7 +62,7 @@ namespace FEAST
       // TODO: Mapping to Feast error codes like in FEAST1? [dom 25.8.2010]
       MPI_Abort(MPI_COMM_WORLD, 1);
     }
-#endif // PARALLEL
+#endif // SERIAL
 
     // abort program execution
     exit(exit_code);

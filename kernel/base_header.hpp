@@ -33,31 +33,9 @@
 #  define DEBUG 1
 #endif
 
-// The DEBUG and NDEBUG macros are mutually exclusive
-#if defined(DEBUG) && defined(NDEBUG)
-#  error The DEBUG and NDEBUG macros must not be defined at the same time.
-#endif
-
-// Assure that either DEBUG or NDEBUG is defined
-// In consequence, if DEBUG and NDEBUG are both undefined, NDEBUG is defined.
-#if !defined (NDEBUG) && !defined(DEBUG)
-#  define NDEBUG 1
-#endif
-
 // Activate SERIAL macro if the build system tells us to do so.
 #if defined(FEAST_SERIAL_MODE) && !defined(SERIAL)
 #  define SERIAL 1
-#endif
-
-// The SERIAL and PARALLEL macros are mutually exclusive
-#if defined(SERIAL) && defined(PARALLEL)
-#  error The SERIAL and PARALLEL macros must not be defined at the same time.
-#endif
-
-// Assure that either SERIAL or PARALLEL is defined
-// In consequence, if SERIAL and PARALLEL are both undefined, PARALLEL is defined.
-#if !defined(SERIAL) && !defined(PARALLEL)
-#  define PARALLEL 1
 #endif
 /// \endcond
 

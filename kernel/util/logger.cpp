@@ -4,8 +4,8 @@ namespace FEAST
 {
   std::ofstream Logger::_stream[Logger::max_files];
 
-#ifdef PARALLEL
+#ifndef SERIAL
   Logger::MasterSender* Logger::_master_sender = nullptr;
-#endif // PARALLEL
+#endif // SERIAL
 
 } // namespace FEAST
