@@ -157,6 +157,33 @@ namespace FEAST
     bool erase_section(String name);
 
     /**
+     * \brief Queries a value.
+     *
+     * \param[in] key_path
+     * A path to the key whose value is to be returned.
+     *
+     * \returns
+     * A <c>pair<String,bool></c>, where the second component marks, whether an entry with the key path
+     * has been found or not. If the <c>bool</c>-component is \c true, then the <c>String</c>-component
+     * contains the value associated with the key, otherwise the <c>String</c>-component is empty.
+     */
+    std::pair<String, bool> query(String key_path) const;
+
+    /**
+     * \brief Queries a value.
+     *
+     * \param[in] key_path
+     * A path to the key whose value is to be returned.
+     *
+     * \param[in] default_value
+     * A string that is to be returned in the case that the key was not found.
+     *
+     * \returns
+     * A String containing the value corresponding to the key-path, or \p default_value if no such key was found.
+     */
+    String query(String key_path, String default_value) const;
+
+    /**
      * \brief Retrieves a value for a given key.
      *
      * This function returns the value string of a key-value pair.

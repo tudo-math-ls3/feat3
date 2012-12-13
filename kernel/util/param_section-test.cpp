@@ -35,6 +35,7 @@ public:
     ioss << "KEY2 = ...but then it was overwritten" << endl;
     ioss << "[YourSection]" << endl;
     ioss << "{" << endl;
+    ioss << "  sqrt4 = 2" << endl;
     ioss << "  # nest another section into [YourSection]" << endl;
     ioss << "  [Constants]" << endl;
     ioss << "  pi = 3.1415926535& " << endl;
@@ -74,6 +75,11 @@ public:
     ParamSection* mysec = parsec.get_section("MySeCtIoN");
     TEST_CHECK(mysec != nullptr);
     TEST_CHECK_EQUAL(mysec->get_entry("Key3").first, "This entry makes use of line continuation.");
+
+    // test the query functions now
+    TEST_CHECK_EQUAL(parsec.query("E", ""), "m*c^2");
+    TEST_CHECK_EQUAL(parsec.query("YourSection.sqrt4", ""), "2");
+    TEST_CHECK_EQUAL(parsec.query("M.B", "test"), "test"); // does not exist
 
     // okay, test passed
   } // test_0

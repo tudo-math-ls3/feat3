@@ -91,6 +91,61 @@ namespace FEAST
     return false;
   }
 
+  std::pair<String, bool> ParamSection::query(String key_path) const
+  {
+    // try to find a dot within the path
+    size_t off = key_path.find('.');
+    if(off != key_path.npos)
+    {
+      // separate the first substring and interpret it as a section name
+      const ParamSection* sec(get_section(key_path.substr(0, off)));
+      if(sec != nullptr)
+      {
+        // search subsection
+        return sec->query(key_path.substr(off + 1));
+      }
+    }
+    else
+    {
+      // no dot found; interpret key path as key name
+      return get_entry(key_path);
+    }
+
+    // value not found
+    return std::make_pair("", false);
+  }
+
+  String ParamSection::query(String key_path, String default_value) const
+  {
+    CONTEXT("ParamSection::query()");
+
+    // try to find a dot within the path
+    size_t off = key_path.find('.');
+    if(off != key_path.npos)
+    {
+      // separate the first substring and interpret it as a section name
+      const ParamSection* sec(get_section(key_path.substr(0, off)));
+      if(sec != nullptr)
+      {
+        // search subsection
+        return sec->query(key_path.substr(off + 1), default_value);
+      }
+    }
+    else
+    {
+      // no dot found; interpret key path as key name
+      EntryMap::const_iterator iter(_values.find(key_path));
+      if(iter != _values.end())
+      {
+        // key found; return its value
+        return iter->second;
+      }
+    }
+
+    // value not found
+    return default_value;
+  }
+
   std::pair<String, bool> ParamSection::get_entry(String key) const
   {
     CONTEXT("ParamSection::get_entry()");
