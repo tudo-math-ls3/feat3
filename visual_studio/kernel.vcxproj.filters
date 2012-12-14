@@ -60,6 +60,9 @@
     <Filter Include="Header Files\space\discontinuous">
       <UniqueIdentifier>{73e07717-b037-4b7d-b92d-85a356654115}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\geometry\test_aux">
+      <UniqueIdentifier>{01c19f2c-4589-4f00-9012-b61a96f9e103}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\kernel\base_header.hpp">
@@ -596,6 +599,18 @@
     </ClInclude>
     <ClInclude Include="..\kernel\assembly\error_computer.hpp">
       <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\tetris_factory.hpp">
+      <Filter>Header Files\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp">
+      <Filter>Header Files\geometry\test_aux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\patch_factory.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\kernel\geometry\intern\patch_index_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -568,6 +568,7 @@
     <ClInclude Include="..\kernel\geometry\intern\congurency_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\face_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\index_representative.hpp" />
+    <ClInclude Include="..\kernel\geometry\intern\patch_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\refined_entity_counter.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\standard_index_refiner.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\standard_refinement_traits.hpp" />
@@ -581,9 +582,12 @@
     <ClInclude Include="..\kernel\geometry\intern\target_index_mapping.hpp" />
     <ClInclude Include="..\kernel\geometry\intern\vertex_abacus.hpp" />
     <ClInclude Include="..\kernel\geometry\mesh_node.hpp" />
+    <ClInclude Include="..\kernel\geometry\patch_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\struct_index_set.hpp" />
     <ClInclude Include="..\kernel\geometry\target_set.hpp" />
+    <ClInclude Include="..\kernel\geometry\test_aux\copy_comp_set.hpp" />
+    <ClInclude Include="..\kernel\geometry\test_aux\tetris_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\vertex_set.hpp" />
     <ClInclude Include="..\kernel\lafem\absolute.hpp" />
     <ClInclude Include="..\kernel\lafem\algorithm.hpp" />
