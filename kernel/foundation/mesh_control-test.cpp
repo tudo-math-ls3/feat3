@@ -73,6 +73,10 @@ class MeshControlTest1D:
       TEST_CHECK_EQUAL(vertex_coord_tuples[0][0], double(0));
       TEST_CHECK_EQUAL(vertex_coord_tuples[1][0], double(1));
 
+      ///test reconversion
+      Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
+      MeshControl<dim_1D>::fill_adjacencies(confmesh, m1, size_set);
+
       delete[] size_set;
     }
 };
