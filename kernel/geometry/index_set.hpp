@@ -54,7 +54,6 @@ namespace FEAST
       IndexVectorType* _indices;
 
     private:
-      IndexSet(const IndexSet&);
       IndexSet& operator=(const IndexSet&);
 
     public:
@@ -79,6 +78,30 @@ namespace FEAST
         if(num_entities > 0)
         {
           _indices = new IndexVectorType[num_entities];
+        }
+      }
+
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The index set that is to be copied.
+       */
+      IndexSet(const IndexSet& other) :
+        _num_entities(other._num_entities),
+        _index_bound(other._index_bound),
+        _indices(nullptr)
+      {
+        if(_num_entities > 0)
+        {
+          _indices = new IndexVectorType[_num_entities];
+          for(Index i(0); i < _num_entities; ++i)
+          {
+            for(int j(0); j < num_indices_; ++j)
+            {
+              _indices[i][j] = other._indices[i][j];
+            }
+          }
         }
       }
 
@@ -286,6 +309,12 @@ namespace FEAST
         CONTEXT(name() + "::IndexSetWrapper()");
       }
 
+      IndexSetWrapper(const IndexSetWrapper& other) :
+        BaseClass(other),
+        _index_set(other._index_set)
+      {
+      }
+
       virtual ~IndexSetWrapper()
       {
         CONTEXT(name() + "::~IndexSetWrapper()");
@@ -333,6 +362,11 @@ namespace FEAST
           num_entities[0])
       {
         CONTEXT(name() + "::IndexSetWrapper()");
+      }
+
+      IndexSetWrapper(const IndexSetWrapper& other) :
+        _index_set(other._index_set)
+      {
       }
 
       virtual ~IndexSetWrapper()
@@ -400,6 +434,12 @@ namespace FEAST
         _index_set_wrapper(num_entities)
       {
         CONTEXT(name() + "::IndexSetHolder()");
+      }
+
+      IndexSetHolder(const IndexSetHolder& other) :
+        BaseClass(other),
+        _index_set_wrapper(other._index_set_wrapper)
+      {
       }
 
       virtual ~IndexSetHolder()
@@ -480,6 +520,10 @@ namespace FEAST
       explicit IndexSetHolder(const Index* /*num_entities*/)
       {
         CONTEXT(name() + "::IndexSetHolder()");
+      }
+
+      IndexSetHolder(const IndexSetHolder&)
+      {
       }
 
       virtual ~IndexSetHolder()

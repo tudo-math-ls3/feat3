@@ -24,7 +24,6 @@ namespace FEAST
       Index* _indices;
 
     private:
-      TargetSet(const TargetSet&);
       TargetSet& operator=(const TargetSet&);
 
     public:
@@ -42,6 +41,26 @@ namespace FEAST
         if(num_entities > 0)
         {
           _indices = new Index[num_entities];
+        }
+      }
+
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The target set that is to be copied.
+       */
+      TargetSet(const TargetSet& other) :
+        _num_entities(other._num_entities),
+        _indices(nullptr)
+      {
+        if(_num_entities > 0)
+        {
+          _indices = new Index[_num_entities];
+          for(Index i(0); i < _num_entities; ++i)
+          {
+            _indices[i] = other._indices[i];
+          }
         }
       }
 
@@ -130,6 +149,12 @@ namespace FEAST
         CONTEXT(name() + "::TargetSetHolder(const Index[])");
       }
 
+      TargetSetHolder(const TargetSetHolder& other) :
+        BaseClass(other),
+        _target_set(other._target_set)
+      {
+      }
+
       virtual ~TargetSetHolder()
       {
         CONTEXT(name() + "::~TargetSetHolder()");
@@ -196,6 +221,11 @@ namespace FEAST
         _target_set(num_entities[0])
       {
         CONTEXT(name() + "::TargetSetHolder(const Index[])");
+      }
+
+      TargetSetHolder(const TargetSetHolder& other) :
+        _target_set(other._target_set)
+      {
       }
 
       virtual ~TargetSetHolder()

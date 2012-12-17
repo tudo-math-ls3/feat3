@@ -94,7 +94,6 @@ namespace FEAST
       IndexSetHolderType _index_set_holder;
 
     private:
-      ConformalMesh(const ConformalMesh&);
       ConformalMesh& operator=(const ConformalMesh&);
 
     public:
@@ -137,6 +136,24 @@ namespace FEAST
 
         // fill index sets
         factory.fill_index_sets(_index_set_holder);
+      }
+
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The conformal mesh that is to be copied.
+       */
+      template<int stride2_, typename Coord2_>
+      ConformalMesh(const ConformalMesh<Shape_, num_coords_, stride2_, Coord2_>& other) :
+        _vertex_set(other.get_vertex_set()),
+        _index_set_holder(other.get_index_set_holder())
+      {
+        CONTEXT(name() + "::ConformalMesh() [copy]");
+        for(int i(0); i <= shape_dim; ++i)
+        {
+          _num_entities[i] = other.get_num_entities(i);
+        }
       }
 
       /// virtual destructor

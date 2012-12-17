@@ -9,6 +9,10 @@ namespace FEAST
 {
   namespace Geometry
   {
+    // forward declaration
+    template<typename Coord_ = Real>
+    class VertexSetVariable;
+
     /**
      * \brief Fixed-Sized Vertex Set class template
      *
@@ -66,7 +70,6 @@ namespace FEAST
       VertexType* _vertices;
 
     private:
-      VertexSetFixed(const VertexSetFixed&);
       VertexSetFixed& operator=(const VertexSetFixed&);
 
     public:
@@ -103,6 +106,57 @@ namespace FEAST
         }
       }
       /// \endcond
+
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The vertex set that is to be copied.
+       */
+      template<
+        int stride2_,
+        typename Coord2_>
+      VertexSetFixed(const VertexSetFixed<num_coords_, stride2_, Coord2_>& other) :
+        _num_vertices(other.get_num_vertices()),
+        _vertices(nullptr)
+      {
+        if(_num_vertices > 0)
+        {
+          _vertices = new VertexType(_num_vertices);
+          for(Index i(0); i < _num_vertices; ++i)
+          {
+            for(int j(0); j < num_coords_; ++j)
+            {
+              _vertices[i][j] = Coord_(other[i][j]);
+            }
+          }
+        }
+      }
+
+      /**
+       * \brief Conversion Constructor.
+       *
+       * \param[in] other
+       * The variable vertex set that is to be copied.
+       */
+      template<typename Coord2_>
+      explicit VertexSetFixed(const VertexSetVariable<Coord2_>& other) :
+        _num_vertices(other.get_num_vertices()),
+        _vertices(nullptr)
+      {
+        ASSERT(other.get_num_coords() == num_coords_, "Coordinate count mismatch!");
+        if(_num_vertices > 0)
+        {
+          _vertices = new VertexType(_num_vertices);
+          for(Index i(0); i < _num_vertices; ++i)
+          {
+            for(int j(0); j < num_coords_; ++j)
+            {
+              _vertices[i][j] = Coord_(other[i][j]);
+            }
+          }
+        }
+      }
 
       /// virtual destructor
       virtual ~VertexSetFixed()
@@ -180,7 +234,7 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename Coord_ = Real>
+    template<typename Coord_>
     class VertexSetVariable
     {
     public:
@@ -207,7 +261,6 @@ namespace FEAST
       CoordType* _vertices;
 
     private:
-      VertexSetVariable(const VertexSetVariable&);
       VertexSetVariable& operator=(const VertexSetVariable&);
 
     public:
@@ -239,6 +292,72 @@ namespace FEAST
         if((_num_vertices > 0) && (_num_coords > 0))
         {
           _vertices = new CoordType[_num_vertices * _stride];
+        }
+      }
+
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The vertex set that is to be copied.
+       */
+      template<typename Coord2_>
+      VertexSetVariable(const VertexSetVariable<Coord2_>& other) :
+        _num_vertices(other.get_num_vertices()),
+        _num_coords(other.get_num_coords()),
+        _stride(other.get_stride()),
+        _vertices(nullptr)
+      {
+        if((_num_vertices > 0) && (_num_coords > 0))
+        {
+          _vertices = new CoordType[_num_vertices * _stride];
+          for(Index i(0); i < _num_vertices; ++i)
+          {
+            for(int j(0); j < _num_coords; ++j)
+            {
+              _vertices[i * _stride + j] = CoordType(other[i][j]);
+            }
+            for(int j(_num_coords); j < _stride; ++j)
+            {
+              _vertices[i * _stride + j] = CoordType(0);
+            }
+          }
+        }
+      }
+
+      /**
+       * \brief Conversion Constructor
+       *
+       * \param[in] other
+       * The fixed vertex set that is to be copied.
+       *
+       * \param[in] stride
+       * The stride for the vertex set. If set to 0, the stride of the fixed vertex set is used.
+       */
+      template<int num_coords_, int stride_, typename Coord2_>
+      explicit VertexSetVariable(
+        const VertexSetFixed<num_coords_, stride_, Coord2_>& other,
+        int stride = 0) :
+        _num_vertices(other.get_num_vertices()),
+        _num_coords(num_coords_),
+        _stride(stride == 0 ? stride_ : stride),
+        _vertices(nullptr)
+      {
+        ASSERT_(_stride >= _num_coords);
+        if((_num_vertices > 0) && (_num_coords > 0))
+        {
+          _vertices = new CoordType[_num_vertices * _stride];
+          for(Index i(0); i < _num_vertices; ++i)
+          {
+            for(int j(0); j < _num_coords; ++j)
+            {
+              _vertices[i * _stride + j] = CoordType(other[i][j]);
+            }
+            for(int j(_num_coords); j < _stride; ++j)
+            {
+              _vertices[i * _stride + j] = CoordType(0);
+            }
+          }
         }
       }
 

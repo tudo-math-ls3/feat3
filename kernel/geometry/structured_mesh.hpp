@@ -140,6 +140,26 @@ namespace FEAST
         factory.fill_vertex_set(_vertex_set);
       }
 
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The structured mesh that is to be copied.
+       */
+      template<int stride2_, typename Coord2_>
+      StructuredMesh(const StructuredMesh<shape_dim_, num_coords_, stride2_, Coord2_>& other) :
+        _vertex_set(other.get_vertex_set()),
+        _index_set_holder(other.get_num_slices())
+      {
+        for(int i(0); i < shape_dim_; ++i)
+        {
+          _num_slices[i] = other.get_num_slices(i);
+        }
+
+        // calculate number of enitites
+        Intern::StructNumEntitiesWrapper<shape_dim_>::compute(_num_entities, _num_slices);
+      }
+
       /// virtual destructor
       virtual ~StructuredMesh()
       {
@@ -161,6 +181,12 @@ namespace FEAST
         ASSERT_(dir >= 0);
         ASSERT_(dir < shape_dim);
         return _num_slices[dir];
+      }
+
+      /// \brief Returns the num_slices array.
+      const Index* get_num_slices() const
+      {
+        return _num_slices;
       }
 
       /**

@@ -106,7 +106,6 @@ namespace FEAST
       TargetSetHolderType _target_set_holder;
 
     private:
-      ConformalSubMesh(const ConformalSubMesh&);
       ConformalSubMesh& operator=(const ConformalSubMesh&);
 
     public:
@@ -149,6 +148,8 @@ namespace FEAST
         _index_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities),
         _target_set_holder(Intern::NumEntitiesWrapper<shape_dim>(factory).num_entities)
       {
+        CONTEXT(name() + "::ConformalSubMesh() [factory]");
+
         // compute entity counts
         Intern::NumEntitiesWrapper<shape_dim>::apply(factory, _num_entities);
 
@@ -160,6 +161,26 @@ namespace FEAST
 
         // fill target sets
         factory.fill_target_sets(_target_set_holder);
+      }
+
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The conformal sub-mesh that is to be copied.
+       */
+      template<typename Coord2_>
+      ConformalSubMesh(const ConformalSubMesh<Shape_, Coord2_>& other) :
+        _vertex_set(other.get_vertex_set()),
+        _index_set_holder(other.get_index_set_holder()),
+        _target_set_holder(other.get_target_set())
+      {
+        CONTEXT(name() + "::ConformalSubMesh() [copy]");
+
+        for(int i(0); i <= shape_dim; ++i)
+        {
+          _num_entities[i] = other.get_num_entities(i);
+        }
       }
 
       /// virtual destructor

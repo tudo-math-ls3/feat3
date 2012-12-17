@@ -54,7 +54,6 @@ namespace FEAST
       TargetSetHolderType _target_set_holder;
 
     private:
-      CellSubSet(const CellSubSet&);
       CellSubSet& operator=(const CellSubSet&);
 
     public:
@@ -82,6 +81,18 @@ namespace FEAST
       {
         CONTEXT(name() + "::CellSubSet() [factory]");
         factory.fill_target_sets(_target_set_holder);
+      }
+
+      /**
+       * \brief Copy Constructor
+       *
+       * \param[in] other
+       * The cell sub-set that is to be copied.
+       */
+      CellSubSet(const CellSubSet& other) :
+        _target_set_holder(other.get_target_set_holder())
+      {
+        CONTEXT(name() + "::CellSubSet() [copy]");
       }
 
       /// virtual destructor
