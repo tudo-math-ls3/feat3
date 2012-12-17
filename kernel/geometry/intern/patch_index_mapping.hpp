@@ -145,14 +145,13 @@ namespace FEAST
         {
           tsf[0] = new Index[num_entities[0]];
           Index* tsi(tsf[0]);
-          const TargetSet& ts(tsh.template get_target_set<0>());
+          const TargetSet& ts(tsh.get_target_set<0>());
           const Index ni(tsh.get_num_entities(0));
           for(Index i(0); i < ni; ++i)
           {
             tsi[ts[i]] = i;
           }
         }
-
 
         template<typename ISO_, typename ISI_, typename TSC_>
         static void _apply(ISO_&, const ISI_&, const TSC_&, Index**)
