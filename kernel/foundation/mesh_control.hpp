@@ -5,6 +5,7 @@
 #include <kernel/foundation/base.hpp>
 #include <kernel/foundation/mesh.hpp>
 #include<kernel/geometry/conformal_mesh.hpp>
+#include<kernel/geometry/index_calculator.hpp>
 
 using namespace FEAST::Geometry;
 
@@ -226,6 +227,17 @@ namespace FEAST
             target_vertex_at_face[i][j] = source_vertex_at_face_i.at(j); //face i, adjacent vertex j
           }
         }
+
+        //face->edge
+        typedef typename TargetMeshType_::ShapeType face_type;
+        typedef typename Shape::FaceTraits<face_type, face_type::dimension - 1>::ShapeType edge_type;
+
+        IndexTree<edge_type> it(target_mesh.get_num_entities(0));
+        it.parse(target_vertex_at_edge);
+
+
+        typename TargetMeshType_::template IndexSet<2, 1>::Type& target_edge_at_face(target_mesh.template get_index_set<2, 1>());
+        IndexCalculator<face_type, face_type::dimension - 1>::compute(it, target_vertex_at_face, target_edge_at_face);
       }
 
       template<
@@ -419,6 +431,26 @@ namespace FEAST
             target_vertex_at_polyhedron[i][j] = source_vertex_at_polyhedron_i.at(j); //polyhedron i, adjacent vertex j
           }
         }
+
+        //poly->face
+        typedef typename TargetMeshType_::ShapeType poly_type;
+        typedef typename Shape::FaceTraits<poly_type, poly_type::dimension - 1>::ShapeType face_type;
+        typedef typename Shape::FaceTraits<poly_type, poly_type::dimension - 2>::ShapeType edge_type;
+
+        IndexTree<face_type> it_face(target_mesh.get_num_entities(0));
+        IndexTree<edge_type> it_edge(target_mesh.get_num_entities(0));
+
+        it_face.parse(target_vertex_at_face);
+        it_edge.parse(target_vertex_at_edge);
+
+
+        typename TargetMeshType_::template IndexSet<2, 1>::Type& target_edge_at_face(target_mesh.template get_index_set<2, 1>());
+        typename TargetMeshType_::template IndexSet<3, 1>::Type& target_edge_at_poly(target_mesh.template get_index_set<3, 1>());
+        typename TargetMeshType_::template IndexSet<3, 2>::Type& target_face_at_poly(target_mesh.template get_index_set<3, 2>());
+
+        IndexCalculator<poly_type, poly_type::dimension - 1>::compute(it_face, target_vertex_at_polyhedron, target_face_at_poly);
+        IndexCalculator<face_type, face_type::dimension - 1>::compute(it_edge, target_vertex_at_face, target_edge_at_face);
+        IndexCalculator<poly_type, poly_type::dimension - 2>::compute(it_edge, target_vertex_at_polyhedron, target_edge_at_poly);
       }
 
       template<
