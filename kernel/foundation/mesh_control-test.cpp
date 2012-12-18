@@ -540,6 +540,10 @@ class MeshControlTest3D:
       TEST_CHECK_EQUAL(vertex_coord_tuples[7][1], double(1));
       TEST_CHECK_EQUAL(vertex_coord_tuples[7][2], double(1));
 
+      ///test reconversion
+      Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
+      MeshControl<dim_3D>::fill_adjacencies(confmesh, m1, size_set);
+
       delete[] size_set;
     }
 };
