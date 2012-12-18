@@ -77,6 +77,11 @@ class MeshControlTest1D:
       Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
       MeshControl<dim_1D>::fill_adjacencies(confmesh, m1, size_set);
 
+      for(Index i(0) ; i < m.get_topologies().size() ; ++i)
+        for(Index j(0) ; j < m.get_topologies().at(i).size() ; ++j)
+          for(Index k(0) ; k < m.get_topologies().at(i).at(j).size() ; ++k)
+            TEST_CHECK_EQUAL(m1.get_topologies().at(i).at(j).at(k), m.get_topologies().at(i).at(j).at(k));
+
       delete[] size_set;
     }
 };

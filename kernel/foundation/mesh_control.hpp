@@ -95,6 +95,7 @@ namespace FEAST
           found_mesh.add_polytope(pl_edge);
         }
 
+        //add adjacencies
         for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
           for(Index j(0) ; j < source_vertex_at_edge.get_num_indices() ; ++j)
           {
