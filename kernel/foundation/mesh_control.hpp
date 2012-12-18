@@ -32,7 +32,8 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class,
           template <typename, typename> class> class MeshType_>
-      static void fill_sizes(const MeshType_<a_, b_, c_, d_, e_>& mesh, typename MeshType_<a_, b_, c_, d_, e_>::index_type_* target)
+      static void fill_sizes(const MeshType_<a_, b_, c_, d_, e_>& mesh,
+                             typename MeshType_<a_, b_, c_, d_, e_>::index_type_* target)
       {
         target[0] = mesh.get_topologies().at(0).get_topology().size();
         target[1] = mesh.get_topologies().at(1).get_topology().size();
@@ -51,7 +52,8 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class> class SourceMeshType_,
         typename TargetMeshType_>
-      static void fill_adjacencies(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh)
+      static void fill_adjacencies(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh,
+                                   TargetMeshType_& target_mesh)
       {
         //edge->Vertex
         typename TargetMeshType_::template IndexSet<1, 0>::Type& target_vertex_at_edge(target_mesh.template get_index_set<1, 0>());
@@ -80,7 +82,9 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class> class TargetMeshType_,
         typename SourceMeshType_>
-      static void fill_adjacencies(SourceMeshType_& geo_mesh, TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, typename TargetMeshType_<a_, b_, c_, d_, e_>::index_type_* sizes)
+      static void fill_adjacencies(SourceMeshType_& geo_mesh,
+                                   TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh,
+                                   typename TargetMeshType_<a_, b_, c_, d_, e_>::index_type_* sizes)
       {
         typename SourceMeshType_::template IndexSet<1, 0>::Type& source_vertex_at_edge(geo_mesh.template get_index_set<1, 0>());
 
@@ -117,7 +121,8 @@ namespace FEAST
           template <typename, typename> class> class SourceMeshType_,
         typename TargetMeshType_,
         typename AttributeType_>
-      static void fill_vertex_sets(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh, const AttributeType_& attr)
+      static void fill_vertex_sets(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh,
+                                   TargetMeshType_& target_mesh, const AttributeType_& attr)
       {
         typename TargetMeshType_::VertexSetType& vertex_coord_tuples(target_mesh.get_vertex_set());
         for(Index i(0) ; i < source_mesh.get_topologies().at(0).get_topology().size() ; ++i)
@@ -141,15 +146,17 @@ namespace FEAST
           template <typename, typename> class> class TargetMeshType_,
         typename SourceMeshType_,
         typename AttributeType_>
-      static void fill_vertex_sets(SourceMeshType_& geo_mesh, const TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, AttributeType_& attr)
+      static void fill_vertex_sets(SourceMeshType_& geo_mesh,
+                                   const TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh,
+                                   AttributeType_& attr)
       {
         ///TODO check attribute registration status with target mesh
-        ///TODO should be called after found_mesh is set up
         typename SourceMeshType_::VertexSetType& vertex_coord_tuples(geo_mesh.get_vertex_set());
 
+        attr.get_data().clear();
         for(Index i(0) ; i < found_mesh.get_topologies().at(0).get_topology().size() ; ++i)
         {
-          attr.get_data().at(i) = vertex_coord_tuples[i][0];
+          attr.get_data().push_back(vertex_coord_tuples[i][0]);
         }
       }
     };
@@ -169,7 +176,8 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class,
           template <typename, typename> class> class SourceMeshType_>
-      static void fill_sizes(const SourceMeshType_<a_, b_, c_, d_, e_>& mesh, typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_* target)
+      static void fill_sizes(const SourceMeshType_<a_, b_, c_, d_, e_>& mesh,
+                             typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_* target)
       {
         typedef typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_ IndexType;
         target[0] = IndexType(mesh.get_topologies().at(0).get_topology().size());
@@ -190,7 +198,8 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class> class SourceMeshType_,
         typename TargetMeshType_>
-      static void fill_adjacencies(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh)
+      static void fill_adjacencies(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh,
+                                   TargetMeshType_& target_mesh)
       {
         //edge->Vertex
         typename TargetMeshType_::template IndexSet<1, 0>::Type& target_vertex_at_edge(target_mesh.template get_index_set<1, 0>());
@@ -232,7 +241,9 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class> class TargetMeshType_,
         typename SourceMeshType_>
-      static void fill_adjacencies(SourceMeshType_& geo_mesh, TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, typename TargetMeshType_<a_, b_, c_, d_, e_>::index_type_* sizes)
+      static void fill_adjacencies(SourceMeshType_& geo_mesh,
+                                   TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh,
+                                   typename TargetMeshType_<a_, b_, c_, d_, e_>::index_type_* sizes)
       {
         typename SourceMeshType_::template IndexSet<1, 0>::Type& source_vertex_at_edge(geo_mesh.template get_index_set<1, 0>());
         typename SourceMeshType_::template IndexSet<2, 0>::Type& source_vertex_at_face(geo_mesh.template get_index_set<2, 0>());
@@ -283,7 +294,10 @@ namespace FEAST
         typename TargetMeshType_,
         typename AttributeType1_,
         typename AttributeType2_>
-      static void fill_vertex_sets(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh, const AttributeType1_& attr_0, const AttributeType2_& attr_1)
+      static void fill_vertex_sets(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh,
+                                   TargetMeshType_& target_mesh,
+                                   const AttributeType1_& attr_0,
+                                   const AttributeType2_& attr_1)
       {
         typename TargetMeshType_::VertexSetType& vertex_coord_tuples(target_mesh.get_vertex_set());
         for(Index i(0) ; i < source_mesh.get_topologies().at(0).get_topology().size() ; ++i)
@@ -309,16 +323,20 @@ namespace FEAST
         typename SourceMeshType_,
         typename AttributeType1_,
         typename AttributeType2_>
-      static void fill_vertex_sets(SourceMeshType_& geo_mesh, const TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, AttributeType1_& attr1, AttributeType2_& attr2)
+      static void fill_vertex_sets(SourceMeshType_& geo_mesh,
+                                   const TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh,
+                                   AttributeType1_& attr1,
+                                   AttributeType2_& attr2)
       {
         ///TODO check attribute registration status with target mesh
-        ///TODO should be called after found_mesh is set up
         typename SourceMeshType_::VertexSetType& vertex_coord_tuples(geo_mesh.get_vertex_set());
 
+        attr1.get_data().clear();
+        attr2.get_data().clear();
         for(Index i(0) ; i < found_mesh.get_topologies().at(0).get_topology().size() ; ++i)
         {
-          attr1.get_data().at(i) = vertex_coord_tuples[i][0];
-          attr2.get_data().at(i) = vertex_coord_tuples[i][1];
+          attr1.get_data().push_back(vertex_coord_tuples[i][0]);
+          attr2.get_data().push_back(vertex_coord_tuples[i][1]);
         }
       }
     };
@@ -338,7 +356,8 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class,
           template <typename, typename> class> class SourceMeshType_>
-      static void fill_sizes(const SourceMeshType_<a_, b_, c_, d_, e_>& mesh, typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_* target)
+      static void fill_sizes(const SourceMeshType_<a_, b_, c_, d_, e_>& mesh,
+                             typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_* target)
       {
         target[0] = mesh.get_topologies().at(0).get_topology().size();
         target[1] = mesh.get_topologies().at(1).get_topology().size();
@@ -359,7 +378,8 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class> class SourceMeshType_,
         typename TargetMeshType_>
-      static void fill_adjacencies(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh)
+      static void fill_adjacencies(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh,
+                                   TargetMeshType_& target_mesh)
       {
         //edge->Vertex
         typename TargetMeshType_::template IndexSet<1, 0>::Type& target_vertex_at_edge(target_mesh.template get_index_set<1, 0>());
@@ -414,7 +434,9 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class> class TargetMeshType_,
         typename SourceMeshType_>
-      static void fill_adjacencies(SourceMeshType_& geo_mesh, TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, typename TargetMeshType_<a_, b_, c_, d_, e_>::index_type_* sizes)
+      static void fill_adjacencies(SourceMeshType_& geo_mesh,
+                                   TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh,
+                                   typename TargetMeshType_<a_, b_, c_, d_, e_>::index_type_* sizes)
       {
         typename SourceMeshType_::template IndexSet<1, 0>::Type& source_vertex_at_edge(geo_mesh.template get_index_set<1, 0>());
         typename SourceMeshType_::template IndexSet<2, 0>::Type& source_vertex_at_face(geo_mesh.template get_index_set<2, 0>());
@@ -479,7 +501,11 @@ namespace FEAST
         typename AttributeType1_,
         typename AttributeType2_,
         typename AttributeType3_>
-      static void fill_vertex_sets(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh, TargetMeshType_& target_mesh, const AttributeType1_& attr_0, const AttributeType2_& attr_1, const AttributeType3_& attr_2)
+      static void fill_vertex_sets(const SourceMeshType_<a_, b_, c_, d_, e_>& source_mesh,
+                                   TargetMeshType_& target_mesh,
+                                   const AttributeType1_& attr_0,
+                                   const AttributeType2_& attr_1,
+                                   const AttributeType3_& attr_2)
       {
         typename TargetMeshType_::VertexSetType& vertex_coord_tuples(target_mesh.get_vertex_set());
         for(Index i(0) ; i < source_mesh.get_topologies().at(0).get_topology().size() ; ++i)
@@ -507,17 +533,23 @@ namespace FEAST
         typename AttributeType1_,
         typename AttributeType2_,
         typename AttributeType3_>
-      static void fill_vertex_sets(SourceMeshType_& geo_mesh, const TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, AttributeType1_& attr1, AttributeType2_& attr2, AttributeType3_& attr3)
+      static void fill_vertex_sets(SourceMeshType_& geo_mesh,
+                                   const TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh,
+                                   AttributeType1_& attr1,
+                                   AttributeType2_& attr2,
+                                   AttributeType3_& attr3)
       {
         ///TODO check attribute registration status with target mesh
-        ///TODO should be called after found_mesh is set up
         typename SourceMeshType_::VertexSetType& vertex_coord_tuples(geo_mesh.get_vertex_set());
 
+        attr1.get_data().clear();
+        attr2.get_data().clear();
+        attr3.get_data().clear();
         for(Index i(0) ; i < found_mesh.get_topologies().at(0).get_topology().size() ; ++i)
         {
-          attr1.get_data().at(i) = vertex_coord_tuples[i][0];
-          attr2.get_data().at(i) = vertex_coord_tuples[i][1];
-          attr3.get_data().at(i) = vertex_coord_tuples[i][2];
+          attr1.get_data().push_back(vertex_coord_tuples[i][0]);
+          attr2.get_data().push_back(vertex_coord_tuples[i][1]);
+          attr3.get_data().push_back(vertex_coord_tuples[i][2]);
         }
       }
     };
