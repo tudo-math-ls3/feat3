@@ -75,7 +75,7 @@ class MeshControlTest1D:
 
       ///test reconversion
       Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
-      MeshControl<dim_1D>::fill_adjacencies(confmesh, m1, size_set);
+      MeshControl<dim_1D>::fill_adjacencies(confmesh, m1);
 
       for(Index i(0) ; i < m.get_topologies().size() ; ++i)
         for(Index j(0) ; j < m.get_topologies().at(i).size() ; ++j)

@@ -80,29 +80,27 @@ namespace FEAST
           template <typename, typename> class,
           template <typename, typename> class> class TargetMeshType_,
         typename SourceMeshType_>
-      static void fill_adjacencies(SourceMeshType_& geo_mesh, TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, typename TargetMeshType_<a_, b_, c_, d_, e_>::index_type_* sizes)
+      static void fill_adjacencies(SourceMeshType_& geo_mesh, TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh)
       {
         typename SourceMeshType_::template IndexSet<1, 0>::Type& source_vertex_at_edge(geo_mesh.template get_index_set<1, 0>());
 
         //create entities
-        for(Index i(0) ; i < sizes[0] ; ++i)
+        for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() * source_vertex_at_edge.get_num_indices() ; ++i)
         {
           found_mesh.add_polytope(pl_vertex);
         }
 
-        for(Index i(0) ; i < sizes[1] ; ++i)
+        for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
         {
           found_mesh.add_polytope(pl_edge);
         }
 
-        //add adjacencies
+        //add adjacencies edge->vertex
         for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
           for(Index j(0) ; j < source_vertex_at_edge.get_num_indices() ; ++j)
           {
             found_mesh.add_adjacency(pl_edge, pl_vertex, i, source_vertex_at_edge[i][j]);
           }
-
-        ///TODO check
       }
 
       template<
