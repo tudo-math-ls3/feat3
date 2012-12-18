@@ -4,6 +4,7 @@
 
 #include<kernel/foundation/mesh_control.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
+#include<kernel/geometry/macro_factory.hpp>
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
@@ -76,7 +77,7 @@ class MeshControlTest1D:
 
       ///test reconversion
       Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
-      MeshControl<dim_1D>::fill_adjacencies(confmesh, m1, size_set);
+      MeshControl<dim_1D>::fill_adjacencies(confmesh, m1);
 
       for(Index i(0) ; i < m.get_topologies().size() ; ++i)
         for(Index j(0) ; j < m.get_topologies().at(i).size() ; ++j)
@@ -212,7 +213,7 @@ class MeshControlTest2D:
 
       ///test reconversion
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
-      MeshControl<dim_2D>::fill_adjacencies(confmesh, m1, size_set);
+      MeshControl<dim_2D>::fill_adjacencies(confmesh, m1);
 
       for(Index i(0) ; i < m.get_topologies().size() ; ++i)
         for(Index j(0) ; j < m.get_topologies().at(i).size() ; ++j)
@@ -543,7 +544,7 @@ class MeshControlTest3D:
 
       ///test reconversion
       Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
-      MeshControl<dim_3D>::fill_adjacencies(confmesh, m1, size_set);
+      MeshControl<dim_3D>::fill_adjacencies(confmesh, m1);
 
       MeshControl<dim_3D>::fill_vertex_sets(confmesh, m1, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())), *((Attribute<double, OT_>*)(attrs.at(2).get())));
       TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(0), double(0));
@@ -668,6 +669,13 @@ class MeshControlPartitioningTest2D:
       ///refine basemesh
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery(basemesh);
       basemeshtype_ fine_basemesh(mesh_refinery);
+
+      ///select a macro
+      MacroFactory<basemeshtype_> macro_factory(fine_basemesh, 0);
+      basemeshtype_ macro_mesh(macro_factory);
+
+      ///get foundation mesh, create halo set
+
 
       delete[] size_set;
     }
