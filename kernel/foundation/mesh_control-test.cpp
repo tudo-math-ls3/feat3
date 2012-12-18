@@ -82,6 +82,10 @@ class MeshControlTest1D:
           for(Index k(0) ; k < m.get_topologies().at(i).at(j).size() ; ++k)
             TEST_CHECK_EQUAL(m1.get_topologies().at(i).at(j).at(k), m.get_topologies().at(i).at(j).at(k));
 
+      MeshControl<dim_1D>::fill_vertex_sets(confmesh, m1, *((Attribute<double, OT_>*)(attrs.at(0).get())));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(0), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(1), double(1));
+
       delete[] size_set;
     }
 };

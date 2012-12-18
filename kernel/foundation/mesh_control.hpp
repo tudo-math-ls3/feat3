@@ -126,6 +126,32 @@ namespace FEAST
         }
       }
 
+      ///geo -> found, overwrite version
+      template<
+        RequiredNumTopologies a_,
+        typename b_,
+        template <typename, typename> class c_,
+        template <typename, typename> class d_,
+        template <typename, typename> class e_,
+        template<
+          RequiredNumTopologies,
+          typename,
+          template <typename, typename> class,
+          template <typename, typename> class,
+          template <typename, typename> class> class TargetMeshType_,
+        typename SourceMeshType_,
+        typename AttributeType_>
+      static void fill_vertex_sets(SourceMeshType_& geo_mesh, const TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh, AttributeType_& attr)
+      {
+        ///TODO check attribute registration status with target mesh
+        ///TODO should be called after found_mesh is set up
+        typename SourceMeshType_::VertexSetType& vertex_coord_tuples(geo_mesh.get_vertex_set());
+
+        for(Index i(0) ; i < found_mesh.get_topologies().at(0).get_topology().size() ; ++i)
+        {
+          attr.get_data().at(i) = vertex_coord_tuples[i][0];
+        }
+      }
     };
 
     template<>
