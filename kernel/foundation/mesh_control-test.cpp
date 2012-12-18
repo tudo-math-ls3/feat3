@@ -209,6 +209,15 @@ class MeshControlTest2D:
       TEST_CHECK_EQUAL(vertex_coord_tuples[3][0], 1u);
       TEST_CHECK_EQUAL(vertex_coord_tuples[3][1], 1u);
 
+      ///test reconversion
+      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
+      MeshControl<dim_2D>::fill_adjacencies(confmesh, m1);
+
+      for(Index i(0) ; i < m.get_topologies().size() ; ++i)
+        for(Index j(0) ; j < m.get_topologies().at(i).size() ; ++j)
+          for(Index k(0) ; k < m.get_topologies().at(i).at(j).size() ; ++k)
+            TEST_CHECK_EQUAL(m1.get_topologies().at(i).at(j).at(k), m.get_topologies().at(i).at(j).at(k));
+
       delete[] size_set;
     }
 };

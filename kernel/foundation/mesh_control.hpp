@@ -230,6 +230,55 @@ namespace FEAST
           typename,
           template <typename, typename> class,
           template <typename, typename> class,
+          template <typename, typename> class> class TargetMeshType_,
+        typename SourceMeshType_>
+      static void fill_adjacencies(SourceMeshType_& geo_mesh, TargetMeshType_<a_, b_, c_, d_, e_>& found_mesh)
+      {
+        typename SourceMeshType_::template IndexSet<1, 0>::Type& source_vertex_at_edge(geo_mesh.template get_index_set<1, 0>());
+        typename SourceMeshType_::template IndexSet<2, 0>::Type& source_vertex_at_face(geo_mesh.template get_index_set<2, 0>());
+
+        //create entities
+        for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() * source_vertex_at_edge.get_num_indices() ; ++i)
+        {
+          found_mesh.add_polytope(pl_vertex);
+        }
+
+        for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
+        {
+          found_mesh.add_polytope(pl_edge);
+        }
+
+        for(Index i(0) ; i < source_vertex_at_face.get_num_entities() ; ++i)
+        {
+          found_mesh.add_polytope(pl_face);
+        }
+
+        //add adjacencies edge->vertex
+        for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
+          for(Index j(0) ; j < source_vertex_at_edge.get_num_indices() ; ++j)
+          {
+            found_mesh.add_adjacency(pl_edge, pl_vertex, i, source_vertex_at_edge[i][j]);
+          }
+
+        //add adjacencies face->vertex
+        for(Index i(0) ; i < source_vertex_at_face.get_num_entities() ; ++i)
+          for(Index j(0) ; j < source_vertex_at_face.get_num_indices() ; ++j)
+          {
+            found_mesh.add_adjacency(pl_face, pl_vertex, i, source_vertex_at_face[i][j]);
+          }
+      }
+
+      template<
+        RequiredNumTopologies a_,
+        typename b_,
+        template <typename, typename> class c_,
+        template <typename, typename> class d_,
+        template <typename, typename> class e_,
+        template<
+          RequiredNumTopologies,
+          typename,
+          template <typename, typename> class,
+          template <typename, typename> class,
           template <typename, typename> class> class SourceMeshType_,
         typename TargetMeshType_,
         typename AttributeType1_,
