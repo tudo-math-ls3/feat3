@@ -544,6 +544,32 @@ class MeshControlTest3D:
       Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
       MeshControl<dim_3D>::fill_adjacencies(confmesh, m1, size_set);
 
+      MeshControl<dim_3D>::fill_vertex_sets(confmesh, m1, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())), *((Attribute<double, OT_>*)(attrs.at(2).get())));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(0), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(0), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(0), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(1), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(1), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(1), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(2), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(2), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(2), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(3), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(3), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(3), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(4), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(4), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(4), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(5), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(5), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(5), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(6), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(6), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(6), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(7), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(7), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(2).get()))->at(7), double(1));
+
       delete[] size_set;
     }
 };
