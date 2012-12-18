@@ -675,7 +675,10 @@ class MeshControlPartitioningTest2D:
       basemeshtype_ macro_mesh(macro_factory);
 
       ///get foundation mesh, create halo set
-
+      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > macro_mesh_found_coarse(4711, &attrs);
+      MeshControl<dim_2D>::fill_adjacencies(macro_mesh, macro_mesh_found_coarse);
+      MeshControl<dim_2D>::fill_vertex_sets(macro_mesh, macro_mesh_found_coarse, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
+      Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > example_halo(macro_mesh_found_coarse);
 
       delete[] size_set;
     }

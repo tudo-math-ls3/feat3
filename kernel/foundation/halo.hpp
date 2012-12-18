@@ -50,7 +50,7 @@ namespace FEAST
         typedef BufferedData<StorageType_> buffer_type_;
 
         ///CTOR
-        Halo(MeshType_ & mesh, IndexType_ other, PolytopeLevels level = pl_edge) : //TODO move to template
+        Halo(MeshType_ & mesh, IndexType_ other = 0, PolytopeLevels level = pl_edge) : //TODO move to template
           _halo_elements(),
           _halo_element_counterparts(),
           _mesh(mesh),

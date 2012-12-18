@@ -4,6 +4,7 @@
 
 #include <kernel/foundation/base.hpp>
 #include <kernel/foundation/mesh.hpp>
+#include <kernel/foundation/halo.hpp>
 #include<kernel/geometry/conformal_mesh.hpp>
 #include<kernel/geometry/index_calculator.hpp>
 
