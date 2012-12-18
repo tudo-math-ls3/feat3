@@ -75,7 +75,7 @@ class MeshControlTest1D:
 
       ///test reconversion
       Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
-      MeshControl<dim_1D>::fill_adjacencies(confmesh, m1);
+      MeshControl<dim_1D>::fill_adjacencies(confmesh, m1, size_set);
 
       for(Index i(0) ; i < m.get_topologies().size() ; ++i)
         for(Index j(0) ; j < m.get_topologies().at(i).size() ; ++j)
@@ -211,12 +211,23 @@ class MeshControlTest2D:
 
       ///test reconversion
       Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
-      MeshControl<dim_2D>::fill_adjacencies(confmesh, m1);
+      MeshControl<dim_2D>::fill_adjacencies(confmesh, m1, size_set);
 
       for(Index i(0) ; i < m.get_topologies().size() ; ++i)
         for(Index j(0) ; j < m.get_topologies().at(i).size() ; ++j)
           for(Index k(0) ; k < m.get_topologies().at(i).at(j).size() ; ++k)
             TEST_CHECK_EQUAL(m1.get_topologies().at(i).at(j).at(k), m.get_topologies().at(i).at(j).at(k));
+
+      MeshControl<dim_2D>::fill_vertex_sets(confmesh, m1, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(0), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(0), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(1), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(1), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(2), double(0));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(2), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(0).get()))->at(3), double(1));
+      TEST_CHECK_EQUAL(((Attribute<double, OT_>*)(attrs.at(1).get()))->at(3), double(1));
+
 
       delete[] size_set;
     }
