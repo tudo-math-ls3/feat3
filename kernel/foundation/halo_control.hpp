@@ -92,6 +92,24 @@ namespace FEAST
           target.template get_target_set<0>()[0] = halo.get_element(0);
         }
 
+        //reverse
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<2> >& source, HaloType_<0, pl_vertex, b_, c_, d_>& halo)
+        {
+          halo.get_elements().clear();
+          halo.get_element_counterparts().clear();
+          halo.add_element_pair(source.template get_target_set<0>()[0], source.template get_target_set<0>()[0]);
+        }
+
         ///overload for Hypercube<3>
         template<
           typename b_,
@@ -107,6 +125,24 @@ namespace FEAST
         {
           ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           target.template get_target_set<0>()[0] = halo.get_element(0);
+        }
+
+        //reverse
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, pl_vertex, b_, c_, d_>& halo)
+        {
+          halo.get_elements().clear();
+          halo.get_element_counterparts().clear();
+          halo.add_element_pair(source.template get_target_set<0>()[0], source.template get_target_set<0>()[0]);
         }
 
         ///delta = i case: in 1D, overlapping meshes have halos given in terms of edges
@@ -160,6 +196,28 @@ namespace FEAST
             }
 
           }
+        }
+
+        //reverse
+        template<
+          unsigned a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<1> >& source, HaloType_<a_, pl_edge, b_, c_, d_>& halo)
+        {
+          typedef typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_ IndexType;
+
+          Index size(source.template get_target_set<1>().get_num_entities());
+
+          for(Index i(0) ; i < size ; ++i)
+            halo.add_element_pair(source.template get_target_set<1>()[i], source.template get_target_set<1>()[i]);
         }
 
     };
