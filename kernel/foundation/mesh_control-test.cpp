@@ -6,6 +6,8 @@
 #include<kernel/foundation/dense_data_wrapper.hpp>
 #include<kernel/geometry/macro_factory.hpp>
 #include<kernel/lafem/dense_vector.hpp>
+#include<kernel/foundation/halo_control.hpp>
+#include<kernel/geometry/cell_sub_set.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
 
@@ -682,47 +684,63 @@ class MeshControlPartitioningTest2D:
       //  origin_vertex_indices.push_back(origin_vertex_at_face[macro_number][i]);
 
       ///get foundation mesh, create halo set
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > fine_bm_found(4711, &attrs);
+      Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > fine_bm_found(4711, &attrs);
       MeshControl<dim_2D>::fill_adjacencies(fine_basemesh, fine_bm_found);
       MeshControl<dim_2D>::fill_vertex_sets(fine_basemesh, fine_bm_found, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
 
-      ///depending on rank: process adjacent macros to potentially communicate with, e.g. rank 0
-      typedef typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ TopologyStorageType;
-      TopologyStorageType potential_comm_partners_for_face_0(fine_bm_found.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_face, 0));
+      ///depending on rank: compute adjacent macros to potentially communicate with, e.g. rank 0
+      typedef typename Topology<IndexType_, OT_, IT_>::storage_type_ TopologyStorageType;
+      TopologyStorageType potential_comm_partners_for_face_0(fine_bm_found.get_adjacent_polytopes(pl_face, pl_face, 0));
 
-      std::vector<Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > > halos;
-      std::vector<Index> comm_with_face;
+      ///create halos
+      std::vector<Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > vertex_halos;
+      std::vector<Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > edge_halos;
       for(Index i(0) ; i < potential_comm_partners_for_face_0.size() ; ++i)
       {
-        TopologyStorageType comm_intersect_0_i(fine_bm_found.get_comm_intersection(Foundation::pl_face, Foundation::pl_edge, 0, i));
+        TopologyStorageType comm_intersect_0_i(fine_bm_found.get_comm_intersection(pl_face, pl_edge, 0, i));
         if(comm_intersect_0_i.size() == 0)
         {
-          comm_intersect_0_i = fine_bm_found.get_comm_intersection(Foundation::pl_face, Foundation::pl_vertex, 0, i);
+          comm_intersect_0_i = fine_bm_found.get_comm_intersection(pl_face, pl_vertex, 0, i);
           for(Index j(0) ; j < comm_intersect_0_i.size() ; ++j)
           {
-            Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
+            Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
             halo.add_element_pair(comm_intersect_0_i.at(j), comm_intersect_0_i.at(j));
-            halos.push_back(halo);
+            vertex_halos.push_back(halo);
           }
         }
         else
         {
           for(Index j(0) ; j < comm_intersect_0_i.size() ; ++j)
           {
-            Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
-            TopologyStorageType verts(fine_bm_found.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, comm_intersect_0_i.at(j)));
-            halo.add_element_pair(verts.at(0), verts.at(0));
-            halo.add_element_pair(verts.at(1), verts.at(1));
-            halos.push_back(halo);
+            Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
+            halo.add_element_pair(comm_intersect_0_i.at(j), comm_intersect_0_i.at(j));
+            edge_halos.push_back(halo);
           }
         }
       }
 
-      std::cout << halos.at(0).get_other() << " " << halos.at(0).size() << std::endl;
-      std::cout << halos.at(1).get_other() << " " << halos.at(1).size() << std::endl;
-      std::cout << halos.at(2).get_other() << " " << halos.at(2).size() << std::endl;
+      //create cell_subsets from halos
+      /*for(Index i(0) ; i < edge_halos.size() ; ++i)
+      {
+        Index* polytopes_in_subset = new Index[3];
+        HaloControl<dim_2D>::fill_sizes(edge_halos.at(i), polytopes_in_subset);
+        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+        HaloControl<dim_2D>::fill_target_set(edge_halos.at(i), cell_sub_set);
+        cellsubsets.push_back(cell_sub_set);
+        //do something with it
 
-      //Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > example_halo(macro_mesh_found_coarse);
+        delete[] polytopes_in_subset;
+      }
+      for(Index i(0) ; i < vertex_halos.size() ; ++i)
+      {
+        Index* polytopes_in_subset = new Index[3];
+        HaloControl<dim_1D>::fill_sizes(vertex_halos.at(i), polytopes_in_subset);
+        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+        HaloControl<dim_1D>::fill_target_set(vertex_halos.at(i), cell_sub_set);
+        //do something with it
+
+        delete[] polytopes_in_subset;
+      }*/
 
       delete[] size_set;
     }
