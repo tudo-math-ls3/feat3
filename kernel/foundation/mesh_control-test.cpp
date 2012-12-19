@@ -666,19 +666,63 @@ class MeshControlPartitioningTest2D:
       MeshControl<dim_2D>::fill_adjacencies(m, basemesh);
       MeshControl<dim_2D>::fill_vertex_sets(m, basemesh, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
 
-      ///refine basemesh
+      ///refine basemesh to match process count
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery(basemesh);
       basemeshtype_ fine_basemesh(mesh_refinery);
 
-      ///select a macro
-      MacroFactory<basemeshtype_> macro_factory(fine_basemesh, 0);
-      basemeshtype_ macro_mesh(macro_factory);
+      //select a macro, store original vertex numbers
+      //Index macro_number(3);
+      //MacroFactory<basemeshtype_> macro_factory(fine_basemesh, macro_number);
+      //basemeshtype_ macro_mesh(macro_factory);
+
+      //std::vector<Index> origin_vertex_indices;
+      //typename basemeshtype_::template IndexSet<2,0>::Type& origin_vertex_at_face(fine_basemesh.template get_index_set<2,0>());
+      //face with number macro_number is what we need
+      //for(Index i(0) ; i < origin_vertex_at_face.get_num_indices() ; ++i)
+      //  origin_vertex_indices.push_back(origin_vertex_at_face[macro_number][i]);
 
       ///get foundation mesh, create halo set
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > macro_mesh_found_coarse(4711, &attrs);
-      MeshControl<dim_2D>::fill_adjacencies(macro_mesh, macro_mesh_found_coarse);
-      MeshControl<dim_2D>::fill_vertex_sets(macro_mesh, macro_mesh_found_coarse, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
-      Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > example_halo(macro_mesh_found_coarse);
+      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > fine_bm_found(4711, &attrs);
+      MeshControl<dim_2D>::fill_adjacencies(fine_basemesh, fine_bm_found);
+      MeshControl<dim_2D>::fill_vertex_sets(fine_basemesh, fine_bm_found, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
+
+      ///depending on rank: process adjacent macros to potentially communicate with, e.g. rank 0
+      typedef typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ TopologyStorageType;
+      TopologyStorageType potential_comm_partners_for_face_0(fine_bm_found.get_adjacent_polytopes(Foundation::pl_face, Foundation::pl_face, 0));
+
+      std::vector<Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > > halos;
+      std::vector<Index> comm_with_face;
+      for(Index i(0) ; i < potential_comm_partners_for_face_0.size() ; ++i)
+      {
+        TopologyStorageType comm_intersect_0_i(fine_bm_found.get_comm_intersection(Foundation::pl_face, Foundation::pl_edge, 0, i));
+        if(comm_intersect_0_i.size() == 0)
+        {
+          comm_intersect_0_i = fine_bm_found.get_comm_intersection(Foundation::pl_face, Foundation::pl_vertex, 0, i);
+          for(Index j(0) ; j < comm_intersect_0_i.size() ; ++j)
+          {
+            Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
+            halo.add_element_pair(comm_intersect_0_i.at(j), comm_intersect_0_i.at(j));
+            halos.push_back(halo);
+          }
+        }
+        else
+        {
+          for(Index j(0) ; j < comm_intersect_0_i.size() ; ++j)
+          {
+            Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
+            TopologyStorageType verts(fine_bm_found.get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, comm_intersect_0_i.at(j)));
+            halo.add_element_pair(verts.at(0), verts.at(0));
+            halo.add_element_pair(verts.at(1), verts.at(1));
+            halos.push_back(halo);
+          }
+        }
+      }
+
+      std::cout << halos.at(0).get_other() << " " << halos.at(0).size() << std::endl;
+      std::cout << halos.at(1).get_other() << " " << halos.at(1).size() << std::endl;
+      std::cout << halos.at(2).get_other() << " " << halos.at(2).size() << std::endl;
+
+      //Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > example_halo(macro_mesh_found_coarse);
 
       delete[] size_set;
     }

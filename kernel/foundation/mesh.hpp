@@ -408,6 +408,44 @@ namespace FEAST
           }
         }
 
+        /**
+         * \brief for two given polyopes at the same level, compute intersections
+         *
+         * \param[in] intersecting_elements_level
+         * polytope level of the elements to check intersection for
+         *
+         * \param[in] intersection_level
+         * polytope level of the intersection polytope
+         *
+         * \param[in] a
+         * index of the first element
+         *
+         * \param[in] b
+         * index of the second element
+         */
+        const typename TopologyType_::storage_type_ get_comm_intersection(
+                                                                     const PolytopeLevels intersecting_elements_level,
+                                                                     const PolytopeLevels intersection_level,
+                                                                     index_type_ a,
+                                                                     index_type_ b) const
+        {
+          CONTEXT("When calculating communication intersection in Mesh<>");
+
+          typename TopologyType_::storage_type_ result;
+
+          if(a == b)
+            return result;
+
+          typename TopologyType_::storage_type_ adj_a(get_adjacent_polytopes(intersecting_elements_level, intersection_level, a));
+          typename TopologyType_::storage_type_ adj_b(get_adjacent_polytopes(intersecting_elements_level, intersection_level, b));
+
+          for(index_type_ i(0) ; i < adj_a.size() ; ++i)
+            for(index_type_ j(0) ; j < adj_b.size() ; ++j)
+              if(adj_a.at(i) == adj_b.at(j))
+                result.push_back(adj_a.at(i));
+
+        }
+
         ///needed public access functions
         typename TopologyType_::index_type_ get_num_levels()
         {
