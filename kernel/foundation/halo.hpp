@@ -145,6 +145,26 @@ namespace FEAST
           return *this;
         }
 
+        StorageType_<IndexType_, std::allocator<IndexType_> >& get_elements()
+        {
+          return _halo_elements;
+        }
+
+        const StorageType_<IndexType_, std::allocator<IndexType_> >& get_elements() const
+        {
+          return _halo_elements;
+        }
+
+        StorageType_<IndexType_, std::allocator<IndexType_> >& get_element_counterparts()
+        {
+          return _halo_element_counterparts;
+        }
+
+        const StorageType_<IndexType_, std::allocator<IndexType_> >& get_element_counterparts() const
+        {
+          return _halo_element_counterparts;
+        }
+
         ///implementation of Bufferable interface
         virtual BufferedData<StorageType_> buffer(IndexType_ estimated_size_increase = 0)
         {

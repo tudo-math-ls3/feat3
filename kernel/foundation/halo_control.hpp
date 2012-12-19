@@ -57,6 +57,24 @@ namespace FEAST
           target.template get_target_set<0>()[0] = halo.get_element(0);
         }
 
+        //reverse
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<1> >& source, HaloType_<0, pl_vertex, b_, c_, d_>& halo)
+        {
+          halo.get_elements().clear();
+          halo.get_element_counterparts().clear();
+          halo.add_element_pair(source.template get_target_set<0>()[0], source.template get_target_set<0>()[0]);
+        }
+
         ///overload for Hypercube<2> (in order to get point-diagonal halos)
         template<
           typename b_,

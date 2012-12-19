@@ -113,6 +113,11 @@ class HaloControlTest1D:
       TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<0>()[1], 1ul); //vertex 1
       //-------------------------------------
 
+      ///check reverse
+      Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h2(m, 1);
+      HaloControl<Foundation::dim_1D>::fill_target_set(cell_sub_set, h2);
+      TEST_CHECK_EQUAL(h2.get_element(0), h.get_element(0));
+
       delete[] polytopes_in_subset;
       delete[] polytopes_in_subset1;
     }
