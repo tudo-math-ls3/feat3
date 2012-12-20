@@ -659,6 +659,27 @@ namespace FEAST
           }
         }
 
+        //reverse
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, pl_face, b_, c_, d_>& halo)
+        {
+          typedef typename HaloType_<0, pl_face, b_, c_, d_>::index_type_ IndexType;
+
+          Index size(source.template get_target_set<2>().get_num_entities());
+
+          for(Index i(0) ; i < size ; ++i)
+            halo.add_element_pair(source.template get_target_set<2>()[i], source.template get_target_set<2>()[i]);
+        }
+
         ///delta = i case: in 3D, halos with overlap = i can only be given by polyhedrons
         ///i, pl_polyhedron case
         template<
@@ -844,6 +865,28 @@ namespace FEAST
           {
             target.template get_target_set<0>()[i] = all_vertices.at(i);
           }
+        }
+
+        //reverse
+        template<
+          unsigned a_,
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<a_, pl_polyhedron, b_, c_, d_>& halo)
+        {
+          typedef typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_ IndexType;
+
+          Index size(source.template get_target_set<3>().get_num_entities());
+
+          for(Index i(0) ; i < size ; ++i)
+            halo.add_element_pair(source.template get_target_set<3>()[i], source.template get_target_set<3>()[i]);
         }
     };
   }
