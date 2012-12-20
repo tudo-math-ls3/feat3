@@ -10,6 +10,7 @@
 #include<kernel/geometry/cell_sub_set.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
+#include<algorithm>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -693,8 +694,7 @@ class MeshControlPartitioningTest2D:
       TopologyStorageType potential_comm_partners_for_face_0(fine_bm_found.get_adjacent_polytopes(pl_face, pl_face, 0));
 
       ///create halos
-      std::vector<Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > vertex_halos;
-      std::vector<Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > edge_halos;
+      std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > > halos;
       for(Index i(0) ; i < potential_comm_partners_for_face_0.size() ; ++i)
       {
         TopologyStorageType comm_intersect_0_i(fine_bm_found.get_comm_intersection(pl_face, pl_edge, 0, i));
@@ -705,7 +705,8 @@ class MeshControlPartitioningTest2D:
           {
             Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
             halo.add_element_pair(comm_intersect_0_i.at(j), comm_intersect_0_i.at(j));
-            vertex_halos.push_back(halo);
+
+            halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(halo)));
           }
         }
         else
@@ -714,15 +715,15 @@ class MeshControlPartitioningTest2D:
           {
             Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
             halo.add_element_pair(comm_intersect_0_i.at(j), comm_intersect_0_i.at(j));
-            edge_halos.push_back(halo);
+            halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(halo)));
           }
         }
       }
 
-      for(Index i(0) ; i < vertex_halos.size() ; ++i)
-        std::cout << vertex_halos.at(i).get_other() << std::endl;
-      for(Index i(0) ; i < edge_halos.size() ; ++i)
-        std::cout <<  edge_halos.at(i).get_other() << std::endl;
+      //std::sort(halos.begin(), halos.end(), Foundation::compare_other);
+
+      for(Index i(0) ; i < halos.size() ; ++i)
+        std::cout <<  halos.at(i)->get_other() << std::endl;
 
       //create cell_subsets from halos
       /*for(Index i(0) ; i < edge_halos.size() ; ++i)
