@@ -719,6 +719,11 @@ class MeshControlPartitioningTest2D:
         }
       }
 
+      for(Index i(0) ; i < vertex_halos.size() ; ++i)
+        std::cout << vertex_halos.at(i).get_other() << std::endl;
+      for(Index i(0) ; i < edge_halos.size() ; ++i)
+        std::cout <<  edge_halos.at(i).get_other() << std::endl;
+
       //create cell_subsets from halos
       /*for(Index i(0) ; i < edge_halos.size() ; ++i)
       {
