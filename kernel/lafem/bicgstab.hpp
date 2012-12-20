@@ -37,8 +37,7 @@ namespace FEAST
         DT_ defnorm, defnorm_0, defnorm_00(1e14);
         Index iter = 0;
         DT_ rho_tilde, rho_tilde_old, alpha_tilde, omega_tilde, beta_tilde, gamma_tilde;
-        DT_ nrm_r_tilde_0, nrm_tilde_00;
-        bool early_exit = 0;
+        //bool early_exit = 0;
         bool restarted = false;
         bool converged = 0;
 
@@ -59,12 +58,10 @@ namespace FEAST
           defnorm_0 = Norm2<Algo_>::value(r);
           defnorm = defnorm_0;
           precon.apply(r_tilde_0, r);
-          nrm_r_tilde_0 = Norm2<Algo_>::value(r_tilde_0);
 
           if (restarted == false)
           {
             defnorm_00 = defnorm_0;
-            nrm_tilde_00 = nrm_r_tilde_0;
           }
           copy(r_tilde, r_tilde_0);
           copy(p_tilde, r_tilde_0);
@@ -106,7 +103,7 @@ namespace FEAST
             {
               Axpy<Algo_>::value(x, alpha_tilde, p_tilde, x);
 
-              early_exit = 1;
+              //early_exit = 1;
               converged = 1;
               //std::cout << "Breakpoint 3 (converged)" << std::endl;
               break;
