@@ -7,6 +7,7 @@
 #include<kernel/geometry/macro_factory.hpp>
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/foundation/halo_control.hpp>
+#include<kernel/foundation/halo.hpp>
 #include<kernel/geometry/cell_sub_set.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
@@ -720,7 +721,7 @@ class MeshControlPartitioningTest2D:
         }
       }
 
-      //std::sort(halos.begin(), halos.end(), Foundation::compare_other);
+      std::sort(halos.begin(), halos.end(), compare_other<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> >, OT_, IndexType_>);
 
       for(Index i(0) ; i < halos.size() ; ++i)
         std::cout <<  halos.at(i)->get_other() << std::endl;
