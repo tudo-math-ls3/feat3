@@ -6,6 +6,7 @@
 #include<kernel/foundation/dense_data_wrapper.hpp>
 #include<kernel/geometry/macro_factory.hpp>
 #include<kernel/lafem/dense_vector.hpp>
+#include<kernel/lafem/vector_mirror.hpp>
 #include<kernel/foundation/halo_control.hpp>
 #include<kernel/foundation/halo.hpp>
 #include<kernel/geometry/cell_sub_set.hpp>
@@ -725,6 +726,48 @@ class MeshControlPartitioningTest2D:
 
       for(Index i(0) ; i < halos.size() ; ++i)
         std::cout <<  halos.at(i)->get_other() << std::endl;
+
+      ///before refinement, get the actual macro for assembly (of BC mainly)
+      Index macro_number(0);
+      MacroFactory<basemeshtype_> macro_factory(fine_basemesh, macro_number);
+      basemeshtype_ macro_mesh(macro_factory);
+
+      ///refine basemesh, macromesh
+      Geometry::StandardRefinery<basemeshtype_> mesh_refinery_fine(fine_basemesh);
+      Geometry::StandardRefinery<basemeshtype_> mesh_refinery_macro(macro_mesh);
+      basemeshtype_ finemost_basemesh(mesh_refinery_fine);
+      basemeshtype_ finemost_macro(mesh_refinery_macro);
+
+      ///get refined halos
+      std::vector<std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > > > finemost_cell_subsets;
+      for(Index i(0) ; i < halos.size() ; ++i)
+      {
+        //transform found->geo
+        Index* polytopes_in_subset = new Index[3];
+
+        if(halos.at(i)->get_level() == pl_vertex)
+          HaloControl<dim_1D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
+        else
+          HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
+
+        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+
+        if(halos.at(i)->get_level() == pl_vertex)
+          HaloControl<dim_1D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
+        else
+          HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
+
+        //refine
+        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, fine_basemesh);
+
+        //add
+        finemost_cell_subsets.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(cell_refinery)));
+
+        delete[] polytopes_in_subset;
+      }
+
+      ///assembly
+      ///we now have: finemost basemesh, macro_mesh, cell_subsets from halos all in 'geometry mode'
 
       //create cell_subsets from halos
       /*for(Index i(0) ; i < edge_halos.size() ; ++i)

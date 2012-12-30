@@ -318,7 +318,9 @@ namespace FEAST
     };
 
 
-    template<typename MeshType_, template<typename, typename> class StorageType_, typename IndexType_>
+    template<typename MeshType_,
+             template<typename, typename> class StorageType_,
+             typename IndexType_>
     bool compare_other(const std::shared_ptr<HaloBase<MeshType_, StorageType_, IndexType_> >& l, const std::shared_ptr<HaloBase<MeshType_, StorageType_, IndexType_> >& r)
     {
       return (l->get_other() < r->get_other());
