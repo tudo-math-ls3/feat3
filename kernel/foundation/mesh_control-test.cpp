@@ -778,6 +778,25 @@ class MeshControlPartitioningTest2D:
         delete[] polytopes_in_subset;
       }
 
+      ///get refined macro boundaries
+      std::vector<std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > > > finemost_macro_boundaries;
+      for(Index i(0) ; i < halos.size() ; ++i)
+      {
+        //transform found->geo
+        Index* polytopes_in_subset = new Index[3];
+        HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), polytopes_in_subset);
+        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
+        HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), cell_sub_set);
+
+        //refine
+        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, macro_mesh);
+
+        //add
+        finemost_macro_boundaries.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(cell_refinery)));
+
+        delete[] polytopes_in_subset;
+      }
+
       ///assembly
       ///we now have: finemost basemesh, macro_mesh, cell_subsets from halos all in 'geometry mode'
 
