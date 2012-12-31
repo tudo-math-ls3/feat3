@@ -721,16 +721,21 @@ class MeshControlPartitioningTest2D:
           }
         }
       }
-
       std::sort(halos.begin(), halos.end(), compare_other<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> >, OT_, IndexType_>);
 
-      for(Index i(0) ; i < halos.size() ; ++i)
-        std::cout <<  halos.at(i)->get_other() << std::endl;
-
-      ///before refinement, get the actual macro for assembly (of BC mainly)
+      ///before refinement, get the actual macro for assembly (of inner BC mainly)
       Index macro_number(0);
       MacroFactory<basemeshtype_> macro_factory(fine_basemesh, macro_number);
       basemeshtype_ macro_mesh(macro_factory);
+      //every edge is an inner boundary
+      Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > macro_mesh_found(99);
+      MeshControl<dim_2D>::fill_adjacencies(macro_mesh, macro_mesh_found);
+      Attribute<double, OT_> vertex_x_coords_macro;
+      Attribute<double, OT_> vertex_y_coords_macro;
+      MeshControl<dim_2D>::fill_vertex_sets(macro_mesh, macro_mesh_found, vertex_x_coords_macro, vertex_y_coords_macro);
+
+      //std::vector<std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > > > fine_macro_subsets;
+
 
       ///refine basemesh, macromesh
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery_fine(fine_basemesh);
