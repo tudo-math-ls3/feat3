@@ -743,7 +743,6 @@ class MeshControlPartitioningTest2D:
         macro_boundaries.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(result)));
       }
 
-
       ///refine basemesh, macromesh
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery_fine(fine_basemesh);
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery_macro(macro_mesh);
@@ -798,30 +797,7 @@ class MeshControlPartitioningTest2D:
       }
 
       ///assembly
-      ///we now have: finemost basemesh, macro_mesh, cell_subsets from halos all in 'geometry mode'
-
-      //create cell_subsets from halos
-      /*for(Index i(0) ; i < edge_halos.size() ; ++i)
-      {
-        Index* polytopes_in_subset = new Index[3];
-        HaloControl<dim_2D>::fill_sizes(edge_halos.at(i), polytopes_in_subset);
-        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
-        HaloControl<dim_2D>::fill_target_set(edge_halos.at(i), cell_sub_set);
-        cellsubsets.push_back(cell_sub_set);
-        //do something with it
-
-        delete[] polytopes_in_subset;
-      }
-      for(Index i(0) ; i < vertex_halos.size() ; ++i)
-      {
-        Index* polytopes_in_subset = new Index[3];
-        HaloControl<dim_1D>::fill_sizes(vertex_halos.at(i), polytopes_in_subset);
-        Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
-        HaloControl<dim_1D>::fill_target_set(vertex_halos.at(i), cell_sub_set);
-        //do something with it
-
-        delete[] polytopes_in_subset;
-      }*/
+      ///we now have: finemost basemesh, macro_mesh and its boundary components, cell_subsets from halos all in 'geometry mode'
 
       delete[] size_set;
     }
