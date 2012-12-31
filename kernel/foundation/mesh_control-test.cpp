@@ -727,14 +727,21 @@ class MeshControlPartitioningTest2D:
       Index macro_number(0);
       MacroFactory<basemeshtype_> macro_factory(fine_basemesh, macro_number);
       basemeshtype_ macro_mesh(macro_factory);
-      //every edge is an inner boundary
       Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > macro_mesh_found(99);
       MeshControl<dim_2D>::fill_adjacencies(macro_mesh, macro_mesh_found);
       Attribute<double, OT_> vertex_x_coords_macro;
       Attribute<double, OT_> vertex_y_coords_macro;
       MeshControl<dim_2D>::fill_vertex_sets(macro_mesh, macro_mesh_found, vertex_x_coords_macro, vertex_y_coords_macro);
 
-      //std::vector<std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > > > fine_macro_subsets;
+      //every edge is an inner boundary
+      std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > > macro_boundaries;
+
+      for(Index i(0) ; i < macro_mesh_found.get_topologies().at(ipi_edge_vertex).size() ; ++i)
+      {
+        Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > result(macro_mesh_found);
+        result.add_element_pair(i, i);
+        macro_boundaries.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(result)));
+      }
 
 
       ///refine basemesh, macromesh
