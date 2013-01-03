@@ -81,7 +81,7 @@ namespace FEAST
         }
 
         // default DTOR
-        MeshDataContainer::~MeshDataContainer()
+        ~MeshDataContainer()
         {
           CONTEXT("MeshDataContainer::~MeshDataContainer()");
         }
@@ -121,7 +121,7 @@ namespace FEAST
         }
 
         // default DTOR
-        CellSetContainer::~CellSetContainer()
+        ~CellSetContainer()
         {
           CONTEXT("CellSetContainer::~CellSetContainer()");
         }

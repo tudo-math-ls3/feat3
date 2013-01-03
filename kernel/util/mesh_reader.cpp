@@ -656,7 +656,7 @@ namespace FEAST
         }
 
         // adjacency vector
-        std::vector<std::vector<Index>> a_stack;
+        std::vector<std::vector<Index> > a_stack;
 
         while(!ifs.eof() && ifs.good())
         {
@@ -1557,7 +1557,7 @@ namespace FEAST
           throw SyntaxError("Unknown format in line " + stringify(cur_line2));
         }
 
-        std::vector<std::vector<Index>> a_stack;
+        std::vector<std::vector<Index> > a_stack;
 
         while(!ifs.eof() && ifs.good())
         {

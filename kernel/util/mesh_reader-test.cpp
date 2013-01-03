@@ -167,7 +167,7 @@ public:
     TEST_CHECK_EQUAL(root_mesh.adj_path, "");
 
     // check the root mesh coordinates
-    std::vector<std::vector<double>> coords = root_mesh.coords;
+    std::vector<std::vector<double> > coords = root_mesh.coords;
 
     // reference coordinates
     double coords_ref[] =
@@ -202,7 +202,7 @@ public:
     TEST_CHECK_EQUAL(error, false);
 
     // check the adjacencies
-    std::vector<std::vector<Index>> adj_stack;
+    std::vector<std::vector<Index> > adj_stack;
 
     // reference adjacencies
     Index adj_ref_01[] =
@@ -295,7 +295,7 @@ public:
     TEST_CHECK_EQUAL(sub_mesh.adj_path, "");
 
     // check the sub mesh coordinates
-    std::vector<std::vector<double>> coords_sub = sub_mesh.coords;
+    std::vector<std::vector<double> > coords_sub = sub_mesh.coords;
 
     // reference coordinates
     double coords_sub_ref[] =
@@ -327,7 +327,7 @@ public:
     TEST_CHECK_EQUAL(error, false);
 
     // check the adjacencies
-    std::vector<std::vector<Index>> adj_stack_sub;
+    std::vector<std::vector<Index> > adj_stack_sub;
 
     // reference adjacencies
     Index adj_sub_ref_01[] =
