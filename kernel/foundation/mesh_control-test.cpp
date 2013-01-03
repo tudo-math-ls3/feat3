@@ -14,6 +14,13 @@
 #include<deque>
 #include<algorithm>
 
+#include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/dof_adjacency.hpp>
+#include <kernel/assembly/standard_operators.hpp>
+#include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/dirichlet_bc.hpp>
+
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
@@ -583,6 +590,15 @@ class MeshControlTest3D:
 MeshControlTest3D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol3d_testvv("std::vector, std::vector");
 MeshControlTest3D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrol3d_testvd("std::vector, std::deque");
 
+template<typename T_>
+class RhsFunc
+{
+public:
+  static T_ eval(T_ /*x*/, T_ /*y*/)
+  {
+    return T_(1);
+  }
+};
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlPartitioningTest2D:
   public TaggedTest<Tag_, IndexType_>
@@ -798,6 +814,17 @@ class MeshControlPartitioningTest2D:
 
       ///assembly
       ///we now have: finemost basemesh, macro_mesh and its boundary components, cell_subsets from halos all in 'geometry mode'
+      // create trafo
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo(macro_mesh);
+      // create space
+      Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
+
+      SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
+      mat_sys.clear();
+      Assembly::BilinearScalarLaplaceFunctor::assemble(mat_sys, space, "gauss-legendre:2");
+
+      DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
+      Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
 
       delete[] size_set;
     }
