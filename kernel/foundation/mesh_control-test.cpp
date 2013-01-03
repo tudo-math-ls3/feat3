@@ -826,6 +826,13 @@ class MeshControlPartitioningTest2D:
       DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
       Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
 
+      // assemble homogene Dirichlet BCs
+      Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+      for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
+      {
+        dirichlet.add_cell_set(*finemost_macro_boundaries.at(i).get());
+      }
+
       delete[] size_set;
     }
 };
