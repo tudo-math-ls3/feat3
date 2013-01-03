@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 ADD_LIBRARY(kernel-util STATIC
   colouring.cpp
   exception.cpp
+  mesh_reader.cpp
   param_section.cpp
 )
 
