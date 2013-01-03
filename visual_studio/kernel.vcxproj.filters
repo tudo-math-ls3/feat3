@@ -618,6 +618,9 @@
     <ClInclude Include="..\kernel\geometry\intern\macro_index_mapping.hpp">
       <Filter>Header Files\geometry\intern</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\mesh_reader.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
@@ -648,6 +651,9 @@
       <Filter>Source Files\lafem</Filter>
     </ClCompile>
     <ClCompile Include="..\kernel\util\colouring.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\kernel\util\mesh_reader.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>

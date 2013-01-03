@@ -666,6 +666,7 @@
     <ClInclude Include="..\kernel\util\instantiation_policy.hpp" />
     <ClInclude Include="..\kernel\util\linear_algebra.hpp" />
     <ClInclude Include="..\kernel\util\logger.hpp" />
+    <ClInclude Include="..\kernel\util\mesh_reader.hpp" />
     <ClInclude Include="..\kernel\util\param_section.hpp" />
     <ClInclude Include="..\kernel\util\permutation.hpp" />
     <ClInclude Include="..\kernel\util\prefix.hpp" />
@@ -688,6 +689,7 @@
     <ClCompile Include="..\kernel\util\colouring.cpp" />
     <ClCompile Include="..\kernel\util\exception.cpp" />
     <ClCompile Include="..\kernel\util\logger.cpp" />
+    <ClCompile Include="..\kernel\util\mesh_reader.cpp" />
     <ClCompile Include="..\kernel\util\param_section.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

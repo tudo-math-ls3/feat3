@@ -22,53 +22,6 @@ namespace FEAST
   class ParamSection
   {
   public:
-    /**
-     * \brief Syntax Error exception class
-     *
-     * This class derives from FEAST::Exception and is thrown by the ParamSection parser when a syntax error
-     * is detected.
-     *
-     * \author Constantin Christof
-     * \author Peter Zajac
-     */
-    class SyntaxError :
-      public Exception
-    {
-    protected:
-      /// name of the file containing the syntax error
-      String _filename;
-
-    public:
-      /**
-       * \brief Constructor
-       *
-       * \param[in] message
-       * A description of the syntax error.
-       *
-       * \param[in] filename
-       * The name of the file in which the syntax error has been detected.
-       */
-      explicit SyntaxError(
-        String message,
-        String filename = ""):
-        Exception(message + (filename.empty() ? "": " in file " + filename)),
-        _filename(filename)
-      {
-      }
-
-      /// virtual destructor
-      virtual ~SyntaxError() throw()
-      {
-      }
-
-      /// returns the filename
-      String get_filename() const
-      {
-        return _filename;
-      }
-    }; // class ParamSection::SyntaxError
-
-  public:
     /// entry-map type
     typedef std::map<String, String, String::NoCaseLess> EntryMap;
     /// section-map type

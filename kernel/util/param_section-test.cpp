@@ -101,7 +101,7 @@ public:
 
     // does parsing fail?
     ParamSection parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), ParamSection::SyntaxError);
+    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_1
 
   void test_2() const
@@ -121,7 +121,7 @@ public:
 
     // does parsing fail?
     ParamSection parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), ParamSection::SyntaxError);
+    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_2
 
   void test_3() const
@@ -134,7 +134,7 @@ public:
 
     // does parsing fail?
     ParamSection parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), ParamSection::SyntaxError);
+    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_3
 
   void test_4() const
@@ -147,7 +147,7 @@ public:
 
     // does parsing fail?
     ParamSection parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), ParamSection::SyntaxError);
+    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_4
 
   void test_5() const
@@ -164,7 +164,7 @@ public:
 
     // does parsing fail?
     ParamSection parsec;
-    TEST_CHECK_THROWS(parsec.parse(ioss), ParamSection::SyntaxError);
+    TEST_CHECK_THROWS(parsec.parse(ioss), SyntaxError);
   } //test_5
 
   void test_6() const

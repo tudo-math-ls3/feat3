@@ -22,6 +22,7 @@ SET (test_list
   graph-test
   inheritance-test
   linear_algebra-test
+  mesh_reader-test
   param_section-test
   permutation-test
   string-test

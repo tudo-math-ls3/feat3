@@ -490,6 +490,7 @@
     <ClCompile Include="..\kernel\util\graph-test.cpp" />
     <ClCompile Include="..\kernel\util\inheritance-test.cpp" />
     <ClCompile Include="..\kernel\util\linear_algebra-test.cpp" />
+    <ClCompile Include="..\kernel\util\mesh_reader-test.cpp" />
     <ClCompile Include="..\kernel\util\param_section-test.cpp" />
     <ClCompile Include="..\kernel\util\permutation-test.cpp" />
     <ClCompile Include="..\kernel\util\string-test.cpp" />

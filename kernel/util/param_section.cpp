@@ -199,7 +199,7 @@ namespace FEAST
       parse(ifs, replace);
       ifs.close();
     }
-    catch(ParamSection::SyntaxError& exc)
+    catch(SyntaxError& exc)
     {
       // If the exception does not contain a filename, we'll recycle the exception and include our filename now.
       // Note: The exception may indeed already have a filename; this happens when another (erroneous) file is
