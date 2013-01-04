@@ -826,12 +826,27 @@ class MeshControlPartitioningTest2D:
       DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
       Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
 
-      // assemble homogene Dirichlet BCs
+      // assemble homogeneous Dirichlet BCs
       Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
       for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
       {
+        /*std::cout << "--" << i << "--" << std::endl;
+        std::cout << (*finemost_macro_boundaries.at(i).get()).template get_target_set<0>().get_num_entities() << std::endl;
+        std::cout << (*finemost_macro_boundaries.at(i).get()).template get_target_set<1>().get_num_entities() << std::endl;
+        std::cout << (*finemost_macro_boundaries.at(i).get()).template get_target_set<2>().get_num_entities() << std::endl;*/
         dirichlet.add_cell_set(*finemost_macro_boundaries.at(i).get());
       }
+
+      // allocate solution vector
+      DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
+
+      // assemble filter:
+      UnitFilter<Mem::Main, double> filter(dirichlet.template assemble<Mem::Main, double>());
+
+      // filter system
+      //filter.filter_mat(mat_sys);
+      //filter.filter_rhs(vec_rhs);
+      //filter.filter_sol(vec_sol);
 
       delete[] size_set;
     }
