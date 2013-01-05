@@ -17,6 +17,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
+#include <kernel/space/dof_mirror.hpp>
 #include <kernel/assembly/standard_operators.hpp>
 #include <kernel/assembly/standard_functionals.hpp>
 #include <kernel/assembly/dirichlet_bc.hpp>
@@ -832,6 +833,30 @@ class MeshControlPartitioningTest2D:
       filter.filter_mat(mat_sys);
       filter.filter_rhs(vec_rhs);
       filter.filter_sol(vec_sol);
+
+      ///assemble mirrors
+      std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
+      std::vector<LAFEM::DenseVector<Mem::Main, double> > sendbufs;
+      std::vector<LAFEM::DenseVector<Mem::Main, double> > recvbufs;
+      std::vector<Index> destranks;
+      std::vector<Index> sourceranks;
+
+      Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+
+      for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
+      {
+        Graph dof_mirror(Space::DofMirror::assemble(space, *(finemost_macro_boundaries.at(i).get())));
+        VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
+        DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
+        DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
+
+        mirrors.push_back(target_mirror);
+        sendbufs.push_back(sendbuf);
+        recvbufs.push_back(recvbuf);
+
+        destranks.push_back(macro_boundaries.at(i)->get_other());
+        sourceranks.push_back(macro_number);
+      }
 
       delete[] size_set;
     }
