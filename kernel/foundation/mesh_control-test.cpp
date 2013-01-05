@@ -691,17 +691,6 @@ class MeshControlPartitioningTest2D:
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery(basemesh);
       basemeshtype_ fine_basemesh(mesh_refinery);
 
-      //select a macro, store original vertex numbers
-      //Index macro_number(3);
-      //MacroFactory<basemeshtype_> macro_factory(fine_basemesh, macro_number);
-      //basemeshtype_ macro_mesh(macro_factory);
-
-      //std::vector<Index> origin_vertex_indices;
-      //typename basemeshtype_::template IndexSet<2,0>::Type& origin_vertex_at_face(fine_basemesh.template get_index_set<2,0>());
-      //face with number macro_number is what we need
-      //for(Index i(0) ; i < origin_vertex_at_face.get_num_indices() ; ++i)
-      //  origin_vertex_indices.push_back(origin_vertex_at_face[macro_number][i]);
-
       ///get foundation mesh, create halo set
       Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > fine_bm_found(4711, &attrs);
       MeshControl<dim_2D>::fill_adjacencies(fine_basemesh, fine_bm_found);
@@ -830,10 +819,6 @@ class MeshControlPartitioningTest2D:
       Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
       for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
       {
-        /*std::cout << "--" << i << "--" << std::endl;
-        std::cout << (*finemost_macro_boundaries.at(i).get()).template get_target_set<0>().get_num_entities() << std::endl;
-        std::cout << (*finemost_macro_boundaries.at(i).get()).template get_target_set<1>().get_num_entities() << std::endl;
-        std::cout << (*finemost_macro_boundaries.at(i).get()).template get_target_set<2>().get_num_entities() << std::endl;*/
         dirichlet.add_cell_set(*finemost_macro_boundaries.at(i).get());
       }
 
