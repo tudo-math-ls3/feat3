@@ -729,6 +729,11 @@ class MeshControlPartitioningTest2D:
       }
       std::sort(halos.begin(), halos.end(), compare_other<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> >, OT_, IndexType_>);
 
+      TEST_CHECK_EQUAL(halos.size(), 3);
+      TEST_CHECK_EQUAL(halos.at(0)->get_other(), 1);
+      TEST_CHECK_EQUAL(halos.at(1)->get_other(), 2);
+      TEST_CHECK_EQUAL(halos.at(2)->get_other(), 3);
+
       ///before refinement, get the actual macro for assembly (of inner BC mainly)
       Index macro_number(0);
       MacroFactory<basemeshtype_> macro_factory(fine_basemesh, macro_number);
@@ -739,6 +744,15 @@ class MeshControlPartitioningTest2D:
       Attribute<double, OT_> vertex_y_coords_macro;
       MeshControl<dim_2D>::fill_vertex_sets(macro_mesh, macro_mesh_found, vertex_x_coords_macro, vertex_y_coords_macro);
 
+      TEST_CHECK_EQUAL(vertex_x_coords_macro.at(0), double(0));
+      TEST_CHECK_EQUAL(vertex_y_coords_macro.at(0), double(0));
+      TEST_CHECK_EQUAL(vertex_x_coords_macro.at(1), double(0.5));
+      TEST_CHECK_EQUAL(vertex_y_coords_macro.at(1), double(0));
+      TEST_CHECK_EQUAL(vertex_x_coords_macro.at(2), double(0));
+      TEST_CHECK_EQUAL(vertex_y_coords_macro.at(2), double(0.5));
+      TEST_CHECK_EQUAL(vertex_x_coords_macro.at(3), double(0.5));
+      TEST_CHECK_EQUAL(vertex_y_coords_macro.at(3), double(0.5));
+
       //every edge is an inner boundary
       std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > > macro_boundaries;
 
@@ -748,6 +762,7 @@ class MeshControlPartitioningTest2D:
         result.add_element_pair(i, i);
         macro_boundaries.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(result)));
       }
+      TEST_CHECK_EQUAL(macro_boundaries.size(), 4);
 
       ///refine basemesh, macromesh
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery_fine(fine_basemesh);
@@ -785,7 +800,7 @@ class MeshControlPartitioningTest2D:
 
       ///get refined macro boundaries
       std::vector<std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > > > finemost_macro_boundaries;
-      for(Index i(0) ; i < halos.size() ; ++i)
+      for(Index i(0) ; i < macro_boundaries.size() ; ++i)
       {
         //transform found->geo
         Index* polytopes_in_subset = new Index[3];
@@ -801,6 +816,7 @@ class MeshControlPartitioningTest2D:
 
         delete[] polytopes_in_subset;
       }
+      TEST_CHECK_EQUAL(finemost_macro_boundaries.size(), 4);
 
       ///assembly
       ///we now have: finemost basemesh, macro_mesh and its boundary components, cell_subsets from halos all in 'geometry mode'
@@ -857,8 +873,8 @@ class MeshControlPartitioningTest2D:
         destranks.push_back(macro_boundaries.at(i)->get_other());
         sourceranks.push_back(macro_number);
       }
-
       delete[] size_set;
+
     }
 };
 MeshControlPartitioningTest2D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrolpart_testvv("std::vector, std::vector");
