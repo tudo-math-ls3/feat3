@@ -815,7 +815,7 @@ class MeshControlPartitioningTest2D:
       ///assembly
       ///we now have: finemost basemesh, macro_mesh and its boundary components, cell_subsets from halos all in 'geometry mode'
       // create trafo
-      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo(macro_mesh);
+      Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo(finemost_macro);
       // create space
       Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
@@ -844,9 +844,9 @@ class MeshControlPartitioningTest2D:
       UnitFilter<Mem::Main, double> filter(dirichlet.template assemble<Mem::Main, double>());
 
       // filter system
-      //filter.filter_mat(mat_sys);
-      //filter.filter_rhs(vec_rhs);
-      //filter.filter_sol(vec_sol);
+      filter.filter_mat(mat_sys);
+      filter.filter_rhs(vec_rhs);
+      filter.filter_sol(vec_sol);
 
       delete[] size_set;
     }
