@@ -688,15 +688,25 @@ class MeshControlPartitioningTest2D:
       MeshControl<dim_2D>::fill_adjacencies(m, basemesh);
       MeshControl<dim_2D>::fill_vertex_sets(m, basemesh, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
 
+
       ///refine basemesh to match process count
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery(basemesh);
       basemeshtype_ fine_basemesh(mesh_refinery);
 
-      ///get foundation mesh, create halo set
+      ///get foundation mesh
       Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > fine_bm_found(4711, &attrs);
       MeshControl<dim_2D>::fill_adjacencies(fine_basemesh, fine_bm_found);
       MeshControl<dim_2D>::fill_vertex_sets(fine_basemesh, fine_bm_found, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
 
+      ///get a single halo that represents the whole macro for reinsertion to global solution, then get a single cellsubset from it
+      Halo<1, pl_face, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > macro_subset(fine_bm_found);
+      macro_subset.add_element_pair(0, 0);
+      IndexType_* polytopes_in_macrosubset(new IndexType_[3]);
+      HaloControl<dim_2D>::fill_sizes(macro_subset, polytopes_in_macrosubset);
+      CellSubSet<Shape::Hypercube<2> > macro_subset_geo(polytopes_in_macrosubset);
+      HaloControl<dim_2D>::fill_target_set(macro_subset, macro_subset_geo);
+
+      ///create halo set
       ///depending on rank: compute adjacent macros to potentially communicate with, e.g. rank 0
       typedef typename Topology<IndexType_, OT_, IT_>::storage_type_ TopologyStorageType;
       TopologyStorageType potential_comm_partners_for_face_0(fine_bm_found.get_adjacent_polytopes(pl_face, pl_face, 0));
