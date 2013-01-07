@@ -5,6 +5,7 @@
 #include<kernel/foundation/mesh_control.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
 #include<kernel/geometry/macro_factory.hpp>
+#include<kernel/geometry/patch_factory.hpp>
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/lafem/vector_mirror.hpp>
 #include<kernel/foundation/halo_control.hpp>
@@ -688,7 +689,6 @@ class MeshControlPartitioningTest2D:
       MeshControl<dim_2D>::fill_adjacencies(m, basemesh);
       MeshControl<dim_2D>::fill_vertex_sets(m, basemesh, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
 
-
       ///refine basemesh to match process count
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery(basemesh);
       basemeshtype_ fine_basemesh(mesh_refinery);
@@ -705,6 +705,13 @@ class MeshControlPartitioningTest2D:
       HaloControl<dim_2D>::fill_sizes(macro_subset, polytopes_in_macrosubset);
       CellSubSet<Shape::Hypercube<2> > macro_subset_geo(polytopes_in_macrosubset);
       HaloControl<dim_2D>::fill_target_set(macro_subset, macro_subset_geo);
+
+      ///get a mesh from this
+      PatchFactory<basemeshtype_> pf(fine_basemesh, macro_subset_geo);
+      basemeshtype_ macro_mesh_geo(pf);
+      /*for(Index i(0) ; i < macro_mesh_geo.template get_index_set<1,0>().get_num_entities() ; ++i)
+        for(Index j(0) ; j < macro_mesh_geo.template get_index_set<1,0>().get_num_indices() ; ++j)
+          std::cout << macro_mesh_geo.template get_index_set<1,0>()[i][j] << std::endl;*/
 
       ///create halo set
       ///depending on rank: compute adjacent macros to potentially communicate with, e.g. rank 0

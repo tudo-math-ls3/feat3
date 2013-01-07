@@ -365,8 +365,8 @@ namespace FEAST
 
           IndexType num_edges(0);
           IndexType num_vertices(0);
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             ///for any face count edges
@@ -394,7 +394,7 @@ namespace FEAST
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
@@ -435,8 +435,8 @@ namespace FEAST
 
           typedef typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_ IndexType;
 
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             ///for any face count edges
@@ -460,7 +460,7 @@ namespace FEAST
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
               bool already_in(false);
