@@ -114,10 +114,14 @@ void test_hypercube_2d(int rank, int num_patches)
   MeshControl<dim_2D>::fill_adjacencies(m, *macro_basemesh);
   MeshControl<dim_2D>::fill_vertex_sets(m, *macro_basemesh, *((Attribute<double>*)(attrs.at(0).get())), *((Attribute<double>*)(attrs.at(1).get())));
 
-  for(Index i(0) ; i < log(num_patches) / log(2) ; ++i)
+  for(int i(0) ; i < log(num_patches) / log(4) ; ++i)
   {
-    Geometry::StandardRefinery<BaseMeshType_> mesh_refinery(*macro_basemesh);
-    macro_basemesh = new BaseMeshType_(mesh_refinery);
+    BaseMeshType_* coarse_mesh(macro_basemesh);
+    {
+      Geometry::StandardRefinery<BaseMeshType_> mesh_refinery(*coarse_mesh);
+      macro_basemesh = new BaseMeshType_(mesh_refinery);
+    }
+    delete coarse_mesh;
   }
 
   delete macro_basemesh;
