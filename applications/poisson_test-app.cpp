@@ -124,7 +124,7 @@ void test_hypercube_2d(int rank, int num_patches)
     delete coarse_mesh;
   }
 
-  ///select macro by rank
+  ///select macro by rank, create macro subset
   Mesh<rnt_2D, Topology<> > macro_basemesh_found(4711, &attrs);
   MeshControl<dim_2D>::fill_adjacencies(*macro_basemesh, macro_basemesh_found);
   MeshControl<dim_2D>::fill_vertex_sets(*macro_basemesh, macro_basemesh_found, *((Attribute<double>*)(attrs.at(0).get())), *((Attribute<double>*)(attrs.at(1).get())));
@@ -137,6 +137,10 @@ void test_hypercube_2d(int rank, int num_patches)
   CellSubSet<Shape::Hypercube<2> > macro_subset_geo(polytopes_in_macrosubset);
   HaloControl<dim_2D>::fill_target_set(macro_subset, macro_subset_geo);
   delete polytopes_in_macrosubset;
+
+  ///get a mesh from this
+  PatchFactory<BaseMeshType_> pf(*macro_basemesh, macro_subset_geo);
+  BaseMeshType_ macro_mesh_geo(pf);
 
   delete macro_basemesh;
 
