@@ -32,7 +32,7 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 
-void test_hypercube_2d(int rank, int num_patches)
+void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level)
 {
   /*(0,1) (1,1)
    *  *----*
@@ -184,6 +184,40 @@ void test_hypercube_2d(int rank, int num_patches)
     macro_boundaries_found.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D> > >(new Halo<0, pl_edge, Mesh<rnt_2D> >(result)));
   }
 
+  ///refine everything to desried level of detail
+  BaseMeshType* macro_basemesh_fine = new BaseMeshType(*macro_basemesh);
+  BaseMeshType* macro_mesh_geo_fine = new BaseMeshType(macro_mesh_geo);
+  CellSubSet<Shape::Hypercube<2> >* macro_subset_geo_fine = new CellSubSet<Shape::Hypercube<2> >(macro_subset_geo);
+
+  ///TODO what is with these copy-CTORS??
+  for(int i(0) ; i < desired_refinement_level - (log(num_patches) / log(4)) ; ++i)
+  {
+    BaseMeshType* coarse_macro_basemesh_fine(macro_basemesh_fine);
+    {
+      Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_basemesh_fine);
+      macro_basemesh_fine = new BaseMeshType(refinery_0);
+    }
+    //delete coarse_macro_basemesh_fine;
+  }
+  for(int i(0) ; i < desired_refinement_level - (log(num_patches) / log(4)) ; ++i)
+  {
+    BaseMeshType* coarse_macro_mesh_geo_fine(macro_mesh_geo_fine);
+    {
+      Geometry::StandardRefinery<BaseMeshType> refinery_1(*coarse_macro_mesh_geo_fine);
+      macro_mesh_geo_fine = new BaseMeshType(refinery_1);
+    }
+    //delete coarse_macro_mesh_geo_fine;
+  }
+  for(int i(0) ; i < desired_refinement_level - (log(num_patches) / log(4)) ; ++i)
+  {
+    CellSubSet<Shape::Hypercube<2> >* coarse_macro_subset_geo_fine(macro_subset_geo_fine);
+    {
+      Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, BaseMeshType> refinery_2(*coarse_macro_subset_geo_fine, *macro_basemesh_fine);
+      macro_subset_geo_fine = new CellSubSet<Shape::Hypercube<2> >(refinery_2);
+    }
+    delete coarse_macro_subset_geo_fine;
+  }
+
   delete macro_basemesh;
 }
 
@@ -191,6 +225,7 @@ int main(int argc, char* argv[])
 {
   int me(0);
   int num_patches(0);
+  Index desired_refinement_level(4);
 
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
@@ -198,7 +233,7 @@ int main(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &num_patches);
 #endif
 
-  test_hypercube_2d(me, num_patches);
+  test_hypercube_2d(me, num_patches, desired_refinement_level);
 
 #ifndef SERIAL
   MPI_Finalize();
