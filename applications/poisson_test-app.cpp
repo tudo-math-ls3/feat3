@@ -149,10 +149,10 @@ void test_hypercube_2d(int rank, int num_patches)
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > > > macro_comm_halos;
   for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
   {
-    TopologyStorageType comm_intersect_rank_i(macro_basemesh_found.get_comm_intersection(pl_face, pl_edge, 0, i));
+    TopologyStorageType comm_intersect_rank_i(macro_basemesh_found.get_comm_intersection(pl_face, pl_edge, rank, i));
     if(comm_intersect_rank_i.size() == 0)
     {
-      comm_intersect_rank_i = macro_basemesh_found.get_comm_intersection(pl_face, pl_vertex, 0, i);
+      comm_intersect_rank_i = macro_basemesh_found.get_comm_intersection(pl_face, pl_vertex, rank, i);
       for(Index j(0) ; j < comm_intersect_rank_i.size() ; ++j)
       {
         Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, i);
@@ -173,8 +173,18 @@ void test_hypercube_2d(int rank, int num_patches)
   }
   std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);
 
-  delete macro_basemesh;
+  ///get macro boundary components
+  //every edge of the face is a boundary and since we use Additive Schwarz, they all can use homogeneous Dirichlet BC
+  //a macro basemesh is always the reference element of the specific face
+  std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D> > > > macro_boundaries_found;
+  for(Index i(0) ; i < macro_basemesh_found.get_topologies().at(ipi_edge_vertex).size() ; ++i)
+  {
+    Halo<0, pl_edge, Mesh<rnt_2D> > result(macro_basemesh_found);
+    result.add_element_pair(i, i);
+    macro_boundaries_found.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D> > >(new Halo<0, pl_edge, Mesh<rnt_2D> >(result)));
+  }
 
+  delete macro_basemesh;
 }
 
 int main(int argc, char* argv[])
