@@ -100,26 +100,26 @@ void test_hypercube_2d(int rank, int num_patches)
   m.add_adjacency(pl_vertex, pl_face, 3, 0);
 
   ///get a conformal mesh as basemesh
-  typedef ConformalMesh<Shape::Hypercube<dim_2D> > BaseMeshType_;
+  typedef ConformalMesh<Shape::Hypercube<dim_2D> > BaseMeshType;
 
   Index* size_set(new Index[3]);
   MeshControl<dim_2D>::fill_sizes(m, size_set);
 
-  BaseMeshType_ basemesh(size_set);
+  BaseMeshType basemesh(size_set);
   MeshControl<dim_2D>::fill_adjacencies(m, basemesh);
   MeshControl<dim_2D>::fill_vertex_sets(m, basemesh, *((Attribute<double>*)(attrs.at(0).get())), *((Attribute<double>*)(attrs.at(1).get())));
 
   ///refine basemesh to match process count
-  BaseMeshType_* macro_basemesh = new BaseMeshType_(size_set);
+  BaseMeshType* macro_basemesh = new BaseMeshType(size_set);
   MeshControl<dim_2D>::fill_adjacencies(m, *macro_basemesh);
   MeshControl<dim_2D>::fill_vertex_sets(m, *macro_basemesh, *((Attribute<double>*)(attrs.at(0).get())), *((Attribute<double>*)(attrs.at(1).get())));
 
   for(int i(0) ; i < log(num_patches) / log(4) ; ++i)
   {
-    BaseMeshType_* coarse_mesh(macro_basemesh);
+    BaseMeshType* coarse_mesh(macro_basemesh);
     {
-      Geometry::StandardRefinery<BaseMeshType_> mesh_refinery(*coarse_mesh);
-      macro_basemesh = new BaseMeshType_(mesh_refinery);
+      Geometry::StandardRefinery<BaseMeshType> mesh_refinery(*coarse_mesh);
+      macro_basemesh = new BaseMeshType(mesh_refinery);
     }
     delete coarse_mesh;
   }
@@ -139,8 +139,39 @@ void test_hypercube_2d(int rank, int num_patches)
   delete polytopes_in_macrosubset;
 
   ///get a mesh from this
-  PatchFactory<BaseMeshType_> pf(*macro_basemesh, macro_subset_geo);
-  BaseMeshType_ macro_mesh_geo(pf);
+  PatchFactory<BaseMeshType> pf(*macro_basemesh, macro_subset_geo);
+  BaseMeshType macro_mesh_geo(pf);
+
+  ///create communication halos
+  ///depending on rank: compute adjacent macros to potentially communicate with
+  typedef Topology<>::storage_type_ TopologyStorageType;
+  TopologyStorageType potential_comm_partners_for_face_rank(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_face, 0));
+  std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > > > macro_comm_halos;
+  for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
+  {
+    TopologyStorageType comm_intersect_rank_i(macro_basemesh_found.get_comm_intersection(pl_face, pl_edge, 0, i));
+    if(comm_intersect_rank_i.size() == 0)
+    {
+      comm_intersect_rank_i = macro_basemesh_found.get_comm_intersection(pl_face, pl_vertex, 0, i);
+      for(Index j(0) ; j < comm_intersect_rank_i.size() ; ++j)
+      {
+        Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, i);
+        halo.add_element_pair(comm_intersect_rank_i.at(j), comm_intersect_rank_i.at(j));
+
+        macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > >(new Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >(halo)));
+      }
+    }
+    else
+    {
+      for(Index j(0) ; j < comm_intersect_rank_i.size() ; ++j)
+      {
+        Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, i);
+        halo.add_element_pair(comm_intersect_rank_i.at(j), comm_intersect_rank_i.at(j));
+        macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >(halo)));
+      }
+    }
+  }
+  std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);
 
   delete macro_basemesh;
 
