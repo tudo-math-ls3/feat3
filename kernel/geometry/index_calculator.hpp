@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/geometry/intern/index_representative.hpp>
 #include <kernel/geometry/intern/face_index_mapping.hpp>
+#include <kernel/geometry/index_set.hpp>
 #include <kernel/util/exception.hpp>
 
 // includes, system
@@ -325,6 +326,93 @@ namespace FEAST
         return "IndexCalculator<" + Shape_::name() + "," + stringify(face_dim_) + ">";
       }
     }; // class IndexCalculator
+
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename Shape_, int face_dim_, int cell_dim_ = Shape_::dimension>
+      struct RisbHelper
+      {
+        typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
+        typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType FaceType;
+
+        static void compute(IndexSetHolder<Shape_>& ish, IndexTree<FaceType>& idx_tree)
+        {
+          // recurse down
+          RisbHelper<Shape_, face_dim_, cell_dim_ - 1>::compute(ish, idx_tree);
+
+          // create an index calculator
+          IndexCalculator<CellType, face_dim_>::compute(
+            idx_tree,
+            ish.template get_index_set<cell_dim_, 0>(),
+            ish.template get_index_set<cell_dim_, face_dim_>());
+        }
+      };
+
+      template<typename Shape_, int face_dim_>
+      struct RisbHelper<Shape_, face_dim_, face_dim_>
+      {
+        typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType FaceType;
+
+        static void compute(IndexSetHolder<Shape_>&, IndexTree<FaceType>&)
+        {
+          // dummy
+        }
+      };
+
+      template<typename Shape_, int face_dim_ = Shape_::dimension - 1>
+      struct RisbWrapper
+      {
+        typedef typename Shape::FaceTraits<Shape_, face_dim_>::ShapeType FaceType;
+        enum
+        {
+          num_verts = Shape::FaceTraits<FaceType, 0>::count
+        };
+
+        static void wrap(IndexSetHolder<Shape_>& ish)
+        {
+          // recurse down
+          RisbWrapper<Shape_, face_dim_ - 1>::wrap(ish);
+
+          // get vertices-at-face index set
+          IndexSet<num_verts>& vert_adj(ish.template get_index_set<face_dim_, 0>());
+
+          // build an index-tree from it
+          IndexTree<FaceType> idx_tree(vert_adj.get_index_bound());
+          idx_tree.parse(vert_adj);
+
+          // call the helper
+          RisbHelper<Shape_, face_dim_>::compute(ish, idx_tree);
+        }
+      };
+
+      template<typename Shape_>
+      struct RisbWrapper<Shape_, 0>
+      {
+        static void wrap(IndexSetHolder<Shape_>& ish)
+        {
+          // dummy
+        }
+      };
+    } // namespace Intern
+    /// \endcond
+
+    /**
+     * \brief Builder for redundant index sets
+     *
+     * This class builds all redundant index sets from the mandatory index sets.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Shape_>
+    class RedundantIndexSetBuilder
+    {
+    public:
+      static void compute(IndexSetHolder<Shape_>& index_set_holder)
+      {
+        Intern::RisbWrapper<Shape_>::wrap(index_set_holder);
+      }
+    };
   } // namespace Geometry
 } // namespace FEAST
 
