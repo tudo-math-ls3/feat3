@@ -1,5 +1,6 @@
 // includes, FEAST
 #include <kernel/util/mesh_reader.hpp>
+#include <kernel/util/assertion.hpp>
 
 // includes, system
 #include <fstream>
@@ -8,7 +9,12 @@ namespace FEAST
 {
 
   // default constructor
-  MeshReader::MeshReader()
+  MeshReader::MeshReader() :
+    _version(0),
+    _num_submeshes(0),
+    _num_cellsets(0),
+    _chart_path(""),
+    _root_mesh_node(nullptr)
   {
     CONTEXT("MeshReader::MeshReader()");
   }
@@ -18,8 +24,29 @@ namespace FEAST
   MeshReader::~MeshReader()
   {
     CONTEXT("MeshReader::~MeshReader()");
+    if(_root_mesh_node != nullptr)
+    {
+      delete _root_mesh_node;
+    }
   }
 
+  MeshReader::CellSetParent* MeshReader::_find_cell_set_parent(String parent_name)
+  {
+    if(parent_name == "root")
+      return _root_mesh_node;
+    if(_root_mesh_node != nullptr)
+      return _root_mesh_node->find_cell_set_parent(parent_name);
+    return nullptr;
+  }
+
+  MeshReader::MeshNode* MeshReader::_find_sub_mesh_parent(String parent_name)
+  {
+    if(parent_name == "root")
+      return _root_mesh_node;
+    if(_root_mesh_node != nullptr)
+      return _root_mesh_node->find_sub_mesh(parent_name);
+    return nullptr;
+  }
 
   // parses the FEAST- mesh file given by filename
   void MeshReader::parse_mesh_file(String filename)
@@ -99,36 +126,36 @@ namespace FEAST
       // if it is the header chunk
       if(line == "<header>")
       {
-        cur_line = parse_header_section(cur_line, ifs);
+        cur_line = _parse_header_section(cur_line, ifs);
       }
 
       // if it is an info chunk
       else if(line == "<info>")
       {
-        cur_line = parse_info_section(cur_line, ifs);
+        cur_line = _parse_info_section(cur_line, ifs);
       }
 
       // if it is a mesh chunk
       else if(line == "<mesh>")
       {
-        cur_line = parse_mesh_section(cur_line, "root", ifs);
+        cur_line = _parse_mesh_section(cur_line, false, ifs);
 
         // insert basic root mesh information
-        (meshes.back()).name = "root";
-        (meshes.back()).parent = "none";
-        (meshes.back()).chart = "none";
+        _root_mesh_node->mesh_data.name = "root";
+        _root_mesh_node->mesh_data.parent = "none";
+        _root_mesh_node->mesh_data.chart = "none";
       }
 
       // if it is a submesh chunk
       else if(line == "<submesh>")
       {
-        cur_line = parse_mesh_section(cur_line, "sub", ifs);
+        cur_line = _parse_mesh_section(cur_line, true, ifs);
       }
 
       // if it is a cellset chunk
       else if(line == "<cellset>")
       {
-        cur_line = parse_cellset_section(cur_line, ifs);
+        cur_line = _parse_cellset_section(cur_line, ifs);
       }
 
       // if it is the end
@@ -147,7 +174,7 @@ namespace FEAST
 
 
   // parses header-section streams
-  Index MeshReader::parse_header_section(Index cur_line, std::istream& ifs)
+  Index MeshReader::_parse_header_section(Index cur_line, std::istream& ifs)
   {
     CONTEXT("MeshReader::parse_header_section");
 
@@ -172,7 +199,7 @@ namespace FEAST
         {
           throw SyntaxError("Missing version number in line " + stringify(cur_line));
         }
-        version = line;
+        line.parse(_version);
       }
       // if it is the chart-file-path
       else if(line.compare(0, 11, "chart_file ") == 0)
@@ -184,7 +211,7 @@ namespace FEAST
         {
           throw SyntaxError("Missing chart file path in line " + stringify(cur_line));
         }
-        chart_path = line;
+        _chart_path = line;
       }
       // if it is the number of submeshes
       else if(line.compare(0, 10, "submeshes ") == 0)
@@ -196,7 +223,7 @@ namespace FEAST
         {
           throw SyntaxError("Missing number of submeshes in line " + stringify(cur_line));
         }
-        number_of_submeshes = atoi(line.c_str());
+        line.parse(_num_submeshes);
       }
       // if it is the number of cellsets
       else if(line.compare(0, 9, "cellsets ") == 0)
@@ -208,7 +235,7 @@ namespace FEAST
         {
           throw SyntaxError("Missing number of cellsets in line " + stringify(cur_line));
         }
-        number_of_cellsets =  atoi(line.c_str());
+        line.parse(_num_cellsets);
       }
       // if it is the end of the header section
       else if(line == "</header>")
@@ -228,7 +255,7 @@ namespace FEAST
 
 
   // parses/ignores the given info-section stream
-  Index MeshReader::parse_info_section(Index cur_line, std::istream& ifs)
+  Index MeshReader::_parse_info_section(Index cur_line, std::istream& ifs)
   {
     CONTEXT("MeshReader::parse_info_section");
 
@@ -248,7 +275,7 @@ namespace FEAST
 
 
   // parses the given mesh-section stream
-  Index MeshReader::parse_mesh_section(Index cur_line, String flag, std::istream& ifs)
+  Index MeshReader::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
   {
     CONTEXT("MeshReader::parse_mesh_section");
 
@@ -265,18 +292,18 @@ namespace FEAST
     String coord, adj, face, shape, break_line;
 
     // if it is the root mesh
-    if(flag == "root")
+    break_line = submesh ? "</submesh>" : "</mesh>";
+
+    // create a new mesh node
+    MeshNode* mesh_node = new MeshNode();
+    if(!submesh)
     {
-      break_line = "</mesh>";
-    }
-    // if it is a submesh
-    else if(flag == "sub")
-    {
-      break_line = "</submesh>";
+      ASSERT_(_root_mesh_node == nullptr);
+      _root_mesh_node = mesh_node;
     }
 
     // mesh data container of the current mesh
-    MeshDataContainer current_mesh;
+    MeshDataContainer& current_mesh(mesh_node->mesh_data);
 
     // while everything is fine
     while(!ifs.eof() && ifs.good())
@@ -365,7 +392,7 @@ namespace FEAST
           }
 
           // if it is the name and the mesh is a submesh
-          else if(line.compare(0, 5, "name ") == 0 && flag == "sub")
+          else if(line.compare(0, 5, "name ") == 0 && submesh)
           {
             // erase "name "
             line.erase(0, 5);
@@ -378,7 +405,7 @@ namespace FEAST
           }
 
           // if it is the parent (of a submesh)
-          else if(line.compare(0, 7, "parent ") == 0 && flag == "sub")
+          else if(line.compare(0, 7, "parent ") == 0 && submesh)
           {
             // erase "parent "
             line.erase(0, 7);
@@ -391,7 +418,7 @@ namespace FEAST
           }
 
           // if it is the chart
-          else if(line.compare(0, 6, "chart ") == 0 && flag == "sub")
+          else if(line.compare(0, 6, "chart ") == 0 && submesh)
           {
             // erase "chart "
             line.erase(0, 6);
@@ -705,7 +732,7 @@ namespace FEAST
               line.compare(0, 10, "<tria_idx>") == 0 ||
               line.compare(0, 10, "<quad_idx>") == 0 ||
               line.compare(0, 11, "<tetra_idx>") == 0 ||
-              line.compare(0, 10, "<hexa_idx>") == 0) && flag == "sub")
+              line.compare(0, 10, "<hexa_idx>") == 0) && submesh)
       {
 
         std::vector<Index> idx;
@@ -753,7 +780,12 @@ namespace FEAST
       // if it is the end of the mesh section
       else if(line == break_line)
       {
-        meshes.push_back(current_mesh);
+        if(submesh)
+        {
+          MeshNode* parent = _find_sub_mesh_parent(current_mesh.parent);
+          ASSERT_(parent != nullptr);
+          parent->sub_mesh_map.insert(std::make_pair(current_mesh.name, mesh_node));
+        }
         return cur_line;
       }
       else
@@ -769,15 +801,18 @@ namespace FEAST
 
 
   // parses the cellset-section stream ifs
-  Index MeshReader::parse_cellset_section(Index cur_line, std::istream& ifs)
+  Index MeshReader::_parse_cellset_section(Index cur_line, std::istream& ifs)
   {
     CONTEXT("MeshReader::parse_cellset_section");
 
     // (auxiliary) variables
     String line;
 
+    // create a new cell-set node
+    CellSetNode* cell_set_node = new CellSetNode();
+
     // cellset data container of the root mesh
-    CellSetContainer current_set;
+    CellSetContainer& current_set(cell_set_node->cell_set);
 
     while(!ifs.eof() && ifs.good())
     {
@@ -1013,7 +1048,9 @@ namespace FEAST
       // if it is the end of the cellset section
       else if(line == "</cellset>")
       {
-        cell_sets.push_back(current_set);
+        CellSetParent* parent = _find_cell_set_parent(current_set.parent);
+        ASSERT_(parent != nullptr);
+        parent->cell_set_map.insert(std::make_pair(current_set.name, cell_set_node));
         return cur_line;
       }
       else
@@ -1618,33 +1655,53 @@ namespace FEAST
   } // MeshReader::parse_adjacency_file(std::istream& ifs, MeshReader::MeshDataContainer *mesh)
 
   // returns the version
-  String MeshReader::get_version()
+  Index MeshReader::get_version() const
   {
     CONTEXT("MeshReader::get_version()");
-    return version;
+    return _version;
   }
 
   // returns the chart path
-  String MeshReader::get_chart_path()
+  String MeshReader::get_chart_path() const
   {
     CONTEXT("MeshReader::get_chart_path()");
-    return chart_path;
+    return _chart_path;
   }
 
   // returns the number of submeshes
-  Index MeshReader::get_number_of_submeshes()
+  Index MeshReader::get_num_submeshes() const
   {
     CONTEXT("MeshReader::get_number_of_submeshes()");
-    return number_of_submeshes;
+    return _num_submeshes;
   }
 
   // returns the number of cellsets
-  Index MeshReader::get_number_of_cellsets()
+  Index MeshReader::get_num_cellsets() const
   {
     CONTEXT("MeshReader::get_number_of_cellsets()");
-    return number_of_cellsets;
+    return _num_cellsets;
   }
 
+  MeshReader::MeshDataContainer* MeshReader::get_mesh(String name)
+  {
+    CONTEXT("MeshReader::get_mesh()");
+    if(_root_mesh_node == nullptr)
+      return nullptr;
+    if(name.compare_no_case("root") == 0)
+      return &_root_mesh_node->mesh_data;
+    MeshNode* node = _root_mesh_node->find_sub_mesh(name);
+    return (node != nullptr) ? &node->mesh_data : nullptr;
+  }
+
+  MeshReader::CellSetContainer* MeshReader::get_cell_set(String name)
+  {
+    CONTEXT("MeshReader::get_mesh()");
+    if(_root_mesh_node == nullptr)
+      return nullptr;
+    CellSetNode* node = _root_mesh_node->find_cell_set(name);
+    return (node != nullptr) ? &node->cell_set : nullptr;
+  }
+  /*
   // returns the mesh with the name "mesh_name"
   std::pair<MeshReader::MeshDataContainer, bool> MeshReader::get_mesh(String mesh_name)
   {
@@ -1694,5 +1751,5 @@ namespace FEAST
     CONTEXT("MeshReader::no_cellsets()");
     return cell_sets.empty();
   }
-
+  */
 } //namespace FEAST

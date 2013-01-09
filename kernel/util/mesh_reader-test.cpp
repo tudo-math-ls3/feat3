@@ -126,26 +126,19 @@ public:
     reader.parse_mesh_file(ioss);
 
     // check members
-    TEST_CHECK_EQUAL(reader.get_version(), "1");
+    TEST_CHECK_EQUAL(reader.get_version(), Index(1));
     TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
-    TEST_CHECK_EQUAL(reader.get_number_of_submeshes(), Index(1));
-    TEST_CHECK_EQUAL(reader.get_number_of_cellsets(), Index(0));
-
-    // check the cellset stack
-    TEST_CHECK_EQUAL(reader.no_cellsets(), true);
-
-    // check the mesh stack
-    TEST_CHECK_EQUAL(reader.no_meshes(), false);
+    TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(1));
+    TEST_CHECK_EQUAL(reader.get_num_cellsets(), Index(0));
 
     // test the get_mesh function
-    std::pair<MeshReader::MeshDataContainer, bool> root_mesh_pair;
-    root_mesh_pair = reader.get_mesh("rooot");
-    TEST_CHECK_EQUAL(root_mesh_pair.second, false);
+    MeshReader::MeshDataContainer* root_mesh_ptr = reader.get_mesh("rooot");
+    TEST_CHECK_EQUAL(root_mesh_ptr, ((MeshReader::MeshDataContainer*)nullptr));
 
-    root_mesh_pair = reader.get_mesh("root");
-    TEST_CHECK_EQUAL(root_mesh_pair.second, true);
+    root_mesh_ptr = reader.get_mesh("root");
+    TEST_CHECK_NOT_EQUAL(root_mesh_ptr, ((MeshReader::MeshDataContainer*)nullptr));
 
-    MeshReader::MeshDataContainer root_mesh = root_mesh_pair.first;
+    MeshReader::MeshDataContainer& root_mesh(*root_mesh_ptr);
 
     // check the root mesh data
     TEST_CHECK_EQUAL(root_mesh.name , "root");
@@ -167,7 +160,7 @@ public:
     TEST_CHECK_EQUAL(root_mesh.adj_path, "");
 
     // check the root mesh coordinates
-    std::vector<std::vector<double> > coords = root_mesh.coords;
+    std::vector<std::vector<double> >& coords = root_mesh.coords;
 
     // reference coordinates
     double coords_ref[] =
@@ -271,11 +264,10 @@ public:
     // check the sub mesh data
     //
 
-    std::pair<MeshReader::MeshDataContainer, bool> sub_mesh_pair;
-    sub_mesh_pair = reader.get_mesh("outer");
-    TEST_CHECK_EQUAL(sub_mesh_pair.second, true);
+    MeshReader::MeshDataContainer* sub_mesh_ptr = reader.get_mesh("outer");
+    TEST_CHECK_NOT_EQUAL(sub_mesh_ptr, ((MeshReader::MeshDataContainer*)nullptr));
 
-    MeshReader::MeshDataContainer sub_mesh = sub_mesh_pair.first;
+    MeshReader::MeshDataContainer& sub_mesh(*sub_mesh_ptr);
     TEST_CHECK_EQUAL(sub_mesh.name , "outer");
     TEST_CHECK_EQUAL(sub_mesh.parent , "root");
     TEST_CHECK_EQUAL(sub_mesh.chart , "");
@@ -295,7 +287,7 @@ public:
     TEST_CHECK_EQUAL(sub_mesh.adj_path, "");
 
     // check the sub mesh coordinates
-    std::vector<std::vector<double> > coords_sub = sub_mesh.coords;
+    std::vector<std::vector<double> >& coords_sub = sub_mesh.coords;
 
     // reference coordinates
     double coords_sub_ref[] =
