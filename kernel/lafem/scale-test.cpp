@@ -14,13 +14,13 @@ template<
   typename Algo_,
   typename DT_>
 class DVScaleTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DVScaleTest()
-    : TaggedTest<Arch_, DT_>("dv_scale_test")
+    : TaggedTest<Arch_, DT_, Algo_>("dv_scale_test")
   {
   }
 

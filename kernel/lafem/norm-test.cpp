@@ -13,13 +13,13 @@ template<
   typename Algo_,
   typename DT_>
 class DVNorm2Test
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DVNorm2Test()
-    : TaggedTest<Arch_, DT_>("dv_norm2_test")
+    : TaggedTest<Arch_, DT_, Algo_>("dv_norm2_test")
   {
   }
 

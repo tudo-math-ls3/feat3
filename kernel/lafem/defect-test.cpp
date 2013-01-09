@@ -16,13 +16,13 @@ template<
   typename DT_,
   typename SM_>
 class DefectTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DefectTest()
-    : TaggedTest<Arch_, DT_>("defect_test: " + SM_::type_name())
+    : TaggedTest<Arch_, DT_, Algo_>("defect_test: " + SM_::type_name())
   {
   }
 

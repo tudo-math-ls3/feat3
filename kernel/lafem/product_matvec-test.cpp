@@ -18,13 +18,13 @@ template<
   typename DT_,
   typename SM_>
 class ProductTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   ProductTest()
-    : TaggedTest<Arch_, DT_>("product_matvec_test: " + SM_::type_name())
+    : TaggedTest<Arch_, DT_, Algo_>("product_matvec_test: " + SM_::type_name())
   {
   }
 

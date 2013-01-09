@@ -17,13 +17,13 @@ template<
   typename Algo_,
   typename DT_>
 class DVSumTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DVSumTest()
-    : TaggedTest<Arch_, DT_>("dv_sum_test")
+    : TaggedTest<Arch_, DT_, Algo_>("dv_sum_test")
   {
   }
 
@@ -86,13 +86,13 @@ template<
   typename Algo_,
   typename DT_>
 class SMCSRSumTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   SMCSRSumTest()
-    : TaggedTest<Arch_, DT_>("smcsr_sum_test")
+    : TaggedTest<Arch_, DT_, Algo_>("smcsr_sum_test")
   {
   }
 

@@ -14,13 +14,13 @@ template<
   typename Algo_,
   typename DT_>
 class DVDotProductTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DVDotProductTest()
-    : TaggedTest<Arch_, DT_>("dv_dot_product_test")
+    : TaggedTest<Arch_, DT_, Algo_>("dv_dot_product_test")
   {
   }
 

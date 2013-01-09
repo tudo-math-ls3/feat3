@@ -17,13 +17,13 @@ template<
   typename Algo_,
   typename DT_>
 class DVAxpyTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DVAxpyTest()
-    : TaggedTest<Arch_, DT_>("dv_axpy_test")
+    : TaggedTest<Arch_, DT_, Algo_>("dv_axpy_test")
   {
   }
 
@@ -82,13 +82,13 @@ template<
   typename Algo_,
   typename DT_>
 class DVAxpyVTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DVAxpyVTest()
-    : TaggedTest<Arch_, DT_>("dv_axpy_v_test")
+    : TaggedTest<Arch_, DT_, Algo_>("dv_axpy_v_test")
   {
   }
 
@@ -153,12 +153,12 @@ template<
   typename DT_,
   typename SM_>
 class DVAxpyMVTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
   DVAxpyMVTest()
-    : TaggedTest<Arch_, DT_>("dv_axpy_mv_test: " + SM_::type_name())
+    : TaggedTest<Arch_, DT_, Algo_>("dv_axpy_mv_test: " + SM_::type_name())
   {
   }
 

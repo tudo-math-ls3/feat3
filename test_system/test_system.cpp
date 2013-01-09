@@ -37,8 +37,11 @@ int main(int argc, char** argv)
     CONTEXT("When running test case '" + (*i)->id() + ":");
     try
     {
-      std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id() + " [Memory: "
-        << (*i)->get_memory_name() << "]" << " [Precision: "<< (*i)->get_prec_name() << "]" << std::endl;
+      std::cout << "(" << iterator_index << "/" << list_size << ") " << (*i)->id()
+        << " [Memory: " << (*i)->get_memory_name() << "]"
+        << " [Algo: " << (*i)->get_algo_name() << "]"
+        << " [Precision: "<< (*i)->get_prec_name() << "]"
+        << std::endl;
       (*i)->run();
       std::cout << "PASSED" << std::endl;
       ++tests_passed;

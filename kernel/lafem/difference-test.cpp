@@ -14,13 +14,13 @@ template<
   typename Algo_,
   typename DT_>
 class DVDifferenceTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   DVDifferenceTest()
-    : TaggedTest<Arch_, DT_>("dv_difference_test")
+    : TaggedTest<Arch_, DT_, Algo_>("dv_difference_test")
   {
   }
 

@@ -17,13 +17,13 @@ template<
   typename Algo_,
   typename DT_>
 class BiCGStabTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   BiCGStabTest()
-    : TaggedTest<Arch_, DT_>("bicgstab_test")
+    : TaggedTest<Arch_, DT_, Algo_>("bicgstab_test")
   {
   }
 

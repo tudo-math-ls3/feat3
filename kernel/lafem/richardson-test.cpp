@@ -17,13 +17,13 @@ template<
   typename Algo_,
   typename DT_>
 class RichardsonTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   RichardsonTest()
-    : TaggedTest<Arch_, DT_>("richardson_test")
+    : TaggedTest<Arch_, DT_, Algo_>("richardson_test")
   {
   }
 

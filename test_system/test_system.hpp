@@ -158,6 +158,8 @@ namespace FEAST
       String _tag_name;
       /// precision description String
       String _prec_name;
+      /// algorithm description String
+      String _algo_name;
 
 
     public:
@@ -171,7 +173,8 @@ namespace FEAST
       BaseTest(const String& id)
         : _id(id),
         _tag_name(Type::Traits<Archs::None>::name()),
-        _prec_name(Type::Traits<Archs::None>::name())
+        _prec_name(Type::Traits<Archs::None>::name()),
+        _algo_name(Type::Traits<Archs::None>::name())
       {
         TestList::instance()->register_test(this);
       }
@@ -210,6 +213,12 @@ namespace FEAST
       virtual String get_prec_name()
       {
         return _prec_name;
+      }
+
+      /// returns our used algorithm platform
+      virtual String get_algo_name()
+      {
+        return _algo_name;
       }
 
       /// utility class used by TEST_CHECK_EQUAL
@@ -352,7 +361,8 @@ namespace FEAST
      */
     template<
       typename Tag_,
-      typename DataType_>
+      typename DataType_,
+      typename Algo_ = Archs::None>
     class TaggedTest
       : public BaseTest
     {
@@ -368,6 +378,7 @@ namespace FEAST
       {
         _tag_name = Type::Traits<Tag_>::name();
         _prec_name = Type::Traits<DataType_>::name();
+        _algo_name = Type::Traits<Algo_>::name();
       };
 
       /// DTOR

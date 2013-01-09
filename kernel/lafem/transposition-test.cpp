@@ -10,17 +10,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Tag_,
+  typename Arch_,
   typename Algo_,
   typename DT_>
 class TranspositionTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
   TranspositionTest()
-    : TaggedTest<Tag_, DT_>("transposition_test")
+    : TaggedTest<Arch_, DT_, Algo_>("transposition_test")
   {
   }
 
@@ -39,9 +39,9 @@ public:
             a_local(row, col, DT_(-1));
         }
       }
-      SparseMatrixCSR<Tag_, DT_> a(a_local);
+      SparseMatrixCSR<Arch_, DT_> a(a_local);
 
-      SparseMatrixCSR<Tag_, DT_> b;
+      SparseMatrixCSR<Arch_, DT_> b;
       b = Transposition<Algo_>::value(a);
 
       for (Index i(0) ; i < a.rows() ; ++i)
