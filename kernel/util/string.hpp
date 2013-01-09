@@ -591,6 +591,14 @@ namespace FEAST
   {
     return String(item ? "true" : "false");
   }
+
+#ifdef HAVE_CPP11_NULLPTR
+  inline String stringify(std::nullptr_t)
+  {
+    return String("nullptr");
+  }
+#endif // HAVE_CPP11_NULLPTR
+
   /// \endcond
 } // namespace FEAST
 
