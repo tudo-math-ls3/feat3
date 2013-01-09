@@ -584,6 +584,7 @@
     <ClInclude Include="..\kernel\geometry\intern\vertex_abacus.hpp" />
     <ClInclude Include="..\kernel\geometry\macro_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\mesh_node.hpp" />
+    <ClInclude Include="..\kernel\geometry\mesh_reader_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\patch_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\struct_index_set.hpp" />
