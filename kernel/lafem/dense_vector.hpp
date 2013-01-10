@@ -124,7 +124,7 @@ namespace FEAST
 
           std::vector<DT_> data;
 
-          std::ifstream file(filename.c_str(), std::ifstream::out);
+          std::ifstream file(filename.c_str(), std::ifstream::in);
           if (! file.is_open())
             throw InternalError("Unable to open Vector file " + filename);
 
@@ -304,14 +304,16 @@ namespace FEAST
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
           MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));
 
-          FILE* file;
-          file = fopen(filename.c_str(), "w");
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError("Unable to open Vector file " + filename);
+
           for (Index i(0) ; i < this->_size ; ++i)
           {
-            fprintf(file, "%E\n", (double)temp[i]);
+            file << std::scientific << (double)temp[i] << std::endl;
           }
 
-          fclose(file);
+          file.close();
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
         }
 

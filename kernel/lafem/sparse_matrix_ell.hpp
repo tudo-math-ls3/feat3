@@ -238,30 +238,20 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixELL");
 
-          FILE* file(NULL);
-          file = fopen(filename.c_str(), "rb");
-          if (file == NULL)
-            throw InternalError("File "+filename+" not found!");
+          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+
           uint64_t size;
           uint64_t rows;
           uint64_t columns;
           uint64_t stride;
           uint64_t num_cols_per_row;
-          size_t status = fread(&size, sizeof(uint64_t), 1, file);
-          if (status != 1u)
-            throw InternalError("fread error!");
-          status = fread(&rows, sizeof(uint64_t), 1, file);
-          if (status != 1u)
-            throw InternalError("fread error!");
-          status = fread(&columns, sizeof(uint64_t), 1, file);
-          if (status != 1u)
-            throw InternalError("fread error!");
-          status = fread(&stride, sizeof(uint64_t), 1, file);
-          if (status != 1u)
-            throw InternalError("fread error!");
-          status = fread(&num_cols_per_row, sizeof(uint64_t), 1, file);
-          if (status != 1u)
-            throw InternalError("fread error!");
+          file.read((char *)&size, sizeof(uint64_t));
+          file.read((char *)&rows, sizeof(uint64_t));
+          file.read((char *)&columns, sizeof(uint64_t));
+          file.read((char *)&stride, sizeof(uint64_t));
+          file.read((char *)&num_cols_per_row, sizeof(uint64_t));
 
           this->_size = Index(rows * columns);
           _rows = Index(rows);
@@ -271,19 +261,16 @@ namespace FEAST
           _zero_element = 0u;
 
           uint64_t * cAj = new uint64_t[size];
-          status = fread(cAj, sizeof(uint64_t), size, file);
-          if ((unsigned long)status != size)
-            throw InternalError("fread error!");
+          file.read((char *)cAj, size * sizeof(uint64_t));
           _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
           for (Index i(0) ; i < size ; ++i)
             _Aj[i] = Index(cAj[i]);
           delete[] cAj;
 
           double * cAx = new double[size];
-          status = fread(cAx, sizeof(double), size, file);
-          if ((unsigned long)status != size)
-            throw InternalError("fread error!");
-          fclose(file);
+          file.read((char *)cAx, size * sizeof(double));
+          file.close();
+
           _Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
             _Ax[i] = DT_(cAx[i]);
@@ -519,22 +506,25 @@ namespace FEAST
             cAx[i] = Ax[i];
           MemoryPool<Mem::Main>::instance()->release_memory(Ax);
 
-          FILE* file;
-          file = fopen(filename.c_str(), "wb");
+          std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+
           uint64_t size(_num_cols_per_row * _stride);
           uint64_t rows(_rows);
           uint64_t columns(_columns);
           uint64_t stride(_stride);
           uint64_t num_cols_per_row(_num_cols_per_row);
-          fwrite(&size, sizeof(uint64_t), 1, file);
-          fwrite(&rows, sizeof(uint64_t), 1, file);
-          fwrite(&columns, sizeof(uint64_t), 1, file);
-          fwrite(&stride, sizeof(uint64_t), 1, file);
-          fwrite(&num_cols_per_row, sizeof(uint64_t), 1, file);
-          fwrite(cAj, sizeof(uint64_t), size, file);
-          fwrite(cAx, sizeof(double), size, file);
+          file.write((const char *)&size, sizeof(uint64_t));
+          file.write((const char *)&rows, sizeof(uint64_t));
+          file.write((const char *)&columns, sizeof(uint64_t));
+          file.write((const char *)&stride, sizeof(uint64_t));
+          file.write((const char *)&num_cols_per_row, sizeof(uint64_t));
+          file.write((const char *)cAj, size * sizeof(uint64_t));
+          file.write((const char *)cAx, size * sizeof(double));
 
-          fclose(file);
+          file.close();
+
           delete[] cAj;
           delete[] cAx;
         }
