@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/conformal_sub_mesh.hpp>
 #include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/index_calculator.hpp>
 #include <kernel/util/mesh_reader.hpp>
@@ -26,6 +27,11 @@ namespace FEAST
     template<typename Mesh_>
     class MeshReaderFactory DOXY({});
 
+    /**
+     * \brief MeshReaderFactory implementation for ConformalMesh
+     *
+     * \author Peter Zajac
+     */
     template<
       typename Shape_,
       int num_coords_,
@@ -99,6 +105,11 @@ namespace FEAST
     }; // class MeshReaderFactory<ConformalMesh<...>>
 
 
+    /**
+     * \brief MeshReaderFactory implementation for CellSubSet
+     *
+     * \author Peter Zajac
+     */
     template<typename Shape_>
     class MeshReaderFactory< CellSubSet<Shape_> > :
       public Factory< CellSubSet<Shape_> >
@@ -165,6 +176,115 @@ namespace FEAST
         Intern::MeshReaderTargeter<Shape_>::wrap(target_set_holder, _target_data->parent_indices);
       }
     }; // class MeshReaderFactory<CellSubSet<...>>
+
+    /**
+     * \brief MeshReaderFactory implementation for ConformalSubMesh
+     *
+     * \author Peter Zajac
+     */
+    template<
+      typename Shape_,
+      typename Coord_>
+    class MeshReaderFactory< ConformalSubMesh<Shape_, Coord_> > :
+      public Factory< ConformalSubMesh<Shape_, Coord_> >
+    {
+    public:
+      /// mesh typedef
+      typedef ConformalSubMesh<Shape_, Coord_> MeshType;
+      /// vertex set type
+      typedef typename MeshType::VertexSetType VertexSetType;
+      /// index set holder type
+      typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
+      /// target set holder type
+      typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
+
+    private:
+      MeshReader& _mesh_reader;
+      String _name;
+      MeshReader::MeshDataContainer* _mesh_data;
+
+    public:
+      explicit MeshReaderFactory(MeshReader& mesh_reader, String name) :
+        _mesh_reader(mesh_reader),
+        _name(name),
+        _mesh_data(nullptr)
+      {
+        MeshReader::MeshNode* root(_mesh_reader.get_root_mesh_node());
+        ASSERT_(root != nullptr);
+
+        // try to find a sub-mesh node
+        MeshReader::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
+        if(sub_mesh_node != nullptr)
+        {
+          _mesh_data = &sub_mesh_node->mesh_data;
+          return;
+        }
+
+        // no child with 'name' found
+        throw InternalError("No sub-mesh found with name '" + name + "'");
+      }
+
+      virtual Index get_num_entities(int dim)
+      {
+        switch(dim)
+        {
+        case 0:
+          return _mesh_data->vertex_number;
+        case 1:
+          return _mesh_data->edge_number;
+        case 2:
+          return _mesh_data->tria_number + _mesh_data->quad_number;
+        case 3:
+          return _mesh_data->tetra_number + _mesh_data->hexa_number;
+        default:
+          return 0;
+        }
+      }
+
+      virtual int get_num_coords()
+      {
+        return int(_mesh_data->coord_per_vertex);
+      }
+
+      virtual int get_vertex_stride()
+      {
+        return get_num_coords();
+      }
+
+      virtual void fill_vertex_set(VertexSetType& vertex_set)
+      {
+        const int num_coords = get_num_coords();
+        const Index num_vertices(Index(_mesh_data->coords.size()));
+
+        for(Index i(0); i < num_vertices; ++i)
+        {
+          // get a reference to the corresponding vertex
+          MeshReader::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
+
+          ASSERT(int(vtx.size()) == num_coords, "Vertex coordinate count mismatch!");
+
+          // copy vertex coordinates
+          for(int j(0); j < num_coords; ++j)
+          {
+            vertex_set[i][j] = Coord_(vtx[j]);
+          }
+        }
+      }
+
+      virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
+      {
+        // call wrapper
+        Intern::MeshReaderIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);
+
+        // build redundant index sets
+        RedundantIndexSetBuilder<Shape_>::compute(index_set_holder);
+      }
+
+      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+      {
+        Intern::MeshReaderTargeter<Shape_>::wrap(target_set_holder, _mesh_data->parent_indices);
+      }
+    }; // class MeshReaderFactory<ConformalSubMesh<...>>
 
     /// \cond internal
     namespace Intern
@@ -241,7 +361,7 @@ namespace FEAST
         typedef std::vector<Index> ParentIndices[4];
         static void wrap(TargetSetHolder<Shape::Vertex>& tsh, ParentIndices& pi)
         {
-          apply(tsh.template get_target_set<0>(), pi[0]);
+          apply(tsh.get_target_set<0>(), pi[0]);
         }
 
         static void apply(TargetSet& trg, std::vector<Index>& pix)

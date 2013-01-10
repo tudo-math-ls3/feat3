@@ -10,6 +10,9 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # applications to build
+ADD_EXECUTABLE(dbg-bcasm dbg_bcasm/dbg_bcasm.cpp)
+TARGET_LINK_LIBRARIES(dbg-bcasm feast)
+
 ADD_EXECUTABLE(dbg-cub dbg_cub/dbg_cub.cpp)
 TARGET_LINK_LIBRARIES(dbg-cub feast)
 
@@ -19,8 +22,8 @@ TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)
 ADD_EXECUTABLE(dbg-mirror dbg_mirror/dbg_mirror.cpp)
 TARGET_LINK_LIBRARIES(dbg-mirror feast)
 
-ADD_EXECUTABLE(dbg-bcasm dbg_bcasm/dbg_bcasm.cpp)
-TARGET_LINK_LIBRARIES(dbg-bcasm feast)
-
 ADD_EXECUTABLE(dbg-nodefunc dbg_nodefunc/dbg_nodefunc.cpp)
 TARGET_LINK_LIBRARIES(dbg-nodefunc feast)
+
+ADD_EXECUTABLE(dbg-reader dbg_reader/dbg_reader.cpp)
+TARGET_LINK_LIBRARIES(dbg-reader feast)
