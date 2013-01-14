@@ -189,37 +189,31 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   BaseMeshType* macro_mesh_geo_fine = new BaseMeshType(macro_mesh_geo);
   CellSubSet<Shape::Hypercube<2> >* macro_subset_geo_fine = new CellSubSet<Shape::Hypercube<2> >(macro_subset_geo);
 
-  ///TODO what is with these copy-CTORS??
   for(int i(0) ; i < desired_refinement_level - (log(num_patches) / log(4)) ; ++i)
   {
     BaseMeshType* coarse_macro_basemesh_fine(macro_basemesh_fine);
+    BaseMeshType* coarse_macro_mesh_geo_fine(macro_mesh_geo_fine);
+    CellSubSet<Shape::Hypercube<2> >* coarse_macro_subset_geo_fine(macro_subset_geo_fine);
     {
       Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_basemesh_fine);
       macro_basemesh_fine = new BaseMeshType(refinery_0);
-    }
-    //delete coarse_macro_basemesh_fine;
-  }
-  for(int i(0) ; i < desired_refinement_level - (log(num_patches) / log(4)) ; ++i)
-  {
-    BaseMeshType* coarse_macro_mesh_geo_fine(macro_mesh_geo_fine);
-    {
       Geometry::StandardRefinery<BaseMeshType> refinery_1(*coarse_macro_mesh_geo_fine);
       macro_mesh_geo_fine = new BaseMeshType(refinery_1);
-    }
-    //delete coarse_macro_mesh_geo_fine;
-  }
-  for(int i(0) ; i < desired_refinement_level - (log(num_patches) / log(4)) ; ++i)
-  {
-    CellSubSet<Shape::Hypercube<2> >* coarse_macro_subset_geo_fine(macro_subset_geo_fine);
-    {
       Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, BaseMeshType> refinery_2(*coarse_macro_subset_geo_fine, *macro_basemesh_fine);
       macro_subset_geo_fine = new CellSubSet<Shape::Hypercube<2> >(refinery_2);
     }
     delete coarse_macro_subset_geo_fine;
+    delete coarse_macro_mesh_geo_fine;
+    //delete coarse_macro_basemesh_fine; //TODO why can u not deallocate this
   }
+  /*std::cout << (*macro_basemesh_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
+  std::cout << (*macro_mesh_geo_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
+  std::cout << (*macro_subset_geo_fine).get_num_entities(1) << std::endl;*/
+
 
   delete macro_basemesh;
 }
+
 
 int main(int argc, char* argv[])
 {
