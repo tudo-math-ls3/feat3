@@ -242,6 +242,35 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   }
 
   std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_boundaries_fine;
+  for(Index i(0) ; i < macro_boundaries_found.size() ; ++i)
+  {
+    Index* polytopes_in_subset = new Index[3];
+    if(macro_boundaries_found.at(i)->get_level() == pl_vertex)
+      HaloControl<dim_1D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), polytopes_in_subset);
+    else
+      HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), polytopes_in_subset);
+
+    Geometry::CellSubSet<Shape::Hypercube<2> >* cell_sub_set_fine(new Geometry::CellSubSet<Shape::Hypercube<2> >(polytopes_in_subset));
+
+    if(macro_boundaries_found.at(i)->get_level() == pl_vertex)
+      HaloControl<dim_1D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), *cell_sub_set_fine);
+    else
+      HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), *cell_sub_set_fine);
+
+    for(Index j(0) ; j < desired_refinement_level - (log(num_patches) / log(4)) ; ++j)
+    {
+      CellSubSet<Shape::Hypercube<2> >* coarse_cell_sub_set_fine(cell_sub_set_fine);
+      //refine
+      {
+        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_basemesh);
+        cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
+      }
+      delete coarse_cell_sub_set_fine;
+    }
+    //add
+    macro_boundaries_fine.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(*cell_sub_set_fine)));
+    delete[] polytopes_in_subset;
+  }
 
   delete macro_basemesh;
 }
