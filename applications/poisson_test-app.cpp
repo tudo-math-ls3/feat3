@@ -195,17 +195,18 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     CellSubSet<Shape::Hypercube<2> >* coarse_macro_subset_geo_fine(macro_subset_geo_fine);
     {
       Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_basemesh_fine);
-      macro_basemesh_fine = new BaseMeshType(refinery_0);
       Geometry::StandardRefinery<BaseMeshType> refinery_1(*coarse_macro_mesh_geo_fine);
-      macro_mesh_geo_fine = new BaseMeshType(refinery_1);
       Geometry::StandardRefinery<CellSubSet<Shape::Hypercube<2> >, BaseMeshType> refinery_2(*coarse_macro_subset_geo_fine, *macro_basemesh_fine);
       macro_subset_geo_fine = new CellSubSet<Shape::Hypercube<2> >(refinery_2);
+      macro_mesh_geo_fine = new BaseMeshType(refinery_1);
+      macro_basemesh_fine = new BaseMeshType(refinery_0);
     }
-    delete coarse_macro_subset_geo_fine;
-    delete coarse_macro_mesh_geo_fine;
     //delete coarse_macro_basemesh_fine; //TODO why can u not deallocate this
+    delete coarse_macro_mesh_geo_fine;
+    delete coarse_macro_subset_geo_fine;
   }
-  /*std::cout << (*macro_basemesh_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
+  /*
+  std::cout << (*macro_basemesh_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
   std::cout << (*macro_mesh_geo_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
   std::cout << (*macro_subset_geo_fine).get_num_entities(1) << std::endl;*/
 
@@ -233,12 +234,12 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       //refine
       {
         Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_basemesh_temp);
-        macro_basemesh_temp = new BaseMeshType(refinery_0);
         Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_basemesh_temp);
         cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
+        macro_basemesh_temp = new BaseMeshType(refinery_0);
       }
-      delete coarse_cell_sub_set_fine;
-      //delete coarse_macro_basemesh_temp;
+      delete coarse_macro_basemesh_temp;
+      //delete coarse_cell_sub_set_fine;
     }
     delete macro_basemesh_temp;
     //add
@@ -246,7 +247,6 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     delete[] polytopes_in_subset;
   }
 
-  //TODO!!!!!!reference mesh refinement
   std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_boundaries_fine;
   for(Index i(0) ; i < macro_boundaries_found.size() ; ++i)
   {
@@ -271,12 +271,12 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       //refine
       {
         Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_basemesh_temp);
-        macro_basemesh_temp = new BaseMeshType(refinery_0);
         Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_basemesh_temp);
         cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
+        macro_basemesh_temp = new BaseMeshType(refinery_0);
       }
-      delete coarse_cell_sub_set_fine;
-      //delete coarse_macro_basemesh_temp;
+      delete coarse_macro_basemesh_temp;
+      //delete coarse_cell_sub_set_fine;
     }
     delete macro_basemesh_temp;
     //add
