@@ -232,7 +232,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       //refine
       {
         //TODO!!!!!!reference mesh refinement
-        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, macro_mesh_geo);
+        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_basemesh);
         cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
       }
       delete coarse_cell_sub_set_fine;
