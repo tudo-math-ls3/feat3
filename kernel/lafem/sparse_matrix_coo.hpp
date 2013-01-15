@@ -11,12 +11,21 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 
 
 namespace FEAST
 {
   namespace LAFEM
   {
+    //forward declarations
+    template <typename Arch_, typename DT_>
+    class SparseMatrixELL;
+
+    template <typename Arch_, typename DT_>
+    class SparseMatrixCSR;
+
     template <typename Arch_, typename DT_>
     class SparseMatrixCOO : public Container<Arch_, DT_>
     {
@@ -89,6 +98,58 @@ namespace FEAST
         /**
          * \brief Constructor
          *
+         * \param[in] other The source ell matrix.
+         *
+         * Creates a matrix from the given source matrix.
+         */
+        explicit SparseMatrixCOO(const SparseMatrixELL<Mem::Main, DT_> & other) :
+          Container<Mem::Main, DT_>(other.rows() * other.columns()),
+          _rows(other.rows()),
+          _columns(other.columns()),
+          _zero_element(DT_(0)),
+          _used_elements(other.used_elements())
+        {
+          CONTEXT("When creating SparseMatrixCOO from SparseMatrixELL");
+
+          for (Index i(0) ; i < other.num_cols_per_row() * other.stride() ; ++i)
+          {
+            if (other.Ax()[i] != DT_(0))
+            {
+              (*this)(i%other.stride(), other.Aj()[i], other.Ax()[i]);
+            }
+          }
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] other The source csr matrix.
+         *
+         * Creates a matrix from the given source matrix.
+         */
+        explicit SparseMatrixCOO(const SparseMatrixCSR<Mem::Main, DT_> & other) :
+          Container<Mem::Main, DT_>(other.rows() * other.columns()),
+          _rows(other.rows()),
+          _columns(other.columns()),
+          _zero_element(DT_(0)),
+          _used_elements(other.used_elements())
+        {
+          for (Index row(0) ; row < _rows ; ++row)
+          {
+            const Index end(other.row_ptr_end()[row]);
+            for (Index i(other.row_ptr()[row]) ; i < end ; ++i)
+            {
+              if (other.val()[i] != DT_(0))
+              {
+                (*this)(row, other.col_ind()[i], other.val()[i]);
+              }
+            }
+          }
+        }
+
+        /**
+         * \brief Constructor
+         *
          * \param[in] graph The Graph, the matrix will be created from.
          *
          * Creates a matrix from a given graph.
@@ -112,6 +173,81 @@ namespace FEAST
               (*this)(i, *it, DT_(0));
             }
           }
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] filename The source file to be read in.
+         *
+         * Creates a matrix based on the source file.
+         */
+        explicit SparseMatrixCOO(FileMode mode, String filename) :
+          Container<Mem::Main, DT_>(0),
+          _rows(0),
+          _columns(0)
+        {
+          CONTEXT("When creating SparseMatrixELL");
+
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+
+          std::vector<Index> rowsv;
+          std::vector<Index> colsv;
+          std::vector<DT_> valsv;
+
+          String line;
+          std::getline(file, line);
+          while(!file.eof())
+          {
+            std::getline(file, line);
+
+            if(line.find("]", 0) < line.npos)
+              break;
+
+            if(line[line.size()-1] == ';')
+              line.resize(line.size()-1);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row(atol(srow.c_str()));
+            --row;
+            _rows = std::max(row+1, _rows);
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col(atol(scol.c_str()));
+            --col;
+            _columns = std::max(col+1, _columns);
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ val(atof(sval.c_str()));
+
+            rowsv.push_back(row);
+            colsv.push_back(col);
+            valsv.push_back(val);
+
+          }
+          this->_size = this->_rows * this->_columns;
+
+          for (Index i(0) ; i < rowsv.size() ; ++i)
+          {
+            (*this)(rowsv.at(i), colsv.at(i), valsv.at(i));
+          }
+
+
+
+          file.close();
         }
 
         /**

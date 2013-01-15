@@ -80,6 +80,25 @@ public:
     TEST_CHECK_EQUAL(e, c);
 
     TEST_CHECK_NOT_EQUAL((unsigned long)e.val(), (unsigned long)c.val());
+
+    SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 10);
+    for (unsigned long row(0) ; row < fcoo.rows() ; ++row)
+    {
+      for (unsigned long col(0) ; col < fcoo.columns() ; ++col)
+      {
+        if(row == col)
+          fcoo(row, col, DT_(2));
+        else if((row == col+1) || (row+1 == col))
+          fcoo(row, col, DT_(-1));
+      }
+    }
+    SparseMatrixCSR<Arch_, DT_> f(fcoo);
+
+    f.write_out(fm_m, "test.m");
+    SparseMatrixCOO<Mem::Main, DT_> h(f);
+    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, "test.m");
+    TEST_CHECK_EQUAL(i, h);
+    remove("test.m");
   }
 };
 SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;

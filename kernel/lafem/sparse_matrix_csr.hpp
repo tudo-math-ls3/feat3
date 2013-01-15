@@ -526,6 +526,59 @@ namespace FEAST
         }
 
         /**
+         * \brief Write out matrix to file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out(FileMode mode, String filename) const
+        {
+          CONTEXT("When writing out SparseMatrixCSR");
+
+          switch(mode)
+          {
+            /*case fm_ell:
+              write_out_csr(filename);
+              break;*/
+            case fm_m:
+              write_out_m(filename);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Write out matrix to matlab m file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_m(String filename) const
+        {
+          SparseMatrixCSR<Mem::Main, DT_> temp(*this);
+
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+
+          file << "data = [" << std::endl;
+          for (Index row(0) ; row < _rows ; ++row)
+          {
+            const Index end(temp.row_ptr_end()[row]);
+            for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
+            {
+              if (temp.val()[i] != DT_(0))
+              {
+                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << (double)temp.val()[i] << ";" << std::endl;
+              }
+            }
+          }
+          file << "];" << std::endl;
+          file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
+          file.close();
+        }
+
+        /**
          * \brief Retrieve specific matrix element.
          *
          * \param[in] row The row of the matrix element.

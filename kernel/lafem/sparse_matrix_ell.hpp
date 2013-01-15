@@ -229,7 +229,7 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] other The source file in HONEI ELL format.
+         * \param[in] filename The source file in HONEI ELL format.
          *
          * Creates a ELL matrix based on the source file.
          */
@@ -258,7 +258,7 @@ namespace FEAST
           _columns = Index(columns);
           _stride = Index(stride);
           _num_cols_per_row = Index(num_cols_per_row);
-          _zero_element = 0u;
+          _zero_element = DT_(0);
 
           uint64_t * cAj = new uint64_t[size];
           file.read((char *)cAj, size * sizeof(uint64_t));
@@ -483,11 +483,33 @@ namespace FEAST
         /**
          * \brief Write out matrix to file.
          *
+         * \param[in] mode The used file format.
          * \param[in] filename The file where the matrix shall be stored.
          */
-        void write_out(String filename) const
+        void write_out(FileMode mode, String filename) const
         {
           CONTEXT("When writing out SparseMatrixELL");
+
+          switch(mode)
+          {
+            case fm_ell:
+              write_out_ell(filename);
+              break;
+            case fm_m:
+              write_out_m(filename);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Write out matrix to ell binary file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_ell(String filename) const
+        {
 
           if (typeid(DT_) != typeid(double))
             std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
@@ -527,6 +549,32 @@ namespace FEAST
 
           delete[] cAj;
           delete[] cAx;
+        }
+
+        /**
+         * \brief Write out matrix to matlab m file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_m(String filename) const
+        {
+          SparseMatrixELL<Mem::Main, DT_> temp(*this);
+
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+
+          file << "data = [" << std::endl;
+          for (Index i(0) ; i < _num_cols_per_row * _stride ; ++i)
+          {
+            if (temp.Ax()[i] != DT_(0))
+            {
+              file << (i%_stride) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << (double)temp.Ax()[i] << ";" << std::endl;
+            }
+          }
+          file << "];" << std::endl;
+          file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
+          file.close();
         }
 
         /**

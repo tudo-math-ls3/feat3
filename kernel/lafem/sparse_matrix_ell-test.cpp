@@ -39,7 +39,7 @@ public:
 
   virtual void run() const
   {
-    SparseMatrixCOO<Mem::Main, DT_> a(10, 10);
+    SparseMatrixCOO<Mem::Main, DT_> a(10, 12);
     a(1,2,7);
     a.clear();
     a(1,2,7);
@@ -76,7 +76,7 @@ public:
     e = c;
     TEST_CHECK_EQUAL(e, c);
 
-    SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 12);
+    SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 10);
     for (unsigned long row(0) ; row < fcoo.rows() ; ++row)
     {
       for (unsigned long col(0) ; col < fcoo.columns() ; ++col)
@@ -89,10 +89,15 @@ public:
     }
     SparseMatrixELL<Tag_, DT_> f(fcoo);
 
-    f.write_out("test.ell");
+    f.write_out(fm_ell, "test.ell");
     SparseMatrixELL<Tag_, DT_> g("test.ell");
     TEST_CHECK_EQUAL(g, f);
     remove("test.ell");
+    f.write_out(fm_m, "test.m");
+    SparseMatrixCOO<Mem::Main, DT_> h(f);
+    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, "test.m");
+    TEST_CHECK_EQUAL(i, h);
+    remove("test.m");
   }
 };
 SparseMatrixELLTest<Mem::Main, float> cpu_sparse_matrix_ell_test_float;

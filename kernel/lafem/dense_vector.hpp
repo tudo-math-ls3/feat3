@@ -113,14 +113,18 @@ namespace FEAST
         /**
          * \brief Constructor
          *
+         * \param[in] mode The used file format.
          * \param[in] filename The source file in EXP format.
          *
          * Creates a vector from the given source file.
          */
-        explicit DenseVector(String filename) :
+        explicit DenseVector(FileMode mode, String filename) :
           Container<Arch_, DT_>(0)
         {
           CONTEXT("When creating DenseVector");
+
+          if (mode != fm_exp)
+            throw InternalError("Filemode not supported!");
 
           std::vector<DT_> data;
 
@@ -295,11 +299,15 @@ namespace FEAST
         /**
          * \brief Write out vector to file.
          *
+         * \param[in] mode The used file format.
          * \param[in] filename The file where the vector shall be stored.
          */
-        void write_out(String filename) const
+        void write_out(FileMode mode, String filename) const
         {
           CONTEXT("When writing out DenseVector");
+
+          if (mode != fm_exp)
+            throw InternalError("Filemode not supported!");
 
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
           MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));

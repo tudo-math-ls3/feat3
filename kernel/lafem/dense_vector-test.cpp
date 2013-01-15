@@ -74,8 +74,8 @@ public:
     for (Index i(0) ; i < k.size() ; ++i)
       k(i, DT_(i) / DT_(12));
 
-    k.write_out("test.exp");
-    DenseVector<Tag_, DT_> l("test.exp");
+    k.write_out(fm_exp, "test.exp");
+    DenseVector<Tag_, DT_> l(fm_exp, "test.exp");
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-5);
 

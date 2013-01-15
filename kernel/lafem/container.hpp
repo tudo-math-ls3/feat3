@@ -20,6 +20,16 @@ namespace FEAST
    */
   namespace LAFEM
   {
+      /**
+       * Supported File modes.
+       */
+      enum FileMode
+      {
+        fm_exp = 0,
+        fm_m,
+        fm_ell
+      };
+
     /**
      * \brief Base class of all container types.
      *
