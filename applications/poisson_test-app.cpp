@@ -215,11 +215,14 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     delete coarse_macro_mesh_geo_fine;
     delete coarse_macro_subset_geo_fine;
   }
-  /*
-  std::cout << (*macro_basemesh_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
-  std::cout << (*macro_mesh_geo_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
-  std::cout << (*macro_subset_geo_fine).get_num_entities(1) << std::endl;*/
 
+  //std::cout << (*macro_mesh_geo_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
+  if(rank == 0)
+  {
+    std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(0) << " vertices " << std::endl;
+    std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(1) << " edges " << std::endl;
+    std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(2) << " faces " << std::endl;
+  }
   std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_comm_halos_fine;
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
@@ -292,6 +295,23 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     //add
     macro_boundaries_fine.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(*cell_sub_set_fine)));
     delete[] polytopes_in_subset;
+  }
+
+  for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
+  {
+    if(rank == 0)
+    {
+      std::cout << "proc " << rank << " subset " << i << " with " << macro_boundaries_fine.at(i)->get_num_entities(0) << " vertices." << std::endl;
+      std::cout << "proc " << rank << " subset " << i << " with " << macro_boundaries_fine.at(i)->get_num_entities(1) << " edges." << std::endl;
+      std::cout << "proc " << rank << " subset " << i << " with " << macro_boundaries_fine.at(i)->get_num_entities(2) << " faces." << std::endl;
+      for(Index j(0) ; j < macro_boundaries_fine.at(i)->get_num_entities(0) ; ++j)
+        std::cout << "proc " << rank << " subset " << i << " vertex: " << macro_boundaries_fine.at(i)->get_target_set<0>()[j] << std::endl;
+      for(Index j(0) ; j < macro_boundaries_fine.at(i)->get_num_entities(1) ; ++j)
+        std::cout << "proc " << rank << " subset " << i << " edge: " << macro_boundaries_fine.at(i)->get_target_set<1>()[j] << std::endl;
+      for(Index j(0) ; j < macro_boundaries_fine.at(i)->get_num_entities(2) ; ++j)
+        std::cout << "proc " << rank << " subset " << i << " face: " << macro_boundaries_fine.at(i)->get_target_set<2>()[j] << std::endl;
+
+    }
   }
 
   ///assembly
