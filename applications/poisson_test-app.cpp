@@ -322,7 +322,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  // filter system
+  // filter system TODO: check why this segfaults
   filter.filter_mat(mat_sys);
   filter.filter_rhs(vec_rhs);
   filter.filter_sol(vec_sol);
