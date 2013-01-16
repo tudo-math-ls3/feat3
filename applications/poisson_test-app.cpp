@@ -32,6 +32,16 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 
+template<typename T_>
+class RhsFunc
+{
+public:
+  static T_ eval(T_ /*x*/, T_ /*y*/)
+  {
+    return T_(1);
+  }
+};
+
 void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level)
 {
   /*(0,1) (1,1)
@@ -283,6 +293,19 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     macro_boundaries_fine.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(*cell_sub_set_fine)));
     delete[] polytopes_in_subset;
   }
+
+  ///assembly
+  // create trafo
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo(*macro_mesh_geo_fine);
+  // create space
+  Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
+
+  SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
+  mat_sys.clear();
+  Assembly::BilinearScalarLaplaceFunctor::assemble(mat_sys, space, "gauss-legendre:2");
+
+  DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
+  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
 
   delete macro_basemesh;
 }
