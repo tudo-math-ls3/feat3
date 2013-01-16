@@ -307,6 +307,27 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
 
+  // assemble homogeneous Dirichlet BCs
+  Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+  for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
+  {
+    std::cout << "Adding cell set on process " << rank << std::endl;
+    dirichlet.add_cell_set(*macro_boundaries_fine.at(i).get());
+  }
+  // allocate solution vector
+  DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
+
+  // assemble filter:
+  UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  // filter system
+  filter.filter_mat(mat_sys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+
+
   delete macro_basemesh;
 }
 
