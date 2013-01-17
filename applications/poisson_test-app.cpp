@@ -316,8 +316,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   ///assembly
   // create trafo
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo_base(*macro_basemesh_fine);
   Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo(*macro_mesh_geo_fine);
   // create space
+  Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space_base(trafo_base);
   Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
   SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
