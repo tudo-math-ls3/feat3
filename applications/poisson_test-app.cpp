@@ -364,7 +364,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {
     Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_boundaries_fine.at(i).get())));
-    /*VectorMirror<Mem::Main, double> target_mirror(dof_mirror); //why does this segfault?
+    /*VectorMirror<Mem::Main, double> target_mirror(dof_mirror); //TODO why does this segfault?
     DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
     DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
