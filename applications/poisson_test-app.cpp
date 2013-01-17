@@ -310,16 +310,15 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
         std::cout << "proc " << rank << " subset " << i << " edge: " << macro_boundaries_fine.at(i)->get_target_set<1>()[j] << std::endl;
       for(Index j(0) ; j < macro_boundaries_fine.at(i)->get_num_entities(2) ; ++j)
         std::cout << "proc " << rank << " subset " << i << " face: " << macro_boundaries_fine.at(i)->get_target_set<2>()[j] << std::endl;
-
     }
   }
 
   ///assembly
   // create trafo
-  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo_base(*macro_basemesh_fine);
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo_base(*macro_basemesh_fine); //do we need it?
   Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo(*macro_mesh_geo_fine);
   // create space
-  Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space_base(trafo_base);
+  Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space_base(trafo_base); //do we need it?
   Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
   SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
@@ -345,9 +344,9 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   MPI_Barrier(MPI_COMM_WORLD);
 
   // filter system TODO: check why this segfaults
-  filter.filter_mat(mat_sys);
-  filter.filter_rhs(vec_rhs);
-  filter.filter_sol(vec_sol);
+  //filter.filter_mat(mat_sys);
+  //filter.filter_rhs(vec_rhs);
+  //filter.filter_sol(vec_sol);
 
 
   delete macro_basemesh;
