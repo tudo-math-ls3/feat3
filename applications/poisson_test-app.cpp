@@ -315,10 +315,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   ///assembly
   // create trafo
-  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo_base(*macro_basemesh_fine); //do we need it?
+  Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo_base(*macro_basemesh_fine); //TODO do we need it?
   Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > trafo(*macro_mesh_geo_fine);
   // create space
-  Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space_base(trafo_base); //do we need it?
+  Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space_base(trafo_base); // TODO do we need it?
   Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
   SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
@@ -329,7 +329,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
 
   //assemble dof adjacencies
-  Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //do we need it?
+  Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //TODO do we need it?
   Graph dof_adj(Space::DofAdjacency<>::assemble(space));
 
   // assemble homogeneous Dirichlet BCs
