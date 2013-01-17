@@ -341,7 +341,11 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   // assemble filter:
   UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
 
+  std::cout.flush();
   MPI_Barrier(MPI_COMM_WORLD);
+
+  if(rank == 0)
+    std::cout << mat_sys;
 
   // filter system TODO: check why this segfaults
   //filter.filter_mat(mat_sys);
