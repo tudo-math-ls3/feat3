@@ -1279,9 +1279,9 @@ namespace FEAST
         virtual void execute()
         {
 #ifndef SERIAL
-          SynchVec<Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          SynchVec<Algo_, Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
 #else
-          SynchVec<Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          SynchVec<Algo_, Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
 #endif
         }
 
@@ -1358,9 +1358,9 @@ namespace FEAST
             throw ScaRCError("Error: Incomplete SynchVecFunctor can not be executed!");
 
 #ifndef SERIAL
-          SynchVec<Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          SynchVec<Algo_, Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
 #else
-          SynchVec<Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
+          SynchVec<Algo_, Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
 #endif
         }
 

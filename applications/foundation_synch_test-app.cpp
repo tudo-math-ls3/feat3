@@ -152,7 +152,7 @@ void check_synch_mirror(int rank)
   DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
 #ifndef SERIAL
-  SynchVec<Archs::Parallel, com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
+  SynchVec<Algo::Generic, Archs::Parallel, com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
 #endif
 
   TestResult<double> res[4];
@@ -217,7 +217,7 @@ void check_synch_mirrors(int rank)
   sourceranks.push_back(rank == 0 ? 1 : 0);
 
 #ifndef SERIAL
-  SynchVec<Archs::Parallel, com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
+  SynchVec<Algo::Generic, Archs::Parallel, com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
 #endif
 
   TestResult<double> res[4];

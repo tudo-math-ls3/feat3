@@ -40,6 +40,7 @@ namespace FEAST
       com_recv_replace,
       com_exchange,
       com_average,
+      com_accumulate,
       com_allreduce_sqrtsum,
       com_min,
       com_max
