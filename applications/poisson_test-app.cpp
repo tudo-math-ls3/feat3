@@ -328,6 +328,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
 
+  //assemble dof adjacencies
+  Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //do we need it?
+  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+
   // assemble homogeneous Dirichlet BCs
   Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
@@ -359,7 +363,6 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::vector<Index> destranks;
   std::vector<Index> sourceranks;
 
-  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
 
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {
