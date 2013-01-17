@@ -348,6 +348,29 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   //filter.filter_rhs(vec_rhs);
   //filter.filter_sol(vec_sol);
 
+  ///assemble mirrors
+  std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
+  std::vector<LAFEM::DenseVector<Mem::Main, double> > sendbufs;
+  std::vector<LAFEM::DenseVector<Mem::Main, double> > recvbufs;
+  std::vector<Index> destranks;
+  std::vector<Index> sourceranks;
+
+  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+
+  for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
+  {
+    Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_boundaries_fine.at(i).get())));
+    /*VectorMirror<Mem::Main, double> target_mirror(dof_mirror); //why does this segfault?
+    DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
+    DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
+
+    mirrors.push_back(target_mirror);
+    sendbufs.push_back(sendbuf);
+    recvbufs.push_back(recvbuf);*/
+
+    destranks.push_back(macro_boundaries_found.at(i)->get_other());
+    sourceranks.push_back(rank);
+  }
 
   delete macro_basemesh;
 }
