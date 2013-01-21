@@ -184,7 +184,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);
 
   ///get macro boundary components
-  Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
+  Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank)); //TODO: dont use macro_basemesh but macro_mesh!!
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D> > > > macro_boundaries_found;
   for(Index i(0) ; i < macro_edges.size() ; ++i)
   {
@@ -211,7 +211,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       macro_mesh_geo_fine = new BaseMeshType(refinery_1);
       macro_basemesh_fine = new BaseMeshType(refinery_0);
     }
-    //delete coarse_macro_basemesh_fine; //TODO why can u not deallocate this
+    delete coarse_macro_basemesh_fine; //TODO why can u not deallocate this
     delete coarse_macro_mesh_geo_fine;
     delete coarse_macro_subset_geo_fine;
   }
@@ -252,7 +252,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
         macro_basemesh_temp = new BaseMeshType(refinery_0);
       }
       delete coarse_macro_basemesh_temp;
-      //delete coarse_cell_sub_set_fine;
+      delete coarse_cell_sub_set_fine;
     }
     delete macro_basemesh_temp;
     //add
@@ -289,7 +289,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
         macro_basemesh_temp = new BaseMeshType(refinery_0);
       }
       delete coarse_macro_basemesh_temp;
-      //delete coarse_cell_sub_set_fine;
+      delete coarse_cell_sub_set_fine;
     }
     delete macro_basemesh_temp;
     //add
