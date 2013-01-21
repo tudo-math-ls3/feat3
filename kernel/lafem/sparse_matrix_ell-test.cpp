@@ -93,6 +93,7 @@ public:
     SparseMatrixELL<Tag_, DT_> g("test.ell");
     TEST_CHECK_EQUAL(g, f);
     remove("test.ell");
+
     f.write_out(fm_m, "test.m");
     SparseMatrixCOO<Mem::Main, DT_> h(f);
     SparseMatrixCOO<Mem::Main, DT_> i(fm_m, "test.m");

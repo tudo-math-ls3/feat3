@@ -94,6 +94,11 @@ public:
     }
     SparseMatrixCSR<Arch_, DT_> f(fcoo);
 
+    f.write_out(fm_csr, "test.csr");
+    SparseMatrixCSR<Arch_, DT_> g("test.csr");
+    TEST_CHECK_EQUAL(g, f);
+    remove("test.csr");
+
     f.write_out(fm_m, "test.m");
     SparseMatrixCOO<Mem::Main, DT_> h(f);
     SparseMatrixCOO<Mem::Main, DT_> i(fm_m, "test.m");

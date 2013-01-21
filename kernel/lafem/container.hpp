@@ -27,7 +27,8 @@ namespace FEAST
       {
         fm_exp = 0,
         fm_m,
-        fm_ell
+        fm_ell,
+        fm_csr
       };
 
     /**
