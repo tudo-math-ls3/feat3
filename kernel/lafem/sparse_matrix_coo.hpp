@@ -190,6 +190,9 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixELL");
 
+          if (mode != fm_m)
+                throw InternalError("Filemode not supported!");
+
           std::ifstream file(filename.c_str(), std::ifstream::in);
           if (! file.is_open())
             throw InternalError("Unable to open Matrix file " + filename);

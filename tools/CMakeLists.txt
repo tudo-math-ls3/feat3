@@ -30,3 +30,15 @@ TARGET_LINK_LIBRARIES(dbg-reader feast)
 
 ADD_EXECUTABLE(dbg-patch dbg_patch/dbg_patch.cpp)
 TARGET_LINK_LIBRARIES(dbg-patch feast)
+
+ADD_EXECUTABLE(csr2m io/csr_to_m.cpp)
+TARGET_LINK_LIBRARIES (csr2m feast)
+
+ADD_EXECUTABLE(ell2m io/ell_to_m.cpp)
+TARGET_LINK_LIBRARIES (ell2m feast)
+
+ADD_EXECUTABLE(m2csr io/m_to_csr.cpp)
+TARGET_LINK_LIBRARIES (m2csr feast)
+
+ADD_EXECUTABLE(m2ell io/m_to_ell.cpp)
+TARGET_LINK_LIBRARIES (m2ell feast)
