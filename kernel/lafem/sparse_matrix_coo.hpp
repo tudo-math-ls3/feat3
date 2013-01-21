@@ -185,7 +185,8 @@ namespace FEAST
         explicit SparseMatrixCOO(FileMode mode, String filename) :
           Container<Mem::Main, DT_>(0),
           _rows(0),
-          _columns(0)
+          _columns(0),
+          _zero_element(DT_(0))
         {
           CONTEXT("When creating SparseMatrixELL");
 
