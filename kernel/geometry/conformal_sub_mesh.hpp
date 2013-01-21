@@ -169,8 +169,9 @@ namespace FEAST
        * \param[in] other
        * The conformal sub-mesh that is to be copied.
        */
-      template<typename Coord2_>
-      ConformalSubMesh(const ConformalSubMesh<Shape_, Coord2_>& other) :
+      //template<typename Coord2_>
+      //ConformalSubMesh(const ConformalSubMesh<Shape_, Coord2_>& other) :
+      ConformalSubMesh(const ConformalSubMesh& other) :
         _vertex_set(other.get_vertex_set()),
         _index_set_holder(other.get_index_set_holder()),
         _target_set_holder(other.get_target_set())

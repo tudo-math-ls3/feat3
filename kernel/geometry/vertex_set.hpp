@@ -113,16 +113,15 @@ namespace FEAST
        * \param[in] other
        * The vertex set that is to be copied.
        */
-      template<
-        int stride2_,
-        typename Coord2_>
-      VertexSetFixed(const VertexSetFixed<num_coords_, stride2_, Coord2_>& other) :
+      //template<int stride2_, typename Coord2_>
+      //VertexSetFixed(const VertexSetFixed<num_coords_, stride2_, Coord2_>& other) :
+      VertexSetFixed(const VertexSetFixed& other) :
         _num_vertices(other.get_num_vertices()),
         _vertices(nullptr)
       {
         if(_num_vertices > 0)
         {
-          _vertices = new VertexType(_num_vertices);
+          _vertices = new VertexType[_num_vertices];
           for(Index i(0); i < _num_vertices; ++i)
           {
             for(int j(0); j < num_coords_; ++j)
@@ -147,7 +146,7 @@ namespace FEAST
         ASSERT(other.get_num_coords() == num_coords_, "Coordinate count mismatch!");
         if(_num_vertices > 0)
         {
-          _vertices = new VertexType(_num_vertices);
+          _vertices = new VertexType[_num_vertices];
           for(Index i(0); i < _num_vertices; ++i)
           {
             for(int j(0); j < num_coords_; ++j)
@@ -301,8 +300,9 @@ namespace FEAST
        * \param[in] other
        * The vertex set that is to be copied.
        */
-      template<typename Coord2_>
-      VertexSetVariable(const VertexSetVariable<Coord2_>& other) :
+      //template<typename Coord2_>
+      //VertexSetVariable(const VertexSetVariable<Coord2_>& other) :
+      VertexSetVariable(const VertexSetVariable& other) :
         _num_vertices(other.get_num_vertices()),
         _num_coords(other.get_num_coords()),
         _stride(other.get_stride()),

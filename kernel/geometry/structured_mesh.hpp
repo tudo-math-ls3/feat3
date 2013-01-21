@@ -87,7 +87,6 @@ namespace FEAST
       IndexSetHolderType _index_set_holder;
 
     private:
-      StructuredMesh(const StructuredMesh&);
       StructuredMesh& operator=(const StructuredMesh&);
 
     public:
@@ -146,8 +145,9 @@ namespace FEAST
        * \param[in] other
        * The structured mesh that is to be copied.
        */
-      template<int stride2_, typename Coord2_>
-      StructuredMesh(const StructuredMesh<shape_dim_, num_coords_, stride2_, Coord2_>& other) :
+      //template<int stride2_, typename Coord2_>
+      //StructuredMesh(const StructuredMesh<shape_dim_, num_coords_, stride2_, Coord2_>& other) :
+      StructuredMesh(const StructuredMesh& other) :
         _vertex_set(other.get_vertex_set()),
         _index_set_holder(other.get_num_slices())
       {

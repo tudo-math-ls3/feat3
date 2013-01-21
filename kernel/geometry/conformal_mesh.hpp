@@ -144,8 +144,9 @@ namespace FEAST
        * \param[in] other
        * The conformal mesh that is to be copied.
        */
-      template<int stride2_, typename Coord2_>
-      ConformalMesh(const ConformalMesh<Shape_, num_coords_, stride2_, Coord2_>& other) :
+      //template<int stride2_, typename Coord2_>
+      //ConformalMesh(const ConformalMesh<Shape_, num_coords_, stride2_, Coord2_>& other) :
+      ConformalMesh(const ConformalMesh& other) :
         _vertex_set(other.get_vertex_set()),
         _index_set_holder(other.get_index_set_holder())
       {
