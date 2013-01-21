@@ -52,12 +52,17 @@ doc/*
 lib/*
 obj/*
 win/*
+vc10_bin/*
+vc10_lib/*
+vc10_obj/*
 
-# Ignore Visual Studio solution files
+# Ignore Visual Studio intermediate files
 *.opensdf
 *.sdf
 *.suo
-*.vcxproj.user
 
 # Ignore Windows Links
 *.lnk
+
+# Ignore VC10 user-config header
+vc10_user_config.hpp

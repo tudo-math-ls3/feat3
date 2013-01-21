@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dbg-srl|Win32'">
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>[REL_ROOT]</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dbg-srl|x64'">
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>[REL_ROOT]</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dbg-mpi|Win32'">
+    <DebuggerFlavor>MpiClusterDebugger</DebuggerFlavor>
+    <MpiDebuggerWorkingDirectory>[REL_ROOT]</MpiDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dbg-mpi|x64'">
+    <DebuggerFlavor>MpiClusterDebugger</DebuggerFlavor>
+    <MpiDebuggerWorkingDirectory>[REL_ROOT]</MpiDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='opt-srl|Win32'">
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>[REL_ROOT]</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='opt-srl|x64'">
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>[REL_ROOT]</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='opt-mpi|Win32'">
+    <DebuggerFlavor>MpiClusterDebugger</DebuggerFlavor>
+    <MpiDebuggerWorkingDirectory>[REL_ROOT]</MpiDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='opt-mpi|x64'">
+    <DebuggerFlavor>MpiClusterDebugger</DebuggerFlavor>
+    <MpiDebuggerWorkingDirectory>[REL_ROOT]</MpiDebuggerWorkingDirectory>
+  </PropertyGroup>
+</Project>

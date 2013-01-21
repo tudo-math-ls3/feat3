@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="vc10_gen.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Templates">
+      <UniqueIdentifier>{d2a56a79-3406-4989-bcc5-e336bffc44b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="templates\project_head.xml">
+      <Filter>Templates</Filter>
+    </None>
+    <None Include="templates\project_tail.xml">
+      <Filter>Templates</Filter>
+    </None>
+    <None Include="templates\solution.xml">
+      <Filter>Templates</Filter>
+    </None>
+    <None Include="templates\project_user.xml">
+      <Filter>Templates</Filter>
+    </None>
+  </ItemGroup>
+</Project>

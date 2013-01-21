@@ -1,0 +1,699 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files\assembly">
+      <UniqueIdentifier>{df60bb8b-2287-4ce4-86b3-7f6d79d40499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cubature">
+      <UniqueIdentifier>{70738fcd-c235-4236-bf68-6e9b8dd8e7b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cubature\scalar">
+      <UniqueIdentifier>{ede68e81-08b1-4807-995e-3ed656810995}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\foundation">
+      <UniqueIdentifier>{25bab0b8-78df-496b-8a22-f7a86c416aa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\geometry">
+      <UniqueIdentifier>{afa0f642-9c74-4cd2-8b23-ee88d771792b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\geometry\intern">
+      <UniqueIdentifier>{4298ef81-1db6-4d46-9001-79bf909708b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lafem">
+      <UniqueIdentifier>{57056c45-eab0-4391-ad11-accbf758f9d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\space">
+      <UniqueIdentifier>{318e4975-1d41-4437-882f-f9b7a142d16e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\space\discontinuous">
+      <UniqueIdentifier>{73e07717-b037-4b7d-b92d-85a356654115}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\space\lagrange1">
+      <UniqueIdentifier>{984e2d06-40de-44f1-aed8-7100e383d835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\space\rannacher_turek">
+      <UniqueIdentifier>{30b37baa-6716-4545-b0ee-188c78b72b3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\trafo">
+      <UniqueIdentifier>{13b83348-7a23-4d9e-92d3-08397ec96d73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\trafo\standard">
+      <UniqueIdentifier>{c45aa492-ab12-4335-8ce3-7d763adae5d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{09524e05-8107-4f0a-b5f7-c473b2106d8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\assembly">
+      <UniqueIdentifier>{1010c7e7-e9ee-4496-a57f-cc385c0bb65d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cubature">
+      <UniqueIdentifier>{9d84af4c-94c2-47b6-8778-e7360c76fd33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\foundation">
+      <UniqueIdentifier>{00d9dcec-fec5-4be2-a18f-c5f9362b916a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\geometry">
+      <UniqueIdentifier>{c77b0ef7-5423-49ff-addf-3704ba675d16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lafem">
+      <UniqueIdentifier>{d65d2c66-7cd9-4785-8f88-46c3ca28c73e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\space">
+      <UniqueIdentifier>{5d3cb996-9b94-4f7d-8b3b-7713f66ffb51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\trafo">
+      <UniqueIdentifier>{4cae0a39-686d-43e2-98bf-c0fb2cfd39bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{fc956664-a3a9-45df-92e4-c5631ac60774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vc10">
+      <UniqueIdentifier>{e2c7ebf2-718f-4777-a574-59babe29983f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vc10">
+      <UniqueIdentifier>{2a6cc596-20e3-4996-8c7e-12ebc1563f17}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\assembly\asm_traits.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\base.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\bilinear_functor_base.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\bilinear_operator.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\dirichlet_bc.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\discrete_projector.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\error_computer.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\grid_transfer.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\interpolator.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\lafem_backend.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\linear_functional.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\linear_functor_base.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\local_system_data.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\standard_functionals.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\assembly\standard_operators.hpp">
+      <Filter>Header Files\assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\avail_functor.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\barycentre_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\driver_base.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\driver_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\dynamic_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\factory_wrapper.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\hammer_stroud_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\lauffer_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\refine_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\rule.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\simplex_scalar_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\tensor_product_factory.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\trapezoidal_driver.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\auto_alias.hpp">
+      <Filter>Header Files\cubature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\gauss_legendre_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\gauss_lobatto_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\maclaurin_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\midpoint_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\newton_cotes_closed_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\newton_cotes_open_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\rule.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\trapezoidal_driver.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\driver_base.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\driver_factory.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\dynamic_factory.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cubature\scalar\factory_wrapper.hpp">
+      <Filter>Header Files\cubature\scalar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\cell_sub_set.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\cell_sub_set_node.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\conformal_factories.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\conformal_mesh.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\conformal_sub_mesh.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\export_vtk.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\factory.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\index_calculator.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\index_set.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\macro_factory.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\mesh_node.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\mesh_reader_factory.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\patch_factory.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\struct_index_set.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\structured_mesh.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\target_set.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\vertex_set.hpp">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\index_representative.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\macro_index_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\patch_index_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\refined_entity_counter.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\standard_index_refiner.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\standard_refinement_traits.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\standard_subset_refiner.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\standard_target_refiner.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\standard_vertex_refiner.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\struct_index_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\struct_num_entities.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\structured_vertex_refiner.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\sub_index_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\target_index_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\vertex_abacus.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\congruency_sampler.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\congurency_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\intern\face_index_mapping.hpp">
+      <Filter>Header Files\geometry\intern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\abort.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\adjactor.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\assertion.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\binary_stream.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\colouring.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\compiler_gnu.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\compiler_intel.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\compiler_microsoft.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\compiler_open64.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\compiler_oracle.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\compiler_pgi.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\cpp11_smart_pointer.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\cuthill_mckee.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\dynamic_graph.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\exception.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\factorial.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\file_error.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\graph.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\inheritance.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\instantiation_policy.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\linear_algebra.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\logger.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\mesh_reader.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\param_section.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\permutation.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\prefix.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\pretty_printer.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\random.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\stop_watch.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\string.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\time_stamp.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\tiny_algebra.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\type_traits.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\trafo\base.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\trafo\eval_data.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\trafo\evaluator_base.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\trafo\mapping_base.hpp">
+      <Filter>Header Files\trafo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\trafo\standard\mapping.hpp">
+      <Filter>Header Files\trafo\standard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\trafo\standard\evaluator.hpp">
+      <Filter>Header Files\trafo\standard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\dof_mapping_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\dof_mapping_common.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\dof_mirror.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\element_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\eval_data.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\evaluator_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\node_functional_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\dof_adjacency.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\dof_assignment_base.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\dof_assignment_common.hpp">
+      <Filter>Header Files\space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\discontinuous\evaluator.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\discontinuous\node_functional.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\discontinuous\variant.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\discontinuous\element.hpp">
+      <Filter>Header Files\space\discontinuous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\lagrange1\evaluator.hpp">
+      <Filter>Header Files\space\lagrange1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\lagrange1\node_functional.hpp">
+      <Filter>Header Files\space\lagrange1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\lagrange1\element.hpp">
+      <Filter>Header Files\space\lagrange1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\rannacher_turek\node_functional.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\rannacher_turek\variant.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\rannacher_turek\element.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\space\rannacher_turek\evaluator.hpp">
+      <Filter>Header Files\space\rannacher_turek</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\dot_product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\matrix_mirror.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\memory_pool.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\norm.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\preconditioner.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\product_matvec.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\richardson.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\scale.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\sparse_matrix_coo.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\sparse_matrix_csr.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\sparse_matrix_ell.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\sum.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\transposition.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\unit_filter.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\vector_mirror.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\absolute.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\algorithm.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\axpy.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\bicgstab.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\component_product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\container.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\defect.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\dense_matrix.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\dense_vector.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\difference.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\attribute.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\attribute_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\base.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\buffer.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\communication.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\communication_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\control.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\data.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\dense_data_wrapper.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\file_parser.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\functor.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\functor_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\halo.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\halo_control.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\halo_data.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\load_balancing.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\mapped_topology.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\mesh.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\mesh_control.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\mesh_data.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\mesh_error.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\foundation\topology.hpp">
+      <Filter>Header Files\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\analytic_functor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\archs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base_header.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shape.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="feast_config.hpp">
+      <Filter>Header Files\vc10</Filter>
+    </ClInclude>
+    <ClInclude Include="vc10_user_config.hpp">
+      <Filter>Header Files\vc10</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vc10_user_config.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\util\exception.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\logger.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mesh_reader.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\param_section.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\colouring.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lafem\memory_pool.cpp">
+      <Filter>Source Files\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\foundation\attribute_error.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\foundation\communication_error.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\foundation\functor_error.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\foundation\mesh_error.cpp">
+      <Filter>Source Files\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\archs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mkl_support.cpp">
+      <Filter>Source Files\vc10</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

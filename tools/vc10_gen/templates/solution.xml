@@ -1,0 +1,56 @@
+
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "[PRJ_NAME]", "[PRJ_NAME].vcxproj", "[PRJ_GUID]"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel", "[KRN_PATH]", "[KRN_GUID]"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		dbg-mpi|Win32 = dbg-mpi|Win32
+		dbg-mpi|Win64 = dbg-mpi|Win64
+		dbg-srl|Win32 = dbg-srl|Win32
+		dbg-srl|Win64 = dbg-srl|Win64
+		opt-mpi|Win32 = opt-mpi|Win32
+		opt-mpi|Win64 = opt-mpi|Win64
+		opt-srl|Win32 = opt-srl|Win32
+		opt-srl|Win64 = opt-srl|Win64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		[PRJ_GUID].dbg-mpi|Win32.ActiveCfg = dbg-mpi|Win32
+		[PRJ_GUID].dbg-mpi|Win32.Build.0 = dbg-mpi|Win32
+		[PRJ_GUID].dbg-mpi|Win64.ActiveCfg = dbg-mpi|x64
+		[PRJ_GUID].dbg-mpi|Win64.Build.0 = dbg-mpi|x64
+		[PRJ_GUID].dbg-srl|Win32.ActiveCfg = dbg-srl|Win32
+		[PRJ_GUID].dbg-srl|Win32.Build.0 = dbg-srl|Win32
+		[PRJ_GUID].dbg-srl|Win64.ActiveCfg = dbg-srl|x64
+		[PRJ_GUID].dbg-srl|Win64.Build.0 = dbg-srl|x64
+		[PRJ_GUID].opt-mpi|Win32.ActiveCfg = opt-mpi|Win32
+		[PRJ_GUID].opt-mpi|Win32.Build.0 = opt-mpi|Win32
+		[PRJ_GUID].opt-mpi|Win64.ActiveCfg = opt-mpi|x64
+		[PRJ_GUID].opt-mpi|Win64.Build.0 = opt-mpi|x64
+		[PRJ_GUID].opt-srl|Win32.ActiveCfg = opt-srl|Win32
+		[PRJ_GUID].opt-srl|Win32.Build.0 = opt-srl|Win32
+		[PRJ_GUID].opt-srl|Win64.ActiveCfg = opt-srl|x64
+		[PRJ_GUID].opt-srl|Win64.Build.0 = opt-srl|x64
+		[KRN_GUID].dbg-mpi|Win32.ActiveCfg = dbg-mpi|Win32
+		[KRN_GUID].dbg-mpi|Win32.Build.0 = dbg-mpi|Win32
+		[KRN_GUID].dbg-mpi|Win64.ActiveCfg = dbg-mpi|x64
+		[KRN_GUID].dbg-mpi|Win64.Build.0 = dbg-mpi|x64
+		[KRN_GUID].dbg-srl|Win32.ActiveCfg = dbg-srl|Win32
+		[KRN_GUID].dbg-srl|Win32.Build.0 = dbg-srl|Win32
+		[KRN_GUID].dbg-srl|Win64.ActiveCfg = dbg-srl|x64
+		[KRN_GUID].dbg-srl|Win64.Build.0 = dbg-srl|x64
+		[KRN_GUID].opt-mpi|Win32.ActiveCfg = opt-mpi|Win32
+		[KRN_GUID].opt-mpi|Win32.Build.0 = opt-mpi|Win32
+		[KRN_GUID].opt-mpi|Win64.ActiveCfg = opt-mpi|x64
+		[KRN_GUID].opt-mpi|Win64.Build.0 = opt-mpi|x64
+		[KRN_GUID].opt-srl|Win32.ActiveCfg = opt-srl|Win32
+		[KRN_GUID].opt-srl|Win32.Build.0 = opt-srl|Win32
+		[KRN_GUID].opt-srl|Win64.ActiveCfg = opt-srl|x64
+		[KRN_GUID].opt-srl|Win64.Build.0 = opt-srl|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

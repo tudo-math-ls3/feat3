@@ -26,7 +26,8 @@ struct TestResult
     right(r),
     epsilon(eps)
   {
-    passed = abs(l - r) < eps ? true : false;
+    //passed = std::abs(l - r) < eps ? true : false;
+    passed = (l < r ? r - l : l - r) < eps ? true : false;
   }
 
   TestResult()
@@ -121,7 +122,8 @@ void check_halo_transfer(int rank)
 
     bool passed(true);
 #ifndef SERIAL
-    TestResult<Index> res[rank == 0 ? 4 : 2];
+    //TestResult<Index> res[rank == 0 ? 4 : 2];
+    TestResult<Index> res[4];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
     res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
     if(rank == 0) //rank 0 receives more from rank 1
@@ -184,7 +186,8 @@ void check_attribute_transfer(int rank)
 
     bool passed(true);
 #ifndef SERIAL
-    TestResult<double> res[rank == 0 ? 3 : 2];
+    //TestResult<double> res[rank == 0 ? 3 : 2];
+    TestResult<double> res[3];
     res[0] = test_check_equal_within_eps(attr.at(0), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(1), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
     if(rank == 0)
@@ -249,7 +252,8 @@ void check_topology_transfer(int rank)
 
     bool passed(true);
 #ifndef SERIAL
-    TestResult<Index> res[rank == 0 ? 5 : 4];
+    //TestResult<Index> res[rank == 0 ? 5 : 4];
+    TestResult<Index> res[5];
     res[0] = test_check_equal_within_eps(t.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
     res[1] = test_check_equal_within_eps(t.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
     res[2] = test_check_equal_within_eps(t.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
@@ -348,15 +352,15 @@ void check_mesh_transfer(int rank)
     res[1] = test_check_equal_within_eps(m.get_topologies().at(ipi_vertex_face).size(), Index(6), Index(1));
     res[2] = test_check_equal_within_eps(m.get_topologies().at(ipi_face_vertex).size(), Index(2), Index(1));
     res[3] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).size(), Index(7), Index(1));
-    res[4] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(0).size(), Index(2), Index(1));
-    res[5] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(1).size(), Index(2), Index(1));
-    res[6] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(2).size(), Index(2), Index(1));
-    res[7] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(3).size(), Index(2), Index(1));
-    res[8] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(4).size(), Index(2), Index(1));
-    res[9] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(5).size(), Index(2), Index(1));
-    res[10] = test_check_equal_within_eps(m.get_topologies().at(ipi_edge_vertex).at(6).size(), Index(2), Index(1));
-    res[11] = test_check_equal_within_eps(m.get_topologies().at(ipi_face_vertex).at(0).size(), Index(4), Index(1));
-    res[12] = test_check_equal_within_eps(m.get_topologies().at(ipi_face_vertex).at(1).size(), Index(4), Index(1));
+    res[4] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_edge_vertex).at(0).size(), Index(2), Index(1));
+    res[5] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_edge_vertex).at(1).size(), Index(2), Index(1));
+    res[6] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_edge_vertex).at(2).size(), Index(2), Index(1));
+    res[7] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_edge_vertex).at(3).size(), Index(2), Index(1));
+    res[8] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_edge_vertex).at(4).size(), Index(2), Index(1));
+    res[9] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_edge_vertex).at(5).size(), Index(2), Index(1));
+    res[10] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_edge_vertex).at(6).size(), Index(2), Index(1));
+    res[11] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_face_vertex).at(0).size(), Index(4), Index(1));
+    res[12] = test_check_equal_within_eps<Index>(m.get_topologies().at(ipi_face_vertex).at(1).size(), Index(4), Index(1));
 
     bool passed(true);
     for(Index i(0) ; i < 13 ; ++i)

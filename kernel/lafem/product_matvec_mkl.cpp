@@ -2,6 +2,7 @@
 #include <kernel/lafem/product_matvec.hpp>
 
 #include <mkl.h>
+#include <mkl_spblas.h>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
