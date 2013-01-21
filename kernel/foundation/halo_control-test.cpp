@@ -2,6 +2,8 @@
 #include <test_system/test_system.hpp>
 
 #include<kernel/foundation/halo_control.hpp>
+#include<kernel/foundation/attribute.hpp>
+#include<kernel/foundation/mesh.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
 #include<kernel/geometry/cell_sub_set.hpp>
 #include<kernel/lafem/dense_vector.hpp>
