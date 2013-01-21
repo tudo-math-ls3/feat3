@@ -27,3 +27,6 @@ TARGET_LINK_LIBRARIES(dbg-nodefunc feast)
 
 ADD_EXECUTABLE(dbg-reader dbg_reader/dbg_reader.cpp)
 TARGET_LINK_LIBRARIES(dbg-reader feast)
+
+ADD_EXECUTABLE(dbg-patch dbg_patch/dbg_patch.cpp)
+TARGET_LINK_LIBRARIES(dbg-patch feast)

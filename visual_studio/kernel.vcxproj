@@ -586,6 +586,7 @@
     <ClInclude Include="..\kernel\geometry\mesh_node.hpp" />
     <ClInclude Include="..\kernel\geometry\mesh_reader_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\patch_factory.hpp" />
+    <ClInclude Include="..\kernel\geometry\patch_halo_factory.hpp" />
     <ClInclude Include="..\kernel\geometry\structured_mesh.hpp" />
     <ClInclude Include="..\kernel\geometry\struct_index_set.hpp" />
     <ClInclude Include="..\kernel\geometry\target_set.hpp" />
