@@ -5,15 +5,17 @@
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
+#include<kernel/geometry/conformal_mesh.hpp>
+//#include<kernel/geometry/cell_sub_set.hpp>
+#include<kernel/geometry/patch_factory.hpp>
+#include<kernel/geometry/macro_factory.hpp>
+#include<kernel/geometry/patch_halo_factory.hpp>
 #include<kernel/foundation/mesh_control.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
-#include<kernel/geometry/macro_factory.hpp>
-#include<kernel/geometry/patch_factory.hpp>
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/lafem/vector_mirror.hpp>
 #include<kernel/foundation/halo_control.hpp>
 #include<kernel/foundation/halo.hpp>
-#include<kernel/geometry/cell_sub_set.hpp>
 #include<kernel/archs.hpp>
 #include<deque>
 #include<algorithm>
@@ -154,7 +156,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   ///create communication halos
   ///depending on rank: compute adjacent macros to potentially communicate with
-  typedef Topology<>::storage_type_ TopologyStorageType;
+  /*typedef Topology<>::storage_type_ TopologyStorageType;
   TopologyStorageType potential_comm_partners_for_face_rank(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_face, 0));
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > > > macro_comm_halos;
   for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
@@ -181,10 +183,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       }
     }
   }
-  std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);
+  std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);*/
 
   ///get macro boundary components
-  Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank)); //TODO: dont use macro_basemesh but macro_mesh!!
+  Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D> > > > macro_boundaries_found;
   for(Index i(0) ; i < macro_edges.size() ; ++i)
   {
@@ -211,7 +213,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       macro_mesh_geo_fine = new BaseMeshType(refinery_1);
       macro_basemesh_fine = new BaseMeshType(refinery_0);
     }
-    delete coarse_macro_basemesh_fine; //TODO why can u not deallocate this
+    delete coarse_macro_basemesh_fine;
     delete coarse_macro_mesh_geo_fine;
     delete coarse_macro_subset_geo_fine;
   }
@@ -223,7 +225,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(1) << " edges " << std::endl;
     std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(2) << " faces " << std::endl;
   }
-  std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_comm_halos_fine;
+  /*std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_comm_halos_fine;
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
     Index* polytopes_in_subset = new Index[3];
@@ -258,40 +260,41 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     //add
     macro_comm_halos_fine.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(*cell_sub_set_fine)));
     delete[] polytopes_in_subset;
-  }
+  }*/
 
   std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_boundaries_fine;
   for(Index i(0) ; i < macro_boundaries_found.size() ; ++i)
   {
     Index* polytopes_in_subset = new Index[3];
-    if(macro_boundaries_found.at(i)->get_level() == pl_vertex)
-      HaloControl<dim_1D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), polytopes_in_subset);
-    else
-      HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), polytopes_in_subset);
 
+    HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), polytopes_in_subset);
     Geometry::CellSubSet<Shape::Hypercube<2> >* cell_sub_set_fine(new Geometry::CellSubSet<Shape::Hypercube<2> >(polytopes_in_subset));
+    HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), *cell_sub_set_fine);
 
-    if(macro_boundaries_found.at(i)->get_level() == pl_vertex)
-      HaloControl<dim_1D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), *cell_sub_set_fine);
-    else
-      HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), *cell_sub_set_fine);
+    BaseMeshType* macro_mesh_temp = new BaseMeshType(macro_mesh_geo);
 
-    BaseMeshType* macro_basemesh_temp = new BaseMeshType(*macro_basemesh);
+    ///from global to local coordinates
+    PatchHaloFactory<CellSubSet<Shape::Hypercube<2> > > map_factory(macro_subset_geo, *cell_sub_set_fine);
+    CellSubSet<Shape::Hypercube<2> >* temp(cell_sub_set_fine);
+    cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(map_factory);
+    delete temp;
+
     for(Index j(0) ; j < desired_refinement_level - (log(num_patches) / log(4)) ; ++j)
     {
-      BaseMeshType* coarse_macro_basemesh_temp(macro_basemesh_temp);
+      BaseMeshType* coarse_macro_mesh_temp(macro_mesh_temp);
       CellSubSet<Shape::Hypercube<2> >* coarse_cell_sub_set_fine(cell_sub_set_fine);
       //refine
       {
-        Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_basemesh_temp);
-        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_basemesh_temp);
+        Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_mesh_temp);
+        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_mesh_temp);
         cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
-        macro_basemesh_temp = new BaseMeshType(refinery_0);
+        macro_mesh_temp = new BaseMeshType(refinery_0);
       }
-      delete coarse_macro_basemesh_temp;
+      delete coarse_macro_mesh_temp;
       delete coarse_cell_sub_set_fine;
     }
-    delete macro_basemesh_temp;
+
+    delete macro_mesh_temp;
     //add
     macro_boundaries_fine.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(*cell_sub_set_fine)));
     delete[] polytopes_in_subset;
@@ -345,16 +348,16 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   // assemble filter:
   UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
 
-  std::cout.flush();
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  if(rank == 0)
-    std::cout << mat_sys;
 
   // filter system TODO: check why this segfaults
-  //filter.filter_mat(mat_sys);
-  //filter.filter_rhs(vec_rhs);
-  //filter.filter_sol(vec_sol);
+  filter.filter_mat(mat_sys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  std::cout.flush();
+  if(rank == 0)
+    std::cout << mat_sys;
 
   ///assemble mirrors
   std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
@@ -366,7 +369,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {
-    Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_boundaries_fine.at(i).get())));
+    //Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_comm_halos_fine.at(i).get())));
     /*VectorMirror<Mem::Main, double> target_mirror(dof_mirror); //TODO why does this segfault?
     DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
     DenseVector<Mem::Main, double> recvbuf(target_mirror.size());

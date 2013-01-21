@@ -3,8 +3,8 @@
 #define KERNEL_FOUNDATION_HALO_CONTROL_HPP
 
 #include <kernel/foundation/halo.hpp>
-#include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/cell_sub_set.hpp>
 
 using namespace FEAST::Geometry;
 

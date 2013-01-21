@@ -3,7 +3,6 @@
 #define KERNEL_FOUNDATION_HALO_HH 1
 
 #include<vector>
-#include<kernel/foundation/mesh.hpp>
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/buffer.hpp>
 #include<kernel/archs.hpp>
