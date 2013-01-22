@@ -158,26 +158,44 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   ///depending on rank: compute adjacent macros to potentially communicate with
   typedef Topology<>::storage_type_ TopologyStorageType;
   TopologyStorageType potential_comm_partners_for_face_rank(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_face, rank));
+  for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
+  {
+    if(potential_comm_partners_for_face_rank.at(i) == rank)
+      potential_comm_partners_for_face_rank.erase(potential_comm_partners_for_face_rank.begin() + i);
+  }
+  for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
+  {
+    std::cout << "proc " << rank << " comm with face " << potential_comm_partners_for_face_rank.at(i) << std::endl;
+  }
+
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > > > macro_comm_halos;
   for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
   {
-    TopologyStorageType comm_intersect_rank_i(macro_basemesh_found.get_comm_intersection(pl_face, pl_edge, rank, i));
-    /*if(comm_intersect_rank_i.size() == 0)
+    TopologyStorageType comm_intersect_rank_i(macro_basemesh_found.get_comm_intersection(pl_face, pl_edge, rank, potential_comm_partners_for_face_rank.at(i)));
+    for(Index k(0) ; k < comm_intersect_rank_i.size() ; ++k)
     {
-      comm_intersect_rank_i = macro_basemesh_found.get_comm_intersection(pl_face, pl_vertex, rank, i);
+      std::cout << "proc " << rank << " and face " << potential_comm_partners_for_face_rank.at(i) << " intersecting in edge " << comm_intersect_rank_i.at(k) << std::endl;
+    }
+    if(comm_intersect_rank_i.size() == 0)
+    {
+      comm_intersect_rank_i = macro_basemesh_found.get_comm_intersection(pl_face, pl_vertex, rank, potential_comm_partners_for_face_rank.at(i));
+      for(Index k(0) ; k < comm_intersect_rank_i.size() ; ++k)
+      {
+        std::cout << "proc " << rank << " and face " <<  potential_comm_partners_for_face_rank.at(i) << " intersecting in vertex " << comm_intersect_rank_i.at(k) << std::endl;
+      }
       for(Index j(0) ; j < comm_intersect_rank_i.size() ; ++j)
       {
-        Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, i);
+        Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, potential_comm_partners_for_face_rank.at(i));
         halo.add_element_pair(comm_intersect_rank_i.at(j), comm_intersect_rank_i.at(j));
 
         macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > >(new Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >(halo)));
       }
     }
-    else*/
+    else
     {
       for(Index j(0) ; j < comm_intersect_rank_i.size() ; ++j)
       {
-        Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, i);
+        Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, potential_comm_partners_for_face_rank.at(i));
         halo.add_element_pair(comm_intersect_rank_i.at(j), comm_intersect_rank_i.at(j));
         macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >(halo)));
       }
@@ -225,20 +243,21 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(2) << " faces " << std::endl;
   }*/
 
+  //refine halos
   std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_comm_halos_fine;
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
     Index* polytopes_in_subset = new Index[3];
-    /*if(macro_comm_halos.at(i)->get_level() == pl_vertex)
+    if(macro_comm_halos.at(i)->get_level() == pl_vertex)
       HaloControl<dim_1D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
-    else*/
+    else
       HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
 
     Geometry::CellSubSet<Shape::Hypercube<2> >* cell_sub_set_fine(new Geometry::CellSubSet<Shape::Hypercube<2> >(polytopes_in_subset));
 
-    /*if(macro_comm_halos.at(i)->get_level() == pl_vertex)
+    if(macro_comm_halos.at(i)->get_level() == pl_vertex)
       HaloControl<dim_1D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
-    else*/
+    else
       HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
 
     BaseMeshType* macro_mesh_temp = new BaseMeshType(macro_mesh_geo);
@@ -249,20 +268,22 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(map_factory);
     delete temp;
 
-    for(Index j(0) ; j < desired_refinement_level - (log(num_patches) / log(4)) ; ++j)
-    {
-      BaseMeshType* coarse_macro_mesh_temp(macro_mesh_temp);
-      CellSubSet<Shape::Hypercube<2> >* coarse_cell_sub_set_fine(cell_sub_set_fine);
-      //refine
+    std::cout << "proc " << rank << " halo with level " << macro_comm_halos.at(i)->get_level() << std::endl;
+    if(!(macro_comm_halos.at(i)->get_level() == pl_vertex))
+      for(Index j(0) ; j < desired_refinement_level - (log(num_patches) / log(4)) ; ++j)
       {
-        Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_mesh_temp);
-        Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_mesh_temp);
-        cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
-        macro_mesh_temp = new BaseMeshType(refinery_0);
+        BaseMeshType* coarse_macro_mesh_temp(macro_mesh_temp);
+        CellSubSet<Shape::Hypercube<2> >* coarse_cell_sub_set_fine(cell_sub_set_fine);
+        //refine
+        {
+          Geometry::StandardRefinery<BaseMeshType> refinery_0(*coarse_macro_mesh_temp);
+          Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, BaseMeshType> cell_refinery(*coarse_cell_sub_set_fine, *macro_mesh_temp);
+          cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(cell_refinery);
+          macro_mesh_temp = new BaseMeshType(refinery_0);
+        }
+        delete coarse_macro_mesh_temp;
+        delete coarse_cell_sub_set_fine;
       }
-      delete coarse_macro_mesh_temp;
-      delete coarse_cell_sub_set_fine;
-    }
     delete macro_mesh_temp;
     //add
     macro_comm_halos_fine.push_back(std::shared_ptr<Geometry::CellSubSet<Shape::Hypercube<2> > >(new Geometry::CellSubSet<Shape::Hypercube<2> >(*cell_sub_set_fine)));
@@ -369,6 +390,9 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   for(Index i(0) ; i < macro_comm_halos_fine.size() ; ++i)
   {
+    std::cout << "proc " << rank << " cellsubset " << i << " with " << macro_comm_halos_fine.at(i)->get_num_entities(0) << " vertices" << std::endl;
+    std::cout << "proc " << rank << " cellsubset " << i << " with " << macro_comm_halos_fine.at(i)->get_num_entities(1) << " edges" << std::endl;
+    std::cout << "proc " << rank << " cellsubset " << i << " with " << macro_comm_halos_fine.at(i)->get_num_entities(2) << " faces" << std::endl;
     Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_comm_halos_fine.at(i).get())));
     VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
     DenseVector<Mem::Main, double> sendbuf(target_mirror.size());

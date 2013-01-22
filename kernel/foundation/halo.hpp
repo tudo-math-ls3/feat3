@@ -27,7 +27,7 @@ namespace FEAST
         typedef BufferedData<StorageType_> buffer_type_;
 
         ///CTOR
-        HaloBase(MeshType_ & mesh, IndexType_ other = 0, PolytopeLevels level = pl_edge) : //TODO move to template
+        HaloBase(MeshType_ & mesh, IndexType_ other = 0) : //TODO move to template
           _halo_elements(),
           _halo_element_counterparts(),
           _mesh(mesh),
@@ -256,10 +256,10 @@ namespace FEAST
         typedef typename HaloBase<MeshType_, StorageType_, IndexType_>::buffer_type_ buffer_type_;
 
         ///CTOR
-        Halo(MeshType_ & mesh, IndexType_ other = 0, PolytopeLevels level = pl_edge) : //TODO move to template
-          HaloBase<MeshType_, StorageType_, IndexType_>(mesh, other, level),
+        Halo(MeshType_ & mesh, IndexType_ other = 0) : //TODO move to template
+          HaloBase<MeshType_, StorageType_, IndexType_>(mesh, other),
           _overlap(delta_),
-          _level(level)
+          _level(level_)
         {
         }
 

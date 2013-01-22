@@ -75,6 +75,7 @@ namespace FEAST
           halo.add_element_pair(source.template get_target_set<0>()[0], source.template get_target_set<0>()[0]);
         }
 
+        ///TODO remove these and move them to their actual dimension!
         ///overload for Hypercube<2> (in order to get point-diagonal halos)
         template<
           typename b_,
@@ -343,6 +344,48 @@ namespace FEAST
           for(Index i(0) ; i < size ; ++i)
             halo.add_element_pair(source.template get_target_set<1>()[i], source.template get_target_set<1>()[i]);
         }
+
+        ///delta = 0 case: in 2D, zero-overlap halos can be given in terms of vertices (diagonal case)
+        ///0, pl_vertex case
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_sizes(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_* target)
+        {
+          typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
+          target[0] = IndexType(halo.size());
+          target[1] = IndexType(0);
+          target[2] = IndexType(0);
+        }
+
+        template<
+          typename b_,
+          template<typename, typename> class c_,
+          typename d_,
+          template<unsigned,
+            PolytopeLevels,
+            typename,
+            template<typename, typename> class,
+            typename>
+          class HaloType_>
+        static void fill_target_set(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
+        {
+          typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
+
+          ///add all vertices
+          for(IndexType i(0) ; i < halo.size() ; ++i)
+          {
+              target.template get_target_set<0>()[i] = halo.get_element(i);
+          }
+        }
+
 
         ///delta = i case: in 2D, delta > 0 halos must be given in terms of faces
         ///i, pl_face case
