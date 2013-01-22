@@ -80,7 +80,7 @@ void check_sendrecv(int rank)
     for(unsigned long i(0) ; i < 100000 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -132,7 +132,7 @@ void check_halo_transfer(int rank)
     for(unsigned long i(0) ; i < (rank == 0 ? 4 : 2) ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: (rank " << rank << "): " <<  res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: (rank " << rank << "): " <<  res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -146,7 +146,7 @@ void check_halo_transfer(int rank)
     for(unsigned long i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -193,7 +193,7 @@ void check_attribute_transfer(int rank)
     for(unsigned long i(0) ; i < (rank == 0 ? 3 : 2) ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -207,7 +207,7 @@ void check_attribute_transfer(int rank)
     for(unsigned long i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: (rank " << rank << "): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -260,7 +260,7 @@ void check_topology_transfer(int rank)
     for(Index i(0) ; i < (rank == 0 ? 5 : 4) ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -277,7 +277,7 @@ void check_topology_transfer(int rank)
     for(Index i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -362,7 +362,7 @@ void check_mesh_transfer(int rank)
     for(Index i(0) ; i < 13 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -404,7 +404,7 @@ void check_halobased_attribute_transfer(int rank)
     for(Index i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -445,7 +445,7 @@ void check_halobased_dv_transfer(int rank)
     for(Index i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
@@ -490,7 +490,7 @@ void check_halobased_smcsr_transfer(int rank)
     for(Index i(0) ; i < 4 ; ++i)
       if(!res[i].passed)
       {
-        std::cout << "Failed: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
+        std::cout << "FAILED: " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
         passed = false;
         break;
       }
