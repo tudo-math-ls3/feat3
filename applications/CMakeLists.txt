@@ -67,3 +67,9 @@ else (NOT FEAST_SERIAL_MODE)
   SET_PROPERTY(TEST foundation_system_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_system_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (NOT FEAST_SERIAL_MODE)
+
+# add all tests to applications_tests
+ADD_CUSTOM_TARGET(applications_tests DEPENDS foundation_comm_test-app foundation_system_test-app)
+
+# build all tests through top lvl target tests
+ADD_DEPENDENCIES(tests applications_tests)
