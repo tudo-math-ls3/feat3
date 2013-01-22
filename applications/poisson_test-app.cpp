@@ -157,7 +157,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   ///create communication halos
   ///depending on rank: compute adjacent macros to potentially communicate with
   typedef Topology<>::storage_type_ TopologyStorageType;
-  TopologyStorageType potential_comm_partners_for_face_rank(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_face, 0));
+  TopologyStorageType potential_comm_partners_for_face_rank(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_face, rank));
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > > > macro_comm_halos;
   for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
   {
@@ -218,28 +218,27 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     delete coarse_macro_subset_geo_fine;
   }
 
-  //std::cout << (*macro_mesh_geo_fine).get_index_set<1, 0>().get_num_entities() << std::endl;
-  if(rank == 0)
+  /*if(rank == 0)
   {
     std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(0) << " vertices " << std::endl;
     std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(1) << " edges " << std::endl;
     std::cout << "proc " << rank << " macro_mesh_geo_fine with " << macro_mesh_geo_fine->get_num_entities(2) << " faces " << std::endl;
-  }
+  }*/
 
   std::vector<std::shared_ptr<CellSubSet<Shape::Hypercube<2> > > > macro_comm_halos_fine;
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
     Index* polytopes_in_subset = new Index[3];
-    //if(macro_comm_halos.at(i)->get_level() == pl_vertex)
-      //HaloControl<dim_1D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
-    //else
+    /*if(macro_comm_halos.at(i)->get_level() == pl_vertex)
+      HaloControl<dim_1D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
+    else*/
       HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
 
     Geometry::CellSubSet<Shape::Hypercube<2> >* cell_sub_set_fine(new Geometry::CellSubSet<Shape::Hypercube<2> >(polytopes_in_subset));
 
-    //if(macro_comm_halos.at(i)->get_level() == pl_vertex)
-      //HaloControl<dim_1D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
-    //else
+    /*if(macro_comm_halos.at(i)->get_level() == pl_vertex)
+      HaloControl<dim_1D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
+    else*/
       HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
 
     BaseMeshType* macro_mesh_temp = new BaseMeshType(macro_mesh_geo);
@@ -308,7 +307,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     delete[] polytopes_in_subset;
   }
 
-  for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
+  /*for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {
     if(rank == 0)
     {
@@ -322,7 +321,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       for(Index j(0) ; j < macro_boundaries_fine.at(i)->get_num_entities(2) ; ++j)
         std::cout << "proc " << rank << " subset " << i << " face: " << macro_boundaries_fine.at(i)->get_target_set<2>()[j] << std::endl;
     }
-  }
+  }*/
 
   ///assembly
   // create trafo
@@ -347,7 +346,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {
-    std::cout << "Adding cell set on process " << rank << std::endl;
+    //std::cout << "Adding cell set on process " << rank << std::endl;
     dirichlet.add_cell_set(*macro_boundaries_fine.at(i).get());
   }
   // allocate solution vector
@@ -370,7 +369,6 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   for(Index i(0) ; i < macro_comm_halos_fine.size() ; ++i)
   {
-    std::cout << "proc " << rank << " adding mirror" << std::endl;
     Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_comm_halos_fine.at(i).get())));
     VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
     DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
