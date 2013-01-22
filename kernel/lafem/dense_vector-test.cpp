@@ -78,8 +78,13 @@ public:
     DenseVector<Tag_, DT_> l(fm_exp, "test.exp");
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-5);
-
     remove("test.exp");
+
+
+    k.write_out(fm_dv, "test.dv");
+    DenseVector<Tag_, DT_> m(fm_dv, "test.dv");
+    TEST_CHECK_EQUAL(m, k);
+    remove("test.dv");
   }
 };
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;

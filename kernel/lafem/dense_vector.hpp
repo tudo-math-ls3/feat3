@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdint.h>
 
 
 namespace FEAST
@@ -32,6 +33,75 @@ namespace FEAST
       private:
         /// Pointer to our elements.
         DT_ * _pelements;
+
+        void _read_from_exp(String filename)
+        {
+          std::vector<DT_> data;
+
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError("Unable to open Vector file " + filename);
+
+          while(!file.eof())
+          {
+            std::string line;
+            std::getline(file, line);
+            if(line.find("#", 0) < line.npos)
+              continue;
+            if(file.eof())
+              break;
+
+            std::string n_z_s;
+
+            std::string::size_type first_digit(line.find_first_not_of(" "));
+            line.erase(0, first_digit);
+            std::string::size_type eol(line.length());
+            for(unsigned long i(0) ; i < eol ; ++i)
+            {
+              n_z_s.append(1, line[i]);
+            }
+
+            DT_ n_z = (DT_)atof(n_z_s.c_str());
+
+            data.push_back(n_z);
+
+          }
+          file.close();
+
+          this->_size = Index(data.size());
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(Index(data.size() * sizeof(DT_))));
+          this->_elements_size.push_back(Index(data.size()));
+          this->_pelements = this->_elements.at(0);
+          MemoryPool<Arch_>::instance()->upload(this->_pelements, &data[0], Index(data.size() * sizeof(DT_)));
+        }
+
+        void _read_from_dv(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Vector file " + filename);
+
+          uint64_t size;
+          file.read((char *)&size, sizeof(uint64_t));
+          this->_size = size;
+          this->_elements_size.push_back(this->_size);
+
+          double * ctemp = new double[size];
+          file.read((char *)ctemp, size * sizeof(double));
+          file.close();
+
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
+          for (Index i(0) ; i < size ; ++i)
+          {
+            temp[i] = ctemp[i];
+          }
+          delete[] ctemp;
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
+          this->_pelements = this->_elements.at(0);
+          MemoryPool<Arch_>::instance()->upload(this->_pelements, temp, this->_size * sizeof(DT_));
+          MemoryPool<Mem::Main>::instance()->release_memory(temp);
+
+        }
 
       public:
         /// Our datatype
@@ -123,46 +193,17 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          if (mode != fm_exp)
-            throw InternalError("Filemode not supported!");
-
-          std::vector<DT_> data;
-
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError("Unable to open Vector file " + filename);
-
-          while(!file.eof())
+          switch(mode)
           {
-            std::string line;
-            std::getline(file, line);
-            if(line.find("#", 0) < line.npos)
-              continue;
-            if(file.eof())
+            case fm_exp:
+              _read_from_exp(filename);
               break;
-
-            std::string n_z_s;
-
-            std::string::size_type first_digit(line.find_first_not_of(" "));
-            line.erase(0, first_digit);
-            std::string::size_type eol(line.length());
-            for(unsigned long i(0) ; i < eol ; ++i)
-            {
-              n_z_s.append(1, line[i]);
-            }
-
-            DT_ n_z = (DT_)atof(n_z_s.c_str());
-
-            data.push_back(n_z);
-
+            case fm_dv:
+              _read_from_dv(filename);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
           }
-          file.close();
-
-          this->_size = Index(data.size());
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(Index(data.size() * sizeof(DT_))));
-          this->_elements_size.push_back(Index(data.size()));
-          this->_pelements = this->_elements.at(0);
-          MemoryPool<Arch_>::instance()->upload(this->_pelements, &data[0], Index(data.size() * sizeof(DT_)));
         }
 
         /**
@@ -306,9 +347,27 @@ namespace FEAST
         {
           CONTEXT("When writing out DenseVector");
 
-          if (mode != fm_exp)
-            throw InternalError("Filemode not supported!");
+          switch(mode)
+          {
+            case fm_exp:
+              write_out_exp(filename);
+              break;
+            case fm_dv:
+              write_out_dv(filename);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
+          }
 
+        }
+
+        /**
+         * \brief Write out vector to file.
+         *
+         * \param[in] filename The file where the vector shall be stored.
+         */
+        void write_out_exp(String filename) const
+        {
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
           MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));
 
@@ -323,6 +382,35 @@ namespace FEAST
 
           file.close();
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
+        }
+
+        /**
+         * \brief Write out vector to file.
+         *
+         * \param[in] filename The file where the vector shall be stored.
+         */
+        void write_out_dv(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Vector file " + filename);
+
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
+          MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));
+          double * ctemp = new double[this->_size];
+          for (Index i(0) ; i < this->_size ; ++i)
+          {
+            ctemp[i] = temp[i];
+          }
+          MemoryPool<Mem::Main>::instance()->release_memory(temp);
+
+          uint64_t size(this->_size);
+          file.write((const char *)&size, sizeof(uint64_t));
+          file.write((const char *)ctemp, size * sizeof(double));
+
+          file.close();
+
+          delete[] ctemp;
         }
 
         /**

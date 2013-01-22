@@ -26,6 +26,7 @@ namespace FEAST
       enum FileMode
       {
         fm_exp = 0,
+        fm_dv,
         fm_m,
         fm_ell,
         fm_csr
