@@ -42,3 +42,9 @@ TARGET_LINK_LIBRARIES (m2csr feast)
 
 ADD_EXECUTABLE(m2ell io/m_to_ell.cpp)
 TARGET_LINK_LIBRARIES (m2ell feast)
+
+ADD_EXECUTABLE(dv2exp io/dv_to_exp.cpp)
+TARGET_LINK_LIBRARIES (dv2exp feast)
+
+ADD_EXECUTABLE(exp2dv io/exp_to_dv.cpp)
+TARGET_LINK_LIBRARIES (exp2dv feast)
