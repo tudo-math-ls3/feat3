@@ -28,11 +28,15 @@
 #include <kernel/assembly/standard_functionals.hpp>
 #include <kernel/assembly/dirichlet_bc.hpp>
 
+#include <kernel/scarc/solver_data.hpp>
+#include <kernel/scarc/solver_pattern.hpp>
+
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
+using namespace FEAST::ScaRC;
 
 template<typename T_>
 class RhsFunc
@@ -390,10 +394,31 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     sourceranks.push_back(rank);
   }
 
+  //bring up a local preconditioning matrix TODO use a product wrapper and DV
+  SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_sys.rows(), mat_sys.columns());
+  for(Index i(0) ; i < mat_sys.rows() ; ++i)
+    mat_precon_temp(i, i, mat_sys(i, i));
+
+  SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
+  SynchronisedPreconditionedSolverData<double,
+    Mem::Main,
+    DenseVector,
+    VectorMirror,
+    SparseMatrixCSR,
+    SparseMatrixCSR<Mem::Main, double> >data(mat_sys, mat_precon, vec_sol, vec_rhs,
+        SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_vectors(),
+        SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_scalars());
+
+  data.stored_mirrors = mirrors;
+  data.stored_mirror_sendbufs = sendbufs;
+  data.stored_mirror_recvbufs = recvbufs;
+  data.stored_dest_ranks = destranks;
+  data.stored_source_ranks = sourceranks;
+
   MPI_Barrier(MPI_COMM_WORLD);
-  std::cout.flush();
+  /*std::cout.flush();
   if(rank == 0)
-    std::cout << mat_sys;
+    std::cout << mat_sys;*/
 
   delete macro_basemesh;
 }
