@@ -51,6 +51,7 @@ SET (test_list
   dot_product-test
   component_product-test
   norm-test
+  product-test
   product_matvec-test
   richardson-test
   scale-test
