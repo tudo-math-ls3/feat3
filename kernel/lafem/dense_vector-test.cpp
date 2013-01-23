@@ -2,8 +2,10 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <list>
+#include <kernel/util/binary_stream.hpp>
 
+#include <list>
+#include <sstream>
 #include <cstdio>
 
 using namespace FEAST;
@@ -74,17 +76,17 @@ public:
     for (Index i(0) ; i < k.size() ; ++i)
       k(i, DT_(i) / DT_(12));
 
-    k.write_out(fm_exp, "test.exp");
-    DenseVector<Tag_, DT_> l(fm_exp, "test.exp");
+    std::stringstream ts;
+    k.write_out(fm_exp, ts);
+    DenseVector<Tag_, DT_> l(fm_exp, ts);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-5);
-    remove("test.exp");
 
-
-    k.write_out(fm_dv, "test.dv");
-    DenseVector<Tag_, DT_> m(fm_dv, "test.dv");
+    BinaryStream bs;
+    k.write_out(fm_dv, bs);
+    bs.seekg(0);
+    DenseVector<Tag_, DT_> m(fm_dv, bs);
     TEST_CHECK_EQUAL(m, k);
-    remove("test.dv");
   }
 };
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;

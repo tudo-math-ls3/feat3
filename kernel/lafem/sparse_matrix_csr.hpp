@@ -54,6 +54,84 @@ namespace FEAST
         /// Our layout related hash
         unsigned long _hash;
 
+        void _read_from_csr(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          _read_from_csr(file);
+          file.close();
+        }
+
+        void _read_from_csr(std::istream& file)
+        {
+          uint64_t rows;
+          uint64_t columns;
+          uint64_t elements;
+          file.read((char *)&rows, sizeof(uint64_t));
+          file.read((char *)&columns, sizeof(uint64_t));
+          file.read((char *)&elements, sizeof(uint64_t));
+
+          this->_size = Index(rows * columns);
+          _rows = Index(rows);
+          _columns = Index(columns);
+          _zero_element = DT_(0);
+          _used_elements = elements;
+
+          uint64_t * ccol_ind = new uint64_t[elements];
+          file.read((char *)ccol_ind, elements * sizeof(uint64_t));
+          _col_ind = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(Index));
+          for (Index i(0) ; i < elements ; ++i)
+            _col_ind[i] = Index(ccol_ind[i]);
+          delete[] ccol_ind;
+
+          uint64_t * crow_ptr = new uint64_t[rows + 1];
+          file.read((char *)crow_ptr, (rows + 1) * sizeof(uint64_t));
+          _row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((rows + 1) * sizeof(Index));
+          for (Index i(0) ; i < rows + 1 ; ++i)
+            _row_ptr[i] = Index(crow_ptr[i]);
+          delete[] crow_ptr;
+
+          uint64_t * crow_ptr_end = new uint64_t[rows];
+          file.read((char *)crow_ptr_end, (rows) * sizeof(uint64_t));
+          _row_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((rows) * sizeof(Index));
+          for (Index i(0) ; i < rows ; ++i)
+            _row_ptr_end[i] = Index(crow_ptr_end[i]);
+          delete[] crow_ptr_end;
+
+          double * cval = new double[elements];
+          file.read((char *)cval, elements * sizeof(double));
+          _val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(DT_));
+          for (Index i(0) ; i < elements ; ++i)
+            _val[i] = DT_(cval[i]);
+          delete[] cval;
+
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(elements * sizeof(DT_)));
+          this->_elements_size.push_back(elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(elements * sizeof(Index)));
+          this->_indices_size.push_back(elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1)* sizeof(Index)));
+          this->_indices_size.push_back(_rows + 1);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows)* sizeof(Index)));
+          this->_indices_size.push_back(_rows);
+
+          MemoryPool<Arch_>::upload(this->get_elements().at(0), _val, elements * sizeof(DT_));
+          MemoryPool<Arch_>::upload(this->get_indices().at(0), _col_ind, elements * sizeof(Index));
+          MemoryPool<Arch_>::upload(this->get_indices().at(1), _row_ptr, (_rows  + 1) * sizeof(Index));
+          MemoryPool<Arch_>::upload(this->get_indices().at(2), _row_ptr_end, (_rows) * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->release_memory(_val);
+          MemoryPool<Mem::Main>::instance()->release_memory(_col_ind);
+          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr);
+          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr_end);
+
+          _col_ind = this->_indices.at(0);
+          _val = this->_elements.at(0);
+          _row_ptr = this->_indices.at(1);
+          _row_ptr_end = this->_indices.at(2);
+
+          _hash = MemoryPool<Arch_>::instance()->generate_hash(_row_ptr, (this->_rows + 1) * sizeof(Index));
+        }
+
       public:
         /// Our datatype
         typedef DT_ DataType;
@@ -221,77 +299,22 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-          if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+          _read_from_csr(filename);
+        }
 
-          uint64_t rows;
-          uint64_t columns;
-          uint64_t elements;
-          file.read((char *)&rows, sizeof(uint64_t));
-          file.read((char *)&columns, sizeof(uint64_t));
-          file.read((char *)&elements, sizeof(uint64_t));
+        /**
+         * \brief Constructor
+         *
+         * \param[in] file The source file in binary CSR format.
+         *
+         * Creates a CSR matrix based on the source file.
+         */
+        explicit SparseMatrixCSR(std::istream& file) :
+          Container<Arch_, DT_>(0)
+        {
+          CONTEXT("When creating SparseMatrixCSR");
 
-          this->_size = Index(rows * columns);
-          _rows = Index(rows);
-          _columns = Index(columns);
-          _zero_element = DT_(0);
-          _used_elements = elements;
-
-          uint64_t * ccol_ind = new uint64_t[elements];
-          file.read((char *)ccol_ind, elements * sizeof(uint64_t));
-          _col_ind = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(Index));
-          for (Index i(0) ; i < elements ; ++i)
-            _col_ind[i] = Index(ccol_ind[i]);
-          delete[] ccol_ind;
-
-          uint64_t * crow_ptr = new uint64_t[rows + 1];
-          file.read((char *)crow_ptr, (rows + 1) * sizeof(uint64_t));
-          _row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((rows + 1) * sizeof(Index));
-          for (Index i(0) ; i < rows + 1 ; ++i)
-            _row_ptr[i] = Index(crow_ptr[i]);
-          delete[] crow_ptr;
-
-          uint64_t * crow_ptr_end = new uint64_t[rows];
-          file.read((char *)crow_ptr_end, (rows) * sizeof(uint64_t));
-          _row_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((rows) * sizeof(Index));
-          for (Index i(0) ; i < rows ; ++i)
-            _row_ptr_end[i] = Index(crow_ptr_end[i]);
-          delete[] crow_ptr_end;
-
-          double * cval = new double[elements];
-          file.read((char *)cval, elements * sizeof(double));
-          _val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(DT_));
-          for (Index i(0) ; i < elements ; ++i)
-            _val[i] = DT_(cval[i]);
-          delete[] cval;
-
-          file.close();
-
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(elements * sizeof(DT_)));
-          this->_elements_size.push_back(elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(elements * sizeof(Index)));
-          this->_indices_size.push_back(elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1)* sizeof(Index)));
-          this->_indices_size.push_back(_rows + 1);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows)* sizeof(Index)));
-          this->_indices_size.push_back(_rows);
-
-          MemoryPool<Arch_>::upload(this->get_elements().at(0), _val, elements * sizeof(DT_));
-          MemoryPool<Arch_>::upload(this->get_indices().at(0), _col_ind, elements * sizeof(Index));
-          MemoryPool<Arch_>::upload(this->get_indices().at(1), _row_ptr, (_rows  + 1) * sizeof(Index));
-          MemoryPool<Arch_>::upload(this->get_indices().at(2), _row_ptr_end, (_rows) * sizeof(Index));
-          MemoryPool<Mem::Main>::instance()->release_memory(_val);
-          MemoryPool<Mem::Main>::instance()->release_memory(_col_ind);
-          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr);
-          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr_end);
-
-          _col_ind = this->_indices.at(0);
-          _val = this->_elements.at(0);
-          _row_ptr = this->_indices.at(1);
-          _row_ptr_end = this->_indices.at(2);
-
-          _hash = MemoryPool<Arch_>::instance()->generate_hash(_row_ptr, (this->_rows + 1) * sizeof(Index));
+          _read_from_csr(file);
         }
 
         /**
@@ -634,11 +657,48 @@ namespace FEAST
         }
 
         /**
+         * \brief Write out matrix to file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out(FileMode mode, std::ostream& file) const
+        {
+          CONTEXT("When writing out SparseMatrixCSR");
+
+          switch(mode)
+          {
+            case fm_csr:
+              write_out_csr(file);
+              break;
+            case fm_m:
+              write_out_m(file);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
+          }
+        }
+
+        /**
          * \brief Write out matrix to csr binary file.
          *
          * \param[in] filename The file where the matrix shall be stored.
          */
         void write_out_csr(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          write_out_csr(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to csr binary file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_csr(std::ostream& file) const
         {
           if (typeid(DT_) != typeid(double))
             std::cout<<"Warning: You are writing out an csr matrix with less than double precission!"<<std::endl;
@@ -671,10 +731,6 @@ namespace FEAST
             cval[i] = val[i];
           MemoryPool<Mem::Main>::instance()->release_memory(val);
 
-          std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-          if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
-
           uint64_t rows(_rows);
           uint64_t columns(_columns);
           uint64_t elements(this->_indices_size.at(0));
@@ -685,8 +741,6 @@ namespace FEAST
           file.write((const char *)crow_ptr, (rows + 1) * sizeof(uint64_t));
           file.write((const char *)crow_ptr_end, rows * sizeof(uint64_t));
           file.write((const char *)cval, elements * sizeof(double));
-
-          file.close();
 
           delete[] ccol_ind;
           delete[] crow_ptr;
@@ -701,11 +755,21 @@ namespace FEAST
          */
         void write_out_m(String filename) const
         {
-          SparseMatrixCSR<Mem::Main, DT_> temp(*this);
-
           std::ofstream file(filename.c_str(), std::ofstream::out);
           if (! file.is_open())
             throw InternalError("Unable to open Matrix file " + filename);
+          write_out_m(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to matlab m file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_m(std::ostream& file) const
+        {
+          SparseMatrixCSR<Mem::Main, DT_> temp(*this);
 
           file << "data = [" << std::endl;
           for (Index row(0) ; row < _rows ; ++row)
@@ -721,7 +785,6 @@ namespace FEAST
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
-          file.close();
         }
 
         /**

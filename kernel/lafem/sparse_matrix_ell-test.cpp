@@ -3,8 +3,10 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/util/binary_stream.hpp>
 
 #include <cstdio>
+#include <sstream>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -89,16 +91,17 @@ public:
     }
     SparseMatrixELL<Tag_, DT_> f(fcoo);
 
-    f.write_out(fm_ell, "test.ell");
-    SparseMatrixELL<Tag_, DT_> g("test.ell");
+    BinaryStream bs;
+    f.write_out(fm_ell, bs);
+    bs.seekg(0);
+    SparseMatrixELL<Tag_, DT_> g(bs);
     TEST_CHECK_EQUAL(g, f);
-    remove("test.ell");
 
-    f.write_out(fm_m, "test.m");
+    std::stringstream ts;
+    f.write_out(fm_m, ts);
     SparseMatrixCOO<Mem::Main, DT_> h(f);
-    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, "test.m");
+    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, ts);
     TEST_CHECK_EQUAL(i, h);
-    remove("test.m");
   }
 };
 SparseMatrixELLTest<Mem::Main, float> cpu_sparse_matrix_ell_test_float;

@@ -56,6 +56,70 @@ namespace FEAST
         /// Our non zero element count.
         Index _used_elements;
 
+        void _read_from_m(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          _read_from_m(file);
+          file.close();
+        }
+
+        void _read_from_m(std::istream& file)
+        {
+          std::vector<Index> rowsv;
+          std::vector<Index> colsv;
+          std::vector<DT_> valsv;
+
+          String line;
+          std::getline(file, line);
+          while(!file.eof())
+          {
+            std::getline(file, line);
+
+            if(line.find("]", 0) < line.npos)
+              break;
+
+            if(line[line.size()-1] == ';')
+              line.resize(line.size()-1);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row(atol(srow.c_str()));
+            --row;
+            _rows = std::max(row+1, _rows);
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col(atol(scol.c_str()));
+            --col;
+            _columns = std::max(col+1, _columns);
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ val(atof(sval.c_str()));
+
+            rowsv.push_back(row);
+            colsv.push_back(col);
+            valsv.push_back(val);
+
+          }
+          this->_size = this->_rows * this->_columns;
+
+          for (Index i(0) ; i < rowsv.size() ; ++i)
+          {
+            (*this)(rowsv.at(i), colsv.at(i), valsv.at(i));
+          }
+        }
+
       public:
         /// Our datatype
         typedef DT_ DataType;
@@ -178,6 +242,7 @@ namespace FEAST
         /**
          * \brief Constructor
          *
+         * \param[in] mode The used file format.
          * \param[in] filename The source file to be read in.
          *
          * Creates a matrix based on the source file.
@@ -188,70 +253,42 @@ namespace FEAST
           _columns(0),
           _zero_element(DT_(0))
         {
-          CONTEXT("When creating SparseMatrixELL");
+          CONTEXT("When creating SparseMatrixCOO");
 
-          if (mode != fm_m)
-                throw InternalError("Filemode not supported!");
-
-          std::ifstream file(filename.c_str(), std::ifstream::in);
-          if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
-
-          std::vector<Index> rowsv;
-          std::vector<Index> colsv;
-          std::vector<DT_> valsv;
-
-          String line;
-          std::getline(file, line);
-          while(!file.eof())
+          switch(mode)
           {
-            std::getline(file, line);
-
-            if(line.find("]", 0) < line.npos)
+            case fm_m:
+              _read_from_m(filename);
               break;
-
-            if(line[line.size()-1] == ';')
-              line.resize(line.size()-1);
-
-            String::size_type begin(line.find_first_not_of(" "));
-            line.erase(0, begin);
-            String::size_type end(line.find_first_of(" "));
-            String srow(line, 0, end);
-            Index row(atol(srow.c_str()));
-            --row;
-            _rows = std::max(row+1, _rows);
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String scol(line, 0, end);
-            Index col(atol(scol.c_str()));
-            --col;
-            _columns = std::max(col+1, _columns);
-            line.erase(0, end);
-
-            begin = line.find_first_not_of(" ");
-            line.erase(0, begin);
-            end = line.find_first_of(" ");
-            String sval(line, 0, end);
-            DT_ val(atof(sval.c_str()));
-
-            rowsv.push_back(row);
-            colsv.push_back(col);
-            valsv.push_back(val);
-
+            default:
+              throw InternalError("Filemode not supported!");
           }
-          this->_size = this->_rows * this->_columns;
+        }
 
-          for (Index i(0) ; i < rowsv.size() ; ++i)
+        /**
+         * \brief Constructor
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The stream that is to be read from.
+         *
+         * Creates a matrix based on the source file.
+         */
+        explicit SparseMatrixCOO(FileMode mode, std::istream& file) :
+          Container<Mem::Main, DT_>(0),
+          _rows(0),
+          _columns(0),
+          _zero_element(DT_(0))
+        {
+          CONTEXT("When creating SparseMatrixCOO");
+
+          switch(mode)
           {
-            (*this)(rowsv.at(i), colsv.at(i), valsv.at(i));
+            case fm_m:
+              _read_from_m(file);
+              break;
+            default:
+              throw InternalError("Filemode not supported!");
           }
-
-
-
-          file.close();
         }
 
         /**

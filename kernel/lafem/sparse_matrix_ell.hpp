@@ -59,6 +59,88 @@ namespace FEAST
         /// Our non zero element count.
         Index _used_elements;
 
+        void _read_from_ell(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          _read_from_ell(file);
+          file.close();
+        }
+
+        void _read_from_ell(std::istream& file)
+        {
+          uint64_t size;
+          uint64_t rows;
+          uint64_t columns;
+          uint64_t stride;
+          uint64_t num_cols_per_row;
+          file.read((char *)&size, sizeof(uint64_t));
+          file.read((char *)&rows, sizeof(uint64_t));
+          file.read((char *)&columns, sizeof(uint64_t));
+          file.read((char *)&stride, sizeof(uint64_t));
+          file.read((char *)&num_cols_per_row, sizeof(uint64_t));
+
+          this->_size = Index(rows * columns);
+          _rows = Index(rows);
+          _columns = Index(columns);
+          _stride = Index(stride);
+          _num_cols_per_row = Index(num_cols_per_row);
+          _zero_element = DT_(0);
+
+          uint64_t * cAj = new uint64_t[size];
+          file.read((char *)cAj, size * sizeof(uint64_t));
+          _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
+          for (Index i(0) ; i < size ; ++i)
+            _Aj[i] = Index(cAj[i]);
+          delete[] cAj;
+
+          double * cAx = new double[size];
+          file.read((char *)cAx, size * sizeof(double));
+
+          _Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(DT_));
+          for (Index i(0) ; i < size ; ++i)
+            _Ax[i] = DT_(cAx[i]);
+          delete[] cAx;
+
+          _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
+          //compute row length vector
+          _used_elements = 0;
+          for (Index row(0) ; row < _rows ; ++row)
+          {
+            Index count(0);
+            for (Index i(row) ; i < Index(size) ; i += Index(stride))
+            {
+                if (_Ax[i] == DT_(0))
+                {
+                  i = Index(size);
+                  break;
+                }
+                ++count;
+                ++_used_elements;
+            }
+            _Arl[row] = count;
+          }
+
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_num_cols_per_row * _stride * sizeof(DT_)));
+          this->_elements_size.push_back(_num_cols_per_row * _stride);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_num_cols_per_row * _stride * sizeof(Index)));
+          this->_indices_size.push_back(_num_cols_per_row * _stride);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
+          this->_indices_size.push_back(_rows);
+
+          MemoryPool<Arch_>::upload(this->get_elements().at(0), _Ax, _num_cols_per_row * _stride * sizeof(DT_));
+          MemoryPool<Arch_>::upload(this->get_indices().at(0), _Aj, _num_cols_per_row * _stride * sizeof(Index));
+          MemoryPool<Arch_>::upload(this->get_indices().at(1), _Arl, _rows * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->release_memory(_Ax);
+          MemoryPool<Mem::Main>::instance()->release_memory(_Aj);
+          MemoryPool<Mem::Main>::instance()->release_memory(_Arl);
+
+          _Ax = this->_elements.at(0);
+          _Aj = this->_indices.at(0);
+          _Arl = this->_indices.at(1);
+        }
+
       public:
         /// Our datatype
         typedef DT_ DataType;
@@ -238,80 +320,22 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixELL");
 
-          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-          if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+          _read_from_ell(filename);
+        }
 
-          uint64_t size;
-          uint64_t rows;
-          uint64_t columns;
-          uint64_t stride;
-          uint64_t num_cols_per_row;
-          file.read((char *)&size, sizeof(uint64_t));
-          file.read((char *)&rows, sizeof(uint64_t));
-          file.read((char *)&columns, sizeof(uint64_t));
-          file.read((char *)&stride, sizeof(uint64_t));
-          file.read((char *)&num_cols_per_row, sizeof(uint64_t));
+        /**
+         * \brief Constructor
+         *
+         * \param[in] file The stream that shall be read from.
+         *
+         * Creates a ELL matrix based on the source file.
+         */
+        explicit SparseMatrixELL(std::istream& file) :
+          Container<Arch_, DT_>(0)
+        {
+          CONTEXT("When creating SparseMatrixELL");
 
-          this->_size = Index(rows * columns);
-          _rows = Index(rows);
-          _columns = Index(columns);
-          _stride = Index(stride);
-          _num_cols_per_row = Index(num_cols_per_row);
-          _zero_element = DT_(0);
-
-          uint64_t * cAj = new uint64_t[size];
-          file.read((char *)cAj, size * sizeof(uint64_t));
-          _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
-          for (Index i(0) ; i < size ; ++i)
-            _Aj[i] = Index(cAj[i]);
-          delete[] cAj;
-
-          double * cAx = new double[size];
-          file.read((char *)cAx, size * sizeof(double));
-          file.close();
-
-          _Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(DT_));
-          for (Index i(0) ; i < size ; ++i)
-            _Ax[i] = DT_(cAx[i]);
-          delete[] cAx;
-
-          _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
-          //compute row length vector
-          _used_elements = 0;
-          for (Index row(0) ; row < _rows ; ++row)
-          {
-            Index count(0);
-            for (Index i(row) ; i < Index(size) ; i += Index(stride))
-            {
-                if (_Ax[i] == DT_(0))
-                {
-                  i = Index(size);
-                  break;
-                }
-                ++count;
-                ++_used_elements;
-            }
-            _Arl[row] = count;
-          }
-
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_num_cols_per_row * _stride * sizeof(DT_)));
-          this->_elements_size.push_back(_num_cols_per_row * _stride);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_num_cols_per_row * _stride * sizeof(Index)));
-          this->_indices_size.push_back(_num_cols_per_row * _stride);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
-          this->_indices_size.push_back(_rows);
-
-          MemoryPool<Arch_>::upload(this->get_elements().at(0), _Ax, _num_cols_per_row * _stride * sizeof(DT_));
-          MemoryPool<Arch_>::upload(this->get_indices().at(0), _Aj, _num_cols_per_row * _stride * sizeof(Index));
-          MemoryPool<Arch_>::upload(this->get_indices().at(1), _Arl, _rows * sizeof(Index));
-          MemoryPool<Mem::Main>::instance()->release_memory(_Ax);
-          MemoryPool<Mem::Main>::instance()->release_memory(_Aj);
-          MemoryPool<Mem::Main>::instance()->release_memory(_Arl);
-
-          _Ax = this->_elements.at(0);
-          _Aj = this->_indices.at(0);
-          _Arl = this->_indices.at(1);
+          _read_from_ell(file);
         }
 
         /**
@@ -504,13 +528,49 @@ namespace FEAST
         }
 
         /**
+         * \brief Write out matrix to file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out(FileMode mode, std::ostream& file) const
+        {
+          CONTEXT("When writing out SparseMatrixELL");
+
+          switch(mode)
+          {
+            case fm_ell:
+              write_out_ell(file);
+              break;
+            case fm_m:
+              write_out_m(file);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
+          }
+        }
+
+        /**
          * \brief Write out matrix to ell binary file.
          *
          * \param[in] filename The file where the matrix shall be stored.
          */
         void write_out_ell(String filename) const
         {
+          std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          write_out_ell(file);
+          file.close();
+        }
 
+        /**
+         * \brief Write out matrix to ell binary file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_ell(std::ostream& file) const
+        {
           if (typeid(DT_) != typeid(double))
             std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
 
@@ -528,10 +588,6 @@ namespace FEAST
             cAx[i] = Ax[i];
           MemoryPool<Mem::Main>::instance()->release_memory(Ax);
 
-          std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-          if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
-
           uint64_t size(_num_cols_per_row * _stride);
           uint64_t rows(_rows);
           uint64_t columns(_columns);
@@ -545,8 +601,6 @@ namespace FEAST
           file.write((const char *)cAj, size * sizeof(uint64_t));
           file.write((const char *)cAx, size * sizeof(double));
 
-          file.close();
-
           delete[] cAj;
           delete[] cAx;
         }
@@ -558,11 +612,21 @@ namespace FEAST
          */
         void write_out_m(String filename) const
         {
-          SparseMatrixELL<Mem::Main, DT_> temp(*this);
-
           std::ofstream file(filename.c_str(), std::ofstream::out);
           if (! file.is_open())
             throw InternalError("Unable to open Matrix file " + filename);
+          write_out_m(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to matlab m file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_m(std::ostream& file) const
+        {
+          SparseMatrixELL<Mem::Main, DT_> temp(*this);
 
           file << "data = [" << std::endl;
           for (Index i(0) ; i < _num_cols_per_row * _stride ; ++i)
@@ -574,7 +638,6 @@ namespace FEAST
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
-          file.close();
         }
 
         /**

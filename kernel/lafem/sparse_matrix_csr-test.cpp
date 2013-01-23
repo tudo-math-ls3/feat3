@@ -3,6 +3,9 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/util/binary_stream.hpp>
+
+#include <sstream>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -94,16 +97,17 @@ public:
     }
     SparseMatrixCSR<Arch_, DT_> f(fcoo);
 
-    f.write_out(fm_csr, "test.csr");
-    SparseMatrixCSR<Arch_, DT_> g("test.csr");
+    BinaryStream bs;
+    f.write_out(fm_csr, bs);
+    bs.seekg(0);
+    SparseMatrixCSR<Arch_, DT_> g(bs);
     TEST_CHECK_EQUAL(g, f);
-    remove("test.csr");
 
-    f.write_out(fm_m, "test.m");
+    std::stringstream ts;
+    f.write_out(fm_m, ts);
     SparseMatrixCOO<Mem::Main, DT_> h(f);
-    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, "test.m");
+    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, ts);
     TEST_CHECK_EQUAL(i, h);
-    remove("test.m");
   }
 };
 SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;
