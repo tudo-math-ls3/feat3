@@ -1,9 +1,3 @@
-//#define SERIAL
-#ifndef SERIAL
-#include <mpi.h>
-#endif
-#include <iostream>
-#include <limits>
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
@@ -14,6 +8,12 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+
+#include <iostream>
+#include <limits>
+#ifndef SERIAL
+#  include <mpi.h>
+#endif
 
 using namespace FEAST;
 using namespace Foundation;

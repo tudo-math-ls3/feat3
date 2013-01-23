@@ -1,11 +1,12 @@
-#ifndef SERIAL
-#include <mpi.h>
-#endif
-#include <iostream>
 #include <kernel/base_header.hpp>
 #include <kernel/foundation/control.hpp>
 #include <kernel/foundation/data.hpp>
 #include <kernel/foundation/topology.hpp>
+
+#include <iostream>
+#ifndef SERIAL
+#  include <mpi.h>
+#endif
 
 using namespace FEAST;
 using namespace Foundation;
