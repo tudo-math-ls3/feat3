@@ -391,7 +391,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     recvbufs.push_back(recvbuf);
 
     destranks.push_back(macro_comm_halos.at(i)->get_other());
-    sourceranks.push_back(rank);
+    sourceranks.push_back(macro_comm_halos.at(i)->get_other());
   }
 
   //bring up a local preconditioning matrix TODO use a product wrapper and DV
@@ -406,8 +406,8 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     VectorMirror,
     SparseMatrixCSR,
     SparseMatrixCSR<Mem::Main, double> >data(mat_sys, mat_precon, vec_sol, vec_rhs,
-        SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_vectors(),
-        SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_scalars());
+                                             SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_vectors(),
+                                             SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_scalars());
 
   data.stored_mirrors = mirrors;
   data.stored_mirror_sendbufs = sendbufs;
@@ -415,10 +415,11 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.stored_dest_ranks = destranks;
   data.stored_source_ranks = sourceranks;
 
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<Richardson, Algo::Generic>::execute(data, 20, 1e-8));
+
   MPI_Barrier(MPI_COMM_WORLD);
-  /*std::cout.flush();
-  if(rank == 0)
-    std::cout << mat_sys;*/
+
+  solver->execute();
 
   delete macro_basemesh;
 }
