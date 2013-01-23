@@ -17,6 +17,7 @@ ADD_LIBRARY(kernel-util STATIC
 # list of util tests
 SET (test_list
   assertion-test
+  binary_stream-test
   colouring-test
   cuthill_mckee-test
   factorial-test

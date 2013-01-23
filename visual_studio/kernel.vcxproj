@@ -650,6 +650,7 @@
     <ClInclude Include="..\kernel\util\abort.hpp" />
     <ClInclude Include="..\kernel\util\adjactor.hpp" />
     <ClInclude Include="..\kernel\util\assertion.hpp" />
+    <ClInclude Include="..\kernel\util\binary_stream.hpp" />
     <ClInclude Include="..\kernel\util\colouring.hpp" />
     <ClInclude Include="..\kernel\util\compiler_gnu.hpp" />
     <ClInclude Include="..\kernel\util\compiler_intel.hpp" />

@@ -484,6 +484,7 @@
     <ClCompile Include="..\kernel\space\lagrange1-test.cpp" />
     <ClCompile Include="..\kernel\space\rannacher_turek-test.cpp" />
     <ClCompile Include="..\kernel\util\assertion-test.cpp" />
+    <ClCompile Include="..\kernel\util\binary_stream-test.cpp" />
     <ClCompile Include="..\kernel\util\colouring-test.cpp" />
     <ClCompile Include="..\kernel\util\cuthill_mckee-test.cpp" />
     <ClCompile Include="..\kernel\util\factorial-test.cpp" />

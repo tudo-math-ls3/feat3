@@ -627,6 +627,9 @@
     <ClInclude Include="..\kernel\geometry\patch_halo_factory.hpp">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\util\binary_stream.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">
