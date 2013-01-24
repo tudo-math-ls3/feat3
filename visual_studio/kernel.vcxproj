@@ -608,6 +608,7 @@
     <ClInclude Include="..\kernel\lafem\memory_pool.hpp" />
     <ClInclude Include="..\kernel\lafem\norm.hpp" />
     <ClInclude Include="..\kernel\lafem\preconditioner.hpp" />
+    <ClInclude Include="..\kernel\lafem\product.hpp" />
     <ClInclude Include="..\kernel\lafem\product_matvec.hpp" />
     <ClInclude Include="..\kernel\lafem\richardson.hpp" />
     <ClInclude Include="..\kernel\lafem\scale.hpp" />

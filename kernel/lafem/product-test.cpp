@@ -14,13 +14,13 @@ template<
   typename Arch_,
   typename Algo_,
   typename DT_>
-class DVComponentProductTest
+class DVComponentProductTest2
   : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
-  DVComponentProductTest()
+  DVComponentProductTest2()
     : TaggedTest<Arch_, DT_, Algo_>("dv_component_product_test")
   {
   }
@@ -68,15 +68,15 @@ public:
     }
   }
 };
-DVComponentProductTest<Mem::Main, Algo::Generic, float> dv_component_product_test_float;
-DVComponentProductTest<Mem::Main, Algo::Generic, double> dv_component_product_test_double;
+DVComponentProductTest2<Mem::Main, Algo::Generic, float> dv_component_product_test_float2;
+DVComponentProductTest2<Mem::Main, Algo::Generic, double> dv_component_product_test_double2;
 #ifdef FEAST_BACKENDS_MKL
-DVComponentProductTest<Mem::Main, Algo::MKL, float> mkl_dv_component_product_test_float;
-DVComponentProductTest<Mem::Main, Algo::MKL, double> mkl_dv_component_product_test_double;
+DVComponentProductTest2<Mem::Main, Algo::MKL, float> mkl_dv_component_product_test_float2;
+DVComponentProductTest2<Mem::Main, Algo::MKL, double> mkl_dv_component_product_test_double2;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DVComponentProductTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_component_product_test_float;
-DVComponentProductTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_component_product_test_double;
+DVComponentProductTest2<Mem::CUDA, Algo::CUDA, float> cuda_dv_component_product_test_float2;
+DVComponentProductTest2<Mem::CUDA, Algo::CUDA, double> cuda_dv_component_product_test_double2;
 #endif
 
 template<
@@ -84,13 +84,13 @@ template<
   typename Algo_,
   typename DT_,
   typename SM_>
-class ProductMatVecTest
+class ProductMatVecTest2
   : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
-  ProductMatVecTest()
+  ProductMatVecTest2()
     : TaggedTest<Arch_, DT_, Algo_>("product_matvec_test: " + SM_::type_name())
   {
   }
@@ -142,34 +142,34 @@ public:
     }
   }
 };
-ProductMatVecTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > csr_product_matvec_test_float;
-ProductMatVecTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > csr_product_matvec_test_double;
+ProductMatVecTest2<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > csr_product_matvec_test_float2;
+ProductMatVecTest2<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > csr_product_matvec_test_double2;
 #ifdef FEAST_BACKENDS_MKL
-ProductMatVecTest<Mem::Main, Algo::MKL, float, SparseMatrixCSR<Mem::Main, float> > mkl_csr_product_matvec_test_float;
-ProductMatVecTest<Mem::Main, Algo::MKL, double, SparseMatrixCSR<Mem::Main, double> > mkl_csr_product_matvec_test_double;
+ProductMatVecTest2<Mem::Main, Algo::MKL, float, SparseMatrixCSR<Mem::Main, float> > mkl_csr_product_matvec_test_float2;
+ProductMatVecTest2<Mem::Main, Algo::MKL, double, SparseMatrixCSR<Mem::Main, double> > mkl_csr_product_matvec_test_double2;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-ProductMatVecTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > cuda_csr_product_matvec_test_float;
-ProductMatVecTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_product_matvec_test_double;
+ProductMatVecTest2<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > cuda_csr_product_matvec_test_float2;
+ProductMatVecTest2<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_product_matvec_test_double2;
 #endif
-ProductMatVecTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_product_matvec_test_float;
-ProductMatVecTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_product_matvec_test_double;
+ProductMatVecTest2<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_product_matvec_test_float2;
+ProductMatVecTest2<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_product_matvec_test_double2;
 #ifdef FEAST_BACKENDS_CUDA
-ProductMatVecTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_ell_product_matvec_test_float;
-ProductMatVecTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_product_matvec_test_double;
+ProductMatVecTest2<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_ell_product_matvec_test_float2;
+ProductMatVecTest2<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_product_matvec_test_double2;
 #endif
 
 template<
   typename Arch_,
   typename Algo_,
   typename DT_>
-class DVDotProductTest
+class DVDotProductTest2
   : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
-  DVDotProductTest()
+  DVDotProductTest2()
     : TaggedTest<Arch_, DT_, Algo_>("dv_dot_product_test")
   {
   }
@@ -205,13 +205,13 @@ public:
     }
   }
 };
-DVDotProductTest<Mem::Main, Algo::Generic, float> dv_dot_product_test_float;
-DVDotProductTest<Mem::Main, Algo::Generic, double> dv_dot_product_test_double;
+DVDotProductTest2<Mem::Main, Algo::Generic, float> dv_dot_product_test_float2;
+DVDotProductTest2<Mem::Main, Algo::Generic, double> dv_dot_product_test_double2;
 #ifdef FEAST_BACKENDS_MKL
-DVDotProductTest<Mem::Main, Algo::MKL, float> mkl_dv_dot_product_test_float;
-DVDotProductTest<Mem::Main, Algo::MKL, double> mkl_dv_dot_product_test_double;
+DVDotProductTest2<Mem::Main, Algo::MKL, float> mkl_dv_dot_product_test_float2;
+DVDotProductTest2<Mem::Main, Algo::MKL, double> mkl_dv_dot_product_test_double2;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-DVDotProductTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_dot_product_test_float;
-DVDotProductTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_dot_product_test_double;
+DVDotProductTest2<Mem::CUDA, Algo::CUDA, float> cuda_dv_dot_product_test_float2;
+DVDotProductTest2<Mem::CUDA, Algo::CUDA, double> cuda_dv_dot_product_test_double2;
 #endif

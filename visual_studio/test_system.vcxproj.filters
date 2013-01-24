@@ -274,5 +274,8 @@
     <ClCompile Include="..\kernel\util\binary_stream-test.cpp">
       <Filter>Source Files %28kernel%29\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\kernel\lafem\product-test.cpp">
+      <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

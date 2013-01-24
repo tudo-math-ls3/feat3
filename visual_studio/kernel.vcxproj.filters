@@ -630,6 +630,9 @@
     <ClInclude Include="..\kernel\util\binary_stream.hpp">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\kernel\lafem\product.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\util\exception.cpp">

@@ -471,6 +471,7 @@
     <ClCompile Include="..\kernel\lafem\difference-test.cpp" />
     <ClCompile Include="..\kernel\lafem\dot_product-test.cpp" />
     <ClCompile Include="..\kernel\lafem\norm-test.cpp" />
+    <ClCompile Include="..\kernel\lafem\product-test.cpp" />
     <ClCompile Include="..\kernel\lafem\product_matvec-test.cpp" />
     <ClCompile Include="..\kernel\lafem\richardson-test.cpp" />
     <ClCompile Include="..\kernel\lafem\scale-test.cpp" />
