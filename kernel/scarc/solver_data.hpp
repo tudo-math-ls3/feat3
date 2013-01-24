@@ -347,14 +347,101 @@ namespace FEAST
       }
     };
 
-/*
+    template<typename DataType_ = double,
+             typename MemTag_ = Mem::Main,
+             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename> class StorageType_ = std::vector>
+    struct SynchronizationDataContainer
+    {
+      public:
+        typedef VectorType_<MemTag_, DataType_> vector_type_;
+        typedef VectorMirrorType_<MemTag_, DataType_> vector_mirror_type_;
+        typedef VectorType_<MemTag_, DataType_> vector_storage_type_;
+        typedef StorageType_<VectorMirrorType_<MemTag_, DataType_>, std::allocator<VectorMirrorType_<MemTag_, DataType_> > > vector_mirror_storage_type_;
+        typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
+
+        virtual vector_mirror_storage_type_& vector_mirrors()
+        {
+          return _stored_vector_mirrors;
+        }
+        virtual const vector_mirror_storage_type_& vector_mirrors() const
+        {
+          return _stored_vector_mirrors;
+        }
+
+        virtual vector_storage_type_& vector_mirror_sendbufs()
+        {
+          return _stored_vector_mirror_sendbufs;
+        }
+        virtual const vector_storage_type_& vector_mirror_sendbufs() const
+        {
+          return _stored_vector_mirror_sendbufs;
+        }
+
+        virtual vector_storage_type_& vector_mirror_recvbufs()
+        {
+          return _stored_vector_mirror_recvbufs;
+        }
+        virtual const vector_storage_type_& vector_mirror_recvbufs() const
+        {
+          return _stored_vector_mirror_recvbufs;
+        }
+
+        virtual index_storage_type_& dest_ranks()
+        {
+          return _stored_dest_ranks;
+        }
+        virtual const index_storage_type_& dest_ranks() const
+        {
+          return _stored_dest_ranks;
+        }
+
+        virtual index_storage_type_& source_ranks()
+        {
+          return _stored_source_ranks;
+        }
+        virtual const index_storage_type_& source_ranks() const
+        {
+          return _stored_source_ranks;
+        }
+
+      protected:
+        ///CTORs to be used in subclasses
+        SynchronizationDataContainer() :
+          _stored_vector_mirrors(),
+          _stored_vector_mirror_sendbufs(),
+          _stored_vector_mirror_recvbufs(),
+          _stored_dest_ranks(),
+          _stored_source_ranks()
+        {
+        }
+
+        SynchronizationDataContainer(const SynchronizationDataContainer& other)
+        {
+          this->_stored_vector_mirrors = other._stored_vector_mirrors;
+          this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
+          this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
+          this->_stored_dest_ranks = other.stored_dest_ranks;
+          this->_stored_source_ranks = other.stored_source_ranks;
+        }
+
+        vector_mirror_storage_type_ _stored_vector_mirrors;
+        vector_storage_type_ _stored_vector_mirror_sendbufs;
+        vector_storage_type_ _stored_vector_mirror_recvbufs;
+        index_storage_type_ _stored_dest_ranks;
+        index_storage_type_ _stored_source_ranks;
+    };
+
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector>
-    struct SynchronisedSolverData : public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>
+    struct SynchronisedSolverData :
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
+      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
     {
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
@@ -375,22 +462,14 @@ namespace FEAST
                              Index num_temp_vectors = 0,
                              Index num_temp_scalars = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
-        stored_mirrors(),
-        stored_mirror_sendbufs(),
-        stored_mirror_recvbufs(),
-        stored_dest_ranks(),
-        stored_source_ranks()
+        SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
       }
 
       ///copy CTOR
       SynchronisedSolverData(const SynchronisedSolverData& other) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
-        stored_mirrors(other.stored_mirrors),
-        stored_mirror_sendbufs(other.stored_mirror_sendbufs),
-        stored_mirror_recvbufs(other.stored_mirror_recvbufs),
-        stored_dest_ranks(other.stored_dest_ranks),
-        stored_source_ranks(other.stored_source_ranks)
+        SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>(other)
       {
       }
 
@@ -411,22 +490,16 @@ namespace FEAST
         this->_stored_max_iters = Index(0);
         this->_stored_used_iters = Index(0);
 
-        this->stored_mirrors = other.stored_mirrors;
-        this->stored_mirror_sendbufs = other.stored_mirror_sendbufs;
-        this->stored_mirror_recvbufs = other.stored_mirror_recvbufs;
-        this->stored_dest_ranks = other.stored_dest_ranks;
-        this->stored_source_ranks = other.stored_source_ranks;
+        this->_stored_vector_mirrors = other._stored_vector_mirrors;
+        this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
+        this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
+        this->_stored_dest_ranks = other._stored_dest_ranks;
+        this->_stored_source_ranks = other._stored_source_ranks;
 
         return *this;
       }
-
-      vector_mirror_storage_type_ stored_mirrors;
-      vector_storage_type_ stored_mirror_sendbufs;
-      vector_storage_type_ stored_mirror_recvbufs;
-      index_storage_type_ stored_dest_ranks;
-      index_storage_type_ stored_source_ranks;
     };
-
+/*
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
