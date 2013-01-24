@@ -11,6 +11,7 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/component_product.hpp>
 #include <kernel/lafem/product_matvec.hpp>
+#include <kernel/lafem/dot_product.hpp>
 
 
 
@@ -38,6 +39,12 @@ namespace FEAST
       static void value(DenseVector<Mem_, DT_> & r, const SM_ & a, const DenseVector<Mem_, DT_> & b)
       {
         ProductMatVec<Algo_>::value(r, a, b);
+      }
+
+      template <typename Mem_, typename DT_>
+      static DT_ value(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
+      {
+        return DotProduct<Algo_>::value(x, y);
       }
     };
 
