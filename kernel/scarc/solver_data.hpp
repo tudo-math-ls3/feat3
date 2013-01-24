@@ -5,6 +5,7 @@
 #include<kernel/lafem/dense_vector.hpp>
 #include<kernel/lafem/vector_mirror.hpp>
 #include<kernel/lafem/sparse_matrix_csr.hpp>
+#include<kernel/lafem/unit_filter.hpp>
 #include<kernel/util/cpp11_smart_pointer.hpp>
 
 using namespace FEAST::LAFEM;
@@ -248,18 +249,55 @@ namespace FEAST
 
     };
 
+    template<typename DataType_ = double,
+             typename MemTag_ = Mem::Main,
+             template<typename, typename> class PreconContType_ = SparseMatrixCSR>
+    struct PreconditionerDataContainer
+    {
+      public:
+        typedef PreconContType_<MemTag_, DataType_> precon_type_;
+
+        virtual precon_type_& precon()
+        {
+          return _stored_precon;
+        }
+
+        virtual const precon_type_& precon() const
+        {
+          return _stored_precon;
+        }
+
+      protected:
+        ///CTORs to be used in subclasses
+        PreconditionerDataContainer(const precon_type_& precon) :
+          _stored_precon(precon)
+        {
+        }
+
+        PreconditionerDataContainer(const PreconditionerDataContainer& other)
+        {
+          this->_stored_precon = other._stored_precon;
+        }
+
+        precon_type_ _stored_precon;
+    };
+
     ///only store data that is *referenced* by solver functors, do not store constants
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             template<typename, typename> class PreconContType_ = SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector>
-    struct PreconditionedSolverData : public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>
+    struct PreconditionedSolverData :
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
+      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>
     {
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+
+      typedef PreconContType_<MemTag_, DataType_> precon_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -269,20 +307,20 @@ namespace FEAST
 
       ///CTOR from system data
       PreconditionedSolverData(matrix_type_& A,
-                              matrix_type_& P,
-                              vector_type_& x,
-                              vector_type_& b,
-                              Index num_temp_vectors = 0,
-                              Index num_temp_scalars = 0) :
+                               precon_type_& P,
+                               vector_type_& x,
+                               vector_type_& b,
+                               Index num_temp_vectors = 0,
+                               Index num_temp_scalars = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
-        stored_prec(P)
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P)
       {
       }
 
       ///copy CTOR
       PreconditionedSolverData(const PreconditionedSolverData& other) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
-        stored_prec(other.stored_prec)
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(other)
       {
       }
 
@@ -303,14 +341,13 @@ namespace FEAST
         this->_stored_max_iters = Index(0);
         this->_stored_used_iters = Index(0);
 
-        this->stored_prec = other._stored_prec;
+        this->_stored_precon = other._stored_precon;
 
         return *this;
       }
-
-      PreconContType_ stored_prec;
     };
 
+/*
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -522,7 +559,7 @@ namespace FEAST
       }
 
       leveldata_storage_type_ stored_level_data;
-    };
+    };*/
   }
 }
 

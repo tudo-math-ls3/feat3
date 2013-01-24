@@ -67,7 +67,7 @@ namespace FEAST
                typename DataType_,
                template<typename, typename> class VT_,
                template<typename, typename> class MT_,
-               typename PT_,
+               template<typename, typename> class PT_,
                template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data,
                                                                                 Index max_iter = 100,
