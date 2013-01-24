@@ -637,6 +637,117 @@ namespace FEAST
 
       leveldata_storage_type_ stored_level_data;
     };
+
+    template<typename DataType_ = double,
+             typename MemTag_ = Mem::Main,
+             template<typename, typename> class FilterType_ = UnitFilter>
+    struct FilterDataContainer
+    {
+      public:
+        typedef FilterType_<MemTag_, DataType_> filter_type_;
+
+        virtual filter_type_& filter()
+        {
+          return _stored_filter;
+        }
+
+        virtual const filter_type_& filter() const
+        {
+          return _stored_filter;
+        }
+
+      protected:
+        ///CTORs to be used in subclasses
+        FilterDataContainer(const filter_type_& precon) :
+          _stored_filter(filter)
+        {
+        }
+
+        FilterDataContainer(const FilterDataContainer& other)
+        {
+          this->_stored_filter = other._stored_filter;
+        }
+
+        filter_type_ _stored_filter;
+    };
+
+    template<typename DataType_ = double,
+             typename MemTag_ = Mem::Main,
+             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename> class VectorMirrorType_ = VectorMirror,
+             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename> class PreconContType_ = SparseMatrixCSR,
+             template<typename, typename> class FilterType_ = UnitFilter,
+             template<typename, typename> class StorageType_ = std::vector>
+    struct SynchronisedPreconditionedFilteredSolverData :
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
+      public FilterDataContainer<DataType_, MemTag_, FilterType_>,
+      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>,
+      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
+    {
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+
+      ///fulfill pure virtual
+      virtual const std::string type_name()
+      {
+        return "SynchronisedPreconditionedFilteredSolverData";
+      }
+
+      ///CTOR from system data
+      SynchronisedPreconditionedFilteredSolverData(matrix_type_& A,
+                                                   PreconContType_<MemTag_, DataType_>& P,
+                                                   vector_type_& x,
+                                                   vector_type_& b,
+                                                   Index num_temp_vectors = 0,
+                                                   Index num_temp_scalars = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+        FilterDataContainer<DataType_, MemTag_, FilterType_>(),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
+        SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
+      {
+      }
+
+      ///copy CTOR
+      SynchronisedPreconditionedFilteredSolverData(const SynchronisedPreconditionedFilteredSolverData& other) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
+        FilterDataContainer<DataType_, MemTag_, FilterType_>(other),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(other),
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>(other)
+      {
+      }
+
+      ///assignment operator overload
+      SynchronisedPreconditionedFilteredSolverData& operator=(const SynchronisedPreconditionedFilteredSolverData& other)
+      {
+          if(this == &other)
+            return *this;
+
+        this->_stored_sys = other._stored_sys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
+
+        this->_stored_precon = other._stored_precon;
+
+        this->_stored_vector_mirrors = other._stored_vector_mirrors;
+        this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
+        this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
+        this->_stored_dest_ranks = other._stored_dest_ranks;
+        this->_stored_source_ranks = other._stored_source_ranks;
+
+        this->_stored_filter = other._stored_filter;
+
+        return *this;
+      }
+    };
   }
 }
 
