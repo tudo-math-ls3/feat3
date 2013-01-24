@@ -415,11 +415,13 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.stored_dest_ranks = destranks;
   data.stored_source_ranks = sourceranks;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<Richardson, Algo::Generic>::execute(data, 20, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<Richardson, Algo::Generic>::execute(data, 2, 1e-8));
 
   MPI_Barrier(MPI_COMM_WORLD);
 
   solver->execute();
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
   delete macro_basemesh;
 }

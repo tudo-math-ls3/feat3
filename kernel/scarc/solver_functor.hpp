@@ -1462,6 +1462,99 @@ namespace FEAST
         DT_& _sendbuf;
         DT_& _recvbuf;
     };
+
+    ///filter functors
+    template<typename Algo_, typename VT_, typename FilterType_>
+    class FilterDefectFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        FilterDefectFunctor(VT_& l, const FilterType_& r) :
+          _l(l),
+          _r(r)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "FilterDefectFunctor";
+        }
+
+        virtual void execute()
+        {
+          _r.filter_def(_l);
+        }
+
+        FilterDefectFunctor& operator=(const FilterDefectFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_l = rhs._l;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        FilterDefectFunctor(const FilterDefectFunctor& other) :
+          _l(other._l),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        VT_& _l;
+        const FilterType_& _r;
+    };
+
+    template<typename Algo_, typename VT_, typename FilterType_>
+    class FilterCorrectionFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        FilterCorrectionFunctor(VT_& l, const FilterType_& r) :
+          _l(l),
+          _r(r)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "FilterCorrectionFunctor";
+        }
+
+        virtual void execute()
+        {
+          _r.filter_def(_l);
+        }
+
+        FilterCorrectionFunctor& operator=(const FilterCorrectionFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_l = rhs._l;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        FilterCorrectionFunctor(const FilterCorrectionFunctor& other) :
+          _l(other._l),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        VT_& _l;
+        const FilterType_& _r;
+    };
   }
 }
 
