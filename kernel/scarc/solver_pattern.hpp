@@ -94,7 +94,7 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.stored_prec, data.temp().at(0)));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
         cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.temp().at(0), data.sol()));
 
         cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
@@ -111,7 +111,7 @@ namespace FEAST
                template<typename, typename> class VT_,
                template<typename, typename> class VMT_,
                template<typename, typename> class MT_,
-               typename PT_,
+               template<typename, typename> class PT_,
                template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(SynchronisedPreconditionedSolverData<DataType_,
                                                                                                                      Tag_,
@@ -140,11 +140,11 @@ namespace FEAST
                                            VMT_<Tag_, DataType_>,
                                            com_exchange,
                                            StoreT_>(data.temp().at(0),
-                                                    data.stored_mirrors,
-                                                    data.stored_mirror_sendbufs,
-                                                    data.stored_mirror_recvbufs,
-                                                    data.stored_dest_ranks,
-                                                    data.stored_source_ranks));
+                                                    data.vector_mirrors(),
+                                                    data.vector_mirror_sendbufs(),
+                                                    data.vector_mirror_recvbufs(),
+                                                    data.dest_ranks(),
+                                                    data.source_ranks()));
 
         //norm2(norm_0, t)
         cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
@@ -157,7 +157,7 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.stored_prec, data.temp().at(0)));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
         cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.temp().at(0), data.sol()));
 
         cfiterate.add_functor(new DefectFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), data.sol()));
@@ -166,11 +166,11 @@ namespace FEAST
                                                   VMT_<Tag_, DataType_>,
                                                   com_exchange,
                                                   StoreT_>(data.temp().at(0),
-                                                           data.stored_mirrors,
-                                                           data.stored_mirror_sendbufs,
-                                                           data.stored_mirror_recvbufs,
-                                                           data.stored_dest_ranks,
-                                                           data.stored_source_ranks));
+                                                           data.vector_mirrors(),
+                                                           data.vector_mirror_sendbufs(),
+                                                           data.vector_mirror_recvbufs(),
+                                                           data.dest_ranks(),
+                                                           data.source_ranks()));
 
         cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
         cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
@@ -205,7 +205,7 @@ namespace FEAST
                typename DataType_,
                template<typename, typename> class VT_,
                template<typename, typename> class MT_,
-               typename PT_,
+               template<typename, typename> class PT_,
                template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data,
                                                                                 VT_<Tag_, DataType_>& dummy,
@@ -233,7 +233,7 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.stored_prec, data.temp().at(0)));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
         cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(dummy, dummy, data.temp().at(0)));
 
         cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
@@ -377,7 +377,7 @@ namespace FEAST
                typename DataType_,
                template<typename, typename> class VT_,
                template<typename, typename> class MT_,
-               typename PT_,
+               template<typename, typename> class PT_,
                template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data)
       {
@@ -411,7 +411,7 @@ namespace FEAST
                typename DataType_,
                template<typename, typename> class VT_,
                template<typename, typename> class MT_,
-               typename PT_,
+               template<typename, typename> class PT_,
                template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(PreconditionedSolverData<DataType_, Tag_, VT_, MT_, PT_, StoreT_>& data,
                                                                                 VT_<Tag_, DataType_>& dummy)

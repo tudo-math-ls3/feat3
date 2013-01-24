@@ -357,7 +357,7 @@ namespace FEAST
       public:
         typedef VectorType_<MemTag_, DataType_> vector_type_;
         typedef VectorMirrorType_<MemTag_, DataType_> vector_mirror_type_;
-        typedef VectorType_<MemTag_, DataType_> vector_storage_type_;
+        typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
         typedef StorageType_<VectorMirrorType_<MemTag_, DataType_>, std::allocator<VectorMirrorType_<MemTag_, DataType_> > > vector_mirror_storage_type_;
         typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
 
@@ -499,15 +499,18 @@ namespace FEAST
         return *this;
       }
     };
-/*
+
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             template<typename, typename> class PreconContType_ = SparseMatrixCSR,
              template<typename, typename> class StorageType_ = std::vector>
-    struct SynchronisedPreconditionedSolverData : public SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>
+    struct SynchronisedPreconditionedSolverData :
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
+      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>,
+      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
     {
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
@@ -521,20 +524,23 @@ namespace FEAST
 
       ///CTOR from system data
       SynchronisedPreconditionedSolverData(matrix_type_& A,
-                             PreconContType_& P,
+                             PreconContType_<MemTag_, DataType_>& P,
                              vector_type_& x,
                              vector_type_& b,
                              Index num_temp_vectors = 0,
                              Index num_temp_scalars = 0) :
-        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
-        stored_prec(P)
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
+        SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
+
       {
       }
 
       ///copy CTOR
       SynchronisedPreconditionedSolverData(const SynchronisedPreconditionedSolverData& other) :
-        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(other),
-        stored_prec(other.stored_prec)
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(other),
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>(other)
       {
       }
 
@@ -555,18 +561,16 @@ namespace FEAST
         this->_stored_max_iters = Index(0);
         this->_stored_used_iters = Index(0);
 
-        this->stored_mirrors = other.stored_mirrors;
-        this->stored_mirror_sendbufs = other.stored_mirror_sendbufs;
-        this->stored_mirror_recvbufs = other.stored_mirror_recvbufs;
-        this->stored_dest_ranks = other.stored_dest_ranks;
-        this->stored_source_ranks = other.stored_source_ranks;
+        this->_stored_precon = other._stored_precon;
 
-        this->stored_prec = other.stored_prec;
+        this->_stored_vector_mirrors = other._stored_vector_mirrors;
+        this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
+        this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
+        this->_stored_dest_ranks = other._stored_dest_ranks;
+        this->_stored_source_ranks = other._stored_source_ranks;
 
         return *this;
       }
-
-      PreconContType_ stored_prec;
     };
 
     template<typename DataType_ = double,
@@ -632,7 +636,7 @@ namespace FEAST
       }
 
       leveldata_storage_type_ stored_level_data;
-    };*/
+    };
   }
 }
 

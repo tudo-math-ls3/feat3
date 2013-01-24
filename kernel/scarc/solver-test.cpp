@@ -56,7 +56,7 @@ class SolverTest:
       }
       SparseMatrixELL<Tag_, DataType_> P(P_proxy);
 
-      PreconditionedSolverData<DataType_, Tag_, DenseVector, SparseMatrixELL, SparseMatrixELL<Tag_, DataType_> >data(A, P, x, b,
+      PreconditionedSolverData<DataType_, Tag_, DenseVector, SparseMatrixELL, SparseMatrixELL >data(A, P, x, b,
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 2000, 1e-8));
@@ -73,7 +73,7 @@ class SolverTest:
                                            DenseVector,
                                            VectorMirror,
                                            SparseMatrixELL,
-                                           SparseMatrixELL<Tag_, DataType_> >data1(A, P, x1, b,
+                                           SparseMatrixELL >data1(A, P, x1, b,
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver1(SolverPatternGeneration<Richardson, Algo_>::execute(data1, 2000, 1e-8));

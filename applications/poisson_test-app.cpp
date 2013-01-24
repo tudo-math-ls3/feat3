@@ -405,15 +405,15 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     DenseVector,
     VectorMirror,
     SparseMatrixCSR,
-    SparseMatrixCSR<Mem::Main, double> >data(mat_sys, mat_precon, vec_sol, vec_rhs,
+    SparseMatrixCSR >data(mat_sys, mat_precon, vec_sol, vec_rhs,
                                              SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_vectors(),
                                              SolverPatternGeneration<Richardson, Algo::Generic>::min_num_temp_scalars());
 
-  data.stored_mirrors = mirrors;
-  data.stored_mirror_sendbufs = sendbufs;
-  data.stored_mirror_recvbufs = recvbufs;
-  data.stored_dest_ranks = destranks;
-  data.stored_source_ranks = sourceranks;
+  data.vector_mirrors() = mirrors;
+  data.vector_mirror_sendbufs() = sendbufs;
+  data.vector_mirror_recvbufs() = recvbufs;
+  data.dest_ranks() = destranks;
+  data.source_ranks() = sourceranks;
 
   std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<Richardson, Algo::Generic>::execute(data, 2, 1e-8));
 
