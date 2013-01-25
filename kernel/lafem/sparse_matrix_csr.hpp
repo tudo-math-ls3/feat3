@@ -187,10 +187,10 @@ namespace FEAST
           Index ait(0);
           Index current_row(0);
           _row_ptr[current_row] = 0;
-          for (typename std::map<unsigned long, DT_>::const_iterator it(other.elements().begin()) ; it != other.elements().end() ; ++it)
+          for (Index it(0) ; it < other.used_elements() ; ++it)
           {
-            Index row(it->first / _columns);
-            Index column(it->first % _columns);
+            Index row(other.row()[it]);
+            Index column(other.column()[it]);
 
             if (current_row < row)
             {
@@ -203,7 +203,7 @@ namespace FEAST
               current_row = row;
               _row_ptr[current_row] = ait;
             }
-            _val[ait] = it->second;
+            _val[ait] = other.val()[it];
             _col_ind[ait] = column;
             ++ait;
           }
@@ -235,7 +235,8 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          SparseMatrixCSR<Mem::Main, DT_> tother(other);
+          SparseMatrixCOO<Mem::Main, DT_> xother(other);
+          SparseMatrixCSR<Mem::Main, DT_> tother(xother);
 
           this->_size = tother.size();
           this->_rows = tother.rows();
@@ -261,28 +262,28 @@ namespace FEAST
           Index src_size(tother.get_elements_size().at(0) * sizeof(DT_));
           Index dest_size(tother.get_elements_size().at(0) * sizeof(DT_));
           void * temp(::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, tother.get_elements().at(0), src_size);
+          MemoryPool<Mem::Main>::download(temp, tother.get_elements().at(0), src_size);
           MemoryPool<Arch_>::upload(this->get_elements().at(0), temp, dest_size);
           ::free(temp);
 
           src_size = (tother.get_indices_size().at(0) * sizeof(Index));
           dest_size = (tother.get_indices_size().at(0) * sizeof(Index));
           temp = (::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, tother.get_indices().at(0), src_size);
+          MemoryPool<Mem::Main>::download(temp, tother.get_indices().at(0), src_size);
           MemoryPool<Arch_>::upload(this->get_indices().at(0), temp, dest_size);
           ::free(temp);
 
           src_size = (tother.get_indices_size().at(1) * sizeof(Index));
           dest_size = (tother.get_indices_size().at(1) * sizeof(Index));
           temp = (::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, tother.get_indices().at(1), src_size);
+          MemoryPool<Mem::Main>::download(temp, tother.get_indices().at(1), src_size);
           MemoryPool<Arch_>::upload(this->get_indices().at(1), temp, dest_size);
           ::free(temp);
 
           src_size = (tother.get_indices_size().at(2) * sizeof(Index));
           dest_size = (tother.get_indices_size().at(2) * sizeof(Index));
           temp = (::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, tother.get_indices().at(2), src_size);
+          MemoryPool<Mem::Main>::download(temp, tother.get_indices().at(2), src_size);
           MemoryPool<Arch_>::upload(this->get_indices().at(2), temp, dest_size);
           ::free(temp);
         }

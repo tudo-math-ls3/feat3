@@ -36,13 +36,34 @@ public:
 
   virtual void run() const
   {
+    SparseMatrixCOO<Tag_, DT_> x;
     SparseMatrixCOO<Tag_, DT_> a(10, 10);
+    a(5,5,2);
+    std::cout<<a;
     a(1,2,7);
-    //a.insert(5,5,2);
+    std::cout<<a;
+    a(5,5,2);
+    std::cout<<a;
+    TEST_CHECK_EQUAL(a.used_elements(), 2ul);
+    TEST_CHECK_EQUAL(a(1, 2), 7.);
+    TEST_CHECK_EQUAL(a(5, 5), 2.);
+
+    a.clear();
+    a(1,2,7);
+    a(5,5,2);
     a(5,5,2);
     TEST_CHECK_EQUAL(a.used_elements(), 2ul);
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
+
+    a.clear();
+    a(1,2,7);
+    a(5,5,2);
+    a(1,2,7);
+    TEST_CHECK_EQUAL(a.used_elements(), 2ul);
+    TEST_CHECK_EQUAL(a(1, 2), 7.);
+    TEST_CHECK_EQUAL(a(5, 5), 2.);
+
     SparseMatrixCOO<Tag_, DT_> b(a);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
@@ -66,3 +87,5 @@ public:
 };
 SparseMatrixCOOTest<Mem::Main, float> sparse_matrix_coo_test_float;
 SparseMatrixCOOTest<Mem::Main, double> sparse_matrix_coo_test_double;
+SparseMatrixCOOTest<Mem::CUDA, float> cuda_sparse_matrix_coo_test_float;
+SparseMatrixCOOTest<Mem::CUDA, double> cuda_sparse_matrix_coo_test_double;
