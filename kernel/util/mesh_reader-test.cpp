@@ -37,7 +37,7 @@ public:
     ioss << " version 1" << endl;
     ioss << " chart_file unit_quad_chart.txt" << endl;
     ioss << " submeshes 1" << endl;
-    ioss << " cellsets 0" << endl;
+    ioss << " cellsets 1" << endl;
     ioss << "</header>" << endl;
     ioss << "   <info>    " << endl;
     ioss << " This file contains a simple unit-square mesh with one quadrilateral" << endl;
@@ -50,7 +50,7 @@ public:
     ioss << "  shape quad" << endl;
     ioss << " </header>" << endl;
     ioss << " <info>" << endl;
-    ioss << "Friss meine shorts!" << endl;
+    ioss << "test" << endl;
     ioss << " </info>" << endl;
     ioss << " <counts>" << endl;
     ioss << "  verts 4" << endl;
@@ -75,6 +75,25 @@ public:
     ioss << "  0 1 2 3" << endl;
     ioss << " </vert@quad>" << endl;
     ioss << "</mesh>" << endl;
+    // cellset
+    ioss << "<cellset>" << endl;
+    ioss << " <header>" << endl;
+    ioss << "  name cellset_1" << endl;
+    ioss << "  parent root" << endl;
+    ioss << " </header>" << endl;
+    ioss << " <info>" << endl;
+    ioss << " I am a cellset!" << endl;
+    ioss << " </info>" << endl;
+    ioss << " <counts>" << endl;
+    ioss << "  verts 4" << endl;
+    ioss << " </counts>" << endl;
+    ioss << " <vert_idx>" << endl;
+    ioss << "1" << endl;
+    ioss << "2" << endl;
+    ioss << "3" << endl;
+    ioss << "0" << endl;
+    ioss << " </vert_idx>" << endl;
+    ioss << "</cellset>" << endl;
     // submesh
     ioss << "<submesh>   " << endl;
     ioss << " <header>" << endl;
@@ -85,7 +104,7 @@ public:
     ioss << "  coords    1" << endl;
     ioss << "</header>" << endl;
     ioss << " <info>  " << endl;
-    ioss << " This is a submesh that 42" << endl;
+    ioss << " This is a submesh that..." << endl;
     ioss << " </info> " << endl;
     ioss << " <counts>" << endl;
     ioss << "   verts    5   " << endl;
@@ -129,7 +148,7 @@ public:
     TEST_CHECK_EQUAL(reader.get_version(), Index(1));
     TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
     TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(1));
-    TEST_CHECK_EQUAL(reader.get_num_cellsets(), Index(0));
+    TEST_CHECK_EQUAL(reader.get_num_cellsets(), Index(1));
 
     // test the get_mesh function
     MeshReader::MeshDataContainer* root_mesh_ptr = reader.get_mesh("rooot");
@@ -212,7 +231,7 @@ public:
     };
 
     // check vertex at edge adjacencies
-    adj_stack = root_mesh.adjacencies[0][1];
+    adj_stack = root_mesh.adjacencies[1];
     count = 0;
     for(Index i(0); i < 4; ++i)
     {
@@ -233,7 +252,7 @@ public:
     TEST_CHECK_EQUAL(error, false);
 
     // check vertex at quad adjacencies
-    adj_stack = root_mesh.adjacencies[0][2];
+    adj_stack = root_mesh.adjacencies[2];
     count = 0;
     for(Index j(0); j < 4; ++j)
     {
@@ -249,16 +268,55 @@ public:
     TEST_CHECK_EQUAL(error, false);
 
     // check if the rest is emtpy
-    TEST_CHECK_EQUAL((root_mesh.adjacencies[1][2]).empty(), true);
-    TEST_CHECK_EQUAL((root_mesh.adjacencies[0][3]).empty(), true);
-    TEST_CHECK_EQUAL((root_mesh.adjacencies[1][3]).empty(), true);
-    TEST_CHECK_EQUAL((root_mesh.adjacencies[2][3]).empty(), true);
+    TEST_CHECK_EQUAL((root_mesh.adjacencies[3]).empty(), true);
 
     // check parent indices
     TEST_CHECK_EQUAL((root_mesh.parent_indices[0]).empty(), true);
     TEST_CHECK_EQUAL((root_mesh.parent_indices[1]).empty(), true);
     TEST_CHECK_EQUAL((root_mesh.parent_indices[2]).empty(), true);
     TEST_CHECK_EQUAL((root_mesh.parent_indices[3]).empty(), true);
+
+    //
+    // check the cellset
+    //
+
+    String cellset_name = "cellset_1";
+    MeshReader::CellSetContainer* cellset = reader.get_cell_set(cellset_name);
+
+    TEST_CHECK_EQUAL(cellset->name, "cellset_1");
+    TEST_CHECK_EQUAL(cellset->parent, "root");
+    TEST_CHECK_EQUAL(cellset->vertex_number, Index(4));
+    TEST_CHECK_EQUAL(cellset->edge_number, Index(0));
+    TEST_CHECK_EQUAL(cellset->quad_number, Index(0));
+    TEST_CHECK_EQUAL(cellset->tria_number, Index(0));
+    TEST_CHECK_EQUAL(cellset->hexa_number, Index(0));
+    TEST_CHECK_EQUAL(cellset->tetra_number, Index(0));
+
+    // check parent indices of the cellset
+    std::vector<Index> par_vert = cellset->parent_indices[0];
+
+    // reference
+    Index par_vert_ref[] =
+    {
+      1, 2, 3, 0
+    };
+
+    // check vertex parents
+    error = false;
+    for(Index j(0); j < 4; ++j)
+    {
+      if(par_vert_ref[j] != par_vert[j])
+      {
+        error = true;
+        break;
+      }
+    }
+    TEST_CHECK_EQUAL(error, false);
+
+    // check if the rest is empty
+    TEST_CHECK_EQUAL((cellset->parent_indices[1]).empty(), true);
+    TEST_CHECK_EQUAL((cellset->parent_indices[2]).empty(), true);
+    TEST_CHECK_EQUAL((cellset->parent_indices[3]).empty(), true);
 
     //
     // check the sub mesh data
@@ -331,7 +389,7 @@ public:
     };
 
     // check vertex at edge adjacencies
-    adj_stack_sub = sub_mesh.adjacencies[0][1];
+    adj_stack_sub = sub_mesh.adjacencies[1];
     count = 0;
     for(Index i(0); i < 4; ++i)
     {
@@ -351,12 +409,9 @@ public:
     }
     TEST_CHECK_EQUAL(error, false);
 
-    // check if the rest is emtpy
-    TEST_CHECK_EQUAL((sub_mesh.adjacencies[0][2]).empty(), true);
-    TEST_CHECK_EQUAL((sub_mesh.adjacencies[1][2]).empty(), true);
-    TEST_CHECK_EQUAL((sub_mesh.adjacencies[0][3]).empty(), true);
-    TEST_CHECK_EQUAL((sub_mesh.adjacencies[1][3]).empty(), true);
-    TEST_CHECK_EQUAL((sub_mesh.adjacencies[2][3]).empty(), true);
+    // check if the rest is empty
+    TEST_CHECK_EQUAL((sub_mesh.adjacencies[2]).empty(), true);
+    TEST_CHECK_EQUAL((sub_mesh.adjacencies[3]).empty(), true);
 
     // check parent indices of the sub mesh
     std::vector<Index> par0 = sub_mesh.parent_indices[0];

@@ -92,7 +92,7 @@ namespace FEAST
       CoordStack coords;
 
       // adjacencies
-      AdjStack adjacencies [4][4];
+      AdjStack adjacencies[4];
 
     public:
       // default CTOR
@@ -307,7 +307,7 @@ namespace FEAST
     /**
      * \brief Parses a given FEAST- coord file.
      *
-     * This function parses the FEAST- coord file given by "filepath" and saves the data within
+     * This function parses the FEAST- coord file given by "filepath" and saves the data in
      * the MeshDataContainer that is specified by the pointer "mesh".
      *
      * \param[in] filepath
@@ -334,7 +334,7 @@ namespace FEAST
     /**
      * \brief Parses a given FEAST- adjacency file.
      *
-     * This function parses the FEAST- adjacency file given by "filepath" and saves the data within
+     * This function parses the FEAST- adjacency file given by "filepath" and saves the data in
      * the MeshDataContainer that is specified by the pointer "mesh".
      *
      * \param[in] filepath
@@ -402,34 +402,6 @@ namespace FEAST
      */
     MeshReader::CellSetContainer* get_cell_set(String name);
 
-    /*
-     * \brief Returns the mesh data container that belongs to the given name.
-     * The returned bool is false if no such mesh was found.
-     *
-     * \param[in] name
-     * The name of the mesh that is needed.
-     */
-    //std::pair<MeshReader::MeshDataContainer, bool> get_mesh(String mesh_name);
-
-    /*
-     * \brief Returns the cellset container that belongs to the given name.
-     * The returned bool is false if no such set was found.
-     *
-     * \param[in] name
-     * The name of the cellset that is needed.
-     */
-    //std::pair<MeshReader::CellSetContainer, bool> get_cellset(String cellset_name);
-
-    /*
-     * \brief Returns true if "meshes" is empty.
-     */
-    //bool no_meshes() const;
-
-    /*
-     * \brief Returns true if "cellsets" is empty.
-     */
-    //bool no_cellsets() const;
-
   private:
 
     MeshReader::CellSetParent* _find_cell_set_parent(String parent_name);
@@ -442,12 +414,12 @@ namespace FEAST
      * A reference to the input stream to be parsed.
      *
      * \param[in] cur_line
-     * A counter that specifies the number of "lines" read so far.
+     * A counter that specifies the number of lines read so far.
      *
      * \returns
      * The number of lines that has been read when the programme is done.
      */
-    Index _parse_header_section(Index cur_line, std::istream& ifs);
+     Index _parse_header_section(Index cur_line, std::istream& ifs);
 
     /**
      * \brief Parses a mesh-info-data-input stream.
@@ -456,7 +428,7 @@ namespace FEAST
      * A reference to the input stream to be parsed.
      *
      * \param[in] cur_line
-     * A counter that specifies the number of "lines" read so far.
+     * A counter that specifies the number of lines read so far.
      *
      * \returns
      * The number of lines that has been read when the programme is done.
@@ -470,7 +442,7 @@ namespace FEAST
      * A reference to the input stream to be parsed.
      *
      * \param[in] cur_line
-     * A counter that specifies the number of "lines" read so far.
+     * A counter that specifies the number of lines read so far.
      *
      * \param[in] submesh
      * Specifies whether the data belongs to a sub-mesh (true) or the root mesh (false).
@@ -487,12 +459,86 @@ namespace FEAST
      * A reference to the input stream to be parsed.
      *
      * \param[in] cur_line
-     * A counter that specifies the number of "lines" read so far.
+     * A counter that specifies the number of lines read so far.
      *
      * \returns
      * The number of lines that has been read when the programme is done.
      */
     Index _parse_cellset_section(Index cur_line, std::istream& ifs);
+
+    /**
+     * \brief Parses a counts subchunk
+     *
+     * \param[in] ifs
+     * A reference to the input stream to be parsed.
+     *
+     * \param[in] cur_line
+     * A counter that specifies the number of lines read so far.
+     *
+     * \param[in] container
+     * A pointer to the BaseContainer the data shall be saved in.
+     *
+     * \returns
+     * The number of lines that has been read when the programme is done.
+     */
+    Index _parse_counts_chunk(Index cur_line, std::istream& ifs, BaseContainer* container);
+
+    /**
+     * \brief Parses a coords subchunk
+     *
+     * \param[in] ifs
+     * A reference to the input stream to be parsed.
+     *
+     * \param[in] cur_line
+     * A counter that specifies the number of lines read so far.
+     *
+     * \param[in] container
+     * A pointer to the BaseContainer the data shall be saved in.
+     *
+     * \returns
+     * The number of lines that has been read when the programme is done.
+     */
+    Index _parse_coords_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container);
+
+    /**
+     * \brief Parses an adjacency subchunk
+     *
+     * \param[in] ifs
+     * A reference to the input stream to be parsed.
+     *
+     * \param[in] cur_line
+     * A counter that specifies the number of lines read so far.
+     *
+     * \param[in] container
+     * A pointer to the BaseContainer the data shall be saved in.
+     *
+     * \param[in] line
+     * The last line that was read (and therefore the first line of the subchunk)
+     *
+     * \returns
+     * The number of lines that has been read when the programme is done.
+     */
+    Index _parse_adjacency_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container, String line);
+
+    /**
+     * \brief Parses a parent-indices subchunk
+     *
+     * \param[in] ifs
+     * A reference to the input stream to be parsed.
+     *
+     * \param[in] cur_line
+     * A counter that specifies the number of lines read so far.
+     *
+     * \param[in] container
+     * A pointer to the BaseContainer the data shall be saved in.
+     *
+     * \param[in] line
+     * The last line that was read (and therefore the first line of the subchunk)
+     *
+     * \returns
+     * The number of lines that has been read when the programme is done.
+     */
+    Index _parse_parents_chunk(Index cur_line, std::istream& ifs, BaseContainer* container, String line);
 
   }; // class MeshReader
 } // namespace FEAST
