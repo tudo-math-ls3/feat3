@@ -845,7 +845,7 @@ namespace FEAST
      * \param[in] a A matrix to compare with.
      * \param[in] b A matrix to compare with.
      */
-    template <typename Mem_, typename DT_> bool operator== (const SparseMatrixCOO<Mem_, DT_> & a, const SparseMatrixCOO<Mem_, DT_> & b)
+    template <typename Mem_, typename Mem2_, typename DT_> bool operator== (const SparseMatrixCOO<Mem_, DT_> & a, const SparseMatrixCOO<Mem2_, DT_> & b)
     {
       CONTEXT("When comparing SparseMatrixCOOs");
 
