@@ -29,7 +29,8 @@ namespace FEAST
         fm_dv,
         fm_m,
         fm_ell,
-        fm_csr
+        fm_csr,
+        fm_coo
       };
 
     /**

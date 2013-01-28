@@ -120,6 +120,70 @@ namespace FEAST
           }
         }
 
+        void _read_from_coo(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          _read_from_coo(file);
+          file.close();
+        }
+
+        void _read_from_coo(std::istream& file)
+        {
+          uint64_t rows;
+          uint64_t columns;
+          uint64_t elements;
+          file.read((char *)&rows, sizeof(uint64_t));
+          file.read((char *)&columns, sizeof(uint64_t));
+          file.read((char *)&elements, sizeof(uint64_t));
+
+          this->_size = Index(rows * columns);
+          _rows = Index(rows);
+          _columns = Index(columns);
+          _zero_element = DT_(0);
+          _used_elements = elements;
+
+          uint64_t * crow_ptr = new uint64_t[elements];
+          file.read((char *)crow_ptr, (elements) * sizeof(uint64_t));
+          _row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(Index));
+          for (Index i(0) ; i < elements ; ++i)
+            _row_ptr[i] = Index(crow_ptr[i]);
+          delete[] crow_ptr;
+
+          uint64_t * ccol_ptr = new uint64_t[elements];
+          file.read((char *)ccol_ptr, (elements) * sizeof(uint64_t));
+          _col_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(Index));
+          for (Index i(0) ; i < elements ; ++i)
+            _col_ptr[i] = Index(ccol_ptr[i]);
+          delete[] ccol_ptr;
+
+          double * cval = new double[elements];
+          file.read((char *)cval, elements * sizeof(double));
+          _val_ptr = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(DT_));
+          for (Index i(0) ; i < elements ; ++i)
+            _val_ptr[i] = DT_(cval[i]);
+          delete[] cval;
+
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(elements * sizeof(DT_)));
+          this->_elements_size.push_back(elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory((elements)* sizeof(Index)));
+          this->_indices_size.push_back(elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory((elements)* sizeof(Index)));
+          this->_indices_size.push_back(elements);
+
+          MemoryPool<Mem_>::upload(this->get_elements().at(0), _val_ptr, elements * sizeof(DT_));
+          MemoryPool<Mem_>::upload(this->get_indices().at(0), _row_ptr, elements * sizeof(Index));
+          MemoryPool<Mem_>::upload(this->get_indices().at(1), _col_ptr, elements * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->release_memory(_val_ptr);
+          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr);
+          MemoryPool<Mem::Main>::instance()->release_memory(_col_ptr);
+
+          _row_ptr = this->_indices.at(0);
+          _col_ptr = this->_indices.at(1);
+          _val_ptr = this->_elements.at(0);
+        }
+
       public:
         /// Our datatype
         typedef DT_ DataType;
@@ -278,6 +342,9 @@ namespace FEAST
             case fm_m:
               _read_from_m(filename);
               break;
+            case fm_coo:
+              _read_from_coo(filename);
+              break;
             default:
               throw InternalError("Filemode not supported!");
           }
@@ -306,6 +373,9 @@ namespace FEAST
           {
             case fm_m:
               _read_from_m(file);
+              break;
+            case fm_coo:
+              _read_from_coo(file);
               break;
             default:
               throw InternalError("Filemode not supported!");
@@ -429,6 +499,106 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
 
           return *this;
+        }
+
+        /**
+         * \brief Write out matrix to file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out(FileMode mode, String filename) const
+        {
+          CONTEXT("When writing out SparseMatrixCOO");
+
+          switch(mode)
+          {
+            case fm_coo:
+              write_out_coo(filename);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Write out matrix to file.
+         *
+         * \param[in] mode The used file format.
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out(FileMode mode, std::ostream& file) const
+        {
+          CONTEXT("When writing out SparseMatrixCOO");
+
+          switch(mode)
+          {
+            case fm_coo:
+              write_out_coo(file);
+              break;
+            default:
+                throw InternalError("Filemode not supported!");
+          }
+        }
+
+        /**
+         * \brief Write out matrix to coo binary file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_coo(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          write_out_coo(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to coo binary file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_coo(std::ostream& file) const
+        {
+          if (typeid(DT_) != typeid(double))
+            std::cout<<"Warning: You are writing out an coo matrix with less than double precission!"<<std::endl;
+
+          Index * row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(this->_indices_size.at(0) * sizeof(Index));
+          MemoryPool<Mem_>::download(row_ptr, _row_ptr, this->_indices_size.at(0) * sizeof(Index));
+          uint64_t * crow_ptr = new uint64_t[this->_indices_size.at(0)];
+          for (Index i(0) ; i < this->_indices_size.at(0) ; ++i)
+            crow_ptr[i] = row_ptr[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(row_ptr);
+
+          Index * col_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(this->_indices_size.at(1) * sizeof(Index));
+          MemoryPool<Mem_>::download(col_ptr, _col_ptr, this->_indices_size.at(1) * sizeof(Index));
+          uint64_t * ccol_ptr = new uint64_t[this->_indices_size.at(1)];
+          for (Index i(0) ; i < this->_indices_size.at(1) ; ++i)
+            ccol_ptr[i] = col_ptr[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(col_ptr);
+
+          DT_ * val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(this->_elements_size.at(0) * sizeof(DT_));
+          MemoryPool<Mem_>::download(val, _val_ptr, this->_elements_size.at(0) * sizeof(DT_));
+          double * cval = new double[this->_elements_size.at(0)];
+          for (Index i(0) ; i < this->_elements_size.at(0) ; ++i)
+            cval[i] = val[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(val);
+
+          uint64_t rows(_rows);
+          uint64_t columns(_columns);
+          uint64_t elements(this->_indices_size.at(0));
+          file.write((const char *)&rows, sizeof(uint64_t));
+          file.write((const char *)&columns, sizeof(uint64_t));
+          file.write((const char *)&elements, sizeof(uint64_t));
+          file.write((const char *)crow_ptr, elements * sizeof(uint64_t));
+          file.write((const char *)ccol_ptr, elements * sizeof(uint64_t));
+          file.write((const char *)cval, elements * sizeof(double));
+
+          delete[] crow_ptr;
+          delete[] ccol_ptr;
+          delete[] cval;
         }
 
         /**
