@@ -343,9 +343,9 @@ namespace FEAST
         template <typename Arch2_, typename DT2_>
         SparseMatrixCOO(const SparseMatrixCOO<Arch2_, DT2_> & other) :
           Container<Mem_, DT_>(other),
-          _rows(other._rows),
-          _columns(other._columns),
-          _zero_element(other._zero_element),
+          _rows(other.rows()),
+          _columns(other.columns()),
+          _zero_element(other.zero_element()),
           _used_elements(other.used_elements())
         {
           CONTEXT("When copying SparseMatrixCOO");

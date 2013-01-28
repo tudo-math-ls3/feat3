@@ -385,6 +385,21 @@ namespace FEAST
           this->_Arl = this->_indices.at(1);
         }
 
+        /** \brief Clone operation
+         *
+         * Creates a deep copy of this matrix.
+         */
+        SparseMatrixELL<Arch_, DT_> clone()
+        {
+          CONTEXT("When cloning SparseMatrixELL");
+
+
+          SparseMatrixCOO<Arch_, DT_> tcoo(*this);
+          SparseMatrixELL<Arch_, DT_> t(tcoo);
+
+          return t;
+        }
+
         /**
          * \brief Assignment operator
          *
