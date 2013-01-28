@@ -8,8 +8,11 @@
 #include<kernel/lafem/unit_filter.hpp>
 #include<kernel/util/cpp11_smart_pointer.hpp>
 
-using namespace FEAST::LAFEM;
+#include<kernel/foundation/communication.hpp>
+
 using namespace FEAST;
+using namespace FEAST::LAFEM;
+using namespace FEAST::Foundation;
 
 namespace FEAST
 {
@@ -438,7 +441,9 @@ namespace FEAST
              template<typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename> class StorageType_ = std::vector,
+             Tier2CommModes cm_vector_ = com_exchange,
+             Tier2CommModes cm_scalar = com_allreduce_sqrtsum>
     struct SynchronisedSolverData :
       public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
       public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
@@ -506,7 +511,9 @@ namespace FEAST
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename> class PreconContType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename> class StorageType_ = std::vector,
+             Tier2CommModes cm_vector_ = com_exchange,
+             Tier2CommModes cm_scalar = com_allreduce_sqrtsum>
     struct SynchronisedPreconditionedSolverData :
       public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
       public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>,
@@ -678,7 +685,9 @@ namespace FEAST
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename> class PreconContType_ = SparseMatrixCSR,
              template<typename, typename> class FilterType_ = UnitFilter,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename> class StorageType_ = std::vector,
+             Tier2CommModes cm_vector_ = com_exchange,
+             Tier2CommModes cm_scalar = com_allreduce_sqrtsum>
     struct SynchronisedPreconditionedFilteredSolverData :
       public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
       public FilterDataContainer<DataType_, MemTag_, FilterType_>,
