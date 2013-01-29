@@ -394,8 +394,29 @@ namespace FEAST
           CONTEXT("When cloning SparseMatrixELL");
 
 
-          SparseMatrixCOO<Arch_, DT_> tcoo(*this);
-          SparseMatrixELL<Arch_, DT_> t(tcoo);
+          SparseMatrixELL<Arch_, DT_> t;
+          t._size = this->_size;
+          t._rows = _rows;
+          t._columns = _columns;
+          t._zero_element = _zero_element;
+          t._used_elements = _used_elements;
+          t._stride = _stride;
+          t._num_cols_per_row = _num_cols_per_row;
+
+          t._elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_num_cols_per_row * _stride * sizeof(DT_)));
+          t._elements_size.push_back(_num_cols_per_row * _stride);
+          t._indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_num_cols_per_row * _stride * sizeof(Index)));
+          t._indices_size.push_back(_num_cols_per_row * _stride);
+          t._indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
+          t._indices_size.push_back(_rows);
+
+          t._Ax = t._elements.at(0);
+          t._Aj = t._indices.at(0);
+          t._Arl = t._indices.at(1);
+
+          MemoryPool<Arch_>::copy(t._Ax, _Ax, _num_cols_per_row * _stride * sizeof(DT_));
+          MemoryPool<Arch_>::copy(t._Aj, _Aj, _num_cols_per_row * _stride * sizeof(Index));
+          MemoryPool<Arch_>::copy(t._Arl, _Arl, _rows * sizeof(Index));
 
           return t;
         }
