@@ -111,6 +111,35 @@ namespace FEAST
           result[row] = sum;
         }
       }
+
+      /**
+       * \brief Calculate Matrix-Vector-Product \f$r \leftarrow Ab\f$
+       *
+       * \param[out] r The product result.
+       * \param[in] A The matrix.
+       * \param[in] b The vector.
+       */
+      template <typename DT_>
+      static void value(DenseVector<Mem::Main, DT_> & r, const SparseMatrixCOO<Mem::Main, DT_> & a, const DenseVector<Mem::Main, DT_> & b)
+      {
+        if (b.size() != a.columns())
+          throw InternalError("Vector size does not match!");
+        if (a.rows() != r.size())
+          throw InternalError("Vector size does not match!");
+
+        const DT_ * bp(b.elements());
+        const DT_ * val(a.val());
+        const Index * row_ptr(a.row());
+        const Index * col_ptr(a.column());
+        DT_ * rp(r.elements());
+        const Index ue(a.used_elements());
+
+        r.clear(DT_(0));
+        for (Index i(0) ; i < ue ; ++i)
+        {
+          rp[row_ptr[i]] += val[i] * bp[col_ptr[i]];
+        }
+      }
     };
 
     template <>
@@ -118,6 +147,9 @@ namespace FEAST
     {
       static void value(DenseVector<Mem::Main, float> & r, const SparseMatrixCSR<Mem::Main, float> & a, const DenseVector<Mem::Main, float> & b);
       static void value(DenseVector<Mem::Main, double> & r, const SparseMatrixCSR<Mem::Main, double> & a, const DenseVector<Mem::Main, double> & b);
+
+      static void value(DenseVector<Mem::Main, float> & r, const SparseMatrixCOO<Mem::Main, float> & a, const DenseVector<Mem::Main, float> & b);
+      static void value(DenseVector<Mem::Main, double> & r, const SparseMatrixCOO<Mem::Main, double> & a, const DenseVector<Mem::Main, double> & b);
     };
 
     template <>

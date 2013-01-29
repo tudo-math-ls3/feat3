@@ -85,6 +85,16 @@ ProductMatVecTest<Mem::Main, Algo::MKL, double, SparseMatrixCSR<Mem::Main, doubl
 ProductMatVecTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > cuda_csr_product_matvec_test_float;
 ProductMatVecTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_product_matvec_test_double;
 #endif
+ProductMatVecTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_product_matvec_test_float;
+ProductMatVecTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_product_matvec_test_double;
+#ifdef FEAST_BACKENDS_MKL
+ProductMatVecTest<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_coo_product_matvec_test_float;
+ProductMatVecTest<Mem::Main, Algo::MKL, double, SparseMatrixCOO<Mem::Main, double> > mkl_coo_product_matvec_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+//ProductMatVecTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCOO<Mem::CUDA, float> > cuda_coo_product_matvec_test_float;
+//ProductMatVecTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCOO<Mem::CUDA, double> > cuda_coo_product_matvec_test_double;
+#endif
 ProductMatVecTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_product_matvec_test_float;
 ProductMatVecTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_product_matvec_test_double;
 #ifdef FEAST_BACKENDS_CUDA

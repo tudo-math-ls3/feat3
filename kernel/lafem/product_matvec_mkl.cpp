@@ -19,3 +19,19 @@ void ProductMatVec<Algo::MKL>::value(DenseVector<Mem::Main, double> & r, const S
   char trans = 'N';
   mkl_cspblas_dcsrgemv(&trans, &rows, (double *)a.val(), (MKL_INT*)a.row_ptr(), (MKL_INT*)a.col_ind(), (double *)b.elements(), r.elements());
 }
+
+void ProductMatVec<Algo::MKL>::value(DenseVector<Mem::Main, float> & r, const SparseMatrixCOO<Mem::Main, float> & a, const DenseVector<Mem::Main, float> & b)
+{
+  MKL_INT rows = a.rows();
+  char trans = 'N';
+  MKL_INT ue = a.used_elements();
+  mkl_cspblas_scoogemv(&trans, &rows, (float *)a.val(), (MKL_INT*)a.row(), (MKL_INT*)a.column(), &ue, (float *)b.elements(), r.elements());
+}
+
+void ProductMatVec<Algo::MKL>::value(DenseVector<Mem::Main, double> & r, const SparseMatrixCOO<Mem::Main, double> & a, const DenseVector<Mem::Main, double> & b)
+{
+  MKL_INT rows = a.rows();
+  char trans = 'N';
+  MKL_INT ue = a.used_elements();
+  mkl_cspblas_dcoogemv(&trans, &rows, (double *)a.val(), (MKL_INT*)a.row(), (MKL_INT*)a.column(), &ue, (double *)b.elements(), r.elements());
+}

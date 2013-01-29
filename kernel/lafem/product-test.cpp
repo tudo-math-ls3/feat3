@@ -158,6 +158,16 @@ ProductMatVecTest2<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, 
 ProductMatVecTest2<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_ell_product_matvec_test_float2;
 ProductMatVecTest2<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_product_matvec_test_double2;
 #endif
+ProductMatVecTest2<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_product_matvec_test_float2;
+ProductMatVecTest2<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_product_matvec_test_double2;
+#ifdef FEAST_BACKENDS_MKL
+ProductMatVecTest2<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_coo_product_matvec_test_float2;
+ProductMatVecTest2<Mem::Main, Algo::MKL, double, SparseMatrixCOO<Mem::Main, double> > mkl_coo_product_matvec_test_double2;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+//ProductMatVecTest2<Mem::CUDA, Algo::CUDA, float, SparseMatrixCOO<Mem::CUDA, float> > cuda_coo_product_matvec_test_float2;
+//ProductMatVecTest2<Mem::CUDA, Algo::CUDA, double, SparseMatrixCOO<Mem::CUDA, double> > cuda_coo_product_matvec_test_double2;
+#endif
 
 template<
   typename Arch_,
