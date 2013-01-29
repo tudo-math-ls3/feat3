@@ -195,15 +195,26 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   }
   std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);
 
-  ///get macro boundary components
+  ///get (non-inner) macro boundary components
   Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D> > > > macro_boundaries_found;
+  for(Index i(0) ; i < macro_edges.size() ; ++i)
+  {
+    for(Index j(0) ; j < macro_comm_halos.size() ; ++j)
+    {
+      if(macro_comm_halos.at(j)->get_level() == 1)
+        if(macro_edges.at(i) == macro_comm_halos.at(j)->get_element(0))
+          macro_edges.erase(macro_edges.begin() + i);
+    }
+  }
   for(Index i(0) ; i < macro_edges.size() ; ++i)
   {
     Halo<0, pl_edge, Mesh<rnt_2D> > result(macro_basemesh_found);
     result.add_element_pair(macro_edges.at(i), macro_edges.at(i));
     macro_boundaries_found.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D> > >(new Halo<0, pl_edge, Mesh<rnt_2D> >(result)));
   }
+
+
 
   ///refine everything to desired level of detail
   BaseMeshType* macro_basemesh_fine = new BaseMeshType(*macro_basemesh);
