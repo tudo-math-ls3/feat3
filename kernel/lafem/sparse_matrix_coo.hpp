@@ -248,13 +248,31 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCOO from SparseMatrixELL");
 
+          SparseMatrixELL<Mem::Main, DT_> cother(other);
+
+          SparseMatrixCOO<Mem::Main, DT_> coo(_rows, _columns);
+
           for (Index i(0) ; i < other.num_cols_per_row() * other.stride() ; ++i)
           {
-            if (other.Ax()[i] != DT_(0))
+            if (cother.Ax()[i] != DT_(0))
             {
-              (*this)(i%other.stride(), other.Aj()[i], other.Ax()[i]);
+              coo(i%other.stride(), cother.Aj()[i], cother.Ax()[i]);
             }
           }
+
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+          this->_elements_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+          _val_ptr = this->_elements.at(0);
+          _row_ptr = this->_indices.at(0);
+          _col_ptr = this->_indices.at(1);
+
+          MemoryPool<Mem_>::upload(_val_ptr, coo.val(), _used_elements * sizeof(DT_));
+          MemoryPool<Mem_>::upload(_row_ptr, coo.row(), _used_elements * sizeof(Index));
+          MemoryPool<Mem_>::upload(_col_ptr, coo.column(), _used_elements * sizeof(Index));
         }
 
         /**
@@ -274,17 +292,37 @@ namespace FEAST
           _row_ptr(0),
           _col_ptr(0)
         {
+          CONTEXT("When creating SparseMatrixCOO from SparseMatrixELL");
+
+          SparseMatrixCSR<Mem::Main, DT_> cother(other);
+
+          SparseMatrixCOO<Mem::Main, DT_> coo(_rows, _columns);
+
           for (Index row(0) ; row < _rows ; ++row)
           {
-            const Index end(other.row_ptr_end()[row]);
-            for (Index i(other.row_ptr()[row]) ; i < end ; ++i)
+            const Index end(cother.row_ptr_end()[row]);
+            for (Index i(cother.row_ptr()[row]) ; i < end ; ++i)
             {
-              if (other.val()[i] != DT_(0))
+              if (cother.val()[i] != DT_(0))
               {
-                (*this)(row, other.col_ind()[i], other.val()[i]);
+                coo(row, cother.col_ind()[i], cother.val()[i]);
               }
             }
           }
+
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+          this->_elements_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+          _val_ptr = this->_elements.at(0);
+          _row_ptr = this->_indices.at(0);
+          _col_ptr = this->_indices.at(1);
+
+          MemoryPool<Mem_>::upload(_val_ptr, coo.val(), _used_elements * sizeof(DT_));
+          MemoryPool<Mem_>::upload(_row_ptr, coo.row(), _used_elements * sizeof(Index));
+          MemoryPool<Mem_>::upload(_col_ptr, coo.column(), _used_elements * sizeof(Index));
         }
 
         /**
@@ -517,7 +555,7 @@ namespace FEAST
           this->_rows = other.rows();
           this->_columns = other.columns();
           this->_used_elements = other.used_elements();
-          this->_zero_element = other._zero_element;
+          this->_zero_element = other.zero_element();
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
