@@ -236,7 +236,8 @@ namespace FEAST
          *
          * Creates a matrix from the given source matrix.
          */
-        explicit SparseMatrixCOO(const SparseMatrixELL<Mem_, DT_> & other) :
+        template <typename Mem2_>
+        explicit SparseMatrixCOO(const SparseMatrixELL<Mem2_, DT_> & other) :
           Container<Mem_, DT_>(other.rows() * other.columns()),
           _rows(other.rows()),
           _columns(other.columns()),
@@ -282,7 +283,8 @@ namespace FEAST
          *
          * Creates a matrix from the given source matrix.
          */
-        explicit SparseMatrixCOO(const SparseMatrixCSR<Mem_, DT_> & other) :
+        template <typename Mem2_>
+        explicit SparseMatrixCOO(const SparseMatrixCSR<Mem2_, DT_> & other) :
           Container<Mem_, DT_>(other.rows() * other.columns()),
           _rows(other.rows()),
           _columns(other.columns()),
@@ -292,7 +294,7 @@ namespace FEAST
           _row_ptr(0),
           _col_ptr(0)
         {
-          CONTEXT("When creating SparseMatrixCOO from SparseMatrixELL");
+          CONTEXT("When creating SparseMatrixCOO from SparseMatrixCSR");
 
           SparseMatrixCSR<Mem::Main, DT_> cother(other);
 
