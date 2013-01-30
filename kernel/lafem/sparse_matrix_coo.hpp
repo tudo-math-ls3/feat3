@@ -502,6 +502,70 @@ namespace FEAST
         }
 
         /**
+         * \brief Assignment operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Assigns a matrix from another memory architecture to the target matrix.
+         */
+        template <typename Mem2_, typename DT2_>
+        SparseMatrixCOO<Mem_, DT_> & operator= (const SparseMatrixCOO<Mem2_, DT2_> & other)
+        {
+          CONTEXT("When assigning SparseMatrixCOO");
+
+          this->_size = other.size();
+          this->_rows = other.rows();
+          this->_columns = other.columns();
+          this->_used_elements = other.used_elements();
+          this->_zero_element = other._zero_element;
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
+
+
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+          this->_elements_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+
+          this->_val_ptr = this->_elements.at(0);
+          this->_row_ptr = this->_indices.at(0);
+          this->_col_ptr = this->_indices.at(1);
+
+          Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
+          Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
+          void * temp(::malloc(src_size));
+          MemoryPool<Mem2_>::download(temp, other.get_elements().at(0), src_size);
+          MemoryPool<Mem_>::upload(this->get_elements().at(0), temp, dest_size);
+          ::free(temp);
+
+          src_size = (other.get_indices_size().at(0) * sizeof(Index));
+          dest_size = (other.get_indices_size().at(0) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Mem2_>::download(temp, other.get_indices().at(0), src_size);
+          MemoryPool<Mem_>::upload(this->get_indices().at(0), temp, dest_size);
+          ::free(temp);
+
+          src_size = (other.get_indices_size().at(1) * sizeof(Index));
+          dest_size = (other.get_indices_size().at(1) * sizeof(Index));
+          temp = (::malloc(src_size));
+          MemoryPool<Mem2_>::download(temp, other.get_indices().at(1), src_size);
+          MemoryPool<Mem_>::upload(this->get_indices().at(1), temp, dest_size);
+          ::free(temp);
+
+          return *this;
+        }
+
+        /**
          * \brief Write out matrix to file.
          *
          * \param[in] mode The used file format.
