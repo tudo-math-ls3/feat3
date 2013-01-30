@@ -342,23 +342,14 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          DenseVector<Arch_, Index> tcol_ind(col_ind.size());
-          copy(tcol_ind, col_ind);
-          DenseVector<Arch_, DT_> tval(val.size());
-          copy(tval, val);
-          DenseVector<Arch_, Index> trow_ptr(row_ptr.size());
-          copy(trow_ptr, row_ptr);
-          DenseVector<Arch_, Index> trow_ptr_end(row_ptr_end.size());
-          copy(trow_ptr_end, row_ptr_end);
-
-          this->_elements.push_back(tval.get_elements().at(0));
-          this->_elements_size.push_back(tval.size());
-          this->_indices.push_back(tcol_ind.get_elements().at(0));
-          this->_indices_size.push_back(tcol_ind.size());
-          this->_indices.push_back(trow_ptr.get_elements().at(0));
-          this->_indices_size.push_back(trow_ptr.size());
-          this->_indices.push_back(trow_ptr_end.get_elements().at(0));
-          this->_indices_size.push_back(trow_ptr_end.size());
+          this->_elements.push_back(val.get_elements().at(0));
+          this->_elements_size.push_back(val.size());
+          this->_indices.push_back(col_ind.get_elements().at(0));
+          this->_indices_size.push_back(col_ind.size());
+          this->_indices.push_back(row_ptr.get_elements().at(0));
+          this->_indices_size.push_back(row_ptr.size());
+          this->_indices.push_back(row_ptr_end.get_elements().at(0));
+          this->_indices_size.push_back(row_ptr_end.size());
 
           this->_val = this->_elements.at(0);
           this->_col_ind = this->_indices.at(0);
