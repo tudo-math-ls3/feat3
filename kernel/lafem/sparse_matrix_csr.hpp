@@ -330,6 +330,7 @@ namespace FEAST
          * \param[in] row_ptr_end Vector with end indices of all rows.
          *
          * Creates a matrix with given dimensions and content.
+         * During creation, the input data are copied. Thus the matrix is independent of later input vector modifications.
          */
         explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Arch_, Index> & col_ind, const DenseVector<Arch_, DT_> & val, const DenseVector<Arch_, Index> & row_ptr, const DenseVector<Arch_, Index> & row_ptr_end) :
           Container<Arch_, DT_>(rows * columns),

@@ -46,14 +46,18 @@ public:
     a.clear();
     a(1,2,7);
     a(5,5,2);
-    SparseMatrixCSR<Tag_, DT_> a2(a);
-    SparseMatrixELL<Tag_, DT_> b(a2);
+    SparseMatrixELL<Tag_, DT_> b(a);
     TEST_CHECK_EQUAL(b.used_elements(), 2ul);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
     TEST_CHECK_EQUAL(b.columns(), a.columns());
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
+
+    //SparseMatrixCSR<Tag_, DT_> b2(b);
+    SparseMatrixCSR<Tag_, DT_> b2(a);
+    SparseMatrixELL<Tag_, DT_> b3(b);
+    TEST_CHECK_EQUAL(b3, b);
 
     SparseMatrixELL<Tag_, DT_> z(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);

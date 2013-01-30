@@ -242,25 +242,25 @@ namespace FEAST
          *
          * Creates a ELL matrix based on the COO source matrix.
          */
-        explicit SparseMatrixELL(const SparseMatrixCOO<Mem::Main, DT_> & other_orig) :
-          Container<Arch_, DT_>(other_orig.size()),
-          _rows(other_orig.rows()),
-          _columns(other_orig.columns()),
-          _zero_element(other_orig.zero_element()),
-          _used_elements(other_orig.used_elements())
+        explicit SparseMatrixELL(const SparseMatrixCOO<Mem::Main, DT_> & other) :
+          Container<Arch_, DT_>(other.size()),
+          _rows(other.rows()),
+          _columns(other.columns()),
+          _zero_element(other.zero_element()),
+          _used_elements(other.used_elements())
         {
           CONTEXT("When creating SparseMatrixELL");
 
-          SparseMatrixCSR<Mem::Main, DT_> other(other_orig);
-
           _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->set_memory(_Arl, Index(0), _rows);
 
           _num_cols_per_row = 0;
-          for (Index i(0) ; i < _rows ; ++i)
+          for (Index i(0) ; i < _used_elements ; ++i)
           {
-            _Arl[i] = other.row_ptr_end()[i] - other.row_ptr()[i];
-            if (_Arl[i] > _num_cols_per_row)
-              _num_cols_per_row = _Arl[i];
+            Index cur_row(other.row()[i]);
+            ++_Arl[cur_row];
+            if (_Arl[cur_row] > _num_cols_per_row)
+              _num_cols_per_row = _Arl[cur_row];
           }
 
           Index alignment(32);
@@ -272,19 +272,19 @@ namespace FEAST
           _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
           MemoryPool<Mem::Main>::instance()->set_memory(_Aj, Index(0), _num_cols_per_row * _stride);
 
-          for (Index row(0); row < _rows ; ++row)
+          Index last_row(other.row()[0]);
+          Index target(0);
+          for (Index i(0) ; i < _used_elements ; ++i)
           {
-            Index target(0);
-            for (Index i(0) ; i < _Arl[row] ; ++i)
+            Index row(other.row()[i]);
+            if (row != last_row)
             {
-              const Index row_start(other.row_ptr()[row]);
-              //if(other.val()[row_start + i] != DT_(0))
-              {
-                _Aj[row + target * _stride] = (other.col_ind())[row_start + i];
-                _Ax[row + target * _stride] = (other.val())[row_start + i];
-                target++;
-              }
+              target = 0;
+              last_row = row;
             }
+            _Aj[row + target * _stride] = (other.column())[i];
+            _Ax[row + target * _stride] = (other.val())[i];
+            target++;
           }
 
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_num_cols_per_row * _stride * sizeof(DT_)));
