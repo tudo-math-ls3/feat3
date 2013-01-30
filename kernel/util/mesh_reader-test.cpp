@@ -231,7 +231,7 @@ public:
     };
 
     // check vertex at edge adjacencies
-    adj_stack = root_mesh.adjacencies[1];
+    adj_stack = root_mesh.adjacencies[0][1];
     count = 0;
     for(Index i(0); i < 4; ++i)
     {
@@ -252,7 +252,7 @@ public:
     TEST_CHECK_EQUAL(error, false);
 
     // check vertex at quad adjacencies
-    adj_stack = root_mesh.adjacencies[2];
+    adj_stack = root_mesh.adjacencies[0][2];
     count = 0;
     for(Index j(0); j < 4; ++j)
     {
@@ -268,7 +268,7 @@ public:
     TEST_CHECK_EQUAL(error, false);
 
     // check if the rest is emtpy
-    TEST_CHECK_EQUAL((root_mesh.adjacencies[3]).empty(), true);
+    TEST_CHECK_EQUAL((root_mesh.adjacencies[0][3]).empty(), true);
 
     // check parent indices
     TEST_CHECK_EQUAL((root_mesh.parent_indices[0]).empty(), true);
@@ -389,7 +389,7 @@ public:
     };
 
     // check vertex at edge adjacencies
-    adj_stack_sub = sub_mesh.adjacencies[1];
+    adj_stack_sub = sub_mesh.adjacencies[0][1];
     count = 0;
     for(Index i(0); i < 4; ++i)
     {
@@ -410,8 +410,8 @@ public:
     TEST_CHECK_EQUAL(error, false);
 
     // check if the rest is empty
-    TEST_CHECK_EQUAL((sub_mesh.adjacencies[2]).empty(), true);
-    TEST_CHECK_EQUAL((sub_mesh.adjacencies[3]).empty(), true);
+    TEST_CHECK_EQUAL((sub_mesh.adjacencies[0][2]).empty(), true);
+    TEST_CHECK_EQUAL((sub_mesh.adjacencies[0][3]).empty(), true);
 
     // check parent indices of the sub mesh
     std::vector<Index> par0 = sub_mesh.parent_indices[0];

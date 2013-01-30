@@ -1178,7 +1178,7 @@ namespace FEAST
         // if it is the end of the sub chunk
         if(line.find('@') != std::string::npos)
         {
-          container->adjacencies[shape_dim] = a_stack;
+          container->adjacencies[0][shape_dim] = a_stack;
           break;
         }
         else

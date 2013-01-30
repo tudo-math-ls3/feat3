@@ -92,7 +92,7 @@ namespace FEAST
       CoordStack coords;
 
       // adjacencies
-      AdjStack adjacencies[4];
+      AdjStack adjacencies[4][4];
 
     public:
       // default CTOR
