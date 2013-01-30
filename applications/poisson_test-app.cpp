@@ -2,24 +2,27 @@
 #include <mpi.h>
 #endif
 
-#include <kernel/base_header.hpp>
-#include <test_system/test_system.hpp>
-
-#include<kernel/geometry/conformal_mesh.hpp>
-#include<kernel/geometry/cell_sub_set.hpp>
-#include<kernel/geometry/patch_factory.hpp>
-#include<kernel/geometry/macro_factory.hpp>
-#include<kernel/geometry/patch_halo_factory.hpp>
-#include<kernel/foundation/mesh_control.hpp>
-#include<kernel/foundation/dense_data_wrapper.hpp>
-#include<kernel/lafem/dense_vector.hpp>
-#include<kernel/lafem/vector_mirror.hpp>
-#include<kernel/foundation/halo_control.hpp>
-#include<kernel/foundation/halo.hpp>
-#include<kernel/archs.hpp>
 #include<deque>
 #include<algorithm>
 #include<cmath>
+
+#include <kernel/base_header.hpp>
+#include <test_system/test_system.hpp>
+
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/patch_factory.hpp>
+#include <kernel/geometry/macro_factory.hpp>
+#include <kernel/geometry/patch_halo_factory.hpp>
+#include <kernel/foundation/mesh_control.hpp>
+#include <kernel/foundation/dense_data_wrapper.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/lafem/matrix_mirror.hpp>
+#include <kernel/lafem/scale.hpp>
+#include <kernel/foundation/halo_control.hpp>
+#include <kernel/foundation/halo.hpp>
+#include <kernel/archs.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
@@ -405,7 +408,18 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     sourceranks.push_back(macro_comm_halos.at(i)->get_other());
   }
 
-  //bring up a local preconditioning matrix TODO use a product wrapper and DV
+  ///(type-1 to type-0 conversion)
+  for(Index i(0) ; i < mirrors.size() ; ++i)
+  {
+    MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
+    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_sys));
+    mat_mirror.gather_op(buf_mat, mat_sys);
+    DenseVector<Mem::Main, double> t(buf_mat.used_elements(), buf_mat.val());
+    Scale<Algo::Generic>::value(t, t, 0.5);
+    mat_mirror.scatter_op(mat_sys, buf_mat);
+  }
+
+  ///bring up a local preconditioning matrix TODO use a product wrapper and DV
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_sys.rows(), mat_sys.columns());
   for(Index i(0) ; i < mat_sys.rows() ; ++i)
     mat_precon_temp(i, i, mat_sys(i, i));
@@ -426,13 +440,14 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.dest_ranks() = destranks;
   data.source_ranks() = sourceranks;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<Richardson, Algo::Generic>::execute(data, 2, 1e-8));
+
+  /*std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<Richardson, Algo::Generic>::execute(data, 2, 1e-8));
 
   MPI_Barrier(MPI_COMM_WORLD);
 
   solver->execute();
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);*/
 
   delete macro_basemesh;
 }
