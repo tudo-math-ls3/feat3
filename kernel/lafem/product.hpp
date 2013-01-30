@@ -12,6 +12,7 @@
 #include <kernel/lafem/component_product.hpp>
 #include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/dot_product.hpp>
+#include <kernel/lafem/scale.hpp>
 
 
 
@@ -45,6 +46,18 @@ namespace FEAST
       static DT_ value(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
       {
         return DotProduct<Algo_>::value(x, y);
+      }
+
+      template <typename Mem_, typename DT_>
+      static void value(DenseVector<Mem_, DT_> & r, const DenseVector<Mem_, DT_> & x, DT_ s)
+      {
+        Scale<Algo_>::value(r, x, s);
+      }
+
+      template <typename DT_, typename SM_>
+      static void value(SM_ & r, const SM_ & x, DT_ s)
+      {
+        Scale<Algo_>::value(r, x, s);
       }
     };
 
