@@ -8,6 +8,7 @@
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/algorithm.hpp>
 #include <kernel/util/graph.hpp>
 
@@ -17,6 +18,13 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    //forward declarations
+    template <typename Mem_, typename DT_>
+    class SparseMatrixELL;
+
+    template <typename Mem_, typename DT_>
+    class SparseMatrixCOO;
+
     /**
      * \brief CSR based sparse matrix.
      *
@@ -157,40 +165,35 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] other The source matrix in COO format.
+         * \param[in] other The source matrix in ELL format.
          *
-         * Creates a CSR matrix based on the COO source matrix.
+         * Creates a ELL matrix based on the ELL source matrix.
          */
-        explicit SparseMatrixCSR(const SparseMatrixCOO<Arch_, DT_> & other) :
-          Container<Arch_, DT_>(other.size()),
-          _rows(other.rows()),
-          _columns(other.columns()),
-          _zero_element(other.zero_element()),
-          _used_elements(other.used_elements())
+        template <typename Arch2_>
+        explicit SparseMatrixCSR(const SparseMatrixELL<Arch2_, DT_> & other_orig) :
+          Container<Arch_, DT_>(other_orig.size()),
+          _rows(other_orig.rows()),
+          _columns(other_orig.columns()),
+          _zero_element(other_orig.zero_element()),
+          _used_elements(other_orig.used_elements())
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
-          this->_elements_size.push_back(_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
-          this->_indices_size.push_back(_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1) * sizeof(Index)));
-          this->_indices_size.push_back(_rows + 1);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows) * sizeof(Index)));
-          this->_indices_size.push_back(_rows);
+          SparseMatrixCOO<Arch2_, DT_> ccother(other_orig);
+          SparseMatrixCOO<Mem::Main, DT_> cother(ccother);
 
-          _col_ind = this->_indices.at(0);
-          _val = this->_elements.at(0);
-          _row_ptr = this->_indices.at(1);
-          _row_ptr_end = this->_indices.at(2);
+          _val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(_used_elements * sizeof(DT_));
+          _col_ind = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(_used_elements * sizeof(Index));
+          _row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows + 1) * sizeof(Index));
+          _row_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
 
           Index ait(0);
           Index current_row(0);
           _row_ptr[current_row] = 0;
-          for (Index it(0) ; it < other.used_elements() ; ++it)
+          for (Index it(0) ; it < cother.used_elements() ; ++it)
           {
-            Index row(other.row()[it]);
-            Index column(other.column()[it]);
+            Index row(cother.row()[it]);
+            Index column(cother.column()[it]);
 
             if (current_row < row)
             {
@@ -203,7 +206,7 @@ namespace FEAST
               current_row = row;
               _row_ptr[current_row] = ait;
             }
-            _val[ait] = other.val()[it];
+            _val[ait] = cother.val()[it];
             _col_ind[ait] = column;
             ++ait;
           }
@@ -215,6 +218,29 @@ namespace FEAST
           }
           _row_ptr[_rows] = ait;
 
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+          this->_elements_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1)* sizeof(Index)));
+          this->_indices_size.push_back(_rows + 1);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows)* sizeof(Index)));
+          this->_indices_size.push_back(_rows);
+
+          MemoryPool<Arch_>::upload(this->get_elements().at(0), _val, _used_elements * sizeof(DT_));
+          MemoryPool<Arch_>::upload(this->get_indices().at(0), _col_ind, _used_elements * sizeof(Index));
+          MemoryPool<Arch_>::upload(this->get_indices().at(1), _row_ptr, (_rows  + 1) * sizeof(Index));
+          MemoryPool<Arch_>::upload(this->get_indices().at(2), _row_ptr_end, (_rows) * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->release_memory(_val);
+          MemoryPool<Mem::Main>::instance()->release_memory(_col_ind);
+          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr);
+          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr_end);
+
+          _col_ind = this->_indices.at(0);
+          _val = this->_elements.at(0);
+          _row_ptr = this->_indices.at(1);
+          _row_ptr_end = this->_indices.at(2);
+
           _hash = MemoryPool<Arch_>::instance()->generate_hash(_row_ptr, (this->_rows + 1) * sizeof(Index));
         }
 
@@ -223,7 +249,7 @@ namespace FEAST
          *
          * \param[in] other The source matrix in COO format.
          *
-         * Creates a CSR matrix based on the COO source matrix from another memory architecture.
+         * Creates a CSR matrix based on the COO source matrix.
          */
         template <typename Arch2_>
         explicit SparseMatrixCSR(const SparseMatrixCOO<Arch2_, DT_> & other) :
@@ -235,57 +261,69 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          SparseMatrixCOO<Mem::Main, DT_> xother(other);
-          SparseMatrixCSR<Mem::Main, DT_> tother(xother);
+          SparseMatrixCOO<Mem::Main, DT_> cother(other);
 
-          this->_size = tother.size();
-          this->_rows = tother.rows();
-          this->_columns = tother.columns();
-          this->_used_elements = tother.used_elements();
-          this->_zero_element = tother.zero_element();
-          this->_hash = tother.hash();
+          _val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(_used_elements * sizeof(DT_));
+          _col_ind = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(_used_elements * sizeof(Index));
+          _row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows + 1) * sizeof(Index));
+          _row_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
 
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(tother.used_elements() * sizeof(DT_)));
-          this->_elements_size.push_back(this->_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(tother.used_elements() * sizeof(Index)));
-          this->_indices_size.push_back(this->_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1) * sizeof(Index)));
+          Index ait(0);
+          Index current_row(0);
+          _row_ptr[current_row] = 0;
+          for (Index it(0) ; it < cother.used_elements() ; ++it)
+          {
+            Index row(cother.row()[it]);
+            Index column(cother.column()[it]);
+
+            if (current_row < row)
+            {
+              _row_ptr_end[current_row] = ait;
+              for (unsigned long i(current_row + 1) ; i < row ; ++i)
+              {
+                _row_ptr[i] = ait;
+                _row_ptr_end[i] = ait;
+              }
+              current_row = row;
+              _row_ptr[current_row] = ait;
+            }
+            _val[ait] = cother.val()[it];
+            _col_ind[ait] = column;
+            ++ait;
+          }
+          _row_ptr_end[current_row] = ait;
+          for (unsigned long i(current_row + 1) ; i < _rows ; ++i)
+          {
+            _row_ptr[i] = ait;
+            _row_ptr_end[i] = ait;
+          }
+          _row_ptr[_rows] = ait;
+
+          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+          this->_elements_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+          this->_indices_size.push_back(_used_elements);
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows + 1)* sizeof(Index)));
           this->_indices_size.push_back(_rows + 1);
-          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(_rows * sizeof(Index)));
+          this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory((_rows)* sizeof(Index)));
           this->_indices_size.push_back(_rows);
+
+          MemoryPool<Arch_>::upload(this->get_elements().at(0), _val, _used_elements * sizeof(DT_));
+          MemoryPool<Arch_>::upload(this->get_indices().at(0), _col_ind, _used_elements * sizeof(Index));
+          MemoryPool<Arch_>::upload(this->get_indices().at(1), _row_ptr, (_rows  + 1) * sizeof(Index));
+          MemoryPool<Arch_>::upload(this->get_indices().at(2), _row_ptr_end, (_rows) * sizeof(Index));
+          MemoryPool<Mem::Main>::instance()->release_memory(_val);
+          MemoryPool<Mem::Main>::instance()->release_memory(_col_ind);
+          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr);
+          MemoryPool<Mem::Main>::instance()->release_memory(_row_ptr_end);
 
           _col_ind = this->_indices.at(0);
           _val = this->_elements.at(0);
           _row_ptr = this->_indices.at(1);
           _row_ptr_end = this->_indices.at(2);
 
-          Index src_size(tother.get_elements_size().at(0) * sizeof(DT_));
-          Index dest_size(tother.get_elements_size().at(0) * sizeof(DT_));
-          void * temp(::malloc(src_size));
-          MemoryPool<Mem::Main>::download(temp, tother.get_elements().at(0), src_size);
-          MemoryPool<Arch_>::upload(this->get_elements().at(0), temp, dest_size);
-          ::free(temp);
+          _hash = MemoryPool<Arch_>::instance()->generate_hash(_row_ptr, (this->_rows + 1) * sizeof(Index));
 
-          src_size = (tother.get_indices_size().at(0) * sizeof(Index));
-          dest_size = (tother.get_indices_size().at(0) * sizeof(Index));
-          temp = (::malloc(src_size));
-          MemoryPool<Mem::Main>::download(temp, tother.get_indices().at(0), src_size);
-          MemoryPool<Arch_>::upload(this->get_indices().at(0), temp, dest_size);
-          ::free(temp);
-
-          src_size = (tother.get_indices_size().at(1) * sizeof(Index));
-          dest_size = (tother.get_indices_size().at(1) * sizeof(Index));
-          temp = (::malloc(src_size));
-          MemoryPool<Mem::Main>::download(temp, tother.get_indices().at(1), src_size);
-          MemoryPool<Arch_>::upload(this->get_indices().at(1), temp, dest_size);
-          ::free(temp);
-
-          src_size = (tother.get_indices_size().at(2) * sizeof(Index));
-          dest_size = (tother.get_indices_size().at(2) * sizeof(Index));
-          temp = (::malloc(src_size));
-          MemoryPool<Mem::Main>::download(temp, tother.get_indices().at(2), src_size);
-          MemoryPool<Arch_>::upload(this->get_indices().at(2), temp, dest_size);
-          ::free(temp);
         }
 
         /**

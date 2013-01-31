@@ -23,6 +23,13 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    //forward declarations
+    template <typename Mem_, typename DT_>
+    class SparseMatrixCSR;
+
+    template <typename Mem_, typename DT_>
+    class SparseMatrixCOO;
+
     /**
      * \brief ELL based sparse matrix.
      *
@@ -171,7 +178,8 @@ namespace FEAST
          *
          * Creates a ELL matrix based on the CSR source matrix.
          */
-        explicit SparseMatrixELL(const SparseMatrixCSR<Arch_, DT_> & other_orig) :
+        template <typename Arch2_>
+        explicit SparseMatrixELL(const SparseMatrixCSR<Arch2_, DT_> & other_orig) :
           Container<Arch_, DT_>(other_orig.size()),
           _rows(other_orig.rows()),
           _columns(other_orig.columns()),
@@ -242,7 +250,8 @@ namespace FEAST
          *
          * Creates a ELL matrix based on the COO source matrix.
          */
-        explicit SparseMatrixELL(const SparseMatrixCOO<Mem::Main, DT_> & other) :
+        template <typename Mem2_>
+        explicit SparseMatrixELL(const SparseMatrixCOO<Mem2_, DT_> & other) :
           Container<Arch_, DT_>(other.size()),
           _rows(other.rows()),
           _columns(other.columns()),
@@ -251,13 +260,15 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixELL");
 
+          SparseMatrixCOO<Mem::Main, DT_> cother(other);
+
           _Arl = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_rows) * sizeof(Index));
           MemoryPool<Mem::Main>::instance()->set_memory(_Arl, Index(0), _rows);
 
           _num_cols_per_row = 0;
           for (Index i(0) ; i < _used_elements ; ++i)
           {
-            Index cur_row(other.row()[i]);
+            Index cur_row(cother.row()[i]);
             ++_Arl[cur_row];
             if (_Arl[cur_row] > _num_cols_per_row)
               _num_cols_per_row = _Arl[cur_row];
@@ -272,18 +283,18 @@ namespace FEAST
           _Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((_num_cols_per_row * _stride) * sizeof(Index));
           MemoryPool<Mem::Main>::instance()->set_memory(_Aj, Index(0), _num_cols_per_row * _stride);
 
-          Index last_row(other.row()[0]);
+          Index last_row(cother.row()[0]);
           Index target(0);
           for (Index i(0) ; i < _used_elements ; ++i)
           {
-            Index row(other.row()[i]);
+            Index row(cother.row()[i]);
             if (row != last_row)
             {
               target = 0;
               last_row = row;
             }
-            _Aj[row + target * _stride] = (other.column())[i];
-            _Ax[row + target * _stride] = (other.val())[i];
+            _Aj[row + target * _stride] = (cother.column())[i];
+            _Ax[row + target * _stride] = (cother.val())[i];
             target++;
           }
 
