@@ -957,14 +957,19 @@ namespace FEAST
         return false;
       if (a.columns() != b.columns())
         return false;
+      if (a.used_elements() != b.used_elements())
+        return false;
+      if (a.zero_element() != b.zero_element())
+        return false;
 
-      for (Index i(0) ; i < a.rows() ; ++i)
+      for (Index i(0) ; i < a.used_elements() ; ++i)
       {
-        for (Index j(0) ; j < a.columns() ; ++j)
-        {
-          if (a(i, j) != b(i, j))
+        if (MemoryPool<Mem_>::get_element(a.val(), i) != MemoryPool<Mem2_>::get_element(b.val(), i))
             return false;
-        }
+        if (MemoryPool<Mem_>::get_element(a.row(), i) != MemoryPool<Mem2_>::get_element(b.row(), i))
+            return false;
+        if (MemoryPool<Mem_>::get_element(a.column(), i) != MemoryPool<Mem2_>::get_element(b.column(), i))
+            return false;
       }
 
       return true;

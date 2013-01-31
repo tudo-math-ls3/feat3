@@ -838,14 +838,17 @@ namespace FEAST
         return false;
       if (a.zero_element() != b.zero_element())
         return false;
+      if (a.stride() != b.stride())
+        return false;
+      if (a.num_cols_per_row() != b.num_cols_per_row())
+        return false;
 
-      for (Index i(0) ; i < a.rows() ; ++i)
+      for (Index i(0) ; i < a.stride() * a.num_cols_per_row() ; ++i)
       {
-        for (Index j(0) ; j < a.columns() ; ++j)
-        {
-          if (a(i, j) != b(i, j))
-            return false;
-        }
+        if (MemoryPool<Arch_>::get_element(a.Ax(), i) != MemoryPool<Arch2_>::get_element(b.Ax(), i))
+          return false;
+        if (MemoryPool<Arch_>::get_element(a.Aj(), i) != MemoryPool<Arch2_>::get_element(b.Aj(), i))
+          return false;
       }
 
       return true;

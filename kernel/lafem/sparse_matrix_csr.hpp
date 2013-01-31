@@ -1004,13 +1004,22 @@ namespace FEAST
       if (a.hash() != b.hash())
         return false;
 
-      for (Index i(0) ; i < a.rows() ; ++i)
+      for (Index i(0) ; i < a.used_elements() ; ++i)
       {
-        for (Index j(0) ; j < a.columns() ; ++j)
-        {
-          if (a(i, j) != b(i, j))
-            return false;
-        }
+        if (MemoryPool<Arch_>::get_element(a.col_ind(), i) != MemoryPool<Arch2_>::get_element(b.col_ind(), i))
+          return false;
+        if (MemoryPool<Arch_>::get_element(a.val(), i) != MemoryPool<Arch2_>::get_element(b.val(), i))
+          return false;
+      }
+      for (Index i(0) ; i < a.rows() + 1; ++i)
+      {
+        if (MemoryPool<Arch_>::get_element(a.row_ptr(), i) != MemoryPool<Arch2_>::get_element(b.row_ptr(), i))
+          return false;
+      }
+      for (Index i(0) ; i < a.rows(); ++i)
+      {
+        if (MemoryPool<Arch_>::get_element(a.row_ptr_end(), i) != MemoryPool<Arch2_>::get_element(b.row_ptr_end(), i))
+          return false;
       }
 
       return true;
