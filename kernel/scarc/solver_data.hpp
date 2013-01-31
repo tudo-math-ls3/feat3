@@ -441,9 +441,7 @@ namespace FEAST
              template<typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector,
-             Tier2CommModes cm_vector_ = com_exchange,
-             Tier2CommModes cm_scalar = com_allreduce_sqrtsum>
+             template<typename, typename> class StorageType_ = std::vector>
     struct SynchronisedSolverData :
       public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
       public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
@@ -511,9 +509,7 @@ namespace FEAST
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename> class PreconContType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector,
-             Tier2CommModes cm_vector_ = com_exchange,
-             Tier2CommModes cm_scalar = com_allreduce_sqrtsum>
+             template<typename, typename> class StorageType_ = std::vector>
     struct SynchronisedPreconditionedSolverData :
       public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
       public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>,
@@ -665,7 +661,7 @@ namespace FEAST
 
       protected:
         ///CTORs to be used in subclasses
-        FilterDataContainer(const filter_type_& precon) :
+        FilterDataContainer(const filter_type_& filter) :
           _stored_filter(filter)
         {
         }
@@ -685,9 +681,7 @@ namespace FEAST
              template<typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename> class PreconContType_ = SparseMatrixCSR,
              template<typename, typename> class FilterType_ = UnitFilter,
-             template<typename, typename> class StorageType_ = std::vector,
-             Tier2CommModes cm_vector_ = com_exchange,
-             Tier2CommModes cm_scalar = com_allreduce_sqrtsum>
+             template<typename, typename> class StorageType_ = std::vector>
     struct SynchronisedPreconditionedFilteredSolverData :
       public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
       public FilterDataContainer<DataType_, MemTag_, FilterType_>,
@@ -709,10 +703,11 @@ namespace FEAST
                                                    PreconContType_<MemTag_, DataType_>& P,
                                                    vector_type_& x,
                                                    vector_type_& b,
+                                                   FilterType_<MemTag_, DataType_>& filter,
                                                    Index num_temp_vectors = 0,
                                                    Index num_temp_scalars = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
-        FilterDataContainer<DataType_, MemTag_, FilterType_>(),
+        FilterDataContainer<DataType_, MemTag_, FilterType_>(filter),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {

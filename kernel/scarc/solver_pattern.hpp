@@ -13,6 +13,9 @@ namespace FEAST
   namespace ScaRC
   {
     ///tag definitions
+    class BlockJacobi
+    {
+    };
 
     ///full local solver
     class Richardson
@@ -48,6 +51,69 @@ namespace FEAST
     template<typename Pattern_, typename Algo_>
     struct SolverPatternGeneration
     {
+    };
+
+    template<typename Algo_>
+    struct SolverPatternGeneration<BlockJacobi, Algo_>
+    {
+      static Index min_num_temp_scalars()
+      {
+        return 3;
+      }
+
+      static Index min_num_temp_vectors()
+      {
+        return 1;
+      }
+
+      template<typename Tag_,
+               typename DataType_,
+               template<typename, typename> class VT_,
+               template<typename, typename> class VMT_,
+               template<typename, typename> class MT_,
+               template<typename, typename> class PT_,
+               template<typename, typename> class FT_,
+               template<typename, typename> class StoreT_>
+      static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(SynchronisedPreconditionedFilteredSolverData<DataType_,
+                                                                                                                             Tag_,
+                                                                                                                             VT_,
+                                                                                                                             VMT_,
+                                                                                                                             MT_,
+                                                                                                                             PT_,
+                                                                                                                             FT_,
+                                                                                                                             StoreT_>& data,
+                                                                                Index max_iter = 100,
+                                                                                DataType_ eps = 1e-8)
+      {
+        ///take over 'logically constant' values
+        data.max_iters() = max_iter;
+        data.eps() = eps;
+
+        ///create compound functor
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        ///get reference to functor (in order to cast only once)
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
+
+        ///global defect :=  type-0[y]<-type-0[A]*type-1[x], type-1[y]<-SynchVec_acc, type-1[y]<-filter_defect(type-1[y])
+        cf.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.sys(), data.sol()));
+
+        cf.add_functor(new SynchVecFunctor<Algo_,
+                                           VT_<Tag_, DataType_>,
+                                           VMT_<Tag_, DataType_>,
+                                           com_accumulate,
+                                           StoreT_>(data.temp().at(0),
+                                                    data.vector_mirrors(),
+                                                    data.vector_mirror_sendbufs(),
+                                                    data.vector_mirror_recvbufs(),
+                                                    data.dest_ranks(),
+                                                    data.source_ranks()));
+
+        cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.temp().at(0)));
+
+        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+
+        return result;
+      }
     };
 
     template<typename Algo_>
@@ -112,20 +178,16 @@ namespace FEAST
                template<typename, typename> class VMT_,
                template<typename, typename> class MT_,
                template<typename, typename> class PT_,
-               template<typename, typename> class StoreT_,
-               Tier2CommModes cm_vector_,
-               Tier2CommModes cm_scalar_>
+               template<typename, typename> class StoreT_>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(SynchronisedPreconditionedSolverData<DataType_,
                                                                                                                      Tag_,
                                                                                                                      VT_,
                                                                                                                      VMT_,
                                                                                                                      MT_,
                                                                                                                      PT_,
-                                                                                                                     StoreT_,
-                                                                                                                     cm_vector_,
-                                                                                                                     cm_scalar_>& data,
-                                                                                                                                  Index max_iter = 100,
-                                                                                                                                  DataType_ eps = 1e-8)
+                                                                                                                     StoreT_>& data,
+                                                                                Index max_iter = 100,
+                                                                                DataType_ eps = 1e-8)
       {
         ///take over 'logically constant' values
         data.max_iters() = max_iter;
@@ -142,7 +204,7 @@ namespace FEAST
         cf.add_functor(new SynchVecFunctor<Algo_,
                                            VT_<Tag_, DataType_>,
                                            VMT_<Tag_, DataType_>,
-                                           cm_vector_,
+                                           com_exchange,
                                            StoreT_>(data.temp().at(0),
                                                     data.vector_mirrors(),
                                                     data.vector_mirror_sendbufs(),
@@ -152,7 +214,7 @@ namespace FEAST
 
         //norm2(norm_0, t)
         cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
-        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, cm_scalar_>(data.norm_0(),
+        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm_0(),
                                                                                                 data.scalars().at(1),
                                                                                                 data.scalars().at(2)));
 
@@ -168,7 +230,7 @@ namespace FEAST
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                                   VT_<Tag_, DataType_>,
                                                   VMT_<Tag_, DataType_>,
-                                                  cm_vector_,
+                                                  com_exchange,
                                                   StoreT_>(data.temp().at(0),
                                                            data.vector_mirrors(),
                                                            data.vector_mirror_sendbufs(),
@@ -177,7 +239,7 @@ namespace FEAST
                                                            data.source_ranks()));
 
         cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
-        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, cm_scalar_>(data.norm(),
+        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
                                                                                                        data.scalars().at(1),
                                                                                                        data.scalars().at(2)));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));

@@ -7,6 +7,7 @@
 #include<kernel/foundation/synch.hpp>
 #include<kernel/lafem/defect.hpp>
 #include<kernel/lafem/sum.hpp>
+#include<kernel/lafem/difference.hpp>
 #include<kernel/lafem/product_matvec.hpp>
 #include<kernel/lafem/norm.hpp>
 
@@ -246,6 +247,229 @@ namespace FEAST
         }
 
         SumFunctor(const SumFunctor& other) :
+          _y(other._y),
+          _l(other._l),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        VT_& _y;
+        const VT_& _l;
+        const VT_& _r;
+    };
+
+    ///always substitute left argument
+    template<typename Algo_, typename VT_>
+    class DifferenceFunctorProxyLeft : public SolverFunctorBase<VT_>
+    {
+      public:
+        DifferenceFunctorProxyLeft(VT_& y, VT_& l, const VT_& r) :
+          _y(y),
+          _l(l),
+          _r(r)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DifferenceFunctor";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
+
+          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+        }
+
+        DifferenceFunctorProxyLeft& operator=(const DifferenceFunctorProxyLeft& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DifferenceFunctorProxyLeft(const DifferenceFunctorProxyLeft& other) :
+          _y(other._y),
+          _l(other._l),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _l = arg;
+          this->_complete = true;
+        }
+
+      private:
+        VT_& _y;
+        VT_& _l;
+        const VT_& _r;
+    };
+
+
+    ///always substitute result and left arguments
+    template<typename Algo_, typename VT_>
+    class DifferenceFunctorProxyResultLeft : public SolverFunctorBase<VT_>
+    {
+      public:
+        DifferenceFunctorProxyResultLeft(VT_& y, VT_& l, const VT_& r) :
+          _y(y),
+          _l(l),
+          _r(r)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DifferenceFunctor";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
+
+          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+        }
+
+        DifferenceFunctorProxyResultLeft& operator=(const DifferenceFunctorProxyResultLeft& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DifferenceFunctorProxyResultLeft(const DifferenceFunctorProxyResultLeft& other) :
+          _y(other._y),
+          _l(other._l),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _y = arg;
+          _l = arg;
+          this->_complete = true;
+        }
+
+      private:
+        VT_& _y;
+        VT_& _l;
+        const VT_& _r;
+    };
+
+    ///always substitute all arguments
+    template<typename Algo_, typename VT_>
+    class DifferenceFunctorProxyAll : public SolverFunctorBase<VT_>
+    {
+      public:
+        DifferenceFunctorProxyAll(VT_& y, VT_& l, VT_& r) :
+          _y(y),
+          _l(l),
+          _r(r)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DifferenceFunctor";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
+
+          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+        }
+
+        DifferenceFunctorProxyAll& operator=(const DifferenceFunctorProxyAll& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DifferenceFunctorProxyAll(const DifferenceFunctorProxyAll& other) :
+          _y(other._y),
+          _l(other._l),
+          _r(other._r)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _y = arg;
+          _l = arg;
+          _r = arg;
+          this->_complete = true;
+        }
+
+      private:
+        VT_& _y;
+        VT_& _l;
+        VT_& _r;
+    };
+
+
+    template<typename Algo_, typename VT_>
+    class DifferenceFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        DifferenceFunctor(VT_& y, const VT_& l, const VT_& r) :
+          _y(y),
+          _l(l),
+          _r(r)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "DifferenceFunctor";
+        }
+
+        virtual void execute()
+        {
+          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+        }
+
+        DifferenceFunctor& operator=(const DifferenceFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_l = rhs._l;
+          this->_r = rhs._r;
+          return *this;
+        }
+
+        DifferenceFunctor(const DifferenceFunctor& other) :
           _y(other._y),
           _l(other._l),
           _r(other._r)
