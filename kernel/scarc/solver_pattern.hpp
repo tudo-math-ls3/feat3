@@ -63,7 +63,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 1;
+        return 0;
       }
 
       template<typename Tag_,
@@ -95,21 +95,20 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
 
         ///global defect :=  type-0[y]<-type-0[A]*type-1[x], type-1[y]<-SynchVec_acc, type-1[y]<-filter_defect(type-1[y])
-        cf.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.sys(), data.sol()));
+        cf.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.def(), data.sys(), data.sol()));
 
         cf.add_functor(new SynchVecFunctor<Algo_,
                                            VT_<Tag_, DataType_>,
                                            VMT_<Tag_, DataType_>,
                                            com_accumulate,
-                                           StoreT_>(data.temp().at(0),
+                                           StoreT_>(data.def(),
                                                     data.vector_mirrors(),
                                                     data.vector_mirror_sendbufs(),
                                                     data.vector_mirror_recvbufs(),
                                                     data.dest_ranks(),
                                                     data.source_ranks()));
 
-        cf.add_functor(new CopyFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), data.sol())); ///safe old solution
-        cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.rhs(), data.temp().at(0)));///TODO really set sol() to inner?
+        cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.def(), data.rhs(), data.def()));
 
         cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.sol(), data.filter()));
 
@@ -123,35 +122,35 @@ namespace FEAST
         ///main loop
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
-        cfiterate.add_functor(new PreconFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol())); ///TODO because: think shared temp storage
+        cfiterate.add_functor(new PreconFunctor<Algo_, VT_<Tag_, DataType_> >(data.def()));
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                                   VT_<Tag_, DataType_>,
                                                   VMT_<Tag_, DataType_>,
                                                   com_average,
-                                                  StoreT_>(data.sol(),
+                                                  StoreT_>(data.def(),
                                                            data.vector_mirrors(),
                                                            data.vector_mirror_sendbufs(),
                                                            data.vector_mirror_recvbufs(),
                                                            data.dest_ranks(),
                                                            data.source_ranks()));
-        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.sol(), data.filter()));
-        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.sol(), data.temp().at(0)));
+        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
+        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.sol(), data.def()));
 
         ///new defect
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.sys(), data.sol()));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.def(), data.sys(), data.sol()));
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                            VT_<Tag_, DataType_>,
                                            VMT_<Tag_, DataType_>,
                                            com_accumulate,
-                                           StoreT_>(data.temp().at(0),
+                                           StoreT_>(data.def(),
                                                     data.vector_mirrors(),
                                                     data.vector_mirror_sendbufs(),
                                                     data.vector_mirror_recvbufs(),
                                                     data.dest_ranks(),
                                                     data.source_ranks()));
-        cfiterate.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.temp().at(0)));
-        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
-        cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
+        cfiterate.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.def(), data.rhs(), data.def()));
+        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
+        cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.def()));
         cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
                                                                                                            data.scalars().at(0),
                                                                                                            data.scalars().at(1)));

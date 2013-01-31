@@ -66,6 +66,16 @@ namespace FEAST
           return this->_stored_sol;
         }
 
+        virtual vector_type_& def()
+        {
+          return this->_stored_def;
+        }
+
+        virtual const vector_type_& def() const
+        {
+          return this->_stored_def;
+        }
+
         virtual vector_storage_type_& temp()
         {
           return _stored_temp;
@@ -145,6 +155,7 @@ namespace FEAST
         matrix_type_ _stored_sys;
         vector_type_ _stored_rhs;
         vector_type_ _stored_sol;
+        vector_type_ _stored_def;
         vector_storage_type_ _stored_temp;
         scalar_storage_type_ _stored_scalars;
 
@@ -186,6 +197,7 @@ namespace FEAST
         this->_stored_sys = A;
         this->_stored_rhs = b;
         this->_stored_sol = x;
+        this->_stored_def = vector_type_(x.size());
         this->_stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size()));
         this->_stored_scalars = scalar_storage_type_(num_temp_scalars, DataType_(0));
         this->_stored_norm_0 = DataType_(0);
@@ -201,6 +213,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
@@ -219,6 +232,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
@@ -241,6 +255,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
@@ -336,6 +351,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
@@ -485,6 +501,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
@@ -556,6 +573,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
@@ -625,6 +643,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
@@ -731,6 +750,7 @@ namespace FEAST
         this->_stored_sys = other._stored_sys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
         this->_stored_norm_0 = other._stored_norm_0;
