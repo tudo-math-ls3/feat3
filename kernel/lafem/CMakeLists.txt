@@ -55,6 +55,7 @@ SET (test_list
   product_matvec-test
   richardson-test
   scale-test
+  sparse_matrix_conversion-test
   sparse_matrix_coo-test
   sparse_matrix_csr-test
   sparse_matrix_ell-test
