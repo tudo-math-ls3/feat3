@@ -58,7 +58,7 @@ namespace FEAST
     {
       static Index min_num_temp_scalars()
       {
-        return 3;
+        return 2;
       }
 
       static Index min_num_temp_vectors()
@@ -111,6 +111,51 @@ namespace FEAST
         cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.temp().at(0)));
 
         cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+
+        ///initial norm of defect with global comm
+        cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
+
+        cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm_0(),
+                                                                                                           data.scalars().at(0),
+                                                                                                           data.scalars().at(1)));
+
+        ///main loop
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
+        cfiterate.add_functor(new PreconFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0))); ///TODO think shared temp storage
+        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+        cfiterate.add_functor(new SynchVecFunctor<Algo_,
+                                                  VT_<Tag_, DataType_>,
+                                                  VMT_<Tag_, DataType_>,
+                                                  com_average,
+                                                  StoreT_>(data.temp().at(0),
+                                                           data.vector_mirrors(),
+                                                           data.vector_mirror_sendbufs(),
+                                                           data.vector_mirror_recvbufs(),
+                                                           data.dest_ranks(),
+                                                           data.source_ranks()));
+        cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.sol(), data.temp().at(0)));
+        ///new defect
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.sys(), data.sol()));
+        cfiterate.add_functor(new SynchVecFunctor<Algo_,
+                                           VT_<Tag_, DataType_>,
+                                           VMT_<Tag_, DataType_>,
+                                           com_accumulate,
+                                           StoreT_>(data.temp().at(0),
+                                                    data.vector_mirrors(),
+                                                    data.vector_mirror_sendbufs(),
+                                                    data.vector_mirror_recvbufs(),
+                                                    data.dest_ranks(),
+                                                    data.source_ranks()));
+        cfiterate.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.temp().at(0)));
+        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+        cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.temp().at(0)));
+        cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
+                                                                                                           data.scalars().at(0),
+                                                                                                           data.scalars().at(1)));
+        cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
+
+        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
 
         return result;
       }
