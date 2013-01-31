@@ -108,12 +108,13 @@ namespace FEAST
                                                     data.dest_ranks(),
                                                     data.source_ranks()));
 
-        cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.temp().at(0)));
+        cf.add_functor(new CopyFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), data.sol())); ///safe old solution
+        cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.rhs(), data.temp().at(0)));///TODO really set sol() to inner?
 
-        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.sol(), data.filter()));
 
         ///initial norm of defect with global comm
-        cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.temp().at(0)));
+        cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.sol()));
 
         cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm_0(),
                                                                                                            data.scalars().at(0),
@@ -122,19 +123,20 @@ namespace FEAST
         ///main loop
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
-        cfiterate.add_functor(new PreconFunctor<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0))); ///TODO think shared temp storage
-        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+        cfiterate.add_functor(new PreconFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol())); ///TODO because: think shared temp storage
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                                   VT_<Tag_, DataType_>,
                                                   VMT_<Tag_, DataType_>,
                                                   com_average,
-                                                  StoreT_>(data.temp().at(0),
+                                                  StoreT_>(data.sol(),
                                                            data.vector_mirrors(),
                                                            data.vector_mirror_sendbufs(),
                                                            data.vector_mirror_recvbufs(),
                                                            data.dest_ranks(),
                                                            data.source_ranks()));
+        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.sol(), data.filter()));
         cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.sol(), data.temp().at(0)));
+
         ///new defect
         cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.sys(), data.sol()));
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
