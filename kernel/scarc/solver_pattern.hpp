@@ -136,7 +136,6 @@ namespace FEAST
         cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
         cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_> >(data.sol(), data.sol(), data.def()));
 
-        ///new defect
         cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.def(), data.sys(), data.sol()));
         cfiterate.add_functor(new SynchVecFunctor<Algo_,
                                            VT_<Tag_, DataType_>,
@@ -311,6 +310,50 @@ namespace FEAST
       static Index min_num_temp_vectors()
       {
         return 1;
+      }
+
+      template<typename Tag_,
+               typename DataType_,
+               template<typename, typename> class VT_,
+               template<typename, typename> class VMT_,
+               template<typename, typename> class MT_,
+               template<typename, typename> class PT_,
+               template<typename, typename> class FT_,
+               template<typename, typename> class StoreT_>
+      static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > execute(SynchronisedPreconditionedFilteredSolverData<DataType_,
+                                                                                                                             Tag_,
+                                                                                                                             VT_,
+                                                                                                                             VMT_,
+                                                                                                                             MT_,
+                                                                                                                             PT_,
+                                                                                                                             FT_,
+                                                                                                                             StoreT_>& data,
+                                                                                VT_<Tag_, DataType_>& dummy,
+                                                                                Index max_iter = 100)
+      {
+        ///create compound functor
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        ///get reference to functor (in order to cast only once)
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
+
+        ///add functors to the solver program:
+        //defect(t, b, A, x)
+        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
+        ///TODO assumes scaled precon matrix
+        std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
+        CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
+
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(dummy, dummy, data.temp().at(0)));
+
+        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr,
+                                                                                   data.scalars().at(0),
+                                                                                   data.eps(),
+                                                                                   max_iter,
+                                                                                   max_iter));
+        return result;
       }
 
       template<typename Tag_,

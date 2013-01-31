@@ -1038,7 +1038,9 @@ namespace FEAST
                                 );
             if(break_condition || count == _maxiter)
             {
-              _count = count;
+              if(_opcode != coc_countloop)
+                _count = count;
+
               break;
             }
           }

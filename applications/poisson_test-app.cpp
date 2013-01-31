@@ -434,8 +434,8 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     SparseMatrixCSR,
     SparseMatrixCSR,
     UnitFilter> data(mat_sys, mat_precon, vec_sol, vec_rhs, filter,
-                     SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_vectors(),
-                     SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_scalars());
+                     std::max(SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_vectors(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_vectors()),
+                     std::max(SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_scalars(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_scalars()));
 
   data.vector_mirrors() = mirrors;
   data.vector_mirror_sendbufs() = sendbufs;
@@ -443,13 +443,21 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.dest_ranks() = destranks;
   data.source_ranks() = sourceranks;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 2, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-8));
 
-  /*MPI_Barrier(MPI_COMM_WORLD);
+  DenseVector<Mem::Main, double> dummy;
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 2));
+
+  solver->set_preconditioner(block_solver);
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
   solver->execute();
 
-  MPI_Barrier(MPI_COMM_WORLD);*/
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  std::cout << data.sol();
+  std::cout << data.used_iters() << std::endl;
 
   delete macro_basemesh;
 }
