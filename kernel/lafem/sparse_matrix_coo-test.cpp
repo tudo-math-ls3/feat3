@@ -100,10 +100,10 @@ public:
     SparseMatrixCOO<Tag_, DT_> g(fm_coo, bs);
     TEST_CHECK_EQUAL(g, f);
 
-    /*std::stringstream ts;
+    std::stringstream ts;
     f.write_out(fm_m, ts);
-    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, ts);
-    TEST_CHECK_EQUAL(i, h);*/
+    SparseMatrixCOO<Tag_, DT_> i(fm_m, ts);
+    TEST_CHECK_EQUAL(i, f);
   }
 };
 SparseMatrixCOOTest<Mem::Main, float> sparse_matrix_coo_test_float;

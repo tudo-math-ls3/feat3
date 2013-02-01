@@ -620,6 +620,8 @@ namespace FEAST
             case fm_coo:
               write_out_coo(filename);
               break;
+            case fm_m:
+              write_out_m(filename);
             default:
                 throw InternalError("Filemode not supported!");
           }
@@ -639,6 +641,9 @@ namespace FEAST
           {
             case fm_coo:
               write_out_coo(file);
+              break;
+            case fm_m:
+              write_out_m(file);
               break;
             default:
                 throw InternalError("Filemode not supported!");
@@ -703,6 +708,38 @@ namespace FEAST
           delete[] crow_ptr;
           delete[] ccol_ptr;
           delete[] cval;
+        }
+
+        /**
+         * \brief Write out matrix to matlab m file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_m(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          write_out_m(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to matlab m file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_m(std::ostream& file) const
+        {
+          SparseMatrixCOO<Mem::Main, DT_> temp(*this);
+
+          file << "data = [" << std::endl;
+          for (Index i(0) ; i < _used_elements ; ++i)
+          {
+            file << temp.row()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << (double)temp.val()[i] << ";" << std::endl;
+          }
+          file << "];" << std::endl;
+          file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
         }
 
         /**
