@@ -93,3 +93,7 @@ DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> 
 DefectTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_ell_defect_test_float;
 DefectTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_defect_test_double;
 #endif
+DefectTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_defect_test_float;
+DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_defect_test_double;
+DefectTest<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_coo_defect_test_float;
+DefectTest<Mem::Main, Algo::MKL, double, SparseMatrixCOO<Mem::Main, double> > mkl_coo_defect_test_double;

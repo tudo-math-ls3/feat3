@@ -9,6 +9,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/difference.hpp>
 
 namespace FEAST
 {
@@ -117,6 +118,41 @@ namespace FEAST
           result[row] = rhsp[row] - sum;
         }
       }
+
+      /**
+       * \brief Calculate \f$r \leftarrow rhs - Ab\f$
+       *
+       * \param[out] r The defect result.
+       * \param[in] rhs The right hand side of the system.
+       * \param[in] A The system matrix.
+       * \param[in] b The given solution.
+         */
+      template <typename DT_>
+      static void value(DenseVector<Mem::Main, DT_> & r, const DenseVector<Mem::Main, DT_> & rhs, const SparseMatrixCOO<Mem::Main, DT_> & a, const DenseVector<Mem::Main, DT_> & b)
+      {
+        if (b.size() != a.columns())
+          throw InternalError("Vector size does not match!");
+        if (a.rows() != r.size())
+          throw InternalError("Vector size does not match!");
+        if (a.rows() != rhs.size())
+          throw InternalError("Vector size does not match!");
+
+        const DT_ * bp(b.elements());
+        const DT_ * val(a.val());
+        const Index * row_ptr(a.row());
+        const Index * col_ptr(a.column());
+        DT_ * rp(r.elements());
+        const Index ue(a.used_elements());
+
+        r.clear(DT_(0));
+        for (Index i(0) ; i < ue ; ++i)
+        {
+          rp[row_ptr[i]] += val[i] * bp[col_ptr[i]];
+        }
+
+        Difference<Algo::Generic>::value(r, rhs, r);
+
+      }
     };
 
     template <>
@@ -124,6 +160,9 @@ namespace FEAST
     {
       static void value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & rhs, const SparseMatrixCSR<Mem::Main, float> & a, const DenseVector<Mem::Main, float> & b);
       static void value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & rhs, const SparseMatrixCSR<Mem::Main, double> & a, const DenseVector<Mem::Main, double> & b);
+
+      static void value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & rhs, const SparseMatrixCOO<Mem::Main, float> & a, const DenseVector<Mem::Main, float> & b);
+      static void value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & rhs, const SparseMatrixCOO<Mem::Main, double> & a, const DenseVector<Mem::Main, double> & b);
     };
 
     template <>
