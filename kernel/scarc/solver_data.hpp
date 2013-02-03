@@ -198,7 +198,7 @@ namespace FEAST
         this->_stored_rhs = b;
         this->_stored_sol = x;
         this->_stored_def = vector_type_(x.size());
-        this->_stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size()));
+        this->_stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size(), DataType_(0)));
         this->_stored_scalars = scalar_storage_type_(num_temp_scalars, DataType_(0));
         this->_stored_norm_0 = DataType_(0);
         this->_stored_norm = DataType_(0);

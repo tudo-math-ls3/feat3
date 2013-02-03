@@ -309,7 +309,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 1;
+        return 2;
       }
 
       template<typename Tag_,
@@ -337,17 +337,20 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
 
         ///add functors to the solver program:
-        //defect(t, b, A, x)
-        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.sys(), data.temp().at(1)));
+        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+
         //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
 
         cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
         cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(dummy, dummy, data.temp().at(0)));
 
-        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.rhs(), data.sys(), dummy));
+        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.sys(), data.temp().at(0)));
+        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr,
                                                                                    data.scalars().at(0),
                                                                                    data.eps(),
