@@ -110,10 +110,10 @@ namespace FEAST
 
         cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.def(), data.rhs(), data.def()));
 
-        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.sol(), data.filter()));
+        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
 
         ///initial norm of defect with global comm
-        cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.sol()));
+        cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), data.def()));
 
         cf.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm_0(),
                                                                                                            data.scalars().at(0),
@@ -356,6 +356,7 @@ namespace FEAST
                                                                                    data.eps(),
                                                                                    max_iter,
                                                                                    max_iter));
+        cf.add_functor(new CopyFunctorProxyResult<Algo_, VT_<Tag_, DataType_> >(dummy, data.temp().at(0)));
         return result;
       }
 

@@ -422,9 +422,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   ///bring up a local preconditioning matrix TODO use a product wrapper and DV
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_sys.rows(), mat_sys.columns());
   for(Index i(0) ; i < mat_sys.rows() ; ++i)
-    mat_precon_temp(i, i, mat_sys(i, i));
+    mat_precon_temp(i, i, double(0.5) * (double(1)/mat_sys(i, i)));
 
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
+  //filter.filter_mat(mat_precon); //TODO do i have to?
 
   ///bring up solver data
   SynchronisedPreconditionedFilteredSolverData<double,
@@ -443,7 +444,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.dest_ranks() = destranks;
   data.source_ranks() = sourceranks;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-6));
 
   DenseVector<Mem::Main, double> dummy;
   std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 1));
@@ -451,6 +452,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   solver->set_preconditioner(block_solver);
 
   MPI_Barrier(MPI_COMM_WORLD);
+  std::cout << solver->type_name();
 
   solver->execute();
 
@@ -467,7 +469,7 @@ int main(int argc, char* argv[])
 {
   int me(0);
   int num_patches(0);
-  Index desired_refinement_level(4);
+  Index desired_refinement_level(5);
 
 #ifndef SERIAL
   MPI_Init(&argc, &argv);

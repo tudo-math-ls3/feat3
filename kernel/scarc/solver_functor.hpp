@@ -1135,6 +1135,57 @@ namespace FEAST
         const VT_& _x;
     };
 
+    template<typename Algo_, typename VT_>
+    class CopyFunctorProxyResult : public SolverFunctorBase<VT_>
+    {
+      public:
+        CopyFunctorProxyResult(VT_& y, const VT_& x) :
+          _y(y),
+          _x(x)
+        {
+          this->_complete = false;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "CopyFunctorProxyResult";
+        }
+
+        virtual void execute()
+        {
+          if(!this->_complete)
+            throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
+
+          copy(_y, _x);
+        }
+
+        CopyFunctorProxyResult& operator=(const CopyFunctorProxyResult& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_x = rhs._x;
+          return *this;
+        }
+
+        CopyFunctorProxyResult(const CopyFunctorProxyResult& other) :
+          _y(other._y),
+          _x(other._x)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+          _y = arg;
+          this->_complete = true;
+        }
+
+      private:
+        VT_& _y;
+        const VT_& _x;
+    };
+
     template<typename Algo_, typename VT_, typename ST_>
     class NormFunctor2wosqrt : public SolverFunctorBase<VT_>
     {
