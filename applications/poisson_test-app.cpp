@@ -200,20 +200,26 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   ///get (non-inner) macro boundary components
   Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
+  Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges_final;
+  std::cout << "proc " << rank << " #macro edges initially " << macro_edges.size() << std::endl;
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D> > > > macro_boundaries_found;
   for(Index i(0) ; i < macro_edges.size() ; ++i)
   {
+    bool in(false);
     for(Index j(0) ; j < macro_comm_halos.size() ; ++j)
     {
       if(macro_comm_halos.at(j)->get_level() == 1)
         if(macro_edges.at(i) == macro_comm_halos.at(j)->get_element(0))
-          macro_edges.erase(macro_edges.begin() + i);
+          in = true;
     }
+    if(!in)
+      macro_edges_final.push_back(macro_edges.at(i));
   }
-  for(Index i(0) ; i < macro_edges.size() ; ++i)
+  std::cout << "proc " << rank << " #macro edges after elimination " << macro_edges_final.size() << std::endl;
+  for(Index i(0) ; i < macro_edges_final.size() ; ++i)
   {
     Halo<0, pl_edge, Mesh<rnt_2D> > result(macro_basemesh_found);
-    result.add_element_pair(macro_edges.at(i), macro_edges.at(i));
+    result.add_element_pair(macro_edges_final.at(i), macro_edges_final.at(i));
     macro_boundaries_found.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D> > >(new Halo<0, pl_edge, Mesh<rnt_2D> >(result)));
   }
 
@@ -370,6 +376,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   // assemble homogeneous Dirichlet BCs
   Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+  std::cout << "proc " << rank << " #macro boundaries " << macro_boundaries_fine.size() << std::endl;
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {
     //std::cout << "Adding cell set on process " << rank << std::endl;
@@ -378,14 +385,6 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   // allocate solution vector
   DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
 
-  // assemble filter:
-  UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
-
-  ///filter system
-  filter.filter_mat(mat_sys);
-  filter.filter_rhs(vec_rhs);
-  filter.filter_sol(vec_sol);
-
   ///assemble mirrors
   std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
   std::vector<LAFEM::DenseVector<Mem::Main, double> > sendbufs;
@@ -393,6 +392,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::vector<Index> destranks;
   std::vector<Index> sourceranks;
 
+  std::cout << "proc " << rank << " #comm halos " << macro_comm_halos_fine.size() << std::endl;
   for(Index i(0) ; i < macro_comm_halos_fine.size() ; ++i)
   {
     Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_comm_halos_fine.at(i).get())));
@@ -408,7 +408,15 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     sourceranks.push_back(macro_comm_halos.at(i)->get_other());
   }
 
+  ///bring up a local preconditioning matrix TODO use a product wrapper and DV
+  SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_sys.rows(), mat_sys.columns());
+  for(Index i(0) ; i < mat_sys.rows() ; ++i)
+    mat_precon_temp(i, i, double(0.5) * (double(1)/mat_sys(i, i)));
+
+  SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
+
   ///(type-1 to type-0 conversion)
+  std::cout << "proc " << rank << " #mirrors " << mirrors.size() << std::endl;
   for(Index i(0) ; i < mirrors.size() ; ++i)
   {
     MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
@@ -419,13 +427,19 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     mat_mirror.scatter_op(mat_sys, buf_mat);
   }
 
-  ///bring up a local preconditioning matrix TODO use a product wrapper and DV
-  SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_sys.rows(), mat_sys.columns());
-  for(Index i(0) ; i < mat_sys.rows() ; ++i)
-    mat_precon_temp(i, i, double(0.5) * (double(1)/mat_sys(i, i)));
 
-  SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
-  //filter.filter_mat(mat_precon); //TODO do i have to?
+  // assemble filter:
+  UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
+
+  ///filter system
+  filter.filter_mat(mat_sys);
+  filter.filter_rhs(vec_rhs);
+  filter.filter_sol(vec_sol);
+
+  filter.filter_mat(mat_precon); //TODO do i have to?
+
+  std::cout << "proc " << rank << " A " << mat_sys << std::endl;
+  std::cout << "proc " << rank << " P " << mat_precon;
 
   ///bring up solver data
   SynchronisedPreconditionedFilteredSolverData<double,
@@ -447,19 +461,19 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-6));
 
   DenseVector<Mem::Main, double> dummy;
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 1));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 10));
 
   solver->set_preconditioner(block_solver);
 
   MPI_Barrier(MPI_COMM_WORLD);
-  std::cout << solver->type_name();
+  std::cout << "proc " << rank << " rhs " << data.rhs();
 
   solver->execute();
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  std::cout << data.sol();
-  std::cout << data.used_iters() << std::endl;
+  std::cout << "proc " << rank << " sol " << data.sol();
+  std::cout << "proc " << rank << " iters used " << data.used_iters() << std::endl;
 
   delete macro_basemesh;
 }
@@ -469,7 +483,7 @@ int main(int argc, char* argv[])
 {
   int me(0);
   int num_patches(0);
-  Index desired_refinement_level(5);
+  Index desired_refinement_level(2);
 
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
