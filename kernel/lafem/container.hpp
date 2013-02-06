@@ -28,6 +28,7 @@ namespace FEAST
         fm_exp = 0,
         fm_dv,
         fm_m,
+        fm_mtx,
         fm_ell,
         fm_csr,
         fm_coo

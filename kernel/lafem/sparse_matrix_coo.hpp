@@ -120,6 +120,82 @@ namespace FEAST
           }
         }
 
+        void _read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          _read_from_mtx(file);
+          file.close();
+        }
+
+        void _read_from_mtx(std::istream& file)
+        {
+          std::vector<Index> rowsv;
+          std::vector<Index> colsv;
+          std::vector<DT_> valsv;
+
+          String line;
+          std::getline(file, line);
+          {
+            std::getline(file, line);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row(atol(srow.c_str()));
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col(atol(scol.c_str()));
+            line.erase(0, end);
+            this->_rows = row;
+            this->_columns = col;
+            this->_size = this->_rows * this->_columns;
+          }
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row(atol(srow.c_str()));
+            --row;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col(atol(scol.c_str()));
+            --col;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ val(atof(sval.c_str()));
+
+            rowsv.push_back(row);
+            colsv.push_back(col);
+            valsv.push_back(val);
+          }
+
+          for (Index i(0) ; i < rowsv.size() ; ++i)
+          {
+            (*this)(rowsv.at(i), colsv.at(i), valsv.at(i));
+          }
+        }
+
         void _read_from_coo(String filename)
         {
           std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
@@ -382,6 +458,9 @@ namespace FEAST
             case fm_m:
               _read_from_m(filename);
               break;
+            case fm_mtx:
+              _read_from_mtx(filename);
+              break;
             case fm_coo:
               _read_from_coo(filename);
               break;
@@ -413,6 +492,9 @@ namespace FEAST
           {
             case fm_m:
               _read_from_m(file);
+              break;
+            case fm_mtx:
+              _read_from_mtx(file);
               break;
             case fm_coo:
               _read_from_coo(file);
@@ -622,6 +704,10 @@ namespace FEAST
               break;
             case fm_m:
               write_out_m(filename);
+              break;
+            case fm_mtx:
+              write_out_mtx(filename);
+              break;
             default:
                 throw InternalError("Filemode not supported!");
           }
@@ -644,6 +730,9 @@ namespace FEAST
               break;
             case fm_m:
               write_out_m(file);
+              break;
+            case fm_mtx:
+              write_out_mtx(file);
               break;
             default:
                 throw InternalError("Filemode not supported!");
@@ -740,6 +829,38 @@ namespace FEAST
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
+        }
+
+        /**
+         * \brief Write out matrix to matrix market mtx file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_mtx(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          write_out_mtx(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to matrix market mtx file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_mtx(std::ostream& file) const
+        {
+          SparseMatrixCOO<Mem::Main, DT_> temp(*this);
+
+          file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+          file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
+
+          for (Index i(0) ; i < _used_elements ; ++i)
+          {
+            file << temp.row()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << (double)temp.val()[i] << std::endl;
+          }
         }
 
         /**
