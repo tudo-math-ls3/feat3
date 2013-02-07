@@ -167,7 +167,7 @@ namespace FEAST
          *
          * \param[in] other The source matrix in ELL format.
          *
-         * Creates a ELL matrix based on the ELL source matrix.
+         * Creates a CSR matrix based on the ELL source matrix.
          */
         template <typename Arch2_>
         explicit SparseMatrixCSR(const SparseMatrixELL<Arch2_, DT_> & other_orig) :
@@ -179,7 +179,7 @@ namespace FEAST
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          SparseMatrixCOO<Arch2_, DT_> ccother(other_orig);
+          SparseMatrixELL<Mem::Main, DT_> ccother(other_orig);
           SparseMatrixCOO<Mem::Main, DT_> cother(ccother);
 
           _val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(_used_elements * sizeof(DT_));
