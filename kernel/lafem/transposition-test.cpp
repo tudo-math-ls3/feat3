@@ -12,7 +12,8 @@ using namespace FEAST::TestSystem;
 template<
   typename Arch_,
   typename Algo_,
-  typename DT_>
+  typename DT_,
+  typename SM_>
 class TranspositionTest
   : public TaggedTest<Arch_, DT_, Algo_>
 {
@@ -20,7 +21,7 @@ class TranspositionTest
 public:
 
   TranspositionTest()
-    : TaggedTest<Arch_, DT_, Algo_>("transposition_test")
+    : TaggedTest<Arch_, DT_, Algo_>("transposition_test" + SM_::type_name())
   {
   }
 
@@ -39,9 +40,9 @@ public:
             a_local(row, col, DT_(-1));
         }
       }
-      SparseMatrixCSR<Arch_, DT_> a(a_local);
+      SM_ a(a_local);
 
-      SparseMatrixCSR<Arch_, DT_> b;
+      SM_ b;
       b = Transposition<Algo_>::value(a);
 
       for (Index i(0) ; i < a.rows() ; ++i)
@@ -54,5 +55,9 @@ public:
     }
   }
 };
-TranspositionTest<Mem::Main, Algo::Generic, float> cpu_transposition_test_float;
-TranspositionTest<Mem::Main, Algo::Generic, double> cpu_transposition_test_double;
+TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_cpu_transposition_test_float;
+TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_cpu_transposition_test_double;
+TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > csr_cpu_transposition_test_float;
+TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > csr_cpu_transposition_test_double;
+TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_cpu_transposition_test_float;
+TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_cpu_transposition_test_double;

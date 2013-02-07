@@ -6,7 +6,9 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 
 
 
@@ -36,32 +38,45 @@ namespace FEAST
        * \returns The transpose of a.
        */
       template <typename DT_>
-      static SparseMatrixCSR<Mem::Main, DT_> value(const SparseMatrixCSR<Mem::Main, DT_> & a)
+      static SparseMatrixCOO<Mem::Main, DT_> value(const SparseMatrixCOO<Mem::Main, DT_> & a)
       {
-        /*DenseVector<Mem::Main, Index> col_ind(a.used_elements());
-        DenseVector<Mem::Main, DT_> val(a.used_elements());
-        DenseVector<Mem::Main, Index> row_ptr(a.columns() + 1);
-        DenseVector<Mem::Main, Index> row_ptr_end(a.columns());*/
-
         SparseMatrixCOO<Mem::Main, DT_> st(a.columns(), a.rows());
 
-        const Index * col_ind(a.col_ind());
-        const DT_ * val(a.val());
-        const Index * row_ptr(a.row_ptr());
-        const Index * row_ptr_end(a.row_ptr_end());
-        const Index rows(a.rows());
-
-        for (Index row(0) ; row < rows ; ++row)
+        for (Index i(0) ; i < a.used_elements() ; ++i)
         {
-          const Index end(row_ptr_end[row]);
-          for (Index i(row_ptr[row]) ; i < end ; ++i)
-          {
-            st(col_ind[i], row, val[i]);
-          }
+          st(a.column()[i], a.row()[i], a.val()[i]);
+        }
+
+        return st;
+      }
+
+      template <typename DT_>
+      static SparseMatrixCSR<Mem::Main, DT_> value(const SparseMatrixCSR<Mem::Main, DT_> & a)
+      {
+        SparseMatrixCOO<Mem::Main, DT_> st(a.columns(), a.rows());
+        SparseMatrixCOO<Mem::Main, DT_> at(a);
+
+        for (Index i(0) ; i < at.used_elements() ; ++i)
+        {
+          st(at.column()[i], at.row()[i], at.val()[i]);
         }
 
         SparseMatrixCSR<Mem::Main, DT_> t(st);
-        //SparseMatrixCSR<Mem::Main, DT_> t(a.columns(), a.rows(), col_ind, val, row_ptr, row_ptr_end);
+        return t;
+      }
+
+      template <typename DT_>
+      static SparseMatrixELL<Mem::Main, DT_> value(const SparseMatrixELL<Mem::Main, DT_> & a)
+      {
+        SparseMatrixCOO<Mem::Main, DT_> st(a.columns(), a.rows());
+        SparseMatrixCOO<Mem::Main, DT_> at(a);
+
+        for (Index i(0) ; i < at.used_elements() ; ++i)
+        {
+          st(at.column()[i], at.row()[i], at.val()[i]);
+        }
+
+        SparseMatrixELL<Mem::Main, DT_> t(st);
         return t;
       }
     };
