@@ -419,12 +419,15 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::cout << "proc " << rank << " #mirrors " << mirrors.size() << std::endl;
   for(Index i(0) ; i < mirrors.size() ; ++i)
   {
-    MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
-    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_sys));
-    mat_mirror.gather_op(buf_mat, mat_sys);
-    DenseVector<Mem::Main, double> t(buf_mat.used_elements(), buf_mat.val());
-    Scale<Algo::Generic>::value(t, t, 0.5);
-    mat_mirror.scatter_op(mat_sys, buf_mat);
+    if(macro_comm_halos.at(i)->get_level() != pl_vertex)
+    {
+      MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
+      SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_sys));
+      mat_mirror.gather_op(buf_mat, mat_sys);
+      DenseVector<Mem::Main, double> t(buf_mat.used_elements(), buf_mat.val());
+      Scale<Algo::Generic>::value(t, t, 0.5);
+      mat_mirror.scatter_op(mat_sys, buf_mat);
+    }
   }
 
 
@@ -458,7 +461,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.dest_ranks() = destranks;
   data.source_ranks() = sourceranks;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-6));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 2, 1e-6));
 
   DenseVector<Mem::Main, double> dummy;
   std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 10));
