@@ -46,6 +46,16 @@ namespace FEAST
           return this->_stored_sys;
         }
 
+        virtual matrix_type_& localsys()
+        {
+          return this->_stored_localsys;
+        }
+
+        virtual const matrix_type_& localsys() const
+        {
+          return this->_stored_localsys;
+        }
+
         virtual vector_type_& rhs()
         {
           return this->_stored_rhs;
@@ -153,6 +163,7 @@ namespace FEAST
       protected:
         ///MemTag_ memory to store matrices and vectors and scalars
         matrix_type_ _stored_sys;
+        matrix_type_ _stored_localsys;
         vector_type_ _stored_rhs;
         vector_type_ _stored_sol;
         vector_type_ _stored_def;
@@ -211,6 +222,7 @@ namespace FEAST
       SolverData(const SolverData& other)
       {
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;
@@ -230,6 +242,7 @@ namespace FEAST
             return *this;
 
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;
@@ -253,6 +266,7 @@ namespace FEAST
       SolverData(const SolverDataBase<DT_, Tag_, VT_, MT_, StoreT_>& other)
       {
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;
@@ -349,6 +363,7 @@ namespace FEAST
             return *this;
 
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;
@@ -499,6 +514,7 @@ namespace FEAST
             return *this;
 
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;
@@ -571,6 +587,7 @@ namespace FEAST
             return *this;
 
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;
@@ -641,6 +658,7 @@ namespace FEAST
             return *this;
 
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;
@@ -748,6 +766,7 @@ namespace FEAST
             return *this;
 
         this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
         this->_stored_rhs = other._stored_rhs;
         this->_stored_sol = other._stored_sol;
         this->_stored_def = other._stored_def;

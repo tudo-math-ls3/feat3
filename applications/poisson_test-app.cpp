@@ -408,6 +408,16 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     sourceranks.push_back(macro_comm_halos.at(i)->get_other());
   }
 
+  ///safe type-1 matrix
+  SparseMatrixCSR<Mem::Main, double> mat_localsys(mat_sys.clone());
+
+  ///bring up a local preconditioning matrix TODO use a product wrapper and DV
+  SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
+  for(Index i(0) ; i < mat_localsys.rows() ; ++i)
+    mat_precon_temp(i, i, double(0.75) * (double(1)/mat_localsys(i, i)));
+
+  SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
+
   ///(type-1 to type-0 conversion)
   std::cout << "proc " << rank << " #mirrors " << mirrors.size() << std::endl;
   for(Index i(0) ; i < mirrors.size() ; ++i)
@@ -428,16 +438,9 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   ///filter system
   filter.filter_mat(mat_sys);
+  filter.filter_mat(mat_localsys);
   filter.filter_rhs(vec_rhs);
   filter.filter_sol(vec_sol);
-
-  ///bring up a local preconditioning matrix TODO use a product wrapper and DV
-  SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_sys.rows(), mat_sys.columns());
-  for(Index i(0) ; i < mat_sys.rows() ; ++i)
-    mat_precon_temp(i, i, double(0.1) * (double(1)/mat_sys(i, i)));
-
-  SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
-
   filter.filter_mat(mat_precon); //TODO do i have to?
 
   std::cout << "proc " << rank << " A " << mat_sys << std::endl;
@@ -459,8 +462,9 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.vector_mirror_recvbufs() = recvbufs;
   data.dest_ranks() = destranks;
   data.source_ranks() = sourceranks;
+  data.localsys() = mat_localsys;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-6));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-8));
 
   DenseVector<Mem::Main, double> dummy;
   std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 10));
@@ -485,7 +489,7 @@ int main(int argc, char* argv[])
 {
   int me(0);
   int num_patches(0);
-  Index desired_refinement_level(2);
+  Index desired_refinement_level(4);
 
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
