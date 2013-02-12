@@ -44,6 +44,7 @@ endif(FEAST_BACKENDS_CUDA)
 SET (test_list
   axpy-test
   bicgstab-test
+  container_pool-test
   defect-test
   dense_matrix-test
   dense_vector-test
