@@ -287,6 +287,26 @@ namespace FEAST
         /**
          * \brief Constructor
          *
+         * \param[in] dimensions The row/column count of the created matrix.
+         *
+         * Creates a matrix with given dimensions.
+         */
+        explicit SparseMatrixCOO(Index dimensions) :
+          Container<Mem_, DT_>(dimensions * dimensions),
+          _rows(dimensions),
+          _columns(dimensions),
+          _zero_element(DT_(0)),
+          _used_elements(0),
+          _val_ptr(0),
+          _row_ptr(0),
+          _col_ptr(0)
+        {
+          CONTEXT("When creating SparseMatrixCOO");
+        }
+
+        /**
+         * \brief Constructor
+         *
          * \param[in] rows The row count of the created matrix.
          * \param[in] columns The column count of the created matrix.
          *
