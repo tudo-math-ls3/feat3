@@ -198,6 +198,13 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   }
   std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);
 
+  ///get adjacencies of halos
+  std::vector<std::vector<Index> > halo_adjacencies;
+  for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
+  {
+    ///TODO
+  }
+
   ///get (non-inner) macro boundary components
   Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
   Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges_final;
@@ -408,18 +415,20 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     sourceranks.push_back(macro_comm_halos.at(i)->get_other());
   }
 
-  ///safe type-1 matrix
+  ///build up a type-1 matrix for the local solvers
   SparseMatrixCSR<Mem::Main, double> mat_localsys(mat_sys.clone());
+  ///TODO
+
 
   ///bring up a local preconditioning matrix TODO use a product wrapper and DV
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
   for(Index i(0) ; i < mat_localsys.rows() ; ++i)
-    mat_precon_temp(i, i, double(0.75) * (double(1)/mat_localsys(i, i)));
+    mat_precon_temp(i, i, double(0.5) * (double(1)/mat_localsys(i, i)));
 
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
   ///(type-1 to type-0 conversion)
-  std::cout << "proc " << rank << " #mirrors " << mirrors.size() << std::endl;
+  /*std::cout << "proc " << rank << " #mirrors " << mirrors.size() << std::endl;
   for(Index i(0) ; i < mirrors.size() ; ++i)
   {
     if(macro_comm_halos.at(i)->get_level() != pl_vertex)
@@ -431,7 +440,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       Scale<Algo::Generic>::value(t, t, 0.5);
       mat_mirror.scatter_op(mat_sys, buf_mat);
     }
-  }
+  }*/
 
   // assemble filter:
   UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
@@ -441,7 +450,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   filter.filter_mat(mat_localsys);
   filter.filter_rhs(vec_rhs);
   filter.filter_sol(vec_sol);
-  filter.filter_mat(mat_precon); //TODO do i have to?
+  //filter.filter_mat(mat_precon); //NO!
 
   std::cout << "proc " << rank << " A " << mat_sys << std::endl;
   std::cout << "proc " << rank << " P " << mat_precon;
@@ -464,10 +473,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.source_ranks() = sourceranks;
   data.localsys() = mat_localsys;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 2, 1e-8));
 
   DenseVector<Mem::Main, double> dummy;
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 10));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 1));
 
   solver->set_preconditioner(block_solver);
 
@@ -489,7 +498,7 @@ int main(int argc, char* argv[])
 {
   int me(0);
   int num_patches(0);
-  Index desired_refinement_level(4);
+  Index desired_refinement_level(1);
 
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
