@@ -292,8 +292,6 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     macro_boundaries_found.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D> > >(new Halo<0, pl_edge, Mesh<rnt_2D> >(result)));
   }
 
-
-
   ///refine everything to desired level of detail
   BaseMeshType* macro_basemesh_fine = new BaseMeshType(*macro_basemesh);
   BaseMeshType* macro_mesh_geo_fine = new BaseMeshType(macro_mesh_geo);
@@ -479,8 +477,81 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   ///build up a type-1 matrix for the local solvers
   SparseMatrixCSR<Mem::Main, double> mat_localsys(mat_sys.clone());
-  ///TODO
+  for(Index i(0) ; i < macro_comm_halos_fine.size() ; ++i)
+  {
+    //gather data, exchange
+    MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
+    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_sys));
+    mat_mirror.gather_op(buf_mat, mat_sys);
 
+    double* val(buf_mat.val());
+    Index* row_ptr(buf_mat.row_ptr());
+    Index* row_ptr_end(buf_mat.row_ptr_end());
+    Index* col_ind(buf_mat.col_ind());
+
+    DenseVector<Mem::Main, double> val_sendbuf(buf_mat.used_elements());
+    DenseVector<Mem::Main, double> val_recvbuf(buf_mat.used_elements());
+    DenseVector<Mem::Main, Index> colind_sendbuf(buf_mat.used_elements());
+    DenseVector<Mem::Main, Index> colind_recvbuf(buf_mat.used_elements());
+    DenseVector<Mem::Main, Index> rp_sendbuf(buf_mat.rows() + 1);
+    DenseVector<Mem::Main, Index> rp_recvbuf(buf_mat.rows() + 1);
+    DenseVector<Mem::Main, Index> rpend_sendbuf(buf_mat.rows());
+    DenseVector<Mem::Main, Index> rpend_recvbuf(buf_mat.rows());
+
+    for(Index j(0) ; j < buf_mat.used_elements() ; ++j)
+    {
+      val_sendbuf(j, val[j]);
+      colind_sendbuf(j, val[j]);
+    }
+    for(Index j(0) ; j < buf_mat.rows() + 1 ; ++j)
+    {
+      rp_sendbuf(j, val[j]);
+    }
+    for(Index j(0) ; j < buf_mat.rows() ; ++j)
+    {
+      rpend_sendbuf(j, val[j]);
+    }
+
+    Comm<Parallel>::send_recv(val_sendbuf.elements(),
+                              val_sendbuf.size(),
+                              macro_comm_halos.at(i)->get_other(),
+                              val_recvbuf.elements(),
+                              val_recvbuf.size(),
+                              macro_comm_halos.at(i)->get_other());
+    Comm<Parallel>::send_recv(colind_sendbuf.elements(),
+                              colind_sendbuf.size(),
+                              macro_comm_halos.at(i)->get_other(),
+                              colind_recvbuf.elements(),
+                              colind_recvbuf.size(),
+                              macro_comm_halos.at(i)->get_other());
+    Comm<Parallel>::send_recv(rp_sendbuf.elements(),
+                              rp_sendbuf.size(),
+                              macro_comm_halos.at(i)->get_other(),
+                              rp_recvbuf.elements(),
+                              rp_recvbuf.size(),
+                              macro_comm_halos.at(i)->get_other());
+    Comm<Parallel>::send_recv(rpend_sendbuf.elements(),
+                              rpend_sendbuf.size(),
+                              macro_comm_halos.at(i)->get_other(),
+                              rpend_recvbuf.elements(),
+                              rpend_recvbuf.size(),
+                              macro_comm_halos.at(i)->get_other());
+
+    SparseMatrixCSR<Mem::Main, double> other_buf_mat(buf_mat.rows(),
+                                                     buf_mat.columns(),
+                                                     colind_recvbuf,
+                                                     val_recvbuf,
+                                                     rp_recvbuf,
+                                                     rpend_recvbuf);
+
+    std::cout << "proc: " << rank << " buf_mat0 " << buf_mat;
+    std::cout << "proc: " << rank << " buf_mat1 " << other_buf_mat;
+
+    Sum<Algo::Generic>::value(buf_mat, buf_mat, other_buf_mat);
+    mat_mirror.gather_op(buf_mat, mat_sys);
+    std::cout << "proc: " << rank << " buf_mat2 " << buf_mat;
+
+  }
 
   ///bring up a local preconditioning matrix TODO use a product wrapper and DV
   SparseMatrixCOO<Mem::Main, double> mat_precon_temp(mat_localsys.rows(), mat_localsys.columns());
@@ -512,7 +583,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   filter.filter_mat(mat_localsys);
   filter.filter_rhs(vec_rhs);
   filter.filter_sol(vec_sol);
-  //filter.filter_mat(mat_precon); //NO!
+  //filter.filter_mat(mat_precon); //NO! we do this in the solver program when applying the correction filter after preconditioning
 
   std::cout << "proc " << rank << " A " << mat_sys << std::endl;
   std::cout << "proc " << rank << " P " << mat_precon;
