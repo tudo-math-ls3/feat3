@@ -540,9 +540,18 @@ namespace FEAST
         {
           CONTEXT("When copying SparseMatrixCOO");
 
+          if (this->_elements.size() > 0)
+          {
           this->_val_ptr = this->_elements.at(0);
           this->_row_ptr = this->_indices.at(0);
           this->_col_ptr = this->_indices.at(1);
+          }
+          else
+          {
+            _val_ptr = 0;
+            _row_ptr = 0;
+            _col_ptr = 0;
+          }
         }
 
         /**
@@ -562,9 +571,18 @@ namespace FEAST
         {
           CONTEXT("When copying SparseMatrixCOO");
 
-          this->_val_ptr = this->_elements.at(0);
-          this->_row_ptr = this->_indices.at(0);
-          this->_col_ptr = this->_indices.at(1);
+          if (this->_elements.size() > 0)
+          {
+            this->_val_ptr = this->_elements.at(0);
+            this->_row_ptr = this->_indices.at(0);
+            this->_col_ptr = this->_indices.at(1);
+          }
+          else
+          {
+            _val_ptr = 0;
+            _row_ptr = 0;
+            _col_ptr = 0;
+          }
         }
 
         /** \brief Clone operation
@@ -576,20 +594,30 @@ namespace FEAST
           CONTEXT("When cloning SparseMatrixCOO");
 
           SparseMatrixCOO<Mem_, DT_> t(this->_rows, this->_columns);
-          t._elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
-          t._elements_size.push_back(_used_elements);
-          t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
-          t._indices_size.push_back(_used_elements);
-          t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
-          t._indices_size.push_back(_used_elements);
-          t._val_ptr = t._elements.at(0);
-          t._row_ptr = t._indices.at(0);
-          t._col_ptr = t._indices.at(1);
-          t._used_elements = _used_elements;
 
-          MemoryPool<Mem_>::copy(t._elements.at(0), _val_ptr, _used_elements * sizeof(DT_));
-          MemoryPool<Mem_>::copy(t._indices.at(0), _row_ptr, _used_elements * sizeof(Index));
-          MemoryPool<Mem_>::copy(t._indices.at(1), _col_ptr, _used_elements * sizeof(Index));
+          if (this->_elements.size() > 0)
+          {
+            t._elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+            t._elements_size.push_back(_used_elements);
+            t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+            t._indices_size.push_back(_used_elements);
+            t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+            t._indices_size.push_back(_used_elements);
+            t._val_ptr = t._elements.at(0);
+            t._row_ptr = t._indices.at(0);
+            t._col_ptr = t._indices.at(1);
+            t._used_elements = _used_elements;
+
+            MemoryPool<Mem_>::copy(t._elements.at(0), _val_ptr, _used_elements * sizeof(DT_));
+            MemoryPool<Mem_>::copy(t._indices.at(0), _row_ptr, _used_elements * sizeof(Index));
+            MemoryPool<Mem_>::copy(t._indices.at(1), _col_ptr, _used_elements * sizeof(Index));
+          }
+          else
+          {
+            t._val_ptr = 0;
+            t._row_ptr = 0;
+            t._col_ptr = 0;
+          }
           return t;
         }
 
@@ -631,9 +659,18 @@ namespace FEAST
           this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
           this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
 
-          this->_val_ptr = this->_elements.at(0);
-          this->_row_ptr = this->_indices.at(0);
-          this->_col_ptr = this->_indices.at(1);
+          if (this->_elements.size() > 0)
+          {
+            this->_val_ptr = this->_elements.at(0);
+            this->_row_ptr = this->_indices.at(0);
+            this->_col_ptr = this->_indices.at(1);
+          }
+          else
+          {
+            _val_ptr = 0;
+            _row_ptr = 0;
+            _col_ptr = 0;
+          }
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
@@ -671,38 +708,47 @@ namespace FEAST
           this->_elements_size.clear();
           this->_indices_size.clear();
 
+          if (this->_elements.size() > 0)
+          {
+            this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
+            this->_elements_size.push_back(_used_elements);
+            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+            this->_indices_size.push_back(_used_elements);
+            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
+            this->_indices_size.push_back(_used_elements);
 
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
-          this->_elements_size.push_back(_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
-          this->_indices_size.push_back(_used_elements);
-          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(Index)));
-          this->_indices_size.push_back(_used_elements);
+            this->_val_ptr = this->_elements.at(0);
+            this->_row_ptr = this->_indices.at(0);
+            this->_col_ptr = this->_indices.at(1);
 
-          this->_val_ptr = this->_elements.at(0);
-          this->_row_ptr = this->_indices.at(0);
-          this->_col_ptr = this->_indices.at(1);
 
-          Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
-          Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
-          void * temp(::malloc(src_size));
-          MemoryPool<Mem2_>::download(temp, other.get_elements().at(0), src_size);
-          MemoryPool<Mem_>::upload(this->get_elements().at(0), temp, dest_size);
-          ::free(temp);
+            Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
+            Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
+            void * temp(::malloc(src_size));
+            MemoryPool<Mem2_>::download(temp, other.get_elements().at(0), src_size);
+            MemoryPool<Mem_>::upload(this->get_elements().at(0), temp, dest_size);
+            ::free(temp);
 
-          src_size = (other.get_indices_size().at(0) * sizeof(Index));
-          dest_size = (other.get_indices_size().at(0) * sizeof(Index));
-          temp = (::malloc(src_size));
-          MemoryPool<Mem2_>::download(temp, other.get_indices().at(0), src_size);
-          MemoryPool<Mem_>::upload(this->get_indices().at(0), temp, dest_size);
-          ::free(temp);
+            src_size = (other.get_indices_size().at(0) * sizeof(Index));
+            dest_size = (other.get_indices_size().at(0) * sizeof(Index));
+            temp = (::malloc(src_size));
+            MemoryPool<Mem2_>::download(temp, other.get_indices().at(0), src_size);
+            MemoryPool<Mem_>::upload(this->get_indices().at(0), temp, dest_size);
+            ::free(temp);
 
-          src_size = (other.get_indices_size().at(1) * sizeof(Index));
-          dest_size = (other.get_indices_size().at(1) * sizeof(Index));
-          temp = (::malloc(src_size));
-          MemoryPool<Mem2_>::download(temp, other.get_indices().at(1), src_size);
-          MemoryPool<Mem_>::upload(this->get_indices().at(1), temp, dest_size);
-          ::free(temp);
+            src_size = (other.get_indices_size().at(1) * sizeof(Index));
+            dest_size = (other.get_indices_size().at(1) * sizeof(Index));
+            temp = (::malloc(src_size));
+            MemoryPool<Mem2_>::download(temp, other.get_indices().at(1), src_size);
+            MemoryPool<Mem_>::upload(this->get_indices().at(1), temp, dest_size);
+            ::free(temp);
+          }
+          else
+          {
+            _val_ptr = 0;
+            _row_ptr = 0;
+            _col_ptr = 0;
+          }
 
           return *this;
         }
