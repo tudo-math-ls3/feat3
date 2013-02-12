@@ -168,7 +168,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
   {
     if(potential_comm_partners_for_face_rank.at(i) == rank)
+    {
       potential_comm_partners_for_face_rank.erase(potential_comm_partners_for_face_rank.begin() + i);
+      break;
+    }
   }
 
   std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > > > macro_comm_halos;
@@ -202,8 +205,67 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::vector<std::vector<Index> > halo_adjacencies;
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
-    ///TODO
+    Index elem(macro_comm_halos.at(i)->get_element(0));
+    halo_adjacencies.push_back(std::vector<Index>());
+
+    if(macro_comm_halos.at(i)->get_level() == pl_edge)
+    {
+      TopologyStorageType adjacent_edges_for_halo_elem(macro_basemesh_found.get_adjacent_polytopes(pl_edge, pl_edge, elem));
+      //remove self
+      for(Index j(0) ; j < adjacent_edges_for_halo_elem.size() ; ++j)
+      {
+        if(adjacent_edges_for_halo_elem.at(j) == elem)
+        {
+          adjacent_edges_for_halo_elem.erase(adjacent_edges_for_halo_elem.begin() + j);
+          break;
+        }
+      }
+
+      for(Index j(0) ; j < adjacent_edges_for_halo_elem.size() ; ++j)
+      {
+        for(Index k(0) ; k < macro_comm_halos.size() ; ++k)
+        {
+          if(macro_comm_halos.at(k)->get_element(0) == adjacent_edges_for_halo_elem.at(j))
+          {
+            if(macro_comm_halos.at(k)->get_level() == pl_edge)
+              halo_adjacencies.at(i).push_back(k);
+          }
+        }
+      }
+
+      TopologyStorageType adjacent_vertices_for_halo_elem(macro_basemesh_found.get_adjacent_polytopes(pl_edge, pl_vertex, elem));
+      for(Index j(0) ; j < adjacent_vertices_for_halo_elem.size() ; ++j)
+      {
+        for(Index k(0) ; k < macro_comm_halos.size() ; ++k)
+        {
+          if(macro_comm_halos.at(k)->get_element(0) == adjacent_vertices_for_halo_elem.at(j))
+          {
+            if(macro_comm_halos.at(k)->get_level() == pl_vertex)
+              halo_adjacencies.at(i).push_back(k);
+          }
+        }
+      }
+    }
+    else if(macro_comm_halos.at(i)->get_level() == pl_vertex)
+    {
+      TopologyStorageType adjacent_edges_for_halo_elem(macro_basemesh_found.get_adjacent_polytopes(pl_vertex, pl_edge, elem));
+      for(Index j(0) ; j < adjacent_edges_for_halo_elem.size() ; ++j)
+      {
+        for(Index k(0) ; k < macro_comm_halos.size() ; ++k)
+        {
+          if(macro_comm_halos.at(k)->get_element(0) == adjacent_edges_for_halo_elem.at(j))
+          {
+            if(macro_comm_halos.at(k)->get_level() == pl_edge)
+              halo_adjacencies.at(i).push_back(k);
+          }
+        }
+      }
+    }
   }
+  for(Index i(0) ; i < halo_adjacencies.size() ; ++i)
+    for(Index j(0) ; j < halo_adjacencies.at(i).size() ; ++j)
+      std::cout << "proc: " << rank << " halo " << i << " adj to " << halo_adjacencies.at(i).at(j) << std::endl;
+
 
   ///get (non-inner) macro boundary components
   Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
