@@ -165,14 +165,17 @@ namespace FEAST
                                  StorageT_<Index, std::allocator<Index> >& dest_ranks,
                                  StorageT_<Index, std::allocator<Index> >& source_ranks)
       {
+        SynchVec<Tag_, Arch_, com_accumulate>::execute(target, mirrors, sendbufs, recvbufs, dest_ranks, source_ranks);
+
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          SynchVec<Tag_, Arch_, com_average>::execute(target,
-                                                         mirrors.at(i),
-                                                         sendbufs.at(i),
-                                                         recvbufs.at(i),
-                                                         dest_ranks.at(i),
-                                                         source_ranks.at(i));
+          //average by two along non-vertex halos only (implies divide by four along vertex halos) TODO: generalize will in most cases not work
+          if(mirrors.at(i).size() != 1)
+          {
+            mirrors.at(i).gather_dual(sendbufs.at(i), target);
+            Scale<Tag_>::value(sendbufs.at(i), sendbufs.at(i), typename VectorT_::DataType(0.5));
+            mirrors.at(i).scatter_dual(target, sendbufs.at(i));
+          }
         }
       }
     };
