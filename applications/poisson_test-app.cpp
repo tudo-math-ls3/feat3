@@ -501,15 +501,15 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     for(Index j(0) ; j < buf_mat.used_elements() ; ++j)
     {
       val_sendbuf(j, val[j]);
-      colind_sendbuf(j, val[j]);
+      colind_sendbuf(j, col_ind[j]);
     }
     for(Index j(0) ; j < buf_mat.rows() + 1 ; ++j)
     {
-      rp_sendbuf(j, val[j]);
+      rp_sendbuf(j, row_ptr[j]);
     }
     for(Index j(0) ; j < buf_mat.rows() ; ++j)
     {
-      rpend_sendbuf(j, val[j]);
+      rpend_sendbuf(j, row_ptr_end[j]);
     }
 
     Comm<Parallel>::send_recv(val_sendbuf.elements(),
@@ -548,8 +548,8 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     std::cout << "proc: " << rank << " buf_mat1 " << other_buf_mat;
 
     Sum<Algo::Generic>::value(buf_mat, buf_mat, other_buf_mat);
-    mat_mirror.gather_op(buf_mat, mat_sys);
     std::cout << "proc: " << rank << " buf_mat2 " << buf_mat;
+    mat_mirror.scatter_op(mat_sys, buf_mat);
 
   }
 
