@@ -95,5 +95,7 @@ DefectTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > c
 #endif
 DefectTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_defect_test_float;
 DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_defect_test_double;
+#ifdef FEAST_BACKENDS_CUDA
 DefectTest<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_coo_defect_test_float;
 DefectTest<Mem::Main, Algo::MKL, double, SparseMatrixCOO<Mem::Main, double> > mkl_coo_defect_test_double;
+#endif
