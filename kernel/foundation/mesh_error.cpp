@@ -9,7 +9,7 @@ MeshError::MeshError(const std::string & message) throw () :
 {
 }
 
-MeshInternalIndexOutOfBounds::MeshInternalIndexOutOfBounds(unsigned long index, unsigned long max_index) throw () :
+MeshInternalIndexOutOfBounds::MeshInternalIndexOutOfBounds(Index index, Index max_index) throw () :
     MeshError("Internal index '" + stringify(index) + "' exceeds max index '"
             + stringify(max_index) + "'")
 {

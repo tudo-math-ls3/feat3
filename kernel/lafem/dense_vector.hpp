@@ -314,7 +314,7 @@ namespace FEAST
           this->_indices_size.clear();
 
           std::vector<DT_ *> new_elements = other.get_elements();
-          std::vector<unsigned long *> new_indices = other.get_indices();
+          std::vector<Index*> new_indices = other.get_indices();
 
           this->_elements.assign(new_elements.begin(), new_elements.end());
           this->_indices.assign(new_indices.begin(), new_indices.end());
