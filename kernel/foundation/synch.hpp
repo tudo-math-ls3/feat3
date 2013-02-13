@@ -4,7 +4,7 @@
 
 #include<kernel/foundation/communication.hpp>
 #include<kernel/lafem/sum.hpp>
-#include<kernel/lafem/axpy.hpp>
+#include<kernel/lafem/scale.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -132,7 +132,8 @@ namespace FEAST
                                recvbuf.size(),
                                source_rank);
 
-        Axpy<Tag_>::value(recvbuf, typename VectorT_::DataType(0.5), sendbuf, recvbuf);
+        Sum<Tag_>::value(recvbuf, sendbuf, recvbuf);
+        Scale<Tag_>::value(recvbuf, recvbuf, typename VectorT_::DataType(0.5));
 
         mirror.scatter_dual(target, recvbuf);
       }

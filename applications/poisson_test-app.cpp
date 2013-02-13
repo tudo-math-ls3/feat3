@@ -476,13 +476,22 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   }
 
   ///build up a type-1 matrix for the local solvers
+  std::vector<DenseVector<Mem::Main, double> > val_sendbufs;
+  std::vector<DenseVector<Mem::Main, double> > val_recvbufs;
+  std::vector<DenseVector<Mem::Main, Index> > colind_sendbufs;
+  std::vector<DenseVector<Mem::Main, Index> > colind_recvbufs;
+  std::vector<DenseVector<Mem::Main, Index> > rp_sendbufs;
+  std::vector<DenseVector<Mem::Main, Index> > rp_recvbufs;
+  std::vector<DenseVector<Mem::Main, Index> > rpend_sendbufs;
+  std::vector<DenseVector<Mem::Main, Index> > rpend_recvbufs;
+
   SparseMatrixCSR<Mem::Main, double> mat_localsys(mat_sys.clone());
-  for(Index i(0) ; i < macro_comm_halos_fine.size() ; ++i)
+  for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
     //gather data, exchange
     MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
-    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_sys));
-    mat_mirror.gather_op(buf_mat, mat_sys);
+    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_localsys));
+    mat_mirror.gather_op(buf_mat, mat_localsys);
 
     double* val(buf_mat.val());
     Index* row_ptr(buf_mat.row_ptr());
@@ -537,20 +546,35 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
                               rpend_recvbuf.size(),
                               macro_comm_halos.at(i)->get_other());
 
+    val_sendbufs.push_back(val_sendbuf);
+    val_recvbufs.push_back(val_recvbuf);
+    colind_sendbufs.push_back(colind_sendbuf);
+    colind_recvbufs.push_back(colind_recvbuf);
+    rp_sendbufs.push_back(rp_sendbuf);
+    rp_recvbufs.push_back(rp_recvbuf);
+    rpend_sendbufs.push_back(rpend_sendbuf);
+    rpend_recvbufs.push_back(rpend_recvbuf);
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
+  {
+    MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
+    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_localsys));
+    mat_mirror.gather_op(buf_mat, mat_localsys);
+
     SparseMatrixCSR<Mem::Main, double> other_buf_mat(buf_mat.rows(),
-                                                     buf_mat.columns(),
-                                                     colind_recvbuf,
-                                                     val_recvbuf,
-                                                     rp_recvbuf,
-                                                     rpend_recvbuf);
+        buf_mat.columns(),
+        colind_recvbufs.at(i),
+        val_recvbufs.at(i),
+        rp_recvbufs.at(i),
+        rpend_recvbufs.at(i));
 
-    std::cout << "proc: " << rank << " buf_mat0 " << buf_mat;
-    std::cout << "proc: " << rank << " buf_mat1 " << other_buf_mat;
-
+    std::cout << "proc " << rank << "A0_omega_i " << buf_mat;
+    std::cout << "proc " << rank << "A0_omega_j " << other_buf_mat;
     Sum<Algo::Generic>::value(buf_mat, buf_mat, other_buf_mat);
-    std::cout << "proc: " << rank << " buf_mat2 " << buf_mat;
-    mat_mirror.scatter_op(mat_sys, buf_mat);
-
+    std::cout << "proc " << rank << "A1_omega_i " << buf_mat;
+    mat_mirror.scatter_op(mat_localsys, buf_mat);
   }
 
   ///bring up a local preconditioning matrix TODO use a product wrapper and DV
@@ -560,7 +584,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   SparseMatrixCSR<Mem::Main, double> mat_precon(mat_precon_temp);
 
-  ///(type-1 to type-0 conversion)
+  ///(type-1 to type-0 conversion) -- NO: mats are type 0 at the beginning
   /*std::cout << "proc " << rank << " #mirrors " << mirrors.size() << std::endl;
   for(Index i(0) ; i < mirrors.size() ; ++i)
   {
@@ -585,7 +609,8 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   filter.filter_sol(vec_sol);
   //filter.filter_mat(mat_precon); //NO! we do this in the solver program when applying the correction filter after preconditioning
 
-  std::cout << "proc " << rank << " A " << mat_sys << std::endl;
+  std::cout << "proc " << rank << " A0 " << mat_sys << std::endl;
+  std::cout << "proc " << rank << " A1 " << mat_localsys;
   std::cout << "proc " << rank << " P " << mat_precon;
 
   ///bring up solver data
@@ -606,10 +631,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.source_ranks() = sourceranks;
   data.localsys() = mat_localsys;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 2, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 10, 1e-8));
 
   DenseVector<Mem::Main, double> dummy;
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 1));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 10));
 
   solver->set_preconditioner(block_solver);
 
@@ -625,7 +650,6 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   delete macro_basemesh;
 }
-
 
 int main(int argc, char* argv[])
 {
