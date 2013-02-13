@@ -97,16 +97,34 @@ namespace FEAST
                                  StorageT_<VectorT_, std::allocator<VectorT_> >& sendbufs,
                                  StorageT_<VectorT_, std::allocator<VectorT_> >& recvbufs,
                                  StorageT_<Index, std::allocator<Index> >& dest_ranks,
-                                 StorageT_<Index, std::allocator<Index> >& source_ranks)
+                                 StorageT_<Index, std::allocator<Index> >& source_ranks//,
+                                 /*typename VectorT_::DataType weight_vertex = 0.25,
+                                 typename VectorT_::DataType weight_edge = 0.5,
+                                 typename VectorT_::DataType weight_face = 0.5,
+                                 typename VectorT_::DataType weight_polyhedron = 0.5*/
+                                 )
       {
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          SynchVec<Tag_, Arch_, com_accumulate>::execute(target,
-                                                         mirrors.at(i),
-                                                         sendbufs.at(i),
-                                                         recvbufs.at(i),
-                                                         dest_ranks.at(i),
-                                                         source_ranks.at(i));
+          mirrors.at(i).gather_dual(sendbufs.at(i), target);
+
+          Comm<Arch_>::send_recv(sendbufs.at(i).elements(),
+              sendbufs.at(i).size(),
+              dest_ranks.at(i),
+              recvbufs.at(i).elements(),
+              recvbufs.at(i).size(),
+              source_ranks.at(i));
+        }
+
+        MPI_Barrier(MPI_COMM_WORLD); //TODO communicator handling
+
+        for(Index i(0) ; i < mirrors.size() ; ++i)
+        {
+          mirrors.at(i).gather_dual(sendbufs.at(i), target); //we dont need the sendbuf any more
+
+          Sum<Tag_>::value(recvbufs.at(i), sendbufs.at(i), recvbufs.at(i));
+
+          mirrors.at(i).scatter_dual(target, recvbufs.at(i));
         }
       }
     };
