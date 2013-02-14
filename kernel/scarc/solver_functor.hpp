@@ -1021,6 +1021,9 @@ namespace FEAST
 
         virtual void execute()
         {
+          if (_maxiter == 0)
+            return;
+
           Index count(0);
           while(true)
           {

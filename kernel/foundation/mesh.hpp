@@ -444,6 +444,7 @@ namespace FEAST
               if(adj_a.at(i) == adj_b.at(j))
                 result.push_back(adj_a.at(i));
 
+          return result;
         }
 
         ///needed public access functions
