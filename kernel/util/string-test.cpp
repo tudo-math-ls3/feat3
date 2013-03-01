@@ -25,6 +25,7 @@ public:
     bool b;
     int i;
     std::vector<String> words;
+    String s;
 
     // test bool stringify/parse
     TEST_CHECK(stringify(b = true).parse(b));
@@ -58,5 +59,15 @@ public:
     TEST_CHECK_EQUAL(words[2], "");
     TEST_CHECK_EQUAL(words[3], "7 ");
     TEST_CHECK_EQUAL(words[4], " ");
+
+    // test replace_all
+    TEST_CHECK_EQUAL((s = "abcde").replace_all("", "xy"), size_t(0));
+    TEST_CHECK_EQUAL((s = "abcde").replace_all("bc", "xy"), size_t(1));
+    TEST_CHECK_EQUAL(s, "axyde");
+    TEST_CHECK_EQUAL((s = "abcde").replace_all("cb", "xy"), size_t(0));
+    TEST_CHECK_EQUAL((s = "abcde").replace_all("bc", "xbc"), size_t(1));
+    TEST_CHECK_EQUAL(s, "axbcde");
+    TEST_CHECK_EQUAL((s = "aaaa").replace_all("aa", "pa"), size_t(2));
+    TEST_CHECK_EQUAL(s, "papa");
   }
 } string_test;

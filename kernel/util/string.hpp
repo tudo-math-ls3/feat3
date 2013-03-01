@@ -360,6 +360,50 @@ namespace FEAST
     }
 
     /**
+     * \brief Replaces all occurances of a substring by another substring.
+     *
+     * This function will replace all occurances of a substring \c find_string by \c replace_string.
+     *
+     * \note This function is not successive, i.e. it will \b not replace an occurance of the find-string
+     * if this occurance is a result of a previous replacement, e.g. for the combination \c *this = "aaa",
+     * \c find_string = "aa" and \c replace_string = "pa" the resulting string will be "paa" and not "papa".
+     *
+     * \param[in] find_string
+     * The substring that is to be searched for. Must not be empty.
+     *
+     * \param[in] replace_string
+     * The substring that is to be replaced by.
+     *
+     * \returns
+     * The total number of replacements made.
+     */
+    size_type replace_all(const String& find_string, const String& replace_string)
+    {
+      size_type flen(find_string.size());
+      size_type rlen(replace_string.size());
+      if(flen <= 0)
+        return size_type(0u);
+
+      // find first occurance of find string
+      size_type pos(find(find_string));
+      size_type counter(0u);
+      while(pos != npos)
+      {
+        // replace substring
+        replace(pos, flen, replace_string);
+
+        // increment counter
+        ++counter;
+
+        // find next occurance
+        pos = find(find_string, pos + rlen);
+      }
+
+      // return replacement count
+      return counter;
+    }
+
+    /**
      * \brief Converts the string to upper case.
      *
      * \returns
