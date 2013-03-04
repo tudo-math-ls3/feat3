@@ -540,11 +540,11 @@ namespace FEAST
         {
           CONTEXT("When copying SparseMatrixCOO");
 
-          if (this->_elements.size() > 0)
+          if (other.get_elements().size() > 0)
           {
-          this->_val_ptr = this->_elements.at(0);
-          this->_row_ptr = this->_indices.at(0);
-          this->_col_ptr = this->_indices.at(1);
+            this->_val_ptr = this->_elements.at(0);
+            this->_row_ptr = this->_indices.at(0);
+            this->_col_ptr = this->_indices.at(1);
           }
           else
           {
@@ -571,7 +571,7 @@ namespace FEAST
         {
           CONTEXT("When copying SparseMatrixCOO");
 
-          if (this->_elements.size() > 0)
+          if (other.get_elements().size() > 0)
           {
             this->_val_ptr = this->_elements.at(0);
             this->_row_ptr = this->_indices.at(0);
@@ -659,7 +659,7 @@ namespace FEAST
           this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
           this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
 
-          if (this->_elements.size() > 0)
+          if (other.get_elements().size() > 0)
           {
             this->_val_ptr = this->_elements.at(0);
             this->_row_ptr = this->_indices.at(0);
@@ -708,7 +708,7 @@ namespace FEAST
           this->_elements_size.clear();
           this->_indices_size.clear();
 
-          if (this->_elements.size() > 0)
+          if (other.get_elements().size() > 0)
           {
             this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(_used_elements * sizeof(DT_)));
             this->_elements_size.push_back(_used_elements);
