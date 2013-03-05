@@ -989,8 +989,8 @@ namespace FEAST
     {
       public:
         IterateFunctor(std::shared_ptr<SolverFunctorBase<VT_> >& functor,
-                       ST_& arg1,
-                       ST_& arg2,
+                       const ST_& arg1,
+                       ST_ arg2,
                        Index& count,
                        Index max_iter = 100,
                        ComparisonOpCode opcode = coc_countloop) :
@@ -1084,8 +1084,8 @@ namespace FEAST
 
       private:
         std::shared_ptr<SolverFunctorBase<VT_> > _functor;
-        ST_& _arg1;
-        ST_& _arg2;
+        const ST_& _arg1;
+        ST_ _arg2;
         Index& _count;
         Index _maxiter;
         ComparisonOpCode _opcode;
@@ -1853,7 +1853,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " with value " << _y << " !" << std::endl;
+          std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " with value " << T_(_y) << " !" << std::endl;
         }
 
         InspectionFunctor& operator=(const InspectionFunctor& rhs)
@@ -1862,11 +1862,13 @@ namespace FEAST
             return *this;
 
           this->_y = rhs._y;
+          this->_tracetag = rhs._tracetag;
           return *this;
         }
 
         InspectionFunctor(const InspectionFunctor& other) :
-          _y(other._y)
+          _y(other._y),
+          _tracetag(other._tracetag)
         {
         }
 
@@ -1877,6 +1879,148 @@ namespace FEAST
       private:
         const T_& _y;
         const std::string _tracetag;
+    };
+
+    template<typename Algo_, typename VT_, typename T_, template<typename, typename> class StoT_ = std::vector>
+    class InspectionFunctorSTL : public SolverFunctorBase<VT_>
+    {
+      public:
+        InspectionFunctorSTL(const StoT_<T_, std::allocator<T_> >& y, Index index, const std::string tracetag) :
+          _y(y),
+          _index(index),
+          _tracetag(tracetag)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "InspectionFunctorSTL";
+        }
+
+        virtual void execute()
+        {
+          std::cout << _tracetag << "| element of size " << sizeof(T_) << " at index " << _index << " with value " << _y.at(_index) << " !" << std::endl;
+        }
+
+        InspectionFunctorSTL& operator=(const InspectionFunctorSTL& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_index = rhs._index;
+          this->_tracetag = rhs._tracetag;
+          return *this;
+        }
+
+        InspectionFunctorSTL(const InspectionFunctorSTL& other) :
+          _y(other._y),
+          _index(other._index),
+          _tracetag(other._tracetag)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        const StoT_<T_, std::allocator<T_> >& _y;
+        Index _index;
+        const std::string _tracetag;
+    };
+
+    template<typename Algo_, typename VT_, typename T_>
+    class InspectionConstFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        InspectionConstFunctor(const T_& y, const std::string tracetag) :
+          _y(y),
+          _tracetag(tracetag)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "InspectionConstFunctor";
+        }
+
+        virtual void execute()
+        {
+          std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " with value " << T_(_y) << " !" << std::endl;
+        }
+
+        InspectionConstFunctor& operator=(const InspectionConstFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          this->_tracetag = rhs._tracetag;
+          return *this;
+        }
+
+        InspectionConstFunctor(const InspectionConstFunctor& other) :
+          _y(other._y),
+          _tracetag(other._tracetag)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        const T_ _y;
+        const std::string _tracetag;
+    };
+
+    template<typename Algo_, typename VT_>
+    class SetFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        SetFunctor(VT_& y, typename VT_::DataType val) :
+          _y(y),
+          _val(val)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "SetFunctor";
+        }
+
+        virtual void execute()
+        {
+          for(Index i(0) ; i < _y.size() ; ++i)
+            _y(i, _val);
+        }
+
+        SetFunctor& operator=(const SetFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          return *this;
+        }
+
+        SetFunctor(const SetFunctor& other) :
+          _y(other._y),
+          _val(other._val)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        VT_& _y;
+        const typename VT_::DataType _val;
     };
   }
 }
