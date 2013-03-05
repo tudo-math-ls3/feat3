@@ -347,7 +347,7 @@ namespace FEAST
 
         cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
         cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
-        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(dummy, dummy, data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.temp().at(0)));
 
         cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.localsys(), data.temp().at(0)));
         cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
