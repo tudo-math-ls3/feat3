@@ -66,6 +66,11 @@ namespace FEAST
         return 0;
       }
 
+      static Index min_num_temp_indices()
+      {
+        return 0;
+      }
+
       template<typename Tag_,
                typename DataType_,
                template<typename, typename> class VT_,
@@ -119,6 +124,8 @@ namespace FEAST
                                                                                                            data.scalars().at(0),
                                                                                                            data.scalars().at(1)));
 
+        cf.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm_0(), "outer_norm_0"));
+
         ///main loop
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
@@ -153,11 +160,17 @@ namespace FEAST
         cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
                                                                                                            data.scalars().at(0),
                                                                                                            data.scalars().at(1)));
+
+        cfiterate.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), "outer_norm"));
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(0), data.norm(), data.norm_0()));
 
-        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
 
-        cf.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(0)));
+        cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr,
+                                                                                   data.scalars().at(0),
+                                                                                   data.eps(),
+                                                                                   data.used_iters(),
+                                                                                   data.max_iters(),
+                                                                                   coc_less));
 
         return result;
       }
@@ -306,10 +319,15 @@ namespace FEAST
     {
       static Index min_num_temp_scalars()
       {
-        return 1;
+        return 4;
       }
 
       static Index min_num_temp_vectors()
+      {
+        return 2;
+      }
+
+      static Index min_num_temp_indices()
       {
         return 2;
       }
@@ -331,8 +349,13 @@ namespace FEAST
                                                                                                                              FT_,
                                                                                                                              StoreT_>& data,
                                                                                 VT_<Tag_, DataType_>& dummy,
-                                                                                Index max_iter = 100)
+                                                                                Index max_iter = 100,
+                                                                                DataType_ eps = 1e-8)
       {
+        ///store values
+        data.indices().at(0) = max_iter; ///MAX_ITER
+        data.scalars().at(0) = eps;      ///EPS
+
         ///create compound functor
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         ///get reference to functor (in order to cast only once)
@@ -341,6 +364,9 @@ namespace FEAST
         ///add functors to the solver program:
         cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.localsys(), data.temp().at(1)));
         cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+
+        cf.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(1), data.temp().at(0))); ///NORM_0
+        cf.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(1), "inner_norm_0"));
 
         //iterate until s < eps: [product(t, P, t), sum(x, x, t), defect(t, b, A, x) norm(norm, t), div(s, norm, norm_0)]
         ///TODO assumes scaled precon matrix
@@ -353,12 +379,22 @@ namespace FEAST
 
         cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.localsys(), data.temp().at(0)));
         cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+
+        cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(2), data.temp().at(0))); ///NORM_k
+
+        cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(3), data.scalars().at(2), data.scalars().at(1))); ///NORM_k/NORM_0
+
+        cfiterate.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(2), "inner_norm"));
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr,
+                                                                                   data.scalars().at(3),
                                                                                    data.scalars().at(0),
-                                                                                   data.eps(),
-                                                                                   max_iter,
-                                                                                   max_iter));
+                                                                                   data.indices().at(1), ///used_iters
+                                                                                   data.indices().at(0), ///max_iters
+                                                                                   coc_less));
+
         cf.add_functor(new CopyFunctorProxyResult<Algo_, VT_<Tag_, DataType_> >(dummy, data.temp().at(0)));
+
+        cf.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_>, Index >(data.indices().at(1), "inner_used_iters"));
         return result;
       }
 

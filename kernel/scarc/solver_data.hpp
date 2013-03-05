@@ -33,6 +33,7 @@ namespace FEAST
         typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
         typedef StorageType_<MatrixType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > matrix_storage_type_;
         typedef StorageType_<DataType_, std::allocator<DataType_> > scalar_storage_type_;
+        typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
 
         virtual const std::string type_name() = 0;
 
@@ -126,6 +127,16 @@ namespace FEAST
           return _stored_scalars;
         }
 
+        virtual index_storage_type_& indices()
+        {
+          return _stored_indices;
+        }
+
+        virtual const index_storage_type_& indices() const
+        {
+          return _stored_indices;
+        }
+
         virtual DataType_& eps()
         {
           return _stored_eps;
@@ -169,6 +180,7 @@ namespace FEAST
         vector_type_ _stored_def;
         vector_storage_type_ _stored_temp;
         scalar_storage_type_ _stored_scalars;
+        index_storage_type_ _stored_indices;
 
         ///host memory to store global scalars
         DataType_ _stored_norm_0;
@@ -191,6 +203,7 @@ namespace FEAST
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
       typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::scalar_storage_type_ scalar_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::index_storage_type_ index_storage_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -203,7 +216,8 @@ namespace FEAST
                  vector_type_& x,
                  vector_type_& b,
                  Index num_temp_vectors = 0,
-                 Index num_temp_scalars = 0)
+                 Index num_temp_scalars = 0,
+                 Index num_temp_indices = 0)
       {
         this->_stored_sys = A;
         this->_stored_rhs = b;
@@ -211,10 +225,11 @@ namespace FEAST
         this->_stored_def = vector_type_(x.size());
         this->_stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size(), DataType_(0)));
         this->_stored_scalars = scalar_storage_type_(num_temp_scalars, DataType_(0));
-        this->_stored_norm_0 = DataType_(0);
-        this->_stored_norm = DataType_(0);
-        this->_stored_eps = DataType_(0);
-        this->_stored_max_iters = Index(0);
+        this->_stored_indices = index_storage_type_(num_temp_indices, Index(0));
+        this->_stored_norm_0 = DataType_(1000);
+        this->_stored_norm = DataType_(1000);
+        this->_stored_eps = DataType_(1e-8);
+        this->_stored_max_iters = Index(1000);
         this->_stored_used_iters = Index(0);
       }
 
@@ -228,6 +243,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -248,6 +264,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -272,6 +289,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -343,8 +361,9 @@ namespace FEAST
                                vector_type_& x,
                                vector_type_& b,
                                Index num_temp_vectors = 0,
-                               Index num_temp_scalars = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+                               Index num_temp_scalars = 0,
+                               Index num_temp_indices = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P)
       {
       }
@@ -369,6 +388,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -494,8 +514,9 @@ namespace FEAST
                              vector_type_& x,
                              vector_type_& b,
                              Index num_temp_vectors = 0,
-                             Index num_temp_scalars = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+                             Index num_temp_scalars = 0,
+                             Index num_temp_indices = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
       }
@@ -520,6 +541,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -564,8 +586,9 @@ namespace FEAST
                              vector_type_& x,
                              vector_type_& b,
                              Index num_temp_vectors = 0,
-                             Index num_temp_scalars = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+                             Index num_temp_scalars = 0,
+                             Index num_temp_indices = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
 
@@ -593,6 +616,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -637,8 +661,9 @@ namespace FEAST
                            vector_type_& x,
                            vector_type_& b,
                            Index num_temp_vectors = 0,
-                           Index num_temp_scalars = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+                           Index num_temp_scalars = 0,
+                           Index num_temp_indices = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         stored_level_data()
       {
         ///TODO
@@ -664,6 +689,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -742,8 +768,9 @@ namespace FEAST
                                                    vector_type_& b,
                                                    FilterType_<MemTag_, DataType_>& filter,
                                                    Index num_temp_vectors = 0,
-                                                   Index num_temp_scalars = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars),
+                                                   Index num_temp_scalars = 0,
+                                                   Index num_temp_indices = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         FilterDataContainer<DataType_, MemTag_, FilterType_>(filter),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
@@ -772,6 +799,7 @@ namespace FEAST
         this->_stored_def = other._stored_def;
         this->_stored_temp = other._stored_temp;
         this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;

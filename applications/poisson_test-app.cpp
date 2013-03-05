@@ -622,7 +622,8 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     SparseMatrixCSR,
     UnitFilter> data(mat_sys, mat_precon, vec_sol, vec_rhs, filter,
                      std::max(SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_vectors(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_vectors()),
-                     std::max(SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_scalars(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_scalars()));
+                     std::max(SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_scalars(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_scalars()),
+                     std::max(SolverPatternGeneration<BlockJacobi, Algo::Generic>::min_num_temp_indices(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_indices()));
 
   data.vector_mirrors() = mirrors;
   data.vector_mirror_sendbufs() = sendbufs;
@@ -631,10 +632,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   data.source_ranks() = sourceranks;
   data.localsys() = mat_localsys;
 
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 100, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 2, 1e-8));
 
   DenseVector<Mem::Main, double> dummy;
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 5));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 5, 1e-8));
 
   solver->set_preconditioner(block_solver);
 

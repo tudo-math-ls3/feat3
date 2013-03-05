@@ -1839,8 +1839,9 @@ namespace FEAST
     class InspectionFunctor : public SolverFunctorBase<VT_>
     {
       public:
-        InspectionFunctor(const T_& y) :
-          _y(y)
+        InspectionFunctor(const T_& y, const std::string tracetag) :
+          _y(y),
+          _tracetag(tracetag)
         {
           this->_complete = true;
         }
@@ -1852,7 +1853,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          std::cout << "Element of size " << sizeof(T_) << " at address " << &_y << " with value " << _y << " !" << std::endl;
+          std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " with value " << _y << " !" << std::endl;
         }
 
         InspectionFunctor& operator=(const InspectionFunctor& rhs)
@@ -1875,6 +1876,7 @@ namespace FEAST
 
       private:
         const T_& _y;
+        const std::string _tracetag;
     };
   }
 }
