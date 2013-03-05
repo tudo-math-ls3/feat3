@@ -157,6 +157,8 @@ namespace FEAST
 
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr, data.scalars().at(0), data.eps(), data.used_iters(), data.max_iters(), coc_less));
 
+        cf.add_functor(new InspectionFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(0)));
+
         return result;
       }
     };

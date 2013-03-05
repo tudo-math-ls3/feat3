@@ -96,7 +96,6 @@ namespace FEAST
         const VT_& _r;
     };
 
-
     ///always substitute result and left arguments
     template<typename Algo_, typename VT_>
     class SumFunctorProxyResultLeft : public SolverFunctorBase<VT_>
@@ -1834,6 +1833,48 @@ namespace FEAST
       private:
         VT_& _l;
         const FilterType_& _r;
+    };
+
+    template<typename Algo_, typename VT_, typename T_>
+    class InspectionFunctor : public SolverFunctorBase<VT_>
+    {
+      public:
+        InspectionFunctor(const T_& y) :
+          _y(y)
+        {
+          this->_complete = true;
+        }
+
+        virtual const std::string type_name()
+        {
+          return "InspectionFunctor";
+        }
+
+        virtual void execute()
+        {
+          std::cout << "Element of size " << sizeof(T_) << " at address " << &_y << " with value " << _y << " !" << std::endl;
+        }
+
+        InspectionFunctor& operator=(const InspectionFunctor& rhs)
+        {
+          if(this == &rhs)
+            return *this;
+
+          this->_y = rhs._y;
+          return *this;
+        }
+
+        InspectionFunctor(const InspectionFunctor& other) :
+          _y(other._y)
+        {
+        }
+
+        virtual void substitute(VT_& arg)
+        {
+        }
+
+      private:
+        const T_& _y;
     };
   }
 }
