@@ -1020,7 +1020,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          if (_maxiter == 0)
+          if(_maxiter == 0)
             return;
 
           Index count(0);
@@ -1038,9 +1038,9 @@ namespace FEAST
                                  (_opcode == coc_geq ? (_arg1 >= _arg2) :
                                  (count == _maxiter))))))
                                 );
-            if(break_condition || count == _maxiter)
+            if(break_condition || (count == _maxiter))
             {
-              if(_opcode != coc_countloop)
+              //if(_opcode != coc_countloop)
                 _count = count;
 
               break;

@@ -91,8 +91,8 @@ namespace FEAST
                                                                                 DataType_ eps = 1e-8)
       {
         ///take over 'logically constant' values
-        data.max_iters() = max_iter;
-        data.eps() = eps;
+        //data.max_iters() = max_iter;
+        //data.eps() = eps;
 
         ///create compound functor
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > result(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
@@ -169,9 +169,9 @@ namespace FEAST
 
         cf.add_functor(new IterateFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(cfiterateptr,
                                                                                    data.scalars().at(0),
-                                                                                   data.eps(),
+                                                                                   eps,
                                                                                    data.used_iters(),
-                                                                                   data.max_iters(),
+                                                                                   max_iter,
                                                                                    coc_less));
 
         return result;
