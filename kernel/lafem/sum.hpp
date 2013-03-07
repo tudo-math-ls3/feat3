@@ -112,6 +112,25 @@ namespace FEAST
     {
       static void value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & x, const DenseVector<Mem::Main, float> & y);
       static void value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & x, const DenseVector<Mem::Main, double> & y);
+
+      template <typename DT_>
+      static void value(SparseMatrixCSR<Mem::Main, DT_> & r, const SparseMatrixCSR<Mem::Main, DT_> & x, const SparseMatrixCSR<Mem::Main, DT_> & y)
+      {
+        if (x.rows() != y.rows())
+          throw InternalError("Matrix rows do not match!");
+        if (x.columns() != y.columns())
+          throw InternalError("Matrix columns do not match!");
+        if (x.rows() != r.rows())
+          throw InternalError("Matrix rows do not match!");
+        if (x.columns() != r.columns())
+          throw InternalError("Matrix columns do not match!");
+
+        DenseVector<Mem::Main, DT_> xv(x.used_elements(), x.val());
+        DenseVector<Mem::Main, DT_> yv(y.used_elements(), y.val());
+        DenseVector<Mem::Main, DT_> rv(r.used_elements(), r.val());
+
+        Sum<Algo::MKL>::value(rv, xv, yv);
+      }
     };
 
     template <>
