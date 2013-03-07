@@ -649,6 +649,12 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::cout << "proc " << rank << " sol " << data.sol();
   std::cout << "proc " << rank << " iters used " << data.used_iters() << std::endl;
 
+  MPI_Barrier(MPI_COMM_WORLD);
+  sleep(1);
+  MPI_Barrier(MPI_COMM_WORLD);
+  if (rank==0)
+    std::cout<<SolverFunctorBase<DenseVector<Mem::Main, double> >::pretty_printer(solver->type_name());
+
   delete macro_basemesh;
 }
 

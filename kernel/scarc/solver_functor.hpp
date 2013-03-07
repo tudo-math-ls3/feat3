@@ -35,6 +35,40 @@ namespace FEAST
         {
         }
 
+        static String pretty_printer(String input)
+        {
+          String output;
+          String d_indent(">-<");
+          String indent;
+          Index last_token(0);
+
+          for (Index i(0) ; i < input.length() ; ++i)
+          {
+            if(input[i] == '[')
+            {
+              output += indent + input.substr(last_token, i - last_token) + "\n";
+              last_token = i+1;
+              d_indent.replace(1, 1, stringify(indent.size() / d_indent.size() + 1));
+              indent += d_indent;
+            }
+            else if(input[i] == ']')
+            {
+              if (input[i-1] != ']')
+                output += indent + input.substr(last_token, i - last_token) + "\n";
+              last_token = i+1;
+              indent.erase(indent.size() - d_indent.size(), d_indent.size());
+            }
+            else if(input[i] == ',')
+            {
+              if (input[i-1] != ']')
+                output += indent + input.substr(last_token, i - last_token) + "\n";
+              last_token = i+2;
+            }
+
+          }
+          return output;
+        }
+
       protected:
         bool _complete;
     };
@@ -1456,7 +1490,7 @@ namespace FEAST
 
         virtual const std::string type_name()
         {
-          std::string result("[");
+          std::string result("CompoundSolverFunctor[");
 
           for(Index i(0) ; i < (this->_functors).size() ; ++i)
           {
