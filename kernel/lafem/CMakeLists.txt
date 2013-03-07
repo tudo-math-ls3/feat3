@@ -17,7 +17,8 @@ endif(FEAST_BACKENDS_MKL)
 
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 if (FEAST_BACKENDS_MKL)
-  TARGET_LINK_LIBRARIES(kernel-lafem mkl_intel_ilp64 mkl_sequential mkl_core)
+  TARGET_LINK_LIBRARIES(kernel-lafem mkl_rt)
+  #TARGET_LINK_LIBRARIES(kernel-lafem mkl_intel_ilp64 mkl_sequential mkl_core)
 endif(FEAST_BACKENDS_MKL)
 
 
