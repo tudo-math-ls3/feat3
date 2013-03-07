@@ -275,7 +275,7 @@ namespace FEAST
       }
 
       ///CTOR from any SolverDataBase
-      template<typename DT_,
+      /*template<typename DT_,
                typename Tag_,
                template<typename, typename> class VT_,
                template<typename, typename> class MT_,
@@ -295,7 +295,7 @@ namespace FEAST
         this->_stored_eps = other._stored_eps;
         this->_stored_max_iters = Index(0);
         this->_stored_used_iters = Index(0);
-      }
+      }*/
 
     };
 

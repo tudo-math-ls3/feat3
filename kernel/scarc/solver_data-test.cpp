@@ -54,15 +54,6 @@ class SolverDataTest:
       TEST_CHECK_EQUAL(psd.temp().at(1).size(), x.size());
       TEST_CHECK_EQUAL(psd.temp().at(2).size(), x.size());
 
-      SolverData<> sd2(psd);
-      TEST_CHECK_EQUAL(sd2.sys(), A);
-      TEST_CHECK_EQUAL(sd2.sol(), x);
-      TEST_CHECK_EQUAL(sd2.rhs(), b);
-      TEST_CHECK_EQUAL(sd2.temp().size(), 3);
-      TEST_CHECK_EQUAL(sd2.temp().at(0).size(), x.size());
-      TEST_CHECK_EQUAL(sd2.temp().at(1).size(), x.size());
-      TEST_CHECK_EQUAL(sd2.temp().at(2).size(), x.size());
-
       SynchronisedSolverData<> sd3(A, x, b, 3);
       TEST_CHECK_EQUAL(sd3.sys(), A);
       TEST_CHECK_EQUAL(sd3.sol(), x);

@@ -5,6 +5,9 @@
 #include<kernel/foundation/communication.hpp>
 #include<kernel/lafem/sum.hpp>
 #include<kernel/lafem/scale.hpp>
+#ifndef SERIAL
+#include<mpi.h>
+#endif
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -116,8 +119,9 @@ namespace FEAST
               source_ranks.at(i));
         }
 
+#ifndef SERIAL
         MPI_Barrier(MPI_COMM_WORLD); //TODO communicator handling
-
+#endif
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
           mirrors.at(i).gather_dual(sendbufs.at(i), target); //we dont need the sendbuf any more
