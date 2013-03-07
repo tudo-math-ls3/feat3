@@ -156,8 +156,10 @@ namespace FEAST
                                                     data.vector_mirror_recvbufs(),
                                                     data.dest_ranks(),
                                                     data.source_ranks()));
+
         cfiterate.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_> >(data.def(), data.rhs(), data.def()));
         cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
+
         cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.norm(), data.def()));
         cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
                                                                                                            data.scalars().at(0),
@@ -326,7 +328,7 @@ namespace FEAST
 
       static Index min_num_temp_vectors()
       {
-        return 2;
+        return 4;
       }
 
       static Index min_num_temp_indices()
@@ -364,10 +366,11 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cf(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(result.get())));
 
         ///add functors to the solver program:
-        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.localsys(), data.temp().at(1)));
-        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+        //use zero as start
+        cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(1)));
+        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(2), data.filter()));
 
-        cf.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(1), data.temp().at(0))); ///NORM_0
+        cf.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(1), data.temp().at(2))); ///NORM_0
         cf.add_functor(new InspectionFunctorSTL<Algo_, VT_<Tag_, DataType_>, DataType_>(data.scalars(), 1, "inner_norm_0"));
         cf.add_functor(new InspectionConstFunctor<Algo_, VT_<Tag_, DataType_>, Index >(max_iter, "inner_max_iter"));
         cf.add_functor(new InspectionConstFunctor<Algo_, VT_<Tag_, DataType_>, DataType_ >(eps, "inner_eps"));
@@ -377,14 +380,14 @@ namespace FEAST
         std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_> > > cfiterateptr(new CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >());
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_> >*)(cfiterateptr.get())));
 
-        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(0)));
+        cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), data.precon(), data.temp().at(2)));
         cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
-        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.temp().at(0)));
+        cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_> >(data.temp().at(3), data.temp().at(3), data.temp().at(0)));
 
-        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(0), dummy, data.localsys(), data.temp().at(0)));
-        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+        cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_>, MT_<Tag_, DataType_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(3)));
+        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_>, FT_<Tag_, DataType_> >(data.temp().at(2), data.filter()));
 
-        cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(2), data.temp().at(0))); ///NORM_k
+        cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_>, DataType_ >(data.scalars().at(2), data.temp().at(2))); ///NORM_k
 
         cfiterate.add_functor(new DivFunctor<VT_<Tag_, DataType_>, DataType_>(data.scalars().at(3), data.scalars().at(2), data.scalars().at(1))); ///NORM_k/NORM_0
 
@@ -396,7 +399,7 @@ namespace FEAST
                                                                                    max_iter, ///max_iters
                                                                                    coc_less));
 
-        cf.add_functor(new CopyFunctorProxyResult<Algo_, VT_<Tag_, DataType_> >(dummy, data.temp().at(0)));
+        cf.add_functor(new CopyFunctorProxyResult<Algo_, VT_<Tag_, DataType_> >(dummy, data.temp().at(3)));
 
         cf.add_functor(new InspectionFunctorSTL<Algo_, VT_<Tag_, DataType_>, Index >(data.indices(), 1, "inner_used_iters"));
         return result;
