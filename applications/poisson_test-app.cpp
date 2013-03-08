@@ -655,6 +655,18 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   if (rank==0)
     std::cout<<SolverFunctorBase<DenseVector<Mem::Main, double> >::pretty_printer(solver->type_name());
 
+  ///gather solution vector on process 0
+  //local mirror creation
+  Graph dof_mirror_local(Space::DofMirror::assemble(space_base, *macro_subset_geo_fine));
+  VectorMirror<Mem::Main, double> source_mirror_local(dof_mirror_local);
+  ///now we must send the mirror to rank 0 -> VM must implement foundation's sendable/bufferable interfaces -> TODO
+  ///alternatively, we can create all needed subsets again on rank 0 and only communicate sol
+  ///TODO send data.sol to rank 0
+  if(rank == 0)
+  {
+    ///TODO receive sol and mirror, scatter into global solution
+  }
+
   delete macro_basemesh;
 }
 
