@@ -635,7 +635,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<BlockJacobi, Algo::Generic>::execute(data, 1000, 1e-8));
 
   DenseVector<Mem::Main, double> dummy;
-  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 5, 1e-8));
+  std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > block_solver(SolverPatternGeneration<RichardsonLayer, Algo::Generic>::execute(data, dummy, 20, 1e-1));
 
   solver->set_preconditioner(block_solver);
 
@@ -662,7 +662,7 @@ int main(int argc, char* argv[])
 {
   int me(0);
   int num_patches(0);
-  Index desired_refinement_level(3);
+  Index desired_refinement_level(4);
 
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
