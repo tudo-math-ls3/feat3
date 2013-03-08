@@ -88,9 +88,9 @@ namespace FEAST
   enum Version
   {
     /// FEAST major version number
-    version_major = 1,
+    version_major = 0,
     /// FEAST minor version number
-    version_minor = 0,
+    version_minor = 1,
     /// FEAST patch version number
     version_patch = 0
   };

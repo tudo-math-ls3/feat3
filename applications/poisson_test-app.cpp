@@ -1,3 +1,13 @@
+/**
+ * \file
+ * \brief FEAST milestone 1 test application for the solution of the Poisson problem
+ * \author Markus Geveler
+ * \date 2012 - 2013
+ *
+ * This file contains the first application code testing the FEAST kernel w.o. the final application framework.
+ */
+
+
 #ifndef SERIAL
 #include <mpi.h>
 #endif
