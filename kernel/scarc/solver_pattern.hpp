@@ -13,7 +13,7 @@ namespace FEAST
   namespace ScaRC
   {
     ///tag definitions
-    class BlockJacobi
+    class ScaRCBlockSmoother
     {
     };
 
@@ -54,7 +54,7 @@ namespace FEAST
     };
 
     template<typename Algo_>
-    struct SolverPatternGeneration<BlockJacobi, Algo_>
+    struct SolverPatternGeneration<ScaRCBlockSmoother, Algo_>
     {
       static Index min_num_temp_scalars()
       {
