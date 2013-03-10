@@ -1,3 +1,13 @@
+/**
+ * \file
+ * \brief FEAST milestone 1 ScaRC functor implementations
+ * \author Markus Geveler
+ * \date 2012 - 2013
+ *
+ * See class documentation.
+ *
+ */
+
 #pragma once
 #ifndef SCARC_GUARD_SOLVER_FUNCTOR_HH
 #define SCARC_GUARD_SOLVER_FUNCTOR_HH 1
@@ -18,23 +28,62 @@ namespace FEAST
 {
   namespace ScaRC
   {
+    /**
+     * \brief Base class for all solver functors
+     *
+     * Solver functors store references to variable data containers and values for constants.
+     * The specific SolverFunctor subclass specifies the operation by overwriting its execute() member function.
+     * Hence, no function pointers and bindings are required for the functor library implementation.
+     *
+     * \tparam VT_
+     * Vector type of the solution space, necesssary for substitution function
+     *
+     * \author Markus Geveler
+     */
     template<typename VT_>
     class SolverFunctorBase
     {
       public:
+        /**
+         * \brief substitutes specific references by renference to arg
+         *
+         * ProxyFunctors can overwrite this function in order to 'replace' references to dummy containers.
+         *
+         * \param[in] arg
+         * the substitute
+         *
+         */
         virtual void substitute(VT_& arg) = 0;
 
+        /**
+         * \brief executes the functor on the stored arguments
+         *
+         */
         virtual void execute() = 0;
+
+        ///returns a string that describes the functor
         virtual const std::string type_name() = 0;
 
+        ///virtual DTOR
         virtual ~SolverFunctorBase()
         {
         }
 
+        /**
+         * \brief substitutes a preconditioner by a functor
+         *
+         * Preconditioner functors can overwrite this function. With this mechanism, solver layers can be created
+         * independently and plugged into each other dynamically.
+         *
+         * \param[in] precon
+         * the substitute
+         *
+         */
         virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& precon)
         {
         }
 
+        ///better visualisation of type_names
         static String pretty_printer(String input)
         {
           String output;
@@ -70,6 +119,7 @@ namespace FEAST
         }
 
       protected:
+        ///flag for signalling that all substitutions are done - ProxyFunctor CTORs must init it with false
         bool _complete;
     };
 
