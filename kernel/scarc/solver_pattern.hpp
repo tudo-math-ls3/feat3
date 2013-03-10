@@ -1,3 +1,13 @@
+/**
+ * \file
+ * \brief FEAST milestone 1 ScaRC pattern generation implementations
+ * \author Markus Geveler
+ * \date 2012 - 2013
+ *
+ * See class documentation.
+ *
+ */
+
 #pragma once
 #ifndef SCARC_GUARD_SOLVER_PATTERN_HH
 #define SCARC_GUARD_SOLVER_PATTERN_HH 1
@@ -53,6 +63,17 @@ namespace FEAST
     {
     };
 
+
+    /**
+     * \brief Generates a ScaRC block smoother solver pattern
+     *
+     * Blockwise application of point smoothers with synchronisation by averaging.
+     *
+     * \tparam Algo_
+     * algorithm (architecture) tag
+     *
+     * \author Markus Geveler
+     */
     template<typename Algo_>
     struct SolverPatternGeneration<ScaRCBlockSmoother, Algo_>
     {
@@ -318,6 +339,14 @@ namespace FEAST
       }
     };
 
+    /**
+     * \brief Generates a (pointwise) Richardson pattern
+     *
+     * \tparam Algo_
+     * algorithm (architecture) tag
+     *
+     * \author Markus Geveler
+     */
     template<typename Algo_>
     struct SolverPatternGeneration<RichardsonLayer, Algo_>
     {
