@@ -34,13 +34,13 @@ class SolverDataTest:
       TEST_CHECK_EQUAL(sd0.sys(), A);
       TEST_CHECK_EQUAL(sd0.sol(), x);
       TEST_CHECK_EQUAL(sd0.rhs(), b);
-      TEST_CHECK_EQUAL(sd0.temp().size(), 0);
+      TEST_CHECK_EQUAL(sd0.temp().size(), Index(0));
 
       SolverData<> sd1(A, x, b, 2);
       TEST_CHECK_EQUAL(sd1.sys(), A);
       TEST_CHECK_EQUAL(sd1.sol(), x);
       TEST_CHECK_EQUAL(sd1.rhs(), b);
-      TEST_CHECK_EQUAL(sd1.temp().size(), 2);
+      TEST_CHECK_EQUAL(sd1.temp().size(), Index(2));
       TEST_CHECK_EQUAL(sd1.temp().at(0).size(), x.size());
       TEST_CHECK_EQUAL(sd1.temp().at(1).size(), x.size());
 
@@ -49,7 +49,7 @@ class SolverDataTest:
       TEST_CHECK_EQUAL(psd.precon(), A);
       TEST_CHECK_EQUAL(psd.sol(), x);
       TEST_CHECK_EQUAL(psd.rhs(), b);
-      TEST_CHECK_EQUAL(psd.temp().size(), 3);
+      TEST_CHECK_EQUAL(psd.temp().size(), Index(3));
       TEST_CHECK_EQUAL(psd.temp().at(0).size(), x.size());
       TEST_CHECK_EQUAL(psd.temp().at(1).size(), x.size());
       TEST_CHECK_EQUAL(psd.temp().at(2).size(), x.size());
@@ -58,29 +58,29 @@ class SolverDataTest:
       TEST_CHECK_EQUAL(sd3.sys(), A);
       TEST_CHECK_EQUAL(sd3.sol(), x);
       TEST_CHECK_EQUAL(sd3.rhs(), b);
-      TEST_CHECK_EQUAL(sd3.temp().size(), 3);
+      TEST_CHECK_EQUAL(sd3.temp().size(), Index(3));
       TEST_CHECK_EQUAL(sd3.temp().at(0).size(), x.size());
       TEST_CHECK_EQUAL(sd3.temp().at(1).size(), x.size());
       TEST_CHECK_EQUAL(sd3.temp().at(2).size(), x.size());
-      TEST_CHECK_EQUAL(sd3.vector_mirrors().size(), 0);
-      TEST_CHECK_EQUAL(sd3.vector_mirror_sendbufs().size(), 0);
-      TEST_CHECK_EQUAL(sd3.vector_mirror_recvbufs().size(), 0);
-      TEST_CHECK_EQUAL(sd3.dest_ranks().size(), 0);
-      TEST_CHECK_EQUAL(sd3.source_ranks().size(), 0);
+      TEST_CHECK_EQUAL(sd3.vector_mirrors().size(), Index(0));
+      TEST_CHECK_EQUAL(sd3.vector_mirror_sendbufs().size(), Index(0));
+      TEST_CHECK_EQUAL(sd3.vector_mirror_recvbufs().size(), Index(0));
+      TEST_CHECK_EQUAL(sd3.dest_ranks().size(), Index(0));
+      TEST_CHECK_EQUAL(sd3.source_ranks().size(), Index(0));
 
       SynchronisedPreconditionedSolverData<> sd4(A, A, x, b, 3);
       TEST_CHECK_EQUAL(sd4.sys(), A);
       TEST_CHECK_EQUAL(sd4.sol(), x);
       TEST_CHECK_EQUAL(sd4.rhs(), b);
-      TEST_CHECK_EQUAL(sd4.temp().size(), 3);
+      TEST_CHECK_EQUAL(sd4.temp().size(), Index(3));
       TEST_CHECK_EQUAL(sd4.temp().at(0).size(), x.size());
       TEST_CHECK_EQUAL(sd4.temp().at(1).size(), x.size());
       TEST_CHECK_EQUAL(sd4.temp().at(2).size(), x.size());
-      TEST_CHECK_EQUAL(sd4.vector_mirrors().size(), 0);
-      TEST_CHECK_EQUAL(sd4.vector_mirror_sendbufs().size(), 0);
-      TEST_CHECK_EQUAL(sd4.vector_mirror_recvbufs().size(), 0);
-      TEST_CHECK_EQUAL(sd4.dest_ranks().size(), 0);
-      TEST_CHECK_EQUAL(sd4.source_ranks().size(), 0);
+      TEST_CHECK_EQUAL(sd4.vector_mirrors().size(), Index(0));
+      TEST_CHECK_EQUAL(sd4.vector_mirror_sendbufs().size(), Index(0));
+      TEST_CHECK_EQUAL(sd4.vector_mirror_recvbufs().size(), Index(0));
+      TEST_CHECK_EQUAL(sd4.dest_ranks().size(), Index(0));
+      TEST_CHECK_EQUAL(sd4.source_ranks().size(), Index(0));
       //-------------------------------------------------------------------------
       MultiLevelSolverData<> mlsd(A, b, x);
     }

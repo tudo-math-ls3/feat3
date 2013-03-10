@@ -102,7 +102,7 @@ namespace FEAST
 
         //add adjacencies edge->vertex
         for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
-          for(Index j(0) ; j < source_vertex_at_edge.get_num_indices() ; ++j)
+          for(Index j(0) ; j < (Index)source_vertex_at_edge.get_num_indices() ; ++j)
           {
             found_mesh.add_adjacency(pl_edge, pl_vertex, i, source_vertex_at_edge[i][j]);
           }
@@ -277,14 +277,14 @@ namespace FEAST
 
         //add adjacencies edge->vertex
         for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
-          for(Index j(0) ; j < source_vertex_at_edge.get_num_indices() ; ++j)
+          for(Index j(0) ; j < (Index)source_vertex_at_edge.get_num_indices() ; ++j)
           {
             found_mesh.add_adjacency(pl_edge, pl_vertex, i, source_vertex_at_edge[i][j]);
           }
 
         //add adjacencies face->vertex
         for(Index i(0) ; i < source_vertex_at_face.get_num_entities() ; ++i)
-          for(Index j(0) ; j < source_vertex_at_face.get_num_indices() ; ++j)
+          for(Index j(0) ; j < (Index)source_vertex_at_face.get_num_indices() ; ++j)
           {
             found_mesh.add_adjacency(pl_face, pl_vertex, i, source_vertex_at_face[i][j]);
           }
@@ -495,21 +495,21 @@ namespace FEAST
 
         //add adjacencies edge->vertex
         for(Index i(0) ; i < source_vertex_at_edge.get_num_entities() ; ++i)
-          for(Index j(0) ; j < source_vertex_at_edge.get_num_indices() ; ++j)
+          for(Index j(0) ; j < (Index)source_vertex_at_edge.get_num_indices() ; ++j)
           {
             found_mesh.add_adjacency(pl_edge, pl_vertex, i, source_vertex_at_edge[i][j]);
           }
 
         //add adjacencies face->vertex
         for(Index i(0) ; i < source_vertex_at_face.get_num_entities() ; ++i)
-          for(Index j(0) ; j < source_vertex_at_face.get_num_indices() ; ++j)
+          for(Index j(0) ; j < (Index)source_vertex_at_face.get_num_indices() ; ++j)
           {
             found_mesh.add_adjacency(pl_face, pl_vertex, i, source_vertex_at_face[i][j]);
           }
 
         //add adjacencies poly->vertex
         for(Index i(0) ; i < source_vertex_at_poly.get_num_entities() ; ++i)
-          for(Index j(0) ; j < source_vertex_at_poly.get_num_indices() ; ++j)
+          for(Index j(0) ; j < (Index)source_vertex_at_poly.get_num_indices() ; ++j)
           {
             found_mesh.add_adjacency(pl_polyhedron, pl_vertex, i, source_vertex_at_poly[i][j]);
           }

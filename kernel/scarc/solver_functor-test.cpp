@@ -119,7 +119,7 @@ class SolverFunctorTest:
 
       iterfunc.execute();
 
-      TEST_CHECK_EQUAL(used_iters, 3);
+      TEST_CHECK_EQUAL(used_iters, Index(3));
 
       //---------------------------------------------------------------------------------------------
 

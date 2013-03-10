@@ -746,10 +746,10 @@ class MeshControlPartitioningTest2D:
       }
       std::sort(halos.begin(), halos.end(), compare_other<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> >, OT_, IndexType_>);
 
-      TEST_CHECK_EQUAL(halos.size(), 3);
-      TEST_CHECK_EQUAL(halos.at(0)->get_other(), 1);
-      TEST_CHECK_EQUAL(halos.at(1)->get_other(), 2);
-      TEST_CHECK_EQUAL(halos.at(2)->get_other(), 3);
+      TEST_CHECK_EQUAL(halos.size(), Index(3));
+      TEST_CHECK_EQUAL(halos.at(0)->get_other(), Index(1));
+      TEST_CHECK_EQUAL(halos.at(1)->get_other(), Index(2));
+      TEST_CHECK_EQUAL(halos.at(2)->get_other(), Index(3));
 
       ///before refinement, get the actual macro for assembly (of inner BC mainly)
       Index macro_number(0);
@@ -779,7 +779,7 @@ class MeshControlPartitioningTest2D:
         result.add_element_pair(i, i);
         macro_boundaries.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(result)));
       }
-      TEST_CHECK_EQUAL(macro_boundaries.size(), 4);
+      TEST_CHECK_EQUAL(macro_boundaries.size(), Index(4));
 
       ///refine basemesh, macromesh
       Geometry::StandardRefinery<basemeshtype_> mesh_refinery_fine(fine_basemesh);
@@ -833,7 +833,7 @@ class MeshControlPartitioningTest2D:
 
         delete[] polytopes_in_subset;
       }
-      TEST_CHECK_EQUAL(finemost_macro_boundaries.size(), 4);
+      TEST_CHECK_EQUAL(finemost_macro_boundaries.size(), Index(4));
 
       ///assembly
       ///we now have: finemost basemesh, macro_mesh and its boundary components, cell_subsets from halos all in 'geometry mode'

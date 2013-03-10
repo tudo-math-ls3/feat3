@@ -146,7 +146,7 @@ void check_bcast(int rank)
   int size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   float* recvbuffer(new float[size]);
-  for(Index i(0) ; i < size ; ++i)
+  for(Index i(0) ; i < (Index)size ; ++i)
   {
     recvbuffer[i] = i + rank;
   }
@@ -154,11 +154,11 @@ void check_bcast(int rank)
   Comm<Archs::Parallel>::bcast(recvbuffer, size, 0);
 
   TestResult<float> res[size];
-  for(unsigned long i(0) ; i < size ; ++i)
+  for(Index i(0) ; i < (Index)size ; ++i)
     res[i] = test_check_equal_within_eps(recvbuffer[i], i, std::numeric_limits<float>::epsilon());
 
   bool passed(true);
-  for(unsigned long i(0) ; i < size ; ++i)
+  for(Index i(0) ; i < (Index)size ; ++i)
     if(!res[i].passed)
     {
       std::cout << "Failed (Tier-0: bcast): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
@@ -183,7 +183,7 @@ void check_scatter_gather(int rank)
 
   Comm<Archs::Parallel>::gather(&value, 1, buffer, 1, 0);
   if (rank == 0)
-    for(Index i(0) ; i < size ; ++i)
+    for(Index i(0) ; i < (Index)size ; ++i)
     {
       buffer[i] += 1;
     }
@@ -217,11 +217,11 @@ void check_allgather(int rank)
   Comm<Archs::Parallel>::allgather(&value, 1, buffer, 1);
 
   TestResult<float> res[size];
-  for(unsigned long i(0) ; i < size ; ++i)
+  for(Index i(0) ; i < (Index)size ; ++i)
     res[i] = test_check_equal_within_eps(buffer[i], i, std::numeric_limits<float>::epsilon());
 
   bool passed(true);
-  for(unsigned long i(0) ; i < size ; ++i)
+  for(Index i(0) ; i < (Index)size ; ++i)
     if(!res[i].passed)
     {
       std::cout << "Failed (Tier-0: allgather): " << res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;

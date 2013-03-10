@@ -177,7 +177,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   TopologyStorageType potential_comm_partners_for_face_rank(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_face, rank));
   for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
   {
-    if(potential_comm_partners_for_face_rank.at(i) == rank)
+    if(potential_comm_partners_for_face_rank.at(i) == (Index)rank)
     {
       potential_comm_partners_for_face_rank.erase(potential_comm_partners_for_face_rank.begin() + i);
       break;
