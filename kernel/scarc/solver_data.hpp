@@ -1,3 +1,13 @@
+/**
+ * \file
+ * \brief FEAST milestone 1 ScaRC data implementations
+ * \author Markus Geveler
+ * \date 2012 - 2013
+ *
+ * See class documentation.
+ *
+ */
+
 #pragma once
 #ifndef SCARC_GUARD_SOLVER_DATA_HH
 #define SCARC_GUARD_SOLVER_DATA_HH 1
@@ -19,6 +29,29 @@ namespace FEAST
   namespace ScaRC
   {
 
+    /**
+     * \brief Base class for all solver data containers
+     *
+     * Solver data containers rely on singly (per value) or multiple (per STL) stored data.
+     * Solver data conatainers are referenced by solver pattern creation functions.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam VectorType_
+     * vector type template
+     *
+     * \tparam MatrixType_
+     * matrix type template
+     *
+     * \tparam StorageType_
+     * storage type template (STL or -conformal)
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -191,7 +224,28 @@ namespace FEAST
 
     };
 
-    ///only store data that is *referenced* by solver functors, do not store constants
+    /**
+     * \brief Simplemost data container implementation
+     *
+     * See bse class.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam VectorType_
+     * vector type template
+     *
+     * \tparam MatrixType_
+     * matrix type template
+     *
+     * \tparam StorageType_
+     * storage type template (STL or -conformal)
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -299,6 +353,23 @@ namespace FEAST
 
     };
 
+    /**
+     * \brief Preconditioner data interface
+     *
+     * Can be subclassed in addition to SolverDataBase (or subclasses thereof) in order to store
+     * preconditioner data.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam PreconContType_
+     * storage type template for preconditioner data
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class PreconContType_ = SparseMatrixCSR>
@@ -332,7 +403,29 @@ namespace FEAST
         precon_type_ _stored_precon;
     };
 
-    ///only store data that is *referenced* by solver functors, do not store constants
+    /**
+     * \brief Simple data container with preconditioner data
+     *
+     * PreconditionedSolverData combines SoverData and PreconditionerData.
+     * See base classes.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam VectorType_
+     * vector type template
+     *
+     * \tparam MatrixType_
+     * matrix type template
+     *
+     * \tparam StorageType_
+     * storage type template (STL or -conformal)
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -401,6 +494,23 @@ namespace FEAST
       }
     };
 
+    /**
+     * \brief Synchronisation data interface
+     *
+     * Can be subclassed in addition to SolverDataBase (or subclasses thereof) in order to store
+     * synchronisation data (like buffers and mirrors).
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam PreconContType_
+     * storage type template for preconditioner data
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -487,6 +597,32 @@ namespace FEAST
         index_storage_type_ _stored_source_ranks;
     };
 
+    /**
+     * \brief Simple data container with synchronisation data
+     *
+     * SynchronisedSolverData combines SoverData and SynchronizationDataContainer.
+     * See base classes.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam VectorType_
+     * vector type template
+     *
+     * \tparam VectorMirrorType_
+     * vector mirror type template
+     *
+     * \tparam MatrixType_
+     * matrix type template
+     *
+     * \tparam StorageType_
+     * storage type template (STL or -conformal)
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -558,6 +694,34 @@ namespace FEAST
       }
     };
 
+    /**
+     * \brief Data container with synchronisation and preconditioner data
+     *
+     * See base classes.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam VectorType_
+     * vector type template
+     *
+     * \tparam VectorMirrorType_
+     * vector mirror type template
+     *
+     * \tparam MatrixType_
+     * matrix type template
+     *
+     * \tparam PreconContType_
+     * preconditioner type template
+     *
+     * \tparam StorageType_
+     * storage type template (STL or -conformal)
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -635,6 +799,7 @@ namespace FEAST
       }
     };
 
+    ///multilevel solver data draft - NOTE: not subject to milestone 1 (v0.1)
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
@@ -704,6 +869,23 @@ namespace FEAST
       leveldata_storage_type_ stored_level_data;
     };
 
+    /**
+     * \brief Filter data interface
+     *
+     * Can be subclassed in addition to SolverDataBase (subclasses thereof) in order to store
+     * filter data.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam FilterType_
+     * storage type template for filter data
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class FilterType_ = UnitFilter>
@@ -737,6 +919,37 @@ namespace FEAST
         filter_type_ _stored_filter;
     };
 
+    /**
+     * \brief Complex container with filter data
+     *
+     * See base classes.
+     *
+     * \tparam DataType_
+     * data type
+     *
+     * \tparam MemTag_
+     * memory tag
+     *
+     * \tparam VectorType_
+     * vector type template
+     *
+     * \tparam VectorMirrorType_
+     * vector mirror type template
+     *
+     * \tparam MatrixType_
+     * matrix type template
+     *
+     * \tparam PreconContType_
+     * preconditioner data type template
+     *
+     * \tparam FilterType_
+     * filter data type template
+     *
+     * \tparam StorageType_
+     * storage type template (STL or -conformal)
+     *
+     * \author Markus Geveler
+     */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
              template<typename, typename> class VectorType_ = DenseVector,
