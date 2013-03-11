@@ -97,7 +97,9 @@
 #  pragma warning(disable: 4986)
 
 // disable CRT security warnings for standard C/C++ library functions
+#ifndef _CRT_SECURE_NO_WARNINGS
 #  define _CRT_SECURE_NO_WARNINGS 1
+#endif
 
 #endif // !defined(FEAST_COMPILER) && defined(_MSC_VER)
 

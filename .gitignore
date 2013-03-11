@@ -48,21 +48,24 @@ test_system/Testing/
 # Ignore Doxygen output files
 doc/*
 
+# Ignore Visual Studio user/filter files
+*.vcxproj.user
+*.vcxproj.filters
+
 # Ignore Visual Studio output files
 lib/*
 obj/*
 win/*
-vc10_bin/*
-vc10_lib/*
-vc10_obj/*
 
 # Ignore Visual Studio intermediate files
 *.opensdf
 *.sdf
 *.suo
+*/ipch/*
 
 # Ignore Windows Links
 *.lnk
 
-# Ignore VC10 user-config header
-vc10_user_config.hpp
+# Ignore Visual Studio user-configfiles
+config-vc10.xml
+config-vc11.xml

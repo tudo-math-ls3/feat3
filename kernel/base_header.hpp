@@ -11,7 +11,9 @@
  */
 
 // Include FEAST configuration header.
-#include <feast_config.hpp>
+#ifndef FEAST_NO_CONFIG
+#  include <feast_config.hpp>
+#endif
 
 // Make sure the DOXYGEN macro is not defined at compile-time;
 // it is reserved for doxygen's preprocessor.

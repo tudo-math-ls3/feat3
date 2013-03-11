@@ -9,33 +9,15 @@
   <ItemGroup>
     <ClCompile Include="vc10_gen.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="templates\project_head.xml" />
-    <None Include="templates\project_tail.xml" />
-    <None Include="templates\project_user.xml" />
-    <None Include="templates\solution.xml" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6EBFB643-A736-4230-8246-CE333355B6B8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>test_system</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|Win32'">
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Serial-Release|Win32'">
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|x64'">
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Serial-Release|x64'">
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -45,68 +27,33 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup>
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)..\..\vc10_bin\</OutDir>
-    <IntDir>$(ProjectDir)..\..\vc10_obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\</OutDir>
+    <IntDir>$(ProjectDir)..\..\obj\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <GenerateManifest>false</GenerateManifest>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\..</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|Win32'">
-    <OutDir>$(ProjectDir)..\..\vc10_bin</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|Win32'">
-    <IntDir>$(ProjectDir)..\..\vc10_obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|Win32'">
-    <OutDir>$(ProjectDir)..\..\vc10_bin</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|Win32'">
-    <IntDir>$(ProjectDir)..\..\vc10_obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|x64'">
-    <OutDir>$(ProjectDir)..\..\vc10_bin</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|x64'">
-    <IntDir>$(ProjectDir)..\..\vc10_obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|x64'">
-    <OutDir>$(ProjectDir)..\..\vc10_bin</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Release|x64'">
-    <IntDir>$(ProjectDir)..\..\vc10_obj\$(ProjectName)_$(PlatformName)_$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>SERIAL;DEBUG;VISUAL_STUDIO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..;$(ProjectDir)..\..\..\visual_studio</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <SmallerTypeCheck>true</SmallerTypeCheck>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeaderOutputFile>
-      </PrecompiledHeaderOutputFile>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <FixedBaseAddress>false</FixedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Serial-Debug|Win32'">
-    <ClCompile>
-      <CompileAs>CompileAsCpp</CompileAs>
-    </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
