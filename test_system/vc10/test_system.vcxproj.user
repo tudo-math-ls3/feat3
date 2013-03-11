@@ -11,6 +11,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dbg-mpi|x64'">
     <DebuggerFlavor>MpiClusterDebugger</DebuggerFlavor>
     <MpiDebuggerWorkingDirectory>$(ProjectDir)..\..</MpiDebuggerWorkingDirectory>
+    <MpiDebuggerSchedulerNode>localhost/4</MpiDebuggerSchedulerNode>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='opt-mpi|x64'">
     <DebuggerFlavor>MpiClusterDebugger</DebuggerFlavor>

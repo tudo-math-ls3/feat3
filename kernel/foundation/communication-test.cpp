@@ -4,7 +4,6 @@
 
 #include<kernel/foundation/mesh.hpp>
 #include<kernel/foundation/halo.hpp>
-#include<kernel/foundation/halo_data.hpp>
 #include<kernel/foundation/communication.hpp>
 #include<kernel/foundation/attribute.hpp>
 #include<kernel/archs.hpp>

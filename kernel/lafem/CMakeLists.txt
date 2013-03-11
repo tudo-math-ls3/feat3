@@ -11,13 +11,24 @@ SET (kernel-lafem-list memory_pool.cpp)
 
 if (FEAST_BACKENDS_MKL)
   SET (kernel-lafem-list ${kernel-lafem-list}
-    axpy_mkl.cpp component_product_mkl.cpp defect_mkl.cpp difference_mkl.cpp dot_product_mkl.cpp norm_mkl.cpp
-    product_matvec_mkl.cpp scale_mkl.cpp sum_mkl.cpp)
+    axpy_mkl.cpp
+    component_product_mkl.cpp
+    defect_mkl.cpp
+    difference_mkl.cpp
+    dot_product_mkl.cpp
+    norm_mkl.cpp
+    product_matvec_mkl.cpp
+    scale_mkl.cpp sum_mkl.cpp
+  )
 endif(FEAST_BACKENDS_MKL)
 
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 if (FEAST_BACKENDS_MKL)
-  TARGET_LINK_LIBRARIES(kernel-lafem /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_intel_ilp64.a /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_sequential.a /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_core.a)
+  TARGET_LINK_LIBRARIES(kernel-lafem
+    /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_intel_ilp64.a
+    /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_sequential.a
+    /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_core.a
+  )
 endif(FEAST_BACKENDS_MKL)
 
 

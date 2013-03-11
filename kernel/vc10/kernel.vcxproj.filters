@@ -81,6 +81,12 @@
     <Filter Include="Source Files\vc10">
       <UniqueIdentifier>{2a6cc596-20e3-4996-8c7e-12ebc1563f17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\scarc">
+      <UniqueIdentifier>{81e8085b-2975-4fbc-87ca-57c2dd85aee7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\scarc">
+      <UniqueIdentifier>{92efd212-2ef2-4bbe-925b-94280c0d6e56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\assembly\asm_traits.hpp">
@@ -497,6 +503,9 @@
     <ClInclude Include="..\lafem\dot_product.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
+    <ClInclude Include="..\lafem\matrix_base.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
     <ClInclude Include="..\lafem\matrix_mirror.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
@@ -537,6 +546,9 @@
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
     <ClInclude Include="..\lafem\unit_filter.hpp">
+      <Filter>Header Files\lafem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lafem\vector_base.hpp">
       <Filter>Header Files\lafem</Filter>
     </ClInclude>
     <ClInclude Include="..\lafem\vector_mirror.hpp">
@@ -614,13 +626,7 @@
     <ClInclude Include="..\foundation\halo_control.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\foundation\halo_data.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\foundation\load_balancing.hpp">
-      <Filter>Header Files\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\foundation\mapped_topology.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\foundation\mesh.hpp">
@@ -629,10 +635,10 @@
     <ClInclude Include="..\foundation\mesh_control.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\foundation\mesh_data.hpp">
+    <ClInclude Include="..\foundation\mesh_error.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\foundation\mesh_error.hpp">
+    <ClInclude Include="..\foundation\synch.hpp">
       <Filter>Header Files\foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\foundation\topology.hpp">
@@ -657,6 +663,24 @@
       <Filter>Header Files\vc10</Filter>
     </ClInclude>
     <ClInclude Include="..\..\vc10_user_config.hpp" />
+    <ClInclude Include="..\scarc\scarc_error.hpp">
+      <Filter>Header Files\scarc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scarc\solver_data.hpp">
+      <Filter>Header Files\scarc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scarc\solver_functor.hpp">
+      <Filter>Header Files\scarc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scarc\solver_pattern.hpp">
+      <Filter>Header Files\scarc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scarc\vector.hpp">
+      <Filter>Header Files\scarc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scarc\matrix.hpp">
+      <Filter>Header Files\scarc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\util\exception.cpp">
@@ -694,6 +718,9 @@
     </ClCompile>
     <ClCompile Include="mkl_support.cpp">
       <Filter>Source Files\vc10</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scarc\scarc_error.cpp">
+      <Filter>Source Files\scarc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

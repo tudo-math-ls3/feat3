@@ -94,13 +94,11 @@
     <ClInclude Include="..\foundation\functor_error.hpp" />
     <ClInclude Include="..\foundation\halo.hpp" />
     <ClInclude Include="..\foundation\halo_control.hpp" />
-    <ClInclude Include="..\foundation\halo_data.hpp" />
     <ClInclude Include="..\foundation\load_balancing.hpp" />
-    <ClInclude Include="..\foundation\mapped_topology.hpp" />
     <ClInclude Include="..\foundation\mesh.hpp" />
     <ClInclude Include="..\foundation\mesh_control.hpp" />
-    <ClInclude Include="..\foundation\mesh_data.hpp" />
     <ClInclude Include="..\foundation\mesh_error.hpp" />
+    <ClInclude Include="..\foundation\synch.hpp" />
     <ClInclude Include="..\foundation\topology.hpp" />
     <ClInclude Include="..\geometry\cell_sub_set.hpp" />
     <ClInclude Include="..\geometry\cell_sub_set_node.hpp" />
@@ -148,6 +146,7 @@
     <ClInclude Include="..\lafem\dense_vector.hpp" />
     <ClInclude Include="..\lafem\difference.hpp" />
     <ClInclude Include="..\lafem\dot_product.hpp" />
+    <ClInclude Include="..\lafem\matrix_base.hpp" />
     <ClInclude Include="..\lafem\matrix_mirror.hpp" />
     <ClInclude Include="..\lafem\memory_pool.hpp" />
     <ClInclude Include="..\lafem\norm.hpp" />
@@ -162,8 +161,15 @@
     <ClInclude Include="..\lafem\sum.hpp" />
     <ClInclude Include="..\lafem\transposition.hpp" />
     <ClInclude Include="..\lafem\unit_filter.hpp" />
+    <ClInclude Include="..\lafem\vector_base.hpp" />
     <ClInclude Include="..\lafem\vector_mirror.hpp" />
     <ClInclude Include="..\shape.hpp" />
+    <ClInclude Include="..\scarc\matrix.hpp" />
+    <ClInclude Include="..\scarc\scarc_error.hpp" />
+    <ClInclude Include="..\scarc\solver_data.hpp" />
+    <ClInclude Include="..\scarc\solver_functor.hpp" />
+    <ClInclude Include="..\scarc\solver_pattern.hpp" />
+    <ClInclude Include="..\scarc\vector.hpp" />
     <ClInclude Include="..\space\base.hpp" />
     <ClInclude Include="..\space\discontinuous\element.hpp" />
     <ClInclude Include="..\space\discontinuous\evaluator.hpp" />
@@ -235,6 +241,7 @@
     <ClCompile Include="..\foundation\functor_error.cpp" />
     <ClCompile Include="..\foundation\mesh_error.cpp" />
     <ClCompile Include="..\lafem\memory_pool.cpp" />
+    <ClCompile Include="..\scarc\scarc_error.cpp" />
     <ClCompile Include="..\util\colouring.cpp" />
     <ClCompile Include="..\util\exception.cpp" />
     <ClCompile Include="..\util\logger.cpp" />

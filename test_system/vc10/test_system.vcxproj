@@ -453,8 +453,6 @@
     <ClCompile Include="..\..\kernel\foundation\functor-test.cpp" />
     <ClCompile Include="..\..\kernel\foundation\halo-test.cpp" />
     <ClCompile Include="..\..\kernel\foundation\halo_control-test.cpp" />
-    <ClCompile Include="..\..\kernel\foundation\halo_data-test.cpp" />
-    <ClCompile Include="..\..\kernel\foundation\mapped_topology-test.cpp" />
     <ClCompile Include="..\..\kernel\foundation\mesh-test.cpp" />
     <ClCompile Include="..\..\kernel\foundation\mesh_control-test.cpp" />
     <ClCompile Include="..\..\kernel\foundation\topology-test.cpp" />
@@ -494,6 +492,11 @@
     <ClCompile Include="..\..\kernel\lafem\sum-test.cpp" />
     <ClCompile Include="..\..\kernel\lafem\transposition-test.cpp" />
     <ClCompile Include="..\..\kernel\shape-test.cpp" />
+    <ClCompile Include="..\..\kernel\scarc\matrix-test.cpp" />
+    <ClCompile Include="..\..\kernel\scarc\solver_data-test.cpp" />
+    <ClCompile Include="..\..\kernel\scarc\solver_functor-test.cpp" />
+    <ClCompile Include="..\..\kernel\scarc\solver_pattern-test.cpp" />
+    <ClCompile Include="..\..\kernel\scarc\vector-test.cpp" />
     <ClCompile Include="..\..\kernel\space\discontinuous-test.cpp" />
     <ClCompile Include="..\..\kernel\space\lagrange1-test.cpp" />
     <ClCompile Include="..\..\kernel\space\rannacher_turek-test.cpp" />

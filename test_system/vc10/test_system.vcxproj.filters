@@ -46,6 +46,9 @@
     <Filter Include="Source Files %28test_system%29">
       <UniqueIdentifier>{a1d0d675-e19e-453f-bc47-76259a411898}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files %28kernel%29\scarc">
+      <UniqueIdentifier>{5453b50f-651c-4fbc-83d5-15a827cb2f5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\kernel\geometry\test_aux\copy_comp_set.hpp">
@@ -104,13 +107,7 @@
     <ClCompile Include="..\..\kernel\foundation\halo_control-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\kernel\foundation\halo_data-test.cpp">
-      <Filter>Source Files %28kernel%29\foundation</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\kernel\foundation\halo-test.cpp">
-      <Filter>Source Files %28kernel%29\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\kernel\foundation\mapped_topology-test.cpp">
       <Filter>Source Files %28kernel%29\foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\kernel\foundation\mesh_control-test.cpp">
@@ -280,6 +277,21 @@
     </ClCompile>
     <ClCompile Include="..\..\kernel\lafem\sparse_matrix_conversion-test.cpp">
       <Filter>Source Files %28kernel%29\lafem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\scarc\matrix-test.cpp">
+      <Filter>Source Files %28kernel%29\scarc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\scarc\solver_data-test.cpp">
+      <Filter>Source Files %28kernel%29\scarc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\scarc\solver_functor-test.cpp">
+      <Filter>Source Files %28kernel%29\scarc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\scarc\solver_pattern-test.cpp">
+      <Filter>Source Files %28kernel%29\scarc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\scarc\vector-test.cpp">
+      <Filter>Source Files %28kernel%29\scarc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
