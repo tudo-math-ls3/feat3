@@ -711,6 +711,7 @@ int main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
 
+#ifndef SERIAL
   check_sendrecv(me);
   check_send_and_recv(me);
   check_bcast(me);
@@ -725,6 +726,7 @@ int main(int argc, char* argv[])
   check_halobased_attribute_transfer(me);
   check_halobased_dv_transfer(me);
   check_halobased_smcsr_transfer(me);
+#endif
 
 #ifndef SERIAL
   MPI_Finalize();

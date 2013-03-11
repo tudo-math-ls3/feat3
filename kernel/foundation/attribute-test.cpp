@@ -1,5 +1,5 @@
 #include <kernel/base_header.hpp>
-#ifdef SERIAL
+#ifndef SERIAL
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/attribute.hpp>

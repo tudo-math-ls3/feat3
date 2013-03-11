@@ -7,11 +7,6 @@
  * This file contains the first application code testing the FEAST kernel w.o. the final application framework.
  */
 
-
-#ifndef SERIAL
-#include <mpi.h>
-#endif
-
 #include<deque>
 #include<algorithm>
 #include<cmath>
@@ -43,6 +38,10 @@
 
 #include <kernel/scarc/solver_data.hpp>
 #include <kernel/scarc/solver_pattern.hpp>
+
+#ifndef SERIAL
+#include <mpi.h>
+#endif
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -531,6 +530,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       rpend_sendbuf(j, row_ptr_end[j]);
     }
 
+#ifndef SERIAL
     Comm<Parallel>::send_recv(val_sendbuf.elements(),
                               val_sendbuf.size(),
                               macro_comm_halos.at(i)->get_other(),
@@ -555,6 +555,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
                               rpend_recvbuf.elements(),
                               rpend_recvbuf.size(),
                               macro_comm_halos.at(i)->get_other());
+#endif
 
     val_sendbufs.push_back(val_sendbuf);
     val_recvbufs.push_back(val_recvbuf);
@@ -565,7 +566,9 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     rpend_sendbufs.push_back(rpend_sendbuf);
     rpend_recvbufs.push_back(rpend_recvbuf);
   }
+#ifndef SERIAL
   MPI_Barrier(MPI_COMM_WORLD);
+#endif
 
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
@@ -649,19 +652,26 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   solver->set_preconditioner(block_solver);
 
+#ifndef SERIAL
   MPI_Barrier(MPI_COMM_WORLD);
+#endif
   std::cout << "proc " << rank << " rhs " << data.rhs();
 
   solver->execute();
 
+#ifndef SERIAL
   MPI_Barrier(MPI_COMM_WORLD);
+#endif
 
   std::cout << "proc " << rank << " sol " << data.sol();
   std::cout << "proc " << rank << " iters used " << data.used_iters() << std::endl;
 
+#ifndef SERIAL
   MPI_Barrier(MPI_COMM_WORLD);
   sleep(1);
   MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
   if (rank==0)
     std::cout<<SolverFunctorBase<DenseVector<Mem::Main, double> >::pretty_printer(solver->type_name());
 
@@ -692,7 +702,9 @@ int main(int argc, char* argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &num_patches);
 #endif
 
+#ifndef SERIAL
   test_hypercube_2d(me, num_patches, desired_refinement_level);
+#endif
 
 #ifndef SERIAL
   MPI_Finalize();

@@ -1,9 +1,9 @@
-#ifndef SERIAL
-#include <mpi.h>
-#endif
 #include <iostream>
 #include <kernel/scarc/solver_pattern.hpp>
 
+#ifndef SERIAL
+#include <mpi.h>
+#endif
 using namespace FEAST;
 using namespace Foundation;
 

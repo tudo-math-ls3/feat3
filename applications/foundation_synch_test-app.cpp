@@ -1,7 +1,5 @@
 //#define SERIAL
-#ifndef SERIAL
-#include <mpi.h>
-#endif
+
 #include <iostream>
 #include <limits>
 #include <kernel/base_header.hpp>
@@ -22,6 +20,10 @@
 #include <kernel/space/dof_mirror.hpp>
 
 #include <kernel/trafo/standard/mapping.hpp>
+
+#ifndef SERIAL
+#include <mpi.h>
+#endif
 
 using namespace FEAST;
 using namespace Foundation;
@@ -248,7 +250,7 @@ void check_synch_mirrors(int rank)
 
 void check_synch_scal(int rank)
 {
-#ifndef FEAST_SERIAL_MODE
+#ifndef SERIAL
   int size;
   float value(rank + 1);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
