@@ -1,5 +1,7 @@
-#include <kernel/base_header.hpp>
 #ifndef SERIAL
+#define SERIAL
+
+#include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/mesh.hpp>
@@ -299,6 +301,6 @@ class HaloTestComm:
       TEST_CHECK_EQUAL(h.get_element_counterpart(0), 0);
     }
 };
-HaloTestComm<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_comm_cpu_v_v("std::vector, std::vector");
-HaloTestComm<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halo_test_comm_cpu_v_d("std::vector, std::deque");
+/*HaloTestComm<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_comm_cpu_v_v("std::vector, std::vector");
+HaloTestComm<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halo_test_comm_cpu_v_d("std::vector, std::deque");*/
 #endif // SERIAL

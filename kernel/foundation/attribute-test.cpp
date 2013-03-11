@@ -1,5 +1,6 @@
-#include <kernel/base_header.hpp>
 #ifndef SERIAL
+#define SERIAL
+#include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/attribute.hpp>
@@ -42,12 +43,12 @@ class AttributeTest:
       }
     }
 };
-AttributeTest<Archs::None, unsigned long, float, std::vector> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataTypes: ulong, float");
+/*AttributeTest<Archs::None, unsigned long, float, std::vector> attribute_test_cpu_v_ulong_float("StorageType: std::vector, DataTypes: ulong, float");
 AttributeTest<Archs::None, double, float, std::vector> attribute_test_cpu_v_double_float("StorageType: std::vector, DataTypes: double, float");
 AttributeTest<Archs::None, double, int, std::vector> attribute_test_cpu_v_double_int("StorageType: std::vector, DataTypes: double, int");
 AttributeTest<Archs::None, unsigned long, float, std::deque> attribute_test_cpu_d_ulong_float("StorageType: std::deque, DataTypes: ulong, float");
 AttributeTest<Archs::None, double, float, std::deque> attribute_test_cpu_d_double_float("StorageType: std::deque, DataTypes: double, float");
-AttributeTest<Archs::None, double, int, std::deque> attribute_test_cpu_d_double_int("StorageType: std::deque, DataTypes: double, int");
+AttributeTest<Archs::None, double, int, std::deque> attribute_test_cpu_d_double_int("StorageType: std::deque, DataTypes: double, int");*/
 
 template<typename Tag_, typename DataType1_, typename DataType2_, template<typename, typename> class ST_>
 class AttributeCommTest:
@@ -82,10 +83,10 @@ class AttributeCommTest:
       TEST_CHECK_EQUAL(attr.at(1), DataType1_(42));
     }
 };
-AttributeCommTest<Archs::None, unsigned long, float, std::vector> attribute_commtest_cpu_v_ulong_float("StorageType: std::vector, DataTypes: ulong, float");
+/*AttributeCommTest<Archs::None, unsigned long, float, std::vector> attribute_commtest_cpu_v_ulong_float("StorageType: std::vector, DataTypes: ulong, float");
 AttributeCommTest<Archs::None, double, float, std::vector> attribute_commtest_cpu_v_double_float("StorageType: std::vector, DataTypes: double, float");
 AttributeCommTest<Archs::None, double, int, std::vector> attribute_commtest_cpu_v_double_int("StorageType: std::vector, DataTypes: double, int");
 AttributeCommTest<Archs::None, unsigned long, float, std::deque> attribute_commtest_cpu_d_ulong_float("StorageType: std::deque, DataTypes: ulong, float");
 AttributeCommTest<Archs::None, double, float, std::deque> attribute_commtest_cpu_d_double_float("StorageType: std::deque, DataTypes: double, float");
-AttributeCommTest<Archs::None, double, int, std::deque> attribute_commtest_cpu_d_double_int("StorageType: std::deque, DataTypes: double, int");
+AttributeCommTest<Archs::None, double, int, std::deque> attribute_commtest_cpu_d_double_int("StorageType: std::deque, DataTypes: double, int");*/
 #endif // SERIAL

@@ -1,5 +1,7 @@
-#include <kernel/base_header.hpp>
 #ifndef SERIAL
+#define SERIAL
+
+#include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
 #include <kernel/foundation/topology.hpp>
@@ -103,10 +105,10 @@ class TopologyCommTest:
       TEST_CHECK_EQUAL(t.at(1).at(1), 57);
     }
 };
-TopologyCommTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_commtest_cpu_v_v("std::vector, std::vector");
+/*TopologyCommTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_commtest_cpu_v_v("std::vector, std::vector");
 TopologyCommTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > topology_commtest_cpu_d_v("std::deque, std::vector");
 TopologyCommTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_commtest_cpu_v_d("std::vector, std::deque");
 TopologyCommTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_commtest_cpu_d_d("std::deque, std::deque");
 
-TopologyCommTest<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, unsigned long, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");
+TopologyCommTest<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, unsigned long, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");*/
 #endif // SERIAL
