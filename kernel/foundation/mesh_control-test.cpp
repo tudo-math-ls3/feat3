@@ -1,5 +1,5 @@
-#define SERIAL
 #include <kernel/base_header.hpp>
+#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
 #include<kernel/foundation/mesh_control.hpp>
@@ -795,14 +795,14 @@ class MeshControlPartitioningTest2D:
         Index* polytopes_in_subset = new Index[3];
 
         if(halos.at(i)->get_level() == pl_vertex)
-          HaloControl<dim_1D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
+          HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
         else
           HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
 
         Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
 
         if(halos.at(i)->get_level() == pl_vertex)
-          HaloControl<dim_1D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
+          HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
         else
           HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
 
@@ -896,3 +896,4 @@ class MeshControlPartitioningTest2D:
 };
 MeshControlPartitioningTest2D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrolpart_testvv("std::vector, std::vector");
 MeshControlPartitioningTest2D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrolpart_testvd("std::vector, std::deque");
+#endif // SERIAL
