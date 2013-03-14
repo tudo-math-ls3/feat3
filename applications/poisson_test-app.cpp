@@ -451,16 +451,16 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space_base(trafo_base); // TODO do we need it?
   Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
-  SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
+  //assemble dof adjacencies
+  Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //TODO do we need it?
+  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+
+  SparseMatrixCSR<Mem::Main, double> mat_sys(dof_adj);
   mat_sys.clear();
   Assembly::BilinearScalarLaplaceFunctor::assemble(mat_sys, space, "gauss-legendre:2");
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
   Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
-
-  //assemble dof adjacencies
-  Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //TODO do we need it?
-  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
 
   // assemble homogeneous Dirichlet BCs
   Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
