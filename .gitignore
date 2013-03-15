@@ -61,7 +61,7 @@ win/*
 *.opensdf
 *.sdf
 *.suo
-*/ipch/*
+ipch
 
 # Ignore Windows Links
 *.lnk
