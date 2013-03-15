@@ -69,7 +69,7 @@ void check_sendrecv(int rank)
     Comm<Archs::Serial>::send_recv(f, 100000, 0, recvbuffer, 100000, 0);
 #endif
 
-    TestResult<float> res[100000];
+    TestResult<float>* res = new TestResult<float>[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
 #ifndef SERIAL
       res[i] = test_check_equal_within_eps(recvbuffer[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
@@ -88,6 +88,8 @@ void check_sendrecv(int rank)
 
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: sendrecv)" << std::endl;
+
+    delete[] res;
   }
 
   delete[] f;
@@ -118,7 +120,7 @@ void check_send_and_recv(int rank)
     Comm<Archs::Parallel>::recv(recvbuffer,
                                      100000,
                                      0);
-    TestResult<float> res[100000];
+    TestResult<float>* res = new TestResult<float>[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
       res[i] = test_check_equal_within_eps(recvbuffer[i], i, std::numeric_limits<float>::epsilon());
 
@@ -133,6 +135,8 @@ void check_send_and_recv(int rank)
 
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: send and recv)" << std::endl;
+
+    delete[] res;
   }
 
   delete[] f;
@@ -153,7 +157,7 @@ void check_bcast(int rank)
 
   Comm<Archs::Parallel>::bcast(recvbuffer, size, 0);
 
-  TestResult<float> res[size];
+  TestResult<float>* res =  new TestResult<float>[size];
   for(Index i(0) ; i < (Index)size ; ++i)
     res[i] = test_check_equal_within_eps(recvbuffer[i], i, std::numeric_limits<float>::epsilon());
 
@@ -169,6 +173,7 @@ void check_bcast(int rank)
   if(passed)
     std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: bcast)" << std::endl;
 
+  delete[] res;
   delete[] recvbuffer;
 #endif
 }
@@ -216,7 +221,7 @@ void check_allgather(int rank)
 
   Comm<Archs::Parallel>::allgather(&value, 1, buffer, 1);
 
-  TestResult<float> res[size];
+  TestResult<float>* res = new TestResult<float>[size];
   for(Index i(0) ; i < (Index)size ; ++i)
     res[i] = test_check_equal_within_eps(buffer[i], i, std::numeric_limits<float>::epsilon());
 
@@ -232,6 +237,7 @@ void check_allgather(int rank)
   if(passed)
     std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: allgather)" << std::endl;
 
+  delete[] res;
   delete[] buffer;
 #endif
 }

@@ -36,7 +36,8 @@ struct TestResult
     right(r),
     epsilon(eps)
   {
-    passed = abs(l - r) < eps ? true : false;
+    //passed = std::abs(l - r) < eps ? true : false;
+    passed = (l < r ? r - l : l - r) < eps ? true : false;
   }
 
   TestResult()
@@ -252,7 +253,7 @@ void check_synch_scal(int rank)
 {
 #ifndef SERIAL
   int size;
-  float value(rank + 1);
+  float value(float(rank + 1));
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   float* send_buffer(new float[1]);
@@ -262,7 +263,7 @@ void check_synch_scal(int rank)
   SynchScal<Parallel, com_allreduce_sqrtsum>::execute(value, *send_buffer, *recv_buffer);
 
   TestResult<float> res;
-  res = test_check_equal_within_eps(value, float(sqrt(1)), std::numeric_limits<float>::epsilon());
+  res = test_check_equal_within_eps(value, std::sqrt(3.0f), std::numeric_limits<float>::epsilon());
 
   if(!res.passed)
   {
