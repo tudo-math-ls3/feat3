@@ -106,6 +106,12 @@ namespace FEAST
         }
       }
 
+      /// \returns The number of entries in the filter.
+      Index size() const
+      {
+        return _num_entries;
+      }
+
       /// \returns The index array.
       Index* get_indices()
       {
