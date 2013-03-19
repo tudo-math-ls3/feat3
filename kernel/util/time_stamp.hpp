@@ -4,8 +4,12 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/util/string.hpp>
 
 // includes, system
+#include <sstream>
+#include <iomanip>
+
 #if defined(__linux) || defined(__unix__)
 #  define FEAST_HAVE_GETTIMEOFDAY 1
 #  include <sys/time.h>
@@ -112,6 +116,35 @@ namespace FEAST
 #else
       return 1000000ll * (long long)(_clock - before._clock) / (long long)CLOCKS_PER_SEC;
 #endif
+    }
+
+    /**
+     * \brief Return the time elapsed between two time stamps as a string.
+     *
+     * \param[in] before
+     * A time stamp that represents a previous moment.
+     *
+     * \returns
+     * The time elapsed between the time stamps \p before and \c this as a formatted string
+     * <code>h:mm:ss.nnn</code>.
+     */
+    String elapsed_string(const TimeStamp& before) const
+    {
+      if(*this < before)
+        return String("-").append(before.elapsed_string(*this));
+
+      long long micros(elapsed_micros(before));
+      std::ostringstream oss;
+      oss << std::setfill('0');
+      // write hours
+      oss << (micros / 3600000000ll);
+      // write minutes
+      oss << ":" << std::setw(2) << ((micros /   60000000ll) %   60ll);
+      // write seconds
+      oss << ":" << std::setw(2) << ((micros /    1000000ll) %   60ll);
+      // write milli-seconds
+      oss << "." << std::setw(3) << ((micros /       1000ll) % 1000ll);
+      return oss.str();
     }
 
     /**
