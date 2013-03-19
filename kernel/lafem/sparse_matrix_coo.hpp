@@ -339,7 +339,7 @@ namespace FEAST
           _rows(other.rows()),
           _columns(other.columns()),
           _zero_element(DT_(0)),
-          _used_elements(other.used_elements()),
+          _used_elements(0),
           _val_ptr(0),
           _row_ptr(0),
           _col_ptr(0)
@@ -355,6 +355,7 @@ namespace FEAST
             if (cother.Ax()[i] != DT_(0))
             {
               coo(i%other.stride(), cother.Aj()[i], cother.Ax()[i]);
+              ++used_elements;
             }
           }
 
