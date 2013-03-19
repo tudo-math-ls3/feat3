@@ -355,7 +355,7 @@ namespace FEAST
             if (cother.Ax()[i] != DT_(0))
             {
               coo(i%other.stride(), cother.Aj()[i], cother.Ax()[i]);
-              ++used_elements;
+              ++_used_elements;
             }
           }
 
