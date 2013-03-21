@@ -140,7 +140,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   m.add_adjacency(pl_vertex, pl_face, 3, 0);
 
   ///get a conformal mesh as basemesh
-  typedef ConformalMesh<Shape::Hypercube<dim_2D> > BaseMeshType;
+  typedef ConformalMesh<Shape::Hypercube<2> > BaseMeshType;
 
   Index* size_set(new Index[3]);
   MeshControl<dim_2D>::fill_sizes(m, size_set);
