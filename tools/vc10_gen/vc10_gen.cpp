@@ -267,7 +267,7 @@ public:
   bool write_solution()
   {
     // build solution filename
-    string sln_path(project_path + "\\" + project_name + ".sln");
+    string sln_path(project_path + "\\" + project_name + ".vc10.sln");
     cout << "Writing solution file        '" << sln_path << "'..." << endl;
     ofstream ofs(sln_path, ios_base::out|ios_base::trunc);
     if(!ofs.is_open() || !ofs.good())
