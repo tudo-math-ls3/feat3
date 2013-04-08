@@ -45,18 +45,34 @@ public:
     build_ids.push_back("dbg-cuda");
     build_ids.push_back("dbg-cuda-mkl");
     build_ids.push_back("dbg-cuda-mkl-mpi");
+    build_ids.push_back("dbg-cuda-mkl-mpi-omp");
+    build_ids.push_back("dbg-cuda-mkl-omp");
     build_ids.push_back("dbg-cuda-mpi");
+    build_ids.push_back("dbg-cuda-mpi-omp");
+    build_ids.push_back("dbg-cuda-omp");
     build_ids.push_back("dbg-mkl");
     build_ids.push_back("dbg-mkl-mpi");
+    build_ids.push_back("dbg-mkl-mpi-omp");
+    build_ids.push_back("dbg-mkl-omp");
     build_ids.push_back("dbg-mpi");
+    build_ids.push_back("dbg-mpi-omp");
+    build_ids.push_back("dbg-omp");
     build_ids.push_back("opt");
     build_ids.push_back("opt-cuda");
     build_ids.push_back("opt-cuda-mkl");
     build_ids.push_back("opt-cuda-mkl-mpi");
+    build_ids.push_back("opt-cuda-mkl-mpi-omp");
+    build_ids.push_back("opt-cuda-mkl-omp");
     build_ids.push_back("opt-cuda-mpi");
+    build_ids.push_back("opt-cuda-mpi-omp");
+    build_ids.push_back("opt-cuda-omp");
     build_ids.push_back("opt-mkl");
     build_ids.push_back("opt-mkl-mpi");
+    build_ids.push_back("opt-mkl-mpi-omp");
+    build_ids.push_back("opt-mkl-omp");
     build_ids.push_back("opt-mpi");
+    build_ids.push_back("opt-mpi-omp");
+    build_ids.push_back("opt-omp");
   }
 
   static string read_kernel_guid()

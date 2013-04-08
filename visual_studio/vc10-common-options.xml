@@ -67,6 +67,13 @@
     </ClCompile>
   </ItemDefinitionGroup>
 
+  <!-- OpenMP Settings -->
+  <ItemDefinitionGroup Condition="'(EnableOMP)'=='true'">
+    <ClCompile>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
   <!-- CUDA Backend Settings -->
   <PropertyGroup Condition="'$(BackendCUDA)'=='true'">
     <CudaIntDir>$(FeastObjPath)\$(FeastBuildName)</CudaIntDir>

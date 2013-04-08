@@ -35,12 +35,44 @@
       <Configuration>dbg-cuda-mkl-mpi</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-mkl-mpi-omp|Win32">
+      <Configuration>dbg-cuda-mkl-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-mkl-mpi-omp|x64">
+      <Configuration>dbg-cuda-mkl-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-mkl-omp|Win32">
+      <Configuration>dbg-cuda-mkl-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-mkl-omp|x64">
+      <Configuration>dbg-cuda-mkl-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="dbg-cuda-mpi|Win32">
       <Configuration>dbg-cuda-mpi</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="dbg-cuda-mpi|x64">
       <Configuration>dbg-cuda-mpi</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-mpi-omp|Win32">
+      <Configuration>dbg-cuda-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-mpi-omp|x64">
+      <Configuration>dbg-cuda-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-omp|Win32">
+      <Configuration>dbg-cuda-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-cuda-omp|x64">
+      <Configuration>dbg-cuda-omp</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="dbg-mkl|Win32">
@@ -59,12 +91,44 @@
       <Configuration>dbg-mkl-mpi</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mkl-mpi-omp|Win32">
+      <Configuration>dbg-mkl-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mkl-mpi-omp|x64">
+      <Configuration>dbg-mkl-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mkl-omp|Win32">
+      <Configuration>dbg-mkl-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mkl-omp|x64">
+      <Configuration>dbg-mkl-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="dbg-mpi|Win32">
       <Configuration>dbg-mpi</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="dbg-mpi|x64">
       <Configuration>dbg-mpi</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mpi-omp|Win32">
+      <Configuration>dbg-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-mpi-omp|x64">
+      <Configuration>dbg-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-omp|Win32">
+      <Configuration>dbg-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="dbg-omp|x64">
+      <Configuration>dbg-omp</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="opt|Win32">
@@ -99,12 +163,44 @@
       <Configuration>opt-cuda-mkl-mpi</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-mkl-mpi-omp|Win32">
+      <Configuration>opt-cuda-mkl-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-mkl-mpi-omp|x64">
+      <Configuration>opt-cuda-mkl-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-mkl-omp|Win32">
+      <Configuration>opt-cuda-mkl-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-mkl-omp|x64">
+      <Configuration>opt-cuda-mkl-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="opt-cuda-mpi|Win32">
       <Configuration>opt-cuda-mpi</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="opt-cuda-mpi|x64">
       <Configuration>opt-cuda-mpi</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-mpi-omp|Win32">
+      <Configuration>opt-cuda-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-mpi-omp|x64">
+      <Configuration>opt-cuda-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-omp|Win32">
+      <Configuration>opt-cuda-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-cuda-omp|x64">
+      <Configuration>opt-cuda-omp</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="opt-mkl|Win32">
@@ -123,12 +219,44 @@
       <Configuration>opt-mkl-mpi</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mkl-mpi-omp|Win32">
+      <Configuration>opt-mkl-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mkl-mpi-omp|x64">
+      <Configuration>opt-mkl-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mkl-omp|Win32">
+      <Configuration>opt-mkl-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mkl-omp|x64">
+      <Configuration>opt-mkl-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="opt-mpi|Win32">
       <Configuration>opt-mpi</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="opt-mpi|x64">
       <Configuration>opt-mpi</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mpi-omp|Win32">
+      <Configuration>opt-mpi-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-mpi-omp|x64">
+      <Configuration>opt-mpi-omp</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-omp|Win32">
+      <Configuration>opt-omp</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="opt-omp|x64">
+      <Configuration>opt-omp</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>-->
@@ -138,96 +266,224 @@
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg'">
     <DebugMode>true</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda'">
     <DebugMode>true</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda-mkl'">
     <DebugMode>true</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda-mkl-mpi'">
     <DebugMode>true</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda-mkl-mpi-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda-mkl-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda-mpi'">
     <DebugMode>true</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda-mpi-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-cuda-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mkl'">
     <DebugMode>true</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mkl-mpi'">
     <DebugMode>true</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mkl-mpi-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mkl-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mpi'">
     <DebugMode>true</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-mpi-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='dbg-omp'">
+    <DebugMode>true</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt'">
     <DebugMode>false</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda'">
     <DebugMode>false</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda-mkl'">
     <DebugMode>false</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda-mkl-mpi'">
     <DebugMode>false</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda-mkl-mpi-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda-mkl-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda-mpi'">
     <DebugMode>false</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda-mpi-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>true</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-cuda-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>true</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mkl'">
     <DebugMode>false</DebugMode>
     <SerialMode>true</SerialMode>
+    <EnableOMP>false</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mkl-mpi'">
     <DebugMode>false</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mkl-mpi-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>true</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mkl-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>true</BackendMKL>
   </PropertyGroup>
   <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mpi'">
     <DebugMode>false</DebugMode>
     <SerialMode>false</SerialMode>
+    <EnableOMP>false</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-mpi-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>false</SerialMode>
+    <EnableOMP>true</EnableOMP>
+    <BackendCUDA>false</BackendCUDA>
+    <BackendMKL>false</BackendMKL>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildMode" Condition="'$(Configuration)'=='opt-omp'">
+    <DebugMode>false</DebugMode>
+    <SerialMode>true</SerialMode>
+    <EnableOMP>true</EnableOMP>
     <BackendCUDA>false</BackendCUDA>
     <BackendMKL>false</BackendMKL>
   </PropertyGroup>
