@@ -114,7 +114,8 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
     # the following flag might be useful: -m128bit-long-double
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++98 -Wall -Wextra -Wundef -g")
+    # for older compilers enforce at minimum: -std=c++98
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -Wall -Wextra -Wundef -g")
 
   else ()
     # optimised settings for all currently supported archs
@@ -123,7 +124,8 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
     # -mfpmath=sse forces SSE math rather than FPU (i387) floating point math
     # the other default flags are self-explanatory and are not included in -O3
     # the following flag might be useful: -m128bit-long-double
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O3 -ffast-math -std=c++98 -ggdb -foptimize-register-move -fprefetch-loop-arrays -funroll-loops -mfpmath=sse")
+    # for older compilers enforce at minimum: -std=c++98
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O3 -ffast-math -ggdb -foptimize-register-move -fprefetch-loop-arrays -funroll-loops -mfpmath=sse")
 
     # please try to maintain the same order as in the buildid_arch module
     # Intel CPUs

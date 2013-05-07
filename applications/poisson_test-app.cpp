@@ -15,6 +15,7 @@
 #include <kernel/geometry/patch_factory.hpp>
 #include <kernel/geometry/macro_factory.hpp>
 #include <kernel/geometry/patch_halo_factory.hpp>
+#include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/mesh_control.hpp>
 #include <kernel/foundation/dense_data_wrapper.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -108,9 +109,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
    */
 
   //creating foundation mesh
-  Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<> > m(0, &attrs);
-  Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-  Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+  Foundation::Mesh<Dim2D, Foundation::Topology<> > m(0);
   m.add_polytope(pl_vertex);
   m.add_polytope(pl_vertex);
   m.add_polytope(pl_vertex);
@@ -165,12 +164,12 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   }
 
   ///select macro by rank, create macro subset
-  Mesh<rnt_2D, Topology<> > macro_basemesh_found(4711, &attrs);
+  Mesh<Dim2D, Topology<> > macro_basemesh_found(4711);
   MeshControl<dim_2D>::fill_adjacencies(*macro_basemesh, macro_basemesh_found);
   MeshControl<dim_2D>::fill_vertex_sets(*macro_basemesh, macro_basemesh_found, *((Attribute<double>*)(attrs.at(0).get())), *((Attribute<double>*)(attrs.at(1).get())));
 
-  Halo<1, pl_face, Mesh<rnt_2D, Topology<> > > macro_subset(macro_basemesh_found);
-  macro_subset.add_element_pair(rank, rank);
+  Halo<1, PLFace, Mesh<Dim2D, Topology<> > > macro_subset(macro_basemesh_found);
+  macro_subset.push_back(rank);
 
   Index* polytopes_in_macrosubset(new Index[3]);
   HaloControl<dim_2D>::fill_sizes(macro_subset, polytopes_in_macrosubset);
@@ -195,7 +194,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     }
   }
 
-  std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > > > macro_comm_halos;
+  std::vector<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<> > > > > macro_comm_halos;
   for(Index i(0) ; i < potential_comm_partners_for_face_rank.size() ; ++i)
   {
     TopologyStorageType comm_intersect_rank_i(macro_basemesh_found.get_comm_intersection(pl_face, pl_edge, rank, potential_comm_partners_for_face_rank.at(i)));
@@ -204,23 +203,23 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       comm_intersect_rank_i = macro_basemesh_found.get_comm_intersection(pl_face, pl_vertex, rank, potential_comm_partners_for_face_rank.at(i));
       for(Index j(0) ; j < comm_intersect_rank_i.size() ; ++j)
       {
-        Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, potential_comm_partners_for_face_rank.at(i));
-        halo.add_element_pair(comm_intersect_rank_i.at(j), comm_intersect_rank_i.at(j));
+        Halo<0, PLVertex, Mesh<Dim2D, Topology<> > > halo(macro_basemesh_found, potential_comm_partners_for_face_rank.at(i));
+        halo.push_back(comm_intersect_rank_i.at(j));
 
-        macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > >(new Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >(halo)));
+        macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<> > > >(new Halo<0, PLVertex, Mesh<Dim2D, Topology<> > >(halo)));
       }
     }
     else
     {
       for(Index j(0) ; j < comm_intersect_rank_i.size() ; ++j)
       {
-        Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > > halo(macro_basemesh_found, potential_comm_partners_for_face_rank.at(i));
-        halo.add_element_pair(comm_intersect_rank_i.at(j), comm_intersect_rank_i.at(j));
-        macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >(halo)));
+        Halo<0, PLEdge, Mesh<Dim2D, Topology<> > > halo(macro_basemesh_found, potential_comm_partners_for_face_rank.at(i));
+        halo.push_back(comm_intersect_rank_i.at(j));
+        macro_comm_halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<> > > >(new Halo<0, PLEdge, Mesh<Dim2D, Topology<> > >(halo)));
       }
     }
   }
-  std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<rnt_2D, Topology<> >, std::vector, Index>);
+  std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<Dim2D, Topology<> >, std::vector>);
 
   ///get adjacencies of halos
   std::vector<std::vector<Index> > halo_adjacencies;
@@ -289,10 +288,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
 
   ///get (non-inner) macro boundary components
-  Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
-  Mesh<rnt_2D>::topology_type_::storage_type_ macro_edges_final;
+  Mesh<Dim2D>::topology_type_::storage_type_ macro_edges(macro_basemesh_found.get_adjacent_polytopes(pl_face, pl_edge, rank));
+  Mesh<Dim2D>::topology_type_::storage_type_ macro_edges_final;
   std::cout << "proc " << rank << " #macro edges initially " << macro_edges.size() << std::endl;
-  std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D> > > > macro_boundaries_found;
+  std::vector<std::shared_ptr<HaloBase<Mesh<Dim2D> > > > macro_boundaries_found;
   for(Index i(0) ; i < macro_edges.size() ; ++i)
   {
     bool in(false);
@@ -308,9 +307,9 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::cout << "proc " << rank << " #macro edges after elimination " << macro_edges_final.size() << std::endl;
   for(Index i(0) ; i < macro_edges_final.size() ; ++i)
   {
-    Halo<0, pl_edge, Mesh<rnt_2D> > result(macro_basemesh_found);
-    result.add_element_pair(macro_edges_final.at(i), macro_edges_final.at(i));
-    macro_boundaries_found.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D> > >(new Halo<0, pl_edge, Mesh<rnt_2D> >(result)));
+    Halo<0, PLEdge, Mesh<Dim2D> > result(macro_basemesh_found);
+    result.push_back(macro_edges_final.at(i));
+    macro_boundaries_found.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D> > >(new Halo<0, PLEdge, Mesh<Dim2D> >(result)));
   }
 
   ///refine everything to desired level of detail
@@ -349,16 +348,16 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   {
     Index* polytopes_in_subset = new Index[3];
     if(macro_comm_halos.at(i)->get_level() == pl_vertex)
-      HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
+      HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
     else
-      HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
+      HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<> > >*)(macro_comm_halos.at(i).get())), polytopes_in_subset);
 
     Geometry::CellSubSet<Shape::Hypercube<2> >* cell_sub_set_fine(new Geometry::CellSubSet<Shape::Hypercube<2> >(polytopes_in_subset));
 
     if(macro_comm_halos.at(i)->get_level() == pl_vertex)
-      HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
+      HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
     else
-      HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
+      HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<> > >*)(macro_comm_halos.at(i).get())), *cell_sub_set_fine);
 
     BaseMeshType* macro_mesh_temp = new BaseMeshType(macro_mesh_geo);
 
@@ -394,9 +393,9 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   {
     Index* polytopes_in_subset = new Index[3];
 
-    HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), polytopes_in_subset);
+    HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), polytopes_in_subset);
     Geometry::CellSubSet<Shape::Hypercube<2> >* cell_sub_set_fine(new Geometry::CellSubSet<Shape::Hypercube<2> >(polytopes_in_subset));
-    HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), *cell_sub_set_fine);
+    HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<> > >*)(macro_boundaries_found.at(i).get())), *cell_sub_set_fine);
 
     BaseMeshType* macro_mesh_temp = new BaseMeshType(macro_mesh_geo);
 

@@ -25,18 +25,16 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_sizes(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<0, PLVertex, b_, c_>& halo, typename HaloType_<0, PLVertex, b_, c_>::index_type_* target)
         {
           if (halo.size() != 1)
             throw InternalError("Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
-          typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLVertex, b_, c_>::index_type_ IndexType;
           target[0] = IndexType(1);
           target[1] = IndexType(0);
         }
@@ -44,14 +42,12 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<1> >& target)
+        static void fill_target_set(const HaloType_<0, PLVertex, b_, c_>& halo, CellSubSet<Shape::Hypercube<1> >& target)
         {
           ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           target.template get_target_set<0>()[0] = halo.get_element(0);
@@ -61,18 +57,15 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<1> >& source, HaloType_<0, pl_vertex, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<1> >& source, HaloType_<0, PLVertex, b_, c_>& halo)
         {
           halo.get_elements().clear();
-          halo.get_element_counterparts().clear();
-          halo.add_element_pair(source.template get_target_set<0>()[0], source.template get_target_set<0>()[0]);
+          halo.push_back(source.template get_target_set<0>()[0]);
         }
 
         ///TODO remove these and move them to their actual dimension!
@@ -80,14 +73,12 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<0, PLVertex, b_, c_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
         {
           ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           target.template get_target_set<0>()[0] = halo.get_element(0);
@@ -97,32 +88,27 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<2> >& source, HaloType_<0, pl_vertex, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<2> >& source, HaloType_<0, PLVertex, b_, c_>& halo)
         {
           halo.get_elements().clear();
-          halo.get_element_counterparts().clear();
-          halo.add_element_pair(source.template get_target_set<0>()[0], source.template get_target_set<0>()[0]);
+          halo.push_back(source.template get_target_set<0>()[0]);
         }
 
         ///overload for Hypercube<3>
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, pl_edge, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLEdge, b_, c_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
         {
           ASSERT(halo.size() == 1, "Error: Halo with 0-overlap may not contain more than one vertex in 1D!");
           target.template get_target_set<1>()[0] = halo.get_element(0);
@@ -132,18 +118,15 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, pl_vertex, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, PLVertex, b_, c_>& halo)
         {
           halo.get_elements().clear();
-          halo.get_element_counterparts().clear();
-          halo.add_element_pair(source.template get_target_set<0>()[0], source.template get_target_set<0>()[0]);
+          halo.push_back(source.template get_target_set<0>()[0]);
         }
 
         ///delta = i case: in 1D, overlapping meshes have halos given in terms of edges
@@ -152,18 +135,16 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_sizes(const HaloType_<a_, pl_edge, b_, c_, d_>& halo, typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<a_, PLEdge, b_, c_>& halo, typename HaloType_<a_, PLEdge, b_, c_>::index_type_* target)
         {
           ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain edges in 1D!");
 
-          typedef typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLEdge, b_, c_>::index_type_ IndexType;
           target[0] = IndexType(halo.size() + 1);
           target[1] = IndexType(halo.size());
         }
@@ -172,23 +153,21 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<a_, pl_edge, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<1> >& target)
+        static void fill_target_set(const HaloType_<a_, PLEdge, b_, c_>& halo, CellSubSet<Shape::Hypercube<1> >& target)
         {
           ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain edges in 1D!");
 
-          typedef typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLEdge, b_, c_>::index_type_ IndexType;
 
           ///for any edge add vertices
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
-            typename HaloType_<a_, pl_edge, b_, c_, d_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
+            typename HaloType_<a_, PLEdge, b_, c_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh()->get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
 
             target.template get_target_set<1>()[i] = halo.get_element(i);
             for(IndexType j(0) ; j < adjacent_vertices.size() ; ++j)
@@ -204,21 +183,19 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<1> >& source, HaloType_<a_, pl_edge, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<1> >& source, HaloType_<a_, PLEdge, b_, c_>& halo)
         {
-          typedef typename HaloType_<a_, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLEdge, b_, c_>::index_type_ IndexType;
 
           Index size(source.template get_target_set<1>().get_num_entities());
 
           for(Index i(0) ; i < size ; ++i)
-            halo.add_element_pair(source.template get_target_set<1>()[i], source.template get_target_set<1>()[i]);
+            halo.push_back(source.template get_target_set<1>()[i]);
         }
 
     };
@@ -233,16 +210,14 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_sizes(const HaloType_<0, pl_edge, b_, c_, d_>& halo, typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<0, PLEdge, b_, c_>& halo, typename HaloType_<0, PLEdge, b_, c_>::index_type_* target)
         {
-          typedef typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLEdge, b_, c_>::index_type_ IndexType;
           target[0] = IndexType(halo.size()  + 1);
           target[1] = IndexType(halo.size());
           target[2] = IndexType(0);
@@ -251,21 +226,19 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, pl_edge, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<0, PLEdge, b_, c_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
         {
-          typedef typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLEdge, b_, c_>::index_type_ IndexType;
 
           ///for any edge add vertices
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
-            typename HaloType_<0, pl_edge, b_, c_, d_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
+            typename HaloType_<0, PLEdge, b_, c_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh()->get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
 
             target.template get_target_set<1>()[i] = halo.get_element(i);
             for(IndexType j(0) ; j < adjacent_vertices.size() ; ++j)
@@ -279,42 +252,38 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<2> >& source, HaloType_<0, pl_edge, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<2> >& source, HaloType_<0, PLEdge, b_, c_>& halo)
         {
-          typedef typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLEdge, b_, c_>::index_type_ IndexType;
 
           Index size(source.template get_target_set<1>().get_num_entities());
 
           for(Index i(0) ; i < size ; ++i)
-            halo.add_element_pair(source.template get_target_set<1>()[i], source.template get_target_set<1>()[i]);
+            halo.push_back(source.template get_target_set<1>()[i]);
         }
 
         ///overload for Hypercube<3>
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, pl_edge, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLEdge, b_, c_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
         {
-          typedef typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLEdge, b_, c_>::index_type_ IndexType;
 
           ///for any edge add vertices
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
-            typename HaloType_<0, pl_edge, b_, c_, d_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
+            typename HaloType_<0, PLEdge, b_, c_>::mesh_type_::storage_type_ adjacent_vertices(halo.get_mesh()->get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, halo.get_element(i)));
 
             target.template get_target_set<1>()[i] = halo.get_element(i);
             for(IndexType j(0) ; j < adjacent_vertices.size() ; ++j)
@@ -328,21 +297,19 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, pl_edge, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, PLEdge, b_, c_>& halo)
         {
-          typedef typename HaloType_<0, pl_edge, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLEdge, b_, c_>::index_type_ IndexType;
 
           Index size(source.template get_target_set<1>().get_num_entities());
 
           for(Index i(0) ; i < size ; ++i)
-            halo.add_element_pair(source.template get_target_set<1>()[i], source.template get_target_set<1>()[i]);
+            halo.push_back(source.template get_target_set<1>()[i]);
         }
 
         ///delta = 0 case: in 2D, zero-overlap halos can be given in terms of vertices (diagonal case)
@@ -350,16 +317,14 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_sizes(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<0, PLVertex, b_, c_>& halo, typename HaloType_<0, PLVertex, b_, c_>::index_type_* target)
         {
-          typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLVertex, b_, c_>::index_type_ IndexType;
           target[0] = IndexType(halo.size());
           target[1] = IndexType(0);
           target[2] = IndexType(0);
@@ -368,16 +333,14 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, pl_vertex, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<0, PLVertex, b_, c_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
         {
-          typedef typename HaloType_<0, pl_vertex, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLVertex, b_, c_>::index_type_ IndexType;
 
           ///add all vertices
           for(IndexType i(0) ; i < halo.size() ; ++i)
@@ -393,27 +356,25 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_sizes(const HaloType_<a_, pl_face, b_, c_, d_>& halo, typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<a_, PLFace, b_, c_>& halo, typename HaloType_<a_, PLFace, b_, c_>::index_type_* target)
         {
           ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain faces in 2D!");
 
-          typedef typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLFace, b_, c_>::index_type_ IndexType;
 
           IndexType num_edges(0);
           IndexType num_vertices(0);
-          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
+            typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh()->get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
@@ -437,7 +398,7 @@ namespace FEAST
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh()->get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
@@ -465,25 +426,23 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<a_, pl_face, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
+        static void fill_target_set(const HaloType_<a_, PLFace, b_, c_>& halo, CellSubSet<Shape::Hypercube<2> >& target)
         {
           ASSERT(a_ != 0, "Error: Halos with 0-overlap may not contain faces in 2D!");
 
-          typedef typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLFace, b_, c_>::index_type_ IndexType;
 
-          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
+            typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh()->get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
               bool already_in(false);
@@ -503,7 +462,7 @@ namespace FEAST
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<a_, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<a_, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh()->get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
               bool already_in(false);
@@ -539,21 +498,19 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<2> >& source, HaloType_<a_, pl_face, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<2> >& source, HaloType_<a_, PLFace, b_, c_>& halo)
         {
-          typedef typename HaloType_<a_, pl_face, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLFace, b_, c_>::index_type_ IndexType;
 
           Index size(source.template get_target_set<2>().get_num_entities());
 
           for(Index i(0) ; i < size ; ++i)
-            halo.add_element_pair(source.template get_target_set<2>()[i], source.template get_target_set<2>()[i]);
+            halo.push_back(source.template get_target_set<2>()[i]);
         }
     };
 
@@ -565,25 +522,23 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_sizes(const HaloType_<0, pl_face, b_, c_, d_>& halo, typename HaloType_<0, pl_face, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<0, PLFace, b_, c_>& halo, typename HaloType_<0, PLFace, b_, c_>::index_type_* target)
         {
-          typedef typename HaloType_<0, pl_face, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLFace, b_, c_>::index_type_ IndexType;
 
           IndexType num_edges(0);
           IndexType num_vertices(0);
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
+            typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh()->get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
@@ -607,7 +562,7 @@ namespace FEAST
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh()->get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
@@ -635,23 +590,21 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<0, pl_face, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<0, PLFace, b_, c_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
         {
-          typedef typename HaloType_<0, pl_face, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLFace, b_, c_>::index_type_ IndexType;
 
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
+            typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh()->get_adjacent_polytopes(pl_face, pl_edge, halo.get_element(i)));
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
               bool already_in(false);
@@ -671,7 +624,7 @@ namespace FEAST
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
             ///for any face count edges
-            typename HaloType_<0, pl_face, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<0, PLFace, b_, c_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh()->get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
               bool already_in(false);
@@ -706,21 +659,19 @@ namespace FEAST
         template<
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, pl_face, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<0, PLFace, b_, c_>& halo)
         {
-          typedef typename HaloType_<0, pl_face, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<0, PLFace, b_, c_>::index_type_ IndexType;
 
           Index size(source.template get_target_set<2>().get_num_entities());
 
           for(Index i(0) ; i < size ; ++i)
-            halo.add_element_pair(source.template get_target_set<2>()[i], source.template get_target_set<2>()[i]);
+            halo.push_back(source.template get_target_set<2>()[i]);
         }
 
         ///delta = i case: in 3D, halos with overlap = i can only be given by polyhedrons
@@ -729,26 +680,24 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_sizes(const HaloType_<a_, pl_polyhedron, b_, c_, d_>& halo, typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_* target)
+        static void fill_sizes(const HaloType_<a_, PLPolyhedron, b_, c_>& halo, typename HaloType_<a_, PLPolyhedron, b_, c_>::index_type_* target)
         {
-          typedef typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLPolyhedron, b_, c_>::index_type_ IndexType;
 
           IndexType num_faces(0);
           IndexType num_edges(0);
           IndexType num_vertices(0);
-          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_faces;
-          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ all_faces;
+          typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
-            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh().get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
+            typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh()->get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < faces.size() ; ++j)
             {
@@ -770,7 +719,7 @@ namespace FEAST
           ///for any face computed before, check edge and add if not yet added
           for(IndexType i(0) ; i < all_faces.size() ; ++i)
           {
-            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, all_faces.at(i)));
+            typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh()->get_adjacent_polytopes(pl_face, pl_edge, all_faces.at(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
@@ -792,7 +741,7 @@ namespace FEAST
           ///for any edge computed before, check vertex and add if not yet added
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
-            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh()->get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             IndexType count(0);
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
@@ -821,23 +770,21 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const HaloType_<a_, pl_polyhedron, b_, c_, d_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
+        static void fill_target_set(const HaloType_<a_, PLPolyhedron, b_, c_>& halo, CellSubSet<Shape::Hypercube<3> >& target)
         {
-          typedef typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLPolyhedron, b_, c_>::index_type_ IndexType;
 
-          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_faces;
-          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_edges;
-          typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ all_vertices;
+          typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ all_faces;
+          typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ all_edges;
+          typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ all_vertices;
           for(IndexType i(0) ; i < halo.size() ; ++i)
           {
-            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh().get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
+            typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ faces(halo.get_mesh()->get_adjacent_polytopes(pl_polyhedron, pl_face, halo.get_element(i)));
             for(IndexType j(0) ; j < faces.size() ; ++j)
             {
               bool already_in(false);
@@ -856,7 +803,7 @@ namespace FEAST
           ///for any face computed before, check edge and add if not yet added
           for(IndexType i(0) ; i < all_faces.size() ; ++i)
           {
-            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh().get_adjacent_polytopes(pl_face, pl_edge, all_faces.at(i)));
+            typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ edges(halo.get_mesh()->get_adjacent_polytopes(pl_face, pl_edge, all_faces.at(i)));
             for(IndexType j(0) ; j < edges.size() ; ++j)
             {
               bool already_in(false);
@@ -875,7 +822,7 @@ namespace FEAST
           ///for any edge computed before, check vertex and add if not yet added
           for(IndexType i(0) ; i < all_edges.size() ; ++i)
           {
-            typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh().get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
+            typename HaloType_<a_, PLPolyhedron, b_, c_>::mesh_type_::topology_type_::storage_type_ vertices(halo.get_mesh()->get_adjacent_polytopes(pl_edge, pl_vertex, all_edges.at(i)));
             for(IndexType j(0) ; j < vertices.size() ; ++j)
             {
               bool already_in(false);
@@ -915,21 +862,19 @@ namespace FEAST
           unsigned a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-            PolytopeLevels,
             typename,
-            template<typename, typename> class,
-            typename>
+            typename,
+            template<typename, typename> class>
           class HaloType_>
-        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<a_, pl_polyhedron, b_, c_, d_>& halo)
+        static void fill_target_set(const CellSubSet<Shape::Hypercube<3> >& source, HaloType_<a_, PLPolyhedron, b_, c_>& halo)
         {
-          typedef typename HaloType_<a_, pl_polyhedron, b_, c_, d_>::index_type_ IndexType;
+          typedef typename HaloType_<a_, PLPolyhedron, b_, c_>::index_type_ IndexType;
 
           Index size(source.template get_target_set<3>().get_num_entities());
 
           for(Index i(0) ; i < size ; ++i)
-            halo.add_element_pair(source.template get_target_set<3>()[i], source.template get_target_set<3>()[i]);
+            halo.push_back(source.template get_target_set<3>()[i]);
         }
     };
   }

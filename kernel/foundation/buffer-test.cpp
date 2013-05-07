@@ -9,13 +9,13 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 
-template<typename Tag_, typename DataType_>
+template<typename Tag_, typename DataType_, typename Algo_>
 class BufferTest:
-  public TaggedTest<Tag_, DataType_>
+  public TaggedTest<Tag_, DataType_, Algo_>
 {
   public:
     BufferTest(const std::string & tag) :
-      TaggedTest<Tag_, DataType_>("BufferTest<" + tag + ">")
+      TaggedTest<Tag_, DataType_, Algo_>("BufferTest<" + tag + ">")
     {
     }
 
@@ -40,4 +40,4 @@ class BufferTest:
         TEST_CHECK_EQUAL((*(Foundation::BufferedSharedArray<DataType_>*)((b.get().at(0).get())))[i], i);
     }
 };
-BufferTest<Archs::None, Index> buffer_test_cpu_ulong("ulong");
+BufferTest<Mem::Main, Index, Algo::Generic> buffer_test_cpu_ulong("Main, Generic, Index");

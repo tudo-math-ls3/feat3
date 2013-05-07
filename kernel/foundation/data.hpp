@@ -3,13 +3,55 @@
 #define KERNEL_FOUNDATION_DATA_HH 1
 
 #include<kernel/base_header.hpp>
+#include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/mesh.hpp>
+#include <kernel/foundation/sub_mesh.hpp>
 #include <kernel/foundation/halo.hpp>
 
 namespace FEAST
 {
   namespace Foundation
   {
+
+    template<
+      typename Dim_,
+      typename t_,
+      template <typename, typename> class os_,
+      template <typename, typename, template<typename, typename> class > class MeshType_,
+      typename DT_>
+    struct PData
+    {
+      PData() :
+        submesh(),
+        comm_halos(),
+        boundaries(),
+        attrs()
+      {
+      }
+
+      PData(const PData& other) :
+        submesh(other.submesh),
+        comm_halos(other.comm_halos),
+        boundaries(other.boundaries),
+        attrs(other.attrs)
+      {
+      }
+
+      PData& operator=(const PData& other)
+      {
+        this->submesh = other.submesh;
+        this->comm_halos = other.comm_halos;
+        this->boundaries = other.boundaries;
+        this->attrs = other.attrs;
+      }
+
+      std::shared_ptr<SubMesh<Dim_, t_, os_> > submesh;
+      os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> > > > comm_halos;
+      os_<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>, std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_> > > boundaries;
+      os_<std::shared_ptr<AttributeBase<os_> >, std::allocator<std::shared_ptr<AttributeBase<os_> > > > attrs;
+    };
+
+    //deprecated will be removed as of milestone 2
     template<typename MeshType_,
              typename HaloType_,
              typename TopologyType_,
@@ -22,7 +64,7 @@ namespace FEAST
         mesh_halo_map(TopologyType_()),
         hierachic_mesh_map(TopologyType_()),
         local_global_index_map(TopologyType_()),
-        functions_on_process_patch(typename MeshType_::attr_base_type_())
+        functions_on_process_patch()
       {
       }
 
@@ -31,7 +73,7 @@ namespace FEAST
       TopologyType_ mesh_halo_map;
       TopologyType_ hierachic_mesh_map;
       TopologyType_ local_global_index_map;
-      typename MeshType_::attr_base_type_ functions_on_process_patch;
+      std::vector<std::shared_ptr<Foundation::AttributeBase<> > > functions_on_process_patch;
     };
 
     struct SimpleDataFillPolicy
@@ -42,11 +84,10 @@ namespace FEAST
         //take exactly 1 XOR 4 processes and initialise the meshes and halos
         if(rank < 4 && rank >= 0)
         {
-          MeshType_ local_mesh(rank, &target.functions_on_process_patch); //hide attributes here for now
+          MeshType_ local_mesh(rank); //hide attributes here for now
           target.meshes_on_process_patch.push_back(local_mesh);
 
           target.functions_on_process_patch.push_back(std::shared_ptr<Foundation::AttributeBase<> >(new Foundation::Attribute<double>()));
-          Foundation::MeshAttributeRegistration::execute(target.meshes_on_process_patch.at(0), pl_vertex);
 
           //add vertices
           target.meshes_on_process_patch.at(0).add_polytope(Foundation::pl_vertex);
@@ -95,15 +136,15 @@ namespace FEAST
           if(rank == 0)
           {
             HaloType_ h1(target.meshes_on_process_patch.at(0), 1); //right
-            h1.add_element_pair(3, 2);
-            h1.add_element_pair(1, 0);
+            h1.push_back(3);
+            h1.push_back(1);
 
             HaloType_ h2(target.meshes_on_process_patch.at(0), 2); //down
-            h2.add_element_pair(0, 2);
-            h2.add_element_pair(1, 3);
+            h2.push_back(0);
+            h2.push_back(1);
 
             HaloType_ h3(target.meshes_on_process_patch.at(0), 3); //diag
-            h3.add_element_pair(1, 2);
+            h3.push_back(1);
 
             target.halos_on_process_patch.push_back(h1);
             target.halos_on_process_patch.push_back(h2);
@@ -117,15 +158,15 @@ namespace FEAST
           else if(rank == 1)
           {
             HaloType_ h1(target.meshes_on_process_patch.at(0), 0); //left
-            h1.add_element_pair(0, 1);
-            h1.add_element_pair(2, 3);
+            h1.push_back(0);
+            h1.push_back(2);
 
             HaloType_ h2(target.meshes_on_process_patch.at(0), 3); //down
-            h2.add_element_pair(0, 2);
-            h2.add_element_pair(1, 3);
+            h2.push_back(0);
+            h2.push_back(1);
 
             HaloType_ h3(target.meshes_on_process_patch.at(0), 2); //diag
-            h3.add_element_pair(0, 3);
+            h3.push_back(0);
 
             target.halos_on_process_patch.push_back(h1);
             target.halos_on_process_patch.push_back(h2);
@@ -139,15 +180,15 @@ namespace FEAST
           else if(rank == 2)
           {
             HaloType_ h1(target.meshes_on_process_patch.at(0), 0); //up
-            h1.add_element_pair(2, 0);
-            h1.add_element_pair(3, 1);
+            h1.push_back(2);
+            h1.push_back(3);
 
             HaloType_ h2(target.meshes_on_process_patch.at(0), 3); //right
-            h2.add_element_pair(1, 0);
-            h2.add_element_pair(3, 2);
+            h2.push_back(1);
+            h2.push_back(3);
 
             HaloType_ h3(target.meshes_on_process_patch.at(0), 1); //diag
-            h3.add_element_pair(3, 0);
+            h3.push_back(3);
 
             target.halos_on_process_patch.push_back(h1);
             target.halos_on_process_patch.push_back(h2);
@@ -161,15 +202,15 @@ namespace FEAST
           else if(rank == 3)
           {
             HaloType_ h1(target.meshes_on_process_patch.at(0), 1); //up
-            h1.add_element_pair(2, 0);
-            h1.add_element_pair(3, 1);
+            h1.push_back(2);
+            h1.push_back(3);
 
             HaloType_ h2(target.meshes_on_process_patch.at(0), 2); //left
-            h2.add_element_pair(0, 1);
-            h2.add_element_pair(2, 3);
+            h2.push_back(0);
+            h2.push_back(2);
 
             HaloType_ h3(target.meshes_on_process_patch.at(0), 0); //diag
-            h3.add_element_pair(2, 1);
+            h3.push_back(2);
 
             target.halos_on_process_patch.push_back(h1);
             target.halos_on_process_patch.push_back(h2);

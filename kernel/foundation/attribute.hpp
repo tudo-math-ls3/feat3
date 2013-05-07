@@ -87,7 +87,7 @@ namespace FEAST
           return _data.at(i);
         }
 
-        DataType_& at(const Index i) const
+        const DataType_& at(const Index i) const
         {
           return _data.at(i);
         }

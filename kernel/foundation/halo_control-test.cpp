@@ -16,13 +16,13 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest1D:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     HaloControlTest1D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("HaloControlTest1D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("HaloControlTest1D<" + tag + ">")
     {
     }
 
@@ -45,8 +45,7 @@ class HaloControlTest1D:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
 
       m.add_polytope(Foundation::pl_vertex);
       m.add_polytope(Foundation::pl_vertex);
@@ -76,13 +75,13 @@ class HaloControlTest1D:
       }
 
       typename confmeshtype_::VertexSetType& vertex_coord_tuples(geo_m.get_vertex_set());
-      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node
-      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(1);
+      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(0); //xcoord of first node
+      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(1);
 
       //-------------------------------------
       //create halo with one vertex-vertex pair
-      Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
-      h.add_element_pair(1, 0);
+      Foundation::Halo<0, PLVertex, Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
+      h.push_back(1);
 
       //create CellSubSet
       Index* polytopes_in_subset = new Index[2]; //no overlap and one vertex means one vertex
@@ -98,8 +97,8 @@ class HaloControlTest1D:
       //-------------------------------------
 
       //create halo with one edge-edge pair
-      Foundation::Halo<1, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
-      h1.add_element_pair(0, 0);
+      Foundation::Halo<1, PLEdge, Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
+      h1.push_back(0);
 
       Index* polytopes_in_subset1 = new Index[2]; //overlap 1 and one edge means 2 vertices
       Foundation::HaloControl<Foundation::dim_1D>::fill_sizes(h1, polytopes_in_subset1);
@@ -116,11 +115,11 @@ class HaloControlTest1D:
       //-------------------------------------
 
       ///check reverse
-      Foundation::Halo<0, Foundation::pl_vertex, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h2(m, 1);
+      Foundation::Halo<0, PLVertex, Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_> > > h2(m, 1);
       HaloControl<Foundation::dim_1D>::fill_target_set(cell_sub_set, h2);
       TEST_CHECK_EQUAL(h2.get_element(0), h.get_element(0));
 
-      Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > > h3(m, 1);
+      Foundation::Halo<0, PLEdge, Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_> > > h3(m, 1);
       HaloControl<Foundation::dim_1D>::fill_target_set(cell_sub_set1, h3);
       TEST_CHECK_EQUAL(h3.get_element(0), h1.get_element(0));
 
@@ -128,18 +127,18 @@ class HaloControlTest1D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest1D<Archs::None, Index, std::vector, std::vector<Index> > halocontrol1d_testvv("std::vector, std::vector");
-HaloControlTest1D<Archs::None, Index, std::vector, std::deque<Index> > halocontrol1d_testvd("std::vector, std::deque");
+HaloControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halocontrol1d_testvv("std::vector, std::vector");
+HaloControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halocontrol1d_testvd("std::vector, std::deque");
 
 
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest2D:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     HaloControlTest2D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("HaloControlTest2D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("HaloControlTest2D<" + tag + ">")
     {
     }
 
@@ -179,9 +178,7 @@ class HaloControlTest2D:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
 
       m.add_polytope(Foundation::pl_vertex);
       m.add_polytope(Foundation::pl_vertex);
@@ -244,19 +241,19 @@ class HaloControlTest2D:
       }
 
       typename confmeshtype_::VertexSetType& vertex_coord_tuples(geo_m.get_vertex_set());
-      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node
-      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(0); //ycoord of first node
-      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(1);
-      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(1);
-      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(2);
-      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(2);
-      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(3);
-      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(3);
+      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(0); //xcoord of first node
+      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(0); //ycoord of first node
+      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(1);
+      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(1);
+      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(2);
+      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(2);
+      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(3);
+      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(3);
 
       //-----------------------------------------
       //create halo with one edge-edge pair
-      Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
-      h.add_element_pair(3, 2);
+      Foundation::Halo<0, PLEdge, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
+      h.push_back(3);
 
       //create CellSubSet
       Index* polytopes_in_subset = new Index[3]; //no overlap and one edge means two vertices but no faces
@@ -275,8 +272,8 @@ class HaloControlTest2D:
 
       //-----------------------------------------
       //create halo with one face-face pair
-      Foundation::Halo<1, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
-      h1.add_element_pair(0, 0);
+      Foundation::Halo<1, PLFace, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
+      h1.push_back(0);
 
       Index* polytopes_in_subset1 = new Index[3]; //overlap 1 and one face means 4 vertices and 4 edges
       Foundation::HaloControl<Foundation::dim_2D>::fill_sizes(h1, polytopes_in_subset1);
@@ -303,11 +300,11 @@ class HaloControlTest2D:
       //-----------------------------------------
 
       ///check reverse
-      Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h2(m, 1);
+      Foundation::Halo<0, PLEdge, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h2(m, 1);
       HaloControl<Foundation::dim_2D>::fill_target_set(cell_sub_set, h2);
       TEST_CHECK_EQUAL(h2.get_element(0), h.get_element(0));
 
-      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h3(m, 1);
+      Foundation::Halo<0, PLFace, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h3(m, 1);
       HaloControl<Foundation::dim_2D>::fill_target_set(cell_sub_set1, h3);
       TEST_CHECK_EQUAL(h3.get_element(0), h1.get_element(0));
 
@@ -315,16 +312,16 @@ class HaloControlTest2D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest2D<Archs::None, Index, std::vector, std::vector<Index> > halocontrol_testvv("std::vector, std::vector");
-HaloControlTest2D<Archs::None, Index, std::vector, std::deque<Index> > halocontrol_testvd("std::vector, std::deque");
+HaloControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halocontrol_testvv("std::vector, std::vector");
+HaloControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halocontrol_testvd("std::vector, std::deque");
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest3D:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     HaloControlTest3D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("HaloControlTest3D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("HaloControlTest3D<" + tag + ">")
     {
     }
 
@@ -393,10 +390,7 @@ class HaloControlTest3D:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
 
       m.add_polytope(Foundation::pl_vertex);
       m.add_polytope(Foundation::pl_vertex);
@@ -561,38 +555,38 @@ class HaloControlTest3D:
       }
 
       typename confmeshtype_::VertexSetType& vertex_coord_tuples(geo_m.get_vertex_set());
-      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node
-      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(0); //ycoord of first node
-      vertex_coord_tuples[0][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(0); //zcoord of first node
-      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(1);
-      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(1);
-      vertex_coord_tuples[1][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(1);
-      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(2);
-      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(2);
-      vertex_coord_tuples[2][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(2);
-      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(3);
-      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(3);
-      vertex_coord_tuples[3][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(3);
-      vertex_coord_tuples[4][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(4);
-      vertex_coord_tuples[4][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(4);
-      vertex_coord_tuples[4][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(4);
-      vertex_coord_tuples[5][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(5);
-      vertex_coord_tuples[5][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(5);
-      vertex_coord_tuples[5][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(5);
-      vertex_coord_tuples[6][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(6);
-      vertex_coord_tuples[6][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(6);
-      vertex_coord_tuples[6][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(6);
-      vertex_coord_tuples[7][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(7);
-      vertex_coord_tuples[7][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(7);
-      vertex_coord_tuples[7][2] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(2).get()))->get_data().at(7);
+      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(0); //xcoord of first node
+      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(0); //ycoord of first node
+      vertex_coord_tuples[0][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(0); //zcoord of first node
+      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(1);
+      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(1);
+      vertex_coord_tuples[1][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(1);
+      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(2);
+      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(2);
+      vertex_coord_tuples[2][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(2);
+      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(3);
+      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(3);
+      vertex_coord_tuples[3][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(3);
+      vertex_coord_tuples[4][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(4);
+      vertex_coord_tuples[4][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(4);
+      vertex_coord_tuples[4][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(4);
+      vertex_coord_tuples[5][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(5);
+      vertex_coord_tuples[5][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(5);
+      vertex_coord_tuples[5][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(5);
+      vertex_coord_tuples[6][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(6);
+      vertex_coord_tuples[6][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(6);
+      vertex_coord_tuples[6][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(6);
+      vertex_coord_tuples[7][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(7);
+      vertex_coord_tuples[7][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(7);
+      vertex_coord_tuples[7][2] = ((Foundation::Attribute<double, OT_>*)(attrs.at(2).get()))->get_data().at(7);
 
 
       //create halo with one face-face pair
-      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
-      h.add_element_pair(2, 3);
+      Foundation::Halo<0, PLFace, Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, IndexType_(1));
+      h.push_back(IndexType_(2));
 
       //create CellSubSet
-      Index* polytopes_in_subset = new Index[4]; //no overlap and one face means four vertices and four edges
+      IndexType_* polytopes_in_subset = new IndexType_[4]; //no overlap and one face means four vertices and four edges
       Foundation::HaloControl<Foundation::dim_3D>::fill_sizes(h, polytopes_in_subset);
 
       TEST_CHECK_EQUAL(polytopes_in_subset[0], Index(4));
@@ -616,8 +610,8 @@ class HaloControlTest3D:
       TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<2>()[0], 2ul);
 
       //create halo with one poly-poly pair
-      Foundation::Halo<1, Foundation::pl_polyhedron, Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
-      h1.add_element_pair(0, 0);
+      Foundation::Halo<1, PLPolyhedron, Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_> > > h1(m, 1);
+      h1.push_back(0);
 
       Index* polytopes_in_subset1 = new Index[4]; //overlap 1 and one face means 4 vertices and 4 edges
       Foundation::HaloControl<Foundation::dim_3D>::fill_sizes(h1, polytopes_in_subset1);
@@ -662,11 +656,11 @@ class HaloControlTest3D:
       TEST_CHECK_EQUAL(cell_sub_set1.template get_target_set<3>()[0], 0ul);
 
       ///check reverse
-      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > > h2(m, 1);
+      Foundation::Halo<0, PLFace, Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_> > > h2(m, 1);
       HaloControl<Foundation::dim_3D>::fill_target_set(cell_sub_set, h2);
       TEST_CHECK_EQUAL(h2.get_element(0), h.get_element(0));
 
-      Foundation::Halo<0, Foundation::pl_polyhedron, Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > > h3(m, 1);
+      Foundation::Halo<0, PLPolyhedron, Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_> > > h3(m, 1);
       HaloControl<Foundation::dim_3D>::fill_target_set(cell_sub_set1, h3);
       TEST_CHECK_EQUAL(h3.get_element(0), h1.get_element(0));
 
@@ -674,5 +668,5 @@ class HaloControlTest3D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest3D<Archs::None, Index, std::vector, std::vector<Index> > halocontrol3d_testvv("std::vector, std::vector");
-HaloControlTest3D<Archs::None, Index, std::vector, std::deque<Index> > halocontrol3d_testvd("std::vector, std::deque");
+HaloControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halocontrol3d_testvv("std::vector, std::vector");
+HaloControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halocontrol3d_testvd("std::vector, std::deque");

@@ -304,16 +304,16 @@ void check_halo_transfer(int rank)
   if(rank < 2)
   {
     Mesh<> m(rank);
-    Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
-    h.add_element_pair(rank, rank);
+    Halo<0, PLFace, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.push_back(rank);
 
     //halo at rank 1 is bigger
     if(rank == 1)
-      h.add_element_pair(rank, rank);
+      h.push_back(rank);
 
 
-    Halo<0, pl_face, Mesh<> >::buffer_type_ sendbuf(h.buffer());
-    Halo<0, pl_face, Mesh<> >::buffer_type_ recvbuf(h.buffer(1));
+    Halo<0, PLFace, Mesh<> >::buffer_type_ sendbuf(h.buffer());
+    Halo<0, PLFace, Mesh<> >::buffer_type_ recvbuf(h.buffer(1));
 
     h.to_buffer(sendbuf);
 
@@ -328,15 +328,13 @@ void check_halo_transfer(int rank)
     bool passed(true);
 #ifndef SERIAL
     //TestResult<Index> res[rank == 0 ? 4 : 2];
-    TestResult<Index> res[4];
+    TestResult<Index> res[2];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
-    res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank == 0 ? Index(1) : Index(0), Index(1));
     if(rank == 0) //rank 0 receives more from rank 1
     {
-      res[2] = test_check_equal_within_eps(h.get_element(1), Index(1), Index(1));
-      res[3] = test_check_equal_within_eps(h.get_element_counterpart(1), Index(1), Index(1));
+      res[1] = test_check_equal_within_eps(h.get_element(1), Index(1), Index(1));
     }
-    for(unsigned long i(0) ; i < (rank == 0 ? 4 : 2) ; ++i)
+    for(unsigned long i(0) ; i < (rank == 0 ? 1 : 0) ; ++i)
       if(!res[i].passed)
       {
         std::cout << "FAILED: (rank " << rank << "): " <<  res[i].left << " not within range (eps = " << res[i].epsilon << ") of " << res[i].right << "!" << std::endl;
@@ -347,9 +345,8 @@ void check_halo_transfer(int rank)
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: halo_transfer)" << std::endl;
 #else
-    TestResult<Index> res[2];
+    TestResult<Index> res[1];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank, Index(1));
-    res[1] = test_check_equal_within_eps(h.get_element_counterpart(0), rank, Index(1));
     for(unsigned long i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
       {
@@ -501,7 +498,7 @@ void check_mesh_transfer(int rank)
 {
   if(rank < 2)
   {
-    Foundation::Mesh<Foundation::rnt_2D> m(0);
+    Foundation::Mesh<Dim2D> m(0);
 
     //add vertices
     m.add_polytope(Foundation::pl_vertex);
@@ -595,9 +592,9 @@ void check_halobased_attribute_transfer(int rank)
     attr.at(100) = double(47 + rank);
 
     Mesh<> m(rank);
-    Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
-    h.add_element_pair(10, 999);
-    h.add_element_pair(100, 999);
+    Halo<0, PLFace, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.push_back(10);
+    h.push_back(100);
 
     InterfacedComm<Mem::Main, com_exchange>::execute(h, attr);
 
@@ -636,9 +633,9 @@ void check_halobased_dv_transfer(int rank)
     attr(100, double(47 + rank));
 
     Mesh<> m(rank);
-    Halo<0, pl_face, Mesh<> > h(m, rank == 0 ? 1 : 0);
-    h.add_element_pair(10, 999);
-    h.add_element_pair(100, 999);
+    Halo<0, PLFace, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.push_back(10);
+    h.push_back(100);
 
     InterfacedComm<Mem::Main, com_exchange>::execute(h, attr);
 
@@ -677,9 +674,9 @@ void check_halobased_smcsr_transfer(int rank)
     SparseMatrixCSR<Mem::Main, float> smcsr(smcoo);
 
     Mesh<> m(rank);
-    Halo<0, pl_vertex, Mesh<> > h(m, rank == 0 ? 1 : 0);
-    h.add_element_pair(0, 999);
-    h.add_element_pair(1, 999);
+    Halo<0, PLVertex, Mesh<> > h(m, rank == 0 ? 1 : 0);
+    h.push_back(0);
+    h.push_back(1);
 
     InterfacedComm<Mem::Main, com_exchange>::execute(h, smcsr);
 

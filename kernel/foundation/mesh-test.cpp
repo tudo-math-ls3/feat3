@@ -1,7 +1,7 @@
 #include <kernel/base_header.hpp>
-#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
+#include<kernel/foundation/attribute.hpp>
 #include<kernel/foundation/mesh.hpp>
 #include<kernel/foundation/topology.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
@@ -13,14 +13,15 @@
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
+using namespace FEAST::Foundation;
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshTestAttr:
-public TaggedTest<Tag_, IndexType_>
+public TaggedTest<Tag_, IndexType_, Algo_>
 {
 public:
   MeshTestAttr(const std::string & tag) :
-    TaggedTest<Tag_, IndexType_>("MeshTestAttr<" + tag + ">")
+    TaggedTest<Tag_, IndexType_, Algo_>("MeshTestAttr<" + tag + ">")
   {
   }
 
@@ -34,18 +35,17 @@ public:
     //basic tests
     Foundation::Mesh<> m(0);
 
-    Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m2(1);
+    Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m2(1);
 
     TEST_CHECK_EQUAL(m.get_num_levels(), 3ul);
     TEST_CHECK_EQUAL(m2.get_num_levels(), 3ul);
     //##################################################################
 
-    Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
+    Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(2);
     typedef typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ TopologyStorageType;
 
     //configure attribute
     Foundation::Attribute<double, std::vector> attr;
-    Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
     //add vertices
     m3.add_polytope(Foundation::pl_vertex);
     m3.add_polytope(Foundation::pl_vertex);
@@ -525,7 +525,7 @@ public:
     //testing copy-ctor
     try
     {
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(3, m3);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(3, m3);
     }
     catch(std::exception e)
     {
@@ -534,21 +534,19 @@ public:
     return true;
   }
 };
-MeshTestAttr<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_cpu_v_v("std::vector, std::vector");
-#ifdef DEBUG
-MeshTestAttr<Archs::None, Index, std::deque, std::vector<Index> > mesh_test_cpu_d_v("std::deque, std::vector");
-MeshTestAttr<Archs::None, Index, std::vector, std::deque<Index> > mesh_test_cpu_v_d("std::vector, std::deque");
-MeshTestAttr<Archs::None, Index, std::deque, std::deque<Index> > mesh_test_cpu_d_d("std::deque, std::deque");
-#endif
-//MeshTestAttr<Mem::Main, Index, std::vector, Foundation::DenseDataWrapper<100, Mem::Main, Index, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: ddw needs erase(i) member
+MeshTestAttr<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mesh_test_cpu_v_v("std::vector, std::vector");
+MeshTestAttr<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > mesh_test_cpu_d_v("std::deque, std::vector");
+MeshTestAttr<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mesh_test_cpu_v_d("std::vector, std::deque");
+MeshTestAttr<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > mesh_test_cpu_d_d("std::deque, std::deque");
+//MeshTestAttr<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Mem::Main, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: ddw needs erase(i) member
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshTestHistory:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     MeshTestHistory(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshTestHistory<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("MeshTestHistory<" + tag + ">")
     {
     }
 
@@ -559,7 +557,7 @@ class MeshTestHistory:
 
     bool test() const
     {
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
       typedef typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ TopologyStorageType;
 
       //add vertices
@@ -662,15 +660,15 @@ class MeshTestHistory:
       return true;
     }
 };
-MeshTestHistory<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_his_cpu_v_v("std::vector, std::vector");
+MeshTestHistory<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mesh_test_his_cpu_v_v("std::vector, std::vector");
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshTestGeometryInterface:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     MeshTestGeometryInterface(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshTestGeometryInterface<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("MeshTestGeometryInterface<" + tag + ">")
     {
     }
 
@@ -717,9 +715,7 @@ class MeshTestGeometryInterface:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
 
       m.add_polytope(Foundation::pl_vertex);
       m.add_polytope(Foundation::pl_vertex);
@@ -795,14 +791,14 @@ class MeshTestGeometryInterface:
       if(geo_vertex_at_face[0][3] != 3u) return false;
 
       typename confmeshtype_::VertexSetType& vertex_coord_tuples(geo_m.get_vertex_set());
-      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node
-      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(0); //ycoord of first node
-      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(1);
-      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(1);
-      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(2);
-      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(2);
-      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(3);
-      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(3);
+      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(0); //xcoord of first node
+      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(0); //ycoord of first node
+      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(1);
+      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(1);
+      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(2);
+      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(2);
+      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(3);
+      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(3);
 
       if(vertex_coord_tuples[0][0] != 0.0) return false;
       if(vertex_coord_tuples[0][1] != 0.0) return false;
@@ -816,92 +812,5 @@ class MeshTestGeometryInterface:
       return true;
     }
 };
-MeshTestGeometryInterface<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
-MeshTestGeometryInterface<Archs::None, Index, std::vector, std::deque<Index> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");
-
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
-class MeshTestCommInterface:
-  public TaggedTest<Tag_, IndexType_>
-{
-  public:
-    MeshTestCommInterface(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshTestCommInterface<" + tag + ">")
-    {
-    }
-
-    void run() const
-    {
-      TEST_CHECK_MSG(test(), "Test Failed");
-    }
-
-    bool test() const
-    {
-      Foundation::Mesh<Foundation::rnt_2D> m(0);
-
-      //add vertices
-      m.add_polytope(Foundation::pl_vertex);
-      m.add_polytope(Foundation::pl_vertex);
-      m.add_polytope(Foundation::pl_vertex);
-      m.add_polytope(Foundation::pl_vertex);
-      m.add_polytope(Foundation::pl_vertex);
-      m.add_polytope(Foundation::pl_vertex);
-
-      //add edges
-      m.add_polytope(Foundation::pl_edge);
-      m.add_polytope(Foundation::pl_edge);
-      m.add_polytope(Foundation::pl_edge);
-      m.add_polytope(Foundation::pl_edge);
-      m.add_polytope(Foundation::pl_edge);
-      m.add_polytope(Foundation::pl_edge);
-      m.add_polytope(Foundation::pl_edge);
-
-      //add faces
-      m.add_polytope(Foundation::pl_face);
-      m.add_polytope(Foundation::pl_face);
-
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 0); //v->e is set automagically
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 0, 1);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 1);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 1, 2);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 0);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 2, 3);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 1);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 3, 4);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 2);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 4, 5);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 3);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 5, 4);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 4);
-      m.add_adjacency(Foundation::pl_edge, Foundation::pl_vertex, 6, 5);
-
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 0); //v->f is set automagically
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 1); //v->f is set automagically
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 3); //v->f is set automagically
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 0, 4); //v->f is set automagically
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 1); //v->f is set automagically
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 2); //v->f is set automagically
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 4); //v->f is set automagically
-      m.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
-
-      m.send_recv(m.get_topologies(), 0, 0);
-
-      if(!(m.get_topologies().at(Foundation::ipi_vertex_edge).size() == Index(6))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_vertex_face).size() == Index(6))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_face_vertex).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).size() == Index(7))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(0).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(1).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(2).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(3).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(4).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(5).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_edge_vertex).at(6).size() == Index(2))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_face_vertex).at(0).size() == Index(4))) return false;
-      if(!(m.get_topologies().at(Foundation::ipi_face_vertex).at(1).size() == Index(4))) return false;
-
-      return true;
-    }
-};
-MeshTestCommInterface<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_comminter_cpu_v_v("std::vector, std::vector");
-MeshTestCommInterface<Archs::None, Index, std::vector, std::deque<Index> > mesh_test_comminter_cpu_v_d("std::vector, std::deque");
-#endif // SERIAL
+MeshTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
+MeshTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");

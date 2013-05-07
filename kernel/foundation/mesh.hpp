@@ -1,11 +1,10 @@
 #pragma once
-#ifndef KERNEL_FOUNDATION_MESH_HH
-#define KERNEL_FOUNDATION_MESH_HH 1
+#ifndef KERNEL_FOUNDATION_MESH_HPP
+#define KERNEL_FOUNDATION_MESH_HPP 1
 
 #include <kernel/foundation/base.hpp>
 #include <kernel/foundation/topology.hpp>
 #include <kernel/foundation/mesh_error.hpp>
-#include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/buffer.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <iostream>
@@ -15,45 +14,6 @@ namespace FEAST
 {
   namespace Foundation
   {
-    /**
-     * \brief Attribute registration operation wrapper class template
-     *
-     * \author Markus Geveler
-     */
-    class MeshAttributeRegistration
-    {
-      public:
-        /**
-         * \brief member function executes a registration of an attribute with a mesh
-         *
-         * \param[in] mesh
-         * target mesh reference
-         *
-         * \param[in] polytope_level
-         * polytope level associated with the attribute
-         */
-        template<typename MeshType_>
-        static unsigned execute(MeshType_ & mesh, const unsigned polytope_level)
-        {
-          mesh._attribute_polytopelevel_relations.push_back(polytope_level);
-
-          ++mesh._num_attributes;
-          return mesh._num_attributes - 1;
-        }
-    };
-
-    /**
-     * \brief Required number of topologies for given number of spatial dimensions
-     *
-     * \author Markus Geveler
-     */
-    enum RequiredNumTopologies
-    {
-      rnt_1D = 2,
-      rnt_2D = 4,
-      rnt_3D = 6
-    };
-
     /**
      * \brief Indices of the stored polytopelevel-to-polytopelevel topologies
      *
@@ -82,7 +42,8 @@ namespace FEAST
       ipa_vertex_polyhedron = 4,
       ipa_edge_any = 1,
       ipa_face_any = 3,
-      ipa_polyhedron_any = 5
+      ipa_polyhedron_any = 5,
+      ipa_none = 6
     };
 
     /**
@@ -113,63 +74,44 @@ namespace FEAST
      * \tparam OuterStorageType_
      * STL conformal container template type storing the topologies
      *
-     * \tparam AttributeStorageType_
-     * STL conformal container template type storing the attributes' data
-     *
-     * \tparam OuterAttributeStorageType_
-     * STL conformal container template type storing the attributes
-     *
      * \author Markus Geveler
      */
     template<
-      RequiredNumTopologies i_ = rnt_2D,
+      typename Dim_ = Dim2D,
       typename TopologyType_ = Topology<>,
-      template <typename, typename> class OuterStorageType_ = std::vector,
-      template <typename, typename> class AttributeStorageType_ = std::vector,
-      template <typename, typename> class OuterAttributeStorageType_ = std::vector
+      template <typename, typename> class OuterStorageType_ = std::vector
       >
     class Mesh :
       public CommunicateableByAggregates<TopologyType_, com_send_receive>
     {
       public:
-        friend class MeshAttributeRegistration;
-
         ///type exports
         typedef TopologyType_ topology_type_;
         typedef typename TopologyType_::index_type_ index_type_;
         typedef typename TopologyType_::storage_type_ storage_type_;
         typedef typename TopologyType_::buffer_type_ buffer_type_;
 
-        typedef OuterAttributeStorageType_<
-          std::shared_ptr<AttributeBase<AttributeStorageType_> >, std::allocator<std::shared_ptr<AttributeBase<AttributeStorageType_> > > > attr_base_type_;
-
         ///CTOR
-        Mesh(const typename TopologyType_::index_type_ id, attr_base_type_* attrbase = nullptr, const typename TopologyType_::index_type_ pp_rank = 0, const typename TopologyType_::index_type_ mp_rank = 0) :
+        Mesh(const typename TopologyType_::index_type_ id = 0, const typename TopologyType_::index_type_ pp_rank = 0, const typename TopologyType_::index_type_ mp_rank = 0) :
           _id(id),
           _pp_rank(pp_rank),
           _mp_rank(mp_rank),
-          _num_inter_topologies(i_),
-          _num_levels((unsigned)(i_/2u) + 1u),
-          _topologies(i_),
-          _history(true),
-          _attrs(attrbase),
-          _num_attributes(0),
-          _attribute_polytopelevel_relations()
+          _num_inter_topologies(Dim_::required_num_topologies),
+          _num_levels((unsigned)(Dim_::required_num_topologies/2u) + 1u),
+          _topologies(Dim_::required_num_topologies),
+          _history(true)
         {
         }
 
         ///Copy CTOR
-        Mesh(const typename TopologyType_::index_type_ new_id, Mesh & other, attr_base_type_* attrbase = nullptr) :
+        Mesh(const typename TopologyType_::index_type_ new_id, Mesh& other) :
           _id(new_id),
           _pp_rank(other._pp_rank),
           _mp_rank(other._mp_rank),
           _num_inter_topologies(other._num_inter_topologies),
           _num_levels(other._num_levels),
           _topologies(other._topologies),
-          _history(),
-          _attrs(attrbase),
-          _num_attributes(0),
-          _attribute_polytopelevel_relations(other._attribute_polytopelevel_relations)
+          _history()
         {
         }
 
@@ -187,9 +129,6 @@ namespace FEAST
           this-> _num_levels = rhs._num_levels;
           this-> _topologies = rhs._topologies;
           this-> _history = rhs._history;
-          this-> _attrs = rhs._attrs;
-          this-> _num_attributes = rhs._num_attributes;
-          this-> _attribute_polytopelevel_relations = rhs._attribute_polytopelevel_relations;
 
           return *this;
         }
@@ -263,6 +202,10 @@ namespace FEAST
                   _history.add_functor(_topologies.at(ipi_polyhedron_vertex).get_history().get_functors().at(_topologies.at(ipi_polyhedron_vertex).get_history().size() - 1));
               }
               break;
+
+            default:
+              {
+              }
           }
         }
 
@@ -344,6 +287,9 @@ namespace FEAST
                                                                      index_type_ i) const
         {
           CONTEXT("When calculating adjacent polytopes in Mesh<>");
+
+          if(from_level == pl_none || to_level == pl_none)
+            return typename TopologyType_::storage_type_();
 
 #ifdef FOUNDATION_DEBUG
           if(from_level + 1 > _num_levels)
@@ -454,17 +400,6 @@ namespace FEAST
         }
 
         ///Further needed access functions
-        unsigned get_num_attributes()
-        {
-          return _num_attributes;
-        }
-
-
-        typename TopologyType_::storage_type_ & get_attribute_polytopelevel_relations()
-        {
-          return _attribute_polytopelevel_relations;
-        }
-
         typename TopologyType_::index_type_ get_id()
         {
           return _id;
@@ -488,11 +423,6 @@ namespace FEAST
         void set_mp_rank(typename TopologyType_::index_type_ rank)
         {
           _mp_rank = rank;
-        }
-
-        attr_base_type_* get_attributes()
-        {
-          return _attrs;
         }
 
         /**
@@ -533,7 +463,7 @@ namespace FEAST
 
           _history.get_functors().clear();
 
-          for(index_type_ i(0) ; i < i_ ; ++i)
+          for(index_type_ i(0) ; i < Dim_::required_num_topologies ; ++i)
             _topologies.at(i).get_topology().clear();
 
           return _history;
@@ -571,6 +501,25 @@ namespace FEAST
           return _history;
         }
 
+        const index_type_ num_polytopes(PolytopeLevels level) const
+        {
+          switch(level)
+          {
+            case pl_vertex:
+              return _topologies.at(ipi_vertex_edge).size();
+            case pl_edge:
+              return _topologies.at(ipi_edge_vertex).size();
+            case pl_face:
+              return _topologies.at(ipi_face_vertex).size();
+            case pl_polyhedron:
+              return _topologies.at(ipi_polyhedron_vertex).size();
+            default:
+              return 0;
+          }
+          return 0;
+        }
+
+
       private:
         typename TopologyType_::index_type_ _id;
         typename TopologyType_::index_type_ _pp_rank;
@@ -580,12 +529,6 @@ namespace FEAST
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
         CompoundFunctor<OuterStorageType_> _history;
-
-        attr_base_type_* _attrs;
-
-        unsigned _num_attributes;
-
-        typename TopologyType_::storage_type_ _attribute_polytopelevel_relations;
 
         inline unsigned _level_difference(const unsigned from, const unsigned to)
         {
@@ -623,6 +566,11 @@ namespace FEAST
                       return ipa_vertex_polyhedron;
                     }
                     break;
+
+                  default:
+                    {
+                      return ipa_none;
+                    }
                 }
               }
               break;
@@ -642,6 +590,11 @@ namespace FEAST
             case pl_polyhedron:
               {
                 return ipa_polyhedron_any;
+              }
+
+            default:
+              {
+                return ipa_none;
               }
           }
 

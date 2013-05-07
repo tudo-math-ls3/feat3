@@ -380,18 +380,16 @@ namespace FEAST
         ///implementation for Foundation datastructures (Attribute<.>)
         template<
           unsigned delta_,
-          PolytopeLevels a_,
+          typename a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-                   PolytopeLevels,
                    typename,
-                   template<typename, typename> class,
-                   typename>
+                   typename,
+                   template<typename, typename> class>
            class HaloType_,
            typename AT_>
-         static void execute(const HaloType_<delta_, a_, b_, c_, d_>& interface, AT_& fct)
+         static void execute(const HaloType_<delta_, a_, b_, c_>& interface, AT_& fct)
          {
            //acquire buffers
            std::shared_ptr<SharedArrayBase > sendbuf(BufferedSharedArray<typename AT_::data_type_>::create(interface.size()));
@@ -432,18 +430,16 @@ namespace FEAST
         ///implementation for lafem dv
         template<
           unsigned delta_,
-          PolytopeLevels a_,
+          typename a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-                   PolytopeLevels,
                    typename,
-                   template<typename, typename> class,
-                   typename>
+                   typename,
+                   template<typename, typename> class>
            class HaloType_,
            typename DT_>
-         static void execute(const HaloType_<delta_, a_, b_, c_, d_>& interface, DenseVector<ContainerBackend_, DT_>& fct)
+         static void execute(const HaloType_<delta_, a_, b_, c_>& interface, DenseVector<ContainerBackend_, DT_>& fct)
          {
            ///TODO: does assume, attribute for level a_ is stored in fct
            //acquire buffers
@@ -483,18 +479,16 @@ namespace FEAST
         ///implementation for lafem smcsr
         template<
           unsigned delta_,
-          PolytopeLevels a_,
+          typename a_,
           typename b_,
           template<typename, typename> class c_,
-          typename d_,
           template<unsigned,
-                   PolytopeLevels,
                    typename,
-                   template<typename, typename> class,
-                   typename>
+                   typename,
+                   template<typename, typename> class>
            class HaloType_,
            typename DT_>
-         static void execute(const HaloType_<delta_, a_, b_, c_, d_>& interface, SparseMatrixCSR<ContainerBackend_, DT_>& mat)
+         static void execute(const HaloType_<delta_, a_, b_, c_>& interface, SparseMatrixCSR<ContainerBackend_, DT_>& mat)
          {
            DT_* val(mat.val());
            Index* row_ptr(mat.row_ptr());

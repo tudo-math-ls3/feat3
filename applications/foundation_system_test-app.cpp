@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   CommStructures<Topology<> > lbconf(network, patches);
 
   //prepare local data for each process (i.t.m. 1 on 1 case only)
-  PatchData<Mesh<rnt_2D>, Halo<0, pl_vertex, Mesh<rnt_2D, Topology<> > >, Topology<> > local_data;
+  PatchData<Mesh<Dim2D>, Halo<0, PLVertex, Mesh<Dim2D, Topology<> > >, Topology<> > local_data;
 
   int me(0);
   //build communication structures

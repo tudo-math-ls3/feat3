@@ -18,13 +18,16 @@ TARGET_LINK_LIBRARIES (kernel-foundation kernel-util kernel-lafem)
 SET (test_list
   attribute-test
   buffer-test
-  communication-test
+  data-test
   dense_data_wrapper-test
   functor-test
   halo-test
   halo_control-test
   mesh-test
   mesh_control-test
+  partitioning-test
+  refinement-test
+  sub_mesh-test
   topology-test
 )
 

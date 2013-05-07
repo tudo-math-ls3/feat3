@@ -14,46 +14,50 @@ namespace FEAST
   namespace Foundation
   {
     template<typename MeshType_,
-             template<typename, typename> class StorageType_ = std::vector,
-             typename IndexType_ = Index>
+             template<typename, typename> class BufferStorageType_ = std::vector>
     class HaloBase :
-      public Bufferable<BufferedData<StorageType_> >,
-      public Communicateable<BufferedData<StorageType_>, com_send_receive>
+      public Bufferable<BufferedData<BufferStorageType_> >,
+      public Communicateable<BufferedData<BufferStorageType_>, com_send_receive>
     {
       public:
         ///type exports:
-        typedef IndexType_ index_type_;
+        typedef typename MeshType_::topology_type_::storage_type_ compound_storage_type_;
+        typedef typename MeshType_::topology_type_::index_type_ index_type_;
         typedef MeshType_ mesh_type_;
-        typedef BufferedData<StorageType_> buffer_type_;
+        typedef BufferedData<BufferStorageType_> buffer_type_;
 
         ///CTOR
-        HaloBase(MeshType_ & mesh, IndexType_ other = 0) : //TODO move to template
+        HaloBase() :
           _halo_elements(),
-          _halo_element_counterparts(),
-          _mesh(mesh),
+          _mesh(nullptr),
+          _other(0)
+        {
+        }
+
+        ///CTOR
+        HaloBase(MeshType_ & mesh, index_type_ other = 0) : //TODO move to template
+          _halo_elements(),
+          _mesh(&mesh),
           _other(other)
         {
         }
 
         ///CTOR from buffer
         template<typename BufferType_>
-        HaloBase(const BufferType_& buffer, MeshType_& new_mesh, IndexType_ new_other_rank) :
+        HaloBase(const BufferType_& buffer, MeshType_& new_mesh, index_type_ new_other_rank) :
           _halo_elements(),
-          _halo_element_counterparts(),
-          _mesh(new_mesh),
+          _mesh(&new_mesh),
           _other(new_other_rank)
         {
-          for(IndexType_ i(0) ; i < buffer.size() ; ++i)
+          for(index_type_ i(0) ; i < buffer.size() ; ++i)
           {
             _halo_elements.push_back(buffer.get_element(i));
-            _halo_element_counterparts.push_back(buffer.get_element_counterpart(i));
           }
         }
 
         ///copy-CTOR
         HaloBase(const HaloBase& other) : //TODO move to template
           _halo_elements(other._halo_elements),
-          _halo_element_counterparts(other._halo_element_counterparts),
           _mesh(other._mesh),
           _other(other._other)
         {
@@ -65,159 +69,139 @@ namespace FEAST
         }
 
         ///Add correspondence of i
-        virtual void add_element_pair(IndexType_ i, IndexType_ j)
+        virtual void push_back(const index_type_ i)
         {
           _halo_elements.push_back(i);
-          _halo_element_counterparts.push_back(j);
         }
 
         ///public access functions:
-        virtual IndexType_ get_element_counterpart(IndexType_ index) const
-        {
-          return _halo_element_counterparts.at(index);
-        }
 
-        virtual IndexType_ get_element(IndexType_ index) const
+        virtual index_type_ get_element(const index_type_ index) const
         {
           return _halo_elements.at(index);
         }
 
-        virtual IndexType_ size() const
+        virtual void erase_element(const index_type_ index)
         {
-          return IndexType_(_halo_elements.size());
+          _halo_elements.erase(_halo_elements.begin() + index);
         }
 
-        virtual const MeshType_ & get_mesh() const
+        virtual index_type_ size() const
+        {
+          return index_type_(_halo_elements.size());
+        }
+
+        virtual const mesh_type_* get_mesh() const
         {
           return _mesh;
         }
 
-        virtual MeshType_ & get_mesh()
+        virtual mesh_type_* get_mesh()
         {
           return _mesh;
         }
 
-        virtual IndexType_ get_other() const
+        virtual void reset_mesh(mesh_type_* mp)
+        {
+          _mesh = mp;
+        }
+
+        virtual index_type_ get_other() const
         {
           return _other;
+        }
+
+        virtual void reset_other(index_type_ i)
+        {
+          _other = i;
         }
 
         virtual unsigned get_overlap() const = 0;
         virtual PolytopeLevels get_level() const = 0;
 
-        virtual StorageType_<IndexType_, std::allocator<IndexType_> >& get_elements()
+        virtual compound_storage_type_& get_elements()
         {
           return _halo_elements;
         }
 
-        virtual const StorageType_<IndexType_, std::allocator<IndexType_> >& get_elements() const
+        virtual const compound_storage_type_& get_elements() const
         {
           return _halo_elements;
-        }
-
-        virtual StorageType_<IndexType_, std::allocator<IndexType_> >& get_element_counterparts()
-        {
-          return _halo_element_counterparts;
-        }
-
-        virtual const StorageType_<IndexType_, std::allocator<IndexType_> >& get_element_counterparts() const
-        {
-          return _halo_element_counterparts;
         }
 
         ///implementation of Bufferable interface
-        virtual BufferedData<StorageType_> buffer(IndexType_ estimated_size_increase = 0)
+        virtual BufferedData<BufferStorageType_> buffer(index_type_ estimated_size_increase = 0)
         {
-          BufferedData<StorageType_> result;
-          result.get().push_back(BufferedSharedArray<IndexType_>::create(3));
-          result.get().push_back(BufferedSharedArray<IndexType_>::create((IndexType_)(_halo_elements.size()) + estimated_size_increase));
-          result.get().push_back(BufferedSharedArray<IndexType_>::create((IndexType_)(_halo_element_counterparts.size()) + estimated_size_increase));
+          BufferedData<BufferStorageType_> result;
+          result.get().push_back(BufferedSharedArray<index_type_>::create(3));
+          result.get().push_back(BufferedSharedArray<index_type_>::create((index_type_)(_halo_elements.size()) + estimated_size_increase));
 
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[0] = 3;
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = (IndexType_)(_halo_elements.size()) + estimated_size_increase;
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[2] = (IndexType_)(_halo_element_counterparts.size()) + estimated_size_increase;
+          (*(BufferedSharedArray<index_type_>*)((result.get().at(0).get())))[0] = 2;
+          (*(BufferedSharedArray<index_type_>*)((result.get().at(0).get())))[1] = (index_type_)(_halo_elements.size()) + estimated_size_increase;
 
           return result;
         }
 
-        virtual void to_buffer(BufferedData<StorageType_>& buffer)
+        virtual void to_buffer(BufferedData<BufferStorageType_>& buffer)
         {
-          for(IndexType_ i(0) ; i < _halo_elements.size() ; ++i)
+          for(index_type_ i(0) ; i < _halo_elements.size() ; ++i)
           {
-            (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(1).get())))[i] = _halo_elements.at(i);
-          }
-
-          for(IndexType_ i(0) ; i < _halo_element_counterparts.size() ; ++i)
-          {
-            (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(2).get())))[i] = _halo_element_counterparts.at(i);
+            (*(BufferedSharedArray<index_type_>*)((buffer.get().at(1).get())))[i] = _halo_elements.at(i);
           }
         }
 
-        virtual void from_buffer(const BufferedData<StorageType_>& buffer)
+        virtual void from_buffer(const BufferedData<BufferStorageType_>& buffer)
         {
           _halo_elements.clear();
-          _halo_element_counterparts.clear();
 
-          for(IndexType_ i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[1] ; ++i)
+          for(index_type_ i(0) ; i < (*(BufferedSharedArray<index_type_>*)((buffer.get().at(0).get())))[1] ; ++i)
           {
-            _halo_elements.push_back( (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(1).get())))[i] );
-          }
-
-          for(IndexType_ i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[2] ; ++i)
-          {
-            _halo_element_counterparts.push_back( (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(2).get())))[i] );
+            _halo_elements.push_back( (*(BufferedSharedArray<index_type_>*)((buffer.get().at(1).get())))[i] );
           }
         }
 
         ///implementation of Communicateable interface
-        virtual void send_recv(BufferedData<StorageType_>& sendbuffers,
+        virtual void send_recv(BufferedData<BufferStorageType_>& sendbuffers,
                        int destrank,
-                       BufferedData<StorageType_>& recvbuffers,
+                       BufferedData<BufferStorageType_>& recvbuffers,
                        int sourcerank)
         {
 #ifndef SERIAL
-          Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
-              3,
+          Comm<Parallel>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),
+              2,
               destrank,
-              ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(0).get())->get(),
-              3,
+              ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(0).get())->get(),
+              2,
               sourcerank);
 
-          for(IndexType_ i(1) ; i < 3 ; ++i)
-          {
-            Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(i).get())->get(),
-                                      (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[i],
-                                      destrank,
-                                      ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(i).get())->get(),
-                                      (*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[i],
-                                      sourcerank);
-          }
+          Comm<Parallel>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(1).get())->get(),
+              (*(BufferedSharedArray<index_type_>*)((sendbuffers.get().at(0).get())))[1],
+              destrank,
+              ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(1).get())->get(),
+              (*(BufferedSharedArray<index_type_>*)((recvbuffers.get().at(0).get())))[1],
+              sourcerank);
 #else
-          Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
-              3,
+          Comm<Serial>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),
+              2,
               destrank,
-              ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(0).get())->get(),
-              3,
+              ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(0).get())->get(),
+              2,
               sourcerank);
 
-          for(IndexType_ i(1) ; i < 3 ; ++i)
-          {
-            Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(i).get())->get(),
-                                      (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[i],
-                                      destrank,
-                                      ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(i).get())->get(),
-                                      (*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[i],
-                                      sourcerank);
-          }
+          Comm<Serial>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(1).get())->get(),
+              (*(BufferedSharedArray<index_type_>*)((sendbuffers.get().at(0).get())))[1],
+              destrank,
+              ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(1).get())->get(),
+              (*(BufferedSharedArray<index_type_>*)((recvbuffers.get().at(0).get())))[1],
+              sourcerank);
 #endif
         }
 
       protected:
-        StorageType_<IndexType_, std::allocator<IndexType_> > _halo_elements;
-        StorageType_<IndexType_, std::allocator<IndexType_> > _halo_element_counterparts;
+        compound_storage_type_ _halo_elements;
 
-        MeshType_ & _mesh;
-        IndexType_ _other;
+        mesh_type_* _mesh;
+        index_type_ _other;
 
     };
 
@@ -236,50 +220,53 @@ namespace FEAST
      * \tparam StorageType_
      * type for inner storage of indices
      *
-     * \tparam IndexType_
-     * type of the indices
-     *
      * \author Markus Geveler
      */
     template<unsigned delta_,
-             PolytopeLevels level_,
+             typename Level_,
              typename MeshType_,
-             template<typename, typename> class StorageType_ = std::vector,
-             typename IndexType_ = Index>
+             template<typename, typename> class BufferStorageType_ = std::vector>
     class Halo :
-      public HaloBase<MeshType_, StorageType_, IndexType_>
+      public HaloBase<MeshType_, BufferStorageType_>
     {
       public:
         ///type exports:
-        typedef typename HaloBase<MeshType_, StorageType_, IndexType_>::index_type_ index_type_;
-        typedef typename HaloBase<MeshType_, StorageType_, IndexType_>::mesh_type_ mesh_type_;
-        typedef typename HaloBase<MeshType_, StorageType_, IndexType_>::buffer_type_ buffer_type_;
+        typedef typename HaloBase<MeshType_, BufferStorageType_>::index_type_ index_type_;
+        typedef typename HaloBase<MeshType_, BufferStorageType_>::mesh_type_ mesh_type_;
+        typedef typename HaloBase<MeshType_, BufferStorageType_>::buffer_type_ buffer_type_;
 
         ///CTOR
-        Halo(MeshType_ & mesh, IndexType_ other = 0) : //TODO move to template
-          HaloBase<MeshType_, StorageType_, IndexType_>(mesh, other),
+        Halo() :
+          HaloBase<MeshType_, BufferStorageType_>(),
           _overlap(delta_),
-          _level(level_)
+          _level(Level_::tag_value)
+        {
+        }
+
+        ///CTOR
+        Halo(MeshType_ & mesh, index_type_ other = 0) : //TODO move to template
+          HaloBase<MeshType_, BufferStorageType_>(mesh, other),
+          _overlap(delta_),
+          _level(Level_::tag_value)
         {
         }
 
         ///CTOR from buffer
         template<typename BufferType_>
-        Halo(const BufferType_& buffer, MeshType_& new_mesh, IndexType_ new_other_rank) :
-          HaloBase<MeshType_, StorageType_, IndexType_>(buffer, new_mesh, new_other_rank),
+        Halo(const BufferType_& buffer, MeshType_& new_mesh, index_type_ new_other_rank) :
+          HaloBase<MeshType_, BufferStorageType_>(buffer, new_mesh, new_other_rank),
           _overlap(delta_),
-          _level(level_)
+          _level(Level_::tag_value)
         {
-          for(IndexType_ i(0) ; i < buffer.size() ; ++i)
+          for(index_type_ i(0) ; i < buffer.size() ; ++i)
           {
             this->_halo_elements.push_back(buffer.get_element(i));
-            this->_halo_element_counterparts.push_back(buffer.get_element_counterpart(i));
           }
         }
 
         ///copy-CTOR
         Halo(const Halo& other) : //TODO move to template
-          HaloBase<MeshType_, StorageType_, IndexType_>(other),
+          HaloBase<MeshType_, BufferStorageType_>(other),
           _overlap(other._overlap),
           _level(other._level)
         {
@@ -301,7 +288,6 @@ namespace FEAST
             return *this;
 
           this->_halo_elements = rhs._halo_elements;
-          this->_halo_element_counterparts = rhs._halo_element_counterparts;
           this->_mesh = rhs._mesh;
           this->_other = rhs._other;
           this->_overlap = rhs._overlap;
@@ -318,15 +304,12 @@ namespace FEAST
 
 
     template<typename MeshType_,
-             template<typename, typename> class StorageType_,
-             typename IndexType_>
-    bool compare_other(const std::shared_ptr<HaloBase<MeshType_, StorageType_, IndexType_> >& l, const std::shared_ptr<HaloBase<MeshType_, StorageType_, IndexType_> >& r)
+             template<typename, typename> class StorageType_>
+    bool compare_other(const std::shared_ptr<HaloBase<MeshType_, StorageType_> >& l, const std::shared_ptr<HaloBase<MeshType_, StorageType_> >& r)
     {
       return (l->get_other() < r->get_other());
     }
 
   }
 }
-
-
 #endif

@@ -1,7 +1,7 @@
 #include <kernel/base_header.hpp>
-#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
+#include<kernel/foundation/attribute.hpp>
 #include<kernel/foundation/mesh_control.hpp>
 #include<kernel/foundation/dense_data_wrapper.hpp>
 #include<kernel/geometry/macro_factory.hpp>
@@ -29,13 +29,13 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest1D:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     MeshControlTest1D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshControlTest1D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlTest1D<" + tag + ">")
     {
     }
 
@@ -58,8 +58,7 @@ class MeshControlTest1D:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
 
       m.add_polytope(Foundation::pl_vertex);
       m.add_polytope(Foundation::pl_vertex);
@@ -90,7 +89,7 @@ class MeshControlTest1D:
       TEST_CHECK_EQUAL(vertex_coord_tuples[1][0], double(1));
 
       ///test reconversion
-      Foundation::Mesh<Foundation::rnt_1D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
+      Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
       MeshControl<dim_1D>::fill_adjacencies(confmesh, m1);
 
       for(Index i(0) ; i < m.get_topologies().size() ; ++i)
@@ -105,16 +104,16 @@ class MeshControlTest1D:
       delete[] size_set;
     }
 };
-MeshControlTest1D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrol1d_testvv("std::vector, std::vector");
-MeshControlTest1D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrol1d_testvd("std::vector, std::deque");
+MeshControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrol1d_testvv("std::vector, std::vector");
+MeshControlTest1D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrol1d_testvd("std::vector, std::deque");
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest2D:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     MeshControlTest2D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshControlTest2D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlTest2D<" + tag + ">")
     {
     }
 
@@ -155,9 +154,7 @@ class MeshControlTest2D:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
       m.add_polytope(pl_vertex);
       m.add_polytope(pl_vertex);
       m.add_polytope(pl_vertex);
@@ -226,7 +223,7 @@ class MeshControlTest2D:
       TEST_CHECK_EQUAL(vertex_coord_tuples[3][1], 1u);
 
       ///test reconversion
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
       MeshControl<dim_2D>::fill_adjacencies(confmesh, m1);
 
       for(Index i(0) ; i < m.get_topologies().size() ; ++i)
@@ -248,16 +245,16 @@ class MeshControlTest2D:
       delete[] size_set;
     }
 };
-MeshControlTest2D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrol_testvv("std::vector, std::vector");
-MeshControlTest2D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrol_testvd("std::vector, std::deque");
+MeshControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrol_testvv("std::vector, std::vector");
+MeshControlTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrol_testvd("std::vector, std::deque");
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest3D:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     MeshControlTest3D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshControlTest3D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlTest3D<" + tag + ">")
     {
     }
 
@@ -327,10 +324,7 @@ class MeshControlTest3D:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
 
       m.add_polytope(Foundation::pl_vertex);
       m.add_polytope(Foundation::pl_vertex);
@@ -557,7 +551,7 @@ class MeshControlTest3D:
       TEST_CHECK_EQUAL(vertex_coord_tuples[7][2], double(1));
 
       ///test reconversion
-      Foundation::Mesh<Foundation::rnt_3D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
+      Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_> > m1(1);
       MeshControl<dim_3D>::fill_adjacencies(confmesh, m1);
 
       MeshControl<dim_3D>::fill_vertex_sets(confmesh, m1, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())), *((Attribute<double, OT_>*)(attrs.at(2).get())));
@@ -589,8 +583,8 @@ class MeshControlTest3D:
       delete[] size_set;
     }
 };
-MeshControlTest3D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrol3d_testvv("std::vector, std::vector");
-MeshControlTest3D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrol3d_testvd("std::vector, std::deque");
+MeshControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrol3d_testvv("std::vector, std::vector");
+MeshControlTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrol3d_testvd("std::vector, std::deque");
 
 template<typename T_>
 class RhsFunc
@@ -601,13 +595,13 @@ public:
     return T_(1);
   }
 };
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshControlPartitioningTest2D:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     MeshControlPartitioningTest2D(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("MeshControlPartitioningTest2D<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("MeshControlPartitioningTest2D<" + tag + ">")
     {
     }
 
@@ -648,9 +642,7 @@ class MeshControlPartitioningTest2D:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
       m.add_polytope(pl_vertex);
       m.add_polytope(pl_vertex);
       m.add_polytope(pl_vertex);
@@ -694,13 +686,13 @@ class MeshControlPartitioningTest2D:
       basemeshtype_ fine_basemesh(mesh_refinery);
 
       ///get foundation mesh
-      Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > fine_bm_found(4711, &attrs);
+      Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > fine_bm_found(4711);
       MeshControl<dim_2D>::fill_adjacencies(fine_basemesh, fine_bm_found);
       MeshControl<dim_2D>::fill_vertex_sets(fine_basemesh, fine_bm_found, *((Attribute<double, OT_>*)(attrs.at(0).get())), *((Attribute<double, OT_>*)(attrs.at(1).get())));
 
       ///get a single halo that represents the whole macro for reinsertion to global solution, then get a single cellsubset from it
-      Halo<1, pl_face, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > macro_subset(fine_bm_found);
-      macro_subset.add_element_pair(0, 0);
+      Halo<1, PLFace, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > macro_subset(fine_bm_found);
+      macro_subset.push_back(0);
       IndexType_* polytopes_in_macrosubset(new IndexType_[3]);
       HaloControl<dim_2D>::fill_sizes(macro_subset, polytopes_in_macrosubset);
       CellSubSet<Shape::Hypercube<2> > macro_subset_geo(polytopes_in_macrosubset);
@@ -719,7 +711,7 @@ class MeshControlPartitioningTest2D:
       TopologyStorageType potential_comm_partners_for_face_0(fine_bm_found.get_adjacent_polytopes(pl_face, pl_face, 0));
 
       ///create halos
-      std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > > halos;
+      std::vector<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > > > halos;
       for(Index i(0) ; i < potential_comm_partners_for_face_0.size() ; ++i)
       {
         TopologyStorageType comm_intersect_0_i(fine_bm_found.get_comm_intersection(pl_face, pl_edge, 0, i));
@@ -728,23 +720,23 @@ class MeshControlPartitioningTest2D:
           comm_intersect_0_i = fine_bm_found.get_comm_intersection(pl_face, pl_vertex, 0, i);
           for(Index j(0) ; j < comm_intersect_0_i.size() ; ++j)
           {
-            Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
-            halo.add_element_pair(comm_intersect_0_i.at(j), comm_intersect_0_i.at(j));
+            Halo<0, PLVertex, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
+            halo.push_back(comm_intersect_0_i.at(j));
 
-            halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(halo)));
+            halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, PLVertex, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >(halo)));
           }
         }
         else
         {
           for(Index j(0) ; j < comm_intersect_0_i.size() ; ++j)
           {
-            Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
-            halo.add_element_pair(comm_intersect_0_i.at(j), comm_intersect_0_i.at(j));
-            halos.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(halo)));
+            Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > halo(fine_bm_found, i);
+            halo.push_back(comm_intersect_0_i.at(j));
+            halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >(halo)));
           }
         }
       }
-      std::sort(halos.begin(), halos.end(), compare_other<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> >, OT_, IndexType_>);
+      std::sort(halos.begin(), halos.end(), compare_other<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> >, OT_>);
 
       TEST_CHECK_EQUAL(halos.size(), Index(3));
       TEST_CHECK_EQUAL(halos.at(0)->get_other(), Index(1));
@@ -755,7 +747,7 @@ class MeshControlPartitioningTest2D:
       Index macro_number(0);
       MacroFactory<basemeshtype_> macro_factory(fine_basemesh, macro_number);
       basemeshtype_ macro_mesh(macro_factory);
-      Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > macro_mesh_found(99);
+      Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > macro_mesh_found(99);
       MeshControl<dim_2D>::fill_adjacencies(macro_mesh, macro_mesh_found);
       Attribute<double, OT_> vertex_x_coords_macro;
       Attribute<double, OT_> vertex_y_coords_macro;
@@ -771,13 +763,13 @@ class MeshControlPartitioningTest2D:
       TEST_CHECK_EQUAL(vertex_y_coords_macro.at(3), double(0.5));
 
       //every edge is an inner boundary
-      std::vector<std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > > > macro_boundaries;
+      std::vector<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > > > macro_boundaries;
 
       for(Index i(0) ; i < macro_mesh_found.get_topologies().at(ipi_edge_vertex).size() ; ++i)
       {
-        Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > result(macro_mesh_found);
-        result.add_element_pair(i, i);
-        macro_boundaries.push_back(std::shared_ptr<HaloBase<Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >(result)));
+        Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > result(macro_mesh_found);
+        result.push_back(i);
+        macro_boundaries.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > >(new Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >(result)));
       }
       TEST_CHECK_EQUAL(macro_boundaries.size(), Index(4));
 
@@ -795,16 +787,16 @@ class MeshControlPartitioningTest2D:
         Index* polytopes_in_subset = new Index[3];
 
         if(halos.at(i)->get_level() == pl_vertex)
-          HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
+          HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLVertex, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
         else
-          HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
+          HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), polytopes_in_subset);
 
         Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
 
         if(halos.at(i)->get_level() == pl_vertex)
-          HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_vertex, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
+          HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLVertex, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
         else
-          HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
+          HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(halos.at(i).get())), cell_sub_set);
 
         //refine
         Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, fine_basemesh);
@@ -821,9 +813,9 @@ class MeshControlPartitioningTest2D:
       {
         //transform found->geo
         Index* polytopes_in_subset = new Index[3];
-        HaloControl<dim_2D>::fill_sizes(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), polytopes_in_subset);
+        HaloControl<dim_2D>::fill_sizes(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), polytopes_in_subset);
         Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
-        HaloControl<dim_2D>::fill_target_set(*((Halo<0, pl_edge, Mesh<rnt_2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), cell_sub_set);
+        HaloControl<dim_2D>::fill_target_set(*((Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >*)(macro_boundaries.at(i).get())), cell_sub_set);
 
         //refine
         Geometry::StandardRefinery<Geometry::CellSubSet<Shape::Hypercube<2> >, basemeshtype_> cell_refinery(cell_sub_set, macro_mesh);
@@ -894,6 +886,5 @@ class MeshControlPartitioningTest2D:
 
     }
 };
-MeshControlPartitioningTest2D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrolpart_testvv("std::vector, std::vector");
-MeshControlPartitioningTest2D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrolpart_testvd("std::vector, std::deque");
-#endif // SERIAL
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > meshcontrolpart_testvv("std::vector, std::vector");
+MeshControlPartitioningTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > meshcontrolpart_testvd("std::vector, std::deque");

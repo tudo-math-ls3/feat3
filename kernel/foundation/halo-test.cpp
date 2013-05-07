@@ -1,9 +1,8 @@
-#ifndef SERIAL
-#define SERIAL
-
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
+#include <kernel/foundation/base.hpp>
+#include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/mesh.hpp>
 #include <kernel/foundation/halo.hpp>
 #include <kernel/archs.hpp>
@@ -13,16 +12,18 @@
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
+using namespace FEAST::Foundation;
 
 template<typename Tag_,
          typename IndexType_,
+         typename Algo_,
          template<typename, typename> class OT_, typename IT_>
 class HaloTest:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     HaloTest(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("HaloTest<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("HaloTest<" + tag + ">")
     {
     }
 
@@ -36,11 +37,10 @@ class HaloTest:
       //   3--4--5     *--*--*
       //    5  6
 
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(0);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m3(0);
 
       //configure attribute
       Foundation::Attribute<double, std::vector> attr;
-      Foundation::MeshAttributeRegistration::execute(m3, Foundation::pl_vertex);
 
       //add vertices
       m3.add_polytope(Foundation::pl_vertex);
@@ -94,10 +94,10 @@ class HaloTest:
       m3.add_adjacency(Foundation::pl_face, Foundation::pl_vertex, 1, 5); //v->f is set automagically
 
       //clone mesh
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(1, m3);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m4(1, m3);
 
       //init simple halo
-      Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m3, 1);
+      Foundation::Halo<0, PLEdge, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m3, 1);
 
       //add connections
       //
@@ -111,29 +111,27 @@ class HaloTest:
       // |0 | 1| m4
       // *--*--*
 
-      h.add_element_pair(5u, 0u);
-      h.add_element_pair(6u, 1u);
+      h.push_back(5u);
+      h.push_back(6u);
 
       TEST_CHECK_EQUAL(h.size(), 2u);
       TEST_CHECK_EQUAL(h.get_element(0u), 5u);
       TEST_CHECK_EQUAL(h.get_element(1u), 6u);
-      TEST_CHECK_EQUAL(h.get_element_counterpart(0u), 0u);
-      TEST_CHECK_EQUAL(h.get_element_counterpart(1u), 1u);
 
     }
 };
-HaloTest<Archs::None, Index, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");
-HaloTest<Archs::None, Index, std::deque, std::vector<Index> > halo_test_cpu_d_v("std::deque, std::vector");
-HaloTest<Archs::None, Index, std::vector, std::deque<Index> > halo_test_cpu_v_d("std::vector, std::deque");
-HaloTest<Archs::None, Index, std::deque, std::deque<Index> > halo_test_cpu_d_d("std::deque, std::deque");
+HaloTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");
+HaloTest<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > halo_test_cpu_d_v("std::deque, std::vector");
+HaloTest<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halo_test_cpu_v_d("std::vector, std::deque");
+HaloTest<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > halo_test_cpu_d_d("std::deque, std::deque");
 
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class HaloTestGeometryInterface:
-  public TaggedTest<Tag_, IndexType_>
+  public TaggedTest<Tag_, IndexType_, Algo_>
 {
   public:
     HaloTestGeometryInterface(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("HaloTestGeometryInterface<" + tag + ">")
+      TaggedTest<Tag_, IndexType_, Algo_>("HaloTestGeometryInterface<" + tag + ">")
     {
     }
 
@@ -173,9 +171,7 @@ class HaloTestGeometryInterface:
        */
 
       //creating foundation mesh
-      Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0, &attrs);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
-      Foundation::MeshAttributeRegistration::execute(m, Foundation::pl_vertex);
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > m(0);
 
       m.add_polytope(Foundation::pl_vertex);
       m.add_polytope(Foundation::pl_vertex);
@@ -238,24 +234,24 @@ class HaloTestGeometryInterface:
       }
 
       typename confmeshtype_::VertexSetType& vertex_coord_tuples(geo_m.get_vertex_set());
-      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(0); //xcoord of first node
-      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(0); //ycoord of first node
-      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(1);
-      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(1);
-      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(2);
-      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(2);
-      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(0).get()))->get_data().at(3);
-      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(m.get_attributes()->at(1).get()))->get_data().at(3);
+      vertex_coord_tuples[0][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(0); //xcoord of first node
+      vertex_coord_tuples[0][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(0); //ycoord of first node
+      vertex_coord_tuples[1][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(1);
+      vertex_coord_tuples[1][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(1);
+      vertex_coord_tuples[2][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(2);
+      vertex_coord_tuples[2][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(2);
+      vertex_coord_tuples[3][0] = ((Foundation::Attribute<double, OT_>*)(attrs.at(0).get()))->get_data().at(3);
+      vertex_coord_tuples[3][1] = ((Foundation::Attribute<double, OT_>*)(attrs.at(1).get()))->get_data().at(3);
 
       //create halo with one edge-edge pair
-      Foundation::Halo<0, Foundation::pl_edge, Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
-      h.add_element_pair(3, 2);
+      Foundation::Halo<0, PLEdge, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m, 1);
+      h.push_back(3);
 
       //create CellSubSet
       Index polytopes_in_subset[3] = {2, 1, 0}; //no overlap and one edge means two vertices but no faces
       Geometry::CellSubSet<Shape::Hypercube<2> > cell_sub_set(polytopes_in_subset);
 
-      typename Foundation::Mesh<Foundation::rnt_2D, Foundation::Topology<IndexType_, OT_, IT_> >::storage_type_ adjacent_vertices(h.get_mesh().get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, h.get_element(0)));
+      typename Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> >::storage_type_ adjacent_vertices(h.get_mesh()->get_adjacent_polytopes(Foundation::pl_edge, Foundation::pl_vertex, h.get_element(0)));
 
       cell_sub_set.template get_target_set<0>()[0] = adjacent_vertices.at(0); //first vertex
       cell_sub_set.template get_target_set<0>()[1] = adjacent_vertices.at(1); //second vertex
@@ -266,41 +262,5 @@ class HaloTestGeometryInterface:
       TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);
     }
 };
-HaloTestGeometryInterface<Archs::None, Index, std::vector, std::vector<Index> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
-HaloTestGeometryInterface<Archs::None, Index, std::vector, std::deque<Index> > halo_test_fginter_cpu_v_d("std::vector, std::deque");
-
-template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
-class HaloTestComm:
-  public TaggedTest<Tag_, IndexType_>
-{
-  public:
-    HaloTestComm(const std::string & tag) :
-      TaggedTest<Tag_, IndexType_>("HaloTestComm<" + tag + ">")
-    {
-    }
-
-    void run() const
-    {
-      Foundation::Mesh<> m(0);
-      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<> > h(m, 0);
-      h.add_element_pair(0, 0);
-
-      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<> >::buffer_type_ sendbuf(h.buffer());
-      Foundation::Halo<0, Foundation::pl_face, Foundation::Mesh<> >::buffer_type_ recvbuf(h.buffer());
-      h.to_buffer(sendbuf);
-
-      h.send_recv(
-          sendbuf,
-          0,
-          recvbuf,
-          0);
-
-      h.from_buffer(recvbuf);
-
-      TEST_CHECK_EQUAL(h.get_element(0), 0);
-      TEST_CHECK_EQUAL(h.get_element_counterpart(0), 0);
-    }
-};
-/*HaloTestComm<Archs::None, Index, std::vector, std::vector<Index> > halo_test_comm_cpu_v_v("std::vector, std::vector");
-HaloTestComm<Archs::None, Index, std::vector, std::deque<Index> > halo_test_comm_cpu_v_d("std::vector, std::deque");*/
-#endif // SERIAL
+HaloTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
+HaloTestGeometryInterface<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > halo_test_fginter_cpu_v_d("std::vector, std::deque");

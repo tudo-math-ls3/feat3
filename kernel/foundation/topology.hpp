@@ -56,7 +56,13 @@ namespace FEAST
           _topology(),
           _history()
         {
-        };
+        }
+
+        Topology(IndexType_ i) :
+          _topology(i),
+          _history()
+        {
+        }
 
         ///Copy CTOR
         Topology(const Topology& other) :
