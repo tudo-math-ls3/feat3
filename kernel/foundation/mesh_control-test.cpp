@@ -105,8 +105,8 @@ class MeshControlTest1D:
       delete[] size_set;
     }
 };
-MeshControlTest1D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol1d_testvv("std::vector, std::vector");
-MeshControlTest1D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrol1d_testvd("std::vector, std::deque");
+MeshControlTest1D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrol1d_testvv("std::vector, std::vector");
+MeshControlTest1D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrol1d_testvd("std::vector, std::deque");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest2D:
@@ -248,8 +248,8 @@ class MeshControlTest2D:
       delete[] size_set;
     }
 };
-MeshControlTest2D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol_testvv("std::vector, std::vector");
-MeshControlTest2D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrol_testvd("std::vector, std::deque");
+MeshControlTest2D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrol_testvv("std::vector, std::vector");
+MeshControlTest2D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrol_testvd("std::vector, std::deque");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshControlTest3D:
@@ -589,8 +589,8 @@ class MeshControlTest3D:
       delete[] size_set;
     }
 };
-MeshControlTest3D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrol3d_testvv("std::vector, std::vector");
-MeshControlTest3D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrol3d_testvd("std::vector, std::deque");
+MeshControlTest3D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrol3d_testvv("std::vector, std::vector");
+MeshControlTest3D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrol3d_testvd("std::vector, std::deque");
 
 template<typename T_>
 class RhsFunc
@@ -894,6 +894,6 @@ class MeshControlPartitioningTest2D:
 
     }
 };
-MeshControlPartitioningTest2D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > meshcontrolpart_testvv("std::vector, std::vector");
-MeshControlPartitioningTest2D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > meshcontrolpart_testvd("std::vector, std::deque");
+MeshControlPartitioningTest2D<Archs::None, Index, std::vector, std::vector<Index> > meshcontrolpart_testvv("std::vector, std::vector");
+MeshControlPartitioningTest2D<Archs::None, Index, std::vector, std::deque<Index> > meshcontrolpart_testvd("std::vector, std::deque");
 #endif // SERIAL

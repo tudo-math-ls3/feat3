@@ -2,11 +2,13 @@
 #ifndef KERNEL_FOUNDATION_DENSE_DATA_WRAPPER_HH
 #define KERNEL_FOUNDATION_DENSE_DATA_WRAPPER_HH 1
 
+#include <kernel/foundation/base.hpp>
+
 namespace FEAST
 {
   namespace Foundation
   {
-    template<unsigned long _i,
+    template<Index _i,
              typename Arch_,
              typename DT_,
              template<typename, typename> class ContType_>
@@ -24,12 +26,12 @@ namespace FEAST
           {
           }
 
-          unsigned long size()
+          Index size()
           {
             return _num_non_zeros;
           }
 
-          unsigned long capacity()
+          Index capacity()
           {
             return _size - _num_non_zeros;
           }
@@ -41,13 +43,13 @@ namespace FEAST
             ++_num_non_zeros;
           }
 
-          const DT_ at(unsigned long i)
+          const DT_ at(Index i)
           {
             //todo in non-zero range check
             return _data(i);
           }
 
-          const DT_ operator[](unsigned long i)
+          const DT_ operator[](Index i)
           {
             //todo in non-zero range check
             return _data(i);
@@ -66,8 +68,8 @@ namespace FEAST
           }
 
         private:
-          unsigned long _size;
-          unsigned long _num_non_zeros;
+          Index _size;
+          Index _num_non_zeros;
           ContType_<Arch_, DT_> _data;
       };
   }

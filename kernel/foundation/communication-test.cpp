@@ -130,8 +130,8 @@ class CommunicationTest:
       TEST_CHECK_EQUAL(((Foundation::Attribute<double>*)(all_attributes_m3.at(0).get()))->get_data().at(1), 47.);
     }
 };
-/*CommunicationTest<Mem::Main, unsigned long, std::vector, std::vector<unsigned long> > halo_test_cpu_v_v("std::vector, std::vector");
-CommunicationTest<Mem::Main, unsigned long, std::deque, std::vector<unsigned long> > halo_test_cpu_d_v("std::deque, std::vector");
-CommunicationTest<Mem::Main, unsigned long, std::vector, std::deque<unsigned long> > halo_test_cpu_v_d("std::vector, std::deque");
-CommunicationTest<Mem::Main, unsigned long, std::deque, std::deque<unsigned long> > halo_test_cpu_d_d("std::deque, std::deque");*/
+/*CommunicationTest<Mem::Main, Index, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");
+CommunicationTest<Mem::Main, Index, std::deque, std::vector<Index> > halo_test_cpu_d_v("std::deque, std::vector");
+CommunicationTest<Mem::Main, Index, std::vector, std::deque<Index> > halo_test_cpu_v_d("std::vector, std::deque");
+CommunicationTest<Mem::Main, Index, std::deque, std::deque<Index> > halo_test_cpu_d_d("std::deque, std::deque");*/
 #endif // SERIAL

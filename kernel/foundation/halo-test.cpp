@@ -266,8 +266,8 @@ class HaloTestGeometryInterface:
       TEST_CHECK_EQUAL(cell_sub_set.template get_target_set<1>()[0], 3ul);
     }
 };
-HaloTestGeometryInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
-HaloTestGeometryInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halo_test_fginter_cpu_v_d("std::vector, std::deque");
+HaloTestGeometryInterface<Archs::None, Index, std::vector, std::vector<Index> > halo_test_fginter_cpu_v_v("std::vector, std::vector");
+HaloTestGeometryInterface<Archs::None, Index, std::vector, std::deque<Index> > halo_test_fginter_cpu_v_d("std::vector, std::deque");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class HaloTestComm:
@@ -301,6 +301,6 @@ class HaloTestComm:
       TEST_CHECK_EQUAL(h.get_element_counterpart(0), 0);
     }
 };
-/*HaloTestComm<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halo_test_comm_cpu_v_v("std::vector, std::vector");
-HaloTestComm<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halo_test_comm_cpu_v_d("std::vector, std::deque");*/
+/*HaloTestComm<Archs::None, Index, std::vector, std::vector<Index> > halo_test_comm_cpu_v_v("std::vector, std::vector");
+HaloTestComm<Archs::None, Index, std::vector, std::deque<Index> > halo_test_comm_cpu_v_d("std::vector, std::deque");*/
 #endif // SERIAL

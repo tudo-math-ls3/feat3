@@ -128,8 +128,8 @@ class HaloControlTest1D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest1D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol1d_testvv("std::vector, std::vector");
-HaloControlTest1D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halocontrol1d_testvd("std::vector, std::deque");
+HaloControlTest1D<Archs::None, Index, std::vector, std::vector<Index> > halocontrol1d_testvv("std::vector, std::vector");
+HaloControlTest1D<Archs::None, Index, std::vector, std::deque<Index> > halocontrol1d_testvd("std::vector, std::deque");
 
 
 
@@ -315,8 +315,8 @@ class HaloControlTest2D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest2D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol_testvv("std::vector, std::vector");
-HaloControlTest2D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halocontrol_testvd("std::vector, std::deque");
+HaloControlTest2D<Archs::None, Index, std::vector, std::vector<Index> > halocontrol_testvv("std::vector, std::vector");
+HaloControlTest2D<Archs::None, Index, std::vector, std::deque<Index> > halocontrol_testvd("std::vector, std::deque");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class HaloControlTest3D:
@@ -674,5 +674,5 @@ class HaloControlTest3D:
       delete[] polytopes_in_subset1;
     }
 };
-HaloControlTest3D<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > halocontrol3d_testvv("std::vector, std::vector");
-HaloControlTest3D<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > halocontrol3d_testvd("std::vector, std::deque");
+HaloControlTest3D<Archs::None, Index, std::vector, std::vector<Index> > halocontrol3d_testvv("std::vector, std::vector");
+HaloControlTest3D<Archs::None, Index, std::vector, std::deque<Index> > halocontrol3d_testvd("std::vector, std::deque");

@@ -40,4 +40,4 @@ class BufferTest:
         TEST_CHECK_EQUAL((*(Foundation::BufferedSharedArray<DataType_>*)((b.get().at(0).get())))[i], i);
     }
 };
-BufferTest<Archs::None, unsigned long> buffer_test_cpu_ulong("ulong");
+BufferTest<Archs::None, Index> buffer_test_cpu_ulong("ulong");

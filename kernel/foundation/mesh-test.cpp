@@ -534,13 +534,13 @@ public:
     return true;
   }
 };
-MeshTestAttr<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_cpu_v_v("std::vector, std::vector");
+MeshTestAttr<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_cpu_v_v("std::vector, std::vector");
 #ifdef DEBUG
-MeshTestAttr<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > mesh_test_cpu_d_v("std::deque, std::vector");
-MeshTestAttr<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_cpu_v_d("std::vector, std::deque");
-MeshTestAttr<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > mesh_test_cpu_d_d("std::deque, std::deque");
+MeshTestAttr<Archs::None, Index, std::deque, std::vector<Index> > mesh_test_cpu_d_v("std::deque, std::vector");
+MeshTestAttr<Archs::None, Index, std::vector, std::deque<Index> > mesh_test_cpu_v_d("std::vector, std::deque");
+MeshTestAttr<Archs::None, Index, std::deque, std::deque<Index> > mesh_test_cpu_d_d("std::deque, std::deque");
 #endif
-//MeshTestAttr<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<100, Mem::Main, unsigned long, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: ddw needs erase(i) member
+//MeshTestAttr<Mem::Main, Index, std::vector, Foundation::DenseDataWrapper<100, Mem::Main, Index, DenseVector> > mesh_test_cpu_v_ddw_DV("std::vector, hornet::DV"); //TODO: ddw needs erase(i) member
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestHistory:
@@ -662,7 +662,7 @@ class MeshTestHistory:
       return true;
     }
 };
-MeshTestHistory<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_his_cpu_v_v("std::vector, std::vector");
+MeshTestHistory<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_his_cpu_v_v("std::vector, std::vector");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestGeometryInterface:
@@ -816,8 +816,8 @@ class MeshTestGeometryInterface:
       return true;
     }
 };
-MeshTestGeometryInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
-MeshTestGeometryInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");
+MeshTestGeometryInterface<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_fginter_cpu_v_v("std::vector, std::vector");
+MeshTestGeometryInterface<Archs::None, Index, std::vector, std::deque<Index> > mesh_test_fginter_cpu_v_d("std::vector, std::deque");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class MeshTestCommInterface:
@@ -902,6 +902,6 @@ class MeshTestCommInterface:
       return true;
     }
 };
-MeshTestCommInterface<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > mesh_test_comminter_cpu_v_v("std::vector, std::vector");
-MeshTestCommInterface<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > mesh_test_comminter_cpu_v_d("std::vector, std::deque");
+MeshTestCommInterface<Archs::None, Index, std::vector, std::vector<Index> > mesh_test_comminter_cpu_v_v("std::vector, std::vector");
+MeshTestCommInterface<Archs::None, Index, std::vector, std::deque<Index> > mesh_test_comminter_cpu_v_d("std::vector, std::deque");
 #endif // SERIAL

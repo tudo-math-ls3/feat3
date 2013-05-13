@@ -73,12 +73,12 @@ namespace FEAST
         /**
          * \brief member function retrieves number of polytopes / size of the topology
          */
-        Index size()
+        IndexType_ size()
         {
           return _topology.size();
         }
 
-        Index size() const
+        IndexType_ size() const
         {
           return _topology.size();
         }
@@ -114,12 +114,12 @@ namespace FEAST
          * \param[in] i
          * The index of the polytope whose adjacency list is to be returned
          */
-        StorageType_ & at(Index i)
+        StorageType_ & at(IndexType_ i)
         {
           return _topology.at(i);
         }
 
-        const StorageType_ & at(Index i) const
+        const StorageType_ & at(IndexType_ i) const
         {
           return _topology.at(i);
         }
@@ -130,12 +130,12 @@ namespace FEAST
          * \param[in] i
          * The index of the polytope whose adjacency list is to be returned
          */
-        StorageType_ & operator[] (Index i)
+        StorageType_ & operator[] (IndexType_ i)
         {
           return _topology.at(i);
         }
 
-        const StorageType_ & operator[] (Index i) const
+        const StorageType_ & operator[] (IndexType_ i) const
         {
           return _topology.at(i);
         }
@@ -189,7 +189,7 @@ namespace FEAST
         }
 
         ///implementation of Bufferable interface
-        virtual BufferedData<OuterStorageType_> buffer(Index estimated_size_increase = 0)
+        virtual BufferedData<OuterStorageType_> buffer(IndexType_ estimated_size_increase = 0)
         {
           BufferedData<OuterStorageType_> result;
 
@@ -256,57 +256,57 @@ namespace FEAST
 #ifndef SERIAL
 
           //get sizes
-          Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
+          Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[0],
                                     destrank,
-                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(0).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[0],
+                                    ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[0],
                                     sourcerank);
 
           //get row_ptrs
-          IndexType_ recv_num_polytopes((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1]);
+          IndexType_ recv_num_polytopes((*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[1]);
 
-          Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(1).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
+          Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(1).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[1],
                                     destrank,
-                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(1).get())->get(),
+                                    ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(1).get())->get(),
                                     recv_num_polytopes,
                                     sourcerank);
           //get data
-          IndexType_ recv_datasize((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[2]);
+          IndexType_ recv_datasize((*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[2]);
 
-          Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(2).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[2],
+          Comm<Parallel>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(2).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[2],
                                     destrank,
-                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(2).get())->get(),
+                                    ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(2).get())->get(),
                                     recv_datasize,
                                     sourcerank);
 #else
 
           //get sizes
-          Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
+          Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[0],
                                     destrank,
-                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(0).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[0],
+                                    ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(0).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[0],
                                     sourcerank);
 
           //get row_ptrs
-          IndexType_ recv_num_polytopes((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1]);
+          IndexType_ recv_num_polytopes((*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[1]);
 
-          Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(1).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
+          Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(1).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[1],
                                     destrank,
-                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(1).get())->get(),
+                                    ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(1).get())->get(),
                                     recv_num_polytopes,
                                     sourcerank);
           //get data
-          IndexType_ recv_datasize((*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[2]);
+          IndexType_ recv_datasize((*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[2]);
 
-          Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(2).get())->get(),
-                                    (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[2],
+          Comm<Serial>::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(2).get())->get(),
+                                    (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[2],
                                     destrank,
-                                    ((BufferedSharedArray<Index>*)recvbuffers.get().at(2).get())->get(),
+                                    ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(2).get())->get(),
                                     recv_datasize,
                                     sourcerank);
 #endif

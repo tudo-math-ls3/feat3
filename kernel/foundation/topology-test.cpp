@@ -59,12 +59,12 @@ class TopologyTest:
       TEST_CHECK_EQUAL(t2.size(), 0ul);
     }
 };
-TopologyTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_test_cpu_v_v("std::vector, std::vector");
-TopologyTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > topology_test_cpu_d_v("std::deque, std::vector");
-TopologyTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_test_cpu_v_d("std::vector, std::deque");
-TopologyTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_test_cpu_d_d("std::deque, std::deque");
+TopologyTest<Archs::None, Index, std::vector, std::vector<Index> > topology_test_cpu_v_v("std::vector, std::vector");
+TopologyTest<Archs::None, Index, std::deque, std::vector<Index> > topology_test_cpu_d_v("std::deque, std::vector");
+TopologyTest<Archs::None, Index, std::vector, std::deque<Index> > topology_test_cpu_v_d("std::vector, std::deque");
+TopologyTest<Archs::None, Index, std::deque, std::deque<Index> > topology_test_cpu_d_d("std::deque, std::deque");
 
-TopologyTest<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, unsigned long, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");
+TopologyTest<Mem::Main, Index, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, Index, DenseVector> > topology_test_cpu_v_ddwdv("std::vector, DV");
 
 template<typename Tag_, typename IndexType_, template<typename, typename> class OT_, typename IT_>
 class TopologyCommTest:
@@ -105,10 +105,10 @@ class TopologyCommTest:
       TEST_CHECK_EQUAL(t.at(1).at(1), 57);
     }
 };
-/*TopologyCommTest<Archs::None, unsigned long, std::vector, std::vector<unsigned long> > topology_commtest_cpu_v_v("std::vector, std::vector");
-TopologyCommTest<Archs::None, unsigned long, std::deque, std::vector<unsigned long> > topology_commtest_cpu_d_v("std::deque, std::vector");
-TopologyCommTest<Archs::None, unsigned long, std::vector, std::deque<unsigned long> > topology_commtest_cpu_v_d("std::vector, std::deque");
-TopologyCommTest<Archs::None, unsigned long, std::deque, std::deque<unsigned long> > topology_commtest_cpu_d_d("std::deque, std::deque");
+/*TopologyCommTest<Archs::None, Index, std::vector, std::vector<Index> > topology_commtest_cpu_v_v("std::vector, std::vector");
+TopologyCommTest<Archs::None, Index, std::deque, std::vector<Index> > topology_commtest_cpu_d_v("std::deque, std::vector");
+TopologyCommTest<Archs::None, Index, std::vector, std::deque<Index> > topology_commtest_cpu_v_d("std::vector, std::deque");
+TopologyCommTest<Archs::None, Index, std::deque, std::deque<Index> > topology_commtest_cpu_d_d("std::deque, std::deque");
 
-TopologyCommTest<Mem::Main, unsigned long, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, unsigned long, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");*/
+TopologyCommTest<Mem::Main, Index, std::vector, Foundation::DenseDataWrapper<15, Mem::Main, Index, DenseVector> > topology_commtest_cpu_v_ddwdv("std::vector, DV");*/
 #endif // SERIAL
