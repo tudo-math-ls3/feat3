@@ -93,7 +93,7 @@ namespace FEAST
         {
           uint64_t size;
           file.read((char *)&size, sizeof(uint64_t));
-          this->_size = size;
+          this->_size = (Index)size;
           this->_elements_size.push_back(this->_size);
 
           double * ctemp = new double[size];
@@ -102,7 +102,7 @@ namespace FEAST
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
           {
-            temp[i] = ctemp[i];
+            temp[i] = (DT_)ctemp[i];
           }
           delete[] ctemp;
           this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));

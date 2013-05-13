@@ -106,7 +106,7 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String sval(line, 0, end);
-            DT_ val(atof(sval.c_str()));
+            DT_ val((DT_)atof(sval.c_str()));
 
             rowsv.push_back(row);
             colsv.push_back(col);
@@ -184,7 +184,7 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String sval(line, 0, end);
-            DT_ val(atof(sval.c_str()));
+            DT_ val((DT_)atof(sval.c_str()));
 
             rowsv.push_back(row);
             colsv.push_back(col);
@@ -210,16 +210,17 @@ namespace FEAST
         {
           uint64_t rows;
           uint64_t columns;
-          uint64_t elements;
+          uint64_t elements64;
           file.read((char *)&rows, sizeof(uint64_t));
           file.read((char *)&columns, sizeof(uint64_t));
-          file.read((char *)&elements, sizeof(uint64_t));
+          file.read((char *)&elements64, sizeof(uint64_t));
+          Index elements = (Index)elements64;
 
           this->_size = Index(rows * columns);
           _rows = Index(rows);
           _columns = Index(columns);
           _zero_element = DT_(0);
-          _used_elements = elements;
+          _used_elements = (Index)elements;
 
           uint64_t * crow_ptr = new uint64_t[elements];
           file.read((char *)crow_ptr, (elements) * sizeof(uint64_t));
