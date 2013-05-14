@@ -97,14 +97,14 @@ namespace FEAST
 
           uint64_t * crow_ptr = new uint64_t[rows + 1];
           file.read((char *)crow_ptr, (rows + 1) * sizeof(uint64_t));
-          _row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((rows + 1) * sizeof(Index));
+          _row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(Index(rows + 1) * sizeof(Index));
           for (Index i(0) ; i < rows + 1 ; ++i)
             _row_ptr[i] = Index(crow_ptr[i]);
           delete[] crow_ptr;
 
           uint64_t * crow_ptr_end = new uint64_t[rows];
           file.read((char *)crow_ptr_end, (rows) * sizeof(uint64_t));
-          _row_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((rows) * sizeof(Index));
+          _row_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(Index(rows) * sizeof(Index));
           for (Index i(0) ; i < rows ; ++i)
             _row_ptr_end[i] = Index(crow_ptr_end[i]);
           delete[] crow_ptr_end;
