@@ -130,12 +130,12 @@ namespace FEAST
         {
           BufferedData<StorageType_> result;
           result.get().push_back(BufferedSharedArray<IndexType_>::create(3));
-          result.get().push_back(BufferedSharedArray<IndexType_>::create(_halo_elements.size() + estimated_size_increase));
-          result.get().push_back(BufferedSharedArray<IndexType_>::create(_halo_element_counterparts.size() + estimated_size_increase));
+          result.get().push_back(BufferedSharedArray<IndexType_>::create((IndexType_)(_halo_elements.size()) + estimated_size_increase));
+          result.get().push_back(BufferedSharedArray<IndexType_>::create((IndexType_)(_halo_element_counterparts.size()) + estimated_size_increase));
 
           (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[0] = 3;
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = _halo_elements.size() + estimated_size_increase;
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[2] = _halo_element_counterparts.size() + estimated_size_increase;
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = (IndexType_)(_halo_elements.size()) + estimated_size_increase;
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[2] = (IndexType_)(_halo_element_counterparts.size()) + estimated_size_increase;
 
           return result;
         }

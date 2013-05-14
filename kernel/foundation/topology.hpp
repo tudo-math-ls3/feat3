@@ -75,12 +75,12 @@ namespace FEAST
          */
         IndexType_ size()
         {
-          return _topology.size();
+          return (IndexType_)(_topology.size());
         }
 
         IndexType_ size() const
         {
-          return _topology.size();
+          return (IndexType_)(_topology.size());
         }
 
         /**
@@ -147,7 +147,7 @@ namespace FEAST
         void push_back()
         {
           StorageType_ s;
-          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, _topology.size(), s));
+          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, (IndexType_)(_topology.size()), s));
           _history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
@@ -197,16 +197,16 @@ namespace FEAST
           (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[0] = 3;
 
           //how many row-pointers?
-          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = _topology.size() + estimated_size_increase;
-          result.get().push_back(BufferedSharedArray<IndexType_>::create(_topology.size() + estimated_size_increase));
+          (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[1] = (IndexType_)(_topology.size()) + estimated_size_increase;
+          result.get().push_back(BufferedSharedArray<IndexType_>::create((IndexType_)(_topology.size()) + estimated_size_increase));
 
           IndexType_ final_size(0);
           for(IndexType_ i(0) ; i < _topology.size() ; ++i)
           {
-            (*(BufferedSharedArray<IndexType_>*)((result.get().at(1).get())))[i] = _topology.at(i).size() + estimated_size_increase;
-            final_size += _topology.at(i).size() + estimated_size_increase;
+            (*(BufferedSharedArray<IndexType_>*)((result.get().at(1).get())))[i] = (IndexType_)(_topology.at(i).size()) + estimated_size_increase;
+            final_size += (IndexType_)(_topology.at(i).size()) + estimated_size_increase;
           }
-          final_size *= _topology.size() + estimated_size_increase;
+          final_size *= (IndexType_)(_topology.size()) + estimated_size_increase;
 
           (*(BufferedSharedArray<IndexType_>*)((result.get().at(0).get())))[2] = final_size;;
 

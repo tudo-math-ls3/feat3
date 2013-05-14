@@ -37,8 +37,8 @@ namespace FEAST
       static void fill_sizes(const MeshType_<a_, b_, c_, d_, e_>& mesh,
                              typename MeshType_<a_, b_, c_, d_, e_>::index_type_* target)
       {
-        target[0] = mesh.get_topologies().at(0).get_topology().size();
-        target[1] = mesh.get_topologies().at(1).get_topology().size();
+        target[0] = (typename MeshType_<a_, b_, c_, d_, e_>::index_type_)(mesh.get_topologies().at(0).get_topology().size());
+        target[1] = (typename MeshType_<a_, b_, c_, d_, e_>::index_type_)(mesh.get_topologies().at(1).get_topology().size());
       }
 
       template<
@@ -370,10 +370,10 @@ namespace FEAST
       static void fill_sizes(const SourceMeshType_<a_, b_, c_, d_, e_>& mesh,
                              typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_* target)
       {
-        target[0] = mesh.get_topologies().at(0).get_topology().size();
-        target[1] = mesh.get_topologies().at(1).get_topology().size();
-        target[2] = mesh.get_topologies().at(3).get_topology().size();
-        target[3] = mesh.get_topologies().at(5).get_topology().size();
+        target[0] = (typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_)(mesh.get_topologies().at(0).get_topology().size());
+        target[1] = (typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_)(mesh.get_topologies().at(1).get_topology().size());
+        target[2] = (typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_)(mesh.get_topologies().at(3).get_topology().size());
+        target[3] = (typename SourceMeshType_<a_, b_, c_, d_, e_>::index_type_)(mesh.get_topologies().at(5).get_topology().size());
       }
 
       template<

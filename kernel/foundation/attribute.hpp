@@ -121,17 +121,17 @@ namespace FEAST
         {
           BufferedData<StorageType_> result;
           result.get().push_back(BufferedSharedArray<Index>::create(2));
-          result.get().push_back(BufferedSharedArray<DataType_>::create(_data.size() + estimated_size_increase));
+          result.get().push_back(BufferedSharedArray<DataType_>::create((Index)(_data.size()) + estimated_size_increase));
 
           (*(BufferedSharedArray<Index>*)((result.get().at(0).get())))[0] = 2;
-          (*(BufferedSharedArray<Index>*)((result.get().at(0).get())))[1] = _data.size() + estimated_size_increase;
+          (*(BufferedSharedArray<Index>*)((result.get().at(0).get())))[1] = (Index)(_data.size()) + estimated_size_increase;
 
           return result;
         }
 
         virtual void to_buffer(BufferedData<StorageType_>& buffer)
         {
-          for(Index i(0) ; i < _data.size() ; ++i)
+          for(Index i(0) ; i < (Index)(_data.size()) ; ++i)
           {
             (*(BufferedSharedArray<DataType_>*)((buffer.get().at(1).get())))[i] = _data.at(i);
           }
