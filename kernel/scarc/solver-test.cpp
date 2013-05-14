@@ -1,5 +1,5 @@
-#define SERIAL
 #include <kernel/base_header.hpp>
+#ifdef SERIAL
 #include <test_system/test_system.hpp>
 
 #include <kernel/util/cpp11_smart_pointer.hpp>
@@ -84,3 +84,4 @@ class SolverTest:
     }
 };
 SolverTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("ELL double");
+#endif // SERIAL
