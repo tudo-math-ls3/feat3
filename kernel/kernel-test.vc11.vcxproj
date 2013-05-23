@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- global project properties -->
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{406ECADF-789C-4A4A-997F-09DD444083FC}</ProjectGuid>
+    <FeastAppName>kernel-test</FeastAppName>
+    <FeastRootPath>$(ProjectDir)..</FeastRootPath>
+  </PropertyGroup>
+
+  <!-- import common config -->
+  <Import Project="$(FeastRootPath)\visual_studio\vc11-common-config.xml" />
+
+  <!-- Kernel Source Inclusion List -->
+  <ItemGroup>
+    <!-- include geometry test_aux sources -->
+    <FeastKernelTestIncludeSource Include="geometry\test_aux\*.cpp" />
+  </ItemGroup>
+
+  <!-- ************************************************************************************************************* -->
+  <!-- File Inclusion Lists -->
+  <!-- ************************************************************************************************************* -->
+  <!-- Header File List -->
+  <ItemGroup>
+    <ClInclude Include="..\test_system\*.hpp" />
+    <ClInclude Include="**\*.hpp" />
+  </ItemGroup>
+  <!-- Source File List -->
+  <ItemGroup>
+    <ClCompile Include="..\test_system\*.cpp" />
+    <ClCompile Include="**\*-test*.cpp" Exclude="@(FeastKernelTestExcludeSource)"/>
+    <ClCompile Include="@(FeastKernelTestIncludeSource)" Condition="'@(FeastKernelTestIncludeSource)'!=''" />
+  </ItemGroup>
+  <!-- CUDA Source File List -->
+  <!--<ItemGroup Condition="'$(BackendCUDA)'=='true'">
+    <CudaCompile Include="**\*.cu" Exclude="@(FeastKernelExcludeCuda)" />
+  </ItemGroup>-->
+  <PropertyGroup>
+    <ShowAllFiles>true</ShowAllFiles>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="kernel.vc11.vcxproj">
+      <Project>{98608C16-F806-46BE-BDB4-77BA4023DC38}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <!-- import lib target -->
+  <Import Project="$(FeastRootPath)\visual_studio\vc11-target-app.xml" />
+</Project>
