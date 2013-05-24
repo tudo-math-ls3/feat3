@@ -19,14 +19,14 @@ TARGET_LINK_LIBRARIES(dbg-cub feast)
 ADD_EXECUTABLE(dbg-fe-asm-1 dbg_fe_asm_1/dbg_fe_asm_1.cpp)
 TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)
 
+ADD_EXECUTABLE(dbg-fe-asm-2 dbg_fe_asm_2/dbg_fe_asm_2.cpp)
+TARGET_LINK_LIBRARIES(dbg-fe-asm-2 feast)
+
 ADD_EXECUTABLE(dbg-mirror dbg_mirror/dbg_mirror.cpp)
 TARGET_LINK_LIBRARIES(dbg-mirror feast)
 
 ADD_EXECUTABLE(dbg-nodefunc dbg_nodefunc/dbg_nodefunc.cpp)
 TARGET_LINK_LIBRARIES(dbg-nodefunc feast)
-
-ADD_EXECUTABLE(dbg-reader dbg_reader/dbg_reader.cpp)
-TARGET_LINK_LIBRARIES(dbg-reader feast)
 
 ADD_EXECUTABLE(dbg-patch dbg_patch/dbg_patch.cpp)
 TARGET_LINK_LIBRARIES(dbg-patch feast)
