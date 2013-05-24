@@ -12,6 +12,11 @@ namespace FEAST
    */
   namespace Cubature
   {
+    enum CtorFactory
+    {
+      ctor_factory
+    };
+
     /**
      * \brief Cubature Rule class template
      *
@@ -33,16 +38,6 @@ namespace FEAST
       {
         dimension = ShapeType::dimension
       };
-
-      /**
-       * \brief Cubature rule factory interface
-       */
-      class Factory
-      {
-      public:
-        virtual ~Factory() {}
-        virtual Rule produce() const = 0;
-      }; // class Rule<...>::Factory
 
     protected:
       String _name;
@@ -72,6 +67,16 @@ namespace FEAST
         }
       }
 
+      template<typename Factory_>
+      Rule(CtorFactory, const Factory_& factory) :
+        _name(),
+        _num_points(0),
+        _weights(nullptr),
+        _points(nullptr)
+      {
+        factory.create(*this);
+      }
+
       Rule(const Rule& other) :
         _name(),
         _num_points(0),
@@ -79,15 +84,6 @@ namespace FEAST
         _points(nullptr)
       {
         *this = other;
-      }
-
-      Rule(const Factory& factory) :
-        _name(),
-        _num_points(0),
-        _weights(nullptr),
-        _points(nullptr)
-      {
-        *this = factory.produce();
       }
 
       virtual ~Rule()

@@ -17,7 +17,7 @@ namespace FEAST
         template<
           typename Driver_,
           bool variadic_ = (Driver_::variadic != 0)>
-        class DriverFactoryAliasFunctor;
+        class DriverFactoryAliasMapper;
       } // namespace Intern
       /// \endcond
 
@@ -28,13 +28,7 @@ namespace FEAST
        * the scalar cubature factory interface.
        *
        * \tparam Driver_
-       * The scalar cubature driver class template to be used.
-       *
-       * \tparam Weight_
-       * The data type for the cubature weights.
-       *
-       * \tparam Coord_
-       * The data type for the cubature point coordinates.
+       * The scalar cubature driver class to be used.
        *
        * \tparam variadic_
        * Specifies whether the driver is variadic. This template parameter is chosen automatically
@@ -43,10 +37,8 @@ namespace FEAST
        * \author Peter Zajac
        */
       template<
-        template<typename, typename> class Driver_,
-        typename Weight_ = Real,
-        typename Coord_ = Real,
-        bool variadic_ = (Driver_<Weight_, Coord_>::variadic != 0)>
+        typename Driver_,
+        bool variadic_ = (Driver_::variadic != 0)>
       class DriverFactory DOXY({});
 
       /**
@@ -54,18 +46,11 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      template<
-        template<typename, typename> class Driver_,
-        typename Weight_,
-        typename Coord_>
-      class DriverFactory<Driver_, Weight_, Coord_, false> :
-        public Rule<Weight_, Coord_>::Factory
+      template<typename Driver_>
+      class DriverFactory<Driver_, false>
       {
       public:
-        typedef Weight_ WeightType;
-        typedef Coord_ CoordType;
-        typedef Rule<Weight_, Coord_> RuleType;
-        typedef Driver_<Weight_, Coord_> DriverType;
+        typedef Driver_ DriverType;
         enum
         {
           variadic = 0,
@@ -79,29 +64,21 @@ namespace FEAST
         }
 
         /**
-         * \brief Produces the cubature rule.
-         *
-         * This is an implementation of the scalar cubature factory interface.
-         *
-         * \returns
-         * The cubature rule.
-         */
-        virtual RuleType produce() const
-        {
-          return create();
-        }
-
-        /**
          * \brief Creates the cubature rule.
          *
+         * \param[out] rule
+         * The rule to be created.
+         *
          * \returns
-         * The cubature rule.
+         * \c true
          */
-        static RuleType create()
+        template<typename Weight_, typename Coord_>
+        static bool create(Rule<Weight_, Coord_>& rule)
         {
-          RuleType rule(DriverType::num_points, DriverType::name());
+          // create the rule
+          rule.create(DriverType::num_points, DriverType::name());
           DriverType::fill(rule);
-          return rule;
+          return true;
         }
 
         /**
@@ -110,30 +87,30 @@ namespace FEAST
          * This function creates the cubature rule if the string in \p name represents a valid
          * representation of the cubature rule's name.
          *
-         * \param[in] name
-         * The name of the cubature rule to create.
-         *
          * \param[out] rule
          * The rule to be created.
+         *
+         * \param[in] name
+         * The name of the cubature rule to create.
          *
          * \returns
          * \c true, if the cubature rule was created successfully, or \c false, if \p name is not
          * a valid name of the cubature rule implemented by this factory.
          */
-        static bool create(RuleType& rule, const String& name)
+        template<typename Weight_, typename Coord_>
+        static bool create(Rule<Weight_, Coord_>& rule, const String& name)
         {
           // map alias names
-          Intern::DriverFactoryAliasFunctor<DriverType> functor(name);
-          DriverType::alias(functor);
-          String mapped_name(functor.name());
+          Intern::DriverFactoryAliasMapper<DriverType> mapper(name);
+          DriverType::alias(mapper);
+          String mapped_name(mapper.name());
 
           // check mapped name
           if(mapped_name.trim().compare_no_case(DriverType::name()) != 0)
             return false;
 
           // create the rule
-          rule = create();
-          return true;
+          return create(rule);
         }
 
         /**
@@ -159,18 +136,11 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      template<
-        template<typename,typename> class Driver_,
-        typename Weight_,
-        typename Coord_>
-      class DriverFactory<Driver_, Weight_, Coord_, true> :
-        public Rule<Weight_, Coord_>::Factory
+      template<typename Driver_>
+      class DriverFactory<Driver_, true>
       {
       public:
-        typedef Weight_ WeightType;
-        typedef Coord_ CoordType;
-        typedef Rule<Weight_, Coord_> RuleType;
-        typedef Driver_<Weight_, Coord_> DriverType;
+        typedef Driver_ DriverType;
         enum
         {
           variadic = 1,
@@ -191,35 +161,35 @@ namespace FEAST
         }
 
         /**
-         * \brief Produces the cubature rule.
+         * \brief Creates the cubature rule.
          *
-         * This is an implementation of the scalar cubature factory interface.
-         *
-         * \returns
-         * The cubature rule.
+         * \param[out] rule
+         * The cubature rule to be created.
          */
-        virtual RuleType produce() const
+        template<typename Weight_, typename Coord_>
+        bool create(Rule<Weight_, Coord_>& rule)
         {
-          return create(_num_points);
+          return create(rule, _num_points);
         }
 
         /**
          * \brief Creates the cubature rule.
          *
+         * \param[out] rule
+         * The cubature rule to be created.
+         *
          * \param[in] num_points
          * The number of points for the cubature rule.
-         *
-         * \returns
-         * The cubature rule.
          */
-        static RuleType create(Index num_points)
+        template<typename Weight_, typename Coord_>
+        static bool create(Rule<Weight_, Coord_>& rule, Index num_points)
         {
-          ASSERT_(num_points >= DriverType::min_points);
-          ASSERT_(num_points <= DriverType::max_points);
+          if((num_points < DriverType::min_points) || (num_points > DriverType::max_points))
+            return false;
 
-          RuleType rule(num_points, (DriverType::name() + ":" + stringify(num_points)));
+          rule.create(num_points, (DriverType::name() + ":" + stringify(num_points)));
           DriverType::fill(rule, num_points);
-          return rule;
+          return true;
         }
 
         /**
@@ -228,22 +198,23 @@ namespace FEAST
          * This function creates the cubature rule if the string in \p name represents a valid
          * representation of the cubature rule's name.
          *
-         * \param[in] name
-         * The name of the cubature rule to create.
-         *
          * \param[out] rule
          * The rule to be created.
+         *
+         * \param[in] name
+         * The name of the cubature rule to create.
          *
          * \returns
          * \c true, if the cubature rule was created successfully, or \c false, if \p name is not
          * a valid name of the cubature rule implemented by this factory.
          */
-        static bool create(RuleType& rule, const String& name)
+        template<typename Weight_, typename Coord_>
+        static bool create(Rule<Weight_, Coord_>& rule, const String& name)
         {
           // map alias names
-          Intern::DriverFactoryAliasFunctor<DriverType> functor(name);
-          DriverType::alias(functor);
-          String mapped_name(functor.name());
+          Intern::DriverFactoryAliasMapper<DriverType> mapper(name);
+          DriverType::alias(mapper);
+          String mapped_name(mapper.name());
 
           // try to find a colon within the string
           String::size_type k = mapped_name.find_first_of(':');
@@ -264,8 +235,7 @@ namespace FEAST
             return false;
 
           // try to create the rule
-          rule = create(num_points);
-          return true;
+          return create(rule, num_points);
         }
 
         /**
@@ -290,14 +260,14 @@ namespace FEAST
       namespace Intern
       {
         template<typename Driver_>
-        class DriverFactoryAliasFunctor<Driver_, false>
+        class DriverFactoryAliasMapper<Driver_, false>
         {
         private:
           String _name;
           bool _mapped;
 
         public:
-          explicit DriverFactoryAliasFunctor(const String& name) :
+          explicit DriverFactoryAliasMapper(const String& name) :
             _name(name),
             _mapped(false)
           {
@@ -322,14 +292,14 @@ namespace FEAST
         };
 
         template<typename Driver_>
-        class DriverFactoryAliasFunctor<Driver_, true>
+        class DriverFactoryAliasMapper<Driver_, true>
         {
         private:
           String _name;
           bool _mapped;
 
         public:
-          explicit DriverFactoryAliasFunctor(const String& name) :
+          explicit DriverFactoryAliasMapper(const String& name) :
             _name(name),
             _mapped(false)
           {

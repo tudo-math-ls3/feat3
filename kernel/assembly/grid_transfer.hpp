@@ -72,11 +72,12 @@ namespace FEAST
        * \param[in] cubature_name
        * A string containing the name of the cubature rule to be used for integration.
        */
+      template<typename CubatureFactory_>
       static void assemble_prolongation(
         Matrix_& matrix,
         const FineSpace_& fine_space,
         const CoarseSpace_& coarse_space,
-        const String& cubature_name)
+        const CubatureFactory_& cubature_factory)
       {
 
         // typedefs for trafos, mesh and shape
@@ -113,7 +114,6 @@ namespace FEAST
 
         // typedefs for cubature rule and factory
         typedef typename Intern::CubatureTraits<FineTrafoEvaluator>::RuleType CubatureRuleType;
-        typedef typename Cubature::DynamicFactorySelect<CubatureRuleType>::Type CubatureFactory;
 
         // create matrix scatter-axpy
         MatrixScatterAxpy<Matrix_> scatter_axpy(matrix);
@@ -135,8 +135,8 @@ namespace FEAST
         CoarseSpaceEvaluator coarse_space_eval(coarse_space);
 
         // create the cubature rules
-        CubatureRuleType fine_cubature(CubatureFactory::create(cubature_name));
-        CubatureRuleType coarse_cubature(CubatureFactory::create("refine:" + cubature_name));
+        CubatureRuleType coarse_cubature, fine_cubature(Cubature::ctor_factory, cubature_factory);
+        Cubature::RefineFactoryCore::create(coarse_cubature, fine_cubature);
 
         // allocate fine-mesh mass matrix
         Tiny::Matrix<DataType, FineSpaceEvaluator::max_local_dofs, FineSpaceEvaluator::max_local_dofs> mass;

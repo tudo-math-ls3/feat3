@@ -12,8 +12,9 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
+      template<typename Shape_>
       class TrapezoidalDriverBase :
-        public DriverBase
+        public DriverBase<Shape_>
       {
       public:
         enum
@@ -35,39 +36,22 @@ namespace FEAST
      * \brief Trapezoidal driver class template
      *
      * This driver implements the trapezoidal rule.
-     * \see http://en.wikipedia.org/wiki/Trapezoidal_rule1
+     * \see http://en.wikipedia.org/wiki/Trapezoidal_rule
      *
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \tparam Weight_
-     * The data type of the cubature weights.
-     *
-     * \tparam Coord_
-     * The data type of the cubature point coordinates.
-     *
-     * \tparam Point_
-     *
      * \author Peter Zajac
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class TrapezoidalDriver DOXY({});
 
     // Simplex specialisation
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class TrapezoidalDriver<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
-      public Intern::TrapezoidalDriverBase
+    template<int dim_>
+    class TrapezoidalDriver<Shape::Simplex<dim_> > :
+      public Intern::TrapezoidalDriverBase<Shape::Simplex<dim_> >
     {
     public:
-      typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
       enum
       {
         num_points = dim_ + 1
@@ -79,7 +63,11 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(RuleType& rule)
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
+      static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         for(Index i(0); i <= Index(dim_); ++i)
         {
@@ -93,22 +81,17 @@ namespace FEAST
           }
         }
       }
-    }; // class TrapezoidalDriver<Simplex<...>,...>
+    }; // class TrapezoidalDriver<Simplex<...>>
 
     // Hypercube specialisation
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class TrapezoidalDriver<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> :
-      public Intern::TrapezoidalDriverBase
+    template<int dim_>
+    class TrapezoidalDriver<Shape::Hypercube<dim_> > :
+      public Intern::TrapezoidalDriverBase<Shape::Hypercube<dim_> >
     {
     public:
-      typedef Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> RuleType;
       enum
       {
-        num_points = (1 << dim_)
+        num_points = (1 << dim_) // = 2^dim_
       };
 
       /**
@@ -117,7 +100,11 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(RuleType& rule)
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
+      static void fill(Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_>& rule)
       {
         for(Index i(0); i < Index(1 << dim_); ++i)
         {
@@ -131,7 +118,7 @@ namespace FEAST
           }
         }
       }
-    }; // class TrapezoidalDriver<Hypercube<...>,...>
+    }; // class TrapezoidalDriver<Hypercube<...>>
   } // namespace Cubature
 } // namespace FEAST
 

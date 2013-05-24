@@ -68,8 +68,8 @@ namespace FEAST
        * \param[in] space
        * The Finite-Element space that the coefficient vector belongs to.
        *
-       * \param[in] cubature_name
-       * The name of the cubature rule that is to be used for integration.
+       * \param[in] cubature_factory
+       * The name of the cubature factory that is to be used for integration.
        *
        * \returns
        * The L2-error.
@@ -77,12 +77,13 @@ namespace FEAST
       template<
         typename Functor_,
         typename Vector_,
-        typename Space_>
+        typename Space_,
+        typename CubatureFactory_>
       static typename Vector_::DataType compute(
         const Functor_& functor,
         const Vector_& vector,
         const Space_& space,
-        const String& cubature_name)
+        const CubatureFactory_& cubature_factory)
       {
         // ensure the functor offers function values
         static_assert(Functor_::can_value != 0, "analytic functor can't compute function values");
@@ -97,12 +98,9 @@ namespace FEAST
         typedef AsmTraits1<typename Vector_::DataType, Space_, TrafoConfig, SpaceConfig> AsmTraits;
         /// data type
         typedef typename AsmTraits::DataType DataType;
-        /// cubature rule type
-        typedef typename AsmTraits::CubatureRuleType CubatureRuleType;
 
         // create the cubature rule
-        typedef typename AsmTraits::CubatureDynamicFactoryType CubatureDynamicFactoryType;
-        CubatureRuleType cubature_rule(CubatureDynamicFactoryType::create(cubature_name));
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
@@ -263,8 +261,8 @@ namespace FEAST
        * \param[in] space
        * The Finite-Element space that the coefficient vector belongs to.
        *
-       * \param[in] cubature_name
-       * The name of the cubature rule that is to be used for integration.
+       * \param[in] cubature_factory
+       * The name of the cubature factory that is to be used for integration.
        *
        * \returns
        * The H1-error.
@@ -272,12 +270,13 @@ namespace FEAST
       template<
         typename Functor_,
         typename Vector_,
-        typename Space_>
+        typename Space_,
+        typename CubatureFactory_>
       static typename Vector_::DataType compute(
         const Functor_& functor,
         const Vector_& vector,
         const Space_& space,
-        const String& cubature_name)
+        const CubatureFactory_& cubature_factory)
       {
         // ensure the functor offers gradients
         static_assert(Functor_::can_grad != 0, "analytic functor can't compute gradients");
@@ -292,12 +291,9 @@ namespace FEAST
         typedef AsmTraits1<typename Vector_::DataType, Space_, TrafoConfig, SpaceConfig> AsmTraits;
         /// data type
         typedef typename AsmTraits::DataType DataType;
-        /// cubature rule type
-        typedef typename AsmTraits::CubatureRuleType CubatureRuleType;
 
         // create the cubature rule
-        typedef typename AsmTraits::CubatureDynamicFactoryType CubatureDynamicFactoryType;
-        CubatureRuleType cubature_rule(CubatureDynamicFactoryType::create(cubature_name));
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();

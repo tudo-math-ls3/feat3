@@ -12,62 +12,6 @@ namespace FEAST
 {
   namespace Cubature
   {
-    /// \cond internal
-    namespace Intern
-    {
-      class HammerStroudD2DriverBase :
-        public DriverBase
-      {
-      public:
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-        };
-
-        ///Returns the name of the cubature rule.
-        static String name()
-        {
-          return "hammer-stroud-degree-2";
-        }
-      };
-
-      class HammerStroudD3DriverBase :
-        public DriverBase
-      {
-      public:
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-        };
-
-        ///Returns the name of the cubature rule.
-        static String name()
-        {
-          return "hammer-stroud-degree-3";
-        }
-      };
-
-      class HammerStroudD5DriverBase :
-        public DriverBase
-      {
-      public:
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-        };
-
-        ///Returns the name of the cubature rule.
-        static String name()
-        {
-          return "hammer-stroud-degree-5";
-        }
-      };
-    } // namespace Intern
-    /// \endcond
-
     /**
      * \brief Hammer-Stroud-D2 driver class template
      *
@@ -78,37 +22,29 @@ namespace FEAST
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \tparam Weight_
-     * The data type of the cubature weights.
-     *
-     * \tparam Coord_
-     * The data type of the cubature point coordinates.
-     *
-     * \tparam Point_
-     *
      * \author Constantin Christof
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class HammerStroudD2Driver DOXY({});
 
     // Simplex specialisation
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class HammerStroudD2Driver<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
-      public Intern::HammerStroudD2DriverBase
+    template<int dim_>
+    class HammerStroudD2Driver<Shape::Simplex<dim_> > :
+      public DriverBase<Shape::Simplex<dim_> >
     {
     public:
       enum
       {
+        /// this rule is not variadic
+        variadic = 0,
         num_points = dim_ + 1
       };
+
+      ///Returns the name of the cubature rule.
+      static String name()
+      {
+        return "hammer-stroud-degree-2";
+      }
 
       /**
        * \brief Fills the cubature rule structure.
@@ -116,6 +52,10 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
@@ -155,37 +95,29 @@ namespace FEAST
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \tparam Weight_
-     * The data type of the cubature weights.
-     *
-     * \tparam Coord_
-     * The data type of the cubature point coordinates.
-     *
-     * \tparam Point_
-     *
      * \author Constantin Christof
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class HammerStroudD3Driver DOXY({});
 
     // Simplex specialisation
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class HammerStroudD3Driver<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
-      public Intern::HammerStroudD3DriverBase
+    template<int dim_>
+    class HammerStroudD3Driver<Shape::Simplex<dim_> > :
+      public DriverBase<Shape::Simplex<dim_> >
     {
     public:
       enum
       {
+        /// this rule is not variadic
+        variadic = 0,
         num_points = dim_ + 2
       };
+
+      ///Returns the name of the cubature rule.
+      static String name()
+      {
+        return "hammer-stroud-degree-3";
+      }
 
       /**
        * \brief Fills the cubature rule structure.
@@ -193,6 +125,10 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
@@ -244,37 +180,30 @@ namespace FEAST
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \tparam Weight_
-     * The data type of the cubature weights.
-     *
-     * \tparam Coord_
-     * The data type of the cubature point coordinates.
-     *
-     * \tparam Point_
-     *
      * \author Constantin Christof
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class HammerStroudD5Driver DOXY({});
 
     // Simplex specialisation
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class HammerStroudD5Driver<Shape::Simplex<3>, Weight_, Coord_, Point_> :
-      public Intern::HammerStroudD5DriverBase
+    template<>
+    class HammerStroudD5Driver<Shape::Simplex<3> > :
+      public DriverBase<Shape::Simplex<3> >
     {
     public:
       enum
       {
+        /// this rule is not variadic
+        variadic = 0,
         dim = 3,
         num_points = 15
       };
+
+      ///Returns the name of the cubature rule.
+      static String name()
+      {
+        return "hammer-stroud-degree-5";
+      }
 
       /**
        * \brief Fills the cubature rule structure.
@@ -282,7 +211,11 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(Rule<Shape::Simplex<dim>, Weight_, Coord_, Point_>& rule)
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
+      static void fill(Rule<Shape::Simplex<3>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
         Weight_ V = Weight_(1) / Weight_(Factorial<dim>::value);
@@ -380,7 +313,6 @@ namespace FEAST
         }
       }
     }; // class HammerStroudD5Driver<Simplex<3>,...>
-
   } // namespace Cubature
 } // namespace FEAST
 

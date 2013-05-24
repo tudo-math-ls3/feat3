@@ -147,8 +147,9 @@ namespace FEAST
         typename Vector_::DataType alpha = typename Vector_::DataType(1))
       {
         LinearScalarIntegralFunctor functor;
+        Cubature::DynamicFactory cubature_factory(cubature_name);
         LinearFunctional<Vector_, LinearScalarIntegralFunctor<Function_>, Space_>::
-          assemble(vector, functor, space, cubature_name, alpha);
+          assemble(vector, functor, space, cubature_factory, alpha);
       }
     }; // class LinearScalarIntegralFunctor
   } // namespace Assembly

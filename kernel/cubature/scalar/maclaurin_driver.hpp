@@ -17,17 +17,8 @@ namespace FEAST
        * This driver implements the Maclaurin cubature rules.
        * \see http://de.wikipedia.org/wiki/Newton-Cotes-Formeln
        *
-       * \tparam Weight_
-       * The data type for the cubature weights.
-       *
-       * \tparam Coord_
-       * The data type for the cubature point coordinates.
-       *
        * \author Constantin Christof
        */
-      template<
-        typename Weight_,
-        typename Coord_>
       class MaclaurinDriver :
         public DriverBase
       {
@@ -53,9 +44,13 @@ namespace FEAST
          *
          * \param[in,out] rule
          * The cubature rule to be filled.
+         *
          * \param[in] num_points
          * The number of quadrature points.
          */
+        template<
+          typename Weight_,
+          typename Coord_>
         static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
           // how many points do we have?

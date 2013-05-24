@@ -23,9 +23,6 @@ namespace FEAST
        *
        * \author Peter Zajac
        */
-      template<
-        typename Weight_,
-        typename Coord_>
       class FactoryWrapper
       {
       protected:
@@ -89,10 +86,10 @@ namespace FEAST
           {
           }
 
-          template<template<typename,typename> class Driver_>
+          template<typename Driver_>
           void driver()
           {
-            _functor.template factory< DriverFactory<Driver_, Weight_, Coord_> >();
+            _functor.template factory< DriverFactory<Driver_> >();
           }
         };
         /// \endcond

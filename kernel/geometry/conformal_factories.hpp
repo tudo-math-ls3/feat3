@@ -123,7 +123,7 @@ namespace FEAST
         {
           for(int j(0); j < idx.num_indices; ++j)
           {
-            idx[i][j] = FimType::map(i, j);
+            idx[i][j] = FimType::map(int(i), j);
           }
         }
       }

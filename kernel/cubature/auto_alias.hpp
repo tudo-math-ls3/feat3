@@ -5,6 +5,8 @@
 // includes, FEAST
 #include <kernel/shape.hpp>
 #include <kernel/cubature/scalar/gauss_legendre_driver.hpp>
+#include <kernel/cubature/lauffer_driver.hpp>
+#include <kernel/cubature/hammer_stroud_driver.hpp>
 
 // includes, STL
 #include <algorithm>
@@ -68,54 +70,76 @@ namespace FEAST
     // \cond internal
     namespace Intern
     {
-      template<int dim_>
-      class AutoDegree< Shape::Simplex<dim_> >
+      template<>
+      class AutoDegree< Shape::Simplex<1> >
       {
       public:
         static String choose(Index degree)
         {
-          if(dim_ == 1) // do the same as for hypercubes
-          {
-            // k-point Gauss-Legendre cubature is exact up to a degree of 2*k-1,
-            // so for a degree of n we need k := (n+2)/2 = n/2 + 1
-            Index k = degree/2 + 1;
+          // k-point Gauss-Legendre cubature is exact up to a degree of 2*k-1,
+          // so for a degree of n we need k := (n+2)/2 = n/2 + 1
+          Index k = degree/2 + 1;
 
-            // Also, ensure that we respect the currently implemented borders...
-            k = std::max(k, Index(Scalar::GaussLegendreDriverBase::min_points));
-            k = std::min(k, Index(Scalar::GaussLegendreDriverBase::max_points));
+          // Also, ensure that we respect the currently implemented borders...
+          k = std::max(k, Index(Scalar::GaussLegendreDriver::min_points));
+          k = std::min(k, Index(Scalar::GaussLegendreDriver::max_points));
 
-            // and build the name
-            return
-#ifdef FEAST_CUBATURE_TENSOR_PREFIX
-            "tensor:" +
+          // and build the name
+          return
+#ifdef FEAST_CUBATURE_SCALAR_PREFIX
+            "scalar:" +
 #endif
-            Scalar::GaussLegendreDriverBase::name() + ":" + stringify(k);
-          }
-          else if(degree <= 1) // barycentre
+            Scalar::GaussLegendreDriver::name() + ":" + stringify(k);
+        }
+      };
+
+      template<>
+      class AutoDegree< Shape::Simplex<2> >
+      {
+      public:
+        static String choose(Index degree)
+        {
+          if(degree <= 1) // barycentre
           {
-            return BarycentreDriverBase::name();
+            return BarycentreDriver<Shape::Simplex<2> >::name();
           }
           else if(degree == 2) // Hammer-Stroud of degree 2
           {
-            return HammerStroudD2DriverBase::name();
+            return HammerStroudD2Driver<Shape::Simplex<2> >::name();
+          }
+          else// if(degree == 3) // Hammer-Stroud of degree 3
+          {
+            return HammerStroudD3Driver<Shape::Simplex<2> >::name();
+          }
+        }
+      };
+
+      template<>
+      class AutoDegree< Shape::Simplex<3> >
+      {
+      public:
+        static String choose(Index degree)
+        {
+          if(degree <= 1) // barycentre
+          {
+            return BarycentreDriver<Shape::Simplex<3> >::name();
+          }
+          else if(degree == 2) // Hammer-Stroud of degree 2
+          {
+            return HammerStroudD2Driver<Shape::Simplex<3> >::name();
           }
           else if(degree == 3) // Hammer-Stroud of degree 3
           {
-            return HammerStroudD3DriverBase::name();
+            return HammerStroudD3Driver<Shape::Simplex<3> >::name();
           }
-          else if(dim_ == 3)
+          else if(degree == 4) // Lauffer formula of degree 4 only for tetrahedron
           {
-            if(degree <= 4) // Lauffer formula of degree 4 only for tetrahedron
-            {
-              return LaufferD4DriverBase::name();
-            }
-            else // Hammer-Stroud of degree 5 only for tetrahedra
-            {
-              return HammerStroudD5DriverBase::name();
-            }
+            return LaufferD4Driver<Shape::Simplex<3> >::name();
           }
-          else
-            return HammerStroudD3DriverBase::name();
+          else // Hammer-Stroud of degree 5 only for tetrahedra
+          {
+            return HammerStroudD5Driver<Shape::Simplex<3> >::name();
+          }
         }
       };
 
@@ -130,15 +154,15 @@ namespace FEAST
           Index k = degree/2 + 1;
 
           // Also, ensure that we respect the currently implemented borders...
-          k = std::max(k, Index(Scalar::GaussLegendreDriverBase::min_points));
-          k = std::min(k, Index(Scalar::GaussLegendreDriverBase::max_points));
+          k = std::max(k, Index(Scalar::GaussLegendreDriver::min_points));
+          k = std::min(k, Index(Scalar::GaussLegendreDriver::max_points));
 
           // and build the name
           return
 #ifdef FEAST_CUBATURE_TENSOR_PREFIX
             "tensor:" +
 #endif
-            Scalar::GaussLegendreDriverBase::name() + ":" + stringify(k);
+            Scalar::GaussLegendreDriver::name() + ":" + stringify(k);
         }
       };
     } // namespace Intern

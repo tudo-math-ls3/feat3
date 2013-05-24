@@ -115,8 +115,9 @@ void test_interpolation(Index level)
   Assembly::Interpolator::project(vector, functor, space);
 
   // compute L2-error
-  DataType l2err = Assembly::ScalarErrorComputerL2::compute(functor, vector, space, "auto-degree:10");
-  DataType h1err = Assembly::ScalarErrorComputerH1::compute(functor, vector, space, "auto-degree:10");
+  Cubature::DynamicFactory cubature_factory("auto-degree:10");
+  DataType l2err = Assembly::ScalarErrorComputerL2::compute(functor, vector, space, cubature_factory);
+  DataType h1err = Assembly::ScalarErrorComputerH1::compute(functor, vector, space, cubature_factory);
 
   // print error
   std::cout << "Level: " << level <<

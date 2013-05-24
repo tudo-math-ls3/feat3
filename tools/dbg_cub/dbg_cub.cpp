@@ -2,8 +2,11 @@
 #define FEAST_CUBATURE_SCALAR_PREFIX 1
 #include <kernel/cubature/scalar/dynamic_factory.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
+
 #include <iostream>
 #include <cstdio>
+#include <set>
+#include <map>
 
 using namespace FEAST;
 using namespace FEAST::Cubature;
@@ -11,61 +14,36 @@ using namespace FEAST::Cubature;
 typedef std::set<String> StringSet;
 typedef std::map<String,String> StringMap;
 
+#include "avail_functor.hpp"
+
 void print_avail_scalar()
 {
+  StringSet names;
+  StringMap aliases;
+  AvailFunctor functor(names, aliases);
+  Scalar::FactoryWrapper::factory(functor);
+
   std::cout << "Available scalar cubature names:" << std::endl;
-
-  StringMap names;
-  Scalar::DynamicFactory<>::avail(names);
-  for(StringMap::iterator it(names.begin()); it != names.end(); ++it)
+  for(StringSet::iterator it(names.begin()); it != names.end(); ++it)
   {
-    std::cout << it->first;
-    if(!it->second.empty())
-      std::cout << " [ " << it->second << " ]";
-    else
-      std::cout << " *";
-    std::cout << std::endl;
+    std::cout << *it << std::endl;
   }
 
-  std::cout << std::endl;
-}
-
-template<typename Shape_>
-void print_avail()
-{
-  std::cout << "Available cubature names for '" << Shape_::name() << "' :" << std::endl;
-
-  StringMap names;
-  DynamicFactory<Shape_>::avail(names);
-  for(StringMap::iterator it(names.begin()); it != names.end(); ++it)
+  std::cout << std::endl << "Available scalar cubature aliases:" << std::endl;
+  for(StringMap::iterator it(aliases.begin()); it != aliases.end(); ++it)
   {
-    std::cout << it->first;
-    if(!it->second.empty())
-      std::cout << " [ " << it->second << " ]";
-    else
-      std::cout << " *";
-    std::cout << std::endl;
+    std::cout << it->first << " [ " << it->second << " ]" << std::endl;
   }
-
   std::cout << std::endl;
-}
-
-void print_avail_all()
-{
-  print_avail_scalar();
-  print_avail< Shape::Simplex<1> >();
-  print_avail< Shape::Simplex<2> >();
-  print_avail< Shape::Simplex<3> >();
-  print_avail< Shape::Hypercube<1> >();
-  print_avail< Shape::Hypercube<2> >();
-  print_avail< Shape::Hypercube<3> >();
 }
 
 void test_dynamic_scalar(const String& name)
 {
   // create rule
   Scalar::Rule<> rule;
-  if(!Scalar::DynamicFactory<>::create(rule, name))
+  Scalar::DynamicFactory factory(name);
+  //if(!Scalar::DynamicFactory::create(rule, name))
+  if(!factory.create(rule))
   {
     std::cout << "\nNo scalar cubature rule named '" << name << "' found!" << std::endl;
     return;
@@ -81,11 +59,32 @@ void test_dynamic_scalar(const String& name)
 }
 
 template<typename Shape_>
+void print_avail()
+{
+  StringSet names;
+  StringMap aliases;
+  AvailFunctor functor(names, aliases);
+  FactoryWrapper<Shape_>::factory_no_refine(functor);
+
+  std::cout << "Available cubature names for '" << Shape_::name() << "' :" << std::endl;
+  for(StringSet::iterator it(names.begin()); it != names.end(); ++it)
+  {
+    std::cout << *it << std::endl;
+  }
+
+  std::cout << std::endl << "Available cubature aliases for '" << Shape_::name() << "' :" << std::endl;
+  for(StringMap::iterator it(aliases.begin()); it != aliases.end(); ++it)
+  {
+    std::cout << it->first << " [ " << it->second << " ]" << std::endl;
+  }
+  std::cout << std::endl;}
+
+template<typename Shape_>
 void test_dynamic(const String& name)
 {
   // create rule
   Rule<Shape_> rule;
-  if(!DynamicFactory<Shape_>::create(rule, name))
+  if(!DynamicFactory::create(rule, name))
   {
     std::cout << "\nNo " + Shape_::name() + " cubature rule named '" << name << "' found!" << std::endl;
     return;
@@ -107,6 +106,17 @@ void test_dynamic(const String& name)
       printf(" %15.12f", rule.get_coord(i,j));
     printf("\n");
   }
+}
+
+void print_avail_all()
+{
+  print_avail_scalar();
+  print_avail< Shape::Simplex<1> >();
+  print_avail< Shape::Simplex<2> >();
+  print_avail< Shape::Simplex<3> >();
+  print_avail< Shape::Hypercube<1> >();
+  print_avail< Shape::Hypercube<2> >();
+  print_avail< Shape::Hypercube<3> >();
 }
 
 int main(int argc, char* argv[])

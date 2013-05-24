@@ -5,91 +5,50 @@
 // includes, FEAST
 #include <kernel/cubature/factory_wrapper.hpp>
 #include <kernel/cubature/auto_alias.hpp>
-#include <kernel/cubature/avail_functor.hpp>
-
-// includes, STL
-#include <set>
-#include <map>
 
 namespace FEAST
 {
   namespace Cubature
   {
-    template<
-      typename Shape_,
-      typename Weight_ = Real,
-      typename Coord_ = Real,
-      typename Point_ = Coord_[Shape_::dimension]>
-    class DynamicFactory :
-      public Rule<Shape_, Weight_, Coord_, Point_>::Factory
+    class DynamicFactory
     {
-    public:
-      typedef Rule<Shape_, Weight_, Coord_, Point_> RuleType;
-      typedef typename RuleType::Factory BaseClass;
-      typedef Shape_ ShapeType;
-      typedef Weight_ WeightType;
-      typedef Coord_ CoordType;
-      typedef Point_ PointType;
-
     private:
       String _name;
 
     public:
       explicit DynamicFactory(const String& name) :
-        BaseClass(),
         _name(name)
       {
       }
 
-      virtual RuleType produce() const
+      template<typename Shape_, typename Weight_, typename Coord_, typename Point_>
+      bool create(Rule<Shape_, Weight_, Coord_, Point_>& rule) const
       {
-        return create(_name);
+        return create(rule, _name);
       }
 
-      static bool create(RuleType& rule, const String& name)
+      template<typename Shape_, typename Weight_, typename Coord_, typename Point_>
+      static bool create(Rule<Shape_, Weight_, Coord_, Point_>& rule, const String& name)
       {
         // map auto-aliases
-        String mapped_name(AutoAlias<ShapeType>::map(name));
-        CreateFunctor functor(rule, mapped_name);
-        FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory(functor);
+        String mapped_name(AutoAlias<Shape_>::map(name));
+        CreateFunctor<Rule<Shape_, Weight_, Coord_, Point_> > functor(rule, mapped_name);
+        FactoryWrapper<Shape_>::factory(functor);
         return functor.okay();
-      }
-
-      static RuleType create(const String& name)
-      {
-        RuleType rule;
-        if(create(rule, name))
-          return rule;
-
-        // 'name' does not match any known cubature rule
-        throw InternalError("Unrecognised cubature rule name: '" + name + "'");
-      }
-
-      static void avail(std::set<String>& names, bool aliases = true)
-      {
-        // list all factories except for the refine factory
-        Intern::AvailSetFunctor functor(names, aliases);
-        FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory_no_refine(functor);
-      }
-
-      static void avail(std::map<String,String>& names)
-      {
-        // list all factories except for the refine factory
-        Intern::AvailMapFunctor functor(names);
-        FactoryWrapper<ShapeType, WeightType, CoordType, PointType>::factory_no_refine(functor);
       }
 
       /// \cond internal
     private:
+      template<typename Rule_>
       class CreateFunctor
       {
       private:
-        RuleType& _rule;
+        Rule_& _rule;
         const String& _name;
         bool _okay;
 
       public:
-        CreateFunctor(RuleType& rule, const String& name) :
+        CreateFunctor(Rule_& rule, const String& name) :
           _rule(rule),
           _name(name),
           _okay(false)
@@ -112,20 +71,6 @@ namespace FEAST
       };
       /// \endcond
     }; // class DynamicFactory<...>
-
-    template<typename Rule_>
-    class DynamicFactorySelect DOXY({});
-
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class DynamicFactorySelect< Rule<Shape_, Weight_, Coord_, Point_> >
-    {
-    public:
-      typedef DynamicFactory<Shape_, Weight_, Coord_, Point_> Type;
-    };
   } // namespace Cubature
 } // namespace FEAST
 

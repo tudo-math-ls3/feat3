@@ -32,7 +32,6 @@ class DiscontinuousTest
   typedef Space::Discontinuous::Element<QuadTrafo> QuadSpaceQ0;
 
   typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 2> > CubatureRule;
-  typedef typename Cubature::DynamicFactorySelect<CubatureRule>::Type CubatureFactory;
 
   struct UnitSpaceConfig : public Space::ConfigBase
   {
@@ -89,7 +88,7 @@ public:
     Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
 
     // create a 2x2 Gauss-Legendre cubature formula
-    CubatureRule cubature_rule(CubatureFactory::create("gauss-legendre:2"));
+    CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:2"));
 
     // prepare trafo evaluator
     trafo_eval.prepare(0);

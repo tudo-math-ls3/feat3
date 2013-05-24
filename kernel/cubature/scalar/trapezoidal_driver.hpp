@@ -18,21 +18,8 @@ namespace FEAST
        * \see http://en.wikipedia.org/wiki/Trapezoidal_rule
        * \see http://mathworld.wolfram.com/TrapezoidalRule.html
        *
-       * This rule is also known as:
-       * - 1st order closed Newton-Cotes formula, see
-       *   http://en.wikipedia.org/wiki/Newton%E2%80%93Cotes_formulas
-       *
-       * \tparam Weight_
-       * The data type for the cubature weights.
-       *
-       * \tparam Coord_
-       * The data type for the cubature point coordinates.
-       *
        * \author Peter Zajac
        */
-      template<
-        typename Weight_,
-        typename Coord_>
       class TrapezoidalDriver :
         public DriverBase
       {
@@ -60,6 +47,9 @@ namespace FEAST
          * \param[in,out] rule
          * The cubature rule to be filled.
          */
+        template<
+          typename Weight_,
+          typename Coord_>
         static void fill(Rule<Weight_, Coord_>& rule)
         {
           rule.get_coord(0) = -Coord_(1);

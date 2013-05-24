@@ -49,9 +49,6 @@ namespace FEAST
       /// data type
       typedef typename AsmTraits::DataType DataType;
 
-      /// cubature rule type
-      typedef typename AsmTraits::CubatureRuleType CubatureRuleType;
-
     public:
       /**
        * \brief Assembles a linear functional.
@@ -65,47 +62,18 @@ namespace FEAST
        * \param[in] space
        * A reference to the finite-element space to be used.
        *
-       * \param[in] cubature_name
-       * A string containing the name of the cubature rule to be used for integration.
+       * \param[in] cubature_factory
+       * A reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the linear functional.
        */
+      template<typename CubatureFactory_>
       static void assemble(
         VectorType& vector,
         const FunctorType& functor,
         const SpaceType& space,
-        const String& cubature_name,
-        DataType alpha = DataType(1))
-      {
-        typedef typename AsmTraits::CubatureDynamicFactoryType CubatureDynamicFactoryType;
-        CubatureRuleType cubature_rule(CubatureDynamicFactoryType::create(cubature_name));
-        assemble(vector, functor, space, cubature_rule, alpha);
-      }
-
-      /**
-       * \brief Assembles a linear functional.
-       *
-       * \param[in,out] vector
-       * The vector that is to be assembled.
-       *
-       * \param[in] functor
-       * A reference to the functor defining the linearform.
-       *
-       * \param[in] space
-       * A reference to the finite-element space to be used.
-       *
-       * \param[in] cubature_rule
-       * A reference to the cubature rule to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the linear functional.
-       */
-      static void assemble(
-        VectorType& vector,
-        const FunctorType& functor,
-        const SpaceType& space,
-        const CubatureRuleType& cubature_rule,
+        const CubatureFactory_& cubature_factory,
         DataType alpha = DataType(1))
       {
         // fetch the trafo
@@ -128,6 +96,9 @@ namespace FEAST
 
         // create space evaluation data
         typename AsmTraits::SpaceEvalData space_data;
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create local vector data
         typename AsmTraits::LocalVectorDataType lvad(dof_mapping);

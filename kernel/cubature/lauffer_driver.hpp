@@ -9,45 +9,6 @@ namespace FEAST
 {
   namespace Cubature
   {
-    /// \cond internal
-    namespace Intern
-    {
-      class LaufferD2DriverBase :
-        public DriverBase
-      {
-      public:
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-        };
-
-        ///Returns the name of the cubature rule.
-        static String name()
-        {
-          return "lauffer-degree-2";
-        }
-      };
-
-      class LaufferD4DriverBase :
-        public DriverBase
-      {
-      public:
-        enum
-        {
-          /// this rule is not variadic
-          variadic = 0,
-        };
-
-        ///Returns the name of the cubature rule.
-        static String name()
-        {
-          return "lauffer-degree-4";
-        }
-      };
-    } // namespace Intern
-    /// \endcond
-
     /**
      * \brief Lauffer-D2 driver class template
      *
@@ -58,37 +19,29 @@ namespace FEAST
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \tparam Weight_
-     * The data type of the cubature weights.
-     *
-     * \tparam Coord_
-     * The data type of the cubature point coordinates.
-     *
-     * \tparam Point_
-     *
      * \author Constantin Christof
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class LaufferD2Driver DOXY({});
 
     // Simplex specialisation
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class LaufferD2Driver<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
-      public Intern::LaufferD2DriverBase
+    template<int dim_>
+    class LaufferD2Driver<Shape::Simplex<dim_> > :
+      public DriverBase<Shape::Simplex<dim_> >
     {
     public:
       enum
       {
+        /// this rule is not variadic
+        variadic = 0,
         num_points = (dim_ + 1)*(dim_ + 2)/2
       };
+
+      /// Returns the name of the cubature rule.
+      static String name()
+      {
+        return "lauffer-degree-2";
+      }
 
       /**
        * \brief Fills the cubature rule structure.
@@ -96,6 +49,10 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
@@ -162,37 +119,30 @@ namespace FEAST
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \tparam Weight_
-     * The data type of the cubature weights.
-     *
-     * \tparam Coord_
-     * The data type of the cubature point coordinates.
-     *
-     * \tparam Point_
-     *
      * \author Constantin Christof
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class LaufferD4Driver DOXY({});
 
     // Tetrahedron specialisation
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class LaufferD4Driver<Shape::Simplex<3>, Weight_, Coord_, Point_> :
-      public Intern::LaufferD4DriverBase
+    template<>
+    class LaufferD4Driver<Shape::Simplex<3> > :
+      public DriverBase<Shape::Simplex<3> >
     {
     public:
       enum
       {
+        /// this rule is not variadic
+        variadic = 0,
         dim = 3,
         num_points = (Factorial<dim + 4>::value)/(24*Factorial<dim>::value)
       };
+
+      /// Returns the name of the cubature rule.
+      static String name()
+      {
+        return "lauffer-degree-4";
+      }
 
       /**
        * \brief Fills the cubature rule structure.
@@ -200,6 +150,10 @@ namespace FEAST
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
       static void fill(Rule<Shape::Simplex<3>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
@@ -360,7 +314,6 @@ namespace FEAST
         } // i-loop
       }
     }; // class LaufferD4Driver<Simplex<3>,...>
-
   } // namespace Cubature
 } // namespace FEAST
 

@@ -36,7 +36,6 @@ class Lagrange1Test
   typedef typename QuadSpaceQ1::DofMappingType DofMapping;
 
   typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 2> > CubatureRule;
-  typedef typename Cubature::DynamicFactorySelect<CubatureRule>::Type CubatureFactory;
 
   struct UnitTrafoConfig : public Trafo::ConfigBase
   {
@@ -116,7 +115,7 @@ public:
     Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
 
     // create a 2x2 Gauss-Legendre cubature formula
-    CubatureRule cubature_rule(CubatureFactory::create("gauss-legendre:2"));
+    CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:2"));
 
     // prepare trafo evaluator
     trafo_eval.prepare(0);
@@ -377,7 +376,7 @@ public:
     DofMapping dof_mapping(space);
 
     // create a 2x2 Gauss-Legendre cubature formula
-    CubatureRule cubature_rule(CubatureFactory::create("gauss-legendre:2"));
+    CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:2"));
 
     // allocate local matrix
     Tiny::Matrix<DataType_, SpaceEvaluator::max_local_dofs, SpaceEvaluator::max_local_dofs> Lx;

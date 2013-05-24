@@ -19,24 +19,86 @@ namespace FEAST
     } // namespace Intern
     /// \endcond
 
+    class RefineFactoryCore
+    {
+    public:
+      template<typename Shape_, typename Weight_, typename Coord_, typename Point_>
+      static void create(
+        Rule<Shape_, Weight_, Coord_, Point_>& rule,
+        const Rule<Shape_, Weight_, Coord_, Point_>& rule_in,
+        Index num_refines = 1)
+      {
+        typedef  Rule<Shape_, Weight_, Coord_, Point_> RuleType;
+        typedef Intern::RuleRefinery<RuleType> RefineryType;
+
+        if(num_refines == 0)
+        {
+          rule = rule_in;
+        }
+        else if(num_refines == 1)
+        {
+          rule.create(rule_in.get_num_points() * RefineryType::count, "refine:" + rule_in.get_name());
+          RefineryType::refine(rule, rule_in);
+        }
+        else
+        {
+          // copy input rule
+          rule = rule_in;
+          for(Index i(0); i < num_refines; ++i)
+          {
+            RuleType rule_tmp(rule.get_num_points() * RefineryType::count,
+              "refine*" + stringify(i+1) + ":" + rule_in.get_name());
+            RefineryType::refine(rule_tmp, rule);
+            rule = rule_tmp;
+          }
+        }
+      }
+    };
+
     template<typename Factory_>
     class RefineFactoryBase :
-      public Rule<
-        typename Factory_::ShapeType,
-        typename Factory_::WeightType,
-        typename Factory_::CoordType,
-        typename Factory_::PointType>::Factory
+      public RefineFactoryCore
     {
     public:
       typedef Factory_ FactoryType;
       typedef typename Factory_::ShapeType ShapeType;
-      typedef typename Factory_::WeightType WeightType;
-      typedef typename Factory_::CoordType CoordType;
-      typedef typename Factory_::PointType PointType;
-      typedef Rule<ShapeType, WeightType, CoordType, PointType> RuleType;
-      typedef Intern::RuleRefinery<RuleType> RefineryType;
+      typedef RefineFactoryCore BaseClass;
 
-      static bool create(RuleType& rule, const String& name)
+/*
+      template<typename Weight_, typename Coord_, typename Point_>
+      static void create(
+        Rule<ShapeType, Weight_, Coord_, Point_>& rule,
+        const Rule<ShapeType, Weight_, Coord_, Point_>& rule_in,
+        Index num_refines = 1)
+      {
+        typedef  Rule<ShapeType, Weight_, Coord_, Point_> RuleType;
+        typedef Intern::RuleRefinery<RuleType> RefineryType;
+
+        if(num_refines == 0)
+        {
+          rule = rule_in;
+        }
+        if(num_refines == 1)
+        {
+          RuleType rule(rule_in.get_num_points() * RefineryType::count, "refine:" + rule_in.get_name());
+          RefineryType::refine(rule, rule_in);
+        }
+
+        // copy input rule
+        rule = rule_in;
+        for(Index i(0); i < num_refines; ++i)
+        {
+          RuleType rule_tmp(rule.get_num_points() * RefineryType::count,
+            "refine*" + stringify(i+1) + ":" + rule_in.get_name());
+          RefineryType::refine(rule_tmp, rule);
+          rule = rule_tmp;
+        }
+      }*/
+
+      using BaseClass::create;
+
+      template<typename Weight_, typename Coord_, typename Point_>
+      static bool create(Rule<ShapeType, Weight_, Coord_, Point_>& rule, const String& name)
       {
         // try to find a colon within the name string
         String::size_type k = name.find_first_of(':');
@@ -67,38 +129,13 @@ namespace FEAST
           return false;
 
         // call factory to create the input rule
-        RuleType rule_in;
+        Rule<ShapeType, Weight_, Coord_, Point_> rule_in;
         if(!FactoryType::create(rule_in, tail.trim()))
           return false;
 
         // convert input rule
-        rule = create(rule_in, num_refines);
+        create(rule, rule_in, num_refines);
         return true;
-      }
-
-      static RuleType create(const RuleType& rule_in, Index num_refines = 1)
-      {
-        if(num_refines == 0)
-        {
-          return rule_in;
-        }
-        if(num_refines == 1)
-        {
-          RuleType rule(rule_in.get_num_points() * RefineryType::count, "refine:" + rule_in.get_name());
-          RefineryType::refine(rule, rule_in);
-          return rule;
-        }
-
-        // copy input rule
-        RuleType rule(rule_in);
-        for(Index i(0); i < num_refines; ++i)
-        {
-          RuleType rule_tmp(rule.get_num_points() * RefineryType::count,
-            "refine*" + stringify(i+1) + ":" + rule_in.get_name());
-          RefineryType::refine(rule_tmp, rule);
-          rule = rule_tmp;
-        }
-        return rule;
       }
     };
 
@@ -114,11 +151,6 @@ namespace FEAST
     public:
       typedef Factory_ FactoryType;
       typedef typename Factory_::ShapeType ShapeType;
-      typedef typename Factory_::WeightType WeightType;
-      typedef typename Factory_::CoordType CoordType;
-      typedef typename Factory_::PointType PointType;
-      typedef Rule<ShapeType, WeightType, CoordType, PointType> RuleType;
-      typedef Intern::RuleRefinery<RuleType> RefineryType;
       typedef RefineFactoryBase<FactoryType> BaseClass;
       enum
       {
@@ -135,16 +167,20 @@ namespace FEAST
       {
       }
 
-      virtual RuleType produce() const
-      {
-        return create(_num_refines);
-      }
-
       using BaseClass::create;
 
-      static RuleType create(Index num_refines = 1)
+      template<typename Weight_, typename Coord_, typename Point_>
+      void create(Rule<ShapeType, Weight_, Coord_, Point_>& rule)
       {
-        return BaseClass::create(FactoryType::create(), num_refines);
+        create(rule, _num_refines);
+      }
+
+      template<typename Weight_, typename Coord_, typename Point_>
+      static void create(Rule<ShapeType, Weight_, Coord_, Point_>& rule, Index num_refines)
+      {
+        Rule<ShapeType, Weight_, Coord_, Point_> rule_in;
+        FactoryType::create(rule_in);
+        create(rule, rule_in, num_refines);
       }
     };
 
@@ -155,11 +191,6 @@ namespace FEAST
     public:
       typedef Factory_ FactoryType;
       typedef typename Factory_::ShapeType ShapeType;
-      typedef typename Factory_::WeightType WeightType;
-      typedef typename Factory_::CoordType CoordType;
-      typedef typename Factory_::PointType PointType;
-      typedef Rule<ShapeType, WeightType, CoordType, PointType> RuleType;
-      typedef Intern::RuleRefinery<RuleType> RefineryType;
       typedef RefineFactoryBase<FactoryType> BaseClass;
       enum
       {
@@ -179,16 +210,20 @@ namespace FEAST
       {
       }
 
-      virtual RuleType produce() const
-      {
-        return create(_num_points, _num_refines);
-      }
-
       using BaseClass::create;
 
-      static RuleType create(Index num_points, Index num_refines = 1)
+      template<typename Weight_, typename Coord_, typename Point_>
+      void create(Rule<ShapeType, Weight_, Coord_, Point_>& rule)
       {
-        return BaseClass::create(FactoryType::create(num_points), num_refines);
+        create(rule, _num_points, _num_refines);
+      }
+
+      template<typename Weight_, typename Coord_, typename Point_>
+      static void create(Rule<ShapeType, Weight_, Coord_, Point_>& rule, Index num_points, Index num_refines)
+      {
+        Rule<ShapeType, Weight_, Coord_, Point_> rule_in;
+        FactoryType::create(rule_in, num_points);
+        create(rule, rule_in, num_refines);
       }
     };
 

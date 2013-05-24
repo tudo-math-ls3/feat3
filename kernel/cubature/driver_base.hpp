@@ -9,6 +9,7 @@ namespace FEAST
 {
   namespace Cubature
   {
+    template<typename Shape_>
     class DriverBase
     {
     public:
@@ -22,13 +23,9 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template<
-        typename Shape_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_>
+      template<typename Shape_>
       class DummyDriver :
-        public DriverBase
+        public DriverBase<Shape_>
       {
       public:
         enum
@@ -48,6 +45,10 @@ namespace FEAST
           functor.alias("dummy-alias");
         }
 
+        template<
+          typename Weight_,
+          typename Coord_,
+          typename Point_>
         static void fill(Rule<Shape_, Weight_, Coord_, Point_>&)
         {
         }

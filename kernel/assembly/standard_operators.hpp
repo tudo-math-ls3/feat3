@@ -116,8 +116,9 @@ namespace FEAST
         const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         BilinearScalarLaplaceFunctor functor;
+        Cubature::DynamicFactory cubature_factory(cubature_name);
         BilinearOperator<Matrix_, BilinearScalarLaplaceFunctor, Space_>::
-          assemble(matrix, functor, space, cubature_name, alpha);
+          assemble(matrix, functor, space, cubature_factory, alpha);
       }
     }; // class BilinearScalarLaplaceFunctor
 
@@ -226,8 +227,9 @@ namespace FEAST
         const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         BilinearScalarIdentityFunctor functor;
+        Cubature::DynamicFactory cubature_factory(cubature_name);
         BilinearOperator<Matrix_, BilinearScalarIdentityFunctor, Space_>::
-          assemble(matrix, functor, space, cubature_name, alpha);
+          assemble(matrix, functor, space, cubature_factory, alpha);
       }
     }; // class BilinearScalarIdentityFunctor
   } // namespace Assembly

@@ -36,17 +36,6 @@ namespace FEAST
         /// Coord typedef
         typedef Coord_ CoordType;
 
-        /**
-         * \brief Scalar cubature rule factory interface
-         */
-        class Factory
-        {
-        public:
-          virtual ~Factory() {}
-
-          virtual Rule produce() const = 0;
-        }; // class Rule<...>::Factory
-
       protected:
         /// The name of the cubature rule.
         String _name;
@@ -88,15 +77,6 @@ namespace FEAST
           _coords(nullptr)
         {
           *this = other;
-        }
-
-        explicit Rule(const Factory& factory) :
-          _name(),
-          _num_points(0),
-          _weights(nullptr),
-          _coords(nullptr)
-        {
-          *this = factory.produce();
         }
 
         /// virtual destructor

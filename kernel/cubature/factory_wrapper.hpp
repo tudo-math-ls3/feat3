@@ -22,9 +22,6 @@ namespace FEAST
     {
       template<
         typename Shape_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_,
         typename Functor_>
       class DriverFactoryFunctor
       {
@@ -37,28 +34,22 @@ namespace FEAST
         {
         }
 
-        template<template<typename,typename,typename,typename> class Driver_>
+        template<template<typename> class Driver_>
         void driver()
         {
-          _functor.template factory< DriverFactory<Driver_, Shape_, Weight_, Coord_, Point_> >();
+          _functor.template factory< DriverFactory<Driver_, Shape_> >();
         }
       };
 
       template<
-        template<typename,typename> class ScalarDriver_,
+        typename ScalarDriver_,
         typename Shape_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_,
-        bool tensorise_ = (ScalarDriver_<Weight_, Coord_>::tensorise != 0)>
+        bool tensorise_ = (ScalarDriver_::tensorise != 0)>
       class TensorProductFunctorHelper;
 
       template<
-        template<typename,typename> class ScalarDriver_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_,
-        bool tensorise_ = (ScalarDriver_<Weight_, Coord_>::tensorise != 0)>
+        typename ScalarDriver_,
+        bool tensorise_ = (ScalarDriver_::tensorise != 0)>
       class SimplexScalarFunctorHelper;
     } // namespace Intern
     /// \endcond
@@ -68,11 +59,7 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class FactoryExplicitWrapper DOXY({});
 
     /**
@@ -80,11 +67,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryExplicitWrapper<Shape::Simplex<1>, Weight_, Coord_, Point_>
+    template<>
+    class FactoryExplicitWrapper<Shape::Simplex<1> >
     {
     protected:
       typedef Shape::Simplex<1> ShapeType;
@@ -125,10 +109,10 @@ namespace FEAST
 
         // call simplex-scalar functor
         SimplexScalarFunctor<Functor_> scalar_functor(functor);
-        Scalar::FactoryWrapper<Weight_, Coord_>::driver(scalar_functor);
+        Scalar::FactoryWrapper::driver(scalar_functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
 
@@ -146,10 +130,10 @@ namespace FEAST
         {
         }
 
-        template<template<typename,typename> class ScalarDriver_>
+        template<typename ScalarDriver_>
         void driver()
         {
-          Intern::SimplexScalarFunctorHelper<ScalarDriver_, Weight_, Coord_, Point_>::scalar_driver(_functor);
+          Intern::SimplexScalarFunctorHelper<ScalarDriver_>::scalar_driver(_functor);
         }
       };
       /// \endcond
@@ -160,11 +144,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryExplicitWrapper<Shape::Simplex<2>, Weight_, Coord_, Point_>
+    template<>
+    class FactoryExplicitWrapper<Shape::Simplex<2> >
     {
     protected:
       typedef Shape::Simplex<2> ShapeType;
@@ -207,7 +188,7 @@ namespace FEAST
         _factory_list(functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Simplex<2>,...>
@@ -217,11 +198,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryExplicitWrapper<Shape::Simplex<3>, Weight_, Coord_, Point_>
+    template<>
+    class FactoryExplicitWrapper<Shape::Simplex<3> >
     {
     protected:
       typedef Shape::Simplex<3> ShapeType;
@@ -266,7 +244,7 @@ namespace FEAST
         _factory_list(functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Simplex<3>,...>
@@ -276,11 +254,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryExplicitWrapper<Shape::Hypercube<1>, Weight_, Coord_, Point_>
+    template<>
+    class FactoryExplicitWrapper<Shape::Hypercube<1> >
     {
     protected:
       typedef Shape::Hypercube<1> ShapeType;
@@ -320,7 +295,7 @@ namespace FEAST
         _factory_list(functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Hypercube<1>,...>
@@ -330,11 +305,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryExplicitWrapper<Shape::Hypercube<2>, Weight_, Coord_, Point_>
+    template<>
+    class FactoryExplicitWrapper<Shape::Hypercube<2> >
     {
     protected:
       typedef Shape::Hypercube<2> ShapeType;
@@ -374,7 +346,7 @@ namespace FEAST
         _factory_list(functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Hypercube<2>,...>
@@ -384,11 +356,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryExplicitWrapper<Shape::Hypercube<3>, Weight_, Coord_, Point_>
+    template<>
+    class FactoryExplicitWrapper<Shape::Hypercube<3> >
     {
     protected:
       typedef Shape::Hypercube<3> ShapeType;
@@ -428,7 +397,7 @@ namespace FEAST
         _factory_list(functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
     }; // class FactoryExplicitWrapper<Hypercube<3>,...>
@@ -438,11 +407,7 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class FactoryPartialWrapper DOXY({});
 
     /**
@@ -450,13 +415,9 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryPartialWrapper<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
-      public FactoryExplicitWrapper<Shape::Simplex<dim_>, Weight_, Coord_, Point_>
+    template<int dim_>
+    class FactoryPartialWrapper<Shape::Simplex<dim_> > :
+      public FactoryExplicitWrapper<Shape::Simplex<dim_> >
     {
     protected:
       typedef Shape::Simplex<dim_> ShapeType;
@@ -487,7 +448,7 @@ namespace FEAST
       static void driver(Functor_& functor)
       {
         // first: call the base class driver function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::driver(functor);
+        FactoryExplicitWrapper<ShapeType>::driver(functor);
 
         // call driver list
         _driver_list(functor);
@@ -497,13 +458,13 @@ namespace FEAST
       static void factory(Functor_& functor)
       {
         // first: call the base class factory function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::factory(functor);
+        FactoryExplicitWrapper<ShapeType>::factory(functor);
 
         // call factory list
         _factory_list(functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
     }; // class FactoryPartialWrapper<Simplex<...>,...>
@@ -513,13 +474,9 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class FactoryPartialWrapper<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> :
-      public FactoryExplicitWrapper<Shape::Hypercube<dim_>, Weight_, Coord_, Point_>
+    template<int dim_>
+    class FactoryPartialWrapper<Shape::Hypercube<dim_> > :
+      public FactoryExplicitWrapper<Shape::Hypercube<dim_> >
     {
     protected:
       typedef Shape::Hypercube<dim_> ShapeType;
@@ -549,7 +506,7 @@ namespace FEAST
       static void driver(Functor_& functor)
       {
         // first: call the base class driver function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::driver(functor);
+        FactoryExplicitWrapper<ShapeType>::driver(functor);
 
         // call driver list
         _driver_list(functor);
@@ -559,17 +516,17 @@ namespace FEAST
       static void factory(Functor_& functor)
       {
         // first: call the base class factory function template
-        FactoryExplicitWrapper<ShapeType, Weight_, Coord_, Point_>::factory(functor);
+        FactoryExplicitWrapper<ShapeType>::factory(functor);
 
         // call factory list
         _factory_list(functor);
 
         // call tensor-product functor
         TensorProductFunctor<Functor_> tensor_functor(functor);
-        Scalar::FactoryWrapper<Weight_, Coord_>::driver(tensor_functor);
+        Scalar::FactoryWrapper::driver(tensor_functor);
 
         // last: call driver factory functor
-        Intern::DriverFactoryFunctor<ShapeType, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<ShapeType, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
 
@@ -587,11 +544,10 @@ namespace FEAST
         {
         }
 
-        template<template<typename,typename> class ScalarDriver_>
+        template<typename ScalarDriver_>
         void driver()
         {
-          Intern::TensorProductFunctorHelper<ScalarDriver_, Shape::Hypercube<dim_>, Weight_, Coord_, Point_>
-            ::scalar_driver(_functor);
+          Intern::TensorProductFunctorHelper<ScalarDriver_, Shape::Hypercube<dim_> >::scalar_driver(_functor);
         }
       };
       /// \endcond
@@ -602,13 +558,9 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class FactoryWrapper :
-      public FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>
+      public FactoryPartialWrapper<Shape_>
     {
     protected:
       template<typename Functor_>
@@ -638,13 +590,13 @@ namespace FEAST
       static void factory_no_refine(Functor_& functor)
       {
         // first: call the base class factory function template
-        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::factory(functor);
+        FactoryPartialWrapper<Shape_>::factory(functor);
 
         // call factory list
         _factory_list(functor);
 
         // call driver factory functor
-        Intern::DriverFactoryFunctor<Shape_, Weight_, Coord_, Point_, Functor_> driver_functor(functor);
+        Intern::DriverFactoryFunctor<Shape_, Functor_> driver_functor(functor);
         _driver_list(driver_functor);
       }
 
@@ -652,7 +604,7 @@ namespace FEAST
       static void driver(Functor_& functor)
       {
         // first: call the base class driver function template
-        FactoryPartialWrapper<Shape_, Weight_, Coord_, Point_>::driver(functor);
+        FactoryPartialWrapper<Shape_>::driver(functor);
 
         // call driver list
         _driver_list(functor);
@@ -696,28 +648,22 @@ namespace FEAST
     namespace Intern
     {
       template<
-        template<typename,typename> class ScalarDriver_,
-        typename Shape_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_>
-      class TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_, true>
+        typename ScalarDriver_,
+        typename Shape_>
+      class TensorProductFunctorHelper<ScalarDriver_, Shape_, true>
       {
       public:
         template<typename Functor_>
         static void scalar_driver(Functor_& functor)
         {
-          functor.template factory< TensorProductFactory<ScalarDriver_, Shape_, Weight_, Coord_, Point_> >();
+          functor.template factory< TensorProductFactory<ScalarDriver_, Shape_> >();
         }
       };
 
       template<
-        template<typename,typename> class ScalarDriver_,
-        typename Shape_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_>
-      class TensorProductFunctorHelper<ScalarDriver_, Shape_, Weight_, Coord_, Point_, false>
+        typename ScalarDriver_,
+        typename Shape_>
+      class TensorProductFunctorHelper<ScalarDriver_, Shape_, false>
       {
       public:
         template<typename Functor_>
@@ -727,27 +673,19 @@ namespace FEAST
         }
       };
 
-      template<
-        template<typename,typename> class ScalarDriver_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_>
-      class SimplexScalarFunctorHelper<ScalarDriver_, Weight_, Coord_, Point_, true>
+      template<typename ScalarDriver_>
+      class SimplexScalarFunctorHelper<ScalarDriver_, true>
       {
       public:
         template<typename Functor_>
         static void scalar_driver(Functor_& functor)
         {
-          functor.template factory<SimplexScalarFactory<ScalarDriver_, Weight_, Coord_, Point_> >();
+          functor.template factory<SimplexScalarFactory<ScalarDriver_> >();
         }
       };
 
-      template<
-        template<typename,typename> class ScalarDriver_,
-        typename Weight_,
-        typename Coord_,
-        typename Point_>
-      class SimplexScalarFunctorHelper<ScalarDriver_, Weight_, Coord_, Point_, false>
+      template<typename ScalarDriver_>
+      class SimplexScalarFunctorHelper<ScalarDriver_, false>
       {
       public:
         template<typename Functor_>

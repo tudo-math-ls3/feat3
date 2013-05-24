@@ -44,9 +44,6 @@ namespace FEAST
 
         /// cubature rule type
         typedef Cubature::Rule<ShapeType, DataType, DomainCoordType, DomainPointType> RuleType;
-
-        /// cubature dynamic factory type
-        typedef typename Cubature::DynamicFactorySelect<RuleType>::Type DynamicFactoryType;
       };
     }
     /// \endcond
@@ -190,9 +187,6 @@ namespace FEAST
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
 
-      /// cubature factory type
-      typedef typename Intern::CubatureTraits<TrafoEvaluator>::DynamicFactoryType CubatureDynamicFactoryType;
-
     }; // class AsmTraits1
 
     /**
@@ -328,9 +322,6 @@ namespace FEAST
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
-
-      /// cubature factory type
-      typedef typename Intern::CubatureTraits<TrafoEvaluator>::DynamicFactoryType CubatureDynamicFactoryType;
 
     }; // class AsmTraits2
   } // namespace Assembly

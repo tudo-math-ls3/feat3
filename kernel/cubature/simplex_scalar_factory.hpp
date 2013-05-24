@@ -10,22 +10,36 @@ namespace FEAST
 {
   namespace Cubature
   {
-    template<
-      template<typename,typename> class ScalarDriver_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename ScalarDriver_>
     class SimplexScalarFactoryBase
     {
     public:
-      typedef Rule<Shape::Simplex<1>, Weight_, Coord_, Point_> RuleType;
-      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
-
-      typedef Scalar::DriverFactory<ScalarDriver_, Weight_, Coord_> ScalarFactoryType;
+      typedef Scalar::DriverFactory<ScalarDriver_> ScalarFactoryType;
 
     public:
-      static bool create(RuleType& rule, const String& name)
+      template<typename Weight_, typename Coord_, typename Point_>
+      static void create(
+        Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule,
+        const Scalar::Rule<Weight_, Coord_>& scalar_rule)
       {
+        Index num_points = scalar_rule.get_num_points();
+#ifdef FEAST_CUBATURE_SCALAR_PREFIX
+        rule.create(num_points, "scalar:" + scalar_rule.get_name());
+#else
+        rule.create(num_points, scalar_rule.get_name());
+#endif // FEAST_CUBATURE_SCALAR_PREFIX
+        for(Index i(0); i < num_points; ++i)
+        {
+          rule.get_weight(i) = scalar_rule.get_weight(i) * Weight_(0.5);
+          rule.get_coord(i, 0) = (scalar_rule.get_coord(i) + Coord_(1)) * Coord_(0.5);
+        }
+      }
+
+      template<typename Weight_, typename Coord_, typename Point_>
+      static bool create(Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule, const String& name)
+      {
+        typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
+
 #ifdef FEAST_CUBATURE_SCALAR_PREFIX
         // try to find a colon within the string
         String::size_type k = name.find_first_of(':');
@@ -52,24 +66,8 @@ namespace FEAST
 #endif // FEAST_CUBATURE_SCALAR_PREFIX
 
         // convert scalar rule
-        rule = create(scalar_rule);
+        create(rule, scalar_rule);
         return true;
-      }
-
-      static RuleType create(const ScalarRuleType& scalar_rule)
-      {
-        Index num_points = scalar_rule.get_num_points();
-#ifdef FEAST_CUBATURE_SCALAR_PREFIX
-        RuleType rule(num_points, "scalar:" + scalar_rule.get_name());
-#else
-        RuleType rule(num_points, scalar_rule.get_name());
-#endif // FEAST_CUBATURE_SCALAR_PREFIX
-        for(Index i(0); i < num_points; ++i)
-        {
-          rule.get_weight(i) = scalar_rule.get_weight(i) * Weight_(0.5);
-          rule.get_coord(i, 0) = (scalar_rule.get_coord(i) + Coord_(1)) * Coord_(0.5);
-        }
-        return rule;
       }
 
       static String name()
@@ -122,30 +120,18 @@ namespace FEAST
     };
 
     template<
-      template<typename,typename> class ScalarDriver_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_,
-      bool variadic_ = (ScalarDriver_<Weight_, Coord_>::variadic != 0)>
+      typename ScalarDriver_,
+      bool variadic_ = (ScalarDriver_::variadic != 0)>
     class SimplexScalarFactory DOXY({});
 
-    template<
-      template<typename,typename> class ScalarDriver_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class SimplexScalarFactory<ScalarDriver_, Weight_, Coord_, Point_, false> :
-      public SimplexScalarFactoryBase<ScalarDriver_, Weight_, Coord_, Point_>
+    template<typename ScalarDriver_>
+    class SimplexScalarFactory<ScalarDriver_, false> :
+      public SimplexScalarFactoryBase<ScalarDriver_>
     {
     public:
       typedef Shape::Simplex<1> ShapeType;
-      typedef Rule<ShapeType, Weight_, Coord_, Point_> RuleType;
-      typedef SimplexScalarFactoryBase<ScalarDriver_, Weight_, Coord_, Point_> BaseClass;
-      typedef Weight_ WeightType;
-      typedef Coord_ CoordType;
-      typedef Point_ PointType;
-      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
-      typedef Scalar::DriverFactory<ScalarDriver_, Weight_, Coord_> ScalarFactoryType;
+      typedef SimplexScalarFactoryBase<ScalarDriver_> BaseClass;
+      typedef Scalar::DriverFactory<ScalarDriver_> ScalarFactoryType;
       enum
       {
         variadic = 0,
@@ -157,36 +143,28 @@ namespace FEAST
       {
       }
 
-      virtual RuleType produce() const
-      {
-        return create();
-      }
-
       using BaseClass::create;
 
-      static RuleType create()
+      template<typename Weight_, typename Coord_, typename Point_>
+      static void create(Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule)
       {
-        return create(ScalarFactoryType::create());
+        // call scalar factory to create the scalar rule
+        Scalar::Rule<Weight_, Coord_> scalar_rule;
+        ScalarFactoryType::create(scalar_rule);
+
+        // convert scalar rule
+        create(rule, scalar_rule);
       }
     };
 
-    template<
-      template<typename,typename> class ScalarDriver_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class SimplexScalarFactory<ScalarDriver_, Weight_, Coord_, Point_, true> :
-      public SimplexScalarFactoryBase<ScalarDriver_, Weight_, Coord_, Point_>
+    template<typename ScalarDriver_>
+    class SimplexScalarFactory<ScalarDriver_, true> :
+      public SimplexScalarFactoryBase<ScalarDriver_>
     {
     public:
       typedef Shape::Simplex<1> ShapeType;
-      typedef Rule<ShapeType, Weight_, Coord_, Point_> RuleType;
-      typedef SimplexScalarFactoryBase<ScalarDriver_, Weight_, Coord_, Point_> BaseClass;
-      typedef Weight_ WeightType;
-      typedef Coord_ CoordType;
-      typedef Point_ PointType;
-      typedef Scalar::Rule<Weight_, Coord_> ScalarRuleType;
-      typedef Scalar::DriverFactory<ScalarDriver_, Weight_, Coord_> ScalarFactoryType;
+      typedef SimplexScalarFactoryBase<ScalarDriver_> BaseClass;
+      typedef Scalar::DriverFactory<ScalarDriver_> ScalarFactoryType;
       enum
       {
         variadic = 1,
@@ -203,18 +181,24 @@ namespace FEAST
       {
       }
 
-      virtual RuleType produce() const
-      {
-        return create(_num_points);
-      }
-
       using BaseClass::create;
 
-      static RuleType create(Index num_points)
+      template<typename Weight_, typename Coord_, typename Point_>
+      void create(Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule)
       {
-        return create(ScalarFactoryType::create(num_points));
+        create(rule, _num_points);
       }
 
+      template<typename Weight_, typename Coord_, typename Point_>
+      static void create(Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>& rule, Index num_points)
+      {
+        // call scalar factory to create the scalar rule
+        Scalar::Rule<Weight_, Coord_> scalar_rule;
+        ScalarFactoryType::create(scalar_rule, num_points);
+
+        // convert scalar rule
+        create(rule, scalar_rule);
+      }
     };
   } // namespace Cubature
 } // namespace FEAST

@@ -20,17 +20,8 @@ namespace FEAST
        * This driver implements the Gauss-Lobatto rule.
        * \see http://en.wikipedia.org/wiki/Gaussian_quadrature
        *
-       * \tparam Weight_
-       * The data type for the cubature weights.
-       *
-       * \tparam Coord_
-       * The data type for the cubature point coordinates.
-       *
        * \author Constantin Christof
        */
-      template<
-        typename Weight_,
-        typename Coord_>
       class GaussLobattoDriver :
         public DriverBase
       {
@@ -56,9 +47,13 @@ namespace FEAST
          *
          * \param[in,out] rule
          * The cubature rule to be filled.
+         *
          * \param[in] num_points
          * The number of quadrature points.
          */
+        template<
+          typename Weight_,
+          typename Coord_>
         static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
           // how many points do we have?

@@ -16,17 +16,8 @@ namespace FEAST
        *
        * This driver implements the midpoint rule.
        *
-       * \tparam Weight_
-       * The data type for the cubature weights.
-       *
-       * \tparam Coord_
-       * The data type for the cubature point coordinates.
-       *
        * \author Peter Zajac
        */
-      template<
-        typename Weight_,
-        typename Coord_>
       class MidpointDriver :
         public DriverBase
       {
@@ -36,7 +27,7 @@ namespace FEAST
         {
           /// this rule is not variadic
           variadic = 0,
-          /// this rule has 2 points
+          /// this rule has 1 point
           num_points = 1,
           /// disable tensorisation
           tensorise = 0
@@ -54,6 +45,9 @@ namespace FEAST
          * \param[in,out] rule
          * The cubature rule to be filled.
          */
+        template<
+          typename Weight_,
+          typename Coord_>
         static void fill(Rule<Weight_, Coord_>& rule)
         {
           rule.get_coord(0) = Coord_(0);

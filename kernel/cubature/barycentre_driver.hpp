@@ -12,8 +12,9 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
+      template<typename Shape_>
       class BarycentreDriverBase :
-        public DriverBase
+        public DriverBase<Shape_>
       {
       public:
         enum
@@ -49,47 +50,33 @@ namespace FEAST
      * \brief Barycentre Rule driver class template
      *
      * This driver implements the barycentre cubature rule.
-     * \see http://de.wikipedia.org/wiki/Mittelpunktsregel
+     * \see http://en.wikipedia.org/wiki/Rectangle_method
      *
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \tparam Weight_
-     * The data type for the cubature weights.
-     *
-     * \tparam Coord_
-     * The data type for the cubature point coordinates.
-     *
-     * \tparam Point_
-     *
      * \author Peter Zajac
      */
-    template<
-      typename Shape_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
+    template<typename Shape_>
     class BarycentreDriver DOXY({});
 
     // Simplex specialisation
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class BarycentreDriver<Shape::Simplex<dim_>, Weight_, Coord_, Point_> :
-      public Intern::BarycentreDriverBase
+    template<int dim_>
+    class BarycentreDriver<Shape::Simplex<dim_> > :
+      public Intern::BarycentreDriverBase<Shape::Simplex<dim_> >
     {
     public:
-      typedef Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_> RuleType;
-
       /**
        * \brief Fills the cubature rule structure.
        *
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(RuleType& rule)
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
+      static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         rule.get_weight(0) = Weight_(1) / Weight_(Factorial<dim_>::value);
 
@@ -99,27 +86,25 @@ namespace FEAST
           rule.get_coord(0, i) = Coord_(1) / Coord_(dim_ + 1);
         }
       }
-    }; // class BarycentreDriver<Simplex<...>,...>
+    }; // class BarycentreDriver<Simplex<...>>
 
     // Hypercube specialisation
-    template<
-      int dim_,
-      typename Weight_,
-      typename Coord_,
-      typename Point_>
-    class BarycentreDriver<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> :
-      public Intern::BarycentreDriverBase
+    template<int dim_>
+    class BarycentreDriver<Shape::Hypercube<dim_> > :
+      public Intern::BarycentreDriverBase<Shape::Hypercube<dim_> >
     {
     public:
-      typedef Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_> RuleType;
-
       /**
        * \brief Fills the cubature rule structure.
        *
        * \param[in,out] rule
        * The cubature rule to be filled.
        */
-      static void fill(RuleType& rule)
+      template<
+        typename Weight_,
+        typename Coord_,
+        typename Point_>
+      static void fill(Rule<Shape::Hypercube<dim_>, Weight_, Coord_, Point_>& rule)
       {
         rule.get_weight(0) = Weight_(1 << dim_);
 
@@ -129,7 +114,7 @@ namespace FEAST
           rule.get_coord(0, i) = Coord_(0);
         }
       }
-    }; // class BarycentreDriver<Hypercube<...>,...>
+    }; // class BarycentreDriver<Hypercube<...>>
   } // namespace Cubature
 } // namespace FEAST
 

@@ -32,7 +32,6 @@ class RannacherTurekTest
   typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceStdNonPar;
 
   typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 2> > CubatureRule;
-  typedef typename Cubature::DynamicFactorySelect<CubatureRule>::Type CubatureFactory;
 
   struct UnitTrafoConfig : public Trafo::ConfigBase
   {
@@ -90,7 +89,7 @@ public:
     Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
 
     // create a 3x3 Gauss-Legendre cubature formula
-    CubatureRule cubature_rule(CubatureFactory::create("gauss-legendre:3"));
+    CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:3"));
 
     // prepare trafo evaluator
     trafo_eval.prepare(0);

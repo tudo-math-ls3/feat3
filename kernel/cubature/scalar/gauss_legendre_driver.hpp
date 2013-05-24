@@ -14,7 +14,16 @@ namespace FEAST
   {
     namespace Scalar
     {
-      class GaussLegendreDriverBase :
+      /**
+       * \brief Gauss-Legendre Rule driver class template
+       *
+       * This driver implements the Gauss-Legendre rule.
+       * \see http://en.wikipedia.org/wiki/Gaussian_quadrature
+       * \see http://mathworld.wolfram.com/GaussianQuadrature.html
+       *
+       * \author Peter Zajac
+       */
+      class GaussLegendreDriver :
         public DriverBase
       {
       public:
@@ -34,38 +43,19 @@ namespace FEAST
         {
           return "gauss-legendre";
         }
-      };
 
-      /**
-       * \brief Gauss-Legendre Rule driver class template
-       *
-       * This driver implements the Gauss-Legendre rule.
-       * \see http://en.wikipedia.org/wiki/Gaussian_quadrature
-       * \see http://mathworld.wolfram.com/GaussianQuadrature.html
-       *
-       * \tparam Weight_
-       * The data type for the cubature weights.
-       *
-       * \tparam Coord_
-       * The data type for the cubature point coordinates.
-       *
-       * \author Peter Zajac
-       */
-      template<
-        typename Weight_,
-        typename Coord_>
-      class GaussLegendreDriver :
-        public GaussLegendreDriverBase
-      {
-      public:
         /**
          * \brief Fills the cubature rule structure.
          *
          * \param[in,out] rule
          * The cubature rule to be filled.
+         *
          * \param[in] num_points
          * The number of quadrature points.
          */
+        template<
+          typename Weight_,
+          typename Coord_>
         static void fill(Rule<Weight_, Coord_>& rule, Index num_points)
         {
           // auxiliary variables

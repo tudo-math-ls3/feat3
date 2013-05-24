@@ -77,7 +77,7 @@ namespace FEAST
         typedef typename Functor_::template ValueEvaluator<EvalTraits> FuncEval;
 
         typedef Cubature::Rule<FacetType, DataType_, DomainCoordType, DomainPointType> CubRuleType;
-        typedef typename Cubature::DynamicFactorySelect<CubRuleType>::Type CubDynFactoryType;
+        //typedef typename Cubature::DynamicFactorySelect<CubRuleType>::Type CubDynFactoryType;
 
         TrafoEvalType _trafo_eval;
         FuncEval _func_eval;
@@ -88,7 +88,7 @@ namespace FEAST
           BaseClass(space, functor),
           _trafo_eval(space.get_trafo()),
           _func_eval(functor),
-          _cub_rule(CubDynFactoryType::create("gauss-legendre:2"))
+          _cub_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:2"))
         {
         }
 
