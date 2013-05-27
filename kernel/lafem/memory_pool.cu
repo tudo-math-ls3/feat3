@@ -113,13 +113,6 @@ DT_ MemoryPool<Mem::CUDA>::get_element(const DT_ * data, Index index)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::CUDA>::modify_element(DT_ * data, Index index, DT_ value)
-{
-  void * dest(data + index);
-  cudaMemcpy(dest, &value, sizeof(DT_), cudaMemcpyHostToDevice);
-}
-
-template <typename DT_>
 void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index count)
 {
   Index blocksize(128);
@@ -155,9 +148,6 @@ unsigned long MemoryPool<Mem::CUDA>::generate_hash(void * data, Index bytes)
 template float MemoryPool<Mem::CUDA>::get_element(const float * data, Index index);
 template double MemoryPool<Mem::CUDA>::get_element(const double * data, Index index);
 template Index MemoryPool<Mem::CUDA>::get_element(const Index * data, Index index);
-template void MemoryPool<Mem::CUDA>::modify_element(float * data, Index index, float value);
-template void MemoryPool<Mem::CUDA>::modify_element(double * data, Index index, double value);
-template void MemoryPool<Mem::CUDA>::modify_element(Index * data, Index index, Index value);
 template void MemoryPool<Mem::CUDA>::set_memory(float * address , const float val, const Index count);
 template void MemoryPool<Mem::CUDA>::set_memory(double * address , const double val, const Index count);
 template void MemoryPool<Mem::CUDA>::set_memory(Index * address , const Index val, const Index count);

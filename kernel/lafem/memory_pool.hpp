@@ -77,16 +77,9 @@ namespace FEAST
           return data[index];
         }
 
-        /// modify element
-        template <typename DT_>
-        inline static void modify_element(DT_ * data, Index index, DT_ value)
-        {
-          data[index] = value;
-        }
-
         /// set memory to specific value
         template <typename DT_>
-        void set_memory(DT_ * address, const DT_ val, const Index count);
+        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
 
         /// Copy memory area from src to dest
         static void copy(void * dest, const void * src, const Index bytes)
@@ -136,13 +129,9 @@ namespace FEAST
         template <typename DT_>
         static DT_ get_element(const DT_ * data, Index index);
 
-        /// modify element
-        template <typename DT_>
-        static void modify_element(DT_ * data, Index index, DT_ value);
-
         /// set memory to specific value
         template <typename DT_>
-        void set_memory(DT_ * address, const DT_ val, const Index count);
+        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
 
         /// Copy memory area from src to dest
         static void copy(void * dest, const void * src, const Index bytes);

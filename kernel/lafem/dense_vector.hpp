@@ -527,7 +527,7 @@ namespace FEAST
           CONTEXT("When setting DenseVector element");
 
           ASSERT(index < this->_size, "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_size) + " !");
-          MemoryPool<Arch_>::modify_element(_pelements, index, value);
+          MemoryPool<Arch_>::set_memory(_pelements + index, value);
         }
 
         /**

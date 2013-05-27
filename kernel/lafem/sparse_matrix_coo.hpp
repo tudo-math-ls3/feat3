@@ -960,9 +960,9 @@ namespace FEAST
             this->_row_ptr = this->_indices.at(0);
             this->_col_ptr = this->_indices.at(1);
 
-            MemoryPool<Mem_>::modify_element(_val_ptr, 0, val);
-            MemoryPool<Mem_>::modify_element(_row_ptr, 0, row);
-            MemoryPool<Mem_>::modify_element(_col_ptr, 0, col);
+            MemoryPool<Mem_>::set_memory(_val_ptr, val);
+            MemoryPool<Mem_>::set_memory(_row_ptr, row);
+            MemoryPool<Mem_>::set_memory(_col_ptr, col);
 
             _used_elements = 1;
             return;
@@ -985,7 +985,7 @@ namespace FEAST
 
           if(i < _used_elements && MemoryPool<Mem_>::get_element(_row_ptr, i) == row && MemoryPool<Mem_>::get_element(_col_ptr, i) == col)
           {
-            MemoryPool<Mem_>::modify_element(_val_ptr, i, val);
+            MemoryPool<Mem_>::set_memory(_val_ptr + i, val);
             return;
           }
           else
@@ -1001,9 +1001,9 @@ namespace FEAST
               MemoryPool<Mem_>::copy(t_col, _col_ptr, (i) * sizeof(Index));
             }
 
-            MemoryPool<Mem_>::modify_element(t_val, i, val);
-            MemoryPool<Mem_>::modify_element(t_row, i, row);
-            MemoryPool<Mem_>::modify_element(t_col, i, col);
+            MemoryPool<Mem_>::set_memory(t_val + i, val);
+            MemoryPool<Mem_>::set_memory(t_row + i, row);
+            MemoryPool<Mem_>::set_memory(t_col + i, col);
 
             MemoryPool<Mem_>::copy(t_val + i + 1, _val_ptr + i, (_used_elements - i) * sizeof(DT_));
             MemoryPool<Mem_>::copy(t_row + i + 1, _row_ptr + i, (_used_elements - i) * sizeof(Index));
