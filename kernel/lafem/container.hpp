@@ -35,38 +35,20 @@ namespace FEAST
       };
 
     /**
-     * \brief Base class of all container types.
-     *
-     * This class contains only the container size, the common ground of all containers.
-     *
-     * \author Dirk Ribbrock
-     */
-    class ContainerBase
-    {
-      protected:
-        Index _size;
-
-        ContainerBase(Index size) :
-          _size(size)
-      {
-        CONTEXT("When creating ContainerBase");
-      }
-    };
-
-    /**
-     * \brief Container super class.
+     * \brief Container base class.
      *
      * \tparam Arch_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
      *
-     * This is the super class of all used containers.
+     * This is the base class of all inheritated containers.
      *
      * \author Dirk Ribbrock
      */
     template <typename Arch_, typename DT_>
-    class Container : public ContainerBase
+    class Container
     {
       protected:
+        Index _size;
         /// List of pointers to all datatype dependent arrays.
         std::vector<DT_*> _elements;
         /// List of pointers to all Index dependent arrays.
@@ -75,6 +57,10 @@ namespace FEAST
         std::vector<Index> _elements_size;
         /// List of corresponding Index array sizes.
         std::vector<Index> _indices_size;
+        /// List of scalars with datatype index.
+        std::vector<Index> _scalar_index;
+        /// List of scalars with datatype DT_
+        std::vector<DT_> _scalar_dt;
 
       public:
         /**
@@ -85,7 +71,7 @@ namespace FEAST
          * Creates a container with a given size.
          */
         Container(Index size) :
-          ContainerBase(size)
+          _size(size)
         {
           CONTEXT("When creating Container");
         }
@@ -113,11 +99,13 @@ namespace FEAST
          * Creates a shallow copy of a given container.
          */
         Container(const Container<Arch_, DT_> & other) :
-          ContainerBase(other),
+          _size(other._size),
           _elements(other._elements),
           _indices(other._indices),
           _elements_size(other._elements_size),
-          _indices_size(other._indices_size)
+          _indices_size(other._indices_size),
+          _scalar_index(other._scalar_index),
+          _scalar_dt(other._scalar_dt)
         {
           CONTEXT("When copying Container");
 
@@ -136,7 +124,9 @@ namespace FEAST
          */
         template <typename Arch2_, typename DT2_>
         Container(const Container<Arch2_, DT2_> & other) :
-          ContainerBase(other)
+          _size(other.size()),
+          _scalar_index(other.get_scalar_index()),
+          _scalar_dt(other.get_scalar_dt())
         {
           CONTEXT("When copying Container");
 
@@ -190,11 +180,6 @@ namespace FEAST
          *
          * \returns A list of all data arrays.
          */
-        std::vector<DT_*> & get_elements()
-        {
-          return _elements;
-        }
-
         const std::vector<DT_*> & get_elements() const
         {
           return _elements;
@@ -205,11 +190,6 @@ namespace FEAST
          *
          * \returns A list of all Index arrays.
          */
-        std::vector<Index*> & get_indices()
-        {
-          return _indices;
-        }
-
         const std::vector<Index*> & get_indices() const
         {
           return _indices;
@@ -220,11 +200,6 @@ namespace FEAST
          *
          * \returns A list of all data array sizes.
          */
-        std::vector<Index> & get_elements_size()
-        {
-          return _elements_size;
-        }
-
         const std::vector<Index> & get_elements_size() const
         {
           return _elements_size;
@@ -235,14 +210,29 @@ namespace FEAST
          *
          * \returns A list of all Index array sizes.
          */
-        std::vector<Index> & get_indices_size()
+        const std::vector<Index> & get_indices_size() const
         {
           return _indices_size;
         }
 
-        const std::vector<Index> & get_indices_size() const
+        /**
+         * \brief Returns a list of all scalar values with datatype index.
+         *
+         * \returns A list of all scalars with datatype index.
+         */
+        const std::vector<Index> & get_scalar_index() const
         {
-          return _indices_size;
+          return _scalar_index;
+        }
+
+        /**
+         * \brief Returns a list of all scalar values with datatype dt.
+         *
+         * \returns A list of all scalars with datatype dt.
+         */
+        const std::vector<DT_> & get_scalar_dt() const
+        {
+          return _scalar_dt;
         }
 
         /**
@@ -250,9 +240,9 @@ namespace FEAST
          *
          * \returns The containers size.
          */
-        const Index & size() const
+        Index size() const
         {
-          return this->_size;
+          return _size;
         }
 
         /**
