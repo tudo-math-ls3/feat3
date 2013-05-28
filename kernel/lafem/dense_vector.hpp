@@ -21,20 +21,20 @@ namespace FEAST
     /**
      * \brief Dense data vector class template.
      *
-     * \tparam Arch_ The memory architecture to be used.
+     * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
      *
-     * This class represents a vector of continuous data in memory.
+     * This class represents a vector of continuous data in memory. \n \n
+     * Data survey: \n
+     * _elements[0]: raw number values \n
+     * _scalar_index[0]: container size
      *
      * \author Dirk Ribbrock
      */
-    template <typename Arch_, typename DT_>
-    class DenseVector : public Container<Arch_, DT_>, public VectorBase
+    template <typename Mem_, typename DT_>
+    class DenseVector : public Container<Mem_, DT_>, public VectorBase
     {
       private:
-        /// Pointer to our elements.
-        DT_ * _pelements;
-
         void _read_from_exp(String filename)
         {
           std::ifstream file(filename.c_str(), std::ifstream::in);
@@ -73,11 +73,10 @@ namespace FEAST
 
           }
 
-          this->_size = Index(data.size());
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(Index(data.size() * sizeof(DT_))));
+          this->_scalar_index.at(0) = Index(data.size());
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(Index(data.size() * sizeof(DT_))));
           this->_elements_size.push_back(Index(data.size()));
-          this->_pelements = this->_elements.at(0);
-          MemoryPool<Arch_>::instance()->upload(this->_pelements, &data[0], Index(data.size() * sizeof(DT_)));
+          MemoryPool<Mem_>::instance()->upload(this->_elements.at(0), &data[0], Index(data.size() * sizeof(DT_)));
         }
 
         void _read_from_dv(String filename)
@@ -93,21 +92,20 @@ namespace FEAST
         {
           uint64_t size;
           file.read((char *)&size, sizeof(uint64_t));
-          this->_size = (Index)size;
-          this->_elements_size.push_back(this->_size);
+          this->_scalar_index.at(0) = (Index)size;
+          this->_elements_size.push_back(this->_scalar_index.at(0));
 
           double * ctemp = new double[size];
           file.read((char *)ctemp, size * sizeof(double));
 
-          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(0)) * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
           {
             temp[i] = (DT_)ctemp[i];
           }
           delete[] ctemp;
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
-          this->_pelements = this->_elements.at(0);
-          MemoryPool<Arch_>::instance()->upload(this->_pelements, temp, this->_size * sizeof(DT_));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(0) * sizeof(DT_)));
+          MemoryPool<Mem_>::instance()->upload(this->_elements.at(0), temp, this->_scalar_index.at(0) * sizeof(DT_));
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
         }
 
@@ -115,7 +113,7 @@ namespace FEAST
         /// Our datatype
         typedef DT_ DataType;
         /// Our memory architecture type
-        typedef Arch_ MemType;
+        typedef Mem_ MemType;
 
         /**
          * \brief Constructor
@@ -123,7 +121,7 @@ namespace FEAST
          * Creates an empty non dimensional vector.
          */
         explicit DenseVector() :
-          Container<Arch_, DT_> (0)
+          Container<Mem_, DT_> (0)
         {
           CONTEXT("When creating DenseVector");
         }
@@ -136,13 +134,12 @@ namespace FEAST
          * Creates a vector with a given size.
          */
         explicit DenseVector(Index size) :
-          Container<Arch_, DT_>(size)
+          Container<Mem_, DT_>(size)
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(size * sizeof(DT_)));
           this->_elements_size.push_back(size);
-          this->_pelements = this->_elements.at(0);
         }
 
         /**
@@ -154,15 +151,14 @@ namespace FEAST
          * Creates a vector with given size and value.
          */
         explicit DenseVector(Index size, DT_ value) :
-          Container<Arch_, DT_>(size)
+          Container<Mem_, DT_>(size)
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(size * sizeof(DT_)));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(size * sizeof(DT_)));
           this->_elements_size.push_back(size);
-          this->_pelements = this->_elements.at(0);
 
-          MemoryPool<Arch_>::instance()->set_memory(_pelements, value, size);
+          MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, size);
         }
 
         /**
@@ -174,18 +170,17 @@ namespace FEAST
          * Creates a vector with given size and given data.
          */
         explicit DenseVector(Index size, DT_ * data) :
-          Container<Arch_, DT_>(size)
+          Container<Mem_, DT_>(size)
         {
           CONTEXT("When creating DenseVector");
 
           this->_elements.push_back(data);
           this->_elements_size.push_back(size);
-          this->_pelements = this->_elements.at(0);
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
         /**
@@ -197,7 +192,7 @@ namespace FEAST
          * Creates a vector from the given source file.
          */
         explicit DenseVector(FileMode mode, String filename) :
-          Container<Arch_, DT_>(0)
+          Container<Mem_, DT_>(0)
         {
           CONTEXT("When creating DenseVector");
 
@@ -223,7 +218,7 @@ namespace FEAST
          * Creates a vector from the given source file.
          */
         explicit DenseVector(FileMode mode, std::istream& file) :
-          Container<Arch_, DT_>(0)
+          Container<Mem_, DT_>(0)
         {
           CONTEXT("When creating DenseVector");
 
@@ -247,12 +242,10 @@ namespace FEAST
          *
          * Creates a shallow copy of a given vector.
          */
-        DenseVector(const DenseVector<Arch_, DT_> & other) :
-          Container<Arch_, DT_>(other)
+        DenseVector(const DenseVector<Mem_, DT_> & other) :
+          Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying DenseVector");
-
-          this->_pelements = this->_elements.at(0);
         }
 
         /**
@@ -264,26 +257,24 @@ namespace FEAST
          */
         template <typename Arch2_, typename DT2_>
         DenseVector(const DenseVector<Arch2_, DT2_> & other) :
-            Container<Arch_, DT_>(other)
+            Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying DenseVector");
-
-          this->_pelements = this->_elements.at(0);
         }
 
         /** \brief Clone operation
          *
          * Creates a deep copy of this vector.
          */
-        DenseVector<Arch_, DT_> clone()
+        DenseVector<Mem_, DT_> clone()
         {
           CONTEXT("When cloning DenseVector");
 
-          DenseVector<Arch_, DT_> t(this->_size);
+          DenseVector<Mem_, DT_> t(this->_scalar_index.at(0));
 
           void * pdest(t.elements());
           const void * psrc(this->elements());
-          MemoryPool<Arch_>::copy(pdest, psrc, this->_size * sizeof(DT_));
+          MemoryPool<Mem_>::copy(pdest, psrc, this->_scalar_index.at(0) * sizeof(DT_));
 
           return t;
         }
@@ -295,24 +286,24 @@ namespace FEAST
          *
          * Assigns another vector to the target vector.
          */
-        DenseVector<Arch_, DT_> & operator= (const DenseVector<Arch_, DT_> & other)
+        DenseVector<Mem_, DT_> & operator= (const DenseVector<Mem_, DT_> & other)
         {
           CONTEXT("When assigning DenseVector");
 
           if (this == &other)
             return *this;
 
-          this->_size = other.size();
-
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_indices.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
           this->_indices.clear();
           this->_elements_size.clear();
           this->_indices_size.clear();
+          this->_scalar_index.clear();
+          this->_scalar_dt.clear();
 
           std::vector<DT_ *> new_elements = other.get_elements();
           std::vector<Index*> new_indices = other.get_indices();
@@ -321,13 +312,13 @@ namespace FEAST
           this->_indices.assign(new_indices.begin(), new_indices.end());
           this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
           this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
-
-          _pelements = this->_elements.at(0);
+          this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
+          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
 
           return *this;
         }
@@ -340,16 +331,16 @@ namespace FEAST
          * Assigns a vector from another memory architecture to the target vector.
          */
         template <typename Arch2_, typename DT2_>
-        DenseVector<Arch_, DT_> & operator= (const DenseVector<Arch2_, DT2_> & other)
+        DenseVector<Mem_, DT_> & operator= (const DenseVector<Arch2_, DT2_> & other)
         {
           CONTEXT("When assigning DenseVector");
 
-          this->_size = other.size();
+          this->_scalar_index.at(0) = other.size();
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_indices.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
           this->_indices.clear();
@@ -357,15 +348,14 @@ namespace FEAST
           this->_indices_size.clear();
 
 
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(other.size() * sizeof(DT_)));
-          this->_elements_size.push_back(this->_size);
-          this->_pelements = this->_elements.at(0);
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(other.size() * sizeof(DT_)));
+          this->_elements_size.push_back(this->_scalar_index.at(0));
 
           Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
           Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
           void * temp(::malloc(src_size));
           MemoryPool<Arch2_>::download(temp, other.get_elements().at(0), src_size);
-          MemoryPool<Arch_>::upload(this->get_elements().at(0), temp, dest_size);
+          MemoryPool<Mem_>::upload(this->get_elements().at(0), temp, dest_size);
           ::free(temp);
 
           return *this;
@@ -438,10 +428,10 @@ namespace FEAST
          */
         void write_out_exp(std::ostream& file) const
         {
-          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
-          MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(0)) * sizeof(DT_));
+          MemoryPool<Mem_>::download(temp, this->_elements.at(0), this->_scalar_index.at(0) * sizeof(DT_));
 
-          for (Index i(0) ; i < this->_size ; ++i)
+          for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
           {
             file << std::scientific << (double)temp[i] << std::endl;
           }
@@ -470,16 +460,16 @@ namespace FEAST
          */
         void write_out_dv(std::ostream& file) const
         {
-          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_size) * sizeof(DT_));
-          MemoryPool<Arch_>::download(temp, _pelements, this->_size * sizeof(DT_));
-          double * ctemp = new double[this->_size];
-          for (Index i(0) ; i < this->_size ; ++i)
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(0)) * sizeof(DT_));
+          MemoryPool<Mem_>::download(temp, this->_elements.at(0), this->_scalar_index.at(0) * sizeof(DT_));
+          double * ctemp = new double[this->_scalar_index.at(0)];
+          for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
           {
             ctemp[i] = temp[i];
           }
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
 
-          uint64_t size(this->_size);
+          uint64_t size(this->_scalar_index.at(0));
           file.write((const char *)&size, sizeof(uint64_t));
           file.write((const char *)ctemp, size * sizeof(double));
 
@@ -493,12 +483,12 @@ namespace FEAST
          */
         DT_ * elements()
         {
-          return _pelements;
+          return this->_elements.at(0);
         }
 
         const DT_ * elements() const
         {
-          return _pelements;
+          return this->_elements.at(0);
         }
 
         /**
@@ -512,8 +502,8 @@ namespace FEAST
         {
           CONTEXT("When retrieving DenseVector element");
 
-          ASSERT(index < this->_size, "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_size) + " !");
-          return MemoryPool<Arch_>::get_element(_pelements, index);
+          ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_scalar_index.at(0)) + " !");
+          return MemoryPool<Mem_>::get_element(this->_elements.at(0), index);
         }
 
         /**
@@ -526,8 +516,8 @@ namespace FEAST
         {
           CONTEXT("When setting DenseVector element");
 
-          ASSERT(index < this->_size, "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_size) + " !");
-          MemoryPool<Arch_>::set_memory(_pelements + index, value);
+          ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_scalar_index.at(0)) + " !");
+          MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
         }
 
         /**
@@ -547,7 +537,7 @@ namespace FEAST
      * \param[in] a A vector to compare with.
      * \param[in] b A vector to compare with.
      */
-    template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const DenseVector<Arch_, DT_> & a, const DenseVector<Arch2_, DT_> & b)
+    template <typename Mem_, typename Arch2_, typename DT_> bool operator== (const DenseVector<Mem_, DT_> & a, const DenseVector<Arch2_, DT_> & b)
     {
       CONTEXT("When comparing DenseVectors");
 
@@ -571,9 +561,9 @@ namespace FEAST
      * \param[in] lhs The target stream.
      * \param[in] b The vector to be streamed.
      */
-    template <typename Arch_, typename DT_>
+    template <typename Mem_, typename DT_>
     std::ostream &
-    operator<< (std::ostream & lhs, const DenseVector<Arch_, DT_> & b)
+    operator<< (std::ostream & lhs, const DenseVector<Mem_, DT_> & b)
     {
       lhs << "[";
       for (Index i(0) ; i < b.size() ; ++i)

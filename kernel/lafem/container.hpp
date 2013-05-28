@@ -25,30 +25,31 @@ namespace FEAST
        */
       enum FileMode
       {
-        fm_exp = 0,
-        fm_dv,
-        fm_m,
-        fm_mtx,
-        fm_ell,
-        fm_csr,
-        fm_coo
+        fm_exp = 0, /**< Exponential ascii */
+        fm_dv, /**< Binary data */
+        fm_m, /**< Matlab ascii */
+        fm_mtx, /**< Matrix market ascii */
+        fm_ell, /**< Binary ell data */
+        fm_csr, /**< Binary csr data */
+        fm_coo /**< Binary coo data */
       };
 
     /**
      * \brief Container base class.
      *
-     * \tparam Arch_ The memory architecture to be used.
+     * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
      *
-     * This is the base class of all inheritated containers.
+     * This is the base class of all inheritated containers. \n\n
+     * Data survey: \n
+     * _scalar_index[0]: container size
      *
      * \author Dirk Ribbrock
      */
-    template <typename Arch_, typename DT_>
+    template <typename Mem_, typename DT_>
     class Container
     {
       protected:
-        Index _size;
         /// List of pointers to all datatype dependent arrays.
         std::vector<DT_*> _elements;
         /// List of pointers to all Index dependent arrays.
@@ -70,10 +71,10 @@ namespace FEAST
          *
          * Creates a container with a given size.
          */
-        Container(Index size) :
-          _size(size)
+        Container(Index size)
         {
           CONTEXT("When creating Container");
+          _scalar_index.push_back(size);
         }
 
         /**
@@ -86,9 +87,9 @@ namespace FEAST
           CONTEXT("When destroying Container");
 
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(_elements.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(_indices.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(_indices.at(i));
         }
 
         /**
@@ -98,8 +99,7 @@ namespace FEAST
          *
          * Creates a shallow copy of a given container.
          */
-        Container(const Container<Arch_, DT_> & other) :
-          _size(other._size),
+        Container(const Container<Mem_, DT_> & other) :
           _elements(other._elements),
           _indices(other._indices),
           _elements_size(other._elements_size),
@@ -110,9 +110,9 @@ namespace FEAST
           CONTEXT("When copying Container");
 
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(_elements.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(_elements.at(i));
           for (Index i(0) ; i < _indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(_indices.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(_indices.at(i));
         }
 
         /**
@@ -124,7 +124,6 @@ namespace FEAST
          */
         template <typename Arch2_, typename DT2_>
         Container(const Container<Arch2_, DT2_> & other) :
-          _size(other.size()),
           _scalar_index(other.get_scalar_index()),
           _scalar_dt(other.get_scalar_dt())
         {
@@ -135,9 +134,9 @@ namespace FEAST
 
 
           for (Index i(0) ; i < other.get_elements().size() ; ++i)
-            this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(other.get_elements_size().at(i) * sizeof(DT_)));
+            this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(other.get_elements_size().at(i) * sizeof(DT_)));
           for (Index i(0) ; i < other.get_indices().size() ; ++i)
-            this->_indices.push_back((Index*)MemoryPool<Arch_>::instance()->allocate_memory(other.get_indices_size().at(i) * sizeof(Index)));
+            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(other.get_indices_size().at(i) * sizeof(Index)));
 
           for (Index i(0) ; i < other.get_elements_size().size() ; ++i)
             this->_elements_size.push_back(other.get_elements_size().at(i));
@@ -150,7 +149,7 @@ namespace FEAST
             Index dest_size(other.get_elements_size().at(i) * sizeof(DT_));
             void * temp(::malloc(src_size));
             MemoryPool<Arch2_>::download(temp, other.get_elements().at(i), src_size);
-            MemoryPool<Arch_>::upload(this->get_elements().at(i), temp, dest_size);
+            MemoryPool<Mem_>::upload(this->get_elements().at(i), temp, dest_size);
             ::free(temp);
           }
           for (Index i(0) ; i < other.get_indices().size() ; ++i)
@@ -159,7 +158,7 @@ namespace FEAST
             Index dest_size(other.get_indices_size().at(i) * sizeof(Index));
             void * temp(::malloc(src_size));
             MemoryPool<Arch2_>::download(temp, other.get_indices().at(i), src_size);
-            MemoryPool<Arch_>::upload(this->get_indices().at(i), temp, dest_size);
+            MemoryPool<Mem_>::upload(this->get_indices().at(i), temp, dest_size);
             ::free(temp);
           }
         }
@@ -172,7 +171,7 @@ namespace FEAST
           CONTEXT("When clearing Container");
 
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
+            MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
         }
 
         /**
@@ -242,7 +241,10 @@ namespace FEAST
          */
         Index size() const
         {
-          return _size;
+          if (_scalar_index.size() > 0)
+            return _scalar_index.at(0);
+          else
+            return Index(0);
         }
 
         /**

@@ -16,29 +16,27 @@ namespace FEAST
     /**
      * \brief Dense data matrix class template.
      *
-     * \tparam Arch_ The memory architecture to be used.
+     * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
      *
-     * This class represents a matrix of continuous data in memory.
+     * This class represents a matrix of continuous data in memory. \n\n
+     * Data survey: \n
+     * _elements[0]: raw number values \n
+     *
+     * _scalar_index[0]: container size \n
+     * _scalar_index[1]: row count \n
+     * _scalar_index[2]: column count
      *
      * \author Dirk Ribbrock
      */
-    template <typename Arch_, typename DT_>
-    class DenseMatrix : public Container<Arch_, DT_>, public MatrixBase
+    template <typename Mem_, typename DT_>
+    class DenseMatrix : public Container<Mem_, DT_>, public MatrixBase
     {
-      private:
-        /// Pointer to our elements.
-        DT_ * _pelements;
-        /// Our row count.
-        Index _rows;
-        /// Our column count.
-        Index _columns;
-
       public:
         /// Our datatype
         typedef DT_ DataType;
         /// Our memory architecture type
-        typedef Arch_ MemType;
+        typedef Mem_ MemType;
 
         /**
          * \brief Constructor
@@ -46,11 +44,12 @@ namespace FEAST
          * Creates an empty non dimensional matrix.
          */
         explicit DenseMatrix() :
-          Container<Arch_, DT_> (0),
-          _rows(0),
-          _columns(0)
+          Container<Mem_, DT_> (0)
         {
           CONTEXT("When creating DenseMatrix");
+
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
         }
 
         /**
@@ -62,17 +61,16 @@ namespace FEAST
          * Creates a matrix with given dimensions.
          */
         explicit DenseMatrix(Index rows, Index columns) :
-          Container<Arch_, DT_>(rows * columns)
+          Container<Mem_, DT_>(rows * columns)
         {
           CONTEXT("When creating DenseMatrix");
 
-          this->_size = rows * columns;
-          this->_rows = rows;
-          this->_columns = columns;
+          this->_scalar_index.at(0) = rows * columns;
+          this->_scalar_index.push_back(rows);
+          this->_scalar_index.push_back(columns);
 
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
-          this->_elements_size.push_back(this->_size);
-          _pelements = this->_elements.at(0);
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(0) * sizeof(DT_)));
+          this->_elements_size.push_back(this->_scalar_index.at(0));
         }
 
         /**
@@ -85,18 +83,16 @@ namespace FEAST
          * Creates a matrix with given dimensions and value.
          */
         explicit DenseMatrix(Index rows, Index columns, DT_ value) :
-          Container<Arch_, DT_>(rows * columns)
+          Container<Mem_, DT_>(rows * columns)
         {
           CONTEXT("When creating DenseMatrix");
 
-          this->_size = rows * columns;
-          this->_rows = rows;
-          this->_columns = columns;
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(this->_size * sizeof(DT_)));
-          this->_elements_size.push_back(this->_size);
-          _pelements = this->_elements.at(0);
-
-          MemoryPool<Arch_>::instance()->set_memory(_pelements, value, this->_size);
+          this->_scalar_index.at(0) = rows * columns;
+          this->_scalar_index.push_back(rows);
+          this->_scalar_index.push_back(columns);
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(0) * sizeof(DT_)));
+          this->_elements_size.push_back(this->_scalar_index.at(0));
+          MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
         }
 
         /**
@@ -106,14 +102,10 @@ namespace FEAST
          *
          * Creates a shallow copy of a given matrix.
          */
-        DenseMatrix(const DenseMatrix<Arch_, DT_> & other) :
-          Container<Arch_, DT_>(other),
-          _rows(other._rows),
-          _columns(other._columns)
+        DenseMatrix(const DenseMatrix<Mem_, DT_> & other) :
+          Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying DenseMatrix");
-
-          _pelements = this->_elements.at(0);
         }
 
         /**
@@ -125,28 +117,24 @@ namespace FEAST
          */
         template <typename Arch2_, typename DT2_>
         DenseMatrix(const DenseMatrix<Arch2_, DT2_> & other) :
-          Container<Arch_, DT_>(other),
-          _rows(other.rows()),
-          _columns(other.columns())
+          Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying DenseMatrix");
-
-          _pelements = this->_elements.at(0);
         }
 
         /** \brief Clone operation
          *
          * Creates a deep copy of this matrix.
          */
-        DenseMatrix<Arch_, DT_> clone()
+        DenseMatrix<Mem_, DT_> clone()
         {
           CONTEXT("When cloning DenseMatrix");
 
-          DenseMatrix<Arch_, DT_> t(this->_rows, this->_columns);
+          DenseMatrix<Mem_, DT_> t(this->_scalar_index.at(1), this->_scalar_index.at(2));
 
           void * pdest(t.elements());
           const void * psrc(this->elements());
-          MemoryPool<Arch_>::copy(pdest, psrc, this->_size * sizeof(DT_));
+          MemoryPool<Mem_>::copy(pdest, psrc, this->_scalar_index.at(0) * sizeof(DT_));
 
           return t;
         }
@@ -158,21 +146,21 @@ namespace FEAST
          *
          * Assigns another matrix to the target matrix.
          */
-        DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch_, DT_> & other)
+        DenseMatrix<Mem_, DT_> & operator= (const DenseMatrix<Mem_, DT_> & other)
         {
           CONTEXT("When assigning DenseMatrix");
 
           if (this == &other)
             return *this;
 
-          this->_size = other.size();
-          this->_rows = other.rows();
-          this->_columns = other.columns();
+          this->_scalar_index.at(0) = other.size();
+          this->_scalar_index.at(1) = other.rows();
+          this->_scalar_index.at(2) = other.columns();
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_indices.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
           this->_indices.clear();
@@ -187,12 +175,10 @@ namespace FEAST
           this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
           this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
 
-          _pelements = this->_elements.at(0);
-
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(this->_elements.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->increase_memory(this->_indices.at(i));
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
 
           return *this;
         }
@@ -205,18 +191,18 @@ namespace FEAST
          * Assigns a matrix from another memory architecture to the target matrix.
          */
         template <typename Arch2_, typename DT2_>
-        DenseMatrix<Arch_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
+        DenseMatrix<Mem_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
         {
           CONTEXT("When assigning DenseMatrix");
 
-          this->_size = other.size();
-          this->_rows = other.rows();
-          this->_columns = other.columns();
+          this->_scalar_index.at(0) = other.size();
+          this->_scalar_index.at(1) = other.rows();
+          this->_scalar_index.at(2) = other.columns();
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_elements.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Arch_>::instance()->release_memory(this->_indices.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
           this->_indices.clear();
@@ -224,15 +210,14 @@ namespace FEAST
           this->_indices_size.clear();
 
 
-          this->_elements.push_back((DT_*)MemoryPool<Arch_>::instance()->allocate_memory(other.size() * sizeof(DT_)));
-          this->_elements_size.push_back(this->_size);
-          this->_pelements = this->_elements.at(0);
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(other.size() * sizeof(DT_)));
+          this->_elements_size.push_back(this->_scalar_index.at(0));
 
           Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
           Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
           void * temp(::malloc(src_size));
           MemoryPool<Arch2_>::download(temp, other.get_elements().at(0), src_size);
-          MemoryPool<Arch_>::upload(this->get_elements().at(0), temp, dest_size);
+          MemoryPool<Mem_>::upload(this->get_elements().at(0), temp, dest_size);
           ::free(temp);
 
           return *this;
@@ -245,12 +230,12 @@ namespace FEAST
          */
         DT_ * elements()
         {
-          return _pelements;
+          return this->_elements.at(0);
         }
 
         const DT_ * elements() const
         {
-          return _pelements;
+          return this->_elements.at(0);
         }
 
         /**
@@ -265,9 +250,9 @@ namespace FEAST
         {
           CONTEXT("When retrieving DenseMatrix element");
 
-          ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
-          ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
-          return MemoryPool<Arch_>::get_element(_pelements, row * this->_columns + col);
+          ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
+          ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
+          return MemoryPool<Mem_>::get_element(this->_elements.at(0), row * this->columns() + col);
         }
 
         /**
@@ -281,9 +266,9 @@ namespace FEAST
         {
           CONTEXT("When setting DenseMatrix element");
 
-          ASSERT(row < this->_rows, "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->_rows) + " !");
-          ASSERT(col < this->_columns, "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->_columns) + " !");
-          MemoryPool<Arch_>::set_memory(_pelements + row * this->_columns + col, value);
+          ASSERT(row < this->rows(), "Error: " + stringify(row) + " exceeds dense matrix row size " + stringify(this->rows()) + " !");
+          ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds dense matrix column size " + stringify(this->columns()) + " !");
+          MemoryPool<Mem_>::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
         }
 
         /**
@@ -293,7 +278,7 @@ namespace FEAST
          */
         const Index & rows() const
         {
-          return this->_rows;
+          return this->_scalar_index.at(1);
         }
 
         /**
@@ -303,7 +288,7 @@ namespace FEAST
          */
         const Index & columns() const
         {
-          return this->_columns;
+          return this->_scalar_index.at(2);
         }
 
         /**
@@ -323,7 +308,7 @@ namespace FEAST
      * \param[in] a A matrix to compare with.
      * \param[in] b A matrix to compare with.
      */
-    template <typename Arch_, typename Arch2_, typename DT_> bool operator== (const DenseMatrix<Arch_, DT_> & a, const DenseMatrix<Arch2_, DT_> & b)
+    template <typename Mem_, typename Arch2_, typename DT_> bool operator== (const DenseMatrix<Mem_, DT_> & a, const DenseMatrix<Arch2_, DT_> & b)
     {
       CONTEXT("When comparing DenseMatrices");
 
@@ -352,9 +337,9 @@ namespace FEAST
      * \param[in] lhs The target stream.
      * \param[in] b The matrix to be streamed.
      */
-    template <typename Arch_, typename DT_>
+    template <typename Mem_, typename DT_>
       std::ostream &
-      operator<< (std::ostream & lhs, const DenseMatrix<Arch_, DT_> & b)
+      operator<< (std::ostream & lhs, const DenseMatrix<Mem_, DT_> & b)
       {
         lhs << "[" << std::endl;
         for (Index i(0) ; i < b.rows() ; ++i)
