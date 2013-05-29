@@ -5,6 +5,7 @@ using namespace FEAST::TestSystem;
 
 int main(int argc, char** argv)
 {
+  std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
   int result(EXIT_SUCCESS);
 
   if(argc > 1)
@@ -42,7 +43,6 @@ int main(int argc, char** argv)
         << " [Algo: " << (*i)->get_algo_name() << "]"
         << " [Precision: "<< (*i)->get_prec_name() << "]"
         << std::endl;
-      std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
       (*i)->run();
       std::cout << "PASSED" << std::endl;
       ++tests_passed;

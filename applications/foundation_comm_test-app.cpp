@@ -716,6 +716,7 @@ int main(int argc, char* argv[])
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
+  std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
 #ifndef SERIAL
   check_sendrecv(me);

@@ -713,6 +713,7 @@ int main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   MPI_Comm_size(MPI_COMM_WORLD, &num_patches);
 #endif
+  std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
 #ifndef SERIAL
   test_hypercube_2d(me, num_patches, desired_refinement_level);

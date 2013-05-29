@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
 #endif
+  std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
   ///TODO dedicated processes only
   //tell FEAST, how physical compute nodes and mesh patches are connected
