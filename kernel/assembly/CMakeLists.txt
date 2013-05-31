@@ -11,7 +11,10 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # list of assembly tests
 SET (test_list
+  bilinear_operator-test
   grid_transfer-test
+  interpolator-test
+  linear_functional-test
 )
 
 # create all tests
