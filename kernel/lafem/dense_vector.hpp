@@ -508,7 +508,15 @@ namespace FEAST
          *
          * \returns Specific vector element.
          */
-        const DT_ operator()(Index index) const
+        const DT_& operator()(Index index) const
+        {
+          CONTEXT("When retrieving DenseVector element");
+
+          ASSERT(index < this->_size, "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_size) + " !");
+          return MemoryPool<Arch_>::get_element(_pelements, index);
+        }
+
+        DT_& operator()(Index index)
         {
           CONTEXT("When retrieving DenseVector element");
 
