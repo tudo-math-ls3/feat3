@@ -44,7 +44,7 @@ namespace FEAST
         /// trafo data type
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// test function data type
-        typedef typename AsmTraits_::FuncData FuncData;
+        typedef typename AsmTraits_::BasisData BasisData;
 
       public:
         /**
@@ -81,7 +81,7 @@ namespace FEAST
          * \returns
          * The value of the linear functional.
          */
-        DataType operator()(const TrafoData& tau, const FuncData& psi) const;
+        DataType operator()(const TrafoData& tau, const BasisData& psi) const;
 #endif // DOXYGEN
       }; // class LinearFunctorBase::Evaluator<...>
     }; // class LinearFunctorBase

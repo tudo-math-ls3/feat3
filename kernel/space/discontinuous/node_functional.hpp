@@ -34,10 +34,10 @@ namespace FEAST
         typename Variant_,
         typename DataType_>
       class NodeFunctional<Space_, Functor_, 0, Variant_, DataType_> :
-        public NodeFunctionalBase<Space_, Functor_>
+        public NodeFunctionalBase<Space_, Functor_, DataType_>
       {
       public:
-        typedef NodeFunctionalBase<Space_, Functor_> BaseClass;
+        typedef NodeFunctionalBase<Space_, Functor_, DataType_> BaseClass;
 
       protected:
         struct TrafoConfig :
@@ -52,17 +52,17 @@ namespace FEAST
         typedef typename Space_::TrafoType TrafoType;
         typedef typename Space_::ShapeType ShapeType;
         typedef typename TrafoType::template Evaluator<ShapeType, DataType_>::Type TrafoEvalType;
-        typedef typename TrafoEvalType::EvalPolicy TrafoEvalPolicy;
-        typedef typename TrafoEvalPolicy::DomainCoordType DomainCoordType;
-        typedef typename TrafoEvalPolicy::DomainPointType DomainPointType;
+        typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
+        typedef typename TrafoEvalTraits::DomainCoordType DomainCoordType;
+        typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
-        typedef Trafo::EvalData<TrafoEvalType, TrafoConfig> TrafoEvalData;
+        typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
 
-        struct EvalTraits
+        struct FuncEvalTraits
         {
           enum
           {
-            image_dim = TrafoEvalPolicy::image_dim
+            image_dim = TrafoEvalTraits::image_dim
           };
           typedef TrafoEvalType TrafoEvaluator;
           typedef TrafoEvalData TrafoData;
@@ -70,7 +70,7 @@ namespace FEAST
           typedef DataType_ ValueType;
         };
 
-        typedef typename Functor_::template ValueEvaluator<EvalTraits> FuncEval;
+        typedef typename Functor_::template ValueEvaluator<FuncEvalTraits> FuncEval;
 
         TrafoEvalType _trafo_eval;
         FuncEval _func_eval;

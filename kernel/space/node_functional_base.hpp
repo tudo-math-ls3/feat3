@@ -26,15 +26,17 @@ namespace FEAST
      */
     template<
       typename Space_,
-      typename Functor_>
+      typename Functor_,
+      typename DataType_>
     class NodeFunctionalBase
     {
     public:
       /// space typedef
       typedef Space_ SpaceType;
-
       /// functor type
       typedef Functor_ FunctorType;
+      /// data type
+      typedef DataType_ DataType;
 
     protected:
       /// space reference
@@ -97,7 +99,7 @@ namespace FEAST
        * \returns
        * The value of the node functional applied onto the functor.
        */
-      DataType operator()(Index assign_idx) const;
+      DataType_ operator()(Index assign_idx) const;
 #endif // DOXYGEN
     }; // class NodeFunctionalBase<...>
 
@@ -113,11 +115,11 @@ namespace FEAST
       typename Functor_,
       typename DataType_>
     class NodeFunctionalNull :
-      public NodeFunctionalBase<Space_, Functor_>
+      public NodeFunctionalBase<Space_, Functor_, DataType_>
     {
     private:
       /// base-class typedef
-      typedef NodeFunctionalBase<Space_, Functor_> BaseClass;
+      typedef NodeFunctionalBase<Space_, Functor_, DataType_> BaseClass;
 
     public:
       /// constructor

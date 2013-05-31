@@ -35,10 +35,10 @@ namespace FEAST
         typename Variant_,
         typename DataType_>
       class NodeFunctional<Space_, Functor_, 1, Variant_, DataType_> :
-        public NodeFunctionalBase<Space_, Functor_>
+        public NodeFunctionalBase<Space_, Functor_, DataType_>
       {
       public:
-        typedef NodeFunctionalBase<Space_, Functor_> BaseClass;
+        typedef NodeFunctionalBase<Space_, Functor_, DataType_> BaseClass;
 
       protected:
         struct TrafoConfig :
@@ -55,29 +55,29 @@ namespace FEAST
         typedef typename Space_::ShapeType ShapeType;
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
         typedef typename TrafoType::template Evaluator<FacetType, DataType_>::Type TrafoEvalType;
-        typedef typename TrafoEvalType::EvalPolicy TrafoEvalPolicy;
-        typedef typename TrafoEvalPolicy::DomainCoordType DomainCoordType;
-        typedef typename TrafoEvalPolicy::DomainPointType DomainPointType;
+        typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
+        typedef typename TrafoEvalTraits::DomainCoordType DomainCoordType;
+        typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
-        typedef Trafo::EvalData<TrafoEvalType, TrafoConfig> TrafoEvalData;
+        typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
 
-        struct EvalTraits
+        struct FuncEvalTraits
         {
           enum
           {
-            image_dim = TrafoEvalPolicy::image_dim
+            image_dim = TrafoEvalTraits::image_dim
           };
 
           typedef TrafoEvalType TrafoEvaluator;
           typedef TrafoEvalData TrafoData;
           typedef DataType_ CoeffType;
           typedef DataType_ ValueType;
+          typedef Tiny::Vector<CoeffType, image_dim> GradientType;
         };
 
-        typedef typename Functor_::template ValueEvaluator<EvalTraits> FuncEval;
+        typedef typename Functor_::template ValueEvaluator<FuncEvalTraits> FuncEval;
 
         typedef Cubature::Rule<FacetType, DataType_, DomainCoordType, DomainPointType> CubRuleType;
-        //typedef typename Cubature::DynamicFactorySelect<CubRuleType>::Type CubDynFactoryType;
 
         TrafoEvalType _trafo_eval;
         FuncEval _func_eval;

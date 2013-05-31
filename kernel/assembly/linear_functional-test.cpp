@@ -74,7 +74,7 @@ public:
 
     // assemble the linear functional into a vector
     VectorType vector(space.get_num_dofs(), DataType_(0));
-    Assembly::LinearScalarIntegralFunctor<OneFunction>::assemble(vector, space, "gauss-legendre:2");
+    Assembly::LinearScalarIntegralFunctor<OneFunction>::assemble_vector(vector, "gauss-legendre:2", space);
 
     // get mesh element count
     Index num_verts = mesh.get_num_entities(0);
@@ -119,7 +119,7 @@ public:
 
     // assemble the linear functional into a vector
     VectorType vector(space.get_num_dofs(), DataType_(0));
-    Assembly::LinearScalarIntegralFunctor<SineBubble>::assemble(vector, space, "gauss-legendre:5");
+    Assembly::LinearScalarIntegralFunctor<SineBubble>::assemble_vector(vector, "gauss-legendre:5", space);
 
     // get mesh element count
     Index num_quads = mesh.get_num_entities(2);

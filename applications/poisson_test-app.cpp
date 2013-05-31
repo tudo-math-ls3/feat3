@@ -457,10 +457,10 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   SparseMatrixCSR<Mem::Main, double> mat_sys(dof_adj);
   mat_sys.clear();
-  Assembly::BilinearScalarLaplaceFunctor::assemble(mat_sys, space, "gauss-legendre:2");
+  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(mat_sys, "gauss-legendre:2", space);
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, "gauss-legendre:2");
+  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(vec_rhs, "gauss-legendre:2", space);
 
   // assemble homogeneous Dirichlet BCs
   Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);

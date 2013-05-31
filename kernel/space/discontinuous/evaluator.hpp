@@ -34,8 +34,12 @@ namespace FEAST
       public:
         /// basis value coefficient type
         typedef typename SpaceEvalTraits_::BasisValueCoeff BasisValueCoeff;
-        /// basis value vector reference
-        typedef typename SpaceEvalTraits_::BasisValueVectorRef BasisValueVectorRef;
+
+        /// space evaluation traits
+        typedef SpaceEvalTraits_ SpaceEvalTraits;
+
+        /// trafo evaluation traits
+        typedef typename TrafoEvaluator_::EvalTraits TrafoEvalTraits;
 
         /** \copydoc EvaluatorBase::EvaluatorCapabilities */
         enum EvaluatorCapabilities
@@ -51,7 +55,7 @@ namespace FEAST
          * \param[in] space
          * A reference to the Element using this evaluator.
          */
-        explicit Evaluator(const Space_& /*space*/)
+        explicit Evaluator(const Space_& DOXY(space))
         {
         }
 
@@ -72,12 +76,12 @@ namespace FEAST
         }
 
         /** \copydoc Space::EvaluatorBase::eval_values() */
-        template<typename TrafoEvalData_>
+        template<typename SpaceCfg_, typename TrafoCfg_>
         void eval_values(
-          BasisValueVectorRef values,
-          const TrafoEvalData_& /*trafo_data*/) const
+          EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
         {
-          values[0] = BasisValueCoeff(1);
+          data.phi[0].value = BasisValueCoeff(1);
         }
       };
     } // namespace Discontinuous

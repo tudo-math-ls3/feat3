@@ -81,14 +81,16 @@ public:
     // create a trafo evaluator
     typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
     TrafoEvaluator trafo_eval(trafo);
-    Trafo::EvalData<TrafoEvaluator, UnitTrafoConfig> trafo_data;
+    Trafo::EvalData<typename TrafoEvaluator::EvalTraits, UnitTrafoConfig> trafo_data;
 
     // create a space evaluator
     typedef typename QuadSpaceStdNonPar::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
     SpaceEvaluator space_eval(space);
-    Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
+    Space::EvalData<typename SpaceEvaluator::SpaceEvalTraits, UnitSpaceConfig> space_data;
 
     // create a 3x3 Gauss-Legendre cubature formula
+    //CubatureRule cubature_rule;
+    //CubatureFactory::create(cubature_rule, "gauss-legendre:3");
     CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:3"));
 
     // prepare trafo evaluator
@@ -123,12 +125,12 @@ public:
         {
           // mass matrix entry
           M(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
-            space_data.values[i] * space_data.values[j]);
+            space_data.phi[i].value * space_data.phi[j].value);
 
           // laplace matrix entry
           L(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) * (
-            space_data.grads[i][0] * space_data.grads[j][0] +
-            space_data.grads[i][1] * space_data.grads[j][1]);
+            space_data.phi[i].grad[0] * space_data.phi[j].grad[0] +
+            space_data.phi[i].grad[1] * space_data.phi[j].grad[1]);
           // continue with next trial function
         }
         // continue with next test function

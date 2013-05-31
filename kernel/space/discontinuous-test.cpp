@@ -80,14 +80,16 @@ public:
     // create a trafo evaluator
     typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
     TrafoEvaluator trafo_eval(trafo);
-    Trafo::EvalData<TrafoEvaluator, UnitTrafoConfig> trafo_data;
+    Trafo::EvalData<typename TrafoEvaluator::EvalTraits, UnitTrafoConfig> trafo_data;
 
     // create a space evaluator
     typedef typename QuadSpaceQ0::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
     SpaceEvaluator space_eval(space);
-    Space::EvalData<SpaceEvaluator, UnitSpaceConfig> space_data;
+    Space::EvalData<typename SpaceEvaluator::SpaceEvalTraits, UnitSpaceConfig> space_data;
 
     // create a 2x2 Gauss-Legendre cubature formula
+    //CubatureRule cubature_rule;
+    //CubatureFactory::create(cubature_rule, "gauss-legendre:2");
     CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:2"));
 
     // prepare trafo evaluator
@@ -113,7 +115,7 @@ public:
       space_data(space_eval, trafo_data);
 
       // mass matrix entry
-      M += trafo_data.jac_det * cubature_rule.get_weight(k) * space_data.values[0] * space_data.values[0];
+      M += trafo_data.jac_det * cubature_rule.get_weight(k) * space_data.phi[0].value * space_data.phi[0].value;
     }
 
     // finish evaluators

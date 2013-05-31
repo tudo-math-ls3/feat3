@@ -124,18 +124,27 @@ namespace FEAST
      *
      * This templates applies a boolean OR operator on two trafo config tags.
      *
+     * \tparam Cfg1_, Cfg2_
+     * The two trafo config tags that shall be OR'ed.
+     *
      * \author Peter Zajac
      */
     template<typename Cfg1_, typename Cfg2_>
     struct ConfigOr
     {
+      /// dummy enumeration
       enum
       {
-        need_dom_point = int(Cfg1_::need_dom_point) | int(Cfg2_::need_dom_point),
-        need_img_point = int(Cfg1_::need_img_point) | int(Cfg2_::need_img_point),
-        need_jac_mat = int(Cfg1_::need_jac_mat) | int(Cfg2_::need_jac_mat),
-        need_jac_inv = int(Cfg1_::need_jac_inv) | int(Cfg2_::need_jac_inv),
-        need_jac_det = int(Cfg1_::need_jac_det) | int(Cfg2_::need_jac_det),
+        /// specifies whether the trafo should supply domain point coordinates
+        need_dom_point = (Cfg1_::need_dom_point != 0) || (Cfg2_::need_dom_point != 0) ? 1 : 0,
+        /// specifies whether the trafo should supply image point coordinates
+        need_img_point = (Cfg1_::need_img_point != 0) | (Cfg2_::need_img_point != 0) ? 1 : 0,
+        /// specifies whether the trafo should supply jacobian matrices
+        need_jac_mat = (Cfg1_::need_jac_mat != 0) | (Cfg2_::need_jac_mat != 0) ? 1 : 0,
+        /// specifies whether the trafo should supply inverse jacobian matrices
+        need_jac_inv = (Cfg1_::need_jac_inv != 0) | (Cfg2_::need_jac_inv != 0) ? 1 : 0,
+        /// specifies whether the trafo should supply jacobian determinants
+        need_jac_det = (Cfg1_::need_jac_det != 0) | (Cfg2_::need_jac_det != 0) ? 1 : 0,
       };
     }; // struct ConfigOr<...>
   } // namespace Trafo

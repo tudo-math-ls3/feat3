@@ -90,7 +90,9 @@ namespace FEAST
        * \tparam shape_dim_
        * The dimension of the shape for which the Dof-Assignment is to be defined.
        */
-      template<int shape_dim_>
+      template<
+        int shape_dim_,
+        typename DataType_ = Real>
       class DofAssignment
       {
       public:
@@ -118,7 +120,6 @@ namespace FEAST
       template<
         typename Functor_,
         int shape_dim_,
-        typename Derive_ = Derivative::Value,
         typename DataType_ = Real>
       class NodeFunctional
       {

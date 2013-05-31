@@ -96,12 +96,14 @@ namespace FEAST
         typedef DofMappingSingleEntity<Element, 1> DofMappingType;
 
         /** \copydoc ElementBase::DofAssignment */
-        template<int shape_dim_>
+        template<
+          int shape_dim_,
+          typename DataType_ = Real>
         class DofAssignment
         {
         public:
           /// Dof-Assignment type
-          typedef DofAssignmentSingleEntity<Element, shape_dim_, ShapeType::dimension - 1> Type;
+          typedef DofAssignmentSingleEntity<Element, shape_dim_, DataType_, ShapeType::dimension - 1> Type;
         };
 
         /** \copydoc ElementBase::NodeFunctional */

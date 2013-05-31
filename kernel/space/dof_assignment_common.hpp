@@ -12,11 +12,12 @@ namespace FEAST
   {
     template<
       typename Space_,
-      int shape_dim_>
+      int shape_dim_,
+      typename DataType_>
     class DofAssignmentNull :
-      public DofAssignmentBase<Space_, shape_dim_>
+      public DofAssignmentBase<Space_, shape_dim_, DataType_>
     {
-      typedef DofAssignmentBase<Space_, shape_dim_> BaseClass;
+      typedef DofAssignmentBase<Space_, shape_dim_, DataType_> BaseClass;
 
     public:
       explicit DofAssignmentNull(const Space_& space) :
@@ -54,7 +55,7 @@ namespace FEAST
       }
 
       /** \copydoc DofAssignmentBase::get_weight() */
-      Real get_weight(Index assign_idx, Index contrib_idx = 0) const
+      DataType_ get_weight(Index assign_idx, Index contrib_idx = 0) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_weight()");
       }
@@ -63,11 +64,12 @@ namespace FEAST
     template<
       typename Space_,
       int shape_dim_,
+      typename DataType_,
       int dofs_per_cell_ = 1>
     class DofAssignmentIdentity :
-      public DofAssignmentBase<Space_, shape_dim_>
+      public DofAssignmentBase<Space_, shape_dim_, DataType_>
     {
-      typedef DofAssignmentBase<Space_, shape_dim_> BaseClass;
+      typedef DofAssignmentBase<Space_, shape_dim_, DataType_> BaseClass;
 
 
     public:
@@ -98,12 +100,13 @@ namespace FEAST
     template<
       typename Space_,
       int shape_dim_,
+      typename DataType_,
       int dof_dim_,
       int dofs_per_cell_ = 1>
     class DofAssignmentSingleEntity :
-      public DofAssignmentNull<Space_, shape_dim_>
+      public DofAssignmentNull<Space_, shape_dim_, DataType_>
     {
-      typedef DofAssignmentNull<Space_, shape_dim_> BaseClass;
+      typedef DofAssignmentNull<Space_, shape_dim_, DataType_> BaseClass;
 
     public:
       explicit DofAssignmentSingleEntity(const Space_& space) :
@@ -115,11 +118,12 @@ namespace FEAST
     template<
       typename Space_,
       int shape_dim_,
+      typename DataType_,
       int dofs_per_cell_>
-    class DofAssignmentSingleEntity<Space_, shape_dim_, shape_dim_, dofs_per_cell_> :
-      public DofAssignmentIdentity<Space_, shape_dim_>
+    class DofAssignmentSingleEntity<Space_, shape_dim_, DataType_, shape_dim_, dofs_per_cell_> :
+      public DofAssignmentIdentity<Space_, shape_dim_, DataType_>
     {
-      typedef DofAssignmentIdentity<Space_, shape_dim_> BaseClass;
+      typedef DofAssignmentIdentity<Space_, shape_dim_, DataType_> BaseClass;
 
     public:
       explicit DofAssignmentSingleEntity(const Space_& space) :

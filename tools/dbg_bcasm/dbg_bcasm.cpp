@@ -57,11 +57,11 @@ void test_bcasm(
   // assemble system matrix
   MatrixType mat_sys(Space::DofAdjacency<>::assemble(space));
   mat_sys.clear();
-  Assembly::BilinearScalarLaplaceFunctor::assemble(mat_sys, space, cubature);
+  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(mat_sys, cubature, space);
 
   // assemble rhs vector
   VectorType vec_rhs(space.get_num_dofs(), Real(0));
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(vec_rhs, space, cubature);
+  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(vec_rhs, cubature, space);
 
   // allocate solution vector
   VectorType vec_sol(space.get_num_dofs(), Real(1));

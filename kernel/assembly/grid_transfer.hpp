@@ -15,27 +15,10 @@ namespace FEAST
      *
      * This class template implements the assembly of grid transfer operators.
      *
-     * \tparam Matrix_
-     * The type of the matrix that is to be assembled.
-     *
-     * \tparam FineSpace_
-     * The type of the fine-mesh finite-element space.
-     *
-     * \tparam CoarseSpace_
-     * The type of the coarse-mesh finite-element space.
-     *
      * \author Peter Zajac
      */
-    template<
-      typename Matrix_,
-      typename FineSpace_,
-      typename CoarseSpace_>
     class GridTransfer
     {
-    public:
-      /// data type
-      typedef typename Matrix_::DataType DataType;
-
     private:
       /// \cond internal
       struct AsmSpaceConfig :
@@ -63,22 +46,27 @@ namespace FEAST
        * \param[in,out] matrix
        * A reference to the prolongation matrix that is to be assembled.
        *
+       * \param[in] cubature_factory
+       * The cubature factory to be used for integration.
+       *
        * \param[in] fine_space
        * A reference to the fine-mesh test-space to be used.
        *
        * \param[in] coarse_space
        * A reference to the coarse-mesh trial-space to be used.
-       *
-       * \param[in] cubature_name
-       * A string containing the name of the cubature rule to be used for integration.
        */
-      template<typename CubatureFactory_>
+      template<
+        typename Matrix_,
+        typename CubatureFactory_,
+        typename FineSpace_,
+        typename CoarseSpace_>
       static void assemble_prolongation(
         Matrix_& matrix,
+        const CubatureFactory_& cubature_factory,
         const FineSpace_& fine_space,
-        const CoarseSpace_& coarse_space,
-        const CubatureFactory_& cubature_factory)
+        const CoarseSpace_& coarse_space)
       {
+        typedef typename Matrix_::DataType DataType;
 
         // typedefs for trafos, mesh and shape
         typedef typename FineSpace_::TrafoType FineTrafoType;
@@ -99,16 +87,16 @@ namespace FEAST
         // typedefs for trafo evaluators and data
         typedef typename FineTrafoType::template Evaluator<ShapeType, DataType>::Type FineTrafoEvaluator;
         typedef typename CoarseTrafoType::template Evaluator<ShapeType, DataType>::Type CoarseTrafoEvaluator;
-        typedef Trafo::EvalData<FineTrafoEvaluator, FineTrafoConfig> FineTrafoEvalData;
-        typedef Trafo::EvalData<CoarseTrafoEvaluator, CoarseTrafoConfig> CoarseTrafoEvalData;
+        typedef Trafo::EvalData<typename FineTrafoEvaluator::EvalTraits, FineTrafoConfig> FineTrafoEvalData;
+        typedef Trafo::EvalData<typename CoarseTrafoEvaluator::EvalTraits, CoarseTrafoConfig> CoarseTrafoEvalData;
         FineTrafoEvalData fine_trafo_data;
         CoarseTrafoEvalData coarse_trafo_data;
 
         // typedefs for space evaluators and data
         typedef typename FineSpace_::template Evaluator<FineTrafoEvaluator>::Type FineSpaceEvaluator;
         typedef typename CoarseSpace_::template Evaluator<CoarseTrafoEvaluator>::Type CoarseSpaceEvaluator;
-        typedef Space::EvalData<FineSpaceEvaluator, AsmSpaceConfig> FineSpaceEvalData;
-        typedef Space::EvalData<CoarseSpaceEvaluator, AsmSpaceConfig> CoarseSpaceEvalData;
+        typedef Space::EvalData<typename FineSpaceEvaluator::SpaceEvalTraits, AsmSpaceConfig> FineSpaceEvalData;
+        typedef Space::EvalData<typename CoarseSpaceEvaluator::SpaceEvalTraits, AsmSpaceConfig> CoarseSpaceEvalData;
         FineSpaceEvalData fine_space_data;
         CoarseSpaceEvalData coarse_space_data;
 
@@ -215,7 +203,7 @@ namespace FEAST
                 for(Index j(0); j < fine_num_loc_dofs; ++j)
                 {
                   mass(i,j) += fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
-                    fine_space_data.values[i] * fine_space_data.values[j];
+                    fine_space_data.phi[i].value * fine_space_data.phi[j].value;
                   // go for next fine mesh trial DOF
                 }
 
@@ -224,7 +212,7 @@ namespace FEAST
                 {
                   lmd(i,j) +=
                     fine_trafo_data.jac_det * fine_cubature.get_weight(k) *
-                    fine_space_data.values[i] * coarse_space_data.values[j];
+                    fine_space_data.phi[i].value * coarse_space_data.phi[j].value;
                   // go for next fine mesh trial DOF
                 }
                 // go for next fine mesh test DOF

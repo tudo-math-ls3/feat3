@@ -67,9 +67,9 @@ namespace FEAST
         /// the assembler's trafo data type
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// the assembler's test-function data type
-        typedef typename AsmTraits_::TestFuncData TestFuncData;
+        typedef typename AsmTraits_::TestBasisData TestBasisData;
         /// the assembler's trial-function data type
-        typedef typename AsmTraits_::TrialFuncData TrialFuncData;
+        typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
       public:
         /**
@@ -78,12 +78,12 @@ namespace FEAST
          * \param[in] functor
          * A reference to the scalar Laplace functor.
          */
-        explicit Evaluator(const BilinearScalarLaplaceFunctor& /*functor*/)
+        explicit Evaluator(const BilinearScalarLaplaceFunctor& DOXY(functor))
         {
         }
 
         /** \copydoc BilinearFunctorBase::Evaluator::operator() */
-        DataType operator()(const TrafoData& /*tau*/, const TrialFuncData& phi, const TestFuncData& psi)
+        DataType operator()(const TrafoData& DOXY(tau), const TrialBasisData& phi, const TestBasisData& psi)
         {
           return dot(phi.grad, psi.grad);
         }
@@ -97,28 +97,25 @@ namespace FEAST
        * \param[in,out] matrix
        * The matrix that is to be assembled.
        *
-       * \param[in] space
-       * A reference to the finite-element to be used as the test- and trial-space.
-       *
        * \param[in] cubature_name
        * A string containing the name of the cubature rule to be used for integration.
        *
-       * \param[in] alpha
-       * The scaling factor for the bilinear operator.
+       * \param[in] space
+       * A reference to the finite-element to be used as the test- and trial-space.
        */
       template<
         typename Matrix_,
         typename Space_>
-      static void assemble(
+      static void assemble_matrix(
         Matrix_& matrix,
-        const Space_& space,
         const String& cubature_name,
-        const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
+        const Space_& space,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         BilinearScalarLaplaceFunctor functor;
         Cubature::DynamicFactory cubature_factory(cubature_name);
-        BilinearOperator<Matrix_, BilinearScalarLaplaceFunctor, Space_>::
-          assemble(matrix, functor, space, cubature_factory, alpha);
+        BilinearOperator<BilinearScalarLaplaceFunctor>::
+          assemble_matrix1(matrix, functor, cubature_factory, space, alpha);
       }
     }; // class BilinearScalarLaplaceFunctor
 
@@ -179,9 +176,9 @@ namespace FEAST
         /// the assembler's trafo data type
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// the assembler's test-function data type
-        typedef typename AsmTraits_::TestFuncData TestFuncData;
+        typedef typename AsmTraits_::TestBasisData TestBasisData;
         /// the assembler's trial-function data type
-        typedef typename AsmTraits_::TrialFuncData TrialFuncData;
+        typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
       public:
         /**
@@ -190,12 +187,12 @@ namespace FEAST
          * \param[in] functor
          * A reference to the scalar Identity functor.
          */
-        explicit Evaluator(const BilinearScalarIdentityFunctor& /*functor*/)
+        explicit Evaluator(const BilinearScalarIdentityFunctor& DOXY(functor))
         {
         }
 
         /** \copydoc BilinearFunctorBase::Evaluator::operator() */
-        DataType operator()(const TrafoData& /*tau*/, const TrialFuncData& phi, const TestFuncData& psi)
+        DataType operator()(const TrafoData& DOXY(tau), const TrialBasisData& phi, const TestBasisData& psi)
         {
           return phi.value * psi.value;
         }
@@ -213,23 +210,52 @@ namespace FEAST
        *
        * \param[in] cubature_name
        * A string containing the name of the cubature rule to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the bilinear operator.
        */
       template<
         typename Matrix_,
         typename Space_>
-      static void assemble(
+      static void assemble_matrix1(
         Matrix_& matrix,
-        const Space_& space,
         const String& cubature_name,
-        const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
+        const Space_& space,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         BilinearScalarIdentityFunctor functor;
         Cubature::DynamicFactory cubature_factory(cubature_name);
-        BilinearOperator<Matrix_, BilinearScalarIdentityFunctor, Space_>::
-          assemble(matrix, functor, space, cubature_factory, alpha);
+        BilinearOperator<BilinearScalarIdentityFunctor>::
+          assemble_matrix1(matrix, functor, cubature_factory, space, alpha);
+      }
+
+      /**
+       * \brief Assembles a mass matrix.
+       *
+       * \param[in,out] matrix
+       * The matrix that is to be assembled.
+       *
+       * \param[in] cubature_name
+       * A string containing the name of the cubature rule to be used for integration.
+       *
+       * \param[in] test_space
+       * A reference to the finite-element to be used as the test-space.
+       *
+       * \param[in] trial_space
+       * A reference to the finite-element to be used as the trial-space.
+       */
+      template<
+        typename Matrix_,
+        typename TestSpace_,
+        typename TrialSpace_>
+      static void assemble_matrix2(
+        Matrix_& matrix,
+        const String& cubature_name,
+        const TestSpace_& test_space,
+        const TrialSpace_& trial_space,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
+      {
+        BilinearScalarIdentityFunctor functor;
+        Cubature::DynamicFactory cubature_factory(cubature_name);
+        BilinearOperator<BilinearScalarIdentityFunctor>::
+          assemble_matrix2(matrix, functor, cubature_factory, test_space, trial_space, alpha);
       }
     }; // class BilinearScalarIdentityFunctor
   } // namespace Assembly

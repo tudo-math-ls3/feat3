@@ -33,7 +33,7 @@ namespace FEAST
             return;
 
           // define dof assignment
-          typedef typename Space_::template DofAssignment<shape_dim_>::Type DofAssignType;
+          typedef typename Space_::template DofAssignment<shape_dim_, DataType>::Type DofAssignType;
           DofAssignType dof_assign(space);
 
           // loop over all entities

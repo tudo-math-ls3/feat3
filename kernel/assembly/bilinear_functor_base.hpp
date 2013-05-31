@@ -46,9 +46,9 @@ namespace FEAST
         /// trafo data type
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// test function data type
-        typedef typename AsmTraits_::TestFuncData TestFuncData;
+        typedef typename AsmTraits_::TestBasisData TestBasisData;
         /// trial function data type
-        typedef typename AsmTraits_::TrialFuncData TrialFuncData;
+        typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
       public:
         /**
@@ -89,7 +89,7 @@ namespace FEAST
          * \returns
          * The value of the bilinear functor.
          */
-        DataType operator()(const TrafoData& tau, const TrialFuncData& phi, const TestFuncData& psi) const;
+        DataType operator()(const TrafoData& tau, const TrialBasisData& phi, const TestBasisData& psi) const;
 #endif // DOXYGEN
       }; // class BilinearFunctorBase::Evaluator<...>
     }; // class BilinearFunctorBase

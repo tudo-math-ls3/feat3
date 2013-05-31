@@ -107,7 +107,7 @@ namespace FEAST
         /// trafo data type
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// test-function data type
-        typedef typename AsmTraits_::FuncData FuncData;
+        typedef typename AsmTraits_::BasisData BasisData;
 
       public:
         /// constructor
@@ -116,7 +116,7 @@ namespace FEAST
         }
 
         /** \copydoc LinearFunctorBase::Evaluator::operator() */
-        DataType operator()(const TrafoData& tau, const FuncData& psi) const
+        DataType operator()(const TrafoData& tau, const BasisData& psi) const
         {
           return Intern::AnalyticFunctionWrapper<Function_, AsmTraits_>::eval(tau) * psi.value;
         }
@@ -128,28 +128,25 @@ namespace FEAST
        * \param[in,out] vector
        * The vector that is to be assembled.
        *
-       * \param[in] space
-       * A reference to the finite-element space to be used.
-       *
        * \param[in] cubature_name
        * A string containing the name of the cubature rule to be used for integration.
        *
-       * \param[in] alpha
-       * The scaling factor for the linear functional.
+       * \param[in] space
+       * A reference to the finite-element space to be used.
        */
       template<
         typename Vector_,
         typename Space_>
-      static void assemble(
+      static void assemble_vector(
         Vector_& vector,
-        const Space_& space,
         const String& cubature_name,
+        const Space_& space,
         typename Vector_::DataType alpha = typename Vector_::DataType(1))
       {
         LinearScalarIntegralFunctor functor;
         Cubature::DynamicFactory cubature_factory(cubature_name);
-        LinearFunctional<Vector_, LinearScalarIntegralFunctor<Function_>, Space_>::
-          assemble(vector, functor, space, cubature_factory, alpha);
+        LinearFunctional<LinearScalarIntegralFunctor<Function_> >::
+          assemble_vector(vector, functor, cubature_factory, space, alpha);
       }
     }; // class LinearScalarIntegralFunctor
   } // namespace Assembly

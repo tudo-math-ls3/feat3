@@ -15,53 +15,23 @@ namespace FEAST
      *
      * This class template implements the assembly of a standard bilinear operator into a matrix.
      *
-     * \tparam Matrix_
-     * The type of the matrix that is to be assembled.
-     *
      * \tparam Functor_
      * The bilinear functor that is to be assembled. \see BilinearFunctorBase
      *
-     * \tparam TestSpace_
-     * The type of the Finite Element that is to be used as the test space.
-     *
-     * \tparam TrialSpace_
-     * The type of the Finite Element that is to be used as the trial space. If set to Nil, the test
-     * space is also used as the trial space for the assembly.
-     *
      * \author Peter Zajac
      */
-    template<
-      typename Matrix_,
-      typename Functor_,
-      typename TestSpace_,
-      typename TrialSpace_ = Nil>
+    template<typename Functor_>
     class BilinearOperator
     {
     public:
-      /// matrix type
-      typedef Matrix_ MatrixType;
       /// bilinear functor type
       typedef Functor_ FunctorType;
-      /// test-space type
-      typedef TestSpace_ TestSpaceType;
-      /// trial-space type
-      typedef TrialSpace_ TrialSpaceType;
-
-      /// assembly traits
-      typedef AsmTraits2<
-        typename MatrixType::DataType,
-        TestSpace_,
-        TrialSpace_,
-        typename FunctorType::TrafoConfig,
-        typename FunctorType::TestConfig,
-        typename FunctorType::TrialConfig> AsmTraits;
-
-      /// data type
-      typedef typename AsmTraits::DataType DataType;
 
     public:
       /**
-       * \brief Assembles a bilinear operator.
+       * \brief Assembles a bilinear operator into a matrix.
+       *
+       * This function is the version for different test- and trial-spaces.
        *
        * \param[in,out] matrix
        * The matrix that is to be assembled.
@@ -69,27 +39,50 @@ namespace FEAST
        * \param[in] functor
        * A reference to the functor defining the bilinearform.
        *
+       * \param[in] cubature_factory
+       * A reference to the cubature factory to be used for integration.
+       *
        * \param[in] test_space
        * A reference to the finite-element test-space to be used.
        *
        * \param[in] trial_space
        * A reference to the finite-element trial-space to be used.
        *
-       * \param[in] cubature_factory
-       * A reference to the cubature factory to be used for integration.
-       *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
        */
-      template<typename CubatureFactory_>
-      static void assemble(
-        MatrixType& matrix,
+      template<
+        typename Matrix_,
+        typename CubatureFactory_,
+        typename TestSpace_,
+        typename TrialSpace_>
+      static void assemble_matrix2(
+        Matrix_& matrix,
         FunctorType& functor,
-        const TestSpaceType& test_space,
-        const TrialSpaceType& trial_space,
         const CubatureFactory_& cubature_factory,
-        DataType alpha = DataType(1))
+        const TestSpace_& test_space,
+        const TrialSpace_& trial_space,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
+        // matrix type
+        typedef Matrix_ MatrixType;
+        // test-space type
+        typedef TestSpace_ TestSpaceType;
+        // trial-space type
+        typedef TrialSpace_ TrialSpaceType;
+
+        // assembly traits
+        typedef AsmTraits2<
+          typename Matrix_::DataType,
+          TestSpace_,
+          TrialSpace_,
+          typename FunctorType::TrafoConfig,
+          typename FunctorType::TestConfig,
+          typename FunctorType::TrialConfig> AsmTraits;
+
+        /// data type
+        typedef typename AsmTraits::DataType DataType;
+
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = test_space.get_trafo();
 
@@ -114,11 +107,11 @@ namespace FEAST
         typename AsmTraits::TestEvalData test_data;
         typename AsmTraits::TrialEvalData trial_data;
 
-        // create cubature rule
-        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
         // create local matrix data
         typename AsmTraits::LocalMatrixDataType lmd(test_dof_mapping, trial_dof_mapping);
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
         MatrixScatterAxpy<MatrixType> scatter_axpy(matrix);
@@ -161,9 +154,7 @@ namespace FEAST
               {
                 // evaluate functor and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                  func_eval(trafo_data,
-                    typename AsmTraits::TrialFuncData(trial_data, j),
-                    typename AsmTraits::TestFuncData(test_data, i));
+                  func_eval(trafo_data, trial_data.phi[j], test_data.phi[i]);
               }
               // continue with next trial function
             }
@@ -194,46 +185,11 @@ namespace FEAST
 
         // okay, that's it
       }
-    }; // class BilinearOperator<...>
 
-    /**
-     * \brief BilinearOperator specialisation for identical test and trial spaces.
-     *
-     * \author Peter Zajac
-     */
-    template<
-      typename Matrix_,
-      typename Functor_,
-      typename Space_>
-    class BilinearOperator<Matrix_, Functor_, Space_, Nil>
-    {
-    public:
-      /// matrix type
-      typedef Matrix_ MatrixType;
-      /// bilinear functor type
-      typedef Functor_ FunctorType;
-      /// space type
-      typedef Space_ SpaceType;
-      /// test-space type
-      typedef Space_ TestSpaceType;
-      /// trial-space type
-      typedef Space_ TrialSpaceType;
-
-      /// assembly traits
-      typedef AsmTraits1<
-        typename Matrix_::DataType,
-        Space_,
-        typename Functor_::TrafoConfig,
-        Space::ConfigOr<
-          typename Functor_::TestConfig,
-          typename Functor_::TrialConfig> > AsmTraits;
-
-      /// data type
-      typedef typename AsmTraits::DataType DataType;
-
-    public:
       /**
-       * \brief Assembles a bilinear operator.
+       * \brief Assembles a bilinear operator into a matrix.
+       *
+       * This function is the version for identical test- and trial-spaces.
        *
        * \param[in,out] matrix
        * The matrix that is to be assembled.
@@ -244,20 +200,44 @@ namespace FEAST
        * \param[in] space
        * A reference to the finite-element to be used as the test- and trial-space.
        *
-       * \param[in] cubature_rule
-       * A reference to the cubature rule to be used for integration.
+       * \param[in] cubature_factory
+       * A reference to the cubature factory to be used for integration.
        *
        * \param[in] alpha
        * The scaling factor for the bilinear operator.
        */
-      template<typename CubatureFactory_>
-      static void assemble(
-        MatrixType& matrix,
+      template<
+        typename Matrix_,
+        typename CubatureFactory_,
+        typename Space_>
+      static void assemble_matrix1(
+        Matrix_& matrix,
         FunctorType& functor,
-        const SpaceType& space,
         const CubatureFactory_& cubature_factory,
-        DataType alpha = DataType(1))
+        const Space_& space,
+        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
+        // matrix type
+        typedef Matrix_ MatrixType;
+        // space type
+        typedef Space_ SpaceType;
+        // test-space type
+        typedef Space_ TestSpaceType;
+        // trial-space type
+        typedef Space_ TrialSpaceType;
+
+        // assembly traits
+        typedef AsmTraits1<
+          typename Matrix_::DataType,
+          Space_,
+          typename FunctorType::TrafoConfig,
+          Space::ConfigOr<
+            typename Functor_::TestConfig,
+            typename Functor_::TrialConfig> > AsmTraits;
+
+        /// data type
+        typedef typename AsmTraits::DataType DataType;
+
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
@@ -279,11 +259,11 @@ namespace FEAST
         // create space evaluation data
         typename AsmTraits::SpaceEvalData space_data;
 
-        // create cubature rule
-        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
         // create local matrix data
         typename AsmTraits::LocalMatrixDataType lmd(dof_mapping, dof_mapping);
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
         MatrixScatterAxpy<MatrixType> scatter_axpy(matrix);
@@ -323,9 +303,7 @@ namespace FEAST
               {
                 // evaluate functor and integrate
                 lmd(i,j) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                  func_eval(trafo_data,
-                    typename AsmTraits::FuncData(space_data, j),
-                    typename AsmTraits::FuncData(space_data, i));
+                  func_eval(trafo_data, space_data.phi[j], space_data.phi[i]);
               }
               // continue with next trial function
             }
@@ -353,7 +331,7 @@ namespace FEAST
 
         // okay, that's it
       }
-    }; // class BilinearOperator<..., Nil>
+    }; // class BilinearOperator<...>
   } // namespace Assembly
 } // namespace FEAST
 

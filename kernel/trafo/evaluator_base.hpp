@@ -38,6 +38,9 @@ namespace FEAST
       /// evaluation policy
       typedef EvalPolicy_ EvalPolicy;
 
+      /// evaluation traits; identical to eval policy
+      typedef EvalPolicy_ EvalTraits;
+
       /// evaluation data type
       typedef typename EvalPolicy::DataType DataType;
 

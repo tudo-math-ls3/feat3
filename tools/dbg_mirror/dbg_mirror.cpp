@@ -81,14 +81,14 @@ void test_mirror(
   MatrixType loc_mat_1(dof_adj_1);
 
   // assemble local vectors
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(loc_vec_0, space_0, cubature, 16.0);
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble(loc_vec_1, space_1, cubature, 16.0);
+  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(loc_vec_0, cubature, space_0, 16.0);
+  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(loc_vec_1, cubature, space_1, 16.0);
 
   // assemble local matrices
   loc_mat_0.clear();
   loc_mat_1.clear();
-  Assembly::BilinearScalarLaplaceFunctor::assemble(loc_mat_0, space_0, cubature, 6.0);
-  Assembly::BilinearScalarLaplaceFunctor::assemble(loc_mat_1, space_1, cubature, 6.0);
+  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(loc_mat_0, cubature, space_0, 6.0);
+  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(loc_mat_1, cubature, space_1, 6.0);
 
   // create vector mirrors
   VectorMirrorType vec_mir_0(dof_mir_0);

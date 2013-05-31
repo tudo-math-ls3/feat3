@@ -54,8 +54,11 @@ namespace FEAST
         /// trafo evaluator type
         typedef TrafoEvaluator_ TrafoEvaluator;
 
+        /// trafo evaluator traits
+        typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
+
         /// trafo type
-        typedef typename TrafoEvaluator_::TrafoType TrafoType;
+        typedef typename TrafoEvaluator::TrafoType TrafoType;
 
         /// mesh type
         typedef typename TrafoType::MeshType MeshType;
@@ -85,13 +88,9 @@ namespace FEAST
 
         /// basis value coefficient type
         typedef typename SpaceEvalTraits::BasisValueCoeff BasisValueCoeff;
-        /// basis value vector reference
-        typedef typename SpaceEvalTraits::BasisValueVectorRef BasisValueVectorRef;
 
         /// basis gradient coefficient type
         typedef typename SpaceEvalTraits::BasisGradientCoeff BasisGradientCoeff;
-        /// basis gradent vector reference
-        typedef typename SpaceEvalTraits::BasisGradientVectorRef BasisGradientVectorRef;
 
         /** \copydoc EvaluatorBase::EvaluatorCapabilities */
         enum EvaluatorCapabilities
@@ -116,7 +115,7 @@ namespace FEAST
         };
 
         /// inverse linearised trafo data
-        typedef Trafo::EvalData<TrafoEvaluator, InvLinTrafoConfig> InvLinTrafoData;
+        typedef Trafo::EvalData<TrafoEvalTraits, InvLinTrafoConfig> InvLinTrafoData;
 
 
         /// trafo config for facet trafo
@@ -134,8 +133,10 @@ namespace FEAST
         typedef typename TrafoType::template Evaluator<Shape::Hypercube<1>, DataType>::Type FacetTrafoEvaluator;
         /// facet evaluation policy
         typedef typename FacetTrafoEvaluator::EvalPolicy FacetEvalPolicy;
+        /// facet evaluation traits
+        typedef typename FacetTrafoEvaluator::EvalTraits FacetEvalTraits;
         /// facet trafo data
-        typedef Trafo::EvalData<FacetTrafoEvaluator, FacetTrafoConfig> FacetTrafoData;
+        typedef Trafo::EvalData<FacetEvalTraits, FacetTrafoConfig> FacetTrafoData;
 
         /// basis function coefficient matrix
         typedef Tiny::Matrix<DataType, 4, 4> CoeffMatrixType;
@@ -268,10 +269,10 @@ namespace FEAST
         }
 
         /** \copydoc Space::EvaluatorBase::eval_values() */
-        template<typename TrafoEvalData_>
+        template<typename SpaceCfg_, typename TrafoCfg_>
         void eval_values(
-          BasisValueVectorRef values,
-          const TrafoEvalData_& trafo_data) const
+          EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
         {
           // transform image point
           DomainPointType pt;
@@ -285,15 +286,15 @@ namespace FEAST
           // loop over all basis functions
           for(int i(0); i < 4; ++i)
           {
-            values[i] = _coeff_mat(i,0) + _coeff_mat(i,1)*x + _coeff_mat(i,2)*y + _coeff_mat(i,3)*r;
+            data.phi[i].value = _coeff_mat(i,0) + _coeff_mat(i,1)*x + _coeff_mat(i,2)*y + _coeff_mat(i,3)*r;
           }
         }
 
         /** \copydoc Space::EvaluatorBase::Eval_gradients */
-        template<typename TrafoEvalData_>
+        template<typename SpaceCfg_, typename TrafoCfg_>
         void eval_gradients(
-          BasisGradientVectorRef grads,
-          const TrafoEvalData_& trafo_data) const
+          EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
         {
           // transform image point to local coordinate system
           DomainPointType pt, loc_grad;
@@ -307,9 +308,10 @@ namespace FEAST
             loc_grad(1) = _coeff_mat(i,2) - DataType(2) * _coeff_mat(i,3) * pt(1);
 
             // multiply by transpose inverse linearised trafo matrix for chain rule
-            grads[i].set_vec_mat_mult(loc_grad, _inv_lin_mat);
+            data.phi[i].grad.set_vec_mat_mult(loc_grad, _inv_lin_mat);
           }
         }
+
       }; // Evaluator<..., Variant::StdNonPar, Shape::Quadrilateral>
     } // namespace RannacherTurek
   } // namespace Space

@@ -67,7 +67,7 @@ public:
     matrix.clear();
 
     // assemble the identity operator with barycentre cubature rule
-    Assembly::BilinearScalarIdentityFunctor::assemble(matrix, space, "barycentre");
+    Assembly::BilinearScalarIdentityFunctor::assemble_matrix1(matrix, "barycentre", space);
 
     // fetch the matrix arrays
     DataType_* data = matrix.val();
@@ -101,10 +101,10 @@ public:
     matrix_2.clear();
 
     // assemble the laplace operator with trapezoidal cubature rule
-    Assembly::BilinearScalarLaplaceFunctor::assemble(matrix_1, space, "trapezoidal");
+    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(matrix_1, "trapezoidal", space);
 
     // assemble the laplace operator with gauss-legendre:2 cubature rule
-    Assembly::BilinearScalarLaplaceFunctor::assemble(matrix_2, space, "gauss-legendre:2");
+    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(matrix_2, "gauss-legendre:2", space);
 
     // get mesh element count
     Index num_verts = mesh.get_num_entities(0);

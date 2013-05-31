@@ -200,7 +200,7 @@ namespace FEAST
     }; // class DiscreteVertexProjector<...>
 
     /**
-     * \brief Discrete vertex projector class
+     * \brief Discrete cell projector class
      *
      * This class interpolates a discrete finite-element function in the cells of the space's underyling
      * mesh by computing the integral mean over the cell using a cubature rule.
@@ -234,18 +234,19 @@ namespace FEAST
        * \param[in] space
        * A reference to the finite-element space.
        *
-       * \param[in] cubature_name
-       * The name of the cubature rule that is to be used for integration.
+       * \param[in] cubature_factory
+       * The cubature factory that is to be used for integration.
        */
       template<
         typename VectorOut_,
         typename VectorIn_,
-        typename Space_>
+        typename Space_,
+        typename CubatureFactory_>
       static void project(
         VectorOut_& vector,
         const VectorIn_& coeff,
         const Space_& space,
-        const String cubature_name = "barycentre")
+        const CubatureFactory_& cubature_factory)
       {
         typedef Space_ SpaceType;
         typedef typename SpaceType::TrafoType TrafoType;
@@ -257,8 +258,7 @@ namespace FEAST
         typedef typename AsmTraits::DataType DataType;
 
         // define the cubature rule
-        typedef typename AsmTraits::CubatureDynamicFactoryType CubatureDynamicFactoryType;
-        typename AsmTraits::CubatureRuleType cubature_rule(CubatureDynamicFactoryType::create(cubature_name));
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // define the reference cell type
         typedef Shape::ReferenceCell<ShapeType> RefCell;

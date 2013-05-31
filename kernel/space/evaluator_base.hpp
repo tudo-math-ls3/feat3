@@ -42,16 +42,16 @@ namespace FEAST
       /// space evaluator traits
       typedef SpaceEvalTraits_ SpaceEvalTraits;
 
-      /// evaluation policy
-      typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
+      /// trafo evaluator traits
+      typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
 
       /// dummy enum
       enum
       {
         /// trafo domain dimension
-        domain_dim = EvalPolicy::domain_dim,
+        domain_dim = SpaceEvalTraits::domain_dim,
         /// trafo image dimension
-        image_dim = EvalPolicy::image_dim,
+        image_dim = SpaceEvalTraits::image_dim,
 
         /// maximum number of local DOFs
         max_local_dofs = SpaceEvalTraits::max_local_dofs
@@ -61,31 +61,11 @@ namespace FEAST
       typedef typename SpaceEvalTraits::BasisValueCoeff BasisValueCoeff;
       /// basis function value type
       typedef typename SpaceEvalTraits::BasisValueType BasisValueType;
-      /// basis function value reference
-      typedef typename SpaceEvalTraits::BasisValueRef BasisValueRef;
-      /// basis function value const-reference
-      typedef typename SpaceEvalTraits::BasisValueConstRef BasisValueConstRef;
-      /// basis function value vector type
-      typedef typename SpaceEvalTraits::BasisValueVectorType BasisValueVectorType;
-      /// basis function value vector reference
-      typedef typename SpaceEvalTraits::BasisValueVectorRef BasisValueVectorRef;
-      /// basis function value vector const-reference
-      typedef typename SpaceEvalTraits::BasisValueVectorConstRef BasisValueVectorConstRef;
 
       /// basis function gradient coefficient type
       typedef typename SpaceEvalTraits::BasisGradientCoeff BasisGradientCoeff;
       /// basis function gradient type
       typedef typename SpaceEvalTraits::BasisGradientType BasisGradientType;
-      /// basis function gradient reference
-      typedef typename SpaceEvalTraits::BasisGradientRef BasisGradientRef;
-      /// basis function gradient const-reference
-      typedef typename SpaceEvalTraits::BasisGradientConstRef BasisGradientConstRef;
-      /// basis function gradient vector type
-      typedef typename SpaceEvalTraits::BasisGradientVectorType BasisGradientVectorType;
-      /// basis function gradient vector reference
-      typedef typename SpaceEvalTraits::BasisGradientVectorRef BasisGradientVectorRef;
-      /// basis function gradient vector const-reference
-      typedef typename SpaceEvalTraits::BasisGradientVectorConstRef BasisGradientVectorConstRef;
 
       /**
        * \brief Capability enumeration
@@ -134,7 +114,7 @@ namespace FEAST
        * \param[in] trafo_eval
        * A reference to the trafo evaluator containing the cell information.
        */
-      void prepare(const TrafoEvaluator& /*trafo_eval*/)
+      void prepare(const TrafoEvaluator& DOXY(trafo_eval))
       {
       }
 
@@ -156,16 +136,16 @@ namespace FEAST
        * The trafo evaluation data structure type. Is determined automatically by the compiler.\n
        * See TrafoEvalData for details.
        *
-       * \param[out] values
-       * A reference to a basis value vector that shall receive the basis function values.
+       * \param[out] data
+       * A reference to an evaluation data structure that shall receive the basis function values.
        *
        * \param[in] trafo_data
        * The trafo evaluation data containing information about the evaluation point.
        */
-      template<typename TrafoEvalData_>
+      template<typename SpaceCfg_, typename TrafoCfg_>
       void eval_values(
-        BasisValueVectorRef values,
-        const TrafoEvalData_& trafo_data) const;
+        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
 
       /**
        * \brief Evaluates the basis function gradients on the real cell.
@@ -174,16 +154,17 @@ namespace FEAST
        * The trafo evaluation data structure type. Is determined automatically by the compiler.\n
        * See TrafoEvalData for details.
        *
-       * \param[out] grads
-       * A reference to a basis gradient vector that shall receive the basis function gradients.
+       * \param[out] data
+       * A reference to an evaluation data structure that shall receive the basis function gradients.
        *
        * \param[in] trafo_data
        * The trafo evaluation data containing information about the evaluation point.
        */
-      template<typename TrafoEvalData_>
+      template<typename SpaceCfg_, typename TrafoCfg_>
       void eval_gradients(
-        BasisGradientVectorRef grads,
-        const TrafoEvalData_& trafo_data) const;
+        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const;
+
 #endif // DOXYGEN
     }; // class EvaluatorBase<...>
 
@@ -218,75 +199,105 @@ namespace FEAST
       /// base class typedef
       typedef EvaluatorBase<SpaceEvaluator_, TrafoEvaluator_, SpaceEvalTraits_> BaseClass;
 
+      /// space evaluator type
+      typedef SpaceEvaluator_ SpaceEvaluator;
+
+      /// trafo evaluator type
+      typedef TrafoEvaluator_ TrafoEvaluator;
+
+      /// space evaluator traits
+      typedef SpaceEvalTraits_ SpaceEvalTraits;
+
+      /// trafo evaluator traits
+      typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
+
       /** \copydoc EvaluatorBase::EvaluatorCapabilities */
       enum EvaluatorCapabilities
       {
         /// can compute function values if the trafo can compute domain points
         can_value =
-          int(ReferenceCapabilities_::can_ref_value) |
-          int(TrafoEvaluator_::can_dom_point),
+          (ReferenceCapabilities_::can_ref_value != 0) &&
+          (TrafoEvaluator_::can_dom_point != 0) ? 1 : 0,
 
         /// can compute gradients if the trafo can compute jacobian matrices and domain points
         can_grad =
-          int(ReferenceCapabilities_::can_ref_grad) |
-          int(TrafoEvaluator_::can_dom_point) |
-          int(TrafoEvaluator_::can_jac_inv)
+          (ReferenceCapabilities_::can_ref_grad != 0) &&
+          (TrafoEvaluator_::can_dom_point != 0) &&
+          (TrafoEvaluator_::can_jac_inv != 0) ? 1 : 0
       };
 
-      /// basis function value vector reference
-      typedef typename SpaceEvalTraits_::BasisValueVectorRef BasisValueVectorRef;
-      /// basis function gradient vector reference
-      typedef typename SpaceEvalTraits_::BasisGradientVectorRef BasisGradientVectorRef;
+      /// dummy enumeration
+      enum
+      {
+        /// domain dimension
+        domain_dim = SpaceEvalTraits::domain_dim,
+        /// image dimension
+        image_dim = SpaceEvalTraits::image_dim,
+        /// maximum number of local dofs
+        max_local_dofs = SpaceEvalTraits::max_local_dofs
+      };
 
     protected:
       /// \cond internal
-      SpaceEvaluator_& me()
+      SpaceEvaluator& me()
       {
-        return static_cast<SpaceEvaluator_&>(*this);
+        return static_cast<SpaceEvaluator&>(*this);
       }
 
-      const SpaceEvaluator_& me() const
+      const SpaceEvaluator& me() const
       {
-        return static_cast<const SpaceEvaluator_&>(*this);
+        return static_cast<const SpaceEvaluator&>(*this);
       }
       /// \endcond
 
-    private:
-      /// auxiliary basis gradient vector
-      mutable typename SpaceEvalTraits_::BasisGradientVectorType _aux_grads;
+      /// \cond internal
+      struct ReferenceGradientData
+      {
+        struct PhiData
+        {
+          Tiny::Vector<typename SpaceEvalTraits::BasisGradientCoeff, domain_dim> grad;
+        } phi[max_local_dofs];
+      };
+      /// \endcond
 
     public:
       /** \copydoc EvaluatorBase::eval_values() */
-      template<typename TrafoEvalData_>
+      template<typename SpaceCfg_, typename TrafoCfg_>
       void eval_values(
-        BasisValueVectorRef values,
-        const TrafoEvalData_& trafo_data) const
+        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
       {
         static_assert(can_value != 0, "space evaluator can't compute function values");
+        static_assert(trafo_data.have_dom_point != 0, "trafo data does not offer domain point coordinates");
 
         // compute reference values in the domain point;
         // these coincide with the real values in the image point
-        me().eval_ref_values(values, trafo_data.dom_point);
+        me().eval_ref_values(data, trafo_data.dom_point);
       }
 
       /** \copydoc EvaluatorBase::eval_gradients() */
-      template<typename TrafoEvalData_>
+      template<typename SpaceCfg_, typename TrafoCfg_>
       void eval_gradients(
-        BasisGradientVectorRef grads,
-        const TrafoEvalData_& trafo_data) const
+        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
       {
-        static_assert(can_grad != 0, "space evaluator can't compute gradients");
+        static_assert(can_grad != 0, "space evaluator can't compute function gradients");
+        static_assert(trafo_data.have_dom_point != 0, "trafo data does not offer domain point coordinates");
+        static_assert(trafo_data.have_jac_inv != 0, "trafo data does not offer inverse jacobian matrix");
+
+        // declare auxiliary reference gradient data
+        ReferenceGradientData aux_grads;
 
         // compute reference gradients in the domain point and store them in the
         // auxiliary gradient vector
-        me().eval_ref_gradients(_aux_grads, trafo_data.dom_point);
+        me().eval_ref_gradients(aux_grads, trafo_data.dom_point);
 
         // loop over all basis functions
         for(Index j(0); j < me().get_num_local_dofs(); ++j)
         {
           // apply the chain rule on the reference gradient, i.e.
           // mutliply it by the transposed jacobian matrix inverse
-          grads[j].set_vec_mat_mult(_aux_grads[j], trafo_data.jac_inv);
+          data.phi[j].grad.set_vec_mat_mult(aux_grads.phi[j].grad, trafo_data.jac_inv);
         }
       }
     }; // class EvaluatorParametric<...>

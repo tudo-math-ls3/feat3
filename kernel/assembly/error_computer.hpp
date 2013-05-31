@@ -69,7 +69,7 @@ namespace FEAST
        * The Finite-Element space that the coefficient vector belongs to.
        *
        * \param[in] cubature_factory
-       * The name of the cubature factory that is to be used for integration.
+       * A reference to the cubature factory to be used for integration.
        *
        * \returns
        * The L2-error.
@@ -176,7 +176,7 @@ namespace FEAST
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // subtract basis function value
-              value -= lvad[i] * space_data.values[i];
+              value -= lvad[i] * space_data.phi[i].value;
               // continue with next trial function
             }
 
@@ -262,7 +262,7 @@ namespace FEAST
        * The Finite-Element space that the coefficient vector belongs to.
        *
        * \param[in] cubature_factory
-       * The name of the cubature factory that is to be used for integration.
+       * A reference to the cubature factory to be used for integration.
        *
        * \returns
        * The H1-error.
@@ -369,7 +369,7 @@ namespace FEAST
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // subtract basis function gradient
-              value -= lvad[i] * space_data.grads[i];
+              value -= lvad[i] * space_data.phi[i].grad;
               // continue with next trial function
             }
 

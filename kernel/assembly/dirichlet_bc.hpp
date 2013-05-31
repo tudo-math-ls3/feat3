@@ -225,7 +225,7 @@ namespace FEAST
           const Functor_& functor)
         {
           // create a dof-assignment object
-          typename Space_::template DofAssignment<shape_dim_>::Type dof_assign(space);
+          typename Space_::template DofAssignment<shape_dim_, DataType_>::Type dof_assign(space);
 
           // create a node-functional object
           typename Space_::template NodeFunctional<Functor_, shape_dim_, DataType_>::Type node_func(space, functor);

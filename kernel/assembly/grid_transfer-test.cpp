@@ -93,8 +93,8 @@ public:
     prol_matrix.clear(DataType_(0));
 
     // assemble prolongation matrix
-    Assembly::GridTransfer<MatrixType, QuadSpaceQ1, QuadSpaceQ1>::
-      assemble_prolongation(prol_matrix, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:2"));
+    Assembly::GridTransfer::
+      assemble_prolongation(prol_matrix, Cubature::DynamicFactory("gauss-legendre:2"), space_f, space_c);
 
     // fetch matrix data
     const DataType_* data = prol_matrix.val();
@@ -163,8 +163,8 @@ public:
     prol_matrix.clear(DataType_(0));
 
     // assemble prolongation matrix
-    Assembly::GridTransfer<MatrixType, QuadSpaceQ1T, QuadSpaceQ1T>::
-      assemble_prolongation(prol_matrix, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:3"));
+    Assembly::GridTransfer::
+      assemble_prolongation(prol_matrix, Cubature::DynamicFactory("gauss-legendre:3"), space_f, space_c);
 
     // fetch matrix data
     const DataType_* data = prol_matrix.val();

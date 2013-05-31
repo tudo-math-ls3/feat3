@@ -131,6 +131,9 @@ namespace FEAST
       /// trafo evaluator types
       typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
 
+      /// trafo evaluator traits
+      typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
+
       /// dummy enum
       enum
       {
@@ -146,22 +149,28 @@ namespace FEAST
       typedef SpaceEvaluator TrialEvaluator;
       typedef SpaceEvaluator MultEvaluator;
 
+      /// space evaluator traits
+      typedef typename SpaceEvaluator::SpaceEvalTraits SpaceEvalTraits;
+      typedef SpaceEvalTraits TestEvalTraits;
+      typedef SpaceEvalTraits TrialEvalTraits;
+      typedef SpaceEvalTraits MultEvalTraits;
+
       /// trafo evaluation data type
-      typedef Trafo::EvalData<TrafoEvaluator, TrafoConfig> TrafoEvalData;
+      typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
       typedef TrafoEvalData TrafoData;
 
       /// space evaluation data types
-      typedef Space::EvalData<SpaceEvaluator, SpaceConfig> SpaceEvalData;
+      typedef Space::EvalData<SpaceEvalTraits, SpaceConfig> SpaceEvalData;
       typedef SpaceEvalData TestEvalData;
       typedef SpaceEvalData TrialEvalData;
       typedef SpaceEvalData MultEvalData;
 
       /// basis function data types
-      typedef Space::FuncData<SpaceEvaluator, SpaceConfig> SpaceFuncData;
-      typedef SpaceFuncData FuncData;
-      typedef SpaceFuncData TestFuncData;
-      typedef SpaceFuncData TrialFuncData;
-      typedef SpaceFuncData MultFuncData;
+      typedef Space::BasisData<SpaceEvalTraits, SpaceConfig> SpaceBasisData;
+      typedef SpaceBasisData BasisData;
+      typedef SpaceBasisData TestBasisData;
+      typedef SpaceBasisData TrialBasisData;
+      typedef SpaceBasisData MultBasisData;
 
       /// dof-mapping types
       typedef typename SpaceType::DofMappingType DofMapping;
@@ -186,7 +195,6 @@ namespace FEAST
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
-
     }; // class AsmTraits1
 
     /**
@@ -248,7 +256,7 @@ namespace FEAST
       // define test- and trial-space configs
       typedef TestConfig_ TestConfig;
       typedef TrialConfig_ TrialConfig;
-      typedef TrialConfig MultConfig;
+      typedef TrialConfig_ MultConfig;
 
       // now fetch the trafo configs from the spaces
       typedef typename TestSpaceType::template TrafoConfig<TestConfig> TestTrafoConfig;
@@ -276,6 +284,9 @@ namespace FEAST
       /// trafo evaluator types
       typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
 
+      /// trafo evaluator traits
+      typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
+
       /// dummy enum
       enum
       {
@@ -290,19 +301,24 @@ namespace FEAST
       typedef typename TrialSpaceType::template Evaluator<TrafoEvaluator>::Type TrialEvaluator;
       typedef TrialEvaluator MultEvaluator;
 
+      /// space evaluator traits
+      typedef typename TestEvaluator::SpaceEvalTraits TestEvalTraits;
+      typedef typename TrialEvaluator::SpaceEvalTraits TrialEvalTraits;
+      typedef TrialEvalTraits MultEvalTraits;
+
       /// trafo evaluation data type
-      typedef Trafo::EvalData<TrafoEvaluator, TrafoConfig> TrafoEvalData;
+      typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
       typedef TrafoEvalData TrafoData;
 
       /// space evaluation data types
-      typedef Space::EvalData<TestEvaluator, TestConfig> TestEvalData;
-      typedef Space::EvalData<TrialEvaluator, TrialConfig> TrialEvalData;
+      typedef Space::EvalData<TestEvalTraits, TestConfig> TestEvalData;
+      typedef Space::EvalData<TrialEvalTraits, TrialConfig> TrialEvalData;
       typedef TrialEvalData MultEvalData;
 
       /// basis function data types
-      typedef Space::FuncData<TestEvaluator, TestConfig> TestFuncData;
-      typedef Space::FuncData<TrialEvaluator, TrialConfig> TrialFuncData;
-      typedef TrialFuncData MultFuncData;
+      typedef Space::BasisData<TestEvalTraits, TestConfig> TestBasisData;
+      typedef Space::BasisData<TrialEvalTraits, TrialConfig> TrialBasisData;
+      typedef TrialBasisData MultBasisData;
 
       /// dof-mapping types
       typedef typename TestSpaceType::DofMappingType TestDofMapping;
@@ -322,7 +338,6 @@ namespace FEAST
 
       /// cubature rule type
       typedef typename Intern::CubatureTraits<TrafoEvaluator>::RuleType CubatureRuleType;
-
     }; // class AsmTraits2
   } // namespace Assembly
 } // namespace FEAST

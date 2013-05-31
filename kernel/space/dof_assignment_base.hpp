@@ -16,7 +16,8 @@ namespace FEAST
      */
     template<
       typename Space_,
-      int shape_dim_>
+      int shape_dim_,
+      typename DataType_>
     class DofAssignmentBase
     {
     public:
@@ -70,9 +71,9 @@ namespace FEAST
       Index get_index(Index assign_idx, Index contrib_idx = 0) const;
 #endif // DOXYGEN
 
-      Real get_weight(Index assign_idx, Index contrib_idx = 0) const
+      DataType_ get_weight(Index assign_idx, Index contrib_idx = 0) const
       {
-        return Real(1.0);
+        return DataType_(1.0);
       }
     }; // class DofAssignmentBase
   } // namespace Space

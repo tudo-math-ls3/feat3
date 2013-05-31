@@ -40,11 +40,11 @@ void test_asm(const Space_& space, const String& cubature, int imat)
   switch(imat)
   {
   case 0:
-    Assembly::BilinearScalarLaplaceFunctor::assemble(matrix_d, space, cubature);
+    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(matrix_d, cubature, space);
     break;
 
   case 1:
-    Assembly::BilinearScalarIdentityFunctor::assemble(matrix_d, space, cubature);
+    Assembly::BilinearScalarIdentityFunctor::assemble_matrix1(matrix_d, cubature, space);
     break;
   }
   stop_watch.stop();

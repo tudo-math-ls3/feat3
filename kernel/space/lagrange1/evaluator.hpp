@@ -79,13 +79,9 @@ namespace FEAST
 
         /// basis value coefficient type
         typedef typename SpaceEvalTraits::BasisValueCoeff BasisValueCoeff;
-        /// basis value vector reference
-        typedef typename SpaceEvalTraits::BasisValueVectorRef BasisValueVectorRef;
 
         /// basis gradient coefficient type
         typedef typename SpaceEvalTraits::BasisGradientCoeff BasisGradientCoeff;
-        /// basis gradent vector reference
-        typedef typename SpaceEvalTraits::BasisGradientVectorRef BasisGradientVectorRef;
 
       public:
         /**
@@ -94,7 +90,7 @@ namespace FEAST
          * \param[in] space
          * A reference to the Element using this evaluator.
          */
-        explicit Evaluator(const SpaceType& /*space*/)
+        explicit Evaluator(const SpaceType& DOXY(space))
         {
         }
 
@@ -118,37 +114,39 @@ namespace FEAST
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
          */
+        template<typename EvalData_>
         void eval_ref_values(
-          BasisValueVectorRef values,
+          EvalData_& data,
           DomainPointConstRef point) const
         {
-          values[0] = BasisValueCoeff(0.25 * (1.0 - point[0]) * (1.0 - point[1]));
-          values[1] = BasisValueCoeff(0.25 * (1.0 + point[0]) * (1.0 - point[1]));
-          values[2] = BasisValueCoeff(0.25 * (1.0 - point[0]) * (1.0 + point[1]));
-          values[3] = BasisValueCoeff(0.25 * (1.0 + point[0]) * (1.0 + point[1]));
+          data.phi[0].value = BasisValueCoeff(0.25 * (1.0 - point[0]) * (1.0 - point[1]));
+          data.phi[1].value = BasisValueCoeff(0.25 * (1.0 + point[0]) * (1.0 - point[1]));
+          data.phi[2].value = BasisValueCoeff(0.25 * (1.0 - point[0]) * (1.0 + point[1]));
+          data.phi[3].value = BasisValueCoeff(0.25 * (1.0 + point[0]) * (1.0 + point[1]));
         }
 
         /**
          * \brief Evaluates the basis function gradients on the reference cell.
          *
-         * \param[out] grads
+         * \param[out] data
          * A reference to a basis gradient vector receiveing the result.
          *
          * \param[in] point
          * A reference to the point on the reference cell where to evaluate.
          */
+        template<typename EvalData_>
         void eval_ref_gradients(
-          BasisGradientVectorRef grads,
+          EvalData_& data,
           DomainPointConstRef point) const
         {
-          grads[0][0] = BasisGradientCoeff(-0.25 * (1.0 - point[1]));
-          grads[0][1] = BasisGradientCoeff(-0.25 * (1.0 - point[0]));
-          grads[1][0] = BasisGradientCoeff( 0.25 * (1.0 - point[1]));
-          grads[1][1] = BasisGradientCoeff(-0.25 * (1.0 + point[0]));
-          grads[2][0] = BasisGradientCoeff(-0.25 * (1.0 + point[1]));
-          grads[2][1] = BasisGradientCoeff( 0.25 * (1.0 - point[0]));
-          grads[3][0] = BasisGradientCoeff( 0.25 * (1.0 + point[1]));
-          grads[3][1] = BasisGradientCoeff( 0.25 * (1.0 + point[0]));
+          data.phi[0].grad[0] = BasisGradientCoeff(-0.25 * (1.0 - point[1]));
+          data.phi[0].grad[1] = BasisGradientCoeff(-0.25 * (1.0 - point[0]));
+          data.phi[1].grad[0] = BasisGradientCoeff( 0.25 * (1.0 - point[1]));
+          data.phi[1].grad[1] = BasisGradientCoeff(-0.25 * (1.0 + point[0]));
+          data.phi[2].grad[0] = BasisGradientCoeff(-0.25 * (1.0 + point[1]));
+          data.phi[2].grad[1] = BasisGradientCoeff( 0.25 * (1.0 - point[0]));
+          data.phi[3].grad[0] = BasisGradientCoeff( 0.25 * (1.0 + point[1]));
+          data.phi[3].grad[1] = BasisGradientCoeff( 0.25 * (1.0 + point[0]));
         }
       }; // class Evaluator<...,Hypercube<2>>
     } // namespace Lagrange1

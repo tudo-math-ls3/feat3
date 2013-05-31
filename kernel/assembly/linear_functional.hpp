@@ -14,44 +14,21 @@ namespace FEAST
      *
      * This class template implements the assembly of a standard linear functional into a vector.
      *
-     * \tparam Vector_
-     * The type of the vector that is to be assembled.
-     *
      * \tparam Functor_
      * The linear functor that is to be assembled. \see LinearFunctorBase
      *
-     * \tparam Space_
-     * The type of the Finite Element that is to be used as the test space.
-     *
      * \author Peter Zajac
      */
-    template<
-      typename Vector_,
-      typename Functor_,
-      typename Space_>
+    template<typename Functor_>
     class LinearFunctional
     {
     public:
-      /// vector type
-      typedef Vector_ VectorType;
       /// linear functor type
       typedef Functor_ FunctorType;
-      /// space type
-      typedef Space_ SpaceType;
-
-      /// assembly traits
-      typedef AsmTraits1<
-        typename Vector_::DataType,
-        Space_,
-        typename Functor_::TrafoConfig,
-        typename Functor_::SpaceConfig> AsmTraits;
-
-      /// data type
-      typedef typename AsmTraits::DataType DataType;
 
     public:
       /**
-       * \brief Assembles a linear functional.
+       * \brief Assembles a linear functional into a vector.
        *
        * \param[in,out] vector
        * The vector that is to be assembled.
@@ -59,23 +36,39 @@ namespace FEAST
        * \param[in] functor
        * A reference to the functor defining the linearform.
        *
-       * \param[in] space
-       * A reference to the finite-element space to be used.
-       *
        * \param[in] cubature_factory
        * A reference to the cubature factory to be used for integration.
        *
-       * \param[in] alpha
-       * The scaling factor for the linear functional.
+       * \param[in] space
+       * A reference to the finite-element space to be used.
        */
-      template<typename CubatureFactory_>
-      static void assemble(
-        VectorType& vector,
+      template<
+        typename Vector_,
+        typename CubatureFactory_,
+        typename Space_>
+      static void assemble_vector(
+        Vector_& vector,
         const FunctorType& functor,
-        const SpaceType& space,
         const CubatureFactory_& cubature_factory,
-        DataType alpha = DataType(1))
+        const Space_& space,
+        typename Vector_::DataType alpha = typename Vector_::DataType(1))
       {
+        /// vector type
+        typedef Vector_ VectorType;
+
+        /// space type
+        typedef Space_ SpaceType;
+
+        /// assembly traits
+        typedef AsmTraits1<
+          typename Vector_::DataType,
+          Space_,
+          typename Functor_::TrafoConfig,
+          typename Functor_::SpaceConfig> AsmTraits;
+
+        /// data type
+        typedef typename AsmTraits::DataType DataType;
+
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
@@ -97,11 +90,11 @@ namespace FEAST
         // create space evaluation data
         typename AsmTraits::SpaceEvalData space_data;
 
-        // create cubature rule
-        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
         // create local vector data
         typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+
+        // create cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
         VectorScatterAxpy<VectorType> scatter_axpy(vector);
@@ -138,7 +131,7 @@ namespace FEAST
             {
               // evaluate functor and integrate
               lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                func_eval(trafo_data, typename AsmTraits::FuncData(space_data, i));
+                func_eval(trafo_data, space_data.phi[i]);
               // continue with next trial function
             }
             // continue with next test function
