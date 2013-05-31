@@ -232,7 +232,7 @@ namespace FEAST
     }
 
     /**
-     * \brief Forks the string by a delimiter charset.
+     * \brief Splits the string by a delimiter charset.
      *
      * This function separates the string into substrings, where two substrings are separated a delimiter
      * substring consisting only of delimiter charset characters.
@@ -243,8 +243,15 @@ namespace FEAST
      * When using the default whitespace delimiter character set, the string " 5  42\t7 " will be forked
      * into 3 substrings: "5", "42" and "7".
      *
+     * \tparam Container_
+     * A container class which contains objects of type String, e.g. <c>std::vector<String></c>.
+     * This container class must support at least the following member functions:
+     *  - clear()
+     *  - push_back(const String&)
+     *  - size()
+     *
      * \param[out] words
-     * A vector of Strings which receives the substrings.
+     * A container of Strings which receives the substrings.
      *
      * \param[in] charset
      * The character set which is to be treated as the delimiter charset.
@@ -252,8 +259,9 @@ namespace FEAST
      * \returns
      * <c>words.size()</c>
      */
-    size_t fork_by_charset(
-      std::vector<String>& words,
+    template<typename Container_>
+    size_t split_by_charset(
+      Container_& words,
       const String& charset = " \a\b\f\n\r\t\v") const
     {
       words.clear();
@@ -298,7 +306,7 @@ namespace FEAST
     }
 
     /**
-     * \brief Forks the string by a delimiter substring.
+     * \brief Splits the string by a delimiter substring.
      *
      * This function separates the string into substrings, where the substrings are separated by a delimiter
      * string.
@@ -307,8 +315,15 @@ namespace FEAST
      * When using "," as a delimiter string, the input string " ,5,,3" will be forked into 4 substrings:
      * " ", "5", "" and "3".
      *
+     * \tparam Container_
+     * A container class which contains objects of type String, e.g. <c>std::vector<String></c>.
+     * This container class must support at least the following member functions:
+     *  - clear()
+     *  - push_back(const String&)
+     *  - size()
+     *
      * \param[out] words
-     * A vector of Strings which receives the substrings.
+     * A container of Strings which receives the substrings.
      *
      * \param[in] delimiter
      * The string that is to be treated as a delimiter.
@@ -316,8 +331,9 @@ namespace FEAST
      * \returns
      * <c>words.size()</c>
      */
-    size_t fork_by_string(
-      std::vector<String>& words,
+    template<typename Container_>
+    size_t split_by_string(
+      Container_& words,
       const String& delimiter = " ") const
     {
       words.clear();

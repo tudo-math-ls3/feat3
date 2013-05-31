@@ -43,8 +43,8 @@ public:
     TEST_CHECK(!stringify(27).parse(b));
     TEST_CHECK(!String("nonsense").parse(i));
 
-    // test fork-by-charset
-    String("  0 5 \n 3\tfoo ").fork_by_charset(words);
+    // test split-by-charset
+    String("  0 5 \n 3\tfoo ").split_by_charset(words);
     TEST_CHECK_EQUAL(words.size(), 4u);
     TEST_CHECK_EQUAL(words[0], "0");
     TEST_CHECK_EQUAL(words[1], "5");
@@ -52,7 +52,7 @@ public:
     TEST_CHECK_EQUAL(words[3], "foo");
 
     // test fork-by-string
-    String("0, 4,,7 , ").fork_by_string(words, ",");
+    String("0, 4,,7 , ").split_by_string(words, ",");
     TEST_CHECK_EQUAL(words.size(), 5u);
     TEST_CHECK_EQUAL(words[0], "0");
     TEST_CHECK_EQUAL(words[1], " 4");

@@ -1087,7 +1087,7 @@ namespace FEAST
         double current_value;
 
         // separate by " "
-        line.fork_by_string(line_vec, " ");
+        line.split_by_charset(line_vec);
 
         // parse the substrings
         for(Index i(0); i < line_vec.size(); ++i)
@@ -1189,7 +1189,7 @@ namespace FEAST
           Index current_value;
 
           // separate by " "
-          line.fork_by_string(line_vec, " ");
+          line.split_by_charset(line_vec);
 
           // parse the substrings
           for(Index i(0); i < line_vec.size(); ++i)
