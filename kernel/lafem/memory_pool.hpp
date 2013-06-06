@@ -77,13 +77,6 @@ namespace FEAST
           return data[index];
         }
 
-        /// recieve const element
-        template <typename DT_>
-        inline static DT_ & get_element(DT_ * data, Index index)
-        {
-          return data[index];
-        }
-
         /// modify element
         template <typename DT_>
         inline static void modify_element(DT_ * data, Index index, DT_ value)

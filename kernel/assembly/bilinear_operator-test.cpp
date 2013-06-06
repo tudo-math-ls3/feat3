@@ -117,7 +117,7 @@ public:
     for(Index i(0); i < num_quads; ++i)
     {
       for(int j(0); j < 4; ++j)
-        ++qatv(vatq(i,j));
+        qatv(vatq(i,j), qatv(vatq(i,j)) + 1);
     }
 
     // create a dof-mapping
