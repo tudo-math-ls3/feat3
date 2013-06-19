@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <fstream>
 
 namespace FEAST
 {
@@ -29,6 +30,7 @@ namespace FEAST
       // basic information
       String name;
       String parent;
+      String info;
 
       // number of entities
       Index vertex_number;
@@ -195,6 +197,12 @@ namespace FEAST
     {
     public:
       CellSetContainer cell_set;
+
+      /**
+       * \brief Writes the stored cell set data into the output stream.
+       */
+      void write_cell_set_data(std::ostream &ofs);
+
     };
 
     /**
@@ -263,6 +271,12 @@ namespace FEAST
         // search cell sets
         return find_cell_set(parent_name);
       }
+
+      /**
+       * \brief Drops the mesh data of this mesh and all submeshes related to this mesh
+          into the output stream.
+       */
+      void write_mesh_data(std::ostream &ofs, bool submesh);
     };
 
   private:
@@ -273,6 +287,8 @@ namespace FEAST
 
     // file paths
     String _chart_path;
+    // info
+    String _global_mesh_info;
 
     // root mesh node
     MeshNode* _root_mesh_node;
@@ -379,6 +395,11 @@ namespace FEAST
     Index get_num_cellsets() const;
 
     /**
+     * \brief Returns the global mesh information.
+     */
+    String get_global_mesh_info() const;
+
+    /**
      * \brief Returns a pointer to the root-mesh node.
      */
     MeshReader::MeshNode* get_root_mesh_node()
@@ -401,6 +422,20 @@ namespace FEAST
      * The name of the cell-set that is to be returned.
      */
     MeshReader::CellSetContainer* get_cell_set(String name);
+
+    /**
+     * \brief Drops the mesh data into a file
+     *
+     * \param[in] name of the file the data has to be written in
+     */
+    void write_into(String filename);
+
+    /**
+     * \brief Drops the mesh data into a stream
+     *
+     * \param[in] name of the ostream
+     */
+    void write_into(std::ostream& ofs);
 
   private:
 
@@ -433,7 +468,7 @@ namespace FEAST
      * \returns
      * The number of lines that has been read when the programme is done.
      */
-    Index _parse_info_section(Index cur_line, std::istream& ifs);
+    String _parse_info_section(Index& cur_line, std::istream& ifs);
 
     /**
      * \brief Parses a mesh-section-data-input stream.

@@ -40,8 +40,7 @@ public:
     ioss << " cellsets 1" << endl;
     ioss << "</header>" << endl;
     ioss << "   <info>    " << endl;
-    ioss << " This file contains a simple unit-square mesh with one quadrilateral" << endl;
-    ioss << "and a 1D submesh for the parameterisation of the outer boundary." << endl;
+    ioss << "This file contains a simple unit-square..." << endl;
     ioss << "</info>" << endl;
     ioss << "<mesh>" << endl;
     ioss << " <header>" << endl;
@@ -137,18 +136,32 @@ public:
     ioss << "2" << endl;
     ioss << " </edge_idx>" << endl;
     ioss << "</submesh>" << endl;
+
     ioss << "</feast_mesh_file>" << endl;
     ioss << "BleBlaBlu ignored too" << endl;
 
-    // parse the stream
-    MeshReader reader;
-    reader.parse_mesh_file(ioss);
+    // two mesh reader objects for reading and writing the mesh data
+    MeshReader reader, writer;
+
+    // pares the stream
+    writer.parse_mesh_file(ioss);
+
+    // drop the data into an auxiliary file
+    stringstream ioss2;
+    writer.write_into(ioss2);
+    // writer.write_into("../mytest.txt");
+
+    // parse the data with the other mesh reader
+    reader.parse_mesh_file(ioss2);
+
+    // now check if everything is ok
 
     // check members
     TEST_CHECK_EQUAL(reader.get_version(), Index(1));
     TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
     TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(1));
     TEST_CHECK_EQUAL(reader.get_num_cellsets(), Index(1));
+    TEST_CHECK_EQUAL(reader.get_global_mesh_info(), "This file contains a simple unit-square..." );
 
     // test the get_mesh function
     MeshReader::MeshDataContainer* root_mesh_ptr = reader.get_mesh("rooot");
@@ -177,6 +190,8 @@ public:
 
     TEST_CHECK_EQUAL(root_mesh.coord_path , "");
     TEST_CHECK_EQUAL(root_mesh.adj_path, "");
+
+    TEST_CHECK_EQUAL(root_mesh.info, "test");
 
     // check the root mesh coordinates
     std::vector<std::vector<double> >& coords = root_mesh.coords;
@@ -291,6 +306,7 @@ public:
     TEST_CHECK_EQUAL(cellset->tria_number, Index(0));
     TEST_CHECK_EQUAL(cellset->hexa_number, Index(0));
     TEST_CHECK_EQUAL(cellset->tetra_number, Index(0));
+    TEST_CHECK_EQUAL(cellset->info, "I am a cellset!");
 
     // check parent indices of the cellset
     std::vector<Index> par_vert = cellset->parent_indices[0];
@@ -343,6 +359,8 @@ public:
 
     TEST_CHECK_EQUAL(sub_mesh.coord_path , "");
     TEST_CHECK_EQUAL(sub_mesh.adj_path, "");
+
+    TEST_CHECK_EQUAL(sub_mesh.info, "This is a submesh that...");
 
     // check the sub mesh coordinates
     std::vector<std::vector<double> >& coords_sub = sub_mesh.coords;
@@ -456,6 +474,9 @@ public:
     TEST_CHECK_EQUAL((root_mesh.parent_indices[3]).empty(), true);
 
     // ok, everything is right
+
+    // delete the created file
+    // TEST_CHECK_EQUAL(remove("../mytest.txt"),0);
   } // test_0
 
   void test_1() const

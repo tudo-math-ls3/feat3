@@ -135,7 +135,7 @@ namespace FEAST
       // if it is an info chunk
       else if(line == "<info>")
       {
-        cur_line = _parse_info_section(cur_line, ifs);
+        _global_mesh_info = _parse_info_section(cur_line, ifs);
       }
 
       // if it is a mesh chunk
@@ -263,22 +263,32 @@ namespace FEAST
 
 
   // parses/ignores the given info-section stream
-  Index MeshReader::_parse_info_section(Index cur_line, std::istream& ifs)
+  String MeshReader::_parse_info_section(Index& cur_line, std::istream& ifs)
   {
     CONTEXT("MeshReader::parse_info_section");
 
     // string the current line is saved in
     String line;
+    String infoline("");
 
-    // skip the info block
-    while(line != "</info>" && !ifs.eof() && ifs.good())
+    while(1)
     {
       // get a line
       getline(ifs, line);
       ++cur_line;
       line.trim_me();
+
+      if(line != "</info>" && !ifs.eof() && ifs.good())
+      {
+        infoline+=line+" ";
+      }
+      else
+      {
+        break;
+      }
     }
-    return cur_line;
+    infoline.trim_me();
+    return infoline;
   } // Index MeshReader::parse_info_section(Index cur_line, std::istream& ifs)
 
 
@@ -303,6 +313,7 @@ namespace FEAST
 
     // mesh data container of the current mesh
     MeshDataContainer& current_mesh(mesh_node->mesh_data);
+    current_mesh.coord_per_vertex=0;
 
     // while everything is fine
     while(!ifs.eof() && ifs.good())
@@ -445,7 +456,7 @@ namespace FEAST
       // if it is an info sub chunk
       else if(line.compare(0, 6, "<info>") == 0)
       {
-        cur_line = _parse_info_section(cur_line, ifs);
+        current_mesh.info = _parse_info_section(cur_line, ifs);
       } // info sub-chunk
 
       // if it is the counts sub chunk
@@ -572,7 +583,7 @@ namespace FEAST
       // if it is an info sub chunk
       else if(line.compare(0, 6, "<info>") == 0)
       {
-        cur_line = _parse_info_section(cur_line, ifs);
+        current_set.info = _parse_info_section(cur_line, ifs);
       } // info sub-chunk
 
       // if it is the counts sub chunk
@@ -744,7 +755,7 @@ namespace FEAST
       // if it is an info chunk
       else if(line == "<info>")
       {
-        cur_line = _parse_info_section(cur_line, ifs);
+        mesh->info = _parse_info_section(cur_line, ifs);
       } // info sub chunk
 
       // if it is a coord chunk
@@ -905,7 +916,7 @@ namespace FEAST
       // if it is an info chunk
       else if(line == "<info>")
       {
-        cur_line = _parse_info_section(cur_line, ifs);
+        _parse_info_section(cur_line, ifs);
       }
 
       // if it is the counts sub chunk
@@ -1313,6 +1324,13 @@ namespace FEAST
     return _num_cellsets;
   }
 
+  // returns the global mesh information
+  String MeshReader::get_global_mesh_info() const
+  {
+    CONTEXT("MeshReader::get_global_mesh_info()");
+    return _global_mesh_info;
+  }
+
   // returns a pointer to the MeshDataContainer specified by "name"
   MeshReader::MeshDataContainer* MeshReader::get_mesh(String name)
   {
@@ -1328,10 +1346,354 @@ namespace FEAST
   // returns a pointer to the CellSetContainer specified by "name"
   MeshReader::CellSetContainer* MeshReader::get_cell_set(String name)
   {
-    CONTEXT("MeshReader::get_mesh()");
+    CONTEXT("MeshReader::get_cell_set()");
     if(_root_mesh_node == nullptr)
       return nullptr;
     CellSetNode* node = _root_mesh_node->find_cell_set(name);
     return (node != nullptr) ? &node->cell_set : nullptr;
   }
+
+  // writes the data into a file specified by "filename"
+  void MeshReader::write_into(String filename)
+  {
+    CONTEXT("MeshReader::writeInto()");
+    std::ofstream ofs (filename.c_str());
+
+    write_into(ofs);
+    ofs.close();
+  }
+
+  // writes the data into the ostream
+  void MeshReader::write_into(std::ostream& ofs)
+  {
+    CONTEXT("MeshReader::writeInto()");
+
+    // FILE section
+    ofs << "<feast_mesh_file>" << std::endl;
+
+    // HEADER section
+    ofs << "<header>" << std::endl;
+    ofs << "version " << _version << std::endl;
+    if ( !_chart_path.empty() )
+      ofs << "chart_file " << _chart_path << std::endl;
+    ofs << "submeshes " << _num_submeshes << std::endl;
+    ofs << "cellsets " << _num_cellsets << std::endl;
+    // END OF HEADER section
+    ofs << "</header>" << std::endl;
+
+
+    // INFO section
+    ofs << "<info>" << std::endl;
+    ofs << _global_mesh_info << std::endl;
+    // END OF INFO section
+    ofs << "</info>" << std::endl;
+
+    // drop mesh data
+    _root_mesh_node->write_mesh_data(ofs,false);
+
+    // END OF FILE section
+    ofs << "</feast_mesh_file>";
+  }
+
+  // writes the stored cell set data into the output stream.
+  void MeshReader::CellSetNode::write_cell_set_data(std::ostream &ofs)
+  {
+    ofs << "<cellset>" << std::endl;
+
+    // header section
+    ofs << "<header>" << std::endl;
+    ofs << "name " << cell_set.name << std::endl;
+    ofs << "parent " << cell_set.parent <<std::endl;
+    ofs << "</header>" << std::endl;
+
+    // info section
+    ofs << "<info>" << std::endl;
+    ofs << cell_set.info << std::endl;
+    ofs << "</info>" << std::endl;
+
+    // count section
+    ofs << "<counts>" << std::endl;
+    if( cell_set.vertex_number != 0)
+      ofs << "verts " << cell_set.vertex_number << std::endl;
+    if( cell_set.edge_number != 0)
+      ofs << "edges " << cell_set.edge_number << std::endl;
+    if( cell_set.quad_number != 0)
+      ofs << "quads " << cell_set.quad_number << std::endl;
+    if( cell_set.tria_number != 0)
+      ofs << "trias " << cell_set.tria_number << std::endl;
+    if( cell_set.tetra_number != 0)
+      ofs << "tetras " << cell_set.tetra_number << std::endl;
+    if( cell_set.hexa_number != 0)
+      ofs << "hexas " << cell_set.hexa_number << std::endl;
+    ofs << "</counts>" << std::endl;
+
+    // parent indices
+    ofs << "<vert_idx>" << std::endl;
+    for (Index i(0); i < cell_set.vertex_number ; ++i)
+    {
+      ofs << (cell_set.parent_indices[0])[i] << std::endl;
+    }
+    ofs << "</vert_idx>" << std::endl;
+
+    if ( !(cell_set.edge_number == 0) )
+    {
+      ofs << "<edge_idx>" << std::endl;
+      for (Index i(0); i < cell_set.edge_number ; ++i)
+      {
+        ofs << (cell_set.parent_indices[1])[i] << std::endl;
+      }
+      ofs << "</edge_idx>" << std::endl;
+      }
+
+    if ( !(cell_set.tria_number == 0) )
+    {
+      ofs << "<tria_idx>" << std::endl;
+      for (Index i(0); i < cell_set.tria_number ; ++i)
+      {
+        ofs << (cell_set.parent_indices[2])[i] << std::endl;
+      }
+      ofs << "</tria_idx>" << std::endl;
+    }
+    if ( !(cell_set.quad_number == 0) )
+    {
+      ofs << "<quad_idx>" << std::endl;
+      for (Index i(0); i < cell_set.quad_number ; ++i)
+      {
+        ofs << (cell_set.parent_indices[2])[i] << std::endl;
+      }
+      ofs << "</quad_idx>" << std::endl;
+    }
+
+    if ( !(cell_set.tetra_number == 0) )
+    {
+      ofs << "<tetra_idx>" << std::endl;
+      for (Index i(0); i < cell_set.tetra_number ; ++i)
+      {
+        ofs << (cell_set.parent_indices[3])[i] << std::endl;
+      }
+      ofs << "</tetra_idx>" << std::endl;
+    }
+
+    if ( !(cell_set.hexa_number == 0) )
+    {
+      ofs << "<hexa_idx>" << std::endl;
+      for (Index i(0); i < cell_set.hexa_number ; ++i)
+      {
+        ofs << (cell_set.parent_indices[3])[i] << std::endl;
+      }
+      ofs << "</hexa_idx>" << std::endl;
+    }
+    ofs << "</cellset>" << std::endl;
+  }//write_cell_set_data
+
+  // Drops the mesh data of this mesh and all submeshes related to this mesh
+  // into the output stream.
+  void MeshReader::MeshNode::write_mesh_data(std::ostream &ofs, bool submesh)
+  {
+    // choose the right tag
+    if (submesh)
+      ofs << "<submesh>" << std::endl;
+    else
+      ofs << "<mesh>" << std::endl;
+
+    // header section
+    ofs << "<header>" << std::endl;
+    if (submesh)
+    {
+      ofs << "name " << mesh_data.name << std::endl;
+      ofs << "parent " << mesh_data.parent << std::endl;
+      if ( !mesh_data.chart.empty() )
+        ofs << "chart " << mesh_data.chart << std::endl;
+    }
+    ofs << "type " << mesh_data.mesh_type << std::endl;
+    ofs << "shape " << mesh_data.shape_type << std::endl;
+    if ( !mesh_data.coord_path.empty() )
+      ofs << "coord_file " << mesh_data.coord_path << std::endl;
+    if(mesh_data.coord_per_vertex!=0)
+      ofs << "coords " << mesh_data.coord_per_vertex << std::endl;
+    if ( !mesh_data.adj_path.empty() )
+      ofs << "coord_file " << mesh_data.adj_path << std::endl;
+    ofs << "</header>" << std::endl;
+
+    // info section
+    ofs << "<info>" << std::endl;
+    ofs << mesh_data.info << std::endl;
+    ofs << "</info>" << std::endl;
+
+    // count section
+    ofs << "<counts>" << std::endl;
+    if( mesh_data.vertex_number != 0)
+      ofs << "verts " << mesh_data.vertex_number << std::endl;
+    if( mesh_data.edge_number != 0)
+      ofs << "edges " << mesh_data.edge_number << std::endl;
+    if( mesh_data.quad_number != 0)
+      ofs << "quads " << mesh_data.quad_number << std::endl;
+    if( mesh_data.tria_number != 0)
+      ofs << "trias " << mesh_data.tria_number << std::endl;
+    if( mesh_data.tetra_number != 0)
+      ofs << "tetras " << mesh_data.tetra_number << std::endl;
+    if( mesh_data.hexa_number != 0)
+      ofs << "hexas " << mesh_data.hexa_number << std::endl;
+    ofs << "</counts>" << std::endl;
+
+    // coord section
+    ofs << "<coords>" << std::endl;
+    for (Index i(0); i < mesh_data.vertex_number ; ++i)
+    {
+      for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
+      {
+        ofs << (mesh_data.coords[i])[j] << " ";
+      }
+      ofs << std::endl;
+    }
+    ofs << "</coords>" << std::endl;
+
+    // adjacency section
+    ofs << "<vert@edge>" << std::endl;
+    for (Index i(0); i < (mesh_data.adjacencies[0][1]).size() ; ++i)
+    {
+      ofs << ((mesh_data.adjacencies[0][1])[i])[0] << " ";
+      ofs << ((mesh_data.adjacencies[0][1])[i])[1] << std::endl;
+    }
+    ofs << "</vert@edge>" << std::endl;
+
+    if (!( (mesh_data.adjacencies[0][2]).size() == 0 ))
+    {
+      if ( ((mesh_data.adjacencies[0][2])[0]).size() == 3 )
+      {
+        ofs << "<vert@tria>" << std::endl;
+        for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+        {
+          ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
+          ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
+          ofs << ((mesh_data.adjacencies[0][2])[i])[2] << std::endl;
+        }
+        ofs << "</vert@tria>" << std::endl;
+      }
+      else if ( ((mesh_data.adjacencies[0][2])[0]).size() == 4 )
+      {
+        ofs << "<vert@quad>" << std::endl;
+        for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+        {
+          ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
+          ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
+          ofs << ((mesh_data.adjacencies[0][2])[i])[2] << " ";
+          ofs << ((mesh_data.adjacencies[0][2])[i])[3] << std::endl;
+        }
+        ofs << "</vert@quad>" << std::endl;
+      }
+    }
+
+    if (!( (mesh_data.adjacencies[0][3]).size() == 0 ))
+    {
+      if ( ((mesh_data.adjacencies[0][3])[0]).size() == 4 )
+      {
+        ofs << "<vert@tetra>" << std::endl;
+        for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+        {
+          ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[3] << std::endl;
+        }
+        ofs << "</vert@tetra>" << std::endl;
+      }
+      else if ( ((mesh_data.adjacencies[0][3])[0]).size() == 8 )
+      {
+        ofs << "<vert@hexa>" << std::endl;
+        for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+        {
+          ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[3] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[4] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[5] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[6] << " ";
+          ofs << ((mesh_data.adjacencies[0][3])[i])[7] << std::endl;
+        }
+        ofs << "</vert@hexa>" << std::endl;
+      }
+    }
+
+    // if it is a submesh, add the parent indices
+    if (submesh)
+    {
+      ofs << "<vert_idx>" << std::endl;
+      for (Index i(0); i < mesh_data.vertex_number ; ++i)
+      {
+        ofs << (mesh_data.parent_indices[0])[i] << std::endl;
+      }
+      ofs << "</vert_idx>" << std::endl;
+
+      if ( !(mesh_data.edge_number == 0) )
+      {
+        ofs << "<edge_idx>" << std::endl;
+        for (Index i(0); i < mesh_data.edge_number ; ++i)
+        {
+          ofs << (mesh_data.parent_indices[1])[i] << std::endl;
+        }
+        ofs << "</edge_idx>" << std::endl;
+      }
+
+      if ( !(mesh_data.tria_number == 0) )
+      {
+        ofs << "<tria_idx>" << std::endl;
+        for (Index i(0); i < mesh_data.tria_number ; ++i)
+        {
+          ofs << (mesh_data.parent_indices[2])[i] << std::endl;
+        }
+        ofs << "</tria_idx>" << std::endl;
+      }
+
+      if ( !(mesh_data.quad_number == 0) )
+      {
+        ofs << "<quad_idx>" << std::endl;
+        for (Index i(0); i < mesh_data.quad_number ; ++i)
+        {
+          ofs << (mesh_data.parent_indices[2])[i] << std::endl;
+        }
+        ofs << "</quad_idx>" << std::endl;
+      }
+
+      if ( !(mesh_data.tetra_number == 0) )
+      {
+        ofs << "<tetra_idx>" << std::endl;
+        for (Index i(0); i < mesh_data.tetra_number ; ++i)
+        {
+          ofs << (mesh_data.parent_indices[3])[i] << std::endl;
+        }
+        ofs << "</tetra_idx>" << std::endl;
+      }
+
+      if ( !(mesh_data.hexa_number == 0) )
+      {
+        ofs << "<hexa_idx>" << std::endl;
+        for (Index i(0); i < mesh_data.hexa_number ; ++i)
+        {
+          ofs << (mesh_data.parent_indices[3])[i] << std::endl;
+        }
+        ofs << "</hexa_idx>" << std::endl;
+      }
+    }
+
+    // choose the right tag to end the mesh section
+    if (submesh)
+      ofs<<"</submesh>"<<std::endl;
+    else
+      ofs<<"</mesh>"<<std::endl;
+
+    // loop through all submeshes related to this mesh and drop the data as well
+     SubMeshMap::iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+     for(; it != jt; ++it)
+     {
+       it->second->write_mesh_data(ofs, true);
+     }
+      // loop through all cell sets related to this mesh and drop the data as well
+     CellSetMap::iterator it_cell(cell_set_map.begin()), jt_cell(cell_set_map.end());
+     for(; it_cell != jt_cell; ++it_cell)
+     {
+       it_cell->second->write_cell_set_data(ofs);
+     }
+   }// write_mesh_data
 } //namespace FEAST
