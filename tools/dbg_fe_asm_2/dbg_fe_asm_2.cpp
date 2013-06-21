@@ -1,4 +1,4 @@
-#include <kernel/geometry/mesh_reader_factory.hpp>
+#include <kernel/geometry/mesh_streamer_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
@@ -12,7 +12,7 @@ using namespace FEAST;
 using namespace FEAST::Geometry;
 
 typedef ConformalMesh<Shape::Quadrilateral> QuadMesh;
-typedef MeshReaderFactory<QuadMesh> QuadMeshFactory;
+typedef MeshStreamerFactory<QuadMesh> QuadMeshFactory;
 typedef StandardRefinery<QuadMesh> QuadRefinery;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
   {
     String mesh_name = String("data/meshes/") + String(argv[argc-1]) + String(".txt");
     std::cout << "Reading mesh from '" << mesh_name << "'..." << std::endl;
-    MeshReader mesh_reader;
+    MeshStreamer mesh_reader;
     mesh_reader.parse_mesh_file(mesh_name);
 
     // create mesh

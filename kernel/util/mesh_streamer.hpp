@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_UTIL_MESH_READER_HPP
-#define KERNEL_UTIL_MESH_READER_HPP 1
+#ifndef KERNEL_UTIL_MESH_STREAMER_HPP
+#define KERNEL_UTIL_MESH_STREAMER_HPP 1
 
 // includes, FEAST
 #include <kernel/util/file_error.hpp>
@@ -14,14 +14,14 @@
 namespace FEAST
 {
   /**
-   * \brief Meshreader class
+   * \brief MeshStreamer class
    *
    * This class enables the storage and analysis of data given as a FEAST mesh/adjacency/coord file.
    * (See the external documentation for further information.)
    *
    * \author Constantin Christof
    */
-  class MeshReader
+  class MeshStreamer
   {
   public:
     class BaseContainer
@@ -201,7 +201,7 @@ namespace FEAST
       /**
        * \brief Writes the stored cell set data into the output stream.
        */
-      void write_cell_set_data(std::ostream &ofs);
+      void write(std::ostream &ofs) const;
 
     };
 
@@ -276,7 +276,7 @@ namespace FEAST
        * \brief Drops the mesh data of this mesh and all submeshes related to this mesh
           into the output stream.
        */
-      void write_mesh_data(std::ostream &ofs, bool submesh);
+      void write(std::ostream& ofs, bool submesh) const;
     };
 
   private:
@@ -295,10 +295,10 @@ namespace FEAST
 
   public:
     /// Default Constructor
-    MeshReader();
+    MeshStreamer();
 
     /// Virtual Destructor
-    virtual ~MeshReader();
+    virtual ~MeshStreamer();
 
     /**
      * \brief Parses a given FEAST- mesh file.
@@ -402,7 +402,7 @@ namespace FEAST
     /**
      * \brief Returns a pointer to the root-mesh node.
      */
-    MeshReader::MeshNode* get_root_mesh_node()
+    MeshStreamer::MeshNode* get_root_mesh_node()
     {
       return _root_mesh_node;
     }
@@ -413,7 +413,7 @@ namespace FEAST
      * \param[in] name
      * The name of the (sub-)mesh that is to be returned.
      */
-    MeshReader::MeshDataContainer* get_mesh(String name = "root");
+    MeshStreamer::MeshDataContainer* get_mesh(String name = "root");
 
     /**
      * \brief Returns a cell-set container.
@@ -421,26 +421,28 @@ namespace FEAST
      * \param[in] name
      * The name of the cell-set that is to be returned.
      */
-    MeshReader::CellSetContainer* get_cell_set(String name);
+    MeshStreamer::CellSetContainer* get_cell_set(String name);
 
     /**
-     * \brief Drops the mesh data into a file
+     * \brief Writes the mesh data into a file
      *
-     * \param[in] name of the file the data has to be written in
+     * \param[in] filename
+     * The name of the file the data has to be written in
      */
-    void write_into(String filename);
+    void write_mesh_file(String filename) const;
 
     /**
-     * \brief Drops the mesh data into a stream
+     * \brief Writes the mesh data into a stream
      *
-     * \param[in] name of the ostream
+     * \param[in] ofs
+     * The output stream that is to be written to.
      */
-    void write_into(std::ostream& ofs);
+    void write_mesh_file(std::ostream& ofs) const;
 
   private:
 
-    MeshReader::CellSetParent* _find_cell_set_parent(String parent_name);
-    MeshReader::MeshNode* _find_sub_mesh_parent(String parent_name);
+    MeshStreamer::CellSetParent* _find_cell_set_parent(String parent_name);
+    MeshStreamer::MeshNode* _find_sub_mesh_parent(String parent_name);
 
     /**
      * \brief Parses a mesh-header-data-input stream.
@@ -575,7 +577,7 @@ namespace FEAST
      */
     Index _parse_parents_chunk(Index cur_line, std::istream& ifs, BaseContainer* container, String line);
 
-  }; // class MeshReader
+  }; // class MeshStreamer
 } // namespace FEAST
 
-#endif // KERNEL_UTIL_MESH_READER_HPP
+#endif // KERNEL_UTIL_MESH_STREAMER_HPP

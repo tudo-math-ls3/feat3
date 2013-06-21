@@ -7,7 +7,7 @@
 #include <kernel/geometry/conformal_sub_mesh.hpp>
 #include <kernel/geometry/cell_sub_set.hpp>
 #include <kernel/geometry/index_calculator.hpp>
-#include <kernel/util/mesh_reader.hpp>
+#include <kernel/util/mesh_streamer.hpp>
 
 namespace FEAST
 {
@@ -17,18 +17,18 @@ namespace FEAST
     namespace Intern
     {
       template<typename Shape_>
-      struct MeshReaderIndexer;
+      struct MeshStreamerIndexer;
 
       template<typename Shape_>
-      struct MeshReaderTargeter;
+      struct MeshStreamerTargeter;
     }
     /// \endcond
 
     template<typename Mesh_>
-    class MeshReaderFactory DOXY({});
+    class MeshStreamerFactory DOXY({});
 
     /**
-     * \brief MeshReaderFactory implementation for ConformalMesh
+     * \brief MeshStreamerFactory implementation for ConformalMesh
      *
      * \author Peter Zajac
      */
@@ -37,7 +37,7 @@ namespace FEAST
       int num_coords_,
       int stride_,
       typename Coord_>
-    class MeshReaderFactory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
+    class MeshStreamerFactory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> > :
       public Factory< ConformalMesh<Shape_, num_coords_, stride_, Coord_> >
     {
     public:
@@ -49,11 +49,11 @@ namespace FEAST
       typedef typename MeshType::IndexSetHolderType IndexSetHolderType;
 
     private:
-      MeshReader& _mesh_reader;
-      MeshReader::MeshDataContainer* _mesh_data;
+      MeshStreamer& _mesh_reader;
+      MeshStreamer::MeshDataContainer* _mesh_data;
 
     public:
-      explicit MeshReaderFactory(MeshReader& mesh_reader) :
+      explicit MeshStreamerFactory(MeshStreamer& mesh_reader) :
         _mesh_reader(mesh_reader),
         _mesh_data(mesh_reader.get_mesh())
       {
@@ -82,7 +82,7 @@ namespace FEAST
         for(Index i(0); i < num_vertices; ++i)
         {
           // get a reference to the corresponding vertex
-          MeshReader::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
+          MeshStreamer::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
 
           ASSERT(int(vtx.size()) == num_coords_, "Vertex coordinate count mismatch!");
 
@@ -97,21 +97,21 @@ namespace FEAST
       virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         // call wrapper
-        Intern::MeshReaderIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);
+        Intern::MeshStreamerIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);
 
         // build redundant index sets
         RedundantIndexSetBuilder<Shape_>::compute(index_set_holder);
       }
-    }; // class MeshReaderFactory<ConformalMesh<...>>
+    }; // class MeshStreamerFactory<ConformalMesh<...>>
 
 
     /**
-     * \brief MeshReaderFactory implementation for CellSubSet
+     * \brief MeshStreamerFactory implementation for CellSubSet
      *
      * \author Peter Zajac
      */
     template<typename Shape_>
-    class MeshReaderFactory< CellSubSet<Shape_> > :
+    class MeshStreamerFactory< CellSubSet<Shape_> > :
       public Factory< CellSubSet<Shape_> >
     {
     public:
@@ -121,21 +121,21 @@ namespace FEAST
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
     private:
-      MeshReader& _mesh_reader;
+      MeshStreamer& _mesh_reader;
       String _name;
-      MeshReader::BaseContainer* _target_data;
+      MeshStreamer::BaseContainer* _target_data;
 
     public:
-      explicit MeshReaderFactory(MeshReader& mesh_reader, String name) :
+      explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
         _mesh_reader(mesh_reader),
         _name(name),
         _target_data(nullptr)
       {
-        MeshReader::MeshNode* root(_mesh_reader.get_root_mesh_node());
+        MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
         ASSERT_(root != nullptr);
 
         // try to find a sub-mesh node
-        MeshReader::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
+        MeshStreamer::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
         if(sub_mesh_node != nullptr)
         {
           _target_data = &sub_mesh_node->mesh_data;
@@ -143,7 +143,7 @@ namespace FEAST
         }
 
         // try to find a cell-set node
-        MeshReader::CellSetNode* cell_set_node(root->find_cell_set(name));
+        MeshStreamer::CellSetNode* cell_set_node(root->find_cell_set(name));
         if(cell_set_node != nullptr)
         {
           _target_data = &cell_set_node->cell_set;
@@ -173,19 +173,19 @@ namespace FEAST
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
       {
-        Intern::MeshReaderTargeter<Shape_>::wrap(target_set_holder, _target_data->parent_indices);
+        Intern::MeshStreamerTargeter<Shape_>::wrap(target_set_holder, _target_data->parent_indices);
       }
-    }; // class MeshReaderFactory<CellSubSet<...>>
+    }; // class MeshStreamerFactory<CellSubSet<...>>
 
     /**
-     * \brief MeshReaderFactory implementation for ConformalSubMesh
+     * \brief MeshStreamerFactory implementation for ConformalSubMesh
      *
      * \author Peter Zajac
      */
     template<
       typename Shape_,
       typename Coord_>
-    class MeshReaderFactory< ConformalSubMesh<Shape_, Coord_> > :
+    class MeshStreamerFactory< ConformalSubMesh<Shape_, Coord_> > :
       public Factory< ConformalSubMesh<Shape_, Coord_> >
     {
     public:
@@ -199,21 +199,21 @@ namespace FEAST
       typedef typename MeshType::TargetSetHolderType TargetSetHolderType;
 
     private:
-      MeshReader& _mesh_reader;
+      MeshStreamer& _mesh_reader;
       String _name;
-      MeshReader::MeshDataContainer* _mesh_data;
+      MeshStreamer::MeshDataContainer* _mesh_data;
 
     public:
-      explicit MeshReaderFactory(MeshReader& mesh_reader, String name) :
+      explicit MeshStreamerFactory(MeshStreamer& mesh_reader, String name) :
         _mesh_reader(mesh_reader),
         _name(name),
         _mesh_data(nullptr)
       {
-        MeshReader::MeshNode* root(_mesh_reader.get_root_mesh_node());
+        MeshStreamer::MeshNode* root(_mesh_reader.get_root_mesh_node());
         ASSERT_(root != nullptr);
 
         // try to find a sub-mesh node
-        MeshReader::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
+        MeshStreamer::MeshNode* sub_mesh_node(root->find_sub_mesh(name));
         if(sub_mesh_node != nullptr)
         {
           _mesh_data = &sub_mesh_node->mesh_data;
@@ -259,7 +259,7 @@ namespace FEAST
         for(Index i(0); i < num_vertices; ++i)
         {
           // get a reference to the corresponding vertex
-          MeshReader::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
+          MeshStreamer::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
 
           ASSERT(int(vtx.size()) == num_coords, "Vertex coordinate count mismatch!");
 
@@ -274,7 +274,7 @@ namespace FEAST
       virtual void fill_index_sets(IndexSetHolderType& index_set_holder)
       {
         // call wrapper
-        Intern::MeshReaderIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);
+        Intern::MeshStreamerIndexer<Shape_>::wrap(index_set_holder, _mesh_data->adjacencies);
 
         // build redundant index sets
         RedundantIndexSetBuilder<Shape_>::compute(index_set_holder);
@@ -282,15 +282,15 @@ namespace FEAST
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
       {
-        Intern::MeshReaderTargeter<Shape_>::wrap(target_set_holder, _mesh_data->parent_indices);
+        Intern::MeshStreamerTargeter<Shape_>::wrap(target_set_holder, _mesh_data->parent_indices);
       }
-    }; // class MeshReaderFactory<ConformalSubMesh<...>>
+    }; // class MeshStreamerFactory<ConformalSubMesh<...>>
 
     /// \cond internal
     namespace Intern
     {
       template<typename Shape_>
-      struct MeshReaderIndexer
+      struct MeshStreamerIndexer
       {
         typedef std::vector< std::vector<Index> > AdjStack;
         typedef AdjStack AdjStackMatrix[4][4];
@@ -303,7 +303,7 @@ namespace FEAST
         static void wrap(IndexSetHolder<Shape_>& idx, AdjStackMatrix& adj)
         {
           typedef typename Shape::FaceTraits<Shape_, Shape_::dimension - 1>::ShapeType FacetType;
-          MeshReaderIndexer<FacetType>::wrap(idx, adj);
+          MeshStreamerIndexer<FacetType>::wrap(idx, adj);
           apply(idx.template get_index_set<Shape_::dimension, 0>(), adj[0][Shape_::dimension]);
         }
 
@@ -325,7 +325,7 @@ namespace FEAST
       };
 
       template<>
-      struct MeshReaderIndexer<Shape::Vertex>
+      struct MeshStreamerIndexer<Shape::Vertex>
       {
         template<typename T1_, typename T2_>
         static void wrap(T1_&, T2_&)
@@ -335,13 +335,13 @@ namespace FEAST
       };
 
       template<typename Shape_>
-      struct MeshReaderTargeter
+      struct MeshStreamerTargeter
       {
         typedef std::vector<Index> ParentIndices[4];
         static void wrap(TargetSetHolder<Shape_>& tsh, ParentIndices& pi)
         {
           typedef typename Shape::FaceTraits<Shape_, Shape_::dimension-1>::ShapeType FacetType;
-          MeshReaderTargeter<FacetType>::wrap(tsh, pi);
+          MeshStreamerTargeter<FacetType>::wrap(tsh, pi);
           apply(tsh.template get_target_set<Shape_::dimension>(), pi[Shape_::dimension]);
         }
 
@@ -356,7 +356,7 @@ namespace FEAST
       };
 
       template<>
-      struct MeshReaderTargeter<Shape::Vertex>
+      struct MeshStreamerTargeter<Shape::Vertex>
       {
         typedef std::vector<Index> ParentIndices[4];
         static void wrap(TargetSetHolder<Shape::Vertex>& tsh, ParentIndices& pi)

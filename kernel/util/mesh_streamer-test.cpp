@@ -1,4 +1,4 @@
-#include <kernel/util/mesh_reader.hpp>
+#include <kernel/util/mesh_streamer.hpp>
 #include <test_system/test_system.hpp>
 #include <sstream>
 
@@ -6,19 +6,19 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 
 /**
- * \brief Test class for the MeshReader class.
+ * \brief Test class for the MeshStreamer class.
  *
- * \test Tests the MeshReader class.
+ * \test Tests the MeshStreamer class.
  *
  * \author Constantin Christof
  */
 
-class MeshReaderTest
+class MeshStreamerTest
   : public TaggedTest<Archs::None, Archs::None>
 {
 public:
-  MeshReaderTest() :
-    TaggedTest<Archs::None, Archs::None>("mesh_reader_test")
+  MeshStreamerTest() :
+    TaggedTest<Archs::None, Archs::None>("mesh_streamer_test")
   {
   }
 
@@ -141,14 +141,14 @@ public:
     ioss << "BleBlaBlu ignored too" << endl;
 
     // two mesh reader objects for reading and writing the mesh data
-    MeshReader reader, writer;
+    MeshStreamer reader, writer;
 
     // pares the stream
     writer.parse_mesh_file(ioss);
 
     // drop the data into an auxiliary file
     stringstream ioss2;
-    writer.write_into(ioss2);
+    writer.write_mesh_file(ioss2);
     // writer.write_into("../mytest.txt");
 
     // parse the data with the other mesh reader
@@ -164,13 +164,13 @@ public:
     TEST_CHECK_EQUAL(reader.get_global_mesh_info(), "This file contains a simple unit-square..." );
 
     // test the get_mesh function
-    MeshReader::MeshDataContainer* root_mesh_ptr = reader.get_mesh("rooot");
-    TEST_CHECK_EQUAL(root_mesh_ptr, ((MeshReader::MeshDataContainer*)nullptr));
+    MeshStreamer::MeshDataContainer* root_mesh_ptr = reader.get_mesh("rooot");
+    TEST_CHECK_EQUAL(root_mesh_ptr, ((MeshStreamer::MeshDataContainer*)nullptr));
 
     root_mesh_ptr = reader.get_mesh("root");
-    TEST_CHECK_NOT_EQUAL(root_mesh_ptr, ((MeshReader::MeshDataContainer*)nullptr));
+    TEST_CHECK_NOT_EQUAL(root_mesh_ptr, ((MeshStreamer::MeshDataContainer*)nullptr));
 
-    MeshReader::MeshDataContainer& root_mesh(*root_mesh_ptr);
+    MeshStreamer::MeshDataContainer& root_mesh(*root_mesh_ptr);
 
     // check the root mesh data
     TEST_CHECK_EQUAL(root_mesh.name , "root");
@@ -296,7 +296,7 @@ public:
     //
 
     String cellset_name = "cellset_1";
-    MeshReader::CellSetContainer* cellset = reader.get_cell_set(cellset_name);
+    MeshStreamer::CellSetContainer* cellset = reader.get_cell_set(cellset_name);
 
     TEST_CHECK_EQUAL(cellset->name, "cellset_1");
     TEST_CHECK_EQUAL(cellset->parent, "root");
@@ -338,10 +338,10 @@ public:
     // check the sub mesh data
     //
 
-    MeshReader::MeshDataContainer* sub_mesh_ptr = reader.get_mesh("outer");
-    TEST_CHECK_NOT_EQUAL(sub_mesh_ptr, ((MeshReader::MeshDataContainer*)nullptr));
+    MeshStreamer::MeshDataContainer* sub_mesh_ptr = reader.get_mesh("outer");
+    TEST_CHECK_NOT_EQUAL(sub_mesh_ptr, ((MeshStreamer::MeshDataContainer*)nullptr));
 
-    MeshReader::MeshDataContainer& sub_mesh(*sub_mesh_ptr);
+    MeshStreamer::MeshDataContainer& sub_mesh(*sub_mesh_ptr);
     TEST_CHECK_EQUAL(sub_mesh.name , "outer");
     TEST_CHECK_EQUAL(sub_mesh.parent , "root");
     TEST_CHECK_EQUAL(sub_mesh.chart , "");
@@ -511,7 +511,7 @@ public:
     ioss1 << "</feast_mesh_file>" << endl;
 
     // parse the stream and check if an exception is thrown
-    MeshReader reader1;
+    MeshStreamer reader1;
     TEST_CHECK_THROWS(reader1.parse_mesh_file(ioss1), SyntaxError);
 
     // ioss2: wrong number of coordinates
@@ -542,7 +542,7 @@ public:
     ioss2 << "</feast_mesh_file>" << endl;
 
     // parse the stream and check if an exception is thrown
-    MeshReader reader2;
+    MeshStreamer reader2;
     TEST_CHECK_THROWS(reader2.parse_mesh_file(ioss2), SyntaxError);
 
     // ioss3: missing version entry
@@ -573,7 +573,7 @@ public:
     ioss3 << "</feast_mesh_file>" << endl;
 
     // parse the stream and check if an exception is thrown
-    MeshReader reader3;
+    MeshStreamer reader3;
     TEST_CHECK_THROWS(reader3.parse_mesh_file(ioss3), SyntaxError);
 
     // ioss4: nonsense
@@ -604,7 +604,7 @@ public:
     ioss4 << "</feast_mesh_file>" << endl;
 
     // parse the stream and check if an exception is thrown
-    MeshReader reader4;
+    MeshStreamer reader4;
     TEST_CHECK_THROWS(reader4.parse_mesh_file(ioss4), SyntaxError);
 
     // okay

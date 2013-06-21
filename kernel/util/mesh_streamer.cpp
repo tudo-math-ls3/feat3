@@ -1,5 +1,5 @@
 // includes, FEAST
-#include <kernel/util/mesh_reader.hpp>
+#include <kernel/util/mesh_streamer.hpp>
 #include <kernel/util/assertion.hpp>
 
 // includes, system
@@ -9,20 +9,20 @@ namespace FEAST
 {
 
   // default constructor
-  MeshReader::MeshReader() :
+  MeshStreamer::MeshStreamer() :
     _version(0),
     _num_submeshes(0),
     _num_cellsets(0),
     _chart_path(""),
     _root_mesh_node(nullptr)
   {
-    CONTEXT("MeshReader::MeshReader()");
+    CONTEXT("MeshStreamer::MeshStreamer()");
   }
 
   // default destructor
-  MeshReader::~MeshReader()
+  MeshStreamer::~MeshStreamer()
   {
-    CONTEXT("MeshReader::~MeshReader()");
+    CONTEXT("MeshStreamer::~MeshStreamer()");
     if(_root_mesh_node != nullptr)
     {
       delete _root_mesh_node;
@@ -30,9 +30,9 @@ namespace FEAST
   }
 
   // returns the parent mesh specified by "parent_name"
-  MeshReader::CellSetParent* MeshReader::_find_cell_set_parent(String parent_name)
+  MeshStreamer::CellSetParent* MeshStreamer::_find_cell_set_parent(String parent_name)
   {
-    CONTEXT("MeshReader::_find_cell_set_parent");
+    CONTEXT("MeshStreamer::_find_cell_set_parent");
     if(parent_name == "root")
       return _root_mesh_node;
     if(_root_mesh_node != nullptr)
@@ -41,9 +41,9 @@ namespace FEAST
   }
 
   // returns the sub mesh parent specified by "parent_name"
-  MeshReader::MeshNode* MeshReader::_find_sub_mesh_parent(String parent_name)
+  MeshStreamer::MeshNode* MeshStreamer::_find_sub_mesh_parent(String parent_name)
   {
-    CONTEXT("MeshReader::_find_sub_mesh_parent");
+    CONTEXT("MeshStreamer::_find_sub_mesh_parent");
     if(parent_name == "root")
       return _root_mesh_node;
     if(_root_mesh_node != nullptr)
@@ -52,9 +52,9 @@ namespace FEAST
   }
 
   // parses the FEAST- mesh file given by filename
-  void MeshReader::parse_mesh_file(String filename)
+  void MeshStreamer::parse_mesh_file(String filename)
   {
-    CONTEXT("MeshReader::parse_mesh_file(String)");
+    CONTEXT("MeshStreamer::parse_mesh_file(String)");
 
     // try to open the file
     std::ifstream ifs(filename.c_str(), std::ios::in);
@@ -83,13 +83,13 @@ namespace FEAST
         throw exc;
       }
     }
-  } // MeshReader::parse_mesh_file(String filename)
+  } // MeshStreamer::parse_mesh_file(String filename)
 
 
   // parses the mesh data stream given by ifs
-  void MeshReader::parse_mesh_file(std::istream& ifs)
+  void MeshStreamer::parse_mesh_file(std::istream& ifs)
   {
-    CONTEXT("MeshReader::parse_mesh_file(std::ifstream&)");
+    CONTEXT("MeshStreamer::parse_mesh_file(std::ifstream&)");
 
     // a string containing the current line
     String line = "42";
@@ -173,13 +173,13 @@ namespace FEAST
     {
       throw SyntaxError("Unexpected ending of file in line " + stringify(cur_line));
     }
-  } // MeshReader::parse_mesh_file(std::istream& ifs)
+  } // MeshStreamer::parse_mesh_file(std::istream& ifs)
 
 
   // parses header-section streams
-  Index MeshReader:: _parse_header_section(Index cur_line, std::istream& ifs)
+  Index MeshStreamer:: _parse_header_section(Index cur_line, std::istream& ifs)
   {
-    CONTEXT("MeshReader::parse_header_section");
+    CONTEXT("MeshStreamer::parse_header_section");
 
     // string the current line is saved in
     String line;
@@ -259,13 +259,13 @@ namespace FEAST
     // return the number of lines
     return cur_line;
 
-  } // Index MeshReader::parse_header_section(Index cur_line, std::istream& ifs)
+  } // Index MeshStreamer::parse_header_section(Index cur_line, std::istream& ifs)
 
 
   // parses/ignores the given info-section stream
-  String MeshReader::_parse_info_section(Index& cur_line, std::istream& ifs)
+  String MeshStreamer::_parse_info_section(Index& cur_line, std::istream& ifs)
   {
-    CONTEXT("MeshReader::parse_info_section");
+    CONTEXT("MeshStreamer::parse_info_section");
 
     // string the current line is saved in
     String line;
@@ -289,13 +289,13 @@ namespace FEAST
     }
     infoline.trim_me();
     return infoline;
-  } // Index MeshReader::parse_info_section(Index cur_line, std::istream& ifs)
+  } // Index MeshStreamer::parse_info_section(Index cur_line, std::istream& ifs)
 
 
   // parses the given mesh-section stream
-  Index MeshReader::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
+  Index MeshStreamer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
   {
-    CONTEXT("MeshReader::parse_mesh_section");
+    CONTEXT("MeshStreamer::parse_mesh_section");
 
     // string the current line is saved in
     String line;
@@ -508,13 +508,13 @@ namespace FEAST
     // return number of lines read so far
     return cur_line;
 
-  } // MeshReader::parse_mesh_section(Index cur_line, std::istream& ifs)
+  } // MeshStreamer::parse_mesh_section(Index cur_line, std::istream& ifs)
 
 
   // parses the cellset-section stream ifs
-  Index MeshReader::_parse_cellset_section(Index cur_line, std::istream& ifs)
+  Index MeshStreamer::_parse_cellset_section(Index cur_line, std::istream& ifs)
   {
-    CONTEXT("MeshReader::parse_cellset_section");
+    CONTEXT("MeshStreamer::parse_cellset_section");
 
     // (auxiliary) variables
     String line;
@@ -619,13 +619,13 @@ namespace FEAST
 
     // return number of lines read so far
     return cur_line;
-  } // Index MeshReader::parse_cellset_section(Index cur_line, std::istream& ifs)
+  } // Index MeshStreamer::parse_cellset_section(Index cur_line, std::istream& ifs)
 
 
   // parses the coord file given by filepath
-  void MeshReader::parse_coord_file(String filename, MeshReader::MeshDataContainer *mesh)
+  void MeshStreamer::parse_coord_file(String filename, MeshStreamer::MeshDataContainer *mesh)
   {
-    CONTEXT("MeshReader::parse_coord_file(String filename)");
+    CONTEXT("MeshStreamer::parse_coord_file(String filename)");
 
     // try to open the file
     std::ifstream ifs(filename.c_str(), std::ios::in);
@@ -654,13 +654,13 @@ namespace FEAST
         throw exc;
       }
     }
-  } // MeshReader::parse_coord_file(String filename, MeshReader::MeshDataContainer *mesh)
+  } // MeshStreamer::parse_coord_file(String filename, MeshStreamer::MeshDataContainer *mesh)
 
 
   // parses the coord-file stream given by ifs
-  void MeshReader::parse_coord_file(std::istream& ifs, MeshReader::MeshDataContainer *mesh)
+  void MeshStreamer::parse_coord_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
   {
-    CONTEXT("MeshReader::parse_coord_file(std::ifstream&)");
+    CONTEXT("MeshStreamer::parse_coord_file(std::ifstream&)");
 
     // a string containing the current line
     String line = "42";
@@ -780,13 +780,13 @@ namespace FEAST
     {
       throw SyntaxError("Unexpected file ending in line " + stringify(cur_line));
     }
-  } // MeshReader::parse_coord_file(std::istream& ifs, MeshReader::MeshDataContainer *mesh)
+  } // MeshStreamer::parse_coord_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
 
 
   // parses the adjacency file given by filename
-  void MeshReader::parse_adjacency_file(String filename, MeshReader::MeshDataContainer *mesh)
+  void MeshStreamer::parse_adjacency_file(String filename, MeshStreamer::MeshDataContainer *mesh)
   {
-    CONTEXT("MeshReader::parse_adjacency_file(String filename)");
+    CONTEXT("MeshStreamer::parse_adjacency_file(String filename)");
 
     // try to open the file
     std::ifstream ifs(filename.c_str(), std::ios::in);
@@ -815,13 +815,13 @@ namespace FEAST
         throw exc;
       }
     }
-  } // MeshReader::parse_adjacency_file(String filename)
+  } // MeshStreamer::parse_adjacency_file(String filename)
 
 
   // parses the adjacency-file-stream ifs
-  void MeshReader::parse_adjacency_file(std::istream& ifs, MeshReader::MeshDataContainer *mesh)
+  void MeshStreamer::parse_adjacency_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
   {
-    CONTEXT("MeshReader::parse_adjacency_file(std::ifstream&)");
+    CONTEXT("MeshStreamer::parse_adjacency_file(std::ifstream&)");
 
     // a string containing the current line
     String line = "42";
@@ -947,13 +947,13 @@ namespace FEAST
     {
       throw SyntaxError("Unexpected file ending in line " + stringify(cur_line));
     }
-  } // MeshReader::parse_adjacency_file(std::istream& ifs, MeshReader::MeshDataContainer *mesh)
+  } // MeshStreamer::parse_adjacency_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
 
 
   // parses a counts subchunk
-  Index MeshReader::_parse_counts_chunk(Index cur_line, std::istream& ifs, BaseContainer* container)
+  Index MeshStreamer::_parse_counts_chunk(Index cur_line, std::istream& ifs, BaseContainer* container)
   {
-    CONTEXT("MeshReader::_parse_counts_section");
+    CONTEXT("MeshStreamer::_parse_counts_section");
 
     // string the current line is saved in
     String line;
@@ -1067,13 +1067,13 @@ namespace FEAST
     }
     // return number of read lines
     return cur_line;
-  } // MeshReader::_parse_counts_chunk
+  } // MeshStreamer::_parse_counts_chunk
 
 
   // parses a coords subchunk
-  Index MeshReader::_parse_coords_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container)
+  Index MeshStreamer::_parse_coords_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container)
   {
-    CONTEXT("MeshReader::_parse_coords_section");
+    CONTEXT("MeshStreamer::_parse_coords_section");
 
     // string the current line is saved in
     String line;
@@ -1127,13 +1127,13 @@ namespace FEAST
     }
     // current number of lines
     return cur_line;
-  } //MeshReader::_parse_coords_chunk
+  } //MeshStreamer::_parse_coords_chunk
 
 
   // parses an adjacency subchunk
-  Index MeshReader::_parse_adjacency_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container, String line)
+  Index MeshStreamer::_parse_adjacency_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container, String line)
   {
-    CONTEXT("MeshReader::_parse_adjacency_section");
+    CONTEXT("MeshStreamer::_parse_adjacency_section");
 
     // various auxiliary variables
     Index shape_dim = 0;
@@ -1239,13 +1239,13 @@ namespace FEAST
     }
     // return number of lines read so far
     return cur_line;
-  } // MeshReader::_parse_adjacency_chunk
+  } // MeshStreamer::_parse_adjacency_chunk
 
 
   // parses a parent-indices chunk
-  Index MeshReader::_parse_parents_chunk(Index cur_line, std::istream& ifs, BaseContainer* container, String line)
+  Index MeshStreamer::_parse_parents_chunk(Index cur_line, std::istream& ifs, BaseContainer* container, String line)
   {
-    CONTEXT("MeshReader::_parse_parents_chunk");
+    CONTEXT("MeshStreamer::_parse_parents_chunk");
 
     std::vector<Index> idx;
     Index dim = 0;
@@ -1293,48 +1293,48 @@ namespace FEAST
 
     // return number of lines read so far
     return cur_line;
-  } // MeshReader::_parse_parents_chunk
+  } // MeshStreamer::_parse_parents_chunk
 
 
   // returns the version
-  Index MeshReader::get_version() const
+  Index MeshStreamer::get_version() const
   {
-    CONTEXT("MeshReader::get_version()");
+    CONTEXT("MeshStreamer::get_version()");
     return _version;
   }
 
   // returns the chart path
-  String MeshReader::get_chart_path() const
+  String MeshStreamer::get_chart_path() const
   {
-    CONTEXT("MeshReader::get_chart_path()");
+    CONTEXT("MeshStreamer::get_chart_path()");
     return _chart_path;
   }
 
   // returns the number of submeshes
-  Index MeshReader::get_num_submeshes() const
+  Index MeshStreamer::get_num_submeshes() const
   {
-    CONTEXT("MeshReader::get_number_of_submeshes()");
+    CONTEXT("MeshStreamer::get_number_of_submeshes()");
     return _num_submeshes;
   }
 
   // returns the number of cellsets
-  Index MeshReader::get_num_cellsets() const
+  Index MeshStreamer::get_num_cellsets() const
   {
-    CONTEXT("MeshReader::get_number_of_cellsets()");
+    CONTEXT("MeshStreamer::get_number_of_cellsets()");
     return _num_cellsets;
   }
 
   // returns the global mesh information
-  String MeshReader::get_global_mesh_info() const
+  String MeshStreamer::get_global_mesh_info() const
   {
-    CONTEXT("MeshReader::get_global_mesh_info()");
+    CONTEXT("MeshStreamer::get_global_mesh_info()");
     return _global_mesh_info;
   }
 
   // returns a pointer to the MeshDataContainer specified by "name"
-  MeshReader::MeshDataContainer* MeshReader::get_mesh(String name)
+  MeshStreamer::MeshDataContainer* MeshStreamer::get_mesh(String name)
   {
-    CONTEXT("MeshReader::get_mesh()");
+    CONTEXT("MeshStreamer::get_mesh()");
     if(_root_mesh_node == nullptr)
       return nullptr;
     if(name.compare_no_case("root") == 0)
@@ -1344,9 +1344,9 @@ namespace FEAST
   }
 
   // returns a pointer to the CellSetContainer specified by "name"
-  MeshReader::CellSetContainer* MeshReader::get_cell_set(String name)
+  MeshStreamer::CellSetContainer* MeshStreamer::get_cell_set(String name)
   {
-    CONTEXT("MeshReader::get_cell_set()");
+    CONTEXT("MeshStreamer::get_cell_set()");
     if(_root_mesh_node == nullptr)
       return nullptr;
     CellSetNode* node = _root_mesh_node->find_cell_set(name);
@@ -1354,19 +1354,24 @@ namespace FEAST
   }
 
   // writes the data into a file specified by "filename"
-  void MeshReader::write_into(String filename)
+  void MeshStreamer::write_mesh_file(String filename) const
   {
-    CONTEXT("MeshReader::writeInto()");
+    CONTEXT("MeshStreamer::write_mesh_file()");
     std::ofstream ofs (filename.c_str());
+    // if something went wrong
+    if(!ofs.is_open())
+    {
+      throw FileNotFound(filename);
+    }
 
-    write_into(ofs);
+    write_mesh_file(ofs);
     ofs.close();
   }
 
   // writes the data into the ostream
-  void MeshReader::write_into(std::ostream& ofs)
+  void MeshStreamer::write_mesh_file(std::ostream& ofs) const
   {
-    CONTEXT("MeshReader::writeInto()");
+    CONTEXT("MeshStreamer::write_mesh_file()");
 
     // FILE section
     ofs << "<feast_mesh_file>" << std::endl;
@@ -1389,14 +1394,14 @@ namespace FEAST
     ofs << "</info>" << std::endl;
 
     // drop mesh data
-    _root_mesh_node->write_mesh_data(ofs,false);
+    _root_mesh_node->write(ofs,false);
 
     // END OF FILE section
     ofs << "</feast_mesh_file>";
   }
 
   // writes the stored cell set data into the output stream.
-  void MeshReader::CellSetNode::write_cell_set_data(std::ostream &ofs)
+  void MeshStreamer::CellSetNode::write(std::ostream& ofs) const
   {
     ofs << "<cellset>" << std::endl;
 
@@ -1488,7 +1493,7 @@ namespace FEAST
 
   // Drops the mesh data of this mesh and all submeshes related to this mesh
   // into the output stream.
-  void MeshReader::MeshNode::write_mesh_data(std::ostream &ofs, bool submesh)
+  void MeshStreamer::MeshNode::write(std::ostream& ofs, bool submesh) const
   {
     // choose the right tag
     if (submesh)
@@ -1684,16 +1689,16 @@ namespace FEAST
       ofs<<"</mesh>"<<std::endl;
 
     // loop through all submeshes related to this mesh and drop the data as well
-     SubMeshMap::iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+     SubMeshMap::const_iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
      for(; it != jt; ++it)
      {
-       it->second->write_mesh_data(ofs, true);
+       it->second->write(ofs, true);
      }
       // loop through all cell sets related to this mesh and drop the data as well
-     CellSetMap::iterator it_cell(cell_set_map.begin()), jt_cell(cell_set_map.end());
+     CellSetMap::const_iterator it_cell(cell_set_map.begin()), jt_cell(cell_set_map.end());
      for(; it_cell != jt_cell; ++it_cell)
      {
-       it_cell->second->write_cell_set_data(ofs);
+       it_cell->second->write(ofs);
      }
    }// write_mesh_data
 } //namespace FEAST

@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 ADD_LIBRARY(kernel-util STATIC
   colouring.cpp
   exception.cpp
-  mesh_reader.cpp
+  mesh_streamer.cpp
   param_section.cpp
 )
 
@@ -24,7 +24,7 @@ SET (test_list
   graph-test
   inheritance-test
   linear_algebra-test
-  mesh_reader-test
+  mesh_streamer-test
   param_section-test
   permutation-test
   string-test
