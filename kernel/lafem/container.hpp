@@ -174,6 +174,39 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
         }
 
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given container.
+         */
+        void clone(const Container<Mem_, DT_> & other)
+        {
+          CONTEXT("When cloning Container");
+
+          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
+          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
+          this->_elements_size.assign(other._elements_size.begin(), other._elements_size.end());
+          this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+          this->_elements.clear();
+          this->_indices.clear();
+
+          for (Index i(0) ; i < other._elements.size() ; ++i)
+          {
+            this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_elements_size.at(i) * sizeof(DT_)));
+            MemoryPool<Mem_>::copy(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i) * sizeof(DT_));
+          }
+
+          for (Index i(0) ; i < other._indices.size() ; ++i)
+          {
+            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_indices_size.at(i) * sizeof(Index)));
+            MemoryPool<Mem_>::copy(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i) * sizeof(Index));
+          }
+        }
+
         /**
          * \brief Returns a list of all data arrays.
          *

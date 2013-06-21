@@ -378,27 +378,8 @@ namespace FEAST
         {
           CONTEXT("When cloning SparseMatrixELL");
 
-
           SparseMatrixELL<Mem_, DT_> t;
-          t._scalar_index.at(0) = this->size();
-          t._scalar_index.at(1) = this->_scalar_index.at(1);
-          t._scalar_index.at(2) = this->_scalar_index.at(2);
-          t._scalar_index.at(3) = this->_scalar_index.at(3);
-          t._scalar_index.at(4) = this->_scalar_index.at(4);
-          t._scalar_index.at(5) = this->_scalar_index.at(5);
-          t._scalar_dt.at(0) = this->_scalar_dt.at(0);
-
-          t._elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(DT_)));
-          t._elements_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
-          t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(Index)));
-          t._indices_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
-          t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(1) * sizeof(Index)));
-          t._indices_size.push_back(this->_scalar_index.at(1));
-
-          MemoryPool<Mem_>::copy(t.Ax(), this->_elements.at(0), this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(DT_));
-          MemoryPool<Mem_>::copy(t.Aj(), this->_indices.at(0), this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(Index));
-          MemoryPool<Mem_>::copy(t.Arl(), this->_indices.at(1), this->_scalar_index.at(1) * sizeof(Index));
-
+          ((Container<Mem_, DT_>&)t).clone(*this);
           return t;
         }
 

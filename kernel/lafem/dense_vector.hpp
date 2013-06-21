@@ -270,12 +270,8 @@ namespace FEAST
         {
           CONTEXT("When cloning DenseVector");
 
-          DenseVector<Mem_, DT_> t(this->_scalar_index.at(0));
-
-          void * pdest(t.elements());
-          const void * psrc(this->elements());
-          MemoryPool<Mem_>::copy(pdest, psrc, this->_scalar_index.at(0) * sizeof(DT_));
-
+          DenseVector<Mem_, DT_> t;
+          ((Container<Mem_, DT_>&)t).clone(*this);
           return t;
         }
 

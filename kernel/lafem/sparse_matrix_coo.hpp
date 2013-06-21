@@ -537,22 +537,8 @@ namespace FEAST
         {
           CONTEXT("When cloning SparseMatrixCOO");
 
-          SparseMatrixCOO<Mem_, DT_> t(this->rows(), this->columns());
-
-          if (this->_elements.size() > 0)
-          {
-            t._elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(3) * sizeof(DT_)));
-            t._elements_size.push_back(this->_scalar_index.at(3));
-            t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(3) * sizeof(Index)));
-            t._indices_size.push_back(this->_scalar_index.at(3));
-            t._indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(3) * sizeof(Index)));
-            t._indices_size.push_back(this->_scalar_index.at(3));
-            t._scalar_index.at(3) = this->_scalar_index.at(3);
-
-            MemoryPool<Mem_>::copy(t._elements.at(0), this->_elements.at(0), this->_scalar_index.at(3) * sizeof(DT_));
-            MemoryPool<Mem_>::copy(t._indices.at(0), this->_indices.at(0), this->_scalar_index.at(3) * sizeof(Index));
-            MemoryPool<Mem_>::copy(t._indices.at(1), this->_indices.at(1), this->_scalar_index.at(3) * sizeof(Index));
-          }
+          SparseMatrixCOO<Mem_, DT_> t;
+          ((Container<Mem_, DT_>&)t).clone(*this);
           return t;
         }
 

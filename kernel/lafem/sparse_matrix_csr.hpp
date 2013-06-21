@@ -485,14 +485,8 @@ namespace FEAST
         {
           CONTEXT("When cloning SparseMatrixCSR");
 
-          DenseVector<Mem_, Index> col_ind(this->_scalar_index.at(3), this->_indices.at(0));
-          DenseVector<Mem_, DT_> val(this->_scalar_index.at(3), this->_elements.at(0));
-          DenseVector<Mem_, Index> row_ptr(this->_scalar_index.at(1) + 1, this->_indices.at(1));
-          DenseVector<Mem_, Index> row_ptr_end(this->_scalar_index.at(1), this->_indices.at(2));
-
-          SparseMatrixCSR<Mem_, DT_> t(this->_scalar_index.at(1), this->_scalar_index.at(2), col_ind.clone(), val.clone(),
-              row_ptr.clone(), row_ptr_end.clone());
-
+          SparseMatrixCSR<Mem_, DT_> t;
+          ((Container<Mem_, DT_>&)t).clone(*this);
           return t;
         }
 
