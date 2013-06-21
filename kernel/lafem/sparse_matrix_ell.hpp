@@ -394,39 +394,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixELL");
 
-          if (this == &other)
-            return *this;
-
-          this->_scalar_index.at(0) = other.size();
-          this->_scalar_index.at(1) = other.rows();
-          this->_scalar_index.at(2) = other.columns();
-          this->_scalar_index.at(3) = other.stride();
-          this->_scalar_index.at(4) = other.num_cols_per_row();
-          this->_scalar_index.at(5) = other.used_elements();
-          this->_scalar_dt.at(0) = other.zero_element();
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-
-          this->_elements.clear();
-          this->_indices.clear();
-          this->_elements_size.clear();
-          this->_indices_size.clear();
-
-          std::vector<DT_ *> new_elements = other.get_elements();
-          std::vector<Index *> new_indices = other.get_indices();
-
-          this->_elements.assign(new_elements.begin(), new_elements.end());
-          this->_indices.assign(new_indices.begin(), new_indices.end());
-          this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
-          this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+          assign(other);
 
           return *this;
         }
@@ -443,51 +411,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixELL");
 
-          this->_scalar_index.at(0) = other.size();
-          this->_scalar_index.at(1) = other.rows();
-          this->_scalar_index.at(2) = other.columns();
-          this->_scalar_index.at(3) = other.stride();
-          this->_scalar_index.at(4) = other.num_cols_per_row();
-          this->_scalar_index.at(5) = other.used_elements();
-          this->_scalar_dt.at(0) = other.zero_element();
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-
-          this->_elements.clear();
-          this->_indices.clear();
-          this->_elements_size.clear();
-          this->_indices_size.clear();
-
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(DT_)));
-          this->_elements_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
-          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(Index)));
-          this->_indices_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
-          this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(1) * sizeof(Index)));
-          this->_indices_size.push_back(this->_scalar_index.at(1));
-
-          Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
-          Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
-          void * temp(::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, other.get_elements().at(0), src_size);
-          MemoryPool<Mem_>::upload(this->get_elements().at(0), temp, dest_size);
-          ::free(temp);
-
-          src_size = (other.get_indices_size().at(0) * sizeof(Index));
-          dest_size = (other.get_indices_size().at(0) * sizeof(Index));
-          temp = (::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, other.get_indices().at(0), src_size);
-          MemoryPool<Mem_>::upload(this->get_indices().at(0), temp, dest_size);
-          ::free(temp);
-
-          src_size = (other.get_indices_size().at(1) * sizeof(Index));
-          dest_size = (other.get_indices_size().at(1) * sizeof(Index));
-          temp = (::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, other.get_indices().at(1), src_size);
-          MemoryPool<Mem_>::upload(this->get_indices().at(1), temp, dest_size);
-          ::free(temp);
+          assign(other);
 
           return *this;
         }

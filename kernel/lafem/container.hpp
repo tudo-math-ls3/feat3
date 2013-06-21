@@ -207,6 +207,97 @@ namespace FEAST
           }
         }
 
+        /** \brief Assignment operation
+         *
+         * Assign another container to the current one.
+         */
+        void assign(const Container<Mem_, DT_> & other)
+        {
+          CONTEXT("When assigning Container");
+
+          if (this == &other)
+            return;
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
+          this->_scalar_index.clear();
+          this->_scalar_dt.clear();
+
+          std::vector<DT_ *> new_elements = other.get_elements();
+          std::vector<Index*> new_indices = other.get_indices();
+
+          this->_elements.assign(new_elements.begin(), new_elements.end());
+          this->_indices.assign(new_indices.begin(), new_indices.end());
+          this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
+          this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
+          this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
+          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /** \brief Assignment operation
+         *
+         * Assigns a container from another memory architecture to the current one.
+         */
+        template <typename Mem2_, typename DT2_>
+        void assign(const Container<Mem2_, DT_> & other)
+        {
+          CONTEXT("When assigning Container");
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
+          this->_scalar_index.clear();
+          this->_scalar_dt.clear();
+
+          this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
+          this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
+          this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
+          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
+
+
+          for (Index i(0) ; i < this->_elements_size.size() ; ++i)
+          {
+            this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_elements_size.at(i) * sizeof(DT_)));
+            Index src_size(this->_elements_size.at(0) * sizeof(DT2_));
+            Index dest_size(this->_elements_size.at(0) * sizeof(DT_));
+            void * temp(::malloc(src_size));
+            MemoryPool<Mem2_>::download(temp, other.get_elements().at(0), src_size);
+            MemoryPool<Mem_>::upload(this->_elements.at(0), temp, dest_size);
+            ::free(temp);
+          }
+
+          for (Index i(0) ; i < this->_indices_size.size() ; ++i)
+          {
+            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_indices_size.at(i) * sizeof(Index)));
+            Index src_size(this->_indices_size.at(0) * sizeof(Index));
+            Index dest_size(this->_indices_size.at(0) * sizeof(Index));
+            void * temp(::malloc(src_size));
+            MemoryPool<Mem2_>::download(temp, other.get_indices().at(0), src_size);
+            MemoryPool<Mem_>::upload(this->_indices.at(0), temp, dest_size);
+            ::free(temp);
+          }
+
+        }
+
+
         /**
          * \brief Returns a list of all data arrays.
          *

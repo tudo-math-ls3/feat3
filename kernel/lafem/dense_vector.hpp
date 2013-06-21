@@ -255,8 +255,8 @@ namespace FEAST
          *
          * Creates a copy of a given vector from another memory architecture.
          */
-        template <typename Arch2_, typename DT2_>
-        DenseVector(const DenseVector<Arch2_, DT2_> & other) :
+        template <typename Mem2_, typename DT2_>
+        DenseVector(const DenseVector<Mem2_, DT2_> & other) :
             Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying DenseVector");
@@ -286,35 +286,7 @@ namespace FEAST
         {
           CONTEXT("When assigning DenseVector");
 
-          if (this == &other)
-            return *this;
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-
-          this->_elements.clear();
-          this->_indices.clear();
-          this->_elements_size.clear();
-          this->_indices_size.clear();
-          this->_scalar_index.clear();
-          this->_scalar_dt.clear();
-
-          std::vector<DT_ *> new_elements = other.get_elements();
-          std::vector<Index*> new_indices = other.get_indices();
-
-          this->_elements.assign(new_elements.begin(), new_elements.end());
-          this->_indices.assign(new_indices.begin(), new_indices.end());
-          this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
-          this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
-          this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
-          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+          assign(other);
 
           return *this;
         }
@@ -326,33 +298,12 @@ namespace FEAST
          *
          * Assigns a vector from another memory architecture to the target vector.
          */
-        template <typename Arch2_, typename DT2_>
-        DenseVector<Mem_, DT_> & operator= (const DenseVector<Arch2_, DT2_> & other)
+        template <typename Mem2_, typename DT2_>
+        DenseVector<Mem_, DT_> & operator= (const DenseVector<Mem2_, DT2_> & other)
         {
           CONTEXT("When assigning DenseVector");
 
-          this->_scalar_index.at(0) = other.size();
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-
-          this->_elements.clear();
-          this->_indices.clear();
-          this->_elements_size.clear();
-          this->_indices_size.clear();
-
-
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(other.size() * sizeof(DT_)));
-          this->_elements_size.push_back(this->_scalar_index.at(0));
-
-          Index src_size(other.get_elements_size().at(0) * sizeof(DT2_));
-          Index dest_size(other.get_elements_size().at(0) * sizeof(DT_));
-          void * temp(::malloc(src_size));
-          MemoryPool<Arch2_>::download(temp, other.get_elements().at(0), src_size);
-          MemoryPool<Mem_>::upload(this->get_elements().at(0), temp, dest_size);
-          ::free(temp);
+          assign(other);
 
           return *this;
         }
@@ -533,7 +484,7 @@ namespace FEAST
      * \param[in] a A vector to compare with.
      * \param[in] b A vector to compare with.
      */
-    template <typename Mem_, typename Arch2_, typename DT_> bool operator== (const DenseVector<Mem_, DT_> & a, const DenseVector<Arch2_, DT_> & b)
+    template <typename Mem_, typename Mem2_, typename DT_> bool operator== (const DenseVector<Mem_, DT_> & a, const DenseVector<Mem2_, DT_> & b)
     {
       CONTEXT("When comparing DenseVectors");
 
