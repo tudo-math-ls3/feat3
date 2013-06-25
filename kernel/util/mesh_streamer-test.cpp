@@ -28,10 +28,6 @@ public:
     stringstream ioss;
 
     // let's write an (awfully ugly) mesh file into the stream
-    ioss << "blabla nonsense" << endl;
-    ioss << "in front of the file &%$&/%&" << endl;
-    ioss << "should be ignored" << endl;
-    ioss << "    " << endl;
     ioss << "<feast_mesh_file>" << endl;
     ioss << "<header>  " << endl;
     ioss << " version 1" << endl;
@@ -45,16 +41,16 @@ public:
     ioss << "<mesh>" << endl;
     ioss << " <header>" << endl;
     ioss << "  type conformal" << endl;
-    ioss << "  coords 2" << endl;
     ioss << "  shape quad" << endl;
+    //ioss << "  coord_file /home/doncamillo/swahlers/Desktop/MeshReader_Beispieldateien/coorddatei.txt" << endl;
+    //ioss << "  adj_file /home/doncamillo/swahlers/Desktop/MeshReader_Beispieldateien/adjacencydatei.txt" << endl;
+    ioss << "  coords 2" << endl;
     ioss << " </header>" << endl;
     ioss << " <info>" << endl;
     ioss << "test" << endl;
     ioss << " </info>" << endl;
     ioss << " <counts>" << endl;
     ioss << "  verts 4" << endl;
-    ioss << " " << endl;
-    ioss << "" << endl;
     ioss << "  quads 1" << endl;
     ioss << "  edges 4" << endl;
     ioss << " </counts>" << endl;
@@ -137,8 +133,8 @@ public:
     ioss << " </edge_idx>" << endl;
     ioss << "</submesh>" << endl;
 
-    ioss << "</feast_mesh_file>" << endl;
-    ioss << "BleBlaBlu ignored too" << endl;
+    ioss << "</feast_mesh_file>";
+
 
     // two mesh reader objects for reading and writing the mesh data
     MeshStreamer reader, writer;
@@ -157,11 +153,10 @@ public:
     // now check if everything is ok
 
     // check members
-    TEST_CHECK_EQUAL(reader.get_version(), Index(1));
     TEST_CHECK_EQUAL(reader.get_chart_path(), "unit_quad_chart.txt");
     TEST_CHECK_EQUAL(reader.get_num_submeshes(), Index(1));
     TEST_CHECK_EQUAL(reader.get_num_cellsets(), Index(1));
-    TEST_CHECK_EQUAL(reader.get_global_mesh_info(), "This file contains a simple unit-square..." );
+    TEST_CHECK_EQUAL(reader.get_info(), "This file contains a simple unit-square..." );
 
     // test the get_mesh function
     MeshStreamer::MeshDataContainer* root_mesh_ptr = reader.get_mesh("rooot");
@@ -176,20 +171,15 @@ public:
     TEST_CHECK_EQUAL(root_mesh.name , "root");
     TEST_CHECK_EQUAL(root_mesh.parent , "none");
     TEST_CHECK_EQUAL(root_mesh.chart , "none");
-    TEST_CHECK_EQUAL(root_mesh.coord_version , "");
-    TEST_CHECK_EQUAL(root_mesh.adjacency_version , "");
-    TEST_CHECK_EQUAL(root_mesh.mesh_type , "conformal");
-    TEST_CHECK_EQUAL(root_mesh.shape_type , "quad");
+    TEST_CHECK_EQUAL(root_mesh.convert_mesh_type(root_mesh.mesh_type) , "conformal");
+    TEST_CHECK_EQUAL(root_mesh.convert_shape_type(root_mesh.shape_type) , "quad");
     TEST_CHECK_EQUAL(root_mesh.coord_per_vertex , Index(2));
-    TEST_CHECK_EQUAL(root_mesh.vertex_number , Index(4));
-    TEST_CHECK_EQUAL(root_mesh.edge_number , Index(4));
-    TEST_CHECK_EQUAL(root_mesh.tria_number , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.quad_number , Index(1));
-    TEST_CHECK_EQUAL(root_mesh.tetra_number , Index(0));
-    TEST_CHECK_EQUAL(root_mesh.hexa_number, Index(0));
-
-    TEST_CHECK_EQUAL(root_mesh.coord_path , "");
-    TEST_CHECK_EQUAL(root_mesh.adj_path, "");
+    TEST_CHECK_EQUAL(root_mesh.vertex_count , Index(4));
+    TEST_CHECK_EQUAL(root_mesh.edge_count , Index(4));
+    TEST_CHECK_EQUAL(root_mesh.tria_count , Index(0));
+    TEST_CHECK_EQUAL(root_mesh.quad_count , Index(1));
+    TEST_CHECK_EQUAL(root_mesh.tetra_count , Index(0));
+    TEST_CHECK_EQUAL(root_mesh.hexa_count, Index(0));
 
     TEST_CHECK_EQUAL(root_mesh.info, "test");
 
@@ -300,12 +290,12 @@ public:
 
     TEST_CHECK_EQUAL(cellset->name, "cellset_1");
     TEST_CHECK_EQUAL(cellset->parent, "root");
-    TEST_CHECK_EQUAL(cellset->vertex_number, Index(4));
-    TEST_CHECK_EQUAL(cellset->edge_number, Index(0));
-    TEST_CHECK_EQUAL(cellset->quad_number, Index(0));
-    TEST_CHECK_EQUAL(cellset->tria_number, Index(0));
-    TEST_CHECK_EQUAL(cellset->hexa_number, Index(0));
-    TEST_CHECK_EQUAL(cellset->tetra_number, Index(0));
+    TEST_CHECK_EQUAL(cellset->vertex_count, Index(4));
+    TEST_CHECK_EQUAL(cellset->edge_count, Index(0));
+    TEST_CHECK_EQUAL(cellset->quad_count, Index(0));
+    TEST_CHECK_EQUAL(cellset->tria_count, Index(0));
+    TEST_CHECK_EQUAL(cellset->hexa_count, Index(0));
+    TEST_CHECK_EQUAL(cellset->tetra_count, Index(0));
     TEST_CHECK_EQUAL(cellset->info, "I am a cellset!");
 
     // check parent indices of the cellset
@@ -345,20 +335,15 @@ public:
     TEST_CHECK_EQUAL(sub_mesh.name , "outer");
     TEST_CHECK_EQUAL(sub_mesh.parent , "root");
     TEST_CHECK_EQUAL(sub_mesh.chart , "");
-    TEST_CHECK_EQUAL(sub_mesh.coord_version , "");
-    TEST_CHECK_EQUAL(sub_mesh.adjacency_version , "");
-    TEST_CHECK_EQUAL(sub_mesh.mesh_type , "conformal");
-    TEST_CHECK_EQUAL(sub_mesh.shape_type , "edge");
+    TEST_CHECK_EQUAL(sub_mesh.convert_mesh_type(sub_mesh.mesh_type) , "conformal");
+    TEST_CHECK_EQUAL(sub_mesh.convert_shape_type(sub_mesh.shape_type) , "edge");
     TEST_CHECK_EQUAL(sub_mesh.coord_per_vertex , Index(1));
-    TEST_CHECK_EQUAL(sub_mesh.vertex_number , Index(5));
-    TEST_CHECK_EQUAL(sub_mesh.edge_number , Index(4));
-    TEST_CHECK_EQUAL(sub_mesh.tria_number , Index(0));
-    TEST_CHECK_EQUAL(sub_mesh.quad_number , Index(0));
-    TEST_CHECK_EQUAL(sub_mesh.tetra_number , Index(0));
-    TEST_CHECK_EQUAL(sub_mesh.hexa_number, Index(0));
-
-    TEST_CHECK_EQUAL(sub_mesh.coord_path , "");
-    TEST_CHECK_EQUAL(sub_mesh.adj_path, "");
+    TEST_CHECK_EQUAL(sub_mesh.vertex_count , Index(5));
+    TEST_CHECK_EQUAL(sub_mesh.edge_count , Index(4));
+    TEST_CHECK_EQUAL(sub_mesh.tria_count , Index(0));
+    TEST_CHECK_EQUAL(sub_mesh.quad_count , Index(0));
+    TEST_CHECK_EQUAL(sub_mesh.tetra_count , Index(0));
+    TEST_CHECK_EQUAL(sub_mesh.hexa_count, Index(0));
 
     TEST_CHECK_EQUAL(sub_mesh.info, "This is a submesh that...");
 
@@ -579,7 +564,7 @@ public:
     // ioss4: nonsense
     ioss4 << "<feast_mesh_file>" << endl;
     ioss4 << "<header>  " << endl;
-    ioss4 << "  version 42" << endl;
+    ioss4 << "  version 1" << endl;
     ioss4 << "  submeshes 0" << endl;
     ioss4 << "  cellsets 0" << endl;
     ioss4 << "</header>" << endl;
@@ -599,7 +584,7 @@ public:
     ioss4 << "    1.0 0.0" << endl;
     ioss4 << "    0.0 1.0" << endl;
     ioss4 << "    1.0 1.0" << endl;
-    ioss4 << "  </coords> blub" << endl;
+    ioss4 << "  </coords> blubb" << endl;
     ioss4 << "</mesh>" << endl;
     ioss4 << "</feast_mesh_file>" << endl;
 

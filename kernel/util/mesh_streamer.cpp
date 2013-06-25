@@ -10,7 +10,6 @@ namespace FEAST
 
   // default constructor
   MeshStreamer::MeshStreamer() :
-    _version(0),
     _num_submeshes(0),
     _num_cellsets(0),
     _chart_path(""),
@@ -97,56 +96,54 @@ namespace FEAST
 
     // auxiliary variable that counts the lines
     Index cur_line = 0;
+    line = _new_line(ifs,cur_line);
 
-    // ignore everything until the mesh file begins
-    while(line != "<feast_mesh_file>" && !ifs.eof() && ifs.good())
+    // first line must be "<feast_mesh_file>"
+    if(line != "<feast_mesh_file>" || ifs.eof() || !ifs.good())
     {
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
+      throw SyntaxError("Unknown file format. Expected <feast_mesh_file>.");
+    }
+    line = _new_line(ifs, cur_line);
+
+    // header chunk
+    if(!(line == "<header>"))
+    {
+      throw SyntaxError("Expected <header> in line " + stringify(cur_line));
+    }
+    cur_line = _parse_header_section(cur_line, ifs);
+
+    line = _new_line(ifs, cur_line);
+
+    if(line == "<info>")
+    {
+      _info = _parse_info_section(cur_line, ifs);
+      line = _new_line(ifs, cur_line);
     }
 
-    // if the beginning of the file was not found or something went wrong
-    if(ifs.eof() || !ifs.good())
+    // mesh chunk
+    if(!(line == "<mesh>"))
     {
-      throw SyntaxError("Beginning of mesh file not found");
+      throw SyntaxError("Expected <mesh> in line " + stringify(cur_line));
     }
+
+    cur_line = _parse_mesh_section(cur_line, false, ifs);
+
+    // insert basic root mesh information
+    _root_mesh_node->mesh_data.name = "root";
+    _root_mesh_node->mesh_data.parent = "none";
+    _root_mesh_node->mesh_data.chart = "none";
 
     // loop over all lines until we reach the end of the mesh file
     while(!ifs.eof() && ifs.good())
     {
 
       // get a line
-      getline(ifs, line);
-      ++cur_line;
+      line = _new_line(ifs,cur_line);
 
-      // trim whitespaces; continue with next line if the current one is empty
+      // trim whitespaces; throw error if the current one is empty
       if(line.trim_me().empty())
       {
-        continue;
-      }
-
-      // if it is the header chunk
-      if(line == "<header>")
-      {
-        cur_line = _parse_header_section(cur_line, ifs);
-      }
-
-      // if it is an info chunk
-      else if(line == "<info>")
-      {
-        _global_mesh_info = _parse_info_section(cur_line, ifs);
-      }
-
-      // if it is a mesh chunk
-      else if(line == "<mesh>")
-      {
-        cur_line = _parse_mesh_section(cur_line, false, ifs);
-
-        // insert basic root mesh information
-        _root_mesh_node->mesh_data.name = "root";
-        _root_mesh_node->mesh_data.parent = "none";
-        _root_mesh_node->mesh_data.chart = "none";
+        throw SyntaxError("No empty lines allowed in line " + stringify(cur_line));
       }
 
       // if it is a submesh chunk
@@ -166,106 +163,125 @@ namespace FEAST
       {
         break;
       }
+      else
+      {
+        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+      }
     } // end while
 
     // if the file did not end properly
-    if(line != "</feast_mesh_file>")
+
+    if(line == "</feast_mesh_file>" && (!ifs.eof() && ifs.good()))
     {
-      throw SyntaxError("Unexpected ending of file in line " + stringify(cur_line));
+      throw SyntaxError("Reached </feast_mesh_file> but file contains additional lines at line " + stringify(cur_line+1));
     }
+    if(line != "</feast_mesh_file>" && !(!ifs.eof() && ifs.good()))
+    {
+      throw SyntaxError("Reached end of file but expected </feast_mesh_file> at line " + stringify(cur_line));
+    }
+
   } // MeshStreamer::parse_mesh_file(std::istream& ifs)
 
 
   // parses header-section streams
   Index MeshStreamer:: _parse_header_section(Index cur_line, std::istream& ifs)
   {
-    CONTEXT("MeshStreamer::parse_header_section");
+    CONTEXT("MeshStreamer::_parse_header_section");
 
     // string the current line is saved in
     String line;
+    // get a line
+    line = _new_line(ifs,cur_line);
 
-    // while everything is fine
-    while(!ifs.eof() && ifs.good())
+    // version
+    if(line.compare(0, 8, "version ") == 0)
     {
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
+      // erase "version "
+      line.erase(0, 8);
       line.trim_me();
-
-      // if it is the version
-      if(line.compare(0, 8, "version ") == 0)
+      if(line.empty())
       {
-        // erase "version "
-        line.erase(0, 8);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing version number in line " + stringify(cur_line));
-        }
-        line.parse(_version);
+        throw SyntaxError("Missing version number in line " + stringify(cur_line));
       }
-
-      // if it is the chart-file-path
-      else if(line.compare(0, 11, "chart_file ") == 0)
+      if(!(line == "1" ) )
       {
-        // erase "chart_file "
-        line.erase(0, 11);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing chart file path in line " + stringify(cur_line));
-        }
-        _chart_path = line;
+        throw SyntaxError("Wrong version. Version should be 1, line " + stringify(cur_line));
       }
+    }
+    else
+    {
+      throw SyntaxError("Expected version, line " + stringify(cur_line));
+    }
 
-      // if it is the number of submeshes
-      else if(line.compare(0, 10, "submeshes ") == 0)
+    line = _new_line(ifs,cur_line);
+    // chart file
+    if(line.compare(0, 11, "chart_file ") == 0)
+    {
+      // erase "chart_file "
+      line.erase(0, 11);
+      line.trim_me();
+      if(line.empty())
       {
-        // erase "submeshes "
-        line.erase(0, 10);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing number of submeshes in line " + stringify(cur_line));
-        }
-        line.parse(_num_submeshes);
+        throw SyntaxError("Missing chart file path in line " + stringify(cur_line));
       }
+      _chart_path = line;
 
-      // if it is the number of cellsets
-      else if(line.compare(0, 9, "cellsets ") == 0)
-      {
-        // erase "cellsets "
-        line.erase(0, 9);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing number of cellsets in line " + stringify(cur_line));
-        }
-        line.parse(_num_cellsets);
-      }
+      line = _new_line(ifs,cur_line);
+    }
 
-      // if it is the end of the header section
-      else if(line == "</header>")
+    // submeshes
+    if(line.compare(0, 10, "submeshes ") == 0)
+    {
+      // erase "submeshes "
+      line.erase(0, 10);
+      line.trim_me();
+      if(line.empty())
       {
-        break;
+        throw SyntaxError("Missing number of submeshes in line " + stringify(cur_line));
       }
+      line.parse(_num_submeshes);
+    }
+    else
+    {
+      throw SyntaxError("Expected number of submeshes, line " + stringify(cur_line));
+    }
 
-      else
+    line = _new_line(ifs,cur_line);
+
+    // cellsets
+    if(line.compare(0, 9, "cellsets ") == 0)
+    {
+      // erase "cellsets "
+      line.erase(0, 9);
+      line.trim_me();
+      if(line.empty())
       {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+        throw SyntaxError("Missing number of cellsets in line " + stringify(cur_line));
       }
+      line.parse(_num_cellsets);
+    }
+    else
+    {
+      throw SyntaxError("Expected number of cellsets, line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    // if it is the end of the header section
+    if(!(line == "</header>"))
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
     // return the number of lines
     return cur_line;
 
-  } // Index MeshStreamer::parse_header_section(Index cur_line, std::istream& ifs)
-
+  } // Index MeshStreamer::_parse_header_section(Index cur_line, std::istream& ifs)
 
   // parses/ignores the given info-section stream
   String MeshStreamer::_parse_info_section(Index& cur_line, std::istream& ifs)
   {
-    CONTEXT("MeshStreamer::parse_info_section");
+    CONTEXT("MeshStreamer::_parse_info_section");
 
     // string the current line is saved in
     String line;
@@ -274,13 +290,11 @@ namespace FEAST
     while(1)
     {
       // get a line
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
+      line = _new_line(ifs,cur_line);
 
       if(line != "</info>" && !ifs.eof() && ifs.good())
       {
-        infoline+=line+" ";
+        infoline+=line+"\n";
       }
       else
       {
@@ -289,232 +303,12 @@ namespace FEAST
     }
     infoline.trim_me();
     return infoline;
-  } // Index MeshStreamer::parse_info_section(Index cur_line, std::istream& ifs)
-
-
-  // parses the given mesh-section stream
-  Index MeshStreamer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
-  {
-    CONTEXT("MeshStreamer::parse_mesh_section");
-
-    // string the current line is saved in
-    String line;
-
-    // if it is the root mesh
-    String break_line = submesh ? "</submesh>" : "</mesh>";
-
-    // create a new mesh node
-    MeshNode* mesh_node = new MeshNode();
-    if(!submesh)
-    {
-      ASSERT_(_root_mesh_node == nullptr);
-      _root_mesh_node = mesh_node;
-    }
-
-    // mesh data container of the current mesh
-    MeshDataContainer& current_mesh(mesh_node->mesh_data);
-    current_mesh.coord_per_vertex=0;
-
-    // while everything is fine
-    while(!ifs.eof() && ifs.good())
-    {
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
-
-      // if it is the header sub chunk
-      if(line.compare(0, 8, "<header>") == 0)
-      {
-        while(!ifs.eof() && ifs.good())
-        {
-          // get a line
-          getline(ifs, line);
-          ++cur_line;
-          line.trim_me();
-
-          // if it is the type
-          if(line.compare(0, 5, "type ") == 0)
-          {
-            // erase "type "
-            line.erase(0, 5);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing type in line " + stringify(cur_line));
-            }
-            current_mesh.mesh_type = line;
-          }
-
-          // if it is the shape
-          else if(line.compare(0, 6, "shape ") == 0)
-          {
-            // erase "shape "
-            line.erase(0, 6);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing shape type in line " + stringify(cur_line));
-            }
-            current_mesh.shape_type = line;
-          }
-
-          // if it is the coord-file path
-          else if(line.compare(0, 11, "coord_file ") == 0)
-          {
-            // erase "coord_file "
-            line.erase(0, 11);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing coordinate file path in line " + stringify(cur_line));
-            }
-            current_mesh.coord_path = line;
-            // parse the coord file
-            parse_coord_file(line, &current_mesh);
-          }
-
-          // if it is the number of coordinates per vertex
-          else if(line.compare(0, 7, "coords ") == 0)
-          {
-            // erase "coords "
-            line.erase(0, 7);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
-            }
-            line.parse(current_mesh.coord_per_vertex);
-          }
-
-          // if it is the adjacency file path
-          else if(line.compare(0, 9, "adj_file ") == 0)
-          {
-            // erase "adj_file "
-            line.erase(0, 9);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing adjacency file path in line " + stringify(cur_line));
-            }
-            current_mesh.adj_path = line;
-            parse_adjacency_file(line, &current_mesh);
-          }
-
-          // if it is the name and the mesh is a submesh
-          else if(line.compare(0, 5, "name ") == 0 && submesh)
-          {
-            // erase "name "
-            line.erase(0, 5);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing name in line " + stringify(cur_line));
-            }
-            current_mesh.name = line;
-          }
-
-          // if it is the parent (of a submesh)
-          else if(line.compare(0, 7, "parent ") == 0 && submesh)
-          {
-            // erase "parent "
-            line.erase(0, 7);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing parent in line " + stringify(cur_line));
-            }
-            current_mesh.parent = line;
-          }
-
-          // if it is the chart
-          else if(line.compare(0, 6, "chart ") == 0 && submesh)
-          {
-            // erase "chart "
-            line.erase(0, 6);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing chart name in line " + stringify(cur_line));
-            }
-            current_mesh.chart = line;
-          }
-
-          // if it is the end of the header file
-          else if(line == "</header>")
-          {
-            break;
-          }
-
-          else
-          {
-            throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-          }
-        }
-      } // header sub-chunk
-
-      // if it is an info sub chunk
-      else if(line.compare(0, 6, "<info>") == 0)
-      {
-        current_mesh.info = _parse_info_section(cur_line, ifs);
-      } // info sub-chunk
-
-      // if it is the counts sub chunk
-      else if(line.compare(0, 8, "<counts>") == 0)
-      {
-        cur_line = _parse_counts_chunk(cur_line, ifs, &current_mesh);
-      } // counts sub-chunk
-
-      // if it is a coords sub chunk
-      else if(line.compare(0, 8, "<coords>") == 0)
-      {
-        cur_line = _parse_coords_chunk(cur_line, ifs, &current_mesh);
-      } // coords sub-chunk
-
-      // if it is an adjacency sub chunk
-      else if(line.find('@') != std::string::npos)
-      {
-        cur_line = _parse_adjacency_chunk(cur_line, ifs, &current_mesh, line);
-      } // adjacencies sub-chunk
-
-      // if it is a parent index chunk (of a submesh)
-      else if((line.compare(0, 10, "<vert_idx>") == 0 ||
-              line.compare(0, 10, "<edge_idx>") == 0 ||
-              line.compare(0, 10, "<tria_idx>") == 0 ||
-              line.compare(0, 10, "<quad_idx>") == 0 ||
-              line.compare(0, 11, "<tetra_idx>") == 0 ||
-              line.compare(0, 10, "<hexa_idx>") == 0) && submesh)
-      {
-        cur_line = _parse_parents_chunk(cur_line, ifs, &current_mesh, line);
-      } // parent index sub chunk
-
-      // if it is the end of the mesh section
-      else if(line == break_line)
-      {
-        if(submesh)
-        {
-          MeshNode* parent = _find_sub_mesh_parent(current_mesh.parent);
-          ASSERT_(parent != nullptr);
-          parent->sub_mesh_map.insert(std::make_pair(current_mesh.name, mesh_node));
-        }
-        break;
-      }
-      else
-      {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-      }
-    } // while
-
-    // return number of lines read so far
-    return cur_line;
-
-  } // MeshStreamer::parse_mesh_section(Index cur_line, std::istream& ifs)
-
+  } // Index MeshStreamer::_parse_info_section(Index cur_line, std::istream& ifs)
 
   // parses the cellset-section stream ifs
   Index MeshStreamer::_parse_cellset_section(Index cur_line, std::istream& ifs)
   {
-    CONTEXT("MeshStreamer::parse_cellset_section");
+    CONTEXT("MeshStreamer::_parse_cellset_section");
 
     // (auxiliary) variables
     String line;
@@ -525,783 +319,43 @@ namespace FEAST
     // cellset data container of the root mesh
     CellSetContainer& current_set(cell_set_node->cell_set);
 
-    while(!ifs.eof() && ifs.good())
-    {
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
+    cur_line = current_set._parse_cellset_section(cur_line, ifs);
 
-      // if it is the header sub chunk
-      if(line.compare(0, 8, "<header>") == 0)
-      {
-        while(!ifs.eof() && ifs.good())
-        {
-          // get a line
-          getline(ifs, line);
-          ++cur_line;
-          line.trim_me();
-
-          // if it is the name
-          if(line.compare(0, 5, "name ") == 0)
-          {
-            // erase "name "
-            line.erase(0, 5);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing name in line " + stringify(cur_line));
-            }
-            current_set.name = line;
-          }
-
-          // if it is the parent
-          else if(line.compare(0, 7, "parent ") == 0)
-          {
-            // erase "parent "
-            line.erase(0, 7);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing parent in line " + stringify(cur_line));
-            }
-            current_set.parent = line;
-          }
-          // if it is the end of the header section
-          else if(line == "</header>")
-          {
-            break;
-          }
-
-          else
-          {
-            throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-          }
-        }
-      } // header sub-chunk
-
-      // if it is an info sub chunk
-      else if(line.compare(0, 6, "<info>") == 0)
-      {
-        current_set.info = _parse_info_section(cur_line, ifs);
-      } // info sub-chunk
-
-      // if it is the counts sub chunk
-      else if(line.compare(0, 8, "<counts>") == 0)
-      {
-        cur_line = _parse_counts_chunk(cur_line, ifs, &current_set);
-      } // counts sub-chunk
-
-      // if it is a parent index chunk
-      else if(line.compare(0, 10, "<vert_idx>") == 0 ||
-              line.compare(0, 10, "<edge_idx>") == 0 ||
-              line.compare(0, 10, "<tria_idx>") == 0 ||
-              line.compare(0, 10, "<quad_idx>") == 0 ||
-              line.compare(0, 11, "<tetra_idx>") == 0 ||
-              line.compare(0, 10, "<hexa_idx>") == 0)
-      {
-        cur_line = _parse_parents_chunk(cur_line, ifs, &current_set, line);
-      } // parent index sub chunk
-
-      // if it is the end of the cellset section
-      else if(line == "</cellset>")
-      {
-        CellSetParent* parent = _find_cell_set_parent(current_set.parent);
-        ASSERT_(parent != nullptr);
-        parent->cell_set_map.insert(std::make_pair(current_set.name, cell_set_node));
-        break;
-      }
-      else
-      {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-      }
-    } // while
+    CellSetParent* parent = _find_cell_set_parent(current_set.parent);
+    ASSERT_(parent != nullptr);
+    parent->cell_set_map.insert(std::make_pair(current_set.name, cell_set_node));
 
     // return number of lines read so far
     return cur_line;
-  } // Index MeshStreamer::parse_cellset_section(Index cur_line, std::istream& ifs)
+  } // Index MeshStreamer::_parse_cellset_section(Index cur_line, std::istream& ifs)
 
 
-  // parses the coord file given by filepath
-  void MeshStreamer::parse_coord_file(String filename, MeshStreamer::MeshDataContainer *mesh)
+  // parses the given mesh-section stream
+  Index MeshStreamer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
   {
-    CONTEXT("MeshStreamer::parse_coord_file(String filename)");
+    CONTEXT("MeshStreamer::_parse_mesh_section");
 
-    // try to open the file
-    std::ifstream ifs(filename.c_str(), std::ios::in);
-
-    // if something went wrong
-    if(!ifs.is_open())
+    // create a new mesh node
+    MeshNode* mesh_node = new MeshNode();
+    if(!submesh)
     {
-      throw FileNotFound(filename);
+      ASSERT_(_root_mesh_node == nullptr);
+      _root_mesh_node = mesh_node;
     }
 
-    // parsing
-    try
+    cur_line = (mesh_node->mesh_data)._parse_mesh_section(cur_line, submesh, ifs);
+
+    if(submesh)
     {
-      parse_coord_file(ifs, mesh);
-      ifs.close();
-    }
-    catch(SyntaxError& exc)
-    {
-      // If the exception does not contain a filename, we'll recycle the exception and include our filename now.
-      if(exc.get_filename().empty())
-      {
-        throw(SyntaxError(exc.message(), filename));
-      }
-      else
-      {
-        throw exc;
-      }
-    }
-  } // MeshStreamer::parse_coord_file(String filename, MeshStreamer::MeshDataContainer *mesh)
-
-
-  // parses the coord-file stream given by ifs
-  void MeshStreamer::parse_coord_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
-  {
-    CONTEXT("MeshStreamer::parse_coord_file(std::ifstream&)");
-
-    // a string containing the current line
-    String line = "42";
-    line.reserve(256);
-
-    // auxiliary variables
-    String coord;
-    Index cur_line = 0;
-
-    // ignore everything until the coord file begins
-    while(line != "<feast_coord_file>" && !ifs.eof() && ifs.good())
-    {
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
-    }
-
-    // if the beginning of the file was not found or something went wrong
-    if(ifs.eof() || !ifs.good())
-    {
-      throw SyntaxError("Beginning of coord file not found");
-    }
-
-    // loop over all lines until we reach the end of the coord file
-    while(!ifs.eof() && ifs.good())
-    {
-
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
-
-      // trim whitespaces; continue with next line if the current one is empty
-      if(line.trim_me().empty())
-      {
-        continue;
-      }
-
-      // if it is the header chunk
-      if(line == "<header>")
-      {
-        while(!ifs.eof() && ifs.good())
-        {
-          // get a line
-          getline(ifs, line);
-          ++cur_line;
-          line.trim_me();
-
-          if(line.compare(0, 8, "version ") == 0)
-          {
-            // erase "version "
-            line.erase(0, 8);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing version number in line " + stringify(cur_line));
-            }
-            mesh->coord_version = line;
-          }
-          else if(line.compare(0, 6, "verts ") == 0)
-          {
-            // erase "verts "
-            line.erase(0, 6);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing number of vertices in line " + stringify(cur_line));
-            }
-            line.parse(mesh->vertex_number);
-          }
-          else if(line.compare(0, 7, "coords ") == 0)
-          {
-            // erase "coords "
-            line.erase(0, 7);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
-            }
-            line.parse(mesh->coord_per_vertex);
-          }
-          else if(line == "</header>")
-          {
-            break;
-          }
-          else
-          {
-            throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-          }
-        } // while
-      } // header sub chunk
-
-      // if it is an info chunk
-      else if(line == "<info>")
-      {
-        mesh->info = _parse_info_section(cur_line, ifs);
-      } // info sub chunk
-
-      // if it is a coord chunk
-      else if(line.compare(0, 8, "<coords>") == 0)
-      {
-        cur_line = _parse_coords_chunk(cur_line, ifs, mesh);
-      } // coords sub-chunk
-
-      // if it is the end
-      else if(line == "</feast_coord_file>")
-      {
-        break;
-      }
-      else
-      {
-        throw SyntaxError("Unknown format in line " + stringify(cur_line));
-      }
-    } // end while
-
-    // if the file did not end properly
-    if(line != "</feast_coord_file>")
-    {
-      throw SyntaxError("Unexpected file ending in line " + stringify(cur_line));
-    }
-  } // MeshStreamer::parse_coord_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
-
-
-  // parses the adjacency file given by filename
-  void MeshStreamer::parse_adjacency_file(String filename, MeshStreamer::MeshDataContainer *mesh)
-  {
-    CONTEXT("MeshStreamer::parse_adjacency_file(String filename)");
-
-    // try to open the file
-    std::ifstream ifs(filename.c_str(), std::ios::in);
-
-    // if something went wrong
-    if(!ifs.is_open())
-    {
-      throw FileNotFound(filename);
-    }
-
-    // parsing
-    try
-    {
-      parse_adjacency_file(ifs, mesh);
-      ifs.close();
-    }
-    catch(SyntaxError& exc)
-    {
-      // If the exception does not contain a filename, we'll recycle the exception and include our filename now.
-      if(exc.get_filename().empty())
-      {
-        throw(SyntaxError(exc.message(), filename));
-      }
-      else
-      {
-        throw exc;
-      }
-    }
-  } // MeshStreamer::parse_adjacency_file(String filename)
-
-
-  // parses the adjacency-file-stream ifs
-  void MeshStreamer::parse_adjacency_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
-  {
-    CONTEXT("MeshStreamer::parse_adjacency_file(std::ifstream&)");
-
-    // a string containing the current line
-    String line = "42";
-    line.reserve(256);
-
-    // (auxiliary) variables
-    String adj, face, shape, break_line;
-    Index cur_line = 0;
-
-    // ignore everything until the adjacency file begins
-    while(line != "<feast_adjacency_file>" && !ifs.eof() && ifs.good())
-    {
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
-    }
-
-    // if the beginning of the file was not found or something went wrong
-    if(ifs.eof() || !ifs.good())
-    {
-      throw SyntaxError("Beginning of adjacency file not found");
-    }
-
-    // loop over all lines until we reach the end of the adjacency file
-    while(!ifs.eof() && ifs.good())
-    {
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
-
-      // trim whitespaces; continue with next line if the current one is empty
-      if(line.trim_me().empty())
-      {
-        continue;
-      }
-
-      // if it is the header chunk
-      if(line == "<header>")
-      {
-        while(!ifs.eof() && ifs.good())
-        {
-          // get a line
-          getline(ifs, line);
-          ++cur_line;
-          line.trim_me();
-
-          if(line.compare(0, 8, "version ") == 0)
-          {
-            // erase "version "
-            line.erase(0, 8);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing version number in line " + stringify(cur_line));
-            }
-            mesh->adjacency_version = line;
-          }
-          else if(line.compare(0, 5, "type ") == 0)
-          {
-            // erase "type "
-            line.erase(0, 5);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing type in line " + stringify(cur_line));
-            }
-            mesh->mesh_type = line;
-          }
-          else if(line.compare(0, 6, "shape ") == 0)
-          {
-            // erase "shape "
-            line.erase(0, 6);
-            line.trim_me();
-            if(line.empty())
-            {
-              throw SyntaxError("Missing shape type in line " + stringify(cur_line));
-            }
-            mesh->shape_type = line;
-          }
-          // if it is the end of the header section
-          else if(line == "</header>")
-          {
-            break;
-          }
-          else
-          {
-            throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-          }
-        } // while
-      } // header sub chunk
-
-      // if it is an info chunk
-      else if(line == "<info>")
-      {
-        _parse_info_section(cur_line, ifs);
-      }
-
-      // if it is the counts sub chunk
-      else if(line.compare(0, 8, "<counts>") == 0)
-      {
-        cur_line = _parse_counts_chunk(cur_line, ifs, mesh);
-      } // counts sub-chunk
-
-      // if it is an adjacency sub chunk
-      else if(line.find('@') != std::string::npos)
-      {
-        cur_line =  _parse_adjacency_chunk(cur_line, ifs, mesh, line);
-      } // adjacencies sub-chunk
-
-      // if it is the end of the file
-      else if(line == "</feast_adjacency_file>")
-      {
-        break;
-      }
-      else
-      {
-        throw SyntaxError("Unknown format in line " + stringify(cur_line));
-      }
-    } // end while
-
-    // if the file did not end properly
-    if(line != "</feast_adjacency_file>")
-    {
-      throw SyntaxError("Unexpected file ending in line " + stringify(cur_line));
-    }
-  } // MeshStreamer::parse_adjacency_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
-
-
-  // parses a counts subchunk
-  Index MeshStreamer::_parse_counts_chunk(Index cur_line, std::istream& ifs, BaseContainer* container)
-  {
-    CONTEXT("MeshStreamer::_parse_counts_section");
-
-    // string the current line is saved in
-    String line;
-
-    // default setting: zero
-    container->vertex_number = 0;
-    container->edge_number = 0;
-    container->quad_number = 0;
-    container->tria_number = 0;
-    container->tetra_number = 0;
-    container->hexa_number = 0;
-
-    while(!ifs.eof() && ifs.good())
-    {
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
-
-      // vertex number
-      if(line.compare(0, 6, "verts ") == 0)
-      {
-        // erase "verts "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing vertex number in line " + stringify(cur_line));
-        }
-        line.parse(container->vertex_number);
-      }
-
-      // edge number
-      else if(line.compare(0, 6, "edges ") == 0)
-      {
-        // erase "edges "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing edge number in line " + stringify(cur_line));
-        }
-        line.parse(container->edge_number);
-      }
-
-      // trias number
-      else if(line.compare(0, 6, "trias ") == 0)
-      {
-        // erase "trias "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing triangle number in line " + stringify(cur_line));
-        }
-        line.parse(container->tria_number);
-      }
-
-      // quad number
-      else if(line.compare(0, 6, "quads ") == 0)
-      {
-        // erase "quads "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing quad number in line " + stringify(cur_line));
-        }
-        line.parse(container->quad_number);
-      }
-
-      // tetra number
-      else if(line.compare(0, 7, "tetras ") == 0)
-      {
-        // erase "tetras "
-        line.erase(0, 7);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing tetra number in line " + stringify(cur_line));
-        }
-        line.parse(container->tetra_number);
-      }
-
-      // hexa number
-      else if(line.compare(0, 6, "hexas ") == 0)
-      {
-        // erase "hexas "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
-        {
-          throw SyntaxError("Missing hexa number in line " + stringify(cur_line));
-        }
-        line.parse(container->hexa_number);
-      }
-      // if it is the end of the counts sub chunk
-      else if(line == "</counts>")
-      {
-        break;
-      }
-      // if it is an empty line
-      else if(line.empty())
-      {
-        continue;
-      }
-      else
-      {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
-      }
-    }
-    // return number of read lines
-    return cur_line;
-  } // MeshStreamer::_parse_counts_chunk
-
-
-  // parses a coords subchunk
-  Index MeshStreamer::_parse_coords_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container)
-  {
-    CONTEXT("MeshStreamer::_parse_coords_section");
-
-    // string the current line is saved in
-    String line;
-
-    while(!ifs.eof() && ifs.good())
-    {
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
-
-      // if it is the end of the coord sub chunk
-      if(line == "</coords>")
-      {
-        break;
-      }
-      else
-      {
-        // auxiliary variables
-        std::vector<String> line_vec;
-        std::vector<double> v;
-        double current_value;
-
-        // separate by " "
-        line.split_by_charset(line_vec);
-
-        // parse the substrings
-        for(Index i(0); i < line_vec.size(); ++i)
-        {
-          line_vec[i].trim_me();
-          if( !(line_vec[i]).empty())
-          {
-            line_vec[i].trim_me();
-            if ( !(line_vec[i]).parse(current_value) )
-            {
-              throw SyntaxError("Wrong coordinate format in line " + stringify(cur_line));
-            }
-            v.push_back(current_value);
-          }
-        }
-
-        // if the number of entries does not match the coord_per_vertex variable
-        if (v.size() != container->coord_per_vertex)
-        {
-          throw SyntaxError("Wrong coordinate format in line " + stringify(cur_line));
-        }
-
-        // add to the coordinate stack
-        (container->coords).push_back(v);
-      }
-    }
-    // current number of lines
-    return cur_line;
-  } //MeshStreamer::_parse_coords_chunk
-
-
-  // parses an adjacency subchunk
-  Index MeshStreamer::_parse_adjacency_chunk(Index cur_line, std::istream& ifs, MeshDataContainer* container, String line)
-  {
-    CONTEXT("MeshStreamer::_parse_adjacency_section");
-
-    // various auxiliary variables
-    Index shape_dim = 0;
-    String shape;
-    String::size_type found;
-    String face;
-
-    // get position of the '@'
-    found = line.find('@');
-
-    // separate face and shape
-    line.trim_me();
-    face = line.substr(0, found);
-    shape = line.substr(found + 1);
-
-    face.pop_front();
-    shape.pop_back();
-
-    face.trim_me();
-    shape.trim_me();
-
-    // if it is a "vert@shape" data
-    if(face == "vert")
-    {
-      // get the shape dimension
-      if(shape == "edge")
-      {
-        shape_dim = 1;
-      }
-      else if(shape == "quad" || shape == "tria")
-      {
-        shape_dim = 2;
-      }
-      else if(shape == "hexa" || shape == "tetra")
-      {
-        shape_dim = 3;
-      }
-      else
-      {
-        throw SyntaxError("Unknown format in line " + stringify(cur_line));
-      }
-
-      // adjacency vector
-      std::vector<std::vector<Index> > a_stack;
-
-      while(!ifs.eof() && ifs.good())
-      {
-        // get a line
-        getline(ifs, line);
-        ++cur_line;
-        line.trim_me();
-
-        // if it is the end of the sub chunk
-        if(line.find('@') != std::string::npos)
-        {
-          container->adjacencies[0][shape_dim] = a_stack;
-          break;
-        }
-        else
-        {
-          // auxiliary variables
-          std::vector<String> line_vec;
-          std::vector<Index> a;
-          Index current_value;
-
-          // separate by " "
-          line.split_by_charset(line_vec);
-
-          // parse the substrings
-          for(Index i(0); i < line_vec.size(); ++i)
-          {
-            line_vec[i].trim_me();
-            if( !(line_vec[i]).empty())
-            {
-              if( !(line_vec[i]).parse(current_value) )
-              {
-                throw SyntaxError("Wrong adjacency format in line " + stringify(cur_line));
-              }
-              a.push_back(current_value);
-            }
-          }
-
-          // add the vector to the adjacency stack
-          a_stack.push_back(a);
-        }
-      }
-    }
-    // if it is something else
-    else
-    {
-      while(!ifs.eof() && ifs.good())
-      {
-        // get a line
-        getline(ifs, line);
-        ++cur_line;
-
-        // if it is the end of the sub chunk
-        if(line.find('@') != std::string::npos)
-        {
-          break;
-        }
-      }
-    }
-    // return number of lines read so far
-    return cur_line;
-  } // MeshStreamer::_parse_adjacency_chunk
-
-
-  // parses a parent-indices chunk
-  Index MeshStreamer::_parse_parents_chunk(Index cur_line, std::istream& ifs, BaseContainer* container, String line)
-  {
-    CONTEXT("MeshStreamer::_parse_parents_chunk");
-
-    std::vector<Index> idx;
-    Index dim = 0;
-
-    // get the dimension of the entity
-    if(line.compare(0, 10, "<vert_idx>") == 0)
-    {
-     dim = 0;
-    }
-    else if (line.compare(0, 10, "<edge_idx>") == 0)
-    {
-      dim = 1;
-    }
-    else if (line.compare(0, 10, "<tria_idx>") == 0 || line.compare(0, 10, "<quad_idx>") == 0)
-    {
-      dim = 2;
-    }
-    else if (line.compare(0, 11, "<tetra_idx>") == 0 || line.compare(0, 10, "<hexa_idx>") == 0)
-    {
-      dim = 3;
-    }
-
-    while(!ifs.eof() && ifs.good())
-    {
-
-      // get a line
-      getline(ifs, line);
-      ++cur_line;
-      line.trim_me();
-
-      Index current_value;
-
-      // if it is the end of the parent index chunk
-      if(line.find("idx") != String::npos)
-      {
-        container->parent_indices[dim] = idx;
-        break;
-      }
-      else
-      {
-        line.parse(current_value);
-        idx.push_back(current_value);
-      }
+      MeshNode* parent = _find_sub_mesh_parent((mesh_node->mesh_data).parent);
+      ASSERT_(parent != nullptr);
+      parent->sub_mesh_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
     }
 
     // return number of lines read so far
     return cur_line;
-  } // MeshStreamer::_parse_parents_chunk
 
-
-  // returns the version
-  Index MeshStreamer::get_version() const
-  {
-    CONTEXT("MeshStreamer::get_version()");
-    return _version;
-  }
+  } // MeshStreamer::parse_mesh_section(Index cur_line, std::istream& ifs)
 
   // returns the chart path
   String MeshStreamer::get_chart_path() const
@@ -1310,25 +364,42 @@ namespace FEAST
     return _chart_path;
   }
 
+
   // returns the number of submeshes
   Index MeshStreamer::get_num_submeshes() const
   {
-    CONTEXT("MeshStreamer::get_number_of_submeshes()");
+    CONTEXT("MeshStreamer::get_num_submeshes()");
     return _num_submeshes;
   }
+
 
   // returns the number of cellsets
   Index MeshStreamer::get_num_cellsets() const
   {
-    CONTEXT("MeshStreamer::get_number_of_cellsets()");
+    CONTEXT("MeshStreamer::get_num_cellsets()");
     return _num_cellsets;
   }
 
+
   // returns the global mesh information
-  String MeshStreamer::get_global_mesh_info() const
+  String MeshStreamer::get_info() const
   {
-    CONTEXT("MeshStreamer::get_global_mesh_info()");
-    return _global_mesh_info;
+    CONTEXT("MeshStreamer::get_info()");
+    return _info;
+  }
+
+  // get new line
+  String MeshStreamer::_new_line( std::istream& ifs, Index& cur_line)
+  {
+    String line;
+    if (ifs.eof() && ifs.good())
+    {
+      throw SyntaxError("Unexpected end of file at line " + stringify(cur_line));
+    }
+    getline(ifs, line);
+    line.trim_me();
+    cur_line++;
+    return line;
   }
 
   // returns a pointer to the MeshDataContainer specified by "name"
@@ -1378,7 +449,7 @@ namespace FEAST
 
     // HEADER section
     ofs << "<header>" << std::endl;
-    ofs << "version " << _version << std::endl;
+    ofs << "version " << "1" << std::endl;
     if ( !_chart_path.empty() )
       ofs << "chart_file " << _chart_path << std::endl;
     ofs << "submeshes " << _num_submeshes << std::endl;
@@ -1386,12 +457,14 @@ namespace FEAST
     // END OF HEADER section
     ofs << "</header>" << std::endl;
 
-
-    // INFO section
-    ofs << "<info>" << std::endl;
-    ofs << _global_mesh_info << std::endl;
-    // END OF INFO section
-    ofs << "</info>" << std::endl;
+    if(!_info.empty())
+    {
+      // INFO section
+      ofs << "<info>" << std::endl;
+      ofs << _info << std::endl;
+      // END OF INFO section
+      ofs << "</info>" << std::endl;
+    }
 
     // drop mesh data
     _root_mesh_node->write(ofs,false);
@@ -1399,6 +472,1260 @@ namespace FEAST
     // END OF FILE section
     ofs << "</feast_mesh_file>";
   }
+
+  // get new line
+  String MeshStreamer::BaseContainer::_new_line( std::istream& ifs, Index& cur_line)
+  {
+    String line;
+    if (ifs.eof() && ifs.good())
+    {
+      throw SyntaxError("Unexpected end of file at line " + stringify(cur_line));
+    }
+    getline(ifs, line);
+    line.trim_me();
+    cur_line++;
+    return line;
+  }
+
+  String MeshStreamer::BaseContainer::_parse_info_section(Index& cur_line, std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::BaseContainer::_parse_info_section");
+
+    // string the current line is saved in
+    String line;
+    String infoline("");
+
+    while(1)
+    {
+      // get a line
+      line = _new_line(ifs,cur_line);
+
+      if(line != "</info>" && !ifs.eof() && ifs.good())
+      {
+        infoline+=line+"\n";
+      }
+      else
+      {
+        break;
+      }
+    }
+    infoline.trim_me();
+    return infoline;
+  } // Index MeshStreamer::BaseContainer::_parse_info_section(Index cur_line, std::istream& ifs)
+
+
+  // parses a counts subchunk
+  Index MeshStreamer::BaseContainer::_parse_counts_chunk(Index cur_line, std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::BaseContainer::_parse_counts_section");
+
+    // string the current line is saved in
+    String line;
+
+    // default setting: zero
+    vertex_count = 0;
+    edge_count = 0;
+    quad_count = 0;
+    tria_count = 0;
+    tetra_count = 0;
+    hexa_count = 0;
+
+    while(!ifs.eof() && ifs.good())
+    {
+      // get a line
+      line = _new_line(ifs,cur_line);
+
+      // vertex number
+      if(line.compare(0, 6, "verts ") == 0)
+      {
+        // erase "verts "
+        line.erase(0, 6);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing vertex number in line " + stringify(cur_line));
+        }
+        line.parse(vertex_count);
+      }
+
+      // edge number
+      else if(line.compare(0, 6, "edges ") == 0)
+      {
+        // erase "edges "
+        line.erase(0, 6);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing edge number in line " + stringify(cur_line));
+        }
+        line.parse(edge_count);
+      }
+
+      // trias number
+      else if(line.compare(0, 6, "trias ") == 0)
+      {
+        // erase "trias "
+        line.erase(0, 6);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing triangle number in line " + stringify(cur_line));
+        }
+        line.parse(tria_count);
+      }
+
+      // quad number
+      else if(line.compare(0, 6, "quads ") == 0)
+      {
+        // erase "quads "
+        line.erase(0, 6);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing quad number in line " + stringify(cur_line));
+        }
+        line.parse(quad_count);
+      }
+
+      // tetra number
+      else if(line.compare(0, 7, "tetras ") == 0)
+      {
+        // erase "tetras "
+        line.erase(0, 7);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing tetra number in line " + stringify(cur_line));
+        }
+        line.parse(tetra_count);
+      }
+
+      // hexa number
+      else if(line.compare(0, 6, "hexas ") == 0)
+      {
+        // erase "hexas "
+        line.erase(0, 6);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing hexa number in line " + stringify(cur_line));
+        }
+        line.parse(hexa_count);
+      }
+      // if it is the end of the counts sub chunk
+      else if(line == "</counts>")
+      {
+        break;
+      }
+
+      else
+      {
+        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+      }
+    }
+    // return number of read lines
+    return cur_line;
+  } // MeshStreamer::BaseContainer::_parse_counts_chunk
+
+
+  // parses a parent-indices chunk
+  Index MeshStreamer::BaseContainer::_parse_parents_chunk(Index cur_line, std::istream& ifs, String line)
+  {
+    CONTEXT("MeshStreamer::BaseContainer::_parse_parents_chunk");
+
+    std::vector<Index> idx;
+    Index dim = 0, shape = 0;
+
+    // get the dimension of the entity
+    if(line.compare(0, 10, "<vert_idx>") == 0)
+    {
+     dim = 0;
+    }
+    else if (line.compare(0, 10, "<edge_idx>") == 0)
+    {
+      dim = 1;
+    }
+    else if (line.compare(0, 10, "<tria_idx>") == 0)
+    {
+      dim = 2;
+      shape = 1;
+    }
+    else if ( line.compare(0, 10, "<quad_idx>") == 0)
+    {
+      dim = 2;
+      shape = 2;
+    }
+    else if (line.compare(0, 11, "<tetra_idx>") == 0)
+    {
+      dim = 3;
+      shape = 1;
+    }
+    else if ( line.compare(0, 10, "<hexa_idx>") == 0)
+    {
+      dim = 3;
+      shape = 2;
+    }
+    else
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    while(!ifs.eof() && ifs.good())
+    {
+
+      // get a line
+      line = _new_line(ifs,cur_line);
+
+      Index current_value;
+
+      // if it is the end of the parent index chunk
+      if(line.find("idx") != String::npos)
+      {
+        switch (dim)
+        {
+          case 0:
+            if (! (line == "</vert_idx>"))
+            {
+              throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+            }
+            break;
+          case 1:
+            if (! (line == "</edge_idx>"))
+            {
+              throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+            }
+            break;
+          case 2:
+            if ( shape == 1)
+            {
+              if (! (line == "</tria_idx>"))
+              {
+                throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+              }
+            }
+            if ( shape == 2)
+            {
+              if (! (line == "</quad_idx>"))
+              {
+                throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+              }
+            }
+            break;
+
+          case 3:
+            if ( shape == 1)
+            {
+              if (! (line == "</tetra_idx>"))
+              {
+                throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+              }
+            }
+            if ( shape == 2)
+            {
+              if (! (line == "</hexa_idx>"))
+              {
+                throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+              }
+            }
+            break;
+        }
+        parent_indices[dim] = idx;
+        break;
+      }
+      else
+      {
+        if(!line.parse(current_value))
+        {
+          throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+        }
+        idx.push_back(current_value);
+      }
+    }
+
+    // return number of lines read so far
+    return cur_line;
+  } // MeshStreamer::BaseContainer::_parse_parents_chunk
+
+
+  // parses the cellset-section stream ifs
+  Index MeshStreamer::CellSetContainer::_parse_cellset_section(Index cur_line, std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::CellSetContainer::_parse_cellset_section");
+
+    // (auxiliary) variables
+    String line;
+
+    // get a line
+    line = _new_line(ifs,cur_line);
+    if(!(line=="<header>"))
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 5, "name ") == 0)
+    {
+      // erase "name "
+      line.erase(0, 5);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing name in line " + stringify(cur_line));
+      }
+      name = line;
+    }
+    else
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    // if it is the parent
+    if(line.compare(0, 7, "parent ") == 0)
+    {
+      // erase "parent "
+      line.erase(0, 7);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing parent in line " + stringify(cur_line));
+      }
+      parent = line;
+    }
+    else
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    // end of the header section
+    if(!(line == "</header>"))
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 6, "<info>") == 0)
+    {
+      info = _parse_info_section(cur_line, ifs);
+
+      line = _new_line(ifs,cur_line);
+    } // info sub-chunk
+
+
+
+    // if it is the counts sub chunk
+    if(line.compare(0, 8, "<counts>") == 0)
+    {
+      cur_line = _parse_counts_chunk(cur_line, ifs);
+    } // counts sub-chunk
+    else
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    while(!ifs.eof() && ifs.good())
+    {
+      line = _new_line(ifs,cur_line);
+      // if it is a parent index chunk
+      if(line.compare(0, 10, "<vert_idx>") == 0 ||
+              line.compare(0, 10, "<edge_idx>") == 0 ||
+              line.compare(0, 10, "<tria_idx>") == 0 ||
+              line.compare(0, 10, "<quad_idx>") == 0 ||
+              line.compare(0, 11, "<tetra_idx>") == 0 ||
+              line.compare(0, 10, "<hexa_idx>") == 0)
+      {
+        cur_line = _parse_parents_chunk(cur_line, ifs, line);
+      } // parent index sub chunk
+
+      // if it is the end of the cellset section
+      else if(line == "</cellset>")
+      {
+        break;
+      }
+      else
+      {
+        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+      }
+    } // while
+
+    if(line != "</cellset>" && !(!ifs.eof() && ifs.good()))
+    {
+      throw SyntaxError("Reached end of file but expected </cellset> at line " + stringify(cur_line));
+    }
+    // return number of lines read so far
+    return cur_line;
+  } // Index MeshStreamer::CellSetContainer::_parse_cellset_section(Index cur_line, std::istream& ifs)
+
+
+  // parses the given mesh-section stream
+  Index MeshStreamer::MeshDataContainer::_parse_mesh_section(Index cur_line, bool submesh, std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::MeshDataContainer::_parse_mesh_section");
+
+    bool coordfile = false, adjfile = false;
+
+    // string the current line is saved in
+    String line;
+
+    // if it is the root mesh
+    String break_line = submesh ? "</submesh>" : "</mesh>";
+
+    coord_per_vertex = 0;
+
+    // get a line
+    line = _new_line(ifs,cur_line);
+    if(!(line == "<header>"))
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(submesh)
+    {
+      if(line.compare(0, 5, "name ") == 0)
+      {
+        // erase "name "
+        line.erase(0, 5);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing name in line " + stringify(cur_line));
+        }
+        name = line;
+      }
+      else
+      {
+        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+      }
+
+      line = _new_line(ifs,cur_line);
+
+      if(line.compare(0, 7, "parent ") == 0)
+      {
+        // erase "parent "
+        line.erase(0, 7);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing parent in line " + stringify(cur_line));
+        }
+        parent = line;
+      }
+      else
+      {
+        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+      }
+
+      line = _new_line(ifs,cur_line);
+
+      if(line.compare(0, 6, "chart ") == 0)
+      {
+        // erase "chart "
+        line.erase(0, 6);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing chart name in line " + stringify(cur_line));
+        }
+        chart = line;
+
+        line = _new_line(ifs,cur_line);
+      }
+    }
+
+    // if it is the type
+    if(line.compare(0, 5, "type ") == 0)
+    {
+      // erase "type "
+      line.erase(0, 5);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing type in line " + stringify(cur_line));
+      }
+      mesh_type = convert_mesh_type(line);
+    }
+    else
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 6, "shape ") == 0)
+    {
+      // erase "shape "
+      line.erase(0, 6);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing shape type in line " + stringify(cur_line));
+      }
+      shape_type = convert_shape_type(line);
+    }
+    else
+    {
+      throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 11, "coord_file ") == 0)
+    {
+      // erase "coord_file "
+      line.erase(0, 11);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing coordinate file path in line " + stringify(cur_line));
+      }
+      // parse the coord file
+      parse_coord_file(line);
+      coordfile = true;
+      line = _new_line(ifs,cur_line);
+    }
+
+    if(!coordfile)
+    {
+      if(line.compare(0, 7, "coords ") == 0 )
+      {
+        // erase "coords "
+        line.erase(0, 7);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
+        }
+        line.parse(coord_per_vertex);
+        line = _new_line(ifs,cur_line);
+      }
+      else
+      {
+        throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
+      }
+    }
+    else
+    {
+      if(line.compare(0, 7, "coords ") == 0 )
+      {
+        // erase "coords "
+        line.erase(0, 7);
+        line.trim_me();
+        if(line.empty())
+        {
+          throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
+        }
+        Index coord_per_vertex_cmp;
+        line.parse(coord_per_vertex_cmp);
+        if(coord_per_vertex_cmp != coord_per_vertex)
+        {
+          throw SyntaxError("Coordinate number missmatch in line " + stringify(cur_line));
+        }
+        line = _new_line(ifs,cur_line);
+      }
+    }
+
+    // if it is the adjacency file path
+    if(line.compare(0, 9, "adj_file ") == 0)
+    {
+      // erase "adj_file "
+      line.erase(0, 9);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing adjacency file path in line " + stringify(cur_line));
+      }
+      parse_adjacency_file(line);
+
+      line = _new_line(ifs,cur_line);
+      adjfile = true;
+    }
+
+    if(line != "</header>")
+    {
+      throw SyntaxError("Unknown file format. Expected </header> in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    // if it is an info sub chunk
+    if(line.compare(0, 6, "<info>") == 0)
+    {
+      info = _parse_info_section(cur_line, ifs);
+
+      line = _new_line(ifs,cur_line);
+    } // info sub-chunk
+
+    // if it is the counts sub chunk
+    if(line.compare(0, 8, "<counts>") == 0)
+    {
+      cur_line = _parse_counts_chunk(cur_line, ifs);
+      line = _new_line(ifs,cur_line);
+    }
+    else if (!adjfile)
+    {
+      throw SyntaxError("Unknown file format. Expected <counts> in line " + stringify(cur_line));
+    }// counts sub-chunk
+
+    // if it is a coords sub chunk
+    if(line.compare(0, 8, "<coords>") == 0)
+    {
+      cur_line = _parse_coords_chunk(cur_line, ifs);
+      line = _new_line(ifs,cur_line);
+    }
+    else if(!coordfile)
+    {
+      throw SyntaxError("Unknown file format. Expected <coords> in line " + stringify(cur_line));
+    }// coords sub-chunk
+
+    while(!ifs.eof() && ifs.good())
+    {
+      // if it is an adjacency sub chunk
+      if(line.find('@') != std::string::npos)
+      {
+        cur_line = _parse_adjacency_chunk(cur_line, ifs, line);
+      }// adjacencies sub-chunk
+
+      // if it is a parent index chunk (of a submesh)
+      else if((line.compare(0, 10, "<vert_idx>") == 0 ||
+          line.compare(0, 10, "<edge_idx>") == 0 ||
+          line.compare(0, 10, "<tria_idx>") == 0 ||
+          line.compare(0, 10, "<quad_idx>") == 0 ||
+          line.compare(0, 11, "<tetra_idx>") == 0 ||
+          line.compare(0, 10, "<hexa_idx>") == 0) && submesh)
+      {
+        cur_line = _parse_parents_chunk(cur_line, ifs, line);
+      } // parent index sub chunk
+
+      // if it is the end of the mesh section
+      else if(line == break_line)
+      {
+        break;
+      }
+      else
+      {
+        throw SyntaxError("Unknown file format. Expected </mesh> or </submesh> in line " + stringify(cur_line));
+      }
+
+      line = _new_line(ifs,cur_line);
+    } // while
+
+    if(line != break_line && !(!ifs.eof() && ifs.good()))
+    {
+      throw SyntaxError("Reached end of file but expected " + break_line + " at line " + stringify(cur_line));
+    }
+
+    // return number of lines read so far
+    return cur_line;
+
+  } // MeshStreamer::MeshDataContainer::parse_mesh_section(Index cur_line, std::istream& ifs)
+
+  // parses the coord file given by filepath
+  void MeshStreamer::MeshDataContainer::parse_coord_file(String filename)
+  {
+    CONTEXT("MeshStreamer::MeshDataContainer::parse_coord_file(String filename)");
+
+    // try to open the file
+    std::ifstream ifs(filename.c_str(), std::ios::in);
+
+    // if something went wrong
+    if(!ifs.is_open())
+    {
+      throw FileNotFound(filename);
+    }
+
+    // parsing
+    try
+    {
+      parse_coord_file(ifs);
+      ifs.close();
+    }
+    catch(SyntaxError& exc)
+    {
+      // If the exception does not contain a filename, we'll recycle the exception and include our filename now.
+      if(exc.get_filename().empty())
+      {
+        throw(SyntaxError(exc.message(), filename));
+      }
+      else
+      {
+        throw exc;
+      }
+    }
+  } // MeshStreamer::MeshDataContainer::parse_coord_file(String filename, MeshStreamer::MeshDataContainer *mesh)
+
+  // parses the coord-file stream given by ifs
+  void MeshStreamer::MeshDataContainer::parse_coord_file(std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::MeshDataContainer::parse_coord_file(std::ifstream&)");
+
+    // a string containing the current line
+    String line = "42";
+    line.reserve(256);
+
+    // auxiliary variables
+    String coord;
+    Index cur_line = 0;
+
+    line = _new_line(ifs,cur_line);
+
+    if(line != "<feast_coord_file>" && !ifs.eof() && ifs.good())
+    {
+      throw SyntaxError("Unknown coordfile format. Expected <feast_coord_file> in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    // if it is the header chunk
+    if(!(line == "<header>"))
+    {
+      throw SyntaxError("Unknown coordfile format. Expected <header> in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 8, "version ") == 0)
+    {
+      // erase "version "
+      line.erase(0, 8);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing version number in coordfile in line " + stringify(cur_line));
+      }
+      if(!(line == "1"))
+      {
+        throw SyntaxError("Wrong coord_version in coordfile. Coord_version should be 1 in line " + stringify(cur_line));
+      }
+    }
+    else
+    {
+      throw SyntaxError("Unknown coordfile format. Expected version in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 6, "verts ") == 0)
+    {
+      // erase "verts "
+      line.erase(0, 6);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing number of vertices in coordfile in line " + stringify(cur_line));
+      }
+      line.parse(vertex_count);
+    }
+    else
+    {
+      throw SyntaxError("Unknown coordfile format. Expected verts in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 7, "coords ") == 0)
+    {
+      // erase "coords "
+      line.erase(0, 7);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing coordinate number in coordfile in line " + stringify(cur_line));
+      }
+      line.parse(coord_per_vertex);
+    }
+    else
+    {
+      throw SyntaxError("Unknown coordfile format. Expected coords in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(!(line == "</header>"))
+    {
+      throw SyntaxError("Unknown coordfile format. Expected </header> in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line == "<info>")
+    {
+      info = _parse_info_section(cur_line, ifs);
+
+      line = _new_line(ifs,cur_line);
+    } // info sub chunk
+
+    if(line.compare(0, 8, "<coords>") == 0)
+    {
+      cur_line = _parse_coords_chunk(cur_line, ifs);
+    }
+    else
+    {
+      throw SyntaxError("Unknown coordfile format. Expected <coords> in line " + stringify(cur_line));
+    }// coords sub-chunk
+
+    line = _new_line(ifs,cur_line);
+
+    if(!(line == "</feast_coord_file>"))
+    {
+      throw SyntaxError("Unknown coordfile format. Expected </feast_coord_file> in line " + stringify(cur_line));
+    }
+  } // MeshStreamer::MeshDataContainer::parse_coord_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
+
+  // parses the adjacency file given by filename
+  void MeshStreamer::MeshDataContainer::parse_adjacency_file(String filename)
+  {
+    CONTEXT("MeshStreamer::MeshDataContainer::parse_adjacency_file(String filename)");
+
+    // try to open the file
+    std::ifstream ifs(filename.c_str(), std::ios::in);
+
+    // if something went wrong
+    if(!ifs.is_open())
+    {
+      throw FileNotFound(filename);
+    }
+
+    // parsing
+    try
+    {
+      parse_adjacency_file(ifs);
+      ifs.close();
+    }
+    catch(SyntaxError& exc)
+    {
+      // If the exception does not contain a filename, we'll recycle the exception and include our filename now.
+      if(exc.get_filename().empty())
+      {
+        throw(SyntaxError(exc.message(), filename));
+      }
+      else
+      {
+        throw exc;
+      }
+    }
+  } // MeshStreamer::MeshDataContainer::parse_adjacency_file(String filename)
+
+
+  // parses the adjacency-file-stream ifs
+  void MeshStreamer::MeshDataContainer::parse_adjacency_file(std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::MeshDataContainer::parse_adjacency_file(std::ifstream&)");
+
+    // a string containing the current line
+    String line = "42";
+    line.reserve(256);
+
+    // (auxiliary) variables
+    String adj, face, shape, break_line;
+    Index cur_line = 0;
+
+    line = _new_line(ifs,cur_line);
+    // ignore everything until the adjacency file begins
+    if(line != "<feast_adjacency_file>" && !ifs.eof() && ifs.good())
+    {
+      throw SyntaxError("Beginning of adjacency file not found");
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(!(line == "<header>"))
+    {
+      throw SyntaxError("Unknown adjacencyfile format. Expected <header> in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 8, "version ") == 0)
+    {
+      // erase "version "
+      line.erase(0, 8);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing version number in adjacencyfile in line " + stringify(cur_line));
+      }
+
+      if(!(line == "1"))
+      {
+        throw SyntaxError("Wrong adjacency_version. adjacency_version should be 1 in adjacencyfile in line " + stringify(cur_line));
+      }
+    }
+    else
+    {
+      throw SyntaxError("Unknown adjacencyfile format. Expected version in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 5, "type ") == 0)
+    {
+      // erase "type "
+      line.erase(0, 5);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing type in adjacencyfile in line " + stringify(cur_line));
+      }
+      mesh_type = convert_mesh_type(line);
+    }
+    else
+    {
+      throw SyntaxError("Unknown adjacencyfile format. Expected type in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(line.compare(0, 6, "shape ") == 0)
+    {
+      // erase "shape "
+      line.erase(0, 6);
+      line.trim_me();
+      if(line.empty())
+      {
+        throw SyntaxError("Missing shape type in adjacencyfile in line " + stringify(cur_line));
+      }
+      shape_type = convert_shape_type(line);
+    }
+    else
+    {
+      throw SyntaxError("Unknown adjancencyfile format. Expected shape in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    if(!(line == "</header>"))
+    {
+      throw SyntaxError("Unknown adjacencyfile format. Expected </header> in line " + stringify(cur_line));
+    }
+
+    line = _new_line(ifs,cur_line);
+
+    // if it is an info chunk
+    if(line == "<info>")
+    {
+      _parse_info_section(cur_line, ifs);
+
+      line = _new_line(ifs,cur_line);
+    }
+
+      // if it is the counts sub chunk
+    if(line == "<counts>")
+    {
+      cur_line = _parse_counts_chunk(cur_line, ifs);
+    }
+    else
+    {
+      throw SyntaxError("Unknown adjacencyfile format. Expected <counts> in line " + stringify(cur_line));
+    }// counts sub-chunk
+
+    while(!ifs.eof() && ifs.good())
+    {
+      line = _new_line(ifs,cur_line);
+
+      // if it is an adjacency sub chunk
+      if(line.find('@') != std::string::npos)
+      {
+        cur_line =  _parse_adjacency_chunk(cur_line, ifs, line);
+      } // adjacencies sub-chunk
+
+      // if it is the end of the file
+      else if(line == "</feast_adjacency_file>")
+      {
+        break;
+      }
+      else
+      {
+        throw SyntaxError("Unknown adjacencyfile format. Expected </feast_adjacency_file> in line " + stringify(cur_line));
+      }
+    }
+
+    if(!(line == "</feast_adjacency_file>"))
+    {
+      throw SyntaxError("Unknown adjacencyfile format. Expected </feast_adjacency_file> in line " + stringify(cur_line));
+    }
+
+  } // MeshStreamer::MeshDataContainer::parse_adjacency_file(std::istream& ifs, MeshStreamer::MeshDataContainer *mesh)
+
+
+  // parses a coords subchunk
+  Index MeshStreamer::MeshDataContainer::_parse_coords_chunk(Index cur_line, std::istream& ifs)
+  {
+    CONTEXT("MeshStreamer::MeshDataContainer::_parse_coords_section");
+
+    // string the current line is saved in
+    String line;
+
+    while(!ifs.eof() && ifs.good())
+    {
+      // get a line
+      line = _new_line(ifs,cur_line);
+
+      // if it is the end of the coord sub chunk
+      if(line == "</coords>")
+      {
+        break;
+      }
+      else
+      {
+        // auxiliary variables
+        std::vector<String> line_vec;
+        std::vector<double> v;
+        double current_value;
+
+        // separate by " "
+        line.split_by_charset(line_vec);
+
+        // parse the substrings
+        for(Index i(0); i < line_vec.size(); ++i)
+        {
+          line_vec[i].trim_me();
+          if( !(line_vec[i]).empty())
+          {
+            line_vec[i].trim_me();
+            if ( !(line_vec[i]).parse(current_value) )
+            {
+              throw SyntaxError("Wrong coordinate format in line " + stringify(cur_line));
+            }
+            v.push_back(current_value);
+          }
+        }
+
+        // if the number of entries does not match the coord_per_vertex variable
+        if (v.size() != coord_per_vertex)
+        {
+          throw SyntaxError("Wrong coordinate format in line " + stringify(cur_line));
+        }
+
+        // add to the coordinate stack
+        (coords).push_back(v);
+      }
+    }
+    // current number of lines
+    return cur_line;
+  } //MeshStreamer::MeshDataContainer::_parse_coords_chunk
+
+
+  // parses an adjacency subchunk
+  Index MeshStreamer::MeshDataContainer::_parse_adjacency_chunk(Index cur_line, std::istream& ifs, String line)
+  {
+    CONTEXT("MeshStreamer::MeshDataContainer::_parse_adjacency_section");
+
+    // various auxiliary variables
+    Index shape_dim = 0;
+    String shape;
+    String::size_type found;
+    String face;
+
+    // get position of the '@'
+    found = line.find('@');
+
+    // separate face and shape
+    line.trim_me();
+    face = line.substr(0, found);
+    shape = line.substr(found + 1);
+
+    face.pop_front();
+    shape.pop_back();
+
+    face.trim_me();
+    shape.trim_me();
+
+    // if it is a "vert@shape" data
+    if(face == "vert")
+    {
+      // get the shape dimension
+      if(shape == "edge")
+      {
+        shape_dim = 1;
+      }
+      else if(shape == "quad" || shape == "tria")
+      {
+        shape_dim = 2;
+      }
+      else if(shape == "hexa" || shape == "tetra")
+      {
+        shape_dim = 3;
+      }
+      else
+      {
+        throw SyntaxError("Unknown format. Invalid shape type in line " + stringify(cur_line));
+      }
+
+      // adjacency vector
+      std::vector<std::vector<Index> > a_stack;
+
+      while(!ifs.eof() && ifs.good())
+      {
+        // get a line
+        line = _new_line(ifs,cur_line);
+
+        // if it is the end of the sub chunk
+        if(line.find('@') != std::string::npos)
+        {
+          adjacencies[0][shape_dim] = a_stack;
+          break;
+        }
+        else
+        {
+          // auxiliary variables
+          std::vector<String> line_vec;
+          std::vector<Index> a;
+          Index current_value;
+
+          // separate by " "
+          line.split_by_charset(line_vec);
+
+          // parse the substrings
+          for(Index i(0); i < line_vec.size(); ++i)
+          {
+            line_vec[i].trim_me();
+            if( !(line_vec[i]).empty())
+            {
+              if( !(line_vec[i]).parse(current_value) )
+              {
+                throw SyntaxError("Wrong adjacency format in line " + stringify(cur_line));
+              }
+              a.push_back(current_value);
+            }
+          }
+
+          // add the vector to the adjacency stack
+          a_stack.push_back(a);
+        }
+      }
+    }
+    // if it is something else
+    else
+    {
+      while(!ifs.eof() && ifs.good())
+      {
+        // get a line
+        line = _new_line(ifs,cur_line);
+
+        // if it is the end of the sub chunk
+        if(line.find('@') != std::string::npos)
+        {
+          break;
+        }
+      }
+    }
+    // return number of lines read so far
+    return cur_line;
+  } // MeshStreamer::MeshDataContainer::_parse_adjacency_chunk
+
+  // converts meshtype (MeshType to String)
+  String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshStreamer::MeshDataContainer::MeshType mesh_type) const
+  {
+    if(mesh_type == mt_conformal)
+    {
+      return "conformal";
+    }
+    else
+    {
+      // todo error anpassen
+      throw InternalError("Unknown meshtype");
+    }
+    return "";
+  }// String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshType mesh_type) const
+
+  // converts meshtype (String to MeshType)
+  MeshStreamer::MeshDataContainer::MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type) const
+  {
+    if(mesh_type == "conformal")
+    {
+      return mt_conformal;
+    }
+    else
+    {
+      throw InternalError("Unknown meshtype");
+    }
+    return mt_unknown;
+  } // MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type) const
+
+ // converts shapetype (ShapeType to String)
+  String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType shape_type) const
+  {
+    if(shape_type == st_edge)
+    {
+      return "edge";
+    }
+    else if(shape_type == st_tria)
+    {
+      return "tria";
+    }
+    else if(shape_type == st_quad)
+    {
+      return "quad";
+    }
+    else if(shape_type == st_hexa)
+    {
+      return "hexa";
+    }
+    else if(shape_type == st_tetra)
+    {
+      return "tetra";
+    }
+    else if(shape_type == st_tria_quad)
+    {
+      return "tria-quad";
+    }
+    else if(shape_type == st_tetra_hexa)
+    {
+      return "tetra-hexa";
+    }
+    else
+    {
+      throw InternalError("Unknown shapetype");
+    }
+    return "";
+  } // String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType  shape_type) const
+
+  // converts shapetype (String to ShapeType)
+  MeshStreamer::MeshDataContainer::ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type) const
+  {
+    if(shape_type == "edge")
+    {
+      return st_edge;
+    }
+    else if(shape_type == "tria")
+    {
+      return st_tria;
+    }
+    else if(shape_type == "quad")
+    {
+      return st_quad;
+    }
+    else if(shape_type == "hexa")
+    {
+      return st_hexa;
+    }
+    else if(shape_type == "tetra")
+    {
+      return st_tetra;
+    }
+    else if(shape_type == "tria-quad")
+    {
+      return st_tria_quad;
+    }
+    else if(shape_type == "tetra-hexa")
+    {
+      return st_tetra_hexa;
+    }
+    else
+    {
+      // todo error anpassen
+      throw InternalError("Unknown shapetype");
+    }
+    return st_unknown;
+  } // ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type) const
+
 
   // writes the stored cell set data into the output stream.
   void MeshStreamer::CellSetNode::write(std::ostream& ofs) const
@@ -1418,71 +1745,71 @@ namespace FEAST
 
     // count section
     ofs << "<counts>" << std::endl;
-    if( cell_set.vertex_number != 0)
-      ofs << "verts " << cell_set.vertex_number << std::endl;
-    if( cell_set.edge_number != 0)
-      ofs << "edges " << cell_set.edge_number << std::endl;
-    if( cell_set.quad_number != 0)
-      ofs << "quads " << cell_set.quad_number << std::endl;
-    if( cell_set.tria_number != 0)
-      ofs << "trias " << cell_set.tria_number << std::endl;
-    if( cell_set.tetra_number != 0)
-      ofs << "tetras " << cell_set.tetra_number << std::endl;
-    if( cell_set.hexa_number != 0)
-      ofs << "hexas " << cell_set.hexa_number << std::endl;
+    if( cell_set.vertex_count != 0)
+      ofs << "verts " << cell_set.vertex_count << std::endl;
+    if( cell_set.edge_count != 0)
+      ofs << "edges " << cell_set.edge_count << std::endl;
+    if( cell_set.quad_count != 0)
+      ofs << "quads " << cell_set.quad_count << std::endl;
+    if( cell_set.tria_count != 0)
+      ofs << "trias " << cell_set.tria_count << std::endl;
+    if( cell_set.tetra_count != 0)
+      ofs << "tetras " << cell_set.tetra_count << std::endl;
+    if( cell_set.hexa_count != 0)
+      ofs << "hexas " << cell_set.hexa_count << std::endl;
     ofs << "</counts>" << std::endl;
 
     // parent indices
     ofs << "<vert_idx>" << std::endl;
-    for (Index i(0); i < cell_set.vertex_number ; ++i)
+    for (Index i(0); i < cell_set.vertex_count ; ++i)
     {
       ofs << (cell_set.parent_indices[0])[i] << std::endl;
     }
     ofs << "</vert_idx>" << std::endl;
 
-    if ( !(cell_set.edge_number == 0) )
+    if ( !(cell_set.edge_count == 0) )
     {
       ofs << "<edge_idx>" << std::endl;
-      for (Index i(0); i < cell_set.edge_number ; ++i)
+      for (Index i(0); i < cell_set.edge_count ; ++i)
       {
         ofs << (cell_set.parent_indices[1])[i] << std::endl;
       }
       ofs << "</edge_idx>" << std::endl;
       }
 
-    if ( !(cell_set.tria_number == 0) )
+    if ( !(cell_set.tria_count == 0) )
     {
       ofs << "<tria_idx>" << std::endl;
-      for (Index i(0); i < cell_set.tria_number ; ++i)
+      for (Index i(0); i < cell_set.tria_count ; ++i)
       {
         ofs << (cell_set.parent_indices[2])[i] << std::endl;
       }
       ofs << "</tria_idx>" << std::endl;
     }
-    if ( !(cell_set.quad_number == 0) )
+    if ( !(cell_set.quad_count == 0) )
     {
       ofs << "<quad_idx>" << std::endl;
-      for (Index i(0); i < cell_set.quad_number ; ++i)
+      for (Index i(0); i < cell_set.quad_count ; ++i)
       {
         ofs << (cell_set.parent_indices[2])[i] << std::endl;
       }
       ofs << "</quad_idx>" << std::endl;
     }
 
-    if ( !(cell_set.tetra_number == 0) )
+    if ( !(cell_set.tetra_count == 0) )
     {
       ofs << "<tetra_idx>" << std::endl;
-      for (Index i(0); i < cell_set.tetra_number ; ++i)
+      for (Index i(0); i < cell_set.tetra_count ; ++i)
       {
         ofs << (cell_set.parent_indices[3])[i] << std::endl;
       }
       ofs << "</tetra_idx>" << std::endl;
     }
 
-    if ( !(cell_set.hexa_number == 0) )
+    if ( !(cell_set.hexa_count == 0) )
     {
       ofs << "<hexa_idx>" << std::endl;
-      for (Index i(0); i < cell_set.hexa_number ; ++i)
+      for (Index i(0); i < cell_set.hexa_count ; ++i)
       {
         ofs << (cell_set.parent_indices[3])[i] << std::endl;
       }
@@ -1491,7 +1818,7 @@ namespace FEAST
     ofs << "</cellset>" << std::endl;
   }//write_cell_set_data
 
-  // Drops the mesh data of this mesh and all submeshes related to this mesh
+  // Writes the mesh data of this mesh and all submeshes related to this mesh
   // into the output stream.
   void MeshStreamer::MeshNode::write(std::ostream& ofs, bool submesh) const
   {
@@ -1510,14 +1837,10 @@ namespace FEAST
       if ( !mesh_data.chart.empty() )
         ofs << "chart " << mesh_data.chart << std::endl;
     }
-    ofs << "type " << mesh_data.mesh_type << std::endl;
-    ofs << "shape " << mesh_data.shape_type << std::endl;
-    if ( !mesh_data.coord_path.empty() )
-      ofs << "coord_file " << mesh_data.coord_path << std::endl;
+    ofs << "type " << mesh_data.convert_mesh_type(mesh_data.mesh_type) << std::endl;
+    ofs << "shape " << mesh_data.convert_shape_type(mesh_data.shape_type) << std::endl;
     if(mesh_data.coord_per_vertex!=0)
       ofs << "coords " << mesh_data.coord_per_vertex << std::endl;
-    if ( !mesh_data.adj_path.empty() )
-      ofs << "coord_file " << mesh_data.adj_path << std::endl;
     ofs << "</header>" << std::endl;
 
     // info section
@@ -1527,23 +1850,23 @@ namespace FEAST
 
     // count section
     ofs << "<counts>" << std::endl;
-    if( mesh_data.vertex_number != 0)
-      ofs << "verts " << mesh_data.vertex_number << std::endl;
-    if( mesh_data.edge_number != 0)
-      ofs << "edges " << mesh_data.edge_number << std::endl;
-    if( mesh_data.quad_number != 0)
-      ofs << "quads " << mesh_data.quad_number << std::endl;
-    if( mesh_data.tria_number != 0)
-      ofs << "trias " << mesh_data.tria_number << std::endl;
-    if( mesh_data.tetra_number != 0)
-      ofs << "tetras " << mesh_data.tetra_number << std::endl;
-    if( mesh_data.hexa_number != 0)
-      ofs << "hexas " << mesh_data.hexa_number << std::endl;
+    if( mesh_data.vertex_count != 0)
+      ofs << "verts " << mesh_data.vertex_count << std::endl;
+    if( mesh_data.edge_count != 0)
+      ofs << "edges " << mesh_data.edge_count << std::endl;
+    if( mesh_data.quad_count != 0)
+      ofs << "quads " << mesh_data.quad_count << std::endl;
+    if( mesh_data.tria_count != 0)
+      ofs << "trias " << mesh_data.tria_count << std::endl;
+    if( mesh_data.tetra_count != 0)
+      ofs << "tetras " << mesh_data.tetra_count << std::endl;
+    if( mesh_data.hexa_count != 0)
+      ofs << "hexas " << mesh_data.hexa_count << std::endl;
     ofs << "</counts>" << std::endl;
 
     // coord section
     ofs << "<coords>" << std::endl;
-    for (Index i(0); i < mesh_data.vertex_number ; ++i)
+    for (Index i(0); i < mesh_data.vertex_count ; ++i)
     {
       for (Index j(0); j < mesh_data.coord_per_vertex ; ++j)
       {
@@ -1625,56 +1948,56 @@ namespace FEAST
     if (submesh)
     {
       ofs << "<vert_idx>" << std::endl;
-      for (Index i(0); i < mesh_data.vertex_number ; ++i)
+      for (Index i(0); i < mesh_data.vertex_count ; ++i)
       {
         ofs << (mesh_data.parent_indices[0])[i] << std::endl;
       }
       ofs << "</vert_idx>" << std::endl;
 
-      if ( !(mesh_data.edge_number == 0) )
+      if ( !(mesh_data.edge_count == 0) )
       {
         ofs << "<edge_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.edge_number ; ++i)
+        for (Index i(0); i < mesh_data.edge_count ; ++i)
         {
           ofs << (mesh_data.parent_indices[1])[i] << std::endl;
         }
         ofs << "</edge_idx>" << std::endl;
       }
 
-      if ( !(mesh_data.tria_number == 0) )
+      if ( !(mesh_data.tria_count == 0) )
       {
         ofs << "<tria_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.tria_number ; ++i)
+        for (Index i(0); i < mesh_data.tria_count ; ++i)
         {
           ofs << (mesh_data.parent_indices[2])[i] << std::endl;
         }
         ofs << "</tria_idx>" << std::endl;
       }
 
-      if ( !(mesh_data.quad_number == 0) )
+      if ( !(mesh_data.quad_count == 0) )
       {
         ofs << "<quad_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.quad_number ; ++i)
+        for (Index i(0); i < mesh_data.quad_count ; ++i)
         {
           ofs << (mesh_data.parent_indices[2])[i] << std::endl;
         }
         ofs << "</quad_idx>" << std::endl;
       }
 
-      if ( !(mesh_data.tetra_number == 0) )
+      if ( !(mesh_data.tetra_count == 0) )
       {
         ofs << "<tetra_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.tetra_number ; ++i)
+        for (Index i(0); i < mesh_data.tetra_count ; ++i)
         {
           ofs << (mesh_data.parent_indices[3])[i] << std::endl;
         }
         ofs << "</tetra_idx>" << std::endl;
       }
 
-      if ( !(mesh_data.hexa_number == 0) )
+      if ( !(mesh_data.hexa_count == 0) )
       {
         ofs << "<hexa_idx>" << std::endl;
-        for (Index i(0); i < mesh_data.hexa_number ; ++i)
+        for (Index i(0); i < mesh_data.hexa_count ; ++i)
         {
           ofs << (mesh_data.parent_indices[3])[i] << std::endl;
         }
@@ -1701,4 +2024,5 @@ namespace FEAST
        it_cell->second->write(ofs);
      }
    }// write_mesh_data
+
 } //namespace FEAST
