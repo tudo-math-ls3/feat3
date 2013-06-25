@@ -7,6 +7,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/vector_base.hpp>
+#include <kernel/lafem/edi.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -465,6 +466,18 @@ namespace FEAST
 
           ASSERT(index < this->_scalar_index.at(0), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->_scalar_index.at(0)) + " !");
           MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
+        }
+
+        /**
+         * \brief Create temporary object for direct data manipulation.
+         * \warning Be aware, that any synchronisation only takes place, when the object is destroyed!
+         *
+         * \param[in] index The index of the vector element.
+         */
+        EDI<Mem_, DT_> edi(Index index)
+        {
+          EDI<Mem_, DT_> t(MemoryPool<Mem_>::get_element(this->_elements.at(0), index), this->_elements.at(0) + index);
+          return t;
         }
 
         /**

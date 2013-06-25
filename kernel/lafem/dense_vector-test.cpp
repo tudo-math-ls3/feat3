@@ -72,6 +72,18 @@ public:
     TEST_CHECK_NOT_EQUAL(h, g);
     TEST_CHECK_NOT_EQUAL((unsigned long)h.elements(), (unsigned long)g.elements());
 
+    {
+      EDI<Tag_, DT_> t(d.edi(2));
+      t = DT_(41);
+      TEST_CHECK_NOT_EQUAL(d(2), DT_(41));
+      d.edi(1) = DT_(4);
+      TEST_CHECK_EQUAL(d(1), DT_(4));
+      d.edi(1) += DT_(4);
+      TEST_CHECK_EQUAL(d(1), DT_(8));
+    }
+    TEST_CHECK_EQUAL(d(1), DT_(8));
+    TEST_CHECK_EQUAL(d(2), DT_(41));
+
     DenseVector<Tag_, DT_> k(123);
     for (Index i(0) ; i < k.size() ; ++i)
       k(i, DT_(i) / DT_(12));
