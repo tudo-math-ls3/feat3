@@ -99,6 +99,14 @@ namespace FEAST
     }
 
     /**
+     * \brief Returns a null-terminated char string containing all white-space characters
+     */
+    static const char* white_spaces()
+    {
+      return " \a\b\f\n\r\t\v";
+    }
+
+    /**
      * \brief Returns a reference to the first character in the string.
      * \returns
      * A reference to the first character in the string.
@@ -164,7 +172,7 @@ namespace FEAST
      * \returns
      * The front-trimmed string.
      */
-    String trim_front(const String& charset = " \a\b\f\n\r\t\v") const
+    String trim_front(const String charset) const
     {
       // find first character not to be trimmed
       size_type pos = find_first_not_of(charset);
@@ -172,6 +180,17 @@ namespace FEAST
         return String();
       else
         return substr(pos);
+    }
+
+    /**
+     * \brief Trims the front of the string of all white-spaces.
+     *
+     * \returns
+     * The front-trimmed string.
+     */
+    String trim_front() const
+    {
+      return trim_front(white_spaces());
     }
 
     /**
@@ -185,7 +204,7 @@ namespace FEAST
      * \returns
      * The back-trimmed string.
      */
-    String trim_back(const String& charset = " \a\b\f\n\r\t\v") const
+    String trim_back(const String charset) const
     {
       // find last character not to be trimmed
       size_type pos = find_last_not_of(charset);
@@ -193,6 +212,17 @@ namespace FEAST
         return String();
       else
         return substr(0, pos + 1);
+    }
+
+    /**
+     * \brief Trims the back of the string of all white-spaces.
+     *
+     * \returns
+     * The back-trimmed string.
+     */
+    String trim_back() const
+    {
+      return trim_back(white_spaces());
     }
 
     /**
@@ -208,10 +238,23 @@ namespace FEAST
      * \returns
      * The trimmed string.
      */
-    String trim(const String& charset = " \a\b\f\n\r\t\v") const
+    String trim(const String charset) const
     {
       // trim front and back
       return trim_front(charset).trim_back(charset);
+    }
+
+    /**
+     * \brief Trims the string of all white-spaces.
+     *
+     * \note If you want to trim \e this string, use trim_me() instead.
+     *
+     * \returns
+     * The trimmed string.
+     */
+    String trim() const
+    {
+      return trim(white_spaces());
     }
 
     /**
@@ -226,9 +269,21 @@ namespace FEAST
      *
      * \returns \p *this
      */
-    String& trim_me(const String& charset = " \a\b\f\n\r\t\v")
+    String& trim_me(const String charset)
     {
       return (*this = trim(charset));
+    }
+
+    /**
+     * \brief Trims this string of all white-spaces.
+     *
+     * \note If you want to have the trimmed string without modifying \e this string, use trim() instead.
+     *
+     * \returns \p *this
+     */
+    String& trim_me()
+    {
+      return (*this = trim());
     }
 
     /**
@@ -262,7 +317,7 @@ namespace FEAST
     template<typename Container_>
     size_t split_by_charset(
       Container_& words,
-      const String& charset = " \a\b\f\n\r\t\v") const
+      const String charset) const
     {
       words.clear();
       if(empty() || charset.empty())
@@ -306,6 +361,15 @@ namespace FEAST
     }
 
     /**
+     * \brief Splits the string by white-spaces.
+     */
+    template<typename Container_>
+    size_t split_by_charset(Container_& words) const
+    {
+      return split_by_charset(words, white_spaces());
+    }
+
+    /**
      * \brief Splits the string by a delimiter substring.
      *
      * This function separates the string into substrings, where the substrings are separated by a delimiter
@@ -334,7 +398,7 @@ namespace FEAST
     template<typename Container_>
     size_t split_by_string(
       Container_& words,
-      const String& delimiter = " ") const
+      const String delimiter) const
     {
       words.clear();
       if(empty() || delimiter.empty())
@@ -393,7 +457,7 @@ namespace FEAST
      * \returns
      * The total number of replacements made.
      */
-    size_type replace_all(const String& find_string, const String& replace_string)
+    size_type replace_all(const String find_string, const String replace_string)
     {
       size_type flen(find_string.size());
       size_type rlen(replace_string.size());
@@ -572,7 +636,7 @@ namespace FEAST
     String& join(
       Iterator_ first,
       Iterator_ last,
-      const String& delimiter = "")
+      const String delimiter = "")
     {
       Iterator_ it(first);
       while(it != last)
@@ -604,7 +668,7 @@ namespace FEAST
     template<typename Container_>
     String& join(
       const Container_& container,
-      const String& delimiter = "")
+      const String delimiter = "")
     {
       return join(container.cbegin(), container.cend(), delimiter);
     }

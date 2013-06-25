@@ -51,7 +51,7 @@ public:
     TEST_CHECK_EQUAL(words[2], "3");
     TEST_CHECK_EQUAL(words[3], "foo");
 
-    // test fork-by-string
+    // test split-by-string
     String("0, 4,,7 , ").split_by_string(words, ",");
     TEST_CHECK_EQUAL(words.size(), 5u);
     TEST_CHECK_EQUAL(words[0], "0");
