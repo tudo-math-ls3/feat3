@@ -83,9 +83,9 @@ public:
     TEST_CHECK_NOT_EQUAL(c, b);
 
     SparseMatrixCOO<Tag_, DT_> f(10, 10);
-    for (unsigned long row(0) ; row < f.rows() ; ++row)
+    for (Index row(0) ; row < f.rows() ; ++row)
     {
-      for (unsigned long col(0) ; col < f.columns() ; ++col)
+      for (Index col(0) ; col < f.columns() ; ++col)
       {
         if(row == col)
           f(row, col, DT_(2));

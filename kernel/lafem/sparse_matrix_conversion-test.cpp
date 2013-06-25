@@ -43,9 +43,9 @@ public:
   {
 
     SparseMatrixCOO<Mem::Main, DT_> a(121, 121);
-    for (unsigned long row(0) ; row < a.rows() ; ++row)
+    for (Index row(0) ; row < a.rows() ; ++row)
     {
-      for (unsigned long col(0) ; col < a.columns() ; ++col)
+      for (Index col(0) ; col < a.columns() ; ++col)
       {
         if(row == col)
           a(row, col, DT_(2));
@@ -120,9 +120,9 @@ public:
   {
 
     SparseMatrixCOO<Mem::Main, DT_> a(121, 121);
-    for (unsigned long row(0) ; row < a.rows() ; ++row)
+    for (Index row(0) ; row < a.rows() ; ++row)
     {
-      for (unsigned long col(0) ; col < a.columns() ; ++col)
+      for (Index col(0) ; col < a.columns() ; ++col)
       {
         if(row == col)
           a(row, col, DT_(2));

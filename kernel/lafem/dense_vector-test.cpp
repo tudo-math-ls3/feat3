@@ -70,7 +70,7 @@ public:
     TEST_CHECK_EQUAL(h, g);
     h(1, DT_(5));
     TEST_CHECK_NOT_EQUAL(h, g);
-    TEST_CHECK_NOT_EQUAL((unsigned long)h.elements(), (unsigned long)g.elements());
+    TEST_CHECK_NOT_EQUAL((std::size_t)h.elements(), (std::size_t)g.elements());
 
     {
       EDI<Tag_, DT_> t(d.edi(2));

@@ -82,12 +82,12 @@ public:
     e = c.clone();
     TEST_CHECK_EQUAL(e, c);
 
-    TEST_CHECK_NOT_EQUAL((unsigned long)e.val(), (unsigned long)c.val());
+    TEST_CHECK_NOT_EQUAL((std::size_t)e.val(), (std::size_t)c.val());
 
     SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 10);
-    for (unsigned long row(0) ; row < fcoo.rows() ; ++row)
+    for (Index row(0) ; row < fcoo.rows() ; ++row)
     {
-      for (unsigned long col(0) ; col < fcoo.columns() ; ++col)
+      for (Index col(0) ; col < fcoo.columns() ; ++col)
       {
         if(row == col)
           fcoo(row, col, DT_(2));

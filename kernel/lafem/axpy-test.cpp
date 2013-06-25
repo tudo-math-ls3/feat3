@@ -183,9 +183,9 @@ public:
       DenseVector<Arch_, DT_> y(size);
       copy(y, y_local);
 
-      for (unsigned long row(0) ; row < a_local.rows() ; ++row)
+      for (Index row(0) ; row < a_local.rows() ; ++row)
       {
-        for (unsigned long col(0) ; col < a_local.columns() ; ++col)
+        for (Index col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
             a_local(row, col, DT_(2));

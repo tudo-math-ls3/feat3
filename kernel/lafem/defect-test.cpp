@@ -38,9 +38,9 @@ public:
       DenseVector<Mem::Main, DT_> rhs_local(size);
       DenseVector<Mem::Main, DT_> ref(size);
       DenseVector<Mem::Main, DT_> result_local(size);
-      for (unsigned long row(0) ; row < a_local.rows() ; ++row)
+      for (Index row(0) ; row < a_local.rows() ; ++row)
       {
-        for (unsigned long col(0) ; col < a_local.columns() ; ++col)
+        for (Index col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
             a_local(row, col, DT_(2));
