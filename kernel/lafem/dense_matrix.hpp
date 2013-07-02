@@ -146,7 +146,7 @@ namespace FEAST
         {
           CONTEXT("When assigning DenseMatrix");
 
-          assign(other);
+         this->assign(other);
 
           return *this;
         }
@@ -163,7 +163,7 @@ namespace FEAST
         {
           CONTEXT("When assigning DenseMatrix");
 
-          assign(other);
+         this->assign(other);
 
           return *this;
         }

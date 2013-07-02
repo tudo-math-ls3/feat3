@@ -553,7 +553,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixCOO");
 
-          assign(other);
+         this->assign(other);
 
           return *this;
         }
@@ -570,7 +570,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixCOO");
 
-          assign(other);
+         this->assign(other);
 
           return *this;
         }
