@@ -501,7 +501,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixCSR");
 
-          assign(other);
+          this->assign(other);
 
           return *this;
         }
@@ -518,7 +518,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixCSR");
 
-          assign(other);
+          this->assign(other);
 
           return *this;
         }
