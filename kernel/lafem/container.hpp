@@ -372,6 +372,16 @@ namespace FEAST
         }
 
         /**
+         * \brief Returns the number of effective stored elements.
+         *
+         * \returns The number of data values.
+         */
+        virtual Index used_elements() const
+        {
+          return this->size();
+        }
+
+        /**
          * \brief Returns a descriptive string.
          *
          * \returns A string describing the container.

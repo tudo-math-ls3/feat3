@@ -923,7 +923,7 @@ namespace FEAST
          *
          * \returns Non zero element count.
          */
-        const Index & used_elements() const
+        Index used_elements() const
         {
           return this->_scalar_index.at(3);
         }
