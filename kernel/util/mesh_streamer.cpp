@@ -161,7 +161,7 @@ namespace FEAST
       // if it is the end
       else if(line == "</feast_mesh_file>")
       {
-        break;
+        return;
       }
       else
       {
@@ -171,10 +171,6 @@ namespace FEAST
 
     // if the file did not end properly
 
-    if(line == "</feast_mesh_file>" && (!ifs.eof() && ifs.good()))
-    {
-      throw SyntaxError("Reached </feast_mesh_file> but file contains additional lines at line " + stringify(cur_line+1));
-    }
     if(line != "</feast_mesh_file>" && !(!ifs.eof() && ifs.good()))
     {
       throw SyntaxError("Reached end of file but expected </feast_mesh_file> at line " + stringify(cur_line));
@@ -190,20 +186,19 @@ namespace FEAST
 
     // string the current line is saved in
     String line;
+    std::vector<String> line_vec;
+
     // get a line
     line = _new_line(ifs,cur_line);
-
+    line.split_by_charset(line_vec);
     // version
-    if(line.compare(0, 8, "version ") == 0)
+    if(line_vec[0] == "version")
     {
-      // erase "version "
-      line.erase(0, 8);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing version number in line " + stringify(cur_line));
       }
-      if(!(line == "1" ) )
+      if(!(line_vec.at(1) == "1") )
       {
         throw SyntaxError("Wrong version. Version should be 1, line " + stringify(cur_line));
       }
@@ -214,32 +209,28 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
     // chart file
-    if(line.compare(0, 11, "chart_file ") == 0)
+    if(line_vec[0] == "chart_file")
     {
-      // erase "chart_file "
-      line.erase(0, 11);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing chart file path in line " + stringify(cur_line));
       }
-      _chart_path = line;
+      _chart_path = line_vec.at(1);
 
       line = _new_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
     }
 
     // submeshes
-    if(line.compare(0, 10, "submeshes ") == 0)
+    if(line_vec[0] == "submeshes")
     {
-      // erase "submeshes "
-      line.erase(0, 10);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing number of submeshes in line " + stringify(cur_line));
       }
-      line.parse(_num_submeshes);
+      (line_vec.at(1)).parse(_num_submeshes);
     }
     else
     {
@@ -247,18 +238,16 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
     // cellsets
-    if(line.compare(0, 9, "cellsets ") == 0)
+    if(line_vec[0] == "cellsets")
     {
-      // erase "cellsets "
-      line.erase(0, 9);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing number of cellsets in line " + stringify(cur_line));
       }
-      line.parse(_num_cellsets);
+      (line_vec.at(1)).parse(_num_cellsets);
     }
     else
     {
@@ -521,6 +510,7 @@ namespace FEAST
 
     // string the current line is saved in
     String line;
+    std::vector<String> line_vec;
 
     // default setting: zero
     vertex_count = 0;
@@ -534,83 +524,66 @@ namespace FEAST
     {
       // get a line
       line = _new_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
 
       // vertex number
-      if(line.compare(0, 6, "verts ") == 0)
+      if(line_vec[0] == "verts")
       {
-        // erase "verts "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing vertex number in line " + stringify(cur_line));
         }
-        line.parse(vertex_count);
+        (line_vec.at(1)).parse(vertex_count);
       }
 
       // edge number
-      else if(line.compare(0, 6, "edges ") == 0)
+      else if(line_vec[0] == "edges")
       {
-        // erase "edges "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing edge number in line " + stringify(cur_line));
         }
-        line.parse(edge_count);
+        (line_vec.at(1)).parse(edge_count);
       }
 
       // trias number
-      else if(line.compare(0, 6, "trias ") == 0)
+      else if(line_vec[0] == "trias")
       {
-        // erase "trias "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing triangle number in line " + stringify(cur_line));
         }
-        line.parse(tria_count);
+        (line_vec.at(1)).parse(tria_count);
       }
 
       // quad number
-      else if(line.compare(0, 6, "quads ") == 0)
+      else if(line_vec[0] == "quads")
       {
-        // erase "quads "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing quad number in line " + stringify(cur_line));
         }
-        line.parse(quad_count);
+        (line_vec.at(1)).parse(quad_count);
       }
 
       // tetra number
-      else if(line.compare(0, 7, "tetras ") == 0)
+      else if(line_vec[0] == "tetras")
       {
-        // erase "tetras "
-        line.erase(0, 7);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing tetra number in line " + stringify(cur_line));
         }
-        line.parse(tetra_count);
+        (line_vec.at(1)).parse(tetra_count);
       }
 
       // hexa number
-      else if(line.compare(0, 6, "hexas ") == 0)
+      else if(line_vec[0] == "hexas")
       {
-        // erase "hexas "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing hexa number in line " + stringify(cur_line));
         }
-        line.parse(hexa_count);
+        (line_vec.at(1)).parse(hexa_count);
       }
       // if it is the end of the counts sub chunk
       else if(line == "</counts>")
@@ -633,34 +606,35 @@ namespace FEAST
   {
     CONTEXT("MeshStreamer::BaseContainer::_parse_parents_chunk");
 
+    line.trim_me();
     std::vector<Index> idx;
     Index dim = 0, shape = 0;
 
     // get the dimension of the entity
-    if(line.compare(0, 10, "<vert_idx>") == 0)
+    if(line == "<vert_idx>")
     {
      dim = 0;
     }
-    else if (line.compare(0, 10, "<edge_idx>") == 0)
+    else if (line == "<edge_idx>")
     {
       dim = 1;
     }
-    else if (line.compare(0, 10, "<tria_idx>") == 0)
+    else if (line == "<tria_idx>")
     {
       dim = 2;
       shape = 1;
     }
-    else if ( line.compare(0, 10, "<quad_idx>") == 0)
+    else if (line == "<quad_idx>")
     {
       dim = 2;
       shape = 2;
     }
-    else if (line.compare(0, 11, "<tetra_idx>") == 0)
+    else if (line == "<tetra_idx>")
     {
       dim = 3;
       shape = 1;
     }
-    else if ( line.compare(0, 10, "<hexa_idx>") == 0)
+    else if (line == "<hexa_idx>")
     {
       dim = 3;
       shape = 2;
@@ -754,6 +728,7 @@ namespace FEAST
 
     // (auxiliary) variables
     String line;
+    std::vector<String> line_vec;
 
     // get a line
     line = _new_line(ifs,cur_line);
@@ -763,17 +738,15 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 5, "name ") == 0)
+    if(line_vec[0] == "name")
     {
-      // erase "name "
-      line.erase(0, 5);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing name in line " + stringify(cur_line));
       }
-      name = line;
+      name = line_vec.at(1);
     }
     else
     {
@@ -781,18 +754,16 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
     // if it is the parent
-    if(line.compare(0, 7, "parent ") == 0)
+    if(line_vec[0] == "parent")
     {
-      // erase "parent "
-      line.erase(0, 7);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing parent in line " + stringify(cur_line));
       }
-      parent = line;
+      parent = line_vec.at(1);
     }
     else
     {
@@ -809,17 +780,15 @@ namespace FEAST
 
     line = _new_line(ifs,cur_line);
 
-    if(line.compare(0, 6, "<info>") == 0)
+    if(line == "<info>")
     {
       info = _parse_info_section(cur_line, ifs);
 
       line = _new_line(ifs,cur_line);
     } // info sub-chunk
 
-
-
     // if it is the counts sub chunk
-    if(line.compare(0, 8, "<counts>") == 0)
+    if(line == "<counts>")
     {
       cur_line = _parse_counts_chunk(cur_line, ifs);
     } // counts sub-chunk
@@ -832,12 +801,12 @@ namespace FEAST
     {
       line = _new_line(ifs,cur_line);
       // if it is a parent index chunk
-      if(line.compare(0, 10, "<vert_idx>") == 0 ||
-              line.compare(0, 10, "<edge_idx>") == 0 ||
-              line.compare(0, 10, "<tria_idx>") == 0 ||
-              line.compare(0, 10, "<quad_idx>") == 0 ||
-              line.compare(0, 11, "<tetra_idx>") == 0 ||
-              line.compare(0, 10, "<hexa_idx>") == 0)
+      if(line == "<vert_idx>" ||
+         line == "<edge_idx>" ||
+         line == "<tria_idx>" ||
+         line == "<quad_idx>" ||
+         line == "<tetra_idx>" ||
+         line == "<hexa_idx>")
       {
         cur_line = _parse_parents_chunk(cur_line, ifs, line);
       } // parent index sub chunk
@@ -871,6 +840,7 @@ namespace FEAST
 
     // string the current line is saved in
     String line;
+    std::vector<String> line_vec;
 
     // if it is the root mesh
     String break_line = submesh ? "</submesh>" : "</mesh>";
@@ -885,19 +855,17 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
     if(submesh)
     {
-      if(line.compare(0, 5, "name ") == 0)
+      if(line_vec[0] == "name")
       {
-        // erase "name "
-        line.erase(0, 5);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing name in line " + stringify(cur_line));
         }
-        name = line;
+        name = line_vec.at(1);
       }
       else
       {
@@ -905,17 +873,15 @@ namespace FEAST
       }
 
       line = _new_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
 
-      if(line.compare(0, 7, "parent ") == 0)
+      if(line_vec[0] == "parent")
       {
-        // erase "parent "
-        line.erase(0, 7);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing parent in line " + stringify(cur_line));
         }
-        parent = line;
+        parent = line_vec.at(1);
       }
       else
       {
@@ -923,33 +889,29 @@ namespace FEAST
       }
 
       line = _new_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
 
-      if(line.compare(0, 6, "chart ") == 0)
+      if(line_vec[0] == "chart")
       {
-        // erase "chart "
-        line.erase(0, 6);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing chart name in line " + stringify(cur_line));
         }
-        chart = line;
+        chart = line_vec.at(1);
 
         line = _new_line(ifs,cur_line);
+        line.split_by_charset(line_vec);
       }
     }
 
     // if it is the type
-    if(line.compare(0, 5, "type ") == 0)
+    if(line_vec[0] == "type")
     {
-      // erase "type "
-      line.erase(0, 5);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing type in line " + stringify(cur_line));
       }
-      mesh_type = convert_mesh_type(line);
+      mesh_type = convert_mesh_type(line_vec.at(1));
     }
     else
     {
@@ -957,17 +919,15 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 6, "shape ") == 0)
+    if(line_vec[0] == "shape")
     {
-      // erase "shape "
-      line.erase(0, 6);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing shape type in line " + stringify(cur_line));
       }
-      shape_type = convert_shape_type(line);
+      shape_type = convert_shape_type(line_vec.at(1));
     }
     else
     {
@@ -975,35 +935,32 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 11, "coord_file ") == 0)
+    if(line_vec[0] == "coord_file")
     {
-      // erase "coord_file "
-      line.erase(0, 11);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing coordinate file path in line " + stringify(cur_line));
       }
       // parse the coord file
-      parse_coord_file(line);
+      parse_coord_file(line_vec.at(1));
       coordfile = true;
       line = _new_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
     }
 
     if(!coordfile)
     {
-      if(line.compare(0, 7, "coords ") == 0 )
+      if(line_vec[0] == "coords")
       {
-        // erase "coords "
-        line.erase(0, 7);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
         }
-        line.parse(coord_per_vertex);
+        (line_vec.at(1)).parse(coord_per_vertex);
         line = _new_line(ifs,cur_line);
+        line.split_by_charset(line_vec);
       }
       else
       {
@@ -1012,42 +969,38 @@ namespace FEAST
     }
     else
     {
-      if(line.compare(0, 7, "coords ") == 0 )
+      if(line_vec[0] == "coords")
       {
-        // erase "coords "
-        line.erase(0, 7);
-        line.trim_me();
-        if(line.empty())
+        if(!(line_vec.size() == 2))
         {
           throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
         }
         Index coord_per_vertex_cmp;
-        line.parse(coord_per_vertex_cmp);
+        (line_vec.at(1)).parse(coord_per_vertex_cmp);
         if(coord_per_vertex_cmp != coord_per_vertex)
         {
           throw SyntaxError("Coordinate number missmatch in line " + stringify(cur_line));
         }
         line = _new_line(ifs,cur_line);
+        line.split_by_charset(line_vec);
       }
     }
 
     // if it is the adjacency file path
-    if(line.compare(0, 9, "adj_file ") == 0)
+    if(line_vec[0] == "adj_file")
     {
-      // erase "adj_file "
-      line.erase(0, 9);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing adjacency file path in line " + stringify(cur_line));
       }
-      parse_adjacency_file(line);
+      parse_adjacency_file(line_vec.at(1));
 
       line = _new_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
       adjfile = true;
     }
 
-    if(line != "</header>")
+    if(line_vec[0] != "</header>")
     {
       throw SyntaxError("Unknown file format. Expected </header> in line " + stringify(cur_line));
     }
@@ -1055,15 +1008,14 @@ namespace FEAST
     line = _new_line(ifs,cur_line);
 
     // if it is an info sub chunk
-    if(line.compare(0, 6, "<info>") == 0)
+    if(line == "<info>")
     {
       info = _parse_info_section(cur_line, ifs);
-
       line = _new_line(ifs,cur_line);
     } // info sub-chunk
 
     // if it is the counts sub chunk
-    if(line.compare(0, 8, "<counts>") == 0)
+    if(line == "<counts>")
     {
       cur_line = _parse_counts_chunk(cur_line, ifs);
       line = _new_line(ifs,cur_line);
@@ -1074,7 +1026,7 @@ namespace FEAST
     }// counts sub-chunk
 
     // if it is a coords sub chunk
-    if(line.compare(0, 8, "<coords>") == 0)
+    if(line == "<coords>")
     {
       cur_line = _parse_coords_chunk(cur_line, ifs);
       line = _new_line(ifs,cur_line);
@@ -1093,12 +1045,12 @@ namespace FEAST
       }// adjacencies sub-chunk
 
       // if it is a parent index chunk (of a submesh)
-      else if((line.compare(0, 10, "<vert_idx>") == 0 ||
-          line.compare(0, 10, "<edge_idx>") == 0 ||
-          line.compare(0, 10, "<tria_idx>") == 0 ||
-          line.compare(0, 10, "<quad_idx>") == 0 ||
-          line.compare(0, 11, "<tetra_idx>") == 0 ||
-          line.compare(0, 10, "<hexa_idx>") == 0) && submesh)
+      else if((line == "<vert_idx>"||
+               line == "<edge_idx>"||
+               line == "<tria_idx>"||
+               line == "<quad_idx>"||
+               line == "<tetra_idx>"||
+               line == "<hexa_idx>") && submesh)
       {
         cur_line = _parse_parents_chunk(cur_line, ifs, line);
       } // parent index sub chunk
@@ -1167,6 +1119,7 @@ namespace FEAST
 
     // a string containing the current line
     String line = "42";
+    std::vector<String> line_vec;
     line.reserve(256);
 
     // auxiliary variables
@@ -1189,17 +1142,15 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 8, "version ") == 0)
+    if(line_vec[0] == "version")
     {
-      // erase "version "
-      line.erase(0, 8);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing version number in coordfile in line " + stringify(cur_line));
       }
-      if(!(line == "1"))
+      if(!(line_vec[1] == "1"))
       {
         throw SyntaxError("Wrong coord_version in coordfile. Coord_version should be 1 in line " + stringify(cur_line));
       }
@@ -1210,17 +1161,15 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 6, "verts ") == 0)
+    if(line_vec[0] == "verts")
     {
-      // erase "verts "
-      line.erase(0, 6);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing number of vertices in coordfile in line " + stringify(cur_line));
       }
-      line.parse(vertex_count);
+      line_vec[1].parse(vertex_count);
     }
     else
     {
@@ -1228,17 +1177,15 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 7, "coords ") == 0)
+    if(line_vec[0] == "coords")
     {
-      // erase "coords "
-      line.erase(0, 7);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing coordinate number in coordfile in line " + stringify(cur_line));
       }
-      line.parse(coord_per_vertex);
+      line_vec[1].parse(coord_per_vertex);
     }
     else
     {
@@ -1257,11 +1204,10 @@ namespace FEAST
     if(line == "<info>")
     {
       info = _parse_info_section(cur_line, ifs);
-
       line = _new_line(ifs,cur_line);
     } // info sub chunk
 
-    if(line.compare(0, 8, "<coords>") == 0)
+    if(line == "<coords>")
     {
       cur_line = _parse_coords_chunk(cur_line, ifs);
     }
@@ -1321,6 +1267,7 @@ namespace FEAST
     // a string containing the current line
     String line = "42";
     line.reserve(256);
+    std::vector<String> line_vec;
 
     // (auxiliary) variables
     String adj, face, shape, break_line;
@@ -1341,18 +1288,16 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 8, "version ") == 0)
+    if(line_vec[0] == "version")
     {
-      // erase "version "
-      line.erase(0, 8);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing version number in adjacencyfile in line " + stringify(cur_line));
       }
 
-      if(!(line == "1"))
+      if(!(line_vec[1] == "1"))
       {
         throw SyntaxError("Wrong adjacency_version. adjacency_version should be 1 in adjacencyfile in line " + stringify(cur_line));
       }
@@ -1363,17 +1308,15 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 5, "type ") == 0)
+    if(line_vec[0] == "type")
     {
-      // erase "type "
-      line.erase(0, 5);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing type in adjacencyfile in line " + stringify(cur_line));
       }
-      mesh_type = convert_mesh_type(line);
+      mesh_type = convert_mesh_type(line_vec[1]);
     }
     else
     {
@@ -1381,17 +1324,15 @@ namespace FEAST
     }
 
     line = _new_line(ifs,cur_line);
+    line.split_by_charset(line_vec);
 
-    if(line.compare(0, 6, "shape ") == 0)
+    if(line_vec[0] == "shape")
     {
-      // erase "shape "
-      line.erase(0, 6);
-      line.trim_me();
-      if(line.empty())
+      if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing shape type in adjacencyfile in line " + stringify(cur_line));
       }
-      shape_type = convert_shape_type(line);
+      shape_type = convert_shape_type(line_vec[1]);
     }
     else
     {
@@ -1438,7 +1379,7 @@ namespace FEAST
       // if it is the end of the file
       else if(line == "</feast_adjacency_file>")
       {
-        break;
+        return;
       }
       else
       {
@@ -1485,16 +1426,11 @@ namespace FEAST
         // parse the substrings
         for(Index i(0); i < line_vec.size(); ++i)
         {
-          line_vec[i].trim_me();
-          if( !(line_vec[i]).empty())
+          if ( !(line_vec[i]).parse(current_value) )
           {
-            line_vec[i].trim_me();
-            if ( !(line_vec[i]).parse(current_value) )
-            {
-              throw SyntaxError("Wrong coordinate format in line " + stringify(cur_line));
-            }
-            v.push_back(current_value);
+            throw SyntaxError("Wrong coordinate format in line " + stringify(cur_line));
           }
+          v.push_back(current_value);
         }
 
         // if the number of entries does not match the coord_per_vertex variable
@@ -1621,7 +1557,7 @@ namespace FEAST
   } // MeshStreamer::MeshDataContainer::_parse_adjacency_chunk
 
   // converts meshtype (MeshType to String)
-  String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshStreamer::MeshDataContainer::MeshType mesh_type) const
+  String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshStreamer::MeshDataContainer::MeshType mesh_type)
   {
     if(mesh_type == mt_conformal)
     {
@@ -1632,11 +1568,10 @@ namespace FEAST
       // todo error anpassen
       throw InternalError("Unknown meshtype");
     }
-    return "";
   }// String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshType mesh_type) const
 
   // converts meshtype (String to MeshType)
-  MeshStreamer::MeshDataContainer::MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type) const
+  MeshStreamer::MeshDataContainer::MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type)
   {
     if(mesh_type == "conformal")
     {
@@ -1646,11 +1581,10 @@ namespace FEAST
     {
       throw InternalError("Unknown meshtype");
     }
-    return mt_unknown;
   } // MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type) const
 
- // converts shapetype (ShapeType to String)
-  String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType shape_type) const
+  // converts shapetype (ShapeType to String)
+  String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType shape_type)
   {
     if(shape_type == st_edge)
     {
@@ -1684,11 +1618,10 @@ namespace FEAST
     {
       throw InternalError("Unknown shapetype");
     }
-    return "";
   } // String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType  shape_type) const
 
   // converts shapetype (String to ShapeType)
-  MeshStreamer::MeshDataContainer::ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type) const
+  MeshStreamer::MeshDataContainer::ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type)
   {
     if(shape_type == "edge")
     {
@@ -1723,7 +1656,6 @@ namespace FEAST
       // todo error anpassen
       throw InternalError("Unknown shapetype");
     }
-    return st_unknown;
   } // ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type) const
 
 
@@ -1739,10 +1671,12 @@ namespace FEAST
     ofs << "</header>" << std::endl;
 
     // info section
-    ofs << "<info>" << std::endl;
-    ofs << cell_set.info << std::endl;
-    ofs << "</info>" << std::endl;
-
+    if( !cell_set.info.empty() )
+    {
+      ofs << "<info>" << std::endl;
+      ofs << cell_set.info << std::endl;
+      ofs << "</info>" << std::endl;
+    }
     // count section
     ofs << "<counts>" << std::endl;
     if( cell_set.vertex_count != 0)
@@ -1844,9 +1778,12 @@ namespace FEAST
     ofs << "</header>" << std::endl;
 
     // info section
-    ofs << "<info>" << std::endl;
-    ofs << mesh_data.info << std::endl;
-    ofs << "</info>" << std::endl;
+    if( !mesh_data.info.empty() )
+    {
+      ofs << "<info>" << std::endl;
+      ofs << mesh_data.info << std::endl;
+      ofs << "</info>" << std::endl;
+    }
 
     // count section
     ofs << "<counts>" << std::endl;

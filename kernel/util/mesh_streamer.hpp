@@ -114,7 +114,7 @@ namespace FEAST
        * \returns
        * The last line that was read
        */
-      String _new_line(std::istream& ifs, Index& cur_line);
+      static String _new_line(std::istream& ifs, Index& cur_line);
 
     };
 
@@ -204,7 +204,7 @@ namespace FEAST
       * \returns
       * The mesh_type as a String
       */
-      String convert_mesh_type(const MeshType mesh_type) const;
+      static String convert_mesh_type(const MeshType mesh_type);
 
        /**
       * \brief Converts a String to a MeshType.
@@ -215,7 +215,7 @@ namespace FEAST
       * \returns
       * The mesh_type as a MeshType
       */
-      MeshType convert_mesh_type(const String mesh_type) const;
+      static MeshType convert_mesh_type(const String mesh_type);
 
       /**
       * \brief Converts a ShapeType to a String.
@@ -226,7 +226,7 @@ namespace FEAST
       * \returns
       * The shape_type as a String
       */
-      String convert_shape_type(const ShapeType shape_type) const;
+      static String convert_shape_type(const ShapeType shape_type);
 
        /**
       * \brief Converts a String to a ShapeType
@@ -237,7 +237,7 @@ namespace FEAST
       * \returns
       * The shape_type as a ShapeType
       */
-      ShapeType convert_shape_type(const String shape_type) const;
+      static ShapeType convert_shape_type(const String shape_type);
 
 
       /**
@@ -694,7 +694,7 @@ namespace FEAST
      * \returns
      * The last line that was read
      */
-    String _new_line(std::istream& ifs, Index& cur_line);
+    static String _new_line(std::istream& ifs, Index& cur_line);
 
   }; // class MeshStreamer
 } // namespace FEAST

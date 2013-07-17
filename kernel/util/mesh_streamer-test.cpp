@@ -42,9 +42,12 @@ public:
     ioss << " <header>" << endl;
     ioss << "  type conformal" << endl;
     ioss << "  shape quad" << endl;
+    ioss << "  coords 2" << endl;
+
+
     //ioss << "  coord_file /home/doncamillo/swahlers/Desktop/MeshReader_Beispieldateien/coorddatei.txt" << endl;
     //ioss << "  adj_file /home/doncamillo/swahlers/Desktop/MeshReader_Beispieldateien/adjacencydatei.txt" << endl;
-    ioss << "  coords 2" << endl;
+
     ioss << " </header>" << endl;
     ioss << " <info>" << endl;
     ioss << "test" << endl;
