@@ -520,80 +520,115 @@ namespace FEAST
     tetra_count = 0;
     hexa_count = 0;
 
-    while(!ifs.eof() && ifs.good())
+    if(!(slices.size() == 0))
     {
-      // get a line
+      Index temp_holder;
       line = _new_line(ifs,cur_line);
       line.split_by_charset(line_vec);
 
-      // vertex number
-      if(line_vec[0] == "verts")
+      if(!(line_vec.at(0) == "slices"))
       {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing vertex number in line " + stringify(cur_line));
-        }
-        (line_vec.at(1)).parse(vertex_count);
+        throw SyntaxError("Unknown file format. Expected slices in line " + stringify(cur_line));
+      }
+      (line_vec.at(1)).parse(temp_holder);
+      slices.at(0) = temp_holder;
+      vertex_count = temp_holder+1;
+      for(Index Iter(2);Iter < line_vec.size();++Iter)
+      {
+        (line_vec.at(Iter)).parse(temp_holder);
+        slices.push_back(temp_holder);
+        vertex_count = vertex_count*(temp_holder + 1);
+      }
+      if(!(slices.size() == coord_per_vertex))
+      {
+        throw SyntaxError("Number of slices missmatches the dimension of the mesh in line " + stringify(cur_line));
       }
 
-      // edge number
-      else if(line_vec[0] == "edges")
-      {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing edge number in line " + stringify(cur_line));
-        }
-        (line_vec.at(1)).parse(edge_count);
-      }
+      line = _new_line(ifs,cur_line);
+      line.split_by_charset(line_vec);
 
-      // trias number
-      else if(line_vec[0] == "trias")
+      if(!(line == "</counts>"))
       {
-        if(!(line_vec.size() == 2))
-        {
-          throw SyntaxError("Missing triangle number in line " + stringify(cur_line));
-        }
-        (line_vec.at(1)).parse(tria_count);
+        throw SyntaxError("Unknown file format. Expected </counts> in line " + stringify(cur_line));
       }
+    }
+    else
+    {
+      while(!ifs.eof() && ifs.good())
+      {
+        // get a line
+        line = _new_line(ifs,cur_line);
+        line.split_by_charset(line_vec);
 
-      // quad number
-      else if(line_vec[0] == "quads")
-      {
-        if(!(line_vec.size() == 2))
+        // vertex number
+        if(line_vec[0] == "verts")
         {
-          throw SyntaxError("Missing quad number in line " + stringify(cur_line));
+          if(!(line_vec.size() == 2))
+          {
+            throw SyntaxError("Missing vertex number in line " + stringify(cur_line));
+          }
+          (line_vec.at(1)).parse(vertex_count);
         }
-        (line_vec.at(1)).parse(quad_count);
-      }
 
-      // tetra number
-      else if(line_vec[0] == "tetras")
-      {
-        if(!(line_vec.size() == 2))
+        // edge number
+        else if(line_vec[0] == "edges")
         {
-          throw SyntaxError("Missing tetra number in line " + stringify(cur_line));
+          if(!(line_vec.size() == 2))
+          {
+            throw SyntaxError("Missing edge number in line " + stringify(cur_line));
+          }
+          (line_vec.at(1)).parse(edge_count);
         }
-        (line_vec.at(1)).parse(tetra_count);
-      }
 
-      // hexa number
-      else if(line_vec[0] == "hexas")
-      {
-        if(!(line_vec.size() == 2))
+        // trias number
+        else if(line_vec[0] == "trias")
         {
-          throw SyntaxError("Missing hexa number in line " + stringify(cur_line));
+          if(!(line_vec.size() == 2))
+          {
+            throw SyntaxError("Missing triangle number in line " + stringify(cur_line));
+          }
+          (line_vec.at(1)).parse(tria_count);
         }
-        (line_vec.at(1)).parse(hexa_count);
-      }
-      // if it is the end of the counts sub chunk
-      else if(line == "</counts>")
-      {
-        break;
-      }
 
-      else
-      {
-        throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+        // quad number
+        else if(line_vec[0] == "quads")
+        {
+          if(!(line_vec.size() == 2))
+          {
+            throw SyntaxError("Missing quad number in line " + stringify(cur_line));
+          }
+          (line_vec.at(1)).parse(quad_count);
+        }
+
+        // tetra number
+        else if(line_vec[0] == "tetras")
+        {
+          if(!(line_vec.size() == 2))
+          {
+            throw SyntaxError("Missing tetra number in line " + stringify(cur_line));
+          }
+          (line_vec.at(1)).parse(tetra_count);
+        }
+
+        // hexa number
+        else if(line_vec[0] == "hexas")
+        {
+          if(!(line_vec.size() == 2))
+          {
+            throw SyntaxError("Missing hexa number in line " + stringify(cur_line));
+          }
+          (line_vec.at(1)).parse(hexa_count);
+        }
+        // if it is the end of the counts sub chunk
+        else if(line == "</counts>")
+        {
+          break;
+        }
+
+        else
+        {
+          throw SyntaxError("Unknown file format in line " + stringify(cur_line));
+        }
       }
     }
     // return number of read lines
@@ -912,6 +947,10 @@ namespace FEAST
         throw SyntaxError("Missing type in line " + stringify(cur_line));
       }
       mesh_type = convert_mesh_type(line_vec.at(1));
+      if(mesh_type == mt_structured)
+      {
+        slices.push_back(0);
+      }
     }
     else
     {
@@ -928,6 +967,12 @@ namespace FEAST
         throw SyntaxError("Missing shape type in line " + stringify(cur_line));
       }
       shape_type = convert_shape_type(line_vec.at(1));
+      if(mesh_type == mt_structured &&
+         (shape_type == st_tria || shape_type == st_tetra ||
+          shape_type == st_tria_quad || shape_type == st_tetra_hexa))
+      {
+        throw SyntaxError("Unsupported shape_type for structured mesh, in line " + stringify(cur_line));
+      }
     }
     else
     {
@@ -989,6 +1034,10 @@ namespace FEAST
     // if it is the adjacency file path
     if(line_vec[0] == "adj_file")
     {
+      if(mesh_type == mt_structured)
+      {
+        throw SyntaxError("No adjacency file supported for structured mesh in line " + stringify(cur_line));
+      }
       if(!(line_vec.size() == 2))
       {
         throw SyntaxError("Missing adjacency file path in line " + stringify(cur_line));
@@ -1041,6 +1090,10 @@ namespace FEAST
       // if it is an adjacency sub chunk
       if(line.find('@') != std::string::npos)
       {
+        if(mesh_type == mt_structured)
+        {
+          throw SyntaxError("No adjacency chunk allowed for structured meshes in line " + stringify(cur_line));
+        }
         cur_line = _parse_adjacency_chunk(cur_line, ifs, line);
       }// adjacencies sub-chunk
 
@@ -1563,6 +1616,10 @@ namespace FEAST
     {
       return "conformal";
     }
+    else if (mesh_type == mt_structured)
+    {
+      return "structured";
+    }
     else
     {
       // todo error anpassen
@@ -1576,6 +1633,10 @@ namespace FEAST
     if(mesh_type == "conformal")
     {
       return mt_conformal;
+    }
+    else if(mesh_type == "structured")
+    {
+      return mt_structured;
     }
     else
     {
@@ -1679,6 +1740,8 @@ namespace FEAST
     }
     // count section
     ofs << "<counts>" << std::endl;
+    if(cell_set.slices.size() == 0)
+    {
     if( cell_set.vertex_count != 0)
       ofs << "verts " << cell_set.vertex_count << std::endl;
     if( cell_set.edge_count != 0)
@@ -1691,6 +1754,16 @@ namespace FEAST
       ofs << "tetras " << cell_set.tetra_count << std::endl;
     if( cell_set.hexa_count != 0)
       ofs << "hexas " << cell_set.hexa_count << std::endl;
+    }
+    else
+    {
+      ofs << "slices ";
+      for (Index i(0); i < cell_set.slices.size() ; ++i)
+      {
+        ofs << cell_set.slices.at(i) <<" ";
+      }
+      ofs << std::endl;
+    }
     ofs << "</counts>" << std::endl;
 
     // parent indices
@@ -1787,6 +1860,8 @@ namespace FEAST
 
     // count section
     ofs << "<counts>" << std::endl;
+    if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
+    {
     if( mesh_data.vertex_count != 0)
       ofs << "verts " << mesh_data.vertex_count << std::endl;
     if( mesh_data.edge_count != 0)
@@ -1799,6 +1874,16 @@ namespace FEAST
       ofs << "tetras " << mesh_data.tetra_count << std::endl;
     if( mesh_data.hexa_count != 0)
       ofs << "hexas " << mesh_data.hexa_count << std::endl;
+    }
+    else if( mesh_data.mesh_type == MeshDataContainer::mt_structured)
+    {
+      ofs << "slices ";
+      for (Index i(0); i < mesh_data.slices.size() ; ++i)
+      {
+        ofs << mesh_data.slices.at(i) <<" ";
+      }
+      ofs << std::endl;
+    }
     ofs << "</counts>" << std::endl;
 
     // coord section
@@ -1814,70 +1899,73 @@ namespace FEAST
     ofs << "</coords>" << std::endl;
 
     // adjacency section
-    ofs << "<vert@edge>" << std::endl;
-    for (Index i(0); i < (mesh_data.adjacencies[0][1]).size() ; ++i)
+    if(mesh_data.mesh_type == MeshDataContainer::mt_conformal)
     {
-      ofs << ((mesh_data.adjacencies[0][1])[i])[0] << " ";
-      ofs << ((mesh_data.adjacencies[0][1])[i])[1] << std::endl;
-    }
-    ofs << "</vert@edge>" << std::endl;
+      ofs << "<vert@edge>" << std::endl;
+      for (Index i(0); i < (mesh_data.adjacencies[0][1]).size() ; ++i)
+      {
+        ofs << ((mesh_data.adjacencies[0][1])[i])[0] << " ";
+        ofs << ((mesh_data.adjacencies[0][1])[i])[1] << std::endl;
+      }
+      ofs << "</vert@edge>" << std::endl;
 
-    if (!( (mesh_data.adjacencies[0][2]).size() == 0 ))
-    {
-      if ( ((mesh_data.adjacencies[0][2])[0]).size() == 3 )
+      if (!( (mesh_data.adjacencies[0][2]).size() == 0 ))
       {
-        ofs << "<vert@tria>" << std::endl;
-        for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+        if ( ((mesh_data.adjacencies[0][2])[0]).size() == 3 )
         {
-          ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
-          ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
-          ofs << ((mesh_data.adjacencies[0][2])[i])[2] << std::endl;
+          ofs << "<vert@tria>" << std::endl;
+          for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+          {
+            ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
+            ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
+            ofs << ((mesh_data.adjacencies[0][2])[i])[2] << std::endl;
+          }
+          ofs << "</vert@tria>" << std::endl;
         }
-        ofs << "</vert@tria>" << std::endl;
-      }
-      else if ( ((mesh_data.adjacencies[0][2])[0]).size() == 4 )
-      {
-        ofs << "<vert@quad>" << std::endl;
-        for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+        else if ( ((mesh_data.adjacencies[0][2])[0]).size() == 4 )
         {
-          ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
-          ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
-          ofs << ((mesh_data.adjacencies[0][2])[i])[2] << " ";
-          ofs << ((mesh_data.adjacencies[0][2])[i])[3] << std::endl;
+          ofs << "<vert@quad>" << std::endl;
+          for (Index i(0); i < (mesh_data.adjacencies[0][2]).size() ; ++i)
+          {
+            ofs << ((mesh_data.adjacencies[0][2])[i])[0] << " ";
+            ofs << ((mesh_data.adjacencies[0][2])[i])[1] << " ";
+            ofs << ((mesh_data.adjacencies[0][2])[i])[2] << " ";
+            ofs << ((mesh_data.adjacencies[0][2])[i])[3] << std::endl;
+          }
+          ofs << "</vert@quad>" << std::endl;
         }
-        ofs << "</vert@quad>" << std::endl;
       }
-    }
 
-    if (!( (mesh_data.adjacencies[0][3]).size() == 0 ))
-    {
-      if ( ((mesh_data.adjacencies[0][3])[0]).size() == 4 )
+      if (!( (mesh_data.adjacencies[0][3]).size() == 0 ))
       {
-        ofs << "<vert@tetra>" << std::endl;
-        for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+        if ( ((mesh_data.adjacencies[0][3])[0]).size() == 4 )
         {
-          ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[3] << std::endl;
+          ofs << "<vert@tetra>" << std::endl;
+          for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+          {
+            ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[3] << std::endl;
+          }
+          ofs << "</vert@tetra>" << std::endl;
         }
-        ofs << "</vert@tetra>" << std::endl;
-      }
-      else if ( ((mesh_data.adjacencies[0][3])[0]).size() == 8 )
-      {
-        ofs << "<vert@hexa>" << std::endl;
-        for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+        else if ( ((mesh_data.adjacencies[0][3])[0]).size() == 8 )
         {
-          ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[3] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[4] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[5] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[6] << " ";
-          ofs << ((mesh_data.adjacencies[0][3])[i])[7] << std::endl;
+          ofs << "<vert@hexa>" << std::endl;
+          for (Index i(0); i < (mesh_data.adjacencies[0][3]).size() ; ++i)
+          {
+            ofs << ((mesh_data.adjacencies[0][3])[i])[0] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[1] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[2] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[3] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[4] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[5] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[6] << " ";
+            ofs << ((mesh_data.adjacencies[0][3])[i])[7] << std::endl;
+          }
+          ofs << "</vert@hexa>" << std::endl;
         }
-        ofs << "</vert@hexa>" << std::endl;
       }
     }
 

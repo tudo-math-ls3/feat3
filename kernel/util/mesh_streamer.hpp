@@ -40,6 +40,9 @@ namespace FEAST
       Index quad_count;
       Index tetra_count;
       Index hexa_count;
+      std::vector<Index> slices;
+
+      Index coord_per_vertex;
 
       // parent indices ([0] -> vertices etc.)
       std::vector<Index> parent_indices [4];
@@ -142,7 +145,9 @@ namespace FEAST
         /// unknown mesh type
         mt_unknown = 0,
         /// conformal mesh type
-        mt_conformal
+        mt_conformal,
+        /// structured mesh type
+        mt_structured
       };
 
       /// shape-type enumerations
@@ -174,7 +179,6 @@ namespace FEAST
       // mesh data
       MeshType mesh_type;
       ShapeType shape_type;
-      Index coord_per_vertex;
 
       // coordinates
       CoordStack coords;
