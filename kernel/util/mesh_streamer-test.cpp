@@ -135,15 +135,44 @@ public:
     ioss << "2" << endl;
     ioss << " </edge_idx>" << endl;
     ioss << "</submesh>" << endl;
-
     ioss << "</feast_mesh_file>";
-
 
     // two mesh reader objects for reading and writing the mesh data
     MeshStreamer reader, writer;
 
-    // pares the stream
+    // parse the stream
     writer.parse_mesh_file(ioss);
+
+    // temporary MeshNodes to test the _insert_sub_mesh function
+    MeshStreamer::MeshDataContainer tempMDC1;
+    tempMDC1.name = "tempSubmesh1";
+    tempMDC1.parent = "root";
+    tempMDC1.info = "super info1";
+    MeshStreamer::MeshNode* tempMN1 = new MeshStreamer::MeshNode();
+    tempMN1->mesh_data = tempMDC1;
+
+    MeshStreamer::MeshDataContainer tempMDC2;
+    tempMDC2.name = "tempSubmesh2";
+    tempMDC2.parent = "tempSubmesh1";
+    tempMDC2.info = "super info2";
+    MeshStreamer::MeshNode* tempMN2 = new MeshStreamer::MeshNode();
+    tempMN2->mesh_data = tempMDC2;
+
+    // insert the temporary MeshNodes
+    writer._insert_sub_mesh(tempMN1);
+    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(2));
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1"), tempMN1);
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1")->mesh_data.name, "tempSubmesh1");
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh1")->mesh_data.info, "super info1");
+
+    writer._insert_sub_mesh(tempMN2);
+    TEST_CHECK_EQUAL(writer.get_num_submeshes(), Index(3));
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2"), tempMN2);
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2")->mesh_data.name, "tempSubmesh2");
+    TEST_CHECK_EQUAL((writer.get_root_mesh_node())->find_sub_mesh("tempSubmesh2")->mesh_data.info, "super info2");
+
+    // remove the temporary submeshes
+    writer._delete_sub_mesh("tempSubmesh1");
 
     // drop the data into an auxiliary file
     stringstream ioss2;

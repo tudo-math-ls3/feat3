@@ -499,6 +499,22 @@ namespace FEAST
       }
 
       /**
+       * \brief returns the total number of submeshes of the subtree
+       * which are related to this MeshNode
+       */
+      Index get_num_sub_meshes_below()
+      {
+        Index count(sub_mesh_map.size());
+        // perform depth-first-search
+        SubMeshMap::iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
+        for(; it != jt; ++it)
+        {
+          count += it->second->get_num_sub_meshes_below();
+        }
+        return count;
+      }
+
+      /**
        * \brief Finds a cell-set parent node within this sub-tree.
        *
        * The returned node may be either a CellSetNode or a MeshNode.
@@ -522,6 +538,7 @@ namespace FEAST
     };
 
   private:
+
     // general information
     Index _num_submeshes;
     Index _num_cellsets;
@@ -565,6 +582,30 @@ namespace FEAST
      * \brief Returns the chart path.
      */
     String get_chart_path() const;
+
+    /**
+     * \brief Inserts mesh_node into the tree structure which depends on root
+     *
+     * \param[in] mesh_node
+     * The MeshNode to be inserted.
+     */
+    void _insert_sub_mesh(MeshStreamer::MeshNode* mesh_node);
+
+    /**
+     * \brief deletes mesh_node from the tree structure
+     *
+     * \param[in] mesh_node
+     * The MeshNode to be deleted.
+     */
+    void _delete_sub_mesh(MeshNode* mesh_node);
+
+    /**
+     * \brief deletes mesh_node by name from the tree structure
+     *
+     * \param[in] name
+     * The name of the MeshNode to be deleted.
+     */
+    void _delete_sub_mesh(String name);
 
     /**
      * \brief Returns the number of submeshes.
@@ -620,6 +661,7 @@ namespace FEAST
      * The output stream that is to be written to.
      */
     void write_mesh_file(std::ostream& ofs) const;
+
 
   private:
 

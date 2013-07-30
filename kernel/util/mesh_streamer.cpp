@@ -346,6 +346,71 @@ namespace FEAST
 
   } // MeshStreamer::parse_mesh_section(Index cur_line, std::istream& ifs)
 
+  // inserts submesh into the tree structure
+  void MeshStreamer::_insert_sub_mesh(MeshNode* mesh_node)
+  {
+    CONTEXT("MeshStreamer::_insert_submesh");
+
+    if((mesh_node->mesh_data).parent == "root")
+    {
+      ASSERT_(_root_mesh_node != nullptr);
+      _root_mesh_node->sub_mesh_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
+    }
+    else
+    {
+      MeshNode* parent = _root_mesh_node->find_sub_mesh((mesh_node->mesh_data).parent);
+      ASSERT_(parent != nullptr);
+      parent->sub_mesh_map.insert(std::make_pair((mesh_node->mesh_data).name, mesh_node));
+    }
+    _num_submeshes += mesh_node->get_num_sub_meshes_below() + 1;
+  } // MeshStreamer::_insert_submesh(MeshNode* mesh_node)
+
+  // deletes submesh from the tree structure
+  void MeshStreamer::_delete_sub_mesh(MeshNode* mesh_node)
+  {
+    CONTEXT("MeshStreamer::_delete_sub_mesh");
+    _delete_sub_mesh(mesh_node->mesh_data.name);
+  } // MeshStreamer::_delete_sub_mesh(MeshNode* mesh_node)
+
+  // deletes submesh from the tree structure
+  void MeshStreamer::_delete_sub_mesh(String name)
+  {
+    CONTEXT("MeshStreamer::_delete_sub_mesh");
+    if(name == "root")
+    {
+      ASSERT_(_root_mesh_node != nullptr);
+      _num_submeshes = 0;
+      delete _root_mesh_node;
+    }
+    else
+    {
+      MeshNode* mesh_node = _root_mesh_node->find_sub_mesh(name);
+      ASSERT_(mesh_node != nullptr);
+      _num_submeshes -= (mesh_node->get_num_sub_meshes_below() + 1);
+
+      MeshNode* parent;
+      if((mesh_node->mesh_data).parent == "root")
+      {
+        parent = _root_mesh_node;
+      }
+      else
+      {
+        parent = _root_mesh_node->find_sub_mesh((mesh_node->mesh_data).parent);
+      }
+
+      MeshNode::SubMeshMap::iterator it(parent->sub_mesh_map.begin()), jt(parent->sub_mesh_map.end());
+      for(; it != jt; ++it)
+      {
+        if(it->first.compare_no_case(name) == 0)
+        {
+          parent->sub_mesh_map.erase(it);
+          break;
+        }
+      }
+      delete mesh_node;
+    }
+  } // MeshStreamer::_delete_sub_mesh(String name)
+
   // returns the chart path
   String MeshStreamer::get_chart_path() const
   {
