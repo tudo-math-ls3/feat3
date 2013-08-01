@@ -217,8 +217,8 @@ namespace FEAST
       template<int face_dim_>
       static void _fill_cell_index_set(IndexSetHolderType& index_set_holder)
       {
-        typename IndexSetHolderType::template IndexSet<2, face_dim_>::Type&
-          idx(index_set_holder.template get_index_set<2, face_dim_>());
+        typename IndexSetHolderType::template IndexSet<3, face_dim_>::Type&
+          idx(index_set_holder.template get_index_set<3, face_dim_>());
         for(int j(0); j < idx.num_indices; ++j)
         {
           idx[0][j] = Index(j);
