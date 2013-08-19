@@ -60,6 +60,9 @@ public:
   }
 };
 BiCGStabTest<Mem::Main, Algo::Generic, double> bicgstab_test_double;
+#ifdef FEAST_GMP
+BiCGStabTest<Mem::Main, Algo::Generic, mpf_class> bicgstab_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 BiCGStabTest<Mem::CUDA, Algo::CUDA, double> cuda_bicgstab_test_double;
 #endif

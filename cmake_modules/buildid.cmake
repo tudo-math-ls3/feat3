@@ -193,7 +193,7 @@ else ()
   message (STATUS "MPI wrapper command: ${CMAKE_CXX_COMPILER}")
   message (STATUS "Compiler           : ${FEAST_COMPILER_NAME}")
   message (STATUS "Flags              : ${FEAST_CXX_FLAGS}")
-  message (STATUS "Using Build ID     : ${BUILD_ID}")
+  message (STATUS "Basic Build ID     : ${BUILD_ID}")
   message (STATUS "Source Directory   : ${FEAST_SOURCE_DIR}")
   message (STATUS "##############################################################")
 

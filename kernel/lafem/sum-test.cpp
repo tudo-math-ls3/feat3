@@ -72,6 +72,9 @@ public:
 };
 DVSumTest<Mem::Main, Algo::Generic, float> dv_sum_test_float;
 DVSumTest<Mem::Main, Algo::Generic, double> dv_sum_test_double;
+#ifdef FEAST_GMP
+DVSumTest<Mem::Main, Algo::Generic, mpf_class> dv_sum_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_MKL
 DVSumTest<Mem::Main, Algo::MKL, float> mkl_dv_sum_test_float;
 DVSumTest<Mem::Main, Algo::MKL, double> mkl_dv_sum_test_double;
@@ -132,6 +135,9 @@ public:
 };
 SMCSRSumTest<Mem::Main, Algo::Generic, float> smcsr_sum_test_float;
 SMCSRSumTest<Mem::Main, Algo::Generic, double> smcsr_sum_test_double;
+#ifdef FEAST_GMP
+SMCSRSumTest<Mem::Main, Algo::Generic, mpf_class> smcsr_sum_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 SMCSRSumTest<Mem::CUDA, Algo::CUDA, float> cuda_smcsr_sum_test_float;
 SMCSRSumTest<Mem::CUDA, Algo::CUDA, double> cuda_smcsr_sum_test_double;

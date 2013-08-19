@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/type_traits.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/edi.hpp>
@@ -68,16 +69,16 @@ namespace FEAST
               n_z_s.append(1, line[i]);
             }
 
-            DT_ n_z = (DT_)atof(n_z_s.c_str());
+            DT_ n_z(atof(n_z_s.c_str()));
 
             data.push_back(n_z);
 
           }
 
           this->_scalar_index.at(0) = Index(data.size());
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(Index(data.size() * sizeof(DT_))));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size() * sizeof(DT_))));
           this->_elements_size.push_back(Index(data.size()));
-          MemoryPool<Mem_>::instance()->upload(this->_elements.at(0), &data[0], Index(data.size() * sizeof(DT_)));
+          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size() * sizeof(DT_)));
         }
 
         void _read_from_dv(String filename)
@@ -99,14 +100,14 @@ namespace FEAST
           double * ctemp = new double[size];
           file.read((char *)ctemp, (long)(size * sizeof(double)));
 
-          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(0)) * sizeof(DT_));
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)) * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
           {
             temp[i] = (DT_)ctemp[i];
           }
           delete[] ctemp;
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(0) * sizeof(DT_)));
-          MemoryPool<Mem_>::instance()->upload(this->_elements.at(0), temp, this->_scalar_index.at(0) * sizeof(DT_));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0) * sizeof(DT_)));
+          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), temp, this->_scalar_index.at(0) * sizeof(DT_));
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
         }
 
@@ -139,7 +140,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(size * sizeof(DT_)));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size * sizeof(DT_)));
           this->_elements_size.push_back(size);
         }
 
@@ -156,7 +157,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(size * sizeof(DT_)));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size * sizeof(DT_)));
           this->_elements_size.push_back(size);
 
           MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, size);
@@ -376,12 +377,12 @@ namespace FEAST
          */
         void write_out_exp(std::ostream& file) const
         {
-          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(0)) * sizeof(DT_));
-          MemoryPool<Mem_>::download(temp, this->_elements.at(0), this->_scalar_index.at(0) * sizeof(DT_));
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)) * sizeof(DT_));
+          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->_scalar_index.at(0) * sizeof(DT_));
 
           for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
           {
-            file << std::scientific << (double)temp[i] << std::endl;
+            file << std::scientific << Type::Traits<DT_>::to_double(temp[i]) << std::endl;
           }
 
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
@@ -412,12 +413,12 @@ namespace FEAST
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
           const Index csize(this->_scalar_index.at(0));
-          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(csize * sizeof(DT_));
-          MemoryPool<Mem_>::download(temp, this->_elements.at(0), csize * sizeof(DT_));
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize * sizeof(DT_));
+          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize * sizeof(DT_));
           double * ctemp = new double[csize];
           for (Index i(0) ; i < csize ; ++i)
           {
-            ctemp[i] = temp[i];
+            ctemp[i] = Type::Traits<DT_>::to_double(temp[i]);
           }
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
 

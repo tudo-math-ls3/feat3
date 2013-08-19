@@ -69,6 +69,9 @@ public:
 };
 DVComponentProductTest<Mem::Main, Algo::Generic, float> dv_component_product_test_float;
 DVComponentProductTest<Mem::Main, Algo::Generic, double> dv_component_product_test_double;
+#ifdef FEAST_GMP
+DVComponentProductTest<Mem::Main, Algo::Generic, mpf_class> dv_component_product_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_MKL
 DVComponentProductTest<Mem::Main, Algo::MKL, float> mkl_dv_component_product_test_float;
 DVComponentProductTest<Mem::Main, Algo::MKL, double> mkl_dv_component_product_test_double;

@@ -48,6 +48,9 @@ public:
 };
 DVNorm2Test<Mem::Main, Algo::Generic, float> dv_norm2_test_float;
 DVNorm2Test<Mem::Main, Algo::Generic, double> dv_norm2_test_double;
+#ifdef FEAST_GMP
+DVNorm2Test<Mem::Main, Algo::Generic, mpf_class> dv_norm2_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_MKL
 DVNorm2Test<Mem::Main, Algo::MKL, float> mkl_dv_norm2_test_float;
 DVNorm2Test<Mem::Main, Algo::MKL, double> mkl_dv_norm2_test_double;

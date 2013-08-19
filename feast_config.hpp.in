@@ -38,4 +38,7 @@
 /// Do we have MKL support enabled?
 #cmakedefine FEAST_BACKENDS_MKL
 
+/// Do we have GMP support enabled?
+#cmakedefine FEAST_GMP
+
 #endif // FEAST_CONFIG_HPP

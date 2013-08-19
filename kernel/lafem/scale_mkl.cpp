@@ -41,7 +41,7 @@ void Scale<Algo::MKL>::value(SparseMatrixCOO<Mem::Main, float> & r, const Sparse
   }
   else
   {
-    MemoryPool<Mem::Main>::copy(r.val(), x.val(), r.used_elements() * sizeof(float));
+    MemoryPool<Mem::Main>::copy<float>(r.val(), x.val(), r.used_elements() * sizeof(float));
     cblas_sscal((MKL_INT)r.used_elements(), s, r.val(), 1);
   }
 }
@@ -54,7 +54,7 @@ void Scale<Algo::MKL>::value(SparseMatrixCOO<Mem::Main, double> & r, const Spars
   }
   else
   {
-    MemoryPool<Mem::Main>::copy(r.val(), x.val(), r.used_elements() * sizeof(double));
+    MemoryPool<Mem::Main>::copy<double>(r.val(), x.val(), r.used_elements() * sizeof(double));
     cblas_dscal((MKL_INT)r.used_elements(), s, r.val(), 1);
   }
 }
@@ -67,7 +67,7 @@ void Scale<Algo::MKL>::value(SparseMatrixCSR<Mem::Main, float> & r, const Sparse
   }
   else
   {
-    MemoryPool<Mem::Main>::copy(r.val(), x.val(), r.used_elements() * sizeof(float));
+    MemoryPool<Mem::Main>::copy<float>(r.val(), x.val(), r.used_elements() * sizeof(float));
     cblas_sscal((MKL_INT)r.used_elements(), s, r.val(), 1);
   }
 }
@@ -80,7 +80,7 @@ void Scale<Algo::MKL>::value(SparseMatrixCSR<Mem::Main, double> & r, const Spars
   }
   else
   {
-    MemoryPool<Mem::Main>::copy(r.val(), x.val(), r.used_elements() * sizeof(double));
+    MemoryPool<Mem::Main>::copy<double>(r.val(), x.val(), r.used_elements() * sizeof(double));
     cblas_dscal((MKL_INT)r.used_elements(), s, r.val(), 1);
   }
 }
@@ -93,7 +93,7 @@ void Scale<Algo::MKL>::value(SparseMatrixELL<Mem::Main, float> & r, const Sparse
   }
   else
   {
-    MemoryPool<Mem::Main>::copy(r.Ax(), x.Ax(), r.stride() * r.num_cols_per_row() * sizeof(float));
+    MemoryPool<Mem::Main>::copy<float>(r.Ax(), x.Ax(), r.stride() * r.num_cols_per_row() * sizeof(float));
     cblas_sscal((MKL_INT)r.stride() * (MKL_INT)r.num_cols_per_row(), s, r.Ax(), 1);
   }
 }
@@ -106,7 +106,7 @@ void Scale<Algo::MKL>::value(SparseMatrixELL<Mem::Main, double> & r, const Spars
   }
   else
   {
-    MemoryPool<Mem::Main>::copy(r.Ax(), x.Ax(), r.stride() * r.num_cols_per_row() * sizeof(double));
+    MemoryPool<Mem::Main>::copy<double>(r.Ax(), x.Ax(), r.stride() * r.num_cols_per_row() * sizeof(double));
     cblas_dscal((MKL_INT)r.stride() * (MKL_INT)r.num_cols_per_row(), s, r.Ax(), 1);
   }
 }

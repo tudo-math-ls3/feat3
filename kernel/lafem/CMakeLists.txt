@@ -31,6 +31,13 @@ if (FEAST_BACKENDS_MKL)
   )
 endif(FEAST_BACKENDS_MKL)
 
+if (FEAST_GMP)
+TARGET_LINK_LIBRARIES(kernel-lafem
+  libgmp.so
+  libgmpxx.so
+  )
+endif (FEAST_GMP)
+
 
 if (FEAST_BACKENDS_CUDA)
   INCLUDE(FindCUDA)

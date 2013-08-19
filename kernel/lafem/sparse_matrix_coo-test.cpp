@@ -113,6 +113,9 @@ public:
 };
 SparseMatrixCOOTest<Mem::Main, float> sparse_matrix_coo_test_float;
 SparseMatrixCOOTest<Mem::Main, double> sparse_matrix_coo_test_double;
+#ifdef FEAST_GMP
+SparseMatrixCOOTest<Mem::Main, mpf_class> sparse_matrix_coo_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCOOTest<Mem::CUDA, float> cuda_sparse_matrix_coo_test_float;
 SparseMatrixCOOTest<Mem::CUDA, double> cuda_sparse_matrix_coo_test_double;

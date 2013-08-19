@@ -70,6 +70,9 @@ public:
 };
 DenseMatrixTest<Mem::Main, float> cpu_dense_matrix_test_float;
 DenseMatrixTest<Mem::Main, double> cpu_dense_matrix_test_double;
+#ifdef FEAST_GMP
+DenseMatrixTest<Mem::Main, mpf_class> cpu_dense_matrix_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 DenseMatrixTest<Mem::CUDA, float> cuda_dense_matrix_test_float;
 DenseMatrixTest<Mem::CUDA, double> cuda_dense_matrix_test_double;

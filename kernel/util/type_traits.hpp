@@ -5,6 +5,8 @@
 // includes, FEAST
 #include <kernel/util/string.hpp>
 
+#include <gmpxx.h>
+
 namespace FEAST
 {
   /**
@@ -71,6 +73,12 @@ namespace FEAST
       {
         return "float";
       }
+
+      /// returns the items value in double precision
+      static double to_double(float val)
+      {
+        return (double)val;
+      }
     };
 
     /**
@@ -102,6 +110,12 @@ namespace FEAST
       static String name()
       {
         return "double";
+      }
+
+      /// returns the items value in double precision
+      static double to_double(double val)
+      {
+        return val;
       }
     };
 
@@ -136,6 +150,31 @@ namespace FEAST
         return "long double";
       }
     };
+
+    /**
+     * \brief Type Traits specialisation for <c>mpf_class</c>
+     *
+     * \author Dirk Ribbrock
+     */
+    template<>
+    struct Traits<mpf_class>
+    {
+      /// this type is of floating class
+      typedef FloatingClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "mpf_class";
+      }
+
+      /// returns the items value in double precision
+      static double to_double(mpf_class & val)
+      {
+        return val.get_d();
+      }
+    };
+
 
     /**
      * \brief Type Traits specialisation for <c>unsigned int</c>
@@ -358,6 +397,12 @@ namespace FEAST
       static String name()
       {
         return "unsigned long";
+      }
+
+      /// returns the items value in double precision
+      static double to_double(unsigned long val)
+      {
+        return (double)val;
       }
     };
 

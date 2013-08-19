@@ -88,6 +88,9 @@ public:
 };
 SparseMatrixConversionTest<Mem::Main, float> sparse_matrix_conversion_test_float;
 SparseMatrixConversionTest<Mem::Main, double> sparse_matrix_conversion_test_double;
+#ifdef FEAST_GMP
+SparseMatrixConversionTest<Mem::Main, mpf_class> sparse_matrix_conversion_test_mpf_class;
+#endif
 
 /**
 * \brief Test class for sparse matrix conversions.
@@ -195,5 +198,6 @@ public:
 };
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCudaConversionTest<Mem::CUDA, float> sparse_matrix_cuda_conversion_test_float;
+SparseMatrixCudaConversionTest<Mem::CUDA, double> sparse_matrix_cuda_conversion_test_double;
 SparseMatrixCudaConversionTest<Mem::CUDA, double> sparse_matrix_cuda_conversion_test_double;
 #endif

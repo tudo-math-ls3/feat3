@@ -62,6 +62,9 @@ public:
 };
 DVDifferenceTest<Mem::Main, Algo::Generic, float> dv_difference_test_float;
 DVDifferenceTest<Mem::Main, Algo::Generic, double> dv_difference_test_double;
+#ifdef FEAST_GMP
+DVDifferenceTest<Mem::Main, Algo::Generic, mpf_class> dv_difference_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_MKL
 DVDifferenceTest<Mem::Main, Algo::MKL, float> mkl_dv_difference_test_float;
 DVDifferenceTest<Mem::Main, Algo::MKL, double> mkl_dv_difference_test_double;

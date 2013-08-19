@@ -3,6 +3,7 @@
 # This module sets the following variables:
 #   FEAST_BACKEND_CUDA (bool, cached)
 #   FEAST_BACKEND_MKL  (bool, cached)
+#   FEAST_GMP (bool, cached)
 #
 # \author Dirk Ribbrock
 
@@ -20,7 +21,6 @@ if (NOT DISPLAY_HELP_ONLY)
   #  appears at the beginning, in the middle or at the end of BUILD_ID)
   if (BUILD_ID MATCHES "^cuda-.+|.+-cuda-.+|.+-cuda$")
     set (FEAST_BACKENDS_CUDA ON CACHE BOOL "" FORCE)
-
   endif ()
 
   if (BUILD_ID MATCHES "^mkl-.+|.+-mkl-.+|.+-mkl$")
@@ -36,6 +36,10 @@ if (NOT DISPLAY_HELP_ONLY)
 
   endif ()
 
+  if (BUILD_ID MATCHES "^gmp-.+|.+-gmp-.+|.+-gmp$")
+    set (FEAST_GMP ON CACHE BOOL "" FORCE)
+  endif ()
+
 endif ()
 
 
@@ -45,5 +49,6 @@ if (DISPLAY_HELP_ONLY)
   message (STATUS "Valid settings for token \"backend\"                             ")
   message (STATUS "cuda   : enable cuda support                     ")
   message (STATUS "mkl    : enable mkl support                     ")
+  message (STATUS "gmp    : enable gmp support                     ")
 
 endif ()

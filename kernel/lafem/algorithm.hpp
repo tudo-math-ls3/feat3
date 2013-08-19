@@ -23,7 +23,7 @@ namespace FEAST
       void * pdest(dest.elements());
       const void * psrc(src.elements());
 
-      MemoryPool<Arch_>::copy(pdest, psrc, dest.size() * sizeof(DT_));
+      MemoryPool<Arch_>::template copy<DT_>(pdest, psrc, dest.size() * sizeof(DT_));
     }
 
     template <typename Arch_, typename Arch2_, typename DT_>

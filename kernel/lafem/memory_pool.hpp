@@ -8,8 +8,14 @@
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/archs.hpp>
 
+#ifdef FEAST_GMP
+#include <gmpxx.h>
+#include <mpfr.h>
+#endif
+
 #include <map>
 #include <cstring>
+#include <typeinfo>
 
 
 namespace FEAST
@@ -56,6 +62,7 @@ namespace FEAST
         friend MemoryPool* InstantiationPolicy<MemoryPool<Mem::Main>, Singleton>::instance();
 
         /// allocate new memory
+        template <typename DT_>
         void * allocate_memory(Index bytes);
 
         /// increase memory counter
@@ -65,9 +72,11 @@ namespace FEAST
         void release_memory(void * address);
 
         /// download memory chunk to host memory
+        template <typename DT_>
         static void download(void * dest, void * src, Index bytes);
 
         /// upload memory chunk from host memory to device memory
+        template <typename DT_>
         static void upload(void * dest, void * src, Index bytes);
 
         /// recieve element
@@ -82,12 +91,24 @@ namespace FEAST
         static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
 
         /// Copy memory area from src to dest
+        template <typename DT_>
         static void copy(void * dest, const void * src, const Index bytes)
         {
           if (dest == src)
             return;
 
-          ::memcpy(dest, src, bytes);
+#ifdef FEAST_GMP
+          if (typeid(DT_) == typeid(mpf_class))
+          {
+            const DT_ * s((DT_ *) src);
+            for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + bytes/sizeof(DT_)) ; d != d_end ; ++d, ++s)
+            {
+              *d = *s;
+            }
+          }
+          else
+#endif
+            ::memcpy(dest, src, bytes);
         }
 
         /// Generate hash value for given byte sequence
@@ -111,6 +132,7 @@ namespace FEAST
         friend MemoryPool* InstantiationPolicy<MemoryPool<Mem::CUDA>, Singleton>::instance();
 
         /// allocate new memory
+        template <typename DT_>
         void * allocate_memory(Index bytes);
 
         /// increase memory counter
@@ -120,9 +142,11 @@ namespace FEAST
         void release_memory(void * address);
 
         /// download memory chunk to host memory
+        template <typename DT_>
         static void download(void * dest, void * src, Index bytes);
 
         /// upload memory chunk from host memory to device memory
+        template <typename DT_>
         static void upload(void * dest, void * src, Index bytes);
 
         /// recieve element
@@ -134,6 +158,7 @@ namespace FEAST
         static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
 
         /// Copy memory area from src to dest
+        template <typename DT_>
         static void copy(void * dest, const void * src, const Index bytes);
 
         /// Generate hash value for given byte sequence

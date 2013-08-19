@@ -98,12 +98,16 @@ public:
     k.write_out(fm_dv, bs);
     bs.seekg(0);
     DenseVector<Tag_, DT_> m(fm_dv, bs);
-    TEST_CHECK_EQUAL(m, k);
+    for (Index i(0) ; i < k.size() ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-5);
   }
 };
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
 DenseVectorTest<Mem::Main, double> cpu_dense_vector_test_double;
 DenseVectorTest<Mem::Main, Index> cpu_dense_vector_test_index;
+#ifdef FEAST_GMP
+DenseVectorTest<Mem::Main, mpf_class> cpu_dense_vector_test_mpf;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 DenseVectorTest<Mem::CUDA, float> cuda_dense_vector_test_float;
 DenseVectorTest<Mem::CUDA, double> cuda_dense_vector_test_double;

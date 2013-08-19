@@ -49,6 +49,7 @@ MemoryPool<Mem::CUDA>::~MemoryPool()
     throw InternalError("Memory Pool<GPU> still contains memory chunks!");
 }
 
+template <typename DT_>
 void * MemoryPool<Mem::CUDA>::allocate_memory(Index bytes)
 {
   void * memory(NULL);
@@ -93,11 +94,13 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
   }
 }
 
+template <typename DT_>
 void MemoryPool<Mem::CUDA>::download(void * dest, void * src, Index bytes)
 {
   cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToHost);
 }
 
+template <typename DT_>
 void MemoryPool<Mem::CUDA>::upload(void * dest, void * src, Index bytes)
 {
   cudaMemcpy(dest, src, bytes, cudaMemcpyHostToDevice);
@@ -123,6 +126,7 @@ void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index
   FEAST::LAFEM::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
 }
 
+template <typename DT_>
 void MemoryPool<Mem::CUDA>::copy(void * dest, const void * src, const Index bytes)
 {
   if (dest == src)
@@ -145,9 +149,26 @@ unsigned long MemoryPool<Mem::CUDA>::generate_hash(void * data, Index bytes)
   return result;
 }
 
+template void * MemoryPool<Mem::CUDA>::allocate_memory<float>(Index bytes);
+template void * MemoryPool<Mem::CUDA>::allocate_memory<double>(Index bytes);
+template void * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(Index bytes);
+
+template void MemoryPool<Mem::CUDA>::download<float>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::CUDA>::download<double>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::CUDA>::download<unsigned long>(void * dest, void * src, Index bytes);
+
+template void MemoryPool<Mem::CUDA>::upload<float>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::CUDA>::upload<double>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::CUDA>::upload<unsigned long>(void * dest, void * src, Index bytes);
+
 template float MemoryPool<Mem::CUDA>::get_element(const float * data, Index index);
 template double MemoryPool<Mem::CUDA>::get_element(const double * data, Index index);
 template Index MemoryPool<Mem::CUDA>::get_element(const Index * data, Index index);
+
 template void MemoryPool<Mem::CUDA>::set_memory(float * address , const float val, const Index count);
 template void MemoryPool<Mem::CUDA>::set_memory(double * address , const double val, const Index count);
 template void MemoryPool<Mem::CUDA>::set_memory(Index * address , const Index val, const Index count);
+
+template void MemoryPool<Mem::CUDA>::copy<float>(void * dest, const void * src, const Index Bytes);
+template void MemoryPool<Mem::CUDA>::copy<double>(void * dest, const void * src, const Index Bytes);
+template void MemoryPool<Mem::CUDA>::copy<unsigned long>(void * dest, const void * src, const Index Bytes);

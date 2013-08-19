@@ -53,11 +53,15 @@ public:
 
     DenseVector<Mem::Main, DT_> sol(size);
     copy(sol, x);
-    TEST_CHECK_EQUAL(sol, ref_local);
+    for (Index i(0) ; i < size ; ++i)
+      TEST_CHECK_EQUAL_WITHIN_EPS(sol(i), ref_local(i), 1e-10);
   }
 };
 RichardsonTest<Mem::Main, Algo::Generic, float> richardson_test_float;
 RichardsonTest<Mem::Main, Algo::Generic, double> richardson_test_double;
+#ifdef FEAST_GMP
+RichardsonTest<Mem::Main, Algo::Generic, mpf_class> richardson_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 RichardsonTest<Mem::CUDA, Algo::CUDA, float> cuda_richardson_test_float;
 RichardsonTest<Mem::CUDA, Algo::CUDA, double> cuda_richardson_test_double;
