@@ -198,7 +198,7 @@ namespace FEAST
         }
 
         // okay, that's it
-        return std::sqrt(result);
+        return Math::sqrt(result);
       }
     }; // class ScalarErrorComputerL2
 
@@ -390,7 +390,7 @@ namespace FEAST
         }
 
         // okay, that's it
-        return std::sqrt(result);
+        return Math::sqrt(result);
       }
     }; // class ScalarErrorComputerH1
   } // namespace Assembly

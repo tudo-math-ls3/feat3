@@ -5,9 +5,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-
-#include <limits>
-#include <cmath>
+#include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -64,7 +62,7 @@ public:
   void test_unit_2d_q1(const QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -109,7 +107,7 @@ public:
   void test_unit_2d_q0(const QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -147,7 +145,7 @@ public:
 
       // compute analytic integral:
       // int_[x0,x1]x[y0,y1] sin(Pi*x)*sin(pi*y) dxy = (cos(pi*x0) - cos(pi*x1))*(cos(pi*y0) - cos(pi*y1)) / pi^2
-      DataType_ s = ((std::cos(pi*x0) - std::cos(pi*x1)) * (std::cos(pi*y0)-std::cos(pi*y1))) / (pi*pi);
+      DataType_ s = ((Math::cos(pi*x0) - Math::cos(pi*x1)) * (Math::cos(pi*y0)-Math::cos(pi*y1))) / (pi*pi);
 
       // validate vector data
       TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
@@ -167,61 +165,60 @@ public:
   /// returns the constant pi
   static DataType_ pi()
   {
-    static const DataType_ value(DataType_(2) * std::acos(DataType_(0)));
-    return value;
+    return Math::Limits<DataType_>::pi();
   }
 
   /// 1D: function value
   static DataType_ eval(DataType_ x)
   {
-    return std::sin(pi() * x);
+    return Math::sin(pi() * x);
   }
 
   /// 2D: function value
   static DataType_ eval(DataType_ x, DataType_ y)
   {
-    return std::sin(pi() * x) * std::sin(pi() * y);
+    return Math::sin(pi() * x) * Math::sin(pi() * y);
   }
 
   /// 3D: function value
   static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
   {
-    return std::sin(pi() * x) * std::sin(pi() * y) * std::sin(pi() * z);
+    return Math::sin(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
   }
 
   /// 1D: X-derivative
   static DataType_ der_x(DataType_ x)
   {
-    return pi() * std::cos(pi() * x);
+    return pi() * Math::cos(pi() * x);
   }
 
   /// 2D: X-derivative
   static DataType_ der_x(DataType_ x, DataType_ y)
   {
-    return pi() * std::cos(pi() * x) * std::sin(pi() * y);
+    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y);
   }
 
   /// 2D: Y-derivative
   static DataType_ der_y(DataType_ x, DataType_ y)
   {
-    return pi() * std::sin(pi() * x) * std::cos(pi() * y);
+    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y);
   }
 
   /// 3D: X-derivative
   static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
   {
-    return pi() * std::cos(pi() * x) * std::sin(pi() * y) * std::sin(pi() * z);
+    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
   }
 
   /// 3D: Y-derivative
   static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
   {
-    return pi() * std::sin(pi() * x) * std::cos(pi() * y) * std::sin(pi() * z);
+    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y) * Math::sin(pi() * z);
   }
 
   /// 3D: Z-derivative
   static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
   {
-    return pi() * std::sin(pi() * x) * std::sin(pi() * y) * std::cos(pi() * z);
+    return pi() * Math::sin(pi() * x) * Math::sin(pi() * y) * Math::cos(pi() * z);
   }
 }; // class SineBubble<...>

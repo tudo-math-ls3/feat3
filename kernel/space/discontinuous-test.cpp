@@ -3,9 +3,7 @@
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
-
-#include <limits>
-#include <cmath>
+#include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -65,7 +63,7 @@ public:
   void asm_unit_quad_q0() const
   {
     // compute eps
-    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
 
     // create a quad mesh
     Geometry::UnitCubeFactory<QuadMesh> mesh_factory;

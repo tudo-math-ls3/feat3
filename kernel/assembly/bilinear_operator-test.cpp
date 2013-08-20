@@ -7,9 +7,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-
-#include <limits>
-#include <cmath>
+#include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -53,7 +51,7 @@ public:
   void test_unit_2d_q0(const QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.9));
+    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.9));
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -85,7 +83,7 @@ public:
   void test_unit_2d_q1(const QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.9));
+    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.9));
 
     // create trafo
     QuadTrafo trafo(mesh);

@@ -4,9 +4,7 @@
 
 // includes, FEAST
 #include <kernel/cubature/scalar/driver_base.hpp>
-
-// includes, STL
-#include <cmath>
+#include <kernel/util/math.hpp>
 
 namespace FEAST
 {
@@ -72,17 +70,17 @@ namespace FEAST
             break;
 
           case 2:
-            rule.get_coord(0) = -std::sqrt(Coord_(1) / Coord_(3));
-            rule.get_coord(1) = +std::sqrt(Coord_(1) / Coord_(3));
+            rule.get_coord(0) = -Math::sqrt(Coord_(1) / Coord_(3));
+            rule.get_coord(1) = +Math::sqrt(Coord_(1) / Coord_(3));
 
             rule.get_weight(0) = Weight_(1);
             rule.get_weight(1) = Weight_(1);
             break;
 
           case 3:
-            rule.get_coord(0) = -std::sqrt(Coord_(3) / Coord_(5));
+            rule.get_coord(0) = -Math::sqrt(Coord_(3) / Coord_(5));
             rule.get_coord(1) = Coord_(0);
-            rule.get_coord(2) = +std::sqrt(Coord_(3) / Coord_(5));
+            rule.get_coord(2) = +Math::sqrt(Coord_(3) / Coord_(5));
 
             rule.get_weight(0) = Weight_(5) / Weight_(9);
             rule.get_weight(1) = Weight_(8) / Weight_(9);
@@ -90,13 +88,13 @@ namespace FEAST
             break;
 
           case 4:
-            dc = std::sqrt(Coord_(24) / Coord_(5));
-            rule.get_coord(0) = -std::sqrt((Coord_(3) + dc) / Coord_(7));
-            rule.get_coord(1) = -std::sqrt((Coord_(3) - dc) / Coord_(7));
-            rule.get_coord(2) = +std::sqrt((Coord_(3) - dc) / Coord_(7));
-            rule.get_coord(3) = +std::sqrt((Coord_(3) + dc) / Coord_(7));
+            dc = Math::sqrt(Coord_(24) / Coord_(5));
+            rule.get_coord(0) = -Math::sqrt((Coord_(3) + dc) / Coord_(7));
+            rule.get_coord(1) = -Math::sqrt((Coord_(3) - dc) / Coord_(7));
+            rule.get_coord(2) = +Math::sqrt((Coord_(3) - dc) / Coord_(7));
+            rule.get_coord(3) = +Math::sqrt((Coord_(3) + dc) / Coord_(7));
 
-            dw = std::sqrt(Weight_(30));
+            dw = Math::sqrt(Weight_(30));
             rule.get_weight(0) = (Weight_(18) - dw) / Weight_(36);
             rule.get_weight(1) = (Weight_(18) + dw) / Weight_(36);
             rule.get_weight(2) = (Weight_(18) + dw) / Weight_(36);
@@ -104,14 +102,14 @@ namespace FEAST
             break;
 
           case 5:
-            dc = Coord_(2) * std::sqrt(Coord_(10) / Coord_(7));
-            rule.get_coord(0) = -std::sqrt(Coord_(5) + dc) / Coord_(3);
-            rule.get_coord(1) = -std::sqrt(Coord_(5) - dc) / Coord_(3);
+            dc = Coord_(2) * Math::sqrt(Coord_(10) / Coord_(7));
+            rule.get_coord(0) = -Math::sqrt(Coord_(5) + dc) / Coord_(3);
+            rule.get_coord(1) = -Math::sqrt(Coord_(5) - dc) / Coord_(3);
             rule.get_coord(2) = Coord_(0);
-            rule.get_coord(3) = +std::sqrt(Coord_(5) - dc) / Coord_(3);
-            rule.get_coord(4) = +std::sqrt(Coord_(5) + dc) / Coord_(3);
+            rule.get_coord(3) = +Math::sqrt(Coord_(5) - dc) / Coord_(3);
+            rule.get_coord(4) = +Math::sqrt(Coord_(5) + dc) / Coord_(3);
 
-            dw = Weight_(13) * std::sqrt(Weight_(70));
+            dw = Weight_(13) * Math::sqrt(Weight_(70));
             rule.get_weight(0) = (Weight_(322) - dw) / Weight_(900);
             rule.get_weight(1) = (Weight_(322) + dw) / Weight_(900);
             rule.get_weight(2) =  Weight_(128)       / Weight_(225);

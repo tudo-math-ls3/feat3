@@ -3,6 +3,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/norm.hpp>
+#include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -25,7 +26,7 @@ public:
 
   virtual void run() const
   {
-    const DT_ eps = std::pow(std::numeric_limits<DT_>::epsilon(), DT_(0.8));
+    const DT_ eps = Math::pow(Math::Limits<DT_>::epsilon(), DT_(0.8));
 
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
@@ -33,11 +34,11 @@ public:
       for (Index i(0) ; i < size ; ++i)
       {
         // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
-        a_local(i, std::pow(DT_(0.5), DT_(0.5) * DT_(i)));
+        a_local(i, Math::pow(DT_(0.5), DT_(0.5) * DT_(i)));
       }
 
       // ||a||_2 = sqrt(2 - 2^{1-n})
-      const DT_ ref(std::sqrt(DT_(2) - std::pow(DT_(0.5), DT_(size-1))));
+      const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size-1))));
 
       DenseVector<Arch_, DT_> a(a_local);
       DT_ c = Norm2<Algo_>::value(a);

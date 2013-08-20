@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/cubature/driver_base.hpp>
+#include <kernel/util/meta_math.hpp>
 
 namespace FEAST
 {
@@ -78,7 +79,7 @@ namespace FEAST
         typename Point_>
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
-        rule.get_weight(0) = Weight_(1) / Weight_(Factorial<dim_>::value);
+        rule.get_weight(0) = Weight_(1) / Weight_(MetaMath::Factorial<dim_>::value);
 
         // create coords of barycentre point
         for(int i(0); i < dim_; ++i)

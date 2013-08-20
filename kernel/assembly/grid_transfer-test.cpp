@@ -6,9 +6,7 @@
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
-
-#include <limits>
-#include <cmath>
+#include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -55,7 +53,7 @@ public:
   void test_unit_2d_q1(const QuadMesh& mesh_f, const QuadMesh& mesh_c) const
   {
     // compute eps
-    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
 
     // create trafos
     QuadTrafo trafo_f(mesh_f);
@@ -125,7 +123,7 @@ public:
   void test_unit_2d_q1t(const QuadMesh& mesh_f, const QuadMesh& mesh_c) const
   {
     // compute eps
-    const DataType_ eps = std::pow(std::numeric_limits<DataType_>::epsilon(), DataType_(0.8));
+    const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
 
     // create trafos
     QuadTrafo trafo_f(mesh_f);

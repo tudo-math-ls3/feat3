@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/cubature/driver_base.hpp>
+#include <kernel/util/meta_math.hpp>
 
 namespace FEAST
 {
@@ -56,7 +57,7 @@ namespace FEAST
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
-        Weight_ V = Weight_(1) / Weight_(Factorial<dim_>::value);
+        Weight_ V = Weight_(1) / Weight_(MetaMath::Factorial<dim_>::value);
         Weight_ B = Weight_(2 - dim_)/Weight_((dim_ + 1)*(dim_ + 2)) * V;
         Weight_ C = Weight_(4)/Weight_((dim_ + 1)*(dim_ + 2)) * V;
 
@@ -135,7 +136,7 @@ namespace FEAST
         /// this rule is not variadic
         variadic = 0,
         dim = 3,
-        num_points = (Factorial<dim + 4>::value)/(24*Factorial<dim>::value)
+        num_points = (MetaMath::Factorial<dim + 4>::value)/(24*MetaMath::Factorial<dim>::value)
       };
 
       /// Returns the name of the cubature rule.
@@ -157,7 +158,7 @@ namespace FEAST
       static void fill(Rule<Shape::Simplex<3>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
-        Weight_ V = Weight_(1) / Weight_(Factorial<dim>::value);
+        Weight_ V = Weight_(1) / Weight_(6);
         Weight_ B1 =
           Weight_(-3*dim*dim*dim + 17*dim*dim - 58*dim + 72)/
           Weight_(3*(dim + 1)*(dim + 2)*(dim + 3)*(dim + 4)) * V;

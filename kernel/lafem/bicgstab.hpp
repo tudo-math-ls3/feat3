@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sum.hpp>
@@ -78,7 +79,7 @@ namespace FEAST
 
             gamma_tilde = DotProduct<Algo_>::value(v_tilde, r_tilde_0);
 
-            if (std::abs(gamma_tilde) < std::abs(rho_tilde)*1e-14)
+            if (Math::abs(gamma_tilde) < Math::abs(rho_tilde)*1e-14)
             {
               restarted = true;
               //std::cout << "Breakpoint 1" << std::endl;
@@ -87,7 +88,7 @@ namespace FEAST
 
             alpha_tilde = rho_tilde / gamma_tilde;
 
-            if ((std::abs(alpha_tilde) * Norm2<Algo_>::value(v_tilde)) / defnorm < 1e-5)
+            if ((Math::abs(alpha_tilde) * Norm2<Algo_>::value(v_tilde)) / defnorm < 1e-5)
             {
               restarted = true;;
               //std::cout << "Breakpoint 2" << std::endl;
@@ -117,7 +118,7 @@ namespace FEAST
             gamma_tilde = DotProduct<Algo_>::value(t_tilde, t_tilde);
             omega_tilde = DotProduct<Algo_>::value(t_tilde, s_tilde);
 
-            if (std::abs(gamma_tilde) < std::abs(omega_tilde) * 1e-14)
+            if (Math::abs(gamma_tilde) < Math::abs(omega_tilde) * 1e-14)
             {
               restarted = true;
               //std::cout << "Breakpoint 4" << std::endl;

@@ -1,5 +1,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/util/math.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -28,8 +29,8 @@ public:
 
   virtual void run() const
   {
-    const DT_ eps = std::pow(std::numeric_limits<DT_>::epsilon(), DT_(0.8));
-    const DT_ pi = DT_(2) * std::acos(DT_(0));
+    const DT_ eps = Math::pow(Math::Limits<DT_>::epsilon(), DT_(0.8));
+    const DT_ pi = Math::Limits<DT_>::pi();
 
     for (Index size(2) ; size < 3e2 ; size*=2)
     {
@@ -50,7 +51,7 @@ public:
       }
       for (Index i(0) ; i < size ; ++i)
       {
-        b_local(i, std::sin(pi * DT_(i) / DT_(size-1)));
+        b_local(i, Math::sin(pi * DT_(i) / DT_(size-1)));
         rhs_local(i, b_local(i) - DT_(5));
       }
 
@@ -70,7 +71,7 @@ public:
         DT_ sum(result_local(i) - rhs_local(i));
         for (Index j(0) ; j < a_local.columns() ; ++j)
           sum += a_local(i, j) * b_local(j);
-        dev = std::max(dev, std::abs(sum));
+        dev = Math::max(dev, Math::abs(sum));
       }
 
       TEST_CHECK(dev <= eps);

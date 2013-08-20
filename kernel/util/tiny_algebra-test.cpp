@@ -1,16 +1,11 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/linear_algebra.hpp>
 #include <test_system/test_system.hpp>
-#include <algorithm>
-#include <limits>
 
 using namespace FEAST;
-using namespace Tiny;
-using namespace TestSystem;
+using namespace FEAST::Tiny;
+using namespace FEAST::TestSystem;
 
-using std::abs;
-using std::min;
-using std::max;
 using Intern::sqr;
 using Intern::cub;
 
@@ -35,7 +30,7 @@ private:
     {
       for(int j(0) ; j < n_ ; ++j)
       {
-        a(i,j) = DataType_(min(i, j) + 1) / DataType_(max(i, j) + 1);
+        a(i,j) = DataType_(Math::min(i, j) + 1) / DataType_(Math::max(i, j) + 1);
       }
     }
   }
@@ -62,7 +57,7 @@ public:
   // constructor
   TinyAlgebraTest(const std::string& id) :
     TaggedTest<Archs::None, DataType_>(id),
-    _eps(std::numeric_limits<DataType_>::epsilon())
+    _eps(Math::Limits<DataType_>::epsilon())
   {
   }
 
@@ -70,7 +65,7 @@ public:
   void test_mat_inv_lehmer() const
   {
     // set tolerance
-    const DataType_ tol(std::pow(_eps, DataType_(0.75)));
+    const DataType_ tol(Math::pow(_eps, DataType_(0.75)));
 
     // initialise a Lehmer-Matrix
     Matrix<DataType_, n_, n_> a, b, c;
@@ -89,7 +84,7 @@ public:
   void test_mat_det_lehmer() const
   {
     // set tolerance
-    const DataType_ tol(std::pow(_eps, DataType_(0.75)));
+    const DataType_ tol(Math::pow(_eps, DataType_(0.75)));
 
     // initialise a Lehmer-Matrix
     Matrix<DataType_, n_, n_> a;

@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/cubature/driver_base.hpp>
+#include <kernel/util/meta_math.hpp>
 
 namespace FEAST
 {
@@ -72,7 +73,7 @@ namespace FEAST
         for(Index i(0); i <= Index(dim_); ++i)
         {
           // set weight
-          rule.get_weight(i) = Weight_(1) / Weight_(Factorial<dim_ + 1>::value);
+          rule.get_weight(i) = Weight_(1) / Weight_(MetaMath::Factorial<dim_ + 1>::value);
 
           // set point coords
           for(int j(0); j < dim_; ++j)

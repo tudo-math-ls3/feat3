@@ -1,19 +1,13 @@
 #include <kernel/util/linear_algebra.hpp>
-#include <kernel/util/factorial.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/util/random.hpp>
 #include <test_system/test_system.hpp>
-#include <limits>
 #include <stdint.h>
 
 using namespace FEAST;
 using namespace LinAlg;
 using namespace TestSystem;
-
-using std::abs;
-using std::sin;
-using std::cos;
-using std::min;
-using std::max;
+using namespace Math;
 
 // helper function: calculates the quare of a value
 template<typename T_>
@@ -109,7 +103,7 @@ class LinAlgTest :
         for(size_t j(0) ; j < n ; ++j)
         {
           a[i * n + j] = ((i+j) & 0x1 ? -ONE : ONE) * DataType_((i + j + 1)
-            * binomial(n + i, n - j - 1) * binomial(n + j, n - i - 1)
+            * Math::binomial(n + i, n - j - 1) * Math::binomial(n + j, n - i - 1)
             * sqr(binomial(i + j, i)));
         }
       }
@@ -163,7 +157,7 @@ class LinAlgTest :
     bool test_vec_clear_copy() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
 #define N 16
       DataType_ x[N], y[N];
@@ -188,7 +182,7 @@ class LinAlgTest :
     bool test_vec_axpy_lcomb() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
 #define N 16
       DataType_ x[N], y[N], z[N];
@@ -227,7 +221,7 @@ class LinAlgTest :
     void test_vec_dot() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
 #define N 16
       DataType_ x[N], y[N];
@@ -246,7 +240,7 @@ class LinAlgTest :
     void test_vec_norm_asum() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
 #define N 16
       DataType_ x[N];
@@ -265,7 +259,7 @@ class LinAlgTest :
     void test_vec_norm_euclid() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
 #define N 16
       DataType_ x[N];
@@ -284,7 +278,7 @@ class LinAlgTest :
     void test_vec_norm_max() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
 #define N 16
       static DataType_ r = (DataType_(N - 1) / DataType_(N));
@@ -303,7 +297,7 @@ class LinAlgTest :
     void test_mat_axpy() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
 #define M 8
 #define N 16
@@ -332,7 +326,7 @@ class LinAlgTest :
     void test_mat_mat_mult() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.8)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
 #define N 16
       // initialise a Lehmer matrix and its inverse
@@ -365,7 +359,7 @@ class LinAlgTest :
     void test_mat_vec_solve() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.6)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.6)));
 
 #define N 16
       DataType_ a[N*N], b[N*N], x[N], y[N], z[N];
@@ -400,7 +394,7 @@ class LinAlgTest :
     void test_mat_mat_solve() const
     {
       // set tolerance
-      const DataType_ tol(std::pow(_eps, DataType_(0.6)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.6)));
 
 #define M 8
 #define N 16

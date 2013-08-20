@@ -4,6 +4,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dot_product.hpp>
 #include <kernel/lafem/norm.hpp>
+#include <kernel/util/math.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -26,7 +27,7 @@ public:
 
   virtual void run() const
   {
-    const DT_ eps = std::pow(std::numeric_limits<DT_>::epsilon(), DT_(0.8));
+    const DT_ eps = Math::pow(Math::Limits<DT_>::epsilon(), DT_(0.8));
 
     for (Index size(1) ; size < 1e3 ; size*=2)
     {

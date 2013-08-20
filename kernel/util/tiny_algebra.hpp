@@ -4,9 +4,7 @@
 
 // includes, FEAST
 #include <kernel/util/assertion.hpp>
-
-// includes, STL
-#include <cmath>
+#include <kernel/util/math.hpp>
 
 namespace FEAST
 {
@@ -946,7 +944,7 @@ namespace FEAST
               }
             }
           }
-          return std::sqrt(DetHelper<n_,n_>::template compute<T_,n_,n_>(b));
+          return Math::sqrt(DetHelper<n_,n_>::template compute<T_,n_,n_>(b));
         }
       };
 
@@ -957,7 +955,7 @@ namespace FEAST
         static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // square matrix special case: vol(a) = abs(det(a))
-          return std::abs(DetHelper<n_,n_>::template compute<T_,sm_,sn_>(a));
+          return Math::abs(DetHelper<n_,n_>::template compute<T_,sm_,sn_>(a));
         }
       };
 
@@ -968,7 +966,7 @@ namespace FEAST
         static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the only matrix column.
-          return std::sqrt(sqr(a[0][0]) + sqr(a[1][0]));
+          return Math::sqrt(sqr(a[0][0]) + sqr(a[1][0]));
         }
       };
 
@@ -979,7 +977,7 @@ namespace FEAST
         static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the only matrix column.
-          return std::sqrt(sqr(a[0][0]) + sqr(a[1][0]) + sqr(a[2][0]));
+          return Math::sqrt(sqr(a[0][0]) + sqr(a[1][0]) + sqr(a[2][0]));
         }
       };
 
@@ -990,7 +988,7 @@ namespace FEAST
         static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the 3D cross product of the two matrix columns.
-          return std::sqrt(
+          return Math::sqrt(
             sqr(a[1][0]*a[2][1] - a[2][0]*a[1][1]) +
             sqr(a[2][0]*a[0][1] - a[0][0]*a[2][1]) +
             sqr(a[0][0]*a[1][1] - a[1][0]*a[0][1]));

@@ -20,11 +20,12 @@ SET (test_list
   binary_stream-test
   colouring-test
   cuthill_mckee-test
-  factorial-test
   graph-test
   inheritance-test
   linear_algebra-test
+  math-test
   mesh_streamer-test
+  meta_math-test
   param_section-test
   permutation-test
   string-test

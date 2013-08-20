@@ -4,9 +4,8 @@
 
 // includes, FEAST
 #include <kernel/cubature/driver_base.hpp>
-
-// includes, STL
-#include <cmath>
+#include <kernel/util/math.hpp>
+#include <kernel/util/meta_math.hpp>
 
 namespace FEAST
 {
@@ -59,15 +58,15 @@ namespace FEAST
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
-        Coord_ r = (Coord_(dim_ + 2) - std::sqrt(Coord_(dim_ + 2)))/
+        Coord_ r = (Coord_(dim_ + 2) - Math::sqrt(Coord_(dim_ + 2)))/
                    (Coord_(dim_ + 2) * Coord_(dim_ + 1));
-        Coord_ s = (Coord_(dim_ + 2) + Coord_(dim_) * std::sqrt(Coord_(dim_ + 2)))/
+        Coord_ s = (Coord_(dim_ + 2) + Coord_(dim_) * Math::sqrt(Coord_(dim_ + 2)))/
                    (Coord_(dim_ + 2) * Coord_(dim_ + 1));
 
         for(Index i(0); i <= Index(dim_); ++i)
         {
           // set weight
-          rule.get_weight(i) = Weight_(1) / Weight_(Factorial<dim_ + 1>::value);
+          rule.get_weight(i) = Weight_(1) / Weight_(MetaMath::Factorial<dim_ + 1>::value);
 
           // set point coords
           for(int j(0); j < dim_; ++j)
@@ -132,7 +131,7 @@ namespace FEAST
       static void fill(Rule<Shape::Simplex<dim_>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
-        Weight_ V = Weight_(1) / Weight_(Factorial<dim_>::value);
+        Weight_ V = Weight_(1) / Weight_(MetaMath::Factorial<dim_>::value);
         Weight_ B = - Weight_((dim_ + 1)*(dim_ + 1))/Weight_(4*dim_ + 8) * V;
         Weight_ C = Weight_((dim_ + 3)*(dim_ + 3))/Weight_(4*(dim_ + 1)*(dim_ + 2)) * V;
 
@@ -218,18 +217,18 @@ namespace FEAST
       static void fill(Rule<Shape::Simplex<3>, Weight_, Coord_, Point_>& rule)
       {
         // auxiliary variables
-        Weight_ V = Weight_(1) / Weight_(Factorial<dim>::value);
+        Weight_ V = Weight_(1) / Weight_(MetaMath::Factorial<dim>::value);
         Weight_ A = Weight_(16)/Weight_(135) * V;
-        Weight_ B1 = (Weight_(2665) + Weight_(14)*std::sqrt(Weight_(15)))/Weight_(37800)*V;
-        Weight_ B2 = (Weight_(2665) - Weight_(14)*std::sqrt(Weight_(15)))/Weight_(37800)*V;
+        Weight_ B1 = (Weight_(2665) + Weight_(14)*Math::sqrt(Weight_(15)))/Weight_(37800)*V;
+        Weight_ B2 = (Weight_(2665) - Weight_(14)*Math::sqrt(Weight_(15)))/Weight_(37800)*V;
         Weight_ C = Weight_(20)/Weight_(378)*V;
 
-        Coord_ s1 = (Coord_(7) - std::sqrt(Coord_(15)))/Coord_(34);
-        Coord_ s2 = (Coord_(7) + std::sqrt(Coord_(15)))/Coord_(34);
-        Coord_ t1 = (Coord_(13) + Coord_(3)*std::sqrt(Coord_(15)))/Coord_(34);
-        Coord_ t2 = (Coord_(13) - Coord_(3)*std::sqrt(Coord_(15)))/Coord_(34);
-        Coord_ u  = (Coord_(10) - Coord_(2)*std::sqrt(Coord_(15)))/Coord_(40);
-        Coord_ v  = (Coord_(10) + Coord_(2)*std::sqrt(Coord_(15)))/Coord_(40);
+        Coord_ s1 = (Coord_(7) - Math::sqrt(Coord_(15)))/Coord_(34);
+        Coord_ s2 = (Coord_(7) + Math::sqrt(Coord_(15)))/Coord_(34);
+        Coord_ t1 = (Coord_(13) + Coord_(3)*Math::sqrt(Coord_(15)))/Coord_(34);
+        Coord_ t2 = (Coord_(13) - Coord_(3)*Math::sqrt(Coord_(15)))/Coord_(34);
+        Coord_ u  = (Coord_(10) - Coord_(2)*Math::sqrt(Coord_(15)))/Coord_(40);
+        Coord_ v  = (Coord_(10) + Coord_(2)*Math::sqrt(Coord_(15)))/Coord_(40);
 
         // counter
         Index count = 0;

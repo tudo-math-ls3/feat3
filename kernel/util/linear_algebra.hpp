@@ -14,10 +14,10 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/math.hpp>
 
 // includes, system
 #include <complex>
-#include <cmath>
 
 namespace FEAST
 {
@@ -470,7 +470,7 @@ namespace FEAST
       TypeX_ r = TypeX_(0);
       for(TypeSize_ i(0) ; i < n ; ++i)
       {
-        r += std::abs(x[i]);
+        r += Math::abs(x[i]);
       }
 
       return r;
@@ -493,7 +493,7 @@ namespace FEAST
       TypeReal_ r = TypeReal_(0);
       for(TypeSize_ i(0) ; i < n ; ++i)
       {
-        r += std::abs(x[i]);
+        r += Math::abs(x[i]);
       }
 
       return r;
@@ -533,7 +533,7 @@ namespace FEAST
         r += sqr(x[i]);
       }
 
-      return std::sqrt(r);
+      return Math::sqrt(r);
     }
 
     /**
@@ -559,7 +559,7 @@ namespace FEAST
         r += sqr(x[i].real()) + sqr(x[i].imag());
       }
 
-      return std::sqrt(r);
+      return Math::sqrt(r);
     }
 
     /**
@@ -592,7 +592,7 @@ namespace FEAST
       TypeX_ t, r = TypeX_(0);
       for(TypeSize_ i(0) ; i < n ; ++i)
       {
-        t = std::abs(x[i]);
+        t = Math::abs(x[i]);
         r = r < t ? t : r;
       }
 
@@ -622,7 +622,7 @@ namespace FEAST
         r = r < t ? t : r;
       }
 
-      return std::sqrt(r);
+      return Math::sqrt(r);
     }
 
     /**
@@ -1531,7 +1531,7 @@ namespace FEAST
       TypeA_ r = TypeA_(0);
       for(TypeSize_ i(0) ; i < m ; ++i)
       {
-        r = std::max(r, vec_norm_asum(n, &a[i * stride]));
+        r = Math::max(r, vec_norm_asum(n, &a[i * stride]));
       }
       return r;
     }
@@ -1553,7 +1553,7 @@ namespace FEAST
       TypeReal_ r = TypeReal_(0);
       for(TypeSize_ i(0) ; i < m ; ++i)
       {
-        r = std::max(r, vec_norm_asum(n, &a[i * stride]));
+        r = Math::max(r, vec_norm_asum(n, &a[i * stride]));
       }
       return r;
     }
@@ -1601,7 +1601,7 @@ namespace FEAST
           r += sqr(a[k+j]);
         }
       }
-      return std::sqrt(r);
+      return Math::sqrt(r);
     }
 
     /**
@@ -1628,7 +1628,7 @@ namespace FEAST
           r += sqr(a[k+j].real()) + sqr(a[k+j].imag());
         }
       }
-      return std::sqrt(r);
+      return Math::sqrt(r);
     }
 
     /**
@@ -1667,7 +1667,7 @@ namespace FEAST
       TypeA_ r = TypeA_(0);
       for(TypeSize_ i(0) ; i < m ; ++i)
       {
-        r = std::max(r, vec_norm_max(n, &a[i * stride]));
+        r = Math::max(r, vec_norm_max(n, &a[i * stride]));
       }
       return r;
     }
@@ -1689,7 +1689,7 @@ namespace FEAST
       TypeReal_ r = TypeReal_(0);
       for(TypeSize_ i(0) ; i < m ; ++i)
       {
-        r = std::max(r, vec_norm_max(n, &a[i * stride]));
+        r = Math::max(r, vec_norm_max(n, &a[i * stride]));
       }
       return r;
     }
@@ -1746,7 +1746,6 @@ namespace FEAST
       TypeA_ a[],
       TypeP_ p[])
     {
-      using std::abs;
       CONTEXT("LinAlg::mat_factorise()");
       ASSERT_(a != nullptr);
       ASSERT_(p != nullptr);
@@ -1757,10 +1756,10 @@ namespace FEAST
       {
         // find a pivot
         p[i] = TypeP_(i);
-        TypeA_ tp = abs(a[i * (stride_a + 1)]);
+        TypeA_ tp = Math::abs(a[i * (stride_a + 1)]);
         for(TypeSize_ j(i + 1) ; j < n ; ++j)
         {
-          TypeA_ t = abs(a[j * stride_a + i]);
+          TypeA_ t = Math::abs(a[j * stride_a + i]);
           if(t > tp)
           {
             // row j is our new candidate for the pivot row

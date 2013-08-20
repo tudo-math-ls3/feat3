@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp>
 
 #include <cmath>
@@ -35,7 +36,7 @@ namespace FEAST
          */
       static DT_ value(DT_ val)
       {
-        return std::abs(val);
+        return Math::abs(val);
       }
     };
 

@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
-#include <kernel/util/factorial.hpp>
+#include <kernel/util/meta_math.hpp>
 
 namespace FEAST
 {
@@ -167,7 +167,7 @@ namespace FEAST
          * For an <em>n</em>-Simplex, the number of <em>m</em>-faces is given by
          * \f[ {n+1\choose m+1} \f]
          */
-        count = Binomial<cell_dim_ + 1, face_dim_ + 1>::value
+        count = MetaMath::Binomial<cell_dim_ + 1, face_dim_ + 1>::value
       };
     }; // struct FaceTraits<Simplex<...>, ...>
 
@@ -217,7 +217,7 @@ namespace FEAST
          * For an <em>n</em>-Hypercube, the number of <em>m</em>-faces is given by
          * \f[ 2^{(n-m)}\cdot {n\choose m} \f]
          */
-        count = (1 << (cell_dim_ - face_dim_)) * Binomial<cell_dim_, face_dim_>::value
+        count = (1 << (cell_dim_ - face_dim_)) * MetaMath::Binomial<cell_dim_, face_dim_>::value
       };
     }; // struct FaceTraits<Hypercube<...>, ...>
 
