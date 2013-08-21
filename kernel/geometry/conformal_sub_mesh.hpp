@@ -463,7 +463,7 @@ namespace FEAST
         }
 
         // calculate number of entities in fine mesh
-        Intern::EntityCountWrapper<ShapeType>::query(_num_entities_fine);
+        Intern::EntityCountWrapper<Intern::StandardRefinementTraits, ShapeType>::query(_num_entities_fine);
       }
 
       /// virtual destructor

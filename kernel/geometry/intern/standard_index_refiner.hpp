@@ -4,7 +4,8 @@
 
 // includes, FEAST
 #include <kernel/geometry/index_set.hpp>
-#include <kernel/geometry/intern/refined_entity_counter.hpp>
+#include <kernel/geometry/intern/entity_counter.hpp>
+#include <kernel/geometry/intern/standard_refinement_traits.hpp>
 #include <kernel/geometry/intern/sub_index_mapping.hpp>
 
 namespace FEAST
@@ -2966,7 +2967,7 @@ namespace FEAST
 
           // calculate index offsets
           Index index_offsets[Shape_::dimension+1];
-          EntityCounter<Shape_, face_dim_>::offset(index_offsets, num_entities);
+          EntityCounter<StandardRefinementTraits, Shape_, face_dim_>::offset(index_offsets, num_entities);
 
           // call refinement shape wrapper
           IndexRefineShapeWrapper<Shape_, cell_dim_, face_dim_>
@@ -3005,7 +3006,7 @@ namespace FEAST
 
           // calculate index offsets
           Index index_offsets[Shape_::dimension+1];
-          EntityCounter<Shape_, 0>::offset(index_offsets, num_entities);
+          EntityCounter<StandardRefinementTraits, Shape_, 0>::offset(index_offsets, num_entities);
 
           // call refinement shape wrapper
           IndexRefineShapeWrapper<Shape_, cell_dim_, 0>

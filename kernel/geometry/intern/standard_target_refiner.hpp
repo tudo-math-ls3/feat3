@@ -862,7 +862,8 @@ namespace FEAST
 
           // calculate index offsets
           Index index_offsets[Shape_::dimension+1];
-          Intern::EntityCounter<ShapeType, cell_dim_>::offset(index_offsets, num_entities_trg);
+          Intern::EntityCounter<Intern::StandardRefinementTraits, ShapeType, cell_dim_>
+            ::offset(index_offsets, num_entities_trg);
 
           // call shape wrapper
           TargetRefineShapeWrapper<ShapeType, cell_dim_>::refine(
@@ -900,7 +901,7 @@ namespace FEAST
 
           // calculate index offsets
           Index index_offsets[Shape_::dimension+1];
-          Intern::EntityCounter<ShapeType, 0>::offset(index_offsets, num_entities_trg);
+          Intern::EntityCounter<Intern::StandardRefinementTraits, ShapeType, 0>::offset(index_offsets, num_entities_trg);
 
           // call shape wrapper
           TargetRefineShapeWrapper<ShapeType, 0>::refine(

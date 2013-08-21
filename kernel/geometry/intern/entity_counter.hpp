@@ -1,9 +1,9 @@
 #pragma once
-#ifndef KERNEL_GEOMETRY_INTERNAL_REFINED_ENTITY_COUNTER_HPP
-#define KERNEL_GEOMETRY_INTERNAL_REFINED_ENTITY_COUNTER_HPP 1
+#ifndef KERNEL_GEOMETRY_INTERNAL_ENTITY_COUNTER_HPP
+#define KERNEL_GEOMETRY_INTERNAL_ENTITY_COUNTER_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/intern/standard_refinement_traits.hpp>
+#include <kernel/shape.hpp>
 
 namespace FEAST
 {
@@ -15,9 +15,13 @@ namespace FEAST
       /**
        * \brief Entity counter class template
        *
+       * This is an auxiliary class templates used to compute the number of entities and refinement offsets
+       * used by mesh refinement algorithms.
+       *
        * \author Peter Zajac
        */
       template<
+        template<typename,int> class RefineTraits_,
         typename Shape_,
         int face_dim_,
         int cell_dim_ = Shape_::dimension>
@@ -36,21 +40,22 @@ namespace FEAST
         {
           CONTEXT(name() + "::count()");
           typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
-          return EntityCounter<Shape_, face_dim_, cell_dim_-1>::count(num_entities) +
-            StandardRefinementTraits<CellType, face_dim_>::count * num_entities[cell_dim_];
+          return EntityCounter<RefineTraits_, Shape_, face_dim_, cell_dim_-1>::count(num_entities) +
+            RefineTraits_<CellType, face_dim_>::count * num_entities[cell_dim_];
         }
 
         static void offset(Index offsets[], const Index num_entities[])
         {
-          EntityCounter<Shape_, face_dim_, cell_dim_-1>::offset(offsets, num_entities);
-          offsets[cell_dim_] = EntityCounter<Shape_, face_dim_, cell_dim_-1>::count(num_entities);
+          EntityCounter<RefineTraits_, Shape_, face_dim_, cell_dim_-1>::offset(offsets, num_entities);
+          offsets[cell_dim_] = EntityCounter<RefineTraits_, Shape_, face_dim_, cell_dim_-1>::count(num_entities);
         }
       }; // struct EntityCounter<...>
 
       template<
+        template<typename,int> class RefineTraits_,
         typename Shape_,
         int cell_dim_>
-      struct EntityCounter<Shape_, cell_dim_, cell_dim_>
+      struct EntityCounter<RefineTraits_, Shape_, cell_dim_, cell_dim_>
       {
         static_assert(cell_dim_ >= 0, "invalid cell/face dimension");
         static_assert(cell_dim_ <= Shape_::dimension, "invalid cell dimension");
@@ -64,7 +69,7 @@ namespace FEAST
         {
           CONTEXT(name() + "::count()");
           typedef typename Shape::FaceTraits<Shape_, cell_dim_>::ShapeType CellType;
-          return StandardRefinementTraits<CellType, cell_dim_>::count * num_entities[cell_dim_];
+          return RefineTraits_<CellType, cell_dim_>::count * num_entities[cell_dim_];
         }
 
         static void offset(Index offsets[], const Index* /*num_entities[]*/)
@@ -74,11 +79,15 @@ namespace FEAST
       }; // struct EntityCounter<Shape_, cell_dim_, cell_dim_>
 
       /**
-        * \brief Entity count wrapper class template
-        *
-        * \author Peter Zajac
-        */
+       * \brief Entity count wrapper class template
+       *
+       * This is an auxiliary class templates used to compute the number of entities and refinement offsets
+       * used by mesh refinement algorithms.
+       *
+       * \author Peter Zajac
+       */
       template<
+        template<typename,int> class RefineTraits_,
         typename Shape_,
         int face_dim_ = Shape_::dimension>
       struct EntityCountWrapper
@@ -93,7 +102,7 @@ namespace FEAST
           */
         static String name()
         {
-          return "EntityCounter<" + Shape_::name() + "," + stringify(face_dim_) + ">";
+          return "EntityCounterWrapper<" + Shape_::name() + "," + stringify(face_dim_) + ">";
         }
 
         /**
@@ -107,23 +116,25 @@ namespace FEAST
         static void query(Index num_entities[])
         {
           CONTEXT(name() + "::query()");
-          EntityCountWrapper<Shape_, face_dim_-1>::query(num_entities);
-          num_entities[face_dim_] = EntityCounter<Shape_, face_dim_>::count(num_entities);
+          EntityCountWrapper<RefineTraits_, Shape_, face_dim_-1>::query(num_entities);
+          num_entities[face_dim_] = EntityCounter<RefineTraits_, Shape_, face_dim_>::count(num_entities);
         }
       }; // struct EntityCounter<...>
 
-      template<typename Shape_>
-      struct EntityCountWrapper<Shape_, 0>
+      template<
+        template<typename,int> class RefineTraits_,
+        typename Shape_>
+      struct EntityCountWrapper<RefineTraits_, Shape_, 0>
       {
         static String name()
         {
-          return "EntityCounter<" + Shape_::name() + ",0>";
+          return "EntityCounterWrapper<" + Shape_::name() + ",0>";
         }
 
         static void query(Index num_entities[])
         {
           CONTEXT(name() + "::query()");
-          num_entities[0] = EntityCounter<Shape_, 0>::count(num_entities);
+          num_entities[0] = EntityCounter<RefineTraits_, Shape_, 0>::count(num_entities);
         }
       }; // struct EntityCountWrapper<Shape_, 0>
     } // namespace Intern
@@ -131,4 +142,4 @@ namespace FEAST
   } // namespace Geometry
 } // namespace FEAST
 
-#endif // KERNEL_GEOMETRY_INTERNAL_REFINED_ENTITY_COUNTER_HPP
+#endif // KERNEL_GEOMETRY_INTERNAL_ENTITY_COUNTER_HPP

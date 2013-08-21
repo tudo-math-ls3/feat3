@@ -3,8 +3,9 @@
 #define KERNEL_GEOMETRY_INTERN_STANDARD_SUBSET_REFINER_HPP 1
 
 // includes, FEAST
-#include <kernel/geometry/intern/refined_entity_counter.hpp>
 #include <kernel/geometry/target_set.hpp>
+#include <kernel/geometry/intern/entity_counter.hpp>
+#include <kernel/geometry/intern/standard_refinement_traits.hpp>
 
 namespace FEAST
 {
@@ -141,7 +142,7 @@ namespace FEAST
 
           // calculate index offsets
           Index index_offsets[Shape_::dimension + 1];
-          EntityCounter<ShapeType, cell_dim_>::offset(index_offsets, num_entities_trg);
+          EntityCounter<StandardRefinementTraits, ShapeType, cell_dim_>::offset(index_offsets, num_entities_trg);
 
           // get output target set
           TargetSet& target_set_out = target_set_holder_out.template get_target_set<cell_dim_>();
@@ -170,7 +171,7 @@ namespace FEAST
         {
           // calculate index offsets
           Index index_offsets[Shape_::dimension + 1];
-          EntityCounter<ShapeType, 0>::offset(index_offsets, num_entities_trg);
+          EntityCounter<StandardRefinementTraits, ShapeType, 0>::offset(index_offsets, num_entities_trg);
 
           // get output target set
           TargetSet& target_set_out = target_set_holder_out.template get_target_set<0>();
