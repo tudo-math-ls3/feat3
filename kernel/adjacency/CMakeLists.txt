@@ -6,26 +6,23 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
-# list of util source files
-ADD_LIBRARY(kernel-util STATIC
-  exception.cpp
-  mesh_streamer.cpp
-  param_section.cpp
+# list of adjacency source files
+ADD_LIBRARY(kernel-adjacency STATIC
+  colouring.cpp
+  cuthill_mckee.cpp
+  graph.cpp
+  permutation.cpp
 )
 
-# list of util tests
+# list of adjacency tests
 SET (test_list
-  assertion-test
-  binary_stream-test
-  inheritance-test
-  linear_algebra-test
-  math-test
-  mesh_streamer-test
-  meta_math-test
-  param_section-test
-  string-test
-  tiny_algebra-test
+  colouring-test
+  cuthill_mckee-test
+  graph-test
+  permutation-test
 )
+
+TARGET_LINK_LIBRARIES (kernel-adjacency kernel-util)
 
 # create all tests
 FOREACH (test ${test_list} )
@@ -39,14 +36,14 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/util/${test}" none)
+    --test-command "${FEAST_BINARY_DIR}/kernel/adjacency/${test}" none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
   SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "PASSED")
   SET_PROPERTY(TEST ${test}_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 ENDFOREACH(test)
 
-# add all tests to util_tests
-ADD_CUSTOM_TARGET(util_tests DEPENDS ${test_list})
+# add all tests to adjacency_tests
+ADD_CUSTOM_TARGET(adjacency_tests DEPENDS ${test_list})
 
 # build all tests through top lvl target tests
-ADD_DEPENDENCIES(tests util_tests)
+ADD_DEPENDENCIES(tests adjacency_tests)

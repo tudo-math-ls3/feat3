@@ -49,9 +49,9 @@ namespace FEAST
        *
        * This constructor creates a vector mirror based on a dof-mirror adjacency graph.
        */
-      explicit VectorMirror(const Graph& gather_graph) :
+      explicit VectorMirror(const Adjacency::Graph& gather_graph) :
         _mirror_gather(gather_graph),
-        _mirror_scatter(Graph(Graph::rt_transpose, gather_graph))
+        _mirror_scatter(Adjacency::Graph(Adjacency::rt_transpose, gather_graph))
       {
         _mirror_gather.clear(DataType(1));
         _mirror_scatter.clear(DataType(1));

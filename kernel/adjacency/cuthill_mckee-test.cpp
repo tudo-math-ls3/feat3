@@ -1,10 +1,11 @@
 #include <test_system/test_system.hpp>
-#include <kernel/util/graph.hpp>
-#include <kernel/util/permutation.hpp>
-#include <kernel/util/cuthill_mckee.hpp>
+#include <kernel/adjacency/graph.hpp>
+#include <kernel/adjacency/permutation.hpp>
+#include <kernel/adjacency/cuthill_mckee.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
+using namespace FEAST::Adjacency;
 
 /**
  * \brief Test class for the Cuthill McKee class.

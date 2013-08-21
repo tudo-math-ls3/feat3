@@ -85,7 +85,7 @@ QuadMesh* read_quad_mesh(const char* filename)
   return mesh;
 }
 
-bool verify_struct(const char* filename, const Graph& graph)
+bool verify_struct(const char* filename, const Adjacency::Graph& graph)
 {
   FILE* file = fopen(filename, "rb");
   ASSERT_(file != NULL);
@@ -220,7 +220,7 @@ void test_asm(const Space_& space, const String& cubature, const char* matx_name
 {
   std::cout << "Assembling matrix structure..." << std::endl;
 
-  Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
+  Adjacency::Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
   std::cout << "NEQ : " << dof_adjacency.get_num_nodes_domain() << std::endl;
   std::cout << "NNZE: " << dof_adjacency.get_num_indices() << std::endl;
 

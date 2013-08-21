@@ -11,7 +11,7 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/algorithm.hpp>
-#include <kernel/util/graph.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 
 
@@ -383,7 +383,7 @@ namespace FEAST
          *
          * Creates a matrix from a given graph.
          */
-        explicit SparseMatrixCSR(const Graph & graph) :
+        explicit SparseMatrixCSR(const Adjacency::Graph & graph) :
           Container<Mem_, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image())
         {
           CONTEXT("When creating SparseMatrixCSR");

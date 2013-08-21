@@ -1,9 +1,11 @@
 #include <test_system/test_system.hpp>
-#include <kernel/util/graph.hpp>
-#include <kernel/util/colouring.hpp>
+#include <kernel/adjacency/graph.hpp>
+#include <kernel/adjacency/colouring.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
+using namespace FEAST::Adjacency;
 
 typedef CompositeAdjactor<Graph,Graph> CAGG;
 
@@ -376,15 +378,15 @@ public:
     Graph g(5, 7, 17, g_ptr, nullptr, g_idx);
 
     // transpose the graph G
-    Graph f(Graph::rt_transpose, g);
+    Graph f(rt_transpose, g);
     TEST_CHECK(test_f(f));
 
     // render and test fg
-    Graph fg(Graph::rt_injectify, f, g);
+    Graph fg(rt_injectify, f, g);
     TEST_CHECK(test_fg(fg));
 
     // render and test gf
-    Graph gf(Graph::rt_injectify, g, f);
+    Graph gf(rt_injectify, g, f);
     TEST_CHECK(test_gf(gf));
 
     // test sorting

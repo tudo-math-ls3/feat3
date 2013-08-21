@@ -7,14 +7,14 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/matrix_base.hpp>
-#include <kernel/util/graph.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-
+#include <stdint.h>
 
 namespace FEAST
 {
@@ -415,7 +415,7 @@ namespace FEAST
          *
          * Creates a matrix from a given graph.
          */
-        explicit SparseMatrixCOO(const Graph & graph) :
+        explicit SparseMatrixCOO(const Adjacency::Graph & graph) :
           Container<Mem_, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image())
         {
           CONTEXT("When creating SparseMatrixCOO");
@@ -427,8 +427,8 @@ namespace FEAST
 
           for (Index i(0) ; i < this->rows() ; ++i)
           {
-            typename Graph::ImageIterator it(graph.image_begin(i));
-            typename Graph::ImageIterator jt(graph.image_end(i));
+            typename Adjacency::Graph::ImageIterator it(graph.image_begin(i));
+            typename Adjacency::Graph::ImageIterator jt(graph.image_end(i));
             for( ; it != jt ; ++it)
             {
               (*this)(i, *it, DT_(0));

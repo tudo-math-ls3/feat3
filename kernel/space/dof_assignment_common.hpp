@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/space/dof_assignment_base.hpp>
-#include <kernel/util/adjactor.hpp>
+#include <kernel/adjacency/adjactor.hpp>
 
 namespace FEAST
 {

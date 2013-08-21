@@ -7,6 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # include kernel subdirectories
+ADD_SUBDIRECTORY( adjacency )
 ADD_SUBDIRECTORY( assembly )
 ADD_SUBDIRECTORY( cubature )
 ADD_SUBDIRECTORY( foundation )
@@ -22,6 +23,7 @@ ADD_LIBRARY(feast STATIC archs.cpp)
 
 # list of libraries to include in feast lib
 TARGET_LINK_LIBRARIES (feast
+  kernel-adjacency
 # kernel-assembly
 # kernel-cubature
   kernel-foundation

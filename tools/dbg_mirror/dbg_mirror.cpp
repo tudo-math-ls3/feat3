@@ -65,12 +65,12 @@ void test_mirror(
   const String cubature = "gauss-legendre:2")
 {
   // assemble dof-adjacency graphs
-  Graph dof_adj_0(Space::DofAdjacency<>::assemble(space_0));
-  Graph dof_adj_1(Space::DofAdjacency<>::assemble(space_1));
+  Adjacency::Graph dof_adj_0(Space::DofAdjacency<>::assemble(space_0));
+  Adjacency::Graph dof_adj_1(Space::DofAdjacency<>::assemble(space_1));
 
   // assemble dof-mirror graphs
-  Graph dof_mir_0(Space::DofMirror::assemble(space_0, cell_0));
-  Graph dof_mir_1(Space::DofMirror::assemble(space_1, cell_1));
+  Adjacency::Graph dof_mir_0(Space::DofMirror::assemble(space_0, cell_0));
+  Adjacency::Graph dof_mir_1(Space::DofMirror::assemble(space_1, cell_1));
 
   // allocate local vectors
   VectorType loc_vec_0(space_0.get_num_dofs(), Real(0));

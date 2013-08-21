@@ -144,8 +144,8 @@ void check_synch_mirror(int rank)
   quad_trafo_type_ trafo(mesh);
   quad_space_type_ space(trafo);
 
-  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
-  Graph dof_mirror(Space::DofMirror::assemble(space, cell));
+  Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+  Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, cell));
 
   DenseVector<Mem::Main, double> target(space.get_num_dofs(), double(rank));
   LAFEM::VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
@@ -198,8 +198,8 @@ void check_synch_mirrors(int rank)
   quad_trafo_type_ trafo(mesh);
   quad_space_type_ space(trafo);
 
-  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
-  Graph dof_mirror(Space::DofMirror::assemble(space, cell));
+  Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+  Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, cell));
 
   DenseVector<Mem::Main, double> target(space.get_num_dofs(), double(rank));
   LAFEM::VectorMirror<Mem::Main, double> target_mirror(dof_mirror);

@@ -4,7 +4,7 @@
 
 // includes, FEAST
 #include <kernel/space/dof_mapping_base.hpp>
-#include <kernel/util/adjactor.hpp>
+#include <kernel/adjacency/adjactor.hpp>
 
 namespace FEAST
 {
@@ -34,7 +34,7 @@ namespace FEAST
     {
     public:
       /// adjactor image iterator type
-      typedef Adjactor::IndexImageIterator ImageIterator;
+      typedef Adjacency::Adjactor::IndexImageIterator ImageIterator;
 
     protected:
       /// constructor

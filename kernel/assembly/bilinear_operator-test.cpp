@@ -60,7 +60,7 @@ public:
     QuadSpaceQ0 space(trafo);
 
     // create a CSR matrices
-    Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
+    Adjacency::Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
     MatrixType matrix(dof_adjacency);
     matrix.clear();
 
@@ -92,7 +92,7 @@ public:
     QuadSpaceQ1 space(trafo);
 
     // create two CSR matrices
-    Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
+    Adjacency::Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
     MatrixType matrix_1(dof_adjacency);
     MatrixType matrix_2(dof_adjacency);
     matrix_1.clear();

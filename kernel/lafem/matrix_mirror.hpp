@@ -4,7 +4,8 @@
 
 // includes, FEAST
 #include <kernel/lafem/vector_mirror.hpp>
-#include <kernel/util/dynamic_graph.hpp>
+#include <kernel/adjacency/dynamic_graph.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 namespace FEAST
 {
@@ -93,10 +94,10 @@ namespace FEAST
         // Y is the system matrix
         // A is the row-mirror dual-gather matrix
         // B is the col-mirror dual-gather matrix
-        DynamicGraph graph(DynamicGraph::rt_as_is, _row_mirror.get_gather_dual());
+        Adjacency::DynamicGraph graph(Adjacency::rt_as_is, _row_mirror.get_gather_dual());
         graph.compose(tmpl_mat);
         graph.compose(_col_mirror.get_scatter_dual());
-        return LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>(Graph(Graph::rt_as_is, graph));
+        return LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>(Adjacency::Graph(Adjacency::rt_as_is, graph));
       }
 
       /**

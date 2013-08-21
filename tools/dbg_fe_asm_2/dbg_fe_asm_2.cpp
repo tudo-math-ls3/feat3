@@ -25,7 +25,7 @@ void test_asm(const Space_& space, const String& cubature, int imat)
 {
   std::cout << "Assembling matrix structure..." << std::endl;
 
-  Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
+  Adjacency::Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
   std::cout << "NEQ : " << dof_adjacency.get_num_nodes_domain() << std::endl;
   std::cout << "NNZE: " << dof_adjacency.get_num_indices() << std::endl;
 

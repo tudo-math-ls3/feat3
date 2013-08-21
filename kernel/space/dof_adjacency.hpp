@@ -3,7 +3,7 @@
 #define KERNEL_SPACE_DOF_ADJACENCY_HPP 1
 
 // includes, FEAST
-#include <kernel/util/graph.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 namespace FEAST
 {
@@ -87,17 +87,17 @@ namespace FEAST
       template<
         typename TestSpace_,
         typename TrialSpace_>
-      static Graph assemble(const TestSpace_& test_space, const TrialSpace_& trial_space)
+      static Adjacency::Graph assemble(const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
         // create test- and trial-dof-mappers
         typename TestSpace_::DofMappingType test_dof_mapping(test_space);
         typename TrialSpace_::DofMappingType trial_dof_mapping(trial_space);
 
         // render transposed test-dof-mapping
-        Graph test_dof_support(Graph::rt_transpose, test_dof_mapping);
+        Adjacency::Graph test_dof_support(Adjacency::rt_transpose, test_dof_mapping);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Graph dof_adjactor(Graph::rt_injectify, test_dof_support, trial_dof_mapping);
+        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_support, trial_dof_mapping);
 
         // sort the dof-adjactor graph
         dof_adjactor.sort_indices();
@@ -116,16 +116,16 @@ namespace FEAST
        * The standard Dof-Adjacency graph of the space.
        */
       template<typename Space_>
-      static Graph assemble(const Space_& space)
+      static Adjacency::Graph assemble(const Space_& space)
       {
         // create dof-mapping
         typename Space_::DofMappingType dof_mapping(space);
 
         // render transposed dof-mapping
-        Graph dof_support(Graph::rt_transpose, dof_mapping);
+        Adjacency::Graph dof_support(Adjacency::rt_transpose, dof_mapping);
 
         // render composite dof-mapping/dof-support graph
-        Graph dof_adjactor(Graph::rt_injectify, dof_support, dof_mapping);
+        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, dof_support, dof_mapping);
 
         // sort the sof-adjactor graph
         dof_adjactor.sort_indices();
@@ -151,7 +151,7 @@ namespace FEAST
       class RefinementAdjactor
       {
       public:
-        typedef Adjactor::IndexImageIterator ImageIterator;
+        typedef Adjacency::Adjactor::IndexImageIterator ImageIterator;
 
       private:
         Index _num_elements;
@@ -202,7 +202,7 @@ namespace FEAST
       template<
         typename FineTestSpace_,
         typename CoarseTrialSpace_>
-      static Graph assemble(
+      static Adjacency::Graph assemble(
         const FineTestSpace_& fine_test_space,
         const CoarseTrialSpace_& coarse_trial_space)
       {
@@ -226,10 +226,10 @@ namespace FEAST
         typename CoarseTrialSpace_::DofMappingType trial_dof_mapping(coarse_trial_space);
 
         // render transposed test-dof-mapping
-        Graph test_dof_support(Graph::rt_injectify_transpose, refine_adjactor, test_dof_mapping);
+        Adjacency::Graph test_dof_support(Adjacency::rt_injectify_transpose, refine_adjactor, test_dof_mapping);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Graph dof_adjactor(Graph::rt_injectify, test_dof_support, trial_dof_mapping);
+        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_support, trial_dof_mapping);
 
         // sort the dof-adjactor graph
         dof_adjactor.sort_indices();

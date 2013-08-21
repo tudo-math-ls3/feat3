@@ -3,7 +3,7 @@
 #define KERNEL_SPACE_DOF_MIRROR_HPP 1
 
 // includes, FEAST
-#include <kernel/util/graph.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 namespace FEAST
 {
@@ -160,7 +160,7 @@ namespace FEAST
       template<
         typename Space_,
         typename CellSet_>
-      static Graph assemble(
+      static Adjacency::Graph assemble(
         const Space_& space,
         const CellSet_& cell_set)
       {
@@ -170,7 +170,7 @@ namespace FEAST
 
         Index contribs = 0;
         Index count = Intern::DofMirrorHelpWrapper<Space_, CellSet_>::count(contribs, space, cell_set);
-        Graph graph(count, space.get_num_dofs(), contribs);
+        Adjacency::Graph graph(count, space.get_num_dofs(), contribs);
         Index* ptr = graph.get_domain_ptr();
         Index* idx = graph.get_image_idx();
         Intern::DofMirrorHelpWrapper<Space_, CellSet_>::fill(ptr, idx, space, cell_set);

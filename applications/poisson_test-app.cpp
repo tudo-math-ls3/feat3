@@ -452,8 +452,8 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
   //assemble dof adjacencies
-  Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //TODO do we need it?
-  Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+  Adjacency::Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //TODO do we need it?
+  Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
 
   SparseMatrixCSR<Mem::Main, double> mat_sys(dof_adj);
   mat_sys.clear();
@@ -483,7 +483,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   std::cout << "proc " << rank << " #comm halos " << macro_comm_halos_fine.size() << std::endl;
   for(Index i(0) ; i < macro_comm_halos_fine.size() ; ++i)
   {
-    Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_comm_halos_fine.at(i).get())));
+    Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_comm_halos_fine.at(i).get())));
     VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
     DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
     DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
@@ -689,7 +689,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
 
   ///gather solution vector on process 0
   //local mirror creation
-  Graph dof_mirror_local(Space::DofMirror::assemble(space_base, *macro_subset_geo_fine));
+  Adjacency::Graph dof_mirror_local(Space::DofMirror::assemble(space_base, *macro_subset_geo_fine));
   VectorMirror<Mem::Main, double> source_mirror_local(dof_mirror_local);
   ///now we must send the mirror to rank 0 -> VM must implement foundation's sendable/bufferable interfaces -> TODO
   ///alternatively, we can create all needed subsets again on rank 0 and only communicate sol

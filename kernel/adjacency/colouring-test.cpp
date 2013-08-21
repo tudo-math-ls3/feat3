@@ -1,9 +1,10 @@
 #include <test_system/test_system.hpp>
-#include <kernel/util/graph.hpp>
-#include <kernel/util/colouring.hpp>
+#include <kernel/adjacency/graph.hpp>
+#include <kernel/adjacency/colouring.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
+using namespace FEAST::Adjacency;
 
 /**
  * \brief Test class for the Colouring class.

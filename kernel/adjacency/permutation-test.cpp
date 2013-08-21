@@ -1,10 +1,14 @@
 #include <test_system/test_system.hpp>
-#include <kernel/util/permutation.hpp>
+#include <kernel/adjacency/permutation.hpp>
+#include <kernel/util/random.hpp>
 #include <iostream>
 #include <ctime>
+#include <stdlib.h>
+#include <stdint.h>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
+using namespace FEAST::Adjacency;
 
 /**
  * \brief Test class for the Permutation class.

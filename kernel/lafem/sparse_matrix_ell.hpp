@@ -10,7 +10,6 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/algorithm.hpp>
-#include <kernel/util/graph.hpp>
 
 #include <iostream>
 #include <fstream>

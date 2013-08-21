@@ -874,11 +874,11 @@ class MeshControlPartitioningTest2D:
       std::vector<Index> destranks;
       std::vector<Index> sourceranks;
 
-      Graph dof_adj(Space::DofAdjacency<>::assemble(space));
+      Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
 
       for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
       {
-        Graph dof_mirror(Space::DofMirror::assemble(space, *(finemost_macro_boundaries.at(i).get())));
+        Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, *(finemost_macro_boundaries.at(i).get())));
         VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
         DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
         DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
