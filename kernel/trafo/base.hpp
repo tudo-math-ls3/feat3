@@ -10,6 +10,10 @@ namespace FEAST
 {
   /**
    * \brief Transformation namespace
+   *
+   * This namespace encapsulates classes and class templates related to the transformation between reference
+   * cells and the cells of a Geometry mesh object, which is a basic requirement for the definition of
+   * finite element spaces.
    */
   namespace Trafo
   {

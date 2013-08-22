@@ -6,6 +6,12 @@
 
 namespace FEAST
 {
+  /**
+   * \brief Template Meta-Program Math namespace
+   *
+   * This namespace encapsulated mathematical functions, which are written as template meta-programs
+   * so that they may be evaluated at compile-time.
+   */
   namespace MetaMath
   {
     /**

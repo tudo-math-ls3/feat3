@@ -128,7 +128,8 @@ namespace FEAST
      * This function calculates the binomial coefficient
      * \f[ {n \choose k} := \frac{n!}{k!(n-k)!} \f]
      *
-     * \attentions This function works only for integral data types;
+     * \attention
+     * This function works only for integral data types;
      * it will give incorrect results for floating point data types!
      *
      * \param[in] n,k

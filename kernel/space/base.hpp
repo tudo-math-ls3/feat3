@@ -8,7 +8,9 @@
 namespace FEAST
 {
   /**
-   * \brief Element namespace
+   * \brief Finite Element Space namespace
+   *
+   * This namespaces encapsulates classes and class templates which implement Finite Element spaces.
    */
   namespace Space
   {

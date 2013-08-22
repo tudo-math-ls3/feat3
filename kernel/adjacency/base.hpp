@@ -7,6 +7,11 @@
 
 namespace FEAST
 {
+  /**
+   * \brief Adjacency namespace
+   *
+   * This namespace encapsulates classes and class templates related to handling adjacency information.
+   */
   namespace Adjacency
   {
     /**
