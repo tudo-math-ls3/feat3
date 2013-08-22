@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/assembly/base.hpp>
+#include <kernel/lafem/unit_filter.hpp>
 
 // includes, system
 #include <set>

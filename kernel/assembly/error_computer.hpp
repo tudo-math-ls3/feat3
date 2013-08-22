@@ -127,7 +127,7 @@ namespace FEAST
         typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
 
         // create matrix scatter-axpy
-        VectorGatherAxpy<VectorType> gather_axpy(vector);
+        LAFEM::GatherAxpy<VectorType> gather_axpy(vector);
 
         // initialise result
         DataType result(DataType(0));
@@ -320,7 +320,7 @@ namespace FEAST
         typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
 
         // create matrix scatter-axpy
-        VectorGatherAxpy<VectorType> gather_axpy(vector);
+        LAFEM::GatherAxpy<VectorType> gather_axpy(vector);
 
         // initialise result
         DataType result(DataType(0));

@@ -114,7 +114,7 @@ namespace FEAST
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
-        MatrixScatterAxpy<MatrixType> scatter_axpy(matrix);
+        LAFEM::ScatterAxpy<MatrixType> scatter_axpy(matrix);
 
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
@@ -266,7 +266,7 @@ namespace FEAST
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
 
         // create matrix scatter-axpy
-        MatrixScatterAxpy<MatrixType> scatter_axpy(matrix);
+        LAFEM::ScatterAxpy<MatrixType> scatter_axpy(matrix);
 
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)

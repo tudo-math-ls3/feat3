@@ -5,11 +5,20 @@
 // includes, FEAST
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/util/linear_algebra.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 namespace FEAST
 {
   namespace Assembly
   {
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename Matrix_>
+      class RowScaler;
+    }
+    /// \endcond
+
     /**
      * \brief Grid-Transfer assembly class template
      *
@@ -104,7 +113,7 @@ namespace FEAST
         typedef typename Intern::CubatureTraits<FineTrafoEvaluator>::RuleType CubatureRuleType;
 
         // create matrix scatter-axpy
-        MatrixScatterAxpy<Matrix_> scatter_axpy(matrix);
+        LAFEM::ScatterAxpy<Matrix_> scatter_axpy(matrix);
 
         // create DOF-mappings
         FineDofMapping fine_dof_mapping(fine_space);
@@ -276,6 +285,34 @@ namespace FEAST
         delete [] weight;
       }
     }; // class GridTransfer<...>
+
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename Matrix_>
+      class RowScaler;
+
+      template<typename DataType_>
+      class RowScaler< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
+      {
+      public:
+        typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+
+        static void apply(MatrixType& matrix, const DataType_ x[])
+        {
+          Index* row_ptr(matrix.row_ptr());
+          Index* row_end(matrix.row_ptr_end());
+          DataType_* data(matrix.val());
+
+          for(Index i(0); i < matrix.rows(); ++i)
+          {
+            for(Index j(row_ptr[i]); j < row_end[i]; ++j)
+              data[j] *= x[i];
+          }
+        }
+      };
+    }
+    /// \endcond
   } // namespace Assembly
 } // namespace FEAST
 

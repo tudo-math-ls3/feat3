@@ -1,56 +1,132 @@
 #pragma once
-#ifndef KERNEL_ASSEMBLY_LAFEM_BACKEND_HPP
-#define KERNEL_ASSEMBLY_LAFEM_BACKEND_HPP 1
-
-// includes, FEAST
-#include <kernel/util/tiny_algebra.hpp>
+#ifndef KERNEL_LAFEM_GATHER_SCATTER_HPP
+#define KERNEL_LAFEM_GATHER_SCATTER_HPP 1
 
 // includes, FEAST-LAFEM
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/unit_filter.hpp>
 
 namespace FEAST
 {
-  namespace Assembly
+  namespace LAFEM
   {
-    /// \todo: all the class templates in this file shall be moved to LAFEM later...
-    template<typename Vector_>
-    class VectorScatterAxpy DOXY({});
+    /**
+     * \brief Scatter-Axpy class template
+     *
+     * \tparam Container_
+     * The type of the container that is the target of the scatter-axpy operation.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Container_>
+#ifndef DOXYGEN
+    class ScatterAxpy;
+#else
+    class ScatterAxpy
+    {
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] container
+       * A reference to the container that serves as the scatter target.
+       */
+      explicit(Container_& container);
 
-    template<typename Vector_>
-    class VectorGatherAxpy DOXY({});
+      /**
+       * \brief Scatter-Axpy operator
+       *
+       * \tparam LocalData_
+       * The class of the local data container.
+       * See the Assembly::LocalVectorData and Assembly::LocalMatrixData class templates for
+       * an interface definition and documentation.
+       *
+       * \param[in] local_data
+       * The local data object that serves as the scatter source.
+       *
+       * \param[in] alpha
+       * The scaling factor for the scatter-axpy operation.
+       */
+      template<typename LocalData_>
+      void operator()(
+        const LocalData_& local_data,
+        DataType alpha = DataType_(1));
+    };
+#endif // DOXYGEN
 
-    template<typename Matrix_>
-    class MatrixScatterAxpy DOXY({});
+    /**
+     * \brief Gather-Axpy class template
+     *
+     * \tparam Container_
+     * The type of the container that is the source of the gather-axpy operation.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Container_>
+#ifndef DOXYGEN
+    class GatherAxpy;
+#else
+    class GatherAxpy
+    {
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] container
+       * A const reference to the container that serves as the gather source.
+       */
+      explicit(const Container_& container);
 
-    template<typename Matrix_>
-    class MatrixGatherAxpy DOXY({});
+      /**
+       * \brief Gather-Axpy operator
+       *
+       * \tparam LocalData_
+       * The class of the local data container.
+       *
+       * \param[in] local_data
+       * The local data object that serves as the gather target.
+       *
+       * \param[in] alpha
+       * The scaling factor for the gather-axpy operation.
+       */
+      template<typename LocalData_>
+      void operator()(
+        LocalData_& local_data,
+        DataType alpha = DataType_(1));
+    };
+#endif // DOXYGEN
 
+    /**
+     * \brief Scatter-Axpy specialisation for DenseVector
+     *
+     * \author Peter Zajac
+     */
     template<typename DataType_>
-    class VectorScatterAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
+    class ScatterAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
     {
     public:
       typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
 
     private:
       Index _num_entries;
       DataType_* _data;
 
     public:
-      explicit VectorScatterAxpy(VectorType& vector) :
+      explicit ScatterAxpy(VectorType& vector) :
         _num_entries(vector.size()),
         _data(vector.elements())
       {
       }
 
-      virtual ~VectorScatterAxpy()
+      virtual ~ScatterAxpy()
       {
       }
 
-      template<typename LocalVectorData_>
+      template<typename LocalData_>
       void operator()(
-        const LocalVectorData_& loc_vec,
+        const LocalData_& loc_vec,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
@@ -67,32 +143,39 @@ namespace FEAST
           }
         }
       }
-    }; // class VectorScatterAxpy<LAFEM::DenseVector<Mem::Main,...>>
+    }; // class ScatterAxpy<LAFEM::DenseVector<Mem::Main,...>>
 
+    /**
+     * \brief Gather-Axpy specialisation for DenseVector
+     *
+     * \author Peter Zajac
+     */
     template<typename DataType_>
-    class VectorGatherAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
+    class GatherAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
     {
     public:
       typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
 
     private:
       Index _num_entries;
       const DataType_* _data;
 
     public:
-      explicit VectorGatherAxpy(const VectorType& vector) :
+      explicit GatherAxpy(const VectorType& vector) :
         _num_entries(vector.size()),
         _data(vector.elements())
       {
       }
 
-      virtual ~VectorGatherAxpy()
+      virtual ~GatherAxpy()
       {
       }
 
-      template<typename LocalVectorData_>
+      template<typename LocalData_>
       void operator()(
-        LocalVectorData_& loc_vec,
+        LocalData_& loc_vec,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local entries
@@ -112,13 +195,20 @@ namespace FEAST
           loc_vec(i) += alpha * dx;
         }
       }
-    }; // class VectorGatherAxpy<LAFEM::DenseVector<Mem::Main,...>>
+    }; // class GatherAxpy<LAFEM::DenseVector<Mem::Main,...>>
 
+    /**
+     * \brief Scatter-Axpy specialisation for SparseMatrixCSR
+     *
+     * \author Peter Zajac
+     */
     template<typename DataType_>
-    class MatrixScatterAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
+    class ScatterAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
     {
     public:
       typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
 
     private:
 #ifdef DEBUG
@@ -133,7 +223,7 @@ namespace FEAST
       DataType_ *_data;
 
     public:
-      explicit MatrixScatterAxpy(MatrixType& matrix) :
+      explicit ScatterAxpy(MatrixType& matrix) :
 #ifdef DEBUG
         _deadcode(~Index(0)),
 #endif
@@ -155,7 +245,7 @@ namespace FEAST
 #endif
       }
 
-      virtual ~MatrixScatterAxpy()
+      virtual ~ScatterAxpy()
       {
         if(_col_ptr != nullptr)
         {
@@ -163,9 +253,9 @@ namespace FEAST
         }
       }
 
-      template<typename LocalMatrixData_>
+      template<typename LocalData_>
       void operator()(
-        const LocalMatrixData_& loc_mat,
+        const LocalData_& loc_mat,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
@@ -223,13 +313,20 @@ namespace FEAST
           // continue with next row entry
         }
       }
-    }; // class MatrixScatterAdder<LAFEM::SparseMatrixCSR<Mem::Main,...>>
+    }; // class ScatterAxpy<LAFEM::SparseMatrixCSR<Mem::Main,...>>
 
+    /**
+     * \brief Gather-Axpy specialisation for SparseMatrixCSR
+     *
+     * \author Peter Zajac
+     */
     template<typename DataType_>
-    class MatrixGatherAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
+    class GatherAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
     {
     public:
       typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+      typedef Mem::Main MemType;
+      typedef DataType_ DataType;
 
     private:
 #ifdef DEBUG
@@ -244,7 +341,7 @@ namespace FEAST
       const DataType_ *_data;
 
     public:
-      explicit MatrixGatherAxpy(const MatrixType& matrix) :
+      explicit GatherAxpy(const MatrixType& matrix) :
 #ifdef DEBUG
         _deadcode(~Index(0)),
 #endif
@@ -266,7 +363,7 @@ namespace FEAST
 #endif
       }
 
-      virtual ~MatrixGatherAxpy()
+      virtual ~GatherAxpy()
       {
         if(_col_ptr != nullptr)
         {
@@ -274,9 +371,9 @@ namespace FEAST
         }
       }
 
-      template<typename LocalMatrixData_>
+      template<typename LocalData_>
       void operator()(
-        LocalMatrixData_& loc_mat,
+        LocalData_& loc_mat,
         DataType_ alpha = DataType_(1))
       {
         // loop over all local row entries
@@ -336,36 +433,8 @@ namespace FEAST
           // continue with next row entry
         }
       }
-    }; // class MatrixGatherAxpy<LAFEM::SparseMatrixCSR<Mem::Main,...>>
-
-    /// \cond internal
-    namespace Intern
-    {
-      template<typename Matrix_>
-      class RowScaler;
-
-      template<typename DataType_>
-      class RowScaler< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
-      {
-      public:
-        typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
-
-        static void apply(MatrixType& matrix, const DataType_ x[])
-        {
-          Index* row_ptr(matrix.row_ptr());
-          Index* row_end(matrix.row_ptr_end());
-          DataType_* data(matrix.val());
-
-          for(Index i(0); i < matrix.rows(); ++i)
-          {
-            for(Index j(row_ptr[i]); j < row_end[i]; ++j)
-              data[j] *= x[i];
-          }
-        }
-      };
-    }
-    /// \endcond
-  } // namespace Assembly
+    }; // class GatherAxpy<LAFEM::SparseMatrixCSR<Mem::Main,...>>
+  } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_ASSEMBLY_LAFEM_BACKEND_HPP
+#endif // KERNEL_LAFEM_GATHER_SCATTER_HPP

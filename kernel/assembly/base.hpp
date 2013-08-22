@@ -5,9 +5,7 @@
 // includes, FEAST
 #include <kernel/space/eval_data.hpp>
 #include <kernel/trafo/eval_data.hpp>
-
-// to-be-outsourced to lafem
-#include <kernel/assembly/lafem_backend.hpp>
+#include <kernel/lafem/gather_scatter.hpp>
 
 namespace FEAST
 {

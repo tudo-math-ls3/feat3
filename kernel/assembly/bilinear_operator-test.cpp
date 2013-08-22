@@ -125,7 +125,7 @@ public:
     // create local matrix data
     Assembly::LocalMatrixData<Tiny::Matrix<DataType_,4,4>, DofMapping, DofMapping>
       lmd1(dof_mapping,dof_mapping), lmd2(dof_mapping,dof_mapping);
-    Assembly::MatrixGatherAxpy<MatrixType> gather1(matrix_1), gather2(matrix_2);
+    LAFEM::GatherAxpy<MatrixType> gather1(matrix_1), gather2(matrix_2);
 
     // some constants
     static const DataType_ zero = DataType_(0);
