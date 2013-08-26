@@ -53,7 +53,6 @@ namespace FEAST
         typedef typename Space_::ShapeType ShapeType;
         typedef typename TrafoType::template Evaluator<ShapeType, DataType_>::Type TrafoEvalType;
         typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
-        typedef typename TrafoEvalTraits::DomainCoordType DomainCoordType;
         typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
         typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
@@ -66,7 +65,7 @@ namespace FEAST
           };
           typedef TrafoEvalType TrafoEvaluator;
           typedef TrafoEvalData TrafoData;
-          typedef DataType_ CoeffType;
+          typedef DataType_ DataType;
           typedef DataType_ ValueType;
         };
 
@@ -85,7 +84,7 @@ namespace FEAST
           // set cell midpoint
           for(int i(0); i < ShapeType::dimension; ++i)
           {
-            _dom_point[i] = DomainCoordType(0);
+            _dom_point[i] = DataType_(0);
           }
         }
 

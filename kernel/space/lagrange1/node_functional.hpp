@@ -62,7 +62,7 @@ namespace FEAST
           };
           typedef TrafoEvalType TrafoEvaluator;
           typedef TrafoEvalData TrafoData;
-          typedef DataType_ CoeffType;
+          typedef DataType_ DataType;
           typedef DataType_ ValueType;
         };
 

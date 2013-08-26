@@ -48,21 +48,20 @@ namespace FEAST
         /// type of the underlying mesh
         typedef typename TrafoType::MeshType MeshType;
 
-        /// trafo coefficient type
-        typedef typename EvalPolicy::TrafoCoeffType CoeffType;
-
-        /// const domain point reference
-        typedef typename EvalPolicy::DomainPointConstRef DomainPointConstRef;
-
-        /// image coordinate type
-        typedef typename EvalPolicy::ImageCoordType ImageCoordType;
-        /// image point reference
-        typedef typename EvalPolicy::ImagePointRef ImagePointRef;
-
-        /// jacobian matrix coefficient type
-        typedef typename EvalPolicy::JacMatCoeff JacMatCoeff;
-        /// jacobian matrix reference
-        typedef typename EvalPolicy::JacMatRef JacMatRef;
+        /// evaluation data type
+        typedef typename EvalPolicy::DataType DataType;
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+        /// image point type
+        typedef typename EvalPolicy::ImagePointType ImagePointType;
+        /// jacobian matrix type
+        typedef typename EvalPolicy::JacobianMatrixType JacobianMatrixType;
+        /// jacobian inverse matrix type
+        typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
+        /// jacobian determinant type
+        typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
+        /// hessian tensor type
+        typedef typename EvalPolicy::HessianTensorType HessianTensorType;
 
         /// dummy enumeration
         enum
@@ -85,12 +84,14 @@ namespace FEAST
           /// can't compute jacobian inverse matrices
           can_jac_inv = 0,
           /// can't compute jacobian determinants
-          can_jac_det = 0
+          can_jac_det = 0,
+          /// can't compute hessian tensors
+          can_hess_ten = 0
         };
 
       protected:
         /// the coefficients of the trafo
-        CoeffType _coeff[image_dim];
+        DataType _coeff[image_dim];
 
       public:
         /**
@@ -129,7 +130,7 @@ namespace FEAST
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
           {
-            _coeff[i] = CoeffType(vtx[i]);
+            _coeff[i] = DataType(vtx[i]);
           }
         }
 
@@ -142,11 +143,11 @@ namespace FEAST
          * \param[in] dom_point
          * A reference to the point on the reference cell that is to be mapped.
          */
-        void map_point(ImagePointRef img_point, DomainPointConstRef DOXY(dom_point)) const
+        void map_point(ImagePointType& img_point, const DomainPointType& DOXY(dom_point)) const
         {
           for(int i(0); i < image_dim; ++i)
           {
-            img_point[i] = ImageCoordType(_coeff[i]);
+            img_point[i] = _coeff[i];
           }
         }
       }; // class Evaluator<Hypercube<1>,...>
@@ -177,21 +178,20 @@ namespace FEAST
         /// type of the underlying mesh
         typedef typename TrafoType::MeshType MeshType;
 
-        /// trafo coefficient type
-        typedef typename EvalPolicy::TrafoCoeffType CoeffType;
-
-        /// const domain point reference
-        typedef typename EvalPolicy::DomainPointConstRef DomainPointConstRef;
-
-        /// image coordinate type
-        typedef typename EvalPolicy::ImageCoordType ImageCoordType;
-        /// image point reference
-        typedef typename EvalPolicy::ImagePointRef ImagePointRef;
-
-        /// jacobian matrix coefficient type
-        typedef typename EvalPolicy::JacMatCoeff JacMatCoeff;
-        /// jacobian matrix reference
-        typedef typename EvalPolicy::JacMatRef JacMatRef;
+        /// evaluation data type
+        typedef typename EvalPolicy::DataType DataType;
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+        /// image point type
+        typedef typename EvalPolicy::ImagePointType ImagePointType;
+        /// jacobian matrix type
+        typedef typename EvalPolicy::JacobianMatrixType JacobianMatrixType;
+        /// jacobian inverse matrix type
+        typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
+        /// jacobian determinant type
+        typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
+        /// hessian tensor type
+        typedef typename EvalPolicy::HessianTensorType HessianTensorType;
 
         /// dummy enumeration
         enum
@@ -214,12 +214,14 @@ namespace FEAST
           /// can compute jacobian inverse matrices if domain and image dimensions coincide
           can_jac_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
           /// can compute jacobian determinants
-          can_jac_det = 1
+          can_jac_det = 1,
+          /// can compute hessian tensors
+          can_hess_ten = 1
         };
 
       protected:
         /// the coefficients of the trafo
-        CoeffType _coeff[image_dim][2];
+        DataType _coeff[image_dim][2];
 
       public:
         /**
@@ -263,8 +265,8 @@ namespace FEAST
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
           {
-            _coeff[i][0] = CoeffType(0.5) * CoeffType( v0[i] + v1[i]);
-            _coeff[i][1] = CoeffType(0.5) * CoeffType(-v0[i] + v1[i]);
+            _coeff[i][0] = DataType(0.5) * DataType( v0[i] + v1[i]);
+            _coeff[i][1] = DataType(0.5) * DataType(-v0[i] + v1[i]);
           }
         }
 
@@ -277,12 +279,11 @@ namespace FEAST
          * \param[in] dom_point
          * A reference to the point on the reference cell that is to be mapped.
          */
-        void map_point(ImagePointRef img_point, DomainPointConstRef dom_point) const
+        void map_point(ImagePointType& img_point, const DomainPointType& dom_point) const
         {
           for(int i(0); i < image_dim; ++i)
           {
-            img_point[i] =
-              ImageCoordType(_coeff[i][0]) + ImageCoordType(_coeff[i][1]) * ImageCoordType(dom_point[0]);
+            img_point[i] = _coeff[i][0] + _coeff[i][1] * dom_point[0];
           }
         }
 
@@ -295,11 +296,27 @@ namespace FEAST
          * \param[in] dom_point
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          */
-        void calc_jac_mat(JacMatRef jac_mat, DomainPointConstRef /*dom_point*/) const
+        void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point)) const
         {
           for(int i(0); i < image_dim; ++i)
           {
-            jac_mat(i,0) = JacMatCoeff(_coeff[i][1]);
+            jac_mat(i,0) = _coeff[i][1];
+          }
+        }
+        /**
+         * \brief Computes the hessian tensor for a given domain point.
+         *
+         * \param[out] hess_ten
+         * A reference to the hessian tensor that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
+         */
+        void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
+        {
+          for(int i(0); i < image_dim; ++i)
+          {
+            hess_ten(i,0,0) = DataType(0);
           }
         }
       }; // class Evaluator<Hypercube<1>,...>
@@ -330,21 +347,20 @@ namespace FEAST
         /// type of the underlying mesh
         typedef typename TrafoType::MeshType MeshType;
 
-        /// trafo coefficient type
-        typedef typename EvalPolicy::TrafoCoeffType CoeffType;
-
-        /// const domain point reference
-        typedef typename EvalPolicy::DomainPointConstRef DomainPointConstRef;
-
-        /// image coordinate type
-        typedef typename EvalPolicy::ImageCoordType ImageCoordType;
-        /// image point reference
-        typedef typename EvalPolicy::ImagePointRef ImagePointRef;
-
-        /// jacobian matrix coefficient type
-        typedef typename EvalPolicy::JacMatCoeff JacMatCoeff;
-        /// jacobian matrix reference
-        typedef typename EvalPolicy::JacMatRef JacMatRef;
+        /// evaluation data type
+        typedef typename EvalPolicy::DataType DataType;
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+        /// image point type
+        typedef typename EvalPolicy::ImagePointType ImagePointType;
+        /// jacobian matrix type
+        typedef typename EvalPolicy::JacobianMatrixType JacobianMatrixType;
+        /// jacobian inverse matrix type
+        typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
+        /// jacobian determinant type
+        typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
+        /// hessian tensor type
+        typedef typename EvalPolicy::HessianTensorType HessianTensorType;
 
         /// dummy enumeration
         enum
@@ -367,12 +383,14 @@ namespace FEAST
           /// can compute jacobian inverse matrices if domain and image dimensions coincide
           can_jac_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
           /// can compute jacobian determinants
-          can_jac_det = 1
+          can_jac_det = 1,
+          /// can compute hessian tensors
+          can_hess_ten = 1
         };
 
       protected:
         /// the coefficients of the trafo
-        CoeffType _coeff[image_dim][4];
+        DataType _coeff[image_dim][4];
 
       public:
         /**
@@ -418,10 +436,10 @@ namespace FEAST
           // calculate transformation coefficients
           for(int i(0); i < image_dim; ++i)
           {
-            _coeff[i][0] = CoeffType(0.25) * CoeffType( v0[i] + v1[i] + v2[i] + v3[i]);
-            _coeff[i][1] = CoeffType(0.25) * CoeffType(-v0[i] + v1[i] - v2[i] + v3[i]);
-            _coeff[i][2] = CoeffType(0.25) * CoeffType(-v0[i] - v1[i] + v2[i] + v3[i]);
-            _coeff[i][3] = CoeffType(0.25) * CoeffType( v0[i] - v1[i] - v2[i] + v3[i]);
+            _coeff[i][0] = DataType(0.25) * DataType( v0[i] + v1[i] + v2[i] + v3[i]);
+            _coeff[i][1] = DataType(0.25) * DataType(-v0[i] + v1[i] - v2[i] + v3[i]);
+            _coeff[i][2] = DataType(0.25) * DataType(-v0[i] - v1[i] + v2[i] + v3[i]);
+            _coeff[i][3] = DataType(0.25) * DataType( v0[i] - v1[i] - v2[i] + v3[i]);
           }
         }
 
@@ -434,14 +452,12 @@ namespace FEAST
          * \param[in] dom_point
          * A reference to the point on the reference cell that is to be mapped.
          */
-        void map_point(ImagePointRef img_point, DomainPointConstRef dom_point) const
+        void map_point(ImagePointType& img_point, const DomainPointType& dom_point) const
         {
           for(int i(0); i < image_dim; ++i)
           {
-            img_point[i] =
-              ImageCoordType(_coeff[i][0]) + ImageCoordType(_coeff[i][1]) * ImageCoordType(dom_point[0]) +
-              (ImageCoordType(_coeff[i][2]) + ImageCoordType(_coeff[i][3]) * ImageCoordType(dom_point[0])) *
-              ImageCoordType(dom_point[1]);
+            img_point[i] = _coeff[i][0] + _coeff[i][1] * dom_point[0] +
+              (_coeff[i][2] + _coeff[i][3] * dom_point[0]) * dom_point[1];
           }
         }
 
@@ -454,12 +470,30 @@ namespace FEAST
          * \param[in] dom_point
          * A reference to the point on the reference cell where the jacobian matrix is to be computed.
          */
-        void calc_jac_mat(JacMatRef jac_mat, DomainPointConstRef dom_point) const
+        void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point) const
         {
           for(int i(0); i < image_dim; ++i)
           {
-            jac_mat(i,0) = JacMatCoeff(_coeff[i][1]) + JacMatCoeff(dom_point[1]) * JacMatCoeff(_coeff[i][3]);
-            jac_mat(i,1) = JacMatCoeff(_coeff[i][2]) + JacMatCoeff(dom_point[0]) * JacMatCoeff(_coeff[i][3]);
+            jac_mat(i,0) = _coeff[i][1] + dom_point[1] * _coeff[i][3];
+            jac_mat(i,1) = _coeff[i][2] + dom_point[0] * _coeff[i][3];
+          }
+        }
+
+        /**
+         * \brief Computes the hessian tensor for a given domain point.
+         *
+         * \param[out] hess_ten
+         * A reference to the hessian tensor that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
+         */
+        void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
+        {
+          for(int i(0); i < image_dim; ++i)
+          {
+            hess_ten(i,0,0) = hess_ten(i,1,1) = DataType(0);
+            hess_ten(i,0,1) = hess_ten(i,1,0) = _coeff[i][3];
           }
         }
       }; // class Evaluator<Hypercube<2>,...>

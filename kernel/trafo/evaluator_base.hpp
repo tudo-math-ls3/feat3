@@ -43,39 +43,18 @@ namespace FEAST
 
       /// evaluation data type
       typedef typename EvalPolicy::DataType DataType;
-
-      /// trafo coefficient type
-      typedef typename EvalPolicy::TrafoCoeffType TrafoCoeffType;
-
-      /// domain coordinate type
-      typedef typename EvalPolicy::DomainCoordType DomainCoordType;
       /// domain point type
       typedef typename EvalPolicy::DomainPointType DomainPointType;
-      /// domain point reference
-      typedef typename EvalPolicy::DomainPointRef DomainPointRef;
-      /// domain point const-reference
-      typedef typename EvalPolicy::DomainPointConstRef DomainPointConstRef;
-
-      /// image coordinate type
-      typedef typename EvalPolicy::ImageCoordType ImageCoordType;
       /// image point type
       typedef typename EvalPolicy::ImagePointType ImagePointType;
-      /// image point reference
-      typedef typename EvalPolicy::ImagePointRef ImagePointRef;
-      /// image point const-reference
-      typedef typename EvalPolicy::ImagePointConstRef ImagePointConstRef;
-
-      /// jacobian matrix coefficient type
-      typedef typename EvalPolicy::JacMatCoeff JacMatCoeff;
       /// jacobian matrix type
-      typedef typename EvalPolicy::JacMatType JacMatType;
-      /// jacobian matrix reference
-      typedef typename EvalPolicy::JacMatRef JacMatRef;
-      /// jacobian matrix const-reference
-      typedef typename EvalPolicy::JacMatConstRef JacMatConstRef;
-
+      typedef typename EvalPolicy::JacobianMatrixType JacobianMatrixType;
+      /// jacobian inverse matrix type
+      typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
       /// jacobian determinant type
-      typedef typename EvalPolicy::JacDetType JacDetType;
+      typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
+      /// hessian tensor type
+      typedef typename EvalPolicy::HessianTensorType HessianTensorType;
 
       /// dummy enumeration
       enum
@@ -141,17 +120,25 @@ namespace FEAST
          * See #calc_jac_det for details.
          */
         can_jac_det = ...,
+
+        /**
+         * \brief Hessian-Tensor capability
+         * This entry specifies whether the evaluator is capable of computing hessian tensors.\n
+         * If this value is non-zero, the evaluator implements the #calc_hess_ten member function.\n
+         * See #calc_hess_ten for details.
+         */
+        can_hess_ten = ...,
       };
 #endif // DOXYGEN
 
     protected:
       /// \cond internal
-      Evaluator_& me()
+      Evaluator_& cast()
       {
         return static_cast<Evaluator_&>(*this);
       }
 
-      const Evaluator_& me() const
+      const Evaluator_& cast() const
       {
         return static_cast<const Evaluator_&>(*this);
       }
@@ -232,10 +219,10 @@ namespace FEAST
        * \param[in] dom_point
        * A reference to the domain point on the reference cell that is to be mapped.
        */
-      void map_point(ImagePointRef img_point, DomainPointConstRef dom_point) const;
+      void map_point(ImagePointType& img_point, const DomainPointType& dom_point) const;
 
       /**
-       * \brief Calculates the jacobian matrix for a given domain point.
+       * \brief Computes the jacobian matrix for a given domain point.
        *
        * \param[out] jac_mat
        * A reference to the jacobian matrix that is to be computed.
@@ -243,7 +230,18 @@ namespace FEAST
        * \param[in] dom_point
        * A reference to the domain point on the reference cell for which the jacobian matrix is to be computed.
        */
-      void calc_jac_mat(JacMatRef jac_mat, DomainPointConstRef dom_point) const;
+      void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point) const;
+
+      /**
+       * \brief Computes the hessian tensor for a given domain point.
+       *
+       * \param[out] hess_ten
+       * A reference to the hessian tensor that is to be computed.
+       *
+       * \param[in] dom_point
+       * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
+       */
+      void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& dom_point) const;
 #endif // DOXYGEN
 
       /**
@@ -255,11 +253,11 @@ namespace FEAST
        * \returns
        * The jacobian determinant at the domain point.
        */
-      JacDetType calc_jac_det(DomainPointConstRef dom_point) const
+      JacobianDeterminantType calc_jac_det(const DomainPointType& dom_point) const
       {
         // compute jacobian matrix
-        JacMatType jac_mat;
-        me().calc_jac_mat(jac_mat, dom_point);
+        JacobianMatrixType jac_mat;
+        cast().calc_jac_mat(jac_mat, dom_point);
 
         // return its volume
         return jac_mat.vol();
@@ -274,11 +272,11 @@ namespace FEAST
        * \param[in] dom_point
        * The domain point at which the jacobian matrix is to be computed.
        */
-      void calc_jac_inv(JacMatRef jac_inv, DomainPointConstRef dom_point) const
+      void calc_jac_inv(JacobianInverseType& jac_inv, const DomainPointType& dom_point) const
       {
         // compute jacobian matrix
-        JacMatType jac_mat;
-        me().calc_jac_mat(jac_mat, dom_point);
+        JacobianMatrixType jac_mat;
+        cast().calc_jac_mat(jac_mat, dom_point);
 
         // invert jacobian matrix
         jac_inv.set_inverse(jac_mat);

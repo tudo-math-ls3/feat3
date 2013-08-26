@@ -72,25 +72,15 @@ namespace FEAST
         /// evaluation policy
         typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
 
-        /// domain point coefficient
-        typedef typename EvalPolicy::DomainCoordType DomainCoordType;
         /// domain point type
         typedef typename EvalPolicy::DomainPointType DomainPointType;
         /// image point type
         typedef typename EvalPolicy::ImagePointType ImagePointType;
-        /// const image point reference
-        typedef typename EvalPolicy::ImagePointConstRef ImagePointConstRef;
 
         /// jacobian matrix type
-        typedef typename EvalPolicy::JacMatType JacMatType;
+        typedef typename EvalPolicy::JacobianMatrixType JacobianMatrixType;
         /// jacobian inverse matrix type
-        typedef typename EvalPolicy::JacInvType JacInvType;
-
-        /// basis value coefficient type
-        typedef typename SpaceEvalTraits::BasisValueCoeff BasisValueCoeff;
-
-        /// basis gradient coefficient type
-        typedef typename SpaceEvalTraits::BasisGradientCoeff BasisGradientCoeff;
+        typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
 
         /** \copydoc EvaluatorBase::EvaluatorCapabilities */
         enum EvaluatorCapabilities
@@ -142,7 +132,7 @@ namespace FEAST
         typedef Tiny::Matrix<DataType, 4, 4> CoeffMatrixType;
 
         /// inverse linearised trafo matrix
-        JacInvType _inv_lin_mat;
+        JacobianInverseType _inv_lin_mat;
 
         // inverse linearised trafo vector
         ImagePointType _inv_lin_vec;
@@ -153,7 +143,7 @@ namespace FEAST
         void _build_inv_lin_trafo(const TrafoEvaluator& trafo_eval)
         {
           // create a domain point in the barycentre of the cell
-          DomainPointType dom_point(DomainCoordType(0));
+          DomainPointType dom_point(DataType(0));
 
           // create the trafo data
           InvLinTrafoData trafo_data;

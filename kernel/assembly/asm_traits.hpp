@@ -36,14 +36,11 @@ namespace FEAST
         /// shape type
         typedef typename EvalPolicy::ShapeType ShapeType;
 
-        /// domain coordinate type
-        typedef typename EvalPolicy::DomainCoordType DomainCoordType;
-
         /// domain point type
         typedef typename EvalPolicy::DomainPointType DomainPointType;
 
         /// cubature rule type
-        typedef Cubature::Rule<ShapeType, DataType, DomainCoordType, DomainPointType> RuleType;
+        typedef Cubature::Rule<ShapeType, DataType, DataType, DomainPointType> RuleType;
       };
     }
     /// \endcond

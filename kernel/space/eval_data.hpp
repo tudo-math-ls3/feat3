@@ -27,10 +27,17 @@ namespace FEAST
         static void eval(Data_&, const Evaluator_&, const TrafoEvalData_&) {}
       };
 
+      template<typename EvalTraits_, bool need_hess_>
+      struct BasisHessianData
+      {
+        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
+        static void eval(Data_&, const Evaluator_&, const TrafoEvalData_&) {}
+      };
+
       template<typename EvalTraits_>
       struct BasisValueData<EvalTraits_, true>
       {
-        /// basis function value
+        /// basis function value object
         typename EvalTraits_::BasisValueType value;
 
         template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
@@ -43,13 +50,26 @@ namespace FEAST
       template<typename EvalTraits_>
       struct BasisGradientData<EvalTraits_, true>
       {
-        /// gradient reference
+        /// basis gradient object
         typename EvalTraits_::BasisGradientType grad;
 
         template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
         static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
         {
           evaluator.eval_gradients(data, trafo_data);
+        }
+      };
+
+      template<typename EvalTraits_>
+      struct BasisHessianData<EvalTraits_, true>
+      {
+        /// basis hessian object
+        typename EvalTraits_::BasisHessianType hess;
+
+        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
+        static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
+        {
+          evaluator.eval_hessians(data, trafo_data);
         }
       };
     } // namespace Intern
@@ -70,8 +90,9 @@ namespace FEAST
       typename EvalTraits_,
       typename Cfg_>
     class BasisData :
-      public Intern::BasisValueData<EvalTraits_, Cfg_::need_value != 0>,
-      public Intern::BasisGradientData<EvalTraits_, Cfg_::need_grad != 0>
+      public Intern::BasisHessianData<EvalTraits_, Cfg_::need_hess != 0>,
+      public Intern::BasisGradientData<EvalTraits_, Cfg_::need_grad != 0>,
+      public Intern::BasisValueData<EvalTraits_, Cfg_::need_value != 0>
     {
     public:
       /// support enumeration
@@ -80,12 +101,15 @@ namespace FEAST
         /// specifies whether function values are given
         have_value = Cfg_::need_value,
         /// specifies whether gradients are given
-        have_grad = Cfg_::need_grad
+        have_grad = Cfg_::need_grad,
+        /// specifies whether hessians are given
+        have_hess = Cfg_::need_hess
       };
 
       /// \cond internal
       typedef Intern::BasisValueData<EvalTraits_, have_value != 0> BasisValueBase;
       typedef Intern::BasisGradientData<EvalTraits_, have_grad != 0> BasisGradientBase;
+      typedef Intern::BasisHessianData<EvalTraits_, have_hess != 0> BasisHessianBase;
       /// \endcond
 
       template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
@@ -93,6 +117,7 @@ namespace FEAST
       {
         BasisValueBase::eval(data, evaluator, trafo_data);
         BasisGradientBase::eval(data, evaluator, trafo_data);
+        BasisHessianBase::eval(data, evaluator, trafo_data);
       }
     }; // class FuncData<...>
 
@@ -120,6 +145,8 @@ namespace FEAST
         have_value = Cfg_::need_value,
         /// specifies whether gradients are given
         have_grad = Cfg_::need_grad,
+        /// specifies whether hessians are given
+        have_hess = Cfg_::need_hess,
         /// maximum number of local dofs
         max_local_dofs = EvalTraits_::max_local_dofs
       };

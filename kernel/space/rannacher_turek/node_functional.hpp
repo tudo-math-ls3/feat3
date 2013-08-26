@@ -56,7 +56,6 @@ namespace FEAST
         typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
         typedef typename TrafoType::template Evaluator<FacetType, DataType_>::Type TrafoEvalType;
         typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
-        typedef typename TrafoEvalTraits::DomainCoordType DomainCoordType;
         typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
         typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
@@ -70,14 +69,13 @@ namespace FEAST
 
           typedef TrafoEvalType TrafoEvaluator;
           typedef TrafoEvalData TrafoData;
-          typedef DataType_ CoeffType;
+          typedef DataType_ DataType;
           typedef DataType_ ValueType;
-          typedef Tiny::Vector<CoeffType, image_dim> GradientType;
         };
 
         typedef typename Functor_::template ValueEvaluator<FuncEvalTraits> FuncEval;
 
-        typedef Cubature::Rule<FacetType, DataType_, DomainCoordType, DomainPointType> CubRuleType;
+        typedef Cubature::Rule<FacetType, DataType_, DataType_, DomainPointType> CubRuleType;
 
         TrafoEvalType _trafo_eval;
         FuncEval _func_eval;

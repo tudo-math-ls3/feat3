@@ -16,14 +16,14 @@ namespace FEAST
       struct ImgPointData
       {
         template<typename Evaluator_>
-        void eval(const Evaluator_&, typename EvalTraits_::DomainPointConstRef) {}
+        void eval(const Evaluator_&, const typename EvalTraits_::DomainPointType&) {}
       };
 
       template<typename EvalTraits_, bool need_jac_mat_>
       struct JacMatData
       {
         template<typename Evaluator_>
-        void eval(const Evaluator_&, typename EvalTraits_::DomainPointConstRef) {}
+        void eval(const Evaluator_&, const typename EvalTraits_::DomainPointType&) {}
       };
 
       template<typename EvalTraits_, bool need_jac_inv_>
@@ -40,6 +40,26 @@ namespace FEAST
         void eval(JacMatData<EvalTraits_, need_jac_mat_>&) {}
       };
 
+      template<typename EvalTraits_, bool need_hess_ten_>
+      struct HessTenData
+      {
+        template<typename Evaluator_>
+        void eval(const Evaluator_&, const typename EvalTraits_::DomainPointType&) {}
+      };
+
+      template<typename EvalTraits_>
+      struct DomPointData
+      {
+        /// domain point
+        typename EvalTraits_::DomainPointType dom_point;
+
+        template<typename Evaluator_>
+        void eval(const Evaluator_&, const typename EvalTraits_::DomainPointType& dom_point)
+        {
+          this->dom_point = dom_point;
+        }
+      };
+
       template<typename EvalTraits_>
       struct ImgPointData<EvalTraits_, true>
       {
@@ -47,7 +67,7 @@ namespace FEAST
         typename EvalTraits_::ImagePointType img_point;
 
         template<typename Evaluator_>
-        void eval(const Evaluator_& evaluator, typename EvalTraits_::DomainPointConstRef dom_point)
+        void eval(const Evaluator_& evaluator, const typename EvalTraits_::DomainPointType& dom_point)
         {
           static_assert(Evaluator_::can_img_point != 0, "trafo evaluator can't compute image point coordinates");
           // let the evaluator map the point
@@ -59,10 +79,10 @@ namespace FEAST
       struct JacMatData<EvalTraits_, true>
       {
         /// jacobian matrix
-        typename EvalTraits_::JacMatType jac_mat;
+        typename EvalTraits_::JacobianMatrixType jac_mat;
 
         template<typename Evaluator_>
-        void eval(const Evaluator_& evaluator, typename EvalTraits_::DomainPointConstRef dom_point)
+        void eval(const Evaluator_& evaluator, const typename EvalTraits_::DomainPointType& dom_point)
         {
           static_assert(Evaluator_::can_jac_mat != 0, "trafo evaluator can't compute jacobian matrices");
           // let the evaluator compute the jacobian matrix
@@ -74,7 +94,7 @@ namespace FEAST
       struct JacInvData<EvalTraits_, true>
       {
         /// jacobian inverse matrix
-        typename EvalTraits_::JacMatType jac_inv;
+        typename EvalTraits_::JacobianInverseType jac_inv;
 
         void eval(JacMatData<EvalTraits_, true>& jmd)
         {
@@ -88,13 +108,28 @@ namespace FEAST
       struct JacDetData<EvalTraits_, true>
       {
         /// jacobian determinant
-        typename EvalTraits_::JacDetType jac_det;
+        typename EvalTraits_::JacobianDeterminantType jac_det;
 
         void eval(JacMatData<EvalTraits_, true>& jmd)
         {
           //static_assert(Evaluator_::can_jac_det != 0, "trafo evaluator can't compute jacobian determinants");
           // compute volume of jacobian matrix
           jac_det = jmd.jac_mat.vol();
+        }
+      };
+
+      template<typename EvalTraits_>
+      struct HessTenData<EvalTraits_, true>
+      {
+        /// hessian tensor
+        typename EvalTraits_::HessianTensorType hess_ten;
+
+        template<typename Evaluator_>
+        void eval(const Evaluator_& evaluator, const typename EvalTraits_::DomainPointType& dom_point)
+        {
+          static_assert(Evaluator_::can_hess_ten != 0, "trafo evaluator can't compute hessian tensors");
+          // let the evaluator compute the hessian tensor
+          evaluator.calc_hess_ten(hess_ten, dom_point);
         }
       };
 
@@ -126,9 +161,12 @@ namespace FEAST
       typename EvalTraits_,
       typename Cfg_>
     class EvalData :
-      public Intern::ImgPointData<EvalTraits_, Cfg_::need_img_point != 0>,
+      // Note: The following inheritance list is ordered by size of the classes
+      public Intern::HessTenData<EvalTraits_, Cfg_::need_hess_ten != 0>,
       public Intern::JacMatData<EvalTraits_, Intern::CfgHelper<Cfg_>::need_jac_mat != 0>,
       public Intern::JacInvData<EvalTraits_, Cfg_::need_jac_inv != 0>,
+      public Intern::ImgPointData<EvalTraits_, Cfg_::need_img_point != 0>,
+      public Intern::DomPointData<EvalTraits_>,
       public Intern::JacDetData<EvalTraits_, Cfg_::need_jac_det != 0>
     {
     public:
@@ -144,22 +182,23 @@ namespace FEAST
         /// specifies whether the jacobian inverse matrix is given
         have_jac_inv = Cfg_::need_jac_inv,
         /// specifies whether the jacobian determinant is given
-        have_jac_det = Cfg_::need_jac_det
+        have_jac_det = Cfg_::need_jac_det,
+        /// specifies whether the hessian tensor is given
+        have_hess_ten = Cfg_::need_hess_ten
       };
 
       /// \cond internal
+      typedef Intern::DomPointData<EvalTraits_> DomPointBase;
       typedef Intern::ImgPointData<EvalTraits_, have_img_point != 0> ImgPointBase;
       typedef Intern::JacMatData<EvalTraits_, have_jac_mat != 0> JacMatBase;
       typedef Intern::JacInvData<EvalTraits_, have_jac_inv != 0> JacInvBase;
       typedef Intern::JacDetData<EvalTraits_, have_jac_det != 0> JacDetBase;
+      typedef Intern::HessTenData<EvalTraits_, have_hess_ten != 0> HessTenBase;
       /// \endcond
 
     public:
       /// trafo evaluation traits
       typedef EvalTraits_ EvalTraits;
-
-      /// domain point
-      typename EvalTraits::DomainPointType dom_point;
 
       /**
        * \brief Evaluation operator
@@ -171,16 +210,14 @@ namespace FEAST
        * A reference to the domain point in which the evaluation shall take place.
        */
       template<typename Evaluator_>
-      void operator()(const Evaluator_& evaluator, typename EvalTraits::DomainPointConstRef dom_point_)
+      void operator()(const Evaluator_& evaluator, const typename EvalTraits_::DomainPointType& dom_point)
       {
-        // store domain point
-        dom_point = dom_point_;
-
-        // compute other data
+        DomPointBase::eval(evaluator, dom_point);
         ImgPointBase::eval(evaluator, dom_point);
         JacMatBase::eval(evaluator, dom_point);
         JacInvBase::eval(static_cast<JacMatBase&>(*this));
         JacDetBase::eval(static_cast<JacMatBase&>(*this));
+        HessTenBase::eval(evaluator, dom_point);
       }
     }; // class EvalData<...>
   } // namespace Trafo

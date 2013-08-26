@@ -54,47 +54,18 @@ namespace FEAST
       /// data type
       typedef DataType_ DataType;
 
-      /// trafo coefficient type
-      typedef DataType_ TrafoCoeffType;
-
-      /// domain coordinate type
-      typedef DataType_ DomainCoordType;
       /// domain point type
-      typedef Tiny::Vector<DomainCoordType, domain_dim> DomainPointType;
-      /// domain point reference
-      typedef DomainPointType& DomainPointRef;
-      /// domain point const reference
-      typedef const DomainPointType& DomainPointConstRef;
-
-      /// image coordinate type
-      typedef DataType_ ImageCoordType;
+      typedef Tiny::Vector<DataType, domain_dim> DomainPointType;
       /// image point type
-      typedef Tiny::Vector<ImageCoordType, image_dim> ImagePointType;
-      /// image point reference
-      typedef ImagePointType& ImagePointRef;
-      /// image point const reference
-      typedef const ImagePointType& ImagePointConstRef;
-
-      /// jacobian matrix coefficient type
-      typedef DataType_ JacMatCoeff;
+      typedef Tiny::Vector<DataType, image_dim> ImagePointType;
       /// jacobian matrix type
-      typedef Tiny::Matrix<JacMatCoeff, image_dim, domain_dim> JacMatType;
-      /// jacobian matrix reference
-      typedef JacMatType& JacMatRef;
-      /// jacobian matrix const reference
-      typedef const JacMatType& JacMatConstRef;
-
-      /// jacobian inverse matrix coefficient type
-      typedef DataType_ JacInvCoeff;
+      typedef Tiny::Matrix<DataType, image_dim, domain_dim> JacobianMatrixType;
       /// jacobian inverse matrix type
-      typedef Tiny::Matrix<JacInvCoeff, domain_dim, image_dim> JacInvType;
-      /// jacobian inverse matrix reference
-      typedef JacInvType& JacInvRef;
-      /// jacobian inverse matrix const reference
-      typedef const JacInvType& JacInvConstRef;
-
+      typedef Tiny::Matrix<DataType, domain_dim, image_dim> JacobianInverseType;
       /// jacobian determinant type
-      typedef DataType_ JacDetType;
+      typedef DataType JacobianDeterminantType;
+      /// hessian tensor type
+      typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianTensorType;
 
     }; // class StandardEvalPolicy<...>
 
@@ -119,7 +90,9 @@ namespace FEAST
         /// specifies whether the trafo should supply inverse jacobian matrices
         need_jac_inv = 0,
         /// specifies whether the trafo should supply jacobian determinants
-        need_jac_det = 0
+        need_jac_det = 0,
+        /// specifies whether the trafo should supply hessian tensors
+        need_hess_ten = 0
       };
     }; // struct ConfigBase
 
@@ -149,6 +122,8 @@ namespace FEAST
         need_jac_inv = (Cfg1_::need_jac_inv != 0) | (Cfg2_::need_jac_inv != 0) ? 1 : 0,
         /// specifies whether the trafo should supply jacobian determinants
         need_jac_det = (Cfg1_::need_jac_det != 0) | (Cfg2_::need_jac_det != 0) ? 1 : 0,
+        /// specifies whether the trafo should supply hessiant tensors
+        need_hess_ten = (Cfg1_::need_hess_ten != 0) | (Cfg2_::need_hess_ten != 0) ? 1 : 0,
       };
     }; // struct ConfigOr<...>
   } // namespace Trafo

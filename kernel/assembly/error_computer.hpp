@@ -23,7 +23,7 @@ namespace FEAST
       {
         typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
         typedef typename AsmTraits_::TrafoData TrafoData;
-        typedef typename AsmTraits_::DataType CoeffType;
+        typedef typename AsmTraits_::DataType DataType;
         typedef typename AsmTraits_::DataType ValueType;
         enum
         {
@@ -216,13 +216,13 @@ namespace FEAST
       {
         typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
         typedef typename AsmTraits_::TrafoData TrafoData;
-        typedef typename AsmTraits_::DataType CoeffType;
+        typedef typename AsmTraits_::DataType DataType;
         enum
         {
           domain_dim = AsmTraits_::domain_dim,
           image_dim = AsmTraits_::image_dim
         };
-        typedef Tiny::Vector<CoeffType, image_dim> ValueType;
+        typedef Tiny::Vector<DataType, image_dim> ValueType;
       };
 
       struct TrafoConfig : public Trafo::ConfigBase

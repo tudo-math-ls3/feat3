@@ -57,15 +57,14 @@ namespace FEAST
         max_local_dofs = SpaceEvalTraits::max_local_dofs
       };
 
-      /// basis function value coefficient
-      typedef typename SpaceEvalTraits::BasisValueCoeff BasisValueCoeff;
+      /// data type
+      typedef typename SpaceEvalTraits::DataType DataType;
       /// basis function value type
       typedef typename SpaceEvalTraits::BasisValueType BasisValueType;
-
-      /// basis function gradient coefficient type
-      typedef typename SpaceEvalTraits::BasisGradientCoeff BasisGradientCoeff;
       /// basis function gradient type
       typedef typename SpaceEvalTraits::BasisGradientType BasisGradientType;
+      /// basis function hessian type
+      typedef typename SpaceEvalTraits::BasisHessianType BasisHessianType;
 
       /**
        * \brief Capability enumeration
@@ -92,16 +91,25 @@ namespace FEAST
          * See #eval_gradients for details.
          */
         can_grad = 0,
+
+        /**
+         * \brief Basis Hessians capability
+         *
+         * This entry specifies whether the evaluator is capable of computing basis function hessian matrices.\n
+         * If this value is non-zero, the evaluator implements the #eval_hessians member function.\n
+         * See #eval_hessians for details.
+         */
+        can_hess = 0
       };
 
     protected:
       /// \cond internal
-      SpaceEvaluator& me()
+      SpaceEvaluator& cast()
       {
         return static_cast<SpaceEvaluator&>(*this);
       }
 
-      const SpaceEvaluator& me() const
+      const SpaceEvaluator& cast() const
       {
         return static_cast<const SpaceEvaluator&>(*this);
       }
@@ -132,9 +140,8 @@ namespace FEAST
       /**
        * \brief Evaluates the basis function values on the real cell.
        *
-       * \tparam TrafoEvalData_
-       * The trafo evaluation data structure type. Is determined automatically by the compiler.\n
-       * See TrafoEvalData for details.
+       * \tparam SpaceCfg_, TrafoCfg_
+       * The space and trafo configuration classes. These are determined automatically by the compiler.
        *
        * \param[out] data
        * A reference to an evaluation data structure that shall receive the basis function values.
@@ -150,9 +157,8 @@ namespace FEAST
       /**
        * \brief Evaluates the basis function gradients on the real cell.
        *
-       * \tparam TrafoEvalData_
-       * The trafo evaluation data structure type. Is determined automatically by the compiler.\n
-       * See TrafoEvalData for details.
+       * \tparam SpaceCfg_, TrafoCfg_
+       * The space and trafo configuration classes. These are determined automatically by the compiler.
        *
        * \param[out] data
        * A reference to an evaluation data structure that shall receive the basis function gradients.
@@ -165,6 +171,22 @@ namespace FEAST
         EvalData<SpaceEvalTraits, SpaceCfg_>& data,
         const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const;
 
+      /**
+       * \brief Evaluates the basis function hessians on the real cell.
+       *
+       * \tparam SpaceCfg_, TrafoCfg_
+       * The space and trafo configuration classes. These are determined automatically by the compiler.
+       *
+       * \param[out] data
+       * A reference to an evaluation data structure that shall receive the basis function hessian matrices.
+       *
+       * \param[in] trafo_data
+       * The trafo evaluation data containing information about the evaluation point.
+       */
+      template<typename SpaceCfg_, typename TrafoCfg_>
+      void eval_hessians(
+        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const;
 #endif // DOXYGEN
     }; // class EvaluatorBase<...>
 
@@ -223,7 +245,15 @@ namespace FEAST
         can_grad =
           (ReferenceCapabilities_::can_ref_grad != 0) &&
           (TrafoEvaluator_::can_dom_point != 0) &&
-          (TrafoEvaluator_::can_jac_inv != 0) ? 1 : 0
+          (TrafoEvaluator_::can_jac_inv != 0) ? 1 : 0,
+
+        /// can compute hessians if the trafo can compute hessian tensors, jacobian matrices and domain points
+        /// \todo find out what is required for hessians
+        can_hess = 0
+          //(ReferenceCapabilities_::can_ref_hess != 0) &&
+          //(TrafoEvaluator_::can_hess_ten != 0) &&
+          //(TrafoEvaluator_::can_dom_point != 0) &&
+          //(TrafoEvaluator_::can_jac_inv != 0) ? 1 : 0
       };
 
       /// dummy enumeration
@@ -239,12 +269,12 @@ namespace FEAST
 
     protected:
       /// \cond internal
-      SpaceEvaluator& me()
+      SpaceEvaluator& cast()
       {
         return static_cast<SpaceEvaluator&>(*this);
       }
 
-      const SpaceEvaluator& me() const
+      const SpaceEvaluator& cast() const
       {
         return static_cast<const SpaceEvaluator&>(*this);
       }
@@ -255,7 +285,15 @@ namespace FEAST
       {
         struct PhiData
         {
-          Tiny::Vector<typename SpaceEvalTraits::BasisGradientCoeff, domain_dim> grad;
+          typename SpaceEvalTraits::BasisReferenceGradientType grad;
+        } phi[max_local_dofs];
+      };
+
+      struct ReferenceHessianData
+      {
+        struct PhiData
+        {
+          typename SpaceEvalTraits::BasisReferenceHessianType hess;
         } phi[max_local_dofs];
       };
       /// \endcond
@@ -272,7 +310,7 @@ namespace FEAST
 
         // compute reference values in the domain point;
         // these coincide with the real values in the image point
-        me().eval_ref_values(data, trafo_data.dom_point);
+        cast().eval_ref_values(data, trafo_data.dom_point);
       }
 
       /** \copydoc EvaluatorBase::eval_gradients() */
@@ -288,17 +326,39 @@ namespace FEAST
         // declare auxiliary reference gradient data
         ReferenceGradientData aux_grads;
 
-        // compute reference gradients in the domain point and store them in the
-        // auxiliary gradient vector
-        me().eval_ref_gradients(aux_grads, trafo_data.dom_point);
+        // compute reference gradients in the domain point
+        cast().eval_ref_gradients(aux_grads, trafo_data.dom_point);
 
         // loop over all basis functions
-        for(Index j(0); j < me().get_num_local_dofs(); ++j)
+        for(Index j(0); j < cast().get_num_local_dofs(); ++j)
         {
           // apply the chain rule on the reference gradient, i.e.
           // mutliply it by the transposed jacobian matrix inverse
           data.phi[j].grad.set_vec_mat_mult(aux_grads.phi[j].grad, trafo_data.jac_inv);
         }
+      }
+
+      /** \copydoc EvaluatorBase::eval_hessians() */
+      template<typename SpaceCfg_, typename TrafoCfg_>
+      void eval_hessians(
+        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
+        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+      {
+        static_assert(can_hess != 0, "space evaluator can't compute function hessians");
+
+        /// \todo implement parametric hessian evaluation
+        throw InternalError("Hessian Matrix computation not yet supported by EvaluatorParametric!");
+
+        // declare auxiliary reference gradient data
+        //ReferenceHessianData aux_hesss;
+
+        // compute reference hessians in the domain point
+        //cast().eval_ref_hessians(aux_hesss, trafo_data.dom_point);
+
+        // loop over all basis functions
+        //for(Index j(0); j < cast().get_num_local_dofs(); ++j)
+        //{
+        //}
       }
     }; // class EvaluatorParametric<...>
   } // namespace Space

@@ -54,15 +54,20 @@ namespace FEAST
         max_local_dofs = max_local_dofs_
       };
 
-      /// basis function value coefficient type
-      typedef DataType BasisValueCoeff;
       /// basis function value type
-      typedef BasisValueCoeff BasisValueType;
+      typedef DataType BasisValueType;
+      /// basis function value type on reference element
+      typedef DataType BasisReferenceValueType;
 
-      /// basis gradient coefficient type
-      typedef DataType BasisGradientCoeff;
       /// basis gradient type
-      typedef Tiny::Vector<BasisGradientCoeff, image_dim> BasisGradientType;
+      typedef Tiny::Vector<DataType, image_dim> BasisGradientType;
+      /// basis gradient type on reference element
+      typedef Tiny::Vector<DataType, domain_dim> BasisReferenceGradientType;
+
+      /// basis hessian matrix type
+      typedef Tiny::Matrix<DataType, image_dim, image_dim> BasisHessianType;
+      /// basis hessian type on reference element
+      typedef Tiny::Matrix<DataType, domain_dim, domain_dim> BasisReferenceHessianType;
     }; // class StandardScalarEvalTraits<...>
 
     /**
@@ -105,15 +110,14 @@ namespace FEAST
         max_local_dofs = max_local_dofs_
       };
 
-      /// basis function value coefficient type
-      typedef DataType BasisValueCoeff;
       /// basis function value type
-      typedef Tiny::Vector<BasisValueCoeff, image_dim> BasisValueType;
+      typedef Tiny::Vector<DataType, image_dim> BasisValueType;
 
-      /// basis gradient coefficient type
-      typedef DataType BasisGradientCoeff;
       /// basis gradient type
-      typedef Tiny::Matrix<BasisGradientCoeff, image_dim, image_dim> BasisGradientType;
+      typedef Tiny::Matrix<DataType, image_dim, image_dim> BasisGradientType;
+
+      /// basis hessian type
+      typedef Tiny::Tensor3<DataType, image_dim, image_dim, image_dim> BasisHessianType;
     }; // class StandardScalarEvalTraits<...>
 
     /**
@@ -127,7 +131,9 @@ namespace FEAST
         /// specifies whether the space should supply basis function values
         need_value = 0,
         /// specifies whether the space should supply basis function gradients
-        need_grad = 0
+        need_grad = 0,
+        /// specifies whether the space should supply basis function hessians
+        need_hess = 0
       };
     }; // struct ConfigBase
 
@@ -150,7 +156,9 @@ namespace FEAST
         /// specifies whether the space should supply basis function values
         need_value = (Cfg1_::need_value != 0) || (Cfg2_::need_value != 0) ? 1 : 0,
         /// specifies whether the space should supply basis function gradients
-        need_grad = (Cfg1_::need_grad != 0) || (Cfg2_::need_grad != 0) ? 1 : 0
+        need_grad = (Cfg1_::need_grad != 0) || (Cfg2_::need_grad != 0) ? 1 : 0,
+        /// specifies whether the space should supply basis function hessians
+        need_hess = (Cfg1_::need_hess != 0) || (Cfg2_::need_hess != 0) ? 1 : 0
       };
     }; // struct ConfigOr<...>
   } // namespace Space

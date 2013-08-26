@@ -32,14 +32,14 @@ namespace FEAST
           SpaceEvalTraits_>
       {
       public:
-        /// basis value coefficient type
-        typedef typename SpaceEvalTraits_::BasisValueCoeff BasisValueCoeff;
-
         /// space evaluation traits
         typedef SpaceEvalTraits_ SpaceEvalTraits;
 
         /// trafo evaluation traits
         typedef typename TrafoEvaluator_::EvalTraits TrafoEvalTraits;
+
+        /// basis value coefficient type
+        typedef typename SpaceEvalTraits::DataType DataType;
 
         /** \copydoc EvaluatorBase::EvaluatorCapabilities */
         enum EvaluatorCapabilities
@@ -79,9 +79,9 @@ namespace FEAST
         template<typename SpaceCfg_, typename TrafoCfg_>
         void eval_values(
           EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+          const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& DOXY(trafo_data)) const
         {
-          data.phi[0].value = BasisValueCoeff(1);
+          data.phi[0].value = DataType(1);
         }
       };
     } // namespace Discontinuous

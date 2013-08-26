@@ -74,14 +74,11 @@ namespace FEAST
         /// evaluation policy
         typedef typename SpaceEvalTraits::EvalPolicy EvalPolicy;
 
-        /// const domain point reference
-        typedef typename EvalPolicy::DomainPointConstRef DomainPointConstRef;
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
 
-        /// basis value coefficient type
-        typedef typename SpaceEvalTraits::BasisValueCoeff BasisValueCoeff;
-
-        /// basis gradient coefficient type
-        typedef typename SpaceEvalTraits::BasisGradientCoeff BasisGradientCoeff;
+        /// data type
+        typedef typename SpaceEvalTraits::DataType DataType;
 
       public:
         /**
@@ -117,12 +114,12 @@ namespace FEAST
         template<typename EvalData_>
         void eval_ref_values(
           EvalData_& data,
-          DomainPointConstRef point) const
+          const DomainPointType& point) const
         {
-          data.phi[0].value = BasisValueCoeff(0.25 * (1.0 - point[0]) * (1.0 - point[1]));
-          data.phi[1].value = BasisValueCoeff(0.25 * (1.0 + point[0]) * (1.0 - point[1]));
-          data.phi[2].value = BasisValueCoeff(0.25 * (1.0 - point[0]) * (1.0 + point[1]));
-          data.phi[3].value = BasisValueCoeff(0.25 * (1.0 + point[0]) * (1.0 + point[1]));
+          data.phi[0].value = DataType(0.25) * (DataType(1) - point[0]) * (DataType(1) - point[1]);
+          data.phi[1].value = DataType(0.25) * (DataType(1) + point[0]) * (DataType(1) - point[1]);
+          data.phi[2].value = DataType(0.25) * (DataType(1) - point[0]) * (DataType(1) + point[1]);
+          data.phi[3].value = DataType(0.25) * (DataType(1) + point[0]) * (DataType(1) + point[1]);
         }
 
         /**
@@ -137,16 +134,16 @@ namespace FEAST
         template<typename EvalData_>
         void eval_ref_gradients(
           EvalData_& data,
-          DomainPointConstRef point) const
+          const DomainPointType& point) const
         {
-          data.phi[0].grad[0] = BasisGradientCoeff(-0.25 * (1.0 - point[1]));
-          data.phi[0].grad[1] = BasisGradientCoeff(-0.25 * (1.0 - point[0]));
-          data.phi[1].grad[0] = BasisGradientCoeff( 0.25 * (1.0 - point[1]));
-          data.phi[1].grad[1] = BasisGradientCoeff(-0.25 * (1.0 + point[0]));
-          data.phi[2].grad[0] = BasisGradientCoeff(-0.25 * (1.0 + point[1]));
-          data.phi[2].grad[1] = BasisGradientCoeff( 0.25 * (1.0 - point[0]));
-          data.phi[3].grad[0] = BasisGradientCoeff( 0.25 * (1.0 + point[1]));
-          data.phi[3].grad[1] = BasisGradientCoeff( 0.25 * (1.0 + point[0]));
+          data.phi[0].grad[0] = DataType(-0.25) * (DataType(1) - point[1]);
+          data.phi[0].grad[1] = DataType(-0.25) * (DataType(1) - point[0]);
+          data.phi[1].grad[0] = DataType( 0.25) * (DataType(1) - point[1]);
+          data.phi[1].grad[1] = DataType(-0.25) * (DataType(1) + point[0]);
+          data.phi[2].grad[0] = DataType(-0.25) * (DataType(1) + point[1]);
+          data.phi[2].grad[1] = DataType( 0.25) * (DataType(1) - point[0]);
+          data.phi[3].grad[0] = DataType( 0.25) * (DataType(1) + point[1]);
+          data.phi[3].grad[1] = DataType( 0.25) * (DataType(1) + point[0]);
         }
       }; // class Evaluator<...,Hypercube<2>>
     } // namespace Lagrange1
