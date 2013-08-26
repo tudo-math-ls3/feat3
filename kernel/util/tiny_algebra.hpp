@@ -60,6 +60,39 @@ namespace FEAST
       int sn_ = n_>
     class Matrix DOXY({});
 
+    /**
+     * \brief Tiny Tensor3 class template
+     *
+     * This class template implements a 3rd-order tensor whose datatype and sizes are given at compile-time.
+     * Technically, the Tensor3 class template realises a l-tuple of m-by-n matrices.
+     *
+     * \tparam T_
+     * The datatype that the vector shall contain.
+     *
+     * \tparam l_, m_, n_
+     * The number tubes, rows and columns of the tensor. Must be > 0.
+     *
+     * \tparam sl_,
+     * The tube stride of the tensor. Must be >= \p l_.
+     *
+     * \tparam sm_
+     * The row stride of the tensor. Must be >= \p m_.
+     *
+     * \tparam sn_
+     * The column stride of the tensor. Must be >= \p n_.
+     *
+     * \author Peter Zajac
+     */
+    template<
+      typename T_,
+      int l_,
+      int m_,
+      int n_,
+      int sl_ = l_,
+      int sm_ = m_,
+      int sn_ = n_>
+    class Tensor3 DOXY({});
+
     /// \cond internal
     namespace Intern
     {
@@ -378,7 +411,7 @@ namespace FEAST
     class Matrix
     {
       static_assert(m_ > 0, "invalid row count");
-      static_assert(n_ > 0, "invalid column length");
+      static_assert(n_ > 0, "invalid column count");
       static_assert(sm_ >= m_, "invalid row stride");
       static_assert(sn_ >= n_, "invalid column stride");
 
@@ -510,7 +543,7 @@ namespace FEAST
        *
        * This function casts this matrix's reference to another size.
        *
-       * \tparam nn_, mm_
+       * \tparam mm_, nn_
        * The dimensions of the casted matrix. Must be 0 < \p mm_ <= \p sm_ and 0 < \p nn_ <= \p sn_.
        *
        * \returns
@@ -725,6 +758,210 @@ namespace FEAST
     inline Matrix<T_, m_, n_> operator*(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
     {
       return Matrix<T_, m_, n_>().set_mat_mat_mult(a, b);
+    }
+
+    /* ************************************************************************************************************* */
+    /* ************************************************************************************************************* */
+    // Tiny Tensor3 implementation
+    /* ************************************************************************************************************* */
+    /* ************************************************************************************************************* */
+
+    template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
+    class Tensor3
+    {
+      static_assert(l_ > 0, "invalid tube count");
+      static_assert(m_ > 0, "invalid row count");
+      static_assert(n_ > 0, "invalid column count");
+      static_assert(sl_ >= l_, "invalid tube stride");
+      static_assert(sm_ >= m_, "invalid row stride");
+      static_assert(sn_ >= n_, "invalid column stride");
+
+    public:
+      /// dummy enum
+      enum
+      {
+        /// the tube count of the tensor
+        l = l_,
+        /// the row count of the tensor
+        m = m_,
+        /// the column count of the tensor
+        n = n_,
+        /// the tube stride of the tensor
+        sl = sl_,
+        /// the row stride of the tensor
+        sm = sm_,
+        /// the column stride of the tensor
+        sn = sn_
+      };
+
+      /// the data type of the tensor
+      typedef T_ DataType;
+
+      /// tensor data; that's a tuple of matrices
+      typedef Matrix<T_, m_, n_, sm_, sn_> PlaneType;
+      PlaneType v[sl_];
+
+      /// default constructor
+      Tensor3()
+      {
+      }
+
+      /// value-assignment constructor
+      explicit Tensor3(T_ value)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i] = value;
+      }
+
+      /// copy-constructor
+      template<int sla_, int sma_, int sna_>
+      Tensor3(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i] = a.v[i];
+      }
+
+      /// value-assignment operator
+      Tensor3& operator=(T_ value)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i] = value;
+        return *this;
+      }
+
+      /// copy-assignment operator
+      template<int sla_, int sma_, int sna_>
+      Tensor3& operator=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i] = a.v[i];
+        return *this;
+      }
+
+      /**
+       * \brief Access operator
+       *
+       * \param[in] h,i,j
+       * The indices of the tensor entry that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the tensor entry at position (h,i,j).
+       */
+      T_& operator()(Index h, Index i, Index j)
+      {
+        ASSERT(h < Index(l_), "index h out-of-bounds");
+        ASSERT(i < Index(m_), "index i out-of-bounds");
+        ASSERT(j < Index(n_), "index j out-of-bounds");
+        return v[h](i,j);
+      }
+
+      /** \copydoc operator()() */
+      const T_& operator()(Index h, Index i, Index j) const
+      {
+        ASSERT(h < Index(l_), "index h out-of-bounds");
+        ASSERT(i < Index(m_), "index i out-of-bounds");
+        ASSERT(j < Index(n_), "index j out-of-bounds");
+        return v[h](i,j);
+      }
+
+      /**
+       * \brief Plane-Access operator.
+       *
+       * \param[in] h
+       * The index of the plane that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the matrix representing the <c>h</c>-th plane of the tensor.
+       */
+      PlaneType& operator[](Index h)
+      {
+        ASSERT(h < Index(l_), "index h out-of-bounds");
+        return v[h];
+      }
+
+      /** \copydoc operator[]() */
+      const PlaneType& operator[](Index h) const
+      {
+        ASSERT(h < Index(l_), "index h out-of-bounds");
+        return v[h];
+      }
+
+      /**
+       * \brief Size-cast function.
+       *
+       * This function casts this tensor's reference to another size.
+       *
+       * \tparam ll_, mm_, nn_
+       * The dimensions of the casted matrix. Must be 0 < \p ll_ <= \p sl_, 0 < \p mm_ <= \p sm_
+       * and 0 < \p nn_ <= \p sn_.
+       *
+       * \returns
+       * A casted (const) reference of \p *this.
+       */
+      template<int ll_, int mm_, int nn_>
+      Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast()
+      {
+        static_assert((ll_ > 0) && (ll_ <= sl_), "invalid cast tube count");
+        static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
+        static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
+        return reinterpret_cast<Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>&>(*this);
+      }
+
+      /** \copydoc size_cast() */
+      template<int ll_, int mm_, int nn_>
+      const Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>& size_cast() const
+      {
+        static_assert((ll_ > 0) && (ll_ <= sl_), "invalid cast tube count");
+        static_assert((mm_ > 0) && (mm_ <= sm_), "invalid cast row count");
+        static_assert((nn_ > 0) && (nn_ <= sn_), "invalid cast column count");
+        return reinterpret_cast<Tensor3<T_, ll_, mm_, nn_, sl_, sm_, sn_>&>(*this);
+      }
+
+      /// scalar right-multiply-by operator
+      Tensor3& operator*=(T_ alpha)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i] *= alpha;
+        return *this;
+      }
+
+      /// tensor component-wise addition operator
+      template<int sla_, int sma_, int sna_>
+      Tensor3& operator+=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i] += a.v[i];
+        return *this;
+      }
+
+      /// tensor component-wise subtraction operator
+      template<int sla_, int sma_, int sna_>
+      Tensor3& operator-=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
+      {
+        for(int i(0); i < l_; ++i)
+          v[i] -= a.v[i];
+        return *this;
+      }
+
+      /// clears the tensor
+      void clear(T_ alpha = T_(0))
+      {
+        (*this) = alpha;
+      }
+    }; // class Tensor3<...>
+
+    /// scalar left-multiply operator
+    template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
+    inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(T_ alpha, const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a)
+    {
+      return Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>(a) *= alpha;
+    }
+
+    /// scalar right-multiply operator
+    template<typename T_, int l_, int m_, int n_, int sl_, int sm_, int sn_>
+    inline Tensor3<T_, l_, m_, n_, sl_, sm_, sn_> operator*(const Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>& a, T_ alpha)
+    {
+      return Tensor3<T_, l_, m_, n_, sl_, sm_, sn_>(a) *= alpha;
     }
 
     /* ************************************************************************************************************* */
