@@ -267,7 +267,7 @@ namespace FEAST
          *
          * Creates a deep copy of this vector.
          */
-        DenseVector<Mem_, DT_> clone()
+        DenseVector<Mem_, DT_> clone() const
         {
           CONTEXT("When cloning DenseVector");
 
