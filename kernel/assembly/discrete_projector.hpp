@@ -111,7 +111,7 @@ namespace FEAST
         typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
 
         // create a vector gather-axpy
-        VectorGatherAxpy<VectorIn_> gather_axpy(coeff);
+        LAFEM::GatherAxpy<VectorIn_> gather_axpy(coeff);
 
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
@@ -292,7 +292,7 @@ namespace FEAST
         typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
 
         // create a vector gather-axpy
-        VectorGatherAxpy<VectorIn_> gather_axpy(coeff);
+        LAFEM::GatherAxpy<VectorIn_> gather_axpy(coeff);
 
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
