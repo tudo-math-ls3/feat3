@@ -187,7 +187,7 @@ namespace FEAST
        * The number of points for the cubature rule.
        */
       template<typename Weight_, typename Coord_, typename Point_>
-      static void create(Rule<Shape_, Weight_, Coord_, Point_>& rule, Index num_points)
+      static bool create(Rule<Shape_, Weight_, Coord_, Point_>& rule, Index num_points)
       {
         if((num_points < DriverType::min_points) || (num_points > DriverType::max_points))
           return false;

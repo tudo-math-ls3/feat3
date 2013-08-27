@@ -134,7 +134,7 @@ namespace FEAST
       {
         CONTEXT(name() + "::find_subset()");
         CellSubSetNodeType* node = find_subset_node(id);
-        return (node != nullptr) ? node.get_subset() : nullptr;
+        return (node != nullptr) ? node->get_subset() : nullptr;
       }
 
       /** \copydoc find_subset() */
@@ -142,7 +142,7 @@ namespace FEAST
       {
         CONTEXT(name() + "::find_subset() [const]");
         const CellSubSetNodeType* node = find_subset_node(id);
-        return (node != nullptr) ? node.get_subset() : nullptr;
+        return (node != nullptr) ? node->get_subset() : nullptr;
       }
 
       /**
