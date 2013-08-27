@@ -2,7 +2,7 @@
 #   big fat mapping of compiler to various modes, mpi envs and architectures
 #
 # This module sets the following variables:
-#   FEAST_COMPILER_NAME (string, gnu|intel|oracle|open64|pgi)
+#   FEAST_COMPILER_NAME (string, clang|gnu|intel|oracle|open64|pgi)
 #   CMAKE_CXX_COMPILER (string, actual compiler to be used)
 #   FEAST_CXX_FLAGS (list of compiler flags to be used, piped to cmake
 #                    via add_definitions() later)
@@ -32,7 +32,11 @@ if (NOT DISPLAY_HELP_ONLY)
   # this also checks if a supported compiler is requested,
   # and include the corresponding compiler file which in
   # turn contains the big fat mappings
-  if ( (BUILD_ID MATCHES "^gnu-.+|.+-gnu-.+|.+-gnu$") OR
+  if ( (BUILD_ID MATCHES "^clang-.+|.+-clang-.+|.+-clang$") OR
+       (BUILD_ID MATCHES "^llvm-.+|.+-llvm-.+|.+-llvm$") )
+    include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_compiler_clang.cmake )
+
+  elseif ( (BUILD_ID MATCHES "^gnu-.+|.+-gnu-.+|.+-gnu$") OR
        (BUILD_ID MATCHES "^gcc-.+|.+-gcc-.+|.+-gcc$") )
     include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_compiler_gnu.cmake )
 
@@ -122,6 +126,7 @@ endif (FORCE_ERROR_MESSAGE)
 if (DISPLAY_HELP_ONLY OR FORCE_ERROR_MESSAGE)
   message (STATUS "##############################################################")
   message (STATUS "Valid settings for token \"compiler\"                         ")
+  message (STATUS "clang : LLVM/Clang c++ frontend                               ")
   message (STATUS "gnu   : GNU compiler suite                                    ")
   message (STATUS "intel : Intel compiler suite                                  ")
   message (STATUS "oracle: SunStudio / OracleStudio compiler suite               ")
