@@ -155,7 +155,7 @@ public:
         n3 = min(n1, n2);
 
       // separate strings
-      dirs.push_back(project_path.substr(n0, n3));
+      dirs.push_back(project_path.substr(n0, n3 - n0));
       n0 = n3 + 1u;
     }
 
