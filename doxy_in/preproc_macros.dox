@@ -1,0 +1,189 @@
+/** \page preproc_macros Preprocessor Macros
+This page summarises the preprocessor macros defined by the build-system, the compiler detection or the user.
+
+\tableofcontents
+
+\section preproc_sec_build_system Build-System Macros
+This section enlists the macros defined directly by the buildsystem, specifying the current build mode.
+
+For macros specifying the available third-party libraries and backends, see \ref preproc_sec_backends
+
+<hr>
+\subsection ppm_feast_debug_mode FEAST_DEBUG_MODE
+This macro is defined if the corresponding build is a debug build.
+If defined, the kernel base-header defines the <c>DEBUG</c> macro.
+
+<hr>
+\subsection ppm_feast_serial_mode FEAST_SERIAL_MODE
+This macro is defined if the corresponding build is a serial build.
+If defined, the kernel base-header defines the <c>SERIAL</c> macro.
+
+<hr>
+\subsection ppm_visual_studio VISUAL_STUDIO
+This macro is defined as 1 by the <i>hand-made</i> Visual Studio project files. It must be left undefined by the CMake
+and any other build system, independent of whether the MS VC++ compiler is used or not.
+
+<hr><hr>
+\section preproc_sec_comp_detect Compiler-Detection Macros
+This section enlists the macros defined by the compiler detection headers to provide information about the compiler
+and its version being in use.
+
+For macros specifying the compiler's C++ language capabilities, see \ref preproc_sec_cpp_features
+
+<hr>
+\subsection ppm_feast_compiler FEAST_COMPILER
+This macro is defined by the compiler detection system and its value is a string literal specifying the name and
+possibly the version of the compiler in use, e.g. <code>"Microsoft Visual C++ 2012"</code>.
+
+\note This macro may also be defined the user through the build system, which will effectively disable the internal
+compiler detection system.
+
+<hr>
+\subsection ppm_feast_compiler_gnu FEAST_COMPILER_GNU
+This macro is defined if the GNU C++ compiler is detected. Its value is defined as
+\verbatim
+(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+\endverbatim
+which is a constant integral expression identifying the compiler version, e.g. the value <c>40702</c> identifies the
+G++ 4.7.2 compiler. See the compiler's documentation for details.
+
+<hr>
+\subsection ppm_feast_compiler_intel FEAST_COMPILER_INTEL
+This macro is defined if the Intel C++ compiler is detected. Its value coindices with the compiler's internal macro
+<c>__INTEL_COMPILER</c>, which is a constant integral expression identifying the compiler version, e.g. the value
+<c>1210</c> identifies the Intel C++ 12.1 compiler. See the compiler's documentation for details on this macro.
+
+<hr>
+\subsection ppm_feast_compiler_microsoft FEAST_COMPILER_MICROSOFT
+This macro is defined if the Microsoft Visual C++ compiler is detected. Its value coincides with the compiler's internal
+macro <c>_MSC_VER</c>, which is an constant integral expression identifying the compiler version, e.g. the value
+<code>1700</code> identifies the Visual C++ 2012 compiler. See the compiler's documentation for details on this macro.
+
+<hr>
+\subsection ppm_feast_compiler_open64 FEAST_COMPILER_OPEN64
+This macro is defined if the Open64 C++ compiler is detected. Its value is defined as
+\verbatim
+(__OPENCC__ * 10000 + __OPENCC_MINOR__ * 100 + __OPENCC_PATCHLEVEL__)
+\endverbatim
+which is a constant integral expression identifying the compiler version, e.g. the value <c>40204</c> identifies the
+Open64 C++ 4.2.4 compiler. See the compiler's documentation for details.
+
+<hr>
+\subsection ppm_feast_compiler_oracle FEAST_COMPILER_ORACLE
+This macro is defined if the OracleStudio/SunStudio C++ compiler is detected. Its value coincides with the compiler's
+internal macro <c>__SUNPRO_CC</c>, which is an constant integral expression identifying the compiler version, e.g. the
+value <code>0x5110</code> identifies the OracleStudio C++ 12.2 compiler. See the compiler's documentation for details
+on this macro.
+
+<hr>
+\subsection ppm_feast_compiler_pgi FEAST_COMPILER_PGI
+This macro is defined if the PGI C++ compiler is detected. Unfortunately, it is not known if the compiler's version can
+be deduced at compile-time, therefore this macro is simply defined as 1.
+
+<hr><hr>
+\section preproc_sec_cpp_features C++ Language Feature Macros
+This section enlists macros specifying the C++ language features of the compiler in use. These macros are automatically
+defined for all officially supported and tested compilers by the compiler detection headers, but they may as well be
+defined by the user via the build-system for new or unsupported compilers.
+
+\note As FEAST shall be 'migrated' to officially require a C++11 conforming compiler, these macros and their effects
+are temporary solutions, as all the emulated features will be mandatory from then on.
+
+<hr>
+\subsection ppm_have_cpp11_extern_template HAVE_CPP11_EXTERN_TEMPLATE
+This macro is defined as 1 if the compiler in use supports the C++11 <c>extern template</c> declaration.
+
+<b>Effects:</b><br>
+As the extern template support is not yet in use, this macro has currently no effect.
+
+<hr>
+\subsection ppm_have_cpp11_func HAVE_CPP11_FUNC
+This macro is defined as 1 if the compiler in use supports the C99/C++11 build-in <c>__func__</c> variable.
+
+<b>Effects:</b><br>
+If undefined, the kernel base-header will define <c>__func__</c> as <c>__FUNCTION__</c> in the blind hope that the
+compiler supports this macro instead.
+
+<hr>
+\subsection ppm_have_cpp11_nullptr HAVE_CPP11_NULLPTR
+This macro is defined as 1 if the compiler in use supports the C++11 <c>nullptr</c> keyword.
+
+<b>Effects:</b><br>
+If undefined, the kernel base-header will define <c>nullptr</c> as 0, therefore 'emulating' the C++11 keyword.
+
+<hr>
+\subsection ppm_have_cpp11_smart_pointer HAVE_CPP11_SMART_POINTER
+This macro is defined as 1 if the compiler's standard library implements the <c>std::shared_ptr</c> class template.
+
+<b>Effects:</b><br>
+This macro affects the contents of the <c>kernel/util/cpp11_smart_pointer.hpp</c> header:
+- If defined, the header will simply include the standard library <c>memory</c> header, which contains the library's
+<c>std::shared_ptr</c> implementation.
+- If undefined, the header will provide a custom implementation of the <c>std::shared_ptr</c> class template.<br>
+
+<hr>
+\subsection ppm_have_cpp11_static_assert HAVE_CPP11_STATIC_ASSERT
+This macro is defined as 1 if the compiler in use supports the C++11 <c>static_assert</c> keyword.
+
+<b>Effects:</b><br>
+If undefined, the kernel base-header will define <c>static_assert</c> as an empty macro, therefore ignoring all static
+assertions.
+
+<hr><hr>
+\section preproc_sec_backends Backend / Library Macros
+This section enlists macros defined by the build system, which specify what types of third-party libraries and backends
+are available to FEAST.
+
+<hr>
+\subsection ppm_feast_backends_cuda FEAST_BACKENDS_CUDA
+This macro is defined by the build system if the FEAST kernel is linked against the CUDA library.
+
+If defined, the LAFEM subsystem of the FEAST kernel will offer corresponding specialisations for the containters and
+operations using CUDA as a work-horse.
+
+<hr>
+\subsection ppm_feast_backends_mkl FEAST_BACKENDS_MKL
+This macro is defined by the build system if the FEAST kernel is linked against the Intel MKL library.
+
+If defined, the LAFEM subsystem of the FEAST kernel will offer corresponding specialisations for the operations using
+the MKL as a work-horse.
+
+<hr><hr>
+\section preproc_sec_user_def User-Defineable Macros
+This section enlists miscellaneous macros that can be defined by the user via the build-system to affect various parts
+of the FEAST kernel.
+
+<hr>
+\subsection ppm_feast_index_ull FEAST_INDEX_ULL
+This macro can be defined to affect the definition of the <c>FEAST::Index</c> data type in the kernel base-header.
+
+<b>Effects:</b><br>
+If undefined, <c>FEAST::Index</c> is a typedef for <c>unsigned long</c>.<br>
+If defined, <c>FEAST::Index</c> is a typedef for <c>unsigned long long</c>.
+
+<hr>
+\subsection ppm_feast_no_config FEAST_NO_CONFIG
+This macro can be defined to avoid config-header inclusion in the kernel base-header.
+
+\note This macro is automatically defined by the Visual Studio build system.
+
+<b>Effects:</b><br>
+If undefined, the kernel base-header will include the header <code>feast_config.hpp</code> from the FEAST root directory
+at the beginning of the file.
+
+<hr>
+\subsection ppm_feast_no_context FEAST_NO_CONTEXT
+This macro can be defined to disable the context stack for the exception system.
+
+\note This macro is automatically defined by the Visual Studio build system.
+
+<b>Effects:</b><br>
+If defined, the context back-trace for the exception and assertion system is disabled.
+
+<hr>
+\subsection ppm_feast_trace_context FEAST_TRACE_CONTEXT
+This macro can be defined to enable live-tracing of the context stack.
+
+<b>Effects:</b><br>
+If defined, the context live-trace system is enabled.
+**/
