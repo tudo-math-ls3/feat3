@@ -126,11 +126,11 @@ namespace FEAST
       {
         public:
           template<typename DataType1_, typename DataType2_>
-            static inline void send_recv(DataType1_ * sendbuf,
-                                         Index num_elements_to_send,
+            static inline void send_recv(DataType1_ * /*sendbuf*/,
+                                         Index /*num_elements_to_send*/,
                                          Index /*dest_rank*/,
-                                         DataType2_* recvbuf,
-                                         Index num_elements_to_recv,
+                                         DataType2_* /*recvbuf*/,
+                                         Index /*num_elements_to_recv*/,
                                          Index /*source_rank*/,
                                          Index /*send_tag*/ = 0,
                                          Index /*recv_tag*/ = 0,
@@ -156,9 +156,9 @@ namespace FEAST
             }
 
           template<typename DataType1_>
-            static inline void allreduce(DataType1_ * sendbuf,
-                                         Index num_elements_to_send_and_receive,
-                                         DataType1_ * recvbuf)
+            static inline void allreduce(DataType1_ * /*sendbuf*/,
+                                         Index /*num_elements_to_send_and_receive*/,
+                                         DataType1_ * /*recvbuf*/)
             {
             }
 

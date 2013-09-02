@@ -72,7 +72,11 @@ namespace FEAST
           for(Index i(0); i < num_entities; ++i)
           {
             bool okay = idx_map.insert(std::make_pair(trg_set[i], i)).second;
+#if defined DEBUG
             ASSERT_(okay);
+#else
+            (void)okay;
+#endif
           }
         }
 

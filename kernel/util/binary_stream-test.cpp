@@ -24,7 +24,9 @@ public:
   static bool little_endian()
   {
     int32_t x = 1;
-    return *((int16_t*)&x) == 1;
+    void * xv = (void*)&x;
+    int16_t * x16 = (int16_t*)xv;
+    return *x16 == 1;
   }
 
   virtual void run() const

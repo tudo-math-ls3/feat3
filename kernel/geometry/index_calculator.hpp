@@ -389,7 +389,7 @@ namespace FEAST
       template<typename Shape_>
       struct RisbWrapper<Shape_, 0>
       {
-        static void wrap(IndexSetHolder<Shape_>& ish)
+        static void wrap(IndexSetHolder<Shape_>& /*ish*/)
         {
           // dummy
         }

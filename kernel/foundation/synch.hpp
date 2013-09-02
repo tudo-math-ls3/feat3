@@ -210,8 +210,8 @@ namespace FEAST
       //single target, single solver per process
       template<typename DataType_>
       static inline void execute(DataType_& target,
-                                 DataType_& sendbuf,
-                                 DataType_& recvbuf)
+                                 DataType_& /*sendbuf*/,
+                                 DataType_& /*recvbuf*/)
       {
         target = sqrt(target);
       }

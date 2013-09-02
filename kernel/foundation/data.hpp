@@ -188,7 +188,7 @@ namespace FEAST
     {
       ///TODO
       template<typename MeshType_, typename HaloType_, typename TopologyType_>
-      static void execute(PatchData<MeshType_, HaloType_, TopologyType_> & target, int rank, const std::string filename)
+      static void execute(PatchData<MeshType_, HaloType_, TopologyType_> & /*target*/, int /*rank*/, const std::string /*filename*/)
       {
       }
     };

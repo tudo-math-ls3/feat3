@@ -125,7 +125,7 @@ void test_interpolation(Index level)
     " , H1-Error: " << std::scientific << h1err << std::endl;
 }
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char** /*argv*/)
 {
   for(Index i(0); i < 5; ++i)
   {

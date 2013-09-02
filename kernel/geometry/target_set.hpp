@@ -252,7 +252,11 @@ namespace FEAST
       Index get_num_entities(int dim) const
       {
         CONTEXT(name() + "::get_num_entities()");
+#if defined DEBUG
         ASSERT(dim == 0, "invalid dimension parameter");
+#else
+        (void)dim;
+#endif
         return _target_set.get_num_entities();
       }
 

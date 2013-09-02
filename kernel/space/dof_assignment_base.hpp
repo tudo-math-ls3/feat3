@@ -71,7 +71,7 @@ namespace FEAST
       Index get_index(Index assign_idx, Index contrib_idx = 0) const;
 #endif // DOXYGEN
 
-      DataType_ get_weight(Index assign_idx, Index contrib_idx = 0) const
+      DataType_ get_weight(Index /*assign_idx*/, Index /*contrib_idx*/ = 0) const
       {
         return DataType_(1.0);
       }

@@ -55,7 +55,7 @@ namespace FEAST
       }
 
       /** \copydoc DofAssignmentBase::get_weight() */
-      DataType_ get_weight(Index assign_idx, Index contrib_idx = 0) const
+      DataType_ get_weight(Index /*assign_idx*/, Index /*contrib_idx*/ = 0) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_weight()");
       }

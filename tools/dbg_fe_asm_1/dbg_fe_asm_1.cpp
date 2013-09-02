@@ -33,11 +33,15 @@ QuadMesh* read_quad_mesh(const char* filename)
   double vtx[2];
 
   // read magic
-  fread(&magic, 4, 1, file);
+  size_t status = fread(&magic, 4, 1, file);
+  if (status != 1)
+    throw InternalError("fread failure!");
   ASSERT_(magic == 0x48534D42); // "BMSH"
 
   // read entity count
-  fread(ne, 12, 1, file);
+  status = fread(ne, 12, 1, file);
+  if (status != 1)
+    throw InternalError("fread failure!");
   Index num_entities[3] = {Index(ne[0]), Index(ne[1]), Index(ne[2])};
 
   // create mesh
@@ -46,7 +50,9 @@ QuadMesh* read_quad_mesh(const char* filename)
   // read vertex coords
   for(int i(0); i < ne[0]; ++i)
   {
-    fread(vtx, 16, 1, file);
+    status = fread(vtx, 16, 1, file);
+    if (status != 1)
+      throw InternalError("fread failure!");
     mesh->get_vertex_set()[i][0] = vtx[0];
     mesh->get_vertex_set()[i][1] = vtx[1];
   }
@@ -54,7 +60,9 @@ QuadMesh* read_quad_mesh(const char* filename)
   // read vertex-at-edge
   for(int i(0); i < ne[1]; ++i)
   {
-    fread(idx, 8, 1, file);
+    status = fread(idx, 8, 1, file);
+    if (status != 1)
+      throw InternalError("fread failure!");
     mesh->get_index_set<1,0>()[i][0] = idx[0];
     mesh->get_index_set<1,0>()[i][1] = idx[1];
   }
@@ -62,7 +70,9 @@ QuadMesh* read_quad_mesh(const char* filename)
   // read vertex-at-quad
   for(int i(0); i < ne[2]; ++i)
   {
-    fread(idx, 16, 1, file);
+    status = fread(idx, 16, 1, file);
+    if (status != 1)
+      throw InternalError("fread failure!");
     mesh->get_index_set<2,0>()[i][0] = idx[0];
     mesh->get_index_set<2,0>()[i][1] = idx[1];
     mesh->get_index_set<2,0>()[i][2] = idx[3];
@@ -72,7 +82,9 @@ QuadMesh* read_quad_mesh(const char* filename)
   // read edge-at-quad
   for(int i(0); i < ne[2]; ++i)
   {
-    fread(idx, 16, 1, file);
+    status = fread(idx, 16, 1, file);
+    if (status != 1)
+      throw InternalError("fread failure!");
     mesh->get_index_set<2,1>()[i][0] = idx[0];
     mesh->get_index_set<2,1>()[i][1] = idx[2];
     mesh->get_index_set<2,1>()[i][2] = idx[3];
@@ -101,11 +113,15 @@ bool verify_struct(const char* filename, const Adjacency::Graph& graph)
   const Index* col_idx = graph.get_image_idx();
 
   // read magic
-  fread(&magic, 4, 1, file);
+  size_t status = fread(&magic, 4, 1, file);
+  if (status != 1)
+    throw InternalError("fread failure!");
   ASSERT_(magic == 0x58544D42); // "BMTX"
 
   // read entity count
-  fread(ne, 8, 1, file);
+  status = fread(ne, 8, 1, file);
+  if (status != 1)
+    throw InternalError("fread failure!");
 
   // validate counts
   if(neq != ne[0])
@@ -125,7 +141,9 @@ bool verify_struct(const char* filename, const Adjacency::Graph& graph)
   // validate row pointer
   for(Index i(0); i <= neq; ++i)
   {
-    fread(&idx, 4, 1, file);
+    status = fread(&idx, 4, 1, file);
+    if (status != 1)
+      throw InternalError("fread failure!");
     if(idx != row_ptr[i])
     {
       std::cout << "ERROR: row_ptr[" << i << "] mismatch!" << std::endl;
@@ -136,7 +154,9 @@ bool verify_struct(const char* filename, const Adjacency::Graph& graph)
   // validate column index
   for(Index i(0); i < nnze; ++i)
   {
-    fread(&idx, 4, 1, file);
+    status = fread(&idx, 4, 1, file);
+    if (status != 1)
+      throw InternalError("fread failure!");
     if(idx != col_idx[i])
     {
       std::cout << "ERROR: col_idx[" << i << "] mismatch!" << std::endl;
@@ -170,11 +190,15 @@ double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main,
   const DataType_* data = matrix.val();
 
   // read magic
-  fread(&magic, 4, 1, file);
+  size_t status = fread(&magic, 4, 1, file);
+  if (status != 1)
+    throw InternalError("fread failure!");
   ASSERT_(magic == 0x58544D42); // "BMTX"
 
   // read entity count
-  fread(ne, 8, 1, file);
+  status = fread(ne, 8, 1, file);
+  if (status != 1)
+    throw InternalError("fread failure!");
 
   // validate counts
   if(neq != ne[0])
@@ -203,7 +227,9 @@ double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main,
     da = db = 0.0;
     for(Index j(row_ptr[i]); j < row_ptr[i+1]; ++j)
     {
-      fread(&dx, 8, 1, file);
+      status = fread(&dx, 8, 1, file);
+      if (status != 1)
+        throw InternalError("fread failure!");
       da = std::max(da, std::abs(dx));                   // ||A_i.||
       db = std::max(db, std::abs(dx - double(data[j]))); // ||A_i. - B_i.||
     }

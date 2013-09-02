@@ -341,8 +341,8 @@ namespace FEAST
       /** \copydoc EvaluatorBase::eval_hessians() */
       template<typename SpaceCfg_, typename TrafoCfg_>
       void eval_hessians(
-        EvalData<SpaceEvalTraits, SpaceCfg_>& data,
-        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& trafo_data) const
+        EvalData<SpaceEvalTraits, SpaceCfg_>& /*data*/,
+        const Trafo::EvalData<TrafoEvalTraits, TrafoCfg_>& /*trafo_data*/) const
       {
         static_assert(can_hess != 0, "space evaluator can't compute function hessians");
 

@@ -79,7 +79,7 @@ namespace FEAST
          * the substitute
          *
          */
-        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& precon)
+        virtual void set_preconditioner(std::shared_ptr<SolverFunctorBase<VT_> >& /*precon*/)
         {
         }
 
@@ -336,7 +336,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -559,7 +559,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -722,7 +722,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -894,7 +894,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -960,7 +960,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1212,7 +1212,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1309,7 +1309,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1403,7 +1403,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1500,7 +1500,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1568,7 +1568,7 @@ namespace FEAST
           return _functors;
         }
 
-        const Index size()
+        Index size()
         {
           return Index(_functors.size());
         }
@@ -1673,7 +1673,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1816,7 +1816,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1864,7 +1864,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1910,7 +1910,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -1956,7 +1956,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -2005,7 +2005,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -2052,7 +2052,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 
@@ -2098,7 +2098,7 @@ namespace FEAST
         {
         }
 
-        virtual void substitute(VT_& arg)
+        virtual void substitute(VT_& /*arg*/)
         {
         }
 

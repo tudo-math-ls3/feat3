@@ -275,7 +275,7 @@ namespace FEAST
          * \param[in] index
          * index of the polytope to be removed
          */
-        void remove_polytope(const PolytopeLevels level, index_type_ i)
+        void remove_polytope(const PolytopeLevels /*level*/, index_type_ /*i*/)
         {
           //TODO
         }
