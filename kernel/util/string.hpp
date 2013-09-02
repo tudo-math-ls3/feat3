@@ -10,6 +10,7 @@
 #include <sstream>
 #include <locale>
 #include <vector>
+#include <iomanip>
 
 #ifdef FEAST_COMPILER_MICROSOFT
 #  include <string.h> // for _stricmp
@@ -723,6 +724,41 @@ namespace FEAST
   }
 #endif // HAVE_CPP11_NULLPTR
 
+  /**
+   * \brief Prints a floating point value to a string in scientific notation.
+   *
+   * \tparam DataType_
+   * The data type of the value to be printed. Is silently assumed to be a standard floating-point datatype,
+   * i.e. either \c float, \c double or <c>long double</c>.
+   *
+   * \param[in] value
+   * The floating-point value that is to be printed.
+   *
+   * \param[in] precision
+   * The precision that is to be used, i.e. the number of mantissa digits to be printed.\n
+   * If set to 0, the default (compiler-dependent) precision will be used.
+   *
+   * \param[in] width
+   * The width that is to be used, i.e. the total number of characters to be printed.\n
+   * If set to 0, the default (compiler-dependent) width will be used.
+   *
+   * \returns
+   * A String containing the value of \p value in scientific notation.
+   *
+   * \author Peter Zajac
+   */
+  template<typename DataType_>
+  inline String scientify(DataType_ value, int precision = 0, int width = 0)
+  {
+    std::ostringstream oss;
+    oss << std::scientific;
+    if(precision > 0)
+      oss << std::setprecision(precision);
+    if(width > 0)
+      oss << std::setw(width);
+    oss << value;
+    return oss.str();
+  }
   /// \endcond
 } // namespace FEAST
 
