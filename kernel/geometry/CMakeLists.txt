@@ -15,6 +15,7 @@ ADD_SUBDIRECTORY( test_aux )
 
 # list of geometry tests
 SET (test_list
+  boundary_factory-test
   index_calculator-test
   mesh_node-test-conf-quad
   standard_refinery-test-conf-quad

@@ -804,6 +804,70 @@ namespace FEAST
         if(!comp_trg(subset.get_target_set<1>(), eti))
           throw String("Edge-Target-Indices refinement failure");
       }
+
+      void validate_tetris_quad_boundary_cellsubset_2d(const QuadCellSubSet& subset)
+      {
+        // validate sizes
+        if(subset.get_num_entities(0) != 10)
+          throw String("Vertex count mismatch");
+        if(subset.get_num_entities(1) != 10)
+          throw String("Edge count mismatch");
+        if(subset.get_num_entities(2) != 0)
+          throw String("Quad count mismatch");
+
+        // validate vertex target indices
+        Index vti[] =
+        {
+          0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+        };
+        if(!comp_trg(subset.get_target_set<0>(), vti))
+          throw String("Vertex-Target-Indices refinement failure");
+
+        // validate edge target indices
+        Index eti[] =
+        {
+          0, 1,
+          2, 4,
+          5, 7,
+          8, 10,
+          11, 12
+        };
+        if(!comp_trg(subset.get_target_set<1>(), eti))
+          throw String("Edge-Target-Indices refinement failure");
+      }
+
+      void validate_refined_tetris_quad_boundary_cellsubset_2d(const QuadCellSubSet& subset)
+      {
+        // validate sizes
+        if(subset.get_num_entities(0) != 20)
+          throw String("Vertex count mismatch");
+        if(subset.get_num_entities(1) != 20)
+          throw String("Edge count mismatch");
+        if(subset.get_num_entities(2) != 0)
+          throw String("Quad count mismatch");
+
+        // validate vertex target indices
+        Index vti[] =
+        {
+          0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+          10, 11, 12, 14, 15, 17, 18, 20, 21, 22
+        };
+        if(!comp_trg(subset.get_target_set<0>(), vti))
+          throw String("Vertex-Target-Indices refinement failure");
+
+        // validate edge target indices
+        Index eti[] =
+        {
+          0, 1, 2, 3,
+          4, 5, 8, 9,
+          10, 11, 14, 15,
+          16, 17, 20, 21,
+          22, 23, 24, 25
+        };
+        if(!comp_trg(subset.get_target_set<1>(), eti))
+          throw String("Edge-Target-Indices refinement failure");
+      }
+
     } // namespace TestAux
   } // namespace Geometry
 } // namespace FEAST

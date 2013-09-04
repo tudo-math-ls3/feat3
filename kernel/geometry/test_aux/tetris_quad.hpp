@@ -48,7 +48,7 @@ namespace FEAST
        * \verbatim
            7----W---21----X----8----Y---22----Z----9
            |         |         |         |         |
-          R   Q_10  J'  Q_11  T   Q_14  N'  Q_15  V
+           R   Q_10  J'  Q_11  T   Q_14  N'  Q_15  V
            |         |         |         |         |
           18---K'---25---L'---19---O'---26---P'---20
            |         |         |         |         |
@@ -88,6 +88,8 @@ namespace FEAST
 
       void validate_refined_tetris_quad_edge_cellsubset_2d(const QuadCellSubSet& subset);
 
+      void validate_tetris_quad_boundary_cellsubset_2d(const QuadCellSubSet& subset);
+      void validate_refined_tetris_quad_boundary_cellsubset_2d(const QuadCellSubSet& subset);
     } // namespace TestAux
     /// \endcond
   } // namespace Geometry
