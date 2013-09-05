@@ -43,6 +43,7 @@ namespace FEAST
         template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
         static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
         {
+          static_assert(evaluator.can_value != 0, "space evaluator does not support basis function values");
           evaluator.eval_values(data, trafo_data);
         }
       };
@@ -56,6 +57,7 @@ namespace FEAST
         template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
         static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
         {
+          static_assert(evaluator.can_grad != 0, "space evaluator does not support basis function gradients");
           evaluator.eval_gradients(data, trafo_data);
         }
       };
@@ -69,6 +71,7 @@ namespace FEAST
         template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
         static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
         {
+          static_assert(evaluator.can_hess != 0, "space evaluator does not support basis function hessians");
           evaluator.eval_hessians(data, trafo_data);
         }
       };
