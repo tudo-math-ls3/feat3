@@ -7,6 +7,18 @@
 
 namespace FEAST
 {
+  // read next line from stream
+  String read_next_line(std::istream& ifs, Index& cur_line)
+  {
+    String line;
+    if(ifs.eof() && ifs.good())
+    {
+      throw SyntaxError("Unexpected end of file at line " + stringify(cur_line));
+    }
+    getline(ifs, line);
+    ++cur_line;
+    return line.trim();
+  }
 
   // default constructor
   MeshStreamer::MeshStreamer() :
@@ -96,14 +108,14 @@ namespace FEAST
 
     // auxiliary variable that counts the lines
     Index cur_line = 0;
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     // first line must be "<feast_mesh_file>"
     if(line != "<feast_mesh_file>" || ifs.eof() || !ifs.good())
     {
       throw SyntaxError("Unknown file format. Expected <feast_mesh_file>.");
     }
-    line = _new_line(ifs, cur_line);
+    line = read_next_line(ifs, cur_line);
 
     // header chunk
     if(!(line == "<header>"))
@@ -112,12 +124,12 @@ namespace FEAST
     }
     cur_line = _parse_header_section(cur_line, ifs);
 
-    line = _new_line(ifs, cur_line);
+    line = read_next_line(ifs, cur_line);
 
     if(line == "<info>")
     {
       _info = _parse_info_section(cur_line, ifs);
-      line = _new_line(ifs, cur_line);
+      line = read_next_line(ifs, cur_line);
     }
 
     // mesh chunk
@@ -138,7 +150,7 @@ namespace FEAST
     {
 
       // get a line
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
 
       // trim whitespaces; throw error if the current one is empty
       if(line.trim_me().empty())
@@ -189,7 +201,7 @@ namespace FEAST
     std::vector<String> line_vec;
 
     // get a line
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
     // version
     if(line_vec[0] == "version")
@@ -208,7 +220,7 @@ namespace FEAST
       throw SyntaxError("Expected version, line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
     // chart file
     if(line_vec[0] == "chart_file")
@@ -219,7 +231,7 @@ namespace FEAST
       }
       _chart_path = line_vec.at(1);
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       line.split_by_charset(line_vec);
     }
 
@@ -237,7 +249,7 @@ namespace FEAST
       throw SyntaxError("Expected number of submeshes, line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     // cellsets
@@ -254,7 +266,7 @@ namespace FEAST
       throw SyntaxError("Expected number of cellsets, line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     // if it is the end of the header section
     if(!(line == "</header>"))
@@ -279,7 +291,7 @@ namespace FEAST
     while(1)
     {
       // get a line
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
 
       if(line != "</info>" && !ifs.eof() && ifs.good())
       {
@@ -442,19 +454,6 @@ namespace FEAST
     return _info;
   }
 
-  // get new line
-  String MeshStreamer::_new_line( std::istream& ifs, Index& cur_line)
-  {
-    String line;
-    if (ifs.eof() && ifs.good())
-    {
-      throw SyntaxError("Unexpected end of file at line " + stringify(cur_line));
-    }
-    getline(ifs, line);
-    line.trim_me();
-    cur_line++;
-    return line;
-  }
 
   // returns a pointer to the MeshDataContainer specified by "name"
   MeshStreamer::MeshDataContainer* MeshStreamer::get_mesh(String name)
@@ -527,20 +526,6 @@ namespace FEAST
     ofs << "</feast_mesh_file>";
   }
 
-  // get new line
-  String MeshStreamer::BaseContainer::_new_line( std::istream& ifs, Index& cur_line)
-  {
-    String line;
-    if (ifs.eof() && ifs.good())
-    {
-      throw SyntaxError("Unexpected end of file at line " + stringify(cur_line));
-    }
-    getline(ifs, line);
-    line.trim_me();
-    cur_line++;
-    return line;
-  }
-
   String MeshStreamer::BaseContainer::_parse_info_section(Index& cur_line, std::istream& ifs)
   {
     CONTEXT("MeshStreamer::BaseContainer::_parse_info_section");
@@ -552,7 +537,7 @@ namespace FEAST
     while(1)
     {
       // get a line
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
 
       if(line != "</info>" && !ifs.eof() && ifs.good())
       {
@@ -588,7 +573,7 @@ namespace FEAST
     if(!(slices.size() == 0))
     {
       Index temp_holder;
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       line.split_by_charset(line_vec);
 
       if(!(line_vec.at(0) == "slices"))
@@ -609,7 +594,7 @@ namespace FEAST
         throw SyntaxError("Number of slices missmatches the dimension of the mesh in line " + stringify(cur_line));
       }
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       line.split_by_charset(line_vec);
 
       if(!(line == "</counts>"))
@@ -622,7 +607,7 @@ namespace FEAST
       while(!ifs.eof() && ifs.good())
       {
         // get a line
-        line = _new_line(ifs,cur_line);
+        line = read_next_line(ifs,cur_line);
         line.split_by_charset(line_vec);
 
         // vertex number
@@ -748,7 +733,7 @@ namespace FEAST
     {
 
       // get a line
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
 
       Index current_value;
 
@@ -831,13 +816,13 @@ namespace FEAST
     std::vector<String> line_vec;
 
     // get a line
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     if(!(line=="<header>"))
     {
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "name")
@@ -853,7 +838,7 @@ namespace FEAST
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     // if it is the parent
@@ -870,7 +855,7 @@ namespace FEAST
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     // end of the header section
     if(!(line == "</header>"))
@@ -878,13 +863,13 @@ namespace FEAST
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     if(line == "<info>")
     {
       info = _parse_info_section(cur_line, ifs);
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
     } // info sub-chunk
 
     // if it is the counts sub chunk
@@ -899,7 +884,7 @@ namespace FEAST
 
     while(!ifs.eof() && ifs.good())
     {
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       // if it is a parent index chunk
       if(line == "<vert_idx>" ||
          line == "<edge_idx>" ||
@@ -948,13 +933,13 @@ namespace FEAST
     coord_per_vertex = 0;
 
     // get a line
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     if(!(line == "<header>"))
     {
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(submesh)
@@ -972,7 +957,7 @@ namespace FEAST
         throw SyntaxError("Unknown file format in line " + stringify(cur_line));
       }
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       line.split_by_charset(line_vec);
 
       if(line_vec[0] == "parent")
@@ -988,7 +973,7 @@ namespace FEAST
         throw SyntaxError("Unknown file format in line " + stringify(cur_line));
       }
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       line.split_by_charset(line_vec);
 
       if(line_vec[0] == "chart")
@@ -999,7 +984,7 @@ namespace FEAST
         }
         chart = line_vec.at(1);
 
-        line = _new_line(ifs,cur_line);
+        line = read_next_line(ifs,cur_line);
         line.split_by_charset(line_vec);
       }
     }
@@ -1022,7 +1007,7 @@ namespace FEAST
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "shape")
@@ -1044,7 +1029,7 @@ namespace FEAST
       throw SyntaxError("Unknown file format in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "coord_file")
@@ -1056,7 +1041,7 @@ namespace FEAST
       // parse the coord file
       parse_coord_file(line_vec.at(1));
       coordfile = true;
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       line.split_by_charset(line_vec);
     }
 
@@ -1069,7 +1054,7 @@ namespace FEAST
           throw SyntaxError("Missing coordinate number in line " + stringify(cur_line));
         }
         (line_vec.at(1)).parse(coord_per_vertex);
-        line = _new_line(ifs,cur_line);
+        line = read_next_line(ifs,cur_line);
         line.split_by_charset(line_vec);
       }
       else
@@ -1091,7 +1076,7 @@ namespace FEAST
         {
           throw SyntaxError("Coordinate number missmatch in line " + stringify(cur_line));
         }
-        line = _new_line(ifs,cur_line);
+        line = read_next_line(ifs,cur_line);
         line.split_by_charset(line_vec);
       }
     }
@@ -1109,7 +1094,7 @@ namespace FEAST
       }
       parse_adjacency_file(line_vec.at(1));
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
       line.split_by_charset(line_vec);
       adjfile = true;
     }
@@ -1119,20 +1104,20 @@ namespace FEAST
       throw SyntaxError("Unknown file format. Expected </header> in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     // if it is an info sub chunk
     if(line == "<info>")
     {
       info = _parse_info_section(cur_line, ifs);
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
     } // info sub-chunk
 
     // if it is the counts sub chunk
     if(line == "<counts>")
     {
       cur_line = _parse_counts_chunk(cur_line, ifs);
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
     }
     else if (!adjfile)
     {
@@ -1143,7 +1128,7 @@ namespace FEAST
     if(line == "<coords>")
     {
       cur_line = _parse_coords_chunk(cur_line, ifs);
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
     }
     else if(!coordfile)
     {
@@ -1183,7 +1168,7 @@ namespace FEAST
         throw SyntaxError("Unknown file format. Expected </mesh> or </submesh> in line " + stringify(cur_line));
       }
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
     } // while
 
     if(line != break_line && !(!ifs.eof() && ifs.good()))
@@ -1244,14 +1229,14 @@ namespace FEAST
     String coord;
     Index cur_line = 0;
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     if(line != "<feast_coord_file>" && !ifs.eof() && ifs.good())
     {
       throw SyntaxError("Unknown coordfile format. Expected <feast_coord_file> in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     // if it is the header chunk
     if(!(line == "<header>"))
@@ -1259,7 +1244,7 @@ namespace FEAST
       throw SyntaxError("Unknown coordfile format. Expected <header> in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "version")
@@ -1278,7 +1263,7 @@ namespace FEAST
       throw SyntaxError("Unknown coordfile format. Expected version in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "verts")
@@ -1294,7 +1279,7 @@ namespace FEAST
       throw SyntaxError("Unknown coordfile format. Expected verts in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "coords")
@@ -1310,19 +1295,19 @@ namespace FEAST
       throw SyntaxError("Unknown coordfile format. Expected coords in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     if(!(line == "</header>"))
     {
       throw SyntaxError("Unknown coordfile format. Expected </header> in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     if(line == "<info>")
     {
       info = _parse_info_section(cur_line, ifs);
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
     } // info sub chunk
 
     if(line == "<coords>")
@@ -1334,7 +1319,7 @@ namespace FEAST
       throw SyntaxError("Unknown coordfile format. Expected <coords> in line " + stringify(cur_line));
     }// coords sub-chunk
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     if(!(line == "</feast_coord_file>"))
     {
@@ -1391,21 +1376,21 @@ namespace FEAST
     String adj, face, shape, break_line;
     Index cur_line = 0;
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     // ignore everything until the adjacency file begins
     if(line != "<feast_adjacency_file>" && !ifs.eof() && ifs.good())
     {
       throw SyntaxError("Beginning of adjacency file not found");
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     if(!(line == "<header>"))
     {
       throw SyntaxError("Unknown adjacencyfile format. Expected <header> in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "version")
@@ -1425,7 +1410,7 @@ namespace FEAST
       throw SyntaxError("Unknown adjacencyfile format. Expected version in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "type")
@@ -1441,7 +1426,7 @@ namespace FEAST
       throw SyntaxError("Unknown adjacencyfile format. Expected type in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
     line.split_by_charset(line_vec);
 
     if(line_vec[0] == "shape")
@@ -1457,21 +1442,21 @@ namespace FEAST
       throw SyntaxError("Unknown adjancencyfile format. Expected shape in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     if(!(line == "</header>"))
     {
       throw SyntaxError("Unknown adjacencyfile format. Expected </header> in line " + stringify(cur_line));
     }
 
-    line = _new_line(ifs,cur_line);
+    line = read_next_line(ifs,cur_line);
 
     // if it is an info chunk
     if(line == "<info>")
     {
       _parse_info_section(cur_line, ifs);
 
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
     }
 
       // if it is the counts sub chunk
@@ -1486,7 +1471,7 @@ namespace FEAST
 
     while(!ifs.eof() && ifs.good())
     {
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
 
       // if it is an adjacency sub chunk
       if(line.find('@') != std::string::npos)
@@ -1524,7 +1509,7 @@ namespace FEAST
     while(!ifs.eof() && ifs.good())
     {
       // get a line
-      line = _new_line(ifs,cur_line);
+      line = read_next_line(ifs,cur_line);
 
       // if it is the end of the coord sub chunk
       if(line == "</coords>")
@@ -1618,7 +1603,7 @@ namespace FEAST
       while(!ifs.eof() && ifs.good())
       {
         // get a line
-        line = _new_line(ifs,cur_line);
+        line = read_next_line(ifs,cur_line);
 
         // if it is the end of the sub chunk
         if(line.find('@') != std::string::npos)
@@ -1661,7 +1646,7 @@ namespace FEAST
       while(!ifs.eof() && ifs.good())
       {
         // get a line
-        line = _new_line(ifs,cur_line);
+        line = read_next_line(ifs,cur_line);
 
         // if it is the end of the sub chunk
         if(line.find('@') != std::string::npos)

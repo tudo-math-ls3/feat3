@@ -104,21 +104,6 @@ namespace FEAST
        * The number of lines that has been read when the programme is done.
        */
       Index _parse_parents_chunk(Index cur_line, std::istream& ifs, String line);
-
-      /**
-       * \brief Gets a new line and checks the stream
-       *
-       * \param[in] ifs
-       * A reference to the input stream to be parsed.
-       *
-       * \param[in] cur_line
-       * A counter that specifies the number of lines read so far.
-       *
-       * \returns
-       * The last line that was read
-       */
-      static String _new_line(std::istream& ifs, Index& cur_line);
-
     };
 
     /**
@@ -504,7 +489,7 @@ namespace FEAST
        */
       Index get_num_sub_meshes_below()
       {
-        Index count(sub_mesh_map.size());
+        Index count(Index(sub_mesh_map.size()));
         // perform depth-first-search
         SubMeshMap::iterator it(sub_mesh_map.begin()), jt(sub_mesh_map.end());
         for(; it != jt; ++it)
@@ -727,21 +712,6 @@ namespace FEAST
      * The number of lines that has been read when the programme is done.
      */
     Index _parse_cellset_section(Index cur_line, std::istream& ifs);
-
-    /**
-     * \brief Gets a new line and checks the stream
-     *
-     * \param[in] ifs
-     * A reference to the input stream to be parsed.
-     *
-     * \param[in] cur_line
-     * A counter that specifies the number of lines read so far.
-     *
-     * \returns
-     * The last line that was read
-     */
-    static String _new_line(std::istream& ifs, Index& cur_line);
-
   }; // class MeshStreamer
 } // namespace FEAST
 
