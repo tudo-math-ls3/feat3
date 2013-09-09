@@ -210,7 +210,7 @@ namespace FEAST
         RedundantIndexSetBuilder<ShapeType>::compute(index_set_holder);
       }
 
-      virtual void fill_target_sets(TargetSetHolderType& target_set_holder)
+      virtual void fill_target_sets(TargetSetHolderType& /*target_set_holder*/)
       {
         // TODO
       }

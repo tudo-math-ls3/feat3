@@ -159,13 +159,13 @@ namespace FEAST
         switch(dim)
         {
         case 0:
-          return _target_data->vertex_number;
+          return _target_data->vertex_count;
         case 1:
-          return _target_data->edge_number;
+          return _target_data->edge_count;
         case 2:
-          return _target_data->tria_number + _target_data->quad_number;
+          return _target_data->tria_count + _target_data->quad_count;
         case 3:
-          return _target_data->tetra_number + _target_data->hexa_number;
+          return _target_data->tetra_count + _target_data->hexa_count;
         default:
           return 0;
         }
@@ -229,13 +229,13 @@ namespace FEAST
         switch(dim)
         {
         case 0:
-          return _mesh_data->vertex_number;
+          return _mesh_data->vertex_count;
         case 1:
-          return _mesh_data->edge_number;
+          return _mesh_data->edge_count;
         case 2:
-          return _mesh_data->tria_number + _mesh_data->quad_number;
+          return _mesh_data->tria_count + _mesh_data->quad_count;
         case 3:
-          return _mesh_data->tetra_number + _mesh_data->hexa_number;
+          return _mesh_data->tetra_count + _mesh_data->hexa_count;
         default:
           return 0;
         }
