@@ -70,6 +70,7 @@
 set (BUILD_ID "" CACHE STRING "Use specific build id, or MANUAL, or empty for autodetection, or HELP to see valid settings")
 set (DISPLAY_HELP_ONLY OFF)
 set (FORCE_ERROR_MESSAGE OFF)
+set (ADD_FEAST_FLAGS "" CACHE STRING "Additional FLAGS for CXX and LD")
 
 
 # display welcome message
@@ -171,6 +172,10 @@ else ()
 
   # parse "backends" token
   include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_backends.cmake )
+
+  #add additional cxx flags
+  set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} ${ADD_FEAST_FLAGS}")
+  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ADD_FEAST_FLAGS}")
 
   # ok, all fine so far, so re-map BUILD_ID to our standard ordering of tokens
   # and print out a summary
