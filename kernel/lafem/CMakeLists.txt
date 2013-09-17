@@ -34,6 +34,9 @@ endif(FEAST_BACKENDS_MKL)
 
 if (FEAST_BACKENDS_CUDA)
   INCLUDE(FindCUDA)
+  set (CUDA_VERBOSE_BUILD ON)
+  #TODO  use CUDA_HOST_COMPILER to get rid of hard wired gcc host compilation
+  set (CUDA_PROPAGATE_HOST_FLAGS OFF)
   CUDA_ADD_LIBRARY(kernel-lafem-cuda STATIC
     memory_pool.cu
     axpy.cu
