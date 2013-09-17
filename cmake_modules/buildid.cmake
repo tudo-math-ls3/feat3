@@ -176,6 +176,12 @@ else ()
   #add additional cxx flags
   set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} ${ADD_FEAST_FLAGS}")
   set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ADD_FEAST_FLAGS}")
+  set (COMPILER_VERSION_OUTPUT "")
+  exec_program("${CMAKE_CXX_COMPILER} --version 2>&1 | head -n 1" OUTPUT_VARIABLE COMPILER_VERSION_OUTPUT)
+  if (COMPILER_VERSION_OUTPUT MATCHES .*clang.*)
+    set (FEAST_CXX_FLAGS "${FEAST_CXX_FLAGS} -Qunused-arguments")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Qunused-arguments")
+  endif ()
 
   # ok, all fine so far, so re-map BUILD_ID to our standard ordering of tokens
   # and print out a summary
