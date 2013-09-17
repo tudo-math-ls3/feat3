@@ -100,7 +100,7 @@ namespace FEAST
         LAFEM::ScatterAxpy<VectorType> scatter_axpy(vector);
 
         // loop over all cells of the mesh
-        for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
           // prepare trafo evaluator
           trafo_eval.prepare(cell);
@@ -121,10 +121,10 @@ namespace FEAST
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
-            trafo_data(trafo_eval, cubature_rule.get_point(k));
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
 
             // compute basis function data
-            space_data(space_eval, trafo_data);
+            space_eval(space_data, trafo_data);
 
             // test function loop
             for(Index i(0); i < num_loc_dofs; ++i)

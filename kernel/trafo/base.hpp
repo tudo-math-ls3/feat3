@@ -60,12 +60,14 @@ namespace FEAST
       typedef Tiny::Vector<DataType, image_dim> ImagePointType;
       /// jacobian matrix type
       typedef Tiny::Matrix<DataType, image_dim, domain_dim> JacobianMatrixType;
-      /// jacobian inverse matrix type
+      /// inverse jacobian matrix type
       typedef Tiny::Matrix<DataType, domain_dim, image_dim> JacobianInverseType;
       /// jacobian determinant type
       typedef DataType JacobianDeterminantType;
       /// hessian tensor type
       typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianTensorType;
+      /// inverse hessian tensor type
+      typedef Tiny::Tensor3<DataType, image_dim, domain_dim, domain_dim> HessianInverseType;
 
     }; // class StandardEvalPolicy<...>
 
@@ -92,7 +94,9 @@ namespace FEAST
         /// specifies whether the trafo should supply jacobian determinants
         need_jac_det = 0,
         /// specifies whether the trafo should supply hessian tensors
-        need_hess_ten = 0
+        need_hess_ten = 0,
+        /// specifies whether the trafo should supply inverse hessian tensors
+        need_hess_inv = 0
       };
     }; // struct ConfigBase
 
@@ -109,8 +113,8 @@ namespace FEAST
     template<typename Cfg1_, typename Cfg2_>
     struct ConfigOr
     {
-      /// dummy enumeration
-      enum
+      /** \copydoc Trafo::ConfigBase::TrafoRequirements */
+      enum TrafoRequirements
       {
         /// specifies whether the trafo should supply domain point coordinates
         need_dom_point = (Cfg1_::need_dom_point != 0) || (Cfg2_::need_dom_point != 0) ? 1 : 0,
@@ -122,8 +126,10 @@ namespace FEAST
         need_jac_inv = (Cfg1_::need_jac_inv != 0) | (Cfg2_::need_jac_inv != 0) ? 1 : 0,
         /// specifies whether the trafo should supply jacobian determinants
         need_jac_det = (Cfg1_::need_jac_det != 0) | (Cfg2_::need_jac_det != 0) ? 1 : 0,
-        /// specifies whether the trafo should supply hessiant tensors
+        /// specifies whether the trafo should supply hessian tensors
         need_hess_ten = (Cfg1_::need_hess_ten != 0) | (Cfg2_::need_hess_ten != 0) ? 1 : 0,
+        /// specifies whether the trafo should supply inverse hessian tensors
+        need_hess_inv = (Cfg1_::need_hess_inv != 0) | (Cfg2_::need_hess_inv != 0) ? 1 : 0
       };
     }; // struct ConfigOr<...>
   } // namespace Trafo

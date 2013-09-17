@@ -133,7 +133,7 @@ namespace FEAST
         DataType result(DataType(0));
 
         // loop over all cells of the mesh
-        for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
           // clear local vector
           lvad.clear();
@@ -163,10 +163,10 @@ namespace FEAST
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
-            trafo_data(trafo_eval, cubature_rule.get_point(k));
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
 
             // compute basis function data
-            space_data(space_eval, trafo_data);
+            space_eval(space_data, trafo_data);
 
             // evaluate functor
             DataType value(0);
@@ -326,7 +326,7 @@ namespace FEAST
         DataType result(DataType(0));
 
         // loop over all cells of the mesh
-        for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
           // clear local vector
           lvad.clear();
@@ -356,10 +356,10 @@ namespace FEAST
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
-            trafo_data(trafo_eval, cubature_rule.get_point(k));
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
 
             // compute basis function data
-            space_data(space_eval, trafo_data);
+            space_eval(space_data, trafo_data);
 
             // evaluate functor
             Tiny::Vector<DataType, AsmTraits::image_dim> value(DataType(0));

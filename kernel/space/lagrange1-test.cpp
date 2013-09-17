@@ -41,6 +41,7 @@ class Lagrange1Test
     enum
     {
       need_dom_point = 1,
+      need_jac_mat = 1,
       need_jac_det = 1,
       need_jac_inv = 1
     };
@@ -51,7 +52,9 @@ class Lagrange1Test
     enum
     {
       need_value = 1,
-      need_grad = 1
+      need_grad = 1,
+      need_ref_value = 1,
+      need_ref_grad = 1
     };
   };
 
@@ -60,6 +63,7 @@ class Lagrange1Test
     enum
     {
       need_dom_point = 1,
+      need_jac_mat = 1,
       need_jac_det = 1,
       need_jac_inv = 1
     };
@@ -69,7 +73,8 @@ class Lagrange1Test
   {
     enum
     {
-      need_grad = 1
+      need_grad = 1,
+      need_ref_grad = 1
     };
   };
 
@@ -137,10 +142,10 @@ public:
     for(Index k(0); k < cubature_rule.get_num_points(); ++k)
     {
       // compute trafo data
-      trafo_data(trafo_eval, cubature_rule.get_point(k));
+      trafo_eval(trafo_data, cubature_rule.get_point(k));
 
       // compute space data
-      space_data(space_eval, trafo_data);
+      space_eval(space_data, trafo_data);
 
       // test function loop
       for(Index i(0); i < num_loc_dofs; ++i)
@@ -406,10 +411,10 @@ public:
       for(Index k(0); k < cubature_rule.get_num_points(); ++k)
       {
         // compute trafo data
-        trafo_data(trafo_eval, cubature_rule.get_point(k));
+        trafo_eval(trafo_data, cubature_rule.get_point(k));
 
-        // compute basis function data
-        space_data(space_eval, trafo_data);
+        // compute space data
+        space_eval(space_data, trafo_data);
 
         // test function loop
         for(Index i(0); i < num_loc_dofs; ++i)

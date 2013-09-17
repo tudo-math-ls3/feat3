@@ -40,6 +40,12 @@ namespace FEAST
         typedef NodeFunctionalBase<Space_, Functor_, DataType_> BaseClass;
 
       protected:
+        typedef typename Space_::TrafoType TrafoType;
+        typedef typename Space_::ShapeType ShapeType;
+        typedef typename TrafoType::template Evaluator<ShapeType, DataType_>::Type TrafoEvalType;
+        typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
+        typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
+
         struct TrafoConfig :
           public Trafo::ConfigBase
         {
@@ -49,13 +55,9 @@ namespace FEAST
           };
         };
 
-        typedef typename Space_::TrafoType TrafoType;
-        typedef typename Space_::ShapeType ShapeType;
-        typedef typename TrafoType::template Evaluator<ShapeType, DataType_>::Type TrafoEvalType;
-        typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
-        typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
-
-        typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
+        //typedef typename TrafoEvalType::template TrafoConfig<TrafoConfig1> TrafoConfig;
+        //typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
+        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
 
         struct FuncEvalTraits
         {
@@ -115,7 +117,7 @@ namespace FEAST
         DataType_ operator()(Index /*assign_idx*/) const
         {
           TrafoEvalData trafo_data;
-          trafo_data(_trafo_eval, _dom_point);
+          _trafo_eval(trafo_data, _dom_point);
           DataType_ value(DataType_(0));
           _func_eval(value, trafo_data);
           return value;

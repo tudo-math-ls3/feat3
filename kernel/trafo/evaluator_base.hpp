@@ -9,6 +9,14 @@ namespace FEAST
 {
   namespace Trafo
   {
+    /// \cond internal
+    namespace Intern
+    {
+      template<bool _enable>
+      struct TrafoEvalHelper;
+    } // namespace Intern
+    /// \endcond
+
     /**
      * \brief Trafo Evaluator CRTP base-class template
      *
@@ -55,6 +63,8 @@ namespace FEAST
       typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
       /// hessian tensor type
       typedef typename EvalPolicy::HessianTensorType HessianTensorType;
+      /// hessian inverse tensor type
+      typedef typename EvalPolicy::HessianInverseType HessianInverseType;
 
       /// dummy enumeration
       enum
@@ -64,6 +74,9 @@ namespace FEAST
         /// image dimension
         image_dim = EvalPolicy::image_dim
       };
+
+      /// CellIterator typedef
+      typedef Index CellIterator;
 
       // Note:
       // The following block serves as an element interface documentation and is therefore only
@@ -128,8 +141,52 @@ namespace FEAST
          * See #calc_hess_ten for details.
          */
         can_hess_ten = ...,
+
+        /**
+         * \brief Hessian-Inverse-Tensor capability
+         * This entry specifies whether the evaluator is capable of computing hessian inverse tensors.\n
+         * If this value is non-zero, the evaluator implements the #calc_hess_inv member function.\n
+         * See #calc_hess_inv for details.
+         */
+        can_hess_inv = ...,
       };
 #endif // DOXYGEN
+
+      /**
+       * \brief Trafo configuration traits class template
+       *
+       * \tparam Cfg_
+       * A Trafo configuration, see Trafo::ConfigBase for details.
+       */
+      template<typename Cfg_>
+      struct ConfigTraits
+      {
+        /// evaluation data configuration
+        struct EvalDataConfig :
+          public Trafo::ConfigBase
+        {
+          enum
+          {
+            /// specifies whether inverse hessian tensors are required
+            need_hess_inv = (Cfg_::need_hess_inv != 0) ? 1 : 0,
+            /// specifies whether hessian tensors are required
+            need_hess_ten = (Cfg_::need_hess_ten != 0) || (need_hess_inv != 0) ? 1 : 0,
+            /// specifies whether jacobian determinants are required
+            need_jac_det = (Cfg_::need_jac_det != 0) ? 1 : 0,
+            /// specifies whether inverse jacobian matrices are required
+            need_jac_inv = (Cfg_::need_jac_inv != 0) || (need_hess_inv != 0) ? 1 : 0,
+            /// specifies whether jacobian matrices are required
+            need_jac_mat = (Cfg_::need_jac_mat != 0) || (need_jac_det != 0) || (need_jac_inv != 0) ? 1 : 0,
+            /// specifies whetjer image points are required
+            need_img_point = (Cfg_::need_img_point != 0) ? 1 : 0,
+            /// we always store domain points
+            need_dom_point = 1
+          };
+        };
+
+        /// evaluation data typedef
+        typedef Trafo::EvalData<EvalTraits, EvalDataConfig> EvalDataType;
+      }; // struct ConfigTraits<...>
 
     protected:
       /// \cond internal
@@ -167,6 +224,22 @@ namespace FEAST
       }
 
       /**
+       * \brief Returns a CellIterator representing the index of the first cell.
+       */
+      CellIterator begin() const
+      {
+        return 0;
+      }
+
+      /**
+       * \brief Returns a CellIterator representing the first index past the last cell.
+       */
+      CellIterator end() const
+      {
+        return get_num_cells();
+      }
+
+      /**
        * \brief Returns the number of cells in the mesh.
        *
        * \returns
@@ -188,13 +261,13 @@ namespace FEAST
       /**
        * \brief Prepares the evaluator for a given cell.
        *
-       * \param[in] cell_index
+       * \param[in] cell
        * The index of the cell for which the evaluator is to be prepared.
        */
-      void prepare(Index cell_index)
+      void prepare(const CellIterator& cell)
       {
         // store cell index
-        _cell_index = cell_index;
+        _cell_index = cell;
       }
 
       /**
@@ -204,6 +277,37 @@ namespace FEAST
       {
         // reset cell index
         _cell_index = ~Index(0);
+      }
+
+      /**
+       * \brief Trafo evaluation operator
+       *
+       * \param[out] trafo_data
+       * A reference to the trafo data that is to be computed.
+       *
+       * \param[in] dom_point
+       * A reference to the domain point on the reference cell in which the trafo is to be evaluated.
+       */
+      template<typename TrafoCfg_>
+      void operator()(Trafo::EvalData<EvalTraits, TrafoCfg_>& trafo_data, const DomainPointType& dom_point) const
+      {
+        // typedef mumbo-jumbo
+        typedef Trafo::EvalData<EvalTraits, TrafoCfg_> TrafoData;
+
+        // store domain point
+        Intern::TrafoEvalHelper<TrafoData::have_dom_point != 0>::set_dom_point(trafo_data, dom_point);
+        // map image point
+        Intern::TrafoEvalHelper<TrafoData::have_img_point != 0>::map_img_point(trafo_data, cast());
+        // calculate jacobian matrix
+        Intern::TrafoEvalHelper<TrafoData::have_jac_mat != 0>::calc_jac_mat(trafo_data, cast());
+        // calculate inverse jacobian matrix
+        Intern::TrafoEvalHelper<TrafoData::have_jac_inv != 0>::calc_jac_inv(trafo_data, cast());
+        // calculate jacobian determinants
+        Intern::TrafoEvalHelper<TrafoData::have_jac_det != 0>::calc_jac_det(trafo_data, cast());
+        // calculate hessian tensor
+        Intern::TrafoEvalHelper<TrafoData::have_hess_ten != 0>::calc_hess_ten(trafo_data, cast());
+        // calculate inverse hessian tensor
+        Intern::TrafoEvalHelper<TrafoData::have_hess_inv != 0>::calc_hess_inv(trafo_data, cast());
       }
 
       // Note:
@@ -243,45 +347,101 @@ namespace FEAST
        */
       void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& dom_point) const;
 #endif // DOXYGEN
-
-      /**
-       * \brief Computes the jacobian determinant for a domain point.
-       *
-       * \param[in] dom_point
-       * The domain point at which the jacobian determinant is to be computed.
-       *
-       * \returns
-       * The jacobian determinant at the domain point.
-       */
-      JacobianDeterminantType calc_jac_det(const DomainPointType& dom_point) const
-      {
-        // compute jacobian matrix
-        JacobianMatrixType jac_mat;
-        cast().calc_jac_mat(jac_mat, dom_point);
-
-        // return its volume
-        return jac_mat.vol();
-      }
-
-      /**
-       * \brief Computes the inverse jacobian matrix for a domain point.
-       *
-       * \param[out] jac_inv
-       * A reference to the inverse jacobian matrix that is to be computed.
-       *
-       * \param[in] dom_point
-       * The domain point at which the jacobian matrix is to be computed.
-       */
-      void calc_jac_inv(JacobianInverseType& jac_inv, const DomainPointType& dom_point) const
-      {
-        // compute jacobian matrix
-        JacobianMatrixType jac_mat;
-        cast().calc_jac_mat(jac_mat, dom_point);
-
-        // invert jacobian matrix
-        jac_inv.set_inverse(jac_mat);
-      }
     }; // class EvaluatorBase<...>
+
+    /// \cond internal
+    namespace Intern
+    {
+      template<bool _enable>
+      struct TrafoEvalHelper
+      {
+        template<typename TrafoData_, typename DomPoint_>
+        static void set_dom_point(TrafoData_&, const DomPoint_&) {}
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void map_img_point(TrafoData_&, const Evaluator_&) {}
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_jac_mat(TrafoData_&, const Evaluator_&) {}
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_jac_inv(TrafoData_&, const Evaluator_&) {}
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_jac_det(TrafoData_&, const Evaluator_&) {}
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_hess_ten(TrafoData_&, const Evaluator_&) {}
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_hess_inv(TrafoData_&, const Evaluator_&) {}
+      };
+
+      template<>
+      struct TrafoEvalHelper<true>
+      {
+        template<typename TrafoData_, typename DomPoint_>
+        static void set_dom_point(TrafoData_& trafo_data, const DomPoint_& dom_point)
+        {
+          trafo_data.dom_point = dom_point;
+        }
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void map_img_point(TrafoData_& trafo_data, const Evaluator_& evaluator)
+        {
+          static_assert(Evaluator_::can_img_point != 0, "trafo evaluator can't compute image point coordinates");
+          evaluator.map_point(trafo_data.img_point, trafo_data.dom_point);
+        }
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_jac_mat(TrafoData_& trafo_data, const Evaluator_& evaluator)
+        {
+          static_assert(Evaluator_::can_jac_mat != 0, "trafo evaluator can't compute jacobian matrices");
+          // let the evaluator compute the jacobian matrix
+          evaluator.calc_jac_mat(trafo_data.jac_mat, trafo_data.dom_point);
+        }
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_jac_inv(TrafoData_& trafo_data, const Evaluator_&)
+        {
+          static_assert(Evaluator_::can_jac_inv != 0, "trafo evaluator can't compute jacobian inverse matrices");
+          // invert the jacobian matrix
+          trafo_data.jac_inv.set_inverse(trafo_data.jac_mat);
+        }
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_jac_det(TrafoData_& trafo_data, const Evaluator_&)
+        {
+          static_assert(Evaluator_::can_jac_det != 0, "trafo evaluator can't compute jacobian determinants");
+          // compute the volume of the jacobian matrix
+          trafo_data.jac_det = trafo_data.jac_mat.vol();
+        }
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_hess_ten(TrafoData_& trafo_data, const Evaluator_& evaluator)
+        {
+          static_assert(Evaluator_::can_hess_ten != 0, "trafo evaluator can't compute hessian tensors");
+          // let the evaluator compute the hessian tensor
+          evaluator.calc_hess_ten(trafo_data.hess_ten, trafo_data.dom_point);
+        }
+
+        template<typename TrafoData_, typename Evaluator_>
+        static void calc_hess_inv(TrafoData_& trafo_data, const Evaluator_&)
+        {
+          static_assert(Evaluator_::can_hess_inv != 0, "trafo evaluator can't compute inverse hessian tensors");
+          typedef typename TrafoData_::EvalTraits EvalTraits;
+          typedef typename EvalTraits::DataType DataType;
+          typename EvalTraits::HessianTensorType hess_jac;
+
+          // compute inverse
+          hess_jac.clear();
+          hess_jac.add_double_mat_mult(trafo_data.hess_ten, trafo_data.jac_inv, trafo_data.jac_inv);
+          trafo_data.hess_inv.clear();
+          trafo_data.hess_inv.add_mat_tensor_mult(trafo_data.jac_inv, hess_jac, -DataType(1));
+        }
+      };
+    } // namespace Intern
+    /// \endcond
   } // namespace Trafo
 } // namespace FEAST
 

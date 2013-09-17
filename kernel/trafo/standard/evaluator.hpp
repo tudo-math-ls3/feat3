@@ -62,6 +62,8 @@ namespace FEAST
         typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
         /// hessian tensor type
         typedef typename EvalPolicy::HessianTensorType HessianTensorType;
+        /// hessian inverse tensor type
+        typedef typename EvalPolicy::HessianInverseType HessianInverseType;
 
         /// dummy enumeration
         enum
@@ -192,6 +194,8 @@ namespace FEAST
         typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
         /// hessian tensor type
         typedef typename EvalPolicy::HessianTensorType HessianTensorType;
+        /// hessian inverse tensor type
+        typedef typename EvalPolicy::HessianInverseType HessianInverseType;
 
         /// dummy enumeration
         enum
@@ -216,7 +220,9 @@ namespace FEAST
           /// can compute jacobian determinants
           can_jac_det = 1,
           /// can compute hessian tensors
-          can_hess_ten = 1
+          can_hess_ten = 1,
+          /// can compute inverse hessian tensors if domain and image dimensions coincide
+          can_hess_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
         };
 
       protected:
@@ -361,6 +367,8 @@ namespace FEAST
         typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
         /// hessian tensor type
         typedef typename EvalPolicy::HessianTensorType HessianTensorType;
+        /// hessian inverse tensor type
+        typedef typename EvalPolicy::HessianInverseType HessianInverseType;
 
         /// dummy enumeration
         enum
@@ -385,7 +393,9 @@ namespace FEAST
           /// can compute jacobian determinants
           can_jac_det = 1,
           /// can compute hessian tensors
-          can_hess_ten = 1
+          can_hess_ten = 1,
+          /// can compute inverse hessian tensors if domain and image dimensions coincide
+          can_hess_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
         };
 
       protected:

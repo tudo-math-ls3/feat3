@@ -16,22 +16,31 @@ namespace FEAST
       template<typename EvalTraits_, bool need_value_>
       struct BasisValueData
       {
-        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
-        static void eval(Data_&, const Evaluator_&, const TrafoEvalData_&) {}
       };
 
       template<typename EvalTraits_, bool need_grad_>
       struct BasisGradientData
       {
-        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
-        static void eval(Data_&, const Evaluator_&, const TrafoEvalData_&) {}
       };
 
       template<typename EvalTraits_, bool need_hess_>
       struct BasisHessianData
       {
-        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
-        static void eval(Data_&, const Evaluator_&, const TrafoEvalData_&) {}
+      };
+
+      template<typename EvalTraits_, bool need_ref_value_>
+      struct BasisReferenceValueData
+      {
+      };
+
+      template<typename EvalTraits_, bool need_ref_grad_>
+      struct BasisReferenceGradientData
+      {
+      };
+
+      template<typename EvalTraits_, bool need_ref_hess_>
+      struct BasisReferenceHessianData
+      {
       };
 
       template<typename EvalTraits_>
@@ -39,13 +48,6 @@ namespace FEAST
       {
         /// basis function value object
         typename EvalTraits_::BasisValueType value;
-
-        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
-        static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
-        {
-          static_assert(evaluator.can_value != 0, "space evaluator does not support basis function values");
-          evaluator.eval_values(data, trafo_data);
-        }
       };
 
       template<typename EvalTraits_>
@@ -53,13 +55,6 @@ namespace FEAST
       {
         /// basis gradient object
         typename EvalTraits_::BasisGradientType grad;
-
-        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
-        static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
-        {
-          static_assert(evaluator.can_grad != 0, "space evaluator does not support basis function gradients");
-          evaluator.eval_gradients(data, trafo_data);
-        }
       };
 
       template<typename EvalTraits_>
@@ -67,13 +62,27 @@ namespace FEAST
       {
         /// basis hessian object
         typename EvalTraits_::BasisHessianType hess;
+      };
 
-        template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
-        static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
-        {
-          static_assert(evaluator.can_hess != 0, "space evaluator does not support basis function hessians");
-          evaluator.eval_hessians(data, trafo_data);
-        }
+      template<typename EvalTraits_>
+      struct BasisReferenceValueData<EvalTraits_, true>
+      {
+        /// basis reference value object
+        typename EvalTraits_::BasisReferenceValueType ref_value;
+      };
+
+      template<typename EvalTraits_>
+      struct BasisReferenceGradientData<EvalTraits_, true>
+      {
+        /// basis reference gradient object
+        typename EvalTraits_::BasisReferenceGradientType ref_grad;
+      };
+
+      template<typename EvalTraits_>
+      struct BasisReferenceHessianData<EvalTraits_, true>
+      {
+        /// basis reference hessian object
+        typename EvalTraits_::BasisReferenceHessianType ref_hess;
       };
     } // namespace Intern
     /// \endcond
@@ -95,7 +104,10 @@ namespace FEAST
     class BasisData :
       public Intern::BasisHessianData<EvalTraits_, Cfg_::need_hess != 0>,
       public Intern::BasisGradientData<EvalTraits_, Cfg_::need_grad != 0>,
-      public Intern::BasisValueData<EvalTraits_, Cfg_::need_value != 0>
+      public Intern::BasisValueData<EvalTraits_, Cfg_::need_value != 0>,
+      public Intern::BasisReferenceHessianData<EvalTraits_, Cfg_::need_ref_hess != 0>,
+      public Intern::BasisReferenceGradientData<EvalTraits_, Cfg_::need_ref_grad != 0>,
+      public Intern::BasisReferenceValueData<EvalTraits_, Cfg_::need_ref_value != 0>
     {
     public:
       /// support enumeration
@@ -106,23 +118,24 @@ namespace FEAST
         /// specifies whether gradients are given
         have_grad = Cfg_::need_grad,
         /// specifies whether hessians are given
-        have_hess = Cfg_::need_hess
+        have_hess = Cfg_::need_hess,
+        /// specifies whether reference values are given
+        have_ref_value = Cfg_::need_ref_value,
+        /// specifies whether reference gradients are given
+        have_ref_grad = Cfg_::need_ref_grad,
+        /// specifies whether reference hessians are given
+        have_ref_hess = Cfg_::need_ref_hess
       };
 
       /// \cond internal
       typedef Intern::BasisValueData<EvalTraits_, have_value != 0> BasisValueBase;
       typedef Intern::BasisGradientData<EvalTraits_, have_grad != 0> BasisGradientBase;
       typedef Intern::BasisHessianData<EvalTraits_, have_hess != 0> BasisHessianBase;
+      typedef Intern::BasisReferenceValueData<EvalTraits_, have_ref_value != 0> BasisReferenceValueBase;
+      typedef Intern::BasisReferenceGradientData<EvalTraits_, have_ref_grad != 0> BasisReferenceGradientBase;
+      typedef Intern::BasisReferenceHessianData<EvalTraits_, have_ref_hess != 0> BasisReferenceHessianBase;
       /// \endcond
-
-      template<typename Data_, typename Evaluator_, typename TrafoEvalData_>
-      static void eval(Data_& data, const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
-      {
-        BasisValueBase::eval(data, evaluator, trafo_data);
-        BasisGradientBase::eval(data, evaluator, trafo_data);
-        BasisHessianBase::eval(data, evaluator, trafo_data);
-      }
-    }; // class FuncData<...>
+    }; // class BasisData<...>
 
     /**
      * \brief Space evaluation data structure
@@ -144,35 +157,33 @@ namespace FEAST
       /// support enumeration
       enum
       {
-        /// specifies whether function values are given
-        have_value = Cfg_::need_value,
-        /// specifies whether gradients are given
-        have_grad = Cfg_::need_grad,
-        /// specifies whether hessians are given
-        have_hess = Cfg_::need_hess,
         /// maximum number of local dofs
         max_local_dofs = EvalTraits_::max_local_dofs
       };
 
+      /// basis data type
+      typedef BasisData<EvalTraits_, Cfg_> BasisDataType;
+
       /// the basis function data vector
-      BasisData<EvalTraits_, Cfg_> phi[max_local_dofs];
+      BasisDataType phi[max_local_dofs];
 
-      /**
-       * \brief Evaluation operator
-       *
-       * \param[in] evaluator
-       * The space evaluator that is to be used for evaluation.
-       *
-       * \param[in] trafo_data
-       * The trafo data structure that specifies the evaluation point.
-       */
-      template<typename Evaluator_, typename TrafoEvalData_>
-      void operator()(const Evaluator_& evaluator, const TrafoEvalData_& trafo_data)
+      /// support enumeration
+      enum
       {
-        BasisData<EvalTraits_, Cfg_>::eval(*this, evaluator, trafo_data);
-      }
+        /// specifies whether function values are given
+        have_value = BasisDataType::have_value,
+        /// specifies whether gradients are given
+        have_grad = BasisDataType::have_grad,
+        /// specifies whether hessians are given
+        have_hess = BasisDataType::have_hess,
+        /// specifies whether reference values are given
+        have_ref_value = BasisDataType::have_ref_value,
+        /// specifies whether reference gradients are given
+        have_ref_grad = BasisDataType::have_ref_grad,
+        /// specifies whether reference hessians are given
+        have_ref_hess = BasisDataType::have_ref_hess
+      };
     }; // class EvalData<...>
-
   } // namespace Space
 } // namespace FEAST
 

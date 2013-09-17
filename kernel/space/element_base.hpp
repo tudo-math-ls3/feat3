@@ -40,26 +40,6 @@ namespace FEAST
       // visible to doxygen. The actual functionality has to be supplied by the implementation.
 #ifdef DOXYGEN
       /**
-       * \brief Trafo Config class template
-       *
-       * This class template specifies the trafo-config of the element's evaluator for a given
-       * space-config.
-       *
-       * \tparam SpaceConfig_
-       * The space configuration for which the trafo configuration is to be set up.
-       */
-      template<typename SpaceConfig_>
-      struct TrafoConfig :
-        public Trafo::ConfigBase
-      {
-        /** \copydoc Trafo::ConfigBase::TrafoRequirements */
-        enum
-        {
-          ...
-        };
-      };
-
-      /**
        * \brief Space evaluator class wrapper template.
        *
        * \tparam TrafoEvaluator_

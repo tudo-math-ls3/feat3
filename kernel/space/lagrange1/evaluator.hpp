@@ -3,7 +3,7 @@
 #define KERNEL_SPACE_LAGRANGE1_EVALUATOR_HPP 1
 
 // includes, FEAST
-#include <kernel/space/evaluator_base.hpp>
+#include <kernel/space/parametric_evaluator.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
 
 namespace FEAST
@@ -25,7 +25,9 @@ namespace FEAST
           /// can compute reference function values
           can_ref_value = 1,
           /// can compute reference gradients
-          can_ref_grad = 1
+          can_ref_grad = 1,
+          /// can't compute reference hessians
+          can_ref_hess = 0,
         };
       };
 
@@ -51,7 +53,7 @@ namespace FEAST
         typename TrafoEvaluator_,
         typename SpaceEvalTraits_>
       class Evaluator<Space_, TrafoEvaluator_, SpaceEvalTraits_, Shape::Hypercube<2> > :
-        public EvaluatorParametric<
+        public ParametricEvaluator<
           Evaluator<
             Space_,
             TrafoEvaluator_,
@@ -63,7 +65,8 @@ namespace FEAST
       {
       public:
         /// base-class typedef
-        typedef EvaluatorParametric<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
+        friend BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
@@ -116,10 +119,10 @@ namespace FEAST
           EvalData_& data,
           const DomainPointType& point) const
         {
-          data.phi[0].value = DataType(0.25) * (DataType(1) - point[0]) * (DataType(1) - point[1]);
-          data.phi[1].value = DataType(0.25) * (DataType(1) + point[0]) * (DataType(1) - point[1]);
-          data.phi[2].value = DataType(0.25) * (DataType(1) - point[0]) * (DataType(1) + point[1]);
-          data.phi[3].value = DataType(0.25) * (DataType(1) + point[0]) * (DataType(1) + point[1]);
+          data.phi[0].ref_value = DataType(0.25) * (DataType(1) - point[0]) * (DataType(1) - point[1]);
+          data.phi[1].ref_value = DataType(0.25) * (DataType(1) + point[0]) * (DataType(1) - point[1]);
+          data.phi[2].ref_value = DataType(0.25) * (DataType(1) - point[0]) * (DataType(1) + point[1]);
+          data.phi[3].ref_value = DataType(0.25) * (DataType(1) + point[0]) * (DataType(1) + point[1]);
         }
 
         /**
@@ -136,14 +139,14 @@ namespace FEAST
           EvalData_& data,
           const DomainPointType& point) const
         {
-          data.phi[0].grad[0] = DataType(-0.25) * (DataType(1) - point[1]);
-          data.phi[0].grad[1] = DataType(-0.25) * (DataType(1) - point[0]);
-          data.phi[1].grad[0] = DataType( 0.25) * (DataType(1) - point[1]);
-          data.phi[1].grad[1] = DataType(-0.25) * (DataType(1) + point[0]);
-          data.phi[2].grad[0] = DataType(-0.25) * (DataType(1) + point[1]);
-          data.phi[2].grad[1] = DataType( 0.25) * (DataType(1) - point[0]);
-          data.phi[3].grad[0] = DataType( 0.25) * (DataType(1) + point[1]);
-          data.phi[3].grad[1] = DataType( 0.25) * (DataType(1) + point[0]);
+          data.phi[0].ref_grad[0] = DataType(-0.25) * (DataType(1) - point[1]);
+          data.phi[0].ref_grad[1] = DataType(-0.25) * (DataType(1) - point[0]);
+          data.phi[1].ref_grad[0] = DataType( 0.25) * (DataType(1) - point[1]);
+          data.phi[1].ref_grad[1] = DataType(-0.25) * (DataType(1) + point[0]);
+          data.phi[2].ref_grad[0] = DataType(-0.25) * (DataType(1) + point[1]);
+          data.phi[2].ref_grad[1] = DataType( 0.25) * (DataType(1) - point[0]);
+          data.phi[3].ref_grad[0] = DataType( 0.25) * (DataType(1) + point[1]);
+          data.phi[3].ref_grad[1] = DataType( 0.25) * (DataType(1) + point[0]);
         }
       }; // class Evaluator<...,Hypercube<2>>
     } // namespace Lagrange1

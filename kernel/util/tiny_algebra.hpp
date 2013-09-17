@@ -697,6 +697,41 @@ namespace FEAST
       }
 
       /**
+       * \brief Adds the algebraic matrix-product of two other matrices onto this matrix.
+       *
+       * \param[in] a
+       * The left m-by-l multiplicant matrix.
+       *
+       * \param[in] b
+       * The right l-by-n multiplicant matrix.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
+      template<int l_, int sma_, int sna_, int smb_, int snb_>
+      Matrix& add_mat_mat_mult(
+        const Matrix<T_, m_, l_, sma_, sna_>& a,
+        const Matrix<T_, l_, n_, smb_, snb_>& b,
+        T_ alpha = T_(1))
+      {
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            T_ r(0);
+            for(int k(0); k < l_; ++k)
+            {
+              r += a.v[i][k] * b.v[k][j];
+            }
+            operator()(i,j) += alpha * r;
+          }
+        }
+        return *this;
+      }
+
+      /**
        * \brief Sets this matrix to the algebraic matrix-product of two other matrices.
        *
        * \param[in] a
@@ -710,18 +745,119 @@ namespace FEAST
       template<int l_, int sma_, int sna_, int smb_, int snb_>
       Matrix& set_mat_mat_mult(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
       {
+        clear();
+        return add_mat_mat_mult(a, b);
+      }
+
+
+      /**
+       * \brief Adds the algebraic matrix double-product of three other matrices onto this matrix.
+       *
+       * Let C denote this m-by-n matrix, B the left k-by-m input matrix, D the right l-by-n input matrix
+       * and A the inner k-by-l input matrix, then this operation computes:
+       *   \f[ C += \alpha B^\top\cdot A\cdot D\f]
+       *
+       * \param[in] a
+       * The inner k-by-l multiplicant matrix.
+       *
+       * \param[in] b
+       * The left k-by-m multiplicant matrix.
+       *
+       * \param[in] d
+       * The right l-by-n multiplicant matrix.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
+      template<int k_, int l_, int sma_, int sna_, int smb_, int snb_, int smd_, int snd_>
+      Matrix& add_double_mat_mult(
+        const Matrix<T_, k_, l_, sma_, sna_>& a,
+        const Matrix<T_, k_, m_, smb_, snb_>& b,
+        const Matrix<T_, l_, n_, smd_, snd_>& d,
+        T_ alpha = T_(1))
+      {
         for(int i(0); i < m_; ++i)
         {
           for(int j(0); j < n_; ++j)
           {
-            v[i][j] = T_(0);
-            for(int k(0); k < l_; ++k)
+            T_ r(0);
+            for(int p(0); p < k_; ++p)
             {
-              v[i][j] += a.v[i][k] * b.v[k][j];
+              T_ t(0);
+              for(int q(0); q < l_; ++q)
+              {
+                t += a(p,q) * d(q,j);
+              }
+              r += b(p,i)*t;
             }
+            operator()(i,j) += alpha * r;
           }
         }
         return *this;
+      }
+
+      template<int k_, int l_, int sma_, int sna_, int smb_, int snb_, int smd_, int snd_>
+      Matrix& set_double_mat_mult(
+        const Matrix<T_, k_, l_, sma_, sna_>& a,
+        const Matrix<T_, k_, m_, smb_, snb_>& b,
+        const Matrix<T_, l_, n_, smd_, snd_>& d,
+        T_ alpha = T_(1))
+      {
+        clear();
+        return add_double_mat_mult(a, b, d, alpha);
+      }
+
+      /**
+       * \brief Adds the result of a vector-tensor left-product onto this matrix.
+       *
+       * Let A denote this m-by-n matrix, v the l-size input vector and T the l-by-m-by-b input tensor,
+       * then this operation computes:
+       * \f[ \forall i\in\{1,...,m\},j\in\{1,...,n\}:~ A_{ij} += \alpha \sum_{k=1}^l v_k\cdot T_{kij}\f]
+       *
+       * \note This function is used for the computation of second-order derivatives by the chain rule.
+       *
+       * \param[in] v
+       * The l-size vector that serves as a left multiplicant.
+       *
+       * \param[in] t
+       * The l-by-m-by-n tensor that serves as a right multiplicant.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
+      template<int l_, int snv_, int slt_, int smt_, int snt_>
+      Matrix& add_vec_tensor_mult(
+        const Vector<T_, l_, snv_>& v,
+        const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
+        T_ alpha = T_(1))
+      {
+        for(int i(0); i < m_; ++i)
+        {
+          for(int j(0); j < n_; ++j)
+          {
+            T_ r(0);
+            for(int k(0); k < l_; ++k)
+            {
+              r += v(k) * t(k,i,j);
+            }
+            operator()(i,j) += alpha * r;
+          }
+        }
+        return *this;
+      }
+
+      template<int l_, int snv_, int slt_, int smt_, int snt_>
+      Matrix& set_vec_tensor_mult(
+        const Vector<T_, l_, snv_>& v,
+        const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
+        T_ alpha = T_(1))
+      {
+        clear();
+        return add_vec_tensor_mult(v, t, alpha);
       }
     }; // class Matrix
 
@@ -947,6 +1083,105 @@ namespace FEAST
       void clear(T_ alpha = T_(0))
       {
         (*this) = alpha;
+      }
+
+      /**
+       * \brief Adds the result of a matrix-tensor product onto this tensor.
+       *
+       * Let K denote this tensor, A the input matrix and T the input tensor, then this operation computes:
+       * \f[ \forall h\in\{1,...,l\}, i\in\{1,...,m\},j\in\{1,...,n\}:~ K_{hij} +=
+       *     \alpha \sum_{p=1}^k A_{hp}\cdot T_{pij}\f]
+       *
+       * \note This function is used for the computation of second-order derivatives by the chain rule.
+       *
+       * \param[in] a
+       * The l-by-k matrix that serves as the left multiplicant.
+       *
+       * \param[in] t
+       * The k-by-m-by-n tensor that serves as the right multiplicant.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
+      template<int k_, int sma_, int sna_, int slt_, int smt_, int snt_>
+      Tensor3& add_mat_tensor_mult(
+        const Matrix<T_, l_, k_, sma_, sna_>& a,
+        const Tensor3<T_, k_, m_, n_, slt_, smt_, snt_>& t,
+        T_ alpha = T_(1))
+      {
+        for(int h(0); h < l_; ++h)
+        {
+          for(int i(0); i < m_; ++i)
+          {
+            for(int j(0); j < n_; ++j)
+            {
+              T_ r(0);
+              for(int p(0); p < k_; ++p)
+              {
+                r += a(h,p) * t(p,i,j);
+              }
+              operator()(h,i,j) += alpha * r;
+            }
+          }
+        }
+        return *this;
+      }
+
+      /**
+       * \brief Adds the result of a matrix-tensor-matrix double-product onto this tensor.
+       *
+       * Let K denote this l-by-m-by-n tensor, T the l-by-m'-by-n' input tensor,
+       * B the m'-by-m and D the n'-by-n input matrices, then this operation computes:
+       * \f[ \forall h\in\{1,...,l\}, i\in\{1,...,m\}, j\in\{1,...,n\}:~ K_{hij} +=
+       *     \alpha \sum_{p=1}^{m'}\sum_{q=1}^{n'} T_{hpq}\cdot B_{pi}\cdot D_{qj} \f]
+       *
+       * \note This function is used for the computation of second-order derivatives by the chain rule.
+       *
+       * \param[in] t
+       * The l-by-m'-by-n' tensor that serves as the inner multiplicant.
+       *
+       * \param[in] b
+       * The m'-by-m matrix that serves as the left multiplicant.
+       *
+       * \param[in] d
+       * The n'-by-n matrix that serves as the right multiplicant.
+       *
+       * \param[in] alpha
+       * A scaling factor for the product.
+       *
+       * \returns \p *this
+       */
+      template<
+        int lt_, int mt_, int nt_, // input tensor dimensions
+        int slt_, int smt_, int snt_, // input tensor strides
+        int smb_, int snb_, int smd_, int snd_> // input matrix strides
+      Tensor3& add_double_mat_mult(
+        const Tensor3<T_, lt_, mt_, nt_, slt_, smt_, snt_>& t,
+        const Matrix<T_, nt_, n_, smb_, snb_>& b,
+        const Matrix<T_, mt_, m_, smd_, snd_>& d,
+        T_ alpha = T_(1))
+      {
+        for(int h(0); h < l_; ++h)
+        {
+          for(int i(0); i < m_; ++i)
+          {
+            for(int j(0); j < n_; ++j)
+            {
+              T_ r(0);
+              for(int p(0); p < mt_; ++p)
+              {
+                for(int q(0); q < nt_; ++q)
+                {
+                  r += t(h,p,q) * b(p,i) * d(q,j);
+                }
+              }
+              operator()(h,i,j) += alpha * r;
+            }
+          }
+        }
+        return *this;
       }
     }; // class Tensor3<...>
 

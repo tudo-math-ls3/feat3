@@ -92,6 +92,27 @@ namespace FEAST
           can_grad = 1
         };
 
+        template<typename Cfg_>
+        struct ConfigTraits
+        {
+          /// evaluation data configuration
+          typedef Cfg_ EvalDataConfig;
+
+          /// trafo configuration
+          struct TrafoConfig :
+            public Trafo::ConfigBase
+          {
+            enum
+            {
+              /// we always need image point coordinates
+              need_img_point = 1
+            };
+          };
+
+          /// evaluation data typedef
+          typedef Space::EvalData<SpaceEvalTraits, EvalDataConfig> EvalDataType;
+        };
+
       protected:
         /// inverse linearised trafo config
         struct InvLinTrafoConfig :
@@ -99,14 +120,19 @@ namespace FEAST
         {
           enum
           {
+            need_dom_point = 1,
             need_img_point = 1,
             need_jac_inv = 1
           };
         };
 
         /// inverse linearised trafo data
-        typedef Trafo::EvalData<TrafoEvalTraits, InvLinTrafoConfig> InvLinTrafoData;
+        typedef typename TrafoEvaluator::template ConfigTraits<InvLinTrafoConfig>::EvalDataType InvLinTrafoData;
 
+        /// trafo evaluator for facets (=edges)
+        typedef typename TrafoType::template Evaluator<Shape::Hypercube<1>, DataType>::Type FacetTrafoEvaluator;
+        /// facet evaluation traits
+        typedef typename FacetTrafoEvaluator::EvalTraits FacetEvalTraits;
 
         /// trafo config for facet trafo
         struct FacetTrafoConfig :
@@ -119,14 +145,8 @@ namespace FEAST
           };
         };
 
-        /// trafo evaluator for facets (=edges)
-        typedef typename TrafoType::template Evaluator<Shape::Hypercube<1>, DataType>::Type FacetTrafoEvaluator;
-        /// facet evaluation policy
-        typedef typename FacetTrafoEvaluator::EvalPolicy FacetEvalPolicy;
-        /// facet evaluation traits
-        typedef typename FacetTrafoEvaluator::EvalTraits FacetEvalTraits;
         /// facet trafo data
-        typedef Trafo::EvalData<FacetEvalTraits, FacetTrafoConfig> FacetTrafoData;
+        typedef typename FacetTrafoEvaluator::template ConfigTraits<FacetTrafoConfig>::EvalDataType FacetTrafoData;
 
         /// basis function coefficient matrix
         typedef Tiny::Matrix<DataType, 4, 4> CoeffMatrixType;
@@ -147,7 +167,7 @@ namespace FEAST
 
           // create the trafo data
           InvLinTrafoData trafo_data;
-          trafo_data(trafo_eval, dom_point);
+          trafo_eval(trafo_data, dom_point);
 
           // store inverse trafo linearisation
           _inv_lin_mat = trafo_data.jac_inv;
@@ -180,7 +200,7 @@ namespace FEAST
 
           // define 2-point Gauss cubature point coordinate
           static const DataType g = Math::sqrt(DataType(1) / DataType(3));
-          const typename FacetEvalPolicy::DomainPointType g1(-g), g2(+g);
+          const typename FacetEvalTraits::DomainPointType g1(-g), g2(+g);
           DomainPointType q1, q2;
 
           // loop over all 4 edges of the quad
@@ -190,12 +210,12 @@ namespace FEAST
             facet_eval.prepare(facet_index_set(cell, i));
 
             // map first cubature point
-            facet_data(facet_eval, g1);
+            facet_eval(facet_data, g1);
             DataType w1(facet_data.jac_det);
             q1.set_mat_vec_mult(_inv_lin_mat, facet_data.img_point - _inv_lin_vec);
 
             // map second cubature point
-            facet_data(facet_eval, g2);
+            facet_eval(facet_data, g2);
             DataType w2(facet_data.jac_det);
             q2.set_mat_vec_mult(_inv_lin_mat, facet_data.img_point - _inv_lin_vec);
 

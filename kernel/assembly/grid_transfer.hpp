@@ -83,29 +83,33 @@ namespace FEAST
         typedef typename CoarseTrafoType::MeshType MeshType;
         typedef typename CoarseSpace_::ShapeType ShapeType;
 
-        // define fine and coarse mesh trafo configurations
-        typedef typename CoarseSpace_::template TrafoConfig<AsmSpaceConfig> CoarseSpaceTrafoConfig;
-        typedef typename FineSpace_::template TrafoConfig<AsmSpaceConfig> FineSpaceTrafoConfig;
-        typedef Trafo::ConfigOr<AsmTrafoConfig, CoarseSpaceTrafoConfig> CoarseTrafoConfig;
-        typedef Trafo::ConfigOr<AsmTrafoConfig, FineSpaceTrafoConfig> FineTrafoConfig;
-
         // typedefs for dof-mappings
         typedef typename FineSpace_::DofMappingType FineDofMapping;
         typedef typename CoarseSpace_::DofMappingType CoarseDofMapping;
 
-        // typedefs for trafo evaluators and data
+        // typedefs for trafo evaluators
         typedef typename FineTrafoType::template Evaluator<ShapeType, DataType>::Type FineTrafoEvaluator;
         typedef typename CoarseTrafoType::template Evaluator<ShapeType, DataType>::Type CoarseTrafoEvaluator;
-        typedef Trafo::EvalData<typename FineTrafoEvaluator::EvalTraits, FineTrafoConfig> FineTrafoEvalData;
-        typedef Trafo::EvalData<typename CoarseTrafoEvaluator::EvalTraits, CoarseTrafoConfig> CoarseTrafoEvalData;
+
+        // typedefs for space evaluators
+        typedef typename FineSpace_::template Evaluator<FineTrafoEvaluator>::Type FineSpaceEvaluator;
+        typedef typename CoarseSpace_::template Evaluator<CoarseTrafoEvaluator>::Type CoarseSpaceEvaluator;
+
+        // define fine and coarse mesh trafo configurations
+        typedef typename FineSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::TrafoConfig FineSpaceTrafoConfig;
+        typedef typename CoarseSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::TrafoConfig CoarseSpaceTrafoConfig;
+        typedef Trafo::ConfigOr<AsmTrafoConfig, FineSpaceTrafoConfig> FineTrafoConfig;
+        typedef Trafo::ConfigOr<AsmTrafoConfig, CoarseSpaceTrafoConfig> CoarseTrafoConfig;
+
+        // typedefs for trafo data
+        typedef typename FineTrafoEvaluator::template ConfigTraits<FineTrafoConfig>::EvalDataType FineTrafoEvalData;
+        typedef typename CoarseTrafoEvaluator::template ConfigTraits<CoarseTrafoConfig>::EvalDataType CoarseTrafoEvalData;
         FineTrafoEvalData fine_trafo_data;
         CoarseTrafoEvalData coarse_trafo_data;
 
-        // typedefs for space evaluators and data
-        typedef typename FineSpace_::template Evaluator<FineTrafoEvaluator>::Type FineSpaceEvaluator;
-        typedef typename CoarseSpace_::template Evaluator<CoarseTrafoEvaluator>::Type CoarseSpaceEvaluator;
-        typedef Space::EvalData<typename FineSpaceEvaluator::SpaceEvalTraits, AsmSpaceConfig> FineSpaceEvalData;
-        typedef Space::EvalData<typename CoarseSpaceEvaluator::SpaceEvalTraits, AsmSpaceConfig> CoarseSpaceEvalData;
+        // typedef for space data
+        typedef typename FineSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::EvalDataType FineSpaceEvalData;
+        typedef typename CoarseSpaceEvaluator::template ConfigTraits<AsmSpaceConfig>::EvalDataType CoarseSpaceEvalData;
         FineSpaceEvalData fine_space_data;
         CoarseSpaceEvalData coarse_space_data;
 
@@ -198,12 +202,12 @@ namespace FEAST
               Index l = child * fine_cubature.get_num_points() + k;
 
               // compute trafo data
-              fine_trafo_data(fine_trafo_eval, fine_cubature.get_point(k));
-              coarse_trafo_data(coarse_trafo_eval, coarse_cubature.get_point(l));
+              fine_trafo_eval(fine_trafo_data, fine_cubature.get_point(k));
+              coarse_trafo_eval(coarse_trafo_data, coarse_cubature.get_point(l));
 
               // compute basis function data
-              fine_space_data(fine_space_eval, fine_trafo_data);
-              coarse_space_data(coarse_space_eval, coarse_trafo_data);
+              fine_space_eval(fine_space_data, fine_trafo_data);
+              coarse_space_eval(coarse_space_data, coarse_trafo_data);
 
               // fine mesh test function loop
               for(Index i(0); i < fine_num_loc_dofs; ++i)

@@ -98,6 +98,24 @@ namespace FEAST
       /// mesh type
       typedef typename TrafoType::MeshType MeshType;
 
+      /// trafo evaluator type
+      typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
+
+      /// trafo cell iterator type
+      typedef typename TrafoEvaluator::CellIterator CellIterator;
+
+      /// space evaluator types
+      typedef typename SpaceType::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
+      typedef SpaceEvaluator TestEvaluator;
+      typedef SpaceEvaluator TrialEvaluator;
+      typedef SpaceEvaluator MultEvaluator;
+
+      /// space evaluator traits
+      typedef typename SpaceEvaluator::SpaceEvalTraits SpaceEvalTraits;
+      typedef SpaceEvalTraits TestEvalTraits;
+      typedef SpaceEvalTraits TrialEvalTraits;
+      typedef SpaceEvalTraits MultEvalTraits;
+
       // define test- and trial-space configs
       typedef SpaceConfig_ SpaceConfig;
       typedef SpaceConfig TestConfig;
@@ -105,7 +123,7 @@ namespace FEAST
       typedef SpaceConfig MultConfig;
 
       // now fetch the trafo config from the space
-      typedef typename SpaceType::template TrafoConfig<SpaceConfig> SpaceTrafoConfig;
+      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::TrafoConfig SpaceTrafoConfig;
       typedef SpaceTrafoConfig TestTrafoConfig;
       typedef SpaceTrafoConfig TrialTrafoConfig;
       typedef SpaceTrafoConfig MultTrafoConfig;
@@ -125,45 +143,18 @@ namespace FEAST
       /// trafo config: combine space and assembly trafo configs
       typedef Trafo::ConfigOr<AsmTrafoConfig, SpaceTrafoConfig> TrafoConfig;
 
-      /// trafo evaluator types
-      typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-
-      /// trafo evaluator traits
-      typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
-
-      /// dummy enum
-      enum
-      {
-        /// trafo domain dimension
-        domain_dim = TrafoEvaluator::domain_dim,
-        /// trafo image dimension
-        image_dim = TrafoEvaluator::image_dim
-      };
-
-      /// space evaluator types
-      typedef typename SpaceType::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
-      typedef SpaceEvaluator TestEvaluator;
-      typedef SpaceEvaluator TrialEvaluator;
-      typedef SpaceEvaluator MultEvaluator;
-
-      /// space evaluator traits
-      typedef typename SpaceEvaluator::SpaceEvalTraits SpaceEvalTraits;
-      typedef SpaceEvalTraits TestEvalTraits;
-      typedef SpaceEvalTraits TrialEvalTraits;
-      typedef SpaceEvalTraits MultEvalTraits;
-
       /// trafo evaluation data type
-      typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
+      typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
       typedef TrafoEvalData TrafoData;
 
       /// space evaluation data types
-      typedef Space::EvalData<SpaceEvalTraits, SpaceConfig> SpaceEvalData;
+      typedef typename SpaceEvaluator::template ConfigTraits<SpaceConfig>::EvalDataType SpaceEvalData;
       typedef SpaceEvalData TestEvalData;
       typedef SpaceEvalData TrialEvalData;
       typedef SpaceEvalData MultEvalData;
 
       /// basis function data types
-      typedef Space::BasisData<SpaceEvalTraits, SpaceConfig> SpaceBasisData;
+      typedef typename SpaceEvalData::BasisDataType SpaceBasisData;
       typedef SpaceBasisData BasisData;
       typedef SpaceBasisData TestBasisData;
       typedef SpaceBasisData TrialBasisData;
@@ -174,6 +165,15 @@ namespace FEAST
       typedef DofMapping TestDofMapping;
       typedef DofMapping TrialDofMapping;
       typedef DofMapping MultDofMapping;
+
+      /// dummy enum
+      enum
+      {
+        /// trafo domain dimension
+        domain_dim = TrafoEvaluator::domain_dim,
+        /// trafo image dimension
+        image_dim = TrafoEvaluator::image_dim
+      };
 
       /// local vector type
       typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> LocalVectorType;
@@ -256,8 +256,8 @@ namespace FEAST
       typedef TrialConfig_ MultConfig;
 
       // now fetch the trafo configs from the spaces
-      typedef typename TestSpaceType::template TrafoConfig<TestConfig> TestTrafoConfig;
-      typedef typename TrialSpaceType::template TrafoConfig<TrialConfig> TrialTrafoConfig;
+      typedef typename TestSpaceType::template ConfigTraits<TestConfig>::TrafoConfig TestTrafoConfig;
+      typedef typename TrialSpaceType::template ConfigTraits<TrialConfig>::TrafoConfig TrialTrafoConfig;
       typedef TrialTrafoConfig MultTrafoConfig;
 
       // combine the space trafo configurations
@@ -278,20 +278,11 @@ namespace FEAST
       /// trafo config: combine space and assembly trafo configs
       typedef Trafo::ConfigOr<AsmTrafoConfig, SpaceTrafoConfig> TrafoConfig;
 
-      /// trafo evaluator types
+      /// trafo evaluator type
       typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
 
-      /// trafo evaluator traits
-      typedef typename TrafoEvaluator::EvalTraits TrafoEvalTraits;
-
-      /// dummy enum
-      enum
-      {
-        /// trafo domain dimension
-        domain_dim = TrafoEvaluator::domain_dim,
-        /// trafo image dimension
-        image_dim = TrafoEvaluator::image_dim
-      };
+      /// trafo cell iterator type
+      typedef typename TrafoEvaluator::CellIterator CellIterator;
 
       /// space evaluator types
       typedef typename TestSpaceType::template Evaluator<TrafoEvaluator>::Type TestEvaluator;
@@ -304,23 +295,32 @@ namespace FEAST
       typedef TrialEvalTraits MultEvalTraits;
 
       /// trafo evaluation data type
-      typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
+      typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
       typedef TrafoEvalData TrafoData;
 
       /// space evaluation data types
-      typedef Space::EvalData<TestEvalTraits, TestConfig> TestEvalData;
-      typedef Space::EvalData<TrialEvalTraits, TrialConfig> TrialEvalData;
+      typedef typename TestEvaluator::template ConfigTraits<TestConfig>::EvalDataType TestEvalData;
+      typedef typename TrialEvaluator::template ConfigTraits<TrialConfig>::EvalDataType TrialEvalData;
       typedef TrialEvalData MultEvalData;
 
       /// basis function data types
-      typedef Space::BasisData<TestEvalTraits, TestConfig> TestBasisData;
-      typedef Space::BasisData<TrialEvalTraits, TrialConfig> TrialBasisData;
+      typedef typename TestEvalData::BasisDataType TestBasisData;
+      typedef typename TrialEvalData::BasisDataType TrialBasisData;
       typedef TrialBasisData MultBasisData;
 
       /// dof-mapping types
       typedef typename TestSpaceType::DofMappingType TestDofMapping;
       typedef typename TrialSpaceType::DofMappingType TrialDofMapping;
       typedef TrialDofMapping MultDofMapping;
+
+      /// dummy enum
+      enum
+      {
+        /// trafo domain dimension
+        domain_dim = TrafoEvaluator::domain_dim,
+        /// trafo image dimension
+        image_dim = TrafoEvaluator::image_dim
+      };
 
       /// local vector type
       typedef Tiny::Vector<DataType, TestEvaluator::max_local_dofs> LocalTestVectorType;

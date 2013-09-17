@@ -41,6 +41,13 @@ namespace FEAST
         typedef NodeFunctionalBase<Space_, Functor_, DataType_> BaseClass;
 
       protected:
+        typedef typename Space_::TrafoType TrafoType;
+        typedef typename Space_::ShapeType ShapeType;
+        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
+        typedef typename TrafoType::template Evaluator<FacetType, DataType_>::Type TrafoEvalType;
+        typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
+        typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
+
         struct TrafoConfig :
           public Trafo::ConfigBase
         {
@@ -51,14 +58,9 @@ namespace FEAST
           };
         };
 
-        typedef typename Space_::TrafoType TrafoType;
-        typedef typename Space_::ShapeType ShapeType;
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-        typedef typename TrafoType::template Evaluator<FacetType, DataType_>::Type TrafoEvalType;
-        typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
-        typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
+        typedef typename TrafoEvalType::template TrafoConfig<TrafoConfig> TrafoDataConfig;
 
-        typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
+        typedef Trafo::EvalData<TrafoEvalTraits, TrafoDataConfig> TrafoEvalData;
 
         struct FuncEvalTraits
         {
