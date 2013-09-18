@@ -22,6 +22,8 @@ IF (UNIX)
     ADD_CUSTOM_COMMAND(
         DEPENDS clean
         COMMENT "distribution clean"
+        COMMAND make
+        ARGS clean
         COMMAND rm
         ARGS    -Rf CMakeTmp ${DISTCLEANED}
         TARGET  distclean
