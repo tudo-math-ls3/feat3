@@ -212,7 +212,7 @@ namespace FEAST
       typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set()
       {
         CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">()");
-        return _index_set_holder.template get_index_set_wrapper<cell_dim_>().get_index_set<face_dim_>();
+        return _index_set_holder.template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
       /** \copydoc get_index_set() */
@@ -222,7 +222,7 @@ namespace FEAST
       const typename IndexSet<cell_dim_, face_dim_>::Type& get_index_set() const
       {
         CONTEXT(name() + "::get_index_set<" + stringify(cell_dim_) + "," + stringify(face_dim_) + ">() [const]");
-        return _index_set_holder.template get_index_set_wrapper<cell_dim_>().get_index_set<face_dim_>();
+        return _index_set_holder.template get_index_set_wrapper<cell_dim_>().template get_index_set<face_dim_>();
       }
 
       /// \cond internal
