@@ -499,7 +499,8 @@ namespace FEAST
 #ifdef FEAST_COMPILER_MICROSOFT
         str.push_back(std::toupper(*it, std::locale::classic()));
 #else
-        str.push_back(std::toupper(*it));
+        std::locale loc;
+        str.push_back(std::toupper<char>(*it, loc));
 #endif
       }
       return str;
@@ -520,7 +521,8 @@ namespace FEAST
 #ifdef FEAST_COMPILER_MICROSOFT
         str.push_back(std::tolower(*it, std::locale::classic()));
 #else
-        str.push_back(std::tolower(*it));
+        std::locale loc;
+        str.push_back(std::tolower<char>(*it, loc));
 #endif
       }
       return str;
