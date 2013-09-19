@@ -86,14 +86,14 @@ namespace FEAST
           this->_scalar_dt.push_back(DT_(0));
 
           uint64_t * cAj = new uint64_t[size];
-          file.read((char *)cAj, size * sizeof(uint64_t));
+          file.read((char *)cAj, (long)(size * sizeof(uint64_t)));
           Index* tAj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(4) * this->_scalar_index.at(3)) * sizeof(Index));
           for (Index i(0) ; i < size ; ++i)
             tAj[i] = Index(cAj[i]);
           delete[] cAj;
 
           double * cAx = new double[size];
-          file.read((char *)cAx, size * sizeof(double));
+          file.read((char *)cAx, (long)(size * sizeof(double)));
 
           DT_* tAx = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(4) * this->_scalar_index.at(3)) * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
@@ -509,8 +509,8 @@ namespace FEAST
           file.write((const char *)&columns, sizeof(uint64_t));
           file.write((const char *)&stride, sizeof(uint64_t));
           file.write((const char *)&num_cols_per_row, sizeof(uint64_t));
-          file.write((const char *)cAj, size * sizeof(uint64_t));
-          file.write((const char *)cAx, size * sizeof(double));
+          file.write((const char *)cAj, (long)(size * sizeof(uint64_t)));
+          file.write((const char *)cAx, (long)(size * sizeof(double)));
 
           delete[] cAj;
           delete[] cAx;

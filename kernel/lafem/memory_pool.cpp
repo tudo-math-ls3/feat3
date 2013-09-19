@@ -83,10 +83,10 @@ void MemoryPool<Mem::Main>::set_memory(DT_ * address, const DT_ val, const Index
 unsigned long MemoryPool<Mem::Main>::generate_hash(void * data, Index bytes)
 {
   char * cd((char * )data);
-  unsigned long t(0);
+  Index t(0);
   for (Index i(0) ; i < bytes ; ++i)
   {
-    t += (cd[i] * i) % bytes;
+    t += ((Index)cd[i] * i) % bytes;
   }
   t = t % bytes;
   return t;

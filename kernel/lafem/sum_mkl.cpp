@@ -8,10 +8,10 @@ using namespace FEAST::LAFEM;
 
 void Sum<Algo::MKL>::value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & x, const DenseVector<Mem::Main, float> & y)
 {
-    vsAdd(x.size(), x.elements(), y.elements(), r.elements());
+    vsAdd((MKL_INT)x.size(), x.elements(), y.elements(), r.elements());
 }
 
 void Sum<Algo::MKL>::value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & x, const DenseVector<Mem::Main, double> & y)
 {
-    vdAdd(x.size(), x.elements(), y.elements(), r.elements());
+    vdAdd((MKL_INT)x.size(), x.elements(), y.elements(), r.elements());
 }

@@ -82,28 +82,28 @@ namespace FEAST
           this->_scalar_dt.push_back(DT_(0));
 
           uint64_t * ccol_ind = new uint64_t[elements];
-          file.read((char *)ccol_ind, elements * sizeof(uint64_t));
+          file.read((char *)ccol_ind, (long)(elements * sizeof(uint64_t)));
           Index * tcol_ind = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(Index));
           for (Index i(0) ; i < elements ; ++i)
             tcol_ind[i] = Index(ccol_ind[i]);
           delete[] ccol_ind;
 
           uint64_t * crow_ptr = new uint64_t[rows + 1];
-          file.read((char *)crow_ptr, (rows + 1) * sizeof(uint64_t));
+          file.read((char *)crow_ptr, (long)((rows + 1) * sizeof(uint64_t)));
           Index * trow_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(Index(rows + 1) * sizeof(Index));
           for (Index i(0) ; i < rows + 1 ; ++i)
             trow_ptr[i] = Index(crow_ptr[i]);
           delete[] crow_ptr;
 
           uint64_t * crow_ptr_end = new uint64_t[rows];
-          file.read((char *)crow_ptr_end, (rows) * sizeof(uint64_t));
+          file.read((char *)crow_ptr_end, (long)((rows) * sizeof(uint64_t)));
           Index * trow_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(Index(rows) * sizeof(Index));
           for (Index i(0) ; i < rows ; ++i)
             trow_ptr_end[i] = Index(crow_ptr_end[i]);
           delete[] crow_ptr_end;
 
           double * cval = new double[elements];
-          file.read((char *)cval, elements * sizeof(double));
+          file.read((char *)cval, (long)(elements * sizeof(double)));
           DT_ * tval = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(DT_));
           for (Index i(0) ; i < elements ; ++i)
             tval[i] = DT_(cval[i]);
@@ -627,10 +627,10 @@ namespace FEAST
           file.write((const char *)&rows, sizeof(uint64_t));
           file.write((const char *)&columns, sizeof(uint64_t));
           file.write((const char *)&elements, sizeof(uint64_t));
-          file.write((const char *)ccol_ind, elements * sizeof(uint64_t));
-          file.write((const char *)crow_ptr, (rows + 1) * sizeof(uint64_t));
-          file.write((const char *)crow_ptr_end, rows * sizeof(uint64_t));
-          file.write((const char *)cval, elements * sizeof(double));
+          file.write((const char *)ccol_ind, (long)(elements * sizeof(uint64_t)));
+          file.write((const char *)crow_ptr, (long)((rows + 1) * sizeof(uint64_t)));
+          file.write((const char *)crow_ptr_end, (long)(rows * sizeof(uint64_t)));
+          file.write((const char *)cval, (long)(elements * sizeof(double)));
 
           delete[] ccol_ind;
           delete[] crow_ptr;

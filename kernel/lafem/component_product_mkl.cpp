@@ -8,10 +8,10 @@ using namespace FEAST::LAFEM;
 
 void ComponentProduct<Algo::MKL>::value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & x, const DenseVector<Mem::Main, float> & y)
 {
-    vsMul(x.size(), x.elements(), y.elements(), r.elements());
+    vsMul((MKL_INT)x.size(), x.elements(), y.elements(), r.elements());
 }
 
 void ComponentProduct<Algo::MKL>::value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & x, const DenseVector<Mem::Main, double> & y)
 {
-    vdMul(x.size(), x.elements(), y.elements(), r.elements());
+    vdMul((MKL_INT)x.size(), x.elements(), y.elements(), r.elements());
 }

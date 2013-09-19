@@ -92,12 +92,12 @@ namespace FEAST
         void _read_from_dv(std::istream& file)
         {
           uint64_t size;
-          file.read((char *)&size, sizeof(uint64_t));
+          file.read((char *)&size, (long)(sizeof(uint64_t)));
           this->_scalar_index.at(0) = (Index)size;
           this->_elements_size.push_back(this->_scalar_index.at(0));
 
           double * ctemp = new double[size];
-          file.read((char *)ctemp, size * sizeof(double));
+          file.read((char *)ctemp, (long)(size * sizeof(double)));
 
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(0)) * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
@@ -419,7 +419,7 @@ namespace FEAST
 
           uint64_t size(this->_scalar_index.at(0));
           file.write((const char *)&size, sizeof(uint64_t));
-          file.write((const char *)ctemp, size * sizeof(double));
+          file.write((const char *)ctemp, (long)(size * sizeof(double)));
 
           delete[] ctemp;
         }

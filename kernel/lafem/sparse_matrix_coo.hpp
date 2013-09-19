@@ -86,7 +86,7 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row(atol(srow.c_str()));
+            Index row((Index)atol(srow.c_str()));
             --row;
             this->_scalar_index.at(1) = std::max(row+1, this->rows());
             line.erase(0, end);
@@ -95,7 +95,7 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String scol(line, 0, end);
-            Index col(atol(scol.c_str()));
+            Index col((Index)atol(scol.c_str()));
             --col;
             this->_scalar_index.at(2) = std::max(col+1, this->columns());
             line.erase(0, end);
@@ -147,14 +147,14 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row(atol(srow.c_str()));
+            Index row((Index)atol(srow.c_str()));
             line.erase(0, end);
 
             begin = line.find_first_not_of(" ");
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String scol(line, 0, end);
-            Index col(atol(scol.c_str()));
+            Index col((Index)atol(scol.c_str()));
             line.erase(0, end);
             this->_scalar_index.at(1) = row;
             this->_scalar_index.at(2) = col;
@@ -170,7 +170,7 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row(atol(srow.c_str()));
+            Index row((Index)atol(srow.c_str()));
             --row;
             line.erase(0, end);
 
@@ -178,7 +178,7 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String scol(line, 0, end);
-            Index col(atol(scol.c_str()));
+            Index col((Index)atol(scol.c_str()));
             --col;
             line.erase(0, end);
 
@@ -229,21 +229,21 @@ namespace FEAST
           this->_scalar_index.at(3) = (Index)elements;
 
           uint64_t * crow_ptr = new uint64_t[elements];
-          file.read((char *)crow_ptr, (elements) * sizeof(uint64_t));
+          file.read((char *)crow_ptr, (long)((elements) * sizeof(uint64_t)));
           Index * trow_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(Index));
           for (Index i(0) ; i < elements ; ++i)
             trow_ptr[i] = Index(crow_ptr[i]);
           delete[] crow_ptr;
 
           uint64_t * ccol_ptr = new uint64_t[elements];
-          file.read((char *)ccol_ptr, (elements) * sizeof(uint64_t));
+          file.read((char *)ccol_ptr, (long)((elements) * sizeof(uint64_t)));
           Index * tcol_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(Index));
           for (Index i(0) ; i < elements ; ++i)
             tcol_ptr[i] = Index(ccol_ptr[i]);
           delete[] ccol_ptr;
 
           double * cval = new double[elements];
-          file.read((char *)cval, elements * sizeof(double));
+          file.read((char *)cval, (long)(elements * sizeof(double)));
            DT_ * tval_ptr = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((elements) * sizeof(DT_));
           for (Index i(0) ; i < elements ; ++i)
             tval_ptr[i] = DT_(cval[i]);
@@ -678,9 +678,9 @@ namespace FEAST
           file.write((const char *)&rows, sizeof(uint64_t));
           file.write((const char *)&columns, sizeof(uint64_t));
           file.write((const char *)&elements, sizeof(uint64_t));
-          file.write((const char *)crow_ptr, elements * sizeof(uint64_t));
-          file.write((const char *)ccol_ptr, elements * sizeof(uint64_t));
-          file.write((const char *)cval, elements * sizeof(double));
+          file.write((const char *)crow_ptr, (long)(elements * sizeof(uint64_t)));
+          file.write((const char *)ccol_ptr, (long)(elements * sizeof(uint64_t)));
+          file.write((const char *)cval, (long)(elements * sizeof(double)));
 
           delete[] crow_ptr;
           delete[] ccol_ptr;
