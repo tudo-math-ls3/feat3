@@ -77,13 +77,13 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
   endif ()
 
   # generic settings independent of arch and optimisation level
-  set (FEAST_CXX_FLAGS_INTERNAL "-pipe  -Wno-unused-parameter")
+  set (FEAST_CXX_FLAGS_INTERNAL "-pipe  -Wno-unused-parameter -m64")
 
 
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
     # the following flag might be useful: -m128bit-long-double
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++11 -Wall -Wextra -Wundef -g -Wshorten-64-to-32 -Wconversion")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -std=c++11 -Wall -Wextra -Wundef -ggdb -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wno-unused-value")
 
   else ()
     # optimised settings for all currently supported archs
@@ -91,7 +91,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
     # -ffast-math turns on additional non-IEEE-compliant optimisations
     # the other default flags are self-explanatory and are not included in -O3
     # the following flag might be useful: -m128bit-long-double
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O3 -ffast-math -std=c++11 -ggdb -funroll-loops")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O3 -ggdb -std=c++11")
 
 
   endif (FEAST_DEBUG_MODE)
