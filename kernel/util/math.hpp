@@ -42,6 +42,34 @@ namespace FEAST
     using std::tanh;
 
     /**
+     * \brief Returns the square of a value.
+     *
+     * \param[in] x
+     * The value to be squared.
+     *
+     * Returns x*x
+     */
+    template<typename T_>
+    inline T_ sqr(T_ x)
+    {
+      return x * x;
+    }
+
+    /**
+     * \brief Returns the cube of a value.
+     *
+     * \param[in] x
+     * The value to be cubed.
+     *
+     * Returns x*x*x
+     */
+    template<typename T_>
+    inline T_ cub(T_ x)
+    {
+      return x * x * x;
+    }
+
+    /**
      * \brief Returns the minimum of two values.
      *
      * \param[in] a,b

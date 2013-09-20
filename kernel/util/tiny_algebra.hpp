@@ -1208,18 +1208,6 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template<typename T_>
-      inline T_ sqr(T_ x)
-      {
-        return x*x;
-      }
-
-      template<typename T_>
-      inline T_ cub(T_ x)
-      {
-        return x*x*x;
-      }
-
       template<>
       struct DetHelper<1,1>
       {
@@ -1438,7 +1426,7 @@ namespace FEAST
         static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the only matrix column.
-          return Math::sqrt(sqr(a[0][0]) + sqr(a[1][0]));
+          return Math::sqrt(Math::sqr(a[0][0]) + Math::sqr(a[1][0]));
         }
       };
 
@@ -1449,7 +1437,7 @@ namespace FEAST
         static T_ compute(const T_ (&a)[sm_][sn_])
         {
           // This is the euclid norm of the only matrix column.
-          return Math::sqrt(sqr(a[0][0]) + sqr(a[1][0]) + sqr(a[2][0]));
+          return Math::sqrt(Math::sqr(a[0][0]) + Math::sqr(a[1][0]) + Math::sqr(a[2][0]));
         }
       };
 
@@ -1461,9 +1449,9 @@ namespace FEAST
         {
           // This is the euclid norm of the 3D cross product of the two matrix columns.
           return Math::sqrt(
-            sqr(a[1][0]*a[2][1] - a[2][0]*a[1][1]) +
-            sqr(a[2][0]*a[0][1] - a[0][0]*a[2][1]) +
-            sqr(a[0][0]*a[1][1] - a[1][0]*a[0][1]));
+            Math::sqr(a[1][0]*a[2][1] - a[2][0]*a[1][1]) +
+            Math::sqr(a[2][0]*a[0][1] - a[0][0]*a[2][1]) +
+            Math::sqr(a[0][0]*a[1][1] - a[1][0]*a[0][1]));
         }
       };
 

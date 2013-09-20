@@ -9,20 +9,6 @@ using namespace LinAlg;
 using namespace TestSystem;
 using namespace Math;
 
-// helper function: calculates the quare of a value
-template<typename T_>
-static inline T_ sqr(T_ x)
-{
-  return x*x;
-}
-
-// helper function: calculates the cube of a value
-template<typename T_>
-static inline T_ cub(T_ x)
-{
-  return x*x*x;
-}
-
 /*
   This list keeps track of which linear algebra functions are tested by which test drivers.
 
@@ -104,7 +90,7 @@ class LinAlgTest :
         {
           a[i * n + j] = ((i+j) & 0x1 ? -ONE : ONE) * DataType_((i + j + 1)
             * Math::binomial(n + i, n - j - 1) * Math::binomial(n + j, n - i - 1)
-            * sqr(binomial(i + j, i)));
+            * Math::sqr(binomial(i + j, i)));
         }
       }
     }
@@ -116,7 +102,7 @@ class LinAlgTest :
       {
         for(size_t j(0) ; j < n ; ++j)
         {
-          a[i * n + j] = DataType_(min(i, j) + 1) / DataType_(max(i, j) + 1);
+          a[i * n + j] = DataType_(Math::min(i, j) + 1) / DataType_(Math::max(i, j) + 1);
         }
       }
     }
@@ -131,11 +117,11 @@ class LinAlgTest :
       for(size_t i(1) ; i < n - 1 ; ++i)
       {
         a[i * (n + 1) - 1] = b;
-        a[i * (n + 1)    ] = DataType_(4*cub(i+1)) / DataType_(4*sqr(i+1) - 1);
+        a[i * (n + 1)    ] = DataType_(4*cub(i+1)) / DataType_(4*Math::sqr(i+1) - 1);
         a[i * (n + 1) + 1] = b = -DataType_((i+2)*(i+1)) / DataType_(2*i + 3);
       }
       a[(n - 1) * (n + 1) - 1] = b;
-      a[(n - 1) * (n + 1)    ] = DataType_(sqr(n)) / DataType_(2*n - 1);
+      a[(n - 1) * (n + 1)    ] = DataType_(Math::sqr(n)) / DataType_(2*n - 1);
     }
 
     // helper function: generate a random number in range [0,1]
@@ -169,7 +155,7 @@ class LinAlgTest :
 
       for(size_t i = 0 ; i < N ; ++i)
       {
-        if(abs(y[i] - ONE) >= tol)
+        if(Math::abs(y[i] - ONE) >= tol)
         {
           return false;
         }
@@ -190,8 +176,8 @@ class LinAlgTest :
       // initialise x[i] = cos(i)^2; y[i] = sin(i)^2
       for(size_t i = 0 ; i < N ; ++i)
       {
-        x[i] = sqr(cos(DataType_(i)));
-        y[i] = sqr(sin(DataType_(i)));
+        x[i] = Math::sqr(Math::cos(DataType_(i)));
+        y[i] = Math::sqr(Math::sin(DataType_(i)));
       }
 
       // calculate z := x + y
@@ -203,12 +189,12 @@ class LinAlgTest :
       for(size_t i = 0 ; i < N ; ++i)
       {
         // test y
-        if(abs(y[i] - ONE) >= tol)
+        if(Math::abs(y[i] - ONE) >= tol)
         {
           return false;
         }
         // test z
-        if(abs(z[i] - ONE) >= tol)
+        if(Math::abs(z[i] - ONE) >= tol)
         {
           return false;
         }
@@ -267,7 +253,7 @@ class LinAlgTest :
       // x[i] := 1/sqrt(2^i)
       for(size_t i = 0 ; i < N; ++i)
       {
-        x[i] = ONE / sqrt(DataType_(1 << i));
+        x[i] = ONE / Math::sqrt(DataType_(1 << i));
       }
 
       static DataType_ r = sqrt(TWO - ONE/DataType_(1 << (N-1)));

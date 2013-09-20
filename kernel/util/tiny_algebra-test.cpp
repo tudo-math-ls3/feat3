@@ -6,8 +6,8 @@ using namespace FEAST;
 using namespace FEAST::Tiny;
 using namespace FEAST::TestSystem;
 
-using Intern::sqr;
-using Intern::cub;
+using Math::sqr;
+using Math::cub;
 
 /**
  * \brief Tagged-Test for tiny algebra vector and matrix.
