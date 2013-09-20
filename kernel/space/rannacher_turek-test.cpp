@@ -81,16 +81,14 @@ public:
     // create a trafo evaluator
     typedef typename QuadTrafo::template Evaluator<ShapeType, DataType_>::Type TrafoEvaluator;
     TrafoEvaluator trafo_eval(trafo);
-    Trafo::EvalData<typename TrafoEvaluator::EvalTraits, UnitTrafoConfig> trafo_data;
+    typename TrafoEvaluator::template ConfigTraits<UnitTrafoConfig>::EvalDataType trafo_data;
 
     // create a space evaluator
     typedef typename QuadSpaceStdNonPar::template Evaluator<TrafoEvaluator>::Type SpaceEvaluator;
     SpaceEvaluator space_eval(space);
-    Space::EvalData<typename SpaceEvaluator::SpaceEvalTraits, UnitSpaceConfig> space_data;
+    typename SpaceEvaluator::template ConfigTraits<UnitSpaceConfig>::EvalDataType space_data;
 
     // create a 3x3 Gauss-Legendre cubature formula
-    //CubatureRule cubature_rule;
-    //CubatureFactory::create(cubature_rule, "gauss-legendre:3");
     CubatureRule cubature_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:3"));
 
     // prepare trafo evaluator

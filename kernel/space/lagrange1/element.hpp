@@ -43,21 +43,6 @@ namespace FEAST
         /// shape type
         typedef typename TrafoType::ShapeType ShapeType;
 
-        /** \copydoc ElementBase::TrafoConfig */
-        template<typename SpaceConfig_>
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-          /** \copydoc Trafo::ConfigBase::TrafoRequirements */
-          enum
-          {
-            /// we always need domain coordinates
-            need_dom_point = 1,
-            /// we need jacobian inverses for gradient calculation
-            need_jac_inv = SpaceConfig_::need_grad
-          };
-        };
-
         /** \copydoc ElementBase::Evaluator */
         template<
           typename TrafoEvaluator_,

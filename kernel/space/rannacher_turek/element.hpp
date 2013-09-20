@@ -54,19 +54,6 @@ namespace FEAST
         /// variant of the element
         typedef Variant_ VariantTag;
 
-        /** \copydoc ElementBase::TrafoConfig */
-        template<typename SpaceConfig_>
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-          /** \copydoc TrafoConfigBase::TrafoRequirements */
-          enum
-          {
-            /// we always need image coordinates
-            need_img_point = 1
-          };
-        };
-
         /** \copydoc ElementBase::Evaluator */
         template<
           typename TrafoEvaluator_,

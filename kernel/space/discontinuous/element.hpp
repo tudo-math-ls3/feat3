@@ -44,13 +44,6 @@ namespace FEAST
         /// variant of the element
         typedef Variant_ VariantTag;
 
-        /** \copydoc ElementBase::TrafoConfig */
-        template<typename SpaceConfig_>
-        struct TrafoConfig :
-          public Trafo::ConfigBase
-        {
-        };
-
         /** \copydoc ElementBase::Evaluator */
         template<
           typename TrafoEvaluator_,
