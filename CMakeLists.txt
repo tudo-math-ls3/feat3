@@ -9,6 +9,7 @@ PROJECT( FEAST )
 
 include (CTest)
 ENABLE_TESTING()
+configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.cmake COPONLY)
 
 set(MEMORYCHECK_COMMAND "valgrind")
 set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full")
