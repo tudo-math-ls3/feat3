@@ -408,16 +408,17 @@ namespace FEAST
          */
         void write_out_dv(std::ostream& file) const
         {
-          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(0)) * sizeof(DT_));
-          MemoryPool<Mem_>::download(temp, this->_elements.at(0), this->_scalar_index.at(0) * sizeof(DT_));
-          double * ctemp = new double[this->_scalar_index.at(0)];
-          for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
+          const Index csize(this->_scalar_index.at(0));
+          DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(csize * sizeof(DT_));
+          MemoryPool<Mem_>::download(temp, this->_elements.at(0), csize * sizeof(DT_));
+          double * ctemp = new double[csize];
+          for (Index i(0) ; i < csize ; ++i)
           {
             ctemp[i] = temp[i];
           }
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
 
-          uint64_t size(this->_scalar_index.at(0));
+          uint64_t size(csize);
           file.write((const char *)&size, sizeof(uint64_t));
           file.write((const char *)ctemp, (long)(size * sizeof(double)));
 
