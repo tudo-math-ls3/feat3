@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # list of space tests
 SET (test_list
+  bogner_fox_schmit-test
   discontinuous-test
   lagrange1-test
   rannacher_turek-test
