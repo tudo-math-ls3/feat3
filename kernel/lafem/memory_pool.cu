@@ -53,9 +53,9 @@ void * MemoryPool<Mem::CUDA>::allocate_memory(Index bytes)
 {
   void * memory(NULL);
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, bytes))
-    throw InternalError("MemoryPool<GPU> cuda allocation error");
+    throw InternalError("MemoryPool<GPU> cuda allocation error (cudaErrorMemoryAllocation)");
   if (memory == NULL)
-    throw InternalError("MemoryPool<GPU> allocation error!");
+    throw InternalError("MemoryPool<GPU> allocation error (null pointer returned)");
   Intern::MemoryInfo mi;
   mi.counter = 1;
   mi.size = bytes;
