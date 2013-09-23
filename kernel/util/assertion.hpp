@@ -10,6 +10,15 @@
 
 // includes, system
 
+// check for standard C assert usage
+#ifdef FEAST_STDC_ASSERT
+// ensure that NDEBUG is defined unless DEBUG is defined
+#  if !defined(DEBUG) && !defined(NDEBUG)
+#    define NDEBUG
+#  endif
+#  include <cassert>
+#endif // FEAST_STDC_ASSERT
+
 namespace FEAST
 {
   /**
@@ -80,7 +89,12 @@ namespace FEAST
  *
  * \note This macro will only be compiled in debug mode; it is an empty macro in no-debug mode.
  */
-#if defined (DEBUG)
+#if defined (FEAST_STDC_ASSERT)
+// define as standard C assert
+#  define ASSERT(expr, msg) assert(expr)
+#  define ASSERT_(expr) assert(expr)
+#elif defined (DEBUG)
+// use FEAST::Assertion exception
 #  define ASSERT(expr, msg) \
     do { \
         if (! (expr)) \

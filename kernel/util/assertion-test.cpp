@@ -4,8 +4,8 @@
 
 #include <string>
 
-// This test needs DEBUG defined.
-#ifdef DEBUG
+// This test needs DEBUG defined, but must not be compiled when FEAST_STDC_ASSERT is defined.
+#if defined(DEBUG) && !defined(FEAST_STDC_ASSERT)
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -59,4 +59,4 @@ public:
 };
 AssertionTest<Archs::None, Archs::None> assertion_test;
 
-#endif // DEBUG
+#endif // defined(DEBUG) && !defined(FEAST_STDC_ASSERT)
