@@ -88,7 +88,7 @@ public:
   void quad_std_test() const
   {
     // loop over all possible orientations (max. 8)
-    for(Index i(0); i < 4; ++i)
+    for(int i(0); i < 4; ++i)
     {
       // create a 2D quad element mesh
       RootMesh* quad_mesh_coarse = TestAux::create_quad_mesh_2d(i);

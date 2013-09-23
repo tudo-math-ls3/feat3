@@ -38,7 +38,7 @@ public:
   void tetra_std_test() const
   {
     // loop over all possible orientations
-    for(Index i(0); i < 3; ++i)
+    for(int i(0); i < 3; ++i)
     {
       // create a 3D tetrahedron element mesh
       RootMesh* tetrahedron_mesh_coarse = TestAux::create_tetra_mesh_3d(i);

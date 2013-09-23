@@ -38,7 +38,7 @@ public:
   void tria_std_test() const
   {
     // loop over all possible orientations
-    for(Index i(0); i < 4; ++i)
+    for(int i(0); i < 4; ++i)
     {
       // create a 2D triangle element mesh
       RootMesh* triangle_mesh_coarse = TestAux::create_tria_mesh_2d(i);
