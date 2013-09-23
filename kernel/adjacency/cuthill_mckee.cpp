@@ -24,17 +24,18 @@ namespace FEAST
       const Index* image_idx = graph.get_image_idx();
 
       // auxiliary array storing the node degrees
-      int* node_degree = new int[num_nodes];
+      Index* node_degree = new Index[num_nodes];
+      int* node_mask = new int[num_nodes];
       for(Index j(0); j < num_nodes; ++j)
       {
         node_degree[j] = graph.degree(j);
+        node_mask[j] = 0;
       }
 
       // auxiliary variables
       Index lvl1 = 0;
       Index lvl2 = 0;
-      Index lvl3, lvl_root, n, k, ind, jnd;
-      int root, min, max;
+      Index lvl3 = 0;
 
       // permutation array
       Index* permutation = _perm.get_perm_pos();
@@ -42,7 +43,7 @@ namespace FEAST
       while(lvl2 < num_nodes)
       {
         // initialise root
-        root = -1;
+        Index root = num_nodes + 1;
 
         // get the root node
         switch(root_type)
@@ -52,7 +53,8 @@ namespace FEAST
         case root_default:
           for(Index j(0); j < num_nodes; ++j)
           {
-            if(node_degree[j] > 0)
+            // check if the node is unmarked
+            if(node_mask[j] == 0)
             {
               root = j;
               break;
@@ -62,29 +64,33 @@ namespace FEAST
 
         // choose the node of minimum degree
         case root_minimum_degree:
-          min = num_nodes + 1;
-          for(Index j(0); j < num_nodes; ++j)
           {
-            if(node_degree[j] < min && node_degree[j] > 0)
+            Index min = num_nodes + 1;
+            for(Index j(0); j < num_nodes; ++j)
             {
-              root = j;
-              min = node_degree[j];
+              if((node_degree[j] < min) && (node_mask[j] == 0))
+              {
+                root = j;
+                min = node_degree[j];
+              }
             }
           }
           break;
 
         // choose the node of maximum degree
         case root_maximum_degree:
-          max = 0;
-          for(Index j(0); j < num_nodes; ++j)
           {
-            if(node_degree[j] > max)
+            Index max = 0;
+            for(Index j(0); j < num_nodes; ++j)
             {
-              root = j;
-              max = node_degree[j];
+              if((node_degree[j] > max) && (node_mask[j] == 0))
+              {
+                root = j;
+                max = node_degree[j];
+              }
             }
+            break;
           }
-          break;
 
         // else: error
         default:
@@ -92,7 +98,7 @@ namespace FEAST
         }
 
         // if something very odd has happend
-        if(root < 0)
+        if(!(root < num_nodes))
         {
           throw InternalError("No root found!");
         }
@@ -103,9 +109,9 @@ namespace FEAST
         lvl3 = lvl1;
 
         // add the root into the permutation array
-        lvl_root = lvl1;
+        Index lvl_root = lvl1;
         permutation[lvl1 - 1] = root;
-        node_degree[root] = -node_degree[root];
+        node_mask[root] = 1;
 
         // loop through the adjancy levels of the root
         while(lvl2 < num_nodes)
@@ -115,24 +121,23 @@ namespace FEAST
           for(Index i(lvl1 - 1); i < lvl2 ; ++i)
           {
             // get the node's index
-            n = permutation[i];
+            Index n = permutation[i];
 
             // Go through all nodes which are adjacent to node n
             for(Index j(domain_ptr[n]); j < domain_ptr[n+1] ; ++j)
+            {
+              // Get the index of the adjacent node
+              Index k = image_idx[j];
+
+              // has this node been processed?
+              if(node_mask[k] == 0)
               {
-                // Get the index of the adjacent node
-                k = image_idx[j];
-
-                // has this node been processed?
-                if(node_degree[k] > 0)
-                {
-                  ++lvl3;
-                  permutation[lvl3 - 1] = k;
-                  node_degree[k] = -node_degree[k];
-                } //if
-
-              }//j loop
-          }// i loop
+                ++lvl3;
+                permutation[lvl3 - 1] = k;
+                node_mask[k] = 1;
+              }
+            } //j loop
+          } // i loop
 
           if(lvl3 <= lvl2)
           {
@@ -142,32 +147,8 @@ namespace FEAST
           // sorting
           switch(sort_type)
           {
-
           // default: do nothing
           case sort_default:
-            break;
-
-          // ascending order
-          case sort_asc:
-
-            // if there is nothing to do
-            if(lvl2 + 1 >= lvl3)
-            {
-              break;
-            }
-
-            // sorting algorithm: linear insertion
-            for(Index i(lvl2); i < lvl3; ++i)
-            {
-              int x = node_degree[permutation[i]];
-              Index y = permutation[i];
-              Index k(i);
-              for(; (k > lvl2) && (x > node_degree[permutation[k-1]]); --k)
-              {
-                permutation[k] = permutation[k-1];
-              }
-              permutation[k] = y;
-            }
             break;
 
           // descending order
@@ -182,7 +163,30 @@ namespace FEAST
             // sorting algorithm: linear insertion
             for(Index i(lvl2); i < lvl3; ++i)
             {
-              int x = node_degree[permutation[i]];
+              Index x = node_degree[permutation[i]];
+              Index y = permutation[i];
+              Index k(i);
+              for(; (k > lvl2) && (x > node_degree[permutation[k-1]]); --k)
+              {
+                permutation[k] = permutation[k-1];
+              }
+              permutation[k] = y;
+            }
+            break;
+
+          // ascending order
+          case sort_asc:
+
+            // if there is nothing to do
+            if(lvl2 + 1 >= lvl3)
+            {
+              break;
+            }
+
+            // sorting algorithm: linear insertion
+            for(Index i(lvl2); i < lvl3; ++i)
+            {
+              Index x = node_degree[permutation[i]];
               Index y = permutation[i];
               Index k(i);
               for(; (k > lvl2) && (x < node_degree[permutation[k-1]]); --k)
@@ -207,25 +211,22 @@ namespace FEAST
         // reverse?
         if(reverse)
         {
-          ind = lvl_root - 1;
-          jnd = lvl2 - 1;
-          while(ind < jnd)
+          for(Index ind(lvl_root - 1), jnd(lvl2 - 1); ind < jnd; ++ind, --jnd)
           {
-            n = permutation[ind];
+            Index n = permutation[ind];
             permutation[ind] = permutation[jnd];
             permutation[jnd] = n;
-            ++ind;
-            --jnd;
           }
         }
 
       } //while(lvl2 < num_nodes) (the separability loop)
 
+      // deleting the auxiliary arrays
+      delete [] node_mask;
+      delete [] node_degree;
+
       // create Cuthill-McKee permutation
       _perm.calc_swap_from_perm();
-
-      // deleting the auxiliary arrays
-      delete [] node_degree;
     }
   } // namespace Adjacency
 } // namespace FEAST
