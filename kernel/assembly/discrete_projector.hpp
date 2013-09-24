@@ -141,19 +141,18 @@ namespace FEAST
           for(int k(0); k < nverts; ++k)
           {
             typename AsmTraits::DomainPointType dom_point;
-            typedef typename AsmTraits::DomainCoordType DomainCoordType;
 
             // initialise domain point
             for(int i(0); i < shape_dim; ++i)
             {
-              dom_point[i] = DomainCoordType(RefCell::coord(k, i));
+              dom_point[i] = DataType(RefCell::coord(k, i));
             }
 
             // compute trafo data
-            trafo_data(trafo_eval, dom_point);
+            trafo_eval(trafo_data, dom_point);
 
             // compute basis function data
-            space_data(space_eval, trafo_data);
+            space_eval(space_data, trafo_data);
 
             // compute function value
             DataType value(DataType(0));
@@ -162,7 +161,7 @@ namespace FEAST
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // evaluate fe function
-              value += lvad(i) * space_data.values[i];
+              value += lvad(i) * space_data.phi[i].value;
               // continue with next basis function
             }
 
@@ -326,10 +325,10 @@ namespace FEAST
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
-            trafo_data(trafo_eval, cubature_rule.get_point(k));
+            trafo_eval(trafo_data, dom_point);
 
             // compute basis function data
-            space_data(space_eval, trafo_data);
+            space_eval(space_data, trafo_data);
 
             DataType v(DataType(0));
 
@@ -337,7 +336,7 @@ namespace FEAST
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
-              v += lvad(i) * space_data.values[i];
+              v += lvad(i) * space_data.phi[i].value;
               // continue with next basis function
             }
 
