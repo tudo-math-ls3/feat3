@@ -75,9 +75,9 @@ namespace FEAST
           _cell_orient = SamplerType::compare(comp_index_map, target_verts);
         }
 
-        int map(int face) const
+        Index map(int face) const
         {
-          return CongruencyMapping<Shape_, face_dim_>::map(_cell_orient, face);
+          return Index(CongruencyMapping<Shape_, face_dim_>::map(_cell_orient, face));
         }
       }; // class TargetIndexMapping
     } // namespace Intern
