@@ -12,8 +12,8 @@ ENABLE_TESTING()
 configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.cmake COPONLY)
 configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.ctest COPONLY)
 
-set(MEMORYCHECK_COMMAND "valgrind")
-set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full")
+find_program(MEMORYCHECK_COMMAND NAMES valgrind)
+set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full" CACHE STRING "valgrind options")
 
 # BUILD_ID mechanism
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
