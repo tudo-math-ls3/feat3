@@ -276,8 +276,8 @@ namespace FEAST
           for(int i(0); i < SpaceData_::max_local_dofs; ++i)
           {
             // and apply the second-order chain rule
-            space_data.phi[i].set_double_mat_mult(space_data.phi[i].ref_hess, trafo_data.jac_inv, trafo_data.jac_inv);
-            space_data.phi[i].add_vec_tensor_mult(space_data.phi[i].ref_grad, trafo_data.hess_inv);
+            space_data.phi[i].hess.set_double_mat_mult(space_data.phi[i].ref_hess, trafo_data.jac_inv, trafo_data.jac_inv);
+            space_data.phi[i].hess.add_vec_tensor_mult(space_data.phi[i].ref_grad, trafo_data.hess_inv);
           }
         }
       };

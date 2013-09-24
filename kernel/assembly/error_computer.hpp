@@ -393,6 +393,198 @@ namespace FEAST
         return Math::sqrt(result);
       }
     }; // class ScalarErrorComputerH1
+
+    /**
+     * \brief Scalar H2-error computer class
+     *
+     * \author Peter Zajac
+     */
+    class ScalarErrorComputerH2
+    {
+    private:
+      /// \cond internal
+      template<typename AsmTraits_>
+      struct EvalTraits
+      {
+        typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
+        typedef typename AsmTraits_::TrafoData TrafoData;
+        typedef typename AsmTraits_::DataType DataType;
+        enum
+        {
+          domain_dim = AsmTraits_::domain_dim,
+          image_dim = AsmTraits_::image_dim
+        };
+        typedef Tiny::Matrix<DataType, domain_dim, domain_dim> ValueType;
+      };
+
+      struct TrafoConfig : public Trafo::ConfigBase
+      {
+        enum
+        {
+          need_img_point = 1,
+          need_jac_det = 1
+        };
+      };
+
+      struct SpaceConfig : public Space::ConfigBase
+      {
+        enum
+        {
+          need_hess = 1
+        };
+      };
+      /// \endcond
+
+    public:
+      /**
+       * \brief Computes the H2-error.
+       *
+       * This function computes the H2-semi-norm of the difference of a discrete Finite-Element function
+       * and an analytic function, i.e. it computes
+       *   \f[ |u - u_h|_{H^2}. \f]
+       *
+       * \param[in] functor
+       * An object implementing the Analytic::Functor interface representing the analytic function to be
+       * tested against.
+       *
+       * \param[in] vector
+       * The coefficient vector of the FE function.
+       *
+       * \param[in] space
+       * The Finite-Element space that the coefficient vector belongs to.
+       *
+       * \param[in] cubature_factory
+       * A reference to the cubature factory to be used for integration.
+       *
+       * \returns
+       * The H2-error.
+       */
+      template<
+        typename Functor_,
+        typename Vector_,
+        typename Space_,
+        typename CubatureFactory_>
+      static typename Vector_::DataType compute(
+        const Functor_& functor,
+        const Vector_& vector,
+        const Space_& space,
+        const CubatureFactory_& cubature_factory)
+      {
+        // ensure the functor offers gradients
+        static_assert(Functor_::can_hess != 0, "analytic functor can't compute gradients");
+
+        /// vector type
+        typedef Vector_ VectorType;
+        /// linear functor type
+        typedef Functor_ FunctorType;
+        /// space type
+        typedef Space_ SpaceType;
+        /// assembly traits
+        typedef AsmTraits1<typename Vector_::DataType, Space_, TrafoConfig, SpaceConfig> AsmTraits;
+        /// data type
+        typedef typename AsmTraits::DataType DataType;
+
+        // create the cubature rule
+        typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
+
+        // fetch the trafo
+        const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+
+        // create a functor gradient evaluator
+        typename Functor_::template HessianEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::SpaceEvaluator space_eval(space);
+
+        // create a dof-mapping
+        typename AsmTraits::DofMapping dof_mapping(space);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+
+        // create local vector data
+        typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
+
+        // create matrix scatter-axpy
+        LAFEM::GatherAxpy<VectorType> gather_axpy(vector);
+
+        // initialise result
+        DataType result(DataType(0));
+
+        // loop over all cells of the mesh
+        for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
+        {
+          // clear local vector
+          lvad.clear();
+
+          // initialise dof-mapping
+          dof_mapping.prepare(cell);
+
+          // incorporate local matrix
+          gather_axpy(lvad);
+
+          // finish dof-mapping
+          dof_mapping.finish();
+
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
+
+          // prepare functor evaluator
+          func_eval.prepare(trafo_eval);
+
+          // fetch number of local dofs
+          Index num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // loop over all quadrature points and integrate
+          for(Index k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // compute trafo data
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
+
+            // compute basis function data
+            space_eval(space_data, trafo_data);
+
+            // evaluate functor
+            Tiny::Matrix<DataType, AsmTraits::domain_dim, AsmTraits::domain_dim> value(DataType(0));
+            func_eval(value, trafo_data);
+
+            // test function loop
+            for(Index i(0); i < num_loc_dofs; ++i)
+            {
+              // subtract basis function gradient
+              value -= lvad[i] * space_data.phi[i].hess;
+              // continue with next trial function
+            }
+
+            // update result
+            result += trafo_data.jac_det * cubature_rule.get_weight(k) * value.hessian_sqr_norm();
+
+            // continue with next cubature point
+          }
+
+          // finish functor evaluator
+          func_eval.finish();
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+
+          // continue with next cell
+        }
+
+        // okay, that's it
+        return Math::sqrt(result);
+      }
+    }; // class ScalarErrorComputerH2
   } // namespace Assembly
 } // namespace FEAST
 

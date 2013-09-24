@@ -625,6 +625,31 @@ namespace FEAST
       }
 
       /**
+       * \brief Returns the Hessian norm square.
+       *
+       * This function computes and returns
+       * \f[ \sum_{i=1}^m\sum_{j=1}^n K_{ij}\cdot (A_{ij})^2 \f]
+       * where K_ij is 1 for i=j and 1/2 otherwise.
+       *
+       * \note This function is used for the computation of the H^2 semi-norm of a function.
+       *
+       * \returns The Hessian norm square of the matrix.
+       */
+      T_ hessian_sqr_norm() const
+      {
+        T_ r(0);
+        for(int i(0); i < m_; ++i)
+        {
+          r += Math::sqr(v[i][i]);
+          for(int j(0); j < n_; ++j)
+          {
+            r += Math::sqr(v[i][j]);
+          }
+        }
+        return r / T_(2);
+      }
+
+      /**
        * \brief Returns the determinant of the matrix.
        *
        * \warning This function only works for \p m_ = \p n_ and will intentionally fail to compile in any other case.
