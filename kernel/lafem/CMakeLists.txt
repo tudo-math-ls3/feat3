@@ -35,6 +35,7 @@ endif(FEAST_BACKENDS_MKL)
 if (FEAST_BACKENDS_CUDA)
   INCLUDE(FindCUDA)
   set (CUDA_VERBOSE_BUILD ON)
+  set(CUDA_NVCC_FLAGS "-arch sm_13" CACHE STRING "Semi-colon delimit multiple arguments." FORCE)
   #TODO  use CUDA_HOST_COMPILER to get rid of hard wired gcc host compilation
   set (CUDA_PROPAGATE_HOST_FLAGS OFF)
   CUDA_ADD_LIBRARY(kernel-lafem-cuda STATIC
@@ -50,7 +51,6 @@ if (FEAST_BACKENDS_CUDA)
     sum.cu
   )
   ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
-  set(CUDA_NVCC_FLAGS "-arch=sm_13" CACHE STRING "Semi-colon delimit multiple arguments." FORCE)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-cuda)
 endif(FEAST_BACKENDS_CUDA)
 
