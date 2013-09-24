@@ -135,7 +135,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
     # Note: SSE2 is on by default, so we only have to specify what's better
     #       or worse
     # Note: 64 bit is enabled automatically by passing -xBLA
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O3 -mcmodel=large")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O3 -mcmodel=large -g")
 
     # please try to maintain the same order as in the buildid_arch module
     # Intel CPUs
