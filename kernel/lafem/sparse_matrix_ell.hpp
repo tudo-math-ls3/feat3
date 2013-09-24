@@ -85,9 +85,10 @@ namespace FEAST
           this->_scalar_index.push_back(0);
           this->_scalar_dt.push_back(DT_(0));
 
+          const Index dim(this->_scalar_index.at(4) * this->_scalar_index.at(3));
           uint64_t * cAj = new uint64_t[size];
           file.read((char *)cAj, (long)(size * sizeof(uint64_t)));
-          Index* tAj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(4) * this->_scalar_index.at(3)) * sizeof(Index));
+          Index* tAj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(dim * sizeof(Index));
           for (Index i(0) ; i < size ; ++i)
             tAj[i] = Index(cAj[i]);
           delete[] cAj;
@@ -95,7 +96,7 @@ namespace FEAST
           double * cAx = new double[size];
           file.read((char *)cAx, (long)(size * sizeof(double)));
 
-          DT_* tAx = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(4) * this->_scalar_index.at(3)) * sizeof(DT_));
+          DT_* tAx = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(dim * sizeof(DT_));
           for (Index i(0) ; i < size ; ++i)
             tAx[i] = DT_(cAx[i]);
           delete[] cAx;
@@ -119,15 +120,15 @@ namespace FEAST
             tArl[row] = count;
           }
 
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(DT_)));
-          this->_elements_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->allocate_memory(dim * sizeof(DT_)));
+          this->_elements_size.push_back(dim);
           this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(Index)));
-          this->_indices_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          this->_indices_size.push_back(dim);
           this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->allocate_memory(this->_scalar_index.at(1) * sizeof(Index)));
           this->_indices_size.push_back(this->_scalar_index.at(1));
 
-          MemoryPool<Mem_>::upload(this->get_elements().at(0), tAx, this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(DT_));
-          MemoryPool<Mem_>::upload(this->get_indices().at(0), tAj, this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(Index));
+          MemoryPool<Mem_>::upload(this->get_elements().at(0), tAx, dim * sizeof(DT_));
+          MemoryPool<Mem_>::upload(this->get_indices().at(0), tAj, dim * sizeof(Index));
           MemoryPool<Mem_>::upload(this->get_indices().at(1), tArl, this->_scalar_index.at(1) * sizeof(Index));
           MemoryPool<Mem::Main>::instance()->release_memory(tAx);
           MemoryPool<Mem::Main>::instance()->release_memory(tAj);
@@ -485,21 +486,22 @@ namespace FEAST
           if (typeid(DT_) != typeid(double))
             std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
 
-          Index * Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(4) * this->_scalar_index.at(3)) * sizeof(Index));
-          MemoryPool<Mem_>::download(Aj, this->_indices.at(0), this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(Index));
-          uint64_t * cAj = new uint64_t[this->_scalar_index.at(4) * this->_scalar_index.at(3)];
-          for (Index i(0) ; i < this->_scalar_index.at(4) * this->_scalar_index.at(3) ; ++i)
+          const Index dim(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          Index * Aj = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(dim * sizeof(Index));
+          MemoryPool<Mem_>::download(Aj, this->_indices.at(0), dim * sizeof(Index));
+          uint64_t * cAj = new uint64_t[dim];
+          for (Index i(0) ; i < dim ; ++i)
             cAj[i] = Aj[i];
           MemoryPool<Mem::Main>::instance()->release_memory(Aj);
 
-          DT_ * Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory((this->_scalar_index.at(4) * this->_scalar_index.at(3)) * sizeof(DT_));
-          MemoryPool<Mem_>::download(Ax, this->_elements.at(0), this->_scalar_index.at(4) * this->_scalar_index.at(3) * sizeof(DT_));
-          double * cAx = new double[this->_scalar_index.at(4) * this->_scalar_index.at(3)];
-          for (Index i(0) ; i < this->_scalar_index.at(4) * this->_scalar_index.at(3) ; ++i)
+          DT_ * Ax = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(dim * sizeof(DT_));
+          MemoryPool<Mem_>::download(Ax, this->_elements.at(0), dim * sizeof(DT_));
+          double * cAx = new double[dim];
+          for (Index i(0) ; i < dim ; ++i)
             cAx[i] = Ax[i];
           MemoryPool<Mem::Main>::instance()->release_memory(Ax);
 
-          uint64_t size(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          uint64_t size(dim);
           uint64_t rows(this->_scalar_index.at(1));
           uint64_t columns(this->_scalar_index.at(2));
           uint64_t stride(this->_scalar_index.at(3));
@@ -537,10 +539,11 @@ namespace FEAST
          */
         void write_out_m(std::ostream& file) const
         {
+          const Index dim(this->_scalar_index.at(4) * this->_scalar_index.at(3));
           SparseMatrixELL<Mem::Main, DT_> temp(*this);
 
           file << "data = [" << std::endl;
-          for (Index i(0) ; i < this->_scalar_index.at(4) * this->_scalar_index.at(3) ; ++i)
+          for (Index i(0) ; i < dim ; ++i)
           {
             if (temp.Ax()[i] != DT_(0))
             {

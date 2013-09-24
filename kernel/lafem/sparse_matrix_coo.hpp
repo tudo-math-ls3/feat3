@@ -651,30 +651,33 @@ namespace FEAST
           if (typeid(DT_) != typeid(double))
             std::cout<<"Warning: You are writing out an coo matrix with less than double precission!"<<std::endl;
 
-          Index * row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(this->_indices_size.at(0) * sizeof(Index));
-          MemoryPool<Mem_>::download(row_ptr, this->_indices.at(0), this->_indices_size.at(0) * sizeof(Index));
-          uint64_t * crow_ptr = new uint64_t[this->_indices_size.at(0)];
-          for (Index i(0) ; i < this->_indices_size.at(0) ; ++i)
+          const Index crows(this->_indices_size.at(0));
+          const Index ccolumns(this->_indices_size.at(1));
+          const Index celements(this->_elements_size.at(0));
+          Index * row_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(crows * sizeof(Index));
+          MemoryPool<Mem_>::download(row_ptr, this->_indices.at(0), crows * sizeof(Index));
+          uint64_t * crow_ptr = new uint64_t[crows];
+          for (Index i(0) ; i < crows ; ++i)
             crow_ptr[i] = row_ptr[i];
           MemoryPool<Mem::Main>::instance()->release_memory(row_ptr);
 
-          Index * col_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(this->_indices_size.at(1) * sizeof(Index));
-          MemoryPool<Mem_>::download(col_ptr, this->_indices.at(1), this->_indices_size.at(1) * sizeof(Index));
-          uint64_t * ccol_ptr = new uint64_t[this->_indices_size.at(1)];
-          for (Index i(0) ; i < this->_indices_size.at(1) ; ++i)
+          Index * col_ptr = (Index*)MemoryPool<Mem::Main>::instance()->allocate_memory(ccolumns * sizeof(Index));
+          MemoryPool<Mem_>::download(col_ptr, this->_indices.at(1), ccolumns * sizeof(Index));
+          uint64_t * ccol_ptr = new uint64_t[ccolumns];
+          for (Index i(0) ; i < ccolumns ; ++i)
             ccol_ptr[i] = col_ptr[i];
           MemoryPool<Mem::Main>::instance()->release_memory(col_ptr);
 
-          DT_ * val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(this->_elements_size.at(0) * sizeof(DT_));
-          MemoryPool<Mem_>::download(val, this->_elements.at(0), this->_elements_size.at(0) * sizeof(DT_));
-          double * cval = new double[this->_elements_size.at(0)];
-          for (Index i(0) ; i < this->_elements_size.at(0) ; ++i)
+          DT_ * val = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(celements * sizeof(DT_));
+          MemoryPool<Mem_>::download(val, this->_elements.at(0), celements * sizeof(DT_));
+          double * cval = new double[celements];
+          for (Index i(0) ; i < celements ; ++i)
             cval[i] = val[i];
           MemoryPool<Mem::Main>::instance()->release_memory(val);
 
           uint64_t rows(this->_scalar_index.at(1));
           uint64_t columns(this->_scalar_index.at(2));
-          uint64_t elements(this->_indices_size.at(0));
+          uint64_t elements(crows);
           file.write((const char *)&rows, sizeof(uint64_t));
           file.write((const char *)&columns, sizeof(uint64_t));
           file.write((const char *)&elements, sizeof(uint64_t));

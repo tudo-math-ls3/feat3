@@ -408,6 +408,9 @@ namespace FEAST
          */
         void write_out_dv(std::ostream& file) const
         {
+          if (typeid(DT_) != typeid(double))
+            std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
+
           const Index csize(this->_scalar_index.at(0));
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->allocate_memory(csize * sizeof(DT_));
           MemoryPool<Mem_>::download(temp, this->_elements.at(0), csize * sizeof(DT_));
