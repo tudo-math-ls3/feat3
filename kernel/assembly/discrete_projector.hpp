@@ -325,7 +325,7 @@ namespace FEAST
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)
           {
             // compute trafo data
-            trafo_eval(trafo_data, dom_point);
+            trafo_eval(trafo_data, cubature_rule.get_point(k));
 
             // compute basis function data
             space_eval(space_data, trafo_data);
