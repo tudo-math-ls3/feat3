@@ -27,6 +27,11 @@ namespace FEAST
        * \attention
        * This element is only defined for Hypercube shape meshes!
        *
+       * \attention
+       * This element works only on affine equivalent meshes, i.e. on meshes where all cells are paralleloids.
+       * If you use this element on non-affine equivalent meshes, the result will be garbage. This is not an
+       * implementational issue, but a mathematical problem that can not be solved.
+       *
        * \tparam Trafo_
        * The transformation that is to be used by this space.
        *
