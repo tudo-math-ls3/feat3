@@ -142,7 +142,6 @@ namespace FEAST
       public:
         /// base-class typedef
         typedef ParametricEvaluator<Evaluator, TrafoEvaluator_, SpaceEvalTraits_, ReferenceCapabilities> BaseClass;
-        friend BaseClass;
 
         /// space type
         typedef Space_ SpaceType;
