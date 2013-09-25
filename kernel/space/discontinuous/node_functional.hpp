@@ -84,7 +84,7 @@ namespace FEAST
           _func_eval(functor)
         {
           // set cell midpoint
-          for(int i(0); i < ShapeType::dimension; ++i)
+          for(Index i(0); i < ShapeType::dimension; ++i)
           {
             _dom_point[i] = DataType_(0);
           }

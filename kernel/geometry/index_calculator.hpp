@@ -46,7 +46,7 @@ namespace FEAST
 
         IndexVector(const IndexVector& iv)
         {
-          for(int i(0); i < num_indices; ++i)
+          for(Index i(0); i < num_indices; ++i)
             idx[i] = iv[i];
         }
 
@@ -63,7 +63,7 @@ namespace FEAST
         bool operator<(const IndexVector& other) const
         {
           // Lexicographical comparison ignoring the first entry
-          for(int i(1); i < num_indices; ++i)
+          for(Index i(1); i < num_indices; ++i)
           {
             if (idx[i] < other[i])
             {
@@ -306,7 +306,7 @@ namespace FEAST
             // loop over all indices of the cell-vertex-vector
             for(int k(0); k < IndexTreeType::num_indices; ++k)
             {
-              current_face_indices[k]  = current_cell_in[FimType::map(j, k)];
+              current_face_indices[Index(k)]  = current_cell_in[FimType::map(j, k)];
             }
 
             // try to find the index of the vector within the tree

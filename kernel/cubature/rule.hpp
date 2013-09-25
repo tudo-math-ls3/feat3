@@ -99,7 +99,7 @@ namespace FEAST
           for(Index i(0); i < _num_points; ++i)
           {
             _weights[i] = other._weights[i];
-            for(int j(0); j < dimension; ++j)
+            for(Index j(0); j < dimension; ++j)
             {
               _points[i][j] = other._points[i][j];
             }
@@ -175,17 +175,17 @@ namespace FEAST
         return _points[i];
       }
 
-      CoordType& get_coord(Index i, int j)
+      CoordType& get_coord(Index i, Index j)
       {
         ASSERT(i < _num_points, "index i out-of-range");
-        ASSERT((j >= 0) && (j < dimension), "index j out-of-range");
+        ASSERT(j < dimension, "index j out-of-range");
         return _points[i][j];
       }
 
-      const CoordType& get_coord(Index i, int j) const
+      const CoordType& get_coord(Index i, Index j) const
       {
         ASSERT(i < _num_points, "index i out-of-range");
-        ASSERT((j >= 0) && (j < dimension), "index j out-of-range");
+        ASSERT(j < dimension, "index j out-of-range");
         return _points[i][j];
       }
     }; // class Rule<...>

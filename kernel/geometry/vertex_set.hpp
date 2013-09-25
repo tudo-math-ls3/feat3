@@ -290,7 +290,7 @@ namespace FEAST
         ASSERT_(_stride >= _num_coords);
         if((_num_vertices > 0) && (_num_coords > 0))
         {
-          _vertices = new CoordType[_num_vertices * _stride];
+          _vertices = new CoordType[_num_vertices * Index(_stride)];
         }
       }
 
@@ -310,7 +310,7 @@ namespace FEAST
       {
         if((_num_vertices > 0) && (_num_coords > 0))
         {
-          _vertices = new CoordType[_num_vertices * _stride];
+          _vertices = new CoordType[_num_vertices * Index(_stride)];
           for(Index i(0); i < _num_vertices; ++i)
           {
             for(int j(0); j < _num_coords; ++j)
@@ -346,7 +346,7 @@ namespace FEAST
         ASSERT_(_stride >= _num_coords);
         if((_num_vertices > 0) && (_num_coords > 0))
         {
-          _vertices = new CoordType[_num_vertices * _stride];
+          _vertices = new CoordType[_num_vertices * Index(_stride)];
           for(Index i(0); i < _num_vertices; ++i)
           {
             for(int j(0); j < _num_coords; ++j)
@@ -414,7 +414,7 @@ namespace FEAST
         CONTEXT(name() + "::operator[]()");
         ASSERT_(_vertices != nullptr);
         ASSERT_(i < _num_vertices);
-        return &_vertices[_stride * i];
+        return &_vertices[Index(_stride) * i];
       }
 
       /** \copydoc operator[]() */
@@ -423,7 +423,7 @@ namespace FEAST
         CONTEXT(name() + "::operator[]() [const]");
         ASSERT_(_vertices != nullptr);
         ASSERT_(i < _num_vertices);
-        return &_vertices[_stride * i];
+        return &_vertices[Index(_stride) * i];
       }
 
       /// Returns the name of the class.

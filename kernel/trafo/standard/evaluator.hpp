@@ -130,7 +130,7 @@ namespace FEAST
           ConstVertexReference vtx = vertex_set[cell_index];
 
           // calculate transformation coefficients
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             _coeff[i] = DataType(vtx[i]);
           }
@@ -147,7 +147,7 @@ namespace FEAST
          */
         void map_point(ImagePointType& img_point, const DomainPointType& DOXY(dom_point)) const
         {
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             img_point[i] = _coeff[i];
           }
@@ -269,7 +269,7 @@ namespace FEAST
           ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
 
           // calculate transformation coefficients
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             _coeff[i][0] = DataType(0.5) * DataType( v0[i] + v1[i]);
             _coeff[i][1] = DataType(0.5) * DataType(-v0[i] + v1[i]);
@@ -287,7 +287,7 @@ namespace FEAST
          */
         void map_point(ImagePointType& img_point, const DomainPointType& dom_point) const
         {
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             img_point[i] = _coeff[i][0] + _coeff[i][1] * dom_point[0];
           }
@@ -304,7 +304,7 @@ namespace FEAST
          */
         void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point)) const
         {
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             jac_mat(i,0) = _coeff[i][1];
           }
@@ -320,7 +320,7 @@ namespace FEAST
          */
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             hess_ten(i,0,0) = DataType(0);
           }
@@ -444,7 +444,7 @@ namespace FEAST
           ConstVertexReference v3 = vertex_set[index_set(cell_index, 3)];
 
           // calculate transformation coefficients
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             _coeff[i][0] = DataType(0.25) * DataType( v0[i] + v1[i] + v2[i] + v3[i]);
             _coeff[i][1] = DataType(0.25) * DataType(-v0[i] + v1[i] - v2[i] + v3[i]);
@@ -464,7 +464,7 @@ namespace FEAST
          */
         void map_point(ImagePointType& img_point, const DomainPointType& dom_point) const
         {
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             img_point[i] = _coeff[i][0] + _coeff[i][1] * dom_point[0] +
               (_coeff[i][2] + _coeff[i][3] * dom_point[0]) * dom_point[1];
@@ -482,7 +482,7 @@ namespace FEAST
          */
         void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point) const
         {
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             jac_mat(i,0) = _coeff[i][1] + dom_point[1] * _coeff[i][3];
             jac_mat(i,1) = _coeff[i][2] + dom_point[0] * _coeff[i][3];
@@ -500,7 +500,7 @@ namespace FEAST
          */
         void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
         {
-          for(int i(0); i < image_dim; ++i)
+          for(Index i(0); i < image_dim; ++i)
           {
             hess_ten(i,0,0) = hess_ten(i,1,1) = DataType(0);
             hess_ten(i,0,1) = hess_ten(i,1,0) = _coeff[i][3];

@@ -118,19 +118,19 @@ namespace FEAST
         case std::ios_base::beg:
           if((off < 0) || (off > off_type(_data.size())))
             return pos_type(-1);
-          return _data_pos = datasize(off);
+          return pos_type(_data_pos = datasize(off));
 
         case std::ios_base::cur:
           if((off < 0) && (-off > off_type(_data_pos)))
             return pos_type(-1);
           if((off > 0) && (off_type(_data_pos) + off > off_type(_data.size())))
             return pos_type(-1);
-          return _data_pos = datasize(off_type(_data_pos) + off);
+          return pos_type(_data_pos = datasize(off_type(_data_pos) + off));
 
         case std::ios_base::end:
           if((off > 0) || (-off > off_type(_data.size())))
             return pos_type(-1);
-          return _data_pos = datasize(off_type(_data.size()) + off);
+          return pos_type(_data_pos = datasize(off_type(_data.size()) + off));
 
         default:
           return pos_type(-1);

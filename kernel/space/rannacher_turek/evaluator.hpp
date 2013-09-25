@@ -204,10 +204,10 @@ namespace FEAST
           DomainPointType q1, q2;
 
           // loop over all 4 edges of the quad
-          for(int i(0); i < 4; ++i)
+          for(Index i(0); i < 4; ++i)
           {
             // initialise facet evaluator
-            facet_eval.prepare(facet_index_set(cell, i));
+            facet_eval.prepare(Index(facet_index_set(cell, i)));
 
             // map first cubature point
             facet_eval(facet_data, g1);
@@ -294,7 +294,7 @@ namespace FEAST
           DataType r(x*x - y*y);
 
           // loop over all basis functions
-          for(int i(0); i < 4; ++i)
+          for(Index i(0); i < 4; ++i)
           {
             data.phi[i].value = _coeff_mat(i,0) + _coeff_mat(i,1)*x + _coeff_mat(i,2)*y + _coeff_mat(i,3)*r;
           }
@@ -311,7 +311,7 @@ namespace FEAST
           pt.set_mat_vec_mult(_inv_lin_mat, trafo_data.img_point - _inv_lin_vec);
 
           // loop over all basis functions
-          for(int i(0); i < 4; ++i)
+          for(Index i(0); i < 4; ++i)
           {
             // calculate local gradients
             loc_grad(0) = _coeff_mat(i,1) + DataType(2) * _coeff_mat(i,3) * pt(0);

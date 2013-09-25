@@ -145,7 +145,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
-#define N 16
+#define N size_t(16)
       DataType_ x[N], y[N];
 
       // x := 1
@@ -170,7 +170,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
-#define N 16
+#define N size_t(16)
       DataType_ x[N], y[N], z[N];
 
       // initialise x[i] = cos(i)^2; y[i] = sin(i)^2
@@ -209,7 +209,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
-#define N 16
+#define N size_t(16)
       DataType_ x[N], y[N];
 
       // x[i] = i+1; y[i] = 1/(i+1)
@@ -228,7 +228,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
-#define N 16
+#define N size_t(16)
       DataType_ x[N];
 
       // x[i] := 1/2^i
@@ -247,7 +247,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
-#define N 16
+#define N size_t(16)
       DataType_ x[N];
 
       // x[i] := 1/sqrt(2^i)
@@ -266,7 +266,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
-#define N 16
+#define N size_t(16)
       static DataType_ r = (DataType_(N - 1) / DataType_(N));
       DataType_ x[N];
 
@@ -285,8 +285,8 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
 
-#define M 8
-#define N 16
+#define M size_t(8)
+#define N size_t(16)
       DataType_ a[N*M], b[N*M], c[M*N];
 
       // initialise a random matrix and its transpose
@@ -314,7 +314,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
-#define N 16
+#define N size_t(16)
       // initialise a Lehmer matrix and its inverse
       DataType_ a[N*N], b[N*N], c[N*N];
       _init_lehmer_mat(N, a);
@@ -347,7 +347,7 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.6)));
 
-#define N 16
+#define N size_t(16)
       DataType_ a[N*N], b[N*N], x[N], y[N], z[N];
       size_t p[N];
 
@@ -382,8 +382,8 @@ class LinAlgTest :
       // set tolerance
       const DataType_ tol(Math::pow(_eps, DataType_(0.6)));
 
-#define M 8
-#define N 16
+#define M size_t(8)
+#define N size_t(16)
       DataType_ a[N*N], b[N*N], x[N*M], y[N*M], z[N*M];
       size_t p[N];
 
