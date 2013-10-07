@@ -96,7 +96,7 @@ namespace FEAST
       typedef typename Geometry::ConformalMesh<ShapeType> RefMeshType;
 
     protected:
-      typedef typename TrafoType::Evaluator<>::Type TrafoEval;
+      typedef typename TrafoType::template Evaluator<>::Type TrafoEval;
 
       struct TrafoVertexConfig :
         public Trafo::ConfigBase
@@ -225,7 +225,7 @@ namespace FEAST
       {
         ASSERT_(data != nullptr);
         typedef Space_ SpaceType;
-        typedef typename SpaceType::Evaluator<TrafoEval>::Type SpaceEval;
+        typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
         static_assert(SpaceEval::can_value != 0, "space cannot evalute basis function values!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceValueConfig>::EvalDataType SpaceData;
@@ -305,7 +305,7 @@ namespace FEAST
       {
         ASSERT_(data != nullptr);
         typedef Space_ SpaceType;
-        typedef typename SpaceType::Evaluator<TrafoEval>::Type SpaceEval;
+        typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
         static_assert(SpaceEval::can_grad != 0, "space cannot evalute basis function gradients!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceGradConfig>::EvalDataType SpaceData;
@@ -393,7 +393,7 @@ namespace FEAST
       {
         ASSERT_(data != nullptr);
         typedef Space_ SpaceType;
-        typedef typename SpaceType::Evaluator<TrafoEval>::Type SpaceEval;
+        typedef typename SpaceType::template Evaluator<TrafoEval>::Type SpaceEval;
         static_assert(SpaceEval::can_hess != 0, "space cannot evalute basis function hessians!");
         typedef typename SpaceType::DofMappingType DofMappingType;
         typedef typename SpaceEval::template ConfigTraits<SpaceHessConfig>::EvalDataType SpaceData;
