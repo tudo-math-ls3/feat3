@@ -103,7 +103,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
   endif ()
 
   # generic settings independent of arch and optimisation level
-  set (FEAST_CXX_FLAGS_INTERNAL "-pipe  -Wno-unused-parameter")
+  set (FEAST_CXX_FLAGS_INTERNAL "-pipe  -Wno-unused-parameter -std=c++0x")
 
 
   # code coverage directives

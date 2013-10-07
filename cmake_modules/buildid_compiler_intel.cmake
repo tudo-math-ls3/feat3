@@ -113,7 +113,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
   endif ()
 
   # generic settings independent of arch and optimisation level
-  set (FEAST_CXX_FLAGS_INTERNAL "")
+  set (FEAST_CXX_FLAGS_INTERNAL "-std=c++0x")
 
 
   if (FEAST_DEBUG_MODE)
