@@ -10,6 +10,9 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
 
 # applications to build
+ADD_EXECUTABLE(basisdump basisdump/basisdump.cpp)
+TARGET_LINK_LIBRARIES(basisdump feast)
+
 ADD_EXECUTABLE(dbg-bcasm dbg_bcasm/dbg_bcasm.cpp)
 TARGET_LINK_LIBRARIES(dbg-bcasm feast)
 
