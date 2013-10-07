@@ -143,7 +143,7 @@ class LinAlgTest :
     bool test_vec_clear_copy() const
     {
       // set tolerance
-      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
 #define N size_t(16)
       DataType_ x[N], y[N];
@@ -168,7 +168,7 @@ class LinAlgTest :
     bool test_vec_axpy_lcomb() const
     {
       // set tolerance
-      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
 #define N size_t(16)
       DataType_ x[N], y[N], z[N];
@@ -207,7 +207,7 @@ class LinAlgTest :
     void test_vec_dot() const
     {
       // set tolerance
-      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
 #define N size_t(16)
       DataType_ x[N], y[N];
@@ -226,7 +226,7 @@ class LinAlgTest :
     void test_vec_norm_asum() const
     {
       // set tolerance
-      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
 #define N size_t(16)
       DataType_ x[N];
@@ -264,7 +264,7 @@ class LinAlgTest :
     void test_vec_norm_max() const
     {
       // set tolerance
-      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
 #define N size_t(16)
       static DataType_ r = (DataType_(N - 1) / DataType_(N));
@@ -283,7 +283,7 @@ class LinAlgTest :
     void test_mat_axpy() const
     {
       // set tolerance
-      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
+      const DataType_ tol(Math::pow(_eps, DataType_(0.8)));
 
 #define M size_t(8)
 #define N size_t(16)
