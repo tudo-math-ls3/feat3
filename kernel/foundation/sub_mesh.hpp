@@ -78,7 +78,7 @@ namespace Foundation
                                                                                                                 pl_vertex,
                                                                                                                 subsets.at(l).at(i) ));
 
-            for(auto v : adjacent_polytopes)
+            for(Index v : adjacent_polytopes)
             {
               if(std::find(vertex_map.begin(), vertex_map.end(), v) != vertex_map.end())
               {
