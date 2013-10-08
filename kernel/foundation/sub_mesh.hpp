@@ -78,19 +78,21 @@ namespace Foundation
                                                                                                                 pl_vertex,
                                                                                                                 subsets.at(l).at(i) ));
 
-            for(Index v : adjacent_polytopes)
+            // Note: Due to some compiler bug, the MSC compiler has a problem with the range-based for-loop here...
+            //for(auto v : adjacent_polytopes)
+            for(auto v(adjacent_polytopes.begin()); v != adjacent_polytopes.end(); ++v)
             {
-              if(std::find(vertex_map.begin(), vertex_map.end(), v) != vertex_map.end())
+              if(std::find(vertex_map.begin(), vertex_map.end(), *v) != vertex_map.end())
               {
                 ///v has already been mapped
-                typename TopologyType_::storage_type_::iterator pos(std::find(vertex_map.begin(), vertex_map.end(), v));
+                typename TopologyType_::storage_type_::iterator pos(std::find(vertex_map.begin(), vertex_map.end(), *v));
                 this->add_adjacency(PolytopeLevels(l), pl_vertex, i, pos - vertex_map.begin());
               }
               else
               {
                 ///v has not yet been mapped
                 this->add_adjacency(PolytopeLevels(l), pl_vertex, i, vertex_map.size());
-                vertex_map.push_back(v);
+                vertex_map.push_back(*v);
               }
             }
           }
