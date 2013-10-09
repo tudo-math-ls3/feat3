@@ -10,6 +10,22 @@ namespace FEAST
 {
   namespace Space
   {
+    /**
+     * \brief Null Dof-Assignment class template
+     *
+     * This class defines a dof-assignment which has no dofs for the selected shape dimension.
+     *
+     * \tparam Space_
+     * The finite element space that this dof-assignment is used by.
+     *
+     * \tparam shape_dim_
+     * The dimension of the shape whose dof-assignment is to be considered.
+     *
+     * \tparam DataType_
+     * The data type used by the dof-assignment.
+     *
+     * \author Peter Zajac
+     */
     template<
       typename Space_,
       int shape_dim_,
@@ -37,12 +53,13 @@ namespace FEAST
         return 0;
       }
 
-
+      /** \copydoc DofAssignmentBase::get_max_contribs() */
       Index get_max_contribs() const
       {
         return 0;
       }
 
+      /** \copydoc DofAssignmentBase::get_num_contribs() */
       Index get_num_contribs(Index /*assign_idx*/) const
       {
         throw InternalError("invalid call of DofAssignmentNull::get_num_contribs()");
@@ -59,8 +76,24 @@ namespace FEAST
       {
         throw InternalError("invalid call of DofAssignmentNull::get_weight()");
       }
-    };
+    }; // class DofAssignmentNull<...>
 
+    /**
+     * \brief Identity Dof-Assignment class template
+     *
+     * This class defines a dof-assignment which has no dofs for the selected shape dimension.
+     *
+     * \tparam Space_
+     * The finite element space that this dof-assignment is used by.
+     *
+     * \tparam shape_dim_
+     * The dimension of the shape whose dof-assignment is to be considered.
+     *
+     * \tparam DataType_
+     * The data type used by the dof-assignment.
+     *
+     * \author Peter Zajac
+     */
     template<
       typename Space_,
       int shape_dim_,
@@ -70,7 +103,6 @@ namespace FEAST
       public DofAssignmentBase<Space_, shape_dim_, DataType_>
     {
       typedef DofAssignmentBase<Space_, shape_dim_, DataType_> BaseClass;
-
 
     public:
       explicit DofAssignmentIdentity(const Space_& space) :

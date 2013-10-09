@@ -51,6 +51,69 @@ namespace FEAST
     } // namespace Stencil
 
     /**
+     * \brief Dof-Mapping renderer class
+     *
+     * \author Peter Zajac
+     */
+    class DofMappingRenderer
+    {
+    public:
+      /**
+       * \brief Renders the dof-mapping of a space into an adjacency graph.
+       *
+       * \param[in] space
+       * A reference to a finite element space whose dof-mapping is to be rendered.
+       *
+       * \returns
+       * The dof-mapping of the space given as an adjacency graph.
+       */
+      template<typename Space_>
+      static Adjacency::Graph render(const Space_& space)
+      {
+        // create a dof-mapping
+        typename Space_::DofMappingType dof_map(space);
+
+        // fetch the number of cells and dofs
+        const Index num_cells(space.get_mesh().get_num_entities(Space_::shape_dim));
+        const Index num_dofs(space.get_num_dofs());
+
+        // allocate the domain-pointer
+        Index* dom_ptr = new Index[num_cells+1];
+
+        // loop over all cells and build the domain pointer array
+        dom_ptr[0] = Index(0);
+        for(Index i(0); i < num_cells; ++i)
+        {
+          Index num_adj(0);
+          dof_map.prepare(i);
+          for(Index j(0); j < dof_map.get_num_local_dofs(); ++j)
+            num_adj += dof_map.get_num_contribs(j);
+          dof_map.finish();
+          dom_ptr[i+1] = dom_ptr[i] + num_adj;
+        }
+
+        // allocate the index array
+        Index* img_idx = new Index[dom_ptr[num_cells]];
+
+        // loop over all cells and build the image index array
+        for(Index i(0); i < num_cells; ++i)
+        {
+          Index l(dom_ptr[i]);
+          dof_map.prepare(i);
+          for(Index j(0); j < dof_map.get_num_local_dofs(); ++j)
+          {
+            for(Index k(0); k < dof_map.get_num_contribs(j); ++k, ++l)
+              img_idx[l] = dof_map.get_index(j, k);
+          }
+          dof_map.finish();
+        }
+
+        // create an adjacency graph
+        return Adjacency::Graph(num_cells, num_dofs, dom_ptr[num_cells], dom_ptr, nullptr, img_idx, false);
+      }
+    }; // class DofMappingRenderer
+
+    /**
      * \brief Dof-Adjacency assembler class template
      *
      * This class is used for the assembly of dof-adjacency graphs of operators.
@@ -89,15 +152,15 @@ namespace FEAST
         typename TrialSpace_>
       static Adjacency::Graph assemble(const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
-        // create test- and trial-dof-mappers
-        typename TestSpace_::DofMappingType test_dof_mapping(test_space);
-        typename TrialSpace_::DofMappingType trial_dof_mapping(trial_space);
+        // render dof-graphs
+        Adjacency::Graph test_dof_graph(DofMappingRenderer::render(test_space));
+        Adjacency::Graph trial_dof_graph(DofMappingRenderer::render(trial_space));
 
         // render transposed test-dof-mapping
-        Adjacency::Graph test_dof_support(Adjacency::rt_transpose, test_dof_mapping);
+        Adjacency::Graph test_dof_support(Adjacency::rt_transpose, test_dof_graph);
 
         // render composite test-dof-mapping/trial-dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_support, trial_dof_mapping);
+        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, test_dof_support, trial_dof_graph);
 
         // sort the dof-adjactor graph
         dof_adjactor.sort_indices();
@@ -119,13 +182,13 @@ namespace FEAST
       static Adjacency::Graph assemble(const Space_& space)
       {
         // create dof-mapping
-        typename Space_::DofMappingType dof_mapping(space);
+        Adjacency::Graph dof_graph(DofMappingRenderer::render(space));
 
         // render transposed dof-mapping
-        Adjacency::Graph dof_support(Adjacency::rt_transpose, dof_mapping);
+        Adjacency::Graph dof_support(Adjacency::rt_transpose, dof_graph);
 
         // render composite dof-mapping/dof-support graph
-        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, dof_support, dof_mapping);
+        Adjacency::Graph dof_adjactor(Adjacency::rt_injectify, dof_support, dof_graph);
 
         // sort the sof-adjactor graph
         dof_adjactor.sort_indices();
@@ -222,8 +285,8 @@ namespace FEAST
         RefinementAdjactor refine_adjactor(num_elements_coarse, num_children);
 
         // create test- and trial-dof-mappers
-        typename FineTestSpace_::DofMappingType test_dof_mapping(fine_test_space);
-        typename CoarseTrialSpace_::DofMappingType trial_dof_mapping(coarse_trial_space);
+        Adjacency::Graph test_dof_mapping(DofMappingRenderer::render(fine_test_space));
+        Adjacency::Graph trial_dof_mapping(DofMappingRenderer::render(coarse_trial_space));
 
         // render transposed test-dof-mapping
         Adjacency::Graph test_dof_support(Adjacency::rt_injectify_transpose, refine_adjactor, test_dof_mapping);

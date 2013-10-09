@@ -2,6 +2,7 @@
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/dof_adjacency.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
@@ -304,7 +305,7 @@ public:
   void asm_mat_struct(const QuadSpaceQ1& space, Index& neq, Index& nnze, Index*& row_ptr, Index*& col_idx) const
   {
     // create a dof-mapper
-    DofMapping dof_mapping(space);
+    Adjacency::Graph dof_mapping(Space::DofMappingRenderer::render(space));
 
     // fetch number of dofs
     neq = space.get_num_dofs();

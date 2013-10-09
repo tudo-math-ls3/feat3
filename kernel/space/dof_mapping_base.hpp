@@ -28,15 +28,6 @@ namespace FEAST
       /// shape typedef
       typedef typename SpaceType::ShapeType ShapeType;
 
-#ifdef DOXYGEN
-      /**
-       * \brief ImageIterator typedef
-       *
-       * This typedef is necessary for the implementation of the Adjactor interface.
-       */
-      typedef ... ImageIterator;
-#endif // DOXYGEN
-
     protected:
       /// space reference
       const SpaceType& _space;
@@ -136,29 +127,6 @@ namespace FEAST
       {
         return Real(1.0);
       }
-
-      /* ******************************************************************* */
-      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
-      /* ******************************************************************* */
-      /** \copydoc Adjactor::get_num_nodes_domain() */
-      Index get_num_nodes_domain() const
-      {
-        return _space.get_trafo().get_mesh().get_num_entities(ShapeType::dimension);
-      }
-
-      /** \copydoc Adjactor::get_num_nodes_image() */
-      Index get_num_nodes_image() const
-      {
-        return _space.get_num_dofs();
-      }
-
-#ifdef DOXYGEN
-      /** \copydoc Adjactor::image_begin() */
-      ImageIterator image_begin(Index domain_node) const;
-
-      /** \copydoc Adjactor::image_end() */
-      ImageIterator image_end(Index domain_node) const;
-#endif // DOXYGEN
     }; // class DofMappingBase<...>
   } // namespace Space
 } // namespace FEAST

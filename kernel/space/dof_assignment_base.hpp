@@ -76,6 +76,101 @@ namespace FEAST
         return DataType_(1.0);
       }
     }; // class DofAssignmentBase
+
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename Tag_, template<typename, int> class Traits_, int cell_dim_>
+      struct UniformDofAssignHelper
+      {
+        template<typename Mesh_>
+        static Index dof_offset(const Mesh_& mesh)
+        {
+          return UniformDofAssignHelper<Tag_, Traits_, cell_dim_ - 1>::dof_offset(mesh)
+            + mesh.get_num_entities(cell_dim_-1) * Index(Traits_<Tag_, cell_dim_ - 1>::count);
+        }
+      };
+
+      template<typename Tag_, template<typename, int> class Traits_>
+      struct UniformDofAssignHelper<Tag_, Traits_, 0>
+      {
+        template<typename Mesh_>
+        static Index dof_offset(const Mesh_&)
+        {
+          return Index(0);
+        }
+      };
+    } // namespace Intern
+
+    /**
+     * \brief Uniform Dof-Assignment class template.
+     *
+     * \tparam Space_
+     * The finite element space this dof-assignment is used by.
+     *
+     * \tparam shape_dim_
+     * The dimension of the shape that this dof-assignment refers to.
+     *
+     * \tparam DataType_
+     * The data-type to be used by the dof-assignment.
+     *
+     * \tparam DofTraits_
+     * A dof-traits class template that defines the number of dofs per dimension.
+     *
+     * \tparam DofTag_
+     * A tag class that is passed as a first parameter to the DofTraits_ class template.
+     *
+     * \author Peter Zajac
+     */
+    template<
+      typename Space_,
+      int shape_dim_,
+      typename DataType_,
+      template<typename Tag_, int dim_> class DofTraits_,
+      typename DofTag_>
+    class DofAssignmentUniform
+      : public DofAssignmentBase<Space_, shape_dim_, DataType_>
+    {
+    public:
+      typedef DofAssignmentBase<Space_, shape_dim_, DataType_> BaseClass;
+      typedef Space_ SpaceType;
+      typedef typename SpaceType::ShapeType ShapeType;
+
+      enum
+      {
+        // number of dofs for each cell
+        dofs_per_cell = DofTraits_<DofTag_, shape_dim_>::count
+      };
+
+    protected:
+      /// the offset of the first dof of this cell dimension
+      Index _dof_offset;
+
+    public:
+      explicit DofAssignmentUniform(const SpaceType& space) :
+        BaseClass(space),
+        _dof_offset(Intern::UniformDofAssignHelper<DofTag_, DofTraits_, shape_dim_>::dof_offset(space.get_mesh()))
+      {
+      }
+
+      /** \copydoc DofAssignmentBase::get_max_assigned_dofs() */
+      Index get_max_assigned_dofs() const
+      {
+        return Index(dofs_per_cell);
+      }
+
+      /** \copydoc DofAssignmentBase::get_num_assigned_dofs() */
+      Index get_num_assigned_dofs() const
+      {
+        return Index(dofs_per_cell);
+      }
+
+      /** \copydoc DofAssignmentBase::get_index() */
+      Index get_index(Index assign_idx, Index DOXY(contrib_idx) = 0) const
+      {
+        return _dof_offset + Index(dofs_per_cell) * this->_cell_index + assign_idx;
+      }
+    };
   } // namespace Space
 } // namespace FEAST
 

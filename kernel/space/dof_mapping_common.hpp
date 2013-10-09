@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/space/dof_mapping_base.hpp>
-#include <kernel/adjacency/adjactor.hpp>
 
 namespace FEAST
 {
@@ -18,9 +17,6 @@ namespace FEAST
      * \tparam Space_
      * The finite-element space that this dof-mapping is used by.
      *
-     * \tparam shape_dim_
-     * The dimension of the shape that his dof-mapping is defined on.
-     *
      * \tparam dofs_per_cell_
      * The number of dofs per entity.
      *
@@ -32,10 +28,6 @@ namespace FEAST
     class DofMappingIdentity :
       public DofMappingBase<Space_>
     {
-    public:
-      /// adjactor image iterator type
-      typedef Adjacency::Adjactor::IndexImageIterator ImageIterator;
-
     protected:
       /// constructor
       explicit DofMappingIdentity(const Space_& space) :
@@ -55,18 +47,6 @@ namespace FEAST
       {
         return Index(dofs_per_cell_) * this->_cell_index + local_dof_idx;
       }
-
-      /** \copydoc DofMappingBase::image_begin() */
-      ImageIterator image_begin(Index domain_node) const
-      {
-        return ImageIterator(Index(dofs_per_cell_) * domain_node);
-      }
-
-      /** \copydoc DofMappingBase::image_end() */
-      ImageIterator image_end(Index domain_node) const
-      {
-        return ImageIterator(Index(dofs_per_cell_) * (domain_node + 1));
-      }
     }; // class DofMappingIdentity<...>
 
     /**
@@ -77,9 +57,6 @@ namespace FEAST
      *
      * \tparam Space_
      * The finite-element space that this dof-mapping is used by.
-     *
-     * \tparam shape_dim_
-     * The dimension of the shape that his dof-mapping is defined on.
      *
      * \tparam codim_
      * The co-dimension of the shape that the dofs are assigned to.
@@ -122,47 +99,6 @@ namespace FEAST
       /// index-set type
       typedef typename MeshType::template IndexSet<shape_dim, dof_dim>::Type IndexSetType;
 
-    public:
-      /**
-       * \brief ImageIterator implementation
-       */
-      class ImageIterator
-      {
-      private:
-        /// a pointer to the index-set
-        const IndexSetType* _index_set;
-        /// the current cell index
-        Index _cell;
-        /// the current local dof index
-        Index _loc_dof;
-
-      public:
-        explicit ImageIterator(const IndexSetType* index_set, Index cell, Index loc_dof) :
-          _index_set(index_set),
-          _cell(cell),
-          _loc_dof(loc_dof)
-        {
-        }
-
-        ImageIterator& operator++()
-        {
-          ++_loc_dof;
-          return *this;
-        }
-
-        Index operator*() const
-        {
-          Index ldi_q = _loc_dof / dofs_per_cell_;
-          Index ldi_r = _loc_dof % dofs_per_cell_;
-          return Index(dofs_per_cell_) * ((*_index_set)[_cell][ldi_q]) + ldi_r;
-        }
-
-        bool operator!=(const ImageIterator& other) const
-        {
-          return (_index_set != other._index_set) || (_cell != other._cell) || (_loc_dof != other._loc_dof);
-        }
-      }; // class DofMappingSingleEntity<...>::ImageIterator
-
     protected:
       /// dofs-at-cell index set reference
       const IndexSetType& _index_set;
@@ -187,19 +123,6 @@ namespace FEAST
         Index ldi_q = local_dof_idx / dofs_per_cell_;
         Index ldi_r = local_dof_idx % dofs_per_cell_;
         return Index(dofs_per_cell_) * _index_set(this->_cell_index, ldi_q) + ldi_r;
-        //return Index(dofs_per_cell_) * _index_set[this->_cell_index][ldi_q] + ldi_r;
-      }
-
-      /** \copydoc DofMappingBase::image_begin() */
-      ImageIterator image_begin(Index domain_node) const
-      {
-        return ImageIterator(&_index_set, domain_node, 0);
-      }
-
-      /** \copydoc DofMappingBase::image_end() */
-      ImageIterator image_end(Index domain_node) const
-      {
-        return ImageIterator(&_index_set, domain_node, get_num_local_dofs());
       }
     };
 
@@ -221,6 +144,156 @@ namespace FEAST
       {
       }
     };
+
+    /// \cond internal
+    namespace Intern
+    {
+      template<
+        typename Shape_,
+        template<typename, int> class Traits_,
+        typename Tag_,
+        int cell_dim_ = Shape_::dimension>
+      struct UniformDofMappingHelper;
+    } // namespace Intern
+    /// \endcond
+
+    /**
+     * \brief Uniform Dof-Mapping class template
+     *
+     * This class implements the Dof-Mapping interface for a uniform finite-element space, which has
+     * a fixed number of dofs for each entity dimension.
+     *
+     * \tparam Space_
+     * The finite-element space that this dof-mapping is used by.
+     *
+     * \tparam Traits_
+     * A traits class template defining the number of dofs per entity dimension.
+     *
+     * \author Peter Zajac
+     */
+    template<
+      typename Space_,
+      template<typename Tag_, int dim_> class DofTraits_,
+      typename DofTag_>
+    class DofMappingUniform
+      : public DofMappingBase<Space_>
+    {
+    public:
+      /// base-class typedef
+      typedef DofMappingBase<Space_> BaseClass;
+      /// space typedef
+      typedef Space_ SpaceType;
+      /// shape typedef
+      typedef typename SpaceType::ShapeType ShapeType;
+
+      enum
+      {
+        // total number of local dofs
+        dof_count = Intern::UniformDofMappingHelper<Space_, DofTraits_, DofTag_>::dof_count
+      };
+
+    private:
+      /// dof index vector
+      Index dof_idx[dof_count];
+
+    public:
+      explicit DofMappingUniform(const SpaceType& space) :
+        BaseClass(space)
+      {
+      }
+
+      /** \copydoc DofMappingBase::prepare() */
+      void prepare(Index cell_index)
+      {
+        BaseClass::prepare(cell_index);
+        Index count(0);
+        Intern::UniformDofMappingHelper<Space_, DofTraits_, DofTag_ >::assemble(dof_idx,
+          this->_space.get_mesh().template get_index_set_wrapper<ShapeType::dimension>(),
+          cell_index, count);
+        ASSERT_(count == Index(dof_count));
+      }
+
+      /** \copydoc DofMappingBase::get_num_local_dofs() */
+      Index get_num_local_dofs() const
+      {
+        return Index(dof_count);
+      }
+
+      /** \copydoc DofMappingBase::get_index() */
+      Index get_index(Index local_dof_idx, Index /*contrib_idx*/ = 0) const
+      {
+        ASSERT(local_dof_idx < Index(dof_count), "dof-index out-of-range");
+        return dof_idx[local_dof_idx];
+      }
+    };
+
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int cell_dim_>
+      struct UniformDofMappingHelper
+      {
+        enum
+        {
+          cell_count = Shape::FaceTraits<Shape_, cell_dim_>::count,
+          // number of dofs per cell
+          dofs_per_cell = Traits_<Tag_, cell_dim_>::count,
+          // number of dofs for all cells of this dimension
+          dof_cell_count = cell_count * dofs_per_cell,
+          // total dof count
+          dof_count = UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::dof_count + dof_cell_count
+        };
+
+        template<typename IndexSetWrapper_>
+        static Index assemble(Index dof_idx[], const IndexSetWrapper_& isw, Index cell, Index& k)
+        {
+          Index offs(UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::assemble(dof_idx, isw, cell, k));
+
+          const auto& index_set(isw.template get_index_set<cell_dim_>());
+          for(Index i(0); i < Index(cell_count); ++i)
+          {
+            for(Index j(0); j < Index(dofs_per_cell); ++j, ++k)
+            {
+              dof_idx[k] = index_set(cell,i) * dofs_per_cell + j;
+            }
+          }
+          return offs + Index(dofs_per_cell) * index_set.get_num_entities();
+        }
+      };
+
+      template<typename Shape_, template<typename, int> class Traits_, typename Tag_>
+      struct UniformDofMappingHelper<Shape_, Traits_, Tag_, 0>
+      {
+        enum
+        {
+          cell_count = Shape::FaceTraits<Shape_, 0>::count,
+          // number of dofs per cell
+          dofs_per_cell = Traits_<Tag_, 0>::count,
+          // number of dofs for all cells of this dimension
+          dof_cell_count = cell_count * dofs_per_cell,
+          // total dof count
+          dof_count = dof_cell_count
+        };
+
+        template<typename IndexSetWrapper_>
+        static Index assemble(Index dof_idx[], const IndexSetWrapper_& isw, Index cell, Index& k)
+        {
+          const auto& index_set(isw.template get_index_set<0>());
+
+          k = 0;
+          for(Index i(0); i < Index(cell_count); ++i)
+          {
+            for(Index j(0); j < Index(dofs_per_cell); ++j, ++k)
+            {
+              dof_idx[k] = index_set(cell,i) * dofs_per_cell + j;
+            }
+          }
+          return Index(dofs_per_cell) * index_set.get_num_entities();
+        }
+
+      };
+    } // namespace Intern
+    /// \endcond
   } // namespace Space
 } // namespace FEAST
 

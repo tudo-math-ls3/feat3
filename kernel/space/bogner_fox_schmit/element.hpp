@@ -4,8 +4,9 @@
 
 // includes, FEAST
 #include <kernel/space/element_base.hpp>
-#include <kernel/space/dof_assignment_common.hpp>
+#include <kernel/space/dof_assignment_base.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
+#include <kernel/space/bogner_fox_schmit/dof_traits.hpp>
 #include <kernel/space/bogner_fox_schmit/evaluator.hpp>
 #include <kernel/space/bogner_fox_schmit/node_functional.hpp>
 
@@ -94,7 +95,8 @@ namespace FEAST
         {
         public:
           /// Dof-Assignment type
-          typedef DofAssignmentSingleEntity<Element, shape_dim_, DataType_, 0, num_vert_dofs> Type;
+          //typedef DofAssignmentSingleEntity<Element, shape_dim_, DataType_, 0, num_vert_dofs> Type;
+          typedef DofAssignmentUniform<Element, shape_dim_, DataType_, DofTraits, ShapeType> Type;
         };
 
         /** \copydoc ElementBase::NodeFunctional */
