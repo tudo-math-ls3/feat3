@@ -204,7 +204,7 @@ namespace FEAST
       {
         CONTEXT(name() + "::parse()");
 
-        static_assert(IndexSet_::num_indices == num_indices, "index count mismatch");
+        static_assert(int(IndexSet_::num_indices) == int(num_indices), "index count mismatch");
 
         // fetch number of entities
         const Index num_entities = index_set.get_num_entities();
