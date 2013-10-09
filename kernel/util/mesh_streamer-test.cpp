@@ -678,7 +678,7 @@ public:
     // drop the data into an auxiliary file
     stringstream ioss2;
     writer.write_mesh_file(ioss2);
-    writer.write_mesh_file("../mytest.txt");
+    //writer.write_mesh_file("../mytest.txt");
 
     // parse the data with the other mesh reader
     reader.parse_mesh_file(ioss2);
