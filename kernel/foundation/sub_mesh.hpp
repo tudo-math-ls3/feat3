@@ -101,7 +101,7 @@ namespace Foundation
         }
       }
 
-      const PolytopeLevels get_level() const
+      PolytopeLevels get_level() const
       {
         return _level;
       }
