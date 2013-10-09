@@ -152,7 +152,358 @@ namespace FEAST
             img_point[i] = _coeff[i];
           }
         }
-      }; // class Evaluator<Hypercube<1>,...>
+      }; // class Evaluator<Vertex,...>
+
+
+      /* ************************************************************************************* */
+
+      /**
+       * \brief Specialisation of standard trafo evaluator for Simplex<1> shape
+       *
+       * \author Peter Zajac
+       */
+      template<
+        typename Trafo_,
+        typename EvalPolicy_>
+      class Evaluator<Trafo_, EvalPolicy_, Shape::Simplex<1> > :
+        public EvaluatorBase<Trafo_, Evaluator<Trafo_, EvalPolicy_, Shape::Simplex<1> >, EvalPolicy_>
+      {
+      public:
+        /// base-class typedef
+        typedef EvaluatorBase<Trafo_, Evaluator, EvalPolicy_> BaseClass;
+        /// shape type
+        typedef Shape::Hypercube<1> ShapeType;
+        /// trafo type using this evaluator
+        typedef Trafo_ TrafoType;
+        /// trafo evaluation traits
+        typedef EvalPolicy_ EvalPolicy;
+
+        /// type of the underlying mesh
+        typedef typename TrafoType::MeshType MeshType;
+
+        /// evaluation data type
+        typedef typename EvalPolicy::DataType DataType;
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+        /// image point type
+        typedef typename EvalPolicy::ImagePointType ImagePointType;
+        /// jacobian matrix type
+        typedef typename EvalPolicy::JacobianMatrixType JacobianMatrixType;
+        /// jacobian inverse matrix type
+        typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
+        /// jacobian determinant type
+        typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
+        /// hessian tensor type
+        typedef typename EvalPolicy::HessianTensorType HessianTensorType;
+        /// hessian inverse tensor type
+        typedef typename EvalPolicy::HessianInverseType HessianInverseType;
+
+        /// dummy enumeration
+        enum
+        {
+          /// domain dimension
+          domain_dim = EvalPolicy::domain_dim,
+          /// image dimension
+          image_dim = EvalPolicy::image_dim
+        };
+
+        /// capability enumeration
+        enum EvaluatorCapabilities
+        {
+          /// can compute domain points
+          can_dom_point = 1,
+          /// can compute image points
+          can_img_point = 1,
+          /// can compute jacobian matrices
+          can_jac_mat = 1,
+          /// can compute jacobian inverse matrices if domain and image dimensions coincide
+          can_jac_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
+          /// can compute jacobian determinants
+          can_jac_det = 1,
+          /// can compute hessian tensors
+          can_hess_ten = 1,
+          /// can compute inverse hessian tensors if domain and image dimensions coincide
+          can_hess_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
+        };
+
+      protected:
+        /// the coefficients of the trafo
+        DataType _coeff[image_dim][2];
+
+      public:
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] trafo
+         * A reference to the trafo using this evaluator.
+         */
+        explicit Evaluator(const TrafoType& trafo) :
+          BaseClass(trafo)
+        {
+        }
+
+        /**
+         * \brief Prepares the evaluator for a given cell.
+         *
+         * \param[in] cell_index
+         * The index of the cell for which the evaluator is to be prepared.
+         */
+        void prepare(Index cell_index)
+        {
+          // prepare base-class
+          BaseClass::prepare(cell_index);
+
+          // fetch the mesh from the trafo
+          const MeshType& mesh = this->_trafo.get_mesh();
+
+          // fetch the vertex set from the mesh
+          typedef typename MeshType::VertexSetType VertexSetType;
+          const VertexSetType& vertex_set = mesh.get_vertex_set();
+
+          // fetch the index set
+          typedef typename MeshType::template IndexSet<domain_dim, 0>::Type IndexSetType;
+          const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
+
+          // fetch the vertices of the edge
+          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
+          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
+          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
+
+          // calculate transformation coefficients
+          for(Index i(0); i < image_dim; ++i)
+          {
+            _coeff[i][0] = DataType(v0[i]);
+            _coeff[i][1] = DataType(v1[i] - v0[i]);
+          }
+        }
+
+        /**
+         * \brief Maps a point from the reference cell to the selected cell.
+         *
+         * \param[out] img_point
+         * A reference to the point on the selected cell that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the point on the reference cell that is to be mapped.
+         */
+        void map_point(ImagePointType& img_point, const DomainPointType& dom_point) const
+        {
+          for(Index i(0); i < image_dim; ++i)
+          {
+            img_point[i] = _coeff[i][0] + _coeff[i][1] * dom_point[0];
+          }
+        }
+
+        /**
+         * \brief Calculates the jacobian matrix for a given point.
+         *
+         * \param[out] jac_mat
+         * A reference to the jacobian matrix that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the point on the reference cell where the jacobian matrix is to be computed.
+         */
+        void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& DOXY(dom_point)) const
+        {
+          for(Index i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+          }
+        }
+        /**
+         * \brief Computes the hessian tensor for a given domain point.
+         *
+         * \param[out] hess_ten
+         * A reference to the hessian tensor that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
+         */
+        void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
+        {
+          for(Index i(0); i < image_dim; ++i)
+          {
+            hess_ten(i,0,0) = DataType(0);
+          }
+        }
+      }; // class Evaluator<Simplex<1>,...>
+
+      /* ************************************************************************************* */
+
+      /**
+       * \brief Specialisation of standard trafo evaluator for Simplex<2> shape
+       *
+       * \author Peter Zajac
+       */
+      template<
+        typename Trafo_,
+        typename EvalPolicy_>
+      class Evaluator<Trafo_, EvalPolicy_, Shape::Simplex<2> > :
+        public EvaluatorBase<Trafo_, Evaluator<Trafo_, EvalPolicy_, Shape::Simplex<2> >, EvalPolicy_>
+      {
+      public:
+        /// base-class typedef
+        typedef EvaluatorBase<Trafo_, Evaluator, EvalPolicy_> BaseClass;
+        /// shape type
+        typedef Shape::Simplex<2> ShapeType;
+        /// trafo type using this evaluator
+        typedef Trafo_ TrafoType;
+        /// trafo evaluation traits
+        typedef EvalPolicy_ EvalPolicy;
+
+        /// type of the underlying mesh
+        typedef typename TrafoType::MeshType MeshType;
+
+        /// evaluation data type
+        typedef typename EvalPolicy::DataType DataType;
+        /// domain point type
+        typedef typename EvalPolicy::DomainPointType DomainPointType;
+        /// image point type
+        typedef typename EvalPolicy::ImagePointType ImagePointType;
+        /// jacobian matrix type
+        typedef typename EvalPolicy::JacobianMatrixType JacobianMatrixType;
+        /// jacobian inverse matrix type
+        typedef typename EvalPolicy::JacobianInverseType JacobianInverseType;
+        /// jacobian determinant type
+        typedef typename EvalPolicy::JacobianDeterminantType JacobianDeterminantType;
+        /// hessian tensor type
+        typedef typename EvalPolicy::HessianTensorType HessianTensorType;
+        /// hessian inverse tensor type
+        typedef typename EvalPolicy::HessianInverseType HessianInverseType;
+
+        /// dummy enumeration
+        enum
+        {
+          /// domain dimension
+          domain_dim = EvalPolicy::domain_dim,
+          /// image dimension
+          image_dim = EvalPolicy::image_dim
+        };
+
+        /// dummy enumeration
+        enum
+        {
+          /// can compute domain points
+          can_dom_point = 1,
+          /// can compute image points
+          can_img_point = 1,
+          /// can compute jacobian matrices
+          can_jac_mat = 1,
+          /// can compute jacobian inverse matrices if domain and image dimensions coincide
+          can_jac_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
+          /// can compute jacobian determinants
+          can_jac_det = 1,
+          /// can compute hessian tensors
+          can_hess_ten = 1,
+          /// can compute inverse hessian tensors if domain and image dimensions coincide
+          can_hess_inv = (int(domain_dim) == int(image_dim)) ? 1 : 0,
+        };
+
+      protected:
+        /// the coefficients of the trafo
+        DataType _coeff[image_dim][3];
+
+      public:
+        /**
+         * \brief Constructor.
+         *
+         * \param[in] trafo
+         * A reference to the trafo using this evaluator.
+         */
+        explicit Evaluator(const TrafoType& trafo) :
+          BaseClass(trafo)
+        {
+        }
+
+        /**
+         * \brief Prepares the evaluator for a given cell.
+         *
+         * \param[in] cell_index
+         * The index of the cell for which the evaluator is to be prepared.
+         */
+        void prepare(Index cell_index)
+        {
+          // prepare base-class
+          BaseClass::prepare(cell_index);
+
+          // fetch the mesh from the trafo
+          const MeshType& mesh = this->_trafo.get_mesh();
+
+          // fetch the vertex set from the mesh
+          typedef typename MeshType::VertexSetType VertexSetType;
+          const VertexSetType& vertex_set = mesh.get_vertex_set();
+
+          // fetch the index set
+          typedef typename MeshType::template IndexSet<domain_dim, 0>::Type IndexSetType;
+          const IndexSetType& index_set = mesh.template get_index_set<domain_dim, 0>();
+
+          // fetch the vertices of the edge
+          typedef typename VertexSetType::ConstVertexReference ConstVertexReference;
+          ConstVertexReference v0 = vertex_set[index_set(cell_index, 0)];
+          ConstVertexReference v1 = vertex_set[index_set(cell_index, 1)];
+          ConstVertexReference v2 = vertex_set[index_set(cell_index, 2)];
+
+          // calculate transformation coefficients
+          for(Index i(0); i < image_dim; ++i)
+          {
+            _coeff[i][0] = DataType(v0[i]);
+            _coeff[i][1] = DataType(v1[i] - v0[i]);
+            _coeff[i][2] = DataType(v2[i] - v0[i]);
+          }
+        }
+
+        /**
+         * \brief Maps a point from the reference cell to the selected cell.
+         *
+         * \param[out] img_point
+         * A reference to the point on the selected cell that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the point on the reference cell that is to be mapped.
+         */
+        void map_point(ImagePointType& img_point, const DomainPointType& dom_point) const
+        {
+          for(Index i(0); i < image_dim; ++i)
+          {
+            img_point[i] = _coeff[i][0] + _coeff[i][1] * dom_point[0] + _coeff[i][2] * dom_point[1];
+          }
+        }
+
+        /**
+         * \brief Calculates the jacobian matrix for a given point.
+         *
+         * \param[out] jac_mat
+         * A reference to the jacobian matrix that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the point on the reference cell where the jacobian matrix is to be computed.
+         */
+        void calc_jac_mat(JacobianMatrixType& jac_mat, const DomainPointType& dom_point) const
+        {
+          for(Index i(0); i < image_dim; ++i)
+          {
+            jac_mat(i,0) = _coeff[i][1];
+            jac_mat(i,1) = _coeff[i][2];
+          }
+        }
+
+        /**
+         * \brief Computes the hessian tensor for a given domain point.
+         *
+         * \param[out] hess_ten
+         * A reference to the hessian tensor that is to be computed.
+         *
+         * \param[in] dom_point
+         * A reference to the domain point on the reference cell for which the hessian tensor is to be computed.
+         */
+        void calc_hess_ten(HessianTensorType& hess_ten, const DomainPointType& DOXY(dom_point)) const
+        {
+          for(Index i(0); i < image_dim; ++i)
+          {
+            hess_ten.clear(DataType(0));
+          }
+        }
+      }; // class Evaluator<Simplex<2>,...>
 
       /* ************************************************************************************* */
 

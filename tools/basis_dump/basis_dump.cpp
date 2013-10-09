@@ -3,6 +3,7 @@
 #include <kernel/space/ext_vtk_writer.hpp>
 
 // FE spaces
+#include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
@@ -17,17 +18,65 @@ void dump_basis(String vtk_name, Index num_refines = 5);
 
 int main(int, char**)
 {
-  // 2D Quads
+  // 1D Line Elements
+  {
+    typedef Geometry::ConformalMesh< Shape::Hypercube<1> > MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+    // Discontinuous-0
+    dump_basis< Space::Discontinuous::Element<TrafoType> >("1d_line_discontinuous-0.vtk");
+    // Lagrange-1
+    dump_basis< Space::Lagrange1::Element<TrafoType> >("1d_line_lagrange-1.vtk");
+    // Bogner-Fox-Schmit
+    dump_basis< Space::BognerFoxSchmit::Element<TrafoType> >("1d_line_bogner_fox_schmit.vtk");
+  }
+
+  // 2D Tria Elements
+  {
+    typedef Geometry::ConformalMesh< Shape::Simplex<2> > MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+    // Discontinuous-0
+    dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_tria_discontinuous-0.vtk");
+    // Lagrange-1
+    //dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
+  }
+
+  // 3D Tetra Elements
+  {
+    typedef Geometry::ConformalMesh< Shape::Simplex<3> > MeshType;
+    //typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+    // Discontinuous-0
+    //dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_tetra_discontinuous-0.vtk");
+    // Lagrange-1
+    //dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_tetra_lagrange-1.vtk");
+  }
+
+  // 2D Quad Elements
   {
     typedef Geometry::ConformalMesh< Shape::Hypercube<2> > MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
+    // Discontinuous-0
+    dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_quad_discontinuous-0.vtk");
     // Lagrange-1
     dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_quad_lagrange-1.vtk");
-    // Lagrange-1
+    // Rannacher-Turek
     dump_basis< Space::RannacherTurek::Element<TrafoType> >("2d_quad_rannacher_turek.vtk");
-    // Lagrange-1
+    // Bogner-Fox-Schmit
     dump_basis< Space::BognerFoxSchmit::Element<TrafoType> >("2d_quad_bogner_fox_schmit.vtk");
+  }
+
+  // 3D Hexa Elements
+  {
+    typedef Geometry::ConformalMesh< Shape::Hypercube<3> > MeshType;
+    //typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+    // Discontinuous-0
+    //dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_hexa_discontinuous-0.vtk");
+    // Lagrange-1
+    //dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_hexa_lagrange-1.vtk");
   }
 }
 
@@ -37,7 +86,7 @@ struct DumpWrapper
   template<typename Writer_, typename Space_>
   static void write_values(Writer_&, Space_&) {}
   template<typename Writer_, typename Space_>
-  static void write_graidents(Writer_&, Space_&) {}
+  static void write_gradients(Writer_&, Space_&) {}
   template<typename Writer_, typename Space_>
   static void write_hessians(Writer_&, Space_&) {}
 };
@@ -107,6 +156,9 @@ void dump_basis(String vtk_name, Index num_refines)
   MeshType mesh(factory);
   TrafoType trafo(mesh);
   SpaceType space(trafo);
+
+  // print a message
+  std::cout << "Writing '" << vtk_name << "'..." << std::endl;
 
   // create an extended VTK writer
   Space::ExtVtkWriter<TrafoType> vtk_writer(trafo, num_refines);
