@@ -25,7 +25,9 @@ namespace FEAST
         submesh(),
         comm_halos(),
         boundaries(),
-        attrs()
+        attrs(),
+        comm_cost(0),
+        comp_cost(0)
       {
       }
 
@@ -33,7 +35,9 @@ namespace FEAST
         submesh(other.submesh),
         comm_halos(other.comm_halos),
         boundaries(other.boundaries),
-        attrs(other.attrs)
+        attrs(other.attrs),
+        comm_cost(other.comm_cost),
+        comp_cost(other.comp_cost)
       {
       }
 
@@ -43,12 +47,16 @@ namespace FEAST
         this->comm_halos = other.comm_halos;
         this->boundaries = other.boundaries;
         this->attrs = other.attrs;
+        this->comm_cost = other.comm_cost;
+        this->comp_cost = other.comp_cost;
       }
 
       std::shared_ptr<SubMesh<Dim_, t_, os_> > submesh;
       os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> > > > comm_halos;
       os_<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>, std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_> > > boundaries;
       os_<std::shared_ptr<AttributeBase<os_> >, std::allocator<std::shared_ptr<AttributeBase<os_> > > > attrs;
+      DT_ comm_cost;
+      DT_ comp_cost;
     };
   }
 }

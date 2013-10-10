@@ -23,6 +23,7 @@ SET (test_list
   functor-test
   halo-test
   halo_control-test
+  load_balancing-test
   mesh-test
   mesh_control-test
   partitioning-test

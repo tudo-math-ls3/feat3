@@ -23,10 +23,10 @@ namespace FEAST
           template <typename, typename, template<typename, typename> class > class MeshType_>
         static const DT_ patch_comm_cost(const PData<Dim_, t_, os_, MeshType_, DT_>& data)
         {
-          DT_ result(_latency);
+          DT_ result(0);
 
           for(Index i(0) ; i < data.comm_halos.size() ; ++i)
-            result += data.comm_halos.at(i).size() * _bandwidth;
+            result += _latency + data.comm_halos.at(i)->size() * (DT_(Dim_::ElementPolytopeType_::tag_value)) * _bandwidth; ///estimated n edges => n + 1 verts, ...
 
           return result;
         }
@@ -45,8 +45,8 @@ namespace FEAST
       private:
         ///T_comm = latency + N / bandwidth
         ///later these should be retrieved from the system
-        static const DT_ _latency = DT_(10);  ///maybe ms
-        static const DT_ _bandwidth = DT_(1); ///maybe byte/ms
+        constexpr static const DT_ _latency = DT_(10);  ///maybe ms
+        constexpr static const DT_ _bandwidth = DT_(1); ///maybe byte/ms
     };
 
     template<typename LBPT_>
@@ -62,6 +62,9 @@ namespace FEAST
       {
         DT_ comm_cost(LBPT_::patch_comm_cost(data));
         DT_ comp_cost(LBPT_::patch_comp_cost(data));
+
+        data.comm_cost = comm_cost;
+        data.comp_cost = comp_cost;
 
         ///TODO transform PData
       }
