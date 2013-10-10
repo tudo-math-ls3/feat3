@@ -26,7 +26,7 @@ namespace FEAST
           DT_ result(0);
 
           for(Index i(0) ; i < data.comm_halos.size() ; ++i)
-            result += _latency + data.comm_halos.at(i)->size() * (DT_(Dim_::ElementPolytopeType_::tag_value)) * _bandwidth; ///estimated n edges => n + 1 verts, ...
+            result += _latency() + data.comm_halos.at(i)->size() * (DT_(Dim_::ElementPolytopeType_::tag_value)) * _bandwidth(); ///estimated n edges => n + 1 verts, ...
 
           return result;
         }
@@ -45,8 +45,17 @@ namespace FEAST
       private:
         ///T_comm = latency + N / bandwidth
         ///later these should be retrieved from the system
-        constexpr static const DT_ _latency = DT_(10);  ///maybe ms
-        constexpr static const DT_ _bandwidth = DT_(1); ///maybe byte/ms
+        ///maybe ms
+        static DT_ _latency()
+        {
+          return DT_(10);
+        }
+
+        ///maybe byte/ms
+        static DT_ _bandwidth()
+        {
+          return DT_(1);
+        }
     };
 
     template<typename LBPT_>
