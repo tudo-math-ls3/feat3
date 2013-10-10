@@ -1,56 +1,69 @@
 #pragma once
-#ifndef KERNEL_FOUNDATION_LOAD_BALANCING_HH
-#define KERNEL_FOUNDATION_LOAD_BALANCING_HH 1
+#ifndef KERNEL_FOUNDATION_LOAD_BALANCING_HPP
+#define KERNEL_FOUNDATION_LOAD_BALANCING_HPP 1
 
-#include<kernel/base_header.hpp>
-#include<kernel/foundation/communication.hpp>
+#include<kernel/foundation/base.hpp>
+#include<kernel/foundation/data.hpp>
 
 namespace FEAST
 {
   namespace Foundation
   {
-    struct SimpleLoadBalancingPolicy
+
+    ///Example of a LBPolicy class, simply reads out comm_structures of PData object
+    template<typename DT_>
+    class LBPUniformCompScaledComm
     {
-      template<typename ReturnType_>
-      static void execute(CommStructures<ReturnType_>& lbconf)
+      public:
+        ///decides how the current local comm situation has to be weighted
+        template<
+          typename Dim_,
+          typename t_,
+          template <typename, typename> class os_,
+          template <typename, typename, template<typename, typename> class > class MeshType_>
+        static const DT_ patch_comm_cost(const PData<Dim_, t_, os_, MeshType_, DT_>& data)
+        {
+          DT_ result(_latency);
+
+          for(Index i(0) ; i < data.comm_halos.size() ; ++i)
+            result += data.comm_halos.at(i).size() * _bandwidth;
+
+          return result;
+        }
+
+        ///decides how the current local computational cost situation has to be weighted
+        template<
+          typename Dim_,
+          typename t_,
+          template <typename, typename> class os_,
+          template <typename, typename, template<typename, typename> class > class MeshType_>
+        static const DT_ patch_comp_cost(const PData<Dim_, t_, os_, MeshType_, DT_>& data)
+        {
+          return DT_(data.submesh->num_polytopes(Dim_::ElementPolytopeType_::tag_value));
+        }
+
+      private:
+        ///T_comm = latency + N / bandwidth
+        ///later these should be retrieved from the system
+        static const DT_ _latency = DT_(10);  ///maybe ms
+        static const DT_ _bandwidth = DT_(1); ///maybe byte/ms
+    };
+
+    template<typename LBPT_>
+    struct LoadBalancing
+    {
+      template<
+        typename Dim_,
+        typename t_,
+        template <typename, typename> class os_,
+        template <typename, typename, template<typename, typename> class > class MeshType_,
+        typename DT_>
+      static void execute(PData<Dim_, t_, os_, MeshType_, DT_>& data)
       {
+        DT_ comm_cost(LBPT_::patch_comm_cost(data));
+        DT_ comp_cost(LBPT_::patch_comp_cost(data));
 
-#ifndef SERIAL
-
-        ///TODO only lb procs, scatter, apply real LB
-        int numprocs;
-        MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-
-        for(Index i(0) ; i < lbconf.patch_mesh.size() ; ++i)
-        {
-          lbconf.patch_process_map.push_back();
-        }
-
-        for(int i(0) ; i < numprocs ; ++i)
-        {
-          lbconf.process_patch_map.push_back();
-        }
-
-        Index j(0);
-        for(int i(0) ; i < numprocs ; ++i)
-        {
-          lbconf.patch_process_map.at(j).push_back(i);
-          lbconf.process_patch_map.at(i).push_back(j);
-          ++j;
-          j = j < lbconf.patch_mesh.size() ? j : Index(0);
-        }
-
-#else
-        ///every patch is processed by our only process 0
-        lbconf.process_patch_map.push_back();
-        for(Index i(0) ; i < lbconf.patch_mesh.size() ; ++i)
-        {
-          lbconf.patch_process_map.push_back();
-          lbconf.patch_process_map.at(i).push_back(Index(0));
-          lbconf.process_patch_map.at(0).push_back(i);
-        }
-
-#endif
+        ///TODO transform PData
       }
     };
   }

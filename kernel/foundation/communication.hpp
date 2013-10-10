@@ -518,23 +518,6 @@ namespace FEAST
            }
          }
     };
-
-    template<typename TopologyType_>
-      struct CommStructures
-      {
-        CommStructures(const TopologyType_& n, const TopologyType_& p) :
-          network(n),
-          patch_mesh(p),
-          patch_process_map(TopologyType_()),
-          process_patch_map(TopologyType_())
-        {
-        }
-
-        const TopologyType_& network;
-        const TopologyType_& patch_mesh;
-        TopologyType_ patch_process_map;
-        TopologyType_ process_patch_map;
-      };
   }
 }
 #endif

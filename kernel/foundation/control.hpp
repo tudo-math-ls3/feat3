@@ -19,18 +19,9 @@ namespace FEAST
 {
   namespace Foundation
   {
-    template<typename Tag_, typename LBPolicy_, typename DataFillPolicy_>
     struct Control
     {
-      template<typename ConfigType_, typename PatchDataType_>
-      static void init(ConfigType_ & lbconf,
-                       PatchDataType_ & pd,
-                       int rank)
-      {
-        LBPolicy_::execute(lbconf);
-
-        DataFillPolicy_::execute(pd, rank);
-      }
+      ///TODO
     };
   }
 }
