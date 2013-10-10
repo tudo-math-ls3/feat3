@@ -19,6 +19,7 @@ set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full" CACHE STRING "valgrind optio
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
 
 if (FEAST_BACKENDS_CUDA)
+  MESSAGE("BÄM!")
   FIND_PACKAGE(CUDA)
 endif(FEAST_BACKENDS_CUDA)
 

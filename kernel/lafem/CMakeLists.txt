@@ -33,6 +33,7 @@ endif(FEAST_BACKENDS_MKL)
 
 
 if (FEAST_BACKENDS_CUDA)
+  MESSAGE("BÄM2")
   INCLUDE(FindCUDA)
   set (CUDA_VERBOSE_BUILD ON)
   set(CUDA_NVCC_FLAGS "-arch sm_13" CACHE STRING "Semi-colon delimit multiple arguments." FORCE)
