@@ -32,23 +32,23 @@ class DenseDataWrapperTest:
       test.push_back(3); test.push_back(1); test.push_back(0); test.push_back(2);
       std::sort(test.begin(), test.end());
 
-      TEST_CHECK_EQUAL(test.at(0), 0);
-      TEST_CHECK_EQUAL(test.at(1), 1);
-      TEST_CHECK_EQUAL(test.at(2), 2);
-      TEST_CHECK_EQUAL(test.at(3), 3);
+      TEST_CHECK_EQUAL(test.at(0), DataType_(0));
+      TEST_CHECK_EQUAL(test.at(1), DataType_(1));
+      TEST_CHECK_EQUAL(test.at(2), DataType_(2));
+      TEST_CHECK_EQUAL(test.at(3), DataType_(3));
 
       test.erase(test.begin() + 3);
-      TEST_CHECK_EQUAL(test.size(), 3);
-      TEST_CHECK_EQUAL(test.at(0), 0);
-      TEST_CHECK_EQUAL(test.at(1), 1);
-      TEST_CHECK_EQUAL(test.at(2), 2);
+      TEST_CHECK_EQUAL(test.size(), 3ul);
+      TEST_CHECK_EQUAL(test.at(0), DataType_(0));
+      TEST_CHECK_EQUAL(test.at(1), DataType_(1));
+      TEST_CHECK_EQUAL(test.at(2), DataType_(2));
 
       test.insert(test.begin() + 1, DataType_(118));
-      TEST_CHECK_EQUAL(test.size(), 4);
-      TEST_CHECK_EQUAL(test.at(0), 0);
-      TEST_CHECK_EQUAL(test.at(1), 118);
-      TEST_CHECK_EQUAL(test.at(2), 1);
-      TEST_CHECK_EQUAL(test.at(3), 2);
+      TEST_CHECK_EQUAL(test.size(), 4ul);
+      TEST_CHECK_EQUAL(test.at(0), DataType_(0));
+      TEST_CHECK_EQUAL(test.at(1), DataType_(118));
+      TEST_CHECK_EQUAL(test.at(2), DataType_(1));
+      TEST_CHECK_EQUAL(test.at(3), DataType_(2));
 
 
       std::vector<Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> > test1;
