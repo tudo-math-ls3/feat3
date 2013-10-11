@@ -18,10 +18,10 @@
 using namespace FEAST;
 using namespace Foundation;
 
-template<typename DT_>
+template<typename DT1_, typename DT2_, typename DT3_>
 struct TestResult
 {
-  TestResult(DT_ l, DT_ r, DT_ eps) :
+  TestResult(DT1_ l, DT2_ r, DT3_ eps) :
     left(l),
     right(r),
     epsilon(eps)
@@ -34,16 +34,16 @@ struct TestResult
   {
   }
 
-  DT_ left;
-  DT_ right;
-  DT_ epsilon;
+  DT1_ left;
+  DT2_ right;
+  DT3_ epsilon;
   bool passed;
 };
 
 template<typename DT1_, typename DT2_, typename DT3_>
-TestResult<DT1_> test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ eps)
+TestResult<DT1_, DT2_, DT3_> test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ eps)
 {
-  return TestResult<DT1_>(l, r, eps);
+  return TestResult<DT1_, DT2_, DT3_>(l, r, eps);
 }
 
 void check_sendrecv(int rank)
@@ -69,7 +69,7 @@ void check_sendrecv(int rank)
     Comm<Archs::Serial>::send_recv(f, 100000, 0, recvbuffer, 100000, 0);
 #endif
 
-    TestResult<float>* res = new TestResult<float>[100000];
+    TestResult<float, float, float>* res = new TestResult<float, float, float>[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
 #ifndef SERIAL
       res[i] = test_check_equal_within_eps(recvbuffer[i], rank == 0 ? float(1) : float(0), std::numeric_limits<float>::epsilon());
@@ -103,7 +103,7 @@ void check_send_and_recv(int rank)
   float* recvbuffer(new float[100000]);
   for(Index i(0) ; i < 100000 ; ++i)
   {
-    f[i] = i;
+    f[i] = float(i);
     recvbuffer[i] = rank;
   }
 
@@ -120,9 +120,9 @@ void check_send_and_recv(int rank)
     Comm<Archs::Parallel>::recv(recvbuffer,
                                      100000,
                                      0);
-    TestResult<float>* res = new TestResult<float>[100000];
+    TestResult<float, float, float>* res = new TestResult<float, float, float>[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
-      res[i] = test_check_equal_within_eps(recvbuffer[i], i, std::numeric_limits<float>::epsilon());
+      res[i] = test_check_equal_within_eps(recvbuffer[i], (float)i, std::numeric_limits<float>::epsilon());
 
     bool passed(true);
     for(unsigned long i(0) ; i < 100000 ; ++i)
@@ -152,14 +152,14 @@ void check_bcast(int rank)
   float* recvbuffer(new float[size]);
   for(Index i(0) ; i < (Index)size ; ++i)
   {
-    recvbuffer[i] = i + rank;
+    recvbuffer[i] = float(i + rank);
   }
 
   Comm<Archs::Parallel>::bcast(recvbuffer, size, 0);
 
-  TestResult<float>* res =  new TestResult<float>[size];
+  TestResult<float, float, float>* res =  new TestResult<float, float, float>[size];
   for(Index i(0) ; i < (Index)size ; ++i)
-    res[i] = test_check_equal_within_eps(recvbuffer[i], i, std::numeric_limits<float>::epsilon());
+    res[i] = test_check_equal_within_eps(recvbuffer[i], (float)i, std::numeric_limits<float>::epsilon());
 
   bool passed(true);
   for(Index i(0) ; i < (Index)size ; ++i)
@@ -194,8 +194,8 @@ void check_scatter_gather(int rank)
     }
   Comm<Archs::Parallel>::scatter(buffer, 1, &value, 1, 0);
 
-  TestResult<float> res;
-  res = test_check_equal_within_eps(value, rank+1, std::numeric_limits<float>::epsilon());
+  TestResult<float, float, float> res;
+  res = test_check_equal_within_eps(value, float(rank + 1), std::numeric_limits<float>::epsilon());
 
   bool passed(true);
   if(!res.passed)
@@ -221,9 +221,9 @@ void check_allgather(int rank)
 
   Comm<Archs::Parallel>::allgather(&value, 1, buffer, 1);
 
-  TestResult<float>* res = new TestResult<float>[size];
+  TestResult<float, float, float>* res = new TestResult<float, float, float>[size];
   for(Index i(0) ; i < (Index)size ; ++i)
-    res[i] = test_check_equal_within_eps(buffer[i], i, std::numeric_limits<float>::epsilon());
+    res[i] = test_check_equal_within_eps(buffer[i], (float)i, std::numeric_limits<float>::epsilon());
 
   bool passed(true);
   for(Index i(0) ; i < (Index)size ; ++i)
@@ -255,7 +255,7 @@ void check_allreduce(int rank)
 
   Comm<Archs::Parallel>::allreduce(send_buffer, 1, recv_buffer);
 
-  TestResult<float> res;
+  TestResult<float, float, float> res;
   res = test_check_equal_within_eps(recv_buffer[0], float(3), std::numeric_limits<float>::epsilon());
 
   if(!res.passed)
@@ -282,8 +282,8 @@ void check_reduce(int rank)
 
   if(rank == 0)
   {
-    TestResult<float> res;
-    res = test_check_equal_within_eps(result, size*(size+1)/2, std::numeric_limits<float>::epsilon());
+    TestResult<float, float, float> res;
+    res = test_check_equal_within_eps(result, float(size*(size+1)/2), std::numeric_limits<float>::epsilon());
 
     bool passed(true);
     if(!res.passed)
@@ -328,7 +328,7 @@ void check_halo_transfer(int rank)
     bool passed(true);
 #ifndef SERIAL
     //TestResult<Index> res[rank == 0 ? 4 : 2];
-    TestResult<Index> res[2];
+    TestResult<Index, Index, Index> res[2];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank == 0 ? Index(1) : Index(0), Index(1));
     if(rank == 0) //rank 0 receives more from rank 1
     {
@@ -389,7 +389,7 @@ void check_attribute_transfer(int rank)
     bool passed(true);
 #ifndef SERIAL
     //TestResult<double> res[rank == 0 ? 3 : 2];
-    TestResult<double> res[3];
+    TestResult<double, double, double> res[3];
     res[0] = test_check_equal_within_eps(attr.at(0), rank == 0 ? double(1) : double(0), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(1), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
     if(rank == 0)
@@ -455,7 +455,7 @@ void check_topology_transfer(int rank)
     bool passed(true);
 #ifndef SERIAL
     //TestResult<Index> res[rank == 0 ? 5 : 4];
-    TestResult<Index> res[5];
+    TestResult<Index, Index, Index> res[5];
     res[0] = test_check_equal_within_eps(t.at(0).at(0), rank == 0 ? Index(43) : Index(42), Index(1));
     res[1] = test_check_equal_within_eps(t.at(0).at(1), rank == 0 ? Index(48) : Index(47), Index(1));
     res[2] = test_check_equal_within_eps(t.at(1).at(0), rank == 0 ? Index(53) : Index(52), Index(1));
@@ -549,7 +549,7 @@ void check_mesh_transfer(int rank)
                 rank == 0 ? 1 : 0,
                 rank == 0 ? 1 : 0);
 
-    TestResult<Index> res[13];
+    TestResult<Index, Index, Index> res[13];
     res[0] = test_check_equal_within_eps(m.get_topologies().at(ipi_vertex_edge).size(), Index(6), Index(1));
     res[1] = test_check_equal_within_eps(m.get_topologies().at(ipi_vertex_face).size(), Index(6), Index(1));
     res[2] = test_check_equal_within_eps(m.get_topologies().at(ipi_face_vertex).size(), Index(2), Index(1));
@@ -598,13 +598,13 @@ void check_halobased_attribute_transfer(int rank)
 
     InterfacedComm<Mem::Main, com_exchange>::execute(h, attr);
 
-    TestResult<double> res[2];
+    TestResult<double, double, double> res[2];
 #ifndef SERIAL
-    res[0] = test_check_equal_within_eps(attr.at(10), rank == 0 ? double(43) : double(42), std::numeric_limits<float>::epsilon());
-    res[1] = test_check_equal_within_eps(attr.at(100), rank == 0 ? double(48) : double(47), std::numeric_limits<float>::epsilon());
+    res[0] = test_check_equal_within_eps(attr.at(10), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(attr.at(100), rank == 0 ? double(48) : double(47), std::numeric_limits<double>::epsilon());
 #else
-    res[0] = test_check_equal_within_eps(attr.at(10), double(42), std::numeric_limits<float>::epsilon());
-    res[1] = test_check_equal_within_eps(attr.at(100), double(47), std::numeric_limits<float>::epsilon());
+    res[0] = test_check_equal_within_eps(attr.at(10), double(42), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(attr.at(100), double(47), std::numeric_limits<double>::epsilon());
 #endif
     bool passed(true);
     for(Index i(0) ; i < 2 ; ++i)
@@ -639,13 +639,13 @@ void check_halobased_dv_transfer(int rank)
 
     InterfacedComm<Mem::Main, com_exchange>::execute(h, attr);
 
-    TestResult<double> res[2];
+    TestResult<double, double, double> res[2];
 #ifndef SERIAL
-    res[0] = test_check_equal_within_eps(attr(10), rank == 0 ? double(43) : double(42), std::numeric_limits<float>::epsilon());
-    res[1] = test_check_equal_within_eps(attr(100), rank == 0 ? double(48) : double(47), std::numeric_limits<float>::epsilon());
+    res[0] = test_check_equal_within_eps(attr(10), rank == 0 ? double(43) : double(42), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(attr(100), rank == 0 ? double(48) : double(47), std::numeric_limits<double>::epsilon());
 #else
-    res[0] = test_check_equal_within_eps(attr(10), double(42), std::numeric_limits<float>::epsilon());
-    res[1] = test_check_equal_within_eps(attr(100), double(47), std::numeric_limits<float>::epsilon());
+    res[0] = test_check_equal_within_eps(attr(10), double(42), std::numeric_limits<double>::epsilon());
+    res[1] = test_check_equal_within_eps(attr(100), double(47), std::numeric_limits<double>::epsilon());
 #endif
     bool passed(true);
     for(Index i(0) ; i < 2 ; ++i)
@@ -680,7 +680,7 @@ void check_halobased_smcsr_transfer(int rank)
 
     InterfacedComm<Mem::Main, com_exchange>::execute(h, smcsr);
 
-    TestResult<float> res[4];
+    TestResult<float, float, float> res[4];
 #ifndef SERIAL
     res[0] = test_check_equal_within_eps(smcsr(0, 0), rank == 0 ? float(43) : float(42), std::numeric_limits<float>::epsilon());
     res[1] = test_check_equal_within_eps(smcsr(0, 1), rank == 0 ? float(44) : float(43), std::numeric_limits<float>::epsilon());

@@ -184,15 +184,15 @@ namespace FEAST
               MPI_Status status;
 
               MPI_Sendrecv(sendbuf,
-                           num_elements_to_send,
+                           (unsigned)num_elements_to_send,
                            MPIType<DataType1_>::value(),
-                           dest_rank,
-                           send_tag,
+                           (unsigned)dest_rank,
+                           (unsigned)send_tag,
                            recvbuf,
-                           num_elements_to_recv,
+                           (unsigned)num_elements_to_recv,
                            MPIType<DataType2_>::value(),
-                           source_rank,
-                           recv_tag,
+                           (unsigned)source_rank,
+                           (unsigned)recv_tag,
                            communicator,
                            &status);
             }
@@ -205,10 +205,10 @@ namespace FEAST
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
               MPI_Send(sendbuf,
-                           num_elements_to_send,
+                           (unsigned)num_elements_to_send,
                            MPIType<DataType_>::value(),
-                           dest_rank,
-                           send_tag,
+                           (unsigned)dest_rank,
+                           (unsigned)send_tag,
                            communicator);
             }
 
@@ -222,10 +222,10 @@ namespace FEAST
               MPI_Status status;
 
               MPI_Recv(recvbuf,
-                           num_elements_to_recv,
+                           (unsigned)num_elements_to_recv,
                            MPIType<DataType_>::value(),
-                           src_rank,
-                           recv_tag,
+                           (unsigned)src_rank,
+                           (unsigned)recv_tag,
                            communicator,
                            &status);
             }
@@ -241,7 +241,7 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Bcast(buf, num_elements, MPIType<DataType_>::value(), root, communicator);
+              MPI_Bcast(buf, (unsigned)num_elements, MPIType<DataType_>::value(), (unsigned)root, communicator);
             }
 
           template<typename DataType1_, typename DataType2_>
@@ -252,8 +252,8 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Scatter(sendbuf, num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, num_elements_to_recv,
-                  MPIType<DataType2_>::value(), root, communicator);
+              MPI_Scatter(sendbuf, (unsigned)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (unsigned)num_elements_to_recv,
+                  MPIType<DataType2_>::value(), (unsigned)root, communicator);
             }
 
           template<typename DataType1_, typename DataType2_>
@@ -264,8 +264,8 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Gather(sendbuf, num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, num_elements_to_recv,
-                  MPIType<DataType2_>::value(), root, communicator);
+              MPI_Gather(sendbuf, (unsigned)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (unsigned)num_elements_to_recv,
+                  MPIType<DataType2_>::value(), (unsigned)root, communicator);
             }
 
           template<typename DataType_>
@@ -276,7 +276,7 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Reduce(sendbuf, recvbuf, num_elements_to_send, MPIType<DataType_>::value(), op, root, communicator);
+              MPI_Reduce(sendbuf, recvbuf, (unsigned)num_elements_to_send, MPIType<DataType_>::value(), op, (unsigned)root, communicator);
             }
 
           template<typename DataType1_, typename DataType2_>
@@ -286,8 +286,8 @@ namespace FEAST
                 Index num_elements_to_recv,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Allgather(sendbuf, num_elements_to_send, MPIType<DataType1_>::value(),
-                  recvbuf, num_elements_to_recv, MPIType<DataType2_>::value(), communicator);
+              MPI_Allgather(sendbuf, (unsigned)num_elements_to_send, MPIType<DataType1_>::value(),
+                  recvbuf, (unsigned)num_elements_to_recv, MPIType<DataType2_>::value(), communicator);
             }
 
           ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
@@ -300,7 +300,7 @@ namespace FEAST
             {
               MPI_Allreduce(sendbuf,
                             recvbuf,
-                            num_elements_to_send_and_receive,
+                            (unsigned)num_elements_to_send_and_receive,
                             MPIType<DataType1_>::value(),
                             op,
                             communicator);
