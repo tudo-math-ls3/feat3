@@ -59,7 +59,7 @@ public:
 DVDotProductTest<Mem::Main, Algo::Generic, float> dv_dot_product_test_float;
 DVDotProductTest<Mem::Main, Algo::Generic, double> dv_dot_product_test_double;
 #ifdef FEAST_GMP
-DVDotProductTest<Mem::Main, Algo::Generic, mpf_class> dv_dot_product_test_mpf_class;
+//DVDotProductTest<Mem::Main, Algo::Generic, mpf_class> dv_dot_product_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_MKL
 DVDotProductTest<Mem::Main, Algo::MKL, float> mkl_dv_dot_product_test_float;

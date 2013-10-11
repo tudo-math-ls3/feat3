@@ -81,7 +81,7 @@ public:
 DefectTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > csr_defect_test_float;
 DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > csr_defect_test_double;
 #ifdef FEAST_GMP
-DefectTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCSR<Mem::Main, mpf_class> > csr_defect_test_mpf_class;
+//DefectTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCSR<Mem::Main, mpf_class> > csr_defect_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_MKL
 DefectTest<Mem::Main, Algo::MKL, float, SparseMatrixCSR<Mem::Main, float> > mkl_csr_defect_test_float;
@@ -94,7 +94,7 @@ DefectTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > c
 DefectTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_defect_test_float;
 DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_defect_test_double;
 #ifdef FEAST_GMP
-DefectTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixELL<Mem::Main, mpf_class> > ell_defect_test_mpf_class;
+//DefectTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixELL<Mem::Main, mpf_class> > ell_defect_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
 DefectTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_ell_defect_test_float;
@@ -103,7 +103,7 @@ DefectTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > c
 DefectTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_defect_test_float;
 DefectTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_defect_test_double;
 #ifdef FEAST_GMP
-DefectTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > coo_defect_test_mpf_class;
+//DefectTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > coo_defect_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_MKL
 DefectTest<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_coo_defect_test_float;
