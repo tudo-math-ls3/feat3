@@ -33,8 +33,8 @@ endif(FEAST_BACKENDS_MKL)
 
 if (FEAST_GMP)
 TARGET_LINK_LIBRARIES(kernel-lafem
-  libgmp.so
   libgmpxx.so
+  libgmp.so
   )
 endif (FEAST_GMP)
 
