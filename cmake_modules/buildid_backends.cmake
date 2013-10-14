@@ -4,12 +4,14 @@
 #   FEAST_BACKEND_CUDA (bool, cached)
 #   FEAST_BACKEND_MKL  (bool, cached)
 #   FEAST_GMP (bool, cached)
+#   FEAST_BACKENDS_FLAGS (string, cached)
 #
 # \author Dirk Ribbrock
 
 
 # initialise local variables
 set (FORCE_ERROR_MESSAGE OFF)
+set (FEAST_BACKENDS_FLAGS "none")
 
 # determine and validate setting of "mode" token,
 # recall that this token is mandatory if tokens are used at all.
@@ -21,10 +23,20 @@ if (NOT DISPLAY_HELP_ONLY)
   #  appears at the beginning, in the middle or at the end of BUILD_ID)
   if (BUILD_ID MATCHES "^cuda-.+|.+-cuda-.+|.+-cuda$")
     set (FEAST_BACKENDS_CUDA ON CACHE BOOL "" FORCE)
+    if (FEAST_BACKENDS_FLAGS MATCHES "none")
+      set (FEAST_BACKENDS_FLAGS "cuda")
+    else ()
+      set (FEAST_BACKENDS_FLAGS "${FEAST_BACKENDS_FLAGS}-cuda")
+    endif (FEAST_BACKENDS_FLAGS MATCHES "none")
   endif ()
 
   if (BUILD_ID MATCHES "^mkl-.+|.+-mkl-.+|.+-mkl$")
     set (FEAST_BACKENDS_MKL ON CACHE BOOL "" FORCE)
+    if (FEAST_BACKENDS_FLAGS MATCHES "none")
+      set (FEAST_BACKENDS_FLAGS "mkl")
+    else ()
+      set (FEAST_BACKENDS_FLAGS "${FEAST_BACKENDS_FLAGS}-mkl")
+    endif (FEAST_BACKENDS_FLAGS MATCHES "none")
     # finally, pass all compiler flags to cmake
     if (FEAST_BUILD_MODE_NAME STREQUAL "debug")
       set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DMKL_ILP64")
@@ -38,6 +50,11 @@ if (NOT DISPLAY_HELP_ONLY)
 
   if (BUILD_ID MATCHES "^gmp-.+|.+-gmp-.+|.+-gmp$")
     set (FEAST_GMP ON CACHE BOOL "" FORCE)
+    if (FEAST_BACKENDS_FLAGS MATCHES "none")
+      set (FEAST_BACKENDS_FLAGS "gmp")
+    else ()
+      set (FEAST_BACKENDS_FLAGS "${FEAST_BACKENDS_FLAGS}-gmp")
+    endif (FEAST_BACKENDS_FLAGS MATCHES "none")
   endif ()
 
 endif ()

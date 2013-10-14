@@ -30,6 +30,7 @@
 #   buildid_backends:
 #     FEAST_BACKENDS_CUDA (bool, cached)
 #     FEAST_BACKENDS_MKL (bool, cached)
+#     FEAST_BACKENDS_FLAGS (string, cached)
 #
 # Documentation on using the build system is available in the  "provide help"
 # section below (actually implemented in the module buildid_help.cmake).
@@ -181,7 +182,7 @@ else ()
   # and print out a summary
   message (STATUS "##############################################################")
   message (STATUS "Supplied Build-ID: ${BUILD_ID}")
-  set (BUILD_ID "${FEAST_BUILD_MODE_NAME}-${FEAST_MPI_ENV_NAME}-${FEAST_COMPILER_NAME}-${FEAST_CPU_TYPE}")
+  set (BUILD_ID "${FEAST_BUILD_MODE_NAME}-${FEAST_MPI_ENV_NAME}-${FEAST_COMPILER_NAME}-${FEAST_CPU_TYPE}-${FEAST_BACKENDS_FLAGS}")
   message (STATUS "Debug mode         : ${FEAST_DEBUG_MODE}")
   message (STATUS "Serial mode        : ${FEAST_SERIAL_MODE}")
   if (NOT FEAST_MPI_ENV_NAME STREQUAL "serial")
@@ -193,7 +194,8 @@ else ()
   message (STATUS "MPI wrapper command: ${CMAKE_CXX_COMPILER}")
   message (STATUS "Compiler           : ${FEAST_COMPILER_NAME}")
   message (STATUS "Flags              : ${FEAST_CXX_FLAGS}")
-  message (STATUS "Basic Build ID     : ${BUILD_ID}")
+  message (STATUS "Backends           : ${FEAST_BACKENDS_FLAGS}")
+  message (STATUS "Used Build ID      : ${BUILD_ID}")
   message (STATUS "Source Directory   : ${FEAST_SOURCE_DIR}")
   message (STATUS "##############################################################")
 
