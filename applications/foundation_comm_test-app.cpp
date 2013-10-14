@@ -46,7 +46,7 @@ TestResult<DT1_, DT2_, DT3_> test_check_equal_within_eps(DT1_ l, DT2_ r, DT3_ ep
   return TestResult<DT1_, DT2_, DT3_>(l, r, eps);
 }
 
-void check_sendrecv(int rank)
+void check_sendrecv(Index rank)
 {
   float* f(new float[100000]);
   float* recvbuffer(new float[100000]);
@@ -96,7 +96,7 @@ void check_sendrecv(int rank)
   delete[] recvbuffer;
 }
 
-void check_send_and_recv(int rank)
+void check_send_and_recv(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   float* f(new float[100000]);
@@ -144,20 +144,20 @@ void check_send_and_recv(int rank)
 #endif
 }
 
-void check_bcast(int rank)
+void check_bcast(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  float* recvbuffer(new float[size]);
+  float* recvbuffer(new float[(Index)size]);
   for(Index i(0) ; i < (Index)size ; ++i)
   {
     recvbuffer[i] = float(i + rank);
   }
 
-  Comm<Archs::Parallel>::bcast(recvbuffer, size, 0);
+  Comm<Archs::Parallel>::bcast(recvbuffer, (Index)size, 0);
 
-  TestResult<float, float, float>* res =  new TestResult<float, float, float>[size];
+  TestResult<float, float, float>* res =  new TestResult<float, float, float>[(Index)size];
   for(Index i(0) ; i < (Index)size ; ++i)
     res[i] = test_check_equal_within_eps(recvbuffer[i], (float)i, std::numeric_limits<float>::epsilon());
 
@@ -178,13 +178,13 @@ void check_bcast(int rank)
 #endif
 }
 
-void check_scatter_gather(int rank)
+void check_scatter_gather(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
   float value(rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  float* buffer(new float[size]);
+  float* buffer(new float[(Index)size]);
 
   Comm<Archs::Parallel>::gather(&value, 1, buffer, 1, 0);
   if (rank == 0)
@@ -211,17 +211,17 @@ void check_scatter_gather(int rank)
 #endif
 }
 
-void check_allgather(int rank)
+void check_allgather(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
   float value(rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  float* buffer(new float[size]);
+  float* buffer(new float[(Index)size]);
 
   Comm<Archs::Parallel>::allgather(&value, 1, buffer, 1);
 
-  TestResult<float, float, float>* res = new TestResult<float, float, float>[size];
+  TestResult<float, float, float>* res = new TestResult<float, float, float>[(Index)size];
   for(Index i(0) ; i < (Index)size ; ++i)
     res[i] = test_check_equal_within_eps(buffer[i], (float)i, std::numeric_limits<float>::epsilon());
 
@@ -242,7 +242,7 @@ void check_allgather(int rank)
 #endif
 }
 
-void check_allreduce(int rank)
+void check_allreduce(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
@@ -270,7 +270,7 @@ void check_allreduce(int rank)
 #endif
 }
 
-void check_reduce(int rank)
+void check_reduce(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
@@ -299,7 +299,7 @@ void check_reduce(int rank)
 #endif
 }
 
-void check_halo_transfer(int rank)
+void check_halo_transfer(Index rank)
 {
   if(rank < 2)
   {
@@ -319,9 +319,9 @@ void check_halo_transfer(int rank)
 
     h.send_recv(
         sendbuf,
-        rank == 0 ? 1 : 0,
+        (int)rank == 0 ? 1 : 0,
         recvbuf,
-        rank == 0 ? 1 : 0);
+        (int)rank == 0 ? 1 : 0);
 
     h.from_buffer(recvbuf);
 
@@ -362,7 +362,7 @@ void check_halo_transfer(int rank)
   }
 }
 
-void check_attribute_transfer(int rank)
+void check_attribute_transfer(Index rank)
 {
   if(rank < 2)
   {
@@ -423,7 +423,7 @@ void check_attribute_transfer(int rank)
   }
 }
 
-void check_topology_transfer(int rank)
+void check_topology_transfer(Index rank)
 {
   if(rank < 2)
   {
@@ -494,7 +494,7 @@ void check_topology_transfer(int rank)
   }
 }
 
-void check_mesh_transfer(int rank)
+void check_mesh_transfer(Index rank)
 {
   if(rank < 2)
   {
@@ -579,7 +579,7 @@ void check_mesh_transfer(int rank)
   }
 }
 
-void check_halobased_attribute_transfer(int rank)
+void check_halobased_attribute_transfer(Index rank)
 {
   if(rank < 2)
   {
@@ -620,7 +620,7 @@ void check_halobased_attribute_transfer(int rank)
   }
 }
 
-void check_halobased_dv_transfer(int rank)
+void check_halobased_dv_transfer(Index rank)
 {
   if(rank < 2)
   {
@@ -661,7 +661,7 @@ void check_halobased_dv_transfer(int rank)
   }
 }
 
-void check_halobased_smcsr_transfer(int rank)
+void check_halobased_smcsr_transfer(Index rank)
 {
   if(rank < 2)
   {
@@ -716,20 +716,20 @@ int main(int argc, char* argv[])
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
 #ifndef SERIAL
-  check_sendrecv(me);
-  check_send_and_recv(me);
-  check_bcast(me);
-  check_scatter_gather(me);
-  check_allgather(me);
-  check_allreduce(me);
-  check_reduce(me);
-  check_halo_transfer(me);
-  check_attribute_transfer(me);
-  check_topology_transfer(me);
-  check_mesh_transfer(me);
-  check_halobased_attribute_transfer(me);
-  check_halobased_dv_transfer(me);
-  check_halobased_smcsr_transfer(me);
+  check_sendrecv((Index)me);
+  check_send_and_recv((Index)me);
+  check_bcast((Index)me);
+  check_scatter_gather((Index)me);
+  check_allgather((Index)me);
+  check_allreduce((Index)me);
+  check_reduce((Index)me);
+  check_halo_transfer((Index)me);
+  check_attribute_transfer((Index)me);
+  check_topology_transfer((Index)me);
+  check_mesh_transfer((Index)me);
+  check_halobased_attribute_transfer((Index)me);
+  check_halobased_dv_transfer((Index)me);
+  check_halobased_smcsr_transfer((Index)me);
 #endif
 
 #ifndef SERIAL

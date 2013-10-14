@@ -148,9 +148,9 @@ namespace FEAST
 
         ///implementation of Communicateable interface
         void send_recv(BufferedData<StorageType_>& sendbuffers,
-                       int destrank,
+                       Index destrank,
                        BufferedData<StorageType_>& recvbuffers,
-                       int sourcerank)
+                       Index sourcerank)
         {
 #ifndef SERIAL
           Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),

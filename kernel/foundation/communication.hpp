@@ -184,15 +184,15 @@ namespace FEAST
               MPI_Status status;
 
               MPI_Sendrecv(sendbuf,
-                           (unsigned)num_elements_to_send,
+                           (int)num_elements_to_send,
                            MPIType<DataType1_>::value(),
-                           (unsigned)dest_rank,
-                           (unsigned)send_tag,
+                           (int)dest_rank,
+                           (int)send_tag,
                            recvbuf,
-                           (unsigned)num_elements_to_recv,
+                           (int)num_elements_to_recv,
                            MPIType<DataType2_>::value(),
-                           (unsigned)source_rank,
-                           (unsigned)recv_tag,
+                           (int)source_rank,
+                           (int)recv_tag,
                            communicator,
                            &status);
             }
@@ -205,10 +205,10 @@ namespace FEAST
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
               MPI_Send(sendbuf,
-                           (unsigned)num_elements_to_send,
+                           (int)num_elements_to_send,
                            MPIType<DataType_>::value(),
-                           (unsigned)dest_rank,
-                           (unsigned)send_tag,
+                           (int)dest_rank,
+                           (int)send_tag,
                            communicator);
             }
 
@@ -222,10 +222,10 @@ namespace FEAST
               MPI_Status status;
 
               MPI_Recv(recvbuf,
-                           (unsigned)num_elements_to_recv,
+                           (int)num_elements_to_recv,
                            MPIType<DataType_>::value(),
-                           (unsigned)src_rank,
-                           (unsigned)recv_tag,
+                           (int)src_rank,
+                           (int)recv_tag,
                            communicator,
                            &status);
             }
@@ -241,7 +241,7 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Bcast(buf, (unsigned)num_elements, MPIType<DataType_>::value(), (unsigned)root, communicator);
+              MPI_Bcast(buf, (int)num_elements, MPIType<DataType_>::value(), (int)root, communicator);
             }
 
           template<typename DataType1_, typename DataType2_>
@@ -252,8 +252,8 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Scatter(sendbuf, (unsigned)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (unsigned)num_elements_to_recv,
-                  MPIType<DataType2_>::value(), (unsigned)root, communicator);
+              MPI_Scatter(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
+                  MPIType<DataType2_>::value(), (int)root, communicator);
             }
 
           template<typename DataType1_, typename DataType2_>
@@ -264,8 +264,8 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Gather(sendbuf, (unsigned)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (unsigned)num_elements_to_recv,
-                  MPIType<DataType2_>::value(), (unsigned)root, communicator);
+              MPI_Gather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
+                  MPIType<DataType2_>::value(), (int)root, communicator);
             }
 
           template<typename DataType_>
@@ -276,7 +276,7 @@ namespace FEAST
                 Index root,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Reduce(sendbuf, recvbuf, (unsigned)num_elements_to_send, MPIType<DataType_>::value(), op, (unsigned)root, communicator);
+              MPI_Reduce(sendbuf, recvbuf, (int)num_elements_to_send, MPIType<DataType_>::value(), op, (int)root, communicator);
             }
 
           template<typename DataType1_, typename DataType2_>
@@ -286,8 +286,8 @@ namespace FEAST
                 Index num_elements_to_recv,
                 MPI_Comm communicator = MPI_COMM_WORLD)
             {
-              MPI_Allgather(sendbuf, (unsigned)num_elements_to_send, MPIType<DataType1_>::value(),
-                  recvbuf, (unsigned)num_elements_to_recv, MPIType<DataType2_>::value(), communicator);
+              MPI_Allgather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(),
+                  recvbuf, (int)num_elements_to_recv, MPIType<DataType2_>::value(), communicator);
             }
 
           ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
@@ -300,7 +300,7 @@ namespace FEAST
             {
               MPI_Allreduce(sendbuf,
                             recvbuf,
-                            (unsigned)num_elements_to_send_and_receive,
+                            (int)num_elements_to_send_and_receive,
                             MPIType<DataType1_>::value(),
                             op,
                             communicator);
@@ -322,9 +322,9 @@ namespace FEAST
     {
       public:
         virtual void send_recv(BufferType_& senddata,
-                               int destrank,
+                               Index destrank,
                                BufferType_& recvdata,
-                               int sourcerank) = 0;
+                               Index sourcerank) = 0;
     };
 
     template<typename T_, Tier0CommModes c_>
@@ -339,8 +339,8 @@ namespace FEAST
       public:
         template<typename AggregateStorageType_>
         void send_recv(AggregateStorageType_& aggregates_to_communicate,
-                       int destrank,
-                       int sourcerank,
+                       Index destrank,
+                       Index sourcerank,
                        Index estimated_size_increase = 0)
         {
           for(Index i(0) ; i < aggregates_to_communicate.size() ; ++i)

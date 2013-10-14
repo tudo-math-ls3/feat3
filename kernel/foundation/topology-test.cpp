@@ -64,17 +64,17 @@ class TopologyTest:
       t3.at(0).push_back(4);
 
       t3.at(0).erase(t3.at(0).begin() + 2);
-      TEST_CHECK_EQUAL(t3.at(0).size(), 3);
-      TEST_CHECK_EQUAL(t3.at(0).at(0), 0);
-      TEST_CHECK_EQUAL(t3.at(0).at(1), 3);
-      TEST_CHECK_EQUAL(t3.at(0).at(2), 4);
+      TEST_CHECK_EQUAL(t3.at(0).size(), 3ul);
+      TEST_CHECK_EQUAL(t3.at(0).at(0), 0ul);
+      TEST_CHECK_EQUAL(t3.at(0).at(1), 3ul);
+      TEST_CHECK_EQUAL(t3.at(0).at(2), 4ul);
 
       t3.at(0).insert(t3.at(0).begin() + 2, IndexType_(5));
-      TEST_CHECK_EQUAL(t3.at(0).size(), 4);
-      TEST_CHECK_EQUAL(t3.at(0).at(0), 0);
-      TEST_CHECK_EQUAL(t3.at(0).at(1), 3);
-      TEST_CHECK_EQUAL(t3.at(0).at(2), 5);
-      TEST_CHECK_EQUAL(t3.at(0).at(3), 4);
+      TEST_CHECK_EQUAL(t3.at(0).size(), 4ul);
+      TEST_CHECK_EQUAL(t3.at(0).at(0), 0ul);
+      TEST_CHECK_EQUAL(t3.at(0).at(1), 3ul);
+      TEST_CHECK_EQUAL(t3.at(0).at(2), 5ul);
+      TEST_CHECK_EQUAL(t3.at(0).at(3), 4ul);
     }
 };
 TopologyTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > topology_test_cpu_v_v("std::vector, std::vector");

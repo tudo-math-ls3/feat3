@@ -52,7 +52,7 @@ namespace Foundation
 
             it = std::set_union(subsets.at(l).begin(), subsets.at(l).end(), adjacent_polytopes.begin(), adjacent_polytopes.end(), result_union.begin());
 
-            result_union.resize(it - result_union.begin());
+            result_union.resize(Index(it - result_union.begin()));
 
             subsets.at(l) = result_union;
 
@@ -86,7 +86,7 @@ namespace Foundation
               {
                 ///v has already been mapped
                 typename TopologyType_::storage_type_::iterator pos(std::find(vertex_map.begin(), vertex_map.end(), *v));
-                this->add_adjacency(PolytopeLevels(l), pl_vertex, i, pos - vertex_map.begin());
+                this->add_adjacency(PolytopeLevels(l), pl_vertex, i, Index(pos - vertex_map.begin()));
               }
               else
               {

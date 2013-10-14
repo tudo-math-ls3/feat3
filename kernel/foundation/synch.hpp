@@ -200,7 +200,7 @@ namespace FEAST
       {
         sendbuf = target;
         Comm<Arch_>::allreduce(&sendbuf, Index(1), &recvbuf);
-        target = sqrt(recvbuf);
+        target = (DataType_)sqrt(recvbuf);
       }
     };
 

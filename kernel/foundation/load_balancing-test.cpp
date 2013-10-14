@@ -60,7 +60,7 @@ class LoadBalancingTest1D:
 
       Index num_procs(5);
       Index rank(0);
-      Index level(4);
+      //Index level(4);
 
       PData<Dim1D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
                                                                                       Algo_,
@@ -68,7 +68,7 @@ class LoadBalancingTest1D:
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
                                                                                                           boundaries,
-                                                                                                          num_procs, rank, level,
+                                                                                                          num_procs, rank,
                                                                                                           attrs
                                                                                                           ));
 
@@ -173,7 +173,7 @@ class LoadBalancingTest2D:
 
       Index num_procs(3);
       Index rank(0);
-      Index level(4);
+      //Index level(4);
 
       PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
                                                                                       Algo_,
@@ -181,7 +181,7 @@ class LoadBalancingTest2D:
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
                                                                                                           boundaries,
-                                                                                                          num_procs, rank, level,
+                                                                                                          num_procs, rank,
                                                                                                           attrs
                                                                                                           ));
 

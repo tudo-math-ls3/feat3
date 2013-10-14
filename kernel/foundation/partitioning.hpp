@@ -99,7 +99,6 @@ namespace FEAST
                                                               std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, os_> > >& boundaries,
                                                           const Index num_procs,
                                                           const Index proc_rank,
-                                                          const Index desired_level_of_detail,
                                                           os_<Attribute<DT_, os_>, std::allocator<Attribute<DT_, os_> > >& origin_coords)
       {
         PData<Dim_, t_, os_, MeshType_, DT_> result;
@@ -270,7 +269,7 @@ namespace FEAST
 
               if(found != adj_elements_origin.end())
               {
-                Index found_diff(found - adj_elements_origin.begin());
+                Index found_diff(Index(found - adj_elements_origin.begin()));
                 local_boundaries.at(i).push_back(adj_elements_submesh.at(found_diff));
               }
             }
@@ -296,11 +295,11 @@ namespace FEAST
             typename t_::storage_type_::const_iterator f(std::find(map.begin(),
                                                          map.end(),
                                                          comm_halo_originating_from_element.at(i)));
-            Index element_in_submesh(f - map.begin());
+            Index element_in_submesh(Index(f - map.begin()));
 
             typename t_::storage_type_ tmp_localview(result.submesh->get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value, element_in_submesh));
 
-            Index halo_position_in_adj_list(std::find(tmp_globalview.begin(), tmp_globalview.end(), comm_halos_globalview.at(i).get_element(0)) - tmp_globalview.begin());
+            Index halo_position_in_adj_list(Index(std::find(tmp_globalview.begin(), tmp_globalview.end(), comm_halos_globalview.at(i).get_element(0)) - tmp_globalview.begin()));
             //create new halo
             result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >()));
             result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh((MeshType_<Dim_, t_, os_>*)&result.submesh);
@@ -319,11 +318,11 @@ namespace FEAST
             typename t_::storage_type_::const_iterator f(std::find(map.begin(),
                                                          map.end(),
                                                          comm_halo_originating_from_element_sub.at(i)));
-            Index element_in_submesh(f - map.begin());
+            Index element_in_submesh(Index(f - map.begin()));
 
             typename t_::storage_type_ tmp_localview(result.submesh->get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value, element_in_submesh));
 
-            Index halo_position_in_adj_list(std::find(tmp_globalview_sub.begin(), tmp_globalview_sub.end(), comm_halos_globalview_sub.at(i).get_element(0)) - tmp_globalview_sub.begin());
+            Index halo_position_in_adj_list(Index(std::find(tmp_globalview_sub.begin(), tmp_globalview_sub.end(), comm_halos_globalview_sub.at(i).get_element(0)) - tmp_globalview_sub.begin()));
             //create new halo
             result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >()));
             result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh((MeshType_<Dim_, t_, os_>*)&result.submesh);
@@ -342,11 +341,11 @@ namespace FEAST
             typename t_::storage_type_::const_iterator f(std::find(map.begin(),
                                                          map.end(),
                                                          comm_halo_originating_from_element_sub_sub.at(i)));
-            Index element_in_submesh(f - map.begin());
+            Index element_in_submesh(Index(f - map.begin()));
 
             typename t_::storage_type_ tmp_localview(result.submesh->get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value, element_in_submesh));
 
-            Index halo_position_in_adj_list(std::find(tmp_globalview_sub_sub.begin(), tmp_globalview_sub_sub.end(), comm_halos_globalview_sub_sub.at(i).get_element(0)) - tmp_globalview_sub_sub.begin());
+            Index halo_position_in_adj_list(Index(std::find(tmp_globalview_sub_sub.begin(), tmp_globalview_sub_sub.end(), comm_halos_globalview_sub_sub.at(i).get_element(0)) - tmp_globalview_sub_sub.begin()));
             //create new halo
             result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >()));
             result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh((MeshType_<Dim_, t_, os_>*)&result.submesh);
@@ -370,7 +369,7 @@ namespace FEAST
 
             //which position has vertex i in adj list of specific element elements_i_local.at(0)?
             typename t_::storage_type_ tmp_local(result.submesh->get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, pl_vertex, elements_i_local.at(0)));
-            Index pos(std::find(tmp_local.begin(), tmp_local.end(), i) - tmp_local.begin());
+            Index pos(Index(std::find(tmp_local.begin(), tmp_local.end(), i) - tmp_local.begin()));
 
             //now get element in corresponding supermesh
             Index element_global(result.submesh->get_map().at(elements_i_local.at(0)));

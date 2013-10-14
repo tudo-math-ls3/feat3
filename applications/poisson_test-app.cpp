@@ -73,7 +73,7 @@ int pow4(int i)
   return (1 << i) * (1 << i); // = 4^i
 }
 
-void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level)
+void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_level)
 {
   /*(0,1) (1,1)
    *  *----*
@@ -153,7 +153,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   MeshControl<dim_2D>::fill_adjacencies(m, *macro_basemesh);
   MeshControl<dim_2D>::fill_vertex_sets(m, *macro_basemesh, *((Attribute<double>*)(attrs.at(0).get())), *((Attribute<double>*)(attrs.at(1).get())));
 
-  for(int i(0) ; pow4(i) < num_patches ; ++i)
+  for(int i(0) ; (Index)pow4((int)i) < num_patches ; ++i)
   {
     BaseMeshType* coarse_mesh(macro_basemesh);
     {
@@ -189,7 +189,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   {
     if(potential_comm_partners_for_face_rank.at(i) == (Index)rank)
     {
-      potential_comm_partners_for_face_rank.erase(potential_comm_partners_for_face_rank.begin() + i);
+      potential_comm_partners_for_face_rank.erase(potential_comm_partners_for_face_rank.begin() + (const TopologyStorageType::difference_type)i);
       break;
     }
   }
@@ -236,7 +236,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
       {
         if(adjacent_edges_for_halo_elem.at(j) == elem)
         {
-          adjacent_edges_for_halo_elem.erase(adjacent_edges_for_halo_elem.begin() + j);
+          adjacent_edges_for_halo_elem.erase(adjacent_edges_for_halo_elem.begin() + (const TopologyStorageType::difference_type)j);
           break;
         }
       }
@@ -317,7 +317,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
   BaseMeshType* macro_mesh_geo_fine = new BaseMeshType(macro_mesh_geo);
   CellSubSet<Shape::Hypercube<2> >* macro_subset_geo_fine = new CellSubSet<Shape::Hypercube<2> >(macro_subset_geo);
 
-  for(Index i(0) ; num_patches < pow4(int(desired_refinement_level - i)) ; ++i)
+  for(Index i(0) ; num_patches < (Index)pow4(int(desired_refinement_level - i)) ; ++i)
   {
     BaseMeshType* coarse_macro_basemesh_fine(macro_basemesh_fine);
     BaseMeshType* coarse_macro_mesh_geo_fine(macro_mesh_geo_fine);
@@ -368,7 +368,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     delete temp;
 
     if(!(macro_comm_halos.at(i)->get_level() == pl_vertex))
-      for(Index j(0) ; num_patches < pow4(int(desired_refinement_level - j)) ; ++j)
+      for(Index j(0) ; num_patches < (Index)pow4(int(desired_refinement_level - j)) ; ++j)
       {
         BaseMeshType* coarse_macro_mesh_temp(macro_mesh_temp);
         CellSubSet<Shape::Hypercube<2> >* coarse_cell_sub_set_fine(cell_sub_set_fine);
@@ -405,7 +405,7 @@ void test_hypercube_2d(int rank, int num_patches, Index desired_refinement_level
     cell_sub_set_fine = new CellSubSet<Shape::Hypercube<2> >(map_factory);
     delete temp;
 
-    for(Index j(0) ; num_patches < pow4(int(desired_refinement_level - j)) ; ++j)
+    for(Index j(0) ; num_patches < (Index)pow4(int(desired_refinement_level - j)) ; ++j)
     {
       BaseMeshType* coarse_macro_mesh_temp(macro_mesh_temp);
       CellSubSet<Shape::Hypercube<2> >* coarse_cell_sub_set_fine(cell_sub_set_fine);
@@ -715,7 +715,7 @@ int main(int argc, char* argv[])
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
 #ifndef SERIAL
-  test_hypercube_2d(me, num_patches, desired_refinement_level);
+  test_hypercube_2d((Index)me, (Index)num_patches, desired_refinement_level);
 #endif
 
 #ifndef SERIAL

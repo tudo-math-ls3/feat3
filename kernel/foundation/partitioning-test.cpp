@@ -59,7 +59,7 @@ class PartitioningTest1D:
 
       Index num_procs(5);
       Index rank(0);
-      Index level(4);
+      //Index level(4);
 
       PData<Dim1D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
                                                                                       Algo_,
@@ -67,7 +67,7 @@ class PartitioningTest1D:
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
                                                                                                           boundaries,
-                                                                                                          num_procs, rank, level,
+                                                                                                          num_procs, rank,
                                                                                                           attrs
                                                                                                           ));
       //inspect p0 for (1)submesh data, (2)comm_halos, (3)boundaries, (4)attributes
@@ -202,7 +202,7 @@ class PartitioningTest2D:
 
       Index num_procs(3);
       Index rank(0);
-      Index level(4);
+      //Index level(4);
 
       PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
                                                                                       Algo_,
@@ -210,7 +210,7 @@ class PartitioningTest2D:
                                                                                       0,
                                                                                       pl_vertex>::execute(m,
                                                                                                           boundaries,
-                                                                                                          num_procs, rank, level,
+                                                                                                          num_procs, rank,
                                                                                                           attrs
                                                                                                           ));
 

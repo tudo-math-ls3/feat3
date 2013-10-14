@@ -335,7 +335,7 @@ namespace FEAST
               if(std::find(vertex_at_edge_current.begin(), vertex_at_edge_current.end(), current) != vertex_at_edge_current.end())
               {
                 //target selection
-                Index next(vertex_at_edge_current.at(vertex_at_edge_current.begin() + 1 - std::find(vertex_at_edge_current.begin(), vertex_at_edge_current.end(), current)));
+                Index next(Index(vertex_at_edge_current.at(Index(vertex_at_edge_current.begin() + 1 - std::find(vertex_at_edge_current.begin(), vertex_at_edge_current.end(), current)))));
                 //not yet added?
                 if(std::find(vertex_at_polygon.begin(), vertex_at_polygon.end(), next) == vertex_at_polygon.end())
                 {
@@ -356,7 +356,7 @@ namespace FEAST
             typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ result(100);
             typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_::iterator it;
             it = std::set_intersection(vertex_at_face.begin(), vertex_at_face.end(), vertex_neighbours.begin(), vertex_neighbours.end(), result.begin());
-            result.resize(it - result.begin());
+            result.resize(Index(it - result.begin()));
 
             if(std::find(result.begin(), result.end(), vertexold_at_face.at(j)) != result.end())
               result.erase(std::find(result.begin(), result.end(), vertexold_at_face.at(j))); //remove self

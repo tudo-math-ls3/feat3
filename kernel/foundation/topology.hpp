@@ -255,9 +255,9 @@ namespace FEAST
 
         ///implementation of Communicateable interface
         void send_recv(BufferedData<OuterStorageType_>& sendbuffers,
-                       int destrank,
+                       Index destrank,
                        BufferedData<OuterStorageType_>& recvbuffers,
-                       int sourcerank)
+                       Index sourcerank)
         {
 #ifndef SERIAL
 

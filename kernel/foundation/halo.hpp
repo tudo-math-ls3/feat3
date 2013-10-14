@@ -83,7 +83,7 @@ namespace FEAST
 
         virtual void erase_element(const index_type_ index)
         {
-          _halo_elements.erase(_halo_elements.begin() + index);
+          _halo_elements.erase(_halo_elements.begin() + (const typename compound_storage_type_::difference_type)index);
         }
 
         virtual index_type_ size() const
@@ -162,9 +162,9 @@ namespace FEAST
 
         ///implementation of Communicateable interface
         virtual void send_recv(BufferedData<BufferStorageType_>& sendbuffers,
-                       int destrank,
+                       Index destrank,
                        BufferedData<BufferStorageType_>& recvbuffers,
-                       int sourcerank)
+                       Index sourcerank)
         {
 #ifndef SERIAL
           Comm<Parallel>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),

@@ -137,7 +137,7 @@ namespace FEAST
           if(this->_executed)
             throw FunctorError("Already executed!");
 
-          _target.erase(_target.begin() + _position);
+          _target.erase(_target.begin() + (const typename ContainerType_::difference_type)_position);
           this->_executed = true;
         }
 
@@ -146,7 +146,7 @@ namespace FEAST
           if(!(this->_executed))
             throw FunctorError("Already undone!");
 
-          _target.insert(_target.begin() + _position, _value);
+          _target.insert(_target.begin() + (const typename ContainerType_::difference_type)_position, _value);
           this->_executed = false;
         }
 
