@@ -69,7 +69,7 @@ namespace FEAST
               n_z_s.append(1, line[i]);
             }
 
-            DT_ n_z(atof(n_z_s.c_str()));
+            DT_ n_z((DT_)atof(n_z_s.c_str()));
 
             data.push_back(n_z);
 
