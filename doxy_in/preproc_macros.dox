@@ -148,6 +148,12 @@ This macro is defined by the build system if the FEAST kernel is linked against 
 If defined, the LAFEM subsystem of the FEAST kernel will offer corresponding specialisations for the operations using
 the MKL as a work-horse.
 
+<hr>
+\subsection ppm_feast_gmp FEAST_GMP
+This macro is defined by the build system if the FEAST kernel is linked against the GNU multi-precision library.
+
+If defined, the GNU multi-precision types are added to the type-traits classes as well as to the LAFEM containers.
+
 <hr><hr>
 \section preproc_sec_user_def User-Defineable Macros
 This section enlists miscellaneous macros that can be defined by the user via the build-system to affect various parts

@@ -5,7 +5,9 @@
 // includes, FEAST
 #include <kernel/util/string.hpp>
 
+#ifdef FEAST_GMP
 #include <gmpxx.h>
+#endif
 
 namespace FEAST
 {
@@ -151,6 +153,7 @@ namespace FEAST
       }
     };
 
+#ifdef FEAST_GMP
     /**
      * \brief Type Traits specialisation for <c>mpf_class</c>
      *
@@ -174,7 +177,7 @@ namespace FEAST
         return val.get_d();
       }
     };
-
+#endif // FEAST_GMP
 
     /**
      * \brief Type Traits specialisation for <c>unsigned int</c>
