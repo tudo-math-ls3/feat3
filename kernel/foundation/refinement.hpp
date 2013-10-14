@@ -366,7 +366,14 @@ namespace FEAST
             {
               //remove all occurances of i in the vertex-face lists of all adjacent vertices
               for(Index k(0) ; k < vertex_at_face.size() ; ++k)
-                origin.get_topologies().at(ipi_vertex_face).at(k).erase(std::find(origin.get_topologies().at(ipi_vertex_face).at(k).begin(), origin.get_topologies().at(ipi_vertex_face).at(k).end(), i));
+              {
+                //std::cout << "SIZE " << origin.get_topologies().at(ipi_vertex_face).at(k).size() << std::endl;
+                //std::cout << "INDEX " << std::find(origin.get_topologies().at(ipi_vertex_face).at(k).begin(), origin.get_topologies().at(ipi_vertex_face).at(k).end(), i) - origin.get_topologies().at(ipi_vertex_face).at(k).begin()<< std::endl;
+                typename t_::storage_type_::iterator posi(std::find(origin.get_topologies().at(ipi_vertex_face).at(k).begin(), origin.get_topologies().at(ipi_vertex_face).at(k).end(), i));
+                if(posi != origin.get_topologies().at(ipi_vertex_face).at(k).end())
+                  origin.get_topologies().at(ipi_vertex_face).at(k).erase(posi);
+                //std::cout << "done" << std::endl;
+              }
 
               //clear the face's vertex list
               origin.get_topologies().at(ipi_face_vertex).at(i).clear();
