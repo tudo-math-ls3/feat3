@@ -52,8 +52,8 @@ void check_sendrecv(Index rank)
   float* recvbuffer(new float[100000]);
   for(Index i(0) ; i < 100000 ; ++i)
   {
-    f[i] = rank;
-    recvbuffer[i] = rank;
+    f[i] = (float)rank;
+    recvbuffer[i] = (float)rank;
   }
 
   if(rank < 2)
@@ -104,7 +104,7 @@ void check_send_and_recv(Index rank)
   for(Index i(0) ; i < 100000 ; ++i)
   {
     f[i] = float(i);
-    recvbuffer[i] = rank;
+    recvbuffer[i] = (float)rank;
   }
 
   if(rank == 0)
@@ -182,7 +182,7 @@ void check_scatter_gather(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
-  float value(rank);
+  float value((float)rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   float* buffer(new float[(Index)size]);
 
@@ -195,7 +195,7 @@ void check_scatter_gather(Index rank)
   Comm<Archs::Parallel>::scatter(buffer, 1, &value, 1, 0);
 
   TestResult<float, float, float> res;
-  res = test_check_equal_within_eps(value, float(rank + 1), std::numeric_limits<float>::epsilon());
+  res = test_check_equal_within_eps(float(value), float(rank + 1), std::numeric_limits<float>::epsilon());
 
   bool passed(true);
   if(!res.passed)
@@ -215,7 +215,7 @@ void check_allgather(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
-  float value(rank);
+  float value((float)rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   float* buffer(new float[(Index)size]);
 
@@ -246,7 +246,7 @@ void check_allreduce(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
-  float value(rank + 1);
+  float value(float(rank + 1));
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   float* send_buffer(new float[1]);
@@ -274,7 +274,7 @@ void check_reduce(Index rank)
 {
 #ifndef FEAST_SERIAL_MODE
   int size;
-  float value(rank + 1);
+  float value(float(rank + 1));
   float result(0);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
