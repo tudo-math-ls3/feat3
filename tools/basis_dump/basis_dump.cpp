@@ -7,6 +7,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
+#include <kernel/space/hermite3/element.hpp>
 
 #include <vector>
 
@@ -39,7 +40,9 @@ int main(int, char**)
     // Discontinuous-0
     dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_tria_discontinuous-0.vtk");
     // Lagrange-1
-    //dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
+    dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
+    // Hermite-3
+    dump_basis< Space::Hermite3::Element<TrafoType> >("2d_tria_hermite-3.vtk");
   }
 
   // 3D Tetra Elements
@@ -66,6 +69,8 @@ int main(int, char**)
     dump_basis< Space::RannacherTurek::Element<TrafoType> >("2d_quad_rannacher_turek.vtk");
     // Bogner-Fox-Schmit
     dump_basis< Space::BognerFoxSchmit::Element<TrafoType> >("2d_quad_bogner_fox_schmit.vtk");
+    // Hermite-3
+    dump_basis< Space::Hermite3::Element<TrafoType> >("2d_quad_hermite-3.vtk");
   }
 
   // 3D Hexa Elements
