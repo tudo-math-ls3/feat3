@@ -4,12 +4,17 @@
 import sys
 import os
 
+
+dirname = os.path.dirname(sys.argv[0])
+
 if len(sys.argv) > 1 and "help" in sys.argv[1]:
-  print ("configure feast and set up all necessary environment variables.")
-  print ("usage: %s build-id src-path"%sys.argv[0])
+  print("configure feast and set up all necessary environment variables.")
+  print("usage: %s build-id"%sys.argv[0])
+  print("============================")
+  os.system("cmake -DBUILD_ID=help %s" % dirname)
   sys.exit()
-if len(sys.argv) != 3:
-  print ("usage: %s build-id src-path"%sys.argv[0])
+if len(sys.argv) != 2:
+  print ("usage: %s build-id"%sys.argv[0])
   sys.exit()
 
 buildid = sys.argv[1].split("-")
@@ -43,10 +48,10 @@ else:
 
 
 # clean up
-clean = [ "CMakeCache.txt", sys.argv[2]+os.sep+"CMakeCache.txt" ]
+clean = [ "CMakeCache.txt", dirname+os.sep+"CMakeCache.txt" ]
 for i in clean:
   if os.path.exists(i):
     print i, "deleted."
     os.unlink(i)
 
-os.system("cmake -DBUILD_ID=%s %s" % (sys.argv[1], sys.argv[2]))
+os.system("cmake -DBUILD_ID=%s %s" % (sys.argv[1], dirname))
