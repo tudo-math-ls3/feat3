@@ -883,6 +883,7 @@ class MeshControlPartitioningTest2D:
         sourceranks.push_back(macro_number);
       }
       delete[] size_set;
+      delete[] polytopes_in_macrosubset;
 
     }
 };
