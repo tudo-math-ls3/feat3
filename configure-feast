@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+# This is a python script.
+# If you encounter problemes when executing it on its own, start it with a python interpreter
+import sys
+import os
+
+if len(sys.argv) > 1 and "help" in sys.argv[1]:
+  print ("configure feast and set up all necessary environment variables.")
+  print ("usage: %s build-id src-path"%sys.argv[0])
+  sys.exit()
+if len(sys.argv) != 3:
+  print ("usage: %s build-id src-path"%sys.argv[0])
+  sys.exit()
+
+buildid = sys.argv[1].split("-")
+
+os.environ["CXXFLAGS"] = ""
+
+if "gcc" in buildid or "gnu" in buildid:
+  os.environ["CC"] = "mpicc"
+  os.environ["CXX"] = "mpic++"
+  os.environ["OMPI_CC"] = "gcc"
+  os.environ["OMPI_CXX"] = "g++"
+  os.environ["MPICH_CC"] = "gcc"
+  os.environ["MPICH_CXX"] = "g++"
+elif "icc" in buildid or "intel" in buildid:
+  os.environ["CC"] = "mpicc"
+  os.environ["CXX"] = "mpic++"
+  os.environ["OMPI_CC"] = "icc"
+  os.environ["OMPI_CXX"] = "icpc"
+  os.environ["MPICH_CC"] = "icc"
+  os.environ["MPICH_CXX"] = "icpc"
+elif "clang" in buildid or "llvm" in buildid:
+  os.environ["CC"] = "mpicc"
+  os.environ["CXX"] = "mpic++"
+  os.environ["OMPI_CC"] = "clang"
+  os.environ["OMPI_CXX"] = "clang++"
+  os.environ["MPICH_CC"] = "clang"
+  os.environ["MPICH_CXX"] = "clang++"
+else:
+  print "No supported compiler found in build id."
+  sys.exit(1)
+
+
+# clean up
+clean = [ "CMakeCache.txt", sys.argv[2]+os.sep+"CMakeCache.txt" ]
+for i in clean:
+  if os.path.exists(i):
+    print i, "deleted."
+    os.unlink(i)
+
+os.system("cmake -DBUILD_ID=%s %s" % (sys.argv[1], sys.argv[2]))
