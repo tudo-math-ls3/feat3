@@ -83,7 +83,7 @@ if (FEAST_CXX_FLAGS_INTERNAL STREQUAL "")
   if (FEAST_DEBUG_MODE)
     # unoptimised settings for all archs
     # the following flag might be useful: -m128bit-long-double
-    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -Weverything -Wall -Wextra -Wundef -ggdb -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wno-unused-value")
+    set (FEAST_CXX_FLAGS_INTERNAL "${FEAST_CXX_FLAGS_INTERNAL} -O0 -Wall -Wextra -Wundef -ggdb -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wno-unused-value")
 
   else ()
     # optimised settings for all currently supported archs
