@@ -61,3 +61,4 @@ message (STATUS "            optimised compiler settings will be set.          "
 include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_mode.cmake )
 include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_mpi.cmake )
 include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_compiler.cmake )
+include ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid_backends.cmake )
