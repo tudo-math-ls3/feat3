@@ -204,6 +204,9 @@ namespace FEAST
             const Index num_assign(dof_assign.get_num_assigned_dofs());
             for(Index j(0); j < num_assign; ++j)
             {
+              if(dof_assign.get_derive_order(j) > Index(0))
+                continue;
+
               const Index num_contribs(dof_assign.get_num_contribs(j));
               for(Index k(0); k < num_contribs; ++k)
               {
@@ -245,6 +248,9 @@ namespace FEAST
             const Index num_assign(dof_assign.get_num_assigned_dofs());
             for(Index j(0); j < num_assign; ++j)
             {
+              if(dof_assign.get_derive_order(j) > Index(0))
+                continue;
+
               // evaluate node functional
               DataType_ value(node_func(j));
               const Index num_contribs(dof_assign.get_num_contribs(j));

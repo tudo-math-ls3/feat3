@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/space/dof_mapping_base.hpp>
+#include <kernel/util/assertion.hpp>
 
 namespace FEAST
 {
@@ -152,7 +153,8 @@ namespace FEAST
         typename Shape_,
         template<typename, int> class Traits_,
         typename Tag_,
-        int cell_dim_ = Shape_::dimension>
+        int cell_dim_ = Shape_::dimension,
+        int shape_dim_ = Shape_::dimension>
       struct UniformDofMappingHelper;
     } // namespace Intern
     /// \endcond
@@ -189,7 +191,7 @@ namespace FEAST
       enum
       {
         // total number of local dofs
-        dof_count = Intern::UniformDofMappingHelper<Space_, DofTraits_, DofTag_>::dof_count
+        dof_count = Intern::UniformDofMappingHelper<ShapeType, DofTraits_, DofTag_>::dof_count
       };
 
     private:
@@ -207,9 +209,8 @@ namespace FEAST
       {
         BaseClass::prepare(cell_index);
         Index count(0);
-        Intern::UniformDofMappingHelper<Space_, DofTraits_, DofTag_ >::assemble(dof_idx,
-          this->_space.get_mesh().template get_index_set_wrapper<ShapeType::dimension>(),
-          cell_index, count);
+        Intern::UniformDofMappingHelper<ShapeType, DofTraits_, DofTag_>
+          ::assemble(dof_idx, this->_space.get_mesh(), cell_index, count);
         ASSERT_(count == Index(dof_count));
       }
 
@@ -230,9 +231,11 @@ namespace FEAST
     /// \cond internal
     namespace Intern
     {
-      template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int cell_dim_>
+      template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int cell_dim_, int shape_dim_>
       struct UniformDofMappingHelper
       {
+        static_assert(cell_dim_ < shape_dim_, "invalid cell dimension");
+
         enum
         {
           cell_count = Shape::FaceTraits<Shape_, cell_dim_>::count,
@@ -244,25 +247,53 @@ namespace FEAST
           dof_count = UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::dof_count + dof_cell_count
         };
 
-        template<typename IndexSetWrapper_>
-        static Index assemble(Index dof_idx[], const IndexSetWrapper_& isw, Index cell, Index& k)
+        template<typename MeshType_>
+        static Index assemble(Index dof_idx[], const MeshType_& mesh, Index cell, Index& k)
         {
-          Index offs(UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::assemble(dof_idx, isw, cell, k));
+          Index offs(UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::assemble(dof_idx, mesh, cell, k));
 
-          const auto& index_set(isw.template get_index_set<cell_dim_>());
+          const auto& index_set(mesh.template get_index_set<shape_dim_, cell_dim_>());
           for(Index i(0); i < Index(cell_count); ++i)
           {
             for(Index j(0); j < Index(dofs_per_cell); ++j, ++k)
             {
-              dof_idx[k] = index_set(cell,i) * dofs_per_cell + j;
+              dof_idx[k] = offs + index_set(cell,i) * dofs_per_cell + j;
             }
           }
-          return offs + Index(dofs_per_cell) * index_set.get_num_entities();
+          return offs + Index(dofs_per_cell) * mesh.get_num_entities(cell_dim_);
         }
       };
 
-      template<typename Shape_, template<typename, int> class Traits_, typename Tag_>
-      struct UniformDofMappingHelper<Shape_, Traits_, Tag_, 0>
+      // specialisation for cell_dim_ = shape_dim_
+      template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int cell_dim_>
+      struct UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_, cell_dim_>
+      {
+        enum
+        {
+          // number of dofs per cell
+          dofs_per_cell = Traits_<Tag_, cell_dim_>::count,
+          // number of dofs for all cells of this dimension
+          dof_cell_count = dofs_per_cell,
+          // total dof count
+          dof_count = UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::dof_count + dof_cell_count
+        };
+
+        template<typename MeshType_>
+        static Index assemble(Index dof_idx[], const MeshType_& mesh, Index cell, Index& k)
+        {
+          Index offs(UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::assemble(dof_idx, mesh, cell, k));
+
+          for(Index j(0); j < Index(dofs_per_cell); ++j, ++k)
+          {
+            dof_idx[k] = offs + cell * dofs_per_cell + j;
+          }
+          return offs + Index(dofs_per_cell) * mesh.get_num_entities(cell_dim_);
+        }
+      };
+
+      // specialisation for cell_dim_ = 0
+      template<typename Shape_, template<typename, int> class Traits_, typename Tag_, int shape_dim_>
+      struct UniformDofMappingHelper<Shape_, Traits_, Tag_, 0, shape_dim_>
       {
         enum
         {
@@ -275,10 +306,10 @@ namespace FEAST
           dof_count = dof_cell_count
         };
 
-        template<typename IndexSetWrapper_>
-        static Index assemble(Index dof_idx[], const IndexSetWrapper_& isw, Index cell, Index& k)
+        template<typename MeshType_>
+        static Index assemble(Index dof_idx[], const MeshType_& mesh, Index cell, Index& k)
         {
-          const auto& index_set(isw.template get_index_set<0>());
+          const auto& index_set(mesh.template get_index_set<shape_dim_, 0>());
 
           k = 0;
           for(Index i(0); i < Index(cell_count); ++i)
@@ -288,7 +319,7 @@ namespace FEAST
               dof_idx[k] = index_set(cell,i) * dofs_per_cell + j;
             }
           }
-          return Index(dofs_per_cell) * index_set.get_num_entities();
+          return Index(dofs_per_cell) * mesh.get_num_entities(0);
         }
 
       };

@@ -29,6 +29,11 @@ namespace FEAST
           /// no dofs for any shape dimension > 0
           count = 0
         };
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
 
       template<>
@@ -38,6 +43,11 @@ namespace FEAST
         {
           count = 1
         };
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
 
       template<>
@@ -47,6 +57,11 @@ namespace FEAST
         {
           count = 1
         };
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
     } // namespace RannacherTurek
   } // namespace Space

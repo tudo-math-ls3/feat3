@@ -29,6 +29,12 @@ namespace FEAST
           /// no dofs for any shape dimension > 0
           count = 0
         };
+
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
 
       template<int dim_, int degree_>
@@ -38,6 +44,11 @@ namespace FEAST
         {
           count = MetaMath::Binomial<dim_ + degree_, degree_>::value
         };
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
 
       template<int dim_, int degree_>
@@ -47,6 +58,11 @@ namespace FEAST
         {
           count = MetaMath::Binomial<dim_ + degree_, degree_>::value
         };
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
     } // namespace Discontinuous
   } // namespace Space

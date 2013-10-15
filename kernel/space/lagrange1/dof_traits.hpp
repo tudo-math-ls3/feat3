@@ -24,6 +24,11 @@ namespace FEAST
           /// no dofs for any shape dimension > 0
           count = 0
         };
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
 
       template<typename Shape_>
@@ -34,6 +39,11 @@ namespace FEAST
           /// 1 dof per vertex
           count = 1
         };
+
+        static Index derive_order(Index)
+        {
+          return Index(0);
+        }
       };
     } // namespace Lagrange1
   } // namespace Space

@@ -67,6 +67,11 @@ namespace FEAST
         return 1;
       }
 
+      Index get_derive_order(Index /*assign_idx*/) const
+      {
+        return 0;
+      }
+
 #ifdef DOXYGEN
       Index get_index(Index assign_idx, Index contrib_idx = 0) const;
 #endif // DOXYGEN
@@ -163,6 +168,12 @@ namespace FEAST
       Index get_num_assigned_dofs() const
       {
         return Index(dofs_per_cell);
+      }
+
+      /** \copydoc DofAssignmentBase::get_derive_order() */
+      Index get_derive_order(Index assign_idx)
+      {
+        return DofTraits_<DofTag_, shape_dim_>::derive_order(assign_idx);
       }
 
       /** \copydoc DofAssignmentBase::get_index() */

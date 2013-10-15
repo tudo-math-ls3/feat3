@@ -176,7 +176,7 @@ namespace FEAST
         {
           enum
           {
-            need_jac_det = 1
+            need_jac_mat = 1
           };
         };
 
@@ -219,7 +219,7 @@ namespace FEAST
           trafo_eval(coeff_data, dom_point);
 
           // store coefficient
-          _coeff = coeff_data.jac_det;
+          _coeff = coeff_data.jac_mat(0,0);
         }
 
         /**
@@ -347,7 +347,7 @@ namespace FEAST
         {
           enum
           {
-            need_jac_inv = 1
+            need_jac_mat = 1
           };
         };
 
@@ -432,8 +432,8 @@ namespace FEAST
             // evaluate trafo data
             trafo_eval(coeff_data, dom_point);
 
-            // store inverse jacobian
-            _coeff_fod[i] = coeff_data.jac_inv;
+            // store jacobian matrix
+            _coeff_fod[i] = coeff_data.jac_mat;
           }
         }
 
