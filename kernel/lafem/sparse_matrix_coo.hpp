@@ -104,7 +104,7 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String sval(line, 0, end);
-            DT_ val(atof(sval.c_str()));
+            DT_ val((DT_)atof(sval.c_str()));
 
             rowsv.push_back(row);
             colsv.push_back(col);
@@ -186,7 +186,7 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String sval(line, 0, end);
-            DT_ val(atof(sval.c_str()));
+            DT_ val((DT_)atof(sval.c_str()));
 
             rowsv.push_back(row);
             colsv.push_back(col);
