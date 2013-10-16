@@ -51,7 +51,7 @@ namespace FEAST
           r += xpv * xpv;
         }
 
-        return sqrt(r);
+        return (DT_)std::sqrt(r);
       }
     };
 
