@@ -76,7 +76,7 @@ namespace FEAST
           rule.get_weight(i) = Weight_(1) / Weight_(MetaMath::Factorial<dim_ + 1>::value);
 
           // set point coords
-          for(int j(0); j < dim_; ++j)
+          for(Index j(0); j < Index(dim_); ++j)
           {
             rule.get_coord(i,j) = Index(j+1) == i ? Coord_(1) : Coord_(0);
           }
@@ -113,7 +113,7 @@ namespace FEAST
           rule.get_weight(i) = Weight_(1);
 
           // set point coords
-          for(int j(0); j < dim_; ++j)
+          for(Index j(0); j < Index(dim_); ++j)
           {
             rule.get_coord(i,j) = Coord_(((i >> j) & 1) << 1) - Coord_(1);
           }

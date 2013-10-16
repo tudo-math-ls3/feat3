@@ -249,7 +249,7 @@ namespace FEAST
         //restrict boundary components belonging to this patch to submesh
         std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ > > local_boundaries;
 
-        const Index i_end(boundaries.size());
+        const Index i_end(Index(boundaries.size()));
         for(unsigned long i(0) ; i < i_end; ++i)
         {
           local_boundaries.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(mesh));

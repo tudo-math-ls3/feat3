@@ -145,7 +145,7 @@ namespace FEAST
           int num_idx = idx.get_num_indices();
 
           // write cells
-          os << "CELLS " << num_cells << " " << ((num_idx+1)*num_cells) << std::endl;
+          os << "CELLS " << num_cells << " " << (Index(num_idx+1)*num_cells) << std::endl;
           for(Index i(0); i < num_cells; ++i)
           {
             os << num_idx;

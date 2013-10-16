@@ -68,16 +68,9 @@ namespace FEAST
           rule.get_weight(i) = B;
 
           // set point coords
-          for(int j(0); j < dim_; ++j)
+          for(Index j(0); j < Index(dim_); ++j)
           {
-            if(Index(j) == i)
-            {
-              rule.get_coord(i,j) = 1;
-            }
-            else
-            {
-              rule.get_coord(i,j) = 0;
-            }
+            rule.get_coord(i,j) = (i == j) ? Coord_(1) : Coord_(0);
           }
         }
 
@@ -93,16 +86,9 @@ namespace FEAST
             rule.get_weight(count) = C;
 
             // set point coords
-            for(int j(0); j < dim_; ++j)
+            for(Index j(0); j < Index(dim_); ++j)
             {
-              if(Index(j) == k || Index(j) == i)
-              {
-                rule.get_coord(count,j) = Coord_(1)/Coord_(2);
-              }
-              else
-              {
-                rule.get_coord(count,j) = 0;
-              }
+              rule.get_coord(count,j) = ((j == k) || (j == i)) ? Coord_(1)/Coord_(2) : Coord_(0);
             } // j-loop
           } // k-loop
         } // i-loop
@@ -184,16 +170,9 @@ namespace FEAST
           rule.get_weight(count) = B1;
 
           // set point coords
-          for(int j(0); j < dim; ++j)
+          for(Index j(0); j < Index(dim); ++j)
           {
-            if(Index(j) == i)
-            {
-              rule.get_coord(count,j) = 1;
-            }
-            else
-            {
-              rule.get_coord(count,j) = 0;
-            }
+            rule.get_coord(count,j) = (i == j) ? Coord_(1) : Coord_(0);
           }
           ++count;
         }
@@ -209,13 +188,13 @@ namespace FEAST
               rule.get_weight(count) = B2;
 
               // set point coords
-              for(int k(0); k < dim; ++k)
+              for(Index k(0); k < Index(dim); ++k)
               {
-                if(Index(k) == i)
+                if(k == i)
                 {
                   rule.get_coord(count,k) = Coord_(1)/Coord_(4);
                 }
-                else if (Index(k) == j)
+                else if (k == j)
                 {
                   rule.get_coord(count,k) = Coord_(3)/Coord_(4);
                 }
@@ -237,16 +216,9 @@ namespace FEAST
             rule.get_weight(count) = B3;
 
             // set point coords
-            for(int k(0); k < dim; ++k)
+            for(Index k(0); k < dim; ++k)
             {
-              if(Index(k) == j || Index(k) == i)
-              {
-                rule.get_coord(count,k) = Coord_(1)/Coord_(2);
-              }
-              else
-              {
-                rule.get_coord(count,k) = 0;
-              }
+              rule.get_coord(count,k) = ((k == j) || (k == i)) ? Coord_(1)/Coord_(2) : Coord_(0);
             } // k-loop
             ++count;
           } // j-loop
@@ -264,13 +236,13 @@ namespace FEAST
                 rule.get_weight(count) = B4;
 
                 // set point coords
-                for(int l(0); l < dim; ++l)
+                for(Index l(0); l < Index(dim); ++l)
                 {
-                  if(Index(l) == j || Index(l) == k)
+                  if(l == j || l == k)
                   {
                     rule.get_coord(count,l) = Coord_(1)/Coord_(4);
                   }
-                  else if(Index(l) == i)
+                  else if(l == i)
                   {
                     rule.get_coord(count,l) = Coord_(1)/Coord_(2);
                   }
@@ -297,9 +269,9 @@ namespace FEAST
                 rule.get_weight(count) = B5;
 
                 // set point coords
-                for(int m(0); m < dim; ++m)
+                for(Index m(0); m < Index(dim); ++m)
                 {
-                  if(Index(m) == i || Index(m) == j || Index(m) == k || Index(m) == l)
+                  if(m == i || m == j || m == k || m == l)
                   {
                     rule.get_coord(count,m) = Coord_(1)/Coord_(4);
                   }

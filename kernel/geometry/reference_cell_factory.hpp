@@ -49,7 +49,7 @@ namespace FEAST
     public:
       virtual Index get_num_entities(int dim)
       {
-        return Intern::DynamicNumFaces<Shape_>::value(dim);
+        return Index(Intern::DynamicNumFaces<Shape_>::value(dim));
       }
 
       virtual void fill_vertex_set(VertexSetType& vertex_set)
@@ -74,10 +74,10 @@ namespace FEAST
         {
           typedef typename VertexSet_::CoordType CoordType;
           // loop over all vertices
-          for(int i(0); i < dim_+1; ++i)
+          for(Index i(0); i < Index(dim_+1); ++i)
           {
             // loop over all coords
-            for(int j(0); j < dim_; ++j)
+            for(Index j(0); j < Index(dim_); ++j)
             {
               vtx[i][j] = CoordType(j+1 == i ? 1 : 0);
             }
@@ -93,10 +93,10 @@ namespace FEAST
         {
           typedef typename VertexSet_::CoordType CoordType;
           // loop over all vertices
-          for(int i(0); i < (1 << dim_); ++i)
+          for(Index i(0); i < Index(1 << dim_); ++i)
           {
             // loop over all coords
-            for(int j(0); j < dim_; ++j)
+            for(Index j(0); j < Index(dim_); ++j)
             {
               vtx[i][j] = CoordType((((i >> j) & 1) << 1) - 1);
             }

@@ -82,7 +82,7 @@ namespace FEAST
         rule.get_weight(0) = Weight_(1) / Weight_(MetaMath::Factorial<dim_>::value);
 
         // create coords of barycentre point
-        for(int i(0); i < dim_; ++i)
+        for(Index i(0); i < Index(dim_); ++i)
         {
           rule.get_coord(0, i) = Coord_(1) / Coord_(dim_ + 1);
         }
@@ -110,7 +110,7 @@ namespace FEAST
         rule.get_weight(0) = Weight_(1 << dim_);
 
         // create coords of barycentre point
-        for(int i(0); i < dim_; ++i)
+        for(Index i(0); i < Index(dim_); ++i)
         {
           rule.get_coord(0, i) = Coord_(0);
         }

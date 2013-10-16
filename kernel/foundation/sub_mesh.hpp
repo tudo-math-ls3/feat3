@@ -43,7 +43,7 @@ namespace Foundation
                                                                                                                 _proxy->get_element(i)
                                                                                                                 ));
 
-            Index rsize(subsets.at(l).size() + adjacent_polytopes.size());
+            Index rsize(Index(subsets.at(l).size() + adjacent_polytopes.size()));
             typename TopologyType_::storage_type_ result_union(rsize);
 
             std::sort(adjacent_polytopes.begin(), adjacent_polytopes.end());
@@ -91,7 +91,7 @@ namespace Foundation
               else
               {
                 ///v has not yet been mapped
-                this->add_adjacency(PolytopeLevels(l), pl_vertex, i, vertex_map.size());
+                this->add_adjacency(PolytopeLevels(l), pl_vertex, i, Index(vertex_map.size()));
                 vertex_map.push_back(*v);
               }
             }

@@ -54,6 +54,10 @@
 // C4127: conditional expression is constant
 #  pragma warning(disable: 4127)
 
+// C4180: qualifier applied to function type has no meaning; ignored
+// This warning arises when a non-pointer return type of a function is declared as 'const'.
+#  pragma warning(disable: 4180)
+
 // C4503: 'identifier': decorated name length exceeded, name was truncated
 // This warning arises from heavy template nesting, blowing the compiler's limit on maximal name lengths.
 // Running into this warning does not affect the correctness of the program, however, it might confuse

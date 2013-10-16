@@ -54,11 +54,11 @@ namespace FEAST
         static void build(IndexSet<num_indices>& idx)
         {
           typedef FaceIndexMapping<Shape_, cell_dim_, face_dim_> FimType;
-          for(int i(0); i < num_cells; ++i)
+          for(Index i(0); i < Index(num_cells); ++i)
           {
-            for(int j(0); j < num_indices; ++j)
+            for(Index j(0); j < Index(num_indices); ++j)
             {
-              idx(i, j) = FimType::map(i, j);
+              idx(i, j) = Index(FimType::map(int(i), int(j)));
             }
           }
         }
@@ -77,9 +77,9 @@ namespace FEAST
 
         static void build(IndexSet<num_indices>& idx)
         {
-          for(int j(0); j < num_indices; ++j)
+          for(Index j(0); j < Index(num_indices); ++j)
           {
-            idx(0, j) = Index(j);
+            idx(0, j) = j;
           }
         }
       };

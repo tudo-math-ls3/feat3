@@ -43,7 +43,7 @@ namespace FEAST
 
       virtual Index get_num_entities(int dim)
       {
-        return Intern::DynamicNumFaces<Shape_>::value(dim);
+        return Index(Intern::DynamicNumFaces<Shape_>::value(dim));
       }
 
       virtual void fill_vertex_set(VertexSetType& vertex_set)

@@ -516,7 +516,6 @@ namespace FEAST
             default:
               return 0;
           }
-          return 0;
         }
 
 
@@ -597,8 +596,6 @@ namespace FEAST
                 return ipa_none;
               }
           }
-
-          throw InternalError("Invalid polytope level combination");
         }
 
         InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to) const

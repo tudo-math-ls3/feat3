@@ -136,7 +136,7 @@ namespace FEAST
         template<typename EvalData_>
         void eval_ref_gradients(
           EvalData_& data,
-          const DomainPointType& point) const
+          const DomainPointType& DOXY(point)) const
         {
           data.phi[0].ref_grad[0] = -DataType(1);
           data.phi[0].ref_grad[1] = -DataType(1);
@@ -238,7 +238,7 @@ namespace FEAST
         template<typename EvalData_>
         void eval_ref_gradients(
           EvalData_& data,
-          const DomainPointType& point) const
+          const DomainPointType& DOXY(point)) const
         {
           data.phi[0].ref_grad[0] = DataType(-0.5);
           data.phi[1].ref_grad[0] = DataType( 0.5);

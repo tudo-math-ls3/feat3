@@ -34,12 +34,12 @@ namespace FEAST
           return *this;
         }
 
-        /*DDVIterator operator++(int)
+        DDVIterator operator++(int)
         {
           DDVIterator tmp(*this);
           operator++();
           return tmp;
-        }*/
+        }
 
         DDVIterator& operator--()
         {
@@ -47,12 +47,12 @@ namespace FEAST
           return *this;
         }
 
-        /*DDVIterator operator--(int)
+        DDVIterator operator--(int)
         {
           DDVIterator tmp(*this);
           operator--();
           return tmp;
-        }*/
+        }
 
         bool operator==(const DDVIterator& rhs)
         {
@@ -116,11 +116,10 @@ namespace FEAST
           return _iter[i];
         }
 
-        DDVIterator& operator->()
+        DT_* operator->()
         {
-          return this;
+          return _iter;
         }
-
 
         DT_& operator*()
         {
