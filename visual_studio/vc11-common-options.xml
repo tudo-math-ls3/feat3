@@ -36,6 +36,7 @@
       <AdditionalIncludeDirectories>$(FeastRootPath);$(FeastIncDirList)</AdditionalIncludeDirectories>
       <CompileAs>Default</CompileAs>
       <FloatingPointExceptions>true</FloatingPointExceptions>
+      <DisableLanguageExtensions>true</DisableLanguageExtensions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
