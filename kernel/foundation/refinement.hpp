@@ -1,7 +1,6 @@
 #pragma once
 #ifndef FOUNDATION_GUARD_REFINEMENT_HPP
 #define FOUNDATION_GUARD_REFINEMENT_HPP 1
-
 #include<kernel/foundation/attribute.hpp>
 #include<kernel/foundation/mesh.hpp>
 #include<kernel/foundation/halo.hpp>
@@ -294,6 +293,7 @@ namespace FEAST
 
         //refine all edges first (sets all face/vertex adjacencies correctly)
         const Index num_edges(origin.get_topologies().at(ipi_edge_vertex).size());
+        std::cout << "A" << std::endl;
         for(Index i(0) ; i < num_edges; ++i)
         {
           PolytopeRefinement<Tag_,
@@ -309,148 +309,123 @@ namespace FEAST
                                            );
         }
 
-        //for all faces, finalize the refinement
-        typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ vertices_added;
-        const Index num_faces(origin.get_topologies().at(ipi_face_vertex).size());
+        typename t_::storage_type_ vertex_at_polygon;
+
+        const Index num_faces(origin.num_polytopes(pl_face));
         for(Index i(0) ; i < num_faces; ++i)
         {
-          //get all adjacent vertices
-          typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ vertex_at_face(origin.get_adjacent_polytopes(pl_face, pl_vertex, i));
-          typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ vertexold_at_face(coarse.get_adjacent_polytopes(pl_face, pl_vertex, i));
-          //sort
-          std::sort(vertexold_at_face.begin(), vertexold_at_face.end());
+          ///vertex set T*f_i <- EMPTYSET
+          t_ new_v_at_fo_i;
 
-          //polygonal sorting
-          typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ vertex_at_polygon;
-          vertex_at_polygon.push_back(vertexold_at_face.at(0));
-          typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ edgeold_at_face(coarse.get_adjacent_polytopes(pl_face, pl_edge, i));
+          /// operator V_f->v
+          typename t_::storage_type_ v_fc(coarse.get_adjacent_polytopes(pl_face, pl_vertex, i));
+          vertex_at_polygon = v_fc;
+          std::sort(vertex_at_polygon.begin(), vertex_at_polygon.end());
 
-          while(vertex_at_polygon.size() < 4) //QUAD
+          /// operator E_v->e
+          for(Index j(0) ; j < v_fc.size(); ++j)
           {
-            Index current(vertex_at_polygon.at(vertex_at_polygon.size() - 1));
-            for(Index j(0) ; j < edgeold_at_face.size() ; ++j)
+            typename t_::storage_type_ e_fo_tmp(origin.get_adjacent_polytopes(pl_vertex, pl_edge, v_fc.at(j)));
+
+            /// operator V_e->v
+            for(Index k(0) ; k < e_fo_tmp.size(); ++k)
             {
-              typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ vertex_at_edge_current(coarse.get_adjacent_polytopes(pl_edge, pl_vertex, edgeold_at_face.at(j)));
-              //outgoing edge?
-              if(std::find(vertex_at_edge_current.begin(), vertex_at_edge_current.end(), current) != vertex_at_edge_current.end())
-              {
-                //target selection
-                Index next(Index(vertex_at_edge_current.at(Index(vertex_at_edge_current.begin() + 1 - std::find(vertex_at_edge_current.begin(), vertex_at_edge_current.end(), current)))));
-                //not yet added?
-                if(std::find(vertex_at_polygon.begin(), vertex_at_polygon.end(), next) == vertex_at_polygon.end())
-                {
-                  vertex_at_polygon.push_back(next);
-                  break;
-                }
-              }
+              typename t_::storage_type_ v_fo_tmp(origin.get_adjacent_polytopes(pl_edge, pl_vertex, e_fo_tmp.at(k)));
+
+              new_v_at_fo_i.push_back(v_fo_tmp);
             }
           }
 
-          //for all old vertices: use them as starting point for creation of new faces
-          for(Index j(0) ; j < 4 ; ++j) //QUAD!
+          /// add new vertex
+          origin.add_polytope(pl_vertex);
+
+          /// operator [T*f_i] /intersect [T*f_i])
+          typename t_::storage_type_ t_union;
+          for(Index l(0) ; l < new_v_at_fo_i.size() ; ++l)
           {
-            //get all vertex neighbours
-            typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ vertex_neighbours(origin.get_adjacent_polytopes(pl_vertex, pl_vertex, vertexold_at_face.at(j)));
-            std::sort(vertex_neighbours.begin(), vertex_neighbours.end());
+            t_ t_i_inters;
 
-            typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_ result(100);
-            typename MeshType_<Dim2D, t_, os_>::topology_type_::storage_type_::iterator it;
-            it = std::set_intersection(vertex_at_face.begin(), vertex_at_face.end(), vertex_neighbours.begin(), vertex_neighbours.end(), result.begin());
-            result.resize(Index(it - result.begin()));
-
-            if(std::find(result.begin(), result.end(), vertexold_at_face.at(j)) != result.end())
-              result.erase(std::find(result.begin(), result.end(), vertexold_at_face.at(j))); //remove self
-
-            //use old face number for first new face
-            if(j == 0)
+            for(Index j(0) ; j < new_v_at_fo_i.size() ; ++j)
             {
-              //remove all occurances of i in the vertex-face lists of all adjacent vertices
-              for(Index k(0) ; k < vertex_at_face.size() ; ++k)
+              ///T_i
+              typename t_::storage_type_ t_i(new_v_at_fo_i.at(l));
+              std::sort(t_i.begin(), t_i.end());
+              ///T_j
+              typename t_::storage_type_ t_j(new_v_at_fo_i.at(j));
+              std::sort(t_j.begin(), t_j.end());
+              ///T_ij
+              typename t_::storage_type_ t_ij(std::max(t_i.size(), t_j.size()));
+              typename t_::storage_type_::iterator it(std::set_intersection(t_i.begin(), t_i.end(), t_j.begin(), t_j.end(), t_ij.begin()));
+              t_ij.resize(it - t_ij.begin());
+
+              t_i_inters.push_back(t_ij);
+
+              typename t_::storage_type_ polygon_tmp(vertex_at_polygon.size() + t_ij.size());
+              typename t_::storage_type_::iterator itu(std::set_union(vertex_at_polygon.begin(), vertex_at_polygon.end(), t_ij.begin(), t_ij.end(), polygon_tmp.begin()));
+              polygon_tmp.resize(itu - polygon_tmp.begin());
+              vertex_at_polygon = polygon_tmp;
+            }
+
+            for(Index j(0) ; j < t_i_inters.size() ; ++j)
+            {
+              /// add new edge
+              //(., v_i)
+              for(Index k(0) ; k < t_i_inters.at(j).size() ; ++k)
               {
-                //std::cout << "SIZE " << origin.get_topologies().at(ipi_vertex_face).at(k).size() << std::endl;
-                //std::cout << "INDEX " << std::find(origin.get_topologies().at(ipi_vertex_face).at(k).begin(), origin.get_topologies().at(ipi_vertex_face).at(k).end(), i) - origin.get_topologies().at(ipi_vertex_face).at(k).begin()<< std::endl;
-                typename t_::storage_type_::iterator posi(std::find(origin.get_topologies().at(ipi_vertex_face).at(k).begin(), origin.get_topologies().at(ipi_vertex_face).at(k).end(), i));
-                if(posi != origin.get_topologies().at(ipi_vertex_face).at(k).end())
-                  origin.get_topologies().at(ipi_vertex_face).at(k).erase(posi);
-                //std::cout << "done" << std::endl;
+                if(t_i_inters.at(j).at(k) != v_fc.at(l))
+                {
+                  origin.add_polytope(pl_edge);
+                  origin.add_adjacency(pl_edge, pl_vertex, origin.num_polytopes(pl_edge) - 1, t_i_inters.at(j).at(k));
+                  origin.add_adjacency(pl_edge, pl_vertex, origin.num_polytopes(pl_edge) - 1, origin.num_polytopes(pl_vertex) - 1);
+                }
               }
+            }
 
-              //clear the face's vertex list
-              origin.get_topologies().at(ipi_face_vertex).at(i).clear();
-
-              //create new vertex and add all vertices
-              origin.add_polytope(pl_vertex); //create
-              origin.add_adjacency(pl_face, pl_vertex, i, origin.get_topologies().at(ipi_vertex_face).size() - 1); //new one
-              origin.add_adjacency(pl_face, pl_vertex, i, vertexold_at_face.at(j)); //starting vertex
-              for(Index k(0) ; k < result.size() ; ++k) //result vertices
-                origin.add_adjacency(pl_face, pl_vertex, i, result.at(k));
-
-              //create and connect new edges
-              for(Index k(0) ; k < result.size() ; ++k)
-              {
-                origin.add_polytope(pl_edge);
-                origin.add_adjacency(pl_edge, pl_vertex, origin.get_topologies().at(ipi_edge_vertex).size() - 1, result.at(k));
-                vertices_added.push_back(result.at(k));
-                origin.add_adjacency(pl_edge, pl_vertex, origin.get_topologies().at(ipi_edge_vertex).size() - 1, origin.get_topologies().at(ipi_vertex_face).size() - 1);
-              }
+            ///add faces
+            if(l == 0)
+            {
+              ///TODO
             }
             else
             {
-              //create new face
-              origin.add_polytope(pl_face);
-
-              //add adjacencies
-              origin.add_adjacency(pl_face, pl_vertex, origin.get_topologies().at(ipi_face_vertex).size() - 1, origin.get_topologies().at(ipi_vertex_face).size() - 1); //new one
-              origin.add_adjacency(pl_face, pl_vertex, origin.get_topologies().at(ipi_face_vertex).size() - 1, vertexold_at_face.at(j)); //starting vertex
-              for(Index k(0) ; k < result.size() ; ++k) //result vertices
-                origin.add_adjacency(pl_face, pl_vertex, origin.get_topologies().at(ipi_face_vertex).size() - 1, result.at(k));
-
-              //create and connect new edges
-              for(Index k(0) ; k < result.size() ; ++k)
-              {
-                if(std::find(vertices_added.begin(), vertices_added.end(), result.at(k)) == vertices_added.end())
-                {
-                  origin.add_polytope(pl_edge);
-                  origin.add_adjacency(pl_edge, pl_vertex, origin.get_topologies().at(ipi_edge_vertex).size() - 1, result.at(k));
-                  vertices_added.push_back(result.at(k));
-                  origin.add_adjacency(pl_edge, pl_vertex, origin.get_topologies().at(ipi_edge_vertex).size() - 1, origin.get_topologies().at(ipi_vertex_face).size() - 1);
-                }
-              }
+              ///TODO
             }
           }
 
-          //finally: for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
-          if(hrt_ == hrt_refine)
+        std::cout << "B4" << std::endl;
+        //finally: for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
+        if(hrt_ == hrt_refine)
+        {
+          //refine halo faces
+          if(halos != nullptr)
           {
-            //refine halo faces
-            if(halos != nullptr)
+            for(Index hi(0) ; hi < halos->size() ; ++hi)
             {
-              for(Index hi(0) ; hi < halos->size() ; ++hi)
+              //only do this for face halos with delta > 0
+              if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
               {
-                //only do this for face halos with delta > 0
-                if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                typename HaloBase<MeshType_<Dim2D, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
+                if(iter != halos->at(hi)->get_elements().end())
                 {
-                  typename HaloBase<MeshType_<Dim2D, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
-                  if(iter != halos->at(hi)->get_elements().end())
+                  if(iter + 1 == halos->at(hi)->get_elements().end())
                   {
-                    if(iter + 1 == halos->at(hi)->get_elements().end())
-                    {
-                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 3); ///TODO QUAD
-                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 2); ///TODO QUAD
-                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1); ///TODO QUAD
-                    }
-                    else
-                    {
-                      halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 3); //insertion after ///TODO QUAD
-                      halos->at(hi)->get_elements().insert(iter + 2, origin.get_topologies().at(ipi_face_vertex).size() - 2); //insertion after ///TODO QUAD
-                      halos->at(hi)->get_elements().insert(iter + 3, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
-                    }
+                    halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 3); ///TODO QUAD
+                    halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 2); ///TODO QUAD
+                    halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1); ///TODO QUAD
+                  }
+                  else
+                  {
+                    halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 3); //insertion after ///TODO QUAD
+                    halos->at(hi)->get_elements().insert(iter + 2, origin.get_topologies().at(ipi_face_vertex).size() - 2); //insertion after ///TODO QUAD
+                    halos->at(hi)->get_elements().insert(iter + 3, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
                   }
                 }
               }
             }
           }
+        }
 
+          std::cout << "B5" << std::endl;
           //determine new vertex coordinates for mid-point
           //area
           DataType_ area(0), c_x(0), c_y(0);
