@@ -48,7 +48,7 @@ QuadMesh* read_quad_mesh(const char* filename)
   QuadMesh* mesh = new QuadMesh(num_entities);
 
   // read vertex coords
-  for(int i(0); i < ne[0]; ++i)
+  for(Index i(0); i < Index(ne[0]); ++i)
   {
     status = fread(vtx, 16, 1, file);
     if (status != 1)
@@ -58,7 +58,7 @@ QuadMesh* read_quad_mesh(const char* filename)
   }
 
   // read vertex-at-edge
-  for(int i(0); i < ne[1]; ++i)
+  for(Index i(0); i < Index(ne[1]); ++i)
   {
     status = fread(idx, 8, 1, file);
     if (status != 1)
@@ -68,7 +68,7 @@ QuadMesh* read_quad_mesh(const char* filename)
   }
 
   // read vertex-at-quad
-  for(int i(0); i < ne[2]; ++i)
+  for(Index i(0); i < Index(ne[2]); ++i)
   {
     status = fread(idx, 16, 1, file);
     if (status != 1)
@@ -80,7 +80,7 @@ QuadMesh* read_quad_mesh(const char* filename)
   }
 
   // read edge-at-quad
-  for(int i(0); i < ne[2]; ++i)
+  for(Index i(0); i < Index(ne[2]); ++i)
   {
     status = fread(idx, 16, 1, file);
     if (status != 1)

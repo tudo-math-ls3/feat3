@@ -102,7 +102,7 @@ void test_dynamic(const String& name)
   for(Index i(0); i < rule.get_num_points(); ++i)
   {
     printf("%3i: %15.12f", int(i), rule.get_weight(i));
-    for(int j(0); j < Shape_::dimension; ++j)
+    for(Index j(0); j < Index(Shape_::dimension); ++j)
       printf(" %15.12f", rule.get_coord(i,j));
     printf("\n");
   }

@@ -74,12 +74,12 @@ namespace FEAST
         {
           typedef typename VertexSet_::CoordType CoordType;
           // loop over all vertices
-          for(Index i(0); i < Index(dim_+1); ++i)
+          for(int i(0); i < (dim_+1); ++i)
           {
             // loop over all coords
-            for(Index j(0); j < Index(dim_); ++j)
+            for(int j(0); j < dim_; ++j)
             {
-              vtx[i][j] = CoordType(j+1 == i ? 1 : 0);
+              vtx[Index(i)][Index(j)] = CoordType(j+1 == i ? 1 : 0);
             }
           }
         }
@@ -93,12 +93,12 @@ namespace FEAST
         {
           typedef typename VertexSet_::CoordType CoordType;
           // loop over all vertices
-          for(Index i(0); i < Index(1 << dim_); ++i)
+          for(int i(0); i < (1 << dim_); ++i)
           {
             // loop over all coords
-            for(Index j(0); j < Index(dim_); ++j)
+            for(int j(0); j < dim_; ++j)
             {
-              vtx[i][j] = CoordType((((i >> j) & 1) << 1) - 1);
+              vtx[Index(i)][Index(j)] = CoordType((((i >> j) & 1) << 1) - 1);
             }
           }
         }

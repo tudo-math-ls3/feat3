@@ -144,7 +144,7 @@ namespace FEAST
       /// \brief value-assignment constructor
       explicit Vector(T_ value)
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] = value;
         }
@@ -154,7 +154,7 @@ namespace FEAST
       template<int sx_>
       Vector(const Vector<T_, n_, sx_>& x)
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] = x.v[i];
         }
@@ -163,7 +163,7 @@ namespace FEAST
       /// value-assignment operator
       Vector& operator=(T_ value)
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] = value;
         }
@@ -174,7 +174,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator=(const Vector<T_, n_, sx_>& x)
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] = x.v[i];
         }
@@ -245,7 +245,7 @@ namespace FEAST
       /// scalar-multiply operator
       Vector& operator*=(T_ alpha)
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] *= alpha;
         }
@@ -256,7 +256,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator+=(const Vector<T_, n_, sx_>& x)
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] += x.v[i];
         }
@@ -267,7 +267,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator-=(const Vector<T_, n_, sx_>& x)
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] -= x.v[i];
         }
@@ -282,7 +282,7 @@ namespace FEAST
        */
       void clear(T_ alpha = T_(0))
       {
-        for(int i(0); i < n_; ++i)
+        for(Index i(0); i < Index(n)_; ++i)
         {
           v[i] = alpha;
         }
@@ -302,10 +302,10 @@ namespace FEAST
       template<int m_, int sma_, int sna_, int sx_>
       Vector& set_mat_vec_mult(const Matrix<T_, n_, m_, sma_, sna_>& a, const Vector<T_, m_, sx_>& x)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
           v[i] = T_(0);
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i] += a.v[i][j] * x.v[j];
           }
@@ -327,10 +327,10 @@ namespace FEAST
       template<int m_, int sma_, int sna_, int sx_>
       Vector& set_vec_mat_mult(const Vector<T_, m_, sx_>& x, const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(int j(0); j < n_; ++j)
+        for(Index j(0); j < Index(n_); ++j)
         {
           v[j] = T_(0);
-          for(int i(0); i < m_; ++i)
+          for(Index i(0); i < Index(m_); ++i)
           {
             v[j] += a.v[i][j] * x.v[i];
           }
@@ -351,7 +351,7 @@ namespace FEAST
     inline T_ dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       T_ r(0);
-      for(int i(0); i < n_; ++i)
+      for(Index i(0); i < Index(n)_; ++i)
       {
         r += a.v[i] * b.v[i];
       }
@@ -443,9 +443,9 @@ namespace FEAST
       /// value-assignment constructor
       explicit Matrix(T_ value)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j]= value;
           }
@@ -456,9 +456,9 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j] = a.v[i][j];
           }
@@ -468,9 +468,9 @@ namespace FEAST
       /// value-assignment operator
       Matrix& operator=(T_ value)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j]= value;
           }
@@ -482,9 +482,9 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& operator=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j] = a.v[i][j];
           }
@@ -569,9 +569,9 @@ namespace FEAST
       /// scalar-right-multiply-by operator
       Matrix& operator*=(T_ alpha)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j] *= alpha;
           }
@@ -583,9 +583,9 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& operator+=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j] += a.v[i][j];
           }
@@ -597,9 +597,9 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& operator-=(const Matrix<T_, m_, n_, sma_, sna_>& a)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j] -= a.v[i][j];
           }
@@ -615,9 +615,9 @@ namespace FEAST
        */
       void clear(T_ alpha = T_(0))
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j] = alpha;
           }
@@ -638,10 +638,10 @@ namespace FEAST
       T_ hessian_sqr_norm() const
       {
         T_ r(0);
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
           r += Math::sqr(v[i][i]);
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             r += Math::sqr(v[i][j]);
           }
@@ -711,9 +711,9 @@ namespace FEAST
       template<int sma_, int sna_>
       Matrix& set_transpose(const Matrix<T_, n_, m_, sma_, sna_>& a)
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             v[i][j] = a.v[j][i];
           }
@@ -741,12 +741,12 @@ namespace FEAST
         const Matrix<T_, l_, n_, smb_, snb_>& b,
         T_ alpha = T_(1))
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             T_ r(0);
-            for(int k(0); k < l_; ++k)
+            for(Index k(0); k < Index(l_); ++k)
             {
               r += a.v[i][k] * b.v[k][j];
             }
@@ -803,15 +803,15 @@ namespace FEAST
         const Matrix<T_, l_, n_, smd_, snd_>& d,
         T_ alpha = T_(1))
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             T_ r(0);
-            for(int p(0); p < k_; ++p)
+            for(Index p(0); p < Index(k_); ++p)
             {
               T_ t(0);
-              for(int q(0); q < l_; ++q)
+              for(Index q(0); q < Index(l_); ++q)
               {
                 t += a(p,q) * d(q,j);
               }
@@ -860,12 +860,12 @@ namespace FEAST
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
         T_ alpha = T_(1))
       {
-        for(int i(0); i < m_; ++i)
+        for(Index i(0); i < Index(m_); ++i)
         {
-          for(int j(0); j < n_; ++j)
+          for(Index j(0); j < Index(n_); ++j)
           {
             T_ r(0);
-            for(int k(0); k < l_; ++k)
+            for(Index k(0); k < Index(l_); ++k)
             {
               r += v(k) * t(k,i,j);
             }
@@ -970,7 +970,7 @@ namespace FEAST
       /// value-assignment constructor
       explicit Tensor3(T_ value)
       {
-        for(int i(0); i < l_; ++i)
+        for(Index i(0); i < Index(l_); ++i)
           v[i] = value;
       }
 
@@ -978,14 +978,14 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(int i(0); i < l_; ++i)
+        for(Index i(0); i < Index(l_); ++i)
           v[i] = a.v[i];
       }
 
       /// value-assignment operator
       Tensor3& operator=(T_ value)
       {
-        for(int i(0); i < l_; ++i)
+        for(Index i(0); i < Index(l_); ++i)
           v[i] = value;
         return *this;
       }
@@ -994,7 +994,7 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3& operator=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(int i(0); i < l_; ++i)
+        for(Index i(0); i < Index(l_); ++i)
           v[i] = a.v[i];
         return *this;
       }
@@ -1081,7 +1081,7 @@ namespace FEAST
       /// scalar right-multiply-by operator
       Tensor3& operator*=(T_ alpha)
       {
-        for(int i(0); i < l_; ++i)
+        for(Index i(0); i < Index(l_); ++i)
           v[i] *= alpha;
         return *this;
       }
@@ -1090,7 +1090,7 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3& operator+=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(int i(0); i < l_; ++i)
+        for(Index i(0); i < Index(l_); ++i)
           v[i] += a.v[i];
         return *this;
       }
@@ -1099,7 +1099,7 @@ namespace FEAST
       template<int sla_, int sma_, int sna_>
       Tensor3& operator-=(const Tensor3<T_, l_, m_, n_, sla_, sma_, sna_>& a)
       {
-        for(int i(0); i < l_; ++i)
+        for(Index i(0); i < Index(l_); ++i)
           v[i] -= a.v[i];
         return *this;
       }
@@ -1136,14 +1136,14 @@ namespace FEAST
         const Tensor3<T_, k_, m_, n_, slt_, smt_, snt_>& t,
         T_ alpha = T_(1))
       {
-        for(int h(0); h < l_; ++h)
+        for(Index h(0); h < Index(l_); ++h)
         {
-          for(int i(0); i < m_; ++i)
+          for(Index i(0); i < Index(m_); ++i)
           {
-            for(int j(0); j < n_; ++j)
+            for(Index j(0); j < Index(n_); ++j)
             {
               T_ r(0);
-              for(int p(0); p < k_; ++p)
+              for(Index p(0); p < Index(k_); ++p)
               {
                 r += a(h,p) * t(p,i,j);
               }
@@ -1188,16 +1188,16 @@ namespace FEAST
         const Matrix<T_, mt_, m_, smd_, snd_>& d,
         T_ alpha = T_(1))
       {
-        for(int h(0); h < l_; ++h)
+        for(Index h(0); h < Index(l_); ++h)
         {
-          for(int i(0); i < m_; ++i)
+          for(Index i(0); i < Index(m_); ++i)
           {
-            for(int j(0); j < n_; ++j)
+            for(Index j(0); j < Index(n_); ++j)
             {
               T_ r(0);
-              for(int p(0); p < mt_; ++p)
+              for(Index p(0); p < Index(mt_); ++p)
               {
-                for(int q(0); q < nt_; ++q)
+                for(Index q(0); q < Index(nt_); ++q)
                 {
                   r += t(h,p,q) * b(p,i) * d(q,j);
                 }

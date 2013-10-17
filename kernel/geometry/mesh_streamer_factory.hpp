@@ -84,10 +84,10 @@ namespace FEAST
           // get a reference to the corresponding vertex
           MeshStreamer::MeshDataContainer::CoordVec& vtx(_mesh_data->coords[i]);
 
-          ASSERT(int(vtx.size()) == num_coords_, "Vertex coordinate count mismatch!");
+          ASSERT(Index(vtx.size()) == Index(num_coords_), "Vertex coordinate count mismatch!");
 
           // copy vertex coordinates
-          for(int j(0); j < num_coords_; ++j)
+          for(Index j(0); j < Omdex(num_coords_); ++j)
           {
             vertex_set[i][j] = Coord_(vtx[j]);
           }
@@ -313,10 +313,10 @@ namespace FEAST
           for(Index i(0); i < num_cells; ++i)
           {
             std::vector<Index>& ic(adj[i]);
-            ASSERT(int(ic.size()) == num_indices, "Index tuple size mismatch");
+            ASSERT(Index(ic.size()) == Index(num_indices), "Index tuple size mismatch");
 
             // copy indices
-            for(int j(0); j < num_indices; ++j)
+            for(Index j(0); j < Index(num_indices); ++j)
             {
               idx(i,j) = ic[j];
             }
