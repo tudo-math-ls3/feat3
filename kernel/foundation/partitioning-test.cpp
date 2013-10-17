@@ -226,15 +226,15 @@ class PartitioningTest2D:
 
       auto sm_face_0_adj_vert(p0.submesh->get_adjacent_polytopes(pl_face, pl_vertex, 0));
       TEST_CHECK_EQUAL(sm_face_0_adj_vert.size(), 4ul);
-      TEST_CHECK_EQUAL(sm_face_0_adj_vert.at(0), 5ul);
-      TEST_CHECK_EQUAL(sm_face_0_adj_vert.at(1), 0ul);
+      TEST_CHECK_EQUAL(sm_face_0_adj_vert.at(0), 0ul);
+      TEST_CHECK_EQUAL(sm_face_0_adj_vert.at(1), 5ul);
       TEST_CHECK_EQUAL(sm_face_0_adj_vert.at(2), 1ul);
       TEST_CHECK_EQUAL(sm_face_0_adj_vert.at(3), 2ul);
 
       auto sm_face_1_adj_vert(p0.submesh->get_adjacent_polytopes(pl_face, pl_vertex, 1));
       TEST_CHECK_EQUAL(sm_face_1_adj_vert.size(), 4ul);
-      TEST_CHECK_EQUAL(sm_face_1_adj_vert.at(0), 5ul);
-      TEST_CHECK_EQUAL(sm_face_1_adj_vert.at(1), 3ul);
+      TEST_CHECK_EQUAL(sm_face_1_adj_vert.at(0), 3ul);
+      TEST_CHECK_EQUAL(sm_face_1_adj_vert.at(1), 5ul);
       TEST_CHECK_EQUAL(sm_face_1_adj_vert.at(2), 1ul);
       TEST_CHECK_EQUAL(sm_face_1_adj_vert.at(3), 4ul);
 
@@ -290,7 +290,7 @@ class PartitioningTest2D:
       TEST_CHECK_EQUAL(p0.comm_halos.at(0)->get_level(), pl_edge);
       TEST_CHECK_EQUAL(p0.comm_halos.at(0)->get_other(), 1ul);
       TEST_CHECK_EQUAL(p0.comm_halos.at(0)->size(), 1ul);
-      TEST_CHECK_EQUAL(p0.comm_halos.at(0)->get_element(0), 5ul);
+      TEST_CHECK_EQUAL(p0.comm_halos.at(0)->get_element(0), 6ul);
 
       TEST_CHECK_EQUAL(p0.comm_halos.at(1)->get_overlap(), 0ul);
       TEST_CHECK_EQUAL(p0.comm_halos.at(1)->get_level(), pl_vertex);
@@ -302,7 +302,7 @@ class PartitioningTest2D:
       TEST_CHECK_EQUAL(p0.comm_halos.at(2)->get_level(), pl_edge);
       TEST_CHECK_EQUAL(p0.comm_halos.at(2)->get_other(), 2ul);
       TEST_CHECK_EQUAL(p0.comm_halos.at(2)->size(), 1ul);
-      TEST_CHECK_EQUAL(p0.comm_halos.at(2)->get_element(0), 6ul);
+      TEST_CHECK_EQUAL(p0.comm_halos.at(2)->get_element(0), 5ul);
 
       TEST_CHECK_EQUAL(p0.comm_halos.at(3)->get_overlap(), 0ul);
       TEST_CHECK_EQUAL(p0.comm_halos.at(3)->get_level(), pl_vertex);

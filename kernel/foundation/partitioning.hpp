@@ -111,23 +111,18 @@ namespace FEAST
         {
 
           Index num_refs(_OnPartitioning<Dim_, mrt_>::num_refinements_needed(mesh.get_topologies().at(mesh.get_topologies().size() - 1).size(), num_procs));
-          std::cout << "num refs " << num_refs << std::endl;
 
           ///TODO opt:
           os_<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> > > > boundaries_copy;
           for(Index i(0) ; i < boundaries.size() ; ++i)
             boundaries_copy.push_back(std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, os_>(boundaries.at(i))));
 
-          std::cout << "about to refine" << std::endl;
           for(Index i(0) ; i < num_refs ; ++i)
           {
-            std::cout << "ref #" << i << std::endl;
             Refinement<Tag_, Arch_, mrt_, hrt_refine>::execute(mesh,
                                                                &boundaries_copy,
                                                                origin_coords);
           }
-
-          std::cout << "done refining" << std::endl;
 
           boundaries.clear();
           for(Index i(0) ; i < boundaries_copy.size() ; ++i)

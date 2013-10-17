@@ -229,15 +229,15 @@ class RefinementTest2D:
       TEST_CHECK(std::find(result_vertices_at_edge_8.begin(), result_vertices_at_edge_8.end(), 8) != result_vertices_at_edge_8.end());
       IT_ result_vertices_at_edge_9(m_fine.get_adjacent_polytopes(pl_edge, pl_vertex, 9));
       TEST_CHECK_EQUAL(result_vertices_at_edge_9.size(), 2ul);
-      TEST_CHECK(std::find(result_vertices_at_edge_9.begin(), result_vertices_at_edge_9.end(), 6) != result_vertices_at_edge_9.end());
+      TEST_CHECK(std::find(result_vertices_at_edge_9.begin(), result_vertices_at_edge_9.end(), 5) != result_vertices_at_edge_9.end());
       TEST_CHECK(std::find(result_vertices_at_edge_9.begin(), result_vertices_at_edge_9.end(), 8) != result_vertices_at_edge_9.end());
       IT_ result_vertices_at_edge_10(m_fine.get_adjacent_polytopes(pl_edge, pl_vertex, 10));
       TEST_CHECK_EQUAL(result_vertices_at_edge_10.size(), 2ul);
-      TEST_CHECK(std::find(result_vertices_at_edge_10.begin(), result_vertices_at_edge_10.end(), 7) != result_vertices_at_edge_10.end());
+      TEST_CHECK(std::find(result_vertices_at_edge_10.begin(), result_vertices_at_edge_10.end(), 6) != result_vertices_at_edge_10.end());
       TEST_CHECK(std::find(result_vertices_at_edge_10.begin(), result_vertices_at_edge_10.end(), 8) != result_vertices_at_edge_10.end());
       IT_ result_vertices_at_edge_11(m_fine.get_adjacent_polytopes(pl_edge, pl_vertex, 11));
       TEST_CHECK_EQUAL(result_vertices_at_edge_11.size(), 2ul);
-      TEST_CHECK(std::find(result_vertices_at_edge_11.begin(), result_vertices_at_edge_11.end(), 5) != result_vertices_at_edge_11.end());
+      TEST_CHECK(std::find(result_vertices_at_edge_11.begin(), result_vertices_at_edge_11.end(), 7) != result_vertices_at_edge_11.end());
       TEST_CHECK(std::find(result_vertices_at_edge_11.begin(), result_vertices_at_edge_11.end(), 8) != result_vertices_at_edge_11.end());
 
       TEST_CHECK_EQUAL(halos.at(0)->get_elements().size(), IndexType_(4));

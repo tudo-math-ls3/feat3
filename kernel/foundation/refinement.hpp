@@ -293,7 +293,6 @@ namespace FEAST
 
         //refine all edges first (sets all face/vertex adjacencies correctly)
         const Index num_edges(origin.get_topologies().at(ipi_edge_vertex).size());
-        std::cout << "A" << std::endl;
         for(Index i(0) ; i < num_edges; ++i)
         {
           PolytopeRefinement<Tag_,
@@ -310,12 +309,13 @@ namespace FEAST
         }
 
         typename t_::storage_type_ vertex_at_polygon;
+        typename t_::storage_type_ vf_0; //new vertices for new face with old index i ; need to find them in adj-list updates later
 
         const Index num_faces(origin.num_polytopes(pl_face));
         for(Index i(0) ; i < num_faces; ++i)
         {
           ///vertex set T*f_i <- EMPTYSET
-          t_ new_v_at_fo_i;
+          t_ t_fi;
 
           /// operator V_f->v
           typename t_::storage_type_ v_fc(coarse.get_adjacent_polytopes(pl_face, pl_vertex, i));
@@ -328,105 +328,179 @@ namespace FEAST
             typename t_::storage_type_ e_fo_tmp(origin.get_adjacent_polytopes(pl_vertex, pl_edge, v_fc.at(j)));
 
             /// operator V_e->v
+            typename t_::storage_type_ v_e_v;
             for(Index k(0) ; k < e_fo_tmp.size(); ++k)
             {
               typename t_::storage_type_ v_fo_tmp(origin.get_adjacent_polytopes(pl_edge, pl_vertex, e_fo_tmp.at(k)));
-
-              new_v_at_fo_i.push_back(v_fo_tmp);
+              std::sort(v_fo_tmp.begin(), v_fo_tmp.end());
+              typename t_::storage_type_ res(v_e_v.size() + v_fo_tmp.size());
+              typename t_::storage_type_::iterator it(std::set_union(v_e_v.begin(), v_e_v.end(), v_fo_tmp.begin(), v_fo_tmp.end(), res.begin()));
+              res.resize(it - res.begin());
+              v_e_v = res;
             }
+            t_fi.push_back(v_e_v);
           }
 
-          /// add new vertex
+          /// add new vertex v_i
           origin.add_polytope(pl_vertex);
 
-          /// operator [T*f_i] /intersect [T*f_i])
+          /// operator {[T*f_i] /intersect [T*f_j]} (aka only new vertices for a new face)
           typename t_::storage_type_ t_union;
-          for(Index l(0) ; l < new_v_at_fo_i.size() ; ++l)
+          for(Index l(0) ; l < t_fi.size() ; ++l)
           {
-            t_ t_i_inters;
+            ///[T*f_l] /intersect [T*f_j]
+            t_ t_fi_l_intersect_t_fi_j;
 
-            for(Index j(0) ; j < new_v_at_fo_i.size() ; ++j)
+            for(Index j(0) ; j < t_fi.size() ; ++j)
             {
-              ///T_i
-              typename t_::storage_type_ t_i(new_v_at_fo_i.at(l));
-              std::sort(t_i.begin(), t_i.end());
-              ///T_j
-              typename t_::storage_type_ t_j(new_v_at_fo_i.at(j));
-              std::sort(t_j.begin(), t_j.end());
-              ///T_ij
-              typename t_::storage_type_ t_ij(std::max(t_i.size(), t_j.size()));
-              typename t_::storage_type_::iterator it(std::set_intersection(t_i.begin(), t_i.end(), t_j.begin(), t_j.end(), t_ij.begin()));
-              t_ij.resize(it - t_ij.begin());
-
-              t_i_inters.push_back(t_ij);
-
-              typename t_::storage_type_ polygon_tmp(vertex_at_polygon.size() + t_ij.size());
-              typename t_::storage_type_::iterator itu(std::set_union(vertex_at_polygon.begin(), vertex_at_polygon.end(), t_ij.begin(), t_ij.end(), polygon_tmp.begin()));
-              polygon_tmp.resize(itu - polygon_tmp.begin());
-              vertex_at_polygon = polygon_tmp;
-            }
-
-            for(Index j(0) ; j < t_i_inters.size() ; ++j)
-            {
-              /// add new edge
-              //(., v_i)
-              for(Index k(0) ; k < t_i_inters.at(j).size() ; ++k)
+              if(l != j)
               {
-                if(t_i_inters.at(j).at(k) != v_fc.at(l))
-                {
-                  origin.add_polytope(pl_edge);
-                  origin.add_adjacency(pl_edge, pl_vertex, origin.num_polytopes(pl_edge) - 1, t_i_inters.at(j).at(k));
-                  origin.add_adjacency(pl_edge, pl_vertex, origin.num_polytopes(pl_edge) - 1, origin.num_polytopes(pl_vertex) - 1);
-                }
+                ///T_fi_l
+                typename t_::storage_type_ t_l(t_fi.at(l));
+                std::sort(t_l.begin(), t_l.end());
+                ///T_fi_j
+                typename t_::storage_type_ t_j(t_fi.at(j));
+                std::sort(t_j.begin(), t_j.end());
+                ///T_fi_lj
+                typename t_::storage_type_ t_lj(std::max(t_l.size(), t_j.size()));
+                typename t_::storage_type_::iterator it(std::set_intersection(t_l.begin(), t_l.end(), t_j.begin(), t_j.end(), t_lj.begin()));
+                t_lj.resize(it - t_lj.begin());
+
+                t_fi_l_intersect_t_fi_j.push_back(t_lj);
+
+                typename t_::storage_type_ union_tmp(t_union.size() + t_lj.size());
+                typename t_::storage_type_::iterator itu(std::set_union(t_union.begin(), t_union.end(), t_lj.begin(), t_lj.end(), union_tmp.begin()));
+                union_tmp.resize(itu - union_tmp.begin());
+                t_union = union_tmp;
               }
             }
 
-            ///add faces
-            if(l == 0)
+            ///here, we already have all vertices for the new face originating from old corner vertex v_fc_l aka [v_fc_l, v_i, all in t_fi_l_intersect_t_fi_j]
+            ///add faces {fo_i}
+            if(l == 0) //use face index i
             {
-              ///TODO
+              vf_0.push_back(v_fc.at(l));
+              vf_0.push_back(origin.num_polytopes(pl_vertex)- 1);
+              for(Index m(0) ; m < t_fi_l_intersect_t_fi_j.size() ; ++m)
+                for(Index n(0) ; n < t_fi_l_intersect_t_fi_j.at(m).size() ; ++n)
+                  vf_0.push_back(t_fi_l_intersect_t_fi_j.at(m).at(n));
+
+              //inject
+              origin.get_topologies().at(ipi_face_vertex).at(i) = vf_0; //vertices are already adjacent to face i and  will be removed from all other later => done here
             }
             else
             {
-              ///TODO
+              origin.add_polytope(pl_face);
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, v_fc.at(l));
+
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, origin.num_polytopes(pl_vertex) - 1);
+
+              for(Index m(0) ; m < t_fi_l_intersect_t_fi_j.size() ; ++m)
+                for(Index n(0) ; n < t_fi_l_intersect_t_fi_j.at(m).size() ; ++n)
+                {
+                  origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(m).at(n));
+                }
             }
           }
+          ///all vertices at old face
+          typename t_::storage_type_ vertex_at_polygon_tmp(vertex_at_polygon.size() + t_union.size());
+          typename t_::storage_type_::iterator itu(std::set_union(vertex_at_polygon.begin(), vertex_at_polygon.end(), t_union.begin(), t_union.end(), vertex_at_polygon_tmp.begin()));
+          vertex_at_polygon_tmp.resize(itu - vertex_at_polygon_tmp.begin());
+          vertex_at_polygon = vertex_at_polygon_tmp;
 
-        std::cout << "B4" << std::endl;
-        //finally: for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
-        if(hrt_ == hrt_refine)
-        {
-          //refine halo faces
-          if(halos != nullptr)
+          ///add new edges {e_i_j}
+          for(Index j(0) ; j < t_union.size() ; ++j)
           {
-            for(Index hi(0) ; hi < halos->size() ; ++hi)
+            //(., v_i)
+            origin.add_polytope(pl_edge);
+            origin.add_adjacency(pl_edge, pl_vertex, origin.num_polytopes(pl_edge) - 1, t_union.at(j));
+            origin.add_adjacency(pl_edge, pl_vertex, origin.num_polytopes(pl_edge) - 1, origin.num_polytopes(pl_vertex) - 1);
+          }
+
+          ///remove v->f adjacencies from all vertices in vertex_at_polygon - v_fc_0
+          typename t_::storage_type_ diff(vertex_at_polygon.size());
+          typename t_::storage_type_::iterator itd(std::set_difference(vertex_at_polygon.begin(), vertex_at_polygon.end(), vf_0.begin(), vf_0.end(), diff.begin()));
+          diff.resize(itd - diff.begin());
+          for(Index j(0) ; j < diff.size() ; ++j)
+          {
+            typename t_::storage_type_::iterator ite(std::find(origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).begin(),
+                                                               origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).end(),
+                                                               i
+                                                              ));
+
+            origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).erase(ite);
+          }
+
+          //finally: for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
+          if(hrt_ == hrt_refine)
+          {
+            //refine halo faces
+            if(halos != nullptr)
             {
-              //only do this for face halos with delta > 0
-              if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+              for(Index hi(0) ; hi < halos->size() ; ++hi)
               {
-                typename HaloBase<MeshType_<Dim2D, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
-                if(iter != halos->at(hi)->get_elements().end())
+                //only do this for face halos with delta > 0
+                if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
                 {
-                  if(iter + 1 == halos->at(hi)->get_elements().end())
+                  typename HaloBase<MeshType_<Dim2D, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
+                  if(iter != halos->at(hi)->get_elements().end())
                   {
-                    halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 3); ///TODO QUAD
-                    halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 2); ///TODO QUAD
-                    halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1); ///TODO QUAD
-                  }
-                  else
-                  {
-                    halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 3); //insertion after ///TODO QUAD
-                    halos->at(hi)->get_elements().insert(iter + 2, origin.get_topologies().at(ipi_face_vertex).size() - 2); //insertion after ///TODO QUAD
-                    halos->at(hi)->get_elements().insert(iter + 3, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
+                    if(iter + 1 == halos->at(hi)->get_elements().end())
+                    {
+                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 3); ///TODO QUAD
+                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 2); ///TODO QUAD
+                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1); ///TODO QUAD
+                    }
+                    else
+                    {
+                      halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 3); //insertion after ///TODO QUAD
+                      halos->at(hi)->get_elements().insert(iter + 2, origin.get_topologies().at(ipi_face_vertex).size() - 2); //insertion after ///TODO QUAD
+                      halos->at(hi)->get_elements().insert(iter + 3, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
+                    }
                   }
                 }
               }
             }
           }
-        }
 
-          std::cout << "B5" << std::endl;
           //determine new vertex coordinates for mid-point
+          //sorting
+          vertex_at_polygon = coarse.get_adjacent_polytopes(pl_face, pl_vertex, i);
+          Index v_current(*vertex_at_polygon.begin());
+          Index v_start(*vertex_at_polygon.begin());
+          typename t_::storage_type_ e_way;
+          typename t_::storage_type_ v_way;
+          do
+          {
+            //get all edges
+            typename t_::storage_type_ e_current(coarse.get_adjacent_polytopes(pl_vertex, pl_edge, v_current));
+
+            //restrict to those not used yet
+            std::sort(e_way.begin(), e_way.end());
+            std::sort(e_current.begin(), e_current.end());
+            typename t_::storage_type_ e_valid(e_current.size());
+            typename t_::storage_type_::iterator itv(std::set_difference(e_current.begin(), e_current.end(), e_way.begin(), e_way.end(), e_valid.begin()));
+            e_valid.resize(itv - e_valid.begin());
+
+            //search next candidate
+            for(Index j(0) ; j < e_valid.size() ; ++j)
+            {
+              typename t_::storage_type_ v_valid_j(coarse.get_adjacent_polytopes(pl_edge, pl_vertex, e_valid.at(j)));
+              Index candidate_pos(v_valid_j.at(0) == v_current ? 1 : 0);
+              Index candidate(v_valid_j.at(candidate_pos));
+
+              if(std::find(vertex_at_polygon.begin(), vertex_at_polygon.end(), candidate) != vertex_at_polygon.end())
+              {
+                e_way.push_back(e_valid.at(j));
+                v_way.push_back(candidate);
+                v_current = candidate;
+                break;
+              }
+            }
+          }
+          while(v_current != v_start);
+          vertex_at_polygon = v_way;
+
           //area
           DataType_ area(0), c_x(0), c_y(0);
           for(Index l(0); l < vertex_at_polygon.size() ; ++l)
