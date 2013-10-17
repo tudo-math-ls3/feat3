@@ -8,7 +8,6 @@
 #include <kernel/space/dof_mapping_common.hpp>
 #include <kernel/space/bogner_fox_schmit/dof_traits.hpp>
 #include <kernel/space/bogner_fox_schmit/evaluator.hpp>
-#include <kernel/space/bogner_fox_schmit/node_functional.hpp>
 
 namespace FEAST
 {
@@ -59,6 +58,13 @@ namespace FEAST
           num_vert_dofs = (1 << ShapeType::dimension),
         };
 
+        /** \copydoc ElementBase::ElementCapabilities */
+        enum ElementCapabilities
+        {
+          /// no node functionals available
+          have_node_func = 0
+        };
+
         /** \copydoc ElementBase::Evaluator */
         template<
           typename TrafoEvaluator_,
@@ -107,8 +113,8 @@ namespace FEAST
         class NodeFunctional
         {
         public:
-          /// node functional type
-          typedef BognerFoxSchmit::NodeFunctional<Element, Functor_, ShapeType::dimension, shape_dim_, DataType_> Type;
+          /// no node functionals available
+          typedef Nil Type;
         };
 
       public:

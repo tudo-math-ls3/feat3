@@ -44,6 +44,13 @@ namespace FEAST
         /// shape type
         typedef typename TrafoType::ShapeType ShapeType;
 
+        /** \copydoc ElementBase::ElementCapabilities */
+        enum ElementCapabilities
+        {
+          /// node functionals available
+          have_node_func = 1
+        };
+
         /** \copydoc ElementBase::Evaluator */
         template<
           typename TrafoEvaluator_,

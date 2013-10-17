@@ -55,6 +55,13 @@ namespace FEAST
         /// variant of the element
         typedef Variant_ VariantTag;
 
+        /** \copydoc ElementBase::ElementCapabilities */
+        enum ElementCapabilities
+        {
+          /// node functionals available
+          have_node_func = 1
+        };
+
         /** \copydoc ElementBase::Evaluator */
         template<
           typename TrafoEvaluator_,

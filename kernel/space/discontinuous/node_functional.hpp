@@ -12,6 +12,38 @@ namespace FEAST
   {
     namespace Discontinuous
     {
+      /// \cond internal
+      namespace Intern
+      {
+        template<typename Shape_>
+        struct Barycentre;
+
+        template<int dim_>
+        struct Barycentre< Shape::Simplex<dim_> >
+        {
+          template<typename T_>
+          static void make(T_& p)
+          {
+            typedef typename T_::DataType DT;
+            for(Index i(0); i < Index(dim_); ++i)
+              p[i] = DT(1) / DT(dim_+1);
+          }
+        };
+
+        template<int dim_>
+        struct Barycentre< Shape::Hypercube<dim_> >
+        {
+          template<typename T_>
+          static void make(T_& p)
+          {
+            typedef typename T_::DataType DT;
+            for(Index i(0); i < Index(dim_); ++i)
+              p[i] = DT(0);
+          }
+        };
+      } // namespace Intern
+      /// \endcond
+
       template<
         typename Space_,
         typename Functor_,
@@ -84,10 +116,7 @@ namespace FEAST
           _func_eval(functor)
         {
           // set cell midpoint
-          for(Index i(0); i < ShapeType::dimension; ++i)
-          {
-            _dom_point[i] = DataType_(0);
-          }
+          Intern::Barycentre<ShapeType>::make(_dom_point);
         }
 
         void prepare(Index cell_index)

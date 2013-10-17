@@ -35,6 +35,20 @@ namespace FEAST
         shape_dim = ShapeType::dimension
       };
 
+      /**
+       * \brief Element capabilities enumeration
+       */
+      enum ElementCapabilities
+      {
+        /**
+         * \brief Specifies whether the element has node functionals
+         *
+         * If this value is 1, the element implements node functionals, i.e. the Type member of the
+         * nested NodeFunctional class template is defined.
+         */
+        have_node_func = 0
+      };
+
       // Note:
       // The following block serves as an element interface documentation and is therefore only
       // visible to doxygen. The actual functionality has to be supplied by the implementation.
@@ -104,17 +118,6 @@ namespace FEAST
       class NodeFunctional
       {
       public:
-        /// dummy enum
-        enum
-        {
-          /**
-           * \brief Specifices whether the element has node functionals for the specified combination
-           * of shape dimension and derivative tag. If a node functional exists, this value is non-zero,
-           * otherwise it is zero.
-           */
-          exists = ...
-        };
-
         /// node-functional type
         typedef ... Type;
       };
