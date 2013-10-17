@@ -172,13 +172,14 @@ _end:
 }
 
 template<typename DataType_>
-double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix)
+double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix, double& asm_time)
 {
   FILE* file = fopen(filename, "rb");
   ASSERT_(file != NULL);
 
   int magic;
   unsigned int ne[2];
+  float fasm_time = 0.0f;
   double dx,da,db;
 
   double dev_rel = 0.0;
@@ -212,8 +213,9 @@ double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main,
     goto _end;
   }
 
-  // skip assembly time
-  fseek(file, 4, SEEK_CUR);
+  // read assembly time
+  fread(&fasm_time, 4, 1, file);
+  asm_time = fasm_time;
 
   // skip row pointer
   fseek(file, 4*(ne[0]+1), SEEK_CUR);
@@ -280,8 +282,10 @@ void test_asm(const Space_& space, const String& cubature, const char* matx_name
 
   if(verify_d)
   {
+    double feat_time(0.0);
     std::cout << "Validating matrix against '" << matx_name << "'..." << std::endl;
-    std::cout << "Deviation: " << verify_data(matx_name, matrix_d) << std::endl;
+    std::cout << "Deviation: " << verify_data(matx_name, matrix_d, feat_time) << std::endl;
+    std::cout << "Feat2 Time: " << feat_time << " seconds" << std::endl;
   }
 }
 
@@ -290,7 +294,18 @@ int main(int argc, char* argv[])
 {
   if(argc < 2)
   {
-    std::cout << std::endl << "  USAGE: dbg-fe-asm-1 [-v[s|d]] [-r:<count>] <base-name>" << std::endl << std::endl;
+    std::cout << std::endl << "  USAGE: dbg-fe-asm-1 [-v[s|d]] [-q1[t]] [-sm|mm] [-r:<count>] <base-name>"
+      << std::endl << std::endl;
+    std::cout << "Valid Options:" << std::endl;
+    std::cout << "-vd        verify matrix data" << std::endl;
+    std::cout << "-vs        verify matrix structure" << std::endl;
+    std::cout << "-v         verify both matrix structure and data" << std::endl;
+    std::cout << "-q1        use Q1 element" << std::endl;
+    std::cout << "-q1t       use Q1T element" << std::endl;
+    std::cout << "-sm        assemble stiffness matrix" << std::endl;
+    std::cout << "-mm        assemble mass matrix" << std::endl;
+    std::cout << "-r:<n>     refine mesh <n> times" << std::endl;
+    std::cout << std::endl;
     return 0;
   }
 
@@ -332,6 +347,7 @@ int main(int argc, char* argv[])
   switch(space)
   {
   case 0:
+    // Q1 element
     switch(imat)
     {
     case 0:
@@ -344,6 +360,7 @@ int main(int argc, char* argv[])
     break;
 
   case 1:
+    // Q1~ element
     switch(imat)
     {
     case 0:
