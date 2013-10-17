@@ -345,7 +345,7 @@ void check_halo_transfer(Index rank)
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: halo_transfer)" << std::endl;
 #else
-    TestResult<Index> res[1];
+    TestResult<Index, Index, Index> res[1];
     res[0] = test_check_equal_within_eps(h.get_element(0), rank, Index(1));
     for(unsigned long i(0) ; i < 2 ; ++i)
       if(!res[i].passed)
@@ -406,7 +406,7 @@ void check_attribute_transfer(Index rank)
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: attr_transfer)" << std::endl;
 #else
-    TestResult<double> res[2];
+    TestResult<double, double, double> res[2];
     res[0] = test_check_equal_within_eps(attr.at(0), double(0), std::numeric_limits<double>::epsilon());
     res[1] = test_check_equal_within_eps(attr.at(1), double(42), std::numeric_limits<double>::epsilon());
     for(unsigned long i(0) ; i < 2 ; ++i)
@@ -474,7 +474,7 @@ void check_topology_transfer(Index rank)
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-1: topology_transfer)" << std::endl;
 #else
-    TestResult<Index> res[4];
+    TestResult<Index, Index, Index> res[4];
     res[0] = test_check_equal_within_eps(t.at(0).at(0), Index(42), Index(1));
     res[1] = test_check_equal_within_eps(t.at(0).at(1), Index(47), Index(1));
     res[2] = test_check_equal_within_eps(t.at(1).at(0), Index(52), Index(1));
