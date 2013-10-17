@@ -87,7 +87,7 @@ namespace FEAST
           ASSERT(Index(vtx.size()) == Index(num_coords_), "Vertex coordinate count mismatch!");
 
           // copy vertex coordinates
-          for(Index j(0); j < Omdex(num_coords_); ++j)
+          for(Index j(0); j < Index(num_coords_); ++j)
           {
             vertex_set[i][j] = Coord_(vtx[j]);
           }
