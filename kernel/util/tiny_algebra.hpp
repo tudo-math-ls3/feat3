@@ -144,7 +144,7 @@ namespace FEAST
       /// \brief value-assignment constructor
       explicit Vector(T_ value)
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] = value;
         }
@@ -154,7 +154,7 @@ namespace FEAST
       template<int sx_>
       Vector(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] = x.v[i];
         }
@@ -163,7 +163,7 @@ namespace FEAST
       /// value-assignment operator
       Vector& operator=(T_ value)
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] = value;
         }
@@ -174,7 +174,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator=(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] = x.v[i];
         }
@@ -245,7 +245,7 @@ namespace FEAST
       /// scalar-multiply operator
       Vector& operator*=(T_ alpha)
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] *= alpha;
         }
@@ -256,7 +256,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator+=(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] += x.v[i];
         }
@@ -267,7 +267,7 @@ namespace FEAST
       template<int sx_>
       Vector& operator-=(const Vector<T_, n_, sx_>& x)
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] -= x.v[i];
         }
@@ -282,7 +282,7 @@ namespace FEAST
        */
       void clear(T_ alpha = T_(0))
       {
-        for(Index i(0); i < Index(n)_; ++i)
+        for(Index i(0); i < Index(n_); ++i)
         {
           v[i] = alpha;
         }
@@ -351,7 +351,7 @@ namespace FEAST
     inline T_ dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       T_ r(0);
-      for(Index i(0); i < Index(n)_; ++i)
+      for(Index i(0); i < Index(n_); ++i)
       {
         r += a.v[i] * b.v[i];
       }
