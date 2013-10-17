@@ -5,25 +5,38 @@ cmake_minimum_required (VERSION 2.8)
 #enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
+if (MPI_INCLUDE_PATH)
+  include_directories(${MPI_INCLUDE_PATH})
+endif()
 
 #top lvl include dir
 INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
 # applications to build
-ADD_EXECUTABLE(foundation_system_test-app foundation_system_test-app.cpp)
-ADD_EXECUTABLE(foundation_comm_test-app foundation_comm_test-app.cpp)
-ADD_EXECUTABLE(foundation_synch_test-app foundation_synch_test-app.cpp)
-ADD_EXECUTABLE(scarc_test-app scarc_test-app.cpp)
-ADD_EXECUTABLE(poisson_test-app poisson_test-app.cpp)
-ADD_EXECUTABLE(proto-stokes proto_stokes.cpp)
-TARGET_LINK_LIBRARIES(foundation_system_test-app feast)
-TARGET_LINK_LIBRARIES(foundation_comm_test-app feast)
-TARGET_LINK_LIBRARIES(foundation_synch_test-app feast)
-TARGET_LINK_LIBRARIES(scarc_test-app feast)
-TARGET_LINK_LIBRARIES(poisson_test-app feast)
-TARGET_LINK_LIBRARIES(proto-stokes feast)
+SET (app_list
+  foundation_system_test-app
+  foundation_comm_test-app
+  foundation_synch_test-app
+  scarc_test-app
+  poisson_test-app
+  proto_stokes
+  )
 
-if (NOT FEAST_SERIAL_MODE)
+FOREACH (app ${app_list} )
+  ADD_EXECUTABLE(${app} ${app}.cpp)
+  TARGET_LINK_LIBRARIES(${app} feast ${MPI_LIBRARIES})
+  if(MPI_COMPILE_FLAGS)
+    set_target_properties(${app} PROPERTIES
+      COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
+  endif()
+  if(MPI_LINK_FLAGS)
+    set_target_properties(${app} PROPERTIES
+      LINK_FLAGS "${MPI_LINK_FLAGS}")
+  endif()
+ENDFOREACH(app)
+
+
+if (FEAST_MPI)
   ADD_TEST(foundation_comm_test-app_mpi ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -32,10 +45,10 @@ if (NOT FEAST_SERIAL_MODE)
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "mpirun" -np 2 ${FEAST_BINARY_DIR}/applications/foundation_comm_test-app)
+    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_comm_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_comm_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_comm_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-else (NOT FEAST_SERIAL_MODE)
+else (FEAST_MPI)
   ADD_TEST(foundation_comm_test-app_serial ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -47,9 +60,9 @@ else (NOT FEAST_SERIAL_MODE)
     --test-command "${FEAST_BINARY_DIR}/applications/foundation_comm_test-app")
   SET_PROPERTY(TEST foundation_comm_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_comm_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (NOT FEAST_SERIAL_MODE)
+endif (FEAST_MPI)
 
-if (NOT FEAST_SERIAL_MODE)
+if (FEAST_MPI)
   ADD_TEST(foundation_system_test-app_mpi ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -58,10 +71,10 @@ if (NOT FEAST_SERIAL_MODE)
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "mpirun" -np 4 ${FEAST_BINARY_DIR}/applications/foundation_system_test-app)
+    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_system_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_system_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_system_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-else (NOT FEAST_SERIAL_MODE)
+else (FEAST_MPI)
   ADD_TEST(foundation_system_test-app_serial ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -73,9 +86,9 @@ else (NOT FEAST_SERIAL_MODE)
     --test-systemand "${FEAST_BINARY_DIR}/applications/foundation_system_test-app")
   SET_PROPERTY(TEST foundation_system_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_system_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (NOT FEAST_SERIAL_MODE)
+endif (FEAST_MPI)
 
-if (NOT FEAST_SERIAL_MODE)
+if (FEAST_MPI)
   ADD_TEST(scarc_test-app_mpi ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -84,10 +97,10 @@ if (NOT FEAST_SERIAL_MODE)
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "mpirun" -np 2 ${FEAST_BINARY_DIR}/applications/scarc_test-app)
+    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/scarc_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST scarc_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST scarc_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-else (NOT FEAST_SERIAL_MODE)
+else (FEAST_MPI)
   ADD_TEST(scarc_test-app_serial ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -99,9 +112,9 @@ else (NOT FEAST_SERIAL_MODE)
     --test-command "${FEAST_BINARY_DIR}/applications/scarc_test-app")
   SET_PROPERTY(TEST scarc_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST scarc_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (NOT FEAST_SERIAL_MODE)
+endif (FEAST_MPI)
 
-if (NOT FEAST_SERIAL_MODE)
+if (FEAST_MPI)
   ADD_TEST(foundation_synch_test-app_mpi ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -110,10 +123,10 @@ if (NOT FEAST_SERIAL_MODE)
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "mpirun" -np 2 ${FEAST_BINARY_DIR}/applications/foundation_synch_test-app)
+    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/foundation_synch_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST foundation_synch_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST foundation_synch_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-else (NOT FEAST_SERIAL_MODE)
+else (FEAST_MPI)
   ADD_TEST(foundation_synch_test-app_serial ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -125,9 +138,9 @@ else (NOT FEAST_SERIAL_MODE)
     --test-command "${FEAST_BINARY_DIR}/applications/foundation_synch_test-app")
   SET_PROPERTY(TEST foundation_synch_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_synch_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (NOT FEAST_SERIAL_MODE)
+endif (FEAST_MPI)
 
-if (NOT FEAST_SERIAL_MODE)
+if (FEAST_MPI)
   ADD_TEST(poisson_test-app_mpi ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -136,10 +149,10 @@ if (NOT FEAST_SERIAL_MODE)
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "mpirun" -np 4 ${FEAST_BINARY_DIR}/applications/poisson_test-app)
+    --test-command ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 4 ${MPIEXEC_PREFLAGS} ${FEAST_BINARY_DIR}/applications/poisson_test-app ${MPIEXEC_POSTFLAGS})
   SET_PROPERTY(TEST poisson_test-app_mpi PROPERTY LABELS "mpi")
   SET_PROPERTY(TEST poisson_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-else (NOT FEAST_SERIAL_MODE)
+else (FEAST_MPI)
   ADD_TEST(poisson_test-app_serial ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
@@ -151,7 +164,7 @@ else (NOT FEAST_SERIAL_MODE)
     --test-command "${FEAST_BINARY_DIR}/applications/poisson_test-app")
   SET_PROPERTY(TEST poisson_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-endif (NOT FEAST_SERIAL_MODE)
+endif (FEAST_MPI)
 
 # add all tests to applications_tests
 ADD_CUSTOM_TARGET(applications_tests DEPENDS scarc_test-app foundation_system_test-app)

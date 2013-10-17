@@ -1,57 +1,257 @@
 #!/usr/bin/env python
+# vim: set filetype=python sw=2 sts=2 et nofoldenable :
 # This is a python script.
 # If you encounter problemes when executing it on its own, start it with a python interpreter
 import sys
 import os
+import subprocess
+from cmake_modules import detect_cpu
+from cmake_modules import configure_gcc
+from cmake_modules import configure_icc
+from cmake_modules import configure_clang
+from cmake_modules import is_found
+from cmake_modules import remove_string
 
+#TODO help, ? und guess nicht in sys.argv[0] suchen
+#TODO scalasca
+#TODO cpu=string um cpu direkt anzugeben
 
-dirname = os.path.dirname(sys.argv[0])
-
-if len(sys.argv) > 1 and "help" in sys.argv[1]:
-  print("configure feast and set up all necessary environment variables.")
-  print("usage: %s build-id"%sys.argv[0])
-  print("============================")
-  os.system("cmake -DBUILD_ID=help %s" % dirname)
+# output help screen
+if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
+  print ("Usage: configure_feast [build_id]/[guess]/[help]")
+  print ("")
+  print ("Configure FEAST and set up all necessary environment variables.")
+  print ("You can execute the script(located in the source directory)  from any folder,")
+  print ("that shall contain your object files and executables, and thus becoming your build directory.")
+  print ("")
+  print ("Please note, that you need to rerun this configure script after you have altered the")
+  print ("software or hardware stack of your computer.")
+  print ("")
+  print ("============= REQUIREMENTS ==================")
+  print ("Needs cmake (at least version 2.8) to run properly.")
+  print ("")
+  print ("============= EXAMPLES ==================")
+  print ("")
+  print ("Let configure_feast choose suitable configuration")
+  print ("by inspecting available tools in your $PATH:")
+  print ("    %s"%sys.argv[0])
+  print ("or")
+  print ("    %s guess"%sys.argv[0])
+  print
+  print ("Use a specific build id:")
+  print ("    %s build-id"%sys.argv[0])
+  print ("Example:")
+  print ("    %s gcc-mpi-opt"%sys.argv[0])
+  print ("")
+  print ("============== BUILD ID ====================")
+  print ("The FEAST build-id is a string of various keywords, delimited by hyphes or whitespaces")
+  print ("It is used to choose different tools and configurations related to the build process.")
+  print ("With the exception of the additional backends, you can choose one token out of each category.")
+  print ("These categories are:")
+  print ("  Build Mode: debug, opt")
+  print ("  Parallelisation: serial, mpi")
+  print ("  Compiler: gcc, icc, clang")
+  print ("  Compiler frontends: ccache")
+  print ("  Backends: gmp, cuda, mkl")
+  print ("  Generators: unixmake, ninja - defaults to unixmake if none is choosen")
+  print ("  Instrumentation: scalasca (not implemented yet)")
+  print ("")
+  print ("Note, that you need to provide at least a build mode, a parallelisation mode and a compiler.")
+  print ("Note, that the actual compiler version and mpi implementation is choosen by first come, fist serve")
+  print ("corresponding to your $PATH settings.")
+  print ("The target cpu is detected automatic, manual override options are not implemented yet.")
   sys.exit()
-if len(sys.argv) != 2:
-  print ("usage: %s build-id"%sys.argv[0])
-  sys.exit()
 
-buildid = sys.argv[1].split("-")
-
+#clear all related
 os.environ["CXXFLAGS"] = ""
+os.environ["CXX"] = ""
+os.environ["CC"] = ""
+os.environ["OMP_CXX"] = ""
+os.environ["OMP_CC"] = ""
+os.environ["MPICH_CXX"] = ""
+os.environ["MPICH_CC"] = ""
 
-if "gcc" in buildid or "gnu" in buildid:
-  os.environ["CC"] = "mpicc"
-  os.environ["CXX"] = "mpic++"
-  os.environ["OMPI_CC"] = "gcc"
-  os.environ["OMPI_CXX"] = "g++"
-  os.environ["MPICH_CC"] = "gcc"
-  os.environ["MPICH_CXX"] = "g++"
-elif "icc" in buildid or "intel" in buildid:
-  os.environ["CC"] = "mpicc"
-  os.environ["CXX"] = "mpic++"
-  os.environ["OMPI_CC"] = "icc"
-  os.environ["OMPI_CXX"] = "icpc"
-  os.environ["MPICH_CC"] = "icc"
-  os.environ["MPICH_CXX"] = "icpc"
-elif "clang" in buildid or "llvm" in buildid:
-  os.environ["CC"] = "mpicc"
-  os.environ["CXX"] = "mpic++"
-  os.environ["OMPI_CC"] = "clang"
-  os.environ["OMPI_CXX"] = "clang++"
-  os.environ["MPICH_CC"] = "clang"
-  os.environ["MPICH_CXX"] = "clang++"
+
+# guess a fitting configuration and search for available compilers
+if len(sys.argv) == 1 or "guess" in sys.argv:
+  buildid_string = "opt"
+  if is_found("mpic++"):
+    buildid_string += "-mpi"
+  else:
+    buildid_string += "-serial"
+  if is_found("g++"):
+    buildid_string += "-gcc"
+  elif is_found("icpc"):
+    buildid_string += "-icc"
+  elif is_found("clang++"):
+    buildid_string += "-clang"
+
+  if is_found("nvcc"):
+    buildid_string += "-cuda"
+#TODO suchen nach mkl und gmp
+
+# use provided build id
 else:
-  print "No supported compiler found in build id."
+  buildid_string = ""
+  for i in range(1, len(sys.argv)):
+    buildid_string += sys.argv[i] + "-"
+
+buildid_string = buildid_string.strip("-")
+#generate handy build id array of tokens
+buildid = buildid_string.split("-")
+#list of buildid tokens, remove token when used, results in list of unused tokens
+unused_tokens = buildid
+
+#initialise variables
+build_mode = ""
+cxxflags = ""
+ldflags = ""
+cmake_flags = "-DBUILD_ID:STRING=" + buildid_string
+
+#choose makefile generator. missing entry defaults to unix makefiles
+if "ninja" in buildid:
+  remove_string(unused_tokens, "ninja")
+  generator = "Ninja"
+elif "unixmake" in buildid:
+  remove_string(unused_tokens, "unixmake")
+  generator = "Unix Makefiles"
+else:
+  generator = "Unix Makefiles"
+
+# optimisation/debug mode aka build mode selection
+if "debug" in buildid or "noop" in buildid:
+  remove_string(unused_tokens, "debug")
+  remove_string(unused_tokens, "noop")
+  cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=ON"
+  build_mode = "debug"
+elif "opt" in buildid or "release" in buildid:
+  remove_string(unused_tokens, "opt")
+  remove_string(unused_tokens, "release")
+  cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=OFF"
+  build_mode = "opt"
+else:
+  print ("No supported build mode (opt/debug) found in build id:")
+  print buildid_string
+  sys.exit(1)
+if "coverage" in buildid:
+  remove_string(unused_tokens, "coverage")
+  build_mode += " coverage"
+
+# parallelisation selection
+if "serial" in buildid:
+  cmake_flags += " -DFEAST_SERIAL_MODE:BOOL=ON"
+  remove_string(unused_tokens, "serial")
+elif "mpi" in buildid:
+  remove_string(unused_tokens, "mpi")
+  cmake_flags += " -DFEAST_SERIAL_MODE:BOOL=OFF"
+  cmake_flags += " -DFEAST_MPI:BOOL=TRUE"
+else:
+  print ("No mpi statement nor serial statement found in build id:")
+  print buildid_string
   sys.exit(1)
 
+#cpu detection
+cputype = detect_cpu()
+cmake_flags += " -DFEAST_CPU_TYPE:STRING=" + cputype
 
-# clean up
+#compiler selection
+if "gcc" in buildid or "gnu" in buildid:
+  if not is_found("g++"):
+    print ("Choosen compiler binary g++ not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "gcc")
+  remove_string(unused_tokens, "gnu")
+  os.environ["CC"] = "gcc"
+  os.environ["CXX"] = "g++"
+  cxxflags += " " + configure_gcc (cputype, build_mode)
+elif "icc" in buildid or "intel" in buildid:
+  if not is_found("icpc"):
+    print ("Choosen compiler binary icpc not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "icc")
+  remove_string(unused_tokens, "intel")
+  os.environ["CC"] = "icc"
+  os.environ["CXX"] = "icpc"
+  cxxflags += " " + configure_icc (cputype, build_mode)
+elif "clang" in buildid or "llvm" in buildid:
+  if not is_found("clang++"):
+    print ("Choosen compiler binary clang++ not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "clang")
+  remove_string(unused_tokens, "llvm")
+  os.environ["CC"] = "clang"
+  os.environ["CXX"] = "clang++"
+  cxxflags += " " + configure_clang (cputype, build_mode)
+else:
+  print ("No supported compiler found in build id:")
+  print buildid_string
+  sys.exit(1)
+
+if "ccache" in buildid:
+  if not is_found("ccache"):
+    print ("Choosen compiler frontend binary ccache not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "ccache")
+  os.environ["CC"] = "ccache " + os.environ["CC"]
+  os.environ["CXX"] = "ccache " + os.environ["CXX"]
+
+#additional backends
+if "cuda" in buildid:
+  if not is_found("nvcc"):
+    print ("Choosen backend compiler binary nvcc not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "cuda")
+  cmake_flags += " -DFEAST_BACKENDS_CUDA:BOOL=ON"
+if "mkl" in buildid:
+  remove_string(unused_tokens, "mkl")
+  cmake_flags += " -DFEAST_BACKENDS_MKL:BOOL=ON"
+  cxxflags += " -DMKL_ILP64"
+if "gmp" in buildid:
+  remove_string(unused_tokens, "gmp")
+  cmake_flags += " -DFEAST_GMP:BOOL=ON"
+
+
+# clean up previous configurations
+dirname = os.path.dirname(sys.argv[0])
 clean = [ "CMakeCache.txt", dirname+os.sep+"CMakeCache.txt" ]
 for i in clean:
   if os.path.exists(i):
-    print i, "deleted."
+    os.unlink(i)
+dirname = os.path.dirname(sys.argv[0])
+clean = [ "feast_config.hpp", dirname+os.sep+"feast_config.hpp" ]
+for i in clean:
+  if os.path.exists(i):
+    os.unlink(i)
+clean = [ "rules.ninja", dirname+os.sep+"rules.ninja" ]
+for i in clean:
+  if os.path.exists(i):
+    os.unlink(i)
+clean = [ "build.ninja", dirname+os.sep+"build.ninja" ]
+for i in clean:
+  if os.path.exists(i):
     os.unlink(i)
 
-os.system("cmake -DBUILD_ID=%s %s" % (sys.argv[1], dirname))
+#export compiler/linker flags
+os.environ["CXXFLAGS"] = cxxflags
+os.environ["LDFLAGS"] = ldflags
+
+#print out choosen configuration
+print ("============== configure_feast ===========")
+print ("Build-ID: " + buildid_string)
+if len(unused_tokens) == 0:
+  print ("Unused Build-ID tokens: none")
+else:
+  print ("Unused Build-ID tokens: " + "-".join(unused_tokens))
+print ("Detected CPU Type: " + cputype)
+print
+print ("cxxflags: " + os.environ["CXXFLAGS"])
+print
+print ("ldflags: " + os.environ["LDFLAGS"])
+print
+print ("Generator: " + generator)
+print
+print ("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, dirname))
+print
+#start actual configuration
+print ("============== CMAKE =====================")
+os.system("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, dirname))

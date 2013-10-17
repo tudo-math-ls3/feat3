@@ -10,27 +10,20 @@
 /// Should the build include serial support only?
 #cmakedefine FEAST_SERIAL_MODE
 
+/// Is an mpi environment available?
+#cmakedefine FEAST_MPI
+
 /// Path to the FEAST source dir
 #define FEAST_SRC_DIR "${FEAST_SOURCE_DIR}"
 
 /// Path to the FEAST binary dir
 #define FEAST_BINARY_DIR "${FEAST_BINARY_DIR}"
 
-/// BUILD-ID (in standardised format) being used
+/// provided BUILD-ID being used
 #define BUILD_ID "${BUILD_ID}"
-
-/// MPI environment being used ( a valid option is "serial"
-#define FEAST_MPI_ENV_NAME "${FEAST_MPI_ENV_NAME}"
-
-/// Compiler being used
-// TODO redundant information is in base_header.hpp
-#define FEAST_COMPILER_NAME "${FEAST_COMPILER_NAME}"
 
 /// CPU microarchitecture being used
 #define FEAST_CPU_TYPE "${FEAST_CPU_TYPE}"
-
-/// TODO this is redundant
-#define FEAST_BUILD_MODE "${FEAST_BUILD_MODE}"
 
 /// Do we have CUDA support enabled?
 #cmakedefine FEAST_BACKENDS_CUDA

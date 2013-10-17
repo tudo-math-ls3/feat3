@@ -15,12 +15,18 @@ configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTe
 find_program(MEMORYCHECK_COMMAND NAMES valgrind)
 set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full" CACHE STRING "valgrind options")
 
-# BUILD_ID mechanism
-INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/buildid.cmake )
-
 if (FEAST_BACKENDS_CUDA)
+  set (CUDA_VERBOSE_BUILD ON)
   FIND_PACKAGE(CUDA)
+  set (CUDA_VERBOSE_BUILD ON)
+  set(CUDA_NVCC_FLAGS "-arch sm_13" CACHE STRING "Semi-colon delimit multiple arguments." FORCE)
+  #TODO  use CUDA_HOST_COMPILER to get rid of hard wired gcc host compilation
+  set (CUDA_PROPAGATE_HOST_FLAGS OFF)
 endif(FEAST_BACKENDS_CUDA)
+
+if (FEAST_MPI)
+  find_package(MPI REQUIRED)
+endif (FEAST_MPI)
 
 
 # store all variables describing the build in a custom header file
@@ -46,5 +52,5 @@ endif ( NOT (${FEAST_SOURCE_DIR} STREQUAL ${FEAST_BINARY_DIR}) AND UNIX)
 # directories to scan recursively
 ADD_SUBDIRECTORY( test_system )
 ADD_SUBDIRECTORY( kernel )
-ADD_SUBDIRECTORY( applications )
 ADD_SUBDIRECTORY( tools )
+ADD_SUBDIRECTORY( applications )
