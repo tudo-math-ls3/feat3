@@ -214,7 +214,7 @@ double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main,
   }
 
   // read assembly time
-  fread(&fasm_time, 4, 1, file);
+  status = fread(&fasm_time, 4, 1, file);
   if (status != 1)
     throw InternalError("fread failure!");
   asm_time = fasm_time;
