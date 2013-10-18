@@ -15,11 +15,13 @@ ADD_EXECUTABLE(foundation_comm_test-app foundation_comm_test-app.cpp)
 ADD_EXECUTABLE(foundation_synch_test-app foundation_synch_test-app.cpp)
 ADD_EXECUTABLE(scarc_test-app scarc_test-app.cpp)
 ADD_EXECUTABLE(poisson_test-app poisson_test-app.cpp)
+ADD_EXECUTABLE(proto-stokes proto_stokes.cpp)
 TARGET_LINK_LIBRARIES(foundation_system_test-app feast)
 TARGET_LINK_LIBRARIES(foundation_comm_test-app feast)
 TARGET_LINK_LIBRARIES(foundation_synch_test-app feast)
 TARGET_LINK_LIBRARIES(scarc_test-app feast)
 TARGET_LINK_LIBRARIES(poisson_test-app feast)
+TARGET_LINK_LIBRARIES(proto-stokes feast)
 
 if (NOT FEAST_SERIAL_MODE)
   ADD_TEST(foundation_comm_test-app_mpi ${CMAKE_CTEST_COMMAND}
