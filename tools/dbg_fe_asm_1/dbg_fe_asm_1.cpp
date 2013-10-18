@@ -63,8 +63,8 @@ QuadMesh* read_quad_mesh(const char* filename)
     status = fread(idx, 8, 1, file);
     if (status != 1)
       throw InternalError("fread failure!");
-    mesh->get_index_set<1,0>()[i][0] = idx[0];
-    mesh->get_index_set<1,0>()[i][1] = idx[1];
+    mesh->get_index_set<1,0>()[i][0] = Index(idx[0]);
+    mesh->get_index_set<1,0>()[i][1] = Index(idx[1]);
   }
 
   // read vertex-at-quad
@@ -73,10 +73,10 @@ QuadMesh* read_quad_mesh(const char* filename)
     status = fread(idx, 16, 1, file);
     if (status != 1)
       throw InternalError("fread failure!");
-    mesh->get_index_set<2,0>()[i][0] = idx[0];
-    mesh->get_index_set<2,0>()[i][1] = idx[1];
-    mesh->get_index_set<2,0>()[i][2] = idx[3];
-    mesh->get_index_set<2,0>()[i][3] = idx[2];
+    mesh->get_index_set<2,0>()[i][0] = Index(idx[0]);
+    mesh->get_index_set<2,0>()[i][1] = Index(idx[1]);
+    mesh->get_index_set<2,0>()[i][2] = Index(idx[3]);
+    mesh->get_index_set<2,0>()[i][3] = Index(idx[2]);
   }
 
   // read edge-at-quad
@@ -85,10 +85,10 @@ QuadMesh* read_quad_mesh(const char* filename)
     status = fread(idx, 16, 1, file);
     if (status != 1)
       throw InternalError("fread failure!");
-    mesh->get_index_set<2,1>()[i][0] = idx[0];
-    mesh->get_index_set<2,1>()[i][1] = idx[2];
-    mesh->get_index_set<2,1>()[i][2] = idx[3];
-    mesh->get_index_set<2,1>()[i][3] = idx[1];
+    mesh->get_index_set<2,1>()[i][0] = Index(idx[0]);
+    mesh->get_index_set<2,1>()[i][1] = Index(idx[2]);
+    mesh->get_index_set<2,1>()[i][2] = Index(idx[3]);
+    mesh->get_index_set<2,1>()[i][3] = Index(idx[1]);
   }
 
   // okay
@@ -215,6 +215,8 @@ double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main,
 
   // read assembly time
   fread(&fasm_time, 4, 1, file);
+  if (status != 1)
+    throw InternalError("fread failure!");
   asm_time = fasm_time;
 
   // skip row pointer
