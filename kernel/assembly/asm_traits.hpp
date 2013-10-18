@@ -250,14 +250,30 @@ namespace FEAST
       /// mesh type
       typedef typename TrafoType::MeshType MeshType;
 
+      /// trafo evaluator type
+      typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
+
+      /// trafo cell iterator type
+      typedef typename TrafoEvaluator::CellIterator CellIterator;
+
+      /// space evaluator types
+      typedef typename TestSpaceType::template Evaluator<TrafoEvaluator>::Type TestEvaluator;
+      typedef typename TrialSpaceType::template Evaluator<TrafoEvaluator>::Type TrialEvaluator;
+      typedef TrialEvaluator MultEvaluator;
+
+      /// space evaluator traits
+      typedef typename TestEvaluator::SpaceEvalTraits TestEvalTraits;
+      typedef typename TrialEvaluator::SpaceEvalTraits TrialEvalTraits;
+      typedef TrialEvalTraits MultEvalTraits;
+
       // define test- and trial-space configs
       typedef TestConfig_ TestConfig;
       typedef TrialConfig_ TrialConfig;
       typedef TrialConfig_ MultConfig;
 
       // now fetch the trafo configs from the spaces
-      typedef typename TestSpaceType::template ConfigTraits<TestConfig>::TrafoConfig TestTrafoConfig;
-      typedef typename TrialSpaceType::template ConfigTraits<TrialConfig>::TrafoConfig TrialTrafoConfig;
+      typedef typename TestEvaluator::template ConfigTraits<TestConfig>::TrafoConfig TestTrafoConfig;
+      typedef typename TrialEvaluator::template ConfigTraits<TrialConfig>::TrafoConfig TrialTrafoConfig;
       typedef TrialTrafoConfig MultTrafoConfig;
 
       // combine the space trafo configurations
@@ -277,22 +293,6 @@ namespace FEAST
 
       /// trafo config: combine space and assembly trafo configs
       typedef Trafo::ConfigOr<AsmTrafoConfig, SpaceTrafoConfig> TrafoConfig;
-
-      /// trafo evaluator type
-      typedef typename TrafoType::template Evaluator<ShapeType, DataType>::Type TrafoEvaluator;
-
-      /// trafo cell iterator type
-      typedef typename TrafoEvaluator::CellIterator CellIterator;
-
-      /// space evaluator types
-      typedef typename TestSpaceType::template Evaluator<TrafoEvaluator>::Type TestEvaluator;
-      typedef typename TrialSpaceType::template Evaluator<TrafoEvaluator>::Type TrialEvaluator;
-      typedef TrialEvaluator MultEvaluator;
-
-      /// space evaluator traits
-      typedef typename TestEvaluator::SpaceEvalTraits TestEvalTraits;
-      typedef typename TrialEvaluator::SpaceEvalTraits TrialEvalTraits;
-      typedef TrialEvalTraits MultEvalTraits;
 
       /// trafo evaluation data type
       typedef typename TrafoEvaluator::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;

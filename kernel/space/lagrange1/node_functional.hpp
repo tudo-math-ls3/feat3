@@ -52,8 +52,6 @@ namespace FEAST
           };
         };
 
-        //typedef typename TrafoEvalType::template TrafoConfig<TrafoConfig1> TrafoConfig;
-        //typedef Trafo::EvalData<TrafoEvalTraits, TrafoConfig> TrafoEvalData;
         typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
 
         struct FuncEvalTraits

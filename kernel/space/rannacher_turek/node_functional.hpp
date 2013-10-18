@@ -58,9 +58,7 @@ namespace FEAST
           };
         };
 
-        typedef typename TrafoEvalType::template TrafoConfig<TrafoConfig> TrafoDataConfig;
-
-        typedef Trafo::EvalData<TrafoEvalTraits, TrafoDataConfig> TrafoEvalData;
+        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
 
         struct FuncEvalTraits
         {
@@ -123,7 +121,7 @@ namespace FEAST
           const Index n(_cub_rule.get_num_points());
           for(Index i(0); i < n; ++i)
           {
-            trafo_data(_trafo_eval, _cub_rule.get_point(i));
+            _trafo_eval(trafo_data, _cub_rule.get_point(i));
             _func_eval(v, trafo_data);
             value += _cub_rule.get_weight(i) * trafo_data.jac_det * v;
             mean += _cub_rule.get_weight(i) * trafo_data.jac_det;

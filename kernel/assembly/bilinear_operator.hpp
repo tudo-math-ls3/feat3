@@ -144,7 +144,7 @@ namespace FEAST
 
             // compute basis function data
             test_eval(test_data, trafo_data);
-            trial_eval(test_data, trafo_data);
+            trial_eval(trial_data, trafo_data);
 
             // test function loop
             for(Index i(0); i < num_loc_test_dofs; ++i)
