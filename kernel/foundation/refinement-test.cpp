@@ -242,9 +242,9 @@ class RefinementTest2D:
 
       TEST_CHECK_EQUAL(halos.at(0)->get_elements().size(), IndexType_(4));
       TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(0), IndexType_(0));
-      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(1), IndexType_(1));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(1), IndexType_(3));
       TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(2), IndexType_(2));
-      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(3), IndexType_(3));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(3), IndexType_(1));
 
       TEST_CHECK_EQUAL(halos.at(1)->get_elements().size(), IndexType_(2));
       TEST_CHECK_EQUAL(halos.at(1)->get_elements().at(0), IndexType_(3));

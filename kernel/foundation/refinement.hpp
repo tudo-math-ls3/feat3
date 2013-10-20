@@ -214,10 +214,13 @@ namespace FEAST
           typename MeshType_<Dim_, t_, os_>::topology_type_::storage_type_ faces_at_end_vertex_old(target.get_adjacent_polytopes(pl_vertex, pl_face, vertex_at_edge_old.at(1)));
           for(Index i(0) ; i < faces_at_end_vertex_old.size() ; ++i)
             if(std::find(faces_at_start_vertex_old.begin(), faces_at_start_vertex_old.end(), faces_at_end_vertex_old.at(i)) != faces_at_start_vertex_old.end())
+            {
               target.add_adjacency(pl_vertex,
                                    pl_face,
                                    target.get_topologies().at(ipi_vertex_face).size() - 1,
                                    faces_at_end_vertex_old.at(i));
+
+            }
         }
 
         //add new coordinates
@@ -335,7 +338,7 @@ namespace FEAST
               std::sort(v_fo_tmp.begin(), v_fo_tmp.end());
               typename t_::storage_type_ res(v_e_v.size() + v_fo_tmp.size());
               typename t_::storage_type_::iterator it(std::set_union(v_e_v.begin(), v_e_v.end(), v_fo_tmp.begin(), v_fo_tmp.end(), res.begin()));
-              res.resize(it - res.begin());
+              res.resize(Index(it - res.begin()));
               v_e_v = res;
             }
             t_fi.push_back(v_e_v);
@@ -364,13 +367,13 @@ namespace FEAST
                 ///T_fi_lj
                 typename t_::storage_type_ t_lj(std::max(t_l.size(), t_j.size()));
                 typename t_::storage_type_::iterator it(std::set_intersection(t_l.begin(), t_l.end(), t_j.begin(), t_j.end(), t_lj.begin()));
-                t_lj.resize(it - t_lj.begin());
+                t_lj.resize(Index(it - t_lj.begin()));
 
                 t_fi_l_intersect_t_fi_j.push_back(t_lj);
 
                 typename t_::storage_type_ union_tmp(t_union.size() + t_lj.size());
                 typename t_::storage_type_::iterator itu(std::set_union(t_union.begin(), t_union.end(), t_lj.begin(), t_lj.end(), union_tmp.begin()));
-                union_tmp.resize(itu - union_tmp.begin());
+                union_tmp.resize(Index(itu - union_tmp.begin()));
                 t_union = union_tmp;
               }
             }
@@ -379,6 +382,7 @@ namespace FEAST
             ///add faces {fo_i}
             if(l == 0) //use face index i
             {
+              vf_0.clear();
               vf_0.push_back(v_fc.at(l));
               vf_0.push_back(origin.num_polytopes(pl_vertex)- 1);
               for(Index m(0) ; m < t_fi_l_intersect_t_fi_j.size() ; ++m)
@@ -400,12 +404,40 @@ namespace FEAST
                 {
                   origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(m).at(n));
                 }
+
+              //for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
+              if(hrt_ == hrt_refine)
+              {
+                //refine halo faces
+                if(halos != nullptr)
+                {
+                  for(Index hi(0) ; hi < halos->size() ; ++hi)
+                  {
+                    //only do this for face halos with delta > 0
+                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    {
+                      typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
+                      if(iter != halos->at(hi)->get_elements().end())
+                      {
+                        if(iter + 1 == halos->at(hi)->get_elements().end())
+                        {
+                          halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1);
+                        }
+                        else
+                        {
+                          halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
           ///all vertices at old face
           typename t_::storage_type_ vertex_at_polygon_tmp(vertex_at_polygon.size() + t_union.size());
           typename t_::storage_type_::iterator itu(std::set_union(vertex_at_polygon.begin(), vertex_at_polygon.end(), t_union.begin(), t_union.end(), vertex_at_polygon_tmp.begin()));
-          vertex_at_polygon_tmp.resize(itu - vertex_at_polygon_tmp.begin());
+          vertex_at_polygon_tmp.resize(Index(itu - vertex_at_polygon_tmp.begin()));
           vertex_at_polygon = vertex_at_polygon_tmp;
 
           ///add new edges {e_i_j}
@@ -417,10 +449,13 @@ namespace FEAST
             origin.add_adjacency(pl_edge, pl_vertex, origin.num_polytopes(pl_edge) - 1, origin.num_polytopes(pl_vertex) - 1);
           }
 
-          ///remove v->f adjacencies from all vertices in vertex_at_polygon - v_fc_0
+          ///remove v->f adjacencies from all vertices in vertex_at_polygon - vf_0
+          std::sort(vertex_at_polygon.begin(), vertex_at_polygon.end());
+          std::sort(vf_0.begin(), vf_0.end());
           typename t_::storage_type_ diff(vertex_at_polygon.size());
           typename t_::storage_type_::iterator itd(std::set_difference(vertex_at_polygon.begin(), vertex_at_polygon.end(), vf_0.begin(), vf_0.end(), diff.begin()));
-          diff.resize(itd - diff.begin());
+          diff.resize(Index(itd - diff.begin()));
+
           for(Index j(0) ; j < diff.size() ; ++j)
           {
             typename t_::storage_type_::iterator ite(std::find(origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).begin(),
@@ -428,40 +463,13 @@ namespace FEAST
                                                                i
                                                               ));
 
-            origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).erase(ite);
-          }
-
-          //finally: for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
-          if(hrt_ == hrt_refine)
-          {
-            //refine halo faces
-            if(halos != nullptr)
+            if(ite != origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).end())
             {
-              for(Index hi(0) ; hi < halos->size() ; ++hi)
-              {
-                //only do this for face halos with delta > 0
-                if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
-                {
-                  typename HaloBase<MeshType_<Dim2D, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
-                  if(iter != halos->at(hi)->get_elements().end())
-                  {
-                    if(iter + 1 == halos->at(hi)->get_elements().end())
-                    {
-                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 3); ///TODO QUAD
-                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 2); ///TODO QUAD
-                      halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1); ///TODO QUAD
-                    }
-                    else
-                    {
-                      halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 3); //insertion after ///TODO QUAD
-                      halos->at(hi)->get_elements().insert(iter + 2, origin.get_topologies().at(ipi_face_vertex).size() - 2); //insertion after ///TODO QUAD
-                      halos->at(hi)->get_elements().insert(iter + 3, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
-                    }
-                  }
-                }
-              }
+              origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).erase(ite);
             }
           }
+
+          for(Index b(0) ; b < origin.get_topologies().at(ipi_face_vertex).size() ; ++b)
 
           //determine new vertex coordinates for mid-point
           //sorting
@@ -480,7 +488,7 @@ namespace FEAST
             std::sort(e_current.begin(), e_current.end());
             typename t_::storage_type_ e_valid(e_current.size());
             typename t_::storage_type_::iterator itv(std::set_difference(e_current.begin(), e_current.end(), e_way.begin(), e_way.end(), e_valid.begin()));
-            e_valid.resize(itv - e_valid.begin());
+            e_valid.resize(Index(itv - e_valid.begin()));
 
             //search next candidate
             for(Index j(0) ; j < e_valid.size() ; ++j)
