@@ -99,17 +99,17 @@ template<typename T_>
 class SolX
 {
 public:
-  static T_ eval(T_ x, T_ y)
+  static T_ eval(T_, T_ y)
   {
     return y * (T_(1) - y);
   }
 
-  static T_ der_x(T_ x, T_ y)
+  static T_ der_x(T_, T_)
   {
     return T_(0);
   }
 
-  static T_ der_y(T_ x, T_ y)
+  static T_ der_y(T_, T_ y)
   {
     return T_(1) - T_(2) * y;
   }
@@ -120,17 +120,17 @@ template<typename T_>
 class SolY
 {
 public:
-  static T_ eval(T_ x, T_ y)
+  static T_ eval(T_, T_)
   {
     return T_(0);
   }
 
-  static T_ der_x(T_ x, T_ y)
+  static T_ der_x(T_, T_)
   {
     return T_(0);
   }
 
-  static T_ der_y(T_ x, T_ y)
+  static T_ der_y(T_, T_)
   {
     return T_(0);
   }
@@ -141,7 +141,7 @@ template<typename T_>
 class SolP
 {
 public:
-  static T_ eval(T_ x, T_ y)
+  static T_ eval(T_ x, T_)
   {
     return T_(2) * (T_(1) - x);
   }
@@ -451,7 +451,7 @@ public:
 
   // computes the current pressure/divergence defect vector
   void calc_defect_p(VectorType& def_p, const VectorType& rhs_p,
-    const VectorType& sol_x, const VectorType& sol_y, const VectorType& sol_p) const
+    const VectorType& sol_x, const VectorType& sol_y, const VectorType& /*sol_p*/) const
   {
     // dp = bp - D1*ux - D2*uy
     LAFEM::copy(def_p, rhs_p);
@@ -558,14 +558,14 @@ public:
 };
 
 // assembles the coarse Stokes level
-StokesLevel* build_coarse_level(int lvl)
+StokesLevel* build_coarse_level(std::size_t lvl)
 {
   MeshType* mesh = nullptr;
   CellSetType* cell = nullptr;
 
   MeshFactoryType* mesh_factory = new Geometry::UnitCubeFactory<MeshType>();
   CellFactoryType* cell_factory = new MyCellSetFactory();
-  for(int i(0); i < lvl; ++i)
+  for(std::size_t i(0); i < lvl; ++i)
   {
     MeshType* mesh2 = mesh;
     CellSetType* cell2 = cell;
@@ -642,38 +642,38 @@ void write_vtk(String vtk_name, const StokesLevel& level,
   writer.write(vtk_name);
 }
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char** /*argv*/)
 {
-  int lvl_min = 1;
-  int lvl_max = 5;
+  std::size_t lvl_min = 1;
+  std::size_t lvl_max = 5;
 
   // allocate levels
   typedef std::vector<StokesLevel*> Levels;
   Levels levels;
   std::cout << "Allocating Level " << lvl_min << "..." << std::endl;
   levels.push_back(build_coarse_level(lvl_min));
-  for(int i(lvl_min+1); i <= lvl_max; ++i)
+  for(std::size_t i(lvl_min+1); i <= lvl_max; ++i)
   {
     std::cout << "Allocating Level " << i << "..." << std::endl;
     levels.push_back(levels.back()->refine());
   }
 
   // assemble grid transfer
-  for(int i(lvl_min+1); i <= lvl_max; ++i)
+  for(std::size_t i(lvl_min+1); i <= lvl_max; ++i)
   {
     std::cout << "Assembling Grid Transfer for Level " << (i-1) << " -> " << i << "..." << std::endl;
     levels.at(i - lvl_min)->assemble_prolrest(*levels.at(i - lvl_min - 1));
   }
 
   // assemble matrices
-  for(int i(lvl_min); i <= lvl_max; ++i)
+  for(std::size_t i(lvl_min); i <= lvl_max; ++i)
   {
     std::cout << "Assembling Matrices on Level " << i << "..." << std::endl;
     levels.at(i - lvl_min)->assemble_matrices();
   }
 
   // assemble BCs
-  for(int i(lvl_min); i <= lvl_max; ++i)
+  for(std::size_t i(lvl_min); i <= lvl_max; ++i)
   {
     std::cout << "Assembling Boundary Conditions on Level " << i << "..." << std::endl;
     levels.at(i - lvl_min)->assemble_bc();
@@ -700,7 +700,7 @@ int main(int argc, char* argv[])
   for(int i(0); i < 100; ++i)
   {
     // restriction loop
-    for(int lvl(lvl_max); lvl > lvl_min; --lvl)
+    for(std::size_t lvl(lvl_max); lvl > lvl_min; --lvl)
     {
       // pre-smooth
       levels.at(lvl - lvl_min)->smooth(16, 2, 1, 1.0, 1.0);
@@ -713,7 +713,7 @@ int main(int argc, char* argv[])
     levels.front()->smooth(500, 2, 1, 1.0, 1.0);
 
     // prolongation loop
-    for(int lvl(lvl_min+1); lvl <= lvl_max; ++lvl)
+    for(std::size_t lvl(lvl_min+1); lvl <= lvl_max; ++lvl)
     {
       // prolongate
       levels.at(lvl - lvl_min)->prolongate(*levels.at(lvl - lvl_min - 1));

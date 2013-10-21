@@ -145,7 +145,7 @@ namespace FEAST
             // initialise domain point
             for(int i(0); i < shape_dim; ++i)
             {
-              dom_point[i] = DataType(RefCell::coord(k, i));
+              dom_point[Index(i)] = DataType(RefCell::coord(k, i));
             }
 
             // compute trafo data
