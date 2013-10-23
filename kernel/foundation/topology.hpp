@@ -97,7 +97,7 @@ namespace FEAST
          */
         void push_back(const StorageType_& s)
         {
-          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, _topology.size(), s));
+          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, IndexType_(_topology.size()), s));
           _history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
