@@ -28,7 +28,7 @@ namespace FEAST
     class AttributeBase
     {
       public:
-        virtual Index size() = 0;
+        virtual Index size() const = 0;
         virtual ~AttributeBase()
         {
         }
@@ -72,7 +72,7 @@ namespace FEAST
           return _data;
         }
 
-        virtual Index size()
+        virtual Index size() const
         {
           return Index(_data.size());
         }
