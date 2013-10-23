@@ -707,12 +707,15 @@ int main(int argc, char* argv[])
   int num_patches(0);
   Index desired_refinement_level(4);
 
+  std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
+
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   MPI_Comm_size(MPI_COMM_WORLD, &num_patches);
+#else
+  std::cout << "Parallel tests unavailable on sole process " << me << " with " << num_patches << " patches and l = " << desired_refinement_level << std::endl;
 #endif
-  std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
 #ifndef SERIAL
   test_hypercube_2d((Index)me, (Index)num_patches, desired_refinement_level);

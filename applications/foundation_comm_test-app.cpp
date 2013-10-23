@@ -730,6 +730,8 @@ int main(int argc, char* argv[])
   check_halobased_attribute_transfer((Index)me);
   check_halobased_dv_transfer((Index)me);
   check_halobased_smcsr_transfer((Index)me);
+#else
+  std::cout << "Parallel tests unavailable on sole process " << me << std::endl;
 #endif
 
 #ifndef SERIAL
