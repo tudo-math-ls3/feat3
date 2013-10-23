@@ -4,6 +4,11 @@
 #include<kernel/foundation/refinement.hpp>
 #include<kernel/archs.hpp>
 
+/*#include<kernel/foundation/mesh_control.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/cell_sub_set.hpp>
+#include <kernel/geometry/export_vtk.hpp>*/
+
 #include<deque>
 
 using namespace FEAST;
@@ -186,6 +191,17 @@ class RefinementTest2D:
       Refinement<Mem::Main,
                  Algo::Generic,
                  mrt_standard>::execute(m_fine, &halos, attrs);
+
+      /*Index size_set[3];
+      MeshControl<dim_2D>::fill_sizes(m_fine, size_set);
+
+      typedef ConformalMesh<Shape::Hypercube<2> > BaseMeshType;
+      BaseMeshType basemesh(size_set);
+      MeshControl<dim_2D>::fill_adjacencies(m_fine, basemesh);
+      MeshControl<dim_2D>::fill_vertex_sets(m_fine, basemesh, attrs.at(0), attrs.at(1));
+
+      ExportVTK<BaseMeshType> vtkexporter(basemesh);
+      vtkexporter.write("test_mesh.vtk");*/
 
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_face_vertex).size(), 4ul);
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_edge_vertex).size(), 12ul);
