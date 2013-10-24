@@ -757,14 +757,18 @@ namespace FEAST
               ofs << "2 " << verts.at(0) << " " << verts.at(1) << std::endl;
             }
 
-            ///TODO reorder
             ofs << "POLYGONS " << _mesh.num_polytopes(pl_face) << " " << 5 * _mesh.num_polytopes(pl_face) << std::endl;
+            typename MT_::topology_type_::storage_type_ map(4);
+            map.at(0) = 0;
+            map.at(1) = 1;
+            map.at(2) = 3;
+            map.at(3) = 2;
             for(Index i(0) ; i < _mesh.num_polytopes(pl_face) ; ++i)
             {
               typename MT_::topology_type_::storage_type_ verts(_mesh.get_adjacent_polytopes(pl_face, pl_vertex, i));
               ofs << "4";
               for(Index j(0) ; j < verts.size() ; ++j)
-                 ofs  << " " << verts.at(j);
+                 ofs  << " " << verts.at(map.at(j));
               ofs << std::endl;
             }
 
