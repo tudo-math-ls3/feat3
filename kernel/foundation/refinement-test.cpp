@@ -203,8 +203,8 @@ class RefinementTest2D:
       ExportVTK<BaseMeshType> vtkexporter(basemesh);
       vtkexporter.write("test_mesh.vtk");*/
 
-      /*Exporter<VTK, Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
-      exporter.write("ref_test_2D_result.vtk");*/
+      Exporter<VTK, Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
+      exporter.write("ref_test_2D_result.vtk");
 
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_face_vertex).size(), 4ul);
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_edge_vertex).size(), 12ul);

@@ -369,7 +369,8 @@ namespace FEAST
                 typename t_::storage_type_::iterator it(std::set_intersection(t_l.begin(), t_l.end(), t_j.begin(), t_j.end(), t_lj.begin()));
                 t_lj.resize(Index(it - t_lj.begin()));
 
-                t_fi_l_intersect_t_fi_j.push_back(t_lj);
+                if(t_lj.size() > 0)
+                  t_fi_l_intersect_t_fi_j.push_back(t_lj);
 
                 typename t_::storage_type_ union_tmp(t_union.size() + t_lj.size());
                 typename t_::storage_type_::iterator itu(std::set_union(t_union.begin(), t_union.end(), t_lj.begin(), t_lj.end(), union_tmp.begin()));
@@ -384,26 +385,20 @@ namespace FEAST
             {
               vf_0.clear();
               vf_0.push_back(v_fc.at(l));
+              vf_0.push_back(t_fi_l_intersect_t_fi_j.at(0).at(0));
+              vf_0.push_back(t_fi_l_intersect_t_fi_j.at(1).at(0));
               vf_0.push_back(origin.num_polytopes(pl_vertex)- 1);
-              for(Index m(0) ; m < t_fi_l_intersect_t_fi_j.size() ; ++m)
-                for(Index n(0) ; n < t_fi_l_intersect_t_fi_j.at(m).size() ; ++n)
-                  vf_0.push_back(t_fi_l_intersect_t_fi_j.at(m).at(n));
 
               //inject
               origin.get_topologies().at(ipi_face_vertex).at(i) = vf_0; //vertices are already adjacent to face i and  will be removed from all other later => done here
             }
-            else
+            else if( l == 1)
             {
               origin.add_polytope(pl_face);
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(0).at(0));
               origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, v_fc.at(l));
-
               origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, origin.num_polytopes(pl_vertex) - 1);
-
-              for(Index m(0) ; m < t_fi_l_intersect_t_fi_j.size() ; ++m)
-                for(Index n(0) ; n < t_fi_l_intersect_t_fi_j.at(m).size() ; ++n)
-                {
-                  origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(m).at(n));
-                }
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(1).at(0));
 
               //for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
               if(hrt_ == hrt_refine)
@@ -433,6 +428,80 @@ namespace FEAST
                 }
               }
             }
+            else if( l == 2)
+            {
+              origin.add_polytope(pl_face);
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(0).at(0));
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, origin.num_polytopes(pl_vertex) - 1);
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, v_fc.at(l));
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(1).at(0));
+
+              //for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
+              if(hrt_ == hrt_refine)
+              {
+                //refine halo faces
+                if(halos != nullptr)
+                {
+                  for(Index hi(0) ; hi < halos->size() ; ++hi)
+                  {
+                    //only do this for face halos with delta > 0
+                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    {
+                      typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
+                      if(iter != halos->at(hi)->get_elements().end())
+                      {
+                        if(iter + 1 == halos->at(hi)->get_elements().end())
+                        {
+                          halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1);
+                        }
+                        else
+                        {
+                          halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            else if( l == 3)
+            {
+              origin.add_polytope(pl_face);
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, origin.num_polytopes(pl_vertex) - 1);
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(0).at(0));
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_fi_l_intersect_t_fi_j.at(1).at(0));
+              origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, v_fc.at(l));
+
+              //for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
+              if(hrt_ == hrt_refine)
+              {
+                //refine halo faces
+                if(halos != nullptr)
+                {
+                  for(Index hi(0) ; hi < halos->size() ; ++hi)
+                  {
+                    //only do this for face halos with delta > 0
+                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    {
+                      typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
+                      if(iter != halos->at(hi)->get_elements().end())
+                      {
+                        if(iter + 1 == halos->at(hi)->get_elements().end())
+                        {
+                          halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_face_vertex).size() - 1);
+                        }
+                        else
+                        {
+                          halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_face_vertex).size() - 1); //insertion after ///TODO QUAD
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+
           }
           ///all vertices at old face
           typename t_::storage_type_ vertex_at_polygon_tmp(vertex_at_polygon.size() + t_union.size());

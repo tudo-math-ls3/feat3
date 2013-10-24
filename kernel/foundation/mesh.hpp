@@ -762,9 +762,9 @@ namespace FEAST
             for(Index i(0) ; i < _mesh.num_polytopes(pl_face) ; ++i)
             {
               typename MT_::topology_type_::storage_type_ verts(_mesh.get_adjacent_polytopes(pl_face, pl_vertex, i));
-              ofs << "4 ";
+              ofs << "4";
               for(Index j(0) ; j < verts.size() ; ++j)
-                 ofs << verts.at(j) << " ";
+                 ofs  << " " << verts.at(j);
               ofs << std::endl;
             }
 
