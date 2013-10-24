@@ -255,9 +255,9 @@ namespace FEAST
           const auto& index_set(mesh.template get_index_set<shape_dim_, cell_dim_>());
           for(Index i(0); i < Index(cell_count); ++i)
           {
-            for(Index j(0); j < Index(dofs_per_cell); ++j, ++k)
+            for(int j(0); j < dofs_per_cell; ++j, ++k)
             {
-              dof_idx[k] = offs + index_set(cell,i) * dofs_per_cell + j;
+              dof_idx[k] = offs + index_set(cell,i) * dofs_per_cell + Index(j);
             }
           }
           return offs + Index(dofs_per_cell) * mesh.get_num_entities(cell_dim_);
@@ -283,9 +283,9 @@ namespace FEAST
         {
           Index offs(UniformDofMappingHelper<Shape_, Traits_, Tag_, cell_dim_-1>::assemble(dof_idx, mesh, cell, k));
 
-          for(Index j(0); j < Index(dofs_per_cell); ++j, ++k)
+          for(int j(0); j < dofs_per_cell; ++j, ++k)
           {
-            dof_idx[k] = offs + cell * dofs_per_cell + j;
+            dof_idx[k] = offs + cell * dofs_per_cell + Index(j);
           }
           return offs + Index(dofs_per_cell) * mesh.get_num_entities(cell_dim_);
         }
@@ -314,9 +314,9 @@ namespace FEAST
           k = 0;
           for(Index i(0); i < Index(cell_count); ++i)
           {
-            for(Index j(0); j < Index(dofs_per_cell); ++j, ++k)
+            for(int j(0); j < dofs_per_cell; ++j, ++k)
             {
-              dof_idx[k] = index_set(cell,i) * dofs_per_cell + j;
+              dof_idx[k] = index_set(cell,i) * dofs_per_cell + Index(j);
             }
           }
           return Index(dofs_per_cell) * mesh.get_num_entities(0);
