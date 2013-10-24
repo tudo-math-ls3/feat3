@@ -253,14 +253,11 @@ namespace FEAST
         typedef typename MeshType::ShapeType ShapeType;
 
         // define assembly traits
-        typedef AsmTraits1<typename VectorOut_::DataType, Space_, Trafo::ConfigBase, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename VectorOut_::DataType, SpaceType, Trafo::ConfigBase, SpaceConfig> AsmTraits;
         typedef typename AsmTraits::DataType DataType;
 
         // define the cubature rule
         typename AsmTraits::CubatureRuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // define the reference cell type
-        typedef Shape::ReferenceCell<ShapeType> RefCell;
 
         // fetch the trafo and the mesh
         const TrafoType& trafo(space.get_trafo());

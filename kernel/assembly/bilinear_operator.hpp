@@ -73,15 +73,12 @@ namespace FEAST
 
         // assembly traits
         typedef AsmTraits2<
-          typename Matrix_::DataType,
-          TestSpace_,
-          TrialSpace_,
+          typename MatrixType::DataType,
+          TestSpaceType,
+          TrialSpaceType,
           typename FunctorType::TrafoConfig,
           typename FunctorType::TestConfig,
           typename FunctorType::TrialConfig> AsmTraits;
-
-        /// data type
-        typedef typename AsmTraits::DataType DataType;
 
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = test_space.get_trafo();
@@ -228,15 +225,12 @@ namespace FEAST
 
         // assembly traits
         typedef AsmTraits1<
-          typename Matrix_::DataType,
-          Space_,
+          typename MatrixType::DataType,
+          SpaceType,
           typename FunctorType::TrafoConfig,
           Space::ConfigOr<
-            typename Functor_::TestConfig,
-            typename Functor_::TrialConfig> > AsmTraits;
-
-        /// data type
-        typedef typename AsmTraits::DataType DataType;
+            typename FunctorType::TestConfig,
+            typename FunctorType::TrialConfig> > AsmTraits;
 
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();

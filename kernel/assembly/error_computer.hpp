@@ -95,7 +95,7 @@ namespace FEAST
         /// space type
         typedef Space_ SpaceType;
         /// assembly traits
-        typedef AsmTraits1<typename Vector_::DataType, Space_, TrafoConfig, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename Vector_::DataType, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
         /// data type
         typedef typename AsmTraits::DataType DataType;
 
@@ -106,7 +106,7 @@ namespace FEAST
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
         // create a functor value evaluator
-        typename Functor_::template ValueEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
+        typename FunctorType::template ValueEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -288,7 +288,7 @@ namespace FEAST
         /// space type
         typedef Space_ SpaceType;
         /// assembly traits
-        typedef AsmTraits1<typename Vector_::DataType, Space_, TrafoConfig, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename Vector_::DataType, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
         /// data type
         typedef typename AsmTraits::DataType DataType;
 
@@ -299,7 +299,7 @@ namespace FEAST
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
         // create a functor gradient evaluator
-        typename Functor_::template GradientEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
+        typename FunctorType::template GradientEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -480,7 +480,7 @@ namespace FEAST
         /// space type
         typedef Space_ SpaceType;
         /// assembly traits
-        typedef AsmTraits1<typename Vector_::DataType, Space_, TrafoConfig, SpaceConfig> AsmTraits;
+        typedef AsmTraits1<typename Vector_::DataType, SpaceType, TrafoConfig, SpaceConfig> AsmTraits;
         /// data type
         typedef typename AsmTraits::DataType DataType;
 
@@ -491,7 +491,7 @@ namespace FEAST
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
         // create a functor gradient evaluator
-        typename Functor_::template HessianEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
+        typename FunctorType::template HessianEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);

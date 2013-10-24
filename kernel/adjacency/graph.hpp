@@ -794,9 +794,6 @@ namespace FEAST
         // validate adjactor dimensions
         ASSERT(adj1.get_num_nodes_image() <= adj2.get_num_nodes_domain(), "Adjactor dimension mismatch!");
 
-        typedef typename Adjactor1_::ImageIterator AImIt1;
-        typedef typename Adjactor2_::ImageIterator AImIt2;
-
         // get counts
         _num_nodes_domain = adj1.get_num_nodes_domain();
         _num_nodes_image = adj2.get_num_nodes_image();

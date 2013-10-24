@@ -80,7 +80,6 @@ namespace FEAST
         // typedefs for trafos, mesh and shape
         typedef typename FineSpace_::TrafoType FineTrafoType;
         typedef typename CoarseSpace_::TrafoType CoarseTrafoType;
-        typedef typename CoarseTrafoType::MeshType MeshType;
         typedef typename CoarseSpace_::ShapeType ShapeType;
 
         // typedefs for dof-mappings

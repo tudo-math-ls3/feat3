@@ -545,7 +545,6 @@ namespace FEAST
           typedef IndexSet<6> IndexSetTypeSE;
 
           // typedef index vector type
-          typedef IndexSetTypeST::ConstIndexVectorReference ConstIndexVectorReferenceST;
           typedef IndexSetTypeSE::ConstIndexVectorReference ConstIndexVectorReferenceSE;
 
           // fetch the index sets
@@ -727,7 +726,6 @@ namespace FEAST
           typedef IndexSet<4> IndexSetTypeSV;
 
           // typedef index vector type
-          typedef IndexSetTypeST::ConstIndexVectorReference ConstIndexVectorReferenceST;
           typedef IndexSetTypeSE::ConstIndexVectorReference ConstIndexVectorReferenceSE;
           typedef IndexSetTypeSV::ConstIndexVectorReference ConstIndexVectorReferenceSV;
 
@@ -908,7 +906,6 @@ namespace FEAST
           typedef IndexSet<4> IndexSetTypeST;
 
           // typedef index vector type
-          typedef IndexSetTypeTV::ConstIndexVectorReference ConstIndexVectorReferenceTV;
           typedef IndexSetTypeSV::ConstIndexVectorReference ConstIndexVectorReferenceSV;
           typedef IndexSetTypeST::ConstIndexVectorReference ConstIndexVectorReferenceST;
 
@@ -1073,8 +1070,6 @@ namespace FEAST
           typedef IndexSet<4> IndexSetTypeST;
 
           // typedef index vector type
-          typedef IndexSetTypeEV::ConstIndexVectorReference ConstIndexVectorReferenceEV;
-          typedef IndexSetTypeTV::ConstIndexVectorReference ConstIndexVectorReferenceTV;
           typedef IndexSetTypeSV::ConstIndexVectorReference ConstIndexVectorReferenceSV;
           typedef IndexSetTypeSE::ConstIndexVectorReference ConstIndexVectorReferenceSE;
           typedef IndexSetTypeST::ConstIndexVectorReference ConstIndexVectorReferenceST;
@@ -1256,7 +1251,6 @@ namespace FEAST
           typedef IndexSet<4> IndexSetTypeST;
 
           // typedef index vector type
-          typedef IndexSetTypeTV::ConstIndexVectorReference ConstIndexVectorReferenceTV;
           typedef IndexSetTypeSV::ConstIndexVectorReference ConstIndexVectorReferenceSV;
           typedef IndexSetTypeST::ConstIndexVectorReference ConstIndexVectorReferenceST;
 
@@ -2264,7 +2258,6 @@ namespace FEAST
           typedef IndexSet<6> IndexSetTypeCQ;
 
           // typedef index vector type
-          typedef IndexSetTypeQV::ConstIndexVectorReference ConstIndexVectorReferenceQV;
           typedef IndexSetTypeCV::ConstIndexVectorReference ConstIndexVectorReferenceCV;
           typedef IndexSetTypeCQ::ConstIndexVectorReference ConstIndexVectorReferenceCQ;
 
@@ -2470,8 +2463,6 @@ namespace FEAST
           typedef IndexSet<6> IndexSetTypeCQ;
 
           // typedef index vector type
-          typedef IndexSetTypeEV::ConstIndexVectorReference ConstIndexVectorReferenceEV;
-          typedef IndexSetTypeQV::ConstIndexVectorReference ConstIndexVectorReferenceQV;
           typedef IndexSetTypeCV::ConstIndexVectorReference ConstIndexVectorReferenceCV;
           typedef IndexSetTypeCE::ConstIndexVectorReference ConstIndexVectorReferenceCE;
           typedef IndexSetTypeCQ::ConstIndexVectorReference ConstIndexVectorReferenceCQ;
@@ -2694,7 +2685,6 @@ namespace FEAST
           typedef IndexSet<6> IndexSetTypeCQ;
 
           // typedef index vector type
-          typedef IndexSetTypeQV::ConstIndexVectorReference ConstIndexVectorReferenceQV;
           typedef IndexSetTypeCV::ConstIndexVectorReference ConstIndexVectorReferenceCV;
           typedef IndexSetTypeCQ::ConstIndexVectorReference ConstIndexVectorReferenceCQ;
 
