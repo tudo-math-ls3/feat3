@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 2.8)
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
 # top lvl include dir
-INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
+INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
 # include test_aux subdirectory
 ADD_SUBDIRECTORY( test_aux )

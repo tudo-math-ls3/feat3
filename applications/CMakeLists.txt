@@ -7,7 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 
 
 #top lvl include dir
-INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
+INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
 # applications to build
 ADD_EXECUTABLE(foundation_system_test-app foundation_system_test-app.cpp)
