@@ -253,21 +253,21 @@ namespace FEAST
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_values(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(evaluator.can_value != 0, "space evaluator does not support basis function values");
+          static_assert(Evaluator_::can_value != 0, "space evaluator does not support basis function values");
           evaluator.eval_values(space_data, trafo_data);
         }
 
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_gradients(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(evaluator.can_grad != 0, "space evaluator does not support basis function gradients");
+          static_assert(Evaluator_::can_grad != 0, "space evaluator does not support basis function gradients");
           evaluator.eval_gradients(space_data, trafo_data);
         }
 
         template<typename SpaceData_, typename Evaluator_, typename TrafoData_>
         static void eval_hessians(SpaceData_& space_data, const Evaluator_& evaluator, const TrafoData_& trafo_data)
         {
-          static_assert(evaluator.can_hess != 0, "space evaluator does not support basis function hessians");
+          static_assert(Evaluator_::can_hess != 0, "space evaluator does not support basis function hessians");
           evaluator.eval_hessians(space_data, trafo_data);
         }
       };
