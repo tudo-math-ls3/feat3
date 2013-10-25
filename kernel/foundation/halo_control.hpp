@@ -194,7 +194,7 @@ namespace FEAST
 
           Index size(source.template get_target_set<1>().get_num_entities());
 
-          for(Index i(0) ; i < size ; ++i)
+          for(IndexType i(0) ; i < size ; ++i)
             halo.push_back(source.template get_target_set<1>()[i]);
         }
 
@@ -263,7 +263,7 @@ namespace FEAST
 
           Index size(source.template get_target_set<1>().get_num_entities());
 
-          for(Index i(0) ; i < size ; ++i)
+          for(IndexType i(0) ; i < size ; ++i)
             halo.push_back(source.template get_target_set<1>()[i]);
         }
 
@@ -306,9 +306,9 @@ namespace FEAST
         {
           typedef typename HaloType_<0, PLEdge, b_, c_>::index_type_ IndexType;
 
-          Index size(source.template get_target_set<1>().get_num_entities());
+          IndexType size(source.template get_target_set<1>().get_num_entities());
 
-          for(Index i(0) ; i < size ; ++i)
+          for(IndexType i(0) ; i < size ; ++i)
             halo.push_back(source.template get_target_set<1>()[i]);
         }
 
@@ -507,9 +507,9 @@ namespace FEAST
         {
           typedef typename HaloType_<a_, PLFace, b_, c_>::index_type_ IndexType;
 
-          Index size(source.template get_target_set<2>().get_num_entities());
+          IndexType size(source.template get_target_set<2>().get_num_entities());
 
-          for(Index i(0) ; i < size ; ++i)
+          for(IndexType i(0) ; i < size ; ++i)
             halo.push_back(source.template get_target_set<2>()[i]);
         }
     };
@@ -668,7 +668,7 @@ namespace FEAST
         {
           typedef typename HaloType_<0, PLFace, b_, c_>::index_type_ IndexType;
 
-          Index size(source.template get_target_set<2>().get_num_entities());
+          IndexType size(source.template get_target_set<2>().get_num_entities());
 
           for(Index i(0) ; i < size ; ++i)
             halo.push_back(source.template get_target_set<2>()[i]);
@@ -871,9 +871,9 @@ namespace FEAST
         {
           typedef typename HaloType_<a_, PLPolyhedron, b_, c_>::index_type_ IndexType;
 
-          Index size(source.template get_target_set<3>().get_num_entities());
+          IndexType size(source.template get_target_set<3>().get_num_entities());
 
-          for(Index i(0) ; i < size ; ++i)
+          for(IndexType i(0) ; i < size ; ++i)
             halo.push_back(source.template get_target_set<3>()[i]);
         }
     };
