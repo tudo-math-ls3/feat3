@@ -47,7 +47,7 @@ int main(int, char**)
 
   // 3D Tetra Elements
   {
-    typedef Geometry::ConformalMesh< Shape::Simplex<3> > MeshType;
+    //typedef Geometry::ConformalMesh< Shape::Simplex<3> > MeshType;
     //typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // Discontinuous-0
@@ -75,7 +75,7 @@ int main(int, char**)
 
   // 3D Hexa Elements
   {
-    typedef Geometry::ConformalMesh< Shape::Hypercube<3> > MeshType;
+    //typedef Geometry::ConformalMesh< Shape::Hypercube<3> > MeshType;
     //typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // Discontinuous-0

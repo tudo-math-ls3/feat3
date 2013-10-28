@@ -218,10 +218,6 @@ namespace FEAST
         typedef Matrix_ MatrixType;
         // space type
         typedef Space_ SpaceType;
-        // test-space type
-        typedef Space_ TestSpaceType;
-        // trial-space type
-        typedef Space_ TrialSpaceType;
 
         // assembly traits
         typedef AsmTraits1<
