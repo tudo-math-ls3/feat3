@@ -123,8 +123,8 @@ public:
     // test inverse permutation
     test_inv(prm_rnd, vs);
 
-    // create inverse random permutation directory
-    Permutation prm_inv1(prm_rnd, true);
+    // create inverse random permutation directly
+    Permutation prm_inv1(prm_rnd.inverse());
     test_fwd(prm_inv1, vs);
 
     // create inverse random permutation by inverse permute array

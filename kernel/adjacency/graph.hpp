@@ -11,7 +11,7 @@ namespace FEAST
 {
   namespace Adjacency
   {
-    class Colouring;
+    // forward declaration
     class Permutation;
 
     /**
@@ -174,18 +174,6 @@ namespace FEAST
         const Index* image_idx);
 
       /**
-       * \brief "Colouring" Constructor
-       *
-       * This constructor creates a new graph out of the colouring object which is passed to this function.
-       * The created graph's image is the set of nodes, the domain is the set of colours.
-       *
-       * \param[in] col
-       * The colouring object the graph is derived from.
-       *
-       */
-      explicit Graph(const Colouring& col);
-
-      /**
        * \brief Render constructor
        *
        * This constructor renders an object implementing the Adjactor interface into a graph.
@@ -287,11 +275,11 @@ namespace FEAST
         }
       }
 
-      /// copy CTOR
-      Graph(const Graph& other);
+      /// move CTOR
+      Graph(Graph&& other);
 
-      /// copy assignment operator
-      Graph& operator=(const Graph& other);
+      /// move-assign operator
+      Graph& operator=(Graph&& other);
 
       /**
        * \brief "Permutation" copy CTOR
@@ -308,11 +296,23 @@ namespace FEAST
        * \param[in] image_perm
        * The permutation of the image set.
        */
-
-      Graph(const Graph& other, Permutation& domain_perm, Permutation& image_perm);
+      Graph(const Graph& other, const Permutation& domain_perm, const Permutation& image_perm);
 
       /// virtual destructor
       virtual ~Graph();
+
+      /**
+       * \brief Clones this graph.
+       *
+       * \returns A deep-copy of this graph.
+       */
+      Graph clone() const
+      {
+        if(_domain_ptr != nullptr)
+          return Graph(_num_nodes_domain, _num_nodes_image, _num_indices_image, _domain_ptr, _domain_end, _image_idx);
+        else
+          return Graph();
+      }
 
       /**
        * \brief Returns the degree of a domain node.

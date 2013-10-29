@@ -140,10 +140,46 @@ namespace FEAST
         }
       }
 
+      /// move ctor
+      DynamicGraph(DynamicGraph&& other) :
+        _num_nodes_domain(other._num_nodes_domain),
+        _num_nodes_image(other._num_nodes_image),
+        _indices(std::move(other._indices))
+      {
+      }
+
+      /// move-assign operator
+      DynamicGraph& operator=(DynamicGraph&& other)
+      {
+        // avoid self-move
+        if(this == &other)
+          return *this;
+
+        _num_nodes_domain = other._num_nodes_domain;
+        _num_nodes_image = other._num_nodes_image;
+        _indices = std::move(other._indices);
+
+        other._num_nodes_domain = other._num_nodes_image = Index(0);
+
+        return *this;
+      }
+
       /// virtual destructor
       virtual ~DynamicGraph()
       {
         CONTEXT("DynamicGraph::~DynamicGraph()");
+      }
+
+      /**
+       * \brief Clones this dynamic graph.
+       *
+       * \returns A deep-copy of this dynamic graph.
+       */
+      DynamicGraph clone() const
+      {
+        DynamicGraph graph(_num_nodes_domain, _num_nodes_image);
+        graph._indices = _indices;
+        return std::move(graph);
       }
 
       /**

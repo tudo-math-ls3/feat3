@@ -2,17 +2,18 @@
 #include <kernel/adjacency/cuthill_mckee.hpp>
 #include <kernel/adjacency/graph.hpp>
 
+// includes, system
+#include <vector>
+
 namespace FEAST
 {
   namespace Adjacency
   {
-    CuthillMcKee::CuthillMcKee(
+    Permutation CuthillMcKee::compute(
       const Graph& graph,
       bool reverse,
       CuthillMcKee::RootType root_type,
       CuthillMcKee::SortType sort_type)
-        :
-      _perm(graph.get_num_nodes_domain())
     {
       CONTEXT("CuthillMcKee::CuthillMcKee() [graph]");
 
@@ -23,13 +24,14 @@ namespace FEAST
       const Index* domain_ptr = graph.get_domain_ptr();
       const Index* image_idx = graph.get_image_idx();
 
-      // auxiliary array storing the node degrees
-      Index* node_degree = new Index[num_nodes];
-      int* node_mask = new int[num_nodes];
+      // a vector which keeps track of which nodes have already been processed
+      std::vector<bool> node_mask(num_nodes, false);
+
+      // a vector storing the degree of each node
+      std::vector<Index> node_degree(num_nodes);
       for(Index j(0); j < num_nodes; ++j)
       {
         node_degree[j] = graph.degree(j);
-        node_mask[j] = 0;
       }
 
       // auxiliary variables
@@ -37,8 +39,9 @@ namespace FEAST
       Index lvl2 = 0;
       Index lvl3 = 0;
 
-      // permutation array
-      Index* permutation = _perm.get_perm_pos();
+      // create permutation
+      Permutation perm(graph.get_num_nodes_domain());
+      Index* permutation = perm.get_perm_pos();
 
       while(lvl2 < num_nodes)
       {
@@ -54,7 +57,7 @@ namespace FEAST
           for(Index j(0); j < num_nodes; ++j)
           {
             // check if the node is unmarked
-            if(node_mask[j] == 0)
+            if(!node_mask[j])
             {
               root = j;
               break;
@@ -68,7 +71,7 @@ namespace FEAST
             Index min = num_nodes + 1;
             for(Index j(0); j < num_nodes; ++j)
             {
-              if((node_degree[j] < min) && (node_mask[j] == 0))
+              if((node_degree[j] < min) && !node_mask[j])
               {
                 root = j;
                 min = node_degree[j];
@@ -83,7 +86,7 @@ namespace FEAST
             Index max = 0;
             for(Index j(0); j < num_nodes; ++j)
             {
-              if((node_degree[j] > max) && (node_mask[j] == 0))
+              if((node_degree[j] > max) && !node_mask[j])
               {
                 root = j;
                 max = node_degree[j];
@@ -130,11 +133,11 @@ namespace FEAST
               Index k = image_idx[j];
 
               // has this node been processed?
-              if(node_mask[k] == 0)
+              if(!node_mask[k])
               {
                 ++lvl3;
                 permutation[lvl3 - 1] = k;
-                node_mask[k] = 1;
+                node_mask[k] = true;
               }
             } //j loop
           } // i loop
@@ -221,12 +224,11 @@ namespace FEAST
 
       } //while(lvl2 < num_nodes) (the separability loop)
 
-      // deleting the auxiliary arrays
-      delete [] node_mask;
-      delete [] node_degree;
+      // compute swap array
+      perm.calc_swap_from_perm();
 
-      // create Cuthill-McKee permutation
-      _perm.calc_swap_from_perm();
+      // return permutation
+      return std::move(perm);
     }
   } // namespace Adjacency
 } // namespace FEAST

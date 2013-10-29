@@ -2,6 +2,10 @@
 #include <kernel/adjacency/colouring.hpp>
 #include <kernel/adjacency/graph.hpp>
 
+// includes, system
+#include <vector>
+#include <utility>
+
 namespace FEAST
 {
   namespace Adjacency
@@ -66,15 +70,11 @@ namespace FEAST
       // number of used colours
       _num_colours = 0;
 
-      // auxiliary array storing temporary information about used colours
-      Index* col_aux = new Index[mnc];
+      // auxiliary vector storing temporary information about used colours
+      std::vector<Index> col_aux(mnc);
 
-      // auxiliary array storing the number of colour uses
-      Index* col_num = new Index[mnc];
-      for(Index j(0); j < mnc; ++j)
-      {
-        col_num[j] = 0;
-      }
+      // auxiliary vector storing the number of colour uses
+      std::vector<Index> col_num(mnc, Index(0));
 
       // auxiliary variables
       Index lower_bound;
@@ -139,10 +139,6 @@ namespace FEAST
           ++_num_colours;
         }
       }
-
-      // deleting the auxiliary arrays
-      delete [] col_aux;
-      delete [] col_num;
     }
 
     // Creation out of a given Graph with a prescribed order
@@ -164,15 +160,11 @@ namespace FEAST
       // number of used colours
       _num_colours = 0;
 
-      // auxiliary array storing temporary information about used colours
-      Index* col_aux = new Index[mnc];
+      // auxiliary vector storing temporary information about used colours
+      std::vector<Index> col_aux(mnc);
 
-      // auxiliary array storing the number of colour uses
-      Index* col_num = new Index[mnc];
-      for(Index j(0); j < mnc; ++j)
-      {
-        col_num[j] = 0;
-      }
+      // auxiliary vector storing the number of colour uses
+      std::vector<Index> col_num(mnc, Index(0));
 
       // auxiliary variables
       Index lower_bound;
@@ -249,18 +241,80 @@ namespace FEAST
           ++_num_colours;
         }
       }
-
-      // deleting the auxiliary arrays
-      delete [] col_aux;
-      delete [] col_num;
     }
 
-    /// virtual destructor
+    // move ctor
+    Colouring::Colouring(Colouring&& other) :
+      _num_nodes(other._num_nodes),
+      _num_colours(other._num_colours),
+      _colouring(other._colouring)
+    {
+      other._num_nodes = other._num_colours = Index(0);
+      other._colouring = nullptr;
+    }
+
+    // move-assign operator
+    Colouring& Colouring::operator=(Colouring&& other)
+    {
+      // avoid self-move
+      if(this == &other)
+        return *this;
+
+      if(_colouring != nullptr)
+        delete [] _colouring;
+
+      _num_nodes = other._num_nodes;
+      _num_colours = other._num_colours;
+      _colouring = other._colouring;
+
+      other._num_nodes = other._num_colours = Index(0);
+      other._colouring = nullptr;
+
+      return *this;
+    }
+
+    // virtual destructor
     Colouring::~Colouring()
     {
       CONTEXT("Colouring::~Colouring()");
       if(_colouring != nullptr)
         delete [] _colouring;
     }
+
+    Graph Colouring::create_partition_graph() const
+    {
+      // allocate a new graph
+      Graph graph(get_max_colour() + 1, get_num_nodes(), get_num_nodes());
+
+      // create domain array
+      Index* domain_ptr = graph.get_domain_ptr();
+      domain_ptr[0] = Index(0);
+
+      // create image array
+      Index* image_idx = graph.get_image_idx();
+
+      // index counter
+      Index idx_counter = Index(0);
+
+      // loop over all colours
+      for(Index i(0); i < _num_colours; ++i)
+      {
+        // loop over all nodes
+        for(Index j(0); j < _num_nodes; ++j)
+        {
+          // if node j has the colour i
+          if(i == _colouring[j])
+          {
+            image_idx[idx_counter] = j;
+            ++idx_counter;
+          }
+        }
+        domain_ptr[i+1] = idx_counter;
+      }
+
+      // return graph
+      return std::move(graph);
+    }
+
   } // namespace Adjacency
 } // namespace FEAST

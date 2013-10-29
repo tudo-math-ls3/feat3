@@ -4,13 +4,12 @@
 
 // includes, FEAST
 #include <kernel/adjacency/permutation.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 namespace FEAST
 {
   namespace Adjacency
   {
-    class Graph;
-
     /**
      * \brief Cuthill McKee implementation
      *
@@ -80,15 +79,10 @@ namespace FEAST
         sort_desc = 2
       };
 
-    protected:
-      /// Cuthill McKee permutation
-      Permutation _perm;
-
-    public:
       /**
-       * \brief Graph Constructor
+       * \brief Cuthill-McKee permutation computation functon
        *
-       * This constructor creates a new Cuthill-McKee object and calculates the Cuthill-McKee permutation of the given graph.
+       * This function creates a Cuthill-McKee permutation of the given graph.
        *
        * \param[in] graph
        * The graph, the permutation is calculated for.
@@ -102,35 +96,15 @@ namespace FEAST
        *
        * \param[in] sort_type
        * This parameter determines, which sorting is used in each level of the Cuthill-McKee algorithm.
+       *
+       * \returns
+       * The Cuthill-McKee permutation.
        */
-      explicit CuthillMcKee(
+      static Permutation compute(
         const Graph& graph,
         bool reverse = false,
         CuthillMcKee::RootType root_type = root_default,
         CuthillMcKee::SortType sort_type = sort_default);
-
-      /// virtual destructor
-      virtual ~CuthillMcKee()
-      {
-        CONTEXT("CuthillMcKee::~CuthillMcKee()");
-      }
-
-      /**
-       * \brief Returns the Cuthill-McKee permutation object.
-       * \returns The pointer to the permutation object.
-       */
-      Permutation& get_permutation()
-      {
-        CONTEXT("CuthillMcKee::get_permutation()");
-        return _perm;
-      }
-
-      /** \copydoc get_permutation() */
-      const Permutation& get_permutation() const
-      {
-        CONTEXT("CuthillMcKee::get_permutation() [const]");
-        return _perm;
-      }
     }; // class CuthillMcKee
   } // namespace Adjacency
 } // namespace FEAST

@@ -45,6 +45,14 @@ namespace FEAST
       Index* _swap_pos;
 
     public:
+      /// default CTOR
+      Permutation() :
+        _num_entries(0),
+        _perm_pos(nullptr),
+        _swap_pos(nullptr)
+      {
+      }
+
       /**
        * \brief Constructor
        *
@@ -86,23 +94,39 @@ namespace FEAST
         Index num_entries,
         Random& random);
 
-      /**
-       * \brief Copy/Inversion constructor
-       *
-       * This constructor either copies or inverts another permutation.
-       *
-       * \param[in] other
-       * The permutation that is to be copied or inverted.
-       *
-       * \param[in] invert
-       * If \c false, the other permutation will be copied, otherwise it will be inverted.
-       */
-      explicit Permutation(
-        const Permutation& other,
-        bool invert = false);
+      /// move ctor
+      Permutation(Permutation&& other);
+      /// move-assign operator
+      Permutation& operator=(Permutation&&);
 
       /// virtual destructor
       virtual ~Permutation();
+
+      /**
+       * \brief Clones this permutation.
+       *
+       * \returns A deep-copy of this permutation
+       */
+      Permutation clone() const
+      {
+        if(_perm_pos != nullptr)
+          return Permutation(_num_entries, type_perm, _perm_pos);
+        else
+          return Permutation();
+      }
+
+      /**
+       * \brief Computes the inverse permutation.
+       *
+       * \returns The inverse permutiation.
+       */
+      Permutation inverse() const
+      {
+        if(_perm_pos != nullptr)
+          return Permutation(_num_entries, type_inv_perm, _perm_pos);
+        else
+          return Permutation();
+      }
 
       /// returns the size of the permutation
       Index size() const

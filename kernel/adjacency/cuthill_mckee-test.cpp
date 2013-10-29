@@ -26,20 +26,17 @@ public:
 
   bool test_default_root(Graph& g) const
   {
-    // Permutation pointer and permutation-array pointer
-    Index* perm_array;
+    // permutation-array pointer
+    Index* perm_array(nullptr);
 
-    // create Cuthill-McKee object (descending degrees)
-    CuthillMcKee cuth1(g, false, CuthillMcKee::root_default,
-                      CuthillMcKee::sort_desc);
+    // create Cuthill-McKee permutation (descending degrees)
+    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::root_default, CuthillMcKee::sort_desc));
 
-    // create Cuthill-McKee object (ascending degrees)
-    CuthillMcKee cuth2(g, false, CuthillMcKee::root_default,
-                      CuthillMcKee::sort_asc);
+    // create Cuthill-McKee permutation (ascending degrees)
+    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::root_default, CuthillMcKee::sort_asc));
 
-    // create Cuthill-McKee object (no sorting)
-    CuthillMcKee cuth3(g, false, CuthillMcKee::root_default,
-                      CuthillMcKee::sort_default);
+    // create Cuthill-McKee permutation (no sorting)
+    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::root_default, CuthillMcKee::sort_default));
 
     // analytic solution (descending degrees)
     Index ref1[12] =
@@ -60,7 +57,7 @@ public:
     };
 
     // check the permutation arrays
-    perm_array = cuth1.get_permutation().get_perm_pos();
+    perm_array = cuth1.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -70,7 +67,7 @@ public:
       }
     }
 
-    perm_array = cuth2.get_permutation().get_perm_pos();
+    perm_array = cuth2.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -80,7 +77,7 @@ public:
       }
     }
 
-    perm_array = cuth3.get_permutation().get_perm_pos();
+    perm_array = cuth3.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -94,20 +91,17 @@ public:
 
   bool test_min_root(Graph& g) const
   {
-    // Permutation pointer and permutation-array pointer
-    Index* perm_array;
+    // permutation-array pointer
+    Index* perm_array(nullptr);
 
-    // create Cuthill-McKee object (descending degrees)
-    CuthillMcKee cuth1(g, false, CuthillMcKee::root_minimum_degree,
-                      CuthillMcKee::sort_desc);
+    // create Cuthill-McKee permutation (descending degrees)
+    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_desc));
 
-    // create Cuthill-McKee object (ascending degrees)
-    CuthillMcKee cuth2(g, false, CuthillMcKee::root_minimum_degree,
-                      CuthillMcKee::sort_asc);
+    // create Cuthill-McKee permutation (ascending degrees)
+    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_asc));
 
-    // create Cuthill-McKee object (no sorting)
-    CuthillMcKee cuth3(g, false, CuthillMcKee::root_minimum_degree,
-                      CuthillMcKee::sort_default);
+    // create Cuthill-McKee permutation (no sorting)
+    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_default));
 
     // analytic solution (descending degrees)
     Index ref1[12] =
@@ -128,7 +122,7 @@ public:
     };
 
     // check the permutation arrays
-    perm_array = cuth1.get_permutation().get_perm_pos();
+    perm_array = cuth1.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -138,7 +132,7 @@ public:
       }
     }
 
-    perm_array = cuth2.get_permutation().get_perm_pos();
+    perm_array = cuth2.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -148,7 +142,7 @@ public:
       }
     }
 
-    perm_array = cuth3.get_permutation().get_perm_pos();
+    perm_array = cuth3.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -162,20 +156,17 @@ public:
 
   bool test_max_root(Graph& g) const
   {
-    // Permutation pointer and permutation array pointer
-    Index* perm_array;
+    // permutation-array pointer
+    Index* perm_array(nullptr);
 
-    // create Cuthill-McKee object (descending degrees)
-    CuthillMcKee cuth1(g, false, CuthillMcKee::root_maximum_degree,
-                      CuthillMcKee::sort_desc);
+    // create Cuthill-McKee permutation (descending degrees)
+    Permutation cuth1(CuthillMcKee::compute(g, false, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_desc));
 
-    // create Cuthill-McKee object (ascending degrees)
-    CuthillMcKee cuth2(g, false, CuthillMcKee::root_maximum_degree,
-                      CuthillMcKee::sort_asc);
+    // create Cuthill-McKee permutation (ascending degrees)
+    Permutation cuth2(CuthillMcKee::compute(g, false, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_asc));
 
-    // create Cuthill-McKee object (no sorting)
-    CuthillMcKee cuth3(g, false, CuthillMcKee::root_maximum_degree,
-                      CuthillMcKee::sort_default);
+    // create Cuthill-McKee permutation (no sorting)
+    Permutation cuth3(CuthillMcKee::compute(g, false, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_default));
 
     // analytic solution (descending degrees)
     Index ref1[12] =
@@ -196,7 +187,7 @@ public:
     };
 
     // check the permutation arrays
-    perm_array = cuth1.get_permutation().get_perm_pos();
+    perm_array = cuth1.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -206,7 +197,7 @@ public:
       }
     }
 
-    perm_array = cuth2.get_permutation().get_perm_pos();
+    perm_array = cuth2.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -216,7 +207,7 @@ public:
       }
     }
 
-    perm_array = cuth3.get_permutation().get_perm_pos();
+    perm_array = cuth3.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -230,20 +221,17 @@ public:
 
   bool test_reverse(Graph& g) const
   {
-    // Permutation pointer and permutation array pointer
-    Index* perm_array;
+    // permutation-array pointer
+    Index* perm_array(nullptr);
 
-    // create Cuthill-McKee object (descending degrees, default root, reverse)
-    CuthillMcKee cuth1(g, true, CuthillMcKee::root_default,
-                      CuthillMcKee::sort_desc);
+    // create Cuthill-McKee permutation (descending degrees)
+    Permutation cuth1(CuthillMcKee::compute(g, true, CuthillMcKee::root_default, CuthillMcKee::sort_desc));
 
-    // create Cuthill-McKee object (ascending degrees, min-root, reverse)
-    CuthillMcKee cuth2(g, true, CuthillMcKee::root_maximum_degree,
-                      CuthillMcKee::sort_asc);
+    // create Cuthill-McKee permutation (ascending degrees)
+    Permutation cuth2(CuthillMcKee::compute(g, true, CuthillMcKee::root_maximum_degree, CuthillMcKee::sort_asc));
 
-    // create Cuthill-McKee object (no sorting, max-root, reverse)
-    CuthillMcKee cuth3(g, true, CuthillMcKee::root_minimum_degree,
-                      CuthillMcKee::sort_default);
+    // create Cuthill-McKee permutation (no sorting)
+    Permutation cuth3(CuthillMcKee::compute(g, true, CuthillMcKee::root_minimum_degree, CuthillMcKee::sort_default));
 
     // analytic solution (descending degrees)
     Index ref1[12] =
@@ -264,7 +252,7 @@ public:
     };
 
     // check the permutation arrays
-    perm_array = cuth1.get_permutation().get_perm_pos();
+    perm_array = cuth1.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -274,7 +262,7 @@ public:
       }
     }
 
-    perm_array = cuth2.get_permutation().get_perm_pos();
+    perm_array = cuth2.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {
@@ -284,7 +272,7 @@ public:
       }
     }
 
-    perm_array = cuth3.get_permutation().get_perm_pos();
+    perm_array = cuth3.get_perm_pos();
 
     for(Index i(0); i<12; ++i)
     {

@@ -100,30 +100,34 @@ namespace FEAST
       calc_perm_from_swap();
     }
 
-    Permutation::Permutation(const Permutation& other, bool invert) :
-      _num_entries(other.size()),
-      _perm_pos(new Index[_num_entries]),
-      _swap_pos(new Index[_num_entries])
+    Permutation::Permutation(Permutation&& other) :
+      _num_entries(other._num_entries),
+      _perm_pos(other._perm_pos),
+      _swap_pos(other._swap_pos)
     {
-      if(!invert)
-      {
-        // copy both arrays
-        for(Index i(0); i < _num_entries; ++i)
-        {
-          _perm_pos[i] = other._perm_pos[i];
-          _swap_pos[i] = other._swap_pos[i];
-        }
-      }
-      else
-      {
-        // invert permutation array
-        for(Index i(0); i < _num_entries; ++i)
-        {
-          _perm_pos[other._perm_pos[i]] = i;
-        }
-        // and compute swap array
-        calc_swap_from_perm();
-      }
+      other._num_entries = Index(0);
+      other._perm_pos = other._swap_pos = nullptr;
+    }
+
+    Permutation& Permutation::operator=(Permutation&& other)
+    {
+      // avoid self-move
+      if(this == &other)
+        return *this;
+
+      if(_perm_pos != nullptr)
+        delete [] _perm_pos;
+      if(_swap_pos != nullptr)
+        delete [] _swap_pos;
+
+      _num_entries = other._num_entries;
+      _perm_pos = other._perm_pos;
+      _swap_pos = other._swap_pos;
+
+      other._num_entries = Index(0);
+      other._perm_pos = other._swap_pos = nullptr;
+
+      return *this;
     }
 
     Permutation::~Permutation()

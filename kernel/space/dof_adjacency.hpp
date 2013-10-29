@@ -166,7 +166,7 @@ namespace FEAST
         dof_adjactor.sort_indices();
 
         // return the graph
-        return dof_adjactor;
+        return std::move(dof_adjactor);
       }
 
       /**
@@ -194,7 +194,7 @@ namespace FEAST
         dof_adjactor.sort_indices();
 
         // return the graph
-        return dof_adjactor;
+        return std::move(dof_adjactor);
       }
     }; // class DofAdjacency<Stencil::Standard>
 
@@ -298,7 +298,7 @@ namespace FEAST
         dof_adjactor.sort_indices();
 
         // return the graph
-        return dof_adjactor;
+        return std::move(dof_adjactor);
       }
     }; // class DofAdjacency<Stencil::StandardRefinement>
   } // namespace Space

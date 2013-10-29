@@ -108,8 +108,35 @@ namespace FEAST
        */
       explicit Colouring(const Graph& graph, const Index* order);
 
+      /// move ctor
+      Colouring(Colouring&& other);
+
+      /// move-assign operator
+      Colouring& operator=(Colouring&& other);
+
       /// virtual destructor
       virtual ~Colouring();
+
+      /**
+       * \brief Clones this colouring.
+       *
+       * \returns A deep-copy of this colouring.
+       */
+      Colouring clone() const
+      {
+        if(_colouring != nullptr)
+          return Colouring(_num_nodes, _colouring);
+        else
+          return Colouring();
+      }
+
+      /**
+       * \brief Creates a colour partition graph.
+       *
+       * This function creates a graph out of this colouring object.
+       * The graph's image is the set of nodes, the domain is the set of colours.
+       */
+      Graph create_partition_graph() const;
 
       /**
        * \brief Returns the colouring array.

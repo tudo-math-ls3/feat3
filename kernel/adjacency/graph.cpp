@@ -1,5 +1,4 @@
 #include <kernel/adjacency/graph.hpp>
-#include <kernel/adjacency/colouring.hpp>
 #include <kernel/adjacency/permutation.hpp>
 
 namespace FEAST
@@ -102,86 +101,32 @@ namespace FEAST
       }
     }
 
-    // "Colouring" Constructor
-    Graph::Graph(const Colouring& col)
+    // move ctor
+    Graph::Graph(Graph&& other) :
+      _num_nodes_domain(other._num_nodes_domain),
+      _num_nodes_image(other._num_nodes_image),
+      _num_indices_image(other._num_indices_image),
+      _domain_ptr(other._domain_ptr),
+      _domain_end(other._domain_end),
+      _image_idx(other._image_idx),
+      _shared(other._shared)
     {
-      CONTEXT("Graph::Graph() [colouring]");
-
-      // get 'size' of the graph
-      _num_nodes_domain = col.get_max_colour() + 1;
-      _num_nodes_image = col.get_num_nodes();
-      _num_indices_image = col.get_num_nodes();
-      _shared = false;
-
-      // get colouring
-      const Index* colouring = col.get_colouring();
-
-      // we ignore the domain_end-array of the original graph
-      _domain_end = nullptr;
-
-      // create domain array
-      _domain_ptr = new Index[_num_nodes_domain+1];
-      _domain_ptr[0] = 0;
-
-      // create image array
-      _image_idx = new Index[_num_indices_image];
-
-      // index counter
-      Index idx_counter = 0;
-
-      // loop over all colours
-      for(Index i(0); i < _num_nodes_domain; ++i)
-      {
-        // loop over all nodes
-        for(Index j(0); j < _num_nodes_image; ++j)
-        {
-          // if node j has the colour i
-          if(i == colouring [j])
-          {
-            _image_idx[idx_counter] = j;
-            ++idx_counter;
-          }
-        }
-        _domain_ptr[i+1] = idx_counter;
-      }
+      CONTEXT("Graph::Graph() [move]");
+      other._num_nodes_domain = other._num_nodes_image = other._num_indices_image = Index(0);
+      other._domain_ptr = other._domain_end = nullptr;
+      other._image_idx = nullptr;
+      other._shared = false;
     }
 
-    /// copy CTOR
-    Graph::Graph(const Graph& other) :
-      _num_nodes_domain(other.get_num_nodes_domain()),
-      _num_nodes_image(other.get_num_nodes_image()),
-      _num_indices_image(other.get_num_indices()),
-      _domain_ptr(nullptr),
-      _domain_end(nullptr),
-      _image_idx(nullptr),
-      _shared(false)
+    /// move assignment
+    Graph& Graph::operator=(Graph&& other)
     {
-      CONTEXT("Graph::Graph() [copy]");
+      CONTEXT("Graph::operator=() [move]");
 
-      _domain_ptr = new Index[_num_nodes_domain+1];
-      for(Index i(0); i <= _num_nodes_domain; ++i)
-      {
-        _domain_ptr[i] = other._domain_ptr[i];
-      }
-      if(other._domain_end != nullptr)
-      {
-        _domain_end = new Index[_num_nodes_domain];
-        for(Index i(0); i < _num_nodes_domain; ++i)
-        {
-          _domain_end[i] = other._domain_end[i];
-        }
-      }
-      _image_idx = new Index[_num_indices_image];
-      for(Index i(0); i < _num_indices_image; ++i)
-      {
-        _image_idx[i] = other._image_idx[i];
-      }
-    }
+      // avoid self-move
+      if(this == &other)
+        return *this;
 
-    /// copy assignment
-    Graph& Graph::operator=(const Graph& other)
-    {
-      CONTEXT("Graph::operator=()");
       if(!_shared)
       {
         if(_image_idx != nullptr)
@@ -192,39 +137,24 @@ namespace FEAST
           delete [] _domain_end;
       }
 
-      _num_nodes_domain = other.get_num_nodes_domain();
-      _num_nodes_image = other.get_num_nodes_image();
-      _num_indices_image = other.get_num_indices();
-      _shared = false;
+      _num_nodes_domain = other._num_nodes_domain;
+      _num_nodes_image = other._num_nodes_image;
+      _num_indices_image = other._num_indices_image;
+      _domain_ptr = other._domain_ptr;
+      _domain_end = other._domain_end;
+      _image_idx = other._image_idx;
+      _shared = other._shared;
 
-      _domain_ptr = new Index[_num_nodes_domain+1];
-      for(Index i(0); i <= _num_nodes_domain; ++i)
-      {
-        _domain_ptr[i] = other._domain_ptr[i];
-      }
-      if(other._domain_end != nullptr)
-      {
-        _domain_end = new Index[_num_nodes_domain];
-        for(Index i(0); i < _num_nodes_domain; ++i)
-        {
-          _domain_end[i] = other._domain_end[i];
-        }
-      }
-      else
-      {
-        _domain_end = nullptr;
-      }
-      _image_idx = new Index[_num_indices_image];
-      for(Index i(0); i < _num_indices_image; ++i)
-      {
-        _image_idx[i] = other._image_idx[i];
-      }
+      other._num_nodes_domain = other._num_nodes_image = other._num_indices_image = Index(0);
+      other._domain_ptr = other._domain_end = nullptr;
+      other._image_idx = nullptr;
+      other._shared = false;
 
       return *this;
     }
 
     // "Permutation" copy CTOR
-    Graph::Graph(const Graph& other, Permutation& domain_perm, Permutation& image_perm) :
+    Graph::Graph(const Graph& other, const Permutation& domain_perm, const Permutation& image_perm) :
       _num_nodes_domain(other.get_num_nodes_domain()),
       _num_nodes_image(other.get_num_nodes_image()),
       _num_indices_image(other.get_num_indices()),
@@ -234,7 +164,7 @@ namespace FEAST
       _shared(false)
     {
       // get domain permutation
-      Index* domain_perm_pos = domain_perm.get_perm_pos();
+      const Index* domain_perm_pos = domain_perm.get_perm_pos();
 
       // calculate new domain array
       _domain_ptr[0] = other._domain_ptr[0];
@@ -246,7 +176,7 @@ namespace FEAST
       }
 
       // get image permutation
-      Index* image_perm_pos = image_perm.get_perm_pos();
+      const Index* image_perm_pos = image_perm.get_perm_pos();
 
       // calculate new image array
       Index count = 0;

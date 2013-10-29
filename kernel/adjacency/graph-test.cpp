@@ -428,7 +428,7 @@ public:
     Colouring col(15, colour);
 
     // construct graph
-    Graph fcol(col);
+    Graph fcol(col.create_partition_graph());
 
     // validate
     TEST_CHECK(test_constr_colour(fcol));
