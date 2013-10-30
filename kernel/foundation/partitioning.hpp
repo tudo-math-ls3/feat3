@@ -241,11 +241,11 @@ namespace FEAST
         ///-->Each process for its patch
         ///submesh and halo generation; here not delta_ may be used but rather delta=0, delta_ applies later for the micro-mesh
         //create submesh
-        Halo<0, typename Dim_::ElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ > submeshproxy(mesh);
+        std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_ > > submeshproxy(new Halo<0, typename Dim_::ElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(mesh));
         for(unsigned long i(0) ; i < elements_for_process.at(proc_rank).size() ; ++i)
-          submeshproxy.push_back(elements_for_process.at(proc_rank).at(i));
+          submeshproxy->push_back(elements_for_process.at(proc_rank).at(i));
 
-        result.submesh = std::shared_ptr<SubMesh<Dim_, t_, os_> >(new SubMesh<Dim_, t_, os_>(&submeshproxy));
+        result.submesh = std::shared_ptr<SubMesh<Dim_, t_, os_> >(new SubMesh<Dim_, t_, os_>(submeshproxy));
 
 
         //restrict boundary components belonging to this patch to submesh

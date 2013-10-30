@@ -91,13 +91,13 @@ class SubMeshTest :
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 3, 3);
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_face, 3, 0);
 
-      Foundation::Halo<0, PLEdge, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h(m);
-      h.push_back(3);
+      std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > > h(new Halo<0, PLEdge, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > >(m));
+      h->push_back(3);
 
       ///SUBDIM
       SubMesh<Dim2D,
               Topology<IndexType_, OT_, IT_>,
-              std::vector> sm(&h);
+              std::vector> sm(h);
 
       TEST_CHECK_EQUAL(sm.get_topologies().at(ipi_vertex_edge).size(), 2ul);
       TEST_CHECK_EQUAL(sm.get_topologies().at(ipi_edge_vertex).size(), 1ul);
@@ -110,12 +110,12 @@ class SubMeshTest :
       TEST_CHECK_EQUAL(sm.get_topologies().at(ipi_edge_vertex).at(0).at(1), 1ul);
 
       ///DIM
-      Foundation::Halo<0, PLFace, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > > h_face(m);
-      h_face.push_back(0);
+      std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > > > h_face(new Foundation::Halo<0, PLFace, Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_> > >(m));
+      h_face->push_back(0);
 
       SubMesh<Dim2D,
               Topology<IndexType_, OT_, IT_>,
-              std::vector> sm_face(&h_face);
+              std::vector> sm_face(h_face);
 
       TEST_CHECK_EQUAL(sm_face.get_topologies().at(ipi_vertex_edge).size(), 4ul);
       TEST_CHECK_EQUAL(sm_face.get_topologies().at(ipi_edge_vertex).size(), 4ul);

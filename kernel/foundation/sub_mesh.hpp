@@ -21,7 +21,7 @@ namespace Foundation
     public:
       typedef typename Mesh<Dim_, TopologyType_, OuterStorageType_>::topology_type_::storage_type_ map_storage_type_;
 
-      SubMesh(const HaloBase<Mesh<Dim_, TopologyType_, OuterStorageType_>, OuterStorageType_>* proxy) :
+      SubMesh(const std::shared_ptr<HaloBase<Mesh<Dim_, TopologyType_, OuterStorageType_>, OuterStorageType_> >& proxy) :
         Mesh<Dim_, TopologyType_, OuterStorageType_>(),
         _proxy(proxy),
         _map(),
@@ -122,7 +122,7 @@ namespace Foundation
         }
 
       private:
-        const HaloBase<Mesh<Dim_, TopologyType_, OuterStorageType_>, OuterStorageType_>* _proxy;
+        const std::shared_ptr<HaloBase<Mesh<Dim_, TopologyType_, OuterStorageType_>, OuterStorageType_> > _proxy;
         typename Mesh<Dim_, TopologyType_, OuterStorageType_>::topology_type_::storage_type_ _map;
         PolytopeLevels _level;
     };
