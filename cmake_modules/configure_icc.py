@@ -9,9 +9,9 @@ def configure_icc(cpu, buildmode):
   version = version.split(" ")
   version = version[len(version) - 2]
   version = version.split(".")
-  major = version[0]
-  minor = version[1]
-  minor2 = version[2]
+  major = int(version[0])
+  minor = int(version[1])
+  minor2 = int(version[2])
 
   cxxflags = "-std=c++11 -g -mcmodel=large"
   if buildmode == "debug":

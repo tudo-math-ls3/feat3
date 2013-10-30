@@ -9,9 +9,9 @@ def configure_gcc(cpu, buildmode):
   version = version.split(" ")
   version = version[len(version) - 1]
   version = version.split(".")
-  major = version[0]
-  minor = version[1]
-  minor2 = version[2]
+  major = int(version[0])
+  minor = int(version[1])
+  minor2 = int(version[2])
 
   if major <= 4 and minor <= 4:
     print ("GNU Compiler version less then 4.4 is not supported, please update your compiler")
