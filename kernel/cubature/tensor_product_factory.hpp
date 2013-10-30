@@ -125,9 +125,9 @@ namespace FEAST
       {
         Index num_points = TensorProductDriverType::count(scalar_rule.get_num_points());
 #ifdef FEAST_CUBATURE_TENSOR_PREFIX
-        rule.create(num_points, "tensor:" + scalar_rule.get_name());
+        rule = Rule<Shape_, Weight_, Coord_, Point_>(num_points, "tensor:" + scalar_rule.get_name());
 #else
-        rule.create(num_points, scalar_rule.get_name());
+        rule = Rule<Shape_, Weight_, Coord_, Point_>(num_points, scalar_rule.get_name());
 #endif // FEAST_CUBATURE_TENSOR_PREFIX
         TensorProductDriverType::fill(rule, scalar_rule);
       }

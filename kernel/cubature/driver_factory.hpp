@@ -79,7 +79,7 @@ namespace FEAST
       template<typename Weight_, typename Coord_, typename Point_>
       static bool create(Rule<Shape_, Weight_, Coord_, Point_>& rule)
       {
-        rule.create(DriverType::num_points, DriverType::name());
+        rule = Rule<Shape_, Weight_, Coord_, Point_>(DriverType::num_points, DriverType::name());
         DriverType::fill(rule);
         return true;
       }
@@ -192,7 +192,8 @@ namespace FEAST
         if((num_points < DriverType::min_points) || (num_points > DriverType::max_points))
           return false;
 
-        rule.create(DriverType::count(num_points), (DriverType::name() + ":" + stringify(num_points)));
+        rule = Rule<Shape_, Weight_, Coord_, Point_>(DriverType::count(num_points),
+          (DriverType::name() + ":" + stringify(num_points)));
         DriverType::fill(rule, num_points);
         return true;
       }

@@ -33,23 +33,24 @@ namespace FEAST
 
         if(num_refines == 0)
         {
-          rule = rule_in;
+          rule = std::move(rule_in.clone());
         }
         else if(num_refines == 1)
         {
-          rule.create(rule_in.get_num_points() * RefineryType::count, "refine:" + rule_in.get_name());
+          rule = Rule<Shape_, Weight_, Coord_, Point_>(rule_in.get_num_points() * RefineryType::count,
+            "refine:" + rule_in.get_name());
           RefineryType::refine(rule, rule_in);
         }
         else
         {
           // copy input rule
-          rule = rule_in;
+          rule = std::move(rule_in.clone());
           for(Index i(0); i < num_refines; ++i)
           {
             RuleType rule_tmp(rule.get_num_points() * RefineryType::count,
               "refine*" + stringify(i+1) + ":" + rule_in.get_name());
             RefineryType::refine(rule_tmp, rule);
-            rule = rule_tmp;
+            rule = std::move(rule_tmp);
           }
         }
       }

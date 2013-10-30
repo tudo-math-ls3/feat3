@@ -24,9 +24,9 @@ namespace FEAST
       {
         Index num_points = scalar_rule.get_num_points();
 #ifdef FEAST_CUBATURE_SCALAR_PREFIX
-        rule.create(num_points, "scalar:" + scalar_rule.get_name());
+        rule = Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>(num_points, "scalar:" + scalar_rule.get_name());
 #else
-        rule.create(num_points, scalar_rule.get_name());
+        rule = Rule<Shape::Simplex<1>, Weight_, Coord_, Point_>(num_points, scalar_rule.get_name());
 #endif // FEAST_CUBATURE_SCALAR_PREFIX
         for(Index i(0); i < num_points; ++i)
         {

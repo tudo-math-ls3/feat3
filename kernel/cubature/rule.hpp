@@ -5,6 +5,9 @@
 // includes, FEAST
 #include <kernel/shape.hpp>
 
+// includes, system
+#include <utility> // for std::move
+
 namespace FEAST
 {
   /**
@@ -77,68 +80,66 @@ namespace FEAST
         factory.create(*this);
       }
 
-      Rule(const Rule& other) :
-        _name(),
-        _num_points(0),
-        _weights(nullptr),
-        _points(nullptr)
+      /// move ctor
+      Rule(Rule&& other) :
+        _name(other._name),
+        _num_points(other._num_points),
+        _weights(other._weights),
+        _points(other._points)
       {
-        *this = other;
+        other._name.clear();
+        other._num_points = Index(0);
+        other._weights = nullptr;
+        other._points = nullptr;
+      }
+
+      /// move-assign operator
+      Rule& operator=(Rule&& other)
+      {
+        // avoid self-move
+        if(this == &other)
+          return *this;
+
+        if(_weights != nullptr)
+          delete [] _weights;
+        if(_points != nullptr)
+          delete [] _points;
+
+        _name = other._name;
+        _num_points = other._num_points;
+        _weights = other._weights;
+        _points = other._points;
+
+        other._name.clear();
+        other._num_points = Index(0);
+        other._weights = nullptr;
+        other._points = nullptr;
+
+        return *this;
       }
 
       virtual ~Rule()
       {
-        clear();
-      }
-
-      Rule& operator=(const Rule& other)
-      {
-        if(this != &other)
-        {
-          create(other.get_num_points(), other.get_name());
-          for(Index i(0); i < _num_points; ++i)
-          {
-            _weights[i] = other._weights[i];
-            for(Index j(0); j < dimension; ++j)
-            {
-              _points[i][j] = other._points[i][j];
-            }
-          }
-        }
-        return *this;
-      }
-
-      void clear()
-      {
         if(_points != nullptr)
         {
           delete [] _points;
-          _points = nullptr;
         }
         if(_weights != nullptr)
         {
           delete [] _weights;
-          _weights = nullptr;
         }
-        _num_points = 0;
-        _name.clear();
       }
 
-      void create(Index num_points)
+      Rule clone() const
       {
-        clear();
-        if(num_points > 0)
+        Rule rule(_num_points, _name);
+        for(Index i(0); i < _num_points; ++i)
         {
-          _num_points = num_points;
-          _weights = new WeightType[num_points];
-          _points = new PointType[num_points];
+          rule._weights[i] = _weights[i];
+          for(Index j(0); j < Index(dimension); ++j)
+            rule._points[i][j] = _points[i][j];
         }
-      }
-
-      void create(Index num_points, const String& name)
-      {
-        create(num_points);
-        _name = name;
+        return std::move(rule);
       }
 
       const String& get_name() const

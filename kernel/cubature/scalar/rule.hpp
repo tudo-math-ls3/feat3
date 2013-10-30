@@ -5,6 +5,9 @@
 // includes, FEAST
 #include <kernel/util/assertion.hpp>
 
+// includes, system
+#include <utility> // for std::move
+
 namespace FEAST
 {
   namespace Cubature
@@ -56,7 +59,18 @@ namespace FEAST
         {
         }
 
-        explicit Rule(Index num_points, const String& name) :
+        /**
+         * \brief Constructor
+         *
+         * This constructor allocates the weights and coords arrays, but does not initialise them.
+         *
+         * \param[in] num_points
+         * The number of points to be allocated.
+         *
+         * \param[in] name
+         * The name of the cubature rule.
+         */
+        explicit Rule(Index num_points, String name) :
           _name(name),
           _num_points(num_points),
           _weights(nullptr),
@@ -69,68 +83,66 @@ namespace FEAST
           }
         }
 
-        /// copy constructor
-        Rule(const Rule& other) :
-          _name(),
-          _num_points(0),
-          _weights(nullptr),
-          _coords(nullptr)
+        /// move ctor
+        Rule(Rule&& other) :
+          _name(other._name),
+          _num_points(other._num_points),
+          _weights(other._weights),
+          _coords(other._coords)
         {
-          *this = other;
+          other._name.clear();
+          other._num_points = Index(0);
+          other._weights = nullptr;
+          other._coords = nullptr;
+        }
+
+        /// move-assign operator
+        Rule& operator=(Rule&& other)
+        {
+          // avoid self-move
+          if(this == &other)
+            return *this;
+
+          if(_weights != nullptr)
+            delete [] _weights;
+          if(_coords != nullptr)
+            delete [] _coords;
+
+          _name = other._name;
+          _num_points = other._num_points;
+          _weights = other._weights;
+          _coords = other._coords;
+
+          other._name.clear();
+          other._num_points = Index(0);
+          other._weights = nullptr;
+          other._coords = nullptr;
+
+          return *this;
         }
 
         /// virtual destructor
         virtual ~Rule()
         {
-          clear();
-        }
-
-        /// assignment operator
-        Rule& operator=(const Rule& other)
-        {
-          if(this != &other)
-          {
-            create(other.get_num_points(), other.get_name());
-            for(Index i(0); i < _num_points; ++i)
-            {
-              _weights[i] = other._weights[i];
-              _coords[i] = other._coords[i];
-            }
-          }
-          return *this;
-        }
-
-        void clear()
-        {
           if(_coords != nullptr)
           {
             delete [] _coords;
-            _coords = nullptr;
           }
           if(_weights != nullptr)
           {
             delete [] _weights;
-            _weights = nullptr;
           }
-          _num_points = 0;
-          _name.clear();
         }
 
-        void create(Index num_points)
+        Rule clone() const
         {
-          clear();
-          if(num_points > 0)
+          Rule rule(_num_points, _name);
+          for(Index i(0); i < _num_points; ++i)
           {
-            _num_points = num_points;
-            _weights = new WeightType[num_points];
-            _coords = new CoordType[num_points];
+            rule._weights[i] = _weights[i];
+            rule._coords[i] = _coords[i];
           }
-        }
-
-        void create(Index num_points, const String& name)
-        {
-          create(num_points);
-          _name = name;
+          return std::move(rule);
         }
 
         const String& get_name() const
