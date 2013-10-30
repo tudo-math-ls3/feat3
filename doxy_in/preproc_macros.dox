@@ -23,6 +23,22 @@ If defined, the kernel base-header defines the <c>SERIAL</c> macro.
 This macro is defined as 1 by the <i>hand-made</i> Visual Studio project files. It must be left undefined by the CMake
 and any other build system, independent of whether the MS VC++ compiler is used or not.
 
+<hr>
+\subsection ppm_feast_src_dir FEAST_SRC_DIR
+This macro contains a string literal specifying the full absolute path to the root source directory.
+
+<hr>
+\subsection ppm_feast_binary_dir FEAST_BINARY_DIR
+This macro contains a string literal specifying the full absolute path to the root binary directory.
+
+<hr>
+\subsection ppm_feast_build_id FEAST_BUILD_ID
+This macro contains a string literal specifying the user provided build id string, that was passed to the configure_feast script.
+
+<hr>
+\subsection ppm_feast_cpu_type FEAST_CPU_TYPE
+This macro contains a string literal describing the detected target cpu type.
+
 <hr><hr>
 \section preproc_sec_comp_detect Compiler-Detection Macros
 This section enlists the macros defined by the compiler detection headers to provide information about the compiler
