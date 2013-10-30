@@ -60,7 +60,7 @@ public:
 RichardsonTest<Mem::Main, Algo::Generic, float> richardson_test_float;
 RichardsonTest<Mem::Main, Algo::Generic, double> richardson_test_double;
 #ifdef FEAST_GMP
-RichardsonTest<Mem::Main, Algo::Generic, mpf_class> richardson_test_mpf_class;
+//RichardsonTest<Mem::Main, Algo::Generic, mpf_class> richardson_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
 RichardsonTest<Mem::CUDA, Algo::CUDA, float> cuda_richardson_test_float;
