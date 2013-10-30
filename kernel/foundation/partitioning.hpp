@@ -102,15 +102,21 @@ namespace FEAST
                                                           os_<Attribute<DT_, os_>, std::allocator<Attribute<DT_, os_> > >& origin_coords)
       {
         PData<Dim_, t_, os_, MeshType_, DT_> result;
+        result.basemesh = mesh;
+        result.basemesh_boundaries = boundaries;
+        for(Index i(0) ; i < result.basemesh_boundaries.size() ; ++i)
+        {
+          result.basemesh_boundaries.at(i).reset_mesh(&result.basemesh);
+        }
 
         ///-->Each process for all
         ///Phase 1: refine to match process count
         //only case: more procs than polytopes: refine num_refinements_needed times
 
-        if(num_procs > mesh.get_topologies().at(mesh.get_topologies().size() - 1).size())
+        if(num_procs > result.basemesh.get_topologies().at(result.basemesh.get_topologies().size() - 1).size())
         {
 
-          Index num_refs(_OnPartitioning<Dim_, mrt_>::num_refinements_needed(mesh.get_topologies().at(mesh.get_topologies().size() - 1).size(), num_procs));
+          Index num_refs(_OnPartitioning<Dim_, mrt_>::num_refinements_needed(result.basemesh.get_topologies().at(result.basemesh.get_topologies().size() - 1).size(), num_procs));
 
           ///TODO opt:
           os_<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> > > > boundaries_copy;
@@ -119,7 +125,7 @@ namespace FEAST
 
           for(Index i(0) ; i < num_refs ; ++i)
           {
-            Refinement<Tag_, Arch_, mrt_, hrt_refine>::execute(mesh,
+            Refinement<Tag_, Arch_, mrt_, hrt_refine>::execute(result.basemesh,
                                                                &boundaries_copy,
                                                                origin_coords);
           }
@@ -131,11 +137,11 @@ namespace FEAST
 
         ///Phase 2: initial geometric partitioning
         t_ elements_for_process(num_procs);
-        if(num_procs < mesh.num_polytopes(Dim_::ElementPolytopeType_::tag_value))
+        if(num_procs < result.basemesh.num_polytopes(Dim_::ElementPolytopeType_::tag_value))
         {
           Index num_elems_distributed_local(0);
           Index num_elems_distributed_global(0);
-          Index num_elems_global(mesh.num_polytopes(Dim_::ElementPolytopeType_::tag_value));
+          Index num_elems_global(result.basemesh.num_polytopes(Dim_::ElementPolytopeType_::tag_value));
           os_<Index, std::allocator<Index> > num_desired_elems_local(num_procs, Index(0));
 
           Index elems_dist(0), iter(0);
@@ -152,7 +158,7 @@ namespace FEAST
           for(Index i(0) ; i < num_procs ; ++i) //for every process
           {
             num_elems_distributed_local = 0;
-            _OnPartitioning<Dim_, mrt_>::increase_partition(mesh,
+            _OnPartitioning<Dim_, mrt_>::increase_partition(result.basemesh,
                 elements_for_process,
                 i,
                 num_desired_elems_local.at(i),
@@ -161,7 +167,7 @@ namespace FEAST
                 last);
           }
         }
-        else if(num_procs == mesh.num_polytopes(Dim_:: ElementPolytopeType_::tag_value))
+        else if(num_procs == result.basemesh.num_polytopes(Dim_:: ElementPolytopeType_::tag_value))
         {
           for(Index i(0) ; i < elements_for_process.size() ; ++i)
             elements_for_process.at(i).push_back(i);
@@ -186,21 +192,21 @@ namespace FEAST
               {
                 if(i != k)
                 {
-                  typename t_::storage_type_ tmp(mesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
+                  typename t_::storage_type_ tmp(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
                                                                             Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value,
                                                                             elements_for_process.at(i).at(j),
                                                                             elements_for_process.at(k).at(l)));
-                  typename t_::storage_type_ tmp_sub(mesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
+                  typename t_::storage_type_ tmp_sub(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
                                                                                 Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value,
                                                                                 elements_for_process.at(i).at(j),
                                                                                 elements_for_process.at(k).at(l)));
-                  typename t_::storage_type_ tmp_sub_sub(mesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
+                  typename t_::storage_type_ tmp_sub_sub(result.basemesh.get_comm_intersection(Dim_::ElementPolytopeType_::tag_value,
                                                                                     Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value,
                                                                                     elements_for_process.at(i).at(j),
                                                                                     elements_for_process.at(k).at(l)));
                   if(tmp.size() > 0)
                   {
-                    comm_halos_globalview.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(mesh, k));
+                    comm_halos_globalview.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(result.basemesh, k));
                     comm_halo_originating_from_element.push_back(elements_for_process.at(i).at(j));
                     comm_halo_originating_from_process.push_back(i);
 
@@ -213,7 +219,7 @@ namespace FEAST
                   {
                     if(tmp_sub.size() > 0)
                     {
-                      comm_halos_globalview_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(mesh, k));
+                      comm_halos_globalview_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(result.basemesh, k));
                       comm_halo_originating_from_element_sub.push_back(elements_for_process.at(i).at(j));
                       comm_halo_originating_from_process_sub.push_back(i);
 
@@ -227,7 +233,7 @@ namespace FEAST
                   {
                     if(tmp_sub_sub.size() > 0)
                     {
-                      comm_halos_globalview_sub_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(mesh, k));
+                      comm_halos_globalview_sub_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(result.basemesh, k));
                       comm_halo_originating_from_element_sub_sub.push_back(elements_for_process.at(i).at(j));
                       comm_halo_originating_from_process_sub_sub.push_back(i);
 
@@ -241,7 +247,7 @@ namespace FEAST
         ///-->Each process for its patch
         ///submesh and halo generation; here not delta_ may be used but rather delta=0, delta_ applies later for the micro-mesh
         //create submesh
-        std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_ > > submeshproxy(new Halo<0, typename Dim_::ElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(mesh));
+        std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_ > > submeshproxy(new Halo<0, typename Dim_::ElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(result.basemesh));
         for(unsigned long i(0) ; i < elements_for_process.at(proc_rank).size() ; ++i)
           submeshproxy->push_back(elements_for_process.at(proc_rank).at(i));
 
@@ -254,7 +260,7 @@ namespace FEAST
         const Index i_end(Index(boundaries.size()));
         for(unsigned long i(0) ; i < i_end; ++i)
         {
-          local_boundaries.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(mesh));
+          local_boundaries.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(result.basemesh));
 
           const Index j_end(boundaries.at(i).size());
           for(unsigned long j(0) ; j <  j_end ; ++j)
@@ -264,7 +270,7 @@ namespace FEAST
             const Index k_end(result.submesh->num_polytopes(Dim_::ElementPolytopeType_::tag_value));
             for(unsigned long k(0) ; k < k_end ; ++k)
             {
-              typename t_::storage_type_ adj_elements_origin(mesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value, result.submesh->get_map().at(k)));
+              typename t_::storage_type_ adj_elements_origin(result.basemesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value, result.submesh->get_map().at(k)));
               typename t_::storage_type_ adj_elements_submesh(result.submesh->get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value, k));
 
               typename t_::storage_type_::iterator found(std::find(adj_elements_origin.begin(), adj_elements_origin.end(), boundary_element));
@@ -291,7 +297,7 @@ namespace FEAST
         {
           if(comm_halo_originating_from_process.at(i) == proc_rank)
           {
-            typename t_::storage_type_ tmp_globalview(mesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value, comm_halo_originating_from_element.at(i)));
+            typename t_::storage_type_ tmp_globalview(result.basemesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::tag_value, comm_halo_originating_from_element.at(i)));
 
             const typename t_::storage_type_& map(result.submesh->get_map());
             typename t_::storage_type_::const_iterator f(std::find(map.begin(),
@@ -314,7 +320,7 @@ namespace FEAST
         {
           if(comm_halo_originating_from_process_sub.at(i) == proc_rank)
           {
-            typename t_::storage_type_ tmp_globalview_sub(mesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value, comm_halo_originating_from_element_sub.at(i)));
+            typename t_::storage_type_ tmp_globalview_sub(result.basemesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value, comm_halo_originating_from_element_sub.at(i)));
 
             const typename t_::storage_type_& map(result.submesh->get_map());
             typename t_::storage_type_::const_iterator f(std::find(map.begin(),
@@ -337,7 +343,7 @@ namespace FEAST
         {
           if(comm_halo_originating_from_process_sub_sub.at(i) == proc_rank)
           {
-            typename t_::storage_type_ tmp_globalview_sub_sub(mesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value, comm_halo_originating_from_element_sub_sub.at(i)));
+            typename t_::storage_type_ tmp_globalview_sub_sub(result.basemesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::tag_value, comm_halo_originating_from_element_sub_sub.at(i)));
 
             const typename t_::storage_type_& map(result.submesh->get_map());
             typename t_::storage_type_::const_iterator f(std::find(map.begin(),
@@ -377,7 +383,7 @@ namespace FEAST
             Index element_global(result.submesh->get_map().at(elements_i_local.at(0)));
 
             //get adjacent vertices for that element in supermesh
-            typename t_::storage_type_ tmp_global(mesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, pl_vertex, element_global));
+            typename t_::storage_type_ tmp_global(result.basemesh.get_adjacent_polytopes(Dim_::ElementPolytopeType_::tag_value, pl_vertex, element_global));
 
             //access adj list right at position pos
             Index target_vertex_index(tmp_global.at(pos));
