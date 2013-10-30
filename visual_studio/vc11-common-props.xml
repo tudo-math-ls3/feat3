@@ -51,6 +51,8 @@
       Include="DEBUG" />
     <FeastDef Condition="'$(SerialMode)'=='true'"
       Include="SERIAL" />
+    <FeastDef Condition="'$(SerialMode)'=='false'"
+      Include="FEAST_MPI" />
     <FeastDef Condition="'$(BackendCUDA)'=='true'"
       Include="FEAST_BACKENDS_CUDA" />
     <FeastDef Condition="'$(BackendMKL)'=='true'"
