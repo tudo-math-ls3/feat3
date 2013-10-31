@@ -2,6 +2,7 @@
 #include <test_system/test_system.hpp>
 
 #include<kernel/foundation/refinement.hpp>
+#include<kernel/foundation/export.hpp>
 #include<kernel/archs.hpp>
 
 /*#include<kernel/foundation/mesh_control.hpp>
