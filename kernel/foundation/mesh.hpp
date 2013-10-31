@@ -700,7 +700,7 @@ namespace FEAST
     };
 
     template<typename FT_, typename MT_, typename AST_>
-    class Exporter
+    class MeshExporter
     {
     };
 
@@ -709,10 +709,10 @@ namespace FEAST
     };
 
     template<typename MT_, typename AST_>
-    class Exporter<VTK, MT_, AST_>
+    class MeshExporter<VTK, MT_, AST_>
     {
       public:
-        Exporter(const MT_& m, const AST_& a) :
+        MeshExporter(const MT_& m, const AST_& a) :
           _mesh(m),
           _coords(a)
         {
@@ -758,14 +758,27 @@ namespace FEAST
             }
 
             ofs << "POLYGONS " << _mesh.num_polytopes(pl_face) << " " << 5 * _mesh.num_polytopes(pl_face) << std::endl;
-            typename MT_::topology_type_::storage_type_ map(4);
-            map.at(0) = 0;
-            map.at(1) = 1;
-            map.at(2) = 3;
-            map.at(3) = 2;
             for(Index i(0) ; i < _mesh.num_polytopes(pl_face) ; ++i)
             {
               typename MT_::topology_type_::storage_type_ verts(_mesh.get_adjacent_polytopes(pl_face, pl_vertex, i));
+
+              ///generate map
+              typename MT_::topology_type_::storage_type_ map;
+              // 0
+              map.push_back(0);
+              //odd indices in increasing order
+              for(Index j(1) ; j < verts.size() ; ++j)
+              {
+                if(j % 2 == 1)
+                  map.push_back(j);
+              }
+              //even indices in decreasing order
+              for(Index j(verts.size() - 1) ; j >= 1 ; --j)
+              {
+                if(j % 2 == 0)
+                  map.push_back(j);
+              }
+
               ofs << "4";
               for(Index j(0) ; j < verts.size() ; ++j)
                  ofs  << " " << verts.at(map.at(j));
