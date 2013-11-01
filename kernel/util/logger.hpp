@@ -11,6 +11,7 @@
 // includes, system
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 namespace FEAST
 {

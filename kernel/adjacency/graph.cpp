@@ -1,6 +1,8 @@
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/adjacency/permutation.hpp>
 
+#include <algorithm> // for std::max/min
+
 namespace FEAST
 {
   namespace Adjacency
