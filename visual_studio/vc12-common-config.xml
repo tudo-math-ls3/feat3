@@ -1,0 +1,14 @@
+<!-- *********************************************************************** -->
+<!-- FEAST configuration file for Visual Studio 2013 -->
+<!-- *********************************************************************** -->
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Import user-defined configuration (if it exists) -->
+  <Import Project="..\config-vc12.xml" Condition="Exists('..\config-vc12.xml')" />
+
+  <!-- ********************************************************************* -->
+  <!-- Visual Studio Import Mumbo-Jumbo -->
+  <!-- ********************************************************************* -->
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+</Project>
