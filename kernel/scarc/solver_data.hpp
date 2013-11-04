@@ -388,6 +388,11 @@ namespace FEAST
           return _stored_precon;
         }
 
+        /// virtual destructor
+        virtual ~PreconditionerDataContainer()
+        {
+        }
+
       protected:
         ///CTORs to be used in subclasses
         PreconditionerDataContainer(const precon_type_& precon) :
@@ -568,6 +573,10 @@ namespace FEAST
         virtual const index_storage_type_& source_ranks() const
         {
           return _stored_source_ranks;
+        }
+
+        virtual ~SynchronizationDataContainer()
+        {
         }
 
       protected:

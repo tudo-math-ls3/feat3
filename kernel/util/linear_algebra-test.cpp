@@ -256,7 +256,7 @@ class LinAlgTest :
         x[i] = ONE / Math::sqrt(DataType_(1 << i));
       }
 
-      static DataType_ r = sqrt(TWO - ONE/DataType_(1 << (N-1)));
+      DataType_ r = sqrt(TWO - ONE/DataType_(1 << (N-1)));
       TEST_CHECK_EQUAL_WITHIN_EPS(vec_norm_euclid(N, x), r, tol);
 #undef N
     }

@@ -82,7 +82,7 @@ namespace FEAST
          *
          * Destroys a container and releases all of its used arrays.
          */
-        ~Container()
+        virtual ~Container()
         {
           CONTEXT("When destroying Container");
 

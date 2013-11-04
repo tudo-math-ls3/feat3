@@ -132,7 +132,7 @@ public:
     const Geometry::IndexSet<4> index_set(mesh.get_index_set<2,0>());
 
     // get the constant pi
-    static const DataType_ pi = SineBubble<DataType_>::pi();
+    const DataType_ pi = SineBubble<DataType_>::pi();
 
     // loop over all quads
     for(Index i(0); i < num_quads; ++i)

@@ -98,11 +98,11 @@ public:
     const DataType_* data = prol_matrix.val();
 
     // reference data array
-    static const DataType_ d0 = DataType_(0);
-    static const DataType_ d1 = DataType_(1);
-    static const DataType_ d2 = DataType_(0.5);
-    static const DataType_ d4 = DataType_(0.25);
-    static const DataType_ data_ref[] =
+    const DataType_ d0 = DataType_(0);
+    const DataType_ d1 = DataType_(1);
+    const DataType_ d2 = DataType_(0.5);
+    const DataType_ d4 = DataType_(0.25);
+    const DataType_ data_ref[] =
     {
       d1, d0, d0, d0,
       d0, d1, d0, d0,
@@ -168,12 +168,12 @@ public:
     const DataType_* data = prol_matrix.val();
 
     // reference data array
-    static const DataType_ d0 = DataType_(0);
-    static const DataType_ d1 = DataType_(1);
-    static const DataType_ d4 = DataType_(0.25);   // = 1/4
-    static const DataType_ d18 = DataType_(0.125); // = 1/8
-    static const DataType_ d58 = DataType_(0.625); // = 5/8
-    static const DataType_ data_ref[] =
+    const DataType_ d0 = DataType_(0);
+    const DataType_ d1 = DataType_(1);
+    const DataType_ d4 = DataType_(0.25);   // = 1/4
+    const DataType_ d18 = DataType_(0.125); // = 1/8
+    const DataType_ d58 = DataType_(0.625); // = 5/8
+    const DataType_ data_ref[] =
     {
       d1, d0,  d4, -d4,
       d1, d0, -d4,  d4,

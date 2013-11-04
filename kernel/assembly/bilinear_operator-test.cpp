@@ -114,7 +114,7 @@ public:
     LAFEM::DenseVector<Mem::Main, Index> qatv(num_verts, Index(0));
     for(Index i(0); i < num_quads; ++i)
     {
-      for(int j(0); j < 4; ++j)
+      for(Index j(0); j < 4; ++j)
         qatv(vatq(i,j), qatv(vatq(i,j)) + 1);
     }
 
@@ -145,10 +145,10 @@ public:
       gather2(lmd2);
 
       // loop over all 4x4 entries
-      for(int i(0); i < 4; ++i)
+      for(Index i(0); i < 4; ++i)
       {
         Index nvi = qatv(vatq(cell,i));
-        for(int j(0); j < 4; ++j)
+        for(Index j(0); j < 4; ++j)
         {
           Index nvj = qatv(vatq(cell,j));
           if(i == j)

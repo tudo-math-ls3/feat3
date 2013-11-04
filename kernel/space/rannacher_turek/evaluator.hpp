@@ -199,7 +199,7 @@ namespace FEAST
           FacetTrafoData facet_data;
 
           // define 2-point Gauss cubature point coordinate
-          static const DataType g = Math::sqrt(DataType(1) / DataType(3));
+          const DataType g = Math::sqrt(DataType(1) / DataType(3));
           const typename FacetEvalTraits::DomainPointType g1(-g), g2(+g);
           DomainPointType q1, q2;
 

@@ -72,7 +72,7 @@ namespace FEAST
         };
 
         ///DTOR
-        ~Topology()
+        virtual ~Topology()
         {
         }
 

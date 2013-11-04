@@ -634,7 +634,7 @@ namespace FEAST
             for(Index j(0) ; j < e_valid.size() ; ++j)
             {
               typename t_::storage_type_ v_valid_j(coarse.get_adjacent_polytopes(pl_edge, pl_vertex, e_valid.at(j)));
-              Index candidate_pos(v_valid_j.at(0) == v_current ? 1 : 0);
+              Index candidate_pos(v_valid_j.at(0) == v_current ? Index(1) : Index(0));
               Index candidate(v_valid_j.at(candidate_pos));
 
               if(std::find(vertex_at_polygon.begin(), vertex_at_polygon.end(), candidate) != vertex_at_polygon.end())
