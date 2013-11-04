@@ -18,19 +18,15 @@
   <PropertyGroup Label="Configuration">
     <CharacterSet>MultiByte</CharacterSet>
     <UseDebugLibraries>$(DebugMode)</UseDebugLibraries>
-    <!--<PlatformToolset>v120</PlatformToolset>-->
   </PropertyGroup>
   <PropertyGroup Condition="'$(DebugMode)'=='false'" Label="Configuration">
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <!--<PropertyGroup Condition="'$(SerialMode)'=='false'">
-    <DebuggerFlavor>MpiClusterDebugger</DebuggerFlavor>
-  </PropertyGroup> -->
 
   <!-- Common Settings -->
   <ItemDefinitionGroup>
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>VISUAL_STUDIO;FEAST_NO_CONFIG;FEAST_STDC_ASSERT;$(FeastDefList)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FeastRootPath);$(FeastIncDirList)</AdditionalIncludeDirectories>
@@ -109,7 +105,7 @@
   <!-- ************************************************************************************************************* -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.0.targets"
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.5.targets"
       Condition="'$(CUDA_PATH)'!='' And '$(BackendCUDA)'=='true'"/>
   </ImportGroup>
 </Project>

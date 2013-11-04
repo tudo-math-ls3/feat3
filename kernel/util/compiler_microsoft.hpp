@@ -15,8 +15,10 @@
 #  define FEAST_COMPILER_MICROSOFT _MSC_VER
 
 // detect the compiler verson and define the FEAST_COMPILER macro
-#  if (_MSC_VER >= 1700)
-#    define FEAST_COMPILER "Microsoft Visual C++ 2012 (or newer)"
+#  if (_MSC_VER >= 1800)
+#    define FEAST_COMPILER "Microsoft Visual C++ 2013 (or newer)"
+#  elif (_MSC_VER >= 1700)
+#    define FEAST_COMPILER "Microsoft Visual C++ 2012"
 #  elif (_MSC_VER >= 1600)
 #    define FEAST_COMPILER "Microsoft Visual C++ 2010"
 #  elif (_MSC_VER >= 1500)
@@ -46,12 +48,13 @@
 // define the noinline specifier
 #define NOINLINE __declspec(noinline)
 
-// C4100: 'identifier': unreferenced formal parameter
-// This warning arises from unused function parameters. As we are using doxygen, parameters always need
-// names to produce useful documentation independent of whether the actual parameter is used or not.
-#  pragma warning(disable: 4100)
+// C4061: enumerator 'identifier' in switch of enum 'enumeration' is not explicitly handled by a case label
+// This warning is emitted when a 'switch' handles one or more cases using a 'default' block.
+// Note: If there are unhandled cases and there is no default block, the compiler emits a C4062 warning.
+#  pragma warning(disable: 4061)
 
 // C4127: conditional expression is constant
+// This warning arises for instance in an expression like 'if(true)'.
 #  pragma warning(disable: 4127)
 
 // C4180: qualifier applied to function type has no meaning; ignored
@@ -88,17 +91,23 @@
 // This warning arises from our non-copyable instantiation policy.
 #  pragma warning(disable: 4626)
 
+// C4702: unreachable code
+// This warning is emitted in any case where the compiler detects a statement which will never be executed.
+// This happens e.g. in for-loops which always perform zero iterations due to the chosen template parameters,
+// buzzword 'dead code elimination'.
+#  pragma warning(disable: 4702)
+
 // C4710: 'function': function not inlined
 // This is an annoying optimisation information.
 #  pragma warning(disable: 4710)
 
+// C4711: function 'function' selected for inline expansion
+// This is an annoying optimisation information.
+#  pragma warning(disable: 4711)
+
 // C4820: 'bytes' bytes padding added after construct 'member_name'
 // This warning is disabled as it is mass-produced when compiling standard libraries.
 #  pragma warning(disable: 4820)
-
-// C4986: 'function' exception specification does not match previous declaration
-// This warning is disabled as it is mass-produced when compiling standard libraries.
-#  pragma warning(disable: 4986)
 
 // disable CRT security warnings for standard C/C++ library functions
 #ifndef _CRT_SECURE_NO_WARNINGS
