@@ -6,9 +6,9 @@
 #include <kernel/base_header.hpp>
 
 // includes, system
+#include <locale>
 #include <string>
 #include <sstream>
-#include <locale>
 #include <vector>
 #include <iomanip>
 
@@ -546,6 +546,7 @@ namespace FEAST
       return _stricmp(c_str(), other.c_str());
 #else
       // reference implementation
+      std::locale loc;
       int k;
       size_type n1 = size();
       size_type n2 = other.size();
@@ -554,7 +555,7 @@ namespace FEAST
       // loop over all characters and compare them
       for(size_t i = 0; i < n; ++i)
       {
-        k = int(std::tolower((*this)[i])) - int(std::tolower(other[i]));
+        k = int(std::tolower<char>((*this)[i], loc)) - int(std::tolower<char>(other[i], loc));
         if(k < 0)
         {
           return -1;
