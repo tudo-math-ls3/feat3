@@ -913,6 +913,10 @@ namespace FEAST
           return _stored_filter;
         }
 
+        virtual ~FilterDataContainer()
+        {
+        }
+
       protected:
         ///CTORs to be used in subclasses
         FilterDataContainer(const filter_type_& filter) :
