@@ -38,7 +38,7 @@ ENDFOREACH(app)
 
 if (FEAST_MPI)
   ADD_TEST(foundation_comm_test-app_mpi ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target foundation_comm_test-app
@@ -50,7 +50,7 @@ if (FEAST_MPI)
   SET_PROPERTY(TEST foundation_comm_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
   ADD_TEST(foundation_comm_test-app_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target foundation_comm_test-app
@@ -64,7 +64,7 @@ endif (FEAST_MPI)
 
 if (FEAST_MPI)
   ADD_TEST(foundation_system_test-app_mpi ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target foundation_system_test-app
@@ -76,7 +76,7 @@ if (FEAST_MPI)
   SET_PROPERTY(TEST foundation_system_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
   ADD_TEST(foundation_system_test-app_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target foundation_system_test-app
@@ -90,7 +90,7 @@ endif (FEAST_MPI)
 
 if (FEAST_MPI)
   ADD_TEST(scarc_test-app_mpi ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target scarc_test-app
@@ -102,7 +102,7 @@ if (FEAST_MPI)
   SET_PROPERTY(TEST scarc_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
   ADD_TEST(scarc_test-app_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target scarc_test-app
@@ -116,7 +116,7 @@ endif (FEAST_MPI)
 
 if (FEAST_MPI)
   ADD_TEST(foundation_synch_test-app_mpi ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target foundation_synch_test-app
@@ -128,7 +128,7 @@ if (FEAST_MPI)
   SET_PROPERTY(TEST foundation_synch_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
   ADD_TEST(foundation_synch_test-app_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target foundation_synch_test-app
@@ -142,7 +142,7 @@ endif (FEAST_MPI)
 
 if (FEAST_MPI)
   ADD_TEST(poisson_test-app_mpi ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target poisson_test-app
@@ -154,7 +154,7 @@ if (FEAST_MPI)
   SET_PROPERTY(TEST poisson_test-app_mpi PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 else (FEAST_MPI)
   ADD_TEST(poisson_test-app_serial ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target poisson_test-app
