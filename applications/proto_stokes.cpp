@@ -155,7 +155,7 @@ class MyCellSetFactory :
 public:
   virtual Index get_num_entities(int dim)
   {
-    return dim == 0 ? 4 : (dim == 1 ? 3 : 0);
+    return Index(dim == 0 ? 4 : (dim == 1 ? 3 : 0));
   }
 
   virtual void fill_target_sets(CellSetType::TargetSetHolderType& target_set_holder)
