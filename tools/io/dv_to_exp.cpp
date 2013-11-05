@@ -1,5 +1,5 @@
-#include <iostream>
 #include <kernel/lafem/dense_vector.hpp>
+#include <iostream>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;

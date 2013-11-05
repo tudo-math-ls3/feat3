@@ -1,6 +1,6 @@
-#include <iostream>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
+#include <iostream>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
