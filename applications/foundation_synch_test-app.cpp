@@ -1,7 +1,5 @@
 //#define SERIAL
 
-#include <iostream>
-#include <limits>
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
@@ -20,6 +18,9 @@
 #include <kernel/space/dof_mirror.hpp>
 
 #include <kernel/trafo/standard/mapping.hpp>
+
+#include <iostream>
+#include <limits>
 
 #ifndef SERIAL
 #include <mpi.h>
