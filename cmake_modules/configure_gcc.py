@@ -23,7 +23,7 @@ def configure_gcc(cpu, buildmode):
   if "debug" in buildmode:
     cxxflags += " -O0 -Wall -Wextra -Wundef -Wno-unused-parameter"
   elif "opt" in buildmode:
-    cxxflags += " -O3 -mcmodel=large"
+    cxxflags += " -O3"
     if cpu == "unknown":
       cxxflags += " -march=native"
     # INTEL

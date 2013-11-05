@@ -13,7 +13,7 @@ def configure_icc(cpu, buildmode):
   minor = int(version[1])
   minor2 = int(version[2])
 
-  cxxflags = "-std=c++11 -g -mcmodel=large"
+  cxxflags = "-std=c++11 -g"
   if buildmode == "debug":
     cxxflags += "  -O0 -Wall -g -Wp64 -Wshorten-64-to-32"
   elif "opt" in buildmode:
