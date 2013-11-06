@@ -13,6 +13,8 @@ int main(int argc, char* argv[])
 #ifndef SERIAL
   MPI_Init(&argc, &argv);
 #endif
+  (void)argc;
+  (void)argv;
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
 

@@ -88,14 +88,14 @@ namespace FEAST
             tcol_ind[i] = Index(ccol_ind[i]);
           delete[] ccol_ind;
 
-          uint64_t * crow_ptr = new uint64_t[rows + 1];
+          uint64_t * crow_ptr = new uint64_t[std::size_t(rows + 1)];
           file.read((char *)crow_ptr, (long)((rows + 1) * sizeof(uint64_t)));
           Index * trow_ptr = (Index*)MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(Index(rows + 1) * sizeof(Index));
           for (Index i(0) ; i < rows + 1 ; ++i)
             trow_ptr[i] = Index(crow_ptr[i]);
           delete[] crow_ptr;
 
-          uint64_t * crow_ptr_end = new uint64_t[rows];
+          uint64_t * crow_ptr_end = new uint64_t[std::size_t(rows)];
           file.read((char *)crow_ptr_end, (long)((rows) * sizeof(uint64_t)));
           Index * trow_ptr_end = (Index*)MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(Index(rows) * sizeof(Index));
           for (Index i(0) ; i < rows ; ++i)

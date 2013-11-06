@@ -285,6 +285,8 @@ int main(int argc, char* argv[])
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
 #endif
+  (void)argc;
+  (void)argv;
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
 
   check_synch_mirror(me);

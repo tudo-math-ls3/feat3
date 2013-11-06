@@ -714,6 +714,8 @@ int main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   MPI_Comm_size(MPI_COMM_WORLD, &num_patches);
 #else
+  (void)argc;
+  (void)argv;
   std::cout << "Parallel tests unavailable on sole process " << me << " with " << num_patches << " patches and l = " << desired_refinement_level << std::endl;
 #endif
 

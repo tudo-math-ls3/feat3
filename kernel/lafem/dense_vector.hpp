@@ -97,7 +97,7 @@ namespace FEAST
           this->_scalar_index.at(0) = (Index)size;
           this->_elements_size.push_back(this->_scalar_index.at(0));
 
-          double * ctemp = new double[size];
+          double * ctemp = new double[std::size_t(size)];
           file.read((char *)ctemp, (long)(size * sizeof(double)));
 
           DT_ * temp = (DT_*)MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)) * sizeof(DT_));

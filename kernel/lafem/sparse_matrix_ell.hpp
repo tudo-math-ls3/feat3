@@ -86,14 +86,14 @@ namespace FEAST
           this->_scalar_dt.push_back(DT_(0));
 
           const Index dim(this->_scalar_index.at(4) * this->_scalar_index.at(3));
-          uint64_t * cAj = new uint64_t[size];
+          uint64_t * cAj = new uint64_t[std::size_t(size)];
           file.read((char *)cAj, (long)(size * sizeof(uint64_t)));
           Index* tAj = (Index*)MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(dim * sizeof(Index));
           for (Index i(0) ; i < size ; ++i)
             tAj[i] = Index(cAj[i]);
           delete[] cAj;
 
-          double * cAx = new double[size];
+          double * cAx = new double[std::size_t(size)];
           file.read((char *)cAx, (long)(size * sizeof(double)));
 
           DT_* tAx = (DT_*)MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(dim * sizeof(DT_));
