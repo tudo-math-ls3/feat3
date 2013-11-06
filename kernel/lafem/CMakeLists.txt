@@ -25,9 +25,9 @@ endif(FEAST_BACKENDS_MKL)
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 if (FEAST_BACKENDS_MKL)
   TARGET_LINK_LIBRARIES(kernel-lafem
-    /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_intel_ilp64.a
-    /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_sequential.a
-    /sfw/intel/mkl/10.3.11.339/composer_xe_2011_sp1.11.339/mkl/lib/intel64/libmkl_core.a
+    libmkl_intel_ilp64.a
+    libmkl_sequential.a
+    libmkl_core.a
   )
 endif(FEAST_BACKENDS_MKL)
 
