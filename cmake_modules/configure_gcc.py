@@ -48,27 +48,27 @@ def configure_gcc(cpu, buildmode):
     elif cpu == "penryn":
       cxxflags += " -march=core2 -msse4.1 -m64"
     elif cpu == "nehalem":
-      if major == 4 and minor <= 6:
+      if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
         cxxflags += " -march=corei7 -m64"
     elif cpu == "westmere":
-      if major == 4 and minor <= 6:
+      if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
         cxxflags += " -march=corei7 -msse4.2 -m64"
     elif cpu == "sandybridge":
-      if major == 4 and minor <= 6:
+      if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
         cxxflags += " -march=corei7-avx -msse4 -msse4.1 -msse4.2 -m64"
     elif cpu == "ivybridge":
-      if major == 4 and minor <= 6:
+      if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
         cxxflags += " -march=corei7-avx -msse4 -msse4.1 -msse4.2 -m64"
     elif cpu == "haswell":
-      if major == 4 and minor <= 6:
+      if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
         cxxflags += " -march=corei7-avx2 -msse4 -msse4.1 -msse4.2 -m64"
