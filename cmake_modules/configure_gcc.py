@@ -61,17 +61,26 @@ def configure_gcc(cpu, buildmode):
       if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
-        cxxflags += " -march=corei7-avx -msse4 -msse4.1 -msse4.2 -m64"
+        if platform.system() == "Darwin":
+          cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
+        else:
+          cxxflags += " -march=corei7-avx -msse4 -msse4.1 -msse4.2 -m64"
     elif cpu == "ivybridge":
       if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
-        cxxflags += " -march=corei7-avx -msse4 -msse4.1 -msse4.2 -m64"
+        if platform.system() == "Darwin":
+          cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
+        else:
+          cxxflags += " -march=corei7-avx -msse4 -msse4.1 -msse4.2 -m64"
     elif cpu == "haswell":
       if major == 4 and minor < 6:
         cxxflags += " -march=core2 -msse4.2 -m64"
       else:
-        cxxflags += " -march=corei7-avx2 -msse4 -msse4.1 -msse4.2 -m64"
+        if platform.system() == "Darwin":
+          cxxflags += " -march=corei7 -msse4 -msse4.1 -msse4.2 -m64"
+        else:
+          cxxflags += " -march=corei7-avx -msse4 -msse4.1 -msse4.2 -m64"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
