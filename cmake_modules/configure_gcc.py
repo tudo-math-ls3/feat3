@@ -1,4 +1,5 @@
 import subprocess
+import platform
 
 def configure_gcc(cpu, buildmode):
   if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
