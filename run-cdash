@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+# vim: set filetype=python sw=2 sts=2 et nofoldenable :
+# This is a python script.
+# If you encounter problemes when executing it on its own, start it with a python interpreter
+import sys
+import os
+import subprocess
+import socket
+import shutil
+
+#TODO check for git, cmake, ctest and report missing tools
+sys.dont_write_bytecode = True
+
+#TODO help, ? und guess nicht in sys.argv[0] suchen
+# output help screen
+if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
+  print ("This python scripts starts regression tests and submits them to a cdash server")
+  sys.exit()
+
+
+hostname = socket.gethostname()
+src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+build_dirname = src_dirname + os.sep + hostname
+
+#prepare build dir
+shutil.rmtree(build_dirname, True)
+os.mkdir(build_dirname)
+os.chdir(build_dirname)
+#TODO different file per step
+run_log = open(build_dirname + os.sep + "run.log", "w")
+
+#TODO output zeit und datum
+run_log.write("hostname: " + hostname + os.linesep)
+run_log.write("dirname: " + src_dirname + os.linesep)
+
+#git pull
+#os.chdir(src_dirname)
+#subprocess.Popen("git pull origin", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
+#os.chdir(build_dirname)
+
+subprocess.Popen("../configure-feast", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
+
+subprocess.Popen("ctest -D Nightly Start".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+subprocess.Popen("ctest -D Nightly Update".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+subprocess.Popen("ctest -D Nightly Build".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
+subprocess.Popen("ctest -D Nightly Test".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
+subprocess.Popen("ctest -D Nightly Submit".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
+
+run_log.close()
