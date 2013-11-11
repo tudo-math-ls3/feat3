@@ -15,6 +15,7 @@ SET (test_list
   grid_transfer-test
   interpolator-test
   linear_functional-test
+  rew_projector-test
 )
 
 # create all tests
