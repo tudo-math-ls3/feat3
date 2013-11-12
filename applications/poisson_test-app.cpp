@@ -31,7 +31,10 @@
 #include <kernel/space/dof_mirror.hpp>
 #include <kernel/assembly/standard_operators.hpp>
 #include <kernel/assembly/standard_functionals.hpp>
-#include <kernel/assembly/dirichlet_bc.hpp>
+#include <kernel/assembly/common_functions.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/dirichlet_assembler.hpp>
 
 #include <kernel/scarc/solver_data.hpp>
 #include <kernel/scarc/solver_pattern.hpp>
@@ -57,16 +60,6 @@ using namespace FEAST::TestSystem;
 using namespace FEAST::Foundation;
 using namespace FEAST::Geometry;
 using namespace FEAST::ScaRC;
-
-template<typename T_>
-class RhsFunc
-{
-public:
-  static T_ eval(T_ /*x*/, T_ /*y*/)
-  {
-    return T_(1);
-  }
-};
 
 int pow4(int i)
 {
@@ -456,13 +449,17 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
   SparseMatrixCSR<Mem::Main, double> mat_sys(dof_adj);
   mat_sys.clear();
-  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(mat_sys, "gauss-legendre:2", space);
+  Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
+  Assembly::BilinearScalarLaplaceOperator laplace;
+  Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(vec_rhs, "gauss-legendre:2", space);
+  Assembly::Common::ConstantFunction rhs_func(1.0);
+  Assembly::LinearScalarIntegralFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+  Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
   // assemble homogeneous Dirichlet BCs
-  Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+  Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
   std::cout << "proc " << rank << " #macro boundaries " << macro_boundaries_fine.size() << std::endl;
   for(Index i(0) ; i < macro_boundaries_fine.size() ; ++i)
   {

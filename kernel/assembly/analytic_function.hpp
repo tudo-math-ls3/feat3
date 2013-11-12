@@ -1,40 +1,36 @@
 #pragma once
-#ifndef KERNEL_ANALYTIC_FUNCTOR_HPP
-#define KERNEL_ANALYTIC_FUNCTOR_HPP 1
+#ifndef KERNEL_ASSEMBLY_ANALYTIC_FUNCTION_HPP
+#define KERNEL_ASSEMBLY_ANALYTIC_FUNCTION_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
+#include <kernel/trafo/base.hpp>
 
 namespace FEAST
 {
-  /**
-   * \brief Analytic namespace
-   *
-   * This namespace defines functor interfaces for (user-defined) analytic functions.
-   */
-  namespace Analytic
+  namespace Assembly
   {
     /**
-     * \brief Analytic functor interface class
+     * \brief Analytic function interface class
      *
      * This class acts as a base class and interface documentation for basic analytic functors, which are used
      * by various assemblies.
      *
      * \author Peter Zajac
      */
-    class Functor
+    class AnalyticFunction
     {
     public:
       /**
-       * \brief Functor capabilities enumeration
+       * \brief Function capabilities enumeration
        */
-      enum FunctorCapabilities
+      enum FunctionCapabilities
       {
         /**
          * \brief Function Value capability
          *
          * This entry specifies whether the functor is capable of computing function values.\n
-         * If this value is non-zero, the functor offers a ValueEvaluator class template.
+         * If this value is non-zero, the Evaluator class template offers the value() function.
          */
         can_value = 0,
 
@@ -42,7 +38,7 @@ namespace FEAST
          * \brief Gradient capability
          *
          * This entry specifies whether the functor is capable of computing gradients.\n
-         * If this value is non-zero, the functor offers a GradientEvaluator class template.
+         * If this value is non-zero, the Evaluator class template offers the gradient() function.
          */
         can_grad = 0,
 
@@ -50,19 +46,45 @@ namespace FEAST
          * \brief Hessian capability
          *
          * This entry specifies whether the functor is capable of computing hessians.\n
-         * If this value is non-zero, the functor offers a HessianEvaluator class template.
+         * If this value is non-zero, the Evaluator class template offers the hessian() function.
          */
         can_hess = 0
       };
 
       /**
-       * \brief Analytic functor value evaluator class template
+       * \brief Configuration Traits
+       *
+       * \tparam Config_
+       * A function configuration tag class. See Trafo::AnalyticConfigBase for details.
+       */
+      template<typename Config_>
+      struct ConfigTraits
+      {
+        /**
+         * \brief Trafo configuration tag class
+         *
+         * \see Trafo::ConfigBase
+         */
+        struct TrafoConfig :
+          public Trafo::ConfigBase
+        {
+          /// dummy enumeration
+          enum
+          {
+            /// Let's assume that the function needs image point coordinates
+            need_img_point = 1
+          };
+        };
+      };
+
+      /**
+       * \brief Analytic function evaluator class template
        *
        * \tparam EvalTraits_
        * Specifies the traits for the evaluation.
        */
       template<typename EvalTraits_>
-      class ValueEvaluator
+      class Evaluator
       {
       public:
         /// trafo evaluator data
@@ -73,6 +95,10 @@ namespace FEAST
         typedef typename EvalTraits_::DataType DataType;
         /// value type
         typedef typename EvalTraits_::ValueType ValueType;
+        /// gradient type
+        typedef typename EvalTraits_::GradientType GradientType;
+        /// hessian type
+        typedef typename EvalTraits_::HessianType HessianType;
 
         /**
          * \brief Prepares the evaluator for a given cell
@@ -95,127 +121,45 @@ namespace FEAST
 
 #ifdef DOXYGEN
         /**
-         * \brief Evaluation operator
+         * \brief Value evaluation operator
          *
-         * This operator evaluates the analytic functor for a given point.
-         *
-         * \param[out] value
-         * A reference to the value that is to be computed.
+         * This operator evaluates the analytic function for a given point.
          *
          * \param[in] tau
          * The transformation data in the current evaluation point.
+         *
+         * \returns
+         * The value of the function.
          */
-        void operator()(ValueType& value, const TrafoData& tau) const;
-#endif // DOXYGEN
-      }; // class Functor::ValueEvaluator<...>
-
-      /**
-       * \brief Analytic functor gradient evaluator class template
-       *
-       * \tparam EvalTraits_
-       * Specifies the traits for the evaluation.
-       */
-      template<typename EvalTraits_>
-      class GradientEvaluator
-      {
-      public:
-        /// trafo evaluator data
-        typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-        /// trafo data type
-        typedef typename EvalTraits_::TrafoData TrafoData;
-        /// coefficient data type
-        typedef typename EvalTraits_::DataType DataType;
-        /// value type / gradient type
-        typedef typename EvalTraits_::ValueType ValueType;
+        ValueType value(const TrafoData& tau) const;
 
         /**
-         * \brief Prepares the evaluator for a given cell
+         * \brief Gradient evaluation operator
          *
-         * \param[in] trafo_eval
-         * A reference to the trafo evaluator containing the cell information.
-         */
-        void prepare(const TrafoEvaluator& DOXY(trafo_eval))
-        {
-          // do nothing
-        }
-
-        /**
-         * \brief Releases the evaluator from the current cell.
-         */
-        void finish()
-        {
-          // do nothing
-        }
-
-#ifdef DOXYGEN
-        /**
-         * \brief Evaluation operator
-         *
-         * This operator evaluates the analytic functor for a given point.
-         *
-         * \param[out] value
-         * A reference to the value that is to be computed.
+         * This operator evaluates the analytic function's gradient for a given point.
          *
          * \param[in] tau
          * The transformation data in the current evaluation point.
+         *
+         * \returns
+         * The gradient of the function.
          */
-        void operator()(ValueType& value, const TrafoData& tau) const;
-#endif // DOXYGEN
-      }; // class Functor::GradientEvaluator<...>
-
-      /**
-       * \brief Analytic functor hessian evaluator class template
-       *
-       * \tparam EvalTraits_
-       * Specifies the traits for the evaluation.
-       */
-      template<typename EvalTraits_>
-      class HessianEvaluator
-      {
-      public:
-        /// trafo evaluator data
-        typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
-        /// trafo data type
-        typedef typename EvalTraits_::TrafoData TrafoData;
-        /// coefficient data type
-        typedef typename EvalTraits_::DataType DataType;
-        /// value type / hessian type
-        typedef typename EvalTraits_::ValueType ValueType;
+        GradientType gradient(const TrafoData& tau) const;
 
         /**
-         * \brief Prepares the evaluator for a given cell
+         * \brief Hessian evaluation operator
          *
-         * \param[in] trafo_eval
-         * A reference to the trafo evaluator containing the cell information.
-         */
-        void prepare(const TrafoEvaluator& DOXY(trafo_eval))
-        {
-          // do nothing
-        }
-
-        /**
-         * \brief Releases the evaluator from the current cell.
-         */
-        void finish()
-        {
-          // do nothing
-        }
-
-#ifdef DOXYGEN
-        /**
-         * \brief Evaluation operator
-         *
-         * This operator evaluates the analytic functor for a given point.
-         *
-         * \param[out] value
-         * A reference to the value that is to be computed.
+         * This operator evaluates the analytic function's hessian for a given point.
          *
          * \param[in] tau
          * The transformation data in the current evaluation point.
+         *
+         * \returns
+         * The hessian of the function.
          */
-        void operator()(ValueType& value, const TrafoData& tau) const;
+        HessianType hessian(const TrafoData& tau) const;
 #endif // DOXYGEN
-      }; // class Functor::HessianEvaluator<...>
+      }; // class Functor::Evaluator<...>
     }; // class Functor
 
     /**
@@ -351,19 +295,23 @@ namespace FEAST
       template<template<typename> class Function_, typename Traits_>
       struct StaticFunctionWrapper<Function_, Traits_, true, 1>
       {
-        static void eval(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::ValueType eval(const typename Traits_::TrafoData& tau)
         {
-          value = Function_<typename Traits_::DataType>::eval(tau.img_point[0]);
+          return Function_<typename Traits_::DataType>::eval(tau.img_point[0]);
         }
 
-        static void grad(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::GradientType grad(const typename Traits_::TrafoData& tau)
         {
+          typename Traits_::GradientType value;
           value(0) = Function_<typename Traits_::DataType>::der_x(tau.img_point[0]);
+          return value;
         }
 
-        static void hess(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::HessianType hess(const typename Traits_::TrafoData& tau)
         {
+          typename Traits_::HessianType value;
           value(0,0) = Function_<typename Traits_::DataType>::der_xx(tau.img_point[0]);
+          return value;
         }
       };
 
@@ -371,26 +319,30 @@ namespace FEAST
       template<template<typename> class Function_, typename Traits_>
       struct StaticFunctionWrapper<Function_, Traits_, true, 2>
       {
-        static void eval(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::ValueType eval(const typename Traits_::TrafoData& tau)
         {
           typedef Function_<typename Traits_::DataType> FuncType;
-          value = FuncType::eval(tau.img_point[0], tau.img_point[1]);
+          return FuncType::eval(tau.img_point[0], tau.img_point[1]);
         }
 
-        static void grad(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::GradientType grad(const typename Traits_::TrafoData& tau)
         {
           typedef Function_<typename Traits_::DataType> FuncType;
+          typename Traits_::GradientType value;
           value(0) = FuncType::der_x(tau.img_point[0], tau.img_point[1]);
           value(1) = FuncType::der_y(tau.img_point[0], tau.img_point[1]);
+          return value;
         }
 
-        static void hess(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::HessianType hess(const typename Traits_::TrafoData& tau)
         {
           typedef Function_<typename Traits_::DataType> FuncType;
+          typename Traits_::HessianType value;
           value(0,0) = FuncType::der_xx(tau.img_point[0], tau.img_point[1]);
           value(0,1) = FuncType::der_xy(tau.img_point[0], tau.img_point[1]);
           value(1,0) = FuncType::der_yx(tau.img_point[0], tau.img_point[1]);
           value(1,1) = FuncType::der_yy(tau.img_point[0], tau.img_point[1]);
+          return value;
         }
       };
 
@@ -398,23 +350,26 @@ namespace FEAST
       template<template<typename> class Function_, typename Traits_>
       struct StaticFunctionWrapper<Function_, Traits_, true, 3>
       {
-        static void eval(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::ValueType eval(const typename Traits_::TrafoData& tau)
         {
           typedef Function_<typename Traits_::DataType> FuncType;
-          value = FuncType::eval(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
+          return FuncType::eval(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
         }
 
-        static void grad(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::GradientType grad(const typename Traits_::TrafoData& tau)
         {
           typedef Function_<typename Traits_::DataType> FuncType;
+          typename Traits_::GradientType value;
           value(0) = FuncType::der_x(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
           value(1) = FuncType::der_y(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
           value(2) = FuncType::der_z(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
+          return value;
         }
 
-        static void hess(typename Traits_::ValueType& value, const typename Traits_::TrafoData& tau)
+        static typename Traits_::HessianType hess(const typename Traits_::TrafoData& tau)
         {
           typedef Function_<typename Traits_::DataType> FuncType;
+          typename Traits_::HessianType value;
           value(0,0) = FuncType::der_xx(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
           value(0,1) = FuncType::der_xy(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
           value(0,2) = FuncType::der_xz(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
@@ -424,15 +379,16 @@ namespace FEAST
           value(2,0) = FuncType::der_zx(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
           value(2,1) = FuncType::der_zy(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
           value(2,2) = FuncType::der_zz(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
+          return value;
         }
       };
     } // namespace Intern
     /// \endcond
 
     /**
-     * \brief StaticFunction wrapper class template for Functor interface
+     * \brief StaticFunction wrapper class template for AnalyticFunction interface
      *
-     * This class template implements the Analytic::Functor interface by wrapping around a Analytic::StaticFunction
+     * This class template implements the AnalyticFunction interface by wrapping around a StaticFunction
      * class template.
      *
      * \tparam Function_
@@ -444,7 +400,7 @@ namespace FEAST
      * \tparam can_grad_
      * Specifies whether the static function class template supports the evaluation of first order derivatives.
      *
-     * \tparam can_grad_
+     * \tparam can_hess_
      * Specifies whether the static function class template supports the evaluation of second order derivatives.
      *
      * \author Peter Zajac
@@ -454,11 +410,11 @@ namespace FEAST
       bool can_value_ = true,
       bool can_grad_ = false,
       bool can_hess_ = false>
-    class StaticWrapperFunctor :
-      public Functor
+    class StaticWrapperFunction :
+      public AnalyticFunction
     {
     public:
-      /** \copydoc Functor::FunctorCapabilities */
+      /** \copydoc AnalyticFunction::FunctorCapabilities */
       enum
       {
         can_value = can_value_ ? 1 : 0,
@@ -466,55 +422,73 @@ namespace FEAST
         can_hess = can_hess_ ? 1 : 0
       };
 
-      /** \copydoc Functor::ValueEvaluator */
+      /** \copydoc AnalyticFunction::ConfigTraits */
+      template<typename Config_>
+      struct ConfigTraits
+      {
+        // ensure that we have everything available
+        static_assert(can_value_ || (Config_::need_value == 0), "static function can't compute function values");
+        static_assert(can_grad_ || (Config_::need_grad == 0), "static function can't compute function gradients");
+        static_assert(can_hess_ || (Config_::need_hess == 0), "static function can't compute function hessians");
+
+        /**
+         * \brief Trafo configuration tag class
+         *
+         * \see Trafo::ConfigBase
+         */
+        struct TrafoConfig :
+          public Trafo::ConfigBase
+        {
+          /// dummy enumeration
+          enum
+          {
+            /// Let's assume that the function needs image point coordinates
+            need_img_point = 1
+          };
+        };
+      };
+
+      /** \copydoc AnalyticFunction::Evaluator */
       template<typename EvalTraits_>
-      class ValueEvaluator :
-        public Functor::ValueEvaluator<EvalTraits_>
+      class Evaluator :
+        public AnalyticFunction::Evaluator<EvalTraits_>
       {
       public:
-        explicit ValueEvaluator(const StaticWrapperFunctor&)
-        {
-        }
+        /// trafo evaluator data
+        typedef typename EvalTraits_::TrafoEvaluator TrafoEvaluator;
+        /// trafo data type
+        typedef typename EvalTraits_::TrafoData TrafoData;
+        /// coefficient data type
+        typedef typename EvalTraits_::DataType DataType;
+        /// value type
+        typedef typename EvalTraits_::ValueType ValueType;
+        /// gradient type
+        typedef typename EvalTraits_::GradientType GradientType;
+        /// hessian type
+        typedef typename EvalTraits_::HessianType HessianType;
 
-        void operator()(typename EvalTraits_::ValueType& value, const typename EvalTraits_::TrafoData& tau) const
-        {
-          return Intern::StaticFunctionWrapper<Function_, EvalTraits_, can_value_>::eval(value, tau);
-        }
-      }; // class StaticWrapperFunctor::ValueEvaluator<...>
-
-      /** \copydoc Functor::GradientEvaluator */
-      template<typename EvalTraits_>
-      class GradientEvaluator :
-        public Functor::GradientEvaluator<EvalTraits_>
-      {
       public:
-        explicit GradientEvaluator(const StaticWrapperFunctor&)
+        explicit Evaluator(const StaticWrapperFunction&)
         {
         }
 
-        void operator()(typename EvalTraits_::ValueType& value, const typename EvalTraits_::TrafoData& tau) const
+        ValueType value(const TrafoData& tau) const
         {
-          return Intern::StaticFunctionWrapper<Function_, EvalTraits_, can_grad_>::grad(value, tau);
-        }
-      }; // class StaticWrapperFunctor::GradientEvaluator<...>
-
-      /** \copydoc Functor::HessianEvaluator */
-      template<typename EvalTraits_>
-      class HessianEvaluator :
-        public Functor::HessianEvaluator<EvalTraits_>
-      {
-      public:
-        explicit HessianEvaluator(const StaticWrapperFunctor&)
-        {
+          return Intern::StaticFunctionWrapper<Function_, EvalTraits_, can_value_>::eval(tau);
         }
 
-        void operator()(typename EvalTraits_::ValueType& value, const typename EvalTraits_::TrafoData& tau) const
+        GradientType gradient(const TrafoData& tau) const
         {
-          return Intern::StaticFunctionWrapper<Function_, EvalTraits_, can_hess_>::hess(value, tau);
+          return Intern::StaticFunctionWrapper<Function_, EvalTraits_, can_grad_>::grad(tau);
         }
-      }; // class StaticWrapperFunctor::HessianEvaluator<...>
-    }; // class StaticWrapperFunctor
-  } // namespace Analytic
+
+        HessianType hessian(const TrafoData& tau) const
+        {
+          return Intern::StaticFunctionWrapper<Function_, EvalTraits_, can_hess_>::hess(tau);
+        }
+      }; // class StaticWrapperFunction::Evaluator<...>
+    }; // class StaticWrapperFunction
+  } // namespace Assembly
 } // namespace FEAST
 
-#endif // KERNEL_ANALYTIC_FUNCTOR_HPP
+#endif // KERNEL_ASSEMBLY_ANALYTIC_FUNCTION_HPP

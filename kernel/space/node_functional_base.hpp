@@ -4,7 +4,6 @@
 
 // includes, FEAST
 #include <kernel/space/base.hpp>
-#include <kernel/analytic_functor.hpp>
 
 namespace FEAST
 {
@@ -18,15 +17,15 @@ namespace FEAST
      * \tparam Space_
      * The finite-element space that this node-functional is used by.
      *
-     * \tparam Functor_
-     * The type of the functor that is to be evaluated by the node functionals.\n
-     * Has to implement the Analytic::Functor interface.
+     * \tparam Function_
+     * The type of the function that is to be evaluated by the node functionals.\n
+     * Has to implement the Assembly::AnalyticFunction interface.
      *
      * \author Peter Zajac
      */
     template<
       typename Space_,
-      typename Functor_,
+      typename Function_,
       typename DataType_>
     class NodeFunctionalBase
     {
@@ -34,7 +33,7 @@ namespace FEAST
       /// space typedef
       typedef Space_ SpaceType;
       /// functor type
-      typedef Functor_ FunctorType;
+      typedef Function_ FunctionType;
       /// data type
       typedef DataType_ DataType;
 
@@ -42,14 +41,14 @@ namespace FEAST
       /// space reference
       const SpaceType& _space;
       /// functor reference
-      const FunctorType& _functor;
+      const FunctionType& _function;
       /// currently active cell index
       Index _cell_index;
 
       /// protected constructor
-      explicit NodeFunctionalBase(const SpaceType& space, const FunctorType& functor) :
+      explicit NodeFunctionalBase(const SpaceType& space, const FunctionType& function) :
         _space(space),
-        _functor(functor),
+        _function(function),
         _cell_index(~Index(0))
       {
       }
@@ -112,19 +111,19 @@ namespace FEAST
      */
     template<
       typename Space_,
-      typename Functor_,
+      typename Function_,
       typename DataType_>
     class NodeFunctionalNull :
-      public NodeFunctionalBase<Space_, Functor_, DataType_>
+      public NodeFunctionalBase<Space_, Function_, DataType_>
     {
     private:
       /// base-class typedef
-      typedef NodeFunctionalBase<Space_, Functor_, DataType_> BaseClass;
+      typedef NodeFunctionalBase<Space_, Function_, DataType_> BaseClass;
 
     public:
       /// constructor
-      explicit NodeFunctionalNull(const Space_& space, const Functor_& functor) :
-        BaseClass(space, functor)
+      explicit NodeFunctionalNull(const Space_& space, const Function_& function) :
+        BaseClass(space, function)
       {
       }
 

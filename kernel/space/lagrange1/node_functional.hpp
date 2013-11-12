@@ -14,28 +14,28 @@ namespace FEAST
     {
       template<
         typename Space_,
-        typename Functor_,
+        typename Function_,
         int shape_dim_,
         typename DataType_>
       class NodeFunctional :
-        public NodeFunctionalNull<Space_, Functor_, DataType_>
+        public NodeFunctionalNull<Space_, Function_, DataType_>
       {
       public:
-        explicit NodeFunctional(const Space_& space, const Functor_& functor) :
-          NodeFunctionalNull<Space_, Functor_, DataType_>(space, functor)
+        explicit NodeFunctional(const Space_& space, const Function_& function) :
+          NodeFunctionalNull<Space_, Function_, DataType_>(space, function)
         {
         }
       };
 
       template<
         typename Space_,
-        typename Functor_,
+        typename Function_,
         typename DataType_>
-      class NodeFunctional<Space_, Functor_, 0, DataType_> :
-        public NodeFunctionalBase<Space_, Functor_, DataType_>
+      class NodeFunctional<Space_, Function_, 0, DataType_> :
+        public NodeFunctionalBase<Space_, Function_, DataType_>
       {
       public:
-        typedef NodeFunctionalBase<Space_, Functor_, DataType_> BaseClass;
+        typedef NodeFunctionalBase<Space_, Function_, DataType_> BaseClass;
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -43,40 +43,32 @@ namespace FEAST
         typedef typename TrafoEvalType::EvalTraits TrafoEvalTraits;
         typedef typename TrafoEvalTraits::DomainPointType DomainPointType;
 
-        struct TrafoConfig :
-          public Trafo::ConfigBase
+        struct FunctionConfig :
+          public Trafo::AnalyticConfigBase
         {
           enum
           {
-            need_img_point = 1
+            need_value = 1,
+            need_grad = 0,
+            need_hess = 0
           };
         };
+
+        typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
 
         typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
 
-        struct FuncEvalTraits
-        {
-          enum
-          {
-            image_dim = TrafoEvalTraits::image_dim
-          };
-          typedef TrafoEvalType TrafoEvaluator;
-          typedef TrafoEvalData TrafoData;
-          typedef DataType_ DataType;
-          typedef DataType_ ValueType;
-        };
-
-        typedef typename Functor_::template ValueEvaluator<FuncEvalTraits> FuncEval;
+        typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
+        typedef typename Function_::template Evaluator<AnalyticEvalTraits> FuncEval;
 
         TrafoEvalType _trafo_eval;
         FuncEval _func_eval;
-        DomainPointType _dom_point;
 
       public:
-        explicit NodeFunctional(const Space_& space, const Functor_& functor) :
-          BaseClass(space, functor),
+        explicit NodeFunctional(const Space_& space, const Function_& function) :
+          BaseClass(space, function),
           _trafo_eval(space.get_trafo()),
-          _func_eval(functor)
+          _func_eval(function)
         {
         }
 
@@ -106,11 +98,10 @@ namespace FEAST
 
         DataType_ operator()(Index /*assign_idx*/) const
         {
+          DomainPointType dom_point;
           TrafoEvalData trafo_data;
-          _trafo_eval(trafo_data, _dom_point);
-          DataType_ value(DataType_(0));
-          _func_eval(value, trafo_data);
-          return value;
+          _trafo_eval(trafo_data, dom_point);
+          return _func_eval.value(trafo_data);
         }
       };
     } // namespace Lagrange1

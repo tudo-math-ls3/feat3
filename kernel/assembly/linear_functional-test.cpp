@@ -1,5 +1,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/common_functions.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/space/lagrange1/element.hpp>
@@ -9,20 +11,6 @@
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
-
-template<typename DataType_>
-class SineBubble;
-
-template<typename DataType_>
-class OneFunction
-{
-public:
-  static DataType_ eval(DataType_, DataType_)
-  {
-    return DataType_(1);
-  }
-};
-
 
 template<typename DataType_>
 class LinearFunctionalTest :
@@ -70,9 +58,14 @@ public:
     // create space
     QuadSpaceQ1 space(trafo);
 
+    // create a cubature factory
+    Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
+
     // assemble the linear functional into a vector
     VectorType vector(space.get_num_dofs(), DataType_(0));
-    Assembly::LinearScalarIntegralFunctor<OneFunction>::assemble_vector(vector, "gauss-legendre:2", space);
+    Assembly::Common::ConstantFunction function(DataType_(1));
+    Assembly::LinearScalarIntegralFunctional<Assembly::Common::ConstantFunction> functional(function);
+    Assembly::LinearFunctionalAssembler::assemble_vector(vector, functional, space, cubature_factory);
 
     // get mesh element count
     Index num_verts = mesh.get_num_entities(0);
@@ -115,9 +108,14 @@ public:
     // create space
     QuadSpaceQ0 space(trafo);
 
+    // create a cubature factory
+    Cubature::DynamicFactory cubature_factory("gauss-legendre:5");
+
     // assemble the linear functional into a vector
     VectorType vector(space.get_num_dofs(), DataType_(0));
-    Assembly::LinearScalarIntegralFunctor<SineBubble>::assemble_vector(vector, "gauss-legendre:5", space);
+    Assembly::Common::SineBubbleFunction function;
+    Assembly::LinearScalarIntegralFunctional<Assembly::Common::SineBubbleFunction> functional(function);
+    Assembly::LinearFunctionalAssembler::assemble_vector(vector, functional, space, cubature_factory);
 
     // get mesh element count
     Index num_quads = mesh.get_num_entities(2);
@@ -132,7 +130,7 @@ public:
     const Geometry::IndexSet<4> index_set(mesh.get_index_set<2,0>());
 
     // get the constant pi
-    const DataType_ pi = SineBubble<DataType_>::pi();
+    const DataType_ pi = Math::Limits<DataType_>::pi();
 
     // loop over all quads
     for(Index i(0); i < num_quads; ++i)
@@ -155,70 +153,3 @@ public:
 
 LinearFunctionalTest<float> linear_functional_test_float;
 LinearFunctionalTest<double> linear_functional_test_double;
-
-
-template<typename DataType_>
-class SineBubble :
-  public Analytic::StaticFunction<DataType_>
-{
-public:
-  /// returns the constant pi
-  static DataType_ pi()
-  {
-    return Math::Limits<DataType_>::pi();
-  }
-
-  /// 1D: function value
-  static DataType_ eval(DataType_ x)
-  {
-    return Math::sin(pi() * x);
-  }
-
-  /// 2D: function value
-  static DataType_ eval(DataType_ x, DataType_ y)
-  {
-    return Math::sin(pi() * x) * Math::sin(pi() * y);
-  }
-
-  /// 3D: function value
-  static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return Math::sin(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 1D: X-derivative
-  static DataType_ der_x(DataType_ x)
-  {
-    return pi() * Math::cos(pi() * x);
-  }
-
-  /// 2D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y)
-  {
-    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y);
-  }
-
-  /// 2D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y)
-  {
-    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y);
-  }
-
-  /// 3D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 3D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 3D: Z-derivative
-  static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::sin(pi() * x) * Math::sin(pi() * y) * Math::cos(pi() * z);
-  }
-}; // class SineBubble<...>

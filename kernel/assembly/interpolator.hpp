@@ -14,19 +14,19 @@ namespace FEAST
     {
       template<
         typename Vector_,
-        typename Functor_,
+        typename Function_,
         typename Space_,
         int shape_dim_>
       class InterpolatorCore
       {
       public:
-        static void project(Vector_& vector, const Functor_& functor, const Space_& space)
+        static void project(Vector_& vector, const Function_& function, const Space_& space)
         {
           typedef typename Vector_::DataType DataType;
 
           // define node functional
-          typedef typename Space_::template NodeFunctional<Functor_, shape_dim_, DataType>::Type NodeFuncType;
-          NodeFuncType node_func(space, functor);
+          typedef typename Space_::template NodeFunctional<Function_, shape_dim_, DataType>::Type NodeFuncType;
+          NodeFuncType node_func(space, function);
 
           // skip empty node functional sets
           if(node_func.get_max_assigned_dofs() <= 0)
@@ -71,33 +71,33 @@ namespace FEAST
 
       template<
         typename Vector_,
-        typename Functor_,
+        typename Function_,
         typename Space_,
         int shape_dim_ = Space_::shape_dim>
       class InterpolatorWrapper
       {
       public:
-        static void project(Vector_& vector, const Functor_& functor, const Space_& space)
+        static void project(Vector_& vector, const Function_& function, const Space_& space)
         {
           // recurse down
-          InterpolatorWrapper<Vector_, Functor_, Space_, shape_dim_ - 1>::project(vector, functor, space);
+          InterpolatorWrapper<Vector_, Function_, Space_, shape_dim_ - 1>::project(vector, function, space);
 
           // call interpolator core
-          InterpolatorCore<Vector_, Functor_, Space_, shape_dim_>::project(vector, functor, space);
+          InterpolatorCore<Vector_, Function_, Space_, shape_dim_>::project(vector, function, space);
         }
       };
 
       template<
         typename Vector_,
-        typename Functor_,
+        typename Function_,
         typename Space_>
-      class InterpolatorWrapper<Vector_, Functor_, Space_, 0>
+      class InterpolatorWrapper<Vector_, Function_, Space_, 0>
       {
       public:
-        static void project(Vector_& vector, const Functor_& functor, const Space_& space)
+        static void project(Vector_& vector, const Function_& function, const Space_& space)
         {
           // call interpolator core
-          InterpolatorCore<Vector_, Functor_, Space_, 0>::project(vector, functor, space);
+          InterpolatorCore<Vector_, Function_, Space_, 0>::project(vector, function, space);
         }
       };
     } // namespace Intern
@@ -120,23 +120,23 @@ namespace FEAST
        * \param[out] vector
        * A vector that shall receive the interpolation coefficients.
        *
-       * \param[in] functor
-       * The functor that is to be interpolated. Has to implement the Space::DeriveFunctor interface.
+       * \param[in] function
+       * An object implementing the AnalyticFunction interface.
        *
        * \param[in] space
        * The Finite-Element space into which the functor is to be projected.
        */
       template<
         typename Vector_,
-        typename Functor_,
+        typename Function_,
         typename Space_>
       static void project(
         Vector_& vector,
-        const Functor_& functor,
+        const Function_& function,
         const Space_& space)
       {
         vector = Vector_(space.get_num_dofs(), typename Vector_::DataType(0));
-        Intern::InterpolatorWrapper<Vector_, Functor_, Space_>::project(vector, functor, space);
+        Intern::InterpolatorWrapper<Vector_, Function_, Space_>::project(vector, function, space);
       }
     }; // class Interpolator
   } // namespace Assembly

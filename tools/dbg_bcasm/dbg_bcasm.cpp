@@ -7,7 +7,10 @@
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/assembly/standard_operators.hpp>
 #include <kernel/assembly/standard_functionals.hpp>
-#include <kernel/assembly/dirichlet_bc.hpp>
+#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/common_functions.hpp>
 
 using namespace FEAST;
 
@@ -28,53 +31,38 @@ typedef LAFEM::UnitFilter<Mem::Main, DataType> UnitFilterType;
 void fill_cell_set(QuadCellSet& cell, int face);
 void fill_quad_mesh_2d(QuadMesh& mesh, Real x = 0.0, Real y = 0.0);
 
-template<typename T_>
-class RhsFunc
-{
-public:
-  static T_ eval(T_ /*x*/, T_ /*y*/)
-  {
-    return T_(1);
-  }
-};
-
-template<typename T_>
-class BCFunc
-{
-public:
-  static T_ eval(T_ /*x*/, T_ /*y*/)
-  {
-    return T_(17);
-  }
-};
-
 template<typename Space_, typename CellSet_>
 void test_bcasm(
   const Space_& space,
   const CellSet_& cell,
-  const String cubature = "gauss-legendre:2")
+  const String cubature_name = "gauss-legendre:2")
 {
+  Cubature::DynamicFactory cubature_factory(cubature_name);
+
   // assemble system matrix
   MatrixType mat_sys(Space::DofAdjacency<>::assemble(space));
   mat_sys.clear();
-  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(mat_sys, cubature, space);
+  Assembly::BilinearScalarLaplaceOperator laplace;
+  Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   // assemble rhs vector
   VectorType vec_rhs(space.get_num_dofs(), Real(0));
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(vec_rhs, cubature, space);
+  Assembly::Common::ConstantFunction rhs_func(1.0);
+  Assembly::LinearScalarIntegralFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+  Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
   // allocate solution vector
   VectorType vec_sol(space.get_num_dofs(), Real(1));
 
   // assemble homogene Dirichlet BCs
-  Assembly::DirichletBC<Space_> dirichlet(space);
+  Assembly::DirichletAssembler<Space_> dirichlet(space);
   dirichlet.add_cell_set(cell);
 
   // assemble filter:
   // a) homogene Dirichlet BCs
   //UnitFilterType filter(dirichlet.template assemble<Mem::Main, DataType>());
   // b) inhomogene Dirichlet BCs
-  Analytic::StaticWrapperFunctor<BCFunc> bc_func;
+  Assembly::Common::ConstantFunction bc_func(17.0);
   UnitFilterType filter(dirichlet.template assemble<Mem::Main, DataType>(bc_func));
 
   // filter system

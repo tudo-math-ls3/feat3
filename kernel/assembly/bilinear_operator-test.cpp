@@ -1,5 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/standard_operators.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -64,8 +65,12 @@ public:
     MatrixType matrix(dof_adjacency);
     matrix.clear();
 
+    // create a cubature factory
+    Cubature::DynamicFactory cubature_factory("barycentre");
+
     // assemble the identity operator with barycentre cubature rule
-    Assembly::BilinearScalarIdentityFunctor::assemble_matrix1(matrix, "barycentre", space);
+    Assembly::BilinearScalarIdentityOperator operat;
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, operat, space, cubature_factory);
 
     // fetch the matrix arrays
     DataType_* data = matrix.val();
@@ -98,11 +103,14 @@ public:
     matrix_1.clear();
     matrix_2.clear();
 
-    // assemble the laplace operator with trapezoidal cubature rule
-    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(matrix_1, "trapezoidal", space);
+    // create a cubature factory
+    Cubature::DynamicFactory cubature_factory_trz("trapezoidal");
+    Cubature::DynamicFactory cubature_factory_gl2("gauss-legendre:2");
 
-    // assemble the laplace operator with gauss-legendre:2 cubature rule
-    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(matrix_2, "gauss-legendre:2", space);
+    // assemble the identity operator with barycentre cubature rule
+    Assembly::BilinearScalarLaplaceOperator operat;
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_1, operat, space, cubature_factory_trz);
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_2, operat, space, cubature_factory_gl2);
 
     // get mesh element count
     Index num_verts = mesh.get_num_entities(0);

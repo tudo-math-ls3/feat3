@@ -23,7 +23,9 @@ for further application development.
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/assembly/standard_operators.hpp>
 #include <kernel/assembly/standard_functionals.hpp>
-#include <kernel/assembly/dirichlet_bc.hpp>
+#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/error_computer.hpp>
@@ -147,6 +149,10 @@ public:
   }
 };
 
+typedef Assembly::StaticWrapperFunction<SolX, true, true> FuncSolX;
+typedef Assembly::StaticWrapperFunction<SolY, true, true> FuncSolY;
+typedef Assembly::StaticWrapperFunction<SolP, true, false> FuncSolP;
+
 // a cell factory for the coarse mesh: contains all boundary edges except for the ones
 // with a X-coordinate of 1.
 class MyCellSetFactory :
@@ -172,10 +178,10 @@ public:
   }
 }; // class Factory<CellSubSet<...>>
 
-// a bilinear function for the pressure gradient matrices
+// a bilinear operator for the pressure gradient matrices
 template<int der_>
-class PressureGradientFunctor :
-  public Assembly::BilinearFunctorBase
+class PressureGradientOperator :
+  public Assembly::BilinearOperator
 {
 public:
   /// test space configuration
@@ -204,7 +210,7 @@ public:
 
   template<typename AsmTraits_>
   class Evaluator :
-      public Assembly::BilinearFunctorBase::Evaluator<AsmTraits_>
+    public Assembly::BilinearOperator::Evaluator<AsmTraits_>
   {
   public:
     /// the data type to be used
@@ -217,35 +223,17 @@ public:
     typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
   public:
-    explicit Evaluator(const PressureGradientFunctor& /*functor*/)
+    explicit Evaluator(const PressureGradientOperator&)
     {
     }
 
-    /** \copydoc BilinearFunctorBase::Evaluator::operator() */
-    DataType operator()(const TrafoData& /*tau*/, const TrialBasisData& phi, const TestBasisData& psi)
+    /** \copydoc BilinearOperator::Evaluator::operator() */
+    DataType operator()(const TrafoData&, const TrialBasisData& phi, const TestBasisData& psi)
     {
       return -phi.value * psi.grad[der_];
     }
   };
-
-public:
-  template<
-    typename Matrix_,
-    typename TestSpace_,
-    typename TrialSpace_>
-  static void assemble(
-    Matrix_& matrix,
-    const String& cubature_name,
-    const TestSpace_& test_space,
-    const TrialSpace_& trial_space,
-    const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
-  {
-    PressureGradientFunctor<der_> functor;
-    Cubature::DynamicFactory cubature_factory(cubature_name);
-    Assembly::BilinearOperator<PressureGradientFunctor<der_> >::
-      assemble_matrix2(matrix, functor, cubature_factory, test_space, trial_space, alpha);
-  }
-}; // class PressureGradientFunctor
+}; // class PressureGradientOperator
 
 // A class containing all data for the discretised Stokes equation on a particular mesh level.
 class StokesLevel
@@ -335,8 +323,8 @@ public:
     _matrix_m = MatrixType(Space::DofAdjacency<>::assemble(_space_p));
 
     // create cubature factories
-    String cubature_velo("gauss-legendre:3");
-    String cubature_pres("gauss-legendre:2");
+    Cubature::DynamicFactory cubature_factory_velo("gauss-legendre:3");
+    Cubature::DynamicFactory cubature_factory_pres("gauss-legendre:2");
 
     // clear all matrices
     _matrix_a.clear();
@@ -345,14 +333,18 @@ public:
     _matrix_m.clear();
 
     // assemble velocity laplace matrix A
-    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(_matrix_a, cubature_velo, _space_v);
+    Assembly::BilinearScalarLaplaceOperator laplace;
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(_matrix_a, laplace, _space_v, cubature_factory_velo);
 
     // assemble pressure mass matrix
-    Assembly::BilinearScalarIdentityFunctor::assemble_matrix1(_matrix_m, cubature_pres, _space_p, -DataType(1));
+    Assembly::BilinearScalarIdentityOperator identity;
+    Assembly::BilinearOperatorAssembler::assemble_matrix1(_matrix_m, identity, _space_p, cubature_factory_pres, -DataType(1));
 
     // assemble pressure gradient matrices B1 and B2
-    PressureGradientFunctor<0>::assemble(_matrix_b1, cubature_velo, _space_v, _space_p);
-    PressureGradientFunctor<1>::assemble(_matrix_b2, cubature_velo, _space_v, _space_p);
+    PressureGradientOperator<0> gradient_x;
+    PressureGradientOperator<1> gradient_y;
+    Assembly::BilinearOperatorAssembler::assemble_matrix2(_matrix_b1, gradient_x, _space_v, _space_p, cubature_factory_velo);
+    Assembly::BilinearOperatorAssembler::assemble_matrix2(_matrix_b2, gradient_y, _space_v, _space_p, cubature_factory_velo);
 
     // build velocity divergence matrices D1 and D2 by transposing B1 and B2
     _matrix_d1 = LAFEM::Transposition<AlgoType>::value(_matrix_b1);
@@ -373,8 +365,8 @@ public:
     Cubature::DynamicFactory cubature_factory_pres("gauss-legendre:1");
 
     // assemble prolongation matrices
-    Assembly::GridTransfer::assemble_prolongation(_prol_v, cubature_factory_velo, _space_v, coarse._space_v);
-    Assembly::GridTransfer::assemble_prolongation(_prol_p, cubature_factory_pres, _space_p, coarse._space_p);
+    Assembly::GridTransfer::assemble_prolongation(_prol_v, _space_v, coarse._space_v, cubature_factory_velo);
+    Assembly::GridTransfer::assemble_prolongation(_prol_p, _space_p, coarse._space_p, cubature_factory_pres);
 
     // transpose to obtain restriction matrices
     _rest_v = LAFEM::Transposition<AlgoType>::value(_prol_v);
@@ -385,16 +377,16 @@ public:
   void assemble_bc()
   {
     // create two Dirichlet BC assemblers
-    Assembly::DirichletBC<SpaceVeloType> dirichlet_x(_space_v);
-    Assembly::DirichletBC<SpaceVeloType> dirichlet_y(_space_v);
+    Assembly::DirichletAssembler<SpaceVeloType> dirichlet_x(_space_v);
+    Assembly::DirichletAssembler<SpaceVeloType> dirichlet_y(_space_v);
 
     // add our boundary cell sets
     dirichlet_x.add_cell_set(_cell_set);
     dirichlet_y.add_cell_set(_cell_set);
 
     // assemble X-velocity BC values
-    Analytic::StaticWrapperFunctor<SolX> bc_x;
-    _filter_x = dirichlet_x.assemble<MemType, DataType>(bc_x);
+    FuncSolX sol_x;
+    _filter_x = dirichlet_x.assemble<MemType, DataType>(sol_x);
 
     // assemble Y-velocity BC values
     _filter_y = dirichlet_y.assemble<MemType, DataType>();
@@ -477,7 +469,7 @@ public:
     DataType dx = LAFEM::Norm2<AlgoType>::value(_vec_rhs_x);
     DataType dy = LAFEM::Norm2<AlgoType>::value(_vec_rhs_y);
     DataType dp = LAFEM::Norm2<AlgoType>::value(_vec_rhs_p);
-    return std::sqrt(dx*dx + dy*dy + dp*dp);
+    return Math::sqrt(dx*dx + dy*dy + dp*dp);
   }
 
   // updates the solution vectors
@@ -597,25 +589,25 @@ StokesLevel* build_coarse_level(std::size_t lvl)
 void calc_errors(const StokesLevel& level, const VectorType& vec_ux, const VectorType& vec_uy, const VectorType& vec_p)
 {
   // define solution functors
-  Analytic::StaticWrapperFunctor<SolX, true, true> func_sol_x;
-  Analytic::StaticWrapperFunctor<SolY, true, true> func_sol_y;
-  Analytic::StaticWrapperFunctor<SolP, true, false> func_sol_p;
+  FuncSolX func_sol_x;
+  FuncSolY func_sol_y;
+  FuncSolP func_sol_p;
 
   // define cubature factory
   Cubature::DynamicFactory cubature_factory("gauss-legendre:4");
 
   // compute velocity L2-errors
-  DataType l2_ux = Assembly::ScalarErrorComputerL2::compute(func_sol_x, vec_ux, level._space_v, cubature_factory);
-  DataType l2_uy = Assembly::ScalarErrorComputerL2::compute(func_sol_y, vec_uy, level._space_v, cubature_factory);
+  DataType l2_ux = Assembly::ScalarErrorComputerL2::compute(vec_ux, func_sol_x, level._space_v, cubature_factory);
+  DataType l2_uy = Assembly::ScalarErrorComputerL2::compute(vec_uy, func_sol_y, level._space_v, cubature_factory);
   DataType l2_u = Math::sqrt(Math::sqr(l2_ux) + Math::sqr(l2_uy));
 
   // compute velocity H1-errors
-  DataType h1_ux = Assembly::ScalarErrorComputerH1::compute(func_sol_x, vec_ux, level._space_v, cubature_factory);
-  DataType h1_uy = Assembly::ScalarErrorComputerH1::compute(func_sol_y, vec_uy, level._space_v, cubature_factory);
+  DataType h1_ux = Assembly::ScalarErrorComputerH1::compute(vec_ux, func_sol_x, level._space_v, cubature_factory);
+  DataType h1_uy = Assembly::ScalarErrorComputerH1::compute(vec_uy, func_sol_y, level._space_v, cubature_factory);
   DataType h1_u = Math::sqrt(Math::sqr(h1_ux) + Math::sqr(h1_uy));
 
   // compute pressure L2-error
-  DataType l2_p = Assembly::ScalarErrorComputerL2::compute(func_sol_p, vec_p, level._space_p, cubature_factory);
+  DataType l2_p = Assembly::ScalarErrorComputerL2::compute(vec_p, func_sol_p, level._space_p, cubature_factory);
 
   // print errors
   std::cout << std::endl;

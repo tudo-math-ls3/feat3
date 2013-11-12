@@ -66,14 +66,14 @@ namespace FEAST
        */
       template<
         typename Matrix_,
-        typename CubatureFactory_,
         typename FineSpace_,
-        typename CoarseSpace_>
+        typename CoarseSpace_,
+        typename CubatureFactory_>
       static void assemble_prolongation(
         Matrix_& matrix,
-        const CubatureFactory_& cubature_factory,
         const FineSpace_& fine_space,
-        const CoarseSpace_& coarse_space)
+        const CoarseSpace_& coarse_space,
+        const CubatureFactory_& cubature_factory)
       {
         typedef typename Matrix_::DataType DataType;
 

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_ASSEMBLY_DIRICHLET_BC_HPP
-#define KERNEL_ASSEMBLY_DIRICHLET_BC_HPP 1
+#ifndef KERNEL_ASSEMBLY_DIRICHLET_ASSEMBLER_HPP
+#define KERNEL_ASSEMBLY_DIRICHLET_ASSEMBLER_HPP 1
 
 // includes, FEAST
 #include <kernel/assembly/base.hpp>
@@ -33,7 +33,7 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<typename Space_>
-    class DirichletBC
+    class DirichletAssembler
     {
     public:
       /// space type
@@ -63,13 +63,13 @@ namespace FEAST
        * \param[in] space
        * A reference to the space for which the boundary conditions are to be assembled.
        */
-      explicit DirichletBC(const SpaceType& space) :
+      explicit DirichletAssembler(const SpaceType& space) :
         _space(space)
       {
       }
 
       /// virtual destructor
-      virtual ~DirichletBC()
+      virtual ~DirichletAssembler()
       {
       }
 
@@ -164,7 +164,7 @@ namespace FEAST
         // return filter
         return filter;
       }
-    }; // class DirichletBC
+    }; // class DirichletAssembler
 
     /// \cond internal
     namespace Intern
@@ -334,4 +334,4 @@ namespace FEAST
   } // namespace Assembly
 } // namespace FEAST
 
-#endif // KERNEL_ASSEMBLY_DIRICHLET_BC_HPP
+#endif // KERNEL_ASSEMBLY_DIRICHLET_ASSEMBLER_HPP

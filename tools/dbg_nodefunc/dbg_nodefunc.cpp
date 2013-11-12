@@ -9,6 +9,7 @@
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/error_computer.hpp>
+#include <kernel/assembly/common_functions.hpp>
 
 using namespace FEAST;
 
@@ -23,73 +24,6 @@ typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 typedef Space::Discontinuous::Element<QuadTrafo> QuadSpaceQ0;
 
 typedef LAFEM::DenseVector<Mem::Main, DataType> VectorType;
-
-template<typename DataType_>
-class SineBubble :
-  public Analytic::StaticFunction<DataType_>
-{
-public:
-  /// returns the constant pi
-  static DataType_ pi()
-  {
-    static const DataType_ value(DataType_(2) * std::acos(DataType_(0)));
-    return value;
-  }
-
-  /// 1D: function value
-  static DataType_ eval(DataType_ x)
-  {
-    return std::sin(pi() * x);
-  }
-
-  /// 2D: function value
-  static DataType_ eval(DataType_ x, DataType_ y)
-  {
-    return std::sin(pi() * x) * std::sin(pi() * y);
-  }
-
-  /// 3D: function value
-  static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return std::sin(pi() * x) * std::sin(pi() * y) * std::sin(pi() * z);
-  }
-
-  /// 1D: X-derivative
-  static DataType_ der_x(DataType_ x)
-  {
-    return pi() * std::cos(pi() * x);
-  }
-
-  /// 2D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y)
-  {
-    return pi() * std::cos(pi() * x) * std::sin(pi() * y);
-  }
-
-  /// 2D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y)
-  {
-    return pi() * std::sin(pi() * x) * std::cos(pi() * y);
-  }
-
-  /// 3D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * std::cos(pi() * x) * std::sin(pi() * y) * std::sin(pi() * z);
-  }
-
-  /// 3D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * std::sin(pi() * x) * std::cos(pi() * y) * std::sin(pi() * z);
-  }
-
-  /// 3D: Z-derivative
-  static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * std::sin(pi() * x) * std::sin(pi() * y) * std::cos(pi() * z);
-  }
-}; // class SineBubble<...>
 
 template<typename Space_>
 void test_interpolation(Index level)
@@ -107,17 +41,16 @@ void test_interpolation(Index level)
   Space_ space(trafo);
 
   // define functor
-  typedef Analytic::StaticWrapperFunctor<SineBubble, true, true> FunctorType;
-  FunctorType functor;
+  Assembly::Common::SineBubbleFunction sine_bubble;
 
   // interpolate functor into FE space
   VectorType vector;
-  Assembly::Interpolator::project(vector, functor, space);
+  Assembly::Interpolator::project(vector, sine_bubble, space);
 
   // compute L2-error
   Cubature::DynamicFactory cubature_factory("auto-degree:10");
-  DataType l2err = Assembly::ScalarErrorComputerL2::compute(functor, vector, space, cubature_factory);
-  DataType h1err = Assembly::ScalarErrorComputerH1::compute(functor, vector, space, cubature_factory);
+  DataType l2err = Assembly::ScalarErrorComputerL2::compute(vector, sine_bubble, space, cubature_factory);
+  DataType h1err = Assembly::ScalarErrorComputerH1::compute(vector, sine_bubble, space, cubature_factory);
 
   // print error
   std::cout << "Level: " << level <<

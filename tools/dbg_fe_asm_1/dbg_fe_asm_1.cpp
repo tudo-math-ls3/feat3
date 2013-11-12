@@ -4,6 +4,7 @@
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/assembly/standard_operators.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/util/stop_watch.hpp>
 #include <cstdio>
@@ -220,10 +221,10 @@ double verify_data(const char* filename, const LAFEM::SparseMatrixCSR<Mem::Main,
   asm_time = fasm_time;
 
   // skip row pointer
-  fseek(file, 4*(ne[0]+1), SEEK_CUR);
+  fseek(file, long(4*(ne[0]+1)), SEEK_CUR);
 
   // skip column indices
-  fseek(file, 4*ne[1], SEEK_CUR);
+  fseek(file, long(4*ne[1]), SEEK_CUR);
 
   // validate data
   for(Index i(0); i < neq; ++i)
@@ -246,7 +247,7 @@ _end:
 }
 
 template<typename Space_>
-void test_asm(const Space_& space, const String& cubature, const char* matx_name)
+void test_asm(const Space_& space, const String& cubature_name, const char* matx_name)
 {
   std::cout << "Assembling matrix structure..." << std::endl;
 
@@ -265,6 +266,8 @@ void test_asm(const Space_& space, const String& cubature, const char* matx_name
 
   LAFEM::SparseMatrixCSR<Mem::Main, double> matrix_d(dof_adjacency);
 
+  Cubature::DynamicFactory cubature_factory(cubature_name);
+
   std::cout << "Assembling double precision matrix data..." << std::endl;
   matrix_d.clear(0.0f);
   stop_watch.reset();
@@ -272,11 +275,17 @@ void test_asm(const Space_& space, const String& cubature, const char* matx_name
   switch(imat)
   {
   case 0:
-    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(matrix_d, cubature, space);
+    {
+      Assembly::BilinearScalarLaplaceOperator laplace;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_d, laplace, space, cubature_factory);
+    }
     break;
 
   case 1:
-    Assembly::BilinearScalarIdentityFunctor::assemble_matrix1(matrix_d, cubature, space);
+    {
+      Assembly::BilinearScalarIdentityOperator identity;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_d, identity, space, cubature_factory);
+    }
     break;
   }
   stop_watch.stop();

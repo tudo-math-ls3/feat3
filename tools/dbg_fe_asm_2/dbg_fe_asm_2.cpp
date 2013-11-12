@@ -4,6 +4,7 @@
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/assembly/standard_operators.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/util/stop_watch.hpp>
 #include <cstdio>
@@ -21,7 +22,7 @@ typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 
 
 template<typename Space_>
-void test_asm(const Space_& space, const String& cubature, int imat)
+void test_asm(const Space_& space, const String& cubature_name, int imat)
 {
   std::cout << "Assembling matrix structure..." << std::endl;
 
@@ -33,6 +34,8 @@ void test_asm(const Space_& space, const String& cubature, int imat)
 
   LAFEM::SparseMatrixCSR<Mem::Main, double> matrix_d(dof_adjacency);
 
+  Cubature::DynamicFactory cubature_factory(cubature_name);
+
   std::cout << "Assembling " << (imat == 0 ? "stiffness" : "mass") << " matrix data..." << std::endl;
   matrix_d.clear(0.0f);
   stop_watch.reset();
@@ -40,11 +43,17 @@ void test_asm(const Space_& space, const String& cubature, int imat)
   switch(imat)
   {
   case 0:
-    Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(matrix_d, cubature, space);
+    {
+      Assembly::BilinearScalarLaplaceOperator laplace;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_d, laplace, space, cubature_factory);
+    }
     break;
 
   case 1:
-    Assembly::BilinearScalarIdentityFunctor::assemble_matrix1(matrix_d, cubature, space);
+    {
+      Assembly::BilinearScalarIdentityOperator identity;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_d, identity, space, cubature_factory);
+    }
     break;
   }
   stop_watch.stop();

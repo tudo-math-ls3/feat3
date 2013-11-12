@@ -92,7 +92,7 @@ public:
 
     // assemble prolongation matrix
     Assembly::GridTransfer::
-      assemble_prolongation(prol_matrix, Cubature::DynamicFactory("gauss-legendre:2"), space_f, space_c);
+      assemble_prolongation(prol_matrix, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:2"));
 
     // fetch matrix data
     const DataType_* data = prol_matrix.val();
@@ -162,7 +162,7 @@ public:
 
     // assemble prolongation matrix
     Assembly::GridTransfer::
-      assemble_prolongation(prol_matrix, Cubature::DynamicFactory("gauss-legendre:3"), space_f, space_c);
+      assemble_prolongation(prol_matrix, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:3"));
 
     // fetch matrix data
     const DataType_* data = prol_matrix.val();

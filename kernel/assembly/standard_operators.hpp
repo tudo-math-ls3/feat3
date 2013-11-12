@@ -3,7 +3,6 @@
 #define KERNEL_ASSEMBLY_STANDARD_OPERATORS_HPP 1
 
 // includes, FEAST
-#include <kernel/assembly/bilinear_functor_base.hpp>
 #include <kernel/assembly/bilinear_operator.hpp>
 
 namespace FEAST
@@ -11,7 +10,7 @@ namespace FEAST
   namespace Assembly
   {
     /**
-     * \brief Bilinear scalar Laplace operator functor implementation
+     * \brief Bilinear scalar -Laplace operator functor implementation
      *
      * This functor implements the weak formulation of the bilinear scalar Laplace operator, i.e.
      *   \f[ \nabla \varphi \cdot \nabla\psi \f]
@@ -21,8 +20,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    class BilinearScalarLaplaceFunctor :
-      public BilinearFunctorBase
+    class BilinearScalarLaplaceOperator :
+      public BilinearOperator
     {
     public:
       /// test space configuration
@@ -59,7 +58,7 @@ namespace FEAST
        */
       template<typename AsmTraits_>
       class Evaluator :
-          public BilinearFunctorBase::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
       {
       public:
         /// the data type to be used
@@ -78,7 +77,7 @@ namespace FEAST
          * \param[in] functor
          * A reference to the scalar Laplace functor.
          */
-        explicit Evaluator(const BilinearScalarLaplaceFunctor& DOXY(functor))
+        explicit Evaluator(const BilinearScalarLaplaceOperator& DOXY(functor))
         {
         }
 
@@ -87,37 +86,8 @@ namespace FEAST
         {
           return dot(phi.grad, psi.grad);
         }
-      }; // class BilinearScalarLaplaceFunctor::Evaluator<...>
-
-
-    public:
-      /**
-       * \brief Assembles a stiffness matrix.
-       *
-       * \param[in,out] matrix
-       * The matrix that is to be assembled.
-       *
-       * \param[in] cubature_name
-       * A string containing the name of the cubature rule to be used for integration.
-       *
-       * \param[in] space
-       * A reference to the finite-element to be used as the test- and trial-space.
-       */
-      template<
-        typename Matrix_,
-        typename Space_>
-      static void assemble_matrix(
-        Matrix_& matrix,
-        const String& cubature_name,
-        const Space_& space,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
-      {
-        BilinearScalarLaplaceFunctor functor;
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        BilinearOperator<BilinearScalarLaplaceFunctor>::
-          assemble_matrix1(matrix, functor, cubature_factory, space, alpha);
-      }
-    }; // class BilinearScalarLaplaceFunctor
+      }; // class BilinearScalarLaplaceOperator::Evaluator<...>
+    }; // class BilinearScalarLaplaceOperator
 
     /**
      * \brief Bilinear scalar Identity operator functor implementation
@@ -130,8 +100,8 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    class BilinearScalarIdentityFunctor :
-      public BilinearFunctorBase
+    class BilinearScalarIdentityOperator :
+      public BilinearOperator
     {
     public:
       /// test space configuration
@@ -168,7 +138,7 @@ namespace FEAST
        */
       template<typename AsmTraits_>
       class Evaluator :
-          public BilinearFunctorBase::Evaluator<AsmTraits_>
+          public BilinearOperator::Evaluator<AsmTraits_>
       {
       public:
         /// the data type to be used
@@ -187,7 +157,7 @@ namespace FEAST
          * \param[in] functor
          * A reference to the scalar Identity functor.
          */
-        explicit Evaluator(const BilinearScalarIdentityFunctor& DOXY(functor))
+        explicit Evaluator(const BilinearScalarIdentityOperator& DOXY(functor))
         {
         }
 
@@ -196,68 +166,8 @@ namespace FEAST
         {
           return phi.value * psi.value;
         }
-      }; // class BilinearScalarIdentityFunctor::Evaluator<...>
-
-    public:
-      /**
-       * \brief Assembles a mass matrix.
-       *
-       * \param[in,out] matrix
-       * The matrix that is to be assembled.
-       *
-       * \param[in] space
-       * A reference to the finite-element to be used as the test- and trial-space.
-       *
-       * \param[in] cubature_name
-       * A string containing the name of the cubature rule to be used for integration.
-       */
-      template<
-        typename Matrix_,
-        typename Space_>
-      static void assemble_matrix1(
-        Matrix_& matrix,
-        const String& cubature_name,
-        const Space_& space,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
-      {
-        BilinearScalarIdentityFunctor functor;
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        BilinearOperator<BilinearScalarIdentityFunctor>::
-          assemble_matrix1(matrix, functor, cubature_factory, space, alpha);
-      }
-
-      /**
-       * \brief Assembles a mass matrix.
-       *
-       * \param[in,out] matrix
-       * The matrix that is to be assembled.
-       *
-       * \param[in] cubature_name
-       * A string containing the name of the cubature rule to be used for integration.
-       *
-       * \param[in] test_space
-       * A reference to the finite-element to be used as the test-space.
-       *
-       * \param[in] trial_space
-       * A reference to the finite-element to be used as the trial-space.
-       */
-      template<
-        typename Matrix_,
-        typename TestSpace_,
-        typename TrialSpace_>
-      static void assemble_matrix2(
-        Matrix_& matrix,
-        const String& cubature_name,
-        const TestSpace_& test_space,
-        const TrialSpace_& trial_space,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
-      {
-        BilinearScalarIdentityFunctor functor;
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        BilinearOperator<BilinearScalarIdentityFunctor>::
-          assemble_matrix2(matrix, functor, cubature_factory, test_space, trial_space, alpha);
-      }
-    }; // class BilinearScalarIdentityFunctor
+      }; // class BilinearScalarIdentityOperator::Evaluator<...>
+    }; // class BilinearScalarIdentityOperator
   } // namespace Assembly
 } // namespace FEAST
 

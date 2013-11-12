@@ -3,79 +3,47 @@
 #define KERNEL_ASSEMBLY_STANDARD_FUNCTIONALS_HPP 1
 
 // includes, FEAST
-#include <kernel/assembly/linear_functor_base.hpp>
 #include <kernel/assembly/linear_functional.hpp>
+#include <kernel/assembly/analytic_function.hpp>
 
 namespace FEAST
 {
   namespace Assembly
   {
-    /// \cond internal
-    namespace Intern
-    {
-      template<
-        template<typename> class Function_,
-        typename Traits_,
-        int dim_ = Traits_::image_dim>
-      struct AnalyticFunctionWrapper;
-
-      template<template<typename> class Function_, typename Traits_>
-      struct AnalyticFunctionWrapper<Function_, Traits_, 1>
-      {
-        static typename Traits_::DataType eval(const typename Traits_::TrafoData& tau)
-        {
-          return Function_<typename Traits_::DataType>::eval(tau.img_point[0]);
-        }
-      };
-
-      template<template<typename> class Function_, typename Traits_>
-      struct AnalyticFunctionWrapper<Function_, Traits_, 2>
-      {
-        static typename Traits_::DataType eval(const typename Traits_::TrafoData& tau)
-        {
-          return Function_<typename Traits_::DataType>::eval(tau.img_point[0], tau.img_point[1]);
-        }
-      };
-
-      template<template<typename> class Function_, typename Traits_>
-      struct AnalyticFunctionWrapper<Function_, Traits_, 3>
-      {
-        static typename Traits_::DataType eval(const typename Traits_::TrafoData& tau)
-        {
-          return Function_<typename Traits_::DataType>::eval(tau.img_point[0], tau.img_point[1], tau.img_point[2]);
-        }
-      };
-    } // namespace Intern
-    /// \endcond
-
     /**
-     * \brief Linear scalar Integral functional functor implementation
+     * \brief Linear scalar Integral functor implementation
      *
-     * This functor implements the LinearFunctor interface with
+     * This functor implements the LinearFunctional interface with
      *   \f[ \ell(\varphi) := \int_\Omega f\cdot\varphi \f]
-     * for a static analytic function \e f.
+     * for an analytic function \e f.
      *
      * \tparam Function_
-     * A template class implementing the function \e f for the linearform.
+     * A template class implementing the AnalyticFunction interface representing the function \e f.
      *
      * \author Peter Zajac
      */
-    template<template<typename DataType_> class Function_>
-    class LinearScalarIntegralFunctor :
-      public LinearFunctorBase
+    template<typename Function_>
+    class LinearScalarIntegralFunctional :
+      public LinearFunctional
     {
     public:
-      /// trafo config tag
-      struct TrafoConfig :
-        public Trafo::ConfigBase
+      /// ensure that the function can compute values
+      static_assert(Function_::can_value != 0, "function can't compute values");
+
+      /// function config tag
+      struct FunctionConfig :
+        public Trafo::AnalyticConfigBase
       {
         /// dummy enum
         enum
         {
-          /// we need image points for the analytic function
-          need_img_point = 1
+          /// we need function values
+          need_value = 1
         };
       };
+
+      /// trafo config tag
+      typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
 
       /// space config tag
       struct SpaceConfig :
@@ -90,7 +58,7 @@ namespace FEAST
       };
 
       /**
-       * \brief Linear Functor Evaluator class template
+       * \brief Linear Functional Evaluator class template
        *
        * \tparam AsmTraits_
        * The assembly traits class.
@@ -99,7 +67,7 @@ namespace FEAST
        */
       template<typename AsmTraits_>
       class Evaluator :
-        public LinearFunctorBase::Evaluator<AsmTraits_>
+        public LinearFunctional::Evaluator<AsmTraits_>
       {
       public:
         /// data type
@@ -109,46 +77,34 @@ namespace FEAST
         /// test-function data type
         typedef typename AsmTraits_::BasisData BasisData;
 
+      protected:
+        /// the function evaluator
+        typename Function_::template Evaluator<typename AsmTraits_::AnalyticEvalTraits> _func_eval;
+
       public:
         /// constructor
-        explicit Evaluator(const LinearScalarIntegralFunctor<Function_>&)
+        explicit Evaluator(const LinearScalarIntegralFunctional<Function_>& functional) :
+          _func_eval(functional._function)
         {
         }
 
-        /** \copydoc LinearFunctorBase::Evaluator::operator() */
+        /** \copydoc LinearFunctional::Evaluator::operator() */
         DataType operator()(const TrafoData& tau, const BasisData& psi) const
         {
-          return Intern::AnalyticFunctionWrapper<Function_, AsmTraits_>::eval(tau) * psi.value;
+          return _func_eval.value(tau) * psi.value;
         }
-      }; // class LinearScalarIntegralFunctor::Evaluator<...>
+      }; // class LinearScalarIntegralFunctional::Evaluator<...>
 
-      /**
-       * \brief Assembles a vector using the analytic function.
-       *
-       * \param[in,out] vector
-       * The vector that is to be assembled.
-       *
-       * \param[in] cubature_name
-       * A string containing the name of the cubature rule to be used for integration.
-       *
-       * \param[in] space
-       * A reference to the finite-element space to be used.
-       */
-      template<
-        typename Vector_,
-        typename Space_>
-      static void assemble_vector(
-        Vector_& vector,
-        const String& cubature_name,
-        const Space_& space,
-        typename Vector_::DataType alpha = typename Vector_::DataType(1))
+    protected:
+      /// a reference to the analytic function
+      const Function_& _function;
+
+    public:
+      explicit LinearScalarIntegralFunctional(const Function_& function) :
+        _function(function)
       {
-        LinearScalarIntegralFunctor functor;
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        LinearFunctional<LinearScalarIntegralFunctor<Function_> >::
-          assemble_vector(vector, functor, cubature_factory, space, alpha);
       }
-    }; // class LinearScalarIntegralFunctor
+    }; // class LinearScalarIntegralFunctional
   } // namespace Assembly
 } // namespace FEAST
 

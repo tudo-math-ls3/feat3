@@ -1,4 +1,5 @@
 #include <test_system/test_system.hpp>
+#include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/rew_projector.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
@@ -12,10 +13,16 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-template<typename DataType_>
-class SineBubble;
-
-
+/**
+ * \brief RewProjector test class template
+ *
+ * \test Tests the Assembly::RewProjector class
+ *
+ * \tparam DataType_
+ * The data type for the test. Shall be either double or float.
+ *
+ * \author Peter Zajac
+ */
 template<typename DataType_>
 class RewProjectorTest :
   public TestSystem::TaggedTest<Archs::None, DataType_>
@@ -79,88 +86,22 @@ public:
     Space_ space(trafo);
 
     // define functor
-    Analytic::StaticWrapperFunctor<SineBubble, true, true> functor;
+    Assembly::Common::SineBubbleFunction function;
 
     // define a cubature factory
     Cubature::DynamicFactory cubature_factory(cubature_name);
 
     // project functor into FE space
     VectorType vector;
-    Assembly::RewProjector::project(vector, functor, space, cubature_factory);
+    Assembly::RewProjector::project(vector, function, space, cubature_factory);
 
     // compute L2-Error
     return //std::make_pair(
-      Assembly::ScalarErrorComputerL2::compute(functor, vector, space, cubature_factory)/*,
-      Assembly::ScalarErrorComputerH1::compute(functor, vector, space, cubature_factory))*/;
+      Assembly::ScalarErrorComputerL2::compute(vector, function, space, cubature_factory)/*,
+      Assembly::ScalarErrorComputerH1::compute(vector, function, space, cubature_factory))*/;
   }
 
 };
 
 RewProjectorTest<float> rew_projector_test_float;
 RewProjectorTest<double> rew_projector_test_double;
-
-template<typename DataType_>
-class SineBubble :
-  public Analytic::StaticFunction<DataType_>
-{
-public:
-  /// returns the constant pi
-  static DataType_ pi()
-  {
-    return Math::Limits<DataType_>::pi();
-  }
-
-  /// 1D: function value
-  static DataType_ eval(DataType_ x)
-  {
-    return Math::sin(pi() * x);
-  }
-
-  /// 2D: function value
-  static DataType_ eval(DataType_ x, DataType_ y)
-  {
-    return Math::sin(pi() * x) * Math::sin(pi() * y);
-  }
-
-  /// 3D: function value
-  static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return Math::sin(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 1D: X-derivative
-  static DataType_ der_x(DataType_ x)
-  {
-    return pi() * Math::cos(pi() * x);
-  }
-
-  /// 2D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y)
-  {
-    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y);
-  }
-
-  /// 2D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y)
-  {
-    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y);
-  }
-
-  /// 3D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 3D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 3D: Z-derivative
-  static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::sin(pi() * x) * Math::sin(pi() * y) * Math::cos(pi() * z);
-  }
-}; // class SineBubble<...>

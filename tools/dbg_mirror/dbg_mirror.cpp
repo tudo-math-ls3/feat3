@@ -8,6 +8,9 @@
 #include <kernel/space/dof_mirror.hpp>
 #include <kernel/assembly/standard_operators.hpp>
 #include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/common_functions.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
 
 using namespace FEAST;
@@ -27,16 +30,6 @@ typedef LAFEM::MatrixMirror<Mem::Main, double> MatrixMirrorType;
 
 void fill_cell_set(QuadCellSet& cell, int face);
 void fill_quad_mesh_2d(QuadMesh& mesh, Real x = 0.0, Real y = 0.0);
-
-template<typename T_>
-class RhsFunc
-{
-public:
-  static T_ eval(T_ /*x*/, T_ /*y*/)
-  {
-    return T_(1);
-  }
-};
 
 void sync_add(VectorType& a, VectorType& b)
 {
@@ -62,7 +55,7 @@ void test_mirror(
   const Space_& space_1,
   const CellSet_& cell_0,
   const CellSet_& cell_1,
-  const String cubature = "gauss-legendre:2")
+  const String cubature_name = "gauss-legendre:2")
 {
   // assemble dof-adjacency graphs
   Adjacency::Graph dof_adj_0(Space::DofAdjacency<>::assemble(space_0));
@@ -80,15 +73,20 @@ void test_mirror(
   MatrixType loc_mat_0(dof_adj_0);
   MatrixType loc_mat_1(dof_adj_1);
 
+  Cubature::DynamicFactory cubature_factory(cubature_name);
+
   // assemble local vectors
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(loc_vec_0, cubature, space_0, 16.0);
-  Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(loc_vec_1, cubature, space_1, 16.0);
+  Assembly::Common::ConstantFunction rhs_func(1.0);
+  Assembly::LinearScalarIntegralFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+  Assembly::LinearFunctionalAssembler::assemble_vector(loc_vec_0, rhs_functional, space_0, cubature_factory, 16.0);
+  Assembly::LinearFunctionalAssembler::assemble_vector(loc_vec_1, rhs_functional, space_1, cubature_factory, 16.0);
 
   // assemble local matrices
   loc_mat_0.clear();
   loc_mat_1.clear();
-  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(loc_mat_0, cubature, space_0, 6.0);
-  Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(loc_mat_1, cubature, space_1, 6.0);
+  Assembly::BilinearScalarLaplaceOperator laplace;
+  Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_0, laplace, space_0, cubature_factory, 6.0);
+  Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_1, laplace, space_1, cubature_factory, 6.0);
 
   // create vector mirrors
   VectorMirrorType vec_mir_0(dof_mir_0);

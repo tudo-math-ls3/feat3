@@ -175,33 +175,15 @@ namespace FEAST
         image_dim = TrafoEvaluator::image_dim
       };
 
-      /// analytic functor value-evaluator traits
-      struct FuncValueEvalTraits :
-        TrafoEvaluator::EvalTraits
-      {
-        /// trafo evaluator data
-        typedef typename AsmTraits1::TrafoEvaluator TrafoEvaluator;
-        /// trafo data type
-        typedef typename AsmTraits1::TrafoData TrafoData;
-        /// coefficient data type
-        typedef typename AsmTraits1::DataType DataType;
-        /// value type
-        typedef typename AsmTraits1::DataType ValueType;
-      };
+      /// analytic function evaluator traits
+      typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;
 
-      /// analytic functor gradient-evaluator traits
-      struct FuncGradientEvalTraits :
-        TrafoEvaluator::EvalTraits
-      {
-        /// trafo evaluator data
-        typedef typename AsmTraits1::TrafoEvaluator TrafoEvaluator;
-        /// trafo data type
-        typedef typename AsmTraits1::TrafoData TrafoData;
-        /// coefficient data type
-        typedef typename AsmTraits1::DataType DataType;
-        /// value type
-        typedef Tiny::Vector<DataType, image_dim> ValueType;
-      };
+      /// value type
+      typedef typename AnalyticEvalTraits::ValueType ValueType;
+      /// gradient type
+      typedef typename AnalyticEvalTraits::GradientType GradientType;
+      /// hessian type
+      typedef typename AnalyticEvalTraits::HessianType HessianType;
 
       /// local vector type
       typedef Tiny::Vector<DataType, SpaceEvaluator::max_local_dofs> LocalVectorType;
@@ -350,33 +332,15 @@ namespace FEAST
         image_dim = TrafoEvaluator::image_dim
       };
 
-      /// analytic functor value-evaluator traits
-      struct FuncValueEvalTraits :
-        TrafoEvaluator::EvalTraits
-      {
-        /// trafo evaluator data
-        typedef typename AsmTraits2::TrafoEvaluator TrafoEvaluator;
-        /// trafo data type
-        typedef typename AsmTraits2::TrafoData TrafoData;
-        /// coefficient data type
-        typedef typename AsmTraits2::DataType DataType;
-        /// value type
-        typedef typename AsmTraits2::DataType ValueType;
-      };
+      /// analytic function evaluator traits
+      typedef Trafo::AnalyticEvalTraits<TrafoEvaluator, TrafoEvalData> AnalyticEvalTraits;
 
-      /// analytic functor gradient-evaluator traits
-      struct FuncGradientEvalTraits :
-        TrafoEvaluator::EvalTraits
-      {
-        /// trafo evaluator data
-        typedef typename AsmTraits2::TrafoEvaluator TrafoEvaluator;
-        /// trafo data type
-        typedef typename AsmTraits2::TrafoData TrafoData;
-        /// coefficient data type
-        typedef typename AsmTraits2::DataType DataType;
-        /// value type
-        typedef Tiny::Vector<DataType, image_dim> ValueType;
-      };
+      /// value type
+      typedef typename AnalyticEvalTraits::ValueType ValueType;
+      /// gradient type
+      typedef typename AnalyticEvalTraits::GradientType GradientType;
+      /// hessian type
+      typedef typename AnalyticEvalTraits::HessianType HessianType;
 
       /// local vector type
       typedef Tiny::Vector<DataType, TestEvaluator::max_local_dofs> LocalTestVectorType;

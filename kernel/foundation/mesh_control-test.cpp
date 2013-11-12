@@ -21,7 +21,9 @@
 #include <kernel/space/dof_mirror.hpp>
 #include <kernel/assembly/standard_operators.hpp>
 #include <kernel/assembly/standard_functionals.hpp>
-#include <kernel/assembly/dirichlet_bc.hpp>
+#include <kernel/assembly/dirichlet_assembler.hpp>
+#include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/linear_functional_assembler.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -595,6 +597,9 @@ public:
     return T_(1);
   }
 };
+
+typedef Assembly::StaticWrapperFunction<RhsFunc> RhsFunction;
+
 template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
 class MeshControlPartitioningTest2D:
   public TaggedTest<Tag_, IndexType_, Algo_>
@@ -836,13 +841,17 @@ class MeshControlPartitioningTest2D:
 
       SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
       mat_sys.clear();
-      Assembly::BilinearScalarLaplaceFunctor::assemble_matrix(mat_sys, "gauss-legendre:2", space);
+      Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
+      Assembly::BilinearScalarLaplaceOperator operat;
+      Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, operat, space, cubature_factory);
 
       DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
-      Assembly::LinearScalarIntegralFunctor<RhsFunc>::assemble_vector(vec_rhs, "gauss-legendre:2", space);
+      RhsFunction rhs_function;
+      Assembly::LinearScalarIntegralFunctional<RhsFunction> rhs_functional(rhs_function);
+      Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
       // assemble homogeneous Dirichlet BCs
-      Assembly::DirichletBC<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
+      Assembly::DirichletAssembler<Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > > dirichlet(space);
       for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
       {
         dirichlet.add_cell_set(*finemost_macro_boundaries.at(i).get());

@@ -1,5 +1,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/interpolator.hpp>
+#include <kernel/assembly/common_functions.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/space/lagrange1/element.hpp>
@@ -10,10 +11,16 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-template<typename DataType_>
-class SineBubble;
-
-
+/**
+ * \brief Interpolator test class template
+ *
+ * \test Tests the Assembly::Interpolator class
+ *
+ * \tparam DataType_
+ * The data type for the test. Shall be either double or float.
+ *
+ * \author Peter Zajac
+ */
 template<typename DataType_>
 class InterpolatorTest :
   public TestSystem::TaggedTest<Archs::None, DataType_>
@@ -60,13 +67,12 @@ public:
     // create space
     QuadSpaceQ1 space(trafo);
 
-    // define functor
-    typedef Analytic::StaticWrapperFunctor<SineBubble, true, true> FunctorType;
-    FunctorType functor;
+    // define function
+    Assembly::Common::SineBubbleFunction sine_bubble;
 
     // interpolate functor into FE space
     VectorType vector;
-    Assembly::Interpolator::project(vector, functor, space);
+    Assembly::Interpolator::project(vector, sine_bubble, space);
 
     // get mesh vertex count
     Index num_verts = mesh.get_num_entities(0);
@@ -81,7 +87,8 @@ public:
     for(Index i(0); i < num_verts; ++i)
     {
       // compute sine-bubble value in vertex position
-      DataType_ s = SineBubble<DataType_>::eval(DataType_(vertex_set[i][0]), DataType_(vertex_set[i][1]));
+      DataType_ s = Assembly::Common::SineBubbleStatic<DataType_>
+        ::eval(DataType_(vertex_set[i][0]), DataType_(vertex_set[i][1]));
 
       // validate vector data
       TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
@@ -99,13 +106,12 @@ public:
     // create space
     QuadSpaceQ0 space(trafo);
 
-    // define functor
-    typedef Analytic::StaticWrapperFunctor<SineBubble, true, true> FunctorType;
-    FunctorType functor;
+    // define function
+    Assembly::Common::SineBubbleFunction sine_bubble;
 
     // interpolate functor into FE space
     VectorType vector;
-    Assembly::Interpolator::project(vector, functor, space);
+    Assembly::Interpolator::project(vector, sine_bubble, space);
 
     // get mesh element count
     Index num_quads = mesh.get_num_entities(2);
@@ -131,7 +137,7 @@ public:
       }
 
       // compute sine-bubble value in quad center
-      DataType_ s = SineBubble<DataType_>::eval(DataType_(0.25)*x, DataType_(0.25)*y);
+      DataType_ s = Assembly::Common::SineBubbleStatic<DataType_>::eval(DataType_(0.25)*x, DataType_(0.25)*y);
 
       // validate vector data
       TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
@@ -141,70 +147,3 @@ public:
 
 InterpolatorTest<float> interpolator_test_float;
 InterpolatorTest<double> interpolator_test_double;
-
-
-template<typename DataType_>
-class SineBubble :
-  public Analytic::StaticFunction<DataType_>
-{
-public:
-  /// returns the constant pi
-  static DataType_ pi()
-  {
-    return Math::Limits<DataType_>::pi();
-  }
-
-  /// 1D: function value
-  static DataType_ eval(DataType_ x)
-  {
-    return Math::sin(pi() * x);
-  }
-
-  /// 2D: function value
-  static DataType_ eval(DataType_ x, DataType_ y)
-  {
-    return Math::sin(pi() * x) * Math::sin(pi() * y);
-  }
-
-  /// 3D: function value
-  static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return Math::sin(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 1D: X-derivative
-  static DataType_ der_x(DataType_ x)
-  {
-    return pi() * Math::cos(pi() * x);
-  }
-
-  /// 2D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y)
-  {
-    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y);
-  }
-
-  /// 2D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y)
-  {
-    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y);
-  }
-
-  /// 3D: X-derivative
-  static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::cos(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 3D: Y-derivative
-  static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::sin(pi() * x) * Math::cos(pi() * y) * Math::sin(pi() * z);
-  }
-
-  /// 3D: Z-derivative
-  static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
-  {
-    return pi() * Math::sin(pi() * x) * Math::sin(pi() * y) * Math::cos(pi() * z);
-  }
-}; // class SineBubble<...>

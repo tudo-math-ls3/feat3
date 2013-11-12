@@ -60,8 +60,8 @@ namespace FEAST
        * \param[out] vector
        * A reference to the coefficient vector that is to be assembled.
        *
-       * \param[in] functor
-       * A functor implementing the Analytic::Functor interface capable of computing function values.
+       * \param[in] function
+       * An object implementing the AnalyticFunction interface capable of computing function values.
        *
        * \param[in] space
        * A reference to the space to which to project into.
@@ -74,24 +74,24 @@ namespace FEAST
        */
       template<
         typename Vector_,
-        typename Functor_,
+        typename Function_,
         typename Space_,
         typename CubatureFactory_>
       static void project(
         Vector_& vector,
-        const Functor_& functor,
+        const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory,
         WeightType weight_type = wt_volume)
       {
         typedef Vector_ VectorType;
-        typedef Functor_ FunctorType;
+        typedef Function_ FunctionType;
         typedef Space_ SpaceType;
         typedef typename SpaceType::TrafoType TrafoType;
         typedef typename TrafoType::MeshType MeshType;
         typedef typename MeshType::ShapeType ShapeType;
 
-        static_assert(Functor_::can_value != 0, "analytic functor can't compute function values");
+        static_assert(Function_::can_value != 0, "analytic function can't compute function values");
 
         // define assembly traits
         typedef AsmTraits1<typename Vector_::DataType, SpaceType, AsmTrafoConfig, AsmSpaceConfig> AsmTraits;
@@ -113,7 +113,7 @@ namespace FEAST
         typename AsmTraits::DofMapping dof_mapping(space);
 
         // create a functor evaluator
-        typename FunctorType::template ValueEvaluator<typename AsmTraits::FuncValueEvalTraits> func_eval(functor);
+        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
 
         // create trafo evaluation data
         typename AsmTraits::TrafoEvalData trafo_data;
@@ -184,8 +184,7 @@ namespace FEAST
             space_eval(space_data, trafo_data);
 
             // compute function value
-            DataType fv(DataType(0));
-            func_eval(fv, trafo_data);
+            DataType fv(func_eval.value(trafo_data));
 
             // pre-compute integration weight
             DataType omega(trafo_data.jac_det * cubature_rule.get_weight(k));

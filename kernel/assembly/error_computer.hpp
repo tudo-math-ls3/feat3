@@ -17,21 +17,6 @@ namespace FEAST
     class ScalarErrorComputerL2
     {
     private:
-      /// \cond internal
-      template<typename AsmTraits_>
-      struct EvalTraits
-      {
-        typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
-        typedef typename AsmTraits_::TrafoData TrafoData;
-        typedef typename AsmTraits_::DataType DataType;
-        typedef typename AsmTraits_::DataType ValueType;
-        enum
-        {
-          domain_dim = AsmTraits_::domain_dim,
-          image_dim = AsmTraits_::image_dim
-        };
-      };
-
       struct TrafoConfig : public Trafo::ConfigBase
       {
         enum
@@ -58,12 +43,12 @@ namespace FEAST
        * and an analytic function, i.e. it computes
        *   \f[ \|u - u_h\|_{L^2}. \f]
        *
-       * \param[in] functor
-       * An object implementing the Analytic::Functor interface representing the analytic function to be
-       * tested against.
-       *
        * \param[in] vector
        * The coefficient vector of the FE function.
+       *
+       * \param[in] function
+       * An object implementing the AnalyticFunction interface representing the analytic function to be
+       * tested against.
        *
        * \param[in] space
        * The Finite-Element space that the coefficient vector belongs to.
@@ -75,23 +60,23 @@ namespace FEAST
        * The L2-error.
        */
       template<
-        typename Functor_,
         typename Vector_,
+        typename Function_,
         typename Space_,
         typename CubatureFactory_>
       static typename Vector_::DataType compute(
-        const Functor_& functor,
         const Vector_& vector,
+        const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory)
       {
         // ensure the functor offers function values
-        static_assert(Functor_::can_value != 0, "analytic functor can't compute function values");
+        static_assert(Function_::can_value != 0, "analytic function can't compute function values");
 
         /// vector type
         typedef Vector_ VectorType;
-        /// linear functor type
-        typedef Functor_ FunctorType;
+        /// analytic function type
+        typedef Function_ FunctionType;
         /// space type
         typedef Space_ SpaceType;
         /// assembly traits
@@ -105,8 +90,8 @@ namespace FEAST
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
-        // create a functor value evaluator
-        typename FunctorType::template ValueEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
+        // create a function evaluator
+        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -168,9 +153,8 @@ namespace FEAST
             // compute basis function data
             space_eval(space_data, trafo_data);
 
-            // evaluate functor
-            DataType value(0);
-            func_eval(value, trafo_data);
+            // evaluate function value
+            typename AsmTraits::ValueType value(func_eval.value(trafo_data));
 
             // test function loop
             for(Index i(0); i < num_loc_dofs; ++i)
@@ -210,21 +194,6 @@ namespace FEAST
     class ScalarErrorComputerH1
     {
     private:
-      /// \cond internal
-      template<typename AsmTraits_>
-      struct EvalTraits
-      {
-        typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
-        typedef typename AsmTraits_::TrafoData TrafoData;
-        typedef typename AsmTraits_::DataType DataType;
-        enum
-        {
-          domain_dim = AsmTraits_::domain_dim,
-          image_dim = AsmTraits_::image_dim
-        };
-        typedef Tiny::Vector<DataType, image_dim> ValueType;
-      };
-
       struct TrafoConfig : public Trafo::ConfigBase
       {
         enum
@@ -251,12 +220,10 @@ namespace FEAST
        * and an analytic function, i.e. it computes
        *   \f[ |u - u_h|_{H^1}. \f]
        *
-       * \param[in] functor
-       * An object implementing the Analytic::Functor interface representing the analytic function to be
-       * tested against.
        *
-       * \param[in] vector
-       * The coefficient vector of the FE function.
+       * \param[in] function
+       * An object implementing the AnalyticFunction interface representing the analytic function to be
+       * tested against.
        *
        * \param[in] space
        * The Finite-Element space that the coefficient vector belongs to.
@@ -268,23 +235,23 @@ namespace FEAST
        * The H1-error.
        */
       template<
-        typename Functor_,
         typename Vector_,
+        typename Function_,
         typename Space_,
         typename CubatureFactory_>
       static typename Vector_::DataType compute(
-        const Functor_& functor,
         const Vector_& vector,
+        const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory)
       {
         // ensure the functor offers gradients
-        static_assert(Functor_::can_grad != 0, "analytic functor can't compute gradients");
+        static_assert(Function_::can_grad != 0, "analytic function can't compute gradients");
 
         /// vector type
         typedef Vector_ VectorType;
-        /// linear functor type
-        typedef Functor_ FunctorType;
+        /// analytic function type
+        typedef Function_ FunctionType;
         /// space type
         typedef Space_ SpaceType;
         /// assembly traits
@@ -298,8 +265,8 @@ namespace FEAST
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
-        // create a functor gradient evaluator
-        typename FunctorType::template GradientEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
+        // create a function evaluator
+        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -361,9 +328,8 @@ namespace FEAST
             // compute basis function data
             space_eval(space_data, trafo_data);
 
-            // evaluate functor
-            Tiny::Vector<DataType, AsmTraits::image_dim> value(DataType(0));
-            func_eval(value, trafo_data);
+            // evaluate function gradient
+            typename AsmTraits::GradientType value(func_eval.gradient(trafo_data));
 
             // test function loop
             for(Index i(0); i < num_loc_dofs; ++i)
@@ -401,22 +367,6 @@ namespace FEAST
      */
     class ScalarErrorComputerH2
     {
-    private:
-      /// \cond internal
-      template<typename AsmTraits_>
-      struct EvalTraits
-      {
-        typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
-        typedef typename AsmTraits_::TrafoData TrafoData;
-        typedef typename AsmTraits_::DataType DataType;
-        enum
-        {
-          domain_dim = AsmTraits_::domain_dim,
-          image_dim = AsmTraits_::image_dim
-        };
-        typedef Tiny::Matrix<DataType, domain_dim, domain_dim> ValueType;
-      };
-
       struct TrafoConfig : public Trafo::ConfigBase
       {
         enum
@@ -443,12 +393,12 @@ namespace FEAST
        * and an analytic function, i.e. it computes
        *   \f[ |u - u_h|_{H^2}. \f]
        *
-       * \param[in] functor
-       * An object implementing the Analytic::Functor interface representing the analytic function to be
-       * tested against.
-       *
        * \param[in] vector
        * The coefficient vector of the FE function.
+       *
+       * \param[in] function
+       * An object implementing the AnalyticFunction interface representing the analytic function to be
+       * tested against.
        *
        * \param[in] space
        * The Finite-Element space that the coefficient vector belongs to.
@@ -460,23 +410,23 @@ namespace FEAST
        * The H2-error.
        */
       template<
-        typename Functor_,
         typename Vector_,
+        typename Function_,
         typename Space_,
         typename CubatureFactory_>
       static typename Vector_::DataType compute(
-        const Functor_& functor,
         const Vector_& vector,
+        const Function_& function,
         const Space_& space,
         const CubatureFactory_& cubature_factory)
       {
-        // ensure the functor offers gradients
-        static_assert(Functor_::can_hess != 0, "analytic functor can't compute gradients");
+        // ensure the function offers hessians
+        static_assert(Function_::can_hess != 0, "analytic function can't compute hessians");
 
         /// vector type
         typedef Vector_ VectorType;
-        /// linear functor type
-        typedef Functor_ FunctorType;
+        /// analytic function type
+        typedef Function_ FunctionType;
         /// space type
         typedef Space_ SpaceType;
         /// assembly traits
@@ -490,8 +440,8 @@ namespace FEAST
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
 
-        // create a functor gradient evaluator
-        typename FunctorType::template HessianEvaluator<EvalTraits<AsmTraits> > func_eval(functor);
+        // create a function evaluator
+        typename FunctionType::template Evaluator<typename AsmTraits::AnalyticEvalTraits> func_eval(function);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -554,8 +504,7 @@ namespace FEAST
             space_eval(space_data, trafo_data);
 
             // evaluate functor
-            Tiny::Matrix<DataType, AsmTraits::domain_dim, AsmTraits::domain_dim> value(DataType(0));
-            func_eval(value, trafo_data);
+            typename AsmTraits::HessianType value(func_eval.hessian(trafo_data));
 
             // test function loop
             for(Index i(0); i < num_loc_dofs; ++i)
