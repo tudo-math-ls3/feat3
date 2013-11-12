@@ -34,9 +34,9 @@ run_log.write("hostname: " + hostname + os.linesep)
 run_log.write("dirname: " + src_dirname + os.linesep)
 
 #git pull
-os.chdir(src_dirname)
-subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-os.chdir(build_dirname)
+#os.chdir(src_dirname)
+#subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+#os.chdir(build_dirname)
 
 subprocess.Popen("../configure-feast", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
