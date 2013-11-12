@@ -8,6 +8,41 @@ import subprocess
 import socket
 import shutil
 
+def run_test(build_id):
+  hostname = socket.gethostname()
+  src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+  build_dirname = src_dirname + os.sep + hostname
+
+  #prepare build dir
+  shutil.rmtree(build_dirname, True)
+  os.mkdir(build_dirname)
+  os.chdir(build_dirname)
+  #TODO different file per step
+  run_log = open(build_dirname + os.sep + "run.log", "w")
+
+  #TODO output zeit und datum
+  run_log.write("hostname: " + hostname + os.linesep)
+  run_log.write("dirname: " + src_dirname + os.linesep)
+  run_log.flush()
+
+  #git pull
+  #os.chdir(src_dirname)
+  #subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  #os.chdir(build_dirname)
+
+  configure_command = "../configure-feast " + build_id
+  subprocess.Popen(configure_command.split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("ctest -D NightlyBuild".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("ctest -D NightlyTest".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  if "coverage" in build_id:
+    subprocess.Popen("ctest -D NightlyCoverage".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("ctest -D NightlySubmit".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+
+  run_log.close()
+
+
 #TODO check for git, cmake, ctest and report missing tools
 sys.dont_write_bytecode = True
 
@@ -17,33 +52,9 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("This python scripts starts regression tests and submits them to a cdash server")
   sys.exit()
 
-
-hostname = socket.gethostname()
-src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
-build_dirname = src_dirname + os.sep + hostname
-
-#prepare build dir
-shutil.rmtree(build_dirname, True)
-os.mkdir(build_dirname)
-os.chdir(build_dirname)
-#TODO different file per step
-run_log = open(build_dirname + os.sep + "run.log", "w")
-
-#TODO output zeit und datum
-run_log.write("hostname: " + hostname + os.linesep)
-run_log.write("dirname: " + src_dirname + os.linesep)
-
-#git pull
-#os.chdir(src_dirname)
-#subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-#os.chdir(build_dirname)
-
-subprocess.Popen("../configure-feast", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-
-subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-subprocess.Popen("ctest -D NightlyBuild".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-subprocess.Popen("ctest -D NightlyTest".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-subprocess.Popen("ctest -D NightlySubmit".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-
-run_log.close()
+run_test("mpi-gcc-debug-coverage-gmp-mkl")
+run_test("mpi-gcc-opt-coverage-gmp-mkl")
+run_test("mpi-clang-debug-gmp-mkl")
+run_test("mpi-clang-opt-gmp-mkl")
+run_test("mpi-icc-debug-gmp-mkl")
+run_test("mpi-icc-opt-gmp-mkl")
