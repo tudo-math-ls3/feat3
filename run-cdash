@@ -34,16 +34,16 @@ run_log.write("hostname: " + hostname + os.linesep)
 run_log.write("dirname: " + src_dirname + os.linesep)
 
 #git pull
-#os.chdir(src_dirname)
-#subprocess.Popen("git pull origin", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
-#os.chdir(build_dirname)
+os.chdir(src_dirname)
+subprocess.Popen("git pull origin", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+os.chdir(build_dirname)
 
-subprocess.Popen("../configure-feast", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
+subprocess.Popen("../configure-feast", bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
-subprocess.Popen("ctest -D Nightly Start".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-subprocess.Popen("ctest -D Nightly Update".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-subprocess.Popen("ctest -D Nightly Build".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
-subprocess.Popen("ctest -D Nightly Test".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
-subprocess.Popen("ctest -D Nightly Submit".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT, shell=True).wait()
+subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+subprocess.Popen("ctest -D NightlyBuild".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+subprocess.Popen("ctest -D NightlyTest".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+subprocess.Popen("ctest -D NightlySubmit".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
 run_log.close()

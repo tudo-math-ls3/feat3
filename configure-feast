@@ -260,4 +260,6 @@ print ("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, dirname))
 print
 #start actual configuration
 print ("============== CMAKE =====================")
+sys.stdout.flush()
+sys.stderr.flush()
 os.system("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, dirname))
