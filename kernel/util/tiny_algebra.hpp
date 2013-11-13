@@ -722,6 +722,37 @@ namespace FEAST
       }
 
       /**
+       * \brief Computes the scalar product of two vectors with this matrix.
+       *
+       * This function returns
+       * \f[ x^\top\cdot A\cdot y \f]
+       *
+       * \param[in] x
+       * The left muliplicant vector of size \p m_.
+       *
+       * \param[in] y
+       * The right multiplicant vector of size \p n_.
+       *
+       * \returns
+       * The scalar product of \p x and \p y with this matrix.
+       */
+      template<int snx_, int sny_>
+      T_ scalar_product(const Vector<T_, m_, snx_>& x, const Vector<T_, n_, sny_>& y) const
+      {
+        T_ r(T_(0));
+        for(Index i(0); i < Index(m_); ++i)
+        {
+          T_ t(T(0));
+          for(Index j(0); j < Index(n_); ++j)
+          {
+            t += v[i][j] * y[j];
+          }
+          r += x[i] * t;
+        }
+        return r;
+      }
+
+      /**
        * \brief Adds the algebraic matrix-product of two other matrices onto this matrix.
        *
        * \param[in] a
