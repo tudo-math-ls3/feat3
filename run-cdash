@@ -8,6 +8,8 @@ import subprocess
 import socket
 import shutil
 
+from cmake_modules import is_found
+
 def run_test(build_id):
   hostname = socket.gethostname()
   src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -30,8 +32,23 @@ def run_test(build_id):
   #subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   #os.chdir(build_dirname)
 
-  configure_command = "../configure-feast " + build_id
+  configure_command = src_dirname + os.sep + "configure-feast " + build_id
   subprocess.Popen(configure_command.split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+
+  build_name = build_id
+  dart_out = ""
+  dart_file = open(build_dirname + os.sep + "DartConfiguration.tcl", "r")
+  for line in dart_file:
+    if "BuildName" in line:
+      dart_out += "BuildName: " + build_name
+    else:
+      dart_out += line
+  dart_file.close()
+  dart_file = open(build_dirname + os.sep + "DartConfiguration.tcl", "w")
+  dart_file.write(dart_out)
+  dart_file.close()
+  exit()
+
   subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen("ctest -D NightlyBuild".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
@@ -45,6 +62,12 @@ def run_test(build_id):
 
 #TODO check for git, cmake, ctest and report missing tools
 sys.dont_write_bytecode = True
+if not is_found("cmake"):
+  print ("cmake not found! aborting...")
+  sys.exit(1)
+if not is_found("git"):
+  print ("git not found! aborting...")
+  sys.exit(1)
 
 #TODO help, ? und guess nicht in sys.argv[0] suchen
 # output help screen
@@ -52,9 +75,19 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("This python scripts starts regression tests and submits them to a cdash server")
   sys.exit()
 
-run_test("mpi-gcc-debug-coverage-gmp-mkl")
-run_test("mpi-gcc-opt-coverage-gmp-mkl")
-run_test("mpi-clang-debug-gmp-mkl")
-run_test("mpi-clang-opt-gmp-mkl")
-run_test("mpi-icc-debug-gmp-mkl")
-run_test("mpi-icc-opt-gmp-mkl")
+if is_found("mpic++"):
+  run_test("mpi-gcc-debug-coverage-gmp-mkl")
+  run_test("mpi-gcc-opt-coverage-gmp-mkl")
+  if is_found("clang++"):
+    run_test("mpi-clang-debug-gmp-mkl")
+    run_test("mpi-clang-opt-gmp-mkl")
+  run_test("mpi-icc-debug-mkl")
+  run_test("mpi-icc-opt-mkl")
+
+run_test("serial-gcc-debug-coverage-gmp-mkl")
+run_test("serial-gcc-opt-coverage-gmp-mkl")
+if is_found("clang++"):
+  run_test("serial-clang-debug-gmp-mkl")
+  run_test("serial-clang-opt-gmp-mkl")
+run_test("serial-icc-debug-mkl")
+run_test("serial-icc-opt-mkl")
