@@ -742,7 +742,7 @@ namespace FEAST
         T_ r(T_(0));
         for(Index i(0); i < Index(m_); ++i)
         {
-          T_ t(T(0));
+          T_ t(T_(0));
           for(Index j(0); j < Index(n_); ++j)
           {
             t += v[i][j] * y[j];
@@ -950,6 +950,19 @@ namespace FEAST
     inline Matrix<T_, m_, n_> operator*(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
     {
       return Matrix<T_, m_, n_>().set_mat_mat_mult(a, b);
+    }
+
+    /// matrix-matrix dot-product operator
+    template<typename T_, int m_, int n_, int sma_, int sna_, int smb_, int snb_>
+    inline T_ dot(const Matrix<T_, m_, n_, sma_, sna_>& a, const Matrix<T_, m_, n_, smb_, snb_>& b)
+    {
+      T_ r(T_(0));
+      for(Index i(0); i < Index(m_); ++i)
+      {
+        for(Index j(0); j < Index(n_); ++j)
+          r += a(i,j) * b(i,j);
+      }
+      return r;
     }
 
     /* ************************************************************************************************************* */
