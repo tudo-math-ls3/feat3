@@ -47,7 +47,6 @@ def run_test(build_id):
   dart_file = open(build_dirname + os.sep + "DartConfiguration.tcl", "w")
   dart_file.write(dart_out)
   dart_file.close()
-  exit()
 
   subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
