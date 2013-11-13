@@ -35,6 +35,9 @@ def run_test(build_id):
   configure_command = src_dirname + os.sep + "configure-feast " + build_id
   subprocess.Popen(configure_command.split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
+  subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+
   build_name = build_id
   dart_out = ""
   dart_file = open(build_dirname + os.sep + "DartConfiguration.tcl", "r")
@@ -48,8 +51,6 @@ def run_test(build_id):
   dart_file.write(dart_out)
   dart_file.close()
 
-  subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen("ctest -D NightlyBuild".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen("ctest -D NightlyTest".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   if "coverage" in build_id:
