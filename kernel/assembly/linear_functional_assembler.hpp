@@ -58,7 +58,7 @@ namespace FEAST
           typename VectorType::DataType,
           SpaceType,
           typename FunctionalType::TrafoConfig,
-          typename FunctionalType::SpaceConfig> AsmTraits;
+          typename FunctionalType::TestConfig> AsmTraits;
 
         // fetch the trafo
         const typename AsmTraits::TrafoType& trafo = space.get_trafo();
@@ -67,7 +67,7 @@ namespace FEAST
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
 
         // create a space evaluator and evaluation data
-        typename AsmTraits::SpaceEvaluator space_eval(space);
+        typename AsmTraits::TestEvaluator test_eval(space);
 
         // create a dof-mapping
         typename AsmTraits::DofMapping dof_mapping(space);
@@ -79,7 +79,7 @@ namespace FEAST
         typename AsmTraits::TrafoEvalData trafo_data;
 
         // create space evaluation data
-        typename AsmTraits::SpaceEvalData space_data;
+        typename AsmTraits::TestEvalData test_data;
 
         // create local vector data
         typename AsmTraits::LocalVectorDataType lvad(dof_mapping);
@@ -96,14 +96,14 @@ namespace FEAST
           // prepare trafo evaluator
           trafo_eval.prepare(cell);
 
-          // prepare space evaluator
-          space_eval.prepare(trafo_eval);
+          // prepare test-space evaluator
+          test_eval.prepare(trafo_eval);
 
           // prepare functor evaluator
           func_eval.prepare(trafo_eval);
 
           // fetch number of local dofs
-          Index num_loc_dofs = space_eval.get_num_local_dofs();
+          Index num_loc_dofs = test_eval.get_num_local_dofs();
 
           // clear local matrix
           lvad.clear();
@@ -114,15 +114,15 @@ namespace FEAST
             // compute trafo data
             trafo_eval(trafo_data, cubature_rule.get_point(k));
 
-            // compute basis function data
-            space_eval(space_data, trafo_data);
+            // compute test basis function data
+            test_eval(test_data, trafo_data);
 
             // test function loop
             for(Index i(0); i < num_loc_dofs; ++i)
             {
               // evaluate functor and integrate
               lvad(i) += trafo_data.jac_det * cubature_rule.get_weight(k) *
-                func_eval(trafo_data, space_data.phi[i]);
+                func_eval(trafo_data, test_data.phi[i]);
               // continue with next trial function
             }
             // continue with next test function
@@ -132,7 +132,7 @@ namespace FEAST
           func_eval.finish();
 
           // finish evaluators
-          space_eval.finish();
+          test_eval.finish();
           trafo_eval.finish();
 
           // initialise dof-mapping

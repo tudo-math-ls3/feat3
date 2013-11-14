@@ -23,7 +23,7 @@ namespace FEAST
       /// use 'base' trafo configuration
       typedef Trafo::ConfigBase TrafoConfig;
       /// use 'base' test space configuration
-      typedef Space::ConfigBase SpaceConfig;
+      typedef Space::ConfigBase TestConfig;
 
       /**
        * \brief Linear Functional Evaluator class template
@@ -44,7 +44,7 @@ namespace FEAST
         /// trafo data type
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// test function data type
-        typedef typename AsmTraits_::BasisData BasisData;
+        typedef typename AsmTraits_::TestBasisData TestBasisData;
 
       public:
         /**
@@ -76,12 +76,12 @@ namespace FEAST
          * The transformation data in the current evaluation point. \see Trafo::EvalData
          *
          * \param[in] psi
-         * The (test) function data in the current evaluation point. \see Space::EvalData
+         * The test function data in the current evaluation point. \see Space::EvalData
          *
          * \returns
          * The value of the linear functional.
          */
-        DataType operator()(const TrafoData& tau, const BasisData& psi) const;
+        DataType operator()(const TrafoData& tau, const TestBasisData& psi) const;
 #endif // DOXYGEN
       }; // class LinearFunctional::Evaluator<...>
     }; // class LinearFunctional

@@ -45,8 +45,8 @@ namespace FEAST
       /// trafo config tag
       typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
 
-      /// space config tag
-      struct SpaceConfig :
+      /// test space config tag
+      struct TestConfig :
         public Space::ConfigBase
       {
         /// dummy enum
@@ -70,12 +70,14 @@ namespace FEAST
         public LinearFunctional::Evaluator<AsmTraits_>
       {
       public:
+        /// trafo evaluator
+        typedef typename AsmTraits_::TrafoEvaluator TrafoEvaluator;
         /// data type
         typedef typename AsmTraits_::DataType DataType;
         /// trafo data type
         typedef typename AsmTraits_::TrafoData TrafoData;
         /// test-function data type
-        typedef typename AsmTraits_::BasisData BasisData;
+        typedef typename AsmTraits_::TestBasisData TestBasisData;
 
       protected:
         /// the function evaluator
@@ -88,8 +90,21 @@ namespace FEAST
         {
         }
 
+        /** \copydoc LinearFunctional::Evaluator::prepare() */
+        void prepare(const TrafoEvaluator& trafo_eval)
+        {
+          // prepare function evaluator
+          _func_eval.prepare(trafo_eval);
+        }
+
+        void finish()
+        {
+          // finish function evaluator
+          _func_eval.finish();
+        }
+
         /** \copydoc LinearFunctional::Evaluator::operator() */
-        DataType operator()(const TrafoData& tau, const BasisData& psi) const
+        DataType operator()(const TrafoData& tau, const TestBasisData& psi) const
         {
           return _func_eval.value(tau) * psi.value;
         }
