@@ -19,8 +19,8 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/space/dof_mirror.hpp>
-#include <kernel/assembly/standard_operators.hpp>
-#include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/dirichlet_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
@@ -842,12 +842,12 @@ class MeshControlPartitioningTest2D:
       SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
       mat_sys.clear();
       Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
-      Assembly::BilinearScalarLaplaceOperator operat;
+      Assembly::Common::LaplaceOperator operat;
       Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, operat, space, cubature_factory);
 
       DenseVector<Mem::Main, double> vec_rhs(space.get_num_dofs(), double(0));
       RhsFunction rhs_function;
-      Assembly::LinearScalarIntegralFunctional<RhsFunction> rhs_functional(rhs_function);
+      Assembly::Common::ForceFunctional<RhsFunction> rhs_functional(rhs_function);
       Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
       // assemble homogeneous Dirichlet BCs

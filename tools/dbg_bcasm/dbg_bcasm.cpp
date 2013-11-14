@@ -5,12 +5,12 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
-#include <kernel/assembly/standard_operators.hpp>
-#include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/common_functionals.hpp>
+#include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/dirichlet_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
-#include <kernel/assembly/common_functions.hpp>
 
 using namespace FEAST;
 
@@ -42,13 +42,13 @@ void test_bcasm(
   // assemble system matrix
   MatrixType mat_sys(Space::DofAdjacency<>::assemble(space));
   mat_sys.clear();
-  Assembly::BilinearScalarLaplaceOperator laplace;
+  Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 
   // assemble rhs vector
   VectorType vec_rhs(space.get_num_dofs(), Real(0));
   Assembly::Common::ConstantFunction rhs_func(1.0);
-  Assembly::LinearScalarIntegralFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+  Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
   Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
   // allocate solution vector

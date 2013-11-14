@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/common_functions.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
@@ -64,7 +64,7 @@ public:
     // assemble the linear functional into a vector
     VectorType vector(space.get_num_dofs(), DataType_(0));
     Assembly::Common::ConstantFunction function(DataType_(1));
-    Assembly::LinearScalarIntegralFunctional<Assembly::Common::ConstantFunction> functional(function);
+    Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> functional(function);
     Assembly::LinearFunctionalAssembler::assemble_vector(vector, functional, space, cubature_factory);
 
     // get mesh element count
@@ -114,7 +114,7 @@ public:
     // assemble the linear functional into a vector
     VectorType vector(space.get_num_dofs(), DataType_(0));
     Assembly::Common::SineBubbleFunction function;
-    Assembly::LinearScalarIntegralFunctional<Assembly::Common::SineBubbleFunction> functional(function);
+    Assembly::Common::ForceFunctional<Assembly::Common::SineBubbleFunction> functional(function);
     Assembly::LinearFunctionalAssembler::assemble_vector(vector, functional, space, cubature_factory);
 
     // get mesh element count

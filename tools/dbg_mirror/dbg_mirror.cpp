@@ -6,8 +6,8 @@
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
 #include <kernel/space/dof_mirror.hpp>
-#include <kernel/assembly/standard_operators.hpp>
-#include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
@@ -77,14 +77,14 @@ void test_mirror(
 
   // assemble local vectors
   Assembly::Common::ConstantFunction rhs_func(1.0);
-  Assembly::LinearScalarIntegralFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
+  Assembly::Common::ForceFunctional<Assembly::Common::ConstantFunction> rhs_functional(rhs_func);
   Assembly::LinearFunctionalAssembler::assemble_vector(loc_vec_0, rhs_functional, space_0, cubature_factory, 16.0);
   Assembly::LinearFunctionalAssembler::assemble_vector(loc_vec_1, rhs_functional, space_1, cubature_factory, 16.0);
 
   // assemble local matrices
   loc_mat_0.clear();
   loc_mat_1.clear();
-  Assembly::BilinearScalarLaplaceOperator laplace;
+  Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_0, laplace, space_0, cubature_factory, 6.0);
   Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_1, laplace, space_1, cubature_factory, 6.0);
 

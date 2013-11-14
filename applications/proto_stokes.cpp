@@ -21,11 +21,10 @@ for further application development.
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
-#include <kernel/assembly/standard_operators.hpp>
-#include <kernel/assembly/standard_functionals.hpp>
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/dirichlet_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
-#include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 #include <kernel/assembly/error_computer.hpp>
@@ -333,11 +332,11 @@ public:
     _matrix_m.clear();
 
     // assemble velocity laplace matrix A
-    Assembly::BilinearScalarLaplaceOperator laplace;
+    Assembly::Common::LaplaceOperator laplace;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(_matrix_a, laplace, _space_v, cubature_factory_velo);
 
     // assemble pressure mass matrix
-    Assembly::BilinearScalarIdentityOperator identity;
+    Assembly::Common::IdentityOperator identity;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(_matrix_m, identity, _space_p, cubature_factory_pres, -DataType(1));
 
     // assemble pressure gradient matrices B1 and B2

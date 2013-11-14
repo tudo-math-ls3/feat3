@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/assembly/standard_operators.hpp>
+#include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -69,7 +69,7 @@ public:
     Cubature::DynamicFactory cubature_factory("barycentre");
 
     // assemble the identity operator with barycentre cubature rule
-    Assembly::BilinearScalarIdentityOperator operat;
+    Assembly::Common::IdentityOperator operat;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, operat, space, cubature_factory);
 
     // fetch the matrix arrays
@@ -108,7 +108,7 @@ public:
     Cubature::DynamicFactory cubature_factory_gl2("gauss-legendre:2");
 
     // assemble the identity operator with barycentre cubature rule
-    Assembly::BilinearScalarLaplaceOperator operat;
+    Assembly::Common::LaplaceOperator operat;
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_1, operat, space, cubature_factory_trz);
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_2, operat, space, cubature_factory_gl2);
 

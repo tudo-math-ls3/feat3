@@ -3,7 +3,7 @@
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/dof_adjacency.hpp>
-#include <kernel/assembly/standard_operators.hpp>
+#include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/util/stop_watch.hpp>
@@ -276,14 +276,14 @@ void test_asm(const Space_& space, const String& cubature_name, const char* matx
   {
   case 0:
     {
-      Assembly::BilinearScalarLaplaceOperator laplace;
+      Assembly::Common::LaplaceOperator laplace;
       Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_d, laplace, space, cubature_factory);
     }
     break;
 
   case 1:
     {
-      Assembly::BilinearScalarIdentityOperator identity;
+      Assembly::Common::IdentityOperator identity;
       Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix_d, identity, space, cubature_factory);
     }
     break;
