@@ -10,7 +10,7 @@ import shutil
 
 from cmake_modules import is_found
 
-def run_test(build_id):
+def run_test(build_id, branch):
   hostname = socket.gethostname()
   src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
   build_dirname = src_dirname + os.sep + hostname
@@ -29,7 +29,9 @@ def run_test(build_id):
 
   #git pull
   os.chdir(src_dirname)
-  subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("git gc".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("git fetch -v".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen(("git checkout --no-track -B testing origin/" + branch).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   os.chdir(build_dirname)
 
   configure_command = src_dirname + os.sep + "configure-feast " + build_id
@@ -38,7 +40,7 @@ def run_test(build_id):
   subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   #subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
-  build_name = build_id
+  build_name = build_id + "-" + branch
   dart_out = ""
   dart_file = open(build_dirname + os.sep + "DartConfiguration.tcl", "r")
   for line in dart_file:
@@ -75,19 +77,20 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("This python scripts starts regression tests and submits them to a cdash server")
   sys.exit()
 
-if is_found("mpic++"):
-  run_test("mpi-gcc-debug-coverage-gmp-mkl")
-  run_test("mpi-gcc-opt-coverage-gmp-mkl")
-  if is_found("clang++"):
-    run_test("mpi-clang-debug-gmp-mkl")
-    run_test("mpi-clang-opt-gmp-mkl")
-  run_test("mpi-icc-debug-mkl")
-  run_test("mpi-icc-opt-mkl")
+for branch in ["master", "develop"]:
+  if is_found("mpic++"):
+    run_test("mpi-gcc-debug-coverage-gmp-mkl", branch)
+    run_test("mpi-gcc-opt-coverage-gmp-mkl", branch)
+    if is_found("clang++"):
+      run_test("mpi-clang-debug-gmp-mkl", branch)
+      run_test("mpi-clang-opt-gmp-mkl", branch)
+    run_test("mpi-icc-debug-mkl", branch)
+    run_test("mpi-icc-opt-mkl", branch)
 
-run_test("serial-gcc-debug-coverage-gmp-mkl")
-run_test("serial-gcc-opt-coverage-gmp-mkl")
-if is_found("clang++"):
-  run_test("serial-clang-debug-gmp-mkl")
-  run_test("serial-clang-opt-gmp-mkl")
-run_test("serial-icc-debug-mkl")
-run_test("serial-icc-opt-mkl")
+  run_test("serial-gcc-debug-coverage-gmp-mkl", branch)
+  run_test("serial-gcc-opt-coverage-gmp-mkl", branch)
+  if is_found("clang++"):
+    run_test("serial-clang-debug-gmp-mkl", branch)
+    run_test("serial-clang-opt-gmp-mkl", branch)
+  run_test("serial-icc-debug-mkl", branch)
+  run_test("serial-icc-opt-mkl", branch)
