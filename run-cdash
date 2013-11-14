@@ -28,15 +28,15 @@ def run_test(build_id):
   run_log.flush()
 
   #git pull
-  #os.chdir(src_dirname)
-  #subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  #os.chdir(build_dirname)
+  os.chdir(src_dirname)
+  subprocess.Popen("git pull origin".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  os.chdir(build_dirname)
 
   configure_command = src_dirname + os.sep + "configure-feast " + build_id
   subprocess.Popen(configure_command.split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
   subprocess.Popen("ctest -D NightlyStart".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  #subprocess.Popen("ctest -D NightlyUpdate".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
   build_name = build_id
   dart_out = ""
@@ -52,7 +52,7 @@ def run_test(build_id):
   dart_file.close()
 
   subprocess.Popen("ctest -D NightlyBuild -D CTEST_CUSTOM_MAXIMUM_NUMBER_OF_WARNINGS:STRING=9999 -D CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS:STRING=9999".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen("ctest -D NightlyTest".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("ctest -D NightlyTest -D CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE:STRING=9999 -D CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE:STRING=9999".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   if "coverage" in build_id:
     subprocess.Popen("ctest -D NightlyCoverage".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen("ctest -D NightlySubmit".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
