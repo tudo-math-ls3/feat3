@@ -46,7 +46,7 @@ def run_test(build_id, branch):
   subprocess.Popen(("ctest -D ExperimentalStart --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   #subprocess.Popen(("ctest -D ExperimentalUpdate --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
-  build_name = build_id + "-" + branch
+  build_name = branch + "-" + build_id
   dart_out = ""
   dart_file = open(build_dirname + os.sep + "DartConfiguration.tcl", "r")
   for line in dart_file:
