@@ -96,9 +96,9 @@ void check_sendrecv(Index rank)
   delete[] recvbuffer;
 }
 
+#ifndef FEAST_SERIAL_MODE
 void check_send_and_recv(Index rank)
 {
-#ifndef FEAST_SERIAL_MODE
   float* f(new float[100000]);
   float* recvbuffer(new float[100000]);
   for(Index i(0) ; i < 100000 ; ++i)
@@ -141,12 +141,12 @@ void check_send_and_recv(Index rank)
 
   delete[] f;
   delete[] recvbuffer;
-#endif
 }
+#endif
 
+#ifndef FEAST_SERIAL_MODE
 void check_bcast(Index rank)
 {
-#ifndef FEAST_SERIAL_MODE
   int size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   float* recvbuffer(new float[(Index)size]);
@@ -175,12 +175,12 @@ void check_bcast(Index rank)
 
   delete[] res;
   delete[] recvbuffer;
-#endif
 }
+#endif
 
+#ifndef FEAST_SERIAL_MODE
 void check_scatter_gather(Index rank)
 {
-#ifndef FEAST_SERIAL_MODE
   int size;
   float value((float)rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -208,12 +208,12 @@ void check_scatter_gather(Index rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: scatter_gather)" << std::endl;
 
   delete[] buffer;
-#endif
 }
+#endif
 
+#ifndef FEAST_SERIAL_MODE
 void check_allgather(Index rank)
 {
-#ifndef FEAST_SERIAL_MODE
   int size;
   float value((float)rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -239,12 +239,12 @@ void check_allgather(Index rank)
 
   delete[] res;
   delete[] buffer;
-#endif
 }
+#endif
 
+#ifndef FEAST_SERIAL_MODE
 void check_allreduce(Index rank)
 {
-#ifndef FEAST_SERIAL_MODE
   int size;
   float value(float(rank + 1));
   MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -267,12 +267,12 @@ void check_allreduce(Index rank)
 
   delete[] send_buffer;
   delete[] recv_buffer;
-#endif
 }
+#endif
 
+#ifndef FEAST_SERIAL_MODE
 void check_reduce(Index rank)
 {
-#ifndef FEAST_SERIAL_MODE
   int size;
   float value(float(rank + 1));
   float result(0);
@@ -295,9 +295,8 @@ void check_reduce(Index rank)
     if(passed)
       std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: reduce)" << std::endl;
   }
-
-#endif
 }
+#endif
 
 void check_halo_transfer(Index rank)
 {

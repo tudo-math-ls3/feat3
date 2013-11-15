@@ -250,9 +250,9 @@ void check_synch_mirrors(int rank)
     std::cout << "PASSED (rank " << rank <<"): foundation_synch-test (Tier-2: vertex-set based exchange (single target, multiple mirrors))" << std::endl;
 }
 
+#ifndef SERIAL
 void check_synch_scal(int rank)
 {
-#ifndef SERIAL
   int size;
   float value(float(rank + 1));
   MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -275,8 +275,8 @@ void check_synch_scal(int rank)
 
   delete[] send_buffer;
   delete[] recv_buffer;
-#endif
 }
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -291,7 +291,9 @@ int main(int argc, char* argv[])
 
   check_synch_mirror(me);
   check_synch_mirrors(me);
+#ifndef SERIAL
   check_synch_scal(me);
+#endif
 
 #ifndef SERIAL
   MPI_Finalize();
