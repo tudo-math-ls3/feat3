@@ -62,8 +62,10 @@ def run_test(build_id, branch):
   run_log.close()
 
 
-#TODO check for git, cmake, ctest and report missing tools
 sys.dont_write_bytecode = True
+src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+os.chdir(src_dirname)
+
 if not is_found("cmake"):
   print ("cmake not found! aborting...")
   sys.exit(1)
@@ -79,15 +81,17 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
 
 #gather branches to test (branches containing testing\ and master and develop)
 if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-  branches = subprocess.Popen(['git', 'branch'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
+  raw_branches = subprocess.Popen(['git', 'branch', '-a'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
 else:
-  branches = subprocess.check_output("git branch", shell=True).strip().splitlines()
-branches[:] = [s.strip("* ") for s in branches]
-for s in branches[:]:
-  if not "testing/" in s:
-    branches.remove(s)
-branches.append("master")
-branches.append("develop")
+  raw_branches = subprocess.check_output("git branch -a", shell=True).strip().splitlines()
+branches = ["master", "develop"]
+raw_branches[:] = [s.strip("* ") for s in raw_branches]
+for s in raw_branches[:]:
+  if not "remotes/origin/" in s:
+    continue
+  new_s = s.replace("remotes/origin/", "")
+  if "testing/" in new_s:
+    branches.append(new_s)
 
 for branch in branches[:]:
   if is_found("mpic++"):
