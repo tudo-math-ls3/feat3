@@ -19,7 +19,8 @@ int main(int argc, char** argv)
         i != i_end ; )
     {
       if((find(labels.begin(), labels.end(), (*i)->get_memory_name()) == labels.end()) &&
-          (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()))
+          (find(labels.begin(), labels.end(), (*i)->get_algo_name()) == labels.end()) &&
+          (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()) )
       {
         i = TestList::instance()->erase(i);
         continue;
