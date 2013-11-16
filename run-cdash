@@ -36,7 +36,7 @@ def run_test(build_id, branch):
   #git pull
   os.chdir(src_dirname)
   subprocess.Popen("git gc".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen("git fetch -v".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen("git fetch -pv".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen(("git checkout --no-track -B test123-" + hostname + " origin/" + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   os.chdir(build_dirname)
 
