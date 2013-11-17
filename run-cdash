@@ -36,7 +36,6 @@ def run_test(build_id, branch):
   #git pull
   os.chdir(src_dirname)
   subprocess.Popen("git gc".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen("git fetch -pv".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   subprocess.Popen(("git checkout --no-track -B test123-" + hostname + " origin/" + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   os.chdir(build_dirname)
 
@@ -85,7 +84,9 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("This python scripts starts regression tests and submits them to a cdash server")
   sys.exit()
 
-#gather branches to test (branches containing testing\ and master and develop)
+#fetch remote branches and select branches to test (branches containing testing\ and master and develop)
+with open(os.devnull, "w") as fp:
+  subprocess.Popen("git fetch -pv".split(), bufsize=-1, stdout=fp, stderr=subprocess.STDOUT).wait()
 if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
   raw_branches = subprocess.Popen(['git', 'branch', '-a'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
 else:
