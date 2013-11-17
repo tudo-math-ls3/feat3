@@ -15,7 +15,7 @@ def run_test(build_id, branch):
   if (branch == "master") or (branch == "develop"):
     track = branch
   else:
-    track = testing
+    track = "testing"
 
   hostname = socket.gethostname()
   src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
