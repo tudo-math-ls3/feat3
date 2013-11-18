@@ -13,9 +13,9 @@ from cmake_modules import is_found
 def run_test(build_id, branch):
   # set track aka cdash build group
   if (branch == "master") or (branch == "develop"):
-    track = branch
+    cdash_track = branch
   else:
-    track = "testing"
+    cdash_track = "testing"
 
   hostname = socket.gethostname()
   src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -36,14 +36,14 @@ def run_test(build_id, branch):
   #git pull
   os.chdir(src_dirname)
   subprocess.Popen("git gc".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen(("git checkout --no-track -B test123-" + hostname + " origin/" + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen(("git checkout --no-track -B test123-" + hostname + " origin/" + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   os.chdir(build_dirname)
 
   configure_command = src_dirname + os.sep + "configure-feast " + build_id
   subprocess.Popen(configure_command.split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
-  subprocess.Popen(("ctest -D ExperimentalStart --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  #subprocess.Popen(("ctest -D ExperimentalUpdate --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen(("ctest -D ExperimentalStart --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  #subprocess.Popen(("ctest -D ExperimentalUpdate --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
   build_name = branch + "-" + build_id
   dart_out = ""
@@ -58,11 +58,11 @@ def run_test(build_id, branch):
   dart_file.write(dart_out)
   dart_file.close()
 
-  subprocess.Popen(("ctest -D ExperimentalBuild -D CTEST_CUSTOM_MAXIMUM_NUMBER_OF_WARNINGS:STRING=9999 -D CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS:STRING=9999 --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen(("ctest -D ExperimentalTest -D CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE:STRING=9999 -D CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE:STRING=9999 --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen(("ctest -D ExperimentalBuild -D CTEST_CUSTOM_MAXIMUM_NUMBER_OF_WARNINGS:STRING=9999 -D CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS:STRING=9999 --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen(("ctest -D ExperimentalTest -D CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE:STRING=9999 -D CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE:STRING=9999 --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   if "coverage" in build_id:
-    subprocess.Popen(("ctest -D ExperimentalCoverage --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen(("ctest -D ExperimentalSubmit --track " + track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+    subprocess.Popen(("ctest -D ExperimentalCoverage --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen(("ctest -D ExperimentalSubmit --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
   run_log.close()
 
@@ -91,6 +91,7 @@ if "check_output" not in dir( subprocess ): #deactivated as its not available be
   raw_branches = subprocess.Popen(['git', 'branch', '-a'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
 else:
   raw_branches = subprocess.check_output("git branch -a", shell=True).strip().splitlines()
+
 branches = ["master", "develop"]
 raw_branches[:] = [s.strip("* ") for s in raw_branches]
 for s in raw_branches[:]:
