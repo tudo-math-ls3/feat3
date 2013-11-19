@@ -36,6 +36,7 @@
 /// \endcond
 
 // include compiler detection headers
+#include <kernel/util/compiler_clang.hpp>      // Clang/LLVM Compiler. Must be included first, because it claims to be a gcc too!
 #include <kernel/util/compiler_intel.hpp>      // Intel(R) C/C++ compiler
 #include <kernel/util/compiler_microsoft.hpp>  // Microsoft(R) (Visual) C/C++ compiler
 #include <kernel/util/compiler_oracle.hpp>     // SunStudio/OracleStudio C/C++ compiler
