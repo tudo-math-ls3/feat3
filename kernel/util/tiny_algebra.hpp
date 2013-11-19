@@ -351,7 +351,17 @@ namespace FEAST
     inline T_ dot(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
     {
       T_ r(0);
+      // Note: The following ifdef is a compiler hack for the Intel C++ 14.0 compiler.
+      // Due to a reproducable but nonunderstandable compiler bug, the "standard" for
+      // loop below leads to a segmentation fault on optimised builds...
+      // After a few hours of trial-&-error, the following workaround was found for
+      // the compiler bug. Once Intel releases the 14.1 version, we shall check
+      // if the following hack may be removed.
+#ifdef FEAST_COMPILER_INTEL
+      for(Index i(0); (i+1) < Index(n_+1); ++i)
+#else // any other compiler
       for(Index i(0); i < Index(n_); ++i)
+#endif
       {
         r += a.v[i] * b.v[i];
       }
