@@ -15,7 +15,7 @@ def configure_icc(cpu, buildmode):
 
   cxxflags = "-std=c++11 -g"
   if buildmode == "debug":
-    cxxflags += "  -O0 -Wall -g -Wp64 -Wshorten-64-to-32"
+    cxxflags += "  -O0 -Wall -Wp64 -Wshorten-64-to-32 -debug all -ftrapuv"
   elif "opt" in buildmode:
     cxxflags += " -O3"
     if cpu == "unknown":
