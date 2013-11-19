@@ -42,7 +42,7 @@ def run_test(build_id, branch):
   #git pull
   os.chdir(src_dirname)
   subprocess.Popen("git gc".split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen(("git checkout --no-track -B test123-" + hostname + " origin/" + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
+  subprocess.Popen(("git checkout --no-track -B test123-" + hostname + " origin/" + branch).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   os.chdir(build_dirname)
 
   configure_command = src_dirname + os.sep + "configure-feast " + build_id
@@ -51,7 +51,7 @@ def run_test(build_id, branch):
   subprocess.Popen(("ctest -D ExperimentalStart --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   #subprocess.Popen(("ctest -D ExperimentalUpdate --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
 
-  build_name = branch + "-" + build_id
+  build_name = branch.replace("/", "-") + "---" + build_id
   dart_out = ""
   dart_file = open(build_dirname + os.sep + "DartConfiguration.tcl", "r")
   for line in dart_file:
