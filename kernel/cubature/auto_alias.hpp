@@ -9,6 +9,7 @@
 #include <kernel/cubature/hammer_stroud_driver.hpp>
 
 // includes, STL
+#include <vector>
 #include <algorithm>
 
 namespace FEAST
@@ -29,40 +30,47 @@ namespace FEAST
     public:
       static String map(const String& name)
       {
-        // all auto-aliases have the format "auto-<mode>:<param>"
+        // split the name into its parts
+        std::vector<String> parts;
+        name.split_by_charset(parts, ":");
 
-        // try to find a colon within the string
-        String::size_type l = name.find_first_of('-');
-        String::size_type k = name.find_first_of(':');
-        if((l == name.npos) || (k == name.npos))
+        // ensure that we have at least two parts
+        if(parts.size() < std::size_t(2))
           return name;
 
-        // the '-' must preceed the ':'
-        if(l >= k)
+        // fetch the last two parts
+        String param(parts.back());
+        parts.pop_back();
+        String auto_part(parts.back());
+        parts.pop_back();
+
+        // try to split the auto-part
+        std::vector<String> args;
+        auto_part.split_by_charset(args, "-");
+
+        // does this identify an auto-alias rule?
+        if(args.front().compare_no_case("auto") != 0)
           return name;
 
-        // separate the strings
-        String head(name.substr(0, l));
-        String mode(name.substr(l+1, k-l-1));
-        String param(name.substr(k+1));
-
-        // check head
-        if(head.trim().compare_no_case("auto") != 0)
-          return name;
-
-        // check mode
-        if(mode.trim().compare_no_case("degree") == 0)
+        // auto-degree?
+        if((args.size() == std::size_t(2)) && (args.back().compare_no_case("degree") == 0))
         {
-          // auto-degree
+          // try to parse the degree
           Index degree = 0;
           if(!param.parse(degree))
-            return name;
+            return name; // failed to parse degree
 
-          // choose auto-degree alias
-          return Intern::AutoDegree<Shape_>::choose(degree);
+          // map auto-degree rule alias
+          String alias(Intern::AutoDegree<Shape_>::choose(degree));
+
+          // join up with remaining prefix parts (if any)
+          if(!parts.empty())
+            return String().join(parts, ":").append(":").append(alias);
+          else
+            return alias;
         }
 
-        // unknown auto alias
+        // unknown auto-alias
         return name;
       }
     };

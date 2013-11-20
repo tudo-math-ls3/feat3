@@ -1,23 +1,24 @@
-# CmakeLists for directory "applications"
+# CmakeLists for directory "tools"
 
 # this needs to be set again for each directory
 cmake_minimum_required (VERSION 2.8)
-#enable compiler output
+
+# enable compiler output
 set (CMAKE_VERBOSE_MAKEFILE ON)
 
-
-#top lvl include dir
+# top lvl include dir
 INCLUDE_DIRECTORIES(${FEAST_SOURCE_DIR} ${FEAST_BINARY_DIR})
+
 
 # applications to build
 ADD_EXECUTABLE(basis-dump basis_dump/basis_dump.cpp)
 TARGET_LINK_LIBRARIES(basis-dump feast)
 
+ADD_EXECUTABLE(cub-list cub_list/cub_list.cpp)
+TARGET_LINK_LIBRARIES(cub-list feast)
+
 ADD_EXECUTABLE(dbg-bcasm dbg_bcasm/dbg_bcasm.cpp)
 TARGET_LINK_LIBRARIES(dbg-bcasm feast)
-
-ADD_EXECUTABLE(dbg-cub dbg_cub/dbg_cub.cpp)
-TARGET_LINK_LIBRARIES(dbg-cub feast)
 
 ADD_EXECUTABLE(dbg-fe-asm-1 dbg_fe_asm_1/dbg_fe_asm_1.cpp)
 TARGET_LINK_LIBRARIES(dbg-fe-asm-1 feast)
