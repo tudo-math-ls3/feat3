@@ -50,9 +50,9 @@ MemoryPool<Mem::CUDA>::~MemoryPool()
 }
 
 template <typename DT_>
-void * MemoryPool<Mem::CUDA>::allocate_memory(Index bytes)
+DT_ * MemoryPool<Mem::CUDA>::allocate_memory(Index bytes)
 {
-  void * memory(NULL);
+  DT_ * memory(NULL);
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, bytes))
     throw InternalError("MemoryPool<GPU> cuda allocation error (cudaErrorMemoryAllocation)");
   if (memory == NULL)
@@ -149,9 +149,9 @@ unsigned long MemoryPool<Mem::CUDA>::generate_hash(void * data, Index bytes)
   return result;
 }
 
-template void * MemoryPool<Mem::CUDA>::allocate_memory<float>(Index bytes);
-template void * MemoryPool<Mem::CUDA>::allocate_memory<double>(Index bytes);
-template void * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(Index bytes);
+template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(Index bytes);
+template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(Index bytes);
+template unsigned long * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(Index bytes);
 
 template void MemoryPool<Mem::CUDA>::download<float>(void * dest, void * src, Index bytes);
 template void MemoryPool<Mem::CUDA>::download<double>(void * dest, void * src, Index bytes);

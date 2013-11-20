@@ -15,7 +15,6 @@
 // calc linear sortable clang version
 #  define _CLANG_VER (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 
-// define FEAST_COMPILER_GCC
 #  define FEAST_COMPILER_CLANG _CLANG_VER
 
 #  define FEAST_COMPILER "Clang Compiler" // __clang_version__ contains details

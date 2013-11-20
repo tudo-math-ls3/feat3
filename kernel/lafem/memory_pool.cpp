@@ -18,10 +18,10 @@ MemoryPool<Mem::Main>::~MemoryPool()
 }
 
 template <typename DT_>
-void * MemoryPool<Mem::Main>::allocate_memory(Index bytes)
+DT_ * MemoryPool<Mem::Main>::allocate_memory(Index bytes)
 {
-  void * memory(NULL);
-  memory = ::malloc(bytes);
+  DT_ * memory(NULL);
+  memory = (DT_*)::malloc(bytes);
   if (memory == NULL)
     throw InternalError("MemoryPool<CPU> allocation error!");
 #ifdef FEAST_GMP
@@ -131,12 +131,12 @@ unsigned long MemoryPool<Mem::Main>::generate_hash(void * data, Index bytes)
   return t;
 }
 
-template void * MemoryPool<Mem::Main>::allocate_memory<float>(Index bytes);
-template void * MemoryPool<Mem::Main>::allocate_memory<double>(Index bytes);
+template float * MemoryPool<Mem::Main>::allocate_memory<float>(Index bytes);
+template double * MemoryPool<Mem::Main>::allocate_memory<double>(Index bytes);
 #ifdef FEAST_GMP
-template void * MemoryPool<Mem::Main>::allocate_memory<mpf_class>(Index bytes);
+template mpf_class * MemoryPool<Mem::Main>::allocate_memory<mpf_class>(Index bytes);
 #endif
-template void * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(Index bytes);
+template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(Index bytes);
 
 template void MemoryPool<Mem::Main>::download<float>(void * dest, void * src, Index bytes);
 template void MemoryPool<Mem::Main>::download<double>(void * dest, void * src, Index bytes);

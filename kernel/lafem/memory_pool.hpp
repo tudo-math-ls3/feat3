@@ -63,7 +63,7 @@ namespace FEAST
 
         /// allocate new memory
         template <typename DT_>
-        void * allocate_memory(Index bytes);
+        DT_ * allocate_memory(Index bytes);
 
         /// increase memory counter
         void increase_memory(void * address);
