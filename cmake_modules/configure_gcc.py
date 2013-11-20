@@ -3,16 +3,16 @@ import platform
 
 def configure_gcc(cpu, buildmode):
   if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-    version = subprocess.Popen(['g++', '--version'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
+    pipe = subprocess.Popen("g++ -dM -E - ".split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    pipe.stdin.close()
+    version = pipe.stdout.read().splitlines()
   else:
-    version = subprocess.check_output("g++ --version", shell=True).strip().splitlines()
-  version = version[0]
-  version = version.split(" ")
-  version = version[len(version) - 1]
-  version = version.split(".")
-  major = int(version[0])
-  minor = int(version[1])
-  minor2 = int(version[2])
+    version = subprocess.check_output("echo | g++ -dM -E - ", shell=True).splitlines()
+
+  version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
+  major = int(version["__GNUC__"])
+  minor = int(version["__GNUC_MINOR__"])
+  minor2 = int(version["__GNUC_PATCHLEVEL__"])
 
   if major <= 4 and minor <= 4:
     print ("GNU Compiler version less then 4.4 is not supported, please update your compiler")

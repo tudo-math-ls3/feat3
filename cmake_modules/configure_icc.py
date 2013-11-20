@@ -1,17 +1,18 @@
 import subprocess
+import platform
 
 def configure_icc(cpu, buildmode):
   if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-    version = subprocess.Popen(['icpc', '--version'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
+    pipe = subprocess.Popen("icpc -dM -E - ".split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    pipe.stdin.close()
+    version = pipe.stdout.read().splitlines()
   else:
-    version = subprocess.check_output("icpc --version", shell=True).strip().splitlines()
-  version = version[0]
-  version = version.split(" ")
-  version = version[len(version) - 2]
-  version = version.split(".")
-  major = int(version[0])
-  minor = int(version[1])
-  minor2 = int(version[2])
+    version = subprocess.check_output("echo | icpc -dM -E - ", shell=True).splitlines()
+
+  version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
+  major = int(version["__INTEL_COMPILER"][0:2])
+  minor = int(version["__INTEL_COMPILER"][-2:])
+  minor2 = int(version["__INTEL_COMPILER_UPDATE"])
 
   cxxflags = "-std=c++11 -g"
   if buildmode == "debug":

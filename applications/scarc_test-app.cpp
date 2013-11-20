@@ -1,9 +1,10 @@
-#include <kernel/scarc/solver_pattern.hpp>
-#include <iostream>
-
 #ifndef SERIAL
 #include <mpi.h>
 #endif
+
+#include <kernel/scarc/solver_pattern.hpp>
+#include <iostream>
+
 using namespace FEAST;
 using namespace Foundation;
 

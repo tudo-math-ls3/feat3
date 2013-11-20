@@ -2,12 +2,13 @@
 #ifndef SCARC_GUARD_SYNCH_HH
 #define SCARC_GUARD_SYNCH_HH 1
 
-#include<kernel/foundation/communication.hpp>
-#include<kernel/lafem/sum.hpp>
-#include<kernel/lafem/scale.hpp>
 #ifndef SERIAL
 #include<mpi.h>
 #endif
+
+#include<kernel/foundation/communication.hpp>
+#include<kernel/lafem/sum.hpp>
+#include<kernel/lafem/scale.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;

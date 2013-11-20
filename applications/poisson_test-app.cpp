@@ -7,6 +7,11 @@
  * This file contains the first application code testing the FEAST kernel w.o. the final application framework.
  */
 
+
+#ifndef SERIAL
+#include <mpi.h>
+#endif
+
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
@@ -42,10 +47,6 @@
 #include<deque>
 #include<algorithm>
 #include<cmath>
-
-#ifndef SERIAL
-#include <mpi.h>
-#endif
 
 #ifdef _WIN32
   extern "C" void __cdecl Sleep(unsigned int);

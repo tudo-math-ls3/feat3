@@ -1,5 +1,10 @@
 //#define SERIAL
 
+#ifndef SERIAL
+#include <mpi.h>
+#endif
+
+
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
@@ -21,10 +26,6 @@
 
 #include <iostream>
 #include <limits>
-
-#ifndef SERIAL
-#include <mpi.h>
-#endif
 
 using namespace FEAST;
 using namespace Foundation;

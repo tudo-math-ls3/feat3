@@ -1,3 +1,7 @@
+#ifndef SERIAL
+#  include <mpi.h>
+#endif
+
 #include <kernel/base_header.hpp>
 #include <kernel/foundation/base.hpp>
 #include <kernel/foundation/attribute.hpp>
@@ -9,9 +13,6 @@
 #include <kernel/foundation/load_balancing.hpp>
 #include <vector>
 #include <iostream>
-#ifndef SERIAL
-#  include <mpi.h>
-#endif
 
 using namespace FEAST;
 using namespace Foundation;

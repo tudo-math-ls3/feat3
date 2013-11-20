@@ -1,5 +1,20 @@
+import subprocess
+import platform
+
 def configure_clang(cpu, buildmode):
-  #TODO read in version number
+  if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
+    pipe = subprocess.Popen("clang++ -dM -E - ".split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    pipe.stdin.close()
+    version = pipe.stdout.read().splitlines()
+  else:
+    version = subprocess.check_output("echo | clang++ -dM -E - ", shell=True).splitlines()
+
+  version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
+  major = int(version["__clang_major__"])
+  minor = int(version["__clang_minor__"])
+  minor2 = int(version["__clang_patchlevel__"])
+
+
   cxxflags = "-pipe  -Wno-unused-parameter -std=c++11 -ggdb -fcolor-diagnostics -m64"
   if buildmode == "debug":
     cxxflags += " -O0 -Wall -Wextra -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wno-unused-value"
