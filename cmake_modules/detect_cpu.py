@@ -1,5 +1,5 @@
 import platform
-import subprocess
+from feast_util import get_output
 
 def detect_cpu():
   cputype = "unknown"
@@ -21,28 +21,19 @@ def detect_cpu():
     model = int(d["model"])
   elif platform.system() == "Darwin":
     # vendor_id
-    if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-      vendor_id = subprocess.Popen(['sysctl', '-A machdep.cpu.vendor'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
-    else:
-      vendor_id = subprocess.check_output("sysctl -A machdep.cpu.vendor", shell=True).strip().splitlines()
+    vendor_id = get_output("sysctl -A machdep.cpu.vendor")
     vendor_id = vendor_id[0]
     vendor_id = vendor_id.split(":")
     vendor_id = vendor_id[1].strip()
 
     # cpu_family
-    if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-      cpu_family = subprocess.Popen(['sysctl', '-A machdep.cpu.family'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
-    else:
-      cpu_family = subprocess.check_output("sysctl -A machdep.cpu.family", shell=True).strip().splitlines()
+    cpu_family = get_output("sysctl -A machdep.cpu.family")
     cpu_family = cpu_family[0]
     cpu_family = cpu_family.split(":")
     cpu_family = int(cpu_family[1].strip())
 
     # model
-    if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-      model = subprocess.Popen(['sysctl', '-A machdep.cpu.model'], stdout=subprocess.PIPE).communicate()[0].strip().splitlines()
-    else:
-      model = subprocess.check_output("sysctl -A machdep.cpu.model", shell=True).strip().splitlines()
+    model = get_output("sysctl -A machdep.cpu.model")
     model = model[0]
     model = model.split(":")
     model = int(model[1].strip())

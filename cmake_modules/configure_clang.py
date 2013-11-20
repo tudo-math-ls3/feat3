@@ -1,14 +1,8 @@
-import subprocess
 import platform
+from feast_util import get_output
 
 def configure_clang(cpu, buildmode):
-  if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-    pipe = subprocess.Popen("clang++ -dM -E - ".split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-    pipe.stdin.close()
-    version = pipe.stdout.read().splitlines()
-  else:
-    version = subprocess.check_output("echo | clang++ -dM -E - ", shell=True).splitlines()
-
+  version = get_output("clang++ -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__clang_major__"])
   minor = int(version["__clang_minor__"])

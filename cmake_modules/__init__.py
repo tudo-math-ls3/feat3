@@ -4,7 +4,8 @@ from configure_icc import configure_icc
 from configure_clang import configure_clang
 from feast_util import is_found
 from feast_util import remove_string
+from feast_util import get_output
 
 __author__="Dirk Ribbrock"
 
-__all__ = ["detect_cpu configure_gcc configure_icc configure_clang is_found remove_string"]
+__all__ = ["detect_cpu configure_gcc configure_icc configure_clang is_found remove_string get_output"]

@@ -4,7 +4,6 @@
 # If you encounter problemes when executing it on its own, start it with a python interpreter
 import sys
 import os
-import subprocess
 import shutil
 
 sys.dont_write_bytecode = True

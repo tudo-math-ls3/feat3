@@ -1,14 +1,8 @@
-import subprocess
 import platform
+from feast_util import get_output
 
 def configure_icc(cpu, buildmode):
-  if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
-    pipe = subprocess.Popen("icpc -dM -E - ".split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-    pipe.stdin.close()
-    version = pipe.stdout.read().splitlines()
-  else:
-    version = subprocess.check_output("echo | icpc -dM -E - ", shell=True).splitlines()
-
+  version = get_output("icpc -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__INTEL_COMPILER"][0:2])
   minor = int(version["__INTEL_COMPILER"][-2:])
