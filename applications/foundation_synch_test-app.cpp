@@ -1,11 +1,9 @@
 //#define SERIAL
 
+#include <kernel/base_header.hpp>
 #ifndef SERIAL
 #include <mpi.h>
 #endif
-
-
-#include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
 #include <kernel/foundation/synch.hpp>

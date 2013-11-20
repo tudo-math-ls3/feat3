@@ -1,8 +1,7 @@
+#include <kernel/base_header.hpp>
 #ifndef SERIAL
 #  include <mpi.h>
 #endif
-
-#include <kernel/base_header.hpp>
 #include <kernel/foundation/base.hpp>
 #include <kernel/foundation/attribute.hpp>
 #include <kernel/foundation/topology.hpp>

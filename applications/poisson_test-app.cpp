@@ -8,11 +8,11 @@
  */
 
 
+
+#include <kernel/base_header.hpp>
 #ifndef SERIAL
 #include <mpi.h>
 #endif
-
-#include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
 
 #include <kernel/geometry/conformal_mesh.hpp>
