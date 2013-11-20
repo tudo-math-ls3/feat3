@@ -56,7 +56,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Compiler: gcc, icc, clang")
   print ("  Compiler frontends: ccache")
   print ("  Backends: gmp, cuda, mkl")
-  print ("  Generators: unixmake, ninja, xcode - defaults to unixmake if none is choosen")
+  print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scalasca (not implemented yet)")
   print ("")
   print ("Note, that you need to provide at least a build mode, a parallelisation mode and a compiler.")
@@ -119,6 +119,12 @@ if "ninja" in buildid:
 elif "xcode" in buildid:
   remove_string(unused_tokens, "xcode")
   generator = "Xcode"
+elif "mingw" in buildid:
+  remove_string(unused_token, "mingw")
+  generator = "MinGW Makefiles"
+elif "msys" in buildid:
+  remove_string(unused_token, "msys")
+  generator = "MSYS Makefiles"
 elif "unixmake" in buildid:
   remove_string(unused_tokens, "unixmake")
   generator = "Unix Makefiles"
