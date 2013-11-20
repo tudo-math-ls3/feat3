@@ -107,10 +107,11 @@ for s in raw_branches[:]:
   if "testing/" in new_s:
     branches.append(new_s)
 
-if is_found ("ninja"):
-  generator = "-ninja"
-else:
-  generator = "-unixmake"
+#if is_found ("ninja"):
+#  generator = "-ninja"
+#else:
+#  generator = "-unixmake"
+generator = "-unixmake"
 
 for branch in branches[:]:
   if is_found("mpic++"):
