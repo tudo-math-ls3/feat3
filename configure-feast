@@ -5,6 +5,7 @@
 import sys
 import os
 import subprocess
+import shutil
 
 sys.dont_write_bytecode = True
 from cmake_modules import detect_cpu
@@ -236,6 +237,10 @@ clean = [ "build.ninja", dirname+os.sep+"build.ninja" ]
 for i in clean:
   if os.path.exists(i):
     os.unlink(i)
+clean = [ "CMakeFiles", dirname+os.sep+"CMakeFiles" ]
+for i in clean:
+  if os.path.exists(i):
+    shutil.rmtree(i)
 
 #export compiler/linker flags
 os.environ["CXXFLAGS"] = cxxflags
