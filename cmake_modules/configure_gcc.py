@@ -1,4 +1,5 @@
 import platform
+import sys
 from feast_util import get_output
 
 def configure_gcc(cpu, buildmode):
@@ -9,7 +10,8 @@ def configure_gcc(cpu, buildmode):
   minor2 = int(version["__GNUC_PATCHLEVEL__"])
 
   if major <= 4 and minor <= 4:
-    print ("GNU Compiler version less then 4.4 is not supported, please update your compiler")
+    print ("GNU Compiler version less then 4.4 is not supported, please update your compiler!")
+  sys.exit(1)
 
   cxxflags = "-pipe -std=c++0x -ggdb"
 
@@ -117,6 +119,6 @@ def configure_gcc(cpu, buildmode):
 
     else:
       cxxflags += " -march=native"
-      print "Detected cpu type not supported by configure_gcc.py"
+      print ("Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
 
   return cxxflags

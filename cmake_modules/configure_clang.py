@@ -89,6 +89,6 @@ def configure_clang(cpu, buildmode):
 
     else:
       cxxflags += " -march=native"
-      print ("Detected cpu type not supported by configure_gcc.py")
+      print ("Detected cpu type not supported by configure_clang.py, using -march=native instead.")
 
   return cxxflags

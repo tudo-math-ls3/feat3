@@ -88,6 +88,6 @@ def configure_icc(cpu, buildmode):
     elif cpu == "magnycours":
       cxxflags += " -msse4.1"
     else:
-      print ("Detected cpu type not supported by configure_gcc.py")
+      print ("Detected cpu type not supported by configure_icc.py, using -march=native instead.")
 
   return cxxflags
