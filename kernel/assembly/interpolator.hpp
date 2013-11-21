@@ -24,13 +24,19 @@ namespace FEAST
         {
           typedef typename Vector_::DataType DataType;
 
-          // define node functional
-          typedef typename Space_::template NodeFunctional<Function_, shape_dim_, DataType>::Type NodeFuncType;
-          NodeFuncType node_func(space, function);
+          // create a node-functional object
+          typedef typename Space_::template NodeFunctional<shape_dim_, DataType>::Type NodeFunc;
 
-          // skip empty node functional sets
-          if(node_func.get_max_assigned_dofs() <= 0)
+          // check for empty node functional set
+          static constexpr Index max_dofs = NodeFunc::max_assigned_dofs;
+          if(max_dofs <= 0)
             return;
+
+          // create node functional
+          NodeFunc node_func(space);
+
+          // create node data; avoid zero-length vectors
+          Tiny::Vector<DataType, max_dofs+1> node_data;
 
           // define dof assignment
           typedef typename Space_::template DofAssignment<shape_dim_, DataType>::Type DofAssignType;
@@ -40,18 +46,20 @@ namespace FEAST
           const Index num_entities = space.get_mesh().get_num_entities(shape_dim_);
           for(Index i(0); i < num_entities; ++i)
           {
-            // prepare node functional
+            // evaluate the node functional
             node_func.prepare(i);
+            node_func(node_data, function);
+            node_func.finish();
 
             // prepare dof-assignment
             dof_assign.prepare(i);
 
             // loop over all assigned DOFs
-            const Index num_dofs = node_func.get_num_assigned_dofs();
+            const Index num_dofs = dof_assign.get_num_assigned_dofs();
             for(Index j(0); j < num_dofs; ++j)
             {
               // evaluate node functional
-              DataType v = node_func(j);
+              DataType v = node_data[j];
 
               // loop over all contributions
               const Index num_contribs = dof_assign.get_num_contribs(j);
@@ -64,7 +72,6 @@ namespace FEAST
 
             // finish
             dof_assign.finish();
-            node_func.finish();
           }
         }
       };

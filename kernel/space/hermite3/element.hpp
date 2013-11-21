@@ -95,13 +95,12 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
         {
         public:
-          typedef Hermite3::NodeFunctional<Element, Function_, ShapeType, shape_dim_, DataType_> Type;
+          typedef Hermite3::NodeFunctional<Element, ShapeType, shape_dim_, DataType_> Type;
         };
 
       public:

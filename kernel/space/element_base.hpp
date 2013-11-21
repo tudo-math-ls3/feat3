@@ -112,7 +112,6 @@ namespace FEAST
        * The data-type that is to be used for evaluation.
        */
       template<
-        typename Function_,
         int shape_dim_,
         typename DataType_ = Real>
       class NodeFunctional

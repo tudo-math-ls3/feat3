@@ -90,7 +90,6 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
@@ -101,7 +100,7 @@ namespace FEAST
 
         public:
           /// node functional type
-          typedef CrouzeixRaviart::NodeFunctional<Element, Function_, codim, DataType_> Type;
+          typedef CrouzeixRaviart::NodeFunctional<Element, codim, DataType_> Type;
         };
 
       public:

@@ -14,28 +14,27 @@ namespace FEAST
     {
       template<
         typename Space_,
-        typename Function_,
         typename ShapeType_,
         typename DataType_>
       class NodeFunctional :
-        public NodeFunctionalNull<Space_, Function_, DataType_>
+        public NodeFunctionalNull<Space_, DataType_>
       {
       public:
-        explicit NodeFunctional(const Space_& space, const Function_& function) :
-          NodeFunctionalNull<Space_, Function_, DataType_>(space, function)
+        explicit NodeFunctional(const Space_& space) :
+          NodeFunctionalNull<Space_, DataType_>(space)
         {
         }
       };
 
       template<
         typename Space_,
-        typename Function_,
         typename DataType_>
-      class NodeFunctional<Space_, Function_, Shape::Vertex, DataType_> :
-        public NodeFunctionalBase<Space_, Function_, DataType_>
+      class NodeFunctional<Space_, Shape::Vertex, DataType_> :
+        public NodeFunctionalBase<Space_, DataType_>
       {
       public:
-        typedef NodeFunctionalBase<Space_, Function_, DataType_> BaseClass;
+        typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
+        static constexpr Index max_assigned_dofs = Index(1);
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -51,21 +50,12 @@ namespace FEAST
           static constexpr bool need_hess = false;
         };
 
-        typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
-
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
-
-        typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
-        typedef typename Function_::template Evaluator<AnalyticEvalTraits> FuncEval;
-
         TrafoEvalType _trafo_eval;
-        FuncEval _func_eval;
 
       public:
-        explicit NodeFunctional(const Space_& space, const Function_& function) :
-          BaseClass(space, function),
-          _trafo_eval(space.get_trafo()),
-          _func_eval(function)
+        explicit NodeFunctional(const Space_& space) :
+          BaseClass(space),
+          _trafo_eval(space.get_trafo())
         {
         }
 
@@ -73,45 +63,62 @@ namespace FEAST
         {
           BaseClass::prepare(cell_index);
           _trafo_eval.prepare(cell_index);
-          _func_eval.prepare(_trafo_eval);
         }
 
         void finish()
         {
-          _func_eval.finish();
           _trafo_eval.finish();
           BaseClass::finish();
         }
 
-        Index get_max_assigned_dofs() const
-        {
-          return 1;
-        }
-
         Index get_num_assigned_dofs() const
         {
-          return 1;
+          return max_assigned_dofs;
         }
 
-        DataType_ operator()(Index /*assign_idx*/) const
+        template<
+          typename NodeData_,
+          typename Function_>
+        void operator()(NodeData_& node_data, const Function_& function) const
         {
+          // fetch the function's trafo config
+          typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
+
+          // declare trafo evaluation data
+          typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+
+          // declare evaluation traits
+          typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
+
+          // declare function evaluator
+          typename Function_::template Evaluator<AnalyticEvalTraits> func_eval(function);
+
+          // prepare function evaluator
+          func_eval.prepare(_trafo_eval);
+
+          // compute trafo data
           DomainPointType dom_point;
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, dom_point);
-          return _func_eval.value(trafo_data);
+
+          // evaluate function
+          node_data[0] = func_eval.value(trafo_data);
+
+          // finish function evaluator
+          func_eval.finish();
         }
       };
 
       template<
         typename Space_,
-        typename Function_,
         int shape_dim_,
         typename DataType_>
-      class NodeFunctional<Space_, Function_, Shape::Hypercube<shape_dim_>, DataType_> :
-        public NodeFunctionalBase<Space_, Function_, DataType_>
+      class NodeFunctional<Space_, Shape::Hypercube<shape_dim_>, DataType_> :
+        public NodeFunctionalBase<Space_, DataType_>
       {
       public:
-        typedef NodeFunctionalBase<Space_, Function_, DataType_> BaseClass;
+        typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
+        static constexpr Index max_assigned_dofs = Index(1);
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -127,21 +134,12 @@ namespace FEAST
           static constexpr bool need_hess = false;
         };
 
-        typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
-
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
-
-        typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
-        typedef typename Function_::template Evaluator<AnalyticEvalTraits> FuncEval;
-
         TrafoEvalType _trafo_eval;
-        FuncEval _func_eval;
 
       public:
-        explicit NodeFunctional(const Space_& space, const Function_& function) :
-          BaseClass(space, function),
-          _trafo_eval(space.get_trafo()),
-          _func_eval(function)
+        explicit NodeFunctional(const Space_& space) :
+          BaseClass(space),
+          _trafo_eval(space.get_trafo())
         {
         }
 
@@ -149,45 +147,61 @@ namespace FEAST
         {
           BaseClass::prepare(cell_index);
           _trafo_eval.prepare(cell_index);
-          _func_eval.prepare(_trafo_eval);
         }
 
         void finish()
         {
-          _func_eval.finish();
           _trafo_eval.finish();
           BaseClass::finish();
         }
 
-        Index get_max_assigned_dofs() const
-        {
-          return 1;
-        }
-
         Index get_num_assigned_dofs() const
         {
-          return 1;
+          return max_assigned_dofs;
         }
 
-        DataType_ operator()(Index /*assign_idx*/) const
+        template<
+          typename NodeData_,
+          typename Function_>
+        void operator()(NodeData_& node_data, const Function_& function) const
         {
+          // fetch the function's trafo config
+          typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
+
+          // declare trafo evaluation data
+          typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+
+          // declare evaluation traits
+          typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
+
+          // declare function evaluator
+          typename Function_::template Evaluator<AnalyticEvalTraits> func_eval(function);
+
+          // prepare function evaluator
+          func_eval.prepare(_trafo_eval);
+
+          // compute trafo data
           DomainPointType dom_point(DataType_(0));
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, dom_point);
-          return _func_eval.value(trafo_data);
+
+          // evaluate function
+          node_data[0] = func_eval.value(trafo_data);
+
+          // finish function evaluator
+          func_eval.finish();
         }
       };
 
-
       template<
         typename Space_,
-        typename Function_,
         typename DataType_>
-      class NodeFunctional<Space_, Function_, Shape::Simplex<1>, DataType_> :
-        public NodeFunctionalBase<Space_, Function_, DataType_>
+      class NodeFunctional<Space_, Shape::Simplex<1>, DataType_> :
+        public NodeFunctionalBase<Space_, DataType_>
       {
       public:
-        typedef NodeFunctionalBase<Space_, Function_, DataType_> BaseClass;
+        typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
+        static constexpr Index max_assigned_dofs = Index(1);
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -203,21 +217,12 @@ namespace FEAST
           static constexpr bool need_hess = false;
         };
 
-        typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
-
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
-
-        typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
-        typedef typename Function_::template Evaluator<AnalyticEvalTraits> FuncEval;
-
         TrafoEvalType _trafo_eval;
-        FuncEval _func_eval;
 
       public:
-        explicit NodeFunctional(const Space_& space, const Function_& function) :
-          BaseClass(space, function),
-          _trafo_eval(space.get_trafo()),
-          _func_eval(function)
+        explicit NodeFunctional(const Space_& space) :
+          BaseClass(space),
+          _trafo_eval(space.get_trafo())
         {
         }
 
@@ -225,32 +230,49 @@ namespace FEAST
         {
           BaseClass::prepare(cell_index);
           _trafo_eval.prepare(cell_index);
-          _func_eval.prepare(_trafo_eval);
         }
 
         void finish()
         {
-          _func_eval.finish();
           _trafo_eval.finish();
           BaseClass::finish();
         }
 
-        Index get_max_assigned_dofs() const
-        {
-          return 1;
-        }
-
         Index get_num_assigned_dofs() const
         {
-          return 1;
+          return max_assigned_dofs;
         }
 
-        DataType_ operator()(Index /*assign_idx*/) const
+        template<
+          typename NodeData_,
+          typename Function_>
+        void operator()(NodeData_& node_data, const Function_& function) const
         {
+          // fetch the function's trafo config
+          typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig TrafoConfig;
+
+          // declare trafo evaluation data
+          typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
+
+          // declare evaluation traits
+          typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
+
+          // declare function evaluator
+          typename Function_::template Evaluator<AnalyticEvalTraits> func_eval(function);
+
+          // prepare function evaluator
+          func_eval.prepare(_trafo_eval);
+
+          // compute trafo data
           DomainPointType dom_point(DataType_(0.5));
           TrafoEvalData trafo_data;
           _trafo_eval(trafo_data, dom_point);
-          return _func_eval.value(trafo_data);
+
+          // evaluate function
+          node_data[0] = func_eval.value(trafo_data);
+
+          // finish function evaluator
+          func_eval.finish();
         }
       };
     } // namespace Lagrange1

@@ -17,38 +17,33 @@ namespace FEAST
      * \tparam Space_
      * The finite-element space that this node-functional is used by.
      *
-     * \tparam Function_
-     * The type of the function that is to be evaluated by the node functionals.\n
-     * Has to implement the Assembly::AnalyticFunction interface.
-     *
      * \author Peter Zajac
      */
     template<
       typename Space_,
-      typename Function_,
       typename DataType_>
     class NodeFunctionalBase
     {
     public:
       /// space typedef
       typedef Space_ SpaceType;
-      /// functor type
-      typedef Function_ FunctionType;
       /// data type
       typedef DataType_ DataType;
+
+#ifdef DOXYGEN
+      /// specifies the maximum number of assigned DOFs
+      static constexpr Index max_assigned_dofs = ...
+#endif // DOXYGEN
 
     protected:
       /// space reference
       const SpaceType& _space;
-      /// functor reference
-      const FunctionType& _function;
       /// currently active cell index
       Index _cell_index;
 
       /// protected constructor
-      explicit NodeFunctionalBase(const SpaceType& space, const FunctionType& function) :
+      explicit NodeFunctionalBase(const SpaceType& space) :
         _space(space),
-        _function(function),
         _cell_index(~Index(0))
       {
       }
@@ -73,14 +68,6 @@ namespace FEAST
         _cell_index = ~Index(0);
       }
 
-      /**
-       * \brief Returns the maximum number of assigned dofs.
-       */
-      Index get_max_assigned_dofs() const
-      {
-        return 1;
-      }
-
 #ifdef DOXYGEN
       /**
        * \brief Returns the number of assigned dofs on the current cell.
@@ -98,7 +85,10 @@ namespace FEAST
        * \returns
        * The value of the node functional applied onto the functor.
        */
-      DataType_ operator()(Index assign_idx) const;
+      template<
+        typename NodeData_,
+        typename Function_>
+      void operator()(NodeData_& node_data, const Function_& function) const;
 #endif // DOXYGEN
     }; // class NodeFunctionalBase<...>
 
@@ -111,36 +101,35 @@ namespace FEAST
      */
     template<
       typename Space_,
-      typename Function_,
       typename DataType_>
     class NodeFunctionalNull :
-      public NodeFunctionalBase<Space_, Function_, DataType_>
+      public NodeFunctionalBase<Space_, DataType_>
     {
+    public:
+      static constexpr Index max_assigned_dofs = Index(0);
+
     private:
       /// base-class typedef
-      typedef NodeFunctionalBase<Space_, Function_, DataType_> BaseClass;
+      typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
 
     public:
       /// constructor
-      explicit NodeFunctionalNull(const Space_& space, const Function_& function) :
-        BaseClass(space, function)
+      explicit NodeFunctionalNull(const Space_& space) :
+        BaseClass(space)
       {
-      }
-
-      /** \copydoc NodeFunctionalBase::get_max_assigned_dofs() */
-      Index get_max_assigned_dofs() const
-      {
-        return 0;
       }
 
       /** \copydoc NodeFunctionalBase::get_num_assigned_dofs() */
       Index get_num_assigned_dofs() const
       {
-        return 0;
+        return max_assigned_dofs;
       }
 
       /** \copydoc NodeFunctionalBase::operator()() */
-      DataType_ operator()(Index) const
+      template<
+        typename NodeData_,
+        typename Function_>
+      void operator()(NodeData_&, const Function_&) const
       {
         throw InternalError("invalid call of NodeFunctionalNull::operator()()");
       }

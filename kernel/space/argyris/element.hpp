@@ -92,13 +92,12 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
         {
         public:
-          typedef Argyris::NodeFunctional<Element, Function_, shape_dim_, DataType_> Type;
+          typedef Argyris::NodeFunctional<Element, shape_dim_, DataType_> Type;
         };
 
       public:

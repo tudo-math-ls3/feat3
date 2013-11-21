@@ -87,7 +87,6 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
@@ -95,7 +94,7 @@ namespace FEAST
           typedef typename Shape::FaceTraits<ShapeType, shape_dim_>::ShapeType FaceType;
         public:
           /// node functional type
-          typedef Lagrange2::NodeFunctional<Element, Function_, FaceType, DataType_> Type;
+          typedef Lagrange2::NodeFunctional<Element, FaceType, DataType_> Type;
         };
 
       public:

@@ -269,9 +269,6 @@ namespace FEAST
             const Index num_assign(dof_assign.get_num_assigned_dofs());
             for(Index j(0); j < num_assign; ++j)
             {
-              if(dof_assign.get_derive_order(j) > Index(0))
-                continue;
-
               const Index num_contribs(dof_assign.get_num_contribs(j));
               for(Index k(0); k < num_contribs; ++k)
               {
@@ -293,40 +290,45 @@ namespace FEAST
           const std::set<Index>& cells,
           const Functor_& functor)
         {
+          // create a node-functional object
+          typedef typename Space_::template NodeFunctional<shape_dim_, DataType_>::Type NodeFunc;
+
+          // check for empty node functional set
+          static constexpr Index max_dofs = NodeFunc::max_assigned_dofs;
+          if(max_dofs <= 0)
+            return;
+
+          // create node functional
+          NodeFunc node_func(space);
+
           // create a dof-assignment object
           typename Space_::template DofAssignment<shape_dim_, DataType_>::Type dof_assign(space);
 
-          // create a node-functional object
-          typename Space_::template NodeFunctional<Functor_, shape_dim_, DataType_>::Type node_func(space, functor);
-
-          // check for empty node functional set
-          if(node_func.get_max_assigned_dofs() <= 0)
-            return;
+          // create node data; avoid zero-length vectors
+          Tiny::Vector<DataType_, max_dofs+1> node_data;
 
           // loop over all target indices
           std::set<Index>::const_iterator it(cells.begin());
           std::set<Index>::const_iterator jt(cells.end());
           for(; it != jt; ++it)
           {
-            dof_assign.prepare(*it);
             node_func.prepare(*it);
+            node_func(node_data, functor);
+            node_func.finish();
+
+            dof_assign.prepare(*it);
+
             const Index num_assign(dof_assign.get_num_assigned_dofs());
             for(Index j(0); j < num_assign; ++j)
             {
-              if(dof_assign.get_derive_order(j) > Index(0))
-                continue;
-
-              // evaluate node functional
-              DataType_ value(node_func(j));
               const Index num_contribs(dof_assign.get_num_contribs(j));
               for(Index k(0); k < num_contribs; ++k)
               {
                 Index index(dof_assign.get_index(j, k));
                 DataType_ weight(dof_assign.get_weight(j, k));
-                idx.insert(std::make_pair(index, (weight*value)));
+                idx.insert(std::make_pair(index, (weight*node_data[j])));
               }
             }
-            node_func.finish();
             dof_assign.finish();
           }
         }

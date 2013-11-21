@@ -86,7 +86,6 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Functor_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
@@ -97,7 +96,7 @@ namespace FEAST
 
         public:
           /// node functional type
-          typedef Discontinuous::NodeFunctional<Element, Functor_, codim, VariantTag, DataType_> Type;
+          typedef Discontinuous::NodeFunctional<Element, codim, VariantTag, DataType_> Type;
         };
 
       public:

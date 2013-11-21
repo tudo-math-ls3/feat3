@@ -15,30 +15,29 @@ namespace FEAST
     {
       template<
         typename Space_,
-        typename Function_,
         int codim_,
         typename Variant_,
         typename DataType_>
       class NodeFunctional :
-        public NodeFunctionalNull<Space_, Function_, DataType_>
+        public NodeFunctionalNull<Space_, DataType_>
       {
       public:
-        explicit NodeFunctional(const Space_& space, const Function_& function) :
-          NodeFunctionalNull<Space_, Function_, DataType_>(space, function)
+        explicit NodeFunctional(const Space_& space) :
+          NodeFunctionalNull<Space_, DataType_>(space)
         {
         }
       };
 
       template<
         typename Space_,
-        typename Function_,
         typename Variant_,
         typename DataType_>
-      class NodeFunctional<Space_, Function_, 1, Variant_, DataType_> :
-        public NodeFunctionalBase<Space_, Function_, DataType_>
+      class NodeFunctional<Space_, 1, Variant_, DataType_> :
+        public NodeFunctionalBase<Space_, DataType_>
       {
       public:
-        typedef NodeFunctionalBase<Space_, Function_, DataType_> BaseClass;
+        typedef NodeFunctionalBase<Space_, DataType_> BaseClass;
+        static constexpr Index max_assigned_dofs = Index(1);
 
       protected:
         typedef typename Space_::TrafoType TrafoType;
@@ -56,30 +55,22 @@ namespace FEAST
           static constexpr bool need_hess = false;
         };
 
-        typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig FunctionTrafoConfig;
-
+        template<typename FuncTrafoConfig_>
         struct TrafoConfig :
-          public FunctionTrafoConfig
+          public FuncTrafoConfig_
         {
           static constexpr bool need_jac_det = true;
         };
 
-        typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig>::EvalDataType TrafoEvalData;
-
-        typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
-        typedef typename Function_::template Evaluator<AnalyticEvalTraits> FuncEval;
-
         typedef Cubature::Rule<FacetType, DataType_, DataType_, DomainPointType> CubRuleType;
 
         TrafoEvalType _trafo_eval;
-        FuncEval _func_eval;
         CubRuleType _cub_rule;
 
       public:
-        explicit NodeFunctional(const Space_& space, const Function_& function) :
-          BaseClass(space, function),
+        explicit NodeFunctional(const Space_& space) :
+          BaseClass(space),
           _trafo_eval(space.get_trafo()),
-          _func_eval(function),
           _cub_rule(Cubature::ctor_factory, Cubature::DynamicFactory("gauss-legendre:2"))
         {
         }
@@ -88,38 +79,56 @@ namespace FEAST
         {
           BaseClass::prepare(cell_index);
           _trafo_eval.prepare(cell_index);
-          _func_eval.prepare(_trafo_eval);
         }
 
         void finish()
         {
-          _func_eval.finish();
           _trafo_eval.finish();
           BaseClass::finish();
         }
 
-        Index get_max_assigned_dofs() const
-        {
-          return 1;
-        }
-
         Index get_num_assigned_dofs() const
         {
-          return 1;
+          return max_assigned_dofs;
         }
 
-        DataType_ operator()(Index /*assign_idx*/) const
+        template<
+          typename NodeData_,
+          typename Function_>
+        void operator()(NodeData_& node_data, const Function_& function) const
         {
-          DataType_ value(DataType_(0)), mean(DataType_(0));
+          // fetch the function's trafo config
+          typedef typename Function_::template ConfigTraits<FunctionConfig>::TrafoConfig FunctionTrafoConfig;
+
+          // declare trafo evaluation data
+          typedef typename TrafoEvalType::template ConfigTraits<TrafoConfig<FunctionTrafoConfig>>::EvalDataType TrafoEvalData;
+
+          // declare evaluation traits
+          typedef Trafo::AnalyticEvalTraits<TrafoEvalType, TrafoEvalData> AnalyticEvalTraits;
+
+          // declare function evaluator
+          typename Function_::template Evaluator<AnalyticEvalTraits> func_eval(function);
+
+          // prepare function evaluator
+          func_eval.prepare(_trafo_eval);
+
+          typename AnalyticEvalTraits::ValueType value(DataType_(0));
+          DataType_ mean(DataType_(0));
           TrafoEvalData trafo_data;
-          const Index n(_cub_rule.get_num_points());
-          for(Index i(0); i < n; ++i)
+
+          // integrate over facet
+          for(Index i(0); i < _cub_rule.get_num_points(); ++i)
           {
             _trafo_eval(trafo_data, _cub_rule.get_point(i));
-            value += _cub_rule.get_weight(i) * trafo_data.jac_det * _func_eval.value(trafo_data);
+            value += _cub_rule.get_weight(i) * trafo_data.jac_det * func_eval.value(trafo_data);
             mean += _cub_rule.get_weight(i) * trafo_data.jac_det;
           }
-          return value / mean;
+
+          // set integral mean
+          node_data[0] = (DataType_(1) / mean) * value;
+
+          // finish function evaluator
+          func_eval.finish();
         }
       };
     } // namespace RannacherTurek
