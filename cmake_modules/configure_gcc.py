@@ -11,7 +11,7 @@ def configure_gcc(cpu, buildmode):
 
   if major <= 4 and minor <= 4:
     print ("GNU Compiler version less then 4.4 is not supported, please update your compiler!")
-  sys.exit(1)
+    sys.exit(1)
 
   cxxflags = "-pipe -std=c++0x -ggdb"
 
