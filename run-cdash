@@ -68,9 +68,9 @@ def run_test(build_id, branch):
   subprocess.Popen(("ctest -V -D ExperimentalTest -D CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE:STRING=9999 -D CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE:STRING=9999 --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
   if "coverage" in build_id:
     subprocess.Popen(("ctest -D ExperimentalCoverage --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-  subprocess.Popen(("ctest -A " + run_log_name + " -D ExperimentalSubmit --track " + cdash_track).split(), bufsize=-1, stdout=run_log, stderr=subprocess.STDOUT).wait()
-
   run_log.close()
+  with open(os.devnull, "w") as fp:
+    subprocess.Popen(("ctest -A " + run_log_name + " -D ExperimentalSubmit --track " + cdash_track).split(), bufsize=-1, stdout=fp, stderr=subprocess.STDOUT).wait()
 
 
 sys.dont_write_bytecode = True

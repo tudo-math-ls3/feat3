@@ -3,8 +3,8 @@ import subprocess
 
 def is_found(name):
   try:
-    devnull = open(os.devnull)
-    subprocess.Popen([name], stdout=devnull, stderr=devnull).communicate()
+    with open(os.devnull, "w") as fp:
+      subprocess.Popen([name], stdout=fp, stderr=subprocess.STDOUT).communicate()
   except OSError as e:
     if e.errno == os.errno.ENOENT:
       return False
