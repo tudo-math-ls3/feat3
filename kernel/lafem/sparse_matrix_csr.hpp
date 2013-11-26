@@ -311,7 +311,6 @@ namespace FEAST
          * Note, that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
          *
          * Creates a matrix with given dimensions and content.
-         * During creation, the input data are copied. Thus the matrix is independent of later input vector modifications.
          */
         explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Mem_, Index> & col_ind, const DenseVector<Mem_, DT_> & val, const DenseVector<Mem_, Index> & row_ptr) :
           Container<Mem_, DT_>(rows * columns)
@@ -319,7 +318,6 @@ namespace FEAST
           CONTEXT("When creating SparseMatrixCSR");
           this->_scalar_index.push_back(rows);
           this->_scalar_index.push_back(columns);
-          // \TODO use real element count - be aware of non used elements
           this->_scalar_index.push_back(val.size());
           this->_scalar_dt.push_back(DT_(0));
 

@@ -7,6 +7,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/matrix_base.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/adjacency/graph.hpp>
 
 #include <vector>
@@ -406,6 +407,40 @@ namespace FEAST
           MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), coo.val(), this->_scalar_index.at(3));
           MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), coo.row(), this->_scalar_index.at(3));
           MemoryPool<Mem_>::template upload<Index>(this->_indices.at(1), coo.column(), this->_scalar_index.at(3));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] rows The row count of the created matrix.
+         * \param[in] columns The column count of the created matrix.
+         * \param[in] row_ind Vector with row indices.
+         * \param[in] col_ind Vector with column indices.
+         * \param[in] val Vector with non zero elements.
+         *
+         * Creates a matrix with given dimensions and content.
+         */
+        explicit SparseMatrixCOO(Index rows, Index columns, const DenseVector<Mem_, Index> & row_ind,
+            const DenseVector<Mem_, Index> & col_ind, const DenseVector<Mem_, DT_> & val) :
+          Container<Mem_, DT_>(rows * columns)
+        {
+          CONTEXT("When creating SparseMatrixCOO");
+          this->_scalar_index.push_back(rows);
+          this->_scalar_index.push_back(columns);
+          this->_scalar_index.push_back(val.size());
+          this->_scalar_dt.push_back(DT_(0));
+
+          this->_elements.push_back(val.get_elements().at(0));
+          this->_elements_size.push_back(val.size());
+          this->_indices.push_back(row_ind.get_elements().at(0));
+          this->_indices_size.push_back(row_ind.size());
+          this->_indices.push_back(col_ind.get_elements().at(0));
+          this->_indices_size.push_back(col_ind.size());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
         /**
