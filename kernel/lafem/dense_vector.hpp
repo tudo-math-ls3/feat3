@@ -76,9 +76,9 @@ namespace FEAST
           }
 
           this->_scalar_index.at(0) = Index(data.size());
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size() * sizeof(DT_))));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size())));
           this->_elements_size.push_back(Index(data.size()));
-          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size() * sizeof(DT_)));
+          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
         }
 
         void _read_from_dv(String filename)
@@ -100,14 +100,14 @@ namespace FEAST
           double * ctemp = new double[std::size_t(size)];
           file.read((char *)ctemp, (long)(size * sizeof(double)));
 
-          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)) * sizeof(DT_));
+          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)));
           for (Index i(0) ; i < size ; ++i)
           {
             temp[i] = (DT_)ctemp[i];
           }
           delete[] ctemp;
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0) * sizeof(DT_)));
-          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), temp, this->_scalar_index.at(0) * sizeof(DT_));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
+          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), temp, this->_scalar_index.at(0));
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
         }
 
@@ -140,7 +140,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size * sizeof(DT_)));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
           this->_elements_size.push_back(size);
         }
 
@@ -157,7 +157,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size * sizeof(DT_)));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
           this->_elements_size.push_back(size);
 
           MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, size);
@@ -377,8 +377,8 @@ namespace FEAST
          */
         void write_out_exp(std::ostream& file) const
         {
-          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)) * sizeof(DT_));
-          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->_scalar_index.at(0) * sizeof(DT_));
+          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)));
+          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->_scalar_index.at(0));
 
           for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
           {
@@ -413,8 +413,8 @@ namespace FEAST
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
           const Index csize(this->_scalar_index.at(0));
-          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize * sizeof(DT_));
-          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize * sizeof(DT_));
+          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize);
+          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize);
           double * ctemp = new double[csize];
           for (Index i(0) ; i < csize ; ++i)
           {

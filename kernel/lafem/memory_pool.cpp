@@ -18,23 +18,23 @@ MemoryPool<Mem::Main>::~MemoryPool()
 }
 
 template <typename DT_>
-DT_ * MemoryPool<Mem::Main>::allocate_memory(Index bytes)
+DT_ * MemoryPool<Mem::Main>::allocate_memory(const Index count)
 {
   DT_ * memory(NULL);
-  memory = (DT_*)::malloc(bytes);
+  memory = (DT_*)::malloc(count * sizeof(DT_));
   if (memory == NULL)
     throw InternalError("MemoryPool<CPU> allocation error!");
 #ifdef FEAST_GMP
   if (typeid(DT_) == typeid(mpf_class))
   {
-    for (DT_ * location((DT_ *) memory), * end(location + bytes/sizeof(DT_)) ; location != end ; ++location)
+    for (DT_ * location((DT_ *) memory), * end(location + count) ; location != end ; ++location)
       new (location) DT_(0);
   }
 #endif
 
   Intern::MemoryInfo mi;
   mi.counter = 1;
-  mi.size = bytes;
+  mi.size = count * sizeof(DT_);
   _pool.insert(std::pair<void*, Intern::MemoryInfo>(memory, mi));
 
   return memory;
@@ -71,7 +71,7 @@ void MemoryPool<Mem::Main>::release_memory(void * address)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::Main>::download(void * dest, void * src, Index bytes)
+void MemoryPool<Mem::Main>::download(void * dest, void * src, const Index count)
 {
   if (dest == src)
     return;
@@ -80,18 +80,18 @@ void MemoryPool<Mem::Main>::download(void * dest, void * src, Index bytes)
   if (typeid(DT_) == typeid(mpf_class))
   {
     const DT_ * s((DT_ *) src);
-    for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + bytes/sizeof(DT_)) ; d != d_end ; ++d, ++s)
+    for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + count) ; d != d_end ; ++d, ++s)
     {
       *d = *s;
     }
   }
   else
 #endif
-    ::memcpy(dest, src, bytes);
+    ::memcpy(dest, src, count * sizeof(DT_));
 }
 
 template <typename DT_>
-void MemoryPool<Mem::Main>::upload(void * dest, void * src, Index bytes)
+void MemoryPool<Mem::Main>::upload(void * dest, void * src, const Index count)
 {
   if (dest == src)
     return;
@@ -100,14 +100,14 @@ void MemoryPool<Mem::Main>::upload(void * dest, void * src, Index bytes)
   if (typeid(DT_) == typeid(mpf_class))
   {
     const DT_ * s((DT_ *) src);
-    for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + bytes/sizeof(DT_)) ; d != d_end ; ++d, ++s)
+    for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + count) ; d != d_end ; ++d, ++s)
     {
       *d = *s;
     }
   }
   else
 #endif
-    ::memcpy(dest, src, bytes);
+    ::memcpy(dest, src, count * sizeof(DT_));
 }
 
 template <typename DT_>
@@ -119,7 +119,7 @@ void MemoryPool<Mem::Main>::set_memory(DT_ * address, const DT_ val, const Index
   }
 }
 
-unsigned long MemoryPool<Mem::Main>::generate_hash(void * data, Index bytes)
+unsigned long MemoryPool<Mem::Main>::generate_hash(void * data, const Index bytes)
 {
   char * cd((char * )data);
   Index t(0);
@@ -131,30 +131,30 @@ unsigned long MemoryPool<Mem::Main>::generate_hash(void * data, Index bytes)
   return t;
 }
 
-template float * MemoryPool<Mem::Main>::allocate_memory<float>(Index bytes);
-template double * MemoryPool<Mem::Main>::allocate_memory<double>(Index bytes);
+template float * MemoryPool<Mem::Main>::allocate_memory<float>(const Index);
+template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
 #ifdef FEAST_GMP
-template mpf_class * MemoryPool<Mem::Main>::allocate_memory<mpf_class>(Index bytes);
+template mpf_class * MemoryPool<Mem::Main>::allocate_memory<mpf_class>(const Index);
 #endif
-template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(Index bytes);
+template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(const Index);
 
-template void MemoryPool<Mem::Main>::download<float>(void * dest, void * src, Index bytes);
-template void MemoryPool<Mem::Main>::download<double>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::Main>::download<float>(void *, void *, const Index);
+template void MemoryPool<Mem::Main>::download<double>(void *, void *, const Index);
 #ifdef FEAST_GMP
-template void MemoryPool<Mem::Main>::download<mpf_class>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::Main>::download<mpf_class>(void *, void *, const Index);
 #endif
-template void MemoryPool<Mem::Main>::download<unsigned long>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::Main>::download<unsigned long>(void *t, void *, const Index);
 
-template void MemoryPool<Mem::Main>::upload<float>(void * dest, void * src, Index bytes);
-template void MemoryPool<Mem::Main>::upload<double>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::Main>::upload<float>(void *, void *, const Index);
+template void MemoryPool<Mem::Main>::upload<double>(void *, void *, const Index);
 #ifdef FEAST_GMP
-template void MemoryPool<Mem::Main>::upload<mpf_class>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::Main>::upload<mpf_class>(void *, void *, const Index);
 #endif
-template void MemoryPool<Mem::Main>::upload<unsigned long>(void * dest, void * src, Index bytes);
+template void MemoryPool<Mem::Main>::upload<unsigned long>(void *, void *, const Index);
 
-template void MemoryPool<Mem::Main>::set_memory(float * address , const float val, const Index count);
-template void MemoryPool<Mem::Main>::set_memory(double * address , const double val, const Index count);
+template void MemoryPool<Mem::Main>::set_memory(float * , const float, const Index);
+template void MemoryPool<Mem::Main>::set_memory(double * , const double, const Index);
 #ifdef FEAST_GMP
-template void MemoryPool<Mem::Main>::set_memory(mpf_class * address , const mpf_class val, const Index count);
+template void MemoryPool<Mem::Main>::set_memory(mpf_class * , const mpf_class, const Index);
 #endif
-template void MemoryPool<Mem::Main>::set_memory(Index * address , const Index val, const Index count);
+template void MemoryPool<Mem::Main>::set_memory(Index * , const Index, const Index);

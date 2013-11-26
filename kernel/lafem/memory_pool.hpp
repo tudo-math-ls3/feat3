@@ -63,7 +63,7 @@ namespace FEAST
 
         /// allocate new memory
         template <typename DT_>
-        DT_ * allocate_memory(Index bytes);
+        DT_ * allocate_memory(const Index count);
 
         /// increase memory counter
         void increase_memory(void * address);
@@ -73,15 +73,15 @@ namespace FEAST
 
         /// download memory chunk to host memory
         template <typename DT_>
-        static void download(void * dest, void * src, Index bytes);
+        static void download(void * dest, void * src, const Index count);
 
         /// upload memory chunk from host memory to device memory
         template <typename DT_>
-        static void upload(void * dest, void * src, Index bytes);
+        static void upload(void * dest, void * src, const Index count);
 
         /// recieve element
         template <typename DT_>
-        inline static const DT_ & get_element(const DT_ * data, Index index)
+        inline static const DT_ & get_element(const DT_ * data, const Index index)
         {
           return data[index];
         }
@@ -92,7 +92,7 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        static void copy(void * dest, const void * src, const Index bytes)
+        static void copy(void * dest, const void * src, const Index count)
         {
           if (dest == src)
             return;
@@ -101,18 +101,18 @@ namespace FEAST
           if (typeid(DT_) == typeid(mpf_class))
           {
             const DT_ * s((DT_ *) src);
-            for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + bytes/sizeof(DT_)) ; d != d_end ; ++d, ++s)
+            for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + count) ; d != d_end ; ++d, ++s)
             {
               *d = *s;
             }
           }
           else
 #endif
-            ::memcpy(dest, src, bytes);
+            ::memcpy(dest, src, count * sizeof(DT_));
         }
 
         /// Generate hash value for given byte sequence
-        unsigned long generate_hash(void * address, Index bytes);
+        unsigned long generate_hash(void * address, const Index bytes);
     };
 
     template <>
@@ -133,7 +133,7 @@ namespace FEAST
 
         /// allocate new memory
         template <typename DT_>
-        void * allocate_memory(Index bytes);
+        void * allocate_memory(const Index count);
 
         /// increase memory counter
         void increase_memory(void * address);
@@ -143,15 +143,15 @@ namespace FEAST
 
         /// download memory chunk to host memory
         template <typename DT_>
-        static void download(void * dest, void * src, Index bytes);
+        static void download(void * dest, void * src, const Index count);
 
         /// upload memory chunk from host memory to device memory
         template <typename DT_>
-        static void upload(void * dest, void * src, Index bytes);
+        static void upload(void * dest, void * src, const Index count);
 
         /// recieve element
         template <typename DT_>
-        static DT_ get_element(const DT_ * data, Index index);
+        static DT_ get_element(const DT_ * data, const Index index);
 
         /// set memory to specific value
         template <typename DT_>
@@ -159,10 +159,10 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        static void copy(void * dest, const void * src, const Index bytes);
+        static void copy(void * dest, const void * src, const Index count);
 
         /// Generate hash value for given byte sequence
-        unsigned long generate_hash(void * address, Index bytes);
+        unsigned long generate_hash(void * address, const Index bytes);
     };
   } // namespace LAFEM
 } // namespace FEAST
