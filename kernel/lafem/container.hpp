@@ -134,9 +134,9 @@ namespace FEAST
 
 
           for (Index i(0) ; i < other.get_elements().size() ; ++i)
-            this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(other.get_elements_size().at(i) * sizeof(DT_)));
+            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(other.get_elements_size().at(i) * sizeof(DT_)));
           for (Index i(0) ; i < other.get_indices().size() ; ++i)
-            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->template allocate_memory<Index>(other.get_indices_size().at(i) * sizeof(Index)));
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(other.get_indices_size().at(i) * sizeof(Index)));
 
           for (Index i(0) ; i < other.get_elements_size().size() ; ++i)
             this->_elements_size.push_back(other.get_elements_size().at(i));
@@ -196,13 +196,13 @@ namespace FEAST
 
           for (Index i(0) ; i < other._elements.size() ; ++i)
           {
-            this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i) * sizeof(DT_)));
+            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i) * sizeof(DT_)));
             MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i) * sizeof(DT_));
           }
 
           for (Index i(0) ; i < other._indices.size() ; ++i)
           {
-            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_indices_size.at(i) * sizeof(Index)));
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_indices_size.at(i) * sizeof(Index)));
             MemoryPool<Mem_>::template copy<Index>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i) * sizeof(Index));
           }
         }
@@ -275,7 +275,7 @@ namespace FEAST
 
           for (Index i(0) ; i < this->_elements_size.size() ; ++i)
           {
-            this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i) * sizeof(DT_)));
+            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i) * sizeof(DT_)));
             Index src_size(this->_elements_size.at(0) * sizeof(DT2_));
             Index dest_size(this->_elements_size.at(0) * sizeof(DT_));
             void * temp(::malloc(src_size));
@@ -286,7 +286,7 @@ namespace FEAST
 
           for (Index i(0) ; i < this->_indices_size.size() ; ++i)
           {
-            this->_indices.push_back((Index*)MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_indices_size.at(i) * sizeof(Index)));
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_indices_size.at(i) * sizeof(Index)));
             Index src_size(this->_indices_size.at(0) * sizeof(Index));
             Index dest_size(this->_indices_size.at(0) * sizeof(Index));
             void * temp(::malloc(src_size));

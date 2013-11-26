@@ -69,7 +69,7 @@ namespace FEAST
           this->_scalar_index.push_back(rows);
           this->_scalar_index.push_back(columns);
 
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0) * sizeof(DT_)));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0) * sizeof(DT_)));
           this->_elements_size.push_back(this->_scalar_index.at(0));
         }
 
@@ -90,7 +90,7 @@ namespace FEAST
           this->_scalar_index.at(0) = rows * columns;
           this->_scalar_index.push_back(rows);
           this->_scalar_index.push_back(columns);
-          this->_elements.push_back((DT_*)MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0) * sizeof(DT_)));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0) * sizeof(DT_)));
           this->_elements_size.push_back(this->_scalar_index.at(0));
           MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
         }
