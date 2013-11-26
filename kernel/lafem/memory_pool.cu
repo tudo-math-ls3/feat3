@@ -79,13 +79,13 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::CUDA>::download(void * dest, void * src, const Index count)
+void MemoryPool<Mem::CUDA>::download(DT_ * dest, DT_ * src, const Index count)
 {
   cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToHost);
 }
 
 template <typename DT_>
-void MemoryPool<Mem::CUDA>::upload(void * dest, void * src, const Index count)
+void MemoryPool<Mem::CUDA>::upload(DT_ * dest, DT_ * src, const Index count)
 {
   cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyHostToDevice);
 }
@@ -123,13 +123,13 @@ template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template unsigned long * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(const Index);
 
-template void MemoryPool<Mem::CUDA>::download<float>(void *, void *, const Index);
-template void MemoryPool<Mem::CUDA>::download<double>(void *, void *, const Index);
-template void MemoryPool<Mem::CUDA>::download<unsigned long>(void *, void *, const Index);
+template void MemoryPool<Mem::CUDA>::download<float>(float *, float *, const Index);
+template void MemoryPool<Mem::CUDA>::download<double>(double *, double *, const Index);
+template void MemoryPool<Mem::CUDA>::download<unsigned long>(unsigned long *, unsigned long *, const Index);
 
-template void MemoryPool<Mem::CUDA>::upload<float>(void *, void *, const Index);
-template void MemoryPool<Mem::CUDA>::upload<double>(void *, void * const Index);
-template void MemoryPool<Mem::CUDA>::upload<unsigned long>(void *, void *, const Index);
+template void MemoryPool<Mem::CUDA>::upload<float>(flaot *, float *, const Index);
+template void MemoryPool<Mem::CUDA>::upload<double>(double *, double * const Index);
+template void MemoryPool<Mem::CUDA>::upload<unsigned long>(unsigned long *, unsigned long *, const Index);
 
 template float MemoryPool<Mem::CUDA>::get_element(const float *, const Index);
 template double MemoryPool<Mem::CUDA>::get_element(const double *, const Index);

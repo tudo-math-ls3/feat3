@@ -312,7 +312,8 @@ namespace FEAST
          *
          * Creates a matrix with given dimensions and content.
          */
-        explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Mem_, Index> & col_ind, const DenseVector<Mem_, DT_> & val, const DenseVector<Mem_, Index> & row_ptr) :
+        explicit SparseMatrixCSR(const Index rows, const Index columns,
+            DenseVector<Mem_, Index> & col_ind, DenseVector<Mem_, DT_> & val, DenseVector<Mem_, Index> & row_ptr) :
           Container<Mem_, DT_>(rows * columns)
         {
           CONTEXT("When creating SparseMatrixCSR");
@@ -321,11 +322,11 @@ namespace FEAST
           this->_scalar_index.push_back(val.size());
           this->_scalar_dt.push_back(DT_(0));
 
-          this->_elements.push_back(val.get_elements().at(0));
+          this->_elements.push_back(val.elements());
           this->_elements_size.push_back(val.size());
-          this->_indices.push_back(col_ind.get_elements().at(0));
+          this->_indices.push_back(col_ind.elements());
           this->_indices_size.push_back(col_ind.size());
-          this->_indices.push_back(row_ptr.get_elements().at(0));
+          this->_indices.push_back(row_ptr.elements());
           this->_indices_size.push_back(row_ptr.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
@@ -681,7 +682,12 @@ namespace FEAST
          *
          * \returns Column indices array.
          */
-        Index * col_ind() const
+        Index * col_ind()
+        {
+          return this->_indices.at(0);
+        }
+
+        Index const * col_ind() const
         {
           return this->_indices.at(0);
         }
@@ -691,7 +697,12 @@ namespace FEAST
          *
          * \returns Non zero element array.
          */
-        DT_ * val() const
+        DT_ * val()
+        {
+          return this->_elements.at(0);
+        }
+
+        DT_ const * val() const
         {
           return this->_elements.at(0);
         }
@@ -701,7 +712,12 @@ namespace FEAST
          *
          * \returns Row start index array.
          */
-        Index * row_ptr() const
+        Index * row_ptr()
+        {
+          return this->_indices.at(1);
+        }
+
+        Index const * row_ptr() const
         {
           return this->_indices.at(1);
         }

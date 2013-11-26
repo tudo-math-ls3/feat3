@@ -420,8 +420,8 @@ namespace FEAST
          *
          * Creates a matrix with given dimensions and content.
          */
-        explicit SparseMatrixCOO(Index rows, Index columns, const DenseVector<Mem_, Index> & row_ind,
-            const DenseVector<Mem_, Index> & col_ind, const DenseVector<Mem_, DT_> & val) :
+        explicit SparseMatrixCOO(const Index rows, const Index columns, DenseVector<Mem_, Index> & row_ind,
+            DenseVector<Mem_, Index> & col_ind, DenseVector<Mem_, DT_> & val) :
           Container<Mem_, DT_>(rows * columns)
         {
           CONTEXT("When creating SparseMatrixCOO");
@@ -430,45 +430,17 @@ namespace FEAST
           this->_scalar_index.push_back(val.size());
           this->_scalar_dt.push_back(DT_(0));
 
-          this->_elements.push_back(val.get_elements().at(0));
+          this->_elements.push_back(val.elements());
           this->_elements_size.push_back(val.size());
-          this->_indices.push_back(row_ind.get_elements().at(0));
+          this->_indices.push_back(row_ind.elements());
           this->_indices_size.push_back(row_ind.size());
-          this->_indices.push_back(col_ind.get_elements().at(0));
+          this->_indices.push_back(col_ind.elements());
           this->_indices_size.push_back(col_ind.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
-        }
-
-        /**
-         * \brief Constructor
-         *
-         * \param[in] graph The Graph, the matrix will be created from.
-         *
-         * Creates a matrix from a given graph.
-         */
-        explicit SparseMatrixCOO(const Adjacency::Graph & graph) :
-          Container<Mem_, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image())
-        {
-          CONTEXT("When creating SparseMatrixCOO");
-
-          this->_scalar_index.push_back(graph.get_num_nodes_domain());
-          this->_scalar_index.push_back(graph.get_num_nodes_image());
-          this->_scalar_index.push_back(graph.get_num_indices());
-          this->_scalar_dt.push_back(DT_(0));
-
-          for (Index i(0) ; i < this->rows() ; ++i)
-          {
-            typename Adjacency::Graph::ImageIterator it(graph.image_begin(i));
-            typename Adjacency::Graph::ImageIterator jt(graph.image_end(i));
-            for( ; it != jt ; ++it)
-            {
-              (*this)(i, *it, DT_(0));
-            }
-          }
         }
 
         /**
@@ -971,7 +943,12 @@ namespace FEAST
          *
          * \returns Non zero element array.
          */
-        DT_ * val() const
+        DT_ * val()
+        {
+          return this->_elements.at(0);
+        }
+
+        DT_ const * val() const
         {
           return this->_elements.at(0);
         }
@@ -981,7 +958,12 @@ namespace FEAST
          *
          * \returns Row coordinate array.
          */
-        Index * row() const
+        Index * row()
+        {
+          return this->_indices.at(0);
+        }
+
+        Index const * row() const
         {
           return this->_indices.at(0);
         }
@@ -991,7 +973,12 @@ namespace FEAST
          *
          * \returns Column coordinate array.
          */
-        Index * column() const
+        Index * column()
+        {
+          return this->_indices.at(1);
+        }
+
+        Index const * column() const
         {
           return this->_indices.at(1);
         }

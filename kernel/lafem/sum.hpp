@@ -87,8 +87,9 @@ namespace FEAST
        * \param[in] x.The first summand.
        * \param[in] y The second summand.
        */
+      /// \todo make x and y const again
       template <typename DT_>
-      static void value(SparseMatrixCSR<Mem::Main, DT_> & r, const SparseMatrixCSR<Mem::Main, DT_> & x, const SparseMatrixCSR<Mem::Main, DT_> & y)
+      static void value(SparseMatrixCSR<Mem::Main, DT_> & r, SparseMatrixCSR<Mem::Main, DT_> & x, SparseMatrixCSR<Mem::Main, DT_> & y)
       {
         if (x.rows() != y.rows())
           throw InternalError("Matrix rows do not match!");

@@ -304,6 +304,45 @@ namespace FEAST
         /**
          * \brief Constructor
          *
+         * \param[in] rows The row count of the created matrix.
+         * \param[in] columns The column count of the created matrix.
+         * \param[in] Ax Vector with non zero elements.
+         * \param[in] Aj Vector with column indices.
+         * \param[in] Arl Vector with row length.
+         *
+         * Creates a matrix with given dimensions and content.
+         */
+        explicit SparseMatrixELL(const Index rows, const Index columns,
+            const Index stride, const Index num_cols_per_row, const Index used_elements,
+            DenseVector<Mem_, DT_> & Ax,
+            DenseVector<Mem_, Index> & Aj,
+            DenseVector<Mem_, Index> & Arl) :
+          Container<Mem_, DT_>(rows * columns)
+        {
+          CONTEXT("When creating SparseMatrixELL");
+          this->_scalar_index.push_back(rows);
+          this->_scalar_index.push_back(columns);
+          this->_scalar_index.push_back(stride);
+          this->_scalar_index.push_back(num_cols_per_row);
+          this->_scalar_index.push_back(used_elements);
+          this->_scalar_dt.push_back(DT_(0));
+
+          this->_elements.push_back(Ax.elements());
+          this->_elements_size.push_back(Ax.size());
+          this->_indices.push_back(Aj.elements());
+          this->_indices_size.push_back(Aj.size());
+          this->_indices.push_back(Arl.elements());
+          this->_indices_size.push_back(Arl.size());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /**
+         * \brief Constructor
+         *
          * \param[in] filename The source file in HONEI ELL format.
          *
          * Creates a ELL matrix based on the source file.
@@ -621,7 +660,7 @@ namespace FEAST
          *
          * \returns Column indices array.
          */
-        Index * Aj() const
+        Index const * Aj() const
         {
           return this->_indices.at(0);
         }
@@ -631,7 +670,12 @@ namespace FEAST
          *
          * \returns Non zero element array.
          */
-        DT_ * Ax() const
+        DT_ * Ax()
+        {
+          return this->_elements.at(0);
+        }
+
+        DT_ const * Ax() const
         {
           return this->_elements.at(0);
         }
@@ -641,7 +685,7 @@ namespace FEAST
          *
          * \returns Row lenght array.
          */
-        Index * Arl() const
+        Index const * Arl() const
         {
           return this->_indices.at(1);
         }

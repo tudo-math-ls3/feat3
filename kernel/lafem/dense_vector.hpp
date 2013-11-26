@@ -439,7 +439,7 @@ namespace FEAST
           return this->_elements.at(0);
         }
 
-        const DT_ * elements() const
+        DT_ const * elements() const
         {
           return this->_elements.at(0);
         }

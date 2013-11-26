@@ -71,7 +71,7 @@ void MemoryPool<Mem::Main>::release_memory(void * address)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::Main>::download(void * dest, void * src, const Index count)
+void MemoryPool<Mem::Main>::download(DT_ * dest, DT_ * src, const Index count)
 {
   if (dest == src)
     return;
@@ -79,8 +79,8 @@ void MemoryPool<Mem::Main>::download(void * dest, void * src, const Index count)
 #ifdef FEAST_GMP
   if (typeid(DT_) == typeid(mpf_class))
   {
-    const DT_ * s((DT_ *) src);
-    for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + count) ; d != d_end ; ++d, ++s)
+    const DT_ * s( src);
+    for (DT_ * d(dest), * d_end(dest + count) ; d != d_end ; ++d, ++s)
     {
       *d = *s;
     }
@@ -91,7 +91,7 @@ void MemoryPool<Mem::Main>::download(void * dest, void * src, const Index count)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::Main>::upload(void * dest, void * src, const Index count)
+void MemoryPool<Mem::Main>::upload(DT_ * dest, DT_ * src, const Index count)
 {
   if (dest == src)
     return;
@@ -99,8 +99,8 @@ void MemoryPool<Mem::Main>::upload(void * dest, void * src, const Index count)
 #ifdef FEAST_GMP
   if (typeid(DT_) == typeid(mpf_class))
   {
-    const DT_ * s((DT_ *) src);
-    for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + count) ; d != d_end ; ++d, ++s)
+    const DT_ * s( src);
+    for (DT_ * d(dest), * d_end(dest + count) ; d != d_end ; ++d, ++s)
     {
       *d = *s;
     }
@@ -126,19 +126,19 @@ template mpf_class * MemoryPool<Mem::Main>::allocate_memory<mpf_class>(const Ind
 #endif
 template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(const Index);
 
-template void MemoryPool<Mem::Main>::download<float>(void *, void *, const Index);
-template void MemoryPool<Mem::Main>::download<double>(void *, void *, const Index);
+template void MemoryPool<Mem::Main>::download<float>(float *, float *, const Index);
+template void MemoryPool<Mem::Main>::download<double>(double *, double *, const Index);
 #ifdef FEAST_GMP
-template void MemoryPool<Mem::Main>::download<mpf_class>(void *, void *, const Index);
+template void MemoryPool<Mem::Main>::download<mpf_class>(mpf_class *, mpf_class *, const Index);
 #endif
-template void MemoryPool<Mem::Main>::download<unsigned long>(void *t, void *, const Index);
+template void MemoryPool<Mem::Main>::download<unsigned long>(unsigned long *t, unsigned long *, const Index);
 
-template void MemoryPool<Mem::Main>::upload<float>(void *, void *, const Index);
-template void MemoryPool<Mem::Main>::upload<double>(void *, void *, const Index);
+template void MemoryPool<Mem::Main>::upload<float>(float *, float *, const Index);
+template void MemoryPool<Mem::Main>::upload<double>(double *, double *, const Index);
 #ifdef FEAST_GMP
-template void MemoryPool<Mem::Main>::upload<mpf_class>(void *, void *, const Index);
+template void MemoryPool<Mem::Main>::upload<mpf_class>(mpf_class *, mpf_class *, const Index);
 #endif
-template void MemoryPool<Mem::Main>::upload<unsigned long>(void *, void *, const Index);
+template void MemoryPool<Mem::Main>::upload<unsigned long>(unsigned long *, unsigned long *, const Index);
 
 template void MemoryPool<Mem::Main>::set_memory(float * , const float, const Index);
 template void MemoryPool<Mem::Main>::set_memory(double * , const double, const Index);
