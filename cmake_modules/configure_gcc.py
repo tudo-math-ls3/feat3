@@ -1,6 +1,6 @@
 import platform
 import sys
-from feast_util import get_output
+from cmake_modules.feast_util import get_output
 
 def configure_gcc(cpu, buildmode):
   version = get_output("g++ -dM -E - ")

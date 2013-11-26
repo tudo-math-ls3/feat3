@@ -16,10 +16,7 @@ def remove_string(array, string):
   return array
 
 def get_output(command):
-  #if "check_output" not in dir( subprocess ): #deactivated as its not available bevor python 2.7
   pipe = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
   pipe.stdin.close()
-  output = pipe.stdout.read().splitlines()
-  #else:
-  #  output = subprocess.check_output(command.split(), shell=True).splitlines()
+  output = pipe.stdout.read().decode().splitlines()
   return output
