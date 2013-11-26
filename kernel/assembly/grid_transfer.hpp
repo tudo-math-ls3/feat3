@@ -304,12 +304,11 @@ namespace FEAST
         static void apply(MatrixType& matrix, const DataType_ x[])
         {
           Index* row_ptr(matrix.row_ptr());
-          Index* row_end(matrix.row_ptr_end());
           DataType_* data(matrix.val());
 
           for(Index i(0); i < matrix.rows(); ++i)
           {
-            for(Index j(row_ptr[i]); j < row_end[i]; ++j)
+            for(Index j(row_ptr[i]); j < row_ptr[i + 1]; ++j)
               data[j] *= x[i];
           }
         }

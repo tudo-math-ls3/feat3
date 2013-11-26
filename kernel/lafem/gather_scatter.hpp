@@ -217,7 +217,6 @@ namespace FEAST
       Index _num_rows;
       Index _num_cols;
       Index* _row_ptr;
-      Index* _row_end;
       Index* _col_idx;
       Index* _col_ptr;
       DataType_ *_data;
@@ -230,7 +229,6 @@ namespace FEAST
         _num_rows(matrix.rows()),
         _num_cols(matrix.columns()),
         _row_ptr(matrix.row_ptr()),
-        _row_end(matrix.row_ptr_end()),
         _col_idx(matrix.col_ind()),
         _col_ptr(nullptr),
         _data(matrix.val())
@@ -271,7 +269,7 @@ namespace FEAST
             Index ix = loc_mat.get_row_index(i, ic);
 
             // build column pointer for this row entry contribution
-            for(Index k(_row_ptr[ix]); k < _row_end[ix]; ++k)
+            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = k;
             }
@@ -303,7 +301,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(Index k(_row_ptr[ix]); k < _row_end[ix]; ++k)
+            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = _deadcode;
             }
@@ -335,7 +333,6 @@ namespace FEAST
       Index _num_rows;
       Index _num_cols;
       const Index* _row_ptr;
-      const Index* _row_end;
       const Index* _col_idx;
       Index* _col_ptr;
       const DataType_ *_data;
@@ -348,7 +345,6 @@ namespace FEAST
         _num_rows(matrix.rows()),
         _num_cols(matrix.columns()),
         _row_ptr(matrix.row_ptr()),
-        _row_end(matrix.row_ptr_end()),
         _col_idx(matrix.col_ind()),
         _col_ptr(nullptr),
         _data(matrix.val())
@@ -386,7 +382,7 @@ namespace FEAST
             Index ix = loc_mat.get_row_index(i, ic);
 
             // build column pointer for this row entry contribution
-            for(Index k(_row_ptr[ix]); k < _row_end[ix]; ++k)
+            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = k;
             }
@@ -422,7 +418,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(Index k(_row_ptr[ix]); k < _row_end[ix]; ++k)
+            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = _deadcode;
             }

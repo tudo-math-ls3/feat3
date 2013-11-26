@@ -492,7 +492,6 @@ namespace FEAST
          {
            DT_* val(mat.val());
            Index* row_ptr(mat.row_ptr());
-           Index* row_ptr_end(mat.row_ptr_end());
            //Index* col_ind(mat.col_ind());
 
            ///TODO: does assume, matrix rows are associated with polytope level a_
@@ -502,17 +501,17 @@ namespace FEAST
            {
 #ifndef SERIAL
              Comm<Parallel>::send_recv(&val[row_ptr[interface.get_element(i)]],
-                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
                  interface.get_other(),
                  &val[row_ptr[interface.get_element(i)]],
-                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
                  interface.get_other());
 #else
              Comm<Serial>::send_recv(&val[row_ptr[interface.get_element(i)]],
-                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
                  interface.get_other(),
                  &val[row_ptr[interface.get_element(i)]],
-                 row_ptr_end[interface.get_element(i)] - row_ptr[interface.get_element(i)],
+                 row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
                  interface.get_other());
 #endif
            }

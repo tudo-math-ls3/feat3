@@ -125,14 +125,13 @@ namespace FEAST
         const Index * col_idx(_mirror_gather.col_ind());
         const DataType_* val(_mirror_gather.val());
         const Index * row_ptr(_mirror_gather.row_ptr());
-        const Index * row_end(_mirror_gather.row_ptr_end());
         Index num_rows(_mirror_gather.rows());
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
         {
           Tx_ sum(Tx_(0));
-          for (Index i(row_ptr[row]) ; i < row_end[row] ; ++i)
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
           {
             sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
           }
@@ -161,18 +160,17 @@ namespace FEAST
         const Index * col_idx(_mirror_scatter.col_ind());
         const DataType_* val(_mirror_scatter.val());
         const Index * row_ptr(_mirror_scatter.row_ptr());
-        const Index * row_end(_mirror_scatter.row_ptr_end());
         const Index num_rows(_mirror_scatter.rows());
 
         // loop over all scatter-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
         {
           // skip empty rows
-          if(row_ptr[row] >= row_end[row])
+          if(row_ptr[row] >= row_ptr[row + 1])
             continue;
 
           Tx_ sum(Tx_(0));
-          for (Index i(row_ptr[row]) ; i < row_end[row] ; ++i)
+          for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
           {
             sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
           }

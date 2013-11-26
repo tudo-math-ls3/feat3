@@ -500,8 +500,6 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   std::vector<DenseVector<Mem::Main, Index> > colind_recvbufs;
   std::vector<DenseVector<Mem::Main, Index> > rp_sendbufs;
   std::vector<DenseVector<Mem::Main, Index> > rp_recvbufs;
-  std::vector<DenseVector<Mem::Main, Index> > rpend_sendbufs;
-  std::vector<DenseVector<Mem::Main, Index> > rpend_recvbufs;
 
   SparseMatrixCSR<Mem::Main, double> mat_localsys(mat_sys.clone());
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
@@ -513,7 +511,6 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
     double* val(buf_mat.val());
     Index* row_ptr(buf_mat.row_ptr());
-    Index* row_ptr_end(buf_mat.row_ptr_end());
     Index* col_ind(buf_mat.col_ind());
 
     DenseVector<Mem::Main, double> val_sendbuf(buf_mat.used_elements());
@@ -522,8 +519,6 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     DenseVector<Mem::Main, Index> colind_recvbuf(buf_mat.used_elements());
     DenseVector<Mem::Main, Index> rp_sendbuf(buf_mat.rows() + 1);
     DenseVector<Mem::Main, Index> rp_recvbuf(buf_mat.rows() + 1);
-    DenseVector<Mem::Main, Index> rpend_sendbuf(buf_mat.rows());
-    DenseVector<Mem::Main, Index> rpend_recvbuf(buf_mat.rows());
 
     for(Index j(0) ; j < buf_mat.used_elements() ; ++j)
     {
@@ -533,10 +528,6 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     for(Index j(0) ; j < buf_mat.rows() + 1 ; ++j)
     {
       rp_sendbuf(j, row_ptr[j]);
-    }
-    for(Index j(0) ; j < buf_mat.rows() ; ++j)
-    {
-      rpend_sendbuf(j, row_ptr_end[j]);
     }
 
 #ifndef SERIAL
@@ -558,12 +549,6 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
                               rp_recvbuf.elements(),
                               rp_recvbuf.size(),
                               macro_comm_halos.at(i)->get_other());
-    Comm<Parallel>::send_recv(rpend_sendbuf.elements(),
-                              rpend_sendbuf.size(),
-                              macro_comm_halos.at(i)->get_other(),
-                              rpend_recvbuf.elements(),
-                              rpend_recvbuf.size(),
-                              macro_comm_halos.at(i)->get_other());
 #endif
 
     val_sendbufs.push_back(val_sendbuf);
@@ -572,8 +557,6 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     colind_recvbufs.push_back(colind_recvbuf);
     rp_sendbufs.push_back(rp_sendbuf);
     rp_recvbufs.push_back(rp_recvbuf);
-    rpend_sendbufs.push_back(rpend_sendbuf);
-    rpend_recvbufs.push_back(rpend_recvbuf);
   }
 #ifndef SERIAL
   MPI_Barrier(MPI_COMM_WORLD);
@@ -589,8 +572,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
         buf_mat.columns(),
         colind_recvbufs.at(i),
         val_recvbufs.at(i),
-        rp_recvbufs.at(i),
-        rpend_recvbufs.at(i));
+        rp_recvbufs.at(i));
 
     std::cout << "proc " << rank << "A0_omega_i " << buf_mat;
     std::cout << "proc " << rank << "A0_omega_j " << other_buf_mat;

@@ -184,7 +184,7 @@ namespace FEAST
           this->_scalar_index.at(4) = 0;
           for (Index i(0) ; i < this->_scalar_index.at(1) ; ++i)
           {
-            tArl[i] = other.row_ptr_end()[i] - other.row_ptr()[i];
+            tArl[i] = other.row_ptr()[i + 1] - other.row_ptr()[i];
             if (tArl[i] > this->_scalar_index.at(4))
               this->_scalar_index.at(4) = tArl[i];
           }

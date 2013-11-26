@@ -27,14 +27,14 @@ namespace FEAST
 
       template <typename DT_>
       __global__ void cuda_axpy_mv_csr(DT_ * r, const DT_ a, const DT_ * x, const DT_ * y, const DT_ * val, const Index * col_ind,
-          const Index * row_ptr, const Index * row_ptr_end, const Index count)
+          const Index * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
           return;
 
         DT_ sum(0);
-        const Index end(row_ptr_end[idx]);
+        const Index end(row_ptr[idx + 1]);
         for (Index i(row_ptr[idx]) ; i < end ; ++i)
         {
           sum += val[i] * x[col_ind[i]];
@@ -151,9 +151,8 @@ void Axpy<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const DT_ a, const
   const DT_ * val_gpu(P.val());
   const Index * col_ind_gpu(P.col_ind());
   const Index * row_ptr_gpu(P.row_ptr());
-  const Index * row_ptr_end_gpu(P.row_ptr_end());
 
-  FEAST::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r_gpu, a, x_gpu, y_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, row_ptr_end_gpu, r.size());
+  FEAST::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r_gpu, a, x_gpu, y_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, r.size());
 }
 
 template void Axpy<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const float, const SparseMatrixCSR<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);

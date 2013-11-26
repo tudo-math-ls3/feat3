@@ -71,7 +71,6 @@ void SOR(int num_iter, const MatrixType& a, VectorType& x, const VectorType& b, 
 {
   Index num_rows(a.rows());
   const Index* row_ptr(a.row_ptr());
-  const Index* row_end(a.row_ptr_end());
   const Index* col_idx(a.col_ind());
   const DataType* av(a.val());
   DataType* xv(x.elements());
@@ -84,7 +83,7 @@ void SOR(int num_iter, const MatrixType& a, VectorType& x, const VectorType& b, 
     {
       aii = DataType(0);
       di = bv[i];
-      for(Index j(row_ptr[i]); j < row_end[i]; ++j)
+      for(Index j(row_ptr[i]); j < row_ptr[i + 1]; ++j)
       {
         if(col_idx[j] == i)
           aii = av[j];
@@ -396,12 +395,11 @@ public:
     // filter pressure gradient matrices; this needs to be done by hand for now :(
     const Index* idx(_filter_x.get_indices());
     const Index* row_ptr(_matrix_b1.row_ptr());
-    const Index* row_end(_matrix_b1.row_ptr_end());
     DataType* val_b1(_matrix_b1.val());
     DataType* val_b2(_matrix_b2.val());
     for(Index i(0); i < _filter_x.size(); ++i)
     {
-      for(Index j(row_ptr[idx[i]]); j < row_end[idx[i]]; ++j)
+      for(Index j(row_ptr[idx[i]]); j < row_ptr[idx[i + 1]]; ++j)
       {
         val_b1[j] = val_b2[j] = DataType(0);
       }

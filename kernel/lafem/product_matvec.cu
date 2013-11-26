@@ -9,14 +9,14 @@ namespace FEAST
     {
       template <typename DT_>
       __global__ void cuda_product_matvec_csr(DT_ * r, const DT_ * b, const DT_ * val, const Index * col_ind,
-          const Index * row_ptr, const Index * row_ptr_end, const Index count)
+          const Index * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
           return;
 
         DT_ sum(0);
-        const Index end(row_ptr_end[idx]);
+        const Index end(row_ptr[idx + 1]);
         for (Index i(row_ptr[idx]) ; i < end ; ++i)
         {
           sum += val[i] * b[col_ind[i]];
@@ -79,9 +79,8 @@ void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, DT_> & r, const Spa
   const DT_ * val_gpu(a.val());
   const Index * col_ind_gpu(a.col_ind());
   const Index * row_ptr_gpu(a.row_ptr());
-  const Index * row_ptr_end_gpu(a.row_ptr_end());
 
-  FEAST::LAFEM::Intern::cuda_product_matvec_csr<<<grid, block>>>(r_gpu, b_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, row_ptr_end_gpu, r.size());
+  FEAST::LAFEM::Intern::cuda_product_matvec_csr<<<grid, block>>>(r_gpu, b_gpu, val_gpu, col_ind_gpu, row_ptr_gpu, r.size());
 }
 
 template void ProductMatVec<Algo::CUDA>::value(DenseVector<Mem::CUDA, float> &, const SparseMatrixCSR<Mem::CUDA, float> &, const DenseVector<Mem::CUDA, float> &);

@@ -121,25 +121,21 @@ namespace FEAST
 
         // fetch row mirror arrays
         const Index* row_ptr_a(row_mir_mat.row_ptr());
-        const Index* row_end_a(row_mir_mat.row_ptr_end());
         const Index* col_idx_a(row_mir_mat.col_ind());
         const DataType* av(row_mir_mat.val());
 
         // fetch col mirror arrays
         const Index* row_ptr_b(col_mir_mat.row_ptr());
-        const Index* row_end_b(col_mir_mat.row_ptr_end());
         const Index* col_idx_b(col_mir_mat.col_ind());
         const DataType* bv(col_mir_mat.val());
 
         // fetch system matrix arrays
         const Index* row_ptr_y(matrix.row_ptr());
-        const Index* row_end_y(matrix.row_ptr_end());
         const Index* col_idx_y(matrix.col_ind());
         const Ty_* yv(matrix.val());
 
         // fetch buffer arrays
         const Index* row_ptr_x(buffer.row_ptr());
-        const Index* row_end_x(buffer.row_ptr_end());
         const Index* col_idx_x(buffer.col_ind());
         Tx_* xv(buffer.val());
 
@@ -158,7 +154,7 @@ namespace FEAST
           Index irow_a(irow_x); // row of a := row of x
 
           // loop over all non-zeroes in the buffer row (X_i.)
-          for(Index ix(row_ptr_x[irow_x]); ix < row_end_x[irow_x]; ++ix)
+          for(Index ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
           {
             // init result
             Tx_ x_ij(0);
@@ -167,14 +163,14 @@ namespace FEAST
             Index irow_b(col_idx_x[ix]); // row of b := col of x
 
             // loop over all non-zeroes of the col-mirror (B_j.)
-            for(Index ib(row_ptr_b[irow_b]); ib < row_end_b[irow_b]; ++ib)
+            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               // and densify the sparse row B_j.
               _work[col_idx_b[ib]] = bv[ib];
             }
 
             // loop over all non-zeroes of the row-mirror (A_i.)
-            for(Index ia(row_ptr_a[irow_a]); ia < row_end_a[irow_a]; ++ia)
+            for(Index ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
             {
               // fetch the column index
               Index irow_y(col_idx_a[ia]); // row of y := col of a
@@ -183,7 +179,7 @@ namespace FEAST
               Tx_ z_kj(0);
 
               // loop over all non-zeroes of the system matrix (Y_k.)
-              for(Index iy(row_ptr_y[irow_y]); iy < row_end_y[irow_y]; ++iy)
+              for(Index iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
               {
                 z_kj += Tx_(yv[iy]) * Tx_(_work[col_idx_y[iy]]);
               }
@@ -196,7 +192,7 @@ namespace FEAST
             xv[ix] = x_ij;
 
             // reset temporary data
-            for(Index ib(row_ptr_b[irow_b]); ib < row_end_b[irow_b]; ++ib)
+            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               _work[col_idx_b[ib]] = DataType(0);
             }
@@ -225,25 +221,21 @@ namespace FEAST
 
         // fetch row-mirror arrays
         const Index* row_ptr_a(row_mir_mat.row_ptr());
-        const Index* row_end_a(row_mir_mat.row_ptr_end());
         const Index* col_idx_a(row_mir_mat.col_ind());
         const DataType* av(row_mir_mat.val());
 
         // fetch col-mirror arrays
         const Index* row_ptr_b(col_mir_mat.row_ptr());
-        const Index* row_end_b(col_mir_mat.row_ptr_end());
         const Index* col_idx_b(col_mir_mat.col_ind());
         const DataType* bv(col_mir_mat.val());
 
         // fetch system matrix arrays
         const Index* row_ptr_y(matrix.row_ptr());
-        const Index* row_end_y(matrix.row_ptr_end());
         const Index* col_idx_y(matrix.col_ind());
         Ty_* yv(matrix.val());
 
         // fetch buffer arrays
         const Index* row_ptr_x(buffer.row_ptr());
-        const Index* row_end_x(buffer.row_ptr_end());
         const Index* col_idx_x(buffer.col_ind());
         const Tx_* xv(buffer.val());
 
@@ -262,11 +254,11 @@ namespace FEAST
           Index irow_a(irow_y); // row of a := row of y
 
           // skip if the row of a is empty
-          if(row_ptr_a[irow_a] >= row_end_a[irow_a])
+          if(row_ptr_a[irow_a] >= row_ptr_a[irow_a + 1])
             continue;
 
           // loop over all non-zeroes in the system row (Y_i.)
-          for(Index iy(row_ptr_y[irow_y]); iy < row_end_y[irow_y]; ++iy)
+          for(Index iy(row_ptr_y[irow_y]); iy < row_ptr_y[irow_y + 1]; ++iy)
           {
             // init result
             Ty_ y_ij(0);
@@ -275,18 +267,18 @@ namespace FEAST
             Index irow_b(col_idx_y[iy]); // row of b := col of y
 
             // skip if the row of b is empty
-            if(row_ptr_b[irow_b] >= row_end_b[irow_b])
+            if(row_ptr_b[irow_b] >= row_ptr_b[irow_b + 1])
               continue;
 
             // loop over all non-zeroes of the col-mirror (B_j.)
-            for(Index ib(row_ptr_b[irow_b]); ib < row_end_b[irow_b]; ++ib)
+            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               // and densify the sparse row B_j.
               _work[col_idx_b[ib]] = bv[ib];
             }
 
             // loop over all non-zeroes of the row-mirror (A_i.)
-            for(Index ia(row_ptr_a[irow_a]); ia < row_end_a[irow_a]; ++ia)
+            for(Index ia(row_ptr_a[irow_a]); ia < row_ptr_a[irow_a + 1]; ++ia)
             {
               // fetch the column index
               Index irow_x(col_idx_a[ia]); // row of x := col of a
@@ -295,7 +287,7 @@ namespace FEAST
               Ty_ z_kj(0);
 
               // loop over all non-zeroes of the buffer matrix (X_k.)
-              for(Index ix(row_ptr_x[irow_x]); ix < row_end_x[irow_x]; ++ix)
+              for(Index ix(row_ptr_x[irow_x]); ix < row_ptr_x[irow_x + 1]; ++ix)
               {
                 z_kj += Ty_(xv[ix]) * Ty_(_work[col_idx_x[ix]]);
               }
@@ -308,7 +300,7 @@ namespace FEAST
             yv[iy] = y_ij;
 
             // reset temporary data
-            for(Index ib(row_ptr_b[irow_b]); ib < row_end_b[irow_b]; ++ib)
+            for(Index ib(row_ptr_b[irow_b]); ib < row_ptr_b[irow_b + 1]; ++ib)
             {
               _work[col_idx_b[ib]] = DataType(0);
             }

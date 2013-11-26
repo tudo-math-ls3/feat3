@@ -53,14 +53,13 @@ namespace FEAST
         const Index * col_ind(a.col_ind());
         const DT_ * val(a.val());
         const Index * row_ptr(a.row_ptr());
-        const Index * row_ptr_end(a.row_ptr_end());
         DT_ * rp(r.elements());
         const Index rows(a.rows());
 
         for (Index row(0) ; row < rows ; ++row)
         {
           DT_ sum(0);
-          const Index end(row_ptr_end[row]);
+          const Index end(row_ptr[row + 1]);
           for (Index i(row_ptr[row]) ; i < end ; ++i)
           {
             sum += val[i] * bp[col_ind[i]];

@@ -146,7 +146,6 @@ namespace FEAST
       void filter_mat(SparseMatrixCSR<MemType, DataType2_>& matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
-        const Index* row_end(matrix.row_ptr_end());
         const Index* col_idx(matrix.col_ind());
         DataType2_* v(matrix.val());
 
@@ -154,7 +153,7 @@ namespace FEAST
         {
           Index ix(_indices[i]);
           // replace by unit row
-          for(Index j(row_ptr[ix]); j < row_end[ix]; ++j)
+          for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
             v[j] = (col_idx[j] == ix) ? DataType2_(1) : DataType2_(0);
           }

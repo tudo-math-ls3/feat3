@@ -37,7 +37,6 @@ namespace FEAST
      * _elements[0]: raw non zero number values \n
      * _indices[0]: column index per non zero element \n
      * _indices[1]: row start index (including matrix end index)\n
-     * _indices[2]: row end index \n
      *
      * _scalar_index[0]: container size \n
      * _scalar_index[1]: row count \n
@@ -94,13 +93,6 @@ namespace FEAST
             trow_ptr[i] = Index(crow_ptr[i]);
           delete[] crow_ptr;
 
-          uint64_t * crow_ptr_end = new uint64_t[std::size_t(rows)];
-          file.read((char *)crow_ptr_end, (long)((rows) * sizeof(uint64_t)));
-          Index * trow_ptr_end = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(rows);
-          for (Index i(0) ; i < rows ; ++i)
-            trow_ptr_end[i] = Index(crow_ptr_end[i]);
-          delete[] crow_ptr_end;
-
           double * cval = new double[elements];
           file.read((char *)cval, (long)(elements * sizeof(double)));
           DT_ * tval = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(elements);
@@ -120,11 +112,9 @@ namespace FEAST
           MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, elements);
           MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(0), tcol_ind, elements);
           MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(1), trow_ptr, this->_scalar_index.at(1)  + 1);
-          MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(2), trow_ptr_end, this->_scalar_index.at(1));
           MemoryPool<Mem::Main>::instance()->release_memory(tval);
           MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
-          MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr_end);
         }
 
       public:
@@ -172,7 +162,6 @@ namespace FEAST
           DT_ * tval = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3));
           Index * tcol_ind = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3));
           Index * trow_ptr = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1) + 1);
-          Index * trow_ptr_end = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1));
 
           Index ait(0);
           Index current_row(0);
@@ -184,11 +173,9 @@ namespace FEAST
 
             if (current_row < row)
             {
-              trow_ptr_end[current_row] = ait;
               for (unsigned long i(current_row + 1) ; i < row ; ++i)
               {
                 trow_ptr[i] = ait;
-                trow_ptr_end[i] = ait;
               }
               current_row = row;
               trow_ptr[current_row] = ait;
@@ -197,11 +184,9 @@ namespace FEAST
             tcol_ind[ait] = column;
             ++ait;
           }
-          trow_ptr_end[current_row] = ait;
           for (unsigned long i(current_row + 1) ; i < this->_scalar_index.at(1) ; ++i)
           {
             trow_ptr[i] = ait;
-            trow_ptr_end[i] = ait;
           }
           trow_ptr[this->_scalar_index.at(1)] = ait;
 
@@ -211,17 +196,13 @@ namespace FEAST
           this->_indices_size.push_back(this->_scalar_index.at(3));
           this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1) + 1));
           this->_indices_size.push_back(this->_scalar_index.at(1) + 1);
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1)));
-          this->_indices_size.push_back(this->_scalar_index.at(1));
 
           MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, this->_scalar_index.at(3));
           MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
           MemoryPool<Mem_>::template upload<Index>(this->_indices.at(1), trow_ptr, this->_scalar_index.at(1)  + 1);
-          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(2), trow_ptr_end, this->_scalar_index.at(1));
           MemoryPool<Mem::Main>::instance()->release_memory(tval);
           MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
-          MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr_end);
         }
 
         /**
@@ -246,7 +227,6 @@ namespace FEAST
           DT_ * tval = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3));
           Index * tcol_ind = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3));
           Index * trow_ptr = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1) + 1);
-          Index * trow_ptr_end = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1));
 
           Index ait(0);
           Index current_row(0);
@@ -258,11 +238,9 @@ namespace FEAST
 
             if (current_row < row)
             {
-              trow_ptr_end[current_row] = ait;
               for (unsigned long i(current_row + 1) ; i < row ; ++i)
               {
                 trow_ptr[i] = ait;
-                trow_ptr_end[i] = ait;
               }
               current_row = row;
               trow_ptr[current_row] = ait;
@@ -271,11 +249,9 @@ namespace FEAST
             tcol_ind[ait] = column;
             ++ait;
           }
-          trow_ptr_end[current_row] = ait;
           for (unsigned long i(current_row + 1) ; i < this->_scalar_index.at(1) ; ++i)
           {
             trow_ptr[i] = ait;
-            trow_ptr_end[i] = ait;
           }
           trow_ptr[this->_scalar_index.at(1)] = ait;
 
@@ -285,17 +261,13 @@ namespace FEAST
           this->_indices_size.push_back(this->_scalar_index.at(3));
           this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1) + 1));
           this->_indices_size.push_back(this->_scalar_index.at(1) + 1);
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1)));
-          this->_indices_size.push_back(this->_scalar_index.at(1));
 
           MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, this->_scalar_index.at(3));
           MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
           MemoryPool<Mem_>::template upload<Index>(this->_indices.at(1), trow_ptr, this->_scalar_index.at(1)  + 1);
-          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(2), trow_ptr_end, this->_scalar_index.at(1));
           MemoryPool<Mem::Main>::instance()->release_memory(tval);
           MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
-          MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr_end);
         }
 
         /**
@@ -337,12 +309,11 @@ namespace FEAST
          * \param[in] val Vector with non zero elements.
          * \param[in] row_ptr Vector with start indices of all rows into the val/col_ind arrays.
          * Note, that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
-         * \param[in] row_ptr_end Vector with end indices of all rows.
          *
          * Creates a matrix with given dimensions and content.
          * During creation, the input data are copied. Thus the matrix is independent of later input vector modifications.
          */
-        explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Mem_, Index> & col_ind, const DenseVector<Mem_, DT_> & val, const DenseVector<Mem_, Index> & row_ptr, const DenseVector<Mem_, Index> & row_ptr_end) :
+        explicit SparseMatrixCSR(Index rows, Index columns, const DenseVector<Mem_, Index> & col_ind, const DenseVector<Mem_, DT_> & val, const DenseVector<Mem_, Index> & row_ptr) :
           Container<Mem_, DT_>(rows * columns)
         {
           CONTEXT("When creating SparseMatrixCSR");
@@ -358,8 +329,6 @@ namespace FEAST
           this->_indices_size.push_back(col_ind.size());
           this->_indices.push_back(row_ptr.get_elements().at(0));
           this->_indices_size.push_back(row_ptr.size());
-          this->_indices.push_back(row_ptr_end.get_elements().at(0));
-          this->_indices_size.push_back(row_ptr_end.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
@@ -394,18 +363,11 @@ namespace FEAST
           DenseVector<Mem_, Index> col_ind(this->_scalar_index.at(3));
           DenseVector<Mem_, DT_> val(this->_scalar_index.at(3));
           DenseVector<Mem_, Index> row_ptr(this->_scalar_index.at(1) + 1);
-          DenseVector<Mem_, Index> row_ptr_end(this->_scalar_index.at(1));
 
           Index* prow_ptr = row_ptr.elements();
           for(Index i(0); i <= this->_scalar_index.at(1); ++i)
           {
             prow_ptr[i] = dom_ptr[i];
-          }
-
-          Index* prow_end = row_ptr_end.elements();
-          for(Index i(0); i < this->_scalar_index.at(1); ++i)
-          {
-            prow_end[i] = dom_end[i];
           }
 
           Index* pcol_ind = col_ind.elements();
@@ -420,8 +382,6 @@ namespace FEAST
           this->_indices_size.push_back(col_ind.size());
           this->_indices.push_back(row_ptr.get_elements().at(0));
           this->_indices_size.push_back(row_ptr.size());
-          this->_indices.push_back(row_ptr_end.get_elements().at(0));
-          this->_indices_size.push_back(row_ptr_end.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
@@ -594,13 +554,6 @@ namespace FEAST
             crow_ptr[i] = row_ptr[i];
           MemoryPool<Mem::Main>::instance()->release_memory(row_ptr);
 
-          Index * row_ptr_end = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_indices_size.at(2));
-          MemoryPool<Mem_>::template download<Index>(row_ptr_end, this->_indices.at(2), this->_indices_size.at(2));
-          uint64_t * crow_ptr_end = new uint64_t[this->_indices_size.at(2)];
-          for (Index i(0) ; i < this->_indices_size.at(2) ; ++i)
-            crow_ptr_end[i] = row_ptr_end[i];
-          MemoryPool<Mem::Main>::instance()->release_memory(row_ptr_end);
-
           DT_ * val = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_elements_size.at(0));
           MemoryPool<Mem_>::template download<DT_>(val, this->_elements.at(0), this->_elements_size.at(0));
           double * cval = new double[this->_elements_size.at(0)];
@@ -616,12 +569,10 @@ namespace FEAST
           file.write((const char *)&elements, sizeof(uint64_t));
           file.write((const char *)ccol_ind, (long)(elements * sizeof(uint64_t)));
           file.write((const char *)crow_ptr, (long)((rows + 1) * sizeof(uint64_t)));
-          file.write((const char *)crow_ptr_end, (long)(rows * sizeof(uint64_t)));
           file.write((const char *)cval, (long)(elements * sizeof(double)));
 
           delete[] ccol_ind;
           delete[] crow_ptr;
-          delete[] crow_ptr_end;
           delete[] cval;
         }
 
@@ -651,7 +602,7 @@ namespace FEAST
           file << "data = [" << std::endl;
           for (Index row(0) ; row < this->_scalar_index.at(1) ; ++row)
           {
-            const Index end(temp.row_ptr_end()[row]);
+            const Index end(temp.row_ptr()[row + 1]);
             for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
             {
               if (temp.val()[i] != DT_(0))
@@ -681,7 +632,7 @@ namespace FEAST
 
           if (typeid(Mem_) == typeid(Mem::Main))
           {
-            for (unsigned long i(this->_indices.at(1)[row]) ; i < this->_indices.at(2)[row] ; ++i)
+            for (unsigned long i(this->_indices.at(1)[row]) ; i < this->_indices.at(1)[row + 1] ; ++i)
             {
               if (this->_indices.at(0)[i] == col)
                 return this->_elements.at(0)[i];
@@ -758,16 +709,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Retrieve row end index array.
-         *
-         * \returns Row end index array.
-         */
-        Index * row_ptr_end() const
-        {
-          return this->_indices.at(2);
-        }
-
-        /**
          * \brief Retrieve non zero element.
          *
          * \returns Non zero element.
@@ -805,7 +746,7 @@ namespace FEAST
         {
           CONTEXT("Graph::image_end()");
           ASSERT(domain_node < this->_scalar_index.at(1), "Domain node index out of range");
-          return &this->_indices.at(0)[this->_indices.at(2)[domain_node]];
+          return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
         }
 
         /**
@@ -848,11 +789,6 @@ namespace FEAST
       for (Index i(0) ; i < a.rows() + 1; ++i)
       {
         if (MemoryPool<Mem_>::get_element(a.row_ptr(), i) != MemoryPool<Arch2_>::get_element(b.row_ptr(), i))
-          return false;
-      }
-      for (Index i(0) ; i < a.rows(); ++i)
-      {
-        if (MemoryPool<Mem_>::get_element(a.row_ptr_end(), i) != MemoryPool<Arch2_>::get_element(b.row_ptr_end(), i))
           return false;
       }
 

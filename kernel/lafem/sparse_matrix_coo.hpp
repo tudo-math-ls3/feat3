@@ -385,7 +385,7 @@ namespace FEAST
 
           for (Index row(0) ; row < other.rows() ; ++row)
           {
-            const Index end(cother.row_ptr_end()[row]);
+            const Index end(cother.row_ptr()[row + 1]);
             for (Index i(cother.row_ptr()[row]) ; i < end ; ++i)
             {
               if (cother.val()[i] != DT_(0))
