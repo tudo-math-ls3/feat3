@@ -92,7 +92,7 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        static void copy(void * dest, const void * src, const Index count)
+        static void copy(DT_ * dest, const DT_ * src, const Index count)
         {
           if (dest == src)
             return;
@@ -100,8 +100,8 @@ namespace FEAST
 #ifdef FEAST_GMP
           if (typeid(DT_) == typeid(mpf_class))
           {
-            const DT_ * s((DT_ *) src);
-            for (DT_ * d((DT_ * )dest), * d_end((DT_ *)dest + count) ; d != d_end ; ++d, ++s)
+            const DT_ * s( src);
+            for (DT_ * d(dest), * d_end(dest + count) ; d != d_end ; ++d, ++s)
             {
               *d = *s;
             }
@@ -130,7 +130,7 @@ namespace FEAST
 
         /// allocate new memory
         template <typename DT_>
-        void * allocate_memory(const Index count);
+        DT_ * allocate_memory(const Index count);
 
         /// increase memory counter
         void increase_memory(void * address);
@@ -156,7 +156,7 @@ namespace FEAST
 
         /// Copy memory area from src to dest
         template <typename DT_>
-        static void copy(void * dest, const void * src, const Index count);
+        static void copy(DT_ * dest, const DT_ * src, const Index count);
     };
   } // namespace LAFEM
 } // namespace FEAST

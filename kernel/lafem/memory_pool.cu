@@ -111,7 +111,7 @@ void MemoryPool<Mem::CUDA>::set_memory(DT_ * address, const DT_ val, const Index
 }
 
 template <typename DT_>
-void MemoryPool<Mem::CUDA>::copy(void * dest, const void * src, const Index count)
+void MemoryPool<Mem::CUDA>::copy(DT_ * dest, const DT_ * src, const Index count)
 {
   if (dest == src)
     return;
@@ -139,6 +139,6 @@ template void MemoryPool<Mem::CUDA>::set_memory(float * , const float, const con
 template void MemoryPool<Mem::CUDA>::set_memory(double * , const double, const const Index);
 template void MemoryPool<Mem::CUDA>::set_memory(Index * , const Index, const Index);
 
-template void MemoryPool<Mem::CUDA>::copy<float>(void *, const void *, const Index);
-template void MemoryPool<Mem::CUDA>::copy<double>(void *, const void *, const Index);
-template void MemoryPool<Mem::CUDA>::copy<unsigned long>(void *t, const void *, const Index);
+template void MemoryPool<Mem::CUDA>::copy<float>(float *, const float *, const Index);
+template void MemoryPool<Mem::CUDA>::copy<double>(double *, const double *, const Index);
+template void MemoryPool<Mem::CUDA>::copy<unsigned long>(unsigned long *, const unsigned long *, const Index);

@@ -20,8 +20,8 @@ namespace FEAST
       if (dest.size() != src.size())
         throw InternalError("Vector size mismatch!");
 
-      void * pdest(dest.elements());
-      const void * psrc(src.elements());
+      DT_ * pdest(dest.elements());
+      const DT_ * psrc(src.elements());
 
       MemoryPool<Arch_>::template copy<DT_>(pdest, psrc, dest.size());
     }
