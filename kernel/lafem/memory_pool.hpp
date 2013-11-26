@@ -110,9 +110,6 @@ namespace FEAST
 #endif
             ::memcpy(dest, src, count * sizeof(DT_));
         }
-
-        /// Generate hash value for given byte sequence
-        unsigned long generate_hash(void * address, const Index bytes);
     };
 
     template <>
@@ -160,9 +157,6 @@ namespace FEAST
         /// Copy memory area from src to dest
         template <typename DT_>
         static void copy(void * dest, const void * src, const Index count);
-
-        /// Generate hash value for given byte sequence
-        unsigned long generate_hash(void * address, const Index bytes);
     };
   } // namespace LAFEM
 } // namespace FEAST

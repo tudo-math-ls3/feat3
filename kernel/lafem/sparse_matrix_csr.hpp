@@ -43,7 +43,6 @@ namespace FEAST
      * _scalar_index[1]: row count \n
      * _scalar_index[2]: column count \n
      * _scalar_index[3]: non zero element count (used elements) \n
-     * _scalar_index[4]: layout related hash value \n
      * _scalar_dt[0]: zero element
      *
      * \author Dirk Ribbrock
@@ -126,8 +125,6 @@ namespace FEAST
           MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr_end);
-
-          this->_scalar_index.push_back(MemoryPool<Mem_>::instance()->generate_hash(this->_indices.at(1), this->_scalar_index.at(1) + 1));
         }
 
       public:
@@ -225,8 +222,6 @@ namespace FEAST
           MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr_end);
-
-          this->_scalar_index.push_back(MemoryPool<Mem_>::instance()->generate_hash(this->_indices.at(1), this->_scalar_index.at(1) + 1));
         }
 
         /**
@@ -301,8 +296,6 @@ namespace FEAST
           MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr_end);
-
-          this->_scalar_index.push_back(MemoryPool<Mem_>::instance()->generate_hash(this->_indices.at(1), this->_scalar_index.at(1) + 1));
         }
 
         /**
@@ -372,8 +365,6 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
-
-          this->_scalar_index.push_back(MemoryPool<Mem_>::instance()->generate_hash(this->_indices.at(1), this->_scalar_index.at(1) + 1));
         }
 
         /**
@@ -436,8 +427,6 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
-
-          this->_scalar_index.push_back(MemoryPool<Mem_>::instance()->generate_hash(this->_indices.at(1), this->_scalar_index.at(1) + 1));
         }
 
         /**
@@ -454,7 +443,6 @@ namespace FEAST
           this->_scalar_index.push_back(other.rows());
           this->_scalar_index.push_back(other.columns());
           this->_scalar_index.push_back(other.used_elements());
-          this->_scalar_index.push_back(other.hash());
           this->_scalar_dt.push_back(other.zero_element());
         }
 
@@ -473,7 +461,6 @@ namespace FEAST
           this->_scalar_index.push_back(other.rows());
           this->_scalar_index.push_back(other.columns());
           this->_scalar_index.push_back(other.used_elements());
-          this->_scalar_index.push_back(other.hash());
           this->_scalar_dt.push_back(other.zero_element());
         }
 
@@ -790,16 +777,6 @@ namespace FEAST
             return this->_scalar_dt.at(0);
         }
 
-        /**
-         * \brief Retrieve layout hash.
-         *
-         * \returns Hash value of matrix layout.
-         */
-        unsigned long hash() const
-        {
-          return this->_scalar_index.at(4);
-        }
-
         /* ******************************************************************* */
         /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
         /* ******************************************************************* */
@@ -859,8 +836,6 @@ namespace FEAST
       if (a.used_elements() != b.used_elements())
         return false;
       if (a.zero_element() != b.zero_element())
-        return false;
-      if (a.hash() != b.hash())
         return false;
 
       for (Index i(0) ; i < a.used_elements() ; ++i)

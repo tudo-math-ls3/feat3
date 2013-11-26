@@ -119,18 +119,6 @@ void MemoryPool<Mem::Main>::set_memory(DT_ * address, const DT_ val, const Index
   }
 }
 
-unsigned long MemoryPool<Mem::Main>::generate_hash(void * data, const Index bytes)
-{
-  char * cd((char * )data);
-  Index t(0);
-  for (Index i(0) ; i < bytes ; ++i)
-  {
-    t += ((Index)cd[i] * i) % bytes;
-  }
-  t = t % bytes;
-  return t;
-}
-
 template float * MemoryPool<Mem::Main>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
 #ifdef FEAST_GMP

@@ -15,22 +15,6 @@ namespace FEAST
           return;
         ptr[idx] = val;
       }
-
-      __global__ void cuda_generate_hash(char * cd, const Index bytes, void * resultv)
-      {
-        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
-        if (idx != 0)
-          return;
-
-        unsigned long * result = (unsigned long *)resultv;
-        unsigned long t(0);
-        for (Index i(0) ; i < bytes ; ++i)
-        {
-          t += (cd[i] * i) % bytes;
-        }
-        t = t % bytes;
-        result[0] = t;
-      }
     }
   }
 }
@@ -133,20 +117,6 @@ void MemoryPool<Mem::CUDA>::copy(void * dest, const void * src, const Index coun
     return;
 
   cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToDevice);
-}
-
-unsigned long MemoryPool<Mem::CUDA>::generate_hash(void * data, const Index bytes)
-{
-  dim3 grid(1,1,1);
-  dim3 block(128,1,1);
-  unsigned long result(0);
-  void * result_gpu(0);
-  cudaMalloc((void**)&result_gpu, sizeof(unsigned long));
-  char * datac((char *)data);
-  FEAST::LAFEM::Intern::cuda_generate_hash<<<grid, block>>>(datac, bytes, result_gpu);
-  cudaMemcpy(&result, result_gpu, sizeof(unsigned long), cudaMemcpyDeviceToHost);
-  cudaFree(result_gpu);
-  return result;
 }
 
 template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
