@@ -108,29 +108,31 @@ for s in raw_branches[:]:
     branches.append(new_s)
 
 #if is_found ("ninja"):
-#  generator = "-ninja"
+#  addition = "-ninja"
 #else:
-#  generator = "-unixmake"
-generator = "-unixmake"
+#  addition = "-unixmake"
+addition = "-unixmake"
+if is_found ("nvcc"):
+  addition = addition + "-cuda"
 
 for branch in branches[:]:
   if is_found("mpic++"):
     if is_found("g++"):
-      run_test("mpi-gcc-debug-coverage-gmp-mkl" + generator, branch)
-      run_test("mpi-gcc-opt-coverage-gmp-mkl" + generator, branch)
+      run_test("mpi-gcc-debug-coverage-gmp-mkl" + addition, branch)
+      run_test("mpi-gcc-opt-coverage-gmp-mkl" + addition, branch)
     if is_found("clang++"):
-      run_test("mpi-clang-debug-gmp-mkl" + generator, branch)
-      run_test("mpi-clang-opt-gmp-mkl" + generator, branch)
+      run_test("mpi-clang-debug-gmp-mkl" + addition, branch)
+      run_test("mpi-clang-opt-gmp-mkl" + addition, branch)
     if is_found("icpc"):
-      run_test("mpi-icc-debug-mkl" + generator, branch)
-      run_test("mpi-icc-opt-mkl" + generator, branch)
+      run_test("mpi-icc-debug-mkl" + addition, branch)
+      run_test("mpi-icc-opt-mkl" + addition, branch)
 
   if is_found("g++"):
-    run_test("serial-gcc-debug-coverage-gmp-mkl" + generator, branch)
-    run_test("serial-gcc-opt-coverage-gmp-mkl" + generator, branch)
+    run_test("serial-gcc-debug-coverage-gmp-mkl" + addition, branch)
+    run_test("serial-gcc-opt-coverage-gmp-mkl" + addition, branch)
   if is_found("clang++"):
-    run_test("serial-clang-debug-gmp-mkl" + generator, branch)
-    run_test("serial-clang-opt-gmp-mkl" + generator, branch)
+    run_test("serial-clang-debug-gmp-mkl" + addition, branch)
+    run_test("serial-clang-opt-gmp-mkl" + addition, branch)
   if is_found("icpc"):
-    run_test("serial-icc-debug-mkl" + generator, branch)
-    run_test("serial-icc-opt-mkl" + generator, branch)
+    run_test("serial-icc-debug-mkl" + addition, branch)
+    run_test("serial-icc-opt-mkl" + addition, branch)
