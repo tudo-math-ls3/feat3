@@ -127,16 +127,16 @@ template void MemoryPool<Mem::CUDA>::download<float>(float *, float *, const Ind
 template void MemoryPool<Mem::CUDA>::download<double>(double *, double *, const Index);
 template void MemoryPool<Mem::CUDA>::download<Index>(Index *, Index *, const Index);
 
-template void MemoryPool<Mem::CUDA>::upload<float>(flaot *, float *, const Index);
-template void MemoryPool<Mem::CUDA>::upload<double>(double *, double * const Index);
+template void MemoryPool<Mem::CUDA>::upload<float>(float *, float *, const Index);
+template void MemoryPool<Mem::CUDA>::upload<double>(double *, double *, const Index);
 template void MemoryPool<Mem::CUDA>::upload<Index>(Index *, Index *, const Index);
 
 template float MemoryPool<Mem::CUDA>::get_element(const float *, const Index);
 template double MemoryPool<Mem::CUDA>::get_element(const double *, const Index);
 template Index MemoryPool<Mem::CUDA>::get_element(const Index *, const Index);
 
-template void MemoryPool<Mem::CUDA>::set_memory(float * , const float, const const Index);
-template void MemoryPool<Mem::CUDA>::set_memory(double * , const double, const const Index);
+template void MemoryPool<Mem::CUDA>::set_memory(float * , const float, const Index);
+template void MemoryPool<Mem::CUDA>::set_memory(double * , const double, const Index);
 template void MemoryPool<Mem::CUDA>::set_memory(Index * , const Index, const Index);
 
 template void MemoryPool<Mem::CUDA>::copy<float>(float *, const float *, const Index);

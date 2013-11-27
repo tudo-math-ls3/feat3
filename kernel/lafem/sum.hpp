@@ -114,8 +114,9 @@ namespace FEAST
       static void value(DenseVector<Mem::Main, float> & r, const DenseVector<Mem::Main, float> & x, const DenseVector<Mem::Main, float> & y);
       static void value(DenseVector<Mem::Main, double> & r, const DenseVector<Mem::Main, double> & x, const DenseVector<Mem::Main, double> & y);
 
+      /// \todo make x and y const again
       template <typename DT_>
-      static void value(SparseMatrixCSR<Mem::Main, DT_> & r, const SparseMatrixCSR<Mem::Main, DT_> & x, const SparseMatrixCSR<Mem::Main, DT_> & y)
+      static void value(SparseMatrixCSR<Mem::Main, DT_> & r, SparseMatrixCSR<Mem::Main, DT_> & x, SparseMatrixCSR<Mem::Main, DT_> & y)
       {
         if (x.rows() != y.rows())
           throw InternalError("Matrix rows do not match!");
@@ -140,8 +141,9 @@ namespace FEAST
       template <typename DT_>
       static void value(DenseVector<Mem::CUDA, DT_> & r, const DenseVector<Mem::CUDA, DT_> & x, const DenseVector<Mem::CUDA, DT_> & y);
 
+      /// \todo make x and y const again
       template <typename DT_>
-      static void value(SparseMatrixCSR<Mem::CUDA, DT_> & r, const SparseMatrixCSR<Mem::CUDA, DT_> & x, const SparseMatrixCSR<Mem::CUDA, DT_> & y)
+      static void value(SparseMatrixCSR<Mem::CUDA, DT_> & r, SparseMatrixCSR<Mem::CUDA, DT_> & x, SparseMatrixCSR<Mem::CUDA, DT_> & y)
       {
         if (x.rows() != y.rows())
           throw InternalError("Matrix rows do not match!");
@@ -151,8 +153,6 @@ namespace FEAST
           throw InternalError("Matrix rows do not match!");
         if (x.columns() != r.columns())
           throw InternalError("Matrix columns do not match!");
-        if (x.hash() != r.hash() || y.hash() != r.hash())
-          throw InternalError("Matrix layouts do not match!");
 
         DenseVector<Mem::CUDA, DT_> xv(x.used_elements(), x.val());
         DenseVector<Mem::CUDA, DT_> yv(y.used_elements(), y.val());
