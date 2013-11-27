@@ -69,7 +69,7 @@ namespace FEAST
           uint64_t columns64;
           uint64_t elements64;
           file.read((char *)&rows64, sizeof(uint64_t));
-          file.read((char *)&columns, sizeof(uint64_t));
+          file.read((char *)&columns64, sizeof(uint64_t));
           file.read((char *)&elements64, sizeof(uint64_t));
           Index rows = (Index)rows64;
           Index columns = (Index)columns64;
