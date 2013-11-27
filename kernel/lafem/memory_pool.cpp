@@ -124,21 +124,21 @@ template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
 #ifdef FEAST_GMP
 template mpf_class * MemoryPool<Mem::Main>::allocate_memory<mpf_class>(const Index);
 #endif
-template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(const Index);
+template Index * MemoryPool<Mem::Main>::allocate_memory<Index>(const Index);
 
 template void MemoryPool<Mem::Main>::download<float>(float *, float *, const Index);
 template void MemoryPool<Mem::Main>::download<double>(double *, double *, const Index);
 #ifdef FEAST_GMP
 template void MemoryPool<Mem::Main>::download<mpf_class>(mpf_class *, mpf_class *, const Index);
 #endif
-template void MemoryPool<Mem::Main>::download<unsigned long>(unsigned long *t, unsigned long *, const Index);
+template void MemoryPool<Mem::Main>::download<Index>(Index *t, Index *, const Index);
 
 template void MemoryPool<Mem::Main>::upload<float>(float *, float *, const Index);
 template void MemoryPool<Mem::Main>::upload<double>(double *, double *, const Index);
 #ifdef FEAST_GMP
 template void MemoryPool<Mem::Main>::upload<mpf_class>(mpf_class *, mpf_class *, const Index);
 #endif
-template void MemoryPool<Mem::Main>::upload<unsigned long>(unsigned long *, unsigned long *, const Index);
+template void MemoryPool<Mem::Main>::upload<Index>(Index *, Index *, const Index);
 
 template void MemoryPool<Mem::Main>::set_memory(float * , const float, const Index);
 template void MemoryPool<Mem::Main>::set_memory(double * , const double, const Index);

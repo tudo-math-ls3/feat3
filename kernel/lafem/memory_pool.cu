@@ -121,15 +121,15 @@ void MemoryPool<Mem::CUDA>::copy(DT_ * dest, const DT_ * src, const Index count)
 
 template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
-template unsigned long * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(const Index);
+template Index * MemoryPool<Mem::CUDA>::allocate_memory<Index>(const Index);
 
 template void MemoryPool<Mem::CUDA>::download<float>(float *, float *, const Index);
 template void MemoryPool<Mem::CUDA>::download<double>(double *, double *, const Index);
-template void MemoryPool<Mem::CUDA>::download<unsigned long>(unsigned long *, unsigned long *, const Index);
+template void MemoryPool<Mem::CUDA>::download<Index>(Index *, Index *, const Index);
 
 template void MemoryPool<Mem::CUDA>::upload<float>(flaot *, float *, const Index);
 template void MemoryPool<Mem::CUDA>::upload<double>(double *, double * const Index);
-template void MemoryPool<Mem::CUDA>::upload<unsigned long>(unsigned long *, unsigned long *, const Index);
+template void MemoryPool<Mem::CUDA>::upload<Index>(Index *, Index *, const Index);
 
 template float MemoryPool<Mem::CUDA>::get_element(const float *, const Index);
 template double MemoryPool<Mem::CUDA>::get_element(const double *, const Index);
@@ -141,4 +141,4 @@ template void MemoryPool<Mem::CUDA>::set_memory(Index * , const Index, const Ind
 
 template void MemoryPool<Mem::CUDA>::copy<float>(float *, const float *, const Index);
 template void MemoryPool<Mem::CUDA>::copy<double>(double *, const double *, const Index);
-template void MemoryPool<Mem::CUDA>::copy<unsigned long>(unsigned long *, const unsigned long *, const Index);
+template void MemoryPool<Mem::CUDA>::copy<Index>(Index *, const Index *, const Index);
