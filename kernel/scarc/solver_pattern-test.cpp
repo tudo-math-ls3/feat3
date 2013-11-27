@@ -40,14 +40,6 @@ class SolverPatternTest:
       solver->execute();
 
       //---------------------------------------------------------------------------------------------------------------------------------------------
-      SolverData<> data2(A, x, b,
-                         SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_vectors(),
-                         SolverPatternGeneration<RichardsonProxy, Algo_>::min_num_temp_scalars());
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver2(SolverPatternGeneration<RichardsonProxy, Algo_>::execute(data2, 20, 1e-8));
-      TEST_CHECK_THROWS(solver2->execute(), ScaRCError);
-      TEST_CHECK_EQUAL(solver2->type_name(), "CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[PreconFunctor[], SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
-
-      //---------------------------------------------------------------------------------------------------------------------------------------------
       DenseVector<Tag_, DataType_> dummy;
       PreconditionedSolverData<> data3(A, A, x, b,
                          SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_vectors(),
@@ -56,19 +48,6 @@ class SolverPatternTest:
       TEST_CHECK_EQUAL(solver3->type_name(), "CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
       TEST_CHECK_THROWS(solver3->execute(), ScaRCError);
 
-      //---------------------------------------------------------------------------------------------------------------------------------------------
-      DenseVector<Tag_, DataType_> dummy1;
-      SolverData<> data4(A, x, b,
-                         SolverPatternGeneration<RichardsonProxyLayer, Algo_>::min_num_temp_vectors(),
-                         SolverPatternGeneration<RichardsonProxyLayer, Algo_>::min_num_temp_scalars());
-      std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver4(SolverPatternGeneration<RichardsonProxyLayer, Algo_>::execute(data4, dummy1, 20, 1e-8));
-      TEST_CHECK_THROWS(solver4->execute(), ScaRCError);
-      TEST_CHECK_EQUAL(solver4->type_name(), "CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[PreconFunctor[], SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
-
-      solver4->set_preconditioner(solver);
-      solver4->substitute(data.sol());
-      TEST_CHECK_EQUAL(solver4->type_name(), "CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[PreconFunctor[CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]], SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
-      solver4->execute();
     }
 };
 SolverPatternTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");
