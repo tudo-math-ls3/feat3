@@ -65,12 +65,14 @@ namespace FEAST
 
         void _read_from_csr(std::istream& file)
         {
-          uint64_t rows;
-          uint64_t columns;
+          uint64_t rows64;
+          uint64_t columns64;
           uint64_t elements64;
-          file.read((char *)&rows, sizeof(uint64_t));
+          file.read((char *)&rows64, sizeof(uint64_t));
           file.read((char *)&columns, sizeof(uint64_t));
           file.read((char *)&elements64, sizeof(uint64_t));
+          Index rows = (Index)rows64;
+          Index columns = (Index)columns64;
           Index elements = (Index)elements64;
 
           this->_scalar_index.at(0) = Index(rows * columns);
