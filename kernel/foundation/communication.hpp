@@ -2,9 +2,8 @@
 #ifndef KERNEL_FOUNDATION_COMMUNICATION_HH
 #define KERNEL_FOUNDATION_COMMUNICATION_HH 1
 
-#ifndef SERIAL
-#include<mpi.h>
-#endif
+#include<kernel/foundation/comm_base.hpp>
+
 #include <kernel/foundation/base.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication_error.hpp>
@@ -45,286 +44,6 @@ namespace FEAST
       com_min,
       com_max
     };
-
-#ifndef SERIAL
-    template <typename DT_>
-      class MPIType
-      {
-      };
-
-    template <>
-      class MPIType<float>
-      {
-        public:
-          static inline MPI_Datatype value()
-          {
-            return MPI_FLOAT;
-          }
-      };
-
-    template <>
-      class MPIType<double>
-      {
-        public:
-          static inline MPI_Datatype value()
-          {
-            return MPI_DOUBLE;
-          }
-      };
-
-    template <>
-      class MPIType<unsigned long>
-      {
-        public:
-          static inline MPI_Datatype value()
-          {
-            return MPI_UNSIGNED_LONG;
-          }
-      };
-
-    template <>
-      class MPIType<unsigned>
-      {
-        public:
-          static inline MPI_Datatype value()
-          {
-            return MPI_UNSIGNED;
-          }
-      };
-
-    template <>
-      class MPIType<int>
-      {
-        public:
-          static inline MPI_Datatype value()
-          {
-            return MPI_INT;
-          }
-      };
-#endif
-
-    /**
-     * \brief Tier-0 Communication implementation or backend pass-over
-     *
-     * Foundation Tier-0 Comm protocols involve simple pointers as buffers.
-     *
-     * See specialisations.
-     *
-     * \tparam Tag_
-     * backend specifier
-     *
-     * \author Markus Geveler
-     */
-    template<typename Tag_>
-      class Comm
-      {
-      };
-
-    ///example shared-mem exchange
-    template<>
-      class Comm<Archs::Serial>
-      {
-        public:
-          template<typename DataType1_, typename DataType2_>
-            static inline void send_recv(DataType1_ * /*sendbuf*/,
-                                         Index /*num_elements_to_send*/,
-                                         Index /*dest_rank*/,
-                                         DataType2_* /*recvbuf*/,
-                                         Index /*num_elements_to_recv*/,
-                                         Index /*source_rank*/,
-                                         Index /*send_tag*/ = 0,
-                                         Index /*recv_tag*/ = 0,
-                                         Index /*communicator*/ = 0)
-            {
-              /*const Index send_end(num_elements_to_send);
-              const Index recv_end(num_elements_to_recv);
-              DataType1_ bufsend(0);
-              DataType2_ bufrecv(0);
-
-              for(Index i(0) ; i < send_end ; ++i)
-              {
-                bufsend = (DataType1_)recvbuf[i];
-                recvbuf[i] = (DataType2_)sendbuf[i];
-                recvbuf[i] = bufsend;
-              }
-              for(Index i(0) ; i < recv_end ; ++i)
-              {
-                bufrecv = (DataType2_)sendbuf[i];
-                sendbuf[i] = (DataType1_)recvbuf[i];
-                recvbuf[i] = bufrecv;
-              }*/
-            }
-
-          template<typename DataType1_>
-            static inline void allreduce(DataType1_ * /*sendbuf*/,
-                                         Index /*num_elements_to_send_and_receive*/,
-                                         DataType1_ * /*recvbuf*/)
-            {
-            }
-
-          //TODO
-      };
-
-#ifndef SERIAL
-    template<>
-      class Comm<Archs::Parallel>
-      {
-        public:
-          template<typename DataType1_, typename DataType2_>
-            static inline void send_recv(DataType1_ * sendbuf,
-                                         Index num_elements_to_send,
-                                         Index dest_rank,
-                                         DataType2_* recvbuf,
-                                         Index num_elements_to_recv,
-                                         Index source_rank,
-                                         Index send_tag = 0,
-                                         Index recv_tag = 0,
-                                         MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Status status;
-
-              if (sendbuf == recvbuf)
-              {
-                MPI_Sendrecv_replace(
-                    sendbuf,
-                    (int)num_elements_to_send,
-                    MPIType<DataType1_>::value(),
-                    (int)dest_rank,
-                    (int)send_tag,
-                    (int)source_rank,
-                    (int)recv_tag,
-                    communicator,
-                    &status);
-              }
-              else
-              {
-                MPI_Sendrecv(sendbuf,
-                    (int)num_elements_to_send,
-                    MPIType<DataType1_>::value(),
-                    (int)dest_rank,
-                    (int)send_tag,
-                    recvbuf,
-                    (int)num_elements_to_recv,
-                    MPIType<DataType2_>::value(),
-                    (int)source_rank,
-                    (int)recv_tag,
-                    communicator,
-                    &status);
-              }
-            }
-
-          template<typename DataType_>
-            static inline void send(DataType_ * sendbuf,
-                Index num_elements_to_send,
-                Index dest_rank,
-                Index send_tag = 0,
-                MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Send(sendbuf,
-                           (int)num_elements_to_send,
-                           MPIType<DataType_>::value(),
-                           (int)dest_rank,
-                           (int)send_tag,
-                           communicator);
-            }
-
-          template<typename DataType_>
-            static inline void recv(DataType_ * recvbuf,
-                Index num_elements_to_recv,
-                Index src_rank,
-                Index recv_tag = 0,
-                MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Status status;
-
-              MPI_Recv(recvbuf,
-                           (int)num_elements_to_recv,
-                           MPIType<DataType_>::value(),
-                           (int)src_rank,
-                           (int)recv_tag,
-                           communicator,
-                           &status);
-            }
-
-          static inline void barrier(MPI_Comm communicator = MPI_COMM_WORLD)
-          {
-            MPI_Barrier(communicator);
-          }
-
-          template<typename DataType_>
-            static inline void bcast(DataType_ * buf,
-                Index num_elements,
-                Index root,
-                MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Bcast(buf, (int)num_elements, MPIType<DataType_>::value(), (int)root, communicator);
-            }
-
-          template<typename DataType1_, typename DataType2_>
-            static inline void scatter(DataType1_ * sendbuf,
-                Index num_elements_to_send,
-                DataType2_ * recvbuf,
-                Index num_elements_to_recv,
-                Index root,
-                MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Scatter(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
-                  MPIType<DataType2_>::value(), (int)root, communicator);
-            }
-
-          template<typename DataType1_, typename DataType2_>
-            static inline void gather(DataType1_ * sendbuf,
-                Index num_elements_to_send,
-                DataType2_ * recvbuf,
-                Index num_elements_to_recv,
-                Index root,
-                MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Gather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
-                  MPIType<DataType2_>::value(), (int)root, communicator);
-            }
-
-          template<typename DataType_>
-            static inline void reduce(DataType_ * sendbuf,
-                DataType_ * recvbuf,
-                Index num_elements_to_send,
-                MPI_Op op,
-                Index root,
-                MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Reduce(sendbuf, recvbuf, (int)num_elements_to_send, MPIType<DataType_>::value(), op, (int)root, communicator);
-            }
-
-          template<typename DataType1_, typename DataType2_>
-            static inline void allgather(DataType1_ * sendbuf,
-                Index num_elements_to_send,
-                DataType2_ * recvbuf,
-                Index num_elements_to_recv,
-                MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Allgather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(),
-                  recvbuf, (int)num_elements_to_recv, MPIType<DataType2_>::value(), communicator);
-            }
-
-          ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
-          template<typename DataType1_>
-            static inline void allreduce(DataType1_ * sendbuf,
-                                         Index num_elements_to_send_and_receive,
-                                         DataType1_ * recvbuf,
-                                         MPI_Op op = MPI_SUM,
-                                         MPI_Comm communicator = MPI_COMM_WORLD)
-            {
-              MPI_Allreduce(sendbuf,
-                            recvbuf,
-                            (int)num_elements_to_send_and_receive,
-                            MPIType<DataType1_>::value(),
-                            op,
-                            communicator);
-            }
-
-          //TODO
-      };
-#endif
 
     ///Tier-1 implementation: Foundation Tier-1 Comm protocols use Tier-0 protocols and define how Foundation datastructures can be communicated.
     template<typename B_, Tier0CommModes c_>
@@ -419,21 +138,13 @@ namespace FEAST
 
            //post send_recv
            ///TODO validate via mesh reference, that polytope level is correct
-#ifndef SERIAL
-          Comm<Parallel>::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
+          Comm::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
               interface.size(),
               interface.get_other(),
               ((BufferedSharedArray<typename AT_::data_type_>*)(recvbuf.get()))->get(),
               interface.size(),
               interface.get_other());
-#else
-          Comm<Serial>::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
-              interface.size(),
-              interface.get_other(),
-              ((BufferedSharedArray<typename AT_::data_type_>*)(recvbuf.get()))->get(),
-              interface.size(),
-              interface.get_other());
-#endif
+
           //reset values
            for(Index i(0) ; i < interface.size() ; ++i)
            {
@@ -470,21 +181,13 @@ namespace FEAST
 
            //post send_recv
            ///TODO validate via mesh reference, that polytope level is correct
-#ifndef SERIAL
-          Comm<Parallel>::send_recv(sendbuf.elements(),
+          Comm::send_recv(sendbuf.elements(),
               interface.size(),
               interface.get_other(),
               recvbuf.elements(),
               interface.size(),
               interface.get_other());
-#else
-          Comm<Serial>::send_recv(sendbuf.elements(),
-              interface.size(),
-              interface.get_other(),
-              recvbuf.elements(),
-              interface.size(),
-              interface.get_other());
-#endif
+
           //reset values
            for(Index i(0) ; i < interface.size() ; ++i)
            {
@@ -515,21 +218,12 @@ namespace FEAST
            //directly replace row i
            for(Index i(0); i < interface.size() ; ++i)
            {
-#ifndef SERIAL
-             Comm<Parallel>::send_recv(&val[row_ptr[interface.get_element(i)]],
+             Comm::send_recv(&val[row_ptr[interface.get_element(i)]],
                  row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
                  interface.get_other(),
                  &val[row_ptr[interface.get_element(i)]],
                  row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
                  interface.get_other());
-#else
-             Comm<Serial>::send_recv(&val[row_ptr[interface.get_element(i)]],
-                 row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
-                 interface.get_other(),
-                 &val[row_ptr[interface.get_element(i)]],
-                 row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
-                 interface.get_other());
-#endif
            }
          }
     };

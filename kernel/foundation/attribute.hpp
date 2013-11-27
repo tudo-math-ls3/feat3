@@ -152,39 +152,20 @@ namespace FEAST
                        BufferedData<StorageType_>& recvbuffers,
                        Index sourcerank)
         {
-#ifndef SERIAL
-          Comm<Parallel>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
+          Comm::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
               (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
               destrank,
               ((BufferedSharedArray<Index>*)recvbuffers.get().at(0).get())->get(),
               (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[0],
               sourcerank);
 
-          Comm<Parallel>::send_recv(((BufferedSharedArray<DataType_>*)sendbuffers.get().at(1).get())->get(),
+          Comm::send_recv(((BufferedSharedArray<DataType_>*)sendbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
               destrank,
               ((BufferedSharedArray<DataType_>*)recvbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1],
               sourcerank);
-
-#else
-          Comm<Serial>::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
-              (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
-              destrank,
-              ((BufferedSharedArray<Index>*)recvbuffers.get().at(0).get())->get(),
-              (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[0],
-              sourcerank);
-
-          Comm<Serial>::send_recv(((BufferedSharedArray<DataType_>*)sendbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
-              destrank,
-              ((BufferedSharedArray<DataType_>*)recvbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1],
-              sourcerank);
-
-#endif
         }
-
 
       protected:
         StorageType_<DataType_, std::allocator<DataType_> > _data;

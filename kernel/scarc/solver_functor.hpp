@@ -1646,11 +1646,7 @@ namespace FEAST
 
         virtual void execute()
         {
-#ifndef SERIAL
-          SynchVec<Algo_, Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
-#else
-          SynchVec<Algo_, Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
-#endif
+          SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
         }
 
         SynchVecFunctor& operator=(const SynchVecFunctor& rhs)
@@ -1725,11 +1721,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SynchVecFunctor can not be executed!");
 
-#ifndef SERIAL
-          SynchVec<Algo_, Parallel, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
-#else
-          SynchVec<Algo_, Serial, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
-#endif
+          SynchVec<Algo_, cm_>::execute(_l, _mirrors, _sendbufs, _recvbufs, _dest_ranks, _source_ranks);
         }
 
         SynchVecFunctorProxy& operator=(const SynchVecFunctorProxy& rhs)
@@ -1796,11 +1788,7 @@ namespace FEAST
 
         virtual void execute()
         {
-#ifndef SERIAL
-          SynchScal<Parallel, cm_>::execute(_l, _sendbuf, _recvbuf);
-#else
-          SynchScal<Serial, cm_>::execute(_l, _sendbuf, _recvbuf);
-#endif
+          SynchScal<cm_>::execute(_l, _sendbuf, _recvbuf);
         }
 
         SynchScalFunctor& operator=(const SynchScalFunctor& rhs)

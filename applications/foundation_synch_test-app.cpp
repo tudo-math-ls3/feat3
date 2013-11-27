@@ -1,9 +1,8 @@
 //#define SERIAL
-
 #include <kernel/base_header.hpp>
-#ifndef SERIAL
-#include <mpi.h>
-#endif
+
+#include <kernel/foundation/comm_base.hpp>
+
 #include <kernel/archs.hpp>
 
 #include <kernel/foundation/synch.hpp>
@@ -152,9 +151,7 @@ void check_synch_mirror(int rank)
   DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
   DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
-#ifndef SERIAL
-  SynchVec<Algo::Generic, Archs::Parallel, com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
-#endif
+  SynchVec<Algo::Generic, com_exchange>::execute(target, target_mirror, sendbuf, recvbuf, rank == 0 ? 1 : 0, rank == 0 ? 1 : 0);
 
   TestResult<double> res[4];
 #ifndef SERIAL
@@ -215,9 +212,7 @@ void check_synch_mirrors(int rank)
   std::vector<Index> sourceranks;
   sourceranks.push_back(rank == 0 ? 1 : 0);
 
-#ifndef SERIAL
-  SynchVec<Algo::Generic, Archs::Parallel, com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
-#endif
+  SynchVec<Algo::Generic, com_exchange>::execute(target, mirrors, sendbufs, recvbufs, destranks, sourceranks);
 
   TestResult<double> res[4];
 #ifndef SERIAL
@@ -256,7 +251,7 @@ void check_synch_scal(int rank)
   send_buffer[0] = value;
   float* recv_buffer(new float[1]);
 
-  SynchScal<Parallel, com_allreduce_sqrtsum>::execute(value, *send_buffer, *recv_buffer);
+  SynchScal<com_allreduce_sqrtsum>::execute(value, *send_buffer, *recv_buffer);
 
   TestResult<float> res;
   res = test_check_equal_within_eps(value, std::sqrt(3.0f), std::numeric_limits<float>::epsilon());

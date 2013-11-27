@@ -1,7 +1,7 @@
 #include <kernel/base_header.hpp>
-#ifndef SERIAL
-#  include <mpi.h>
-#endif
+
+#include <kernel/foundation/comm_base.hpp>
+
 #include <kernel/archs.hpp>
 #include <kernel/foundation/communication.hpp>
 #include <kernel/foundation/halo.hpp>
@@ -58,16 +58,12 @@ void check_sendrecv(Index rank)
 
   if(rank < 2)
   {
-#ifndef SERIAL
-    Comm<Archs::Parallel>::send_recv(f,
-                                     100000,
-                                     rank == 0 ? 1 : 0,
-                                     recvbuffer,
-                                     100000,
-                                     rank == 0 ? 1 : 0);
-#else
-    Comm<Archs::Serial>::send_recv(f, 100000, 0, recvbuffer, 100000, 0);
-#endif
+    Comm::send_recv(f,
+                    100000,
+                    rank == 0 ? 1 : 0,
+                    recvbuffer,
+                    100000,
+                    rank == 0 ? 1 : 0);
 
     TestResult<float, float, float>* res = new TestResult<float, float, float>[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
@@ -109,17 +105,17 @@ void check_send_and_recv(Index rank)
 
   if(rank == 0)
   {
-    Comm<Archs::Parallel>::send(f,
-                                     100000,
-                                     1);
+    Comm::send(f,
+               100000,
+               1);
 
     std::cout << "PASSED (rank " << rank <<"): foundation_comm_test (Tier-0: send and recv)" << std::endl;
   }
   if(rank == 1)
   {
-    Comm<Archs::Parallel>::recv(recvbuffer,
-                                     100000,
-                                     0);
+    Comm::recv(recvbuffer,
+               100000,
+               0);
     TestResult<float, float, float>* res = new TestResult<float, float, float>[100000];
     for(unsigned long i(0) ; i < 100000 ; ++i)
       res[i] = test_check_equal_within_eps(recvbuffer[i], (float)i, std::numeric_limits<float>::epsilon());
@@ -155,7 +151,7 @@ void check_bcast(Index rank)
     recvbuffer[i] = float(i + rank);
   }
 
-  Comm<Archs::Parallel>::bcast(recvbuffer, (Index)size, 0);
+  Comm::bcast(recvbuffer, (Index)size, 0);
 
   TestResult<float, float, float>* res =  new TestResult<float, float, float>[(Index)size];
   for(Index i(0) ; i < (Index)size ; ++i)
@@ -186,13 +182,13 @@ void check_scatter_gather(Index rank)
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   float* buffer(new float[(Index)size]);
 
-  Comm<Archs::Parallel>::gather(&value, 1, buffer, 1, 0);
+  Comm::gather(&value, 1, buffer, 1, 0);
   if (rank == 0)
     for(Index i(0) ; i < (Index)size ; ++i)
     {
       buffer[i] += 1;
     }
-  Comm<Archs::Parallel>::scatter(buffer, 1, &value, 1, 0);
+  Comm::scatter(buffer, 1, &value, 1, 0);
 
   TestResult<float, float, float> res;
   res = test_check_equal_within_eps(float(value), float(rank + 1), std::numeric_limits<float>::epsilon());
@@ -219,7 +215,7 @@ void check_allgather(Index rank)
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   float* buffer(new float[(Index)size]);
 
-  Comm<Archs::Parallel>::allgather(&value, 1, buffer, 1);
+  Comm::allgather(&value, 1, buffer, 1);
 
   TestResult<float, float, float>* res = new TestResult<float, float, float>[(Index)size];
   for(Index i(0) ; i < (Index)size ; ++i)
@@ -253,7 +249,7 @@ void check_allreduce(Index rank)
   send_buffer[0] = value;
   float* recv_buffer(new float[1]);
 
-  Comm<Archs::Parallel>::allreduce(send_buffer, 1, recv_buffer);
+  Comm::allreduce(send_buffer, 1, recv_buffer);
 
   TestResult<float, float, float> res;
   res = test_check_equal_within_eps(recv_buffer[0], float(3), std::numeric_limits<float>::epsilon());
@@ -278,7 +274,7 @@ void check_reduce(Index rank)
   float result(0);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  Comm<Archs::Parallel>::reduce(&value, &result, 1, MPI_SUM, 0);
+  Comm::reduce(&value, &result, 1, Operation(Index(MPI_SUM)), 0);
 
   if(rank == 0)
   {
@@ -325,6 +321,7 @@ void check_halo_transfer(Index rank)
     h.from_buffer(recvbuf);
 
     bool passed(true);
+
 #ifndef SERIAL
     //TestResult<Index> res[rank == 0 ? 4 : 2];
     TestResult<Index, Index, Index> res[2];

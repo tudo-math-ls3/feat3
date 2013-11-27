@@ -2,9 +2,7 @@
 #ifndef SCARC_GUARD_SYNCH_HH
 #define SCARC_GUARD_SYNCH_HH 1
 
-#ifndef SERIAL
-#include<mpi.h>
-#endif
+#include<kernel/foundation/comm_base.hpp>
 
 #include<kernel/foundation/communication.hpp>
 
@@ -16,13 +14,13 @@ namespace FEAST
 {
   namespace Foundation
   {
-    template<typename Tag_, typename Arch_, Tier2CommModes cm_>
+    template<typename Tag_, Tier2CommModes cm_>
     struct SynchVec
     {
     };
 
-    template<typename Tag_, typename Arch_>
-    struct SynchVec<Tag_, Arch_, com_exchange>
+    template<typename Tag_>
+    struct SynchVec<Tag_, com_exchange>
     {
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
@@ -35,7 +33,7 @@ namespace FEAST
       {
         mirror.gather_dual(sendbuf, target);
 
-        Comm<Arch_>::send_recv(sendbuf.elements(),
+        Comm::send_recv(sendbuf.elements(),
                                sendbuf.size(),
                                dest_rank,
                                recvbuf.elements(),
@@ -56,7 +54,7 @@ namespace FEAST
       {
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
-          SynchVec<Tag_, Arch_, com_exchange>::execute(target,
+          SynchVec<Tag_, com_exchange>::execute(target,
                                                        mirrors.at(i),
                                                        sendbufs.at(i),
                                                        recvbufs.at(i),
@@ -66,8 +64,8 @@ namespace FEAST
       }
     };
 
-    template<typename Tag_, typename Arch_>
-    struct SynchVec<Tag_, Arch_, com_accumulate>
+    template<typename Tag_>
+    struct SynchVec<Tag_, com_accumulate>
     {
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
@@ -80,7 +78,7 @@ namespace FEAST
       {
         mirror.gather_dual(sendbuf, target);
 
-        Comm<Arch_>::send_recv(sendbuf.elements(),
+        Comm::send_recv(sendbuf.elements(),
                                sendbuf.size(),
                                dest_rank,
                                recvbuf.elements(),
@@ -110,7 +108,7 @@ namespace FEAST
         {
           mirrors.at(i).gather_dual(sendbufs.at(i), target);
 
-          Comm<Arch_>::send_recv(sendbufs.at(i).elements(),
+          Comm::send_recv(sendbufs.at(i).elements(),
               sendbufs.at(i).size(),
               dest_ranks.at(i),
               recvbufs.at(i).elements(),
@@ -118,9 +116,8 @@ namespace FEAST
               source_ranks.at(i));
         }
 
-#ifndef SERIAL
-        MPI_Barrier(MPI_COMM_WORLD); //TODO communicator handling
-#endif
+        Comm::barrier();
+
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
           mirrors.at(i).gather_dual(sendbufs.at(i), target); //we dont need the sendbuf any more
@@ -132,8 +129,8 @@ namespace FEAST
       }
     };
 
-    template<typename Tag_, typename Arch_>
-    struct SynchVec<Tag_, Arch_, com_average>
+    template<typename Tag_>
+    struct SynchVec<Tag_, com_average>
     {
       //single target, single mirror
       template<typename VectorT_, typename VectorMirrorT_>
@@ -146,7 +143,7 @@ namespace FEAST
       {
         mirror.gather_dual(sendbuf, target);
 
-        Comm<Arch_>::send_recv(sendbuf.elements(),
+        Comm::send_recv(sendbuf.elements(),
                                sendbuf.size(),
                                dest_rank,
                                recvbuf.elements(),
@@ -168,7 +165,7 @@ namespace FEAST
                                  StorageT_<Index, std::allocator<Index> >& dest_ranks,
                                  StorageT_<Index, std::allocator<Index> >& source_ranks)
       {
-        SynchVec<Tag_, Arch_, com_accumulate>::execute(target, mirrors, sendbufs, recvbufs, dest_ranks, source_ranks);
+        SynchVec<Tag_, com_accumulate>::execute(target, mirrors, sendbufs, recvbufs, dest_ranks, source_ranks);
 
         for(Index i(0) ; i < mirrors.size() ; ++i)
         {
@@ -183,13 +180,13 @@ namespace FEAST
       }
     };
 
-    template<typename Arch_, Tier2CommModes cm_>
+    template<Tier2CommModes cm_>
     struct SynchScal
     {
     };
 
-    template<typename Arch_>
-    struct SynchScal<Arch_, com_allreduce_sqrtsum>
+    template<>
+    struct SynchScal<com_allreduce_sqrtsum>
     {
       //single target, single solver per process
       template<typename DataType_>
@@ -198,21 +195,8 @@ namespace FEAST
                                  DataType_& recvbuf)
       {
         sendbuf = target;
-        Comm<Arch_>::allreduce(&sendbuf, Index(1), &recvbuf);
+        Comm::allreduce(&sendbuf, Index(1), &recvbuf);
         target = (DataType_)sqrt(recvbuf);
-      }
-    };
-
-    template<>
-    struct SynchScal<Serial, com_allreduce_sqrtsum>
-    {
-      //single target, single solver per process
-      template<typename DataType_>
-      static inline void execute(DataType_& target,
-                                 DataType_& /*sendbuf*/,
-                                 DataType_& /*recvbuf*/)
-      {
-        target = sqrt(target);
       }
     };
   }

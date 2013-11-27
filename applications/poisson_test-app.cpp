@@ -7,12 +7,10 @@
  * This file contains the first application code testing the FEAST kernel w.o. the final application framework.
  */
 
-
-
 #include <kernel/base_header.hpp>
-#ifndef SERIAL
-#include <mpi.h>
-#endif
+
+#include <kernel/foundation/comm_base.hpp>
+
 #include <test_system/test_system.hpp>
 
 #include <kernel/geometry/conformal_mesh.hpp>
@@ -530,19 +528,19 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     }
 
 #ifndef SERIAL
-    Comm<Parallel>::send_recv(val_sendbuf.elements(),
+    Comm::send_recv(val_sendbuf.elements(),
                               val_sendbuf.size(),
                               macro_comm_halos.at(i)->get_other(),
                               val_recvbuf.elements(),
                               val_recvbuf.size(),
                               macro_comm_halos.at(i)->get_other());
-    Comm<Parallel>::send_recv(colind_sendbuf.elements(),
+    Comm::send_recv(colind_sendbuf.elements(),
                               colind_sendbuf.size(),
                               macro_comm_halos.at(i)->get_other(),
                               colind_recvbuf.elements(),
                               colind_recvbuf.size(),
                               macro_comm_halos.at(i)->get_other());
-    Comm<Parallel>::send_recv(rp_sendbuf.elements(),
+    Comm::send_recv(rp_sendbuf.elements(),
                               rp_sendbuf.size(),
                               macro_comm_halos.at(i)->get_other(),
                               rp_recvbuf.elements(),

@@ -1,0 +1,371 @@
+#pragma once
+#ifndef KERNEL_FOUNDATION_COMM_BASE_HH
+#define KERNEL_FOUNDATION_COMM_BASE_HH 1
+
+#ifndef SERIAL
+#include<mpi.h>
+
+namespace FEAST
+{
+  namespace Foundation
+  {
+    template <typename DT_>
+      class MPIType
+      {
+      };
+
+    template <>
+      class MPIType<float>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_FLOAT;
+          }
+      };
+
+    template <>
+      class MPIType<double>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_DOUBLE;
+          }
+      };
+
+    template <>
+      class MPIType<unsigned long>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_UNSIGNED_LONG;
+          }
+      };
+
+    template <>
+      class MPIType<unsigned>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_UNSIGNED;
+          }
+      };
+
+    template <>
+      class MPIType<int>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_INT;
+          }
+      };
+
+    class Communicator
+    {
+      public:
+        Communicator(Index comm) :
+          _comm(MPI_Comm(comm))
+      {
+      }
+
+      MPI_Comm mpi_comm()
+      {
+        return _comm;
+      }
+
+      private:
+        MPI_Comm _comm;
+    };
+
+    class Operation
+    {
+      public:
+        Operation(Index op) :
+          _op(MPI_Op(op))
+      {
+      }
+
+      MPI_Op mpi_op()
+      {
+        return _op;
+      }
+
+      private:
+        MPI_Op _op;
+    };
+
+      class Comm
+      {
+        public:
+          template<typename DataType1_, typename DataType2_>
+            static inline void send_recv(DataType1_ * sendbuf,
+                                         Index num_elements_to_send,
+                                         Index dest_rank,
+                                         DataType2_* recvbuf,
+                                         Index num_elements_to_recv,
+                                         Index source_rank,
+                                         Index send_tag = 0,
+                                         Index recv_tag = 0,
+                                         Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Status status;
+
+              MPI_Sendrecv(sendbuf,
+                           (int)num_elements_to_send,
+                           MPIType<DataType1_>::value(),
+                           (int)dest_rank,
+                           (int)send_tag,
+                           recvbuf,
+                           (int)num_elements_to_recv,
+                           MPIType<DataType2_>::value(),
+                           (int)source_rank,
+                           (int)recv_tag,
+                           communicator.mpi_comm(),
+                           &status);
+            }
+
+          template<typename DataType_>
+            static inline void send(DataType_ * sendbuf,
+                Index num_elements_to_send,
+                Index dest_rank,
+                Index send_tag = 0,
+                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Send(sendbuf,
+                           (int)num_elements_to_send,
+                           MPIType<DataType_>::value(),
+                           (int)dest_rank,
+                           (int)send_tag,
+                           communicator.mpi_comm());
+            }
+
+          template<typename DataType_>
+            static inline void recv(DataType_ * recvbuf,
+                Index num_elements_to_recv,
+                Index src_rank,
+                Index recv_tag = 0,
+                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Status status;
+
+              MPI_Recv(recvbuf,
+                           (int)num_elements_to_recv,
+                           MPIType<DataType_>::value(),
+                           (int)src_rank,
+                           (int)recv_tag,
+                           communicator.mpi_comm(),
+                           &status);
+            }
+
+          static inline void barrier(Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+          {
+            MPI_Barrier(communicator.mpi_comm());
+          }
+
+          template<typename DataType_>
+            static inline void bcast(DataType_ * buf,
+                Index num_elements,
+                Index root,
+                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Bcast(buf, (int)num_elements, MPIType<DataType_>::value(), (int)root, communicator.mpi_comm());
+            }
+
+          template<typename DataType1_, typename DataType2_>
+            static inline void scatter(DataType1_ * sendbuf,
+                Index num_elements_to_send,
+                DataType2_ * recvbuf,
+                Index num_elements_to_recv,
+                Index root,
+                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Scatter(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
+                  MPIType<DataType2_>::value(), (int)root, communicator.mpi_comm());
+            }
+
+          template<typename DataType1_, typename DataType2_>
+            static inline void gather(DataType1_ * sendbuf,
+                Index num_elements_to_send,
+                DataType2_ * recvbuf,
+                Index num_elements_to_recv,
+                Index root,
+                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Gather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
+                  MPIType<DataType2_>::value(), (int)root, communicator.mpi_comm());
+            }
+
+          template<typename DataType_>
+            static inline void reduce(DataType_ * sendbuf,
+                DataType_ * recvbuf,
+                Index num_elements_to_send,
+                Operation op,
+                Index root,
+                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Reduce(sendbuf, recvbuf, (int)num_elements_to_send, MPIType<DataType_>::value(), op.mpi_op(), (int)root, communicator.mpi_comm());
+            }
+
+          template<typename DataType1_, typename DataType2_>
+            static inline void allgather(DataType1_ * sendbuf,
+                Index num_elements_to_send,
+                DataType2_ * recvbuf,
+                Index num_elements_to_recv,
+                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Allgather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(),
+                  recvbuf, (int)num_elements_to_recv, MPIType<DataType2_>::value(), communicator.mpi_comm());
+            }
+
+          ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
+          template<typename DataType1_>
+            static inline void allreduce(DataType1_ * sendbuf,
+                                         Index num_elements_to_send_and_receive,
+                                         DataType1_ * recvbuf,
+                                         Operation op = Operation(Index(MPI_SUM)),
+                                         Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+            {
+              MPI_Allreduce(sendbuf,
+                            recvbuf,
+                            (int)num_elements_to_send_and_receive,
+                            MPIType<DataType1_>::value(),
+                            op.mpi_op(),
+                            communicator.mpi_comm());
+            }
+          //TODO
+      };
+  }
+}
+#else //SERIAL MODE
+namespace FEAST
+{
+  namespace Foundation
+  {
+    class Communicator
+    {
+      public:
+        Communicator(Index comm) :
+          _comm(comm)
+      {
+      }
+
+      private:
+        Index _comm;
+    };
+
+    class Operation
+    {
+      public:
+        Operation(Index op) :
+          _op(op)
+      {
+      }
+
+      private:
+        Index _op;
+    };
+
+    class Comm
+    {
+      public:
+        template<typename DataType1_, typename DataType2_>
+          static inline void send_recv(DataType1_ *,
+              Index,
+              Index,
+              DataType2_*,
+              Index,
+              Index,
+              Index = 0,
+              Index = 0,
+              Communicator = Communicator(0))
+          {
+          }
+
+        template<typename DataType_>
+          static inline void send(DataType_,
+              Index,
+              Index,
+              Index,
+              Communicator)
+          {
+          }
+
+        template<typename DataType_>
+          static inline void recv(DataType_ *,
+              Index,
+              Index,
+              Index,
+              Communicator)
+          {
+          }
+
+        static inline void barrier(Communicator = Communicator(0))
+        {
+        }
+
+        template<typename DataType_>
+          static inline void bcast(DataType_*,
+              Index,
+              Index,
+              Communicator)
+          {
+          }
+
+        template<typename DataType1_, typename DataType2_>
+          static inline void scatter(DataType1_*,
+              Index,
+              DataType2_*,
+              Index,
+              Index,
+              Communicator)
+          {
+          }
+
+        template<typename DataType1_, typename DataType2_>
+          static inline void gather(DataType1_*,
+              Index,
+              DataType2_*,
+              Index,
+              Index,
+              Communicator)
+          {
+          }
+
+        template<typename DataType_>
+          static inline void reduce(DataType_*,
+              DataType_*,
+              Index,
+              Operation,
+              Index,
+              Communicator)
+          {
+          }
+
+        template<typename DataType1_, typename DataType2_>
+          static inline void allgather(DataType1_*,
+              Index,
+              DataType2_*,
+              Index,
+              Communicator)
+          {
+          }
+
+        ///TODO delegate Op to an MPI_Op resolver as in MPI_Type resolver
+        template<typename DataType1_>
+          static inline void allreduce(DataType1_*,
+              Index,
+              DataType1_*,
+              Operation = Operation(0),
+              Communicator = Communicator(0))
+          {
+          }
+        //TODO
+    };
+  }
+}
+#endif//ifndef SERIAL
+#endif //GUARD

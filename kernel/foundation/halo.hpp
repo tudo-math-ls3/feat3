@@ -166,35 +166,19 @@ namespace FEAST
                        BufferedData<BufferStorageType_>& recvbuffers,
                        Index sourcerank)
         {
-#ifndef SERIAL
-          Comm<Parallel>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),
+          Comm::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),
               2,
               destrank,
               ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(0).get())->get(),
               2,
               sourcerank);
 
-          Comm<Parallel>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(1).get())->get(),
+          Comm::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<index_type_>*)((sendbuffers.get().at(0).get())))[1],
               destrank,
               ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<index_type_>*)((recvbuffers.get().at(0).get())))[1],
               sourcerank);
-#else
-          Comm<Serial>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),
-              2,
-              destrank,
-              ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(0).get())->get(),
-              2,
-              sourcerank);
-
-          Comm<Serial>::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<index_type_>*)((sendbuffers.get().at(0).get())))[1],
-              destrank,
-              ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(1).get())->get(),
-              (*(BufferedSharedArray<index_type_>*)((recvbuffers.get().at(0).get())))[1],
-              sourcerank);
-#endif
         }
 
       protected:
