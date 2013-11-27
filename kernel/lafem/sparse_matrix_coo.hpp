@@ -8,7 +8,6 @@
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/adjacency/graph.hpp>
 
 #include <vector>
 #include <map>

@@ -11,7 +11,6 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/algorithm.hpp>
-#include <kernel/adjacency/graph.hpp>
 
 
 
@@ -329,59 +328,6 @@ namespace FEAST
           this->_indices.push_back(col_ind.elements());
           this->_indices_size.push_back(col_ind.size());
           this->_indices.push_back(row_ptr.elements());
-          this->_indices_size.push_back(row_ptr.size());
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
-        }
-
-        /**
-         * \brief Constructor
-         *
-         * \param[in] graph The Graph, the matrix will be created from.
-         *
-         * Creates a matrix from a given graph.
-         */
-        explicit SparseMatrixCSR(const Adjacency::Graph & graph) :
-          Container<Mem_, DT_>(graph.get_num_nodes_domain() * graph.get_num_nodes_image())
-        {
-          CONTEXT("When creating SparseMatrixCSR");
-          this->_scalar_index.push_back(graph.get_num_nodes_domain());
-          this->_scalar_index.push_back(graph.get_num_nodes_image());
-          this->_scalar_index.push_back(graph.get_num_indices());
-          this->_scalar_dt.push_back(DT_(0));
-
-          const Index* dom_ptr = graph.get_domain_ptr();
-          const Index* dom_end = graph.get_domain_end();
-          const Index* img_idx = graph.get_image_idx();
-          if(dom_end == nullptr)
-          {
-            dom_end = &dom_ptr[1];
-          }
-
-          DenseVector<Mem_, Index> col_ind(this->_scalar_index.at(3));
-          DenseVector<Mem_, DT_> val(this->_scalar_index.at(3));
-          DenseVector<Mem_, Index> row_ptr(this->_scalar_index.at(1) + 1);
-
-          Index* prow_ptr = row_ptr.elements();
-          for(Index i(0); i <= this->_scalar_index.at(1); ++i)
-          {
-            prow_ptr[i] = dom_ptr[i];
-          }
-
-          Index* pcol_ind = col_ind.elements();
-          for(Index i(0); i < this->_scalar_index.at(3); ++i)
-          {
-            pcol_ind[i] = img_idx[i];
-          }
-
-          this->_elements.push_back(val.get_elements().at(0));
-          this->_elements_size.push_back(val.size());
-          this->_indices.push_back(col_ind.get_elements().at(0));
-          this->_indices_size.push_back(col_ind.size());
-          this->_indices.push_back(row_ptr.get_elements().at(0));
           this->_indices_size.push_back(row_ptr.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
