@@ -114,13 +114,13 @@ namespace FEAST
      */
     reference front()
     {
-      return at(0);
+      return at(size_type(0));
     }
 
     /** \copydoc front() */
     const_reference front() const
     {
-      return at(0);
+      return at(size_type(0));
     }
 
     /**
@@ -130,13 +130,13 @@ namespace FEAST
      */
     reference back()
     {
-      return at(size() - 1);
+      return at(size() - size_type(1));
     }
 
     /** \copydoc back() */
     const_reference back() const
     {
-      return at(size() - 1);
+      return at(size() - size_type(1));
     }
 
     /**
@@ -147,19 +147,19 @@ namespace FEAST
      */
     void push_front(char value)
     {
-      insert(0, 1, value);
+      insert(size_type(0), size_type(1), value);
     }
 
     /// Removes the first character from the string.
     void pop_front()
     {
-      erase(0, 1);
+      erase(size_type(0), size_type(1));
     }
 
     /// Removes the last character from the string.
     void pop_back()
     {
-      erase(size() - 1, 1);
+      erase(size() - size_type(1), size_type(1));
     }
 
     /**
@@ -212,7 +212,7 @@ namespace FEAST
       if(pos == npos)
         return String();
       else
-        return substr(0, pos + 1);
+        return substr(size_type(0), pos + size_type(1));
     }
 
     /**
@@ -316,29 +316,29 @@ namespace FEAST
      * <c>words.size()</c>
      */
     template<typename Container_>
-    size_t split_by_charset(
+    size_type split_by_charset(
       Container_& words,
       const String charset) const
     {
       words.clear();
       if(empty() || charset.empty())
       {
-        return 0;
+        return size_type(0);
       }
 
       // find first occurance of fork substring
-      size_t off1(find_first_not_of(charset));
+      size_type off1(find_first_not_of(charset));
       if(off1 == npos)
       {
         // only delimiter characters; nothing to be extracted
-        return 0;
+        return size_type(0);
       }
 
       // go forking
       while(off1 != npos)
       {
         // find next occurance of delimiter string
-        size_t off2(find_first_of(charset, off1));
+        size_type off2(find_first_of(charset, off1));
 
         // add next fork substring to vector
         if(off2 == npos)
@@ -365,7 +365,7 @@ namespace FEAST
      * \brief Splits the string by white-spaces.
      */
     template<typename Container_>
-    size_t split_by_charset(Container_& words) const
+    size_type split_by_charset(Container_& words) const
     {
       return split_by_charset(words, white_spaces());
     }
@@ -397,29 +397,29 @@ namespace FEAST
      * <c>words.size()</c>
      */
     template<typename Container_>
-    size_t split_by_string(
+    size_type split_by_string(
       Container_& words,
       const String delimiter) const
     {
       words.clear();
       if(empty() || delimiter.empty())
-        return 0u;
+        return size_type(0);
 
       // find first occurance of delimiter substring
-      size_t off1(find(delimiter));
+      size_type off1(find(delimiter));
       words.push_back(substr(0, off1));
       if(off1 == npos)
         return words.size();
 
       // go forking
-      const size_t dellen(delimiter.size());
+      const size_type dellen(delimiter.size());
       while(off1 != npos)
       {
         // increase leading offset by delimiter length
         off1 += dellen;
 
         // find next substring occurance
-        size_t off2 = find(delimiter, off1);
+        size_type off2 = find(delimiter, off1);
         if(off2 == npos)
         {
           // extract last substring
@@ -463,11 +463,11 @@ namespace FEAST
       size_type flen(find_string.size());
       size_type rlen(replace_string.size());
       if(flen <= 0)
-        return size_type(0u);
+        return size_type(0);
 
       // find first occurance of find string
       size_type pos(find(find_string));
-      size_type counter(0u);
+      size_type counter(size_type(0));
       while(pos != npos)
       {
         // replace substring
@@ -553,7 +553,7 @@ namespace FEAST
       size_type n = std::min(n1, n2);
 
       // loop over all characters and compare them
-      for(size_t i = 0; i < n; ++i)
+      for(size_type i = 0; i < n; ++i)
       {
         k = int(std::tolower<char>((*this)[i], loc)) - int(std::tolower<char>(other[i], loc));
         if(k < 0)
