@@ -9,7 +9,7 @@ import socket
 import shutil
 import datetime
 
-from cmake_modules import is_found
+from cmake_modules.feast_util import is_found
 
 def run_test(build_id, branch):
   # set track aka cdash build group
