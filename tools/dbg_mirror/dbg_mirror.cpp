@@ -4,11 +4,11 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
-#include <kernel/space/dof_mirror.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/common_functions.hpp>
+#include <kernel/assembly/mirror_assembler.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
@@ -58,20 +58,22 @@ void test_mirror(
   const String cubature_name = "gauss-legendre:2")
 {
   // assemble dof-adjacency graphs
-  Adjacency::Graph dof_adj_0(Space::DofAdjacency<>::assemble(space_0));
-  Adjacency::Graph dof_adj_1(Space::DofAdjacency<>::assemble(space_1));
+  Adjacency::Graph dof_adj_0(Assembly::SymbolicGraphAssembler<>::assemble_graph(space_0));
+  Adjacency::Graph dof_adj_1(Assembly::SymbolicGraphAssembler<>::assemble_graph(space_1));
 
   // assemble dof-mirror graphs
-  Adjacency::Graph dof_mir_0(Space::DofMirror::assemble(space_0, cell_0));
-  Adjacency::Graph dof_mir_1(Space::DofMirror::assemble(space_1, cell_1));
+  Adjacency::Graph dof_mir_0(Assembly::MirrorAssembler::assemble_mirror_graph(space_0, cell_0));
+  Adjacency::Graph dof_mir_1(Assembly::MirrorAssembler::assemble_mirror_graph(space_1, cell_1));
 
   // allocate local vectors
   VectorType loc_vec_0(space_0.get_num_dofs(), Real(0));
   VectorType loc_vec_1(space_1.get_num_dofs(), Real(0));
 
   // allocate local matrices
-  MatrixType loc_mat_0(dof_adj_0);
-  MatrixType loc_mat_1(dof_adj_1);
+  MatrixType loc_mat_0;
+  MatrixType loc_mat_1;
+  Assembly::SymbolicMatrixAssemblerBase::assemble(loc_mat_0, dof_adj_0);
+  Assembly::SymbolicMatrixAssemblerBase::assemble(loc_mat_1, dof_adj_1);
 
   Cubature::DynamicFactory cubature_factory(cubature_name);
 
@@ -89,20 +91,26 @@ void test_mirror(
   Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_1, laplace, space_1, cubature_factory, 6.0);
 
   // create vector mirrors
-  VectorMirrorType vec_mir_0(dof_mir_0);
-  VectorMirrorType vec_mir_1(dof_mir_1);
+  VectorMirrorType vec_mir_0;
+  VectorMirrorType vec_mir_1;
+  Assembly::MirrorAssembler::assemble_mirror(vec_mir_0, dof_mir_0);
+  Assembly::MirrorAssembler::assemble_mirror(vec_mir_1, dof_mir_1);
 
   // create matrix mirrors
   MatrixMirrorType mat_mir_0(vec_mir_0, vec_mir_0);
   MatrixMirrorType mat_mir_1(vec_mir_1, vec_mir_1);
 
   // allocate buffer vectors
-  VectorType buf_vec_0(vec_mir_0.create_buffer(loc_vec_0));
-  VectorType buf_vec_1(vec_mir_1.create_buffer(loc_vec_1));
+  VectorType buf_vec_0;
+  VectorType buf_vec_1;
+  Assembly::MirrorAssembler::assemble_buffer_vector(buf_vec_0, vec_mir_0, loc_vec_0);
+  Assembly::MirrorAssembler::assemble_buffer_vector(buf_vec_1, vec_mir_1, loc_vec_1);
 
   // allocate buffer matrices
-  MatrixType buf_mat_0(mat_mir_0.create_buffer(loc_mat_0));
-  MatrixType buf_mat_1(mat_mir_1.create_buffer(loc_mat_1));
+  MatrixType buf_mat_0;
+  MatrixType buf_mat_1;
+  Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat_0, mat_mir_0, loc_mat_0);
+  Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat_1, mat_mir_1, loc_mat_1);
 
   // gather vectors
   vec_mir_0.gather_dual(buf_vec_0, loc_vec_0);

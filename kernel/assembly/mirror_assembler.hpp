@@ -1,13 +1,17 @@
 #pragma once
-#ifndef KERNEL_SPACE_DOF_MIRROR_HPP
-#define KERNEL_SPACE_DOF_MIRROR_HPP 1
+#ifndef KERNEL_ASSEMBLY_MIRROR_ASSEMBLER_HPP
+#define KERNEL_ASSEMBLY_MIRROR_ASSEMBLER_HPP 1
 
 // includes, FEAST
-#include <kernel/adjacency/graph.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
+
+// includes, FEAST-LAFEM
+#include <kernel/lafem/matrix_mirror.hpp>
+#include <kernel/lafem/vector_mirror.hpp>
 
 namespace FEAST
 {
-  namespace Space
+  namespace Assembly
   {
     /// \cond internal
     namespace Intern
@@ -151,7 +155,7 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    class DofMirror
+    class MirrorAssembler
     {
     public:
       /**
@@ -160,7 +164,7 @@ namespace FEAST
       template<
         typename Space_,
         typename CellSet_>
-      static Adjacency::Graph assemble(
+      static Adjacency::Graph assemble_mirror_graph(
         const Space_& space,
         const CellSet_& cell_set)
       {
@@ -176,9 +180,119 @@ namespace FEAST
         Intern::DofMirrorHelpWrapper<Space_, CellSet_>::fill(ptr, idx, space, cell_set);
         return graph;
       }
-    }; // class DofMirror
 
-  } // namespace Space
+      /**
+       * \brief Assembles a Vector-Mirror from graph.
+       *
+       * \param[out] vec_mirror
+       * The vector mirror that is to be assembled.
+       *
+       * \param[in] graph
+       * The mirror adjacency graph.
+       */
+      template<typename MemType_, typename DataType_>
+      static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_>& vec_mirror, const Adjacency::Graph& graph)
+      {
+        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_gather_prim(), graph);
+        SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_scatter_prim(),
+          Adjacency::Graph(Adjacency::rt_transpose, graph));
+
+        vec_mirror.get_gather_prim().clear(DataType_(1));
+        vec_mirror.get_scatter_prim().clear(DataType_(1));
+      }
+
+      /**
+       * \brief Assembles a Vector-Mirror from a space and a cell-set.
+       *
+       * \param[out] vec_mirror
+       * The vector mirror that is to be assembled.
+       *
+       * \param[in] space
+       * A reference to the finite element space to be used.
+       *
+       * \param[in] cell_set
+       * A reference to the cell-set that is to be mirrored.
+       */
+      template<
+        typename MemType_,
+        typename DataType_,
+        typename Space_,
+        typename CellSet_>
+      static void assemble_mirror(LAFEM::VectorMirror<MemType_, DataType_>& vec_mirror,
+        const Space_& space, const CellSet_& cell_set)
+      {
+        assemble_mirror(vec_mirror, assemble_mirror_graph(space, cell_set));
+      }
+
+      /**
+       * \brief Assembles the Matrix-Mirror buffer graph.
+       *
+       * \param[in] matrix_mirror
+       * A reference to the matrix mirror that is to be used.
+       *
+       * \param[in] template_matrix
+       * A reference to the matrix that is to be mirrored.
+       */
+      template<
+        typename DataTypeA_,
+        typename DataTypeB_>
+      static Adjacency::Graph assemble_buffer_graph(
+        const LAFEM::MatrixMirror<Mem::Main, DataTypeA_>& matrix_mirror,
+        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeB_>& template_matrix)
+      {
+        Adjacency::Graph tmp(Adjacency::rt_injectify, matrix_mirror.get_row_mirror().get_gather_dual(), template_matrix);
+        return Adjacency::Graph(Adjacency::rt_injectify, tmp, matrix_mirror.get_col_mirror().get_scatter_dual());
+      }
+
+      /**
+       * \brief Assembles a Mirror-Buffer-Matrix.
+       *
+       * \param[out] buffer_matrix
+       * The buffer matrix that is to be assembled.
+       *
+       * \param[in] matrix_mirror
+       * A reference to the matrix mirror that is to be used.
+       *
+       * \param[in] template_matrix
+       * A reference to the matrix that is to be mirrored.
+       */
+      template<
+        typename DataTypeA_,
+        typename DataTypeB_,
+        typename DataTypeC_>
+      static void assemble_buffer_matrix(
+        LAFEM::SparseMatrixCSR<Mem::Main, DataTypeA_>& buffer_matrix,
+        const LAFEM::MatrixMirror<Mem::Main, DataTypeB_>& matrix_mirror,
+        const LAFEM::SparseMatrixCSR<Mem::Main, DataTypeC_>& template_matrix)
+      {
+        SymbolicMatrixAssemblerBase::assemble(buffer_matrix, assemble_buffer_graph(matrix_mirror, template_matrix));
+      }
+
+      /**
+       * \brief Assembles a Mirror-Buffer-Vector.
+       *
+       * \param[out] buffer_vector
+       * The buffer vector that is to be created.
+       *
+       * \param[in] vector_mirror
+       * A reference to the vector mirror that is to be used.
+       *
+       * \param[in] template_vector
+       * A reference to the vector that is to be mirrored.
+       */
+      template<
+        typename DataTypeA_,
+        typename DataTypeB_,
+        typename DataTypeC_>
+      static void assemble_buffer_vector(
+        LAFEM::DenseVector<Mem::Main, DataTypeA_>& buffer_vector,
+        const LAFEM::VectorMirror<Mem::Main, DataTypeB_>& vector_mirror,
+        const LAFEM::DenseVector<Mem::Main, DataTypeC_>& DOXY(template_vector))
+      {
+        buffer_vector = std::move(LAFEM::DenseVector<Mem::Main, DataTypeA_>(vector_mirror.size()));
+      }
+    }; // class DofMirror
+  } // namespace Assembly
 } // namespace FEAST
 
-#endif // KERNEL_SPACE_DOF_MIRROR_HPP
+#endif // KERNEL_ASSEMBLY_MIRROR_ASSEMBLER_HPP

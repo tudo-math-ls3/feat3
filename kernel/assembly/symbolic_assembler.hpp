@@ -1,16 +1,20 @@
 #pragma once
-#ifndef KERNEL_SPACE_DOF_ADJACENCY_HPP
-#define KERNEL_SPACE_DOF_ADJACENCY_HPP 1
+#ifndef KERNEL_ASSEMBLY_SYMBOLIC_ASSEMBLER_HPP
+#define KERNEL_ASSEMBLY_SYMBOLIC_ASSEMBLER_HPP 1
 
 // includes, FEAST
-#include <kernel/adjacency/graph.hpp>
+#include <kernel/space/dof_mapping_renderer.hpp>
+
+// includes, FEAST-LAFEM
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 namespace FEAST
 {
-  namespace Space
+  namespace Assembly
   {
     /**
-     * \brief Finite-Element Stencil namespace
+     * \brief Assembly Stencil namespace
      *
      * This namespace contains several stencil tag classes which are used by the DofAdjacency
      * class template to assemble dof adjacency graphs.
@@ -50,92 +54,11 @@ namespace FEAST
       };
     } // namespace Stencil
 
-    /**
-     * \brief Dof-Mapping renderer class
-     *
-     * \author Peter Zajac
-     */
-    class DofMappingRenderer
-    {
-    public:
-      /**
-       * \brief Renders the dof-mapping of a space into an adjacency graph.
-       *
-       * \param[in] space
-       * A reference to a finite element space whose dof-mapping is to be rendered.
-       *
-       * \returns
-       * The dof-mapping of the space given as an adjacency graph.
-       */
-      template<typename Space_>
-      static Adjacency::Graph render(const Space_& space)
-      {
-        // create a dof-mapping
-        typename Space_::DofMappingType dof_map(space);
-
-        // fetch the number of cells and dofs
-        const Index num_cells(space.get_mesh().get_num_entities(Space_::shape_dim));
-        const Index num_dofs(space.get_num_dofs());
-
-        // allocate the domain-pointer
-        Index* dom_ptr = new Index[num_cells+1];
-
-        // loop over all cells and build the domain pointer array
-        dom_ptr[0] = Index(0);
-        for(Index i(0); i < num_cells; ++i)
-        {
-          Index num_adj(0);
-          dof_map.prepare(i);
-          for(Index j(0); j < dof_map.get_num_local_dofs(); ++j)
-            num_adj += dof_map.get_num_contribs(j);
-          dof_map.finish();
-          dom_ptr[i+1] = dom_ptr[i] + num_adj;
-        }
-
-        // allocate the index array
-        Index* img_idx = new Index[dom_ptr[num_cells]];
-
-        // loop over all cells and build the image index array
-        for(Index i(0); i < num_cells; ++i)
-        {
-          Index l(dom_ptr[i]);
-          dof_map.prepare(i);
-          for(Index j(0); j < dof_map.get_num_local_dofs(); ++j)
-          {
-            for(Index k(0); k < dof_map.get_num_contribs(j); ++k, ++l)
-              img_idx[l] = dof_map.get_index(j, k);
-          }
-          dof_map.finish();
-        }
-
-        // create an adjacency graph
-        return Adjacency::Graph(num_cells, num_dofs, dom_ptr[num_cells], dom_ptr, nullptr, img_idx, false);
-      }
-    }; // class DofMappingRenderer
-
-    /**
-     * \brief Dof-Adjacency assembler class template
-     *
-     * This class is used for the assembly of dof-adjacency graphs of operators.
-     *
-     * \tparam Stencil_
-     * The stencil that is to be assembled. See Stencil namespace for details.
-     *
-     * \author Peter Zajac
-     */
     template<typename Stencil_ = Stencil::Standard>
-    class DofAdjacency DOXY({});
+    class SymbolicGraphAssembler DOXY({});
 
-    /**
-     * \brief Standard-Stencil Dof-Adjacency assembler class
-     *
-     * This class assembles a standard Dof-Adjacency graph for a combination of test- and trial-spaces
-     * on the same mesh.
-     *
-     * \author Peter Zajac
-     */
     template<>
-    class DofAdjacency<Stencil::Standard>
+    class SymbolicGraphAssembler<Stencil::Standard>
     {
     public:
       /**
@@ -150,11 +73,11 @@ namespace FEAST
       template<
         typename TestSpace_,
         typename TrialSpace_>
-      static Adjacency::Graph assemble(const TestSpace_& test_space, const TrialSpace_& trial_space)
+      static Adjacency::Graph assemble_graph(const TestSpace_& test_space, const TrialSpace_& trial_space)
       {
         // render dof-graphs
-        Adjacency::Graph test_dof_graph(DofMappingRenderer::render(test_space));
-        Adjacency::Graph trial_dof_graph(DofMappingRenderer::render(trial_space));
+        Adjacency::Graph test_dof_graph(Space::DofMappingRenderer::render(test_space));
+        Adjacency::Graph trial_dof_graph(Space::DofMappingRenderer::render(trial_space));
 
         // render transposed test-dof-mapping
         Adjacency::Graph test_dof_support(Adjacency::rt_transpose, test_dof_graph);
@@ -179,10 +102,10 @@ namespace FEAST
        * The standard Dof-Adjacency graph of the space.
        */
       template<typename Space_>
-      static Adjacency::Graph assemble(const Space_& space)
+      static Adjacency::Graph assemble_graph(const Space_& space)
       {
         // create dof-mapping
-        Adjacency::Graph dof_graph(DofMappingRenderer::render(space));
+        Adjacency::Graph dof_graph(Space::DofMappingRenderer::render(space));
 
         // render transposed dof-mapping
         Adjacency::Graph dof_support(Adjacency::rt_transpose, dof_graph);
@@ -196,7 +119,8 @@ namespace FEAST
         // return the graph
         return std::move(dof_adjactor);
       }
-    }; // class DofAdjacency<Stencil::Standard>
+    }; // class SymbolicGraphAssembler<Stencil::Standard>
+
 
     /**
      * \brief Standard-Refinement Dof-Adjacency assembler class
@@ -207,7 +131,7 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<>
-    class DofAdjacency<Stencil::StandardRefinement>
+    class SymbolicGraphAssembler<Stencil::StandardRefinement>
     {
     private:
       /// \cond internal
@@ -265,7 +189,7 @@ namespace FEAST
       template<
         typename FineTestSpace_,
         typename CoarseTrialSpace_>
-      static Adjacency::Graph assemble(
+      static Adjacency::Graph assemble_graph(
         const FineTestSpace_& fine_test_space,
         const CoarseTrialSpace_& coarse_trial_space)
       {
@@ -285,8 +209,8 @@ namespace FEAST
         RefinementAdjactor refine_adjactor(num_elements_coarse, num_children);
 
         // create test- and trial-dof-mappers
-        Adjacency::Graph test_dof_mapping(DofMappingRenderer::render(fine_test_space));
-        Adjacency::Graph trial_dof_mapping(DofMappingRenderer::render(coarse_trial_space));
+        Adjacency::Graph test_dof_mapping(Space::DofMappingRenderer::render(fine_test_space));
+        Adjacency::Graph trial_dof_mapping(Space::DofMappingRenderer::render(coarse_trial_space));
 
         // render transposed test-dof-mapping
         Adjacency::Graph test_dof_support(Adjacency::rt_injectify_transpose, refine_adjactor, test_dof_mapping);
@@ -300,8 +224,143 @@ namespace FEAST
         // return the graph
         return std::move(dof_adjactor);
       }
-    }; // class DofAdjacency<Stencil::StandardRefinement>
-  } // namespace Space
+    }; // class SymbolicGraphAssembler<Stencil::StandardRefinement>
+
+    /**
+     * \brief Symbolic matrix assembler base-class
+     *
+     * \author Peter Zajac
+     */
+    class SymbolicMatrixAssemblerBase
+    {
+    public:
+      /**
+       * \brief Assembles a CSR-Matrix from a Graph.
+       *
+       * \param[out] matrix
+       * A reference to the CSR-matrix to be assembled.
+       *
+       * \param[in] graph
+       * The graph representing the sparsity pattern.
+       */
+      template<typename MemType_, typename DataType_>
+      static void assemble(LAFEM::SparseMatrixCSR<MemType_, DataType_>& matrix, const Adjacency::Graph& graph)
+      {
+        Index num_rows = graph.get_num_nodes_domain();
+        Index num_cols = graph.get_num_nodes_image();
+        Index num_nnze = graph.get_num_indices();
+
+        // create temporary vectors
+        LAFEM::DenseVector<Mem::Main, Index> vrow_ptr(num_rows+1);
+        LAFEM::DenseVector<Mem::Main, Index> vcol_idx(num_nnze);
+        LAFEM::DenseVector<Mem::Main, DataType_> vdata(num_nnze, DataType_(0));
+
+        const Index* dom_ptr(graph.get_domain_ptr());
+        const Index* img_idx(graph.get_image_idx());
+        Index* row_ptr(vrow_ptr.elements());
+        Index* col_idx(vcol_idx.elements());
+
+        // build row-end
+        row_ptr[0] = dom_ptr[0];
+        for(Index i(0); i < num_rows; ++i)
+          row_ptr[i+1] = dom_ptr[i+1];
+
+        // build col-idx
+        for(Index i(0); i < num_nnze; ++i)
+          col_idx[i] = img_idx[i];
+
+        // build the matrix
+        matrix = LAFEM::SparseMatrixCSR<MemType_, DataType_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr);
+      }
+    };
+
+    /**
+     * \brief Symbolic Matrix assembler class template
+     *
+     * \tparam Stencil_
+     * One of the tag classes defined in the Stencil namespace identifying the type of the matrix
+     * stencil to be assembled.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Stencil_ = Stencil::Standard>
+    class SymbolicMatrixAssembler :
+      public SymbolicMatrixAssemblerBase
+    {
+    public:
+      /**
+       * \brief Assembles a CSR-Matrix from a test-trial-space pair.
+       *
+       * \param[out] matrix
+       * A reference to the CSR-matrix to be assembled.
+       *
+       * \param[in] test_space, trial_space
+       * The test- and trial-spaces to be used for the assembly.
+       */
+      template<
+        typename DataType_,
+        typename TestSpace_,
+        typename TrialSpace_>
+      static void assemble2(LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix,
+        const TestSpace_& test_space, const TrialSpace_& trial_space)
+      {
+        // assemble Graph
+        SymbolicMatrixAssemblerBase::assemble(matrix,
+          SymbolicGraphAssembler<Stencil_>::assemble_graph(test_space, trial_space));
+      }
+
+      /**
+       * \brief Assembles a CSR-Matrix from a single space.
+       *
+       * \param[out] matrix
+       * A reference to the CSR-matrix to be assembled.
+       *
+       * \param[in] space
+       * The space to be used for the assembly.
+       */
+      template<
+        typename DataType_,
+        typename Space_>
+      static void assemble1(LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix, const Space_& space)
+      {
+        // assemble Graph
+        SymbolicMatrixAssemblerBase::assemble(matrix,
+          SymbolicGraphAssembler<Stencil_>::assemble_graph(space));
+      }
+    }; // class SymbolicMatrixAssembler<...>
+
+    /**
+     * \brief Symbolic Matrix assembler class template for StandardRefinement stencil
+     *
+     * \author Peter Zajac
+     */
+    template<>
+    class SymbolicMatrixAssembler<Stencil::StandardRefinement> :
+      public SymbolicMatrixAssemblerBase
+    {
+    public:
+      /**
+       * \brief Assembles a CSR-Matrix from a fine-coarse-space pair.
+       *
+       * \param[out] matrix
+       * A reference to the CSR-matrix to be assembled.
+       *
+       * \param[in] fine_space, coarse_space
+       * The fine and coarse spaces to be used for the assembly.
+       */
+      template<
+        typename DataType_,
+        typename FineSpace_,
+        typename CoarseSpace_>
+      static void assemble(LAFEM::SparseMatrixCSR<Mem::Main, DataType_>& matrix,
+        const FineSpace_& fine_space, const CoarseSpace_& coarse_space)
+      {
+        // assemble Graph
+        SymbolicMatrixAssemblerBase::assemble(matrix,
+          SymbolicGraphAssembler<Stencil::StandardRefinement>::assemble_graph(fine_space, coarse_space));
+      }
+    }; // class SymbolicMatrixAssembler<...>
+  } // namespace Assembly
 } // namespace FEAST
 
-#endif // KERNEL_SPACE_DOF_ADJACENCY_HPP
+#endif // KERNEL_ASSEMBLY_SYMBOLIC_ASSEMBLER_HPP

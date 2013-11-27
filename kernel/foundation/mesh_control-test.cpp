@@ -17,10 +17,10 @@
 
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
-#include <kernel/space/dof_mirror.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
+#include <kernel/assembly/mirror_assembler.hpp>
 #include <kernel/assembly/dirichlet_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
@@ -839,7 +839,8 @@ class MeshControlPartitioningTest2D:
       // create space
       Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
-      SparseMatrixCSR<Mem::Main, double> mat_sys(Space::DofAdjacency<>::assemble(space));
+      SparseMatrixCSR<Mem::Main, double> mat_sys;
+      Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
       mat_sys.clear();
       Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
       Assembly::Common::LaplaceOperator operat;
@@ -875,12 +876,10 @@ class MeshControlPartitioningTest2D:
       std::vector<Index> destranks;
       std::vector<Index> sourceranks;
 
-      Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
-
       for(Index i(0) ; i < finemost_macro_boundaries.size() ; ++i)
       {
-        Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, *(finemost_macro_boundaries.at(i).get())));
-        VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
+        VectorMirror<Mem::Main, double> target_mirror;
+        Assembly::MirrorAssembler::assemble_mirror(target_mirror, space, *(finemost_macro_boundaries.at(i).get()));
         DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
         DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 

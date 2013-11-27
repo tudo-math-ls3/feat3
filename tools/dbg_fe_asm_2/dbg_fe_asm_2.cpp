@@ -2,7 +2,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
@@ -26,13 +26,14 @@ void test_asm(const Space_& space, const String& cubature_name, int imat)
 {
   std::cout << "Assembling matrix structure..." << std::endl;
 
-  Adjacency::Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
+  Adjacency::Graph dof_adjacency(Assembly::SymbolicGraphAssembler<>::assemble_graph(space));
   std::cout << "NEQ : " << dof_adjacency.get_num_nodes_domain() << std::endl;
   std::cout << "NNZE: " << dof_adjacency.get_num_indices() << std::endl;
 
   StopWatch stop_watch;
 
-  LAFEM::SparseMatrixCSR<Mem::Main, double> matrix_d(dof_adjacency);
+  LAFEM::SparseMatrixCSR<Mem::Main, double> matrix_d;
+  Assembly::SymbolicMatrixAssemblerBase::assemble(matrix_d, dof_adjacency);
 
   Cubature::DynamicFactory cubature_factory(cubature_name);
 

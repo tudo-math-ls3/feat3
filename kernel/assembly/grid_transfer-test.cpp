@@ -1,10 +1,10 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/math.hpp>
 
@@ -64,8 +64,9 @@ public:
     QuadSpaceQ1 space_c(trafo_c);
 
     // assemble matrix structure
-    typedef Space::DofAdjacency<Space::Stencil::StandardRefinement> DofAdjacency;
-    MatrixType prol_matrix(DofAdjacency::assemble(space_f, space_c));
+    //typedef Space::DofAdjacency<Space::Stencil::StandardRefinement> DofAdjacency;
+    MatrixType prol_matrix;//(DofAdjacency::assemble(space_f, space_c));
+    Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
 
     // check matrix dimensions
     TEST_CHECK_EQUAL(prol_matrix.rows(), 9u);
@@ -134,8 +135,9 @@ public:
     QuadSpaceQ1T space_c(trafo_c);
 
     // assemble matrix structure
-    typedef Space::DofAdjacency<Space::Stencil::StandardRefinement> DofAdjacency;
-    MatrixType prol_matrix(DofAdjacency::assemble(space_f, space_c));
+    //typedef Space::DofAdjacency<Space::Stencil::StandardRefinement> DofAdjacency;
+    MatrixType prol_matrix;//(DofAdjacency::assemble(space_f, space_c));
+    Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
 
     // check matrix dimensions
     TEST_CHECK_EQUAL(prol_matrix.rows(), 12u);

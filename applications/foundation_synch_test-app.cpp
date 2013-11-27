@@ -17,8 +17,8 @@
 
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
-#include <kernel/space/dof_mirror.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
+#include <kernel/assembly/mirror_assembler.hpp>
 
 #include <kernel/trafo/standard/mapping.hpp>
 
@@ -144,11 +144,9 @@ void check_synch_mirror(int rank)
   quad_trafo_type_ trafo(mesh);
   quad_space_type_ space(trafo);
 
-  Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
-  Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, cell));
-
   DenseVector<Mem::Main, double> target(space.get_num_dofs(), double(rank));
-  LAFEM::VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
+  LAFEM::VectorMirror<Mem::Main, double> target_mirror;
+  Assembly::MirrorAssembler::assemble_mirror(target_mirror, space, cell);
 
   //dont use create_buffer(..) from mirror
   DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
@@ -198,11 +196,9 @@ void check_synch_mirrors(int rank)
   quad_trafo_type_ trafo(mesh);
   quad_space_type_ space(trafo);
 
-  Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
-  Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, cell));
-
   DenseVector<Mem::Main, double> target(space.get_num_dofs(), double(rank));
-  LAFEM::VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
+  LAFEM::VectorMirror<Mem::Main, double> target_mirror;
+  Assembly::MirrorAssembler::assemble_mirror(target_mirror, space, cell);
 
   //dont use create_buffer(..) from mirror
   DenseVector<Mem::Main, double> sendbuf(target_mirror.size());

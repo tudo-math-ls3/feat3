@@ -4,8 +4,8 @@
 
 // includes, FEAST
 #include <kernel/lafem/vector_mirror.hpp>
-#include <kernel/adjacency/dynamic_graph.hpp>
-#include <kernel/adjacency/graph.hpp>
+//#include <kernel/adjacency/dynamic_graph.hpp>
+//#include <kernel/adjacency/graph.hpp>
 
 namespace FEAST
 {
@@ -74,6 +74,16 @@ namespace FEAST
         }
       }
 
+      const VectorMirrorType& get_row_mirror() const
+      {
+        return _row_mirror;
+      }
+
+      const VectorMirrorType& get_col_mirror() const
+      {
+        return _col_mirror;
+      }
+
       /**
        * \brief Creates a buffer matrix based on a template matrix.
        *
@@ -83,22 +93,22 @@ namespace FEAST
        * \returns
        * A new matrix of the same data-type and arch as the template matrix.
        */
-      template<typename DataType2_>
-      LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>
-        create_buffer(const LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>& tmpl_mat) const
-      {
-        // compute the sparsity pattern of
-        //  X := A * Y * B^T,
-        // where:
-        // X is the buffer matrix
-        // Y is the system matrix
-        // A is the row-mirror dual-gather matrix
-        // B is the col-mirror dual-gather matrix
-        Adjacency::DynamicGraph graph(Adjacency::rt_as_is, _row_mirror.get_gather_dual());
-        graph.compose(tmpl_mat);
-        graph.compose(_col_mirror.get_scatter_dual());
-        return LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>(Adjacency::Graph(Adjacency::rt_as_is, graph));
-      }
+      //template<typename DataType2_>
+      //LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>
+      //  create_buffer(const LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>& tmpl_mat) const
+      //{
+      //  // compute the sparsity pattern of
+      //  //  X := A * Y * B^T,
+      //  // where:
+      //  // X is the buffer matrix
+      //  // Y is the system matrix
+      //  // A is the row-mirror dual-gather matrix
+      //  // B is the col-mirror dual-gather matrix
+      //  Adjacency::DynamicGraph graph(Adjacency::rt_as_is, _row_mirror.get_gather_dual());
+      //  graph.compose(tmpl_mat);
+      //  graph.compose(_col_mirror.get_scatter_dual());
+      //  return LAFEM::SparseMatrixCSR<Mem::Main, DataType2_>(Adjacency::Graph(Adjacency::rt_as_is, graph));
+      //}
 
       /**
        * \brief Performs a gather-operation on an operator matrix.

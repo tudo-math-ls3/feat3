@@ -44,19 +44,6 @@ namespace FEAST
       {
       }
 
-      /**
-       * \brief Graph constructor
-       *
-       * This constructor creates a vector mirror based on a dof-mirror adjacency graph.
-       */
-      explicit VectorMirror(const Adjacency::Graph& gather_graph) :
-        _mirror_gather(gather_graph),
-        _mirror_scatter(Adjacency::Graph(Adjacency::rt_transpose, gather_graph))
-      {
-        _mirror_gather.clear(DataType(1));
-        _mirror_scatter.clear(DataType(1));
-      }
-
       /// \cond internal
       const MirrorMatrixType& get_gather_prim() const
       {
@@ -77,6 +64,26 @@ namespace FEAST
       {
         return _mirror_scatter;
       }
+
+      MirrorMatrixType& get_gather_prim()
+      {
+        return _mirror_gather;
+      }
+
+      MirrorMatrixType& get_gather_dual()
+      {
+        return _mirror_gather;
+      }
+
+      MirrorMatrixType& get_scatter_prim()
+      {
+        return _mirror_scatter;
+      }
+
+      MirrorMatrixType& get_scatter_dual()
+      {
+        return _mirror_scatter;
+      }
       /// \endcond
 
       /**
@@ -85,23 +92,6 @@ namespace FEAST
       Index size() const
       {
         return _mirror_gather.rows();
-      }
-
-      /**
-       * \brief Creates a buffer vector based on a template vector.
-       *
-       * \param[in] tmpl_vec
-       * A reference to the template vector.
-       *
-       * \returns
-       * A new vector of the same data-type and arch as the template vector.
-       */
-      template<
-        typename DataType2_>
-      LAFEM::DenseVector<Arch_, DataType2_> create_buffer(
-        const LAFEM::DenseVector<Arch_, DataType2_>& DOXY(tmpl_vec)) const
-      {
-        return LAFEM::DenseVector<Arch_, DataType2_>(size());
       }
 
       /**

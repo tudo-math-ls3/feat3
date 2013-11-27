@@ -32,11 +32,11 @@
 #include <kernel/archs.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
-#include <kernel/space/dof_mirror.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/common_functions.hpp>
+#include <kernel/assembly/mirror_assembler.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/dirichlet_assembler.hpp>
@@ -445,10 +445,9 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   Space::Lagrange1::Element<Trafo::Standard::Mapping<Geometry::ConformalMesh<Shape::Hypercube<2> > > > space(trafo);
 
   //assemble dof adjacencies
-  Adjacency::Graph dof_adj_base(Space::DofAdjacency<>::assemble(space_base)); //TODO do we need it?
-  Adjacency::Graph dof_adj(Space::DofAdjacency<>::assemble(space));
 
-  SparseMatrixCSR<Mem::Main, double> mat_sys(dof_adj);
+  SparseMatrixCSR<Mem::Main, double> mat_sys;
+  Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
   mat_sys.clear();
   Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
   Assembly::Common::LaplaceOperator laplace;
@@ -480,8 +479,8 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   std::cout << "proc " << rank << " #comm halos " << macro_comm_halos_fine.size() << std::endl;
   for(Index i(0) ; i < macro_comm_halos_fine.size() ; ++i)
   {
-    Adjacency::Graph dof_mirror(Space::DofMirror::assemble(space, *(macro_comm_halos_fine.at(i).get())));
-    VectorMirror<Mem::Main, double> target_mirror(dof_mirror);
+    VectorMirror<Mem::Main, double> target_mirror;
+    Assembly::MirrorAssembler::assemble_mirror(target_mirror, space, *(macro_comm_halos_fine.at(i).get()));
     DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
     DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
@@ -506,7 +505,8 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   {
     //gather data, exchange
     MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
-    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_localsys));
+    SparseMatrixCSR<Mem::Main, double> buf_mat;
+    Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, mat_localsys);
     mat_mirror.gather_op(buf_mat, mat_localsys);
 
     double* val(buf_mat.val());
@@ -565,7 +565,9 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
     MatrixMirror<Mem::Main, double> mat_mirror(mirrors.at(i), mirrors.at(i));
-    SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_localsys));
+    SparseMatrixCSR<Mem::Main, double> buf_mat;
+    Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat, mat_mirror, mat_localsys);
+
     mat_mirror.gather_op(buf_mat, mat_localsys);
 
     SparseMatrixCSR<Mem::Main, double> other_buf_mat(buf_mat.rows(),
@@ -668,8 +670,8 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
   ///gather solution vector on process 0
   //local mirror creation
-  Adjacency::Graph dof_mirror_local(Space::DofMirror::assemble(space_base, *macro_subset_geo_fine));
-  VectorMirror<Mem::Main, double> source_mirror_local(dof_mirror_local);
+  VectorMirror<Mem::Main, double> source_mirror_local;
+  Assembly::MirrorAssembler::assemble_mirror(source_mirror_local, space_base, *macro_subset_geo_fine);
   ///now we must send the mirror to rank 0 -> VM must implement foundation's sendable/bufferable interfaces -> TODO
   ///alternatively, we can create all needed subsets again on rank 0 and only communicate sol
   ///TODO send data.sol to rank 0

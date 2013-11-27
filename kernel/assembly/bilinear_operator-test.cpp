@@ -1,10 +1,10 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/geometry/conformal_factories.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/space/dof_adjacency.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
@@ -61,8 +61,8 @@ public:
     QuadSpaceQ0 space(trafo);
 
     // create a CSR matrices
-    Adjacency::Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
-    MatrixType matrix(dof_adjacency);
+    MatrixType matrix;
+    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
     matrix.clear();
 
     // create a cubature factory
@@ -97,9 +97,9 @@ public:
     QuadSpaceQ1 space(trafo);
 
     // create two CSR matrices
-    Adjacency::Graph dof_adjacency(Space::DofAdjacency<>::assemble(space));
-    MatrixType matrix_1(dof_adjacency);
-    MatrixType matrix_2(dof_adjacency);
+    MatrixType matrix_1, matrix_2;
+    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_1, space);
+    Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_2, space);
     matrix_1.clear();
     matrix_2.clear();
 

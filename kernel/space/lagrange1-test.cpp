@@ -2,7 +2,7 @@
 #include <kernel/geometry/test_aux/tetris_quad.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
+#include <kernel/space/dof_mapping_renderer.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/adjacency/graph.hpp>
 #include <kernel/geometry/conformal_factories.hpp>

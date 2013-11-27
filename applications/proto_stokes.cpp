@@ -20,7 +20,7 @@ for further application development.
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
-#include <kernel/space/dof_adjacency.hpp>
+#include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functions.hpp>
 #include <kernel/assembly/dirichlet_assembler.hpp>
@@ -315,10 +315,10 @@ public:
   void assemble_matrices()
   {
     // assemble matrix structures
-    _matrix_a = MatrixType(Space::DofAdjacency<>::assemble(_space_v));
-    _matrix_b1 = MatrixType(Space::DofAdjacency<>::assemble(_space_v, _space_p));
+    Assembly::SymbolicMatrixAssembler<>::assemble1(_matrix_a, _space_v);
+    Assembly::SymbolicMatrixAssembler<>::assemble2(_matrix_b1, _space_v, _space_p);
     _matrix_b2 = _matrix_b1.clone();
-    _matrix_m = MatrixType(Space::DofAdjacency<>::assemble(_space_p));
+    Assembly::SymbolicMatrixAssembler<>::assemble1(_matrix_m, _space_p);
 
     // create cubature factories
     Cubature::DynamicFactory cubature_factory_velo("gauss-legendre:3");
@@ -353,8 +353,8 @@ public:
   void assemble_prolrest(StokesLevel& coarse)
   {
     // assemble matrix structures
-    _prol_v = MatrixType(Space::DofAdjacency<Space::Stencil::StandardRefinement>::assemble(_space_v, coarse._space_v));
-    _prol_p = MatrixType(Space::DofAdjacency<Space::Stencil::StandardRefinement>::assemble(_space_p, coarse._space_p));
+    Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(_prol_v, _space_v, coarse._space_v);
+    Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(_prol_p, _space_p, coarse._space_p);
     _prol_v.clear();
     _prol_p.clear();
 
