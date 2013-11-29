@@ -145,20 +145,18 @@ namespace FEAST
 
           for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
           {
-            Index src_size(other.get_elements_size().at(i));
-            Index dest_size(other.get_elements_size().at(i));
-            DT2_ * temp((DT2_*)::malloc(src_size * sizeof(DT2_)));
-            MemoryPool<Arch2_>::template download<DT2_>(temp, other.get_elements().at(i), src_size);
-            MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(i), temp, dest_size);
+            const unsigned long size(other.get_elements_size().at(i));
+            DT2_ * temp((DT2_*)::malloc(size * sizeof(DT2_)));
+            MemoryPool<Arch2_>::template download<DT2_>(temp, other.get_elements().at(i), size);
+            MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(i), temp, size);
             ::free(temp);
           }
           for (Index i(0) ; i < other.get_indices().size() ; ++i)
           {
-            Index src_size(other.get_indices_size().at(i));
-            Index dest_size(other.get_indices_size().at(i));
-            Index * temp((Index*)::malloc(src_size * sizeof(Index)));
-            MemoryPool<Arch2_>::template download<Index>(temp, other.get_indices().at(i), src_size);
-            MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(i), temp, dest_size);
+            const unsigned long size(other.get_indices_size().at(i));
+            Index * temp((Index*)::malloc(size * sizeof(Index)));
+            MemoryPool<Arch2_>::template download<Index>(temp, other.get_indices().at(i), size);
+            MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(i), temp, size);
             ::free(temp);
           }
         }
@@ -275,23 +273,21 @@ namespace FEAST
 
           for (Index i(0) ; i < this->_elements_size.size() ; ++i)
           {
-            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
-            Index src_size(this->_elements_size.at(0));
-            Index dest_size(this->_elements_size.at(0));
-            DT2_ * temp((DT2_*)::malloc(src_size * sizeof(DT2_)));
-            MemoryPool<Mem2_>::template download<DT2_>(temp, other.get_elements().at(0), src_size);
-            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), temp, dest_size);
+            const unsigned long size(this->_elements_size.at(i));
+            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
+            DT2_ * temp((DT2_*)::malloc(size * sizeof(DT2_)));
+            MemoryPool<Mem2_>::template download<DT2_>(temp, other.get_elements().at(0), size);
+            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), temp, size);
             ::free(temp);
           }
 
           for (Index i(0) ; i < this->_indices_size.size() ; ++i)
           {
-            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_indices_size.at(i)));
-            Index src_size(this->_indices_size.at(0));
-            Index dest_size(this->_indices_size.at(0));
-            Index * temp((Index*)::malloc(src_size * sizeof(Index)));
-            MemoryPool<Mem2_>::template download<Index>(temp, other.get_indices().at(0), src_size);
-            MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), temp, dest_size);
+            const unsigned long size(this->_indices_size.at(i));
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(size));
+            Index * temp((Index*)::malloc(size * sizeof(Index)));
+            MemoryPool<Mem2_>::template download<Index>(temp, other.get_indices().at(0), size);
+            MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), temp, size);
             ::free(temp);
           }
 
