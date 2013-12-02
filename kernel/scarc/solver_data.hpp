@@ -808,76 +808,6 @@ namespace FEAST
       }
     };
 
-    ///multilevel solver data draft - NOTE: not subject to milestone 1 (v0.1)
-    template<typename DataType_ = double,
-             typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             typename TransferContType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             template<typename, typename> class StorageType_ = std::vector>
-    struct MultiLevelSolverData : public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>
-    {
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
-
-      typedef StorageType_<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_> >, std::allocator<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_> > > > leveldata_storage_type_;
-
-      ///fulfill pure virtual
-      virtual const std::string type_name()
-      {
-        return "MultiLevelSolverData";
-      }
-
-      ///CTOR from system
-      MultiLevelSolverData(matrix_type_& A,
-                           vector_type_& x,
-                           vector_type_& b,
-                           Index num_temp_vectors = 0,
-                           Index num_temp_scalars = 0,
-                           Index num_temp_indices = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
-        stored_level_data()
-      {
-        ///TODO
-      }
-
-      ///copy CTOR
-      MultiLevelSolverData(const MultiLevelSolverData& other) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
-        stored_level_data(other.stored_level_data)
-      {
-      }
-
-      ///assignment operator overload
-      MultiLevelSolverData& operator=(const MultiLevelSolverData& other)
-      {
-          if(this == &other)
-            return *this;
-
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
-        this->_stored_norm_0 = other._stored_norm_0;
-        this->_stored_norm = other._stored_norm;
-        this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
-
-        this->stored_level_data = other._stored_level_data;
-
-        return *this;
-      }
-
-      leveldata_storage_type_ stored_level_data;
-    };
-
     /**
      * \brief Filter data interface
      *
@@ -1045,6 +975,76 @@ namespace FEAST
         return *this;
       }
     };
+
+    template<typename DataType_ = double,
+             typename MemTag_ = Mem::Main,
+             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
+             typename TransferContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
+             template<typename, typename> class StorageType_ = std::vector>
+    struct MultiLevelSolverData : public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>
+    {
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+
+      typedef StorageType_<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_> >, std::allocator<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_> > > > leveldata_storage_type_;
+
+      ///fulfill pure virtual
+      virtual const std::string type_name()
+      {
+        return "MultiLevelSolverData";
+      }
+
+      ///CTOR from system
+      MultiLevelSolverData(matrix_type_& A,
+                           vector_type_& x,
+                           vector_type_& b,
+                           Index num_temp_vectors = 0,
+                           Index num_temp_scalars = 0,
+                           Index num_temp_indices = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
+        stored_level_data()
+      {
+        ///TODO
+      }
+
+      ///copy CTOR
+      MultiLevelSolverData(const MultiLevelSolverData& other) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
+        stored_level_data(other.stored_level_data)
+      {
+      }
+
+      ///assignment operator overload
+      MultiLevelSolverData& operator=(const MultiLevelSolverData& other)
+      {
+          if(this == &other)
+            return *this;
+
+        this->_stored_sys = other._stored_sys;
+        this->_stored_localsys = other._stored_localsys;
+        this->_stored_rhs = other._stored_rhs;
+        this->_stored_sol = other._stored_sol;
+        this->_stored_def = other._stored_def;
+        this->_stored_temp = other._stored_temp;
+        this->_stored_scalars = other._stored_scalars;
+        this->_stored_indices = other._stored_indices;
+        this->_stored_norm_0 = other._stored_norm_0;
+        this->_stored_norm = other._stored_norm;
+        this->_stored_eps = other._stored_eps;
+        this->_stored_max_iters = Index(0);
+        this->_stored_used_iters = Index(0);
+
+        this->stored_level_data = other._stored_level_data;
+
+        return *this;
+      }
+
+      leveldata_storage_type_ stored_level_data;
+    };
+
   }
 }
 
