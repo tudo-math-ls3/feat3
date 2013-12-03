@@ -39,7 +39,7 @@ def configure_gcc(cpu, buildmode):
     elif cpu == "pentium4m":
       cxxflags += " -march=pentium4m -m32"
     elif cpu == "coresolo":
-      cxxflags += " -march=native -m64"
+      cxxflags += " -march=prescott -msse2"
     elif cpu == "coreduo":
       cxxflags += " -march=core2 -m64"
     elif cpu == "penryn":

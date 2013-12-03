@@ -33,7 +33,7 @@ def configure_clang(cpu, buildmode):
     elif cpu == "pentium4m":
       cxxflags += " -march=pentium4m"
     elif cpu == "coresolo":
-      cxxflags += " -march=native"
+      cxxflags += " -march=prescott"
     elif cpu == "coreduo":
       cxxflags += " -march=core2"
     elif cpu == "penryn":

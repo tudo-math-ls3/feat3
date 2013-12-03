@@ -32,7 +32,7 @@ def configure_icc(cpu, buildmode):
     elif cpu == "pentiu4m":
       cxxflags += " -xsse2"
     elif cpu == "coresolo":
-      cxxflags += " -xsse3"
+      cxxflags += " -xsse2"
     elif cpu == "coreduo":
       cxxflags += " -xsse3"
     elif cpu == "pentryn":
