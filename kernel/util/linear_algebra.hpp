@@ -1780,7 +1780,7 @@ namespace FEAST
         {
           // note: we store the inverse of the main diagonal element rather than the element itself to perform
           //       multiplications rather than divisions later on.
-          a[i * (stride_a + 1)] = tp = TypeA_(1) / tp;
+          a[i * (stride_a + 1)] = tp = TypeA_(1) / a[i * (stride_a + 1)];
         }
         catch(...)
         {
