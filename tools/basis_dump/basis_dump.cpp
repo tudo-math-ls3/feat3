@@ -8,6 +8,7 @@
 #include <kernel/space/rannacher_turek/element.hpp>
 #include <kernel/space/bogner_fox_schmit/element.hpp>
 #include <kernel/space/hermite3/element.hpp>
+#include <kernel/space/argyris/element.hpp>
 
 #include <vector>
 
@@ -20,7 +21,7 @@ void dump_basis(String vtk_name, Index num_refines = 5);
 int main(int, char**)
 {
   // 1D Line Elements
-  {
+  {/*
     typedef Geometry::ConformalMesh< Shape::Hypercube<1> > MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
@@ -30,19 +31,23 @@ int main(int, char**)
     dump_basis< Space::Lagrange1::Element<TrafoType> >("1d_line_lagrange-1.vtk");
     // Bogner-Fox-Schmit
     dump_basis< Space::BognerFoxSchmit::Element<TrafoType> >("1d_line_bogner_fox_schmit.vtk");
+    //*/
   }
 
   // 2D Tria Elements
-  {
+  {//*
     typedef Geometry::ConformalMesh< Shape::Simplex<2> > MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // Discontinuous-0
-    dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_tria_discontinuous-0.vtk");
+    //dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_tria_discontinuous-0.vtk");
     // Lagrange-1
-    dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
+    //dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
     // Hermite-3
-    dump_basis< Space::Hermite3::Element<TrafoType> >("2d_tria_hermite-3.vtk");
+    //dump_basis< Space::Hermite3::Element<TrafoType> >("2d_tria_hermite-3.vtk");
+    // Argyris
+    dump_basis< Space::Argyris::Element<TrafoType> >("2d_tria_argyris.vtk");
+    //*/
   }
 
   // 3D Tetra Elements
@@ -57,7 +62,7 @@ int main(int, char**)
   }
 
   // 2D Quad Elements
-  {
+  {/*
     typedef Geometry::ConformalMesh< Shape::Hypercube<2> > MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
@@ -71,6 +76,7 @@ int main(int, char**)
     dump_basis< Space::BognerFoxSchmit::Element<TrafoType> >("2d_quad_bogner_fox_schmit.vtk");
     // Hermite-3
     dump_basis< Space::Hermite3::Element<TrafoType> >("2d_quad_hermite-3.vtk");
+    //*/
   }
 
   // 3D Hexa Elements
@@ -111,7 +117,7 @@ struct DumpWrapper<true>
       if(i > Index(0))
         v[i-1] = 0.0;
       v[i] = 1.0;
-      writer.write_values("phi_" + stringify(i), space, v.data());
+      writer.write_values(String("phi_") + (i < 10 ? "0" : "") + stringify(i), space, v.data());
     }
   }
 
@@ -127,7 +133,7 @@ struct DumpWrapper<true>
       if(i > Index(0))
         v[i-1] = 0.0;
       v[i] = 1.0;
-      writer.write_gradients("phi_" + stringify(i) + "_grad", space, v.data());
+      writer.write_gradients(String("phi_grad_") + (i < 10 ? "0" : "") + stringify(i), space, v.data());
     }
   }
 
@@ -143,7 +149,7 @@ struct DumpWrapper<true>
       if(i > Index(0))
         v[i-1] = 0.0;
       v[i] = 1.0;
-      writer.write_hessians("phi_" + stringify(i) + "_hess", space, v.data());
+      writer.write_hessians(String("phi_hess_") + (i < 10 ? "0" : "") + stringify(i), space, v.data());
     }
   }
 };
