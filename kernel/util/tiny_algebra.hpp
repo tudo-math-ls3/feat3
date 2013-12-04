@@ -337,6 +337,20 @@ namespace FEAST
         }
         return *this;
       }
+
+      /**
+       * \brief Computes the euclid norm of the vector.
+       *
+       * \returns
+       * The euclid norm of the vector.
+       */
+      DataType norm_euclid() const
+      {
+        T_ r(T_(0));
+        for(Index i(0); i < Index(n_); ++i)
+          r += Math::sqr(v[i]);
+        return Math::sqrt(r);
+      }
     }; // class Vector
 
     /**
