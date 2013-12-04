@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_LAFEM_DENSE_MATRIX_HPP
-#define KERNEL_LAFEM_DENSE_MATRIX_HPP 1
+#ifndef KERNEL_LAFEM_SPARSE_MATRIX_COO_HPP
+#define KERNEL_LAFEM_SPARSE_MATRIX_COO_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -1062,4 +1062,4 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_DENSE_VECTOR_HPP
+#endif // KERNEL_LAFEM_SPARSE_MATRIX_COO_HPP

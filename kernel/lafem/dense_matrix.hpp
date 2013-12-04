@@ -303,4 +303,4 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_DENSE_VECTOR_HPP
+#endif // KERNEL_LAFEM_DENSE_MATRIX_HPP
