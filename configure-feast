@@ -141,7 +141,7 @@ elif "opt" in buildid or "release" in buildid:
   cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=OFF"
   build_mode = "opt"
 else:
-  print ("No supported build mode (opt/debug) found in build id:")
+  print ("Error: No supported build mode (opt/debug) found in build id:")
   print (buildid_string)
   sys.exit(1)
 if "coverage" in buildid:
@@ -157,7 +157,7 @@ elif "mpi" in buildid:
   cmake_flags += " -DFEAST_SERIAL_MODE:BOOL=OFF"
   cmake_flags += " -DFEAST_MPI:BOOL=TRUE"
 else:
-  print ("No mpi statement nor serial statement found in build id:")
+  print ("Error: No mpi statement nor serial statement found in build id:")
   print (buildid_string)
   sys.exit(1)
 
@@ -168,7 +168,7 @@ cmake_flags += " -DFEAST_CPU_TYPE:STRING=" + cputype
 #compiler selection
 if "gcc" in buildid or "gnu" in buildid:
   if not is_found("g++"):
-    print ("Choosen compiler binary g++ not found!")
+    print ("Error: Choosen compiler binary g++ not found!")
     sys.exit(1)
   remove_string(unused_tokens, "gcc")
   remove_string(unused_tokens, "gnu")
@@ -177,7 +177,7 @@ if "gcc" in buildid or "gnu" in buildid:
   cxxflags += " " + configure_gcc (cputype, build_mode)
 elif "icc" in buildid or "intel" in buildid:
   if not is_found("icpc"):
-    print ("Choosen compiler binary icpc not found!")
+    print ("Error: Choosen compiler binary icpc not found!")
     sys.exit(1)
   remove_string(unused_tokens, "icc")
   remove_string(unused_tokens, "intel")
@@ -186,7 +186,7 @@ elif "icc" in buildid or "intel" in buildid:
   cxxflags += " " + configure_icc (cputype, build_mode)
 elif "clang" in buildid or "llvm" in buildid:
   if not is_found("clang++"):
-    print ("Choosen compiler binary clang++ not found!")
+    print ("Error: Choosen compiler binary clang++ not found!")
     sys.exit(1)
   remove_string(unused_tokens, "clang")
   remove_string(unused_tokens, "llvm")
@@ -194,13 +194,13 @@ elif "clang" in buildid or "llvm" in buildid:
   os.environ["CXX"] = "clang++"
   cxxflags += " " + configure_clang (cputype, build_mode)
 else:
-  print ("No supported compiler found in build id:")
+  print ("Error: No supported compiler found in build id:")
   print (buildid_string)
   sys.exit(1)
 
 if "ccache" in buildid:
   if not is_found("ccache"):
-    print ("Choosen compiler frontend binary ccache not found!")
+    print ("Error: Choosen compiler frontend binary ccache not found!")
     sys.exit(1)
   remove_string(unused_tokens, "ccache")
   os.environ["CC"] = "ccache " + os.environ["CC"]
@@ -209,7 +209,7 @@ if "ccache" in buildid:
 #additional backends
 if "cuda" in buildid:
   if not is_found("nvcc"):
-    print ("Choosen backend compiler binary nvcc not found!")
+    print ("Error: Choosen backend compiler binary nvcc not found!")
     sys.exit(1)
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAST_BACKENDS_CUDA:BOOL=ON"
@@ -254,9 +254,10 @@ os.environ["LDFLAGS"] = ldflags
 print ("============== configure_feast ===========")
 print ("Build-ID: " + buildid_string)
 if len(unused_tokens) == 0:
-  print ("Unused Build-ID tokens: none")
+  #print ("Unused Build-ID tokens: none")
+  pass
 else:
-  print ("Unused Build-ID tokens: " + "-".join(unused_tokens))
+  print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
 print ("Detected CPU Type: " + cputype)
 print
 print ("cxxflags: " + os.environ["CXXFLAGS"])

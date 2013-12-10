@@ -16,7 +16,13 @@ def remove_string(array, string):
   return array
 
 def get_output(command):
-  pipe = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+  pipe = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
   pipe.stdin.close()
   output = pipe.stdout.read().decode().splitlines()
+  return output
+
+def get_output_utf8(command):
+  pipe = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
+  pipe.stdin.close()
+  output = pipe.stdout.read().splitlines()
   return output
