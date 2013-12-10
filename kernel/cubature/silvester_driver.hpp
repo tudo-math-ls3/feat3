@@ -20,7 +20,6 @@ namespace FEAST
      * \tparam Shape_
      * The shape type of the element.
      *
-     * \todo implement 5,6 and 7 point rules for Simplex<2>
      * \todo implement Simplex<3> rules
      *
      * \author Peter Zajac
@@ -76,11 +75,11 @@ namespace FEAST
           break;
 
         case 3:
-          // 300
-          off += fill_sym1(rule, off, Weight_(-12) / Weight_(60), Coord_(2) / Coord_(6));
-          // 210
-          off += fill_sym2(rule, off, Weight_(  8) / Weight_(60), Coord_(4) / Coord_(6), Coord_(1) / Coord_(6));
           // 111
+          off += fill_sym1(rule, off, Weight_(-12) / Weight_(60), Coord_(2) / Coord_(6));
+          // 300
+          off += fill_sym2(rule, off, Weight_(  8) / Weight_(60), Coord_(4) / Coord_(6), Coord_(1) / Coord_(6));
+          // 310
           off += fill_sym3(rule, off, Weight_(  3) / Weight_(60), Coord_(3) / Coord_(6), Coord_(2) / Coord_(6), Coord_(1) / Coord_(6));
           break;
 
@@ -96,22 +95,59 @@ namespace FEAST
           break;
 
         case 5:
-          // TODO
+          // 500
+          off += fill_sym2(rule, off, Weight_(  71) / Weight_(730), Coord_(6) / Coord_(8), Coord_(1) / Coord_(8));
+          // 311
+          off += fill_sym2(rule, off, Weight_(-167) / Weight_(730), Coord_(4) / Coord_(8), Coord_(2) / Coord_(8));
+          // 122
+          off += fill_sym2(rule, off, Weight_( 113) / Weight_(730), Coord_(2) / Coord_(8), Coord_(3) / Coord_(8));
+          // 410
+          off += fill_sym3(rule, off, Weight_( -13) / Weight_(730), Coord_(5) / Coord_(8), Coord_(2) / Coord_(8), Coord_(1) / Coord_(8));
+          // 320
+          off += fill_sym3(rule, off, Weight_(  57) / Weight_(730), Coord_(4) / Coord_(8), Coord_(3) / Coord_(8), Coord_(1) / Coord_(8));
           break;
 
         case 6:
-          // TODO
+          // 222
+          off += fill_sym1(rule, off, Weight_( 3509) / Weight_(4480), Coord_(3) / Coord_(9));
+          // 600
+          off += fill_sym2(rule, off, Weight_(  767) / Weight_(4480), Coord_(7) / Coord_(9), Coord_(1) / Coord_(9));
+          // 411
+          off += fill_sym2(rule, off, Weight_(  387) / Weight_(4480), Coord_(4) / Coord_(9), Coord_(2) / Coord_(9));
+          // 033
+          off += fill_sym2(rule, off, Weight_(-3035) / Weight_(4480), Coord_(1) / Coord_(9), Coord_(4) / Coord_(9));
+          // 510
+          off += fill_sym3(rule, off, Weight_(-1257) / Weight_(4480), Coord_(6) / Coord_(9), Coord_(2) / Coord_(9), Coord_(1) / Coord_(9));
+          // 420
+          off += fill_sym3(rule, off, Weight_( 2901) / Weight_(4480), Coord_(5) / Coord_(9), Coord_(3) / Coord_(9), Coord_(1) / Coord_(9));
+          // 321
+          off += fill_sym3(rule, off, Weight_( -915) / Weight_(4480), Coord_(4) / Coord_(9), Coord_(3) / Coord_(9), Coord_(2) / Coord_(9));
           break;
 
         case 7:
-          // TODO
+          // 700
+          off += fill_sym2(rule, off, Weight_(  898) / Weight_(9072), Coord_(8) / Coord_(10), Coord_(1) / Coord_(10));
+          // 511
+          off += fill_sym2(rule, off, Weight_(-2522) / Weight_(9072), Coord_(6) / Coord_(10), Coord_(2) / Coord_(10));
+          // 133
+          off += fill_sym2(rule, off, Weight_(-5726) / Weight_(9072), Coord_(2) / Coord_(10), Coord_(4) / Coord_(10));
+          // 322
+          off += fill_sym2(rule, off, Weight_( 1444) / Weight_(9072), Coord_(4) / Coord_(10), Coord_(3) / Coord_(10));
+          // 610
+          off += fill_sym3(rule, off, Weight_( -662) / Weight_(9072), Coord_(7) / Coord_(10), Coord_(2) / Coord_(10), Coord_(1) / Coord_(10));
+          // 520
+          off += fill_sym3(rule, off, Weight_( 1573) / Weight_(9072), Coord_(6) / Coord_(10), Coord_(3) / Coord_(10), Coord_(1) / Coord_(10));
+          // 430
+          off += fill_sym3(rule, off, Weight_( -191) / Weight_(9072), Coord_(5) / Coord_(10), Coord_(4) / Coord_(10), Coord_(1) / Coord_(10));
+          // 421
+          off += fill_sym3(rule, off, Weight_( 2989) / Weight_(9072), Coord_(5) / Coord_(10), Coord_(3) / Coord_(10), Coord_(2) / Coord_(10));
           break;
 
         case 8:
           // 800
           off += fill_sym2(rule, off, Weight_( 1051445) / Weight_(7257600), Coord_(9) / Coord_(11), Coord_(1) / Coord_(11));
           // 611
-          off += fill_sym2(rule, off, Weight_(-1818134) / Weight_(7257600), Coord_(7) / Coord_(11), Coord_(2) / Coord_(11));
+          off += fill_sym2(rule, off, Weight_( 1818134) / Weight_(7257600), Coord_(7) / Coord_(11), Coord_(2) / Coord_(11));
           // 422
           off += fill_sym2(rule, off, Weight_(10685542) / Weight_(7257600), Coord_(5) / Coord_(11), Coord_(3) / Coord_(11));
           // 233
@@ -124,8 +160,12 @@ namespace FEAST
           off += fill_sym3(rule, off, Weight_( 6493915) / Weight_(7257600), Coord_(7) / Coord_(11), Coord_(3) / Coord_(11), Coord_(1) / Coord_(11));
           // 530
           off += fill_sym3(rule, off, Weight_(-9986439) / Weight_(7257600), Coord_(6) / Coord_(11), Coord_(4) / Coord_(11), Coord_(1) / Coord_(11));
+          // Note: The article referenced in the documentation of this class template claims that the following
+          // weight should be positive rather than negative. However, in this case, the sum of the weights does
+          // not match. The negative weight has been chosen in accordance to the implementation provided in
+          // http://people.sc.fsu.edu/~jburkardt/f_src/nco_triangle/nco_triangle.html
           // 521
-          off += fill_sym3(rule, off, Weight_( 3757007) / Weight_(7257600), Coord_(6) / Coord_(11), Coord_(3) / Coord_(11), Coord_(2) / Coord_(11));
+          off += fill_sym3(rule, off, Weight_(-3757007) / Weight_(7257600), Coord_(6) / Coord_(11), Coord_(3) / Coord_(11), Coord_(2) / Coord_(11));
           // 431
           off += fill_sym3(rule, off, Weight_(  478257) / Weight_(7257600), Coord_(5) / Coord_(11), Coord_(4) / Coord_(11), Coord_(2) / Coord_(11));
           break;

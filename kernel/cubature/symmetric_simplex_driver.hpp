@@ -58,14 +58,14 @@ namespace FEAST
         Coord_ x1)
       {
         rule.get_weight(off) = w;
-        rule.get_coord(off, 0) = x0; // 001
-        rule.get_coord(off, 1) = x0;
-        rule.get_weight(++off) = w;
-        rule.get_coord(off, 0) = x0; // 010
+        rule.get_coord(off, 0) = x0; // 011
         rule.get_coord(off, 1) = x1;
         rule.get_weight(++off) = w;
-        rule.get_coord(off, 0) = x1; // 100
+        rule.get_coord(off, 0) = x1; // 101
         rule.get_coord(off, 1) = x0;
+        rule.get_weight(++off) = w;
+        rule.get_coord(off, 0) = x1; // 110
+        rule.get_coord(off, 1) = x1;
         return Index(3);
       }
 
