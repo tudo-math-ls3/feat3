@@ -10,6 +10,7 @@
 #include <kernel/cubature/hammer_stroud_driver.hpp>
 #include <kernel/cubature/lauffer_driver.hpp>
 #include <kernel/cubature/silvester_driver.hpp>
+#include <kernel/cubature/dunavant_driver.hpp>
 #include <kernel/cubature/simplex_scalar_factory.hpp>
 #include <kernel/cubature/tensor_product_factory.hpp>
 #include <kernel/cubature/scalar/factory_wrapper.hpp>
@@ -161,6 +162,7 @@ namespace FEAST
         functor.template driver<HammerStroudD3Driver>();
         functor.template driver<LaufferD2Driver>();
         functor.template driver<SilvesterOpenDriver>();
+        functor.template driver<DunavantDriver>();
 
         // <<< END OF CUBATURE DRIVER LIST <<<
       }
