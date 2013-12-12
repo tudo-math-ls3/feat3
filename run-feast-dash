@@ -63,7 +63,7 @@ def run_test(build_id, branch, myDB):
   build_dirname = src_dirname + os.sep + "build"
 
   #create test run in database
-  r = Run.create(branch=branch, hostname=hostname, build=build_id, starttime=time.time(), endtime=time.time()+300)
+  r = Run.create(branch=branch, hostname=hostname, build=build_id, starttime=time.time())
   r.save()
   m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="directories", body=src_dirname + "\n" + build_dirname)
   m.save()
@@ -89,6 +89,8 @@ def run_test(build_id, branch, myDB):
   if "Error" in configure_output:
     m = Message.create(runid=r, stage="configure", status="error", timestamp=time.time(), title="output", body=configure_output)
     m.save()
+    r.endtime = time.time()
+    r.save()
     return
   elif "Warning" in configure_output:
     m = Message.create(runid=r, stage="configure", status="warning", timestamp=time.time(), title="output", body=configure_output)
@@ -138,6 +140,8 @@ def run_test(build_id, branch, myDB):
   failed = process_compiler_output("warning", make_output)
   failed |= process_compiler_output("error", make_output)
   if failed == True:
+    r.endtime = time.time()
+    r.save()
     return
 
 ######### TEST #####################
@@ -183,6 +187,9 @@ def run_test(build_id, branch, myDB):
   m.save()
   m = Message.create(runid=r, stage="test", status="failed", timestamp=time.time(), title=str(len(failed_tests)) + " tests failed", body=failed_tests)
   m.save()
+
+  r.endtime = time.time()
+  r.save()
 
 
 
