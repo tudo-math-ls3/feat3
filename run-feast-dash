@@ -136,7 +136,7 @@ def run_test(build_id, branch, myDB):
         idx += 1
     return failed
 
-  make_output = get_output_utf8("make  -k all tests")
+  make_output = get_output_utf8("make -k all tests")
   failed = process_compiler_output("warning", make_output)
   failed |= process_compiler_output("error", make_output)
   if failed == True:
@@ -147,15 +147,14 @@ def run_test(build_id, branch, myDB):
 ######### TEST #####################
   test_output = get_output_utf8("ctest --output-on-failure --schedule-random")
 
-  passed_tests = []
-  failed_tests = []
   idx = 0
   while idx < len(test_output):
     if ".   Passed" in test_output[idx]:
       test_name = test_output[idx].split(": ")
       test_name = test_name[1].split(" .")
       test_name = test_name[0]
-      passed_tests.append(test_name)
+      m = Message.create(runid=r, stage="test", status="passed", timestamp=time.time(), title=test_name)
+      m.save()
       idx += 1
 
     elif "***Failed" in test_output[idx]:
@@ -163,7 +162,6 @@ def run_test(build_id, branch, myDB):
       test_name = test_output[idx].split(": ")
       test_name = test_name[1].split(" .")
       test_name = test_name[0]
-      failed_tests.append(test_name)
 
       #search for last line corresponding to current failed test
       test_end = idx
@@ -182,11 +180,6 @@ def run_test(build_id, branch, myDB):
 
     else:
       idx += 1
-
-  m = Message.create(runid=r, stage="test", status="passed", timestamp=time.time(), title=str(len(passed_tests)) + " tests passed", body=passed_tests)
-  m.save()
-  m = Message.create(runid=r, stage="test", status="failed", timestamp=time.time(), title=str(len(failed_tests)) + " tests failed", body=failed_tests)
-  m.save()
 
   r.endtime = time.time()
   r.save()
