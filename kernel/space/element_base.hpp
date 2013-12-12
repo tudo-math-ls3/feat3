@@ -83,6 +83,9 @@ namespace FEAST
        *
        * \tparam shape_dim_
        * The dimension of the shape for which the Dof-Assignment is to be defined.
+       *
+       * \tparam DataType_
+       * The data-type that is to be used for evaluation.
        */
       template<
         int shape_dim_,
@@ -97,22 +100,18 @@ namespace FEAST
       /**
        * \brief Node-Functional class wrapper template
        *
-       * \tparam Functor_
-       * The class of the functor that is to be evaluated by the node functional.
-       * Must implement the DeriveFunctor interface.
+       * \tparam Function_
+       * The class of the function that is to be evaluated by the node functional.
+       * Must implement the Assembly::AnaylticFunction interface.
        *
        * \tparam shape_dim_
        * The dimension of the shape for which the node-functional is to be defined.
-       *
-       * \tparam Derive_
-       * The derivative tag class for which the node-functional is to be defined.
-       * Must be one of the tag classes defined in the FEAST::Derivative namespace.
        *
        * \tparam DataType_
        * The data-type that is to be used for evaluation.
        */
       template<
-        typename Functor_,
+        typename Function_,
         int shape_dim_,
         typename DataType_ = Real>
       class NodeFunctional

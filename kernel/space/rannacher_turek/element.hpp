@@ -103,7 +103,7 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Functor_,
+          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
@@ -118,7 +118,7 @@ namespace FEAST
 
         public:
           /// node functional type
-          typedef RannacherTurek::NodeFunctional<Element, Functor_, codim, VariantTag, DataType_> Type;
+          typedef RannacherTurek::NodeFunctional<Element, Function_, codim, VariantTag, DataType_> Type;
         };
 
       public:

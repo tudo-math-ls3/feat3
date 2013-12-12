@@ -8,6 +8,7 @@
 #include <kernel/space/dof_assignment_common.hpp>
 #include <kernel/space/argyris/dof_traits.hpp>
 #include <kernel/space/argyris/evaluator.hpp>
+#include <kernel/space/argyris/node_functional.hpp>
 
 namespace FEAST
 {
@@ -47,8 +48,8 @@ namespace FEAST
         /** \copydoc ElementBase::ElementCapabilities */
         enum ElementCapabilities
         {
-          /// no node functionals available
-          have_node_func = 0
+          /// node functionals available
+          have_node_func = 1
         };
 
 
@@ -93,14 +94,13 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Functor_,
+          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
         {
         public:
-          /// no node functionals available
-          typedef Nil Type;
+          typedef Argyris::NodeFunctional<Element, Function_, shape_dim_, DataType_> Type;
         };
 
       public:

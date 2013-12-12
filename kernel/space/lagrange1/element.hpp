@@ -92,14 +92,14 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Functor_,
+          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
         {
         public:
           /// node functional type
-          typedef Lagrange1::NodeFunctional<Element, Functor_, shape_dim_, DataType_> Type;
+          typedef Lagrange1::NodeFunctional<Element, Function_, shape_dim_, DataType_> Type;
         };
 
       public:

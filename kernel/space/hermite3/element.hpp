@@ -8,6 +8,7 @@
 #include <kernel/space/dof_mapping_common.hpp>
 #include <kernel/space/hermite3/dof_traits.hpp>
 #include <kernel/space/hermite3/evaluator.hpp>
+#include <kernel/space/hermite3/node_functional.hpp>
 
 namespace FEAST
 {
@@ -58,8 +59,8 @@ namespace FEAST
         /** \copydoc ElementBase::ElementCapabilities */
         enum ElementCapabilities
         {
-          /// no node functionals available
-          have_node_func = 0
+          /// node functionals available
+          have_node_func = 1
         };
 
         /** \copydoc ElementBase::Evaluator */
@@ -103,14 +104,13 @@ namespace FEAST
 
         /** \copydoc ElementBase::NodeFunctional */
         template<
-          typename Functor_,
+          typename Function_,
           int shape_dim_,
           typename DataType_ = Real>
         class NodeFunctional
         {
         public:
-          /// no node functionals available
-          typedef Nil Type;
+          typedef Hermite3::NodeFunctional<Element, Function_, ShapeType, shape_dim_, DataType_> Type;
         };
 
       public:
