@@ -17,8 +17,6 @@ from cmake_modules.feast_util import get_output_utf8
 
 sys.dont_write_bytecode = True
 
-
-
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 myDB = pw.MySQLDatabase("feastdash", host="augias", port=3306, user="feastdash", passwd="feastdash")
 myDB.connect()
@@ -201,6 +199,8 @@ if not is_found("git"):
   print ("git not found! aborting...")
   sys.exit(1)
 
+src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+os.chdir(src_dirname)
 # fetch remote branches and create a list of fetched branches
 #TODO insert output into database
 get_output("git fetch -v -p")
