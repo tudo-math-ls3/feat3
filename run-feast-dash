@@ -135,12 +135,8 @@ def run_test(build_id, branch, myDB):
     return failed
 
   make_output = get_output_utf8("make -k all tests")
-  failed = process_compiler_output("warning", make_output)
-  failed |= process_compiler_output("error", make_output)
-  if failed == True:
-    r.endtime = time.time()
-    r.save()
-    return
+  process_compiler_output("warning", make_output)
+  process_compiler_output("error", make_output)
 
 ######### TEST #####################
   test_output = get_output_utf8("ctest --output-on-failure --schedule-random")
