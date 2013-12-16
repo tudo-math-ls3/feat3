@@ -273,7 +273,7 @@ namespace FEAST
 
           // invert nodal matrix
           Index pivot[21];
-          LinAlg::mat_factorise(21, 21, 21, &node_mat.v[0][0], pivot);
+          LinAlg::mat_factorise((Index)21, (Index)21, (Index)21, &node_mat.v[0][0], pivot);
           LinAlg::mat_identity(21, 21, &_coeff.v[0][0]);
           LinAlg::mat_solve_mat<false>(21, 21, 21, &_coeff.v[0][0], 21, &node_mat.v[0][0], pivot);
         }
