@@ -221,6 +221,8 @@ for branch in branches:
   if found_branch == False:
     continue
 
+  run_test("guess", branch, myDB)
+
   if is_found("mpic++"):
     if is_found("g++"):
       run_test("mpi-gcc-debug-coverage-gmp-mkl" + addition, branch, myDB)
