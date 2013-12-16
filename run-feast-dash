@@ -134,7 +134,7 @@ def run_test(build_id, branch, myDB):
         idx += 1
     return failed
 
-  make_output = get_output_utf8("make -k all tests")
+  make_output = get_output_utf8("make -j 4 -O -k all tests")
   process_compiler_output("warning", make_output)
   process_compiler_output("error", make_output)
 
