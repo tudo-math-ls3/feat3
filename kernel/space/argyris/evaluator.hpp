@@ -275,7 +275,7 @@ namespace FEAST
           Index pivot[21];
           LinAlg::mat_factorise((Index)21, (Index)21, (Index)21, &node_mat.v[0][0], pivot);
           LinAlg::mat_identity((Index)21, (Index)21, &_coeff.v[0][0]);
-          LinAlg::mat_solve_mat<false>((Index)21, (Index)21, (Index)21, &_coeff.v[0][0], 21, &node_mat.v[0][0], pivot);
+          LinAlg::mat_solve_mat<false>((Index)21, (Index)21, (Index)21, &_coeff.v[0][0], (Index)21, &node_mat.v[0][0], pivot);
         }
 
         template<typename SpaceCfg_, typename TrafoCfg_>
