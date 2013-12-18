@@ -183,18 +183,34 @@ namespace FEAST
             {
               MPI_Status status;
 
-              MPI_Sendrecv(sendbuf,
-                           (int)num_elements_to_send,
-                           MPIType<DataType1_>::value(),
-                           (int)dest_rank,
-                           (int)send_tag,
-                           recvbuf,
-                           (int)num_elements_to_recv,
-                           MPIType<DataType2_>::value(),
-                           (int)source_rank,
-                           (int)recv_tag,
-                           communicator,
-                           &status);
+              if (sendbuf == recvbuf)
+              {
+                MPI_Sendrecv_replace(
+                    sendbuf,
+                    (int)num_elements_to_send,
+                    MPIType<DataType1_>::value(),
+                    (int)dest_rank,
+                    (int)send_tag,
+                    (int)source_rank,
+                    (int)recv_tag,
+                    communicator,
+                    &status);
+              }
+              else
+              {
+                MPI_Sendrecv(sendbuf,
+                    (int)num_elements_to_send,
+                    MPIType<DataType1_>::value(),
+                    (int)dest_rank,
+                    (int)send_tag,
+                    recvbuf,
+                    (int)num_elements_to_recv,
+                    MPIType<DataType2_>::value(),
+                    (int)source_rank,
+                    (int)recv_tag,
+                    communicator,
+                    &status);
+              }
             }
 
           template<typename DataType_>
