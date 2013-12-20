@@ -15,6 +15,9 @@ import smtplib
 
 sys.dont_write_bytecode = True
 
+def get_messages(r, stage, status):
+  return Message.select().where(Message.runid == r.id, Message.stage == stage, Message.status == status)
+
 myDB = pw.MySQLDatabase("feastdash", host="augias", port=3306, user="feastdash", passwd="feastdash")
 myDB.connect()
 
@@ -68,55 +71,99 @@ starttime = datetime.datetime(dt.year, dt.month, dt.day)
 endtime = datetime.datetime(dt.year, dt.month, dt.day, 23, 59)
 runs = Run.select().where(Run.starttime.between(time.mktime(starttime.timetuple()), time.mktime(endtime.timetuple())))
 
-mail_body = "Executed Runs:\n\n"
-summary = ""
+detailed_report = ""
+failed_report = ""
+passed_report = ""
+failed_runs = []
+passed_runs = []
 
 for run in runs:
-  def get_messages(stage, status):
-    return Message.select().where(Message.runid == run.id, Message.stage == stage, Message.status == status)
+  config_warning = get_messages(run, "configure", "warning")
+  config_error = get_messages(run, "configure", "error")
+  build_warning = get_messages(run, "build", "warning")
+  build_error = get_messages(run, "build", "error")
+  test_failed = get_messages(run, "test", "failed")
 
-  mail_body += "Host: " + run.hostname + " Branch: " + run.branch + " Buildid: "+ run.build + "\n"
-
-  mail_body += "=== CONFIGURE ===\n"
-  config_warning = get_messages("configure", "warning")
-  mail_body += "Warnings: " + str(config_warning.count()) + "\n"
-  config_error = get_messages("configure", "error")
-  mail_body += "Errors: " + str(config_error.count()) + "\n"
-
-  mail_body += "=== BUILD ===\n"
-  build_warning = get_messages("build", "warning")
-  mail_body += "Warnings: " + str(build_warning.count()) + "\n"
-  for i in build_warning:
-    mail_body += "   " + i.title + "\n"
-  build_error = get_messages("build", "error")
-  mail_body += "Errors: " + str(build_error.count()) + "\n"
-  for i in build_error:
-    mail_body += "   " + i.title + "\n"
-
-  mail_body += "=== TEST ===\n"
-  test_failed = get_messages("test", "failed")
-  mail_body += "Failed: " + str(test_failed.count()) + "\n"
-  for i in test_failed:
-    mail_body += "   " + i.title + "\n"
-  test_passed = get_messages("test", "passed")
-  mail_body += "Passed: " + str(test_passed.count()) + "\n"
-
-  mail_body += "\n\n"
-
-  if summary == "":
-    summary += "Failed Runs:\n"
   if config_warning.count() + config_error.count() + build_warning.count() + build_error.count() + test_failed.count() > 0:
-    summary += "  " + run.hostname + " " + run.branch + " "+ run.build + " C: " + str(config_warning.count()) + " " + str(config_error.count()) + " B: " + str(build_warning.count()) + " " + str(build_error.count()) + " T: " + str(test_failed.count()) + " " + str(test_passed.count()) + "\n"
+    failed_runs.append(run)
+  else:
+    passed_runs.append(run)
 
-if summary == "":
-  summary += "None\n"
-mail_body = "\n" + summary + "\n" + mail_body
+if len(failed_runs) == 0:
+  failed_report = "No run failed\n\n"
+else:
+  failed_report = "Failed runs:\n"
+  for run in failed_runs:
+    config_warning = get_messages(run, "configure", "warning")
+    config_error = get_messages(run, "configure", "error")
+    build_warning = get_messages(run, "build", "warning")
+    build_error = get_messages(run, "build", "error")
+    test_failed = get_messages(run, "test", "failed")
+    test_passed = get_messages(run, "test", "passed")
+
+    failed_report += "  " + run.hostname + " " + run.branch + " "+ run.build + " C: " + str(config_warning.count()) + " " + str(config_error.count()) + " B: " + str(build_warning.count()) + " " + str(build_error.count()) + " T: " + str(test_failed.count()) + " " + str(test_passed.count()) + "\n"
+
+if len(passed_runs) == 0:
+  passed_report = "No run passed without failure\n\n"
+else:
+  passed_report = "Passed runs:\n"
+  for run in passed_runs:
+    config_warning = get_messages(run, "configure", "warning")
+    config_error = get_messages(run, "configure", "error")
+    build_warning = get_messages(run, "build", "warning")
+    build_error = get_messages(run, "build", "error")
+    test_failed = get_messages(run, "test", "failed")
+    test_passed = get_messages(run, "test", "passed")
+
+    passed_report += "  " + run.hostname + " " + run.branch + " "+ run.build + " C: " + str(config_warning.count()) + " " + str(config_error.count()) + " B: " + str(build_warning.count()) + " " + str(build_error.count()) + " T: " + str(test_failed.count()) + " " + str(test_passed.count()) + "\n"
+
+
+if len(failed_runs) > 0:
+  detailed_report = "Detailed report of failed runs:\n\n"
+for run in failed_runs:
+  config_warning = get_messages(run, "configure", "warning")
+  config_error = get_messages(run, "configure", "error")
+  build_warning = get_messages(run, "build", "warning")
+  build_error = get_messages(run, "build", "error")
+  test_failed = get_messages(run, "test", "failed")
+  test_passed = get_messages(run, "test", "passed")
+
+  detailed_report += "Host: " + run.hostname + " Branch: " + run.branch + " Buildid: "+ run.build + "\n"
+
+  detailed_report += "=== CONFIGURE ===\n"
+  config_warning = get_messages(run, "configure", "warning")
+  detailed_report += "Warnings: " + str(config_warning.count()) + "\n"
+  config_error = get_messages(run, "configure", "error")
+  detailed_report += "Errors: " + str(config_error.count()) + "\n"
+
+  detailed_report += "=== BUILD ===\n"
+  build_warning = get_messages(run, "build", "warning")
+  detailed_report += "Warnings: " + str(build_warning.count()) + "\n"
+  for i in build_warning:
+    detailed_report += "   " + i.title + "\n"
+  build_error = get_messages(run, "build", "error")
+  detailed_report += "Errors: " + str(build_error.count()) + "\n"
+  for i in build_error:
+    detailed_report += "   " + i.title + "\n"
+
+  detailed_report += "=== TEST ===\n"
+  test_failed = get_messages(run, "test", "failed")
+  detailed_report += "Failed: " + str(test_failed.count()) + "\n"
+  for i in test_failed:
+    detailed_report += "   " + i.title + "\n"
+  test_passed = get_messages(run, "test", "passed")
+  detailed_report += "Passed: " + str(test_passed.count()) + "\n"
+
+  detailed_report += "\n\n"
+
+
+mail_body = "\n" + failed_report + "\n" + passed_report + "\n" + detailed_report
 
 mail_subject = "Subject: [FEAST-DASH] Summary Mail - "
-if summary == "None\n":
+if len(failed_runs) == 0:
   mail_subject += "All runs passed"
 else:
-  mail_subject += str(summary.count("\n") - 1) + " runs failed"
+  mail_subject += str(len(failed_runs))+ " runs failed"
 mail_from = "dirk.ribbrock@math.tu-dortmund.de"
 mail_to = [i.email for i in Subscriber.select()]
 
