@@ -16,7 +16,7 @@ using namespace FEAST::TestSystem;
 *
 * \test test description missing
 *
-* \tparam Arch_
+* \tparam Mem_
 * description missing
 *
 * \tparam DT_
@@ -25,16 +25,16 @@ using namespace FEAST::TestSystem;
 * \author Dirk Ribbrock
 */
 template<
-  typename Arch_,
+  typename Mem_,
   typename DT_>
 class SparseMatrixCSRTest
-  : public TaggedTest<Arch_, DT_>
+  : public TaggedTest<Mem_, DT_>
 {
 
 public:
 
   SparseMatrixCSRTest()
-    : TaggedTest<Arch_, DT_>("sparse_matrix_csr_test")
+    : TaggedTest<Mem_, DT_>("sparse_matrix_csr_test")
   {
   }
 
@@ -45,15 +45,21 @@ public:
     a.clear();
     a(1,2,7);
     a(5,5,2);
-    SparseMatrixCSR<Arch_, DT_> b(a);
-    TEST_CHECK_EQUAL(b.used_elements(), 2ul);
+    SparseMatrixCSR<Mem_, DT_> b(a);
+    TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
     TEST_CHECK_EQUAL(b.columns(), a.columns());
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
 
-    SparseMatrixCSR<Arch_, DT_> z(b);
+    SparseMatrixCSR<Mem_, DT_> bl(b.layout());
+    TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
+    TEST_CHECK_EQUAL(bl.size(), b.size());
+    TEST_CHECK_EQUAL(bl.rows(), b.rows());
+    TEST_CHECK_EQUAL(bl.columns(), b.columns());
+
+    SparseMatrixCSR<Mem_, DT_> z(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
@@ -61,17 +67,17 @@ public:
     TEST_CHECK_EQUAL(z(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
 
-    SparseMatrixCSR<Arch_, DT_> c;
+    SparseMatrixCSR<Mem_, DT_> c;
     c = b;
     TEST_CHECK_EQUAL(c.used_elements(), b.used_elements());
     TEST_CHECK_EQUAL(c(0,2), b(0,2));
     TEST_CHECK_EQUAL(c(1,2), b(1,2));
     TEST_CHECK_EQUAL(c, b);
 
-    DenseVector<Arch_, Index> col_ind(c.used_elements(), c.col_ind());
-    DenseVector<Arch_, DT_> val(c.used_elements(), c.val());
-    DenseVector<Arch_, Index> row_ptr(c.rows() + 1, c.row_ptr());
-    SparseMatrixCSR<Arch_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
+    DenseVector<Mem_, Index> col_ind(c.used_elements(), c.col_ind());
+    DenseVector<Mem_, DT_> val(c.used_elements(), c.val());
+    DenseVector<Mem_, Index> row_ptr(c.rows() + 1, c.row_ptr());
+    SparseMatrixCSR<Mem_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
     TEST_CHECK_EQUAL(d, c);
 
     SparseMatrixCSR<Mem::Main, DT_> e(c);
@@ -94,12 +100,12 @@ public:
           fcoo(row, col, DT_(-1));
       }
     }
-    SparseMatrixCSR<Arch_, DT_> f(fcoo);
+    SparseMatrixCSR<Mem_, DT_> f(fcoo);
 
     BinaryStream bs;
     f.write_out(fm_csr, bs);
     bs.seekg(0);
-    SparseMatrixCSR<Arch_, DT_> g(bs);
+    SparseMatrixCSR<Mem_, DT_> g(bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;

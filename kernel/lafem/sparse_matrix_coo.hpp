@@ -34,6 +34,7 @@ namespace FEAST
      * \tparam DT_ The datatype to be used.
      *
      * This class represents a sparse matrix, that stores its non zero elements alongside with its coordinates explicitly. \n\n
+     * Note, that the elements are sorted in a row major order.
      * Data survey: \n
      * _elements[0]: raw non zero number values \n
      * _indices[0]: row index \n

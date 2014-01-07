@@ -17,7 +17,7 @@ using namespace FEAST::TestSystem;
 *
 * \test test description missing
 *
-* \tparam Tag_
+* \tparam Mem_
 * description missing
 *
 * \tparam DT_
@@ -26,16 +26,16 @@ using namespace FEAST::TestSystem;
 * \author Dirk Ribbrock
 */
 template<
-  typename Tag_,
+  typename Mem_,
   typename DT_>
 class SparseMatrixELLTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Mem_, DT_>
 {
 
 public:
 
   SparseMatrixELLTest()
-    : TaggedTest<Tag_, DT_>("sparse_matrix_ell_test")
+    : TaggedTest<Mem_, DT_>("sparse_matrix_ell_test")
   {
   }
 
@@ -46,20 +46,26 @@ public:
     a.clear();
     a(1,2,7);
     a(5,5,2);
-    SparseMatrixELL<Tag_, DT_> b(a);
-    TEST_CHECK_EQUAL(b.used_elements(), 2ul);
+    SparseMatrixELL<Mem_, DT_> b(a);
+    TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
     TEST_CHECK_EQUAL(b.columns(), a.columns());
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
 
-    //SparseMatrixCSR<Tag_, DT_> b2(b);
-    SparseMatrixCSR<Tag_, DT_> b2(a);
-    SparseMatrixELL<Tag_, DT_> b3(b);
+    SparseMatrixELL<Mem_, DT_> bl(b.layout());
+    TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
+    TEST_CHECK_EQUAL(bl.size(), b.size());
+    TEST_CHECK_EQUAL(bl.rows(), b.rows());
+    TEST_CHECK_EQUAL(bl.columns(), b.columns());
+
+    //SparseMatrixCSR<Mem_, DT_> b2(b);
+    SparseMatrixCSR<Mem_, DT_> b2(a);
+    SparseMatrixELL<Mem_, DT_> b3(b);
     TEST_CHECK_EQUAL(b3, b);
 
-    SparseMatrixELL<Tag_, DT_> z(b);
+    SparseMatrixELL<Mem_, DT_> z(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
@@ -70,7 +76,7 @@ public:
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
     TEST_CHECK_EQUAL(z(1, 3), a(1, 3));
 
-    SparseMatrixELL<Tag_, DT_> c;
+    SparseMatrixELL<Mem_, DT_> c;
     c = b;
     TEST_CHECK_EQUAL(c.used_elements(), b.used_elements());
     TEST_CHECK_EQUAL(c(0,2), b(0,2));
@@ -95,12 +101,12 @@ public:
           fcoo(row, col, DT_(-1));
       }
     }
-    SparseMatrixELL<Tag_, DT_> f(fcoo);
+    SparseMatrixELL<Mem_, DT_> f(fcoo);
 
     BinaryStream bs;
     f.write_out(fm_ell, bs);
     bs.seekg(0);
-    SparseMatrixELL<Tag_, DT_> g(bs);
+    SparseMatrixELL<Mem_, DT_> g(bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;

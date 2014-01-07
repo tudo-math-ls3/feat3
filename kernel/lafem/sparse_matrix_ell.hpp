@@ -10,6 +10,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/algorithm.hpp>
+#include <kernel/lafem/sparse_layout.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -28,6 +29,9 @@ namespace FEAST
 
     template <typename Mem_, typename DT_>
     class SparseMatrixCOO;
+
+    template <typename Mem_, typename DT_>
+    class SparseMatrixELL;
 
     /**
      * \brief ELL based sparse matrix.
@@ -156,6 +160,29 @@ namespace FEAST
           this->_scalar_index.push_back(0);
           this->_scalar_index.push_back(0);
           this->_scalar_dt.push_back(DT_(0));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] layout The layout to be used.
+         *
+         * Creates an empty matrix with given layout.
+         */
+        explicit SparseMatrixELL(const SparseLayout<SparseMatrixELL<Mem_, bool> > & layout) :
+          Container<Mem_, DT_> (layout._scalar_index.at(0))
+        {
+          CONTEXT("When creating SparseMatrixELL");
+          this->_indices.assign(layout._indices.begin(), layout._indices.end());
+          this->_indices_size.assign(layout._indices_size.begin(), layout._indices_size.end());
+          this->_scalar_index.assign(layout._scalar_index.begin(), layout._scalar_index.end());
+          this->_scalar_dt.push_back(DT_(0));
+
+          for (auto i : this->_indices)
+            MemoryPool<Mem_>::instance()->increase_memory(i);
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(4) * this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
         }
 
         /**
@@ -623,6 +650,17 @@ namespace FEAST
             SparseMatrixELL<Mem::Main, DT_> temp(*this);
             return temp(row, col);
           }
+        }
+
+        /**
+         * \brief Retrieve convenient sparse matrix layout object.
+         *
+         * \return An object containing the sparse matrix layout.
+         */
+        SparseLayout<SparseMatrixELL<Mem_, bool> > layout() const
+        {
+          SparseLayout<SparseMatrixELL<Mem_, bool> > layout(this->_indices, this->_indices_size, this->_scalar_index);
+          return layout;
         }
 
         /**
