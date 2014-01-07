@@ -408,12 +408,6 @@ namespace FEAST
           Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying SparseMatrixELL");
-          this->_scalar_index.push_back(other.rows());
-          this->_scalar_index.push_back(other.columns());
-          this->_scalar_index.push_back(other.stride());
-          this->_scalar_index.push_back(other.num_cols_per_row());
-          this->_scalar_index.push_back(other.used_elements());
-          this->_scalar_dt.push_back(other.zero_element());
         }
 
         /**
@@ -428,12 +422,6 @@ namespace FEAST
           Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying SparseMatrixELL");
-          this->_scalar_index.push_back(other.rows());
-          this->_scalar_index.push_back(other.columns());
-          this->_scalar_index.push_back(other.stride());
-          this->_scalar_index.push_back(other.num_cols_per_row());
-          this->_scalar_index.push_back(other.used_elements());
-          this->_scalar_dt.push_back(other.zero_element());
         }
 
         /** \brief Clone operation
