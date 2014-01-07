@@ -59,6 +59,12 @@ public:
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
+    bl = b.layout();
+    TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
+    TEST_CHECK_EQUAL(bl.size(), b.size());
+    TEST_CHECK_EQUAL(bl.rows(), b.rows());
+    TEST_CHECK_EQUAL(bl.columns(), b.columns());
+
     SparseMatrixCSR<Mem_, DT_> z(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());

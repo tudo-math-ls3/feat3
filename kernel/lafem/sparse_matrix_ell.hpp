@@ -483,6 +483,43 @@ namespace FEAST
         }
 
         /**
+         * \brief Assignment operator
+         *
+         * \param[in] layout A sparse matrix layout.
+         *
+         * Assigns a new matrix layout, discarding all old data
+         */
+        SparseMatrixELL<Mem_, DT_> & operator= (const SparseLayout<SparseMatrixELL<Mem_, bool> > & layout)
+        {
+          CONTEXT("When assigning SparseMatrixELL");
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
+          this->_scalar_index.clear();
+          this->_scalar_dt.clear();
+
+          this->_indices.assign(layout._indices.begin(), layout._indices.end());
+          this->_indices_size.assign(layout._indices_size.begin(), layout._indices_size.end());
+          this->_scalar_index.assign(layout._scalar_index.begin(), layout._scalar_index.end());
+          this->_scalar_dt.push_back(DT_(0));
+
+          for (auto i : this->_indices)
+            MemoryPool<Mem_>::instance()->increase_memory(i);
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(4) * this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+
+          return *this;
+        }
+
+        /**
          * \brief Write out matrix to file.
          *
          * \param[in] mode The used file format.
