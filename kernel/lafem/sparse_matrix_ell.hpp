@@ -5,12 +5,16 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/algorithm.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
+#include <kernel/lafem/arch/sum.hpp>
+#include <kernel/lafem/arch/scale.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -23,16 +27,6 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    //forward declarations
-    template <typename Mem_, typename DT_>
-    class SparseMatrixCSR;
-
-    template <typename Mem_, typename DT_>
-    class SparseMatrixCOO;
-
-    template <typename Mem_, typename DT_>
-    class SparseMatrixELL;
-
     /**
      * \brief ELL based sparse matrix.
      *
@@ -791,6 +785,64 @@ namespace FEAST
         static String type_name()
         {
           return "SparseMatrixELL";
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow x + y\f$
+         *
+         * \param[in] x The first summand.
+         * \param[in] y The second summand.
+         */
+        template <typename Algo_>
+        void sum(const SparseMatrixELL<Mem_, DT_> & x, const SparseMatrixELL<Mem_, DT_> & y)
+        {
+          if (x.rows() != y.rows())
+            throw InternalError("Matrix rows do not match!");
+          if (x.rows() != this->rows())
+            throw InternalError("Matrix rows do not match!");
+          if (x.columns() != y.columns())
+            throw InternalError("Matrix columns do not match!");
+          if (x.columns() != this->columns())
+            throw InternalError("Matrix columns do not match!");
+          if (x.used_elements() != y.used_elements())
+            throw InternalError("Matrix used_elements do not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError("Matrix used_elements do not match!");
+          if (x.stride() != y.stride())
+            throw InternalError("Matrix stride do not match!");
+          if (x.stride() != this->stride())
+            throw InternalError("Matrix stride do not match!");
+          if (x.num_cols_per_row() != y.num_cols_per_row())
+            throw InternalError("Matrix num_cols_per_row do not match!");
+          if (x.num_cols_per_row() != this->num_cols_per_row())
+            throw InternalError("Matrix num_cols_per_row do not match!");
+
+          Arch::Sum<Mem_, Algo_>::value(this->Ax(), x.Ax(), y.Ax(), this->stride() * this->num_cols_per_row());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow x \cdot s\f$
+         *
+         * \param[in] x The matrix to be scaled.
+         * \param[in] s A scalar to scale x with.
+         */
+        template <typename Algo_>
+        void scale(const SparseMatrixELL<Mem_, DT_> & x, const DT_ s)
+        {
+          if (x.rows() != this->rows())
+            throw InternalError("Row count does not match!");
+          if (x.columns() != this->columns())
+            throw InternalError("Column count does not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError("Nonzero count does not match!");
+
+          Arch::Scale<Mem_, Algo_>::value(this->Ax(), x.Ax(), s, this->stride() * this->num_cols_per_row());
+        }
+
+        template <typename Algo_>
+        void product(const SparseMatrixELL<Mem_, DT_> & x, const DT_ s)
+        {
+          this->template scale<Algo_>(x, s);
         }
     };
 

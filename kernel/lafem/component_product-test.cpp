@@ -2,7 +2,6 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/component_product.hpp>
 #include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
@@ -47,21 +46,21 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size);
 
-      ComponentProduct<Algo_>::value(c, a, b);
+      c.template component_product<Algo_>(a, b);
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      ComponentProduct<Algo_>::value(a, a, b);
+      a.template component_product<Algo_>(a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(a, a_local);
-      ComponentProduct<Algo_>::value(b, a, b);
+      b.template component_product<Algo_>(a, b);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(b, b_local);
-      ComponentProduct<Algo_>::value(a, a, a);
+      a.template component_product<Algo_>(a, a);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }

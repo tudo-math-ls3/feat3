@@ -26,7 +26,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
-#include <kernel/lafem/scale.hpp>
 #include <kernel/foundation/halo_control.hpp>
 #include <kernel/foundation/halo.hpp>
 #include <kernel/archs.hpp>
@@ -578,7 +577,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
     std::cout << "proc " << rank << "A0_omega_i " << buf_mat;
     std::cout << "proc " << rank << "A0_omega_j " << other_buf_mat;
-    Sum<Algo::Generic>::value(buf_mat, buf_mat, other_buf_mat);
+    buf_mat.template sum<Algo::Generic>(buf_mat, other_buf_mat);
     std::cout << "proc " << rank << "A1_omega_i " << buf_mat;
     mat_mirror.scatter_op(mat_localsys, buf_mat);
   }
@@ -600,7 +599,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
       SparseMatrixCSR<Mem::Main, double> buf_mat(mat_mirror.create_buffer(mat_sys));
       mat_mirror.gather_op(buf_mat, mat_sys);
       DenseVector<Mem::Main, double> t(buf_mat.used_elements(), buf_mat.val());
-      Scale<Algo::Generic>::value(t, t, 0.5);
+      t.template scale<Algo::Generic>(t, 0.5);
       mat_mirror.scatter_op(mat_sys, buf_mat);
     }
   }*/

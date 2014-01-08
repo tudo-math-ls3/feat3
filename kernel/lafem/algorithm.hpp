@@ -5,10 +5,9 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/lafem/forward.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-
-
 
 namespace FEAST
 {

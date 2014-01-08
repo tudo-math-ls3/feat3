@@ -7,8 +7,6 @@
 #endif
 
 #include<kernel/foundation/communication.hpp>
-#include<kernel/lafem/sum.hpp>
-#include<kernel/lafem/scale.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -89,7 +87,7 @@ namespace FEAST
                                recvbuf.size(),
                                source_rank);
 
-        Sum<Tag_>::value(recvbuf, sendbuf, recvbuf);
+        recvbuf.template sum<Tag_>(sendbuf, recvbuf);
 
         mirror.scatter_dual(target, recvbuf);
       }
@@ -127,7 +125,7 @@ namespace FEAST
         {
           mirrors.at(i).gather_dual(sendbufs.at(i), target); //we dont need the sendbuf any more
 
-          Sum<Tag_>::value(recvbufs.at(i), sendbufs.at(i), recvbufs.at(i));
+          recvbufs.at(i).template sum<Tag_>(sendbufs.at(i), recvbufs.at(i));
 
           mirrors.at(i).scatter_dual(target, recvbufs.at(i));
         }
@@ -155,8 +153,8 @@ namespace FEAST
                                recvbuf.size(),
                                source_rank);
 
-        Sum<Tag_>::value(recvbuf, sendbuf, recvbuf);
-        Scale<Tag_>::value(recvbuf, recvbuf, typename VectorT_::DataType(0.5));
+        recvbuf.template sum<Tag_>(sendbuf, recvbuf);
+        recvbuf.template scale<Tag_>(recvbuf, typename VectorT_::DataType(0.5));
 
         mirror.scatter_dual(target, recvbuf);
       }
@@ -178,7 +176,7 @@ namespace FEAST
           if(mirrors.at(i).size() != 1)
           {
             mirrors.at(i).gather_dual(sendbufs.at(i), target);
-            Scale<Tag_>::value(sendbufs.at(i), sendbufs.at(i), typename VectorT_::DataType(0.5));
+            sendbufs.at(i).template scale<Tag_>(sendbufs.at(i), typename VectorT_::DataType(0.5));
             mirrors.at(i).scatter_dual(target, sendbufs.at(i));
           }
         }

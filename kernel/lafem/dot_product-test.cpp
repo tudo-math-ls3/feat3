@@ -2,8 +2,6 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/dot_product.hpp>
-#include <kernel/lafem/norm.hpp>
 #include <kernel/util/math.hpp>
 
 using namespace FEAST;
@@ -45,12 +43,12 @@ public:
 
       // a*b = 1
       DT_ ref(DT_(1));
-      DT_ c = DotProduct<Algo_>::value(a, b);
+      DT_ c  = a.template dot_product<Algo_>(b);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = DotProduct<Algo_>::value(b, a);
+      c = b.template dot_product<Algo_>(a);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = DotProduct<Algo_>::value(b, b);
-      ref = Norm2<Algo_>::value(b);
+      c = b.template dot_product<Algo_>(b);
+      ref = b.template norm2<Algo_>();
       ref *= ref;
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }

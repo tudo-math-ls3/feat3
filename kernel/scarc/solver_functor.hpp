@@ -15,11 +15,6 @@
 #include<kernel/base_header.hpp>
 #include<kernel/scarc/scarc_error.hpp>
 #include<kernel/foundation/synch.hpp>
-#include<kernel/lafem/defect.hpp>
-#include<kernel/lafem/sum.hpp>
-#include<kernel/lafem/difference.hpp>
-#include<kernel/lafem/product_matvec.hpp>
-#include<kernel/lafem/norm.hpp>
 
 using namespace FEAST::Foundation;
 using namespace FEAST;
@@ -147,7 +142,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          LAFEM::Sum<Algo_>::value(_y, _l, _r);
+          _y.template sum<Algo_>(_l, _r);
         }
 
         SumFunctorProxyLeft& operator=(const SumFunctorProxyLeft& rhs)
@@ -203,7 +198,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          LAFEM::Sum<Algo_>::value(_y, _l, _r);
+          _y.template sum<Algo_>(_l, _r);
         }
 
         SumFunctorProxyResultLeft& operator=(const SumFunctorProxyResultLeft& rhs)
@@ -260,7 +255,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          LAFEM::Sum<Algo_>::value(_y, _l, _r);
+          _y.template sum<Algo_>(_l, _r);
         }
 
         SumFunctorProxyAll& operator=(const SumFunctorProxyAll& rhs)
@@ -315,7 +310,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          LAFEM::Sum<Algo_>::value(_y, _l, _r);
+          _y.template sum<Algo_>(_l, _r);
         }
 
         SumFunctor& operator=(const SumFunctor& rhs)
@@ -369,7 +364,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+          _y.template difference<Algo_>( _l, _r);
         }
 
         DifferenceFunctorProxyLeft& operator=(const DifferenceFunctorProxyLeft& rhs)
@@ -426,7 +421,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+          _y.template difference<Algo_>( _l, _r);
         }
 
         DifferenceFunctorProxyResultLeft& operator=(const DifferenceFunctorProxyResultLeft& rhs)
@@ -483,7 +478,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+          _y.template difference<Algo_>( _l, _r);
         }
 
         DifferenceFunctorProxyAll& operator=(const DifferenceFunctorProxyAll& rhs)
@@ -538,7 +533,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          LAFEM::Difference<Algo_>::value(_y, _l, _r);
+          _y.template difference<Algo_>( _l, _r);
         }
 
         DifferenceFunctor& operator=(const DifferenceFunctor& rhs)
@@ -592,7 +587,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          LAFEM::ProductMatVec<Algo_>::value(_y, _l, _r);
+          _y.template product_matvec<Algo_>(_l, _r);
         }
 
         ProductFunctorProxyRight& operator=(const ProductFunctorProxyRight& rhs)
@@ -648,7 +643,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          LAFEM::ProductMatVec<Algo_>::value(_y, _l, _r);
+          _y.template product_matvec<Algo_>(_l, _r);
         }
 
         ProductFunctorProxyResultRight& operator=(const ProductFunctorProxyResultRight& rhs)
@@ -701,7 +696,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          LAFEM::ProductMatVec<Algo_>::value(_y, _l, _r);
+          _y.template product_matvec<Algo_>(_l, _r);
         }
 
         ProductFunctor& operator=(const ProductFunctor& rhs)
@@ -755,7 +750,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
 
-          LAFEM::Defect<Algo_>::value(_y, _l, _m, _r);
+          _y.template defect<Algo_>(_l, _m, _r);
         }
 
         DefectFunctorProxyRight& operator=(const DefectFunctorProxyRight& rhs)
@@ -814,7 +809,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
 
-          LAFEM::Defect<Algo_>::value(_y, _l, _m, _r);
+          _y.template defect<Algo_>(_l, _m, _r);
         }
 
         DefectFunctorProxyResultRight& operator=(const DefectFunctorProxyResultRight& rhs)
@@ -871,7 +866,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          LAFEM::Defect<Algo_>::value(_y, _l, _m, _r);
+          _y.template defect<Algo_>(_l, _m, _r);
         }
 
         DefectFunctor& operator=(const DefectFunctor& rhs)
@@ -1290,7 +1285,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = LAFEM::Norm2wosqrt<Algo_>::value(_x);
+          _y = _x.template norm2wosqrt<Algo_>();
         }
 
         NormFunctor2wosqrt& operator=(const NormFunctor2wosqrt& rhs)
@@ -1336,7 +1331,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = LAFEM::Norm2wosqrt<Algo_>::value(_x);
+          _y = _x.template norm2wosqrt<Algo_>();
         }
 
         NormFunctor2wosqrtProxyRight& operator=(const NormFunctor2wosqrtProxyRight& rhs)
@@ -1384,7 +1379,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = LAFEM::Norm2<Algo_>::value(_x);
+          _y = _x.template norm2<Algo_>();
         }
 
         NormFunctor2& operator=(const NormFunctor2& rhs)
@@ -1430,7 +1425,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = LAFEM::Norm2<Algo_>::value(_x);
+          _y = _x.template norm2<Algo_>();
         }
 
         NormFunctor2ProxyRight& operator=(const NormFunctor2ProxyRight& rhs)

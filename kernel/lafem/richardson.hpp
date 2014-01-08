@@ -8,11 +8,6 @@
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sum.hpp>
-#include <kernel/lafem/product_matvec.hpp>
-#include <kernel/lafem/defect.hpp>
-#include <kernel/lafem/norm.hpp>
-#include <kernel/lafem/component_product.hpp>
 #include <kernel/lafem/preconditioner.hpp>
 
 
@@ -33,18 +28,18 @@ namespace FEAST
         DenseVector<Arch_, DT_> temp_0(x.size());
         DenseVector<Arch_, DT_> temp_1(x.size());
 
-        Defect<Algo_>::value(temp_0, b, A, x);
-        DT_ initial_defect = Norm2<Algo_>::value(temp_0);
+        temp_0.template defect<Algo_>(b, A, x);
+        DT_ initial_defect = temp_0.template norm2<Algo_>();
 
         Index used_iters = 0;
         while(true)
         {
           ++used_iters;
 
-          Defect<Algo_>::value(temp_0, b, A, x);
-          DT_ current_defect = Norm2<Algo_>::value(temp_0);
+          temp_0.template defect<Algo_>(b, A, x);
+          DT_ current_defect = temp_0.template norm2<Algo_>();
           precon.apply(temp_1, temp_0);
-          Sum<Algo_>::value(x, x, temp_1);
+          x.template sum<Algo_>(x, temp_1);
 
           if(current_defect < eps_relative * initial_defect || current_defect < eps_relative || used_iters >= max_iters)
           {

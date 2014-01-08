@@ -36,7 +36,7 @@ class SolverFunctorTest:
       sf.substitute(l);
       sf.execute();
 
-      Sum<Algo_>::value(y_ref, l, r);
+      y_ref.template sum<Algo_>(l, r);
       TEST_CHECK_EQUAL(y, y_ref);
 
       //---------------------------------------------------------------------------------------------
@@ -73,8 +73,8 @@ class SolverFunctorTest:
       //reference
       DenseVector<Tag_, DataType_> a_ref(1000, DataType_(1));
       DenseVector<Tag_, DataType_> b_ref(1000, DataType_(1));
-      ProductMatVec<Algo_>::value(b_ref, A, a_ref);
-      Sum<Algo_>::value(a_ref, b_ref, a_ref);
+      b_ref.template product_matvec<Algo_>(A, a_ref);
+      a_ref.template sum<Algo_>(b_ref, a_ref);
 
       TEST_CHECK_EQUAL(a, a_ref);
 
@@ -101,8 +101,8 @@ class SolverFunctorTest:
       DenseVector<Tag_, DataType_> v_ref(1000, DataType_(0));
 
       copy(v_ref, u_ref);
-      ProductMatVec<Algo_>::value(u_ref, A, u_ref);
-      Sum<Algo_>::value(u_ref, v_ref, u_ref);
+      u_ref.template product_matvec<Algo_>(A, u_ref);
+      u_ref.template sum<Algo_>(v_ref, u_ref);
 
       TEST_CHECK_EQUAL(u, u_ref);
 
@@ -136,7 +136,7 @@ class SolverFunctorTest:
       defect.substitute(vx);
       defect.execute();
 
-      Defect<Algo_>::value(vy_ref, vb, A, vx);
+      vy_ref.template defect<Algo_>(vb, A, vx);
       TEST_CHECK_EQUAL(vy, vy_ref);
 
       DefectFunctor<Algo_, DenseVector<Tag_, DataType_>, SparseMatrixCSR<Tag_, DataType_> > defect1(vy, vb, A, vx);

@@ -4,8 +4,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/sum.hpp>
-#include <kernel/lafem/scale.hpp>
 #include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
@@ -50,21 +48,21 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size);
 
-      Sum<Algo_>::value(c, a, b);
+      c.template sum<Algo_>(a, b);
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      Sum<Algo_>::value(a, a, b);
+      a.template sum<Algo_>(a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(a, a_local);
-      Sum<Algo_>::value(b, a, b);
+      b.template sum<Algo_>(a, b);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(b, b_local);
-      Sum<Algo_>::value(a, a, a);
+      a.template sum<Algo_>(a, a);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }
@@ -87,58 +85,74 @@ DVSumTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_sum_test_double;
 template<
   typename Arch_,
   typename Algo_,
-  typename DT_>
-class SMCSRSumTest
+  typename DT_,
+  typename SM_>
+class SMSumTest
   : public TaggedTest<Arch_, DT_, Algo_>
 {
 
 public:
 
-  SMCSRSumTest()
+  SMSumTest()
     : TaggedTest<Arch_, DT_, Algo_>("smcsr_sum_test")
   {
   }
 
   virtual void run() const
   {
-    for (Index size(1) ; size < 3e2 ; size*=2)
+    Index size(123);
+    SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
+    for (Index row(0) ; row < a_local.rows() ; ++row)
     {
-      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
-      for (Index row(0) ; row < a_local.rows() ; ++row)
+      for (Index col(0) ; col < a_local.columns() ; ++col)
       {
-        for (Index col(0) ; col < a_local.columns() ; ++col)
-        {
-          if(row == col)
-            a_local(row, col, DT_(2));
-          else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
-        }
+        if(row == col)
+          a_local(row, col, DT_(2));
+        else if((row == col+1) || (row+1 == col))
+          a_local(row, col, DT_(-1));
       }
-      SparseMatrixCSR<Arch_, DT_> a(a_local);
-      SparseMatrixCSR<Arch_, DT_> b(a.clone());
-      DenseVector<Arch_, DT_> b_val(b.used_elements(), b.val());
-      Scale<Algo_>::value(b_val, b_val, DT_(2));
+    }
+    SM_ a(a_local);
+    SM_ b(a.clone());
+    b. template scale<Algo_>(b, DT_(2));
 
-      SparseMatrixCSR<Arch_, DT_> r(a.clone());
+    SM_ r(a.clone());
 
-      Sum<Algo_>::value(r, a, b);
+    r.template sum<Algo_>(a, b);
 
-      DenseVector<Arch_, DT_> a_val(a.used_elements(), a.val());
-      DenseVector<Arch_, DT_> r_val(r.used_elements(), r.val());
-
-      for (Index i(0) ; i < r_val.size() ; ++i)
+    for (Index i(0) ; i < a_local.rows() ; ++i)
+    {
+      for (Index j(0) ; j < a_local.columns() ; ++j)
       {
-        TEST_CHECK_EQUAL(r_val(i), a_val(i) + b_val(i));
+        TEST_CHECK_EQUAL(r(i, j), a(i, j) + b(i, j));
       }
     }
   }
 };
-SMCSRSumTest<Mem::Main, Algo::Generic, float> smcsr_sum_test_float;
-SMCSRSumTest<Mem::Main, Algo::Generic, double> smcsr_sum_test_double;
+SMSumTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > smcsr_sum_test_float;
+SMSumTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > smcsr_sum_test_double;
+#ifdef FEAST_BACKENDS_MKL
+SMSumTest<Mem::Main, Algo::MKL, float, SparseMatrixCSR<Mem::Main, float> > mkl_smcsr_sum_test_float;
+SMSumTest<Mem::Main, Algo::MKL, double, SparseMatrixCSR<Mem::Main, double> > mkl_smcsr_sum_test_double;
+#endif
 #ifdef FEAST_GMP
-SMCSRSumTest<Mem::Main, Algo::Generic, mpf_class> smcsr_sum_test_mpf_class;
+SMSumTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCSR<Mem::Main, mpf_class> > smcsr_sum_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-SMCSRSumTest<Mem::CUDA, Algo::CUDA, float> cuda_smcsr_sum_test_float;
-SMCSRSumTest<Mem::CUDA, Algo::CUDA, double> cuda_smcsr_sum_test_double;
+SMSumTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > cuda_smcsr_sum_test_float;
+SMSumTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > cuda_smcsr_sum_test_double;
+#endif
+
+SMSumTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > smell_sum_test_float;
+SMSumTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > smell_sum_test_double;
+#ifdef FEAST_BACKENDS_MKL
+SMSumTest<Mem::Main, Algo::MKL, float, SparseMatrixELL<Mem::Main, float> > mkl_smell_sum_test_float;
+SMSumTest<Mem::Main, Algo::MKL, double, SparseMatrixELL<Mem::Main, double> > mkl_smell_sum_test_double;
+#endif
+#ifdef FEAST_GMP
+SMSumTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixELL<Mem::Main, mpf_class> > smell_sum_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SMSumTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_smell_sum_test_float;
+SMSumTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_smell_sum_test_double;
 #endif

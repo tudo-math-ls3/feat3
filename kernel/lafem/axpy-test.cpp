@@ -2,11 +2,7 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/axpy.hpp>
 #include <kernel/lafem/algorithm.hpp>
-#include <kernel/lafem/product_matvec.hpp>
-#include <kernel/lafem/sum.hpp>
-#include <kernel/lafem/scale.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -48,18 +44,18 @@ public:
       copy(b, b_local);
 
       DenseVector<Arch_, DT_> c(size);
-      Axpy<Algo_>::value(c, s, a, b);
+      c.template axpy<Algo_>(s, a, b);
       copy(result_local, c);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      Axpy<Algo_>::value(a, s, a, b);
+      a.template axpy<Algo_>(s, a, b);
       copy(result_local, a);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       copy(a, a_local);
-      Axpy<Algo_>::value(b, s, a, b);
+      b.template axpy<Algo_>(s, a, b);
       copy(result_local, b);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
@@ -119,24 +115,24 @@ public:
       copy(c, c_local);
 
       DenseVector<Arch_, DT_> d(size);
-      Axpy<Algo_>::value(d, c, a, b);
+      d.template axpy<Algo_>(c, a, b);
       copy(result_local, d);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      Axpy<Algo_>::value(a, c, a, b);
+      a.template axpy<Algo_>(c, a, b);
       copy(result_local, a);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       copy(a, a_local);
-      Axpy<Algo_>::value(b, c, a, b);
+      b.template axpy<Algo_>(c, a, b);
       copy(result_local, b);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       copy(b, b_local);
-      Axpy<Algo_>::value(c, c, a, b);
+      c.template axpy<Algo_>(c, a, b);
       copy(result_local, c);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
@@ -202,12 +198,12 @@ public:
       SM_ a(a_local);
 
       DenseVector<Arch_, DT_> r(size);
-      Axpy<Algo_>::value(r, s, a, x, y);
+      r.template axpy<Algo_>(s, a, x, y);
       copy(result_local, r);
 
-      ProductMatVec<Algo_>::value(ref, a, x);
-      Scale<Algo_>::value(ref, ref, s);
-      Sum<Algo_>::value(ref, ref, y);
+      ref.template product_matvec<Algo_>(a, x);
+      ref.template scale<Algo_>(ref, s);
+      ref.template sum<Algo_>(ref, y);
       copy(ref_local, ref);
 
       for (Index i(0) ; i < size ; ++i)

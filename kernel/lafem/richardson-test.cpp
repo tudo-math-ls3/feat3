@@ -3,7 +3,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/richardson.hpp>
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/algorithm.hpp>
@@ -47,7 +46,7 @@ public:
 
     JacobiPreconditioner<Algo_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(0.7));
 
-    ProductMatVec<Algo_>::value(b, sys, ref);
+    b.template product_matvec<Algo_>(sys, ref);
 
     Richardson<Algo_>::value(x, sys, b, jac, 1000, DT_(1e-16));
 

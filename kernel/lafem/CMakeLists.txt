@@ -6,23 +6,21 @@ set (CMAKE_VERBOSE_MAKEFILE ON)
 # top lvl include dir
 INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 
+ADD_SUBDIRECTORY( arch )
+
 # list of lafem source files
-SET (kernel-lafem-list memory_pool.cpp)
+SET (kernel-lafem-list
+  memory_pool.cpp
+  )
 
 if (FEAST_BACKENDS_MKL)
   SET (kernel-lafem-list ${kernel-lafem-list}
-    axpy_mkl.cpp
-    component_product_mkl.cpp
-    defect_mkl.cpp
-    difference_mkl.cpp
-    dot_product_mkl.cpp
-    norm_mkl.cpp
-    product_matvec_mkl.cpp
-    scale_mkl.cpp sum_mkl.cpp
   )
 endif(FEAST_BACKENDS_MKL)
 
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
+TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch)
+
 if (FEAST_BACKENDS_MKL)
   TARGET_LINK_LIBRARIES(kernel-lafem
     libmkl_intel_ilp64.a
@@ -33,8 +31,8 @@ endif(FEAST_BACKENDS_MKL)
 
 if (FEAST_GMP)
 TARGET_LINK_LIBRARIES(kernel-lafem
-  libgmpxx.so
-  libgmp.so
+  libgmpxx.a
+  libgmp.a
   )
 endif (FEAST_GMP)
 
@@ -42,15 +40,6 @@ endif (FEAST_GMP)
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-cuda STATIC
     memory_pool.cu
-    axpy.cu
-    defect.cu
-    difference.cu
-    dot_product.cu
-    component_product.cu
-    norm.cu
-    product_matvec.cu
-    scale.cu
-    sum.cu
   )
   ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-cuda)

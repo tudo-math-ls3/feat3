@@ -6,7 +6,6 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
@@ -60,7 +59,7 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size, 4711);
 
-      ProductMatVec<Algo_>::value(c, a, b);
+      c.template product_matvec<Algo_>(a, b);
       copy(result_local, c);
 
       DT_ dev(DT_(0));

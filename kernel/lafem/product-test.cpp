@@ -4,10 +4,6 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/algorithm.hpp>
-#include <kernel/lafem/product.hpp>
-#include <kernel/lafem/norm.hpp>
-#include <kernel/lafem/dot_product.hpp>
-#include <kernel/lafem/scale.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -51,21 +47,21 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size);
 
-      Product<Algo_>::value(c, a, b);
+      c.template product<Algo_>(a, b);
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      Product<Algo_>::value(a, a, b);
+      a.template product<Algo_>(a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(a, a_local);
-      Product<Algo_>::value(b, a, b);
+      b.template product<Algo_>(a, b);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       copy(b, b_local);
-      Product<Algo_>::value(a, a, a);
+      a.template product<Algo_>(a, a);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }
@@ -132,7 +128,7 @@ public:
       copy(b, b_local);
       DenseVector<Arch_, DT_> c(size, 4711);
 
-      Product<Algo_>::value(c, a, b);
+      c.template product<Algo_>(a, b);
       copy(result_local, c);
 
       DT_ dev(DT_(0));
@@ -213,12 +209,12 @@ public:
 
       // a*b = 1
       DT_ ref(DT_(1));
-      DT_ c = Product<Algo_>::value(a, b);
+      DT_ c = a.template product<Algo_>(b);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = Product<Algo_>::value(b, a);
+      c = b.template product<Algo_>(a);
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
-      c = Product<Algo_>::value(b, b);
-      ref = Norm2<Algo_>::value(b);
+      c = b.template product<Algo_>(b);
+      ref = b.template norm2<Algo_>();
       ref *= ref;
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }
@@ -271,11 +267,11 @@ public:
       copy(a, a_local);
       DenseVector<Arch_, DT_> b(size);
 
-      Product<Algo_>::value(b, a, s);
+      b.template product<Algo_>(a, s);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      Product<Algo_>::value(a, a, s);
+      a.template product<Algo_>(a, s);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
     }
@@ -338,11 +334,11 @@ public:
       SM_ a(a_local);
       SM_ b(a.clone());
 
-      Product<Algo_>::value(b, a, s);
+      b.template product<Algo_>(a, s);
       SparseMatrixCOO<Mem::Main, DT_> b_local(b);
       TEST_CHECK_EQUAL(b_local, ref_local);
 
-      Product<Algo_>::value(a, a, s);
+      a.template product<Algo_>(a, s);
       SparseMatrixCOO<Arch_, DT_> a_coo(a);
       a_local = a_coo;
       TEST_CHECK_EQUAL(a_local, ref_local);

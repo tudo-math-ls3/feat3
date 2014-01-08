@@ -2,7 +2,6 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/norm.hpp>
 #include <kernel/util/math.hpp>
 
 using namespace FEAST;
@@ -41,7 +40,7 @@ public:
       const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size-1))));
 
       DenseVector<Arch_, DT_> a(a_local);
-      DT_ c = Norm2<Algo_>::value(a);
+      DT_ c = a.template norm2<Algo_>();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
     }
   }

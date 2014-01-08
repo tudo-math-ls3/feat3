@@ -5,9 +5,13 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/arch/scale.hpp>
 
 #include <vector>
 #include <map>
@@ -20,13 +24,6 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    //forward declarations
-    template <typename Mem_, typename DT_>
-    class SparseMatrixELL;
-
-    template <typename Mem_, typename DT_>
-    class SparseMatrixCSR;
-
     /**
      * \brief Coordinate based sparse matrix.
      *
@@ -1001,6 +998,31 @@ namespace FEAST
         static String type_name()
         {
           return "SparseMatrixCOO";
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow x \cdot s\f$
+         *
+         * \param[in] x The matrix to be scaled.
+         * \param[in] s A scalar to scale x with.
+         */
+        template <typename Algo_>
+        void scale(const SparseMatrixCOO<Mem_, DT_> & x, const DT_ s)
+        {
+          if (x.rows() != this->rows())
+            throw InternalError("Row count does not match!");
+          if (x.columns() != this->columns())
+            throw InternalError("Column count does not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError("Nonzero count does not match!");
+
+          Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), s, this->used_elements());
+        }
+
+        template <typename Algo_>
+        void product(const SparseMatrixCOO<Mem_, DT_> & x, const DT_ s)
+        {
+          this->template scale<Algo_>(x, s);
         }
     };
 

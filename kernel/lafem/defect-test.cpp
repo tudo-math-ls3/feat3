@@ -5,7 +5,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/defect.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -62,7 +61,7 @@ public:
       copy(rhs, rhs_local);
       DenseVector<Arch_, DT_> c(size, 4711);
 
-      Defect<Algo_>::value(c, rhs, a, b);
+      c.template defect<Algo_>(rhs, a, b);
       copy(result_local, c);
 
       DT_ dev(DT_(0));

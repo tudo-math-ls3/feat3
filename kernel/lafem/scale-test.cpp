@@ -2,8 +2,10 @@
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/scale.hpp>
 #include <kernel/lafem/algorithm.hpp>
+#include <kernel/lafem/sparse_matrix_coo.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -42,11 +44,11 @@ public:
       copy(a, a_local);
       DenseVector<Arch_, DT_> b(size);
 
-      Scale<Algo_>::value(b, a, s);
+      b.template scale<Algo_>(a, s);
       copy(result_local, b);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      Scale<Algo_>::value(a, a, s);
+      a.template scale<Algo_>(a, s);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);
     }
@@ -109,11 +111,11 @@ public:
       SM_ a(a_local);
       SM_ b(a.clone());
 
-      Scale<Algo_>::value(b, a, s);
+      b.template scale<Algo_>(a, s);
       SparseMatrixCOO<Mem::Main, DT_> b_local(b);
       TEST_CHECK_EQUAL(b_local, ref_local);
 
-      Scale<Algo_>::value(a, a, s);
+      a.template scale<Algo_>(a, s);
       SparseMatrixCOO<Arch_, DT_> a_coo(a);
       a_local = a_coo;
       TEST_CHECK_EQUAL(a_local, ref_local);
