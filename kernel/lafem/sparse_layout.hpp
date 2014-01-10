@@ -43,7 +43,7 @@ namespace FEAST
       }
 
       /// copy constructor
-      SparseLayout(const SparseLayout& other) :
+      SparseLayout(const SparseLayout & other) :
         _indices(other._indices),
         _indices_size(other._indices_size),
         _scalar_index(other._scalar_index)
@@ -52,11 +52,42 @@ namespace FEAST
           MemoryPool<typename SM_::MemType>::instance()->increase_memory(*it);
       }
 
+      /// move constructor
+      SparseLayout(SparseLayout && other) :
+        _indices(other._indices),
+        _indices_size(other._indices_size),
+        _scalar_index(other._scalar_index)
+      {
+      }
+
       /// virtual destructor
       virtual ~SparseLayout()
       {
         for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
           MemoryPool<typename SM_::MemType>::instance()->release_memory(*it);
+      }
+
+      /// operator=
+      SparseLayout & operator= (const SparseLayout & other)
+      {
+        _indices.assign(other._indices);
+        _indices_size.assign(other._indices_size);
+        _scalar_index.assign(other._scalar_index);
+
+        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
+          MemoryPool<typename SM_::MemType>::instance()->increase_memory(*it);
+
+        return *this;
+      }
+
+      /// move operator=
+      SparseLayout & operator= (SparseLayout && other)
+      {
+        _indices.assign(other._indices);
+        _indices_size.assign(other._indices_size);
+        _scalar_index.assign(other._scalar_index);
+
+        return *this;
       }
     };
   } // namespace LAFEM
