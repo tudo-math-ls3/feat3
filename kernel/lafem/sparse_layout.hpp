@@ -28,7 +28,7 @@ namespace FEAST
     template <typename SM_>
     class SparseLayout
     {
-      public:
+    public:
       std::vector<Index*> _indices;
       std::vector<Index> _indices_size;
       std::vector<Index> _scalar_index;
@@ -38,14 +38,25 @@ namespace FEAST
         _indices_size(indices_size),
         _scalar_index(scalar_index)
       {
-        for (auto i : this->_indices)
-          MemoryPool<typename SM_::MemType>::instance()->increase_memory(i);
+        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
+          MemoryPool<typename SM_::MemType>::instance()->increase_memory(*it);
       }
 
-      ~SparseLayout()
+      /// copy constructor
+      SparseLayout(const SparseLayout& other) :
+        _indices(other._indices),
+        _indices_size(other._indices_size),
+        _scalar_index(other._scalar_index)
       {
-        for (auto i : this->_indices)
-          MemoryPool<typename SM_::MemType>::instance()->release_memory(i);
+        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
+          MemoryPool<typename SM_::MemType>::instance()->increase_memory(*it);
+      }
+
+      /// virtual destructor
+      virtual ~SparseLayout()
+      {
+        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
+          MemoryPool<typename SM_::MemType>::instance()->release_memory(*it);
       }
     };
   } // namespace LAFEM
