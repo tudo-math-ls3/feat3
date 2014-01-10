@@ -221,13 +221,6 @@ namespace FEAST
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
-          this->_elements.clear();
-          this->_indices.clear();
-          this->_elements_size.clear();
-          this->_indices_size.clear();
-          this->_scalar_index.clear();
-          this->_scalar_dt.clear();
-
           std::vector<DT_ *> new_elements = other.get_elements();
           std::vector<Index*> new_indices = other.get_indices();
 
