@@ -112,7 +112,7 @@ def run_test(build_id, branch, myDB):
         idx += 1
 
       # error/warning in building block
-      elif token+":" in make_output[idx].lower():
+    elif token+":" in make_output[idx].lower() or token+" #" in make_output[idx].lower():
         failed = True
         #search for end of block
         iend = len(make_output)
