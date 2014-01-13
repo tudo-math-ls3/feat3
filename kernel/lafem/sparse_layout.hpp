@@ -38,8 +38,8 @@ namespace FEAST
         _indices_size(indices_size),
         _scalar_index(scalar_index)
       {
-        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
-          MemoryPool<typename SM_::MemType>::instance()->increase_memory(*it);
+        for(auto i : this->_indices)
+          MemoryPool<typename SM_::MemType>::instance()->increase_memory(i);
       }
 
       /// copy constructor
@@ -48,8 +48,8 @@ namespace FEAST
         _indices_size(other._indices_size),
         _scalar_index(other._scalar_index)
       {
-        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
-          MemoryPool<typename SM_::MemType>::instance()->increase_memory(*it);
+        for(auto i : this->_indices)
+          MemoryPool<typename SM_::MemType>::instance()->increase_memory(i);
       }
 
       /// move constructor
@@ -63,8 +63,8 @@ namespace FEAST
       /// virtual destructor
       virtual ~SparseLayout()
       {
-        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
-          MemoryPool<typename SM_::MemType>::instance()->release_memory(*it);
+        for(auto i : this->_indices)
+          MemoryPool<typename SM_::MemType>::instance()->release_memory(i);
       }
 
       /// operator=
@@ -74,8 +74,8 @@ namespace FEAST
         _indices_size.assign(other._indices_size);
         _scalar_index.assign(other._scalar_index);
 
-        for(auto it(this->_indices.begin()); it != this->_indices.end(); ++it)
-          MemoryPool<typename SM_::MemType>::instance()->increase_memory(*it);
+        for(auto i : this->_indices)
+          MemoryPool<typename SM_::MemType>::instance()->increase_memory(i);
 
         return *this;
       }
