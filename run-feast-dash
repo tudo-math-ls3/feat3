@@ -228,8 +228,8 @@ for branch in branches:
     if is_found("g++"):
       run_test("mpi-gcc-debug-coverage-gmp-mkl" + addition, branch, myDB)
       run_test("mpi-gcc-opt-coverage-gmp-mkl" + addition, branch, myDB)
-      if is_found ("ninja") and is_found("nvcc"):
-        run_test("mpi-gcc-opt-coverage-gmp-mkl-cuda-ninja", branch, myDB)
+      #if is_found ("ninja") and is_found("nvcc"):
+        #run_test("mpi-gcc-opt-coverage-gmp-mkl-cuda-ninja", branch, myDB)
     if is_found("clang++"):
       run_test("mpi-clang-debug-gmp-mkl" + addition, branch, myDB)
       run_test("mpi-clang-opt-gmp-mkl" + addition, branch, myDB)
