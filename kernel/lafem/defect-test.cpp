@@ -74,6 +74,20 @@ public:
       }
 
       TEST_CHECK(dev <= eps);
+
+      c.template apply<Algo_>(a, b, rhs, DT_(-1));
+      copy(result_local, c);
+
+      dev = DT_(0);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        DT_ sum(result_local(i) - rhs_local(i));
+        for (Index j(0) ; j < a_local.columns() ; ++j)
+          sum += a_local(i, j) * b_local(j);
+        dev = Math::max(dev, Math::abs(sum));
+      }
+
+      TEST_CHECK(dev <= eps);
     }
   }
 };

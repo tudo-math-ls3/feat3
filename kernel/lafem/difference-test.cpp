@@ -48,6 +48,10 @@ public:
       copy(result_local, c);
       TEST_CHECK_EQUAL(result_local, ref);
 
+      c.template apply<Algo_>(b, a, DT_(-1));
+      copy(result_local, c);
+      TEST_CHECK_EQUAL(result_local, ref);
+
       a.template difference<Algo_>(a, b);
       copy(result_local, a);
       TEST_CHECK_EQUAL(result_local, ref);

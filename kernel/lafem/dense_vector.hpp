@@ -657,6 +657,28 @@ namespace FEAST
         }
 
         /**
+         * \brief Calculate \f$this \leftarrow \alpha \cdot P \cdot x + y\f$
+         *
+         * \param[in] a A scalar to scale Px with.
+         * \param[in] x The vector to be multiplied and scaled.
+         * \param[in] P The matrix to be multiplied and scaled.
+         * \param[in] y The other vector
+         */
+        template <typename Algo_>
+        void axpy(const DT_ a, const SparseMatrixCOO<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
+
+        {
+          if (x.size() != P.columns())
+            throw InternalError("Vector size does not match!");
+          if (P.rows() != this->size())
+            throw InternalError("Vector size does not match!");
+          if (y.size() != this->size())
+            throw InternalError("Vector size does not match!");
+
+          Arch::Axpy<Mem_, Algo_>::coo(this->elements(), a, x.elements(), y.elements(), P.val(), P.row(), P.column(), P.rows(), P.used_elements());
+        }
+
+        /**
          * \brief Calculate Matrix-Vector-Product \f$this \leftarrow Ab\f$
          *
          * \param[in] A The matrix.
@@ -732,14 +754,14 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow rhs - Ab\f$
+         * \brief Calculate \f$this \leftarrow rhs - Ax\f$
          *
          * \param[in] rhs The right hand side of the system.
          * \param[in] A The system matrix.
-         * \param[in] b The given solution.
+         * \param[in] x The given solution.
          */
         template <typename Algo_>
-        void defect(const DenseVector<Mem::Main, DT_> & rhs, const SparseMatrixCSR<Mem::Main, DT_> & a, const DenseVector<Mem::Main, DT_> & x)
+        void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixCSR<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
             throw InternalError("Vector size does not match!");
@@ -752,14 +774,14 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow rhs - Ab\f$
+         * \brief Calculate \f$this \leftarrow rhs - Ax\f$
          *
          * \param[in] rhs The right hand side of the system.
          * \param[in] A The system matrix.
-         * \param[in] b The given solution.
+         * \param[in] x The given solution.
          */
         template <typename Algo_>
-        void defect(const DenseVector<Mem::Main, DT_> & rhs, const SparseMatrixELL<Mem::Main, DT_> & a, const DenseVector<Mem::Main, DT_> & x)
+        void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixELL<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
             throw InternalError("Vector size does not match!");
@@ -772,14 +794,14 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow rhs - Ab\f$
+         * \brief Calculate \f$this \leftarrow rhs - Ax\f$
          *
          * \param[in] rhs The right hand side of the system.
          * \param[in] A The system matrix.
-         * \param[in] b The given solution.
+         * \param[in] x The given solution.
          */
         template <typename Algo_>
-        void defect(const DenseVector<Mem::Main, DT_> & rhs, const SparseMatrixCOO<Mem::Main, DT_> & a, const DenseVector<Mem::Main, DT_> & x)
+        void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixCOO<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
             throw InternalError("Vector size does not match!");
@@ -789,6 +811,45 @@ namespace FEAST
             throw InternalError("Vector size does not match!");
 
           Arch::Defect<Mem_, Algo_>::coo(this->elements(), rhs.elements(), a.val(), a.row(), a.column(), x.elements(), a.rows(), a.used_elements());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow y +  s \cdot x\f$
+         *
+         * \param[in] y A vector.
+         * \param[in] x The vector to be scaled.
+         * \param[in] s The scaling value (defaults to 1)
+         */
+        template <typename Algo_>
+        void apply(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y, DT_ s = DT_(1))
+        {
+          this->axpy<Algo_>(s, x, y);
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow Ax\f$
+         *
+         * \param[in] a A Matrix.
+         * \param[in] x A Vector.
+         */
+        template <typename Algo_, typename SM_>
+        void apply(const SM_ & a, const DenseVector<Mem_, DT_> & x)
+        {
+          this->product_matvec<Algo_>(a, x);
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow y +  s \cdot Ax\f$
+         *
+         * \param[in] y A vector.
+         * \param[in] a The matrix to be multiplied and scaled.
+         * \param[in] x The vector to be multiplied and scaled.
+         * \param[in] s The scaling value (defaults to 1)
+         */
+        template <typename Algo_, typename SM_>
+        void apply(const SM_ & a, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y, DT_ s = DT_(1))
+        {
+          this->axpy<Algo_>(s, a, x, y);
         }
 
         /**
@@ -805,7 +866,6 @@ namespace FEAST
 
           return Arch::DotProduct<Mem_, Algo_>::value(this->elements(), x.elements(), this->size());
         }
-
 
         /**
          * \brief Calculate \f$r \leftarrow \sqrt{ \sum\limits_i this_i \cdot this_i } \f$

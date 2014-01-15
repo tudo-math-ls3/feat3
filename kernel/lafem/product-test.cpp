@@ -70,7 +70,7 @@ public:
 DVComponentProductTest2<Mem::Main, Algo::Generic, float> dv_component_product_test_float2;
 DVComponentProductTest2<Mem::Main, Algo::Generic, double> dv_component_product_test_double2;
 #ifdef FEAST_GMP
-//DVComponentProductTest2<Mem::Main, Algo::Generic, mpf_class> dv_component_product_test_mpf_class2;
+DVComponentProductTest2<Mem::Main, Algo::Generic, mpf_class> dv_component_product_test_mpf_class2;
 #endif
 #ifdef FEAST_BACKENDS_MKL
 DVComponentProductTest2<Mem::Main, Algo::MKL, float> mkl_dv_component_product_test_float2;
@@ -280,7 +280,7 @@ public:
 DVScaleTest2<Mem::Main, Algo::Generic, float> dv_scale_test_float;
 DVScaleTest2<Mem::Main, Algo::Generic, double> dv_scale_test_double;
 #ifdef FEAST_GMP
-//DVScaleTest2<Mem::Main, Algo::Generic, mpf_class> dv_scale_test_mpf_class;
+DVScaleTest2<Mem::Main, Algo::Generic, mpf_class> dv_scale_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_MKL
 DVScaleTest2<Mem::Main, Algo::MKL, float> mkl_dv_scale_test_float;
@@ -348,17 +348,17 @@ public:
 SMScaleTest2<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > sm_coo_scale_test_float;
 SMScaleTest2<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > sm_coo_scale_test_double;
 #ifdef FEAST_GMP
-//SMScaleTest2<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > sm_coo_scale_test_mpf_class;
+SMScaleTest2<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > sm_coo_scale_test_mpf_class;
 #endif
 SMScaleTest2<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > sm_csr_scale_test_float;
 SMScaleTest2<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > sm_csr_scale_test_double;
 #ifdef FEAST_GMP
-//SMScaleTest2<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCSR<Mem::Main, mpf_class> > sm_csr_scale_test_mpf_class;
+SMScaleTest2<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCSR<Mem::Main, mpf_class> > sm_csr_scale_test_mpf_class;
 #endif
 SMScaleTest2<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > sm_ell_scale_test_float;
 SMScaleTest2<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > sm_ell_scale_test_double;
 #ifdef FEAST_GMP
-//SMScaleTest2<Mem::Main, Algo::Generic, mpf_class, SparseMatrixELL<Mem::Main, mpf_class> > sm_ell_scale_test_mpf_class;
+SMScaleTest2<Mem::Main, Algo::Generic, mpf_class, SparseMatrixELL<Mem::Main, mpf_class> > sm_ell_scale_test_mpf_class;
 #endif
 #ifdef FEAST_BACKENDS_MKL
 SMScaleTest2<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_sm_coo_scale_test_float;
