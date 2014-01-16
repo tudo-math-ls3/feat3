@@ -43,6 +43,7 @@ if (FEAST_BACKENDS_CUDA)
   )
   ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-cuda)
+  TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-cuda)
 endif(FEAST_BACKENDS_CUDA)
 
 # list of lafem tests

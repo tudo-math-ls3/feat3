@@ -47,6 +47,7 @@ if (FEAST_BACKENDS_CUDA)
     scale.cu
     sum.cu
   )
-  CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
   ADD_DEPENDENCIES(kernel-lafem-arch kernel-lafem-arch-cuda)
+  CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
+  TARGET_LINK_LIBRARIES(kernel-lafem-arch kernel-lafem-arch-cuda)
 endif(FEAST_BACKENDS_CUDA)
