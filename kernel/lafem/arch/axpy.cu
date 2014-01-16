@@ -43,6 +43,23 @@ namespace FEAST
       }
 
       template <typename DT_>
+      __global__ void cuda_axpy_mv_v_csr(DT_ * r, const DT_ * a, const DT_ * x, const DT_ * y, const DT_ * val, const Index * col_ind,
+          const Index * row_ptr, const Index count)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+        if (idx >= count)
+          return;
+
+        DT_ sum(0);
+        const Index end(row_ptr[idx + 1]);
+        for (Index i(row_ptr[idx]) ; i < end ; ++i)
+        {
+          sum += val[i] * x[col_ind[i]];
+        }
+        r[idx] = (sum * a[idx]) + y[idx];
+      }
+
+      template <typename DT_>
       __global__ void cuda_axpy_mv_ell(DT_ * r, const DT_ a, const DT_ * x, const DT_ * y, const DT_ * Ax, const Index * Aj,
           const Index * Arl, const Index stride, const Index count)
       {
@@ -69,6 +86,35 @@ namespace FEAST
           tAx += stride;
         }
         r[row] = (sum * a) + y[idx];
+      }
+
+      template <typename DT_>
+      __global__ void cuda_axpy_mv_v_ell(DT_ * r, const DT_ * a, const DT_ * x, const DT_ * y, const DT_ * Ax, const Index * Aj,
+          const Index * Arl, const Index stride, const Index count)
+      {
+        Index idx = threadIdx.x + blockDim.x * blockIdx.x;
+        if (idx >= count)
+          return;
+
+        const Index row(idx);
+        const Index * tAj(Aj);
+        const DT_ * tAx(Ax);
+        DT_ sum(0);
+        tAj += row;
+        tAx += row;
+
+        const Index max(Arl[row]);
+        for(Index n(0); n < max ; n++)
+        {
+          const DT_ A_ij = *tAx;
+
+          const Index col = *tAj;
+          sum += A_ij * x[col];
+
+          tAj += stride;
+          tAx += stride;
+        }
+        r[row] = (sum * a[idx]) + y[idx];
       }
     }
   }
@@ -105,7 +151,6 @@ void Axpy<Mem::CUDA, Algo::CUDA>::dv(DT_ * r, const DT_ * const a, const DT_ * c
 
   FEAST::LAFEM::Intern::cuda_axpyv<<<grid, block>>>(r, a, x, y, size);
 }
-
 template void Axpy<Mem::CUDA, Algo::CUDA>::dv(float *, const float * const, const float * const, const float * const, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::dv(double *, const double * const, const double * const, const double * const, const Index);
 
@@ -120,9 +165,22 @@ void Axpy<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ a, const DT_ * const x,
 
   FEAST::LAFEM::Intern::cuda_axpy_mv_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows);
 }
-
 template void Axpy<Mem::CUDA, Algo::CUDA>::csr(float *, const float, const float * const, const float * const, const float * const, const Index * const, const Index * const, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::csr(double *, const double, const double * const, const double * const, const double * const, const Index * const, const Index * const, const Index);
+
+template <typename DT_>
+void Axpy<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows)
+{
+  Index blocksize(128);
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((rows)/(double)(block.x));
+
+  FEAST::LAFEM::Intern::cuda_axpy_mv_v_csr<<<grid, block>>>(r, a, x, y, val, col_ind, row_ptr, rows);
+}
+template void Axpy<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const float * const, const float * const, const Index * const, const Index * const, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const double * const, const double * const, const Index * const, const Index * const, const Index);
 
 template <typename DT_>
 void Axpy<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const Ax, const Index * const Aj, const Index * const Arl, const Index stride, const Index rows)
@@ -138,3 +196,18 @@ void Axpy<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ a, const DT_ * const x,
 
 template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float, const float * const, const float * const, const float * const, const Index * const, const Index * const, const Index, const Index);
 template void Axpy<Mem::CUDA, Algo::CUDA>::ell(double *, const double, const double * const, const double * const, const double * const, const Index * const, const Index * const, const Index, const Index);
+
+template <typename DT_>
+void Axpy<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const DT_ * const Ax, const Index * const Aj, const Index * const Arl, const Index stride, const Index rows)
+{
+  Index blocksize(128);
+  dim3 grid;
+  dim3 block;
+  block.x = blocksize;
+  grid.x = (unsigned)ceil((rows)/(double)(block.x));
+
+  FEAST::LAFEM::Intern::cuda_axpy_mv_v_ell<<<grid, block>>>(r, a, x, y, Ax, Aj, Arl, stride, rows);
+}
+
+template void Axpy<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const float * const, const float * const, const Index * const, const Index * const, const Index, const Index);
+template void Axpy<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const double * const, const double * const, const Index * const, const Index * const, const Index, const Index);

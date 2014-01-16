@@ -608,12 +608,14 @@ namespace FEAST
             throw InternalError("Vector size does not match!");
           if (x.size() != this->size())
             throw InternalError("Vector size does not match!");
+          if (a.size() != this->size())
+            throw InternalError("Vector size does not match!");
 
           Arch::Axpy<Mem_, Algo_>::dv(this->elements(), a.elements(), x.elements(), y.elements(), this->size());
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow \alpha \cdot P \cdot x + y\f$
+         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
          *
          * \param[in] a A scalar to scale Px with.
          * \param[in] x The vector to be multiplied and scaled.
@@ -635,7 +637,31 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow \alpha \cdot P \cdot x + y\f$
+         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
+         *
+         * \param[in] a The vector to scale Px with.
+         * \param[in] x The vector to be multiplied and scaled.
+         * \param[in] P The matrix to be multiplied and scaled.
+         * \param[in] y The other vector
+         */
+        template <typename Algo_>
+        void axpy(const DenseVector<Mem_, DT_> & a, const SparseMatrixCSR<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
+
+        {
+          if (x.size() != P.columns())
+            throw InternalError("Vector size does not match!");
+          if (P.rows() != this->size())
+            throw InternalError("Vector size does not match!");
+          if (y.size() != this->size())
+            throw InternalError("Vector size does not match!");
+          if (a.size() != this->size())
+            throw InternalError("Vector size does not match!");
+
+          Arch::Axpy<Mem_, Algo_>::csr(this->elements(), a.elements(), x.elements(), y.elements(), P.val(), P.col_ind(), P.row_ptr(), P.rows());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
          *
          * \param[in] a A scalar to scale Px with.
          * \param[in] x The vector to be multiplied and scaled.
@@ -657,7 +683,31 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow \alpha \cdot P \cdot x + y\f$
+         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
+         *
+         * \param[in] a The vector to scale Px with.
+         * \param[in] x The vector to be multiplied and scaled.
+         * \param[in] P The matrix to be multiplied and scaled.
+         * \param[in] y The other vector
+         */
+        template <typename Algo_>
+        void axpy(const DenseVector<Mem_, DT_> & a, const SparseMatrixELL<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
+
+        {
+          if (x.size() != P.columns())
+            throw InternalError("Vector size does not match!");
+          if (P.rows() != this->size())
+            throw InternalError("Vector size does not match!");
+          if (y.size() != this->size())
+            throw InternalError("Vector size does not match!");
+          if (a.size() != this->size())
+            throw InternalError("Vector size does not match!");
+
+          Arch::Axpy<Mem_, Algo_>::ell(this->elements(), a.elements(), x.elements(), y.elements(), P.Ax(), P.Aj(), P.Arl(), P.stride(), P.rows());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
          *
          * \param[in] a A scalar to scale Px with.
          * \param[in] x The vector to be multiplied and scaled.
@@ -676,6 +726,30 @@ namespace FEAST
             throw InternalError("Vector size does not match!");
 
           Arch::Axpy<Mem_, Algo_>::coo(this->elements(), a, x.elements(), y.elements(), P.val(), P.row(), P.column(), P.rows(), P.used_elements());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
+         *
+         * \param[in] a The vector to scale Px with.
+         * \param[in] x The vector to be multiplied and scaled.
+         * \param[in] P The matrix to be multiplied and scaled.
+         * \param[in] y The other vector
+         */
+        template <typename Algo_>
+        void axpy(const DenseVector<Mem_, DT_> & a, const SparseMatrixCOO<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
+
+        {
+          if (x.size() != P.columns())
+            throw InternalError("Vector size does not match!");
+          if (P.rows() != this->size())
+            throw InternalError("Vector size does not match!");
+          if (y.size() != this->size())
+            throw InternalError("Vector size does not match!");
+          if (a.size() != this->size())
+            throw InternalError("Vector size does not match!");
+
+          Arch::Axpy<Mem_, Algo_>::coo(this->elements(), a.elements(), x.elements(), y.elements(), P.val(), P.row(), P.column(), P.rows(), P.used_elements());
         }
 
         /**
