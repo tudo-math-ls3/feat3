@@ -37,6 +37,6 @@ DT_ DotProduct<Mem::Main, Algo::Generic>::value(const DT_ * const x, const DT_ *
 
 template float DotProduct<Mem::Main, Algo::Generic>::value(const float * const, const float * const, const Index);
 template double DotProduct<Mem::Main, Algo::Generic>::value(const double * const, const double * const, const Index);
-template mpf_class DotProduct<Mem::Main, Algo::Generic>::value(const mpf_class * const, const mpf_class * const, const Index);
 #ifdef FEAST_GMP
+template mpf_class DotProduct<Mem::Main, Algo::Generic>::value(const mpf_class * const, const mpf_class * const, const Index);
 #endif

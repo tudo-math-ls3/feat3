@@ -3,11 +3,12 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 
+#include <cstring>
+
 #ifdef FEAST_GMP
 #include <gmpxx.h>
 #include <mpfr.h>
 #endif
-
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
@@ -159,10 +160,23 @@ void Axpy<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ a, const DT_ * const
   {
     r[row_ptr[i]] += val[i] * x[col_ptr[i]];
   }
-  for (Index row(0) ; row < rows ; ++row)
+
+  // hack for clang, not working correctly with mpf_class
+#ifdef FEAST_GMP
+  if (typeid(DT_) == typeid(mpf_class))
   {
-    r[row] = a * r[row] + y[row];
+    for (Index row(0) ; row < rows ; ++row)
+    {
+      DT_ t(r[row]);
+      t *=a;
+      t += y[row];
+      r[row] = DT_(t);
+    }
   }
+  else
+#endif
+    for (Index row(0) ; row < rows ; ++row)
+      r[row] = a * r[row] + y[row];
 }
 template void Axpy<Mem::Main, Algo::Generic>::coo(float *, const float, const float * const, const float * const, const float * const, const Index * const, const Index * const, const Index, const Index);
 template void Axpy<Mem::Main, Algo::Generic>::coo(double *, const double, const double * const, const double * const, const double * const, const Index * const, const Index * const, const Index, const Index);

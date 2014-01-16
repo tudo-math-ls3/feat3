@@ -35,7 +35,7 @@ public:
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i % 100 * DT_(1.234)));
-        b_local(i, DT_(2 - i % 42));
+        b_local(i, DT_(2 - DT_(i % 42)));
         ref(i, s * a_local(i) + b_local(i));
       }
       DenseVector<Arch_, DT_> a(size);
@@ -108,8 +108,8 @@ public:
       for (Index i(0) ; i < size ; ++i)
       {
         a_local(i, DT_(i % 100 * DT_(1.234)));
-        b_local(i, DT_(2 - i % 42));
-        c_local(i, DT_(1 - i % 23));
+        b_local(i, DT_(2 - DT_(i % 42)));
+        c_local(i, DT_(1 - DT_(i % 23)));
         ref(i, c_local(i) * a_local(i) + b_local(i));
       }
       DenseVector<Arch_, DT_> a(size);
@@ -183,7 +183,7 @@ public:
       for (Index i(0) ; i < size ; ++i)
       {
         x_local(i, DT_(i % 100 * DT_(1.234)));
-        y_local(i, DT_(2 - i % 42));
+        y_local(i, DT_(2 - DT_(i % 42)));
       }
       DenseVector<Arch_, DT_> x(size);
       copy(x, x_local);
@@ -245,7 +245,7 @@ DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> >
 DVAxpyMVTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > dv_axpy_mv_coo_test_float;
 DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > dv_axpy_mv_coo_test_double;
 #ifdef FEAST_GMP
-//DVAxpyMVTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > dv_axpy_mv_coo_test_mpf_class;
+DVAxpyMVTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > dv_axpy_mv_coo_test_mpf_class;
 #endif
 #ifdef FEAST_MKL
 DVAxpyMVTest<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_dv_axpy_mv_coo_test_float;

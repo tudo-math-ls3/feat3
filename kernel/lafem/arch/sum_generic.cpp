@@ -17,16 +17,27 @@ void Sum<Mem::Main, Algo::Generic>::value(DT_ * r, const DT_ * const x, const DT
 {
   if (r == x)
   {
-    for (Index i(0) ; i < size ; ++i)
+  // hack for clang, not working correctly with mpf_class
+#ifdef FEAST_GMP
+    if (typeid(DT_) == typeid(mpf_class))
     {
-      r[i] += y[i];
+      for (Index i(0) ; i < size ; ++i)
+      {
+        DT_ t(y[i]);
+        t += r[i];
+        r[i] = DT_(t);
+      }
     }
+    else
+#endif
+      for (Index i(0) ; i < size ; ++i)
+        r[i] += y[i];
   }
-  else if (r == y)
+else if (r == y)
+{
+  for (Index i(0) ; i < size ; ++i)
   {
-    for (Index i(0) ; i < size ; ++i)
-    {
-      r[i] += x[i];
+    r[i] += x[i];
     }
   }
   else if (r == x && r == y)
