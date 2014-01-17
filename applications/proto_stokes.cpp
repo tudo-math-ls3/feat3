@@ -421,12 +421,12 @@ public:
     const VectorType& sol_x, const VectorType& sol_y, const VectorType& sol_p) const
   {
     // dx = bx - A*ux - B1*p
-    def_x.template defect<AlgoType>(rhs_x, _matrix_a, sol_x);
-    def_x.template axpy<AlgoType>(-DataType(1), _matrix_b1, sol_p, def_x);
+    def_x.defect<AlgoType>(rhs_x, _matrix_a, sol_x);
+    def_x.axpy<AlgoType>(-DataType(1), _matrix_b1, sol_p, def_x);
 
     // dy = by - A*uy - B2*p
-    def_y.template defect<AlgoType>(rhs_y, _matrix_a, sol_y);
-    def_y.template axpy<AlgoType>(-DataType(1), _matrix_b2, sol_p, def_y);
+    def_y.defect<AlgoType>(rhs_y, _matrix_a, sol_y);
+    def_y.axpy<AlgoType>(-DataType(1), _matrix_b2, sol_p, def_y);
 
     // filter defect vectors
     _filter_x.filter_def(def_x);
@@ -439,8 +439,8 @@ public:
   {
     // dp = bp - D1*ux - D2*uy
     LAFEM::copy(def_p, rhs_p);
-    def_p.template axpy<AlgoType>(-DataType(1), _matrix_d1, sol_x, def_p);
-    def_p.template axpy<AlgoType>(-DataType(1), _matrix_d2, sol_y, def_p);
+    def_p.axpy<AlgoType>(-DataType(1), _matrix_d1, sol_x, def_p);
+    def_p.axpy<AlgoType>(-DataType(1), _matrix_d2, sol_y, def_p);
   }
 
   // computes the current system defect and returns its norm
@@ -458,9 +458,9 @@ public:
     _vec_sol_p.clear();
 
     // compute defect norm
-    DataType dx = _vec_rhs_x.template norm2<AlgoType>();
-    DataType dy = _vec_rhs_y.template norm2<AlgoType>();
-    DataType dp = _vec_rhs_p.template norm2<AlgoType>();
+    DataType dx = _vec_rhs_x.norm2<AlgoType>();
+    DataType dy = _vec_rhs_y.norm2<AlgoType>();
+    DataType dp = _vec_rhs_p.norm2<AlgoType>();
     return Math::sqrt(dx*dx + dy*dy + dp*dp);
   }
 
@@ -470,9 +470,9 @@ public:
     // update solution vector
     _filter_x.filter_cor(_vec_sol_x);
     _filter_y.filter_cor(_vec_sol_y);
-    sol_x.template axpy<AlgoType>(DataType(1), _vec_sol_x, sol_x);
-    sol_y.template axpy<AlgoType>(DataType(1), _vec_sol_y, sol_y);
-    sol_p.template axpy<AlgoType>(DataType(1), _vec_sol_p, sol_p);
+    sol_x.axpy<AlgoType>(DataType(1), _vec_sol_x, sol_x);
+    sol_y.axpy<AlgoType>(DataType(1), _vec_sol_y, sol_y);
+    sol_p.axpy<AlgoType>(DataType(1), _vec_sol_p, sol_p);
   }
 
   // applies the Schur-complement-SOR smoother
@@ -482,17 +482,17 @@ public:
     for(int step(0); step < nsteps; ++step)
     {
       // dx_k = bx - B1*p_{k-1}
-      _vec_def_x.template defect<AlgoType>(_vec_rhs_x, _matrix_b1, _vec_sol_p);
+      _vec_def_x.defect<AlgoType>(_vec_rhs_x, _matrix_b1, _vec_sol_p);
       SOR(na, _matrix_a, _vec_sol_x, _vec_def_x, wa);
 
       // dy_k = by - B2*p_{k-1}
-      _vec_def_y.template defect<AlgoType>(_vec_rhs_y, _matrix_b2, _vec_sol_p);
+      _vec_def_y.defect<AlgoType>(_vec_rhs_y, _matrix_b2, _vec_sol_p);
       SOR(na, _matrix_a, _vec_sol_y, _vec_def_y, wa);
 
       // dp_k = dp_{k-1} + bp - D1*ux_k - D2*uy_k
-      _vec_def_p.template axpy<AlgoType>(DataType(1), _vec_rhs_p, _vec_def_p);
-      _vec_def_p.template axpy<AlgoType>(-DataType(1), _matrix_d1, _vec_sol_x, _vec_def_p);
-      _vec_def_p.template axpy<AlgoType>(-DataType(1), _matrix_d2, _vec_sol_y, _vec_def_p);
+      _vec_def_p.axpy<AlgoType>(DataType(1), _vec_rhs_p, _vec_def_p);
+      _vec_def_p.axpy<AlgoType>(-DataType(1), _matrix_d1, _vec_sol_x, _vec_def_p);
+      _vec_def_p.axpy<AlgoType>(-DataType(1), _matrix_d2, _vec_sol_y, _vec_def_p);
       SOR(ns, _matrix_m, _vec_sol_p, _vec_def_p, ws);
     }
   }
@@ -501,34 +501,34 @@ public:
   void prolongate(StokesLevel& coarse)
   {
     // prolongate
-    _vec_def_x.template product_matvec<AlgoType>(_prol_v, coarse._vec_sol_x);
-    _vec_def_y.template product_matvec<AlgoType>(_prol_v, coarse._vec_sol_y);
-    _vec_def_p.template product_matvec<AlgoType>(_prol_p, coarse._vec_sol_p);
+    _vec_def_x.product_matvec<AlgoType>(_prol_v, coarse._vec_sol_x);
+    _vec_def_y.product_matvec<AlgoType>(_prol_v, coarse._vec_sol_y);
+    _vec_def_p.product_matvec<AlgoType>(_prol_p, coarse._vec_sol_p);
     // filter
     _filter_x.filter_cor(_vec_def_x);
     _filter_y.filter_cor(_vec_def_y);
     // correct
-    _vec_sol_x.template axpy<AlgoType>(DataType(1), _vec_def_x, _vec_sol_x);
-    _vec_sol_y.template axpy<AlgoType>(DataType(1), _vec_def_y, _vec_sol_y);
-    _vec_sol_p.template axpy<AlgoType>(DataType(1), _vec_def_p, _vec_sol_p);
+    _vec_sol_x.axpy<AlgoType>(DataType(1), _vec_def_x, _vec_sol_x);
+    _vec_sol_y.axpy<AlgoType>(DataType(1), _vec_def_y, _vec_sol_y);
+    _vec_sol_p.axpy<AlgoType>(DataType(1), _vec_def_p, _vec_sol_p);
   }
 
   // restricts the defect of this level onto the coarse level
   void restrict(StokesLevel& coarse)
   {
     // compute defect
-    _vec_def_x.template defect<AlgoType>(_vec_rhs_x, _matrix_a, _vec_sol_x);
-    _vec_def_x.template axpy<AlgoType>(-DataType(1), _matrix_b1, _vec_sol_p, _vec_def_x);
-    _vec_def_y.template defect<AlgoType>(_vec_rhs_y, _matrix_a, _vec_sol_y);
-    _vec_def_y.template axpy<AlgoType>(-DataType(1), _matrix_b2, _vec_sol_p, _vec_def_y);
+    _vec_def_x.defect<AlgoType>(_vec_rhs_x, _matrix_a, _vec_sol_x);
+    _vec_def_x.axpy<AlgoType>(-DataType(1), _matrix_b1, _vec_sol_p, _vec_def_x);
+    _vec_def_y.defect<AlgoType>(_vec_rhs_y, _matrix_a, _vec_sol_y);
+    _vec_def_y.axpy<AlgoType>(-DataType(1), _matrix_b2, _vec_sol_p, _vec_def_y);
     LAFEM::copy(_vec_def_p, _vec_rhs_p);
-    _vec_def_p.template axpy<AlgoType>(-DataType(1), _matrix_d1, _vec_sol_x, _vec_def_p);
-    _vec_def_p.template axpy<AlgoType>(-DataType(1), _matrix_d2, _vec_sol_y, _vec_def_p);
+    _vec_def_p.axpy<AlgoType>(-DataType(1), _matrix_d1, _vec_sol_x, _vec_def_p);
+    _vec_def_p.axpy<AlgoType>(-DataType(1), _matrix_d2, _vec_sol_y, _vec_def_p);
 
     // restrict
-    coarse._vec_rhs_x.template product_matvec<AlgoType>(_rest_v, _vec_def_x);
-    coarse._vec_rhs_y.template product_matvec<AlgoType>(_rest_v, _vec_def_y);
-    coarse._vec_rhs_p.template product_matvec<AlgoType>(_rest_p, _vec_def_p);
+    coarse._vec_rhs_x.product_matvec<AlgoType>(_rest_v, _vec_def_x);
+    coarse._vec_rhs_y.product_matvec<AlgoType>(_rest_v, _vec_def_y);
+    coarse._vec_rhs_p.product_matvec<AlgoType>(_rest_p, _vec_def_p);
 
     // filter
     coarse._filter_x.filter_def(coarse._vec_rhs_x);
