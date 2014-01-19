@@ -6,7 +6,6 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/product_matvec.hpp>
 #include <kernel/scarc/solver_functor.hpp>
 #include <kernel/scarc/solver_data.hpp>
 #include <kernel/scarc/solver_pattern.hpp>
