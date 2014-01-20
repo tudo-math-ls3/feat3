@@ -46,7 +46,7 @@ class SolverTest:
       DenseVector<Tag_, DataType_> x_ref(A.rows(), DataType_(2));
       DenseVector<Tag_, DataType_> x(A.rows(), DataType_(0));
       DenseVector<Tag_, DataType_> b(A.rows());
-      ProductMatVec<Algo_>::value(b, A, x_ref);
+      b.template product_matvec<Algo_>(A, x_ref);
 
       SparseMatrixCOO<Tag_, DataType_> P_proxy(x.size(), x.size());
       for(Index i(0) ; i < x.size() ; ++i)
