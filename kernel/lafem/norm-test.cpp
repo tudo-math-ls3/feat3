@@ -42,6 +42,9 @@ public:
       DenseVector<Arch_, DT_> a(a_local);
       DT_ c = a.template norm2<Algo_>();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+
+      c = a.template norm2wosqrt<Algo_>();
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref*ref, eps);
     }
   }
 };
