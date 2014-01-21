@@ -179,39 +179,33 @@ namespace FEAST
           this->_scalar_index.push_back(other_orig.used_elements());
           this->_scalar_dt.push_back(other_orig.zero_element());
 
-          SparseMatrixELL<Mem::Main, DT_> ccother(other_orig);
-          SparseMatrixCOO<Mem::Main, DT_> cother(ccother);
+          SparseMatrixELL<Mem::Main, DT_> cother(other_orig);
 
           DT_ * tval = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3));
           Index * tcol_ind = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3));
           Index * trow_ptr = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1) + 1);
 
-          Index ait(0);
-          Index current_row(0);
-          trow_ptr[current_row] = 0;
-          for (Index it(0) ; it < cother.used_elements() ; ++it)
+          trow_ptr[0] = 0;
+          const Index stride(cother.stride());
+          for (Index row(0), ue(0); row < cother.rows() ; ++row)
           {
-            Index row(cother.row()[it]);
-            Index column(cother.column()[it]);
+            const Index * tAj(cother.Aj());
+            const DT_ * tAx(cother.Ax());
+            tAj += row;
+            tAx += row;
 
-            if (current_row < row)
+            const Index max(cother.Arl()[row]);
+            for(Index n(0); n < max ; n++)
             {
-              for (unsigned long i(current_row + 1) ; i < row ; ++i)
-              {
-                trow_ptr[i] = ait;
-              }
-              current_row = row;
-              trow_ptr[current_row] = ait;
+              tval[ue] = *tAx;
+              tcol_ind[ue] = *tAj;
+
+              tAj += stride;
+              tAx += stride;
+              ++ue;
             }
-            tval[ait] = cother.val()[it];
-            tcol_ind[ait] = column;
-            ++ait;
+            trow_ptr[row + 1] = ue;
           }
-          for (unsigned long i(current_row + 1) ; i < this->_scalar_index.at(1) ; ++i)
-          {
-            trow_ptr[i] = ait;
-          }
-          trow_ptr[this->_scalar_index.at(1)] = ait;
 
           this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
           this->_elements_size.push_back(this->_scalar_index.at(3));
