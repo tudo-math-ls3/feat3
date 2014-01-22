@@ -64,12 +64,12 @@ namespace FEAST
 
         void _read_from_ell(std::istream& file)
         {
-          uint64_t size;
+          uint64_t dim;
           uint64_t rows;
           uint64_t columns;
           uint64_t stride;
           uint64_t num_cols_per_row;
-          file.read((char *)&size, sizeof(uint64_t));
+          file.read((char *)&dim, sizeof(uint64_t));
           file.read((char *)&rows, sizeof(uint64_t));
           file.read((char *)&columns, sizeof(uint64_t));
           file.read((char *)&stride, sizeof(uint64_t));
@@ -83,19 +83,18 @@ namespace FEAST
           this->_scalar_index.push_back(0);
           this->_scalar_dt.push_back(DT_(0));
 
-          const Index dim(this->_scalar_index.at(4) * this->_scalar_index.at(3));
-          uint64_t * cAj = new uint64_t[std::size_t(size)];
-          file.read((char *)cAj, (long)(size * sizeof(uint64_t)));
+          uint64_t * cAj = new uint64_t[std::size_t(dim)];
+          file.read((char *)cAj, (long)(dim * sizeof(uint64_t)));
           Index* tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(dim);
-          for (Index i(0) ; i < size ; ++i)
+          for (Index i(0) ; i < dim ; ++i)
             tAj[i] = Index(cAj[i]);
           delete[] cAj;
 
-          double * cAx = new double[std::size_t(size)];
-          file.read((char *)cAx, (long)(size * sizeof(double)));
+          double * cAx = new double[std::size_t(dim)];
+          file.read((char *)cAx, (long)(dim * sizeof(double)));
 
           DT_* tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(dim);
-          for (Index i(0) ; i < size ; ++i)
+          for (Index i(0) ; i < dim ; ++i)
             tAx[i] = DT_(cAx[i]);
           delete[] cAx;
 
@@ -105,11 +104,11 @@ namespace FEAST
           for (Index row(0) ; row < this->_scalar_index.at(1) ; ++row)
           {
             Index count(0);
-            for (Index i(row) ; i < Index(size) ; i += Index(stride))
+            for (Index i(row) ; i < Index(dim) ; i += Index(stride))
             {
                 if (tAx[i] == DT_(0))
                 {
-                  i = Index(size);
+                  i = Index(dim);
                   break;
                 }
                 ++count;
@@ -586,18 +585,18 @@ namespace FEAST
             cAx[i] = Type::Traits<DT_>::to_double(Ax[i]);
           MemoryPool<Mem::Main>::instance()->release_memory(Ax);
 
-          uint64_t size(dim);
+          uint64_t tdim(dim);
           uint64_t rows(this->_scalar_index.at(1));
           uint64_t columns(this->_scalar_index.at(2));
           uint64_t stride(this->_scalar_index.at(3));
           uint64_t num_cols_per_row(this->_scalar_index.at(4));
-          file.write((const char *)&size, sizeof(uint64_t));
+          file.write((const char *)&tdim, sizeof(uint64_t));
           file.write((const char *)&rows, sizeof(uint64_t));
           file.write((const char *)&columns, sizeof(uint64_t));
           file.write((const char *)&stride, sizeof(uint64_t));
           file.write((const char *)&num_cols_per_row, sizeof(uint64_t));
-          file.write((const char *)cAj, (long)(size * sizeof(uint64_t)));
-          file.write((const char *)cAx, (long)(size * sizeof(double)));
+          file.write((const char *)cAj, (long)(tdim * sizeof(uint64_t)));
+          file.write((const char *)cAx, (long)(tdim * sizeof(double)));
 
           delete[] cAj;
           delete[] cAx;
