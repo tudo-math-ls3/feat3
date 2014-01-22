@@ -240,16 +240,16 @@ DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double
 #ifdef FEAST_GMP
 DVAxpyMVTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixELL<Mem::Main, mpf_class> > dv_axpy_mv_ell_test_mpf_class;
 #endif
+DVAxpyMVTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > dv_axpy_mv_coo_test_float;
+DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > dv_axpy_mv_coo_test_double;
+#ifdef FEAST_GMP
+DVAxpyMVTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > dv_axpy_mv_coo_test_mpf_class;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixCSR<Mem::CUDA, float> > cuda_dv_axpy_mv_csr_test_float;
 DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixCSR<Mem::CUDA, double> > cuda_dv_axpy_mv_csr_test_double;
 DVAxpyMVTest<Mem::CUDA, Algo::CUDA, float, SparseMatrixELL<Mem::CUDA, float> > cuda_dv_axpy_mv_ell_test_float;
 DVAxpyMVTest<Mem::CUDA, Algo::CUDA, double, SparseMatrixELL<Mem::CUDA, double> > cuda_dv_axpy_mv_ell_test_double;
-#endif
-DVAxpyMVTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > dv_axpy_mv_coo_test_float;
-DVAxpyMVTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > dv_axpy_mv_coo_test_double;
-#ifdef FEAST_GMP
-DVAxpyMVTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > dv_axpy_mv_coo_test_mpf_class;
 #endif
 #ifdef FEAST_MKL
 DVAxpyMVTest<Mem::Main, Algo::MKL, float, SparseMatrixCOO<Mem::Main, float> > mkl_dv_axpy_mv_coo_test_float;

@@ -25,7 +25,6 @@ namespace FEAST
       static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::DataType eps_relative)
       {
         typedef typename VT_::DataType DT_;
-        typedef typename VT_::MemType Arch_;
 
         DT_ defnorm, defnorm_0, defnorm_00(1e14);
         Index iter = 0;
