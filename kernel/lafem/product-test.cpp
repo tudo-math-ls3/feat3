@@ -10,17 +10,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVComponentProductTest2
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVComponentProductTest2()
-    : TaggedTest<Arch_, DT_, Algo_>("product: dv_component_product_test")
+    : TaggedTest<Mem_, DT_, Algo_>("product: dv_component_product_test")
   {
   }
 
@@ -41,11 +41,11 @@ public:
         ref2(i, a_local(i) * a_local(i));
       }
 
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Mem_, DT_> c(size);
 
       c.template product<Algo_>(a, b);
       copy(result_local, c);
@@ -82,18 +82,18 @@ DVComponentProductTest2<Mem::CUDA, Algo::CUDA, double> cuda_dv_component_product
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class ProductMatVecTest2
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   ProductMatVecTest2()
-    : TaggedTest<Arch_, DT_, Algo_>("product: product_matvec_test: " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("product: product_matvec_test: " + SM_::type_name())
   {
   }
 
@@ -124,9 +124,9 @@ public:
       }
 
       SM_ a(a_local);
-      DenseVector<Arch_, DT_> b(size + 2);
+      DenseVector<Mem_, DT_> b(size + 2);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> c(size, 4711);
+      DenseVector<Mem_, DT_> c(size, 4711);
 
       c.template product<Algo_>(a, b);
       copy(result_local, c);
@@ -175,17 +175,17 @@ ProductMatVecTest2<Mem::Main, Algo::MKL, double, SparseMatrixCOO<Mem::Main, doub
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVDotProductTest2
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVDotProductTest2()
-    : TaggedTest<Arch_, DT_, Algo_>("product: dv_dot_product_test")
+    : TaggedTest<Mem_, DT_, Algo_>("product: dv_dot_product_test")
   {
   }
 
@@ -204,8 +204,8 @@ public:
         b_local(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
       }
 
-      DenseVector<Arch_, DT_> a(a_local);
-      DenseVector<Arch_, DT_> b(b_local);
+      DenseVector<Mem_, DT_> a(a_local);
+      DenseVector<Mem_, DT_> b(b_local);
 
       // a*b = 1
       DT_ ref(DT_(1));
@@ -235,17 +235,17 @@ DVDotProductTest2<Mem::CUDA, Algo::CUDA, double> cuda_dv_dot_product_test_double
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVScaleTest2
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVScaleTest2()
-    : TaggedTest<Arch_, DT_, Algo_>("product: dv_scale_test")
+    : TaggedTest<Mem_, DT_, Algo_>("product: dv_scale_test")
   {
   }
 
@@ -263,9 +263,9 @@ public:
         ref(i, a_local(i) * s);
       }
 
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
 
       b.template product<Algo_>(a, s);
       copy(result_local, b);
@@ -292,18 +292,18 @@ DVScaleTest2<Mem::CUDA, Algo::CUDA, double> cuda_dv_scale_test_double;
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class SMScaleTest2
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   SMScaleTest2()
-    : TaggedTest<Arch_, DT_, Algo_>("product: scale_test: " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("product: scale_test: " + SM_::type_name())
   {
   }
 
@@ -339,7 +339,7 @@ public:
       TEST_CHECK_EQUAL(b_local, ref_local);
 
       a.template product<Algo_>(a, s);
-      SparseMatrixCOO<Arch_, DT_> a_coo(a);
+      SparseMatrixCOO<Mem_, DT_> a_coo(a);
       a_local = a_coo;
       TEST_CHECK_EQUAL(a_local, ref_local);
     }

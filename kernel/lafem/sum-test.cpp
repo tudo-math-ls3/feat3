@@ -11,17 +11,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVSumTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVSumTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_sum_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_sum_test")
   {
   }
 
@@ -42,11 +42,11 @@ public:
         ref2(i, a_local(i) + a_local(i));
       }
 
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Mem_, DT_> c(size);
 
       c.template sum<Algo_>(a, b);
       copy(result_local, c);
@@ -87,18 +87,18 @@ DVSumTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_sum_test_double;
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class SMSumTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   SMSumTest()
-    : TaggedTest<Arch_, DT_, Algo_>("smcsr_sum_test")
+    : TaggedTest<Mem_, DT_, Algo_>("smcsr_sum_test")
   {
   }
 

@@ -12,17 +12,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVScaleTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVScaleTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_scale_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_scale_test")
   {
   }
 
@@ -40,9 +40,9 @@ public:
         ref(i, a_local(i) * s);
       }
 
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
 
       b.template scale<Algo_>(a, s);
       copy(result_local, b);
@@ -69,18 +69,18 @@ DVScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_scale_test_double;
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class SMScaleTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   SMScaleTest()
-    : TaggedTest<Arch_, DT_, Algo_>("scale_test: " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("scale_test: " + SM_::type_name())
   {
   }
 
@@ -116,7 +116,7 @@ public:
       TEST_CHECK_EQUAL(b_local, ref_local);
 
       a.template scale<Algo_>(a, s);
-      SparseMatrixCOO<Arch_, DT_> a_coo(a);
+      SparseMatrixCOO<Mem_, DT_> a_coo(a);
       a_local = a_coo;
       TEST_CHECK_EQUAL(a_local, ref_local);
     }

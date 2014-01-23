@@ -9,17 +9,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVAxpyTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVAxpyTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_axpy_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_axpy_test")
   {
   }
 
@@ -38,12 +38,12 @@ public:
         b_local(i, DT_(2 - DT_(i % 42)));
         ref(i, s * a_local(i) + b_local(i));
       }
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
       copy(b, b_local);
 
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Mem_, DT_> c(size);
       c.template axpy<Algo_>(s, a, b);
       copy(result_local, c);
       for (Index i(0) ; i < size ; ++i)
@@ -82,17 +82,17 @@ DVAxpyTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_axpy_test_double;
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVAxpyVTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVAxpyVTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_axpy_v_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_axpy_v_test")
   {
   }
 
@@ -112,14 +112,14 @@ public:
         c_local(i, DT_(1 - DT_(i % 23)));
         ref(i, c_local(i) * a_local(i) + b_local(i));
       }
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Mem_, DT_> c(size);
       copy(c, c_local);
 
-      DenseVector<Arch_, DT_> d(size);
+      DenseVector<Mem_, DT_> d(size);
       d.template axpy<Algo_>(c, a, b);
       copy(result_local, d);
       for (Index i(0) ; i < size ; ++i)
@@ -159,17 +159,17 @@ DVAxpyVTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_axpy_v_test_double;
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class DVAxpyMVTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
   DVAxpyMVTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_axpy_mv_test: " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("dv_axpy_mv_test: " + SM_::type_name())
   {
   }
 
@@ -182,16 +182,16 @@ public:
       DenseVector<Mem::Main, DT_> x_local(size);
       DenseVector<Mem::Main, DT_> y_local(size);
       DenseVector<Mem::Main, DT_> ref_local(size);
-      DenseVector<Arch_, DT_> ref(size);
+      DenseVector<Mem_, DT_> ref(size);
       DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         x_local(i, DT_(i % 100 * DT_(1.234)));
         y_local(i, DT_(2 - DT_(i % 42)));
       }
-      DenseVector<Arch_, DT_> x(size);
+      DenseVector<Mem_, DT_> x(size);
       copy(x, x_local);
-      DenseVector<Arch_, DT_> y(size);
+      DenseVector<Mem_, DT_> y(size);
       copy(y, y_local);
 
       for (Index row(0) ; row < a_local.rows() ; ++row)
@@ -206,7 +206,7 @@ public:
       }
       SM_ a(a_local);
 
-      DenseVector<Arch_, DT_> r(size);
+      DenseVector<Mem_, DT_> r(size);
       r.template axpy<Algo_>(s, a, x, y);
       copy(result_local, r);
 
@@ -257,17 +257,17 @@ DVAxpyMVTest<Mem::Main, Algo::MKL, double, SparseMatrixCOO<Mem::Main, double> > 
 #endif
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class DVAxpyMVVTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
   DVAxpyMVVTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_axpy_mv_v_test: " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("dv_axpy_mv_v_test: " + SM_::type_name())
   {
   }
 
@@ -280,7 +280,7 @@ public:
       DenseVector<Mem::Main, DT_> y_local(size);
       DenseVector<Mem::Main, DT_> c_local(size);
       DenseVector<Mem::Main, DT_> ref_local(size);
-      DenseVector<Arch_, DT_> ref(size);
+      DenseVector<Mem_, DT_> ref(size);
       DenseVector<Mem::Main, DT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
@@ -288,11 +288,11 @@ public:
         y_local(i, DT_(2 - DT_(i % 42)));
         c_local(i, DT_(1 - DT_(i % 23)));
       }
-      DenseVector<Arch_, DT_> x(size);
+      DenseVector<Mem_, DT_> x(size);
       copy(x, x_local);
-      DenseVector<Arch_, DT_> y(size);
+      DenseVector<Mem_, DT_> y(size);
       copy(y, y_local);
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Mem_, DT_> c(size);
       copy(c, c_local);
 
       for (Index row(0) ; row < a_local.rows() ; ++row)
@@ -307,7 +307,7 @@ public:
       }
       SM_ a(a_local);
 
-      DenseVector<Arch_, DT_> r(size);
+      DenseVector<Mem_, DT_> r(size);
       r.template axpy<Algo_>(c, a, x, y);
       copy(result_local, r);
 

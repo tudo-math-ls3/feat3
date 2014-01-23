@@ -12,27 +12,27 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class RichardsonTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   RichardsonTest()
-    : TaggedTest<Arch_, DT_, Algo_>("richardson_test")
+    : TaggedTest<Mem_, DT_, Algo_>("richardson_test")
   {
   }
 
   virtual void run() const
   {
     Index size(1025);
-    DenseVector<Arch_, DT_> x(size, DT_(1));
-    DenseVector<Arch_, DT_> b(size);
+    DenseVector<Mem_, DT_> x(size, DT_(1));
+    DenseVector<Mem_, DT_> b(size);
     DenseVector<Mem::Main, DT_> ref_local(size, DT_(42));
-    DenseVector<Arch_, DT_> ref(size);
+    DenseVector<Mem_, DT_> ref(size);
     copy(ref, ref_local);
 
     SparseMatrixCOO<Mem::Main, DT_> csys(size, size);
@@ -42,9 +42,9 @@ public:
       csys(i - 1, i, DT_(-1));
     for (Index i(0) ; i < size - 1; ++i)
       csys(i + 1, i, DT_(-1));
-    SparseMatrixCSR<Arch_, DT_> sys(csys);
+    SparseMatrixCSR<Mem_, DT_> sys(csys);
 
-    JacobiPreconditioner<Algo_, SparseMatrixCSR<Arch_, DT_>, DenseVector<Arch_, DT_> > jac(sys, DT_(0.7));
+    JacobiPreconditioner<Algo_, SparseMatrixCSR<Mem_, DT_>, DenseVector<Mem_, DT_> > jac(sys, DT_(0.7));
 
     b.template product_matvec<Algo_>(sys, ref);
 

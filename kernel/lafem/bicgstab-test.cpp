@@ -20,13 +20,13 @@ using namespace FEAST::TestSystem;
  * \author Christoph Lohmann
  */
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename MT_,
   typename PT_>
 class BiCGStabTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 private:
   const Index opt;
@@ -34,7 +34,7 @@ private:
 public:
 
   BiCGStabTest(int opt = 0)
-    : TaggedTest<Arch_, DT_, Algo_>("bicgstab_test: " + MT_::type_name() + " "
+    : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::type_name() + " "
                                     + PT_::type_name() + " opt = "
                                     + std::to_string(opt)), opt(opt)
   {
@@ -43,15 +43,15 @@ public:
   virtual void run() const
   {
     Index size(1025);
-    DenseVector<Arch_, DT_> x(size, DT_(1));
-    DenseVector<Arch_, DT_> b(size);
-    DenseVector<Arch_, DT_> ref(size, DT_(42));
+    DenseVector<Mem_, DT_> x(size, DT_(1));
+    DenseVector<Mem_, DT_> b(size);
+    DenseVector<Mem_, DT_> ref(size, DT_(42));
 
     // Define matrix
     SparseMatrixCOO<Mem::Main, DT_> csys(size, size);
 
     // opt = 1: alternative matrix for polynomial preconditioner without scaling
-    if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> >) && opt == 1)
+    if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >) && opt == 1)
     {
       for (Index i(0) ; i < size ; ++i)
         csys(i, i, DT_(0.4 + 0.1 * (i%2)));
@@ -94,41 +94,41 @@ public:
 
 
     // Define preconditioners for every matrix-type and solve the system
-    if (typeid(PT_) == typeid(NonePreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> >))
+    if (typeid(PT_) == typeid(NonePreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
     {
-      NonePreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> > precond;
+      NonePreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond;
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(JacobiPreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> >))
+    else if (typeid(PT_) == typeid(JacobiPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
     {
-      JacobiPreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> > precond(sys, DT_(1));
+      JacobiPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond(sys, DT_(1));
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(GaussSeidelPreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> >))
+    else if (typeid(PT_) == typeid(GaussSeidelPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
     {
       GaussSeidelPreconditioner<Algo_, MT_,
-                                DenseVector<Arch_, DT_> > precond(sys, DT_(1));
+                                DenseVector<Mem_, DT_> > precond(sys, DT_(1));
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> >))
+    else if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
     {
       if (opt == 0)
       {
         PolynomialPreconditioner<Algo_, MT_,
-                                 DenseVector<Arch_, DT_> > precond(sys, 20, true);
+                                 DenseVector<Mem_, DT_> > precond(sys, 20, true);
         BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
       }
       else if(opt == 1)
       {
         PolynomialPreconditioner<Algo_, MT_,
-                                 DenseVector<Arch_, DT_> > precond(sys, 20, false);
+                                 DenseVector<Mem_, DT_> > precond(sys, 20, false);
         BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
       }
     }
-    else if (typeid(PT_) == typeid(ILUPreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> >))
+    else if (typeid(PT_) == typeid(ILUPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
     {
       ILUPreconditioner<Algo_, MT_,
-                        DenseVector<Arch_, DT_> > precond(sys, opt);
+                        DenseVector<Mem_, DT_> > precond(sys, opt);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
     else
@@ -332,28 +332,28 @@ cuda_bicgstab_test_ell_none_double(0);
  * \author Christoph Lohmann
  */
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename MT_>
 class ILUTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   ILUTest()
-    : TaggedTest<Arch_, DT_, Algo_>("ilu_test" + MT_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("ilu_test" + MT_::type_name())
   {
   }
 
   virtual void run() const
   {
     Index size(1000);
-    DenseVector<Arch_, DT_> x(size);
-    DenseVector<Arch_, DT_> ref(size);
-    DenseVector<Arch_, DT_> b(size);
-    DenseVector<Arch_, DT_> tmp(size);
+    DenseVector<Mem_, DT_> x(size);
+    DenseVector<Mem_, DT_> ref(size);
+    DenseVector<Mem_, DT_> b(size);
+    DenseVector<Mem_, DT_> tmp(size);
 
     // Define solution vector
     for (Index i(0) ; i < size ; ++i)
@@ -394,7 +394,7 @@ public:
     // save reference-solution
     copy(ref, x);
 
-    ILUPreconditioner<Algo_, MT_, DenseVector<Arch_, DT_> > precond(LU);
+    ILUPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond(LU);
     precond.apply(x, b);
 
     // check, if the result is coorect

@@ -9,17 +9,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVComponentProductTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVComponentProductTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_component_product_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_component_product_test")
   {
   }
 
@@ -40,11 +40,11 @@ public:
         ref2(i, a_local(i) * a_local(i));
       }
 
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Mem_, DT_> c(size);
 
       c.template component_product<Algo_>(a, b);
       copy(result_local, c);

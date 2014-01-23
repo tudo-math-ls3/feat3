@@ -17,7 +17,7 @@ using namespace FEAST::TestSystem;
 *
 * \test test description missing
 *
-* \tparam Tag_
+* \tparam Mem_
 * description missing
 *
 * \tparam DT_
@@ -26,35 +26,35 @@ using namespace FEAST::TestSystem;
 * \author Dirk Ribbrock
 */
 template<
-  typename Tag_,
+  typename Mem_,
   typename DT_>
 class DenseVectorTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Mem_, DT_>
 {
 
 public:
 
   DenseVectorTest()
-    : TaggedTest<Tag_, DT_>("dense_vector_test")
+    : TaggedTest<Mem_, DT_>("dense_vector_test")
   {
   }
 
   virtual void run() const
   {
-    DenseVector<Tag_, DT_> a(10, DT_(7));
-    DenseVector<Tag_, DT_> b(10, DT_(5));
+    DenseVector<Mem_, DT_> a(10, DT_(7));
+    DenseVector<Mem_, DT_> b(10, DT_(5));
     b(7, DT_(42));
-    DenseVector<Tag_, DT_> c(b);
+    DenseVector<Mem_, DT_> c(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));
     TEST_CHECK_EQUAL(c, b);
-    std::list<DenseVector<Tag_, DT_> > list;
+    std::list<DenseVector<Mem_, DT_> > list;
     list.push_back(a);
     list.push_back(b);
     list.push_back(c);
-    DenseVector<Tag_, DT_> d = a;
+    DenseVector<Mem_, DT_> d = a;
     list.push_back(d);
-    DenseVector<Tag_, DT_> e(10, DT_(42));
+    DenseVector<Mem_, DT_> e(10, DT_(42));
     e = a;
     TEST_CHECK_EQUAL(e(5), a(5));
     TEST_CHECK_EQUAL(e, a);
@@ -73,7 +73,7 @@ public:
     TEST_CHECK_NOT_EQUAL((std::size_t)h.elements(), (std::size_t)g.elements());
 
     {
-      EDI<Tag_, DT_> t(d.edi(2));
+      EDI<Mem_, DT_> t(d.edi(2));
       t = DT_(41);
       TEST_CHECK_NOT_EQUAL(d(2), DT_(41));
       d.edi(1) = DT_(4);
@@ -84,20 +84,20 @@ public:
     TEST_CHECK_EQUAL(d(1), DT_(8));
     TEST_CHECK_EQUAL(d(2), DT_(41));
 
-    DenseVector<Tag_, DT_> k(123);
+    DenseVector<Mem_, DT_> k(123);
     for (Index i(0) ; i < k.size() ; ++i)
       k(i, DT_(i) / DT_(12));
 
     std::stringstream ts;
     k.write_out(fm_exp, ts);
-    DenseVector<Tag_, DT_> l(fm_exp, ts);
+    DenseVector<Mem_, DT_> l(fm_exp, ts);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-5);
 
     BinaryStream bs;
     k.write_out(fm_dv, bs);
     bs.seekg(0);
-    DenseVector<Tag_, DT_> m(fm_dv, bs);
+    DenseVector<Mem_, DT_> m(fm_dv, bs);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-5);
   }

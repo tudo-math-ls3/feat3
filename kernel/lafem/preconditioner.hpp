@@ -139,15 +139,15 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Arch_, typename DT_>
-    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCSR<Arch_, DT_>,
-                                    DenseVector<Arch_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCSR<Arch_, DT_>,
-                                      DenseVector<Arch_, DT_> >
+    template <typename Mem_, typename DT_>
+    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
+                                    DenseVector<Mem_, DT_> >
+      : public virtual Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
+                                      DenseVector<Mem_, DT_> >
     {
     private:
       DT_ damping;
-      const SparseMatrixCSR<Arch_, DT_> & A;
+      const SparseMatrixCSR<Mem_, DT_> & A;
 
     public:
       /**
@@ -158,7 +158,7 @@ namespace FEAST
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
-      GaussSeidelPreconditioner(const SparseMatrixCSR<Arch_, DT_> & A,
+      GaussSeidelPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
                                 DT_ damping) :
         damping(damping),
         A(A)
@@ -185,8 +185,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Arch_, DT_> & out,
-                         const DenseVector<Arch_, DT_> & in)
+      virtual void apply(DenseVector<Mem_, DT_> & out,
+                         const DenseVector<Mem_, DT_> & in)
       {
 
         // copy in-vector to out-vector
@@ -229,15 +229,15 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Arch_, typename DT_>
-    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCOO<Arch_, DT_>,
-                                    DenseVector<Arch_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCOO<Arch_, DT_>,
-                                      DenseVector<Arch_, DT_> >
+    template <typename Mem_, typename DT_>
+    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
+                                    DenseVector<Mem_, DT_> >
+      : public virtual Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
+                                      DenseVector<Mem_, DT_> >
     {
     private:
       DT_ damping;
-      const SparseMatrixCOO<Arch_, DT_> & A;
+      const SparseMatrixCOO<Mem_, DT_> & A;
 
     public:
       /**
@@ -248,7 +248,7 @@ namespace FEAST
        *
        * Creates a Gauss preconditioner to the given matrix and damping-parameter
        */
-      GaussSeidelPreconditioner(const SparseMatrixCOO<Arch_, DT_> & A,
+      GaussSeidelPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A,
                                 DT_ damping) :
         damping(damping),
         A(A)
@@ -275,8 +275,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Arch_, DT_> & out,
-                         const DenseVector<Arch_, DT_> & in)
+      virtual void apply(DenseVector<Mem_, DT_> & out,
+                         const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
         copy(out, in);
@@ -325,15 +325,15 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Arch_, typename DT_>
-    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixELL<Arch_, DT_>,
-                                    DenseVector<Arch_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixELL<Arch_, DT_>,
-                                      DenseVector<Arch_, DT_> >
+    template <typename Mem_, typename DT_>
+    class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                                    DenseVector<Mem_, DT_> >
+      : public virtual Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                                      DenseVector<Mem_, DT_> >
     {
     private:
       DT_ damping;
-      const SparseMatrixELL<Arch_, DT_> & A;
+      const SparseMatrixELL<Mem_, DT_> & A;
 
     public:
       /**
@@ -344,7 +344,7 @@ namespace FEAST
        *
        * Creates a Gauss preconditioner to the given matrix and damping-parameter
        */
-      GaussSeidelPreconditioner(const SparseMatrixELL<Arch_, DT_> & A,
+      GaussSeidelPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
                                 DT_ damping) :
         damping(damping),
         A(A)
@@ -371,8 +371,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Arch_, DT_> & out,
-                         const DenseVector<Arch_, DT_> & in)
+      virtual void apply(DenseVector<Mem_, DT_> & out,
+                         const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
         copy(out, in);
@@ -574,15 +574,15 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Arch_, typename DT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Arch_, DT_>,
-                                    DenseVector<Arch_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCSR<Arch_, DT_>,
-                                      DenseVector<Arch_, DT_> >
+    template <typename Mem_, typename DT_>
+    class ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
+                                    DenseVector<Mem_, DT_> >
+      : public virtual Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
+                                      DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixCSR<Arch_, DT_> & A;
-      SparseMatrixCSR<Arch_, DT_> LU;
+      const SparseMatrixCSR<Mem_, DT_> & A;
+      SparseMatrixCSR<Mem_, DT_> LU;
 
     public:
       /**
@@ -594,7 +594,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCSR<Arch_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const Index p) :
         A(A)
       {
         if (A.columns() != A.rows())
@@ -604,7 +604,7 @@ namespace FEAST
 
         if (p == 0)
         {
-          SparseMatrixCSR<Arch_, DT_> tLU(A.layout());
+          SparseMatrixCSR<Mem_, DT_> tLU(A.layout());
           LU = tLU;
 
           copy_entries(false);
@@ -627,7 +627,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixCSR<Arch_, DT_> & LU) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & LU) :
         A(LU),
         LU(LU)
       {
@@ -645,7 +645,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
-      ILUPreconditioner(const SparseMatrixCSR<Arch_, DT_> & A,
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
                         const SparseLayout<SparseMatrixCSR<Mem::Main, bool> > & layout) :
         A(A),
         LU(layout)
@@ -685,8 +685,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Arch_, DT_> & out,
-                         const DenseVector<Arch_, DT_> & in)
+      virtual void apply(DenseVector<Mem_, DT_> & out,
+                         const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
         copy(out, in);
@@ -891,9 +891,9 @@ namespace FEAST
         }
 
         // Create LU-matrix
-        DenseVector<Arch_, Index> col_ind(ll.size());
-        DenseVector<Arch_, DT_> val(ll.size());
-        DenseVector<Arch_, Index> row_ptr(n+1);
+        DenseVector<Mem_, Index> col_ind(ll.size());
+        DenseVector<Mem_, DT_> val(ll.size());
+        DenseVector<Mem_, Index> row_ptr(n+1);
         Index k1(0);
         Index k2(0);
         row_ptr(0,0);
@@ -911,7 +911,7 @@ namespace FEAST
           }
         }
 
-        SparseMatrixCSR<Arch_, DT_> tLU(n, n, col_ind, val, row_ptr);
+        SparseMatrixCSR<Mem_, DT_> tLU(n, n, col_ind, val, row_ptr);
         LU = tLU;
       } // symbolic_LU_factorisation
 
@@ -972,15 +972,15 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Arch_, typename DT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixELL<Arch_, DT_>,
-                            DenseVector<Arch_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixELL<Arch_, DT_>,
-                                      DenseVector<Arch_, DT_> >
+    template <typename Mem_, typename DT_>
+    class ILUPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                            DenseVector<Mem_, DT_> >
+      : public virtual Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                                      DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixELL<Arch_, DT_> & A;
-      SparseMatrixELL<Arch_, DT_> LU;
+      const SparseMatrixELL<Mem_, DT_> & A;
+      SparseMatrixELL<Mem_, DT_> LU;
 
     public:
       /**
@@ -992,7 +992,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixELL<Arch_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const Index p) :
         A(A)
       {
         if (A.columns() != A.rows())
@@ -1002,7 +1002,7 @@ namespace FEAST
 
         if (p == 0)
         {
-          SparseMatrixELL<Arch_, DT_> tLU(A.layout());
+          SparseMatrixELL<Mem_, DT_> tLU(A.layout());
           LU = tLU;
 
           copy_entries(false);
@@ -1025,7 +1025,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixELL<Arch_, DT_> & LU) :
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & LU) :
         A(LU),
         LU(LU)
       {
@@ -1043,7 +1043,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and layout
        */
-      ILUPreconditioner(const SparseMatrixELL<Arch_, DT_> & A,
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
                         const SparseLayout<SparseMatrixELL<Mem::Main, bool> > & layout) :
         A(A),
         LU(layout)
@@ -1084,8 +1084,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Arch_, DT_> & out,
-                         const DenseVector<Arch_, DT_> & in)
+      virtual void apply(DenseVector<Mem_, DT_> & out,
+                         const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
         copy(out, in);
@@ -1315,9 +1315,9 @@ namespace FEAST
           ++it;
         }
 
-        DenseVector<Arch_, DT_> LUx(num_cols_per_row * stride);
-        DenseVector<Arch_, Index> LUj(num_cols_per_row * stride);
-        DenseVector<Arch_, Index> LUrl(n);
+        DenseVector<Mem_, DT_> LUx(num_cols_per_row * stride);
+        DenseVector<Mem_, Index> LUj(num_cols_per_row * stride);
+        DenseVector<Mem_, Index> LUrl(n);
 
         Index used_elements(ll.size());
 
@@ -1341,7 +1341,7 @@ namespace FEAST
           ++it;
         }
 
-        SparseMatrixELL<Arch_, DT_> tLU(n, n, stride, num_cols_per_row,
+        SparseMatrixELL<Mem_, DT_> tLU(n, n, stride, num_cols_per_row,
                                         used_elements, LUx, LUj , LUrl);
         LU = tLU;
       } // symbolic_LU_factorisation
@@ -1409,15 +1409,15 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Arch_, typename DT_>
-    class ILUPreconditioner<Algo::Generic, SparseMatrixCOO<Arch_, DT_>,
-                            DenseVector<Arch_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCOO<Arch_, DT_>,
-                                      DenseVector<Arch_, DT_> >
+    template <typename Mem_, typename DT_>
+    class ILUPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
+                            DenseVector<Mem_, DT_> >
+      : public virtual Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
+                                      DenseVector<Mem_, DT_> >
     {
     private:
-      ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Arch_, DT_>,
-                        DenseVector<Arch_, DT_> > precond;
+      ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
+                        DenseVector<Mem_, DT_> > precond;
     public:
       /**
        * \brief Constructor
@@ -1428,8 +1428,8 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCOO<Arch_, DT_> & A, const Index p) :
-        precond(SparseMatrixCSR<Arch_, DT_> (A), p)
+      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const Index p) :
+        precond(SparseMatrixCSR<Mem_, DT_> (A), p)
       {
       }
 
@@ -1442,8 +1442,8 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given LU-decomposition
        */
-      ILUPreconditioner(const SparseMatrixCOO<Arch_, DT_> & LU) :
-        precond(SparseMatrixCSR<Arch_, DT_> (LU))
+      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & LU) :
+        precond(SparseMatrixCSR<Mem_, DT_> (LU))
       {
       }
 
@@ -1463,8 +1463,8 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(DenseVector<Arch_, DT_> & out,
-                         const DenseVector<Arch_, DT_> & in)
+      virtual void apply(DenseVector<Mem_, DT_> & out,
+                         const DenseVector<Mem_, DT_> & in)
       {
         precond.apply(out, in);
       }

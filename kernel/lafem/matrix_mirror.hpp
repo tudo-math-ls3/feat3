@@ -17,13 +17,13 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<
-      typename Arch_,
+      typename Mem_,
       typename DataType_>
     class MatrixMirror
     {
     public:
       /// arch typedef
-      typedef Arch_ MemType;
+      typedef Mem_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
 

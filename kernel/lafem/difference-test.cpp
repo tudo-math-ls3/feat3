@@ -9,17 +9,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVDifferenceTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVDifferenceTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_difference_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_difference_test")
   {
   }
 
@@ -38,11 +38,11 @@ public:
         ref(i, a_local(i) - b_local(i));
       }
 
-      DenseVector<Arch_, DT_> a(size);
+      DenseVector<Mem_, DT_> a(size);
       copy(a, a_local);
-      DenseVector<Arch_, DT_> b(size);
+      DenseVector<Mem_, DT_> b(size);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> c(size);
+      DenseVector<Mem_, DT_> c(size);
 
       c.template difference<Algo_>(a, b);
       copy(result_local, c);

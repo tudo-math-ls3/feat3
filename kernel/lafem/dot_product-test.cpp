@@ -9,17 +9,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVDotProductTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVDotProductTest()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_dot_product_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_dot_product_test")
   {
   }
 
@@ -38,8 +38,8 @@ public:
         b_local(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
       }
 
-      DenseVector<Arch_, DT_> a(a_local);
-      DenseVector<Arch_, DT_> b(b_local);
+      DenseVector<Mem_, DT_> a(a_local);
+      DenseVector<Mem_, DT_> b(b_local);
 
       // a*b = 1
       DT_ ref(DT_(1));

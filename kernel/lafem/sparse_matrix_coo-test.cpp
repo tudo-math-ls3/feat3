@@ -13,7 +13,7 @@ using namespace FEAST::TestSystem;
 *
 * \test test description missing
 *
-* \tparam Tag_
+* \tparam Mem_
 * description missing
 *
 * \tparam DT_
@@ -22,23 +22,23 @@ using namespace FEAST::TestSystem;
 * \author Dirk Ribbrock
 */
 template<
-  typename Tag_,
+  typename Mem_,
   typename DT_>
 class SparseMatrixCOOTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Mem_, DT_>
 {
 
 public:
 
   SparseMatrixCOOTest()
-    : TaggedTest<Tag_, DT_>("sparse_matrix_coo_test")
+    : TaggedTest<Mem_, DT_>("sparse_matrix_coo_test")
   {
   }
 
   virtual void run() const
   {
-    SparseMatrixCOO<Tag_, DT_> x;
-    SparseMatrixCOO<Tag_, DT_> a(10, 10);
+    SparseMatrixCOO<Mem_, DT_> x;
+    SparseMatrixCOO<Mem_, DT_> a(10, 10);
     a(5,5,2);
     a(1,2,7);
     a(5,5,2);
@@ -62,7 +62,7 @@ public:
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
-    SparseMatrixCOO<Tag_, DT_> b(a);
+    SparseMatrixCOO<Mem_, DT_> b(a);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
     TEST_CHECK_EQUAL(b.columns(), a.columns());
@@ -70,7 +70,7 @@ public:
     TEST_CHECK_EQUAL(a(0,2), b(0,2));
     TEST_CHECK_EQUAL(a, b);
 
-    SparseMatrixCOO<Tag_, DT_> c(10, 10);
+    SparseMatrixCOO<Mem_, DT_> c(10, 10);
     c = b;
     TEST_CHECK_EQUAL(c(0,2), b(0,2));
     TEST_CHECK_EQUAL(c(1,2), b(1,2));
@@ -82,7 +82,7 @@ public:
     c(1,2,3);
     TEST_CHECK_NOT_EQUAL(c, b);
 
-    SparseMatrixCOO<Tag_, DT_> f(10, 10);
+    SparseMatrixCOO<Mem_, DT_> f(10, 10);
     for (Index row(0) ; row < f.rows() ; ++row)
     {
       for (Index col(0) ; col < f.columns() ; ++col)
@@ -97,17 +97,17 @@ public:
     BinaryStream bs;
     f.write_out(fm_coo, bs);
     bs.seekg(0);
-    SparseMatrixCOO<Tag_, DT_> g(fm_coo, bs);
+    SparseMatrixCOO<Mem_, DT_> g(fm_coo, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
     f.write_out(fm_m, ts);
-    SparseMatrixCOO<Tag_, DT_> i(fm_m, ts);
+    SparseMatrixCOO<Mem_, DT_> i(fm_m, ts);
     TEST_CHECK_EQUAL(i, f);
 
     std::stringstream ms;
     f.write_out(fm_mtx, ms);
-    SparseMatrixCOO<Tag_, DT_> j(fm_mtx, ms);
+    SparseMatrixCOO<Mem_, DT_> j(fm_mtx, ms);
     TEST_CHECK_EQUAL(j, f);
   }
 };

@@ -17,18 +17,18 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<
-      typename Arch_,
+      typename Mem_,
       typename DataType_>
     class VectorMirror
     {
     public:
       /// arch typedef
-      typedef Arch_ MemType;
+      typedef Mem_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
 
       /// mirror matrix typedef
-      typedef SparseMatrixCSR<Arch_, DataType_> MirrorMatrixType;
+      typedef SparseMatrixCSR<Mem_, DataType_> MirrorMatrixType;
 
     protected:
       /// gather-mirror matrix

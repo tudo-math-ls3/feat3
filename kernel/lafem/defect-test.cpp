@@ -11,18 +11,18 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class DefectTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DefectTest()
-    : TaggedTest<Arch_, DT_, Algo_>("defect_test: " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("defect_test: " + SM_::type_name())
   {
   }
 
@@ -55,11 +55,11 @@ public:
       }
 
       SM_ a(a_local);
-      DenseVector<Arch_, DT_> b(size + 2);
+      DenseVector<Mem_, DT_> b(size + 2);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> rhs(size);
+      DenseVector<Mem_, DT_> rhs(size);
       copy(rhs, rhs_local);
-      DenseVector<Arch_, DT_> c(size, 4711);
+      DenseVector<Mem_, DT_> c(size, 4711);
 
       c.template defect<Algo_>(rhs, a, b);
       copy(result_local, c);

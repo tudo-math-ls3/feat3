@@ -9,17 +9,17 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_>
 class DVNorm2Test
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   DVNorm2Test()
-    : TaggedTest<Arch_, DT_, Algo_>("dv_norm2_test")
+    : TaggedTest<Mem_, DT_, Algo_>("dv_norm2_test")
   {
   }
 
@@ -39,7 +39,7 @@ public:
       // ||a||_2 = sqrt(2 - 2^{1-n})
       const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size-1))));
 
-      DenseVector<Arch_, DT_> a(a_local);
+      DenseVector<Mem_, DT_> a(a_local);
       DT_ c = a.template norm2<Algo_>();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
 

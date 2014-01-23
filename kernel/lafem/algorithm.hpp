@@ -13,8 +13,8 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename Arch_, typename DT_>
-    void copy(DenseVector<Arch_, DT_> & dest, const DenseVector<Arch_, DT_> & src)
+    template <typename Mem_, typename DT_>
+    void copy(DenseVector<Mem_, DT_> & dest, const DenseVector<Mem_, DT_> & src)
     {
       if (dest.size() != src.size())
         throw InternalError("Vector size mismatch!");
@@ -22,16 +22,16 @@ namespace FEAST
       DT_ * pdest(dest.elements());
       const DT_ * psrc(src.elements());
 
-      MemoryPool<Arch_>::template copy<DT_>(pdest, psrc, dest.size());
+      MemoryPool<Mem_>::template copy<DT_>(pdest, psrc, dest.size());
     }
 
-    template <typename Arch_, typename Arch2_, typename DT_>
-    void copy(DenseVector<Arch_, DT_> & dest, const DenseVector<Arch2_, DT_> & src)
+    template <typename Mem_, typename Arch2_, typename DT_>
+    void copy(DenseVector<Mem_, DT_> & dest, const DenseVector<Arch2_, DT_> & src)
     {
       if (dest.size() != src.size())
         throw InternalError("Vector size mismatch!");
 
-      DenseVector<Arch_, DT_> temp(src);
+      DenseVector<Mem_, DT_> temp(src);
       copy(dest, temp);
     }
   } // namespace LAFEM

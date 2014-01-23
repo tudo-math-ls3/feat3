@@ -10,18 +10,18 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class TranspositionTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   TranspositionTest()
-    : TaggedTest<Arch_, DT_, Algo_>("transposition_test" + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("transposition_test" + SM_::type_name())
   {
   }
 

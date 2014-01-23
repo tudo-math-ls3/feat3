@@ -23,10 +23,10 @@ namespace FEAST
       static void value(VT_ & x, const MT_ & A, const VT_ & b, Preconditioner<Algo_, MT_, VT_> & precon, Index max_iters, typename VT_::DataType eps_relative)
       {
         typedef typename VT_::DataType DT_;
-        typedef typename VT_::MemType Arch_;
+        typedef typename VT_::MemType Mem_;
 
-        DenseVector<Arch_, DT_> temp_0(x.size());
-        DenseVector<Arch_, DT_> temp_1(x.size());
+        DenseVector<Mem_, DT_> temp_0(x.size());
+        DenseVector<Mem_, DT_> temp_1(x.size());
 
         temp_0.template defect<Algo_>(b, A, x);
         DT_ initial_defect = temp_0.template norm2<Algo_>();

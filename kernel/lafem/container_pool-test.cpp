@@ -15,7 +15,7 @@ using namespace FEAST::TestSystem;
 *
 * \test test description missing
 *
-* \tparam Tag_
+* \tparam Mem_
 * description missing
 *
 * \tparam DT_
@@ -24,17 +24,17 @@ using namespace FEAST::TestSystem;
 * \author Dirk Ribbrock
 */
 template<
-  typename Tag_,
+  typename Mem_,
   typename DT_,
   typename CT_>
 class ContainerPoolTest
-  : public TaggedTest<Tag_, DT_>
+  : public TaggedTest<Mem_, DT_>
 {
 
 public:
 
   ContainerPoolTest()
-    : TaggedTest<Tag_, DT_>("container_pool_test " + CT_::type_name())
+    : TaggedTest<Mem_, DT_>("container_pool_test " + CT_::type_name())
   {
   }
 

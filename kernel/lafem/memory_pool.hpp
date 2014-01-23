@@ -31,9 +31,9 @@ namespace FEAST
       };
     }
 
-    template <typename Arch_>
+    template <typename Mem_>
     class MemoryPool
-        : public InstantiationPolicy<MemoryPool<Arch_>, Singleton>
+        : public InstantiationPolicy<MemoryPool<Mem_>, Singleton>
     {
     };
 

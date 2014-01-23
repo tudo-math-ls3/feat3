@@ -13,18 +13,18 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Arch_,
+  typename Mem_,
   typename Algo_,
   typename DT_,
   typename SM_>
 class ProductMatVecTest
-  : public TaggedTest<Arch_, DT_, Algo_>
+  : public TaggedTest<Mem_, DT_, Algo_>
 {
 
 public:
 
   ProductMatVecTest()
-    : TaggedTest<Arch_, DT_, Algo_>("product_matvec_test: " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("product_matvec_test: " + SM_::type_name())
   {
   }
 
@@ -55,9 +55,9 @@ public:
       }
 
       SM_ a(a_local);
-      DenseVector<Arch_, DT_> b(size + 2);
+      DenseVector<Mem_, DT_> b(size + 2);
       copy(b, b_local);
-      DenseVector<Arch_, DT_> c(size, 4711);
+      DenseVector<Mem_, DT_> c(size, 4711);
 
       c.template product_matvec<Algo_>(a, b);
       copy(result_local, c);
