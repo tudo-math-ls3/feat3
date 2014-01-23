@@ -77,7 +77,17 @@ void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const
     r[row_ptr[i]] += val[i] * x[col_ptr[i]];
   }
 
-  Difference<Mem::Main, Algo::Generic>::value(r, rhs, r, rows);
+  Index iter(0);
+  for (Index row(0); row < rows; ++row)
+  {
+    DT_ sum(DT_(0));
+    while (row_ptr[iter] == row && iter < used_elements)
+    {
+      sum += val[iter] * x[col_ptr[iter]];
+      ++iter;
+    }
+    r[row] = rhs[row] - sum;
+  }
 }
 
 template void Defect<Mem::Main, Algo::Generic>::coo(float *, const float * const, const float * const, const Index * const, const Index * const, const float * const, const Index, const Index);

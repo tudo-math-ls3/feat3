@@ -195,7 +195,7 @@ template <typename DT_>
 void Axpy<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
     const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
 {
-  /*Index iter(0);
+  Index iter(0);
   for (Index row(0); row < rows; ++row)
   {
     DT_ sum(DT_(0));
@@ -205,30 +205,7 @@ void Axpy<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ a, const DT_ * const
       ++iter;
     }
     r[row] = a * sum + y[row];
-  }*/
-
-  memset(r, 0, sizeof(DT_) * rows);
-  for (Index i(0) ; i < used_elements ; ++i)
-  {
-    r[row_ptr[i]] += val[i] * x[col_ptr[i]];
   }
-
-  // hack for clang, not working correctly with mpf_class
-#ifdef FEAST_GMP
-  if (typeid(DT_) == typeid(mpf_class))
-  {
-    for (Index row(0) ; row < rows ; ++row)
-    {
-      DT_ t(r[row]);
-      t *= a;
-      t += y[row];
-      r[row] = DT_(t);
-    }
-  }
-  else
-#endif
-    for (Index row(0) ; row < rows ; ++row)
-      r[row] = a * r[row] + y[row];
 }
 template void Axpy<Mem::Main, Algo::Generic>::coo(float *, const float, const float * const, const float * const, const float * const, const Index * const, const Index * const, const Index, const Index);
 template void Axpy<Mem::Main, Algo::Generic>::coo(double *, const double, const double * const, const double * const, const double * const, const Index * const, const Index * const, const Index, const Index);
@@ -240,7 +217,7 @@ template <typename DT_>
 void Axpy<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
     const Index * const row_ptr, const Index * const col_ptr, const Index rows, const Index used_elements)
 {
-  /*Index iter(0);
+  Index iter(0);
   for (Index row(0); row < rows; ++row)
   {
     DT_ sum(DT_(0));
@@ -250,30 +227,7 @@ void Axpy<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const a, const DT_
       ++iter;
     }
     r[row] = a[row] * sum + y[row];
-  }*/
-
-  memset(r, 0, sizeof(DT_) * rows);
-  for (Index i(0) ; i < used_elements ; ++i)
-  {
-    r[row_ptr[i]] += val[i] * x[col_ptr[i]];
   }
-
-  // hack for clang, not working correctly with mpf_class
-#ifdef FEAST_GMP
-  if (typeid(DT_) == typeid(mpf_class))
-  {
-    for (Index row(0) ; row < rows ; ++row)
-    {
-      DT_ t(r[row]);
-      t *= a[row];
-      t += y[row];
-      r[row] = DT_(t);
-    }
-  }
-  else
-#endif
-    for (Index row(0) ; row < rows ; ++row)
-      r[row] = a[row] * r[row] + y[row];
 }
 template void Axpy<Mem::Main, Algo::Generic>::coo(float *, const float * const, const float * const, const float * const, const float * const, const Index * const, const Index * const, const Index, const Index);
 template void Axpy<Mem::Main, Algo::Generic>::coo(double *, const double * const, const double * const, const double * const, const double * const, const Index * const, const Index * const, const Index, const Index);

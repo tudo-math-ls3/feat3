@@ -70,10 +70,16 @@ template void ProductMatVec<Mem::Main, Algo::Generic>::ell(mpf_class *, const mp
 template <typename DT_>
 void ProductMatVec<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const val, const Index * const row_ptr, const Index * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
 {
-  memset(r, 0, sizeof(DT_) * rows);
-  for (Index i(0) ; i < used_elements ; ++i)
+  Index iter(0);
+  for (Index row(0); row < rows; ++row)
   {
-    r[row_ptr[i]] += val[i] * x[col_ptr[i]];
+    DT_ sum(DT_(0));
+    while (row_ptr[iter] == row && iter < used_elements)
+    {
+      sum += val[iter] * x[col_ptr[iter]];
+      ++iter;
+    }
+    r[row] = sum;
   }
 }
 
