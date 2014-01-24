@@ -194,16 +194,24 @@ public:
       DenseVector<Mem_, DT_> y(size);
       copy(y, y_local);
 
+      Index ue(0);
       for (Index row(0) ; row < a_local.rows() ; ++row)
       {
         for (Index col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
+          {
             a_local(row, col, DT_(2));
+            ++ue;
+          }
           else if((row == col+1) || (row+1 == col))
+          {
             a_local(row, col, DT_(-1));
+            ++ue;
+          }
         }
       }
+      std::cout<<"real ue: "<<ue<<std::endl;
       SM_ a(a_local);
 
       DenseVector<Mem_, DT_> r(size);
@@ -295,16 +303,24 @@ public:
       DenseVector<Mem_, DT_> c(size);
       copy(c, c_local);
 
+      Index ue(0);
       for (Index row(0) ; row < a_local.rows() ; ++row)
       {
         for (Index col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
+          {
             a_local(row, col, DT_(2));
+            ++ue;
+          }
           else if((row == col+1) || (row+1 == col))
+          {
             a_local(row, col, DT_(-1));
+            ++ue;
+          }
         }
       }
+      std::cout<<"real ue: "<<ue<<std::endl;
       SM_ a(a_local);
 
       DenseVector<Mem_, DT_> r(size);

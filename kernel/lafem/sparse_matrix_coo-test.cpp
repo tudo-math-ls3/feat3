@@ -39,7 +39,7 @@ public:
   {
     SparseMatrixCOO<Mem_, DT_> x;
     SparseMatrixCOO<Mem_, DT_> a(10, 10);
-    a(5,5,2);
+    a(5,5,5);
     a(1,2,7);
     a(5,5,2);
     TEST_CHECK_EQUAL(a.used_elements(), 2ul);
@@ -48,14 +48,14 @@ public:
 
     a.clear();
     a(1,2,7);
-    a(5,5,2);
+    a(5,5,8);
     a(5,5,2);
     TEST_CHECK_EQUAL(a.used_elements(), 2ul);
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
     a.clear();
-    a(1,2,7);
+    a(1,2,8);
     a(5,5,2);
     a(1,2,7);
     TEST_CHECK_EQUAL(a.used_elements(), 2ul);
