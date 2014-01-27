@@ -36,7 +36,7 @@ public:
   BiCGStabTest(int opt = 0)
     : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::type_name() + " "
                                     + PT_::type_name() + " opt = "
-                                    + std::to_string(opt)), opt(opt)
+                                    + std::to_string(opt)), opt(Index(opt))
   {
   }
 

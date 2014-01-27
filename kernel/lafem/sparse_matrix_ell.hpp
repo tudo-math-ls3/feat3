@@ -85,7 +85,7 @@ namespace FEAST
 
           uint64_t * cAj = new uint64_t[std::size_t(dim)];
           file.read((char *)cAj, (long)(dim * sizeof(uint64_t)));
-          Index* tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(dim);
+          Index* tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(Index(dim));
           for (Index i(0) ; i < dim ; ++i)
             tAj[i] = Index(cAj[i]);
           delete[] cAj;
@@ -93,7 +93,7 @@ namespace FEAST
           double * cAx = new double[std::size_t(dim)];
           file.read((char *)cAx, (long)(dim * sizeof(double)));
 
-          DT_* tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(dim);
+          DT_* tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(Index(dim));
           for (Index i(0) ; i < dim ; ++i)
             tAx[i] = DT_(cAx[i]);
           delete[] cAx;
@@ -117,15 +117,15 @@ namespace FEAST
             tArl[row] = count;
           }
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(dim));
-          this->_elements_size.push_back(dim);
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(dim)));
+          this->_elements_size.push_back(Index(dim));
           this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(4) * this->_scalar_index.at(3)));
-          this->_indices_size.push_back(dim);
+          this->_indices_size.push_back(Index(dim));
           this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1)));
           this->_indices_size.push_back(this->_scalar_index.at(1));
 
-          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tAx, dim);
-          MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(0), tAj, dim);
+          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tAx, Index(dim));
+          MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(0), tAj, Index(dim));
           MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(1), tArl, this->_scalar_index.at(1));
           MemoryPool<Mem::Main>::instance()->release_memory(tAx);
           MemoryPool<Mem::Main>::instance()->release_memory(tAj);

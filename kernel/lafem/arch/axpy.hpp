@@ -25,7 +25,7 @@ namespace FEAST
         static void dv(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const Index size);
 
         template <typename DT_>
-        static void dv(DT_ * r, const DT_ * a, const DT_ * const x, const DT_ * const y, const Index size);
+        static void dv(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const Index size);
 
         template <typename DT_>
         static void csr(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows);
