@@ -110,15 +110,6 @@ void MemoryPool<Mem::Main>::upload(DT_ * dest, DT_ * src, const Index count)
     ::memcpy(dest, src, count * sizeof(DT_));
 }
 
-template <typename DT_>
-void MemoryPool<Mem::Main>::set_memory(DT_ * address, const DT_ val, const Index count)
-{
-  for (Index i(0) ; i < count ; ++i)
-  {
-    address[i] = val;
-  }
-}
-
 template float * MemoryPool<Mem::Main>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
 #ifdef FEAST_GMP
@@ -139,10 +130,3 @@ template void MemoryPool<Mem::Main>::upload<double>(double *, double *, const In
 template void MemoryPool<Mem::Main>::upload<mpf_class>(mpf_class *, mpf_class *, const Index);
 #endif
 template void MemoryPool<Mem::Main>::upload<Index>(Index *, Index *, const Index);
-
-template void MemoryPool<Mem::Main>::set_memory(float * , const float, const Index);
-template void MemoryPool<Mem::Main>::set_memory(double * , const double, const Index);
-#ifdef FEAST_GMP
-template void MemoryPool<Mem::Main>::set_memory(mpf_class * , const mpf_class, const Index);
-#endif
-template void MemoryPool<Mem::Main>::set_memory(Index * , const Index, const Index);

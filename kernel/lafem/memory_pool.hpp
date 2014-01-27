@@ -88,7 +88,13 @@ namespace FEAST
 
         /// set memory to specific value
         template <typename DT_>
-        static void set_memory(DT_ * address, const DT_ val, const Index count = 1);
+        static void set_memory(DT_ * address, const DT_ val, const Index count = 1)
+        {
+          for (Index i(0) ; i < count ; ++i)
+          {
+            address[i] = val;
+          }
+        }
 
         /// Copy memory area from src to dest
         template <typename DT_>
