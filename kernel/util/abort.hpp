@@ -5,7 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/pretty_printer.hpp>
+#include <kernel/util/exception.hpp>
 
 #ifndef SERIAL
 #include <mpi.h>
@@ -38,19 +38,14 @@ namespace FEAST
     std::cerr.flush();
 
     // print error message to logfile and stderr
-    PrettyPrinter pp(40, '#');
-    pp.add_line_sep();
     if(!message.empty())
     {
-      pp.add_line_no_right_delim(message);
-      pp.add_line_sep();
+      std::cerr << message << std::endl;
     }
     else
     {
-      pp.add_line_centered("Aborting program execution...");
+      std::cerr << "Aborting program execution..." << std::endl;
     }
-    pp.add_line_sep();
-    pp.print(std::cerr);
     std::cerr.flush();
 
 #ifndef SERIAL
