@@ -726,6 +726,7 @@ namespace FEAST
     return String("nullptr");
   }
 #endif // HAVE_CPP11_NULLPTR
+  /// \endcond
 
   /**
    * \brief Prints a floating point value to a string in scientific notation.
@@ -762,7 +763,6 @@ namespace FEAST
     oss << value;
     return oss.str();
   }
-  /// \endcond
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_STRING_HPP
