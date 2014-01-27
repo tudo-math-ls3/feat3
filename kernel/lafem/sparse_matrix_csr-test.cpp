@@ -116,9 +116,12 @@ public:
 
     std::stringstream ts;
     f.write_out(fm_m, ts);
-    SparseMatrixCOO<Mem::Main, DT_> h(f);
     SparseMatrixCOO<Mem::Main, DT_> i(fm_m, ts);
-    TEST_CHECK_EQUAL(i, h);
+    TEST_CHECK_EQUAL(i, fcoo);
+
+    f.write_out(fm_mtx, ts);
+    SparseMatrixCOO<Mem::Main, DT_> j(fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, fcoo);
   }
 };
 SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;

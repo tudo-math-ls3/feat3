@@ -488,6 +488,9 @@ namespace FEAST
             case fm_m:
               write_out_m(filename);
               break;
+            case fm_mtx:
+              write_out_mtx(filename);
+              break;
             default:
                 throw InternalError("Filemode not supported!");
           }
@@ -510,6 +513,9 @@ namespace FEAST
               break;
             case fm_m:
               write_out_m(file);
+              break;
+            case fm_mtx:
+              write_out_mtx(file);
               break;
             default:
                 throw InternalError("Filemode not supported!");
@@ -613,6 +619,45 @@ namespace FEAST
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
+        }
+
+        /**
+         * \brief Write out matrix to MatrixMarktet mtx file.
+         *
+         * \param[in] filename The file where the matrix shall be stored.
+         */
+        void write_out_mtx(String filename) const
+        {
+          std::ofstream file(filename.c_str(), std::ofstream::out);
+          if (! file.is_open())
+            throw InternalError("Unable to open Matrix file " + filename);
+          write_out_mtx(file);
+          file.close();
+        }
+
+        /**
+         * \brief Write out matrix to MatrixMarktet mtx file.
+         *
+         * \param[in] file The stream that shall be written to.
+         */
+        void write_out_mtx(std::ostream& file) const
+        {
+          SparseMatrixCSR<Mem::Main, DT_> temp(*this);
+
+          file << "%%MatrixMarket matrix coordinate real general" << std::endl;
+          file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
+
+          for (Index row(0) ; row < this->_scalar_index.at(1) ; ++row)
+          {
+            const Index end(temp.row_ptr()[row + 1]);
+            for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
+            {
+              if (temp.val()[i] != DT_(0))
+              {
+                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << Type::Traits<DT_>::to_double(temp.val()[i]) << ";" << std::endl;
+              }
+            }
+          }
         }
 
         /**

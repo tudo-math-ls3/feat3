@@ -8,7 +8,7 @@ int main(int argc, char ** argv)
 {
     if (argc != 3)
     {
-        std::cout<<"Usage 'csr2m csr-file m-file'"<<std::endl;
+        std::cout<<"Usage 'csr2mtx csr-file mtx-file'"<<std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -16,5 +16,5 @@ int main(int argc, char ** argv)
     String output(argv[2]);
 
     SparseMatrixCSR<Mem::Main, double> csr(input);
-    csr.write_out(fm_m, output);
+    csr.write_out(fm_mtx, output);
 }
