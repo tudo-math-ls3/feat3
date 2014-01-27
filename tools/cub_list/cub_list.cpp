@@ -161,10 +161,29 @@ void print_avail()
   std::cout << std::endl;
 }
 
+// Prints the auto-degree aliases for a specific shape
+template<typename Shape_>
+void print_auto_degree()
+{
+  int max_degree = AutoAlias<Shape_>::max_auto_degree;
+
+  std::cout << "\nPrinting auto-degree mappings for '" << Shape_::name() << "':" << std::endl;
+  for(int i(1); i <= max_degree; ++i)
+  {
+    std::cout << "auto-degree:" << i << " -> " << AutoAlias<Shape_>::map("auto-degree:" + stringify(i)) << std::endl;
+  }
+}
+
 // Prints the cubature points for a specific cubature rule and a specific shape
 template<typename Shape_>
 void test_dynamic(const String& name)
 {
+  if(name.compare_no_case("auto-degree") == 0)
+  {
+    print_auto_degree<Shape_>();
+    return;
+  }
+
   // create rule
   Rule<Shape_> rule;
   if(!DynamicFactory::create(rule, name))
@@ -256,11 +275,17 @@ int main(int argc, char* argv[])
     std::cout << "called 'auto-aliased rules'. These auto-aliases are implemented for each shape" << std::endl;
     std::cout << "and will try to select the most appropriate cubature rule fulfilling the desired" << std::endl;
     std::cout << "requirements, if possible." << std::endl;
+    std::cout << std::endl;
     std::cout << "Currently, the only supported auto-aliased rule is the 'auto-degree:<d>' alias," << std::endl;
     std::cout << "which refers to the least-point inner cubature rule capable of integrating" << std::endl;
     std::cout << "polynomials up to degree <d> exactly or to the highest-order cubature rule" << std::endl;
     std::cout << "available if no exact cubature rule is available. Example: the 'auto-degree:2'" << std::endl;
     std::cout << "alias refers to 'tensor:gauss-legendre:2' for Hypercube<n> shapes." << std::endl;
+    std::cout << std::endl;
+    std::cout << "A list of all auto-degree mappings supported by a shape can be printed by" << std::endl;
+    std::cout << "specifying 'auto-degree' as the cubature name, e.g. the command" << std::endl;
+    std::cout << "   cub-list h2 auto-degree" << std::endl;
+    std::cout << "will print all auto-degree aliases for quadrilaterals." << std::endl;
     std::cout << std::endl << std::endl;
     std::cout << "Refined Rules:" << std::endl;
     std::cout << "--------------" << std::endl;
