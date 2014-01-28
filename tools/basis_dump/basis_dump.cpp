@@ -3,6 +3,7 @@
 #include <kernel/space/ext_vtk_writer.hpp>
 
 // FE spaces
+#include <kernel/space/crouzeix_raviart/element.hpp>
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/rannacher_turek/element.hpp>
@@ -42,6 +43,8 @@ int main(int, char**)
     dump_basis< Space::Discontinuous::Element<TrafoType> >("2d_tria_discontinuous-0.vtk");
     // Lagrange-1
     dump_basis< Space::Lagrange1::Element<TrafoType> >("2d_tria_lagrange-1.vtk");
+    // Crouzeix-Raviart
+    dump_basis< Space::CrouzeixRaviart::Element<TrafoType> >("2d_tria_crouzeix_raviart.vtk");
     // Hermite-3
     dump_basis< Space::Hermite3::Element<TrafoType> >("2d_tria_hermite-3.vtk");
     // Argyris
