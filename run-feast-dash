@@ -148,7 +148,7 @@ def run_test(build_id, branch, myDB):
       test_name = test_output[idx].split(": ")
       test_name = test_name[1].split(" .")
       test_name = test_name[0]
-      m = Message.create(runid=r, stage="test", status="passed", timestamp=time.time(), title=test_name)
+      m = Message.create(runid=r, stage="test", status="passed", timestamp=time.time(), title=test_name, body=test_output[idx])
       m.save()
       idx += 1
 
