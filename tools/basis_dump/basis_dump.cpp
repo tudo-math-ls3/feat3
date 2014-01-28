@@ -53,13 +53,13 @@ int main(int, char**)
 
   // 3D Tetra Elements
   {
-    //typedef Geometry::ConformalMesh< Shape::Simplex<3> > MeshType;
-    //typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Geometry::ConformalMesh< Shape::Simplex<3> > MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // Discontinuous-0
-    //dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_tetra_discontinuous-0.vtk");
+    dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_tetra_discontinuous-0.vtk", 1);
     // Lagrange-1
-    //dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_tetra_lagrange-1.vtk");
+    dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_tetra_lagrange-1.vtk", 2);
   }
 
   // 2D Quad Elements
@@ -81,13 +81,13 @@ int main(int, char**)
 
   // 3D Hexa Elements
   {
-    //typedef Geometry::ConformalMesh< Shape::Hypercube<3> > MeshType;
-    //typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+    typedef Geometry::ConformalMesh< Shape::Hypercube<3> > MeshType;
+    typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // Discontinuous-0
-    //dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_hexa_discontinuous-0.vtk");
+    dump_basis< Space::Discontinuous::Element<TrafoType> >("3d_hexa_discontinuous-0.vtk", 1);
     // Lagrange-1
-    //dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_hexa_lagrange-1.vtk");
+    dump_basis< Space::Lagrange1::Element<TrafoType> >("3d_hexa_lagrange-1.vtk", 3);
   }
 }
 
