@@ -13,7 +13,6 @@
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 
-#include <vector>
 #include <map>
 #include <algorithm>
 #include <fstream>
@@ -128,9 +127,7 @@ namespace FEAST
 
         void _read_from_m(std::istream& file)
         {
-          std::vector<Index> rowsv;
-          std::vector<Index> colsv;
-          std::vector<DT_> valsv;
+          std::map<Index, std::map<Index, DT_> > entries; // map<row, map<column, value> >
           this->_scalar_index.push_back(0);
           this->_scalar_index.push_back(0);
           this->_scalar_index.push_back(0);
@@ -139,6 +136,7 @@ namespace FEAST
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
 
+          Index ue(0);
           String line;
           std::getline(file, line);
           while(!file.eof())
@@ -175,19 +173,45 @@ namespace FEAST
             String sval(line, 0, end);
             DT_ val((DT_)atof(sval.c_str()));
 
-            rowsv.push_back(row);
-            colsv.push_back(col);
-            valsv.push_back(val);
-
+            entries[row].insert(std::pair<Index, DT_>(col, val));
+            ++ue;
           }
           this->_scalar_index.at(0) = this->rows() * this->columns();
+          this->_scalar_index.at(3) = ue;
+          this->_scalar_index.at(4) = ue;
 
-          this->_scalar_index.at(5) = rowsv.size();
-          for (Index i(0) ; i < rowsv.size() ; ++i)
+          DT_ * tval = new DT_[ue];
+          Index * trow = new Index[ue];
+          Index * tcolumn = new Index[ue];
+
+          Index idx(0);
+          for (auto row : entries)
           {
-            (*this)(rowsv.at(i), colsv.at(i), valsv.at(i));
+            for (auto col : row.second )
+            {
+              trow[idx] = row.first;
+              tcolumn[idx] = col.first;
+              tval[idx] = col.second;
+              ++idx;
+            }
+            row.second.clear();
           }
-          this->_scalar_index.at(5) = 1000;
+          entries.clear();
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(3));
+
+          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), trow, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(1), tcolumn, this->_scalar_index.at(3));
+
+          delete[] tval;
+          delete[] trow;
+          delete[] tcolumn;
         }
 
         void _read_from_mtx(String filename)
@@ -201,9 +225,7 @@ namespace FEAST
 
         void _read_from_mtx(std::istream& file)
         {
-          std::vector<Index> rowsv;
-          std::vector<Index> colsv;
-          std::vector<DT_> valsv;
+          std::map<Index, std::map<Index, DT_> > entries; // map<row, map<column, value> >
           this->_scalar_index.push_back(0);
           this->_scalar_index.push_back(0);
           this->_scalar_index.push_back(0);
@@ -212,6 +234,7 @@ namespace FEAST
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
 
+          Index ue(0);
           String line;
           std::getline(file, line);
           {
@@ -262,17 +285,46 @@ namespace FEAST
             String sval(line, 0, end);
             DT_ val((DT_)atof(sval.c_str()));
 
-            rowsv.push_back(row);
-            colsv.push_back(col);
-            valsv.push_back(val);
+            entries[row].insert(std::pair<Index, DT_>(col, val));
+            ++ue;
           }
 
-          this->_scalar_index.at(5) = rowsv.size();
-          for (Index i(0) ; i < rowsv.size() ; ++i)
+          this->_scalar_index.at(0) = this->rows() * this->columns();
+          this->_scalar_index.at(3) = ue;
+          this->_scalar_index.at(4) = ue;
+
+          DT_ * tval = new DT_[ue];
+          Index * trow = new Index[ue];
+          Index * tcolumn = new Index[ue];
+
+          Index idx(0);
+          for (auto row : entries)
           {
-            (*this)(rowsv.at(i), colsv.at(i), valsv.at(i));
+            for (auto col : row.second )
+            {
+              trow[idx] = row.first;
+              tcolumn[idx] = col.first;
+              tval[idx] = col.second;
+              ++idx;
+            }
+            row.second.clear();
           }
-          this->_scalar_index.at(5) = 1000;
+          entries.clear();
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(3));
+
+          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), trow, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(1), tcolumn, this->_scalar_index.at(3));
+
+          delete[] tval;
+          delete[] trow;
+          delete[] tcolumn;
         }
 
         void _read_from_coo(String filename)
