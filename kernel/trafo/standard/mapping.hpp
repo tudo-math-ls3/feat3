@@ -62,7 +62,7 @@ namespace FEAST
          * \param[in] mesh
          * A reference to the mesh that this trafo mapping is to be defined on.
          */
-        explicit Mapping(const MeshType& mesh) :
+        explicit Mapping(MeshType& mesh) :
           BaseClass(mesh)
         {
         }

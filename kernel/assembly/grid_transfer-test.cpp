@@ -50,7 +50,7 @@ public:
     test_unit_2d_q1t(mesh_fine, mesh_coarse);
   }
 
-  void test_unit_2d_q1(const QuadMesh& mesh_f, const QuadMesh& mesh_c) const
+  void test_unit_2d_q1(QuadMesh& mesh_f, QuadMesh& mesh_c) const
   {
     // compute eps
     const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));
@@ -121,7 +121,7 @@ public:
     }
   }
 
-  void test_unit_2d_q1t(const QuadMesh& mesh_f, const QuadMesh& mesh_c) const
+  void test_unit_2d_q1t(QuadMesh& mesh_f, QuadMesh& mesh_c) const
   {
     // compute eps
     const DataType_ eps = Math::pow(Math::Limits<DataType_>::epsilon(), DataType_(0.8));

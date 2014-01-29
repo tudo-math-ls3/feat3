@@ -57,7 +57,7 @@ namespace FEAST
 
     protected:
       /// mesh reference
-      const MeshType& _mesh;
+      MeshType& _mesh;
 
       /**
        * \brief Constructor
@@ -67,7 +67,7 @@ namespace FEAST
        *
        * \note This constructor is protected so that it can only be called from a derived class.
        */
-      explicit MappingBase(const MeshType& mesh) :
+      explicit MappingBase(MeshType& mesh) :
         _mesh(mesh)
       {
       }
@@ -76,8 +76,14 @@ namespace FEAST
       /**
        * \brief Returns a reference to the underlying mesh.
        * \returns
-       * A const reference to the underlying mesh.
+       * A (const) reference to the underlying mesh.
        */
+      MeshType& get_mesh()
+      {
+        return _mesh;
+      }
+
+      /** \copydoc get_mesh() */
       const MeshType& get_mesh() const
       {
         return _mesh;

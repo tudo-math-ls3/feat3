@@ -51,7 +51,7 @@ namespace FEAST
         enum ElementCapabilities
         {
           /// node functionals available
-          have_node_func = 0
+          have_node_func = 1
         };
 
         /** \copydoc ElementBase::Evaluator */
@@ -67,7 +67,7 @@ namespace FEAST
           /// dummy enum
           enum
           {
-            /// number of local dofs := number of vertices per cell
+            /// number of local dofs := number of facets per cell
             num_loc_dofs = Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::count
           };
 
@@ -133,7 +133,7 @@ namespace FEAST
         /** \copydoc ElementBase::get_num_dofs() */
         Index get_num_dofs() const
         {
-          // number of DOFs = number of vertices in the mesh
+          // number of DOFs = number of facets in the mesh
           return this->get_mesh().get_num_entities(ShapeType::dimension-1);
         }
       }; // class Element
