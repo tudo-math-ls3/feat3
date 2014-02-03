@@ -33,16 +33,16 @@ private:
 
 public:
 
-  BiCGStabTest(int opt = 0)
+  BiCGStabTest(Index opt = 0)
     : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::type_name() + " "
                                     + PT_::type_name() + " opt = "
-                                    + std::to_string(opt)), opt(Index(opt))
+                                    + std::to_string(opt)), opt(opt)
   {
   }
 
   virtual void run() const
   {
-    Index size(1025);
+    Index size(1000);
     DenseVector<Mem_, DT_> x(size, DT_(1));
     DenseVector<Mem_, DT_> b(size);
     DenseVector<Mem_, DT_> ref(size, DT_(42));
@@ -69,17 +69,19 @@ public:
         {
           if (i == j)
             csys(i, j, DT_(4 + (i%2)));
-          if (i - 1 == j)
+          else if (i - 1 == j)
             csys(i, j, DT_(-1 - 0.2 * (i%3)));
-          if (i + 1 == j)
+          else if (i + 1 == j)
             csys(i, j, DT_(-2 - 0.5 * (i%2)));
-          if (i + 5 == j)
-            csys(i, i + 5, DT_(0.05 * (i%2)));
-          if (i - 5 == j)
+          else if (i + 5 == j)
+            csys(i, j, DT_(0.05 * (i%2)));
+          else if (i - 5 == j)
             csys(i, j, DT_(- 0.5 * (i%2)));
-          if (i + 3 == j)
+          else if (i + 3 == j)
+          {
             if (i%2 == 0)
-              csys(i, i + 3, DT_(0.234 * (i%7)));
+              csys(i, j, DT_(0.234 * (i%7)));
+          }
         }
       }
     }
@@ -406,6 +408,7 @@ public:
   }
 
 };
+
 
 ILUTest<Mem::Main, Algo::Generic, double,
         SparseMatrixCSR<Mem::Main, double> > ilu_test_src_double;

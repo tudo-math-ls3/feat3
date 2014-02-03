@@ -7,6 +7,7 @@
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_matrix.hpp>
 #include <kernel/lafem/algorithm.hpp>
 #include <vector>
 
@@ -18,6 +19,10 @@ namespace FEAST
     class Preconditioner
     {
     public:
+      virtual ~Preconditioner()
+      {
+      }
+
       virtual void apply(VT_ & out, const VT_ & in) = 0;
     };
 
@@ -29,9 +34,12 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Algo_, typename MT_, typename VT_>
-    class NonePreconditioner : public virtual Preconditioner<Algo_, MT_, VT_>
+    class NonePreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     public:
+      virtual ~NonePreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -51,12 +59,12 @@ namespace FEAST
         return "None_Preconditioner";
       }
 
-        /**
-         * \brief apply the preconditioner
-         *
-         * \param[out] out The preconditioner result.
-         * \param[in] in The vector, which is applied to the preconditioning
-         */
+      /**
+       * \brief apply the preconditioner
+       *
+       * \param[out] out The preconditioner result.
+       * \param[in] in The vector, which is applied to the preconditioning
+       */
       virtual void apply(VT_ & out, const VT_ & in)
       {
         copy(out, in);
@@ -72,12 +80,15 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Algo_, typename MT_, typename VT_>
-    class JacobiPreconditioner : public virtual Preconditioner<Algo_, MT_, VT_>
+    class JacobiPreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     private:
       VT_ _jac;
 
     public:
+      virtual ~JacobiPreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -127,7 +138,7 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Algo_, typename MT_, typename VT_>
-    class GaussSeidelPreconditioner : public virtual Preconditioner<Algo_, MT_, VT_>
+    class GaussSeidelPreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     };
 
@@ -142,14 +153,17 @@ namespace FEAST
     template <typename Mem_, typename DT_>
     class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
                                     DenseVector<Mem_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                                      DenseVector<Mem_, DT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
+                              DenseVector<Mem_, DT_> >
     {
     private:
       DT_ damping;
       const SparseMatrixCSR<Mem_, DT_> & A;
 
     public:
+      virtual ~GaussSeidelPreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -194,9 +208,9 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pA_val(A.val());
-        const Index * pA_col_ind(A.col_ind());
-        const Index * pA_row(A.row_ptr());
+        const DT_ * pa_val(A.val());
+        const Index * pa_col_ind(A.col_ind());
+        const Index * pa_row(A.row_ptr());
 
         Index row;
 
@@ -204,16 +218,16 @@ namespace FEAST
         for (Index i(0); i < A.rows(); ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
-          row = pA_row[i];
+          row = pa_row[i];
 
-          while(pA_col_ind[row] < i)
+          while(pa_col_ind[row] < i)
           {
-            pout[i] -= pA_val[row] * pout[pA_col_ind[row]];
+            pout[i] -= pa_val[row] * pout[pa_col_ind[row]];
             ++row;
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pA_val[row];
+          pout[i] /= pa_val[row];
         }
 
         // damping of solution
@@ -232,14 +246,17 @@ namespace FEAST
     template <typename Mem_, typename DT_>
     class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
                                     DenseVector<Mem_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                                      DenseVector<Mem_, DT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
+                              DenseVector<Mem_, DT_> >
     {
     private:
       DT_ damping;
       const SparseMatrixCOO<Mem_, DT_> & A;
 
     public:
+      virtual ~GaussSeidelPreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -283,9 +300,9 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pA_val(A.val());
-        const Index * pA_column(A.column());
-        const Index * pA_row(A.row());
+        const DT_ * pa_val(A.val());
+        const Index * pa_column(A.column());
+        const Index * pa_row(A.row());
 
         Index row = 0;
 
@@ -296,20 +313,20 @@ namespace FEAST
         for (Index i(0); i < A.rows(); ++i)
         {
           // go to the i-th column of A
-          while (pA_row[row] < i)
+          while (pa_row[row] < i)
           {
             ++row;
           }
 
           // iteration over all elements on the left side of the main-diagonal
-          while (pA_column[row] < i)
+          while (pa_column[row] < i)
           {
-            pout[i] -= pA_val[row] * out(pA_column[row]);
+            pout[i] -= pa_val[row] * out(pa_column[row]);
             ++row;
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pA_val[row];
+          pout[i] /= pa_val[row];
         }
 
         // damping of solution
@@ -328,14 +345,17 @@ namespace FEAST
     template <typename Mem_, typename DT_>
     class GaussSeidelPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
                                     DenseVector<Mem_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                                      DenseVector<Mem_, DT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                              DenseVector<Mem_, DT_> >
     {
     private:
       DT_ damping;
       const SparseMatrixELL<Mem_, DT_> & A;
 
     public:
+      virtual ~GaussSeidelPreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -379,8 +399,8 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pA_val(A.Ax());
-        const Index * pAj(A.Aj());
+        const DT_ * pa_val(A.Ax());
+        const Index * paj(A.Aj());
 
         Index col;
         const Index stride(A.stride());
@@ -391,26 +411,26 @@ namespace FEAST
           // search entry on the main-diagonal
           col = i;
 
-          while(pAj[col] < i)
+          while(paj[col] < i)
           {
             col += stride;
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pA_val[col];
+          pout[i] /= pa_val[col];
 
           // iteration over all elements on the left side of the main-diagonal
           for (Index j(i+1); j < A.rows(); ++j)
           {
             col = j;
-            while(pAj[col] < i)
+            while(paj[col] < i)
             {
               col += stride;
             }
 
-            if (pAj[col] == i)
+            if (paj[col] == i)
             {
-               pout[j] -= pA_val[col] * pout[i];
+              pout[j] -= pa_val[col] * pout[i];
             }
           }
         }
@@ -429,7 +449,7 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Algo_, typename MT_, typename VT_>
-    class PolynomialPreconditioner : public virtual Preconditioner<Algo_, MT_, VT_>
+    class PolynomialPreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     private:
       const MT_ & A;        // system-matrix
@@ -438,17 +458,30 @@ namespace FEAST
       VT_ * pscale;         // scaling-vector (if check is true)
 
     public:
-    /**
-     * \brief Constuctor of Neumann-Polynomial-Preconditioner.
-     *
-     * param[in] A system-matrix
-     * param[in] m order of the polynom
-     * param[in] bscale optional paramter: true convergence of neumann-series
-     *                                     for strict diagonaldominant matrices
-     *                                     false (default), dont scale at all
-     *
-     * Creates a Polynomial preconditioner to the given matrix and the given order
-     */
+      /**
+       * \brief Destructor
+       *
+       * deletes a vector, which was only used if bscale was true
+       */
+      ~PolynomialPreconditioner()
+      {
+        if (pscale != nullptr)
+        {
+          delete pscale;
+        }
+      }
+
+      /**
+       * \brief Constuctor of Neumann-Polynomial-Preconditioner.
+       *
+       * param[in] A system-matrix
+       * param[in] m order of the polynom
+       * param[in] bscale optional paramter: true convergence of neumann-series
+       *                                     for strict diagonaldominant matrices
+       *                                     false (default), dont scale at all
+       *
+       * Creates a Polynomial preconditioner to the given matrix and the given order
+       */
       PolynomialPreconditioner(const MT_ & A, Index m, bool bscale = false) :
         A(A),
         m(m),
@@ -474,19 +507,6 @@ namespace FEAST
       }
 
       /**
-       * \brief Destructor
-       *
-       * deletes a vector, which was only used if bscale was true
-       */
-      ~PolynomialPreconditioner()
-      {
-        if (pscale != nullptr)
-        {
-          delete pscale;
-        }
-      }
-
-      /**
        * \brief Returns a descriptive string.
        *
        * \returns A string describing the container.
@@ -507,12 +527,12 @@ namespace FEAST
         typedef typename VT_::DataType DT_;
 
         /*
-        * preconditioner is given by
-        *   M^-1 = I + (I - A) + ... + (I - A)^m
-        *
-        * the preconditioner only works, if
-        *   ||I - A||_2 < 1.
-        */
+         * preconditioner is given by
+         *   M^-1 = I + (I - A) + ... + (I - A)^m
+         *
+         * the preconditioner only works, if
+         *   ||I - A||_2 < 1.
+         */
 
         VT_ * pauxs[2];
 
@@ -562,7 +582,7 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Algo_, typename MT_, typename VT_>
-    class ILUPreconditioner : public virtual Preconditioner<Algo_, MT_, VT_>
+    class ILUPreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     };
 
@@ -576,15 +596,18 @@ namespace FEAST
      */
     template <typename Mem_, typename DT_>
     class ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                                    DenseVector<Mem_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                                      DenseVector<Mem_, DT_> >
+                            DenseVector<Mem_, DT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
+                              DenseVector<Mem_, DT_> >
     {
     private:
       const SparseMatrixCSR<Mem_, DT_> & A;
       SparseMatrixCSR<Mem_, DT_> LU;
 
     public:
+      virtual ~ILUPreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -594,7 +617,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const int p) :
         A(A)
       {
         if (A.columns() != A.rows())
@@ -611,11 +634,11 @@ namespace FEAST
         }
         else
         {
-          symbolic_LU_factorisation(p);
+          symbolic_lu_factorisation(p);
           copy_entries();
         }
 
-        create_LU();
+        create_lu();
       }
 
       /**
@@ -666,7 +689,7 @@ namespace FEAST
         }
 
         copy_entries();
-        create_LU();
+        create_lu();
       }
 
       /**
@@ -696,12 +719,13 @@ namespace FEAST
         const DT_ * pval(LU.val());
         const Index * pcol_ind(LU.col_ind());
         const Index * prow(LU.row_ptr());
+        const Index n(LU.rows());
 
         Index col;
 
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < LU.columns(); ++i)
+        for (Index i(0); i < n; ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
           col = prow[i];
@@ -715,8 +739,10 @@ namespace FEAST
 
         // __backward-insertion__
         // iteration over all rows
-        for (int i(LU.rows()-1); i >= 0; --i)
+        for (Index i(n); i > 0;)
         {
+          --i;
+
           // iteration over all elements on the right side of the main-diagonal
           col = prow[i+1]-1;
 
@@ -732,28 +758,28 @@ namespace FEAST
       } // function apply
 
     private:
-      void create_LU()
+      void create_lu()
       {
         /**
          * This algorithm has been adopted by
-         *    Dominic Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
          *    section 5.5.3; Algo 5.13.; page 132
          */
 
         DT_ * plu(LU.val());
         const Index * pcol(LU.col_ind());
         const Index * prow(LU.row_ptr());
-        const Index N(LU.rows());
+        const Index n(LU.rows());
 
         // integer work array of length n
         //   for saving the position of the diagonal-entries
-        Index * pw = new Index[N];
+        Index * pw = new Index[n];
 
         Index row_start;
         Index row_end;
 
         // iteration over all columns
-        for (Index i(0); i < N; ++i)
+        for (Index i(0); i < n; ++i)
         {
           row_start = prow[i];
           row_end = prow[i + 1];
@@ -789,14 +815,16 @@ namespace FEAST
           // save the position of the diagonal-entry
           pw[i] = k;
         }
-      } // function create_LU
+
+        delete[] pw;
+      } // function create_lu
 
 
-      void symbolic_LU_factorisation(Index p)
+      void symbolic_lu_factorisation(int p)
       {
         /**
          * This algorithm has been adopted by
-         *    Dominic Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
          *    section 5.5.6; Algo 5.19.; page 142
          */
 
@@ -806,48 +834,43 @@ namespace FEAST
 
         // type of list-entries
         typedef std::pair<int, Index> PAIR_;
-        // list for saving the non-zero entries of L
-        std::list<PAIR_> ll;
+        // lists for saving the non-zero entries of L per row
+        std::list<PAIR_> * ll = new std::list<PAIR_>[n];
 
         // vector for saving the iterators to the diag-entries
         std::list<PAIR_>::iterator * pldiag = new std::list<PAIR_>::iterator[n];
-        // vector for saving the last iterators of every row
-        std::list<PAIR_>::iterator * plend = new std::list<PAIR_>::iterator[n];
         // auxillary-iterators
         std::list<PAIR_>::iterator it, it1, it2;
 
         Index col_begin, col_end, col, col2;
-        int l, l2, neuesLevel;
+        int l, l2, neues_level;
 
         // fill list with non-zero entries of A
         // and save iterators to the diag- and last entry of each row
-        it = ll.begin();
         for (Index row(0); row < n; ++row)
         {
+          std::list<PAIR_> & ll_row (ll[row]);
           col_begin = parow[row];
           col_end = parow[row + 1] - 1;
 
           for (Index k(col_begin); k <= col_end; ++k)
           {
-            ++it;
             col = pacol[k];
 
-            it = ll.insert(it, PAIR_(n, col));
-            // it points to current element
+            ll_row.emplace_back((int) n, col);
 
             if (col == row)
             {
-              pldiag[row] = it;
+              pldiag[row] = std::prev(ll_row.end());
             }
           }
-          plend[row] = it;
         }
 
         // calculate "new" entries of LU
         for (Index row(1); row < n; ++row)
         {
           // iterate from the beginning of the line to the diag-entry
-          it = std::next(plend[row - 1]);
+          it = ll[row].begin();
           while (it != pldiag[row])
           {
             col = it->second;
@@ -856,25 +879,23 @@ namespace FEAST
             // search non-zero entries in the col-th row
             it1 = it;
             it2 = pldiag[col];
-            while (it2 != plend[col])
+            while (std::next(it2) != ll[col].end())
             {
               ++it2;
 
               col2 = it2->second;
               l2 = it2->first;
 
-              neuesLevel = 2*n - l - l2 + 1;
+              neues_level = 2*(int) n - l - l2 + 1;
 
               // if new entries must be created, find the correct position in the list
-              // and update if necessary the iterator of the last row-entry
-              if (neuesLevel <= p)
+              if (neues_level <= p)
               {
                 while (it1->second < col2)
                 {
-                  if (it1 == plend[row])
+                  if (it1 == ll[row].end())
                   {
-                    it1 = ll.insert(std::next(it1), PAIR_(neuesLevel, col2));
-                    plend[row] = it1;
+                    ll[row].emplace_back(neues_level, col2);
                     break;
                   }
                   ++it1;
@@ -882,7 +903,7 @@ namespace FEAST
 
                 if (it1->second != col2)
                 {
-                  it1 = ll.insert(it1, PAIR_(neuesLevel, col2));
+                  it1 = ll[row].emplace(it1, neues_level, col2);
                 }
               }
             }
@@ -891,29 +912,38 @@ namespace FEAST
         }
 
         // Create LU-matrix
-        DenseVector<Mem_, Index> col_ind(ll.size());
-        DenseVector<Mem_, DT_> val(ll.size());
+        // calculate number of non-zero-elements
+        Index nnz(0);
+        for (Index i(0); i < n; ++i)
+        {
+          nnz += ll[i].size();
+        }
+
+        DenseVector<Mem_, DT_> val(nnz);
+        DenseVector<Mem_, Index> col_ind(nnz);
         DenseVector<Mem_, Index> row_ptr(n+1);
+        Index * pcol_ind(col_ind.elements());
+        Index * prow_ptr(row_ptr.elements());
+
         Index k1(0);
-        Index k2(0);
         row_ptr(0,0);
 
-        for (std::list<PAIR_ >::iterator it = ll.begin(); it != ll.end(); ++it)
+        for (Index i(0); i < n; ++i)
         {
-          col_ind(k1, it->second);
-          val(k1, it->first);
-          ++k1;
-
-          if (it == plend[k2])
+          for (it = ll[i].begin(); it != ll[i].end(); ++it)
           {
-            row_ptr(k2+1, k1);
-            ++k2;
+            pcol_ind[k1] = it->second;
+            ++k1;
           }
+          prow_ptr[i+1] = k1;
         }
 
         SparseMatrixCSR<Mem_, DT_> tLU(n, n, col_ind, val, row_ptr);
         LU = tLU;
-      } // symbolic_LU_factorisation
+
+        delete[] ll;
+        delete[] pldiag;
+      } // symbolic_lu_factorisation
 
       void copy_entries(bool check = true)
       {
@@ -939,10 +969,10 @@ namespace FEAST
           const Index * pacol(A.col_ind());
           const Index * parow(A.row_ptr());
 
-          const Index N(LU.rows());
+          const Index n(LU.rows());
           Index k;
           // initialize LU array to A
-          for (Index i(0); i < N; ++i)
+          for (Index i(0); i < n; ++i)
           {
             k = parow[i];
             for (Index j(plurow[i]); j < plurow[i + 1]; ++j)
@@ -975,14 +1005,17 @@ namespace FEAST
     template <typename Mem_, typename DT_>
     class ILUPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
                             DenseVector<Mem_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
-                                      DenseVector<Mem_, DT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                              DenseVector<Mem_, DT_> >
     {
     private:
       const SparseMatrixELL<Mem_, DT_> & A;
       SparseMatrixELL<Mem_, DT_> LU;
 
     public:
+      virtual ~ILUPreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -992,7 +1025,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const int p) :
         A(A)
       {
         if (A.columns() != A.rows())
@@ -1009,11 +1042,11 @@ namespace FEAST
         }
         else
         {
-          symbolic_LU_factorisation(p);
+          symbolic_lu_factorisation(p);
           copy_entries();
         }
 
-        create_LU();
+        create_lu();
       }
 
       /**
@@ -1065,7 +1098,7 @@ namespace FEAST
 
         copy_entries();
 
-        create_LU();
+        create_lu();
       }
 
       /**
@@ -1096,12 +1129,13 @@ namespace FEAST
         const Index * pAj(LU.Aj());
         const Index stride(LU.stride());
         const Index * pArl(LU.Arl());
+        const Index n(A.rows());
 
         Index col, ncol;
 
         // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < A.rows(); ++i)
+        for (Index i(0); i < n; ++i)
         {
           // search entry on the main-diagonal
           col = i;
@@ -1112,7 +1146,7 @@ namespace FEAST
           }
 
           // iteration over all cells under the main-diagonal
-          for (Index j(i+1); j < A.rows(); ++j)
+          for (Index j(i+1); j < n; ++j)
           {
             col = j;
             while(pAj[col] < i)
@@ -1129,8 +1163,10 @@ namespace FEAST
 
         // __backward-insertion__
         // iteration over all rows
-        for (int i(LU.rows()-1); i>= 0; --i)
+        for (Index i(LU.rows()); i> 0;)
         {
+          --i;
+
           // iteration over all elements on the right side of the main-diagonal
           ncol = pArl[i];
           col = i + stride * (ncol - 1);
@@ -1147,15 +1183,15 @@ namespace FEAST
       } // function apply
 
     private:
-      void create_LU()
+      void create_lu()
       {
         /**
          * This algorithm has been adopted by
-         *    Dominic Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
          *    section 5.5.3; Algo 5.13.; page 132
          */
 
-        const Index N(A.rows());
+        const Index n(A.rows());
         DT_ * plu(LU.Ax());
         const Index * pj(LU.Aj());
         const Index * prl(LU.Arl());
@@ -1163,10 +1199,10 @@ namespace FEAST
 
         // integer work array of length n
         //   for saving the position of the diagonal-entries
-        Index * pw = new Index[N];
+        Index * pw = new Index[n];
 
         // iteration over all columns
-        for (Index i(0); i < N; ++i)
+        for (Index i(0); i < n; ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
           // k -> \tilde a_{ik}
@@ -1199,13 +1235,15 @@ namespace FEAST
           // save the position of the diagonal-entry
           pw[i] = k;
         }
-      } // function create_LU
 
-      void symbolic_LU_factorisation(Index p)
+        delete[] pw;
+      } // function create_lu
+
+      void symbolic_lu_factorisation(int p)
       {
         /**
          * This algorithm has been adopted by
-         *    Dominic Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
          *    section 5.5.6; Algo 5.19.; page 142
          */
 
@@ -1217,44 +1255,39 @@ namespace FEAST
         // type of list-entries
         typedef std::pair<int, Index> PAIR_;
         // list for saving the non-zero entries of L
-        std::list<PAIR_> ll;
+        std::list<PAIR_> * ll = new std::list<PAIR_>[n];
 
         // vector for saving the iterators to the diag-entries
         std::list<PAIR_>::iterator * pldiag = new std::list<PAIR_>::iterator[n];
-        // vector for saving the last iterators of every row
-        std::list<PAIR_>::iterator * plend = new std::list<PAIR_>::iterator[n];
         // auxillary-iterators
         std::list<PAIR_>::iterator it, it1, it2;
 
         Index col, col2;
-        int l, l2, neuesLevel;
+        int l, l2, neues_level;
 
         // fill list with non-zero entries of A
         // and save iterators to the diag- and last entry of each row
-        it = ll.begin();
         for (Index row(0); row < n; ++row)
         {
+          std::list<PAIR_> & ll_row (ll[row]);
           for (Index k(0); k < parl[row]; ++k)
           {
-            ++it;
             col = paj[row  + stride * k];
 
-            it = ll.insert(it, PAIR_(n, col));
-            // it points to current element
+            ll_row.emplace_back((int) n, col);
 
             if (col == row)
             {
-              pldiag[row] = it;
+              pldiag[row] = std::prev(ll_row.end());
             }
           }
-          plend[row] = it;
         }
 
         // calculate "new" entries of LU
         for (Index row(1); row < n; ++row)
         {
           // iterate from the beginning of the line to the diag-entry
-          it = std::next(plend[row - 1]);
+          it = ll[row].begin();
           while (it != pldiag[row])
           {
             col = it->second;
@@ -1263,25 +1296,24 @@ namespace FEAST
             // search non-zero entries in the col-th row
             it1 = it;
             it2 = pldiag[col];
-            while (it2 != plend[col])
+            while (std::next(it2) != ll[col].end())
             {
               ++it2;
 
               col2 = it2->second;
               l2 = it2->first;
 
-              neuesLevel = 2*n - l - l2 + 1;
+              neues_level = 2*(int) n - l - l2 + 1;
 
               // if new entries must be created, find the correct position in the list
               // and update if necessary the iterator of the last row-entry
-              if (neuesLevel <= p)
+              if (neues_level <= p)
               {
                 while (it1->second < col2)
                 {
-                  if (it1 == plend[row])
+                  if (it1 == ll[row].end())
                   {
-                    it1 = ll.insert(std::next(it1), PAIR_(neuesLevel, col2));
-                    plend[row] = it1;
+                    ll[row].emplace_back(neues_level, col2);
                     break;
                   }
                   ++it1;
@@ -1289,7 +1321,7 @@ namespace FEAST
 
                 if (it1->second != col2)
                 {
-                  it1 = ll.insert(it1, PAIR_(neuesLevel, col2));
+                  it1 = ll[row].emplace(it1, neues_level, col2);
                 }
               }
             }
@@ -1300,51 +1332,40 @@ namespace FEAST
         // Create LU-matrix
         // calculate maximal number of columns per row
         Index num_cols_per_row(0);
-        Index ctr;
+        Index nnz(0);
 
-        it = ll.begin();
-        for (Index row(0); row < n; ++row)
+        for (Index i(0); i < n; ++i)
         {
-          ctr = 1;
-          while (it != plend[row])
-          {
-            ++it;
-            ++ctr;
-          }
-          num_cols_per_row = std::max(num_cols_per_row, ctr);
-          ++it;
+          num_cols_per_row = std::max(num_cols_per_row, ll[i].size());
+          nnz += ll[i].size();
         }
 
         DenseVector<Mem_, DT_> LUx(num_cols_per_row * stride);
         DenseVector<Mem_, Index> LUj(num_cols_per_row * stride);
         DenseVector<Mem_, Index> LUrl(n);
+        Index * pluj(LUj.elements());
+        Index * plurl(LUrl.elements());
 
-        Index used_elements(ll.size());
+        Index used_elements(nnz);
+        Index k1(0);
 
-        // fill LUx, LUj and LUrl
-        it = ll.begin();
-        for (Index row(0); row < n; ++row)
+        for (Index i(0); i < n; ++i)
         {
-          ctr = 0;
-          LUx(row, it->first);
-          LUj(row, it->second);
-          while (it != plend[row])
+          k1 = 0;
+          for (it = ll[i].begin(); it != ll[i].end(); ++it, ++k1)
           {
-            ++it;
-            ++ctr;
-
-            LUx(row + ctr * stride, it->first);
-            LUj(row + ctr * stride, it->second);
+            pluj[i + k1 * stride] = it->second;
           }
-          LUrl(row, ctr + 1);
-
-          ++it;
+          plurl[i] = ll[i].size();
         }
 
         SparseMatrixELL<Mem_, DT_> tLU(n, n, stride, num_cols_per_row,
-                                        used_elements, LUx, LUj , LUrl);
+                                       used_elements, LUx, LUj , LUrl);
         LU = tLU;
-      } // symbolic_LU_factorisation
+
+        delete[] ll;
+        delete[] pldiag;
+      } // symbolic_lu_factorisation
 
       void copy_entries(bool check = true)
       {
@@ -1370,13 +1391,13 @@ namespace FEAST
           const Index * paj(A.Aj());
           const Index * parl(A.Arl());
 
-          const Index N(LU.rows());
+          const Index n(LU.rows());
           const Index stride(A.stride());
 
           Index k, ctr;
 
           // iteration over all rows
-          for (Index row(0); row < N; ++row)
+          for (Index row(0); row < n; ++row)
           {
             k = row;
             ctr = 0;
@@ -1412,13 +1433,16 @@ namespace FEAST
     template <typename Mem_, typename DT_>
     class ILUPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
                             DenseVector<Mem_, DT_> >
-      : public virtual Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                                      DenseVector<Mem_, DT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
+                              DenseVector<Mem_, DT_> >
     {
     private:
       ILUPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
                         DenseVector<Mem_, DT_> > precond;
     public:
+      virtual ~ILUPreconditioner()
+      {
+      }
       /**
        * \brief Constructor
        *
@@ -1469,7 +1493,6 @@ namespace FEAST
         precond.apply(out, in);
       }
     };
-
   }// namespace LAFEM
 } // namespace FEAST
 
