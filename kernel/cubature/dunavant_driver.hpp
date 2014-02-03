@@ -50,43 +50,43 @@ namespace FEAST
         switch(points)
         {
         case 2:
-        return Index(3);
+          return Index(3);
         case 3:
-        return Index(4);
+          return Index(4);
         case 4:
-        return Index(6);
+          return Index(6);
         case 5:
-        return Index(7);
+          return Index(7);
         case 6:
-        return Index(12);
+          return Index(12);
         case 7:
-        return Index(13);
+          return Index(13);
         case 8:
-        return Index(16);
+          return Index(16);
         case 9:
-        return Index(19);
+          return Index(19);
         case 10:
-        return Index(25);
+          return Index(25);
         case 11:
-        return Index(27);
+          return Index(27);
         case 12:
-        return Index(33);
+          return Index(33);
         case 13:
-        return Index(37);
+          return Index(37);
         case 14:
-        return Index(42);
+          return Index(42);
         case 15:
-        return Index(48);
+          return Index(48);
         case 16:
-        return Index(52);
+          return Index(52);
         case 17:
-        return Index(61);
+          return Index(61);
         case 18:
-        return Index(70);
+          return Index(70);
         case 19:
-        return Index(73);
+          return Index(73);
         case 20:
-        return Index(79);
+          return Index(79);
         default:
           return Index(0);
         }
@@ -108,7 +108,7 @@ namespace FEAST
         switch(num_points)
         {
         case 2:
-          off += fill_sym1(rule, off, Weight_(0.1666666666666665), Coord_(0.666666666666667));
+          off += fill_sym2(rule, off, Weight_(0.1666666666666665), Coord_(0.666666666666667), Coord_(0.166666666666667));
           break;
         case 3:
           off += fill_sym1(rule, off, Weight_(-0.2812500000000000), Coord_(0.333333333333333));
@@ -303,9 +303,6 @@ namespace FEAST
           off += fill_sym3(rule, off, Weight_(0.0003522023389540), Coord_(-0.008368153208227), Coord_(0.146965436053239), Coord_(0.861402717154987));
           off += fill_sym3(rule, off, Weight_(0.0050563424637310), Coord_(0.026686063258714), Coord_(0.137726978828923), Coord_(0.835586957912363));
           off += fill_sym3(rule, off, Weight_(0.0017869546929750), Coord_(0.010547719294141), Coord_(0.059696109149007), Coord_(0.929756171556853));
-          break;
-        default:
-        //TODO
           break;
         }
       }
