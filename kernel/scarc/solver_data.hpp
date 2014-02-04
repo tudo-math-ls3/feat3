@@ -920,13 +920,13 @@ namespace FEAST
       protected:
         ///CTORs to be used in subclasses
         FilterDataContainer(const filter_type_& filter) :
-          _stored_filter(filter)
+          _stored_filter(filter.clone())
         {
         }
 
-        FilterDataContainer(const FilterDataContainer& other)
+        FilterDataContainer(FilterDataContainer& other)
         {
-          this->_stored_filter = other._stored_filter;
+          this->_stored_filter = std::move(other._stored_filter.clone());
         }
 
         filter_type_ _stored_filter;
@@ -997,7 +997,7 @@ namespace FEAST
                                                    Index num_temp_scalars = 0,
                                                    Index num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
-        FilterDataContainer<DataType_, MemTag_, FilterType_>(filter),
+        FilterDataContainer<DataType_, MemTag_, FilterType_>(filter.clone()),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
@@ -1040,7 +1040,7 @@ namespace FEAST
         this->_stored_dest_ranks = other._stored_dest_ranks;
         this->_stored_source_ranks = other._stored_source_ranks;
 
-        this->_stored_filter = other._stored_filter;
+        this->_stored_filter = other._stored_filter.clone();
 
         return *this;
       }

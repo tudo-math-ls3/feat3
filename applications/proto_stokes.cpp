@@ -385,34 +385,25 @@ public:
     _filter_y = dirichlet_y.assemble<MemType, DataType>();
 
     // filter matrices
-    _filter_x.filter_mat(_matrix_a);
+    _filter_x.filter_mat<AlgoType>(_matrix_a);
 
-    // filter pressure gradient matrices; this needs to be done by hand for now :(
-    const Index* idx(_filter_x.get_indices());
-    const Index* row_ptr(_matrix_b1.row_ptr());
-    DataType* val_b1(_matrix_b1.val());
-    DataType* val_b2(_matrix_b2.val());
-    for(Index i(0); i < _filter_x.size(); ++i)
-    {
-      for(Index j(row_ptr[idx[i]]); j < row_ptr[idx[i + 1]]; ++j)
-      {
-        val_b1[j] = val_b2[j] = DataType(0);
-      }
-    }
+    // filter (off-diagonal) pressure gradient matrices
+    _filter_x.filter_offdiag_row_mat<AlgoType>(_matrix_b1);
+    _filter_y.filter_offdiag_row_mat<AlgoType>(_matrix_b2);
   }
 
   // filters the rhs vectors
   void filter_rhs(VectorType& rhs_x, VectorType& rhs_y)
   {
-    _filter_x.filter_rhs(rhs_x);
-    _filter_y.filter_rhs(rhs_y);
+    _filter_x.filter_rhs<AlgoType>(rhs_x);
+    _filter_y.filter_rhs<AlgoType>(rhs_y);
   }
 
   // filter the solution vectors
   void filter_sol(VectorType& sol_x, VectorType& sol_y)
   {
-    _filter_x.filter_sol(sol_x);
-    _filter_y.filter_sol(sol_y);
+    _filter_x.filter_sol<AlgoType>(sol_x);
+    _filter_y.filter_sol<AlgoType>(sol_y);
   }
 
   // computes the current velocity defect vectors
@@ -429,8 +420,8 @@ public:
     def_y.axpy<AlgoType>(-DataType(1), _matrix_b2, sol_p, def_y);
 
     // filter defect vectors
-    _filter_x.filter_def(def_x);
-    _filter_y.filter_def(def_y);
+    _filter_x.filter_def<AlgoType>(def_x);
+    _filter_y.filter_def<AlgoType>(def_y);
   }
 
   // computes the current pressure/divergence defect vector
@@ -468,8 +459,8 @@ public:
   void update_solution(VectorType& sol_x, VectorType& sol_y, VectorType& sol_p)
   {
     // update solution vector
-    _filter_x.filter_cor(_vec_sol_x);
-    _filter_y.filter_cor(_vec_sol_y);
+    _filter_x.filter_cor<AlgoType>(_vec_sol_x);
+    _filter_y.filter_cor<AlgoType>(_vec_sol_y);
     sol_x.axpy<AlgoType>(DataType(1), _vec_sol_x, sol_x);
     sol_y.axpy<AlgoType>(DataType(1), _vec_sol_y, sol_y);
     sol_p.axpy<AlgoType>(DataType(1), _vec_sol_p, sol_p);
@@ -505,8 +496,8 @@ public:
     _vec_def_y.product_matvec<AlgoType>(_prol_v, coarse._vec_sol_y);
     _vec_def_p.product_matvec<AlgoType>(_prol_p, coarse._vec_sol_p);
     // filter
-    _filter_x.filter_cor(_vec_def_x);
-    _filter_y.filter_cor(_vec_def_y);
+    _filter_x.filter_cor<AlgoType>(_vec_def_x);
+    _filter_y.filter_cor<AlgoType>(_vec_def_y);
     // correct
     _vec_sol_x.axpy<AlgoType>(DataType(1), _vec_def_x, _vec_sol_x);
     _vec_sol_y.axpy<AlgoType>(DataType(1), _vec_def_y, _vec_sol_y);
@@ -531,8 +522,8 @@ public:
     coarse._vec_rhs_p.product_matvec<AlgoType>(_rest_p, _vec_def_p);
 
     // filter
-    coarse._filter_x.filter_def(coarse._vec_rhs_x);
-    coarse._filter_y.filter_def(coarse._vec_rhs_y);
+    coarse._filter_x.filter_def<AlgoType>(coarse._vec_rhs_x);
+    coarse._filter_y.filter_def<AlgoType>(coarse._vec_rhs_y);
 
     // clear
     coarse._vec_sol_x.clear();

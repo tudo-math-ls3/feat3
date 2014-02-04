@@ -1840,7 +1840,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _r.filter_def(_l);
+          _r.template filter_def<Algo_>(_l);
         }
 
         FilterDefectFunctor& operator=(const FilterDefectFunctor& rhs)
@@ -1886,7 +1886,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _r.filter_def(_l);
+          _r.template filter_cor<Algo_>(_l);
         }
 
         FilterCorrectionFunctor& operator=(const FilterCorrectionFunctor& rhs)

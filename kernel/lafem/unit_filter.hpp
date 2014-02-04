@@ -12,6 +12,8 @@ namespace FEAST
     /**
      * \brief Unit Filter class template.
      *
+     * \todo Replace the internal data storage by SparseVector once it is implemented.
+     *
      * \author Peter Zajac
      */
     template<
@@ -20,7 +22,7 @@ namespace FEAST
     class UnitFilter
     {
     public:
-      /// arch typedef
+      /// mem-type typedef
       typedef MemType_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
@@ -55,23 +57,19 @@ namespace FEAST
       {
       }
 
-      /// copy-ctor
-      UnitFilter(const UnitFilter& other) :
+      /// move-ctor
+      UnitFilter(UnitFilter&& other) :
         _num_entries(other._num_entries),
-        _indices(new Index[_num_entries]),
-        _values(new DataType[_num_entries])
+        _indices(other._indices),
+        _values(other._values)
       {
-        const Index* indices(other.get_indices());
-        const DataType* values(other.get_values());
-        for(Index i(0); i < _num_entries; ++i)
-        {
-          _indices[i] = indices[i];
-          _values[i] = values[i];
-        }
+        other._num_entries = Index(0);
+        other._indices = nullptr;
+        other._values = nullptr;
       }
 
-      /// assignment operator
-      UnitFilter& operator=(const UnitFilter& other)
+      /// move-assignment operator
+      UnitFilter& operator=(UnitFilter&& other)
       {
         if(this == &other)
           return *this;
@@ -80,16 +78,14 @@ namespace FEAST
           delete [] _indices;
         if(_values != nullptr)
           delete [] _values;
+
         _num_entries = other._num_entries;
-        _indices = new Index[_num_entries];
-        _values = new DataType[_num_entries];
-        const Index* indices(other.get_indices());
-        const DataType* values(other.get_values());
-        for(Index i(0); i < _num_entries; ++i)
-        {
-          _indices[i] = indices[i];
-          _values[i] = values[i];
-        }
+        _indices = other._indices;
+        _values = other._values;
+        other._num_entries = Index(0);
+        other._indices = nullptr;
+        other._values = nullptr;
+
         return *this;
       }
 
@@ -104,6 +100,24 @@ namespace FEAST
         {
           delete [] _indices;
         }
+      }
+
+      UnitFilter clone() const
+      {
+        // create copy
+        UnitFilter other(size());
+
+        // copy arrays
+        Index* indices(other.get_indices());
+        DataType* values(other.get_values());
+        for(Index i(0); i < _num_entries; ++i)
+        {
+          indices[i] = _indices[i];
+          values[i] = _values[i];
+        }
+
+        // return
+        return std::move(other);
       }
 
       /// \returns The number of entries in the filter.
@@ -142,12 +156,12 @@ namespace FEAST
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
        */
-      template<typename DataType2_>
-      void filter_mat(SparseMatrixCSR<MemType, DataType2_>& matrix) const
+      template<typename Algo_>
+      void filter_mat(SparseMatrixCSR<MemType, DataType>& matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
         const Index* col_idx(matrix.col_ind());
-        DataType2_* v(matrix.val());
+        DataType* v(matrix.val());
 
         for(Index i(0); i < _num_entries; ++i)
         {
@@ -155,9 +169,32 @@ namespace FEAST
           // replace by unit row
           for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
-            v[j] = (col_idx[j] == ix) ? DataType2_(1) : DataType2_(0);
+            v[j] = (col_idx[j] == ix) ? DataType(1) : DataType(0);
           }
         }
+      }
+
+      template<typename Algo_>
+      void filter_offdiag_row_mat(SparseMatrixCSR<MemType, DataType>& matrix) const
+      {
+        const Index* row_ptr(matrix.row_ptr());
+        DataType* v(matrix.val());
+
+        for(Index i(0); i < _num_entries; ++i)
+        {
+          Index ix(_indices[i]);
+          // replace by null row
+          for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
+          {
+            v[j] = DataType(0);
+          }
+        }
+      }
+
+      template<typename Algo_>
+      void filter_offdiag_col_mat(SparseMatrixCSR<MemType, DataType>&) const
+      {
+        // nothing to do here
       }
 
       /**
@@ -166,13 +203,13 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the right-hand-side vector to be filtered.
        */
-      template<typename DataType2_>
-      void filter_rhs(DenseVector<MemType, DataType2_>& vector) const
+      template<typename Algo_>
+      void filter_rhs(DenseVector<MemType, DataType>& vector) const
       {
-        DataType2_* v(vector.elements());
+        DataType* v(vector.elements());
         for(Index i(0); i < _num_entries; ++i)
         {
-          v[_indices[i]] = DataType2_(_values[i]);
+          v[_indices[i]] = _values[i];
         }
       }
 
@@ -182,14 +219,11 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the solution vector to be filtered.
        */
-      template<typename DataType2_>
-      void filter_sol(DenseVector<MemType, DataType2_>& vector) const
+      template<typename Algo_>
+      void filter_sol(DenseVector<MemType, DataType>& vector) const
       {
-        DataType2_* v(vector.elements());
-        for(Index i(0); i < _num_entries; ++i)
-        {
-          v[_indices[i]] = DataType2_(_values[i]);
-        }
+        // same as rhs
+        filter_rhs<Algo_>(vector);
       }
 
       /**
@@ -198,13 +232,13 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the defect vector to be filtered.
        */
-      template<typename DataType2_>
-      void filter_def(DenseVector<MemType, DataType2_>& vector) const
+      template<typename Algo_>
+      void filter_def(DenseVector<MemType, DataType>& vector) const
       {
-        DataType2_* v(vector.elements());
+        DataType* v(vector.elements());
         for(Index i(0); i < _num_entries; ++i)
         {
-          v[_indices[i]] = DataType2_(0);
+          v[_indices[i]] = DataType(0);
         }
       }
 
@@ -214,14 +248,11 @@ namespace FEAST
        * \param[in,out] vector
        * A reference to the correction vector to be filtered.
        */
-      template<typename DataType2_>
-      void filter_cor(DenseVector<MemType, DataType2_>& vector) const
+      template<typename Algo_>
+      void filter_cor(DenseVector<MemType, DataType>& vector) const
       {
-        DataType2_* v(vector.elements());
-        for(Index i(0); i < _num_entries; ++i)
-        {
-          v[_indices[i]] = DataType2_(0);
-        }
+        // same as def
+        filter_def<Algo_>(vector);
       }
     }; // class UnitFilter<...>
   } // namespace LAFEM

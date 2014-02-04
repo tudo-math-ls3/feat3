@@ -608,10 +608,10 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
 
   ///filter system
-  filter.filter_mat(mat_sys);
-  filter.filter_mat(mat_localsys);
-  filter.filter_rhs(vec_rhs);
-  filter.filter_sol(vec_sol);
+  filter.filter_mat<Algo::Generic>(mat_sys);
+  filter.filter_mat<Algo::Generic>(mat_localsys);
+  filter.filter_rhs<Algo::Generic>(vec_rhs);
+  filter.filter_sol<Algo::Generic>(vec_sol);
   //filter.filter_mat(mat_precon); //NO! we do this in the solver program when applying the correction filter after preconditioning
 
   std::cout << "proc " << rank << " A0 " << mat_sys << std::endl;
