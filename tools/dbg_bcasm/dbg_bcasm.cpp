@@ -78,7 +78,7 @@ void test_bcasm(
 }
 
 template<typename Space_>
-void test_it(const QuadMesh& mesh_0, const QuadMesh& mesh_1, const QuadCellSet& cell_0, const QuadCellSet& cell_1)
+void test_it(QuadMesh& mesh_0, QuadMesh& mesh_1, const QuadCellSet& cell_0, const QuadCellSet& cell_1)
 {
   // create trafos
   QuadTrafo trafo_0(mesh_0);
