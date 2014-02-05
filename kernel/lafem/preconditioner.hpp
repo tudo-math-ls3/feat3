@@ -1336,8 +1336,8 @@ namespace FEAST
 
         for (Index i(0); i < n; ++i)
         {
-          num_cols_per_row = std::max(num_cols_per_row, ll[i].size());
-          nnz += ll[i].size();
+          num_cols_per_row = Math::max(num_cols_per_row, Index(ll[i].size()));
+          nnz += Index(ll[i].size());
         }
 
         DenseVector<Mem_, DT_> LUx(num_cols_per_row * stride);
