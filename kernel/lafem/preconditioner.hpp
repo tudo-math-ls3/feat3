@@ -6,6 +6,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_matrix.hpp>
 #include <kernel/lafem/algorithm.hpp>
