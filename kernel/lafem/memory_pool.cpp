@@ -14,7 +14,7 @@ MemoryPool<Mem::Main>::MemoryPool()
 MemoryPool<Mem::Main>::~MemoryPool()
 {
   if (_pool.size() > 0)
-    throw InternalError("MemoryPool<CPU> still contains memory chunks!");
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> still contains memory chunks!");
 }
 
 template <typename DT_>
@@ -23,7 +23,7 @@ DT_ * MemoryPool<Mem::Main>::allocate_memory(const Index count)
   DT_ * memory(NULL);
   memory = (DT_*)::malloc(count * sizeof(DT_));
   if (memory == NULL)
-    throw InternalError("MemoryPool<CPU> allocation error!");
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> allocation error!");
 #ifdef FEAST_GMP
   if (typeid(DT_) == typeid(mpf_class))
   {
@@ -44,7 +44,7 @@ void MemoryPool<Mem::Main>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("MemoryPool<CPU>::increase_memory: Memory address not found!");
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::increase_memory: Memory address not found!");
   else
   {
     it->second.counter = it->second.counter + 1;
@@ -55,7 +55,7 @@ void MemoryPool<Mem::Main>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("MemoryPool<CPU>::release_memory: Memory address not found!");
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU>::release_memory: Memory address not found!");
   else
   {
     if(it->second.counter == 1)

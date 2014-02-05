@@ -120,7 +120,7 @@ namespace FEAST
         {
           std::ifstream file(filename.c_str(), std::ifstream::in);
           if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
           _read_from_m(file);
           file.close();
         }
@@ -218,7 +218,7 @@ namespace FEAST
         {
           std::ifstream file(filename.c_str(), std::ifstream::in);
           if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
           _read_from_mtx(file);
           file.close();
         }
@@ -331,7 +331,7 @@ namespace FEAST
         {
           std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
           if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
           _read_from_coo(file);
           file.close();
         }
@@ -638,7 +638,7 @@ namespace FEAST
               _read_from_coo(filename);
               break;
             default:
-              throw InternalError("Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -667,7 +667,7 @@ namespace FEAST
               _read_from_coo(file);
               break;
             default:
-              throw InternalError("Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -783,7 +783,7 @@ namespace FEAST
               write_out_mtx(filename);
               break;
             default:
-                throw InternalError("Filemode not supported!");
+                throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -809,7 +809,7 @@ namespace FEAST
               write_out_mtx(file);
               break;
             default:
-                throw InternalError("Filemode not supported!");
+                throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -822,7 +822,7 @@ namespace FEAST
         {
           std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
           if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
           write_out_coo(file);
           file.close();
         }
@@ -883,7 +883,7 @@ namespace FEAST
         {
           std::ofstream file(filename.c_str(), std::ofstream::out);
           if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
           write_out_m(file);
           file.close();
         }
@@ -915,7 +915,7 @@ namespace FEAST
         {
           std::ofstream file(filename.c_str(), std::ofstream::out);
           if (! file.is_open())
-            throw InternalError("Unable to open Matrix file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
           write_out_mtx(file);
           file.close();
         }
@@ -1266,11 +1266,11 @@ namespace FEAST
         void scale(const SparseMatrixCOO<Mem_, DT_> & x, const DT_ s)
         {
           if (x.rows() != this->rows())
-            throw InternalError("Row count does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
           if (x.columns() != this->columns())
-            throw InternalError("Column count does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
           if (x.used_elements() != this->used_elements())
-            throw InternalError("Nonzero count does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
           Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), s, this->used_elements());
         }

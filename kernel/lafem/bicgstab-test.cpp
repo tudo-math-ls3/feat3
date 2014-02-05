@@ -133,7 +133,7 @@ public:
     }
     else
     {
-      throw InternalError("Preconditioner and Matrix have different matrix-types!");
+      throw InternalError(__func__, __FILE__, __LINE__, "Preconditioner and Matrix have different matrix-types!");
     }
 
 

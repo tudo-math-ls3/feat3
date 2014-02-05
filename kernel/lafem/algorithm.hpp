@@ -17,7 +17,7 @@ namespace FEAST
     void copy(DenseVector<Mem_, DT_> & dest, const DenseVector<Mem_, DT_> & src)
     {
       if (dest.size() != src.size())
-        throw InternalError("Vector size mismatch!");
+        throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
 
       DT_ * pdest(dest.elements());
       const DT_ * psrc(src.elements());
@@ -29,7 +29,7 @@ namespace FEAST
     void copy(DenseVector<Mem_, DT_> & dest, const DenseVector<Arch2_, DT_> & src)
     {
       if (dest.size() != src.size())
-        throw InternalError("Vector size mismatch!");
+        throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
 
       DenseVector<Mem_, DT_> temp(src);
       copy(dest, temp);

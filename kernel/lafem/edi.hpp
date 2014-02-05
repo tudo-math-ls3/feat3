@@ -56,7 +56,7 @@ namespace FEAST
           //_armed(true)
         {
           //if (other._armed)
-          //  throw InternalError("You may not use the EDI copy constructor on your own!");
+          //  throw InternalError(__func__, __FILE__, __LINE__, "You may not use the EDI copy constructor on your own!");
         }
 
         EDI<Mem_, DT_> & operator=(DT_ value)

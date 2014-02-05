@@ -47,9 +47,23 @@ namespace FEAST
     * \brief CTOR
     *
     * \param message
-    * the exception's message
+    * the exception's message.
     */
     Exception(const String & message);
+
+    /**
+    * \brief CTOR
+    *
+    * \param function the current function name.
+    * \param file the current file name.
+    * \param line the current line number.
+    * \param message the exception's message.
+    */
+    Exception(
+        const char* const function,
+        const char* const file,
+        const long line,
+        const String & message);
 
     /// copy CTOR
     Exception(const Exception & other);
@@ -94,6 +108,23 @@ namespace FEAST
     */
     InternalError(const String & message) :
       Exception("Internal error: " + message)
+    {
+    }
+
+    /**
+    * \brief Constructor.
+    *
+    * \param function the current function name.
+    * \param file the current file name.
+    * \param line the current line number.
+    * \param message A short error message.
+    */
+    InternalError(
+        const char* const function,
+        const char* const file,
+        const long line,
+        const String & message) :
+      Exception(function, file, line, "Internal error: " + message)
     {
     }
   };

@@ -90,7 +90,7 @@ namespace FEAST
         _jac(A.rows())
       {
         if (A.columns() != A.rows())
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
 
         for (Index i(0) ; i < _jac.size() ; ++i)
           _jac(i, damping / A(i, i));
@@ -165,7 +165,7 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
       }
 
@@ -255,7 +255,7 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
       }
 
@@ -351,7 +351,7 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
       }
 
@@ -457,7 +457,7 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
         typedef typename VT_::DataType DT_;
@@ -599,7 +599,7 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
         if (p == 0)
@@ -633,7 +633,7 @@ namespace FEAST
       {
         if (LU.columns() != LU.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
       }
 
@@ -652,17 +652,17 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
         if (LU.columns() != LU.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
         if (A.columns() != LU.columns())
         {
-          throw InternalError("Matrices have different sizes!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrices have different sizes!");
         }
 
         copy_entries();
@@ -997,7 +997,7 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
         if (p == 0)
@@ -1031,7 +1031,7 @@ namespace FEAST
       {
         if (LU.columns() != LU.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
       }
 
@@ -1050,17 +1050,17 @@ namespace FEAST
       {
         if (A.columns() != A.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
         if (LU.columns() != LU.rows())
         {
-          throw InternalError("Matrix is not square!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
         if (A.columns() != LU.columns())
         {
-          throw InternalError("Matrices have different sizes!");
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrices have different sizes!");
         }
 
         copy_entries();

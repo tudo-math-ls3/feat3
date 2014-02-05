@@ -54,7 +54,7 @@ namespace FEAST
         {
           std::ifstream file(filename.c_str(), std::ifstream::in);
           if (! file.is_open())
-            throw InternalError("Unable to open Vector file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
           _read_from_exp(file);
           file.close();
         }
@@ -98,7 +98,7 @@ namespace FEAST
         {
           std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
           if (! file.is_open())
-            throw InternalError("Unable to open Vector file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
           _read_from_dv(file);
           file.close();
         }
@@ -220,7 +220,7 @@ namespace FEAST
               _read_from_dv(filename);
               break;
             default:
-              throw InternalError("Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -246,7 +246,7 @@ namespace FEAST
               _read_from_dv(file);
               break;
             default:
-              throw InternalError("Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -342,7 +342,7 @@ namespace FEAST
               write_out_dv(filename);
               break;
             default:
-              throw InternalError("Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -365,7 +365,7 @@ namespace FEAST
               write_out_dv(file);
               break;
             default:
-              throw InternalError("Filemode not supported!");
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
           }
         }
 
@@ -378,7 +378,7 @@ namespace FEAST
         {
           std::ofstream file(filename.c_str(), std::ofstream::out);
           if (! file.is_open())
-            throw InternalError("Unable to open Vector file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
           write_out_exp(file);
           file.close();
         }
@@ -410,7 +410,7 @@ namespace FEAST
         {
           std::ofstream file(filename.c_str(), std::ofstream::out | std::ofstream::binary);
           if (! file.is_open())
-            throw InternalError("Unable to open Vector file " + filename);
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Vector file " + filename);
           write_out_dv(file);
           file.close();
         }
@@ -518,9 +518,9 @@ namespace FEAST
         void sum(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
         {
           if (x.size() != y.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (x.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::Sum<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
         }
@@ -535,9 +535,9 @@ namespace FEAST
         void difference(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
         {
           if (x.size() != y.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (x.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::Difference<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
         }
@@ -552,9 +552,9 @@ namespace FEAST
         void component_product(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
         {
           if (x.size() != y.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (x.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::ComponentProduct<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
         }
@@ -569,7 +569,7 @@ namespace FEAST
         void scale(const DenseVector<Mem_, DT_> & x, const DT_ s)
         {
           if (x.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::Scale<Mem_, Algo_>::value(this->elements(), x.elements(), s, this->size());
         }
@@ -585,9 +585,9 @@ namespace FEAST
         void axpy(const DT_ a, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
         {
           if (x.size() != y.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (x.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::Axpy<Mem_, Algo_>::dv(this->elements(), a, x.elements(), y.elements(), this->size());
         }
@@ -603,13 +603,13 @@ namespace FEAST
         void axpy(const DenseVector<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
         {
           if (x.size() != y.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (x.size() != a.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (x.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::Axpy<Mem_, Algo_>::dv(this->elements(), a.elements(), x.elements(), y.elements(), this->size());
         }
@@ -627,11 +627,13 @@ namespace FEAST
 
         {
           if (x.size() != P.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (P.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (y.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Axpy<Mem_, Algo_>::csr(this->elements(), a, x.elements(), y.elements(), P.val(), P.col_ind(), P.row_ptr(), P.rows());
         }
@@ -649,13 +651,15 @@ namespace FEAST
 
         {
           if (x.size() != P.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (P.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (y.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Axpy<Mem_, Algo_>::csr(this->elements(), a.elements(), x.elements(), y.elements(), P.val(), P.col_ind(), P.row_ptr(), P.rows());
         }
@@ -673,11 +677,13 @@ namespace FEAST
 
         {
           if (x.size() != P.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (P.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (y.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Axpy<Mem_, Algo_>::ell(this->elements(), a, x.elements(), y.elements(), P.Ax(), P.Aj(), P.Arl(), P.stride(), P.rows());
         }
@@ -695,13 +701,15 @@ namespace FEAST
 
         {
           if (x.size() != P.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (P.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (y.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Axpy<Mem_, Algo_>::ell(this->elements(), a.elements(), x.elements(), y.elements(), P.Ax(), P.Aj(), P.Arl(), P.stride(), P.rows());
         }
@@ -719,11 +727,13 @@ namespace FEAST
 
         {
           if (x.size() != P.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (P.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (y.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Axpy<Mem_, Algo_>::coo(this->elements(), a, x.elements(), y.elements(), P.val(), P.row(), P.column(), P.rows(), P.used_elements());
         }
@@ -741,13 +751,15 @@ namespace FEAST
 
         {
           if (x.size() != P.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (P.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (y.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Axpy<Mem_, Algo_>::coo(this->elements(), a.elements(), x.elements(), y.elements(), P.val(), P.row(), P.column(), P.rows(), P.used_elements());
         }
@@ -762,9 +774,11 @@ namespace FEAST
         void product_matvec(const SparseMatrixCSR<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::ProductMatVec<Mem_, Algo_>::csr(this->elements(), a.val(), a.col_ind(), a.row_ptr(), x.elements(), a.rows());
         }
@@ -779,9 +793,11 @@ namespace FEAST
         void product_matvec(const SparseMatrixELL<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::ProductMatVec<Mem_, Algo_>::ell(this->elements(), a.Ax(), a.Aj(), a.Arl(), x.elements(), a.stride(), a.rows());
         }
@@ -796,9 +812,11 @@ namespace FEAST
         void product_matvec(const SparseMatrixCOO<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::ProductMatVec<Mem_, Algo_>::coo(this->elements(), a.val(), a.row(), a.column(), x.elements(), a.rows(), a.used_elements());
         }
@@ -838,11 +856,13 @@ namespace FEAST
         void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixCSR<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != rhs.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Defect<Mem_, Algo_>::csr(this->elements(), rhs.elements(), a.val(), a.col_ind(), a.row_ptr(), x.elements(), a.rows());
         }
@@ -858,11 +878,13 @@ namespace FEAST
         void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixELL<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != rhs.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Defect<Mem_, Algo_>::ell(this->elements(), rhs.elements(), a.Ax(), a.Aj(), a.Arl(), x.elements(), a.stride(), a.rows());
         }
@@ -878,11 +900,13 @@ namespace FEAST
         void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixCOO<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
         {
           if (x.size() != a.columns())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (a.rows() != rhs.size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->elements() == x.elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
 
           Arch::Defect<Mem_, Algo_>::coo(this->elements(), rhs.elements(), a.val(), a.row(), a.column(), x.elements(), a.rows(), a.used_elements());
         }
@@ -936,7 +960,7 @@ namespace FEAST
         DT_ dot_product(const DenseVector<Mem_, DT_> & x) const
         {
           if (x.size() != this->size())
-            throw InternalError("Vector size does not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           return Arch::DotProduct<Mem_, Algo_>::value(this->elements(), x.elements(), this->size());
         }

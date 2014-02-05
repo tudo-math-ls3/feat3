@@ -47,6 +47,18 @@ namespace FEAST
   {
   }
 
+  Exception::Exception(
+      const char* const function,
+      const char* const file,
+      const long line,
+      const String & message) :
+#ifndef FEAST_NO_CONTEXT
+    _context_data(new ContextData),
+#endif // FEAST_NO_CONTEXT
+    _message(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message )
+  {
+  }
+
   Exception::Exception(const Exception & other) :
     std::exception(other),
 #ifndef FEAST_NO_CONTEXT

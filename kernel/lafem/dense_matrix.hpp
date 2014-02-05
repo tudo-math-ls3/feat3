@@ -258,13 +258,13 @@ namespace FEAST
         void sum(const DenseMatrix<Mem_, DT_> & x, const DenseMatrix<Mem_, DT_> & y)
         {
           if (x.rows() != y.rows())
-            throw InternalError("Matrix rows do not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
           if (x.columns() != y.columns())
-            throw InternalError("Matrix columns do not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
           if (x.rows() != this->rows())
-            throw InternalError("Matrix rows do not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
           if (x.columns() != this->columns())
-            throw InternalError("Matrix columns do not match!");
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
 
           Arch::Sum<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
         }
