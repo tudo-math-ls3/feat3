@@ -29,11 +29,11 @@ class BiCGStabTest
   : public TaggedTest<Mem_, DT_, Algo_>
 {
 private:
-  const Index opt;
+  const int opt;
 
 public:
 
-  BiCGStabTest(Index opt = 0)
+  BiCGStabTest(int opt = 0)
     : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::type_name() + " "
                                     + PT_::type_name() + " opt = "
                                     + std::to_string(opt)), opt(opt)

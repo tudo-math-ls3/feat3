@@ -1452,7 +1452,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const int p) :
         precond(SparseMatrixCSR<Mem_, DT_> (A), p)
       {
       }
