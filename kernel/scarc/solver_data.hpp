@@ -64,7 +64,7 @@ namespace FEAST
         typedef VectorType_<MemTag_, DataType_> vector_type_;
         typedef MatrixType_<MemTag_, DataType_> matrix_type_;
         typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
-        typedef StorageType_<MatrixType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > matrix_storage_type_;
+        typedef StorageType_<MatrixType_<MemTag_, DataType_>, std::allocator<MatrixType_<MemTag_, DataType_> > > matrix_storage_type_;
         typedef StorageType_<DataType_, std::allocator<DataType_> > scalar_storage_type_;
         typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
 
@@ -277,7 +277,10 @@ namespace FEAST
         this->_stored_rhs = b;
         this->_stored_sol = x;
         this->_stored_def = vector_type_(x.size());
-        this->_stored_temp = vector_storage_type_(num_temp_vectors, vector_type_(x.size(), DataType_(0)));
+        this->_stored_temp = vector_storage_type_();
+        for(unsigned long i(0) ; i < num_temp_vectors ; ++i)
+          this->_stored_temp.push_back(vector_type_(x.size(), DataType_(0)));
+
         this->_stored_scalars = scalar_storage_type_(num_temp_scalars, DataType_(0));
         this->_stored_indices = index_storage_type_(num_temp_indices, Index(0));
         this->_stored_norm_0 = DataType_(1000);
