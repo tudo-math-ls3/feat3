@@ -577,7 +577,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
     std::cout << "proc " << rank << "A0_omega_i " << buf_mat;
     std::cout << "proc " << rank << "A0_omega_j " << other_buf_mat;
-    buf_mat.sum<Algo::Generic>(buf_mat, other_buf_mat);
+    buf_mat.axpy<Algo::Generic>(buf_mat, other_buf_mat);
     std::cout << "proc " << rank << "A1_omega_i " << buf_mat;
     mat_mirror.scatter_op(mat_localsys, buf_mat);
   }

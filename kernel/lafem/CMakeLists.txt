@@ -48,25 +48,15 @@ endif(FEAST_BACKENDS_CUDA)
 
 # list of lafem tests
 SET (test_list
-  axpy-test
   bicgstab-test
   container_pool-test
-  defect-test
   dense_matrix-test
   dense_vector-test
-  difference-test
-  dot_product-test
-  component_product-test
-  norm-test
-  product-test
-  product_matvec-test
   richardson-test
-  scale-test
   sparse_matrix_conversion-test
   sparse_matrix_coo-test
   sparse_matrix_csr-test
   sparse_matrix_ell-test
-  sum-test
   transposition-test
 )
 

@@ -8,7 +8,6 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/matrix_base.hpp>
-#include <kernel/lafem/arch/sum.hpp>
 
 
 namespace FEAST
@@ -246,27 +245,6 @@ namespace FEAST
         static String type_name()
         {
           return "DenseMatrix";
-        }
-
-        /**
-         * \brief Calculate \f$r \leftarrow x + y\f$
-         *
-         * \param[in] x The first summand.
-         * \param[in] y The second summand.
-         */
-        template <typename Algo_>
-        void sum(const DenseMatrix<Mem_, DT_> & x, const DenseMatrix<Mem_, DT_> & y)
-        {
-          if (x.rows() != y.rows())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
-          if (x.columns() != y.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
-          if (x.rows() != this->rows())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
-          if (x.columns() != this->columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
-
-          Arch::Sum<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
         }
     };
 

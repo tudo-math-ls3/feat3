@@ -88,7 +88,8 @@ public:
     MT_ sys(csys);
 
     // calculate the reference-solution
-    b.template product_matvec<Algo_>(sys, ref);
+    //b.template product_matvec<Algo_>(sys, ref);
+    sys.template apply<Algo_>(b, ref);
 
     // solver-paramters
     Index max_iter = 1000;
@@ -390,8 +391,10 @@ public:
     MT_ LU(cLU);
 
     // calculate the reference-solution
-    tmp.template product_matvec<Algo_>(U, x);
-    b.template product_matvec<Algo_>(L, tmp);
+    //tmp.template product_matvec<Algo_>(U, x);
+    U.template apply<Algo_>(tmp, x);
+    //b.template product_matvec<Algo_>(L, tmp);
+    L.template apply<Algo_>(b, tmp);
 
     // save reference-solution
     copy(ref, x);

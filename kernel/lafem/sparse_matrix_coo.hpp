@@ -5,13 +5,19 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/arch/sum.hpp>
+#include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
+#include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/product_matvec.hpp>
+#include <kernel/lafem/arch/defect.hpp>
 
 #include <map>
 #include <algorithm>
@@ -1257,13 +1263,51 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow x \cdot s\f$
+         * \brief Calculate \f$this \leftarrow y + \alpha x\f$
          *
-         * \param[in] x The matrix to be scaled.
-         * \param[in] s A scalar to scale x with.
+         * \param[in] x The first summand matrix to be scaled.
+         * \param[in] y The second summand matrix
+         * \param[in] alpha A scalar to multiply x with.
          */
         template <typename Algo_>
-        void scale(const SparseMatrixCOO<Mem_, DT_> & x, const DT_ s)
+        void axpy(
+          const SparseMatrixCOO<Mem_, DT_> & x,
+          const SparseMatrixCOO<Mem_, DT_> & y,
+          const DataType alpha = DataType(1))
+        {
+          if (x.rows() != y.rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
+          if (x.rows() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
+          if (x.columns() != y.columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
+          if (x.columns() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
+          if (x.used_elements() != y.used_elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
+
+          // check for special cases
+          if(Math::abs(alpha - DataType(1)) < Math::eps<DataType>())
+            // r <- x + y
+            Arch::Sum<Mem_, Algo_>::value(this->val(), x.val(), y.val(), this->used_elements());
+          else if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
+            // r <- y - x
+            Arch::Difference<Mem_, Algo_>::value(this->val(), y.val(), x.val(), this->used_elements());
+          else
+            // r <- y + alpha*x
+            Arch::Axpy<Mem_, Algo_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow \alpha x \f$
+         *
+         * \param[in] x The matrix to be scaled.
+         * \param[in] alpha A scalar to scale x with.
+         */
+        template <typename Algo_>
+        void scale(const SparseMatrixCOO<Mem_, DT_> & x, const DT_ alpha)
         {
           if (x.rows() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
@@ -1272,13 +1316,57 @@ namespace FEAST
           if (x.used_elements() != this->used_elements())
             throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
-          Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), s, this->used_elements());
+          Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->used_elements());
         }
 
-        template <typename Algo_>
-        void product(const SparseMatrixCOO<Mem_, DT_> & x, const DT_ s)
+        /**
+         * \brief Calculate r \leftarrow this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         */
+        template<typename Algo_>
+        void apply(DenseVector<Mem_,DT_>& r, const DenseVector<Mem_, DT_>& x) const
         {
-          this->template scale<Algo_>(x, s);
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+          Arch::ProductMatVec<Mem_, Algo_>::coo(r.elements(), this->val(), this->row(),
+            this->column(), x.elements(), this->rows(), this->used_elements());
+        }
+
+        /**
+         * \brief Calculate r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         * \param[in] y The summand vector.
+         */
+        template<typename Algo_>
+        void apply(
+          DenseVector<Mem_,DT_>& r,
+          const DenseVector<Mem_, DT_>& x,
+          const DenseVector<Mem_, DT_>& y,
+          const DataType alpha = DataType(1)) const
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+          // check for special cases
+          if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
+            // r <- y - A*x
+            Arch::Defect<Mem_, Algo_>::coo(r.elements(), y.elements(), this->val(),
+              this->row(), this->column(), x.elements(), this->rows(), this->used_elements());
+          else
+            // r <- y + alpha*x
+            Arch::Axpy<Mem_, Algo_>::coo(r.elements(), alpha, x.elements(), y.elements(),
+              this->val(), this->row(), this->column(), this->rows(), this->used_elements());
         }
     };
 

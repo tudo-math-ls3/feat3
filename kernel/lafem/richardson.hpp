@@ -28,7 +28,8 @@ namespace FEAST
         DenseVector<Mem_, DT_> temp_0(x.size());
         DenseVector<Mem_, DT_> temp_1(x.size());
 
-        temp_0.template defect<Algo_>(b, A, x);
+        //temp_0.template defect<Algo_>(b, A, x);
+        A.template apply<Algo_>(temp_0, x, b, -DT_(1));
         DT_ initial_defect = temp_0.template norm2<Algo_>();
 
         Index used_iters = 0;
@@ -36,10 +37,11 @@ namespace FEAST
         {
           ++used_iters;
 
-          temp_0.template defect<Algo_>(b, A, x);
+          //temp_0.template defect<Algo_>(b, A, x);
+          A.template apply<Algo_>(temp_0, x, b, -DT_(1));
           DT_ current_defect = temp_0.template norm2<Algo_>();
           precon.apply(temp_1, temp_0);
-          x.template sum<Algo_>(x, temp_1);
+          x.template axpy<Algo_>(x, temp_1);
 
           if(current_defect < eps_relative * initial_defect || current_defect < eps_relative || used_iters >= max_iters)
           {

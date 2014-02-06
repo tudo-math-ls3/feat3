@@ -46,7 +46,8 @@ namespace FEAST
 
         do
         {
-          r.template defect<Algo_>(b, A, x);
+          //r.template defect<Algo_>(b, A, x);
+          A.template apply<Algo_>(r, x, b, -DT_(1));
           defnorm_0 = r.template norm2<Algo_>();
           defnorm = defnorm_0;
           precon.apply(r_tilde_0, r);
@@ -58,17 +59,18 @@ namespace FEAST
           copy(r_tilde, r_tilde_0);
           copy(p_tilde, r_tilde_0);
 
-          rho_tilde = r_tilde_0.template dot_product<Algo_>(r_tilde_0);
+          rho_tilde = r_tilde_0.template dot<Algo_>(r_tilde_0);
 
           // main BiCGStab loop
           do
           {
             iter = iter + 1;
 
-            v.template product_matvec<Algo_>(A, p_tilde);
+            //v.template product_matvec<Algo_>(A, p_tilde);
+            A.template apply<Algo_>(v, p_tilde);
             precon.apply(v_tilde, v);
 
-            gamma_tilde = v_tilde.template dot_product<Algo_>(r_tilde_0);
+            gamma_tilde = v_tilde.template dot<Algo_>(r_tilde_0);
 
             if (Math::abs(gamma_tilde) < Math::abs(rho_tilde)*1e-14)
             {
@@ -88,26 +90,27 @@ namespace FEAST
             }
 
             DT_ malpha_tilde(-alpha_tilde);
-            s.template axpy<Algo_>(malpha_tilde, v, r);
+            s.template axpy<Algo_>(v, r, malpha_tilde);
 
             defnorm = s.template norm2<Algo_>();
             if (defnorm < eps_relative * defnorm_00)
             {
-              x.template axpy<Algo_>(alpha_tilde, p_tilde, x);
+              x.template axpy<Algo_>(p_tilde, x, alpha_tilde);
 
               //early_exit = 1;
               converged = 1;
               //std::cout << "Breakpoint 3 (converged)" << std::endl;
               break;
             }
-            s_tilde.template axpy<Algo_>(malpha_tilde, v_tilde, r_tilde);
+            s_tilde.template axpy<Algo_>(v_tilde, r_tilde, malpha_tilde);
 
-            t.template product_matvec<Algo_>(A, s_tilde);
+            //t.template product_matvec<Algo_>(A, s_tilde);
+            A.template apply<Algo_>(t, s_tilde);
 
             precon.apply(t_tilde, t);
 
-            gamma_tilde = t_tilde.template dot_product<Algo_>(t_tilde);
-            omega_tilde = t_tilde.template dot_product<Algo_>(s_tilde);
+            gamma_tilde = t_tilde.template dot<Algo_>(t_tilde);
+            omega_tilde = t_tilde.template dot<Algo_>(s_tilde);
 
             if (Math::abs(gamma_tilde) < Math::abs(omega_tilde) * 1e-14)
             {
@@ -117,11 +120,11 @@ namespace FEAST
             }
             omega_tilde = omega_tilde / gamma_tilde;
 
-            x.template axpy<Algo_>(omega_tilde, s_tilde, x);
-            x.template axpy<Algo_>(alpha_tilde, p_tilde, x);
+            x.template axpy<Algo_>(s_tilde, x, omega_tilde);
+            x.template axpy<Algo_>(p_tilde, x, alpha_tilde);
 
             DT_ momega_tilde(-omega_tilde);
-            r.template axpy<Algo_>(momega_tilde, t, s);
+            r.template axpy<Algo_>(t, s, momega_tilde);
 
             defnorm = r.template norm2<Algo_>();
             if (defnorm < eps_relative * defnorm_00)
@@ -131,16 +134,16 @@ namespace FEAST
               break;
             }
 
-            r_tilde.template axpy<Algo_>(momega_tilde, t_tilde, s_tilde);
+            r_tilde.template axpy<Algo_>(t_tilde, s_tilde, momega_tilde);
 
             rho_tilde_old = rho_tilde;
-            rho_tilde = r_tilde.template dot_product<Algo_>(r_tilde_0);
+            rho_tilde = r_tilde.template dot<Algo_>(r_tilde_0);
 
             beta_tilde = (alpha_tilde / omega_tilde) * (rho_tilde / rho_tilde_old);
 
-            p_tilde.template axpy<Algo_>(momega_tilde, v_tilde, p_tilde);
+            p_tilde.template axpy<Algo_>(v_tilde, p_tilde, momega_tilde);
             p_tilde.template scale<Algo_>(p_tilde, beta_tilde);
-            p_tilde.template sum<Algo_>(p_tilde, r_tilde);
+            p_tilde.template axpy<Algo_>(p_tilde, r_tilde);
 
           } while (iter <= max_iters);
 

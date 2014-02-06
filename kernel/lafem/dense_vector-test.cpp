@@ -1,7 +1,8 @@
+#include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
-#include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/algorithm.hpp>
 #include <kernel/util/binary_stream.hpp>
 
 #include <list>
@@ -31,11 +32,9 @@ template<
 class DenseVectorTest
   : public TaggedTest<Mem_, DT_>
 {
-
 public:
-
   DenseVectorTest()
-    : TaggedTest<Mem_, DT_>("dense_vector_test")
+    : TaggedTest<Mem_, DT_>("DenseVectorTest")
   {
   }
 
@@ -112,4 +111,362 @@ DenseVectorTest<Mem::Main, mpf_class> cpu_dense_vector_test_mpf;
 DenseVectorTest<Mem::CUDA, float> cuda_dense_vector_test_float;
 DenseVectorTest<Mem::CUDA, double> cuda_dense_vector_test_double;
 DenseVectorTest<Mem::CUDA, Index> cuda_dense_vector_test_index;
+#endif
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_>
+class DenseVectorAxpyTest
+  : public TaggedTest<Mem_, DT_, Algo_>
+{
+public:
+  DenseVectorAxpyTest()
+    : TaggedTest<Mem_, DT_, Algo_>("DenseVectorAxpyTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    DT_ s(DT_(4711.1));
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i % 100 * DT_(1.234)));
+        b_local(i, DT_(2 - DT_(i % 42)));
+        ref(i, s * a_local(i) + b_local(i));
+      }
+      DenseVector<Mem_, DT_> a(size);
+      copy(a, a_local);
+      DenseVector<Mem_, DT_> b(size);
+      copy(b, b_local);
+
+      DenseVector<Mem_, DT_> c(size);
+      c.template axpy<Algo_>(a, b, s);
+      copy(result_local, c);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+
+      a.template axpy<Algo_>(a, b, s);
+      copy(result_local, a);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+
+      copy(a, a_local);
+      b.template axpy<Algo_>(a, b, s);
+      copy(result_local, b);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+    }
+  }
+};
+DenseVectorAxpyTest<Mem::Main, Algo::Generic, float> dv_axpy_test_float;
+DenseVectorAxpyTest<Mem::Main, Algo::Generic, double> dv_axpy_test_double;
+#ifdef FEAST_GMP
+DenseVectorAxpyTest<Mem::Main, Algo::Generic, mpf_class> dv_axpy_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+DenseVectorAxpyTest<Mem::Main, Algo::MKL, float> mkl_dv_axpy_test_float;
+DenseVectorAxpyTest<Mem::Main, Algo::MKL, double> mkl_dv_axpy_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorAxpyTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_axpy_test_float;
+DenseVectorAxpyTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_axpy_test_double;
+#endif
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_>
+class DenseVectorDotTest
+  : public TaggedTest<Mem_, DT_, Algo_>
+{
+public:
+  DenseVectorDotTest()
+    : TaggedTest<Mem_, DT_, Algo_>("DenseVectorDotTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      const DT_ den(DT_(1) / DT_(size));
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i+1) * den);    // a[i] = (i+1) / n
+        b_local(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
+      }
+
+      DenseVector<Mem_, DT_> a(a_local);
+      DenseVector<Mem_, DT_> b(b_local);
+
+      // a*b = 1
+      DT_ ref(DT_(1));
+      DT_ c  = a.template dot<Algo_>(b);
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+      c = b.template dot<Algo_>(a);
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+      c = b.template dot<Algo_>(b);
+      ref = b.template norm2<Algo_>();
+      ref *= ref;
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+    }
+  }
+};
+DenseVectorDotTest<Mem::Main, Algo::Generic, float> dv_dot_product_test_float;
+DenseVectorDotTest<Mem::Main, Algo::Generic, double> dv_dot_product_test_double;
+#ifdef FEAST_GMP
+//DenseVectorDotTest<Mem::Main, Algo::Generic, mpf_class> dv_dot_product_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+DenseVectorDotTest<Mem::Main, Algo::MKL, float> mkl_dv_dot_product_test_float;
+DenseVectorDotTest<Mem::Main, Algo::MKL, double> mkl_dv_dot_product_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorDotTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_dot_product_test_float;
+DenseVectorDotTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_dot_product_test_double;
+#endif
+
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_>
+class DenseVectorComponentProductTest
+  : public TaggedTest<Mem_, DT_, Algo_>
+{
+public:
+  DenseVectorComponentProductTest()
+    : TaggedTest<Mem_, DT_, Algo_>("DenseVectorComponentProductTest")
+  {
+  }
+
+  void run1() const
+  {
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> ref2(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i * DT_(1.234)));
+        b_local(i, DT_(size*2 - i));
+        ref(i, a_local(i) * b_local(i));
+        ref2(i, a_local(i) * a_local(i));
+      }
+
+      DenseVector<Mem_, DT_> a(size);
+      copy(a, a_local);
+      DenseVector<Mem_, DT_> b(size);
+      copy(b, b_local);
+      DenseVector<Mem_, DT_> c(size);
+
+      c.template component_product<Algo_>(a, b);
+      copy(result_local, c);
+      TEST_CHECK_EQUAL(result_local, ref);
+
+      a.template component_product<Algo_>(a, b);
+      copy(result_local, a);
+      TEST_CHECK_EQUAL(result_local, ref);
+
+      copy(a, a_local);
+      b.template component_product<Algo_>(a, b);
+      copy(result_local, b);
+      TEST_CHECK_EQUAL(result_local, ref);
+
+      copy(b, b_local);
+      a.template component_product<Algo_>(a, a);
+      copy(result_local, a);
+      TEST_CHECK_EQUAL(result_local, ref2);
+    }
+  }
+
+  void run2() const
+  {
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> b_local(size);
+      DenseVector<Mem::Main, DT_> c_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i % 100 * DT_(1.234)));
+        b_local(i, DT_(2 - DT_(i % 42)));
+        c_local(i, DT_(1 - DT_(i % 23)));
+        ref(i, c_local(i) * a_local(i) + b_local(i));
+      }
+      DenseVector<Mem_, DT_> a(size);
+      copy(a, a_local);
+      DenseVector<Mem_, DT_> b(size);
+      copy(b, b_local);
+      DenseVector<Mem_, DT_> c(size);
+      copy(c, c_local);
+
+      DenseVector<Mem_, DT_> d(size);
+      d.template component_product<Algo_>(c, a, b);
+      copy(result_local, d);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+
+      a.template component_product<Algo_>(c, a, b);
+      copy(result_local, a);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+
+      copy(a, a_local);
+      b.template component_product<Algo_>(c, a, b);
+      copy(result_local, b);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+
+      copy(b, b_local);
+      c.template component_product<Algo_>(c, a, b);
+      copy(result_local, c);
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
+    }
+  }
+
+  virtual void run() const
+  {
+    run1();
+    run2();
+  }
+};
+DenseVectorComponentProductTest<Mem::Main, Algo::Generic, float> dv_component_product_test_float;
+DenseVectorComponentProductTest<Mem::Main, Algo::Generic, double> dv_component_product_test_double;
+#ifdef FEAST_GMP
+DenseVectorComponentProductTest<Mem::Main, Algo::Generic, mpf_class> dv_component_product_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+DenseVectorComponentProductTest<Mem::Main, Algo::MKL, float> mkl_dv_component_product_test_float;
+DenseVectorComponentProductTest<Mem::Main, Algo::MKL, double> mkl_dv_component_product_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorComponentProductTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_component_product_test_float;
+DenseVectorComponentProductTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_component_product_test_double;
+#endif
+
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_>
+class DenseVectorScaleTest
+  : public TaggedTest<Mem_, DT_, Algo_>
+{
+public:
+  DenseVectorScaleTest()
+    : TaggedTest<Mem_, DT_, Algo_>("DenseVectorScaleTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DT_ s(DT_(4.321));
+      DenseVector<Mem::Main, DT_> a_local(size);
+      DenseVector<Mem::Main, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        a_local(i, DT_(i * DT_(1.234)));
+        ref(i, a_local(i) * s);
+      }
+
+      DenseVector<Mem_, DT_> a(size);
+      copy(a, a_local);
+      DenseVector<Mem_, DT_> b(size);
+
+      b.template scale<Algo_>(a, s);
+      copy(result_local, b);
+      TEST_CHECK_EQUAL(result_local, ref);
+
+      a.template scale<Algo_>(a, s);
+      copy(result_local, a);
+      TEST_CHECK_EQUAL(result_local, ref);
+    }
+  }
+};
+DenseVectorScaleTest<Mem::Main, Algo::Generic, float> dv_scale_test_float;
+DenseVectorScaleTest<Mem::Main, Algo::Generic, double> dv_scale_test_double;
+#ifdef FEAST_GMP
+DenseVectorScaleTest<Mem::Main, Algo::Generic, mpf_class> dv_scale_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+DenseVectorScaleTest<Mem::Main, Algo::MKL, float> mkl_dv_scale_test_float;
+DenseVectorScaleTest<Mem::Main, Algo::MKL, double> mkl_dv_scale_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_dv_scale_test_float;
+DenseVectorScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_dv_scale_test_double;
+#endif
+
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_>
+class DenseVectorNorm2Test
+  : public TaggedTest<Mem_, DT_, Algo_>
+{
+public:
+  DenseVectorNorm2Test()
+    : TaggedTest<Mem_, DT_, Algo_>("DenseVectorNorm2Test")
+  {
+  }
+
+  virtual void run() const
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      DenseVector<Mem::Main, DT_> a_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
+        a_local(i, Math::pow(DT_(0.5), DT_(0.5) * DT_(i)));
+      }
+
+      // ||a||_2 = sqrt(2 - 2^{1-n})
+      const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size-1))));
+
+      DenseVector<Mem_, DT_> a(a_local);
+      DT_ c = a.template norm2<Algo_>();
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
+
+      c = a.template norm2sqr<Algo_>();
+      TEST_CHECK_EQUAL_WITHIN_EPS(c, ref*ref, eps);
+    }
+  }
+};
+DenseVectorNorm2Test<Mem::Main, Algo::Generic, float> dv_norm2_test_float;
+DenseVectorNorm2Test<Mem::Main, Algo::Generic, double> dv_norm2_test_double;
+#ifdef FEAST_GMP
+//DenseVectorNorm2Test<Mem::Main, Algo::Generic, mpf_class> dv_norm2_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+DenseVectorNorm2Test<Mem::Main, Algo::MKL, float> mkl_dv_norm2_test_float;
+DenseVectorNorm2Test<Mem::Main, Algo::MKL, double> mkl_dv_norm2_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, float> cuda_dv_norm2_test_float;
+DenseVectorNorm2Test<Mem::CUDA, Algo::CUDA, double> cuda_dv_norm2_test_double;
 #endif

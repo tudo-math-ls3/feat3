@@ -211,6 +211,15 @@ namespace FEAST
         return T_(2) * acos(T_(0));
       }
     }; // class Limits<...>
+
+    /**
+     * \brief Returns the machine precision constant for a floating-point data type.
+     */
+    template<typename DataType_>
+    static inline DataType_ eps()
+    {
+      return Limits<DataType_>::epsilon();
+    }
   } // namespace Math
 } // namespace FEAST
 

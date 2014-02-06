@@ -7,12 +7,10 @@
 #include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/type_traits.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/vector_base.hpp>
 #include <kernel/lafem/edi.hpp>
-#include <kernel/lafem/sparse_matrix_coo.hpp>
-#include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
@@ -20,8 +18,6 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
-#include <kernel/lafem/arch/product_matvec.hpp>
-#include <kernel/lafem/arch/defect.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -509,37 +505,33 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow x + y\f$
+         * \brief Calculate \f$this \leftarrow \alpha x + y\f$
          *
-         * \param[in] x The first summand.
-         * \param[in] y The second summand.
+         * \param[in] x The first summand vector to be scaled.
+         * \param[in] y The second summand vector
+         * \param[in] alpha A scalar to multiply x with.
          */
         template <typename Algo_>
-        void sum(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
+        void axpy(
+          const DenseVector<Mem_, DT_> & x,
+          const DenseVector<Mem_, DT_> & y,
+          const DataType alpha = DataType(1))
         {
           if (x.size() != y.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
           if (x.size() != this->size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-          Arch::Sum<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow x - y\f$
-         *
-         * \param[in] x The minuend.
-         * \param[in] y The subtrahend.
-         */
-        template <typename Algo_>
-        void difference(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-        {
-          if (x.size() != y.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (x.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-
-          Arch::Difference<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
+          // check for special cases
+          if(Math::abs(alpha - DataType(1)) < Math::eps<DataType>())
+            // r <- x + y
+            Arch::Sum<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
+          else if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
+            // r <- y - x
+            Arch::Difference<Mem_, Algo_>::value(this->elements(), y.elements(), x.elements(), this->size());
+          else
+            // r <- y + alpha*x
+            Arch::Axpy<Mem_, Algo_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
         }
 
         /**
@@ -551,403 +543,50 @@ namespace FEAST
         template <typename Algo_>
         void component_product(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
         {
-          if (x.size() != y.size())
+          if (this->size() != x.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (x.size() != this->size())
+          if (this->size() != y.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::ComponentProduct<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow x \cdot s\f$
+         * \brief Calculate \f$this_i \leftarrow x_i \cdot y_i + z_i\f$
          *
-         * \param[in] x The vector to be scaled.
-         * \param[in] s A scalar to scale x with.
+         * \param[in] x The first factor.
+         * \param[in] y The second factor.
+         * \param[in] z The second summand.
          */
         template <typename Algo_>
-        void scale(const DenseVector<Mem_, DT_> & x, const DT_ s)
+        void component_product(
+          const DenseVector<Mem_, DT_> & x,
+          const DenseVector<Mem_, DT_> & y,
+          const DenseVector<Mem_, DT_> & z)
+        {
+          if (this->size() != x.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->size() != y.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+          if (this->size() != z.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+
+          Arch::Axpy<Mem_, Algo_>::dv(this->elements(), x.elements(), y.elements(), z.elements(), this->size());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow \alpha x \f$
+         *
+         * \param[in] x The vector to be scaled.
+         * \param[in] alpha A scalar to scale x with.
+         */
+        template <typename Algo_>
+        void scale(const DenseVector<Mem_, DT_> & x, const DT_ alpha)
         {
           if (x.size() != this->size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
-          Arch::Scale<Mem_, Algo_>::value(this->elements(), x.elements(), s, this->size());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a x + y\f$
-         *
-         * \param[in] a A scalar to scale x with.
-         * \param[in] x The vector to be scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DT_ a, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-        {
-          if (x.size() != y.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (x.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-
-          Arch::Axpy<Mem_, Algo_>::dv(this->elements(), a, x.elements(), y.elements(), this->size());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a x + y\f$
-         *
-         * \param[in] a A vector to scale x with.
-         * \param[in] x The vector to be scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DenseVector<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-        {
-          if (x.size() != y.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (x.size() != a.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (x.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-
-          Arch::Axpy<Mem_, Algo_>::dv(this->elements(), a.elements(), x.elements(), y.elements(), this->size());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
-         *
-         * \param[in] a A scalar to scale Px with.
-         * \param[in] x The vector to be multiplied and scaled.
-         * \param[in] P The matrix to be multiplied and scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DT_ a, const SparseMatrixCSR<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-
-        {
-          if (x.size() != P.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (P.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (y.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Axpy<Mem_, Algo_>::csr(this->elements(), a, x.elements(), y.elements(), P.val(), P.col_ind(), P.row_ptr(), P.rows());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
-         *
-         * \param[in] a The vector to scale Px with.
-         * \param[in] x The vector to be multiplied and scaled.
-         * \param[in] P The matrix to be multiplied and scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DenseVector<Mem_, DT_> & a, const SparseMatrixCSR<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-
-        {
-          if (x.size() != P.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (P.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (y.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Axpy<Mem_, Algo_>::csr(this->elements(), a.elements(), x.elements(), y.elements(), P.val(), P.col_ind(), P.row_ptr(), P.rows());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
-         *
-         * \param[in] a A scalar to scale Px with.
-         * \param[in] x The vector to be multiplied and scaled.
-         * \param[in] P The matrix to be multiplied and scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DT_ a, const SparseMatrixELL<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-
-        {
-          if (x.size() != P.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (P.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (y.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Axpy<Mem_, Algo_>::ell(this->elements(), a, x.elements(), y.elements(), P.Ax(), P.Aj(), P.Arl(), P.stride(), P.rows());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
-         *
-         * \param[in] a The vector to scale Px with.
-         * \param[in] x The vector to be multiplied and scaled.
-         * \param[in] P The matrix to be multiplied and scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DenseVector<Mem_, DT_> & a, const SparseMatrixELL<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-
-        {
-          if (x.size() != P.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (P.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (y.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Axpy<Mem_, Algo_>::ell(this->elements(), a.elements(), x.elements(), y.elements(), P.Ax(), P.Aj(), P.Arl(), P.stride(), P.rows());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
-         *
-         * \param[in] a A scalar to scale Px with.
-         * \param[in] x The vector to be multiplied and scaled.
-         * \param[in] P The matrix to be multiplied and scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DT_ a, const SparseMatrixCOO<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-
-        {
-          if (x.size() != P.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (P.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (y.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Axpy<Mem_, Algo_>::coo(this->elements(), a, x.elements(), y.elements(), P.val(), P.row(), P.column(), P.rows(), P.used_elements());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow a \cdot P \cdot x + y\f$
-         *
-         * \param[in] a The vector to scale Px with.
-         * \param[in] x The vector to be multiplied and scaled.
-         * \param[in] P The matrix to be multiplied and scaled.
-         * \param[in] y The other vector
-         */
-        template <typename Algo_>
-        void axpy(const DenseVector<Mem_, DT_> & a, const SparseMatrixCOO<Mem_, DT_> & P, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-
-        {
-          if (x.size() != P.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (P.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (y.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.size() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Axpy<Mem_, Algo_>::coo(this->elements(), a.elements(), x.elements(), y.elements(), P.val(), P.row(), P.column(), P.rows(), P.used_elements());
-        }
-
-        /**
-         * \brief Calculate Matrix-Vector-Product \f$this \leftarrow Ab\f$
-         *
-         * \param[in] A The matrix.
-         * \param[in] x The vector.
-         */
-        template <typename Algo_>
-        void product_matvec(const SparseMatrixCSR<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
-        {
-          if (x.size() != a.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::ProductMatVec<Mem_, Algo_>::csr(this->elements(), a.val(), a.col_ind(), a.row_ptr(), x.elements(), a.rows());
-        }
-
-        /**
-         * \brief Calculate Matrix-Vector-Product \f$this \leftarrow Ab\f$
-         *
-         * \param[in] A The matrix.
-         * \param[in] x The vector.
-         */
-        template <typename Algo_>
-        void product_matvec(const SparseMatrixELL<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
-        {
-          if (x.size() != a.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::ProductMatVec<Mem_, Algo_>::ell(this->elements(), a.Ax(), a.Aj(), a.Arl(), x.elements(), a.stride(), a.rows());
-        }
-
-        /**
-         * \brief Calculate Matrix-Vector-Product \f$this \leftarrow Ab\f$
-         *
-         * \param[in] A The matrix.
-         * \param[in] x The vector.
-         */
-        template <typename Algo_>
-        void product_matvec(const SparseMatrixCOO<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
-        {
-          if (x.size() != a.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::ProductMatVec<Mem_, Algo_>::coo(this->elements(), a.val(), a.row(), a.column(), x.elements(), a.rows(), a.used_elements());
-        }
-
-        template <typename Algo_>
-        void product(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
-        {
-          this->template component_product<Algo_>(x, y);
-        }
-
-        template <typename Algo_, typename SM_>
-        void product(const SM_ & a, const DenseVector<Mem_, DT_> & x)
-        {
-          this->template product_matvec<Algo_>(a, x);
-        }
-
-        template <typename Algo_>
-        DT_ product(const DenseVector<Mem_, DT_> & x)
-        {
-          return this->template dot_product<Algo_>(x);
-        }
-
-        template <typename Algo_>
-        void product(const DenseVector<Mem_, DT_> & x, const DT_ s)
-        {
-          this->template scale<Algo_>(x, s);
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow rhs - Ax\f$
-         *
-         * \param[in] rhs The right hand side of the system.
-         * \param[in] A The system matrix.
-         * \param[in] x The given solution.
-         */
-        template <typename Algo_>
-        void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixCSR<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
-        {
-          if (x.size() != a.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != rhs.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Defect<Mem_, Algo_>::csr(this->elements(), rhs.elements(), a.val(), a.col_ind(), a.row_ptr(), x.elements(), a.rows());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow rhs - Ax\f$
-         *
-         * \param[in] rhs The right hand side of the system.
-         * \param[in] A The system matrix.
-         * \param[in] x The given solution.
-         */
-        template <typename Algo_>
-        void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixELL<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
-        {
-          if (x.size() != a.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != rhs.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Defect<Mem_, Algo_>::ell(this->elements(), rhs.elements(), a.Ax(), a.Aj(), a.Arl(), x.elements(), a.stride(), a.rows());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow rhs - Ax\f$
-         *
-         * \param[in] rhs The right hand side of the system.
-         * \param[in] A The system matrix.
-         * \param[in] x The given solution.
-         */
-        template <typename Algo_>
-        void defect(const DenseVector<Mem_, DT_> & rhs, const SparseMatrixCOO<Mem_, DT_> & a, const DenseVector<Mem_, DT_> & x)
-        {
-          if (x.size() != a.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != this->size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (a.rows() != rhs.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
-          if (this->elements() == x.elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Source and target vector are the same!");
-
-          Arch::Defect<Mem_, Algo_>::coo(this->elements(), rhs.elements(), a.val(), a.row(), a.column(), x.elements(), a.rows(), a.used_elements());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow y +  s \cdot x\f$
-         *
-         * \param[in] y A vector.
-         * \param[in] x The vector to be scaled.
-         * \param[in] s The scaling value (defaults to 1)
-         */
-        template <typename Algo_>
-        void apply(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y, DT_ s = DT_(1))
-        {
-          this->axpy<Algo_>(s, x, y);
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow Ax\f$
-         *
-         * \param[in] a A Matrix.
-         * \param[in] x A Vector.
-         */
-        template <typename Algo_, typename SM_>
-        void apply(const SM_ & a, const DenseVector<Mem_, DT_> & x)
-        {
-          this->product_matvec<Algo_>(a, x);
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow y +  s \cdot Ax\f$
-         *
-         * \param[in] y A vector.
-         * \param[in] a The matrix to be multiplied and scaled.
-         * \param[in] x The vector to be multiplied and scaled.
-         * \param[in] s The scaling value (defaults to 1)
-         */
-        template <typename Algo_, typename SM_>
-        void apply(const SM_ & a, const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y, DT_ s = DT_(1))
-        {
-          this->axpy<Algo_>(s, a, x, y);
+          Arch::Scale<Mem_, Algo_>::value(this->elements(), x.elements(), alpha, this->size());
         }
 
         /**
@@ -957,7 +596,7 @@ namespace FEAST
          * \param[in] x The other vector.
          */
         template <typename Algo_>
-        DT_ dot_product(const DenseVector<Mem_, DT_> & x) const
+        DataType dot(const DenseVector& x) const
         {
           if (x.size() != this->size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -966,9 +605,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$r \leftarrow \sqrt{ \sum\limits_i this_i \cdot this_i } \f$
-         *
-         * \returns The L2 norm.
+         * \brief Calculates and returns the euclid norm of this vector.
          */
         template <typename Algo_>
         DT_ norm2() const
@@ -977,19 +614,15 @@ namespace FEAST
         }
 
         /**
-         * \brief L2 norm calculations.
-         *
-         * This class calculates euclidean length (L2 norm) operations without the final square root.
-         *
-         * \author Dirk Ribbrock
+         * \brief Calculates and returns the squared euclid norm of this vector.
          */
         template <typename Algo_>
-        DT_ norm2wosqrt() const
+        DT_ norm2sqr() const
         {
-          DT_ r(Arch::Norm2<Mem_, Algo_>::value(this->elements(), this->size()));
-          return r*r;
+          // fallback
+          return Math::sqr(this->norm2<Algo_>());
         }
-    };
+    }; // class DenseVector<...>
 
 
     /**
@@ -1031,7 +664,7 @@ namespace FEAST
       {
         lhs << "  " << b(i);
       }
-      lhs << "]" << std::endl;
+      lhs << "]";
 
       return lhs;
     }

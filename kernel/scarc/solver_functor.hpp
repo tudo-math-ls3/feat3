@@ -142,7 +142,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          _y.template sum<Algo_>(_l, _r);
+          _y.template axpy<Algo_>(_l, _r);
         }
 
         SumFunctorProxyLeft& operator=(const SumFunctorProxyLeft& rhs)
@@ -198,7 +198,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          _y.template sum<Algo_>(_l, _r);
+          _y.template axpy<Algo_>(_l, _r);
         }
 
         SumFunctorProxyResultLeft& operator=(const SumFunctorProxyResultLeft& rhs)
@@ -255,7 +255,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          _y.template sum<Algo_>(_l, _r);
+          _y.template axpy<Algo_>(_l, _r);
         }
 
         SumFunctorProxyAll& operator=(const SumFunctorProxyAll& rhs)
@@ -310,7 +310,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y.template sum<Algo_>(_l, _r);
+          _y.template axpy<Algo_>(_l, _r);
         }
 
         SumFunctor& operator=(const SumFunctor& rhs)
@@ -364,7 +364,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          _y.template difference<Algo_>( _l, _r);
+          //_y.template difference<Algo_>( _l, _r);
+          _y.template axpy<Algo_>(_r, _l, typename VT_::DataType(-1));
         }
 
         DifferenceFunctorProxyLeft& operator=(const DifferenceFunctorProxyLeft& rhs)
@@ -421,7 +422,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          _y.template difference<Algo_>( _l, _r);
+          //_y.template difference<Algo_>( _l, _r);
+          _y.template axpy(_r, _l, typename VT_::DataType(-1));
         }
 
         DifferenceFunctorProxyResultLeft& operator=(const DifferenceFunctorProxyResultLeft& rhs)
@@ -478,7 +480,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DifferenceFunctor can not be executed!");
 
-          _y.template difference<Algo_>( _l, _r);
+          //_y.template difference<Algo_>( _l, _r);
+          _y.template axpy<Algo_>(_r, _l, typename VT_::DataType(-1));
         }
 
         DifferenceFunctorProxyAll& operator=(const DifferenceFunctorProxyAll& rhs)
@@ -533,7 +536,8 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y.template difference<Algo_>( _l, _r);
+          //_y.template difference<Algo_>( _l, _r);
+          _y.template axpy<Algo_>(_r, _l, typename VT_::DataType(-1));
         }
 
         DifferenceFunctor& operator=(const DifferenceFunctor& rhs)
@@ -587,7 +591,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          _y.template product_matvec<Algo_>(_l, _r);
+          //_y.template product_matvec<Algo_>(_l, _r);
+          _l.template apply<Algo_>(_y, _r);
         }
 
         ProductFunctorProxyRight& operator=(const ProductFunctorProxyRight& rhs)
@@ -643,7 +648,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete ProductFunctor can not be executed!");
 
-          _y.template product_matvec<Algo_>(_l, _r);
+          //_y.template product_matvec<Algo_>(_l, _r);
+          _l.template apply<Algo_>(_y, _r);
         }
 
         ProductFunctorProxyResultRight& operator=(const ProductFunctorProxyResultRight& rhs)
@@ -696,7 +702,8 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y.template product_matvec<Algo_>(_l, _r);
+          //_y.template product_matvec<Algo_>(_l, _r);
+          _l.template apply<Algo_>(_y, _r);
         }
 
         ProductFunctor& operator=(const ProductFunctor& rhs)
@@ -750,7 +757,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
 
-          _y.template defect<Algo_>(_l, _m, _r);
+          //_y.template defect<Algo_>(_l, _m, _r);
+          _m.template apply<Algo_>(_y, _r, _l, typename MT_::DataType(-1));
         }
 
         DefectFunctorProxyRight& operator=(const DefectFunctorProxyRight& rhs)
@@ -809,7 +817,8 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete DefectFunctor can not be executed!");
 
-          _y.template defect<Algo_>(_l, _m, _r);
+          //_y.template defect<Algo_>(_l, _m, _r);
+          _m.template apply<Algo_>(_y, _r, _l, typename MT_::DataType(-1));
         }
 
         DefectFunctorProxyResultRight& operator=(const DefectFunctorProxyResultRight& rhs)
@@ -866,7 +875,8 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y.template defect<Algo_>(_l, _m, _r);
+          //_y.template defect<Algo_>(_l, _m, _r);
+          _m.template apply<Algo_>(_y, _r, _l, typename MT_::DataType(-1));
         }
 
         DefectFunctor& operator=(const DefectFunctor& rhs)
@@ -1285,7 +1295,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = _x.template norm2wosqrt<Algo_>();
+          _y = _x.template norm2sqr<Algo_>();
         }
 
         NormFunctor2wosqrt& operator=(const NormFunctor2wosqrt& rhs)
@@ -1331,7 +1341,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          _y = _x.template norm2wosqrt<Algo_>();
+          _y = _x.template norm2sqr<Algo_>();
         }
 
         NormFunctor2wosqrtProxyRight& operator=(const NormFunctor2wosqrtProxyRight& rhs)

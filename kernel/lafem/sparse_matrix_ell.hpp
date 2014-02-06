@@ -14,13 +14,16 @@
 #include <kernel/lafem/algorithm.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/sum.hpp>
+#include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
+#include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/product_matvec.hpp>
+#include <kernel/lafem/arch/defect.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <stdint.h>
-
 
 
 namespace FEAST
@@ -829,13 +832,17 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow x + y\f$
+         * \brief Calculate \f$this \leftarrow y + \alpha x\f$
          *
-         * \param[in] x The first summand.
-         * \param[in] y The second summand.
+         * \param[in] x The first summand matrix to be scaled.
+         * \param[in] y The second summand matrix
+         * \param[in] alpha A scalar to multiply x with.
          */
         template <typename Algo_>
-        void sum(const SparseMatrixELL<Mem_, DT_> & x, const SparseMatrixELL<Mem_, DT_> & y)
+        void axpy(
+          const SparseMatrixELL<Mem_, DT_> & x,
+          const SparseMatrixELL<Mem_, DT_> & y,
+          DataType alpha = DataType(1))
         {
           if (x.rows() != y.rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
@@ -858,17 +865,26 @@ namespace FEAST
           if (x.num_cols_per_row() != this->num_cols_per_row())
             throw InternalError(__func__, __FILE__, __LINE__, "Matrix num_cols_per_row do not match!");
 
-          Arch::Sum<Mem_, Algo_>::value(this->Ax(), x.Ax(), y.Ax(), this->stride() * this->num_cols_per_row());
+          // check for special cases
+          if(Math::abs(alpha - DataType(1)) < Math::eps<DataType>())
+            // r <- x + y
+            Arch::Sum<Mem_, Algo_>::value(this->Ax(), x.Ax(), y.Ax(), this->stride() * this->num_cols_per_row());
+          else if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
+            // r <- y - x
+            Arch::Difference<Mem_, Algo_>::value(this->Ax(), y.Ax(), x.Ax(), this->stride() * this->num_cols_per_row());
+          else
+            // r <- y + alpha*x
+            Arch::Axpy<Mem_, Algo_>::dv(this->Ax(), alpha, x.Ax(), y.Ax(), this->stride() * this->num_cols_per_row());
         }
 
         /**
-         * \brief Calculate \f$this \leftarrow x \cdot s\f$
+         * \brief Calculate \f$this \leftarrow \alpha x\f$
          *
          * \param[in] x The matrix to be scaled.
-         * \param[in] s A scalar to scale x with.
+         * \param[in] alpha A scalar to scale x with.
          */
         template <typename Algo_>
-        void scale(const SparseMatrixELL<Mem_, DT_> & x, const DT_ s)
+        void scale(const SparseMatrixELL<Mem_, DT_> & x, const DT_ alpha)
         {
           if (x.rows() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
@@ -877,13 +893,57 @@ namespace FEAST
           if (x.used_elements() != this->used_elements())
             throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
-          Arch::Scale<Mem_, Algo_>::value(this->Ax(), x.Ax(), s, this->stride() * this->num_cols_per_row());
+          Arch::Scale<Mem_, Algo_>::value(this->Ax(), x.Ax(), alpha, this->stride() * this->num_cols_per_row());
         }
 
-        template <typename Algo_>
-        void product(const SparseMatrixELL<Mem_, DT_> & x, const DT_ s)
+        /**
+         * \brief Calculate r \leftarrow this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         */
+        template<typename Algo_>
+        void apply(DenseVector<Mem_,DT_>& r, const DenseVector<Mem_, DT_>& x) const
         {
-          this->template scale<Algo_>(x, s);
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+          Arch::ProductMatVec<Mem_, Algo_>::ell(r.elements(), this->Ax(), this->Aj(), this->Arl(),
+            x.elements(), this->stride(), this->rows());
+        }
+
+        /**
+         * \brief Calculate r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         * \param[in] y The summand vector.
+         */
+        template<typename Algo_>
+        void apply(
+          DenseVector<Mem_,DT_>& r,
+          const DenseVector<Mem_, DT_>& x,
+          const DenseVector<Mem_, DT_>& y,
+          const DataType alpha = DataType(1)) const
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+          // check for special cases
+          if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
+            // r <- y - A*x
+            Arch::Defect<Mem_, Algo_>::ell(r.elements(), y.elements(), this->Ax(), this->Aj(),
+              this->Arl(), x.elements(), this->stride(), this->rows());
+          else
+            // r <- y + alpha*x
+            Arch::Axpy<Mem_, Algo_>::ell(r.elements(), alpha, x.elements(), y.elements(),
+              this->Ax(), this->Aj(), this->Arl(), this->stride(), this->rows());
         }
     };
 

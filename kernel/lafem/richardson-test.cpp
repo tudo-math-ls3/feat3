@@ -46,7 +46,7 @@ public:
 
     JacobiPreconditioner<Algo_, SparseMatrixCSR<Mem_, DT_>, DenseVector<Mem_, DT_> > jac(sys, DT_(0.7));
 
-    b.template product_matvec<Algo_>(sys, ref);
+    sys.template apply<Algo_>(b, ref);
 
     Richardson<Algo_>::value(x, sys, b, jac, 1000, DT_(1e-16));
 

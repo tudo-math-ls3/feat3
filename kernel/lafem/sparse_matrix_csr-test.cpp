@@ -30,11 +30,9 @@ template<
 class SparseMatrixCSRTest
   : public TaggedTest<Mem_, DT_>
 {
-
 public:
-
   SparseMatrixCSRTest()
-    : TaggedTest<Mem_, DT_>("sparse_matrix_csr_test")
+    : TaggedTest<Mem_, DT_>("SparseMatrixCSRTest")
   {
   }
 
@@ -132,4 +130,151 @@ SparseMatrixCSRTest<Mem::Main, mpf_class> cpu_sparse_matrix_csr_test_mpf_class;
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCSRTest<Mem::CUDA, float> cuda_sparse_matrix_csr_test_float;
 SparseMatrixCSRTest<Mem::CUDA, double> cuda_sparse_matrix_csr_test_double;
+#endif
+
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_>
+class SparseMatrixCSRApplyTest
+  : public TaggedTest<Mem_, DT_, Algo_>
+{
+public:
+  SparseMatrixCSRApplyTest()
+    : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixCSRApplyTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    DT_ s(DT_(4711.1));
+    for (Index size(1) ; size < 1e3 ; size*=2)
+    {
+      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size);
+      DenseVector<Mem::Main, DT_> x_local(size);
+      DenseVector<Mem::Main, DT_> y_local(size);
+      DenseVector<Mem::Main, DT_> ref_local(size);
+      DenseVector<Mem_, DT_> ref(size);
+      DenseVector<Mem::Main, DT_> result_local(size);
+      for (Index i(0) ; i < size ; ++i)
+      {
+        x_local(i, DT_(i % 100 * DT_(1.234)));
+        y_local(i, DT_(2 - DT_(i % 42)));
+      }
+      DenseVector<Mem_, DT_> x(size);
+      copy(x, x_local);
+      DenseVector<Mem_, DT_> y(size);
+      copy(y, y_local);
+
+      Index ue(0);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+          {
+            a_local(row, col, DT_(2));
+            ++ue;
+          }
+          else if((row == col+1) || (row+1 == col))
+          {
+            a_local(row, col, DT_(-1));
+            ++ue;
+          }
+        }
+      }
+      std::cout<<"real ue: "<<ue<<std::endl;
+      SparseMatrixCSR<Mem_,DT_> a(a_local);
+
+      DenseVector<Mem_, DT_> r(size);
+      //r.template axpy<Algo_>(s, a, x, y);
+      a.template apply<Algo_>(r, x, y, s);
+      copy(result_local, r);
+
+      //ref.template product_matvec<Algo_>(a, x);
+      a.template apply<Algo_>(ref, x);
+      ref.template scale<Algo_>(ref, s);
+      ref.template axpy<Algo_>(ref, y);
+      copy(ref_local, ref);
+
+      for (Index i(0) ; i < size ; ++i)
+        TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);
+    }
+  }
+};
+
+SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, float> sm_csr_apply_test_float;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, double> sm_csr_apply_test_double;
+#ifdef FEAST_GMP
+SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, mpf_class> sm_csr_apply_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_csr_apply_test_float;
+SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_csr_apply_test_double;
+#endif
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_>
+class SparseMatrixCSRScaleTest
+  : public TaggedTest<Mem_, DT_, Algo_>
+{
+public:
+  SparseMatrixCSRScaleTest()
+    : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixCSRScaleTest")
+  {
+  }
+
+  virtual void run() const
+  {
+    for (Index size(2) ; size < 3e2 ; size*=2)
+    {
+      DT_ s(DT_(4.321));
+
+      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DT_> ref_local(size, size + 2);
+      for (Index row(0) ; row < a_local.rows() ; ++row)
+      {
+        for (Index col(0) ; col < a_local.columns() ; ++col)
+        {
+          if(row == col)
+            a_local(row, col, DT_(2));
+          else if((row == col+1) || (row+1 == col))
+            a_local(row, col, DT_(-1));
+
+          if(row == col)
+            ref_local(row, col, DT_(2) * s);
+          else if((row == col+1) || (row+1 == col))
+            ref_local(row, col, DT_(-1) * s);
+        }
+      }
+
+      SparseMatrixCSR<Mem_, DT_> a(a_local);
+      SparseMatrixCSR<Mem_, DT_> b(a.clone());
+
+      b.template scale<Algo_>(a, s);
+      SparseMatrixCOO<Mem::Main, DT_> b_local(b);
+      TEST_CHECK_EQUAL(b_local, ref_local);
+
+      a.template scale<Algo_>(a, s);
+      SparseMatrixCOO<Mem_, DT_> a_coo(a);
+      a_local = a_coo;
+      TEST_CHECK_EQUAL(a_local, ref_local);
+    }
+  }
+};
+SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, float> sm_csr_scale_test_float;
+SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, double> sm_csr_scale_test_double;
+#ifdef FEAST_GMP
+SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, mpf_class> sm_csr_scale_test_mpf_class;
+#endif
+#ifdef FEAST_BACKENDS_MKL
+SparseMatrixCSRScaleTest<Mem::Main, Algo::MKL, float> mkl_sm_csr_scale_test_float;
+SparseMatrixCSRScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_csr_scale_test_double;
+#endif
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixCSRScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_csr_scale_test_float;
+SparseMatrixCSRScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_csr_scale_test_double;
 #endif

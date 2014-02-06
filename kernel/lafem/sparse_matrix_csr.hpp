@@ -14,8 +14,11 @@
 #include <kernel/lafem/algorithm.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/sum.hpp>
+#include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
+#include <kernel/lafem/arch/product_matvec.hpp>
+#include <kernel/lafem/arch/defect.hpp>
 
 #include <fstream>
 
@@ -789,6 +792,123 @@ namespace FEAST
             return this->_scalar_dt.at(0);
         }
 
+        /**
+         * \brief Returns a descriptive string.
+         *
+         * \returns A string describing the container.
+         */
+        static String type_name()
+        {
+          return "SparseMatrixCSR";
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow y + \alpha x\f$
+         *
+         * \param[in] x The first summand matrix to be scaled.
+         * \param[in] y The second summand matrix
+         * \param[in] alpha A scalar to multiply x with.
+         */
+        template <typename Algo_>
+        void axpy(
+          const SparseMatrixCSR<Mem_, DT_> & x,
+          const SparseMatrixCSR<Mem_, DT_> & y,
+          const DataType alpha = DataType(1))
+        {
+          if (x.rows() != y.rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
+          if (x.rows() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
+          if (x.columns() != y.columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
+          if (x.columns() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
+          if (x.used_elements() != y.used_elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
+
+          // check for special cases
+          if(Math::abs(alpha - DataType(1)) < Math::eps<DataType>())
+            // r <- x + y
+            Arch::Sum<Mem_, Algo_>::value(this->val(), x.val(), y.val(), this->used_elements());
+          else if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
+            // r <- y - x
+            Arch::Difference<Mem_, Algo_>::value(this->val(), y.val(), x.val(), this->used_elements());
+          else
+            // r <- y + alpha*x
+            Arch::Axpy<Mem_, Algo_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow \alpha x \f$
+         *
+         * \param[in] x The matrix to be scaled.
+         * \param[in] alpha A scalar to scale x with.
+         */
+        template <typename Algo_>
+        void scale(const SparseMatrixCSR<Mem_, DT_> & x, const DT_ alpha)
+        {
+          if (x.rows() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
+          if (x.columns() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
+
+          Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->used_elements());
+        }
+
+        /**
+         * \brief Calculate r \leftarrow this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         */
+        template<typename Algo_>
+        void apply(DenseVector<Mem_,DT_>& r, const DenseVector<Mem_, DT_>& x) const
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+          Arch::ProductMatVec<Mem_, Algo_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
+            x.elements(), this->rows());
+        }
+
+        /**
+         * \brief Calculate r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         * \param[in] y The summand vector.
+         */
+        template<typename Algo_>
+        void apply(
+          DenseVector<Mem_,DT_>& r,
+          const DenseVector<Mem_, DT_>& x,
+          const DenseVector<Mem_, DT_>& y,
+          const DataType alpha = DataType(1)) const
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+          // check for special cases
+          if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
+            // r <- y - A*x
+            Arch::Defect<Mem_, Algo_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
+              this->row_ptr(), x.elements(), this->rows());
+          else
+            // r <- y + alpha*x
+            Arch::Axpy<Mem_, Algo_>::csr(r.elements(), alpha, x.elements(), y.elements(),
+              this->val(), this->col_ind(), this->row_ptr(), this->rows());
+        }
+
         /* ******************************************************************* */
         /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
         /* ******************************************************************* */
@@ -818,66 +938,6 @@ namespace FEAST
           CONTEXT("Graph::image_end()");
           ASSERT(domain_node < this->_scalar_index.at(1), "Domain node index out of range");
           return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
-        }
-
-        /**
-         * \brief Returns a descriptive string.
-         *
-         * \returns A string describing the container.
-         */
-        static String type_name()
-        {
-          return "SparseMatrixCSR";
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow x + y\f$
-         *
-         * \param[in] x The first summand.
-         * \param[in] y The second summand.
-         */
-        template <typename Algo_>
-        void sum(const SparseMatrixCSR<Mem_, DT_> & x, const SparseMatrixCSR<Mem_, DT_> & y)
-        {
-          if (x.rows() != y.rows())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
-          if (x.rows() != this->rows())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
-          if (x.columns() != y.columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
-          if (x.columns() != this->columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix columns do not match!");
-          if (x.used_elements() != y.used_elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
-          if (x.used_elements() != this->used_elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Matrix used_elements do not match!");
-
-          Arch::Sum<Mem_, Algo_>::value(this->val(), x.val(), y.val(), this->used_elements());
-        }
-
-        /**
-         * \brief Calculate \f$this \leftarrow x \cdot s\f$
-         *
-         * \param[in] x The matrix to be scaled.
-         * \param[in] s A scalar to scale x with.
-         */
-        template <typename Algo_>
-        void scale(const SparseMatrixCSR<Mem_, DT_> & x, const DT_ s)
-        {
-          if (x.rows() != this->rows())
-            throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
-          if (x.columns() != this->columns())
-            throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
-          if (x.used_elements() != this->used_elements())
-            throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
-
-          Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), s, this->used_elements());
-        }
-
-        template <typename Algo_>
-        void product(const SparseMatrixCSR<Mem_, DT_> & x, const DT_ s)
-        {
-          this->template scale<Algo_>(x, s);
         }
     };
 

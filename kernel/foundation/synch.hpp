@@ -87,7 +87,7 @@ namespace FEAST
                                recvbuf.size(),
                                source_rank);
 
-        recvbuf.template sum<Tag_>(sendbuf, recvbuf);
+        recvbuf.template axpy<Tag_>(sendbuf, recvbuf);
 
         mirror.scatter_dual(target, recvbuf);
       }
@@ -125,7 +125,7 @@ namespace FEAST
         {
           mirrors.at(i).gather_dual(sendbufs.at(i), target); //we dont need the sendbuf any more
 
-          recvbufs.at(i).template sum<Tag_>(sendbufs.at(i), recvbufs.at(i));
+          recvbufs.at(i).template axpy<Tag_>(sendbufs.at(i), recvbufs.at(i));
 
           mirrors.at(i).scatter_dual(target, recvbufs.at(i));
         }
@@ -153,7 +153,7 @@ namespace FEAST
                                recvbuf.size(),
                                source_rank);
 
-        recvbuf.template sum<Tag_>(sendbuf, recvbuf);
+        recvbuf.template axpy<Tag_>(sendbuf, recvbuf);
         recvbuf.template scale<Tag_>(recvbuf, typename VectorT_::DataType(0.5));
 
         mirror.scatter_dual(target, recvbuf);

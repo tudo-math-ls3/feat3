@@ -455,7 +455,7 @@ namespace FEAST
     private:
       const MT_ & A;        // system-matrix
       Index m;              // order m of preconditioner
-      VT_ aux;              // auxilary-vector
+      VT_ aux, tmp;         // auxilary-vector
       VT_ * pscale;         // scaling-vector (if check is true)
 
     public:
@@ -487,6 +487,7 @@ namespace FEAST
         A(A),
         m(m),
         aux(A.rows()),
+        tmp(A.rows()),
         pscale(nullptr)
       {
         if (A.columns() != A.rows())
@@ -555,8 +556,9 @@ namespace FEAST
 
           for (Index i = 1; i <= m; ++i)
           {
-            pauxs[i%2]->template axpy<Algo::Generic>(DT_(1.0), in, *pauxs[(i-1)%2]);
-            pauxs[i%2]->template axpy<Algo::Generic>(DT_(-1.0), A, *pauxs[(i-1)%2], *pauxs[i%2]);
+            pauxs[i%2]->template axpy<Algo::Generic>(in, *pauxs[(i-1)%2]);
+            //pauxs[i%2]->template axpy<Algo::Generic>(DT_(-1.0), A, *pauxs[(i-1)%2], *pauxs[i%2]);
+            A.template apply<Algo::Generic>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
           }
         }
         else
@@ -566,8 +568,10 @@ namespace FEAST
 
           for (Index i = 1; i <= m; ++i)
           {
-            pauxs[i%2]->template axpy<Algo::Generic>(DT_(1.0), in, *pauxs[(i-1)%2]);
-            pauxs[i%2]->template axpy<Algo::Generic>(*pscale, A, *pauxs[(i-1)%2], *pauxs[i%2]);
+            pauxs[i%2]->template axpy<Algo::Generic>(in, *pauxs[(i-1)%2]);
+            //pauxs[i%2]->template axpy<Algo::Generic>(*pscale, A, *pauxs[(i-1)%2], *pauxs[i%2]);
+            A.template apply<Algo::Generic>(tmp, *pauxs[(i-1)%2]);
+            pauxs[i%2]->template component_product<Algo::Generic>(tmp, *pscale, *pauxs[i%2]);
           }
         } // function apply
 
