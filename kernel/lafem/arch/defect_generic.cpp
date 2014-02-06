@@ -71,12 +71,6 @@ template void Defect<Mem::Main, Algo::Generic>::ell(mpf_class *, const mpf_class
 template <typename DT_>
 void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const Index * const row_ptr, const Index * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
 {
-  memset(r, 0, sizeof(DT_) * rows);
-  for (Index i(0) ; i < used_elements ; ++i)
-  {
-    r[row_ptr[i]] += val[i] * x[col_ptr[i]];
-  }
-
   Index iter(0);
   for (Index row(0); row < rows; ++row)
   {
