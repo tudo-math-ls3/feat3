@@ -917,7 +917,7 @@ namespace FEAST
         Index nnz(0);
         for (Index i(0); i < n; ++i)
         {
-          nnz += ll[i].size();
+          nnz += Index(ll[i].size());
         }
 
         DenseVector<Mem_, DT_> val(nnz);
@@ -1357,7 +1357,7 @@ namespace FEAST
           {
             pluj[i + k1 * stride] = it->second;
           }
-          plurl[i] = ll[i].size();
+          plurl[i] = Index(ll[i].size());
         }
 
         SparseMatrixELL<Mem_, DT_> tLU(n, n, stride, num_cols_per_row,
