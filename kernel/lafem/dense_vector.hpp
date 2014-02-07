@@ -505,6 +505,23 @@ namespace FEAST
         }
 
         /**
+         * \brief Performs \f$this \leftarrow x\f$.
+         *
+         * \param[in] x The vector to be copied.
+         */
+        void copy(const DenseVector<Mem_, DT_>& x)
+        {
+          if (this->size() != x.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
+
+          DT_ * pdest(this->elements());
+          const DT_ * psrc(x.elements());
+
+          if(pdest != psrc)
+            MemoryPool<Mem_>::template copy<DT_>(pdest, psrc, this->size());
+        }
+
+        /**
          * \brief Calculate \f$this \leftarrow \alpha x + y\f$
          *
          * \param[in] x The first summand vector to be scaled.
