@@ -52,6 +52,10 @@ SET (test_list
   container_pool-test
   dense_matrix-test
   dense_vector-test
+  meta_vector-axpy-test
+  meta_vector-comp_prod-test
+  meta_vector-dot-norm2-test
+  meta_vector-scale-test
   pointstar_factory-test
   richardson-test
   sparse_matrix_conversion-test
