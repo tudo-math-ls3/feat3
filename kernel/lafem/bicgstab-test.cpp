@@ -36,7 +36,7 @@ public:
   BiCGStabTest(int opt = 0)
     : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::type_name() + " "
                                     + PT_::type_name() + " opt = "
-                                    + std::to_string(opt)), opt(opt)
+                                    + stringify(opt)), opt(opt)
   {
   }
 
@@ -284,26 +284,26 @@ BiCGStabTest<Mem::Main, Algo::Generic, double,
 bicgstab_test_ell_ilu_0_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
-             ILUPreconditioner<Algo::Generic,
-                               SparseMatrixCSR<Mem::Main, double>,
-                               DenseVector<Mem::Main, double> > >
-bicgstab_test_csr_ilu_10_double(10);
+//BiCGStabTest<Mem::Main, Algo::Generic, double,
+//             SparseMatrixCSR<Mem::Main, double>,
+//             ILUPreconditioner<Algo::Generic,
+//                               SparseMatrixCSR<Mem::Main, double>,
+//                               DenseVector<Mem::Main, double> > >
+//bicgstab_test_csr_ilu_10_double(10);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
-             ILUPreconditioner<Algo::Generic,
-                               SparseMatrixCOO<Mem::Main, double>,
-                               DenseVector<Mem::Main, double> > >
-bicgstab_test_coo_ilu_10_double(10);
+//BiCGStabTest<Mem::Main, Algo::Generic, double,
+//             SparseMatrixCOO<Mem::Main, double>,
+//             ILUPreconditioner<Algo::Generic,
+//                               SparseMatrixCOO<Mem::Main, double>,
+//                               DenseVector<Mem::Main, double> > >
+//bicgstab_test_coo_ilu_10_double(10);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
-             ILUPreconditioner<Algo::Generic,
-                               SparseMatrixELL<Mem::Main, double>,
-                               DenseVector<Mem::Main, double> > >
-bicgstab_test_ell_ilu_10_double(10);
+//BiCGStabTest<Mem::Main, Algo::Generic, double,
+//             SparseMatrixELL<Mem::Main, double>,
+//             ILUPreconditioner<Algo::Generic,
+//                               SparseMatrixELL<Mem::Main, double>,
+//                               DenseVector<Mem::Main, double> > >
+//bicgstab_test_ell_ilu_10_double(10);
 
 
 #ifdef FEAST_GMP
