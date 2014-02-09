@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_UITL_STOP_WATCH_HPP
-#define KERNEL_UITL_STOP_WATCH_HPP 1
+#ifndef KERNEL_UTIL_STOP_WATCH_HPP
+#define KERNEL_UTIL_STOP_WATCH_HPP 1
 
 // includes, FEAST
 #include <kernel/util/time_stamp.hpp>
@@ -62,4 +62,4 @@ namespace FEAST
   }; // class StopWatch
 } // namespace FEAST
 
-#endif // KERNEL_UITL_STOP_WATCH_HPP
+#endif // KERNEL_UTIL_STOP_WATCH_HPP

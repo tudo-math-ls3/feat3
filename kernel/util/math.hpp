@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_UITL_MATH_HPP
-#define KERNEL_UITL_MATH_HPP 1
+#ifndef KERNEL_UTIL_MATH_HPP
+#define KERNEL_UTIL_MATH_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -8,6 +8,11 @@
 // includes, system
 #include <cmath>
 #include <limits>
+
+#ifdef FEAST_GMP
+#include <gmpxx.h>
+#include <mpfr.h>
+#endif
 
 namespace FEAST
 {
@@ -40,6 +45,13 @@ namespace FEAST
     using std::sqrt;
     using std::tan;
     using std::tanh;
+
+#ifdef FEAST_GMP
+    inline mpf_class abs (mpf_class x)
+    {
+      return ::abs(x);
+    }
+#endif
 
     /**
      * \brief Returns the square of a value.
@@ -223,4 +235,4 @@ namespace FEAST
   } // namespace Math
 } // namespace FEAST
 
-#endif // KERNEL_UITL_MATH_HPP
+#endif // KERNEL_UTIL_MATH_HPP
