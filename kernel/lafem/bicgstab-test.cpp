@@ -5,7 +5,6 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/bicgstab.hpp>
 #include <kernel/lafem/preconditioner.hpp>
-#include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -397,7 +396,7 @@ public:
     L.template apply<Algo_>(b, tmp);
 
     // save reference-solution
-    copy(ref, x);
+    ref.copy(x);
 
     ILUPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond(LU);
     precond.apply(x, b);

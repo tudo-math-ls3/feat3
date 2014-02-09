@@ -163,9 +163,9 @@ public:
         y_local(i, DT_(2 - DT_(i % 42)));
       }
       DenseVector<Mem_, DT_> x(size);
-      copy(x, x_local);
+      x.copy(x_local);
       DenseVector<Mem_, DT_> y(size);
-      copy(y, y_local);
+      y.copy(y_local);
 
       Index ue(0);
       for (Index row(0) ; row < a_local.rows() ; ++row)
@@ -190,13 +190,13 @@ public:
       DenseVector<Mem_, DT_> r(size);
       //r.template axpy<Algo_>(s, a, x, y);
       a.template apply<Algo_>(r, x, y, s);
-      copy(result_local, r);
+      result_local.copy(r);
 
       //ref.template product_matvec<Algo_>(a, x);
       a.template apply<Algo_>(ref, x);
       ref.template scale<Algo_>(ref, s);
       ref.template axpy<Algo_>(ref, y);
-      copy(ref_local, ref);
+      ref_local.copy(ref);
 
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref_local(i), 1e-2);

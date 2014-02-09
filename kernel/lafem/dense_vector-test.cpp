@@ -2,7 +2,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/algorithm.hpp>
 #include <kernel/util/binary_stream.hpp>
 
 #include <list>
@@ -142,24 +141,24 @@ public:
         ref(i, s * a_local(i) + b_local(i));
       }
       DenseVector<Mem_, DT_> a(size);
-      copy(a, a_local);
+      a.copy(a_local);
       DenseVector<Mem_, DT_> b(size);
-      copy(b, b_local);
+      b.copy(b_local);
 
       DenseVector<Mem_, DT_> c(size);
       c.template axpy<Algo_>(a, b, s);
-      copy(result_local, c);
+      result_local.copy(c);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       a.template axpy<Algo_>(a, b, s);
-      copy(result_local, a);
+      result_local.copy(a);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      copy(a, a_local);
+      a.copy(a_local);
       b.template axpy<Algo_>(a, b, s);
-      copy(result_local, b);
+      result_local.copy(b);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
     }
@@ -269,27 +268,27 @@ public:
       }
 
       DenseVector<Mem_, DT_> a(size);
-      copy(a, a_local);
+      a.copy(a_local);
       DenseVector<Mem_, DT_> b(size);
-      copy(b, b_local);
+      b.copy(b_local);
       DenseVector<Mem_, DT_> c(size);
 
       c.template component_product<Algo_>(a, b);
-      copy(result_local, c);
+      result_local.copy(c);
       TEST_CHECK_EQUAL(result_local, ref);
 
       a.template component_product<Algo_>(a, b);
-      copy(result_local, a);
+      result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      copy(a, a_local);
+      a.copy(a_local);
       b.template component_product<Algo_>(a, b);
-      copy(result_local, b);
+      result_local.copy(b);
       TEST_CHECK_EQUAL(result_local, ref);
 
-      copy(b, b_local);
+      b.copy(b_local);
       a.template component_product<Algo_>(a, a);
-      copy(result_local, a);
+      result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref2);
     }
   }
@@ -311,32 +310,32 @@ public:
         ref(i, c_local(i) * a_local(i) + b_local(i));
       }
       DenseVector<Mem_, DT_> a(size);
-      copy(a, a_local);
+      a.copy(a_local);
       DenseVector<Mem_, DT_> b(size);
-      copy(b, b_local);
+      b.copy(b_local);
       DenseVector<Mem_, DT_> c(size);
-      copy(c, c_local);
+      c.copy(c_local);
 
       DenseVector<Mem_, DT_> d(size);
       d.template component_product<Algo_>(c, a, b);
-      copy(result_local, d);
+      result_local.copy(d);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
       a.template component_product<Algo_>(c, a, b);
-      copy(result_local, a);
+      result_local.copy(a);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      copy(a, a_local);
+      a.copy(a_local);
       b.template component_product<Algo_>(c, a, b);
-      copy(result_local, b);
+      result_local.copy(b);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
 
-      copy(b, b_local);
+      b.copy(b_local);
       c.template component_product<Algo_>(c, a, b);
-      copy(result_local, c);
+      result_local.copy(c);
       for (Index i(0) ; i < size ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(result_local(i), ref(i), 1e-2);
     }
@@ -391,15 +390,15 @@ public:
       }
 
       DenseVector<Mem_, DT_> a(size);
-      copy(a, a_local);
+      a.copy(a_local);
       DenseVector<Mem_, DT_> b(size);
 
       b.template scale<Algo_>(a, s);
-      copy(result_local, b);
+      result_local.copy(b);
       TEST_CHECK_EQUAL(result_local, ref);
 
       a.template scale<Algo_>(a, s);
-      copy(result_local, a);
+      result_local.copy(a);
       TEST_CHECK_EQUAL(result_local, ref);
     }
   }

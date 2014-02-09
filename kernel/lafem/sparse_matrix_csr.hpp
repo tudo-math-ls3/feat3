@@ -11,7 +11,6 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/matrix_base.hpp>
-#include <kernel/lafem/algorithm.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 #include <kernel/lafem/arch/difference.hpp>

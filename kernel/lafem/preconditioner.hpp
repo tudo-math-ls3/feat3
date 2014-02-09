@@ -9,7 +9,6 @@
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_matrix.hpp>
-#include <kernel/lafem/algorithm.hpp>
 #include <vector>
 
 namespace FEAST
@@ -68,7 +67,7 @@ namespace FEAST
        */
       virtual void apply(VT_ & out, const VT_ & in)
       {
-        copy(out, in);
+        out.copy(in);
       }
     };
 
@@ -205,7 +204,7 @@ namespace FEAST
       {
 
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
@@ -297,7 +296,7 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
@@ -396,7 +395,7 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
@@ -552,7 +551,7 @@ namespace FEAST
 
         if (pscale == nullptr)
         {
-          copy(*pauxs[0], in);
+          pauxs[0]->copy(in);
 
           for (Index i = 1; i <= m; ++i)
           {
@@ -717,7 +716,7 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
@@ -1126,7 +1125,7 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());

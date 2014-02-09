@@ -10,8 +10,6 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/preconditioner.hpp>
-#include <kernel/lafem/algorithm.hpp>
-
 
 
 namespace FEAST
@@ -56,8 +54,8 @@ namespace FEAST
           {
             defnorm_00 = defnorm_0;
           }
-          copy(r_tilde, r_tilde_0);
-          copy(p_tilde, r_tilde_0);
+          r_tilde.copy(r_tilde_0);
+          p_tilde.copy(r_tilde_0);
 
           rho_tilde = r_tilde_0.template dot<Algo_>(r_tilde_0);
 

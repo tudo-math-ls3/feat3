@@ -1198,7 +1198,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          copy(_y, _x);
+          _y.copy(_x);
         }
 
         CopyFunctor& operator=(const CopyFunctor& rhs)
@@ -1247,7 +1247,7 @@ namespace FEAST
           if(!this->_complete)
             throw ScaRCError("Error: Incomplete SumFunctor can not be executed!");
 
-          copy(_y, _x);
+          _y.copy(_x);
         }
 
         CopyFunctorProxyResult& operator=(const CopyFunctorProxyResult& rhs)

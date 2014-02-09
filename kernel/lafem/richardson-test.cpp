@@ -5,7 +5,6 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/richardson.hpp>
 #include <kernel/lafem/preconditioner.hpp>
-#include <kernel/lafem/algorithm.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -33,7 +32,7 @@ public:
     DenseVector<Mem_, DT_> b(size);
     DenseVector<Mem::Main, DT_> ref_local(size, DT_(42));
     DenseVector<Mem_, DT_> ref(size);
-    copy(ref, ref_local);
+    ref.copy(ref_local);
 
     SparseMatrixCOO<Mem::Main, DT_> csys(size, size);
     for (Index i(0) ; i < size ; ++i)
@@ -51,7 +50,7 @@ public:
     Richardson<Algo_>::value(x, sys, b, jac, 1000, DT_(1e-16));
 
     DenseVector<Mem::Main, DT_> sol(size);
-    copy(sol, x);
+    sol.copy(x);
     for (Index i(0) ; i < size ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(sol(i), ref_local(i), 1e-10);
   }
