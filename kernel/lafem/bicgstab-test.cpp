@@ -41,7 +41,7 @@ public:
 
   virtual void run() const
   {
-    Index size(1000);
+    Index size(1024);
     DenseVector<Mem_, DT_> x(size, DT_(1));
     DenseVector<Mem_, DT_> b(size);
     DenseVector<Mem_, DT_> ref(size, DT_(42));
@@ -73,13 +73,13 @@ public:
           else if (i + 1 == j)
             csys(i, j, DT_(-2 - 0.5 * (i%2)));
           else if (i + 5 == j)
-            csys(i, j, DT_(0.05 * (i%2)));
+            csys(i, j, DT_(0.1 + 0.05 * (i%2)));
           else if (i - 5 == j)
-            csys(i, j, DT_(- 0.5 * (i%2)));
+            csys(i, j, DT_(0.2 - 0.5 * (i%2)));
           else if (i + 3 == j)
           {
             if (i%2 == 0)
-              csys(i, j, DT_(0.234 * (i%7)));
+              csys(i, j, DT_(1 + 0.234 * (i%7)));
           }
         }
       }
@@ -92,8 +92,7 @@ public:
 
     // solver-paramters
     Index max_iter = 1000;
-    DT_ eps = 1e-15;
-
+    DT_ eps = 1e-12;
 
     // Define preconditioners for every matrix-type and solve the system
     if (typeid(PT_) == typeid(NonePreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
@@ -133,6 +132,39 @@ public:
                         DenseVector<Mem_, DT_> > precond(sys, opt);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
+    else if (typeid(PT_) == typeid(SORPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    {
+      SORPreconditioner<Algo_, MT_,
+                        DenseVector<Mem_, DT_> > precond(sys);
+      BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
+    }
+    else if (typeid(PT_) == typeid(SSORPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    {
+      SSORPreconditioner<Algo_, MT_,
+                         DenseVector<Mem_, DT_> > precond(sys);
+      BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
+    }
+    // else if (typeid(PT_) == typeid(SPAIPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    // {
+    //   // Define matrix
+    //   SparseMatrixCOO<Mem::Main, DT_> cm(size, size);
+    //   for (Index i(0) ; i < size ; ++i)
+    //   {
+    //     for (Index j(0) ; j < size ; ++j)
+    //     {
+    //       if (i == j)
+    //       {
+    //         cm(i,j,DT_(1.0 * i + j));
+    //       }
+    //     }
+    //   }
+    //   SparseMatrixCSR<Mem::Main, DT_> m(cm);
+
+    //   SPAIPreconditioner<Algo_, MT_,
+    //                      DenseVector<Mem_, DT_> > precond(sys, m.layout(),
+    //                                                       1e-2, 10, 10, 1e-3, 1e-2, opt == 0);
+    //   BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
+    // }
     else
     {
       throw InternalError(__func__, __FILE__, __LINE__, "Preconditioner and Matrix have different matrix-types!");
@@ -142,7 +174,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < x.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref(i), 1e-10);
+      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref(i), 1e-8);
     }
 
   }
@@ -215,7 +247,6 @@ BiCGStabTest<Mem::Main, Algo::Generic, double,
                                        SparseMatrixELL<Mem::Main, double>,
                                        DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_gaussSeidel_double;
-
 
 
 BiCGStabTest<Mem::Main, Algo::Generic, double,
@@ -304,6 +335,65 @@ bicgstab_test_ell_ilu_0_double;
 //                               SparseMatrixELL<Mem::Main, double>,
 //                               DenseVector<Mem::Main, double> > >
 //bicgstab_test_ell_ilu_10_double(10);
+
+
+BiCGStabTest<Mem::Main, Algo::Generic, double,
+             SparseMatrixCSR<Mem::Main, double>,
+             SORPreconditioner<Algo::Generic,
+                               SparseMatrixCSR<Mem::Main, double>,
+                               DenseVector<Mem::Main, double> > >
+bicgstab_test_csr_sor_double;
+
+BiCGStabTest<Mem::Main, Algo::Generic, double,
+             SparseMatrixCOO<Mem::Main, double>,
+             SORPreconditioner<Algo::Generic,
+                               SparseMatrixCOO<Mem::Main, double>,
+                               DenseVector<Mem::Main, double> > >
+bicgstab_test_coo_sor_double;
+
+BiCGStabTest<Mem::Main, Algo::Generic, double,
+             SparseMatrixELL<Mem::Main, double>,
+             SORPreconditioner<Algo::Generic,
+                               SparseMatrixELL<Mem::Main, double>,
+                               DenseVector<Mem::Main, double> > >
+bicgstab_test_ell_sor_double;
+
+
+BiCGStabTest<Mem::Main, Algo::Generic, double,
+             SparseMatrixCSR<Mem::Main, double>,
+             SSORPreconditioner<Algo::Generic,
+                                SparseMatrixCSR<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_csr_ssor_double;
+
+// BiCGStabTest<Mem::Main, Algo::Generic, double,
+//              SparseMatrixCOO<Mem::Main, double>,
+//              SSORPreconditioner<Algo::Generic,
+//                                 SparseMatrixCOO<Mem::Main, double>,
+//                                 DenseVector<Mem::Main, double> > >
+// bicgstab_test_coo_ssor_double;
+
+BiCGStabTest<Mem::Main, Algo::Generic, double,
+             SparseMatrixELL<Mem::Main, double>,
+             SSORPreconditioner<Algo::Generic,
+                                SparseMatrixELL<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_ell_ssor_double;
+
+
+// BiCGStabTest<Mem::Main, Algo::Generic, double,
+//              SparseMatrixCSR<Mem::Main, double>,
+//              SPAIPreconditioner<Algo::Generic,
+//                                 SparseMatrixCSR<Mem::Main, double>,
+//                                 DenseVector<Mem::Main, double> > >
+// bicgstab_test_csr_spai_double_0(0);
+
+// BiCGStabTest<Mem::Main, Algo::Generic, double,
+//              SparseMatrixCSR<Mem::Main, double>,
+//              SPAIPreconditioner<Algo::Generic,
+//                                 SparseMatrixCSR<Mem::Main, double>,
+//                                 DenseVector<Mem::Main, double> > >
+// bicgstab_test_csr_spai_double_1(1);
 
 
 /*#ifdef FEAST_BACKENDS_CUDA
@@ -407,7 +497,6 @@ public:
   }
 
 };
-
 
 ILUTest<Mem::Main, Algo::Generic, double,
         SparseMatrixCSR<Mem::Main, double> > ilu_test_src_double;
