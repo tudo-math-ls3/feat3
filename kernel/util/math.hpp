@@ -47,9 +47,28 @@ namespace FEAST
     using std::tanh;
 
 #ifdef FEAST_GMP
-    inline mpf_class abs (mpf_class x)
+    /**
+     * \brief Returns the absolute value.
+     *
+     * \param[in] x The value to get the absolute value from.
+     *
+     * Returns abs(x)
+     */
+    inline mpf_class abs(mpf_class x)
     {
       return ::abs(x);
+    }
+
+    /**
+     * \brief Returns the square-root of a value.
+     *
+     * \param[in] x The value to calculate the square-root from.
+     *
+     * Returns sqrt(x)
+     */
+    inline mpf_class sqrt(mpf_class x)
+    {
+      return ::sqrt(x);
     }
 #endif
 
