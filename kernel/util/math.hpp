@@ -25,52 +25,10 @@ namespace FEAST
   namespace Math
   {
     // include C++ overloads of C89 math functions
-    using std::abs;
-    using std::acos;
-    using std::asin;
-    using std::atan;
-    using std::atan2;
     using std::ceil;
-    using std::cos;
-    using std::cosh;
-    using std::exp;
     using std::floor;
     using std::fmod;
-    using std::log;
-    using std::log10;
     using std::modf;
-    using std::pow;
-    using std::sin;
-    using std::sinh;
-    using std::sqrt;
-    using std::tan;
-    using std::tanh;
-
-#ifdef FEAST_GMP
-    /**
-     * \brief Returns the absolute value.
-     *
-     * \param[in] x The value to get the absolute value from.
-     *
-     * Returns abs(x)
-     */
-    inline mpf_class abs(mpf_class x)
-    {
-      return ::abs(x);
-    }
-
-    /**
-     * \brief Returns the square-root of a value.
-     *
-     * \param[in] x The value to calculate the square-root from.
-     *
-     * Returns sqrt(x)
-     */
-    inline mpf_class sqrt(mpf_class x)
-    {
-      return ::sqrt(x);
-    }
-#endif
 
     /**
      * \brief Returns the square of a value.
@@ -145,6 +103,370 @@ namespace FEAST
     {
       return max(a, min(x, b));
     }
+
+    /**
+     * \brief Returns the sign of a value.
+     *
+     * \param[in] x
+     * The value whose sign is to be returned.
+     */
+    template<typename T_>
+    inline T_ signum(T_ x)
+    {
+      return (x < T_(0) ? -T_(1) : (x > T_(0) ? T_(1) : T_(0)));
+    }
+
+    // single argument function wrapper
+#define WRAP_STD_MATH1(func) \
+    inline float func(float x) {return std::func(x);} \
+    inline double func(double x) {return std::func(x);} \
+    inline long double func(long double x) {return std::func(x);}
+
+    // double argument function wrapper
+#define WRAP_STD_MATH2(func) \
+    inline float func(float x, float y) {return std::func(x,y);} \
+    inline double func(double x, double y) {return std::func(x,y);} \
+    inline long double func(long double x, long double y) {return std::func(x,y);}
+
+    /**
+     * \brief Returns the absolute value.
+     *
+     * \param[in] x The value to get the absolute value from.
+     *
+     * \returns abs(x)
+     */
+    template<typename T_>
+    inline T_ abs(T_ x)
+    {
+      return (x < T_(0) ? -x : x);
+    }
+
+    // wrap std::abs
+    WRAP_STD_MATH1(abs)
+
+#ifdef FEAST_GMP
+    inline mpf_class abs(mpf_class x)
+    {
+      return ::abs(x);
+    }
+#endif
+
+    /**
+     * \brief Returns the square-root of a value.
+     *
+     * \param[in] x The value to calculate the square-root from.
+     *
+     * \returns sqrt(x)
+     */
+    template<typename T_>
+    inline T_ sqrt(T_ x)
+    {
+      if(x <= T_(0))
+        return T_(0);
+
+      // use Newton iteration: y_{k+1} := y_k/2 * (3 - (y_k^2)/x)
+      // we choose y_0 = min(1,x); this ensures that the sequence y_k is monotonically increasing
+      // if y_{k+1} is not greater than y_k, we return y_k
+      const T_ z = T_(1) / x;
+      T_ y(Math::min(T_(1), x));
+      T_ yn(y);
+      do
+      {
+        y = yn;
+        yn = T_(0.5)*y * (T_(3) - (y*y*z));
+      } while(yn > y);
+
+      return y;
+    }
+
+    // wrap std::sqrt
+    WRAP_STD_MATH1(sqrt)
+
+#ifdef FEAST_GMP
+    inline mpf_class sqrt(mpf_class x)
+    {
+      return ::sqrt(x);
+    }
+#endif
+
+    /**
+     * \brief Returns the sine of a value.
+     *
+     * \param[in] x The value to calculate the sine from.
+     *
+     * \returns sin(x)
+     */
+    template<typename T_>
+    inline T_ sin(T_ x)
+    {
+      // use the exponential sum formula:
+      //           infty        x^(2*n+1)
+      // sin(x) :=  sum (-1)^n -----------
+      //            n=0         (2*n+1)!
+      T_ y(x), yl(x+T_(1)), z(x);
+      T_ fn(1.0);
+      int n(1);
+      do
+      {
+        // update 1/(2*n+1)!
+        fn /= T_(++n);
+        fn /= T_(++n);
+        yl = y;
+        y += T_(1 - int(n&2)) * (z *= x*x) * T_(fn);
+      } while(yl != y);
+
+      return y;
+    }
+
+    // wrap std::sin
+    WRAP_STD_MATH1(sin)
+
+    /**
+     * \brief Returns the cosine of a value.
+     *
+     * \param[in] x The value to calculate the cosine from.
+     *
+     * \returns cos(x)
+     */
+    template<typename T_>
+    inline T_ cos(T_ x)
+    {
+      // use the exponential sum formula:
+      //           infty        x^(2*n)
+      // cos(x) :=  sum (-1)^n ---------
+      //            n=0         (2*n)!
+      T_ y(T_(1)), yl(T_(0)), z(T_(1));
+      T_ fn(1.0);
+      int n(0);
+      do
+      {
+        // update 1/(2*n)!
+        fn /= T_(++n);
+        fn /= T_(++n);
+        yl = y;
+        y += T_(1 - int(n&2)) * (z *= x*x) * T_(fn);
+      } while(yl != y);
+
+      return y;
+    }
+
+    // wrap std::cos
+    WRAP_STD_MATH1(cos)
+
+    /**
+     * \brief Returns the tangent of a value.
+     *
+     * \param[in] x The value to calculate the tangent from.
+     *
+     * \returns tan(x)
+     */
+    template<typename T_>
+    inline T_ tan(T_ x)
+    {
+      return sin(x) / cos(x);
+    }
+
+    // wrap std::tan
+    WRAP_STD_MATH1(tan)
+
+    /**
+     * \brief Returns the exponential of a value.
+     *
+     * \param[in] x The value to calculate the exponential from.
+     *
+     * \returns exp(x)
+     */
+    template<typename T_>
+    inline T_ exp(T_ x)
+    {
+      T_ y(T_(1)), yl(T_(0)), z(y);
+      int n(0);
+      do
+      {
+        yl = y;
+        y += ((z *= x) /= T_(++n));
+      } while(yl != y);
+      return y;
+    }
+
+    // wrap std::exp
+    WRAP_STD_MATH1(exp)
+
+    /**
+     * \brief Returns the natural logarithm of a value.
+     *
+     * \param[in] x The value to calculate the natural logarithm from.
+     *
+     * \returns log(x)
+     */
+    template<typename T_>
+    inline T_ log(T_ x)
+    {
+      // use Newton iteration: y_{k+1} = y_k + 2*(x - exp(y_k))/(x + exp(y_k))
+      T_ y(T_(0)), yl(T_(0));
+      do
+      {
+        yl = y;
+        T_ ey(Math::exp(y));
+        y += T_(2) * (x - ey) / (x + ey);
+      } while(yl != y);
+      return y;
+    }
+
+    // wrap std::log
+    WRAP_STD_MATH1(log)
+
+    /**
+     * \brief Returns the logarithm to the base 10 of a value.
+     *
+     * \param[in] x The value to calculate the 10-logarithm from.
+     *
+     * \returns log10(x)
+     */
+    template<typename T_>
+    inline T_ log10(T_ x)
+    {
+      return log(x) / log(T_(10));
+    }
+
+    // wrap std::log10
+    WRAP_STD_MATH1(log10)
+
+    /**
+     * \brief Returns x raised to the power of y.
+     *
+     * \param[in] x The base value. Must be positive.
+     * \patam[in] y The exponent value.
+     *
+     * \returns x^y
+     */
+    template<typename T_>
+    inline T_ pow(T_ x, T_ y)
+    {
+      return Math::exp(y * Math::log(x));
+    }
+
+    // wrap std::pow
+    WRAP_STD_MATH2(pow)
+
+    /**
+     * \brief Returns the arctangent of a value.
+     *
+     * \param[in] x The value to calculate the arctangent from.
+     *
+     * \returns atan(x)
+     */
+    template<typename T_>
+    inline T_ atan(T_ x)
+    {
+      // the exponential sum converges only for |x| < 1, but we can reduce any |x| >= 1 by
+      // atan(x) = 2*atan( x / (1 + sqrt(1 + x^2)))
+      int k(0);
+      for(; Math::abs(x) >= T_(1); ++k)
+        x /= (T_(1) + Math::sqrt(T_(1) + x*x));
+
+      // use the exponential sum formula:
+      //            infty        x^(2*n+1)
+      // atan(x) :=  sum (-1)^n -----------
+      //             n=0         (2*n+1)
+      T_ y(x), yl(x+T_(1)), z(x);
+      int n(1);
+      do
+      {
+        yl = y;
+        T_ t((z *= x*x) / T_(n += 2));
+        y += T_(1 - int(n&2)) * t;
+      } while(yl != y);
+
+      return T_(1<<k) * y;
+    }
+
+    // wrap std::atan
+    WRAP_STD_MATH1(atan)
+
+    /**
+     * \brief Returns the arctangent of y/x.
+     *
+     * \param[in] y The nominator of the value to calculate the arctangent from.
+     * \param[in] x The denominator of the value to calculate the arctangent from.
+     *
+     * \returns atan2(y,x) = atan(y/x)
+     */
+    template<typename T_>
+    inline T_ atan2(T_ y, T_ x)
+    {
+      // see http://en.wikipedia.org/wiki/Atan2#Variations_and_notation
+      return T_(2) * atan((Math::sqrt(x*x + y*y) - x) / y);
+    }
+
+    // wrap std::atan2
+    WRAP_STD_MATH2(atan2)
+
+    /**
+     * \brief Returns the mathematical constant pi = 3.1415...
+     */
+    template<typename T_>
+    inline T_ pi()
+    {
+      // use the exponential sum formula:
+      //       infty  (-1)^n
+      // pi :=  sum  ---------
+      //        n=0   (2*n+1)
+      T_ y(T_(1)), yl(T_(0));
+      int n(1);
+      do
+      {
+        yl = y;
+        T_ t(T_(1) / T_(n += 2));
+        y += T_(1 - int(n&2)) * t;
+      } while(yl != y);
+
+      return y;
+    }
+
+    /// \cond internal
+    template<>
+    inline float pi<float>()
+    {
+      return 4.0f * std::atan(1.0f);
+    }
+
+    template<>
+    inline double pi<double>()
+    {
+      return 4.0 * std::atan(1.0);
+    }
+    /// \endcond
+
+    /**
+     * \brief Returns the arcsine of a value.
+     *
+     * \param[in] x The value to calculate the arcsine from.
+     *
+     * \returns asin(x)
+     */
+    template<typename T_>
+    inline T_ asin(T_ x)
+    {
+      return signum(x) * Math::atan(Math::sqrt((x*x) / (T_(1) - x*x)));
+    }
+
+    WRAP_STD_MATH1(asin)
+
+    /**
+     * \brief Returns the arccosine of a value.
+     *
+     * \param[in] x The value to calculate the arccosine from.
+     *
+     * \returns acos(x)
+     */
+    template<typename T_>
+    inline T_ acos(T_ x)
+    {
+      return T_(0.5) * pi<T_>() - Math::asin(x);
+    }
+
+    WRAP_STD_MATH1(acos)
 
     /**
      * \brief Calculates the (partial) factorial.
@@ -239,7 +561,7 @@ namespace FEAST
       /// Returns the mathematical constant pi = 3.14...
       static T_ pi()
       {
-        return T_(2) * acos(T_(0));
+        return Math::pi<T_>();
       }
     }; // class Limits<...>
 
