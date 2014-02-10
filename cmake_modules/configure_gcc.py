@@ -18,7 +18,7 @@ def configure_gcc(cpu, buildmode):
   if "coverage" in buildmode:
     cxxflags += " -fprofile-arcs -ftest-coverage"
   if "debug" in buildmode:
-    cxxflags += " -O0 -Wall -Wextra -Wundef -Wno-unused-parameter"
+    cxxflags += " -O0 -Wall -Wextra -Wundef -Wno-unused-parameter -D_GLIBCXX_DEBUG"
   elif "opt" in buildmode:
     cxxflags += " -O3"
     if cpu == "unknown":
