@@ -96,12 +96,8 @@ public:
 
   virtual void run() const
   {
-    // get a seed for us and print it
-    uint32_t seed((uint32_t)time(NULL));
-    std::cout << "seed = " << seed << std::endl;
-
     // create an rng
-    Random rng(seed);
+    Random rng;
 
 #define N 10
     // create a random permutation
