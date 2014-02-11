@@ -408,17 +408,20 @@ namespace FEAST
     template<typename T_>
     inline T_ pi()
     {
-      // use the exponential sum formula:
-      //       infty  (-1)^n
-      // pi :=  sum  ---------
-      //        n=0   (2*n+1)
-      T_ y(T_(1)), yl(T_(0));
-      int n(1);
+      // use the Bailey-Borwein-Plouffe formula:
+      //       infty   1     /   4      2      1      1  \
+      // pi :=  sum  ----  * | ---- - ---- - ---- - ---- |
+      //        k=0  16^k    \ 8k+1   8k+4   8k+5   8k+6 /
+      T_ y(T_(0)), yl(T_(0));
+      int k(0);
+      const T_ z(T_(1) / T_(16));
+      T_ t(T_(1));
       do
       {
         yl = y;
-        T_ t(T_(1) / T_(n += 2));
-        y += T_(1 - int(n&2)) * t;
+        y += t * (T_(4)/T_(8*k+1) - T_(2)/T_(8*k+4) - T_(1)/T_(8*k+5) - T_(1)/T_(8*k+6));
+        t *= z;
+        ++k;
       } while(yl != y);
 
       return y;
@@ -435,6 +438,47 @@ namespace FEAST
     inline double pi<double>()
     {
       return 4.0 * std::atan(1.0);
+    }
+
+    template<>
+    inline long double pi<long double>()
+    {
+      return 4.0l * std::atan(1.0l);
+    }
+    /// \endcond
+
+    /**
+     * \brief Returns the machine precision constant for a floating-point data type.
+     */
+    template<typename T_>
+    inline T_ eps()
+    {
+      const T_ z(T_(1));
+      const T_ t(T_(0.5));
+      T_ y(t), yl(t);
+      do
+      {
+        yl = y;
+        y *= t;
+      } while(z < (z+y));
+      return yl;
+    }
+
+    /// \cond internal
+    template<>
+    inline float eps<float>()
+    {
+      return std::numeric_limits<float>::epsilon();
+    }
+    template<>
+    inline double eps<double>()
+    {
+      return std::numeric_limits<double>::epsilon();
+    }
+    template<>
+    inline long double eps<long double>()
+    {
+      return std::numeric_limits<long double>::epsilon();
     }
     /// \endcond
 
@@ -564,15 +608,6 @@ namespace FEAST
         return Math::pi<T_>();
       }
     }; // class Limits<...>
-
-    /**
-     * \brief Returns the machine precision constant for a floating-point data type.
-     */
-    template<typename DataType_>
-    static inline DataType_ eps()
-    {
-      return Limits<DataType_>::epsilon();
-    }
   } // namespace Math
 } // namespace FEAST
 

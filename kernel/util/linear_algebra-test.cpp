@@ -136,7 +136,7 @@ class LinAlgTest :
     // constructor
     LinAlgTest(const std::string& id) :
       TaggedTest<Archs::None, DataType_>(id),
-      _eps(std::numeric_limits<DataType_>::epsilon())
+      _eps(Math::eps<DataType_>())
     {
     }
 
@@ -256,7 +256,7 @@ class LinAlgTest :
         x[i] = ONE / Math::sqrt(DataType_(1 << i));
       }
 
-      DataType_ r = sqrt(TWO - ONE/DataType_(1 << (N-1)));
+      DataType_ r = Math::sqrt(TWO - ONE/DataType_(1 << (N-1)));
       TEST_CHECK_EQUAL_WITHIN_EPS(vec_norm_euclid(N, x), r, tol);
 #undef N
     }

@@ -25,7 +25,6 @@ public:
 
   virtual void run() const
   {
-    //std::cout << scientify(Math::exp<double>(0.0), 17) << std::endl;
     test_factorial();
     test_binomial();
     test_sqrt();
@@ -37,7 +36,7 @@ public:
     test_pow();
     test_atan();
     test_atan2();
-    //test_pi();
+    test_pi();
     test_asin();
     test_acos();
   }
@@ -153,6 +152,12 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan2<double>(3.1, 0.7), std::atan2(3.1, 0.7), tol);
   }
 
+  void test_pi() const
+  {
+    // test against std
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pi<double>(), 2.0*std::acos(0.0), tol);
+  }
+
   void test_asin() const
   {
     // test exact
@@ -170,4 +175,5 @@ public:
     // test against std
     TEST_CHECK_EQUAL_WITHIN_EPS(Math::acos<double>(0.7), std::acos(0.7), tol);
   }
+
 } math_test;
