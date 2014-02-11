@@ -409,9 +409,9 @@ namespace FEAST
     inline T_ pi()
     {
       // use the Bailey-Borwein-Plouffe formula:
-      //       infty   1     /   4      2      1      1  \
-      // pi :=  sum  ----  * | ---- - ---- - ---- - ---- |
-      //        k=0  16^k    \ 8k+1   8k+4   8k+5   8k+6 /
+      //       infty   1     (   4      2      1      1  )
+      // pi :=  sum  ----  * ( ---- - ---- - ---- - ---- )
+      //        k=0  16^k    ( 8k+1   8k+4   8k+5   8k+6 )
       T_ y(T_(0)), yl(T_(0));
       int k(0);
       const T_ z(T_(1) / T_(16));
