@@ -4,6 +4,7 @@
 # If you encounter problemes when executing it on its own, start it with a python interpreter
 from __future__ import print_function
 import sys
+import platform
 import os
 import subprocess
 import socket
