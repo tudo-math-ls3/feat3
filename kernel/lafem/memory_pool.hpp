@@ -8,11 +8,6 @@
 #include <kernel/util/instantiation_policy.hpp>
 #include <kernel/archs.hpp>
 
-#ifdef FEAST_GMP
-#include <gmpxx.h>
-#include <mpfr.h>
-#endif
-
 #include <map>
 #include <cstring>
 #include <typeinfo>
@@ -103,18 +98,7 @@ namespace FEAST
           if (dest == src)
             return;
 
-#ifdef FEAST_GMP
-          if (typeid(DT_) == typeid(mpf_class))
-          {
-            const DT_ * s( src);
-            for (DT_ * d(dest), * d_end(dest + count) ; d != d_end ; ++d, ++s)
-            {
-              *d = *s;
-            }
-          }
-          else
-#endif
-            ::memcpy(dest, src, count * sizeof(DT_));
+          ::memcpy(dest, src, count * sizeof(DT_));
         }
     };
 

@@ -224,33 +224,34 @@ for branch in branches:
     continue
 
   run_test("guess", branch, myDB)
+#TODO reactivate gmp everywhere
 
   if platform.system() == "Darwin": # schwarzkopf has no mkl
-    run_test("mpi-gcc-debug-coverage-gmp" + addition, branch, myDB)
-    run_test("mpi-gcc-opt-coverage-gmp" + addition, branch, myDB)
-    run_test("serial-gcc-debug-coverage-gmp" + addition, branch, myDB)
-    run_test("serial-gcc-opt-coverage-gmp" + addition, branch, myDB)
+    run_test("mpi-gcc-debug-coverage" + addition, branch, myDB)
+    run_test("mpi-gcc-opt-coverage" + addition, branch, myDB)
+    run_test("serial-gcc-debug-coverage" + addition, branch, myDB)
+    run_test("serial-gcc-opt-coverage" + addition, branch, myDB)
     sys.exit()
 
   if is_found("mpic++"):
     if is_found("g++"):
-      run_test("mpi-gcc-debug-coverage-gmp-mkl" + addition, branch, myDB)
-      run_test("mpi-gcc-opt-coverage-gmp-mkl" + addition, branch, myDB)
+      run_test("mpi-gcc-debug-coverage-mkl" + addition, branch, myDB)
+      run_test("mpi-gcc-opt-coverage-mkl" + addition, branch, myDB)
       #if is_found ("ninja") and is_found("nvcc"):
-        #run_test("mpi-gcc-opt-coverage-gmp-mkl-cuda-ninja", branch, myDB)
+        #run_test("mpi-gcc-opt-coverage-mkl-cuda-ninja", branch, myDB)
     if is_found("clang++"):
-      run_test("mpi-clang-debug-gmp-mkl" + addition, branch, myDB)
-      run_test("mpi-clang-opt-gmp-mkl" + addition, branch, myDB)
+      run_test("mpi-clang-debug-mkl" + addition, branch, myDB)
+      run_test("mpi-clang-opt-mkl" + addition, branch, myDB)
     if is_found("icpc"):
       run_test("mpi-icc-debug-mkl" + addition, branch, myDB)
       run_test("mpi-icc-opt-mkl" + addition, branch, myDB)
 
   if is_found("g++"):
-    run_test("serial-gcc-debug-coverage-gmp-mkl" + addition, branch, myDB)
-    run_test("serial-gcc-opt-coverage-gmp-mkl" + addition, branch, myDB)
+    run_test("serial-gcc-debug-coverage-mkl" + addition, branch, myDB)
+    run_test("serial-gcc-opt-coverage-mkl" + addition, branch, myDB)
   if is_found("clang++"):
-    run_test("serial-clang-debug-gmp-mkl" + addition, branch, myDB)
-    run_test("serial-clang-opt-gmp-mkl" + addition, branch, myDB)
+    run_test("serial-clang-debug-mkl" + addition, branch, myDB)
+    run_test("serial-clang-opt-mkl" + addition, branch, myDB)
   if is_found("icpc"):
     run_test("serial-icc-debug-mkl" + addition, branch, myDB)
     run_test("serial-icc-opt-mkl" + addition, branch, myDB)

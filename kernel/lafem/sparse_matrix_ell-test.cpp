@@ -127,9 +127,6 @@ public:
 };
 SparseMatrixELLTest<Mem::Main, float> cpu_sparse_matrix_ell_test_float;
 SparseMatrixELLTest<Mem::Main, double> cpu_sparse_matrix_ell_test_double;
-#ifdef FEAST_GMP
-SparseMatrixELLTest<Mem::Main, mpf_class> cpu_sparse_matrix_ell_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixELLTest<Mem::CUDA, float> cuda_sparse_matrix_ell_test_float;
 SparseMatrixELLTest<Mem::CUDA, double> cuda_sparse_matrix_ell_test_double;
@@ -208,9 +205,6 @@ public:
 
 SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, float> sm_ell_apply_test_float;
 SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, double> sm_ell_apply_test_double;
-#ifdef FEAST_GMP
-SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, mpf_class> sm_ell_apply_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_ell_apply_test_float;
 SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_ell_apply_test_double;
@@ -269,9 +263,6 @@ public:
 };
 SparseMatrixELLScaleTest<Mem::Main, Algo::Generic, float> sm_ell_scale_test_float;
 SparseMatrixELLScaleTest<Mem::Main, Algo::Generic, double> sm_ell_scale_test_double;
-#ifdef FEAST_GMP
-SparseMatrixELLScaleTest<Mem::Main, Algo::Generic, mpf_class> sm_ell_scale_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 SparseMatrixELLScaleTest<Mem::Main, Algo::MKL, float> mkl_sm_ell_scale_test_float;
 SparseMatrixELLScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_ell_scale_test_double;

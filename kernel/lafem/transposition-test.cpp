@@ -57,16 +57,7 @@ public:
 };
 TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_cpu_transposition_test_float;
 TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_cpu_transposition_test_double;
-#ifdef FEAST_GMP
-TranspositionTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > coo_cpu_transposition_test_mpf_class;
-#endif
 TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > csr_cpu_transposition_test_float;
 TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > csr_cpu_transposition_test_double;
-#ifdef FEAST_GMP
-TranspositionTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixCSR<Mem::Main, mpf_class> > csr_cpu_transposition_test_mpf_class;
-#endif
 TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_cpu_transposition_test_float;
 TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_cpu_transposition_test_double;
-#ifdef FEAST_GMP
-TranspositionTest<Mem::Main, Algo::Generic, mpf_class, SparseMatrixELL<Mem::Main, mpf_class> > ell_cpu_transposition_test_mpf_class;
-#endif

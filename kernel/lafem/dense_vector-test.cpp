@@ -103,9 +103,6 @@ public:
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
 DenseVectorTest<Mem::Main, double> cpu_dense_vector_test_double;
 DenseVectorTest<Mem::Main, Index> cpu_dense_vector_test_index;
-#ifdef FEAST_GMP
-DenseVectorTest<Mem::Main, mpf_class> cpu_dense_vector_test_mpf;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 DenseVectorTest<Mem::CUDA, float> cuda_dense_vector_test_float;
 DenseVectorTest<Mem::CUDA, double> cuda_dense_vector_test_double;
@@ -166,9 +163,6 @@ public:
 };
 DenseVectorAxpyTest<Mem::Main, Algo::Generic, float> dv_axpy_test_float;
 DenseVectorAxpyTest<Mem::Main, Algo::Generic, double> dv_axpy_test_double;
-#ifdef FEAST_GMP
-DenseVectorAxpyTest<Mem::Main, Algo::Generic, mpf_class> dv_axpy_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 DenseVectorAxpyTest<Mem::Main, Algo::MKL, float> mkl_dv_axpy_test_float;
 DenseVectorAxpyTest<Mem::Main, Algo::MKL, double> mkl_dv_axpy_test_double;
@@ -224,9 +218,6 @@ public:
 };
 DenseVectorDotTest<Mem::Main, Algo::Generic, float> dv_dot_product_test_float;
 DenseVectorDotTest<Mem::Main, Algo::Generic, double> dv_dot_product_test_double;
-#ifdef FEAST_GMP
-//DenseVectorDotTest<Mem::Main, Algo::Generic, mpf_class> dv_dot_product_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 DenseVectorDotTest<Mem::Main, Algo::MKL, float> mkl_dv_dot_product_test_float;
 DenseVectorDotTest<Mem::Main, Algo::MKL, double> mkl_dv_dot_product_test_double;
@@ -349,9 +340,6 @@ public:
 };
 DenseVectorComponentProductTest<Mem::Main, Algo::Generic, float> dv_component_product_test_float;
 DenseVectorComponentProductTest<Mem::Main, Algo::Generic, double> dv_component_product_test_double;
-#ifdef FEAST_GMP
-DenseVectorComponentProductTest<Mem::Main, Algo::Generic, mpf_class> dv_component_product_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 DenseVectorComponentProductTest<Mem::Main, Algo::MKL, float> mkl_dv_component_product_test_float;
 DenseVectorComponentProductTest<Mem::Main, Algo::MKL, double> mkl_dv_component_product_test_double;
@@ -405,9 +393,6 @@ public:
 };
 DenseVectorScaleTest<Mem::Main, Algo::Generic, float> dv_scale_test_float;
 DenseVectorScaleTest<Mem::Main, Algo::Generic, double> dv_scale_test_double;
-#ifdef FEAST_GMP
-DenseVectorScaleTest<Mem::Main, Algo::Generic, mpf_class> dv_scale_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 DenseVectorScaleTest<Mem::Main, Algo::MKL, float> mkl_dv_scale_test_float;
 DenseVectorScaleTest<Mem::Main, Algo::MKL, double> mkl_dv_scale_test_double;
@@ -458,9 +443,6 @@ public:
 };
 DenseVectorNorm2Test<Mem::Main, Algo::Generic, float> dv_norm2_test_float;
 DenseVectorNorm2Test<Mem::Main, Algo::Generic, double> dv_norm2_test_double;
-#ifdef FEAST_GMP
-//DenseVectorNorm2Test<Mem::Main, Algo::Generic, mpf_class> dv_norm2_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 DenseVectorNorm2Test<Mem::Main, Algo::MKL, float> mkl_dv_norm2_test_float;
 DenseVectorNorm2Test<Mem::Main, Algo::MKL, double> mkl_dv_norm2_test_double;

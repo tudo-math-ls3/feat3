@@ -6,11 +6,6 @@
 
 #include <cstring>
 
-#ifdef FEAST_GMP
-#include <gmpxx.h>
-#include <mpfr.h>
-#endif
-
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
@@ -32,9 +27,6 @@ void Defect<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const rhs, const
 
 template void Defect<Mem::Main, Algo::Generic>::csr(float *, const float * const, const float * const, const Index * const, const Index * const, const float * const, const Index);
 template void Defect<Mem::Main, Algo::Generic>::csr(double *, const double * const, const double * const, const Index * const, const Index * const, const double * const, const Index);
-#ifdef FEAST_GMP
-template void Defect<Mem::Main, Algo::Generic>::csr(mpf_class *, const mpf_class * const, const mpf_class * const, const Index * const, const Index * const, const mpf_class * const, const Index);
-#endif
 
 template <typename DT_>
 void Defect<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const Ax, const Index * const Aj, const Index * const Arl, const DT_ * const x, const Index stride, const Index rows)
@@ -64,9 +56,6 @@ void Defect<Mem::Main, Algo::Generic>::ell(DT_ * r, const DT_ * const rhs, const
 
 template void Defect<Mem::Main, Algo::Generic>::ell(float *, const float * const, const float * const, const Index * const, const Index * const, const float * const, const Index, const Index);
 template void Defect<Mem::Main, Algo::Generic>::ell(double *,const double * const,  const double * const, const Index * const, const Index * const, const double * const, const Index, const Index);
-#ifdef FEAST_GMP
-template void Defect<Mem::Main, Algo::Generic>::ell(mpf_class *, const mpf_class * const, const mpf_class * const, const Index * const, const Index * const, const mpf_class * const, const Index, const Index);
-#endif
 
 template <typename DT_>
 void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const DT_ * const val, const Index * const row_ptr, const Index * const col_ptr, const DT_ * const x, const Index rows, const Index used_elements)
@@ -86,6 +75,3 @@ void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const
 
 template void Defect<Mem::Main, Algo::Generic>::coo(float *, const float * const, const float * const, const Index * const, const Index * const, const float * const, const Index, const Index);
 template void Defect<Mem::Main, Algo::Generic>::coo(double *, const double * const, const double * const, const Index * const, const Index * const, const double * const, const Index, const Index);
-#ifdef FEAST_GMP
-template void Defect<Mem::Main, Algo::Generic>::coo(mpf_class *, const mpf_class * const, const mpf_class * const, const Index * const, const Index * const, const mpf_class * const, const Index, const Index);
-#endif

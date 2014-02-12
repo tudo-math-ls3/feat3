@@ -3,11 +3,6 @@
 #include <kernel/archs.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 
-#ifdef FEAST_GMP
-#include <gmpxx.h>
-#include <mpfr.h>
-#endif
-
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
@@ -45,6 +40,3 @@ else if (r == y)
 
 template void Sum<Mem::Main, Algo::Generic>::value(float *, const float * const, const float * const, const Index);
 template void Sum<Mem::Main, Algo::Generic>::value(double *, const double * const, const double * const, const Index);
-#ifdef FEAST_GMP
-template void Sum<Mem::Main, Algo::Generic>::value(mpf_class *, const mpf_class * const, const mpf_class * const, const Index);
-#endif

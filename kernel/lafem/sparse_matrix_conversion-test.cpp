@@ -88,9 +88,6 @@ public:
 };
 SparseMatrixConversionTest<Mem::Main, float> sparse_matrix_conversion_test_float;
 SparseMatrixConversionTest<Mem::Main, double> sparse_matrix_conversion_test_double;
-#ifdef FEAST_GMP
-SparseMatrixConversionTest<Mem::Main, mpf_class> sparse_matrix_conversion_test_mpf_class;
-#endif
 
 /**
 * \brief Test class for sparse matrix conversions.

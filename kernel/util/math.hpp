@@ -9,11 +9,6 @@
 #include <cmath>
 #include <limits>
 
-#ifdef FEAST_GMP
-#include <gmpxx.h>
-#include <mpfr.h>
-#endif
-
 namespace FEAST
 {
   /**
@@ -144,13 +139,6 @@ namespace FEAST
     // wrap std::abs
     WRAP_STD_MATH1(abs)
 
-#ifdef FEAST_GMP
-    inline mpf_class abs(mpf_class x)
-    {
-      return ::abs(x);
-    }
-#endif
-
     /**
      * \brief Returns the square-root of a value.
      *
@@ -181,13 +169,6 @@ namespace FEAST
 
     // wrap std::sqrt
     WRAP_STD_MATH1(sqrt)
-
-#ifdef FEAST_GMP
-    inline mpf_class sqrt(mpf_class x)
-    {
-      return ::sqrt(x);
-    }
-#endif
 
     /**
      * \brief Returns the sine of a value.

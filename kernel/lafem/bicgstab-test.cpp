@@ -306,9 +306,6 @@ bicgstab_test_ell_ilu_0_double;
 //bicgstab_test_ell_ilu_10_double(10);
 
 
-#ifdef FEAST_GMP
-//BiCGStabTest<Mem::Main, Algo::Generic, mpf_class> bicgstab_test_mpf_class;
-#endif
 /*#ifdef FEAST_BACKENDS_CUDA
 BiCGStabTest<Mem::CUDA, Algo::CUDA, double,
              SparseMatrixCSR<Mem::Main, double>,

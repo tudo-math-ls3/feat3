@@ -116,9 +116,6 @@ public:
 };
 SparseMatrixCOOTest<Mem::Main, float> sparse_matrix_coo_test_float;
 SparseMatrixCOOTest<Mem::Main, double> sparse_matrix_coo_test_double;
-#ifdef FEAST_GMP
-SparseMatrixCOOTest<Mem::Main, mpf_class> sparse_matrix_coo_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCOOTest<Mem::CUDA, float> cuda_sparse_matrix_coo_test_float;
 SparseMatrixCOOTest<Mem::CUDA, double> cuda_sparse_matrix_coo_test_double;
@@ -196,9 +193,6 @@ public:
 
 SparseMatrixCOOApplyTest<Mem::Main, Algo::Generic, float> sm_coo_apply_test_float;
 SparseMatrixCOOApplyTest<Mem::Main, Algo::Generic, double> sm_coo_apply_test_double;
-#ifdef FEAST_GMP
-SparseMatrixCOOApplyTest<Mem::Main, Algo::Generic, mpf_class> sm_coo_apply_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 //SparseMatrixCOOApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_coo_apply_test_float;
 //SparseMatrixCOOApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_coo_apply_test_double;
@@ -258,9 +252,6 @@ public:
 };
 SparseMatrixCOOScaleTest<Mem::Main, Algo::Generic, float> sm_coo_scale_test_float;
 SparseMatrixCOOScaleTest<Mem::Main, Algo::Generic, double> sm_coo_scale_test_double;
-#ifdef FEAST_GMP
-SparseMatrixCOOScaleTest<Mem::Main, Algo::Generic, mpf_class> sm_coo_scale_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 SparseMatrixCOOScaleTest<Mem::Main, Algo::MKL, float> mkl_sm_coo_scale_test_float;
 SparseMatrixCOOScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_coo_scale_test_double;

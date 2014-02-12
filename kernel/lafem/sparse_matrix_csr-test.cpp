@@ -126,9 +126,6 @@ public:
 };
 SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;
 SparseMatrixCSRTest<Mem::Main, double> cpu_sparse_matrix_csr_test_double;
-#ifdef FEAST_GMP
-SparseMatrixCSRTest<Mem::Main, mpf_class> cpu_sparse_matrix_csr_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCSRTest<Mem::CUDA, float> cuda_sparse_matrix_csr_test_float;
 SparseMatrixCSRTest<Mem::CUDA, double> cuda_sparse_matrix_csr_test_double;
@@ -207,9 +204,6 @@ public:
 
 SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, float> sm_csr_apply_test_float;
 SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, double> sm_csr_apply_test_double;
-#ifdef FEAST_GMP
-SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, mpf_class> sm_csr_apply_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_csr_apply_test_float;
 SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_csr_apply_test_double;
@@ -268,9 +262,6 @@ public:
 };
 SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, float> sm_csr_scale_test_float;
 SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, double> sm_csr_scale_test_double;
-#ifdef FEAST_GMP
-SparseMatrixCSRScaleTest<Mem::Main, Algo::Generic, mpf_class> sm_csr_scale_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_MKL
 SparseMatrixCSRScaleTest<Mem::Main, Algo::MKL, float> mkl_sm_csr_scale_test_float;
 SparseMatrixCSRScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_csr_scale_test_double;

@@ -54,7 +54,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Parallelisation: serial, mpi")
   print ("  Compiler: gcc, icc, clang")
   print ("  Compiler frontends: ccache")
-  print ("  Backends: gmp, cuda, mkl")
+  print ("  Backends: cuda, mkl, gmp(not implemented yet)")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scalasca (not implemented yet)")
   print ("")

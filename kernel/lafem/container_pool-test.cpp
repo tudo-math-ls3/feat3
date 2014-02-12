@@ -65,18 +65,12 @@ public:
 };
 ContainerPoolTest<Mem::Main, float, DenseVector<Mem::Main, float> > cpu_dv_container_pool_test_float;
 ContainerPoolTest<Mem::Main, double, DenseVector<Mem::Main, double> > cpu_dv_container_pool_test_double;
-#ifdef FEAST_GMP
-ContainerPoolTest<Mem::Main, mpf_class, DenseVector<Mem::Main, mpf_class> > cpu_dv_container_pool_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 ContainerPoolTest<Mem::CUDA, float, DenseVector<Mem::CUDA, float> > gpu_dv_container_pool_test_float;
 ContainerPoolTest<Mem::CUDA, double, DenseVector<Mem::CUDA, double> > gpu_dv_container_pool_test_double;
 #endif
 ContainerPoolTest<Mem::Main, float, SparseMatrixCOO<Mem::Main, float> > cpu_coo_container_pool_test_float;
 ContainerPoolTest<Mem::Main, double, SparseMatrixCOO<Mem::Main, double> > cpu_coo_container_pool_test_double;
-#ifdef FEAST_GMP
-ContainerPoolTest<Mem::Main, mpf_class, SparseMatrixCOO<Mem::Main, mpf_class> > cpu_coo_container_pool_test_mpf_class;
-#endif
 #ifdef FEAST_BACKENDS_CUDA
 ContainerPoolTest<Mem::CUDA, float, SparseMatrixCOO<Mem::CUDA, float> > gpu_coo_container_pool_test_float;
 ContainerPoolTest<Mem::CUDA, double, SparseMatrixCOO<Mem::CUDA, double> > gpu_coo_container_pool_test_double;
