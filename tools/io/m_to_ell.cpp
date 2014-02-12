@@ -16,7 +16,6 @@ int main(int argc, char ** argv)
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixCOO<Mem::Main, double> coo(fm_m, input);
-    SparseMatrixELL<Mem::Main, double> ell(coo);
+    SparseMatrixELL<Mem::Main, double> ell(fm_m, input);
     ell.write_out(fm_ell, output);
 }

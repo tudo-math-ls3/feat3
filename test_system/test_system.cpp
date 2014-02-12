@@ -54,20 +54,6 @@ int main(int argc, char** argv)
       result = EXIT_FAILURE;
       ++tests_failed;
     }
-    catch (InternalError & e)
-    {
-      std::cout << "FAILED with InternalError: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
-        << stringify(e.message()) << std::endl;
-      result = EXIT_FAILURE;
-      ++tests_failed;
-    }
-    catch (std::exception & e)
-    {
-      std::cout << "FAILED with unknown Exception: " << (*i)->id() << std::endl << stringify(e.what()) << std::endl
-        << std::endl;
-      result = EXIT_FAILURE;
-      ++tests_failed;
-    }
     i = TestList::instance()->erase(i);
     iterator_index++;
   }

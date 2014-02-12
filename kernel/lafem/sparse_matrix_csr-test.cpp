@@ -109,17 +109,17 @@ public:
     BinaryStream bs;
     f.write_out(fm_csr, bs);
     bs.seekg(0);
-    SparseMatrixCSR<Mem_, DT_> g(bs);
+    SparseMatrixCSR<Mem_, DT_> g(fm_csr, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
     f.write_out(fm_m, ts);
-    SparseMatrixCOO<Mem::Main, DT_> i(fm_m, ts);
-    TEST_CHECK_EQUAL(i, fcoo);
+    SparseMatrixCSR<Mem::Main, DT_> i(fm_m, ts);
+    TEST_CHECK_EQUAL(i, f);
 
     f.write_out(fm_mtx, ts);
-    SparseMatrixCOO<Mem::Main, DT_> j(fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, fcoo);
+    SparseMatrixCSR<Mem::Main, DT_> j(fm_mtx, ts);
+    TEST_CHECK_EQUAL(j, f);
   }
 };
 SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;
@@ -184,7 +184,6 @@ public:
           }
         }
       }
-      std::cout<<"real ue: "<<ue<<std::endl;
       SparseMatrixCSR<Mem_,DT_> a(a_local);
 
       DenseVector<Mem_, DT_> r(size);

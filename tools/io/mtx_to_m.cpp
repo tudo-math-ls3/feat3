@@ -1,4 +1,4 @@
-#include <kernel/lafem/sparse_matrix_ell.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <iostream>
 
@@ -9,13 +9,13 @@ int main(int argc, char ** argv)
 {
     if (argc != 3)
     {
-        std::cout<<"Usage 'mtx2ell mtx-file ell-file'"<<std::endl;
+        std::cout<<"Usage 'mtx2m mtx-file m-file'"<<std::endl;
         exit(EXIT_FAILURE);
     }
 
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixELL<Mem::Main, double> ell(fm_mtx, input);
-    ell.write_out(fm_ell, output);
+    SparseMatrixCSR<Mem::Main, double> csr(fm_mtx, input);
+    csr.write_out(fm_m, output);
 }

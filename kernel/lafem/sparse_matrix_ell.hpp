@@ -55,6 +55,244 @@ namespace FEAST
     class SparseMatrixELL : public Container<Mem_, DT_>
     {
       private:
+        void _read_from_m(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          _read_from_m(file);
+          file.close();
+        }
+
+        void _read_from_m(std::istream& file)
+        {
+          std::map<Index, std::map<Index, DT_> > entries; // map<row, map<column, value> >
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_dt.push_back(DT_(0));
+
+          Index ue(0);
+          String line;
+          std::getline(file, line);
+          while(!file.eof())
+          {
+            std::getline(file, line);
+
+            if(line.find("]", 0) < line.npos)
+              break;
+
+            if(line[line.size()-1] == ';')
+              line.resize(line.size()-1);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row((Index)atol(srow.c_str()));
+            --row;
+            this->_scalar_index.at(1) = std::max(row+1, this->rows());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col((Index)atol(scol.c_str()));
+            --col;
+            this->_scalar_index.at(2) = std::max(col+1, this->columns());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ val((DT_)atof(sval.c_str()));
+
+            entries[row].insert(std::pair<Index, DT_>(col, val));
+            ++ue;
+          }
+          this->_scalar_index.at(0) = this->rows() * this->columns();
+          this->_scalar_index.at(5) = ue;
+          this->_scalar_index.at(4) = 0;
+
+          Index* tArl = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1));
+
+          Index idx(0);
+          for (auto row : entries)
+          {
+            tArl[idx] = row.second.size();
+            this->_scalar_index.at(4) = std::max(this->_scalar_index.at(4), tArl[idx]);
+            ++idx;
+          }
+
+          Index alignment(32);
+          this->_scalar_index.at(3) = alignment * ((this->_scalar_index.at(1) + alignment - 1)/ alignment);
+
+          DT_* tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem::Main>::instance()->set_memory(tAx, DT_(0), this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          Index* tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem::Main>::instance()->set_memory(tAj, Index(0), this->_scalar_index.at(4) * this->_scalar_index.at(3));
+
+          Index row_idx(0);
+          for (auto row : entries)
+          {
+            Index target(0);
+            for (auto col : row.second )
+            {
+              tAj[row_idx + target * stride()] = col.first;
+              tAx[row_idx + target * stride()] = col.second;
+              ++target;
+            }
+            row.second.clear();
+            ++row_idx;
+          }
+          entries.clear();
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(4) * this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(4) * this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1)));
+          this->_indices_size.push_back(this->_scalar_index.at(1));
+
+          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tAx, this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(0), tAj, this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(1), tArl, this->_scalar_index.at(1));
+
+          MemoryPool<Mem::Main>::instance()->release_memory(tAx);
+          MemoryPool<Mem::Main>::instance()->release_memory(tAj);
+          MemoryPool<Mem::Main>::instance()->release_memory(tArl);
+        }
+
+        void _read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          _read_from_m(file);
+          file.close();
+        }
+
+        void _read_from_mtx(std::istream& file)
+        {
+          std::map<Index, std::map<Index, DT_> > entries; // map<row, map<column, value> >
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_dt.push_back(DT_(0));
+
+          Index ue(0);
+          String line;
+          std::getline(file, line);
+          {
+            std::getline(file, line);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row((Index)atol(srow.c_str()));
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col((Index)atol(scol.c_str()));
+            line.erase(0, end);
+            this->_scalar_index.at(1) = row;
+            this->_scalar_index.at(2) = col;
+            this->_scalar_index.at(0) = this->rows() * this->columns();
+          }
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row((Index)atol(srow.c_str()));
+            --row;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col((Index)atol(scol.c_str()));
+            --col;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ val((DT_)atof(sval.c_str()));
+
+            entries[row].insert(std::pair<Index, DT_>(col, val));
+            ++ue;
+          }
+          this->_scalar_index.at(0) = this->rows() * this->columns();
+          this->_scalar_index.at(5) = ue;
+          this->_scalar_index.at(4) = 0;
+
+          Index* tArl = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1));
+
+          Index idx(0);
+          for (auto row : entries)
+          {
+            tArl[idx] = row.second.size();
+            this->_scalar_index.at(4) = std::max(this->_scalar_index.at(4), tArl[idx]);
+            ++idx;
+          }
+
+          Index alignment(32);
+          this->_scalar_index.at(3) = alignment * ((this->_scalar_index.at(1) + alignment - 1)/ alignment);
+
+          DT_* tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem::Main>::instance()->set_memory(tAx, DT_(0), this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          Index* tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem::Main>::instance()->set_memory(tAj, Index(0), this->_scalar_index.at(4) * this->_scalar_index.at(3));
+
+          Index row_idx(0);
+          for (auto row : entries)
+          {
+            Index target(0);
+            for (auto col : row.second )
+            {
+              tAj[row_idx + target * stride()] = col.first;
+              tAx[row_idx + target * stride()] = col.second;
+              ++target;
+            }
+            row.second.clear();
+            ++row_idx;
+          }
+          entries.clear();
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(4) * this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(4) * this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(1)));
+          this->_indices_size.push_back(this->_scalar_index.at(1));
+
+          MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tAx, this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(0), tAj, this->_scalar_index.at(4) * this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(1), tArl, this->_scalar_index.at(1));
+
+          MemoryPool<Mem::Main>::instance()->release_memory(tAx);
+          MemoryPool<Mem::Main>::instance()->release_memory(tAj);
+          MemoryPool<Mem::Main>::instance()->release_memory(tArl);
+        }
+
         void _read_from_ell(String filename)
         {
           std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
@@ -365,31 +603,59 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] filename The source file in HONEI ELL format.
+         * \param[in] mode The used file format.
+         * \param[in] filename The source file.
          *
          * Creates a ELL matrix based on the source file.
          */
-        explicit SparseMatrixELL(String filename) :
+        explicit SparseMatrixELL(FileMode mode, String filename) :
           Container<Mem_, DT_>(0)
         {
           CONTEXT("When creating SparseMatrixELL");
 
-          _read_from_ell(filename);
+          switch(mode)
+          {
+            case fm_m:
+              _read_from_m(filename);
+              break;
+            case fm_mtx:
+              _read_from_mtx(filename);
+              break;
+            case fm_ell:
+              _read_from_ell(filename);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
         }
 
         /**
          * \brief Constructor
          *
-         * \param[in] file The stream that shall be read from.
+         * \param[in] mode The used file format.
+         * \param[in] file The source filestream.
          *
-         * Creates a ELL matrix based on the source file.
+         * Creates a ELL matrix based on the source filestream.
          */
-        explicit SparseMatrixELL(std::istream& file) :
+        explicit SparseMatrixELL(FileMode mode, std::istream& file) :
           Container<Mem_, DT_>(0)
         {
           CONTEXT("When creating SparseMatrixELL");
 
-          _read_from_ell(file);
+          switch(mode)
+          {
+            case fm_m:
+              _read_from_m(file);
+              break;
+            case fm_mtx:
+              _read_from_mtx(file);
+              break;
+            case fm_ell:
+              _read_from_ell(file);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
         }
 
         /**

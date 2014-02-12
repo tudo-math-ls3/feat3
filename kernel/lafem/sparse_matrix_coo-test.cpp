@@ -170,7 +170,6 @@ public:
           }
         }
       }
-      std::cout<<"real ue: "<<ue<<std::endl;
       SparseMatrixCOO<Mem_,DT_> a(a_local);
 
       DenseVector<Mem_, DT_> r(size);

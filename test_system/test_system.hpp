@@ -399,13 +399,6 @@ namespace FEAST
           "'\nbut got\n'" + test_h.s_a + "'"); \
     } catch (const TestFailedException &) { \
       throw; \
-    } catch (const std::exception & test_e) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
-          " inside a TEST_CHECK_EQUAL block"); \
-    } catch (...) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected unknown exception inside a TEST_CHECK_EQUAL block"); \
     } \
   } while (false)
 

@@ -54,6 +54,214 @@ namespace FEAST
         typedef const Index* ImageIterator;
 
       private:
+        void _read_from_m(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          _read_from_m(file);
+          file.close();
+        }
+
+        void _read_from_m(std::istream& file)
+        {
+          std::map<Index, std::map<Index, DT_> > entries; // map<row, map<column, value> >
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_dt.push_back(DT_(0));
+
+          Index ue(0);
+          String line;
+          std::getline(file, line);
+          while(!file.eof())
+          {
+            std::getline(file, line);
+
+            if(line.find("]", 0) < line.npos)
+              break;
+
+            if(line[line.size()-1] == ';')
+              line.resize(line.size()-1);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row((Index)atol(srow.c_str()));
+            --row;
+            this->_scalar_index.at(1) = std::max(row+1, this->rows());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col((Index)atol(scol.c_str()));
+            --col;
+            this->_scalar_index.at(2) = std::max(col+1, this->columns());
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ val((DT_)atof(sval.c_str()));
+
+            entries[row].insert(std::pair<Index, DT_>(col, val));
+            ++ue;
+          }
+          this->_scalar_index.at(0) = this->rows() * this->columns();
+          this->_scalar_index.at(3) = ue;
+
+          DT_ * tval = new DT_[ue];
+          Index * tcol_ind = new Index[ue];
+          Index * trow_ptr = new Index[rows() + 1];
+
+          Index idx(0);
+          Index row_idx(0);
+          for (auto row : entries)
+          {
+            trow_ptr[row_idx] = idx;
+            for (auto col : row.second )
+            {
+              tcol_ind[idx] = col.first;
+              tval[idx] = col.second;
+              ++idx;
+            }
+            row.second.clear();
+            ++row_idx;
+          }
+          trow_ptr[rows()] = ue;
+          entries.clear();
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(rows() + 1));
+          this->_indices_size.push_back(rows() + 1);
+
+          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(1), trow_ptr, rows() + 1);
+
+          delete[] tval;
+          delete[] tcol_ind;
+          delete[] trow_ptr;
+        }
+
+        void _read_from_mtx(String filename)
+        {
+          std::ifstream file(filename.c_str(), std::ifstream::in);
+          if (! file.is_open())
+            throw InternalError(__func__, __FILE__, __LINE__, "Unable to open Matrix file " + filename);
+          _read_from_m(file);
+          file.close();
+        }
+
+        void _read_from_mtx(std::istream& file)
+        {
+          std::map<Index, std::map<Index, DT_> > entries; // map<row, map<column, value> >
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_dt.push_back(DT_(0));
+
+          Index ue(0);
+          String line;
+          std::getline(file, line);
+          {
+            std::getline(file, line);
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row((Index)atol(srow.c_str()));
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col((Index)atol(scol.c_str()));
+            line.erase(0, end);
+            this->_scalar_index.at(1) = row;
+            this->_scalar_index.at(2) = col;
+            this->_scalar_index.at(0) = this->rows() * this->columns();
+          }
+          while(!file.eof())
+          {
+            std::getline(file, line);
+            if (file.eof())
+              break;
+
+            String::size_type begin(line.find_first_not_of(" "));
+            line.erase(0, begin);
+            String::size_type end(line.find_first_of(" "));
+            String srow(line, 0, end);
+            Index row((Index)atol(srow.c_str()));
+            --row;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String scol(line, 0, end);
+            Index col((Index)atol(scol.c_str()));
+            --col;
+            line.erase(0, end);
+
+            begin = line.find_first_not_of(" ");
+            line.erase(0, begin);
+            end = line.find_first_of(" ");
+            String sval(line, 0, end);
+            DT_ val((DT_)atof(sval.c_str()));
+
+            entries[row].insert(std::pair<Index, DT_>(col, val));
+            ++ue;
+          }
+          this->_scalar_index.at(0) = this->rows() * this->columns();
+          this->_scalar_index.at(3) = ue;
+
+          DT_ * tval = new DT_[ue];
+          Index * tcol_ind = new Index[ue];
+          Index * trow_ptr = new Index[rows() + 1];
+
+          Index idx(0);
+          Index row_idx(0);
+          for (auto row : entries)
+          {
+            trow_ptr[row_idx] = idx;
+            for (auto col : row.second )
+            {
+              tcol_ind[idx] = col.first;
+              tval[idx] = col.second;
+              ++idx;
+            }
+            row.second.clear();
+            ++row_idx;
+          }
+          trow_ptr[rows()] = ue;
+          entries.clear();
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(this->_scalar_index.at(3)));
+          this->_indices_size.push_back(this->_scalar_index.at(3));
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(rows() + 1));
+          this->_indices_size.push_back(rows() + 1);
+
+          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<Index>(this->_indices.at(1), trow_ptr, rows() + 1);
+
+          delete[] tval;
+          delete[] tcol_ind;
+          delete[] trow_ptr;
+        }
+
         void _read_from_csr(String filename)
         {
           std::ifstream file(filename.c_str(), std::ifstream::in | std::ifstream::binary);
@@ -292,31 +500,59 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] filename The source file in binary CSR format.
+         * \param[in] mode The used file format.
+         * \param[in] filename The source file.
          *
          * Creates a CSR matrix based on the source file.
          */
-        explicit SparseMatrixCSR(String filename) :
+        explicit SparseMatrixCSR(FileMode mode, String filename) :
           Container<Mem_, DT_>(0)
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          _read_from_csr(filename);
+          switch(mode)
+          {
+            case fm_m:
+              _read_from_m(filename);
+              break;
+            case fm_mtx:
+              _read_from_mtx(filename);
+              break;
+            case fm_csr:
+              _read_from_csr(filename);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
         }
 
         /**
          * \brief Constructor
          *
-         * \param[in] file The source file in binary CSR format.
+         * \param[in] mode The used file format.
+         * \param[in] file The source filestream.
          *
-         * Creates a CSR matrix based on the source file.
+         * Creates a CSR matrix based on the source filestream.
          */
-        explicit SparseMatrixCSR(std::istream& file) :
+        explicit SparseMatrixCSR(FileMode mode, std::istream& file) :
           Container<Mem_, DT_>(0)
         {
           CONTEXT("When creating SparseMatrixCSR");
 
-          _read_from_csr(file);
+          switch(mode)
+          {
+            case fm_m:
+              _read_from_m(file);
+              break;
+            case fm_mtx:
+              _read_from_mtx(file);
+              break;
+            case fm_csr:
+              _read_from_csr(file);
+              break;
+            default:
+              throw InternalError(__func__, __FILE__, __LINE__, "Filemode not supported!");
+          }
         }
 
         /**
