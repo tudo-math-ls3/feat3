@@ -547,7 +547,7 @@ namespace FEAST
         void axpy(
           const DenseVector<Mem_, DT_> & x,
           const DenseVector<Mem_, DT_> & y,
-          const DataType alpha = DataType(1))
+          const DT_ alpha = DT_(1))
         {
           if (x.size() != y.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -555,14 +555,14 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           // check for special cases
-          if(Math::abs(alpha - DataType(1)) < Math::eps<DataType>())
-            // r <- x + y
+          // r <- x + y
+          if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
             Arch::Sum<Mem_, Algo_>::value(this->elements(), x.elements(), y.elements(), this->size());
-          else if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
-            // r <- y - x
+          // r <- y - x
+          else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
             Arch::Difference<Mem_, Algo_>::value(this->elements(), y.elements(), x.elements(), this->size());
+          // r <- y + alpha*x
           else
-            // r <- y + alpha*x
             Arch::Axpy<Mem_, Algo_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());
         }
 

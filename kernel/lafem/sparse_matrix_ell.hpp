@@ -1107,7 +1107,7 @@ namespace FEAST
         void axpy(
           const SparseMatrixELL<Mem_, DT_> & x,
           const SparseMatrixELL<Mem_, DT_> & y,
-          DataType alpha = DataType(1))
+          DT_ alpha = DT_(1))
         {
           if (x.rows() != y.rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Matrix rows do not match!");
@@ -1131,14 +1131,14 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Matrix num_cols_per_row do not match!");
 
           // check for special cases
-          if(Math::abs(alpha - DataType(1)) < Math::eps<DataType>())
-            // r <- x + y
+          // r <- x + y
+          if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
             Arch::Sum<Mem_, Algo_>::value(this->Ax(), x.Ax(), y.Ax(), this->stride() * this->num_cols_per_row());
-          else if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
-            // r <- y - x
+          // r <- y - x
+          else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
             Arch::Difference<Mem_, Algo_>::value(this->Ax(), y.Ax(), x.Ax(), this->stride() * this->num_cols_per_row());
+          // r <- y + alpha*x
           else
-            // r <- y + alpha*x
             Arch::Axpy<Mem_, Algo_>::dv(this->Ax(), alpha, x.Ax(), y.Ax(), this->stride() * this->num_cols_per_row());
         }
 
@@ -1191,7 +1191,7 @@ namespace FEAST
           DenseVector<Mem_,DT_>& r,
           const DenseVector<Mem_, DT_>& x,
           const DenseVector<Mem_, DT_>& y,
-          const DataType alpha = DataType(1)) const
+          const DT_ alpha = DT_(1)) const
         {
           if (r.size() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
@@ -1201,14 +1201,18 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
           // check for special cases
-          if(Math::abs(alpha + DataType(1)) < Math::eps<DataType>())
-            // r <- y - A*x
+          // r <- y - A*x
+          if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+          {
             Arch::Defect<Mem_, Algo_>::ell(r.elements(), y.elements(), this->Ax(), this->Aj(),
               this->Arl(), x.elements(), this->stride(), this->rows());
+          }
+          // r <- y + alpha*x
           else
-            // r <- y + alpha*x
+          {
             Arch::Axpy<Mem_, Algo_>::ell(r.elements(), alpha, x.elements(), y.elements(),
               this->Ax(), this->Aj(), this->Arl(), this->stride(), this->rows());
+          }
         }
     };
 
