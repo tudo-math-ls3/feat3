@@ -246,6 +246,27 @@ namespace FEAST
         {
           return "DenseMatrix";
         }
+
+        /**
+         * \brief Performs \f$this \leftarrow x\f$.
+         *
+         * \param[in] x The Matrix to be copied.
+         */
+        void copy(const DenseMatrix<Mem_, DT_> & x)
+        {
+          this->_copy_content(x);
+        }
+
+        /**
+         * \brief Performs \f$this \leftarrow x\f$.
+         *
+         * \param[in] x The Matrix to be copied.
+         */
+        template <typename Mem2_>
+        void copy(const DenseMatrix<Mem2_, DT_> & x)
+        {
+          this->_copy_content(x);
+        }
     };
 
     /**

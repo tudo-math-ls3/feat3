@@ -90,6 +90,8 @@ public:
     TEST_CHECK_EQUAL(e, c);
     e = c.clone();
     TEST_CHECK_EQUAL(e, c);
+    e.copy(c);
+    TEST_CHECK_EQUAL(e, c);
 
     TEST_CHECK_NOT_EQUAL((std::size_t)e.val(), (std::size_t)c.val());
 

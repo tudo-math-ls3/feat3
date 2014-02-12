@@ -66,6 +66,11 @@ public:
     h(1,2,3);
     TEST_CHECK_NOT_EQUAL(h, f);
     TEST_CHECK_NOT_EQUAL((std::size_t)h.elements(), (std::size_t)f.elements());
+    h.copy(f);
+    TEST_CHECK_EQUAL(h, f);
+    h(1,2,3);
+    TEST_CHECK_NOT_EQUAL(h, f);
+    TEST_CHECK_NOT_EQUAL((std::size_t)h.elements(), (std::size_t)f.elements());
   }
 };
 DenseMatrixTest<Mem::Main, float> cpu_dense_matrix_test_float;

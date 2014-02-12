@@ -80,6 +80,11 @@ public:
     c(1,2,3);
     TEST_CHECK_NOT_EQUAL(c, b);
 
+    c.copy(b);
+    TEST_CHECK_EQUAL(c, b);
+    c(1,2,3);
+    TEST_CHECK_NOT_EQUAL(c, b);
+
     SparseMatrixCOO<Mem_, DT_> f(10, 10);
     for (Index row(0) ; row < f.rows() ; ++row)
     {

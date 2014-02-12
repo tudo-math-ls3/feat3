@@ -509,16 +509,9 @@ namespace FEAST
          *
          * \param[in] x The vector to be copied.
          */
-        void copy(const DenseVector<Mem_, DT_>& x)
+        void copy(const DenseVector<Mem_, DT_> & x)
         {
-          if (this->size() != x.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
-
-          DT_ * pdest(this->elements());
-          const DT_ * psrc(x.elements());
-
-          if(pdest != psrc)
-            MemoryPool<Mem_>::template copy<DT_>(pdest, psrc, this->size());
+          this->_copy_content(x);
         }
 
         /**
@@ -527,13 +520,9 @@ namespace FEAST
          * \param[in] x The vector to be copied.
          */
         template <typename Mem2_>
-        void copy(const DenseVector<Mem2_, DT_>& x)
+        void copy(const DenseVector<Mem2_, DT_> & x)
         {
-          if (this->size() != x.size())
-            throw InternalError(__func__, __FILE__, __LINE__, "Vector size mismatch!");
-
-          DenseVector<Mem_, DT_> temp(x);
-          MemoryPool<Mem_>::template copy<DT_>(this->elements(), temp.elements(), this->size());
+          this->_copy_content(x);
         }
 
         /**
@@ -561,6 +550,9 @@ namespace FEAST
           // r <- y - x
           else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
             Arch::Difference<Mem_, Algo_>::value(this->elements(), y.elements(), x.elements(), this->size());
+          // r <- y
+          else if(Math::abs(alpha) < Math::eps<DT_>())
+            this->copy(y);
           // r <- y + alpha*x
           else
             Arch::Axpy<Mem_, Algo_>::dv(this->elements(), alpha, x.elements(), y.elements(), this->size());

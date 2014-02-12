@@ -1038,6 +1038,27 @@ namespace FEAST
         }
 
         /**
+         * \brief Performs \f$this \leftarrow x\f$.
+         *
+         * \param[in] x The Matrix to be copied.
+         */
+        void copy(const SparseMatrixCSR<Mem_, DT_> & x)
+        {
+          this->_copy_content(x);
+        }
+
+        /**
+         * \brief Performs \f$this \leftarrow x\f$.
+         *
+         * \param[in] x The Matrix to be copied.
+         */
+        template <typename Mem2_>
+        void copy(const SparseMatrixCSR<Mem2_, DT_> & x)
+        {
+          this->_copy_content(x);
+        }
+
+        /**
          * \brief Calculate \f$this \leftarrow y + \alpha x\f$
          *
          * \param[in] x The first summand matrix to be scaled.
@@ -1070,6 +1091,9 @@ namespace FEAST
           // r <- y - x
           else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
             Arch::Difference<Mem_, Algo_>::value(this->val(), y.val(), x.val(), this->used_elements());
+          // r <- y
+          else if(Math::abs(alpha) < Math::eps<DT_>())
+            this->copy(y);
           // r <- y + alpha*x
           else
             Arch::Axpy<Mem_, Algo_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
@@ -1118,6 +1142,7 @@ namespace FEAST
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
          * \param[in] y The summand vector.
+         * \param[in] alpha A scalar to scale the product with.
          */
         template<typename Algo_>
         void apply(
@@ -1140,6 +1165,9 @@ namespace FEAST
             Arch::Defect<Mem_, Algo_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
               this->row_ptr(), x.elements(), this->rows());
           }
+          //r <- y
+          else if(Math::abs(alpha) < Math::eps<DT_>())
+            r.copy(y);
           // r <- y + alpha*x
           else
           {

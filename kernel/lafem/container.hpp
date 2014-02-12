@@ -63,6 +63,42 @@ namespace FEAST
         /// List of scalars with datatype DT_
         std::vector<DT_> _scalar_dt;
 
+        void _copy_content(const Container<Mem_, DT_> & other)
+        {
+          if (_elements.size() != other.get_elements().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          if (_indices.size() != other.get_indices().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          if (_scalar_index.size() != other.get_scalar_index().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          if (_scalar_dt.size() != other.get_scalar_dt().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+
+          for (Index i(0) ; i < _elements.size() ; ++i)
+          {
+            if (_elements_size.at(i) != other.get_elements_size().at(i))
+              throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            MemoryPool<Mem_>::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+          }
+
+          for (Index i(0) ; i < _indices.size() ; ++i)
+          {
+            if (_indices_size.at(i) != other.get_indices_size().at(i))
+              throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            MemoryPool<Mem_>::template copy<Index>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+          }
+
+          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
+          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
+        }
+
+        template <typename Mem2_>
+        void _copy_content(const Container<Mem2_, DT_> & other)
+        {
+          Container<Mem_, DT_> temp(other);
+          this->_copy_content(temp);
+        }
+
       public:
         /**
          * \brief Constructor
@@ -245,6 +281,9 @@ namespace FEAST
         void assign(const Container<Mem2_, DT_> & other)
         {
           CONTEXT("When assigning Container");
+
+          if (typeid(DT_) != typeid(DT2_))
+            throw InternalError(__func__, __FILE__, __LINE__, "type conversion not supported yet!");
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
