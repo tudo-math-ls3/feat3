@@ -1269,6 +1269,8 @@ namespace FEAST
          */
         void copy(const SparseMatrixCOO<Mem_, DT_> & x)
         {
+          this->sort();
+          const_cast<SparseMatrixCOO<Mem_, DT_> *>(&x)->sort();
           this->_copy_content(x);
         }
 
@@ -1280,6 +1282,8 @@ namespace FEAST
         template <typename Mem2_>
         void copy(const SparseMatrixCOO<Mem2_, DT_> & x)
         {
+          this->sort();
+          const_cast<SparseMatrixCOO<Mem2_, DT_> *>(&x)->sort();
           this->_copy_content(x);
         }
 
