@@ -52,6 +52,7 @@ SET (test_list
   container_pool-test
   dense_matrix-test
   dense_vector-test
+  pointstar_factory-test
   richardson-test
   sparse_matrix_conversion-test
   sparse_matrix_coo-test
