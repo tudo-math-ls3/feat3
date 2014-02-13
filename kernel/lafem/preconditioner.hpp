@@ -75,7 +75,7 @@ namespace FEAST
     /**
      * \brief Jacobi-Preconditioner.
      *
-     * This class represents the Jacobi-Preconditioner.
+     * This class represents the Jacobi-Preconditioner \f$M = D\f$.
      *
      * \author Dirk Ribbrock
      */
@@ -139,7 +139,7 @@ namespace FEAST
     /**
      * \brief Gauss-Seidel-Preconditioner.
      *
-     * This class represents a dummy class for the Gauss-Seidel-Preconditioner.
+     * This class represents a dummy class for the Gauss-Seidel-Preconditioner \f$M = (D + L)\f$.
      *
      * \author Christoph Lohmann
      */
@@ -152,7 +152,7 @@ namespace FEAST
     /**
      * \brief Gauss-Seidel-Preconditioner for CSR-matrices.
      *
-     * This class specializes the Gauss-Seidel-Preconditioner for CSR-matrices.
+     * This class specializes the Gauss-Seidel-Preconditioner \f$M = (D + L)\f$ for CSR-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -163,8 +163,8 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const DT_ damping;
-      const SparseMatrixCSR<Mem_, DT_> & A;
+      const DT_ _damping;
+      const SparseMatrixCSR<Mem_, DT_> & _A;
 
     public:
       virtual ~GaussSeidelPreconditioner()
@@ -179,11 +179,11 @@ namespace FEAST
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
       GaussSeidelPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
-                                DT_ damping) :
-        damping(damping),
-        A(A)
+                                const DT_ damping) :
+        _damping(damping),
+        _A(A)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -213,25 +213,24 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pval(A.val());
-        const Index * pcol_ind(A.col_ind());
-        const Index * prow(A.row_ptr());
-        const Index n(A.rows());
+        const DT_ * pval(_A.val());
+        const Index * pcol_ind(_A.col_ind());
+        const Index * prow(_A.row_ptr());
+        const Index n(_A.rows());
 
         Index col;
 
+        // __forward-insertion__
         // iteration over all rows
-        for (Index i(n); i > 0;)
+        for (Index i(0); i < n; ++i)
         {
-          --i;
+          // iteration over all elements on the left side of the main-diagonal
+          col = prow[i];
 
-          // iteration over all elements on the right side of the main-diagonal
-          col = prow[i+1]-1;
-
-          while(pcol_ind[col] > i)
+          while (pcol_ind[col] < i)
           {
             pout[i] -= pval[col] * pout[pcol_ind[col]];
-            --col;
+            ++col;
           }
 
           // divide by the element on the main-diagonal
@@ -239,7 +238,7 @@ namespace FEAST
         }
 
         // damping of solution
-        out.template scale<Algo::Generic>(out, damping);
+        out.template scale<Algo::Generic>(out, _damping);
       }
     };
 
@@ -247,7 +246,7 @@ namespace FEAST
     /**
      * \brief Gauss-Seidel-Preconditioner for COO-matrices.
      *
-     * This class specializes the Gauss-Seidel-Preconditioner for COO-matrices.
+     * This class specializes the Gauss-Seidel-Preconditioner \f$M = (D + L)\f$ for COO-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -258,8 +257,8 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const DT_ damping;
-      const SparseMatrixCOO<Mem_, DT_> & A;
+      const DT_ _damping;
+      const SparseMatrixCOO<Mem_, DT_> & _A;
 
     public:
       virtual ~GaussSeidelPreconditioner()
@@ -274,11 +273,11 @@ namespace FEAST
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
       GaussSeidelPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A,
-                                DT_ damping) :
-        damping(damping),
-        A(A)
+                                const DT_ damping) :
+        _damping(damping),
+        _A(A)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -308,28 +307,27 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pval(A.val());
-        const Index * pcol(A.column());
-        const Index * prow(A.row());
-        const Index n(A.rows());
+        const DT_ * pval(_A.val());
+        const Index * pcol(_A.column());
+        const Index * prow(_A.row());
+        const Index n(_A.rows());
 
-        Index col(A.used_elements() - 1);
+        Index col(0);
 
+        // __forward-insertion__
         // iteration over all rows
-        for (Index i(n); i > 0;)
+        for (Index i(0); i < n; ++i)
         {
-          --i;
-
-          // iteration over all elements on the right side of the main-diagonal
-          while (prow[col] > i)
+          // iteration over all elements on the left side of the main-diagonal
+          while (prow[col] < i)
           {
-            --col;
+            ++col;
           }
 
-          while(pcol[col] > i)
+          while (pcol[col] < i)
           {
             pout[i] -= pval[col] * pout[pcol[col]];
-            --col;
+            ++col;
           }
 
           // divide by the element on the main-diagonal
@@ -337,7 +335,7 @@ namespace FEAST
         }
 
         // damping of solution
-        out.template scale<Algo::Generic>(out, damping);
+        out.template scale<Algo::Generic>(out, _damping);
       }
     };
 
@@ -345,7 +343,7 @@ namespace FEAST
     /**
      * \brief Gauss-Seidel-Preconditioner for ELL-matrices.
      *
-     * This class specializes the Gauss-Seidel-Preconditioner for ELL-matrices.
+     * This class specializes the Gauss-Seidel-Preconditioner \f$M = (D+L)\f$ for ELL-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -356,8 +354,8 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const DT_ damping;
-      const SparseMatrixELL<Mem_, DT_> & A;
+      const DT_ _damping;
+      const SparseMatrixELL<Mem_, DT_> & _A;
 
     public:
       virtual ~GaussSeidelPreconditioner()
@@ -372,11 +370,11 @@ namespace FEAST
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
       GaussSeidelPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
-                                DT_ damping) :
-        damping(damping),
-        A(A)
+                                const DT_ damping) :
+        _damping(damping),
+        _A(A)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -406,27 +404,25 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pval(A.Ax());
-        const Index * paj(A.Aj());
-        const Index stride(A.stride());
-        const Index * parl(A.Arl());
-        const Index n(A.rows());
+        const DT_ * pval(_A.Ax());
+        const Index * paj(_A.Aj());
+        const Index stride(_A.stride());
+        const Index n(_A.rows());
 
 
         Index col;
 
+        // __forward-insertion__
         // iteration over all rows
-        for (Index i(n); i > 0;)
+        for (Index i(0); i < n; ++i)
         {
-          --i;
+          // iteration over all elements on the left side of the main-diagonal
+          col = i;
 
-          // iteration over all elements on the right side of the main-diagonal
-          col = i + stride * (parl[i] - 1);
-
-          while (paj[col] > i)
+          while (paj[col] < i)
           {
             pout[i] -= pval[col] * pout[paj[col]];
-            col -= stride;
+            col += stride;
           }
 
           // divide by the element on the main-diagonal
@@ -434,7 +430,7 @@ namespace FEAST
         }
 
         // damping of solution
-        out.template scale<Algo::Generic>(out, damping);
+        out.template scale<Algo::Generic>(out, _damping);
       }
     };
 
@@ -442,7 +438,7 @@ namespace FEAST
     /**
      * \brief Polynomial-Preconditioner.
      *
-     * This class represents the Neumann-Polynomial-Preconditioner
+     * This class represents the Neumann-Polynomial-Preconditioner \f$M = \sum_{k=0}^m (I - A)^k\f$
      *
      * \author Christoph Lohmann
      */
@@ -450,10 +446,10 @@ namespace FEAST
     class PolynomialPreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     private:
-      const MT_ & A;        // system-matrix
-      Index m;              // order m of preconditioner
-      VT_ aux, tmp;         // auxilary-vector
-      VT_ * pscale;         // scaling-vector (if check is true)
+      const MT_ & _A;        // system-matrix
+      Index _m;              // order m of preconditioner
+      VT_ _aux, _tmp;              // auxilary-vector
+      VT_ * _pscale;         // scaling-vector (if check is true)
 
     public:
       /**
@@ -463,9 +459,9 @@ namespace FEAST
        */
       ~PolynomialPreconditioner()
       {
-        if (pscale != nullptr)
+        if (_pscale != nullptr)
         {
-          delete pscale;
+          delete _pscale;
         }
       }
 
@@ -481,13 +477,13 @@ namespace FEAST
        * Creates a Polynomial preconditioner to the given matrix and the given order
        */
       PolynomialPreconditioner(const MT_ & A, Index m, bool bscale = false) :
-        A(A),
-        m(m),
-        aux(A.rows()),
-        tmp(A.rows()),
-        pscale(nullptr)
+        _A(A),
+        _m(m),
+        _aux(_A.rows()),
+        _tmp(_A.rows()),
+        _pscale(nullptr)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -496,11 +492,11 @@ namespace FEAST
 
         if (bscale == true)
         {
-          pscale = new VT_(A.rows());
-          DT_ *pscale_elem(pscale->elements());
-          for (Index i = 0; i < A.rows(); ++i)
+          _pscale = new VT_(_A.rows());
+          DT_ *pscale_elem(_pscale->elements());
+          for (Index i = 0; i < _A.rows(); ++i)
           {
-            pscale_elem[i] = -DT_(1.0) / A(i,i);
+            pscale_elem[i] = -DT_(1.0) / _A(i,i);
           }
         }
       }
@@ -535,40 +531,40 @@ namespace FEAST
 
         VT_ * pauxs[2];
 
-        if (m%2 == 0)
+        if (_m%2 == 0)
         {
           pauxs[0] = &out;
-          pauxs[1] = &aux;
+          pauxs[1] = &_aux;
         }
         else
         {
           pauxs[1] = &out;
-          pauxs[0] = &aux;
+          pauxs[0] = &_aux;
 
         }
 
-        if (pscale == nullptr)
+        if (_pscale == nullptr)
         {
           pauxs[0]->copy(in);
 
-          for (Index i = 1; i <= m; ++i)
+          for (Index i = 1; i <= _m; ++i)
           {
             pauxs[i%2]->template axpy<Algo::Generic>(in, *pauxs[(i-1)%2]);
             //pauxs[i%2]->template axpy<Algo::Generic>(DT_(-1.0), A, *pauxs[(i-1)%2], *pauxs[i%2]);
-            A.template apply<Algo::Generic>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
+            _A.template apply<Algo::Generic>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
           }
         }
         else
         {
-          pauxs[0]->template component_product<Algo::Generic>(*pscale, in);
+          pauxs[0]->template component_product<Algo::Generic>(*_pscale, in);
           out.template scale<Algo::Generic>(out, DT_(-1.0));
 
-          for (Index i = 1; i <= m; ++i)
+          for (Index i = 1; i <= _m; ++i)
           {
             pauxs[i%2]->template axpy<Algo::Generic>(in, *pauxs[(i-1)%2]);
             //pauxs[i%2]->template axpy<Algo::Generic>(*pscale, A, *pauxs[(i-1)%2], *pauxs[i%2]);
-            A.template apply<Algo::Generic>(tmp, *pauxs[(i-1)%2]);
-            pauxs[i%2]->template component_product<Algo::Generic>(tmp, *pscale, *pauxs[i%2]);
+            _A.template apply<Algo::Generic>(_tmp, *pauxs[(i-1)%2]);
+            pauxs[i%2]->template component_product<Algo::Generic>(_tmp, *_pscale, *pauxs[i%2]);
           }
         } // function apply
 
@@ -579,7 +575,7 @@ namespace FEAST
     /**
      * \brief ILU(p)-Preconditioner.
      *
-     * This class represents a dummy class for the ILU(p)-Preconditioner.
+     * This class represents a dummy class for the ILU(p)-Preconditioner \f$M = \tilde L \cdot \tilde U\f$.
      *
      * \author Christoph Lohmann
      */
@@ -592,7 +588,7 @@ namespace FEAST
     /**
      * \brief ILU(p)-Preconditioner for CSR-matrices.
      *
-     * This class specializes the ILU(p)-Preconditioner for CSR-matrices.
+     * This class specializes the ILU(p)-Preconditioner \f$M = \tilde L \cdot \tilde U\f$ for CSR-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -603,8 +599,8 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_> & A;
-      SparseMatrixCSR<Mem_, DT_> LU;
+      const SparseMatrixCSR<Mem_, DT_> & _A;
+      SparseMatrixCSR<Mem_, DT_> _LU;
 
     public:
       virtual ~ILUPreconditioner()
@@ -620,9 +616,9 @@ namespace FEAST
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
       ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const int p) :
-        A(A)
+        _A(A)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -630,7 +626,7 @@ namespace FEAST
         if (p == 0)
         {
           SparseMatrixCSR<Mem_, DT_> tLU(A.layout());
-          LU = tLU;
+          _LU = tLU;
 
           copy_entries(false);
         }
@@ -653,10 +649,10 @@ namespace FEAST
        * Creates a ILU preconditioner to the given LU-decomposition
        */
       ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & LU) :
-        A(LU),
-        LU(LU)
+        _A(LU),
+        _LU(LU)
       {
-        if (LU.columns() != LU.rows())
+        if (_LU.columns() != _LU.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -672,20 +668,20 @@ namespace FEAST
        */
       ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
                         const SparseLayout<Mem_, SparseMatrixCSR<Mem_, DT_>::LayoutType> & layout) :
-        A(A),
-        LU(layout)
+        _A(A),
+        _LU(layout)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (LU.columns() != LU.rows())
+        if (_LU.columns() != _LU.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (A.columns() != LU.columns())
+        if (_A.columns() != _LU.columns())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrices have different sizes!");
         }
@@ -718,10 +714,10 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pval(LU.val());
-        const Index * pcol_ind(LU.col_ind());
-        const Index * prow(LU.row_ptr());
-        const Index n(LU.rows());
+        const DT_ * pval(_LU.val());
+        const Index * pcol_ind(_LU.col_ind());
+        const Index * prow(_LU.row_ptr());
+        const Index n(_LU.rows());
 
         Index col;
 
@@ -732,7 +728,7 @@ namespace FEAST
           // iteration over all elements on the left side of the main-diagonal
           col = prow[i];
 
-          while(pcol_ind[col] < i)
+          while (pcol_ind[col] < i)
           {
             pout[i] -= pval[col] * pout[pcol_ind[col]];
             ++col;
@@ -748,7 +744,7 @@ namespace FEAST
           // iteration over all elements on the right side of the main-diagonal
           col = prow[i+1]-1;
 
-          while(pcol_ind[col] > i)
+          while (pcol_ind[col] > i)
           {
             pout[i] -= pval[col] * pout[pcol_ind[col]];
             --col;
@@ -764,14 +760,14 @@ namespace FEAST
       {
         /**
          * This algorithm has been adopted by
-         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/2014
          *    section 5.5.3; Algo 5.13.; page 132
          */
 
-        DT_ * plu(LU.val());
-        const Index * pcol(LU.col_ind());
-        const Index * prow(LU.row_ptr());
-        const Index n(LU.rows());
+        DT_ * plu(_LU.val());
+        const Index * pcol(_LU.col_ind());
+        const Index * prow(_LU.row_ptr());
+        const Index n(_LU.rows());
 
         // integer work array of length n
         //   for saving the position of the diagonal-entries
@@ -789,7 +785,7 @@ namespace FEAST
           // iteration over all elements on the left side of the main-diagonal
           // k -> \tilde a_{ik}
           Index k = row_start;
-          while(pcol[k] < i)
+          while (pcol[k] < i)
           {
             plu[k] /= plu[pw[pcol[k]]];
             Index m(pw[pcol[k]] + 1);
@@ -826,13 +822,13 @@ namespace FEAST
       {
         /**
          * This algorithm has been adopted by
-         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/2014
          *    section 5.5.6; Algo 5.19.; page 142
          */
 
-        const Index n(A.rows());
-        const Index * pacol(A.col_ind());
-        const Index * parow(A.row_ptr());
+        const Index n(_A.rows());
+        const Index * pacol(_A.col_ind());
+        const Index * parow(_A.row_ptr());
 
         // type of list-entries
         typedef std::pair<int, Index> PAIR_;
@@ -939,7 +935,7 @@ namespace FEAST
         }
 
         SparseMatrixCSR<Mem_, DT_> tLU(n, n, col_ind, val, row_ptr);
-        LU = tLU;
+        _LU = tLU;
 
         delete[] ll;
         delete[] pldiag;
@@ -949,9 +945,9 @@ namespace FEAST
       {
         if (check == false)
         {
-          DT_ * plu(LU.val());
-          const DT_ * pa(A.val());
-          const Index used_elements(LU.used_elements());
+          DT_ * plu(_LU.val());
+          const DT_ * pa(_A.val());
+          const Index used_elements(_LU.used_elements());
 
           // initialize LU array to A
           for (Index i(0); i < used_elements; ++i)
@@ -961,15 +957,15 @@ namespace FEAST
         }
         else
         {
-          DT_ * plu(LU.val());
-          const Index * plucol(LU.col_ind());
-          const Index * plurow(LU.row_ptr());
+          DT_ * plu(_LU.val());
+          const Index * plucol(_LU.col_ind());
+          const Index * plurow(_LU.row_ptr());
 
-          const DT_ * pa(A.val());
-          const Index * pacol(A.col_ind());
-          const Index * parow(A.row_ptr());
+          const DT_ * pa(_A.val());
+          const Index * pacol(_A.col_ind());
+          const Index * parow(_A.row_ptr());
 
-          const Index n(LU.rows());
+          const Index n(_LU.rows());
           Index k;
           // initialize LU array to A
           for (Index i(0); i < n; ++i)
@@ -998,7 +994,7 @@ namespace FEAST
     /**
      * \brief ILU(p)-Preconditioner for ELL-matrices.
      *
-     * This class specializes the ILU(p)-Preconditioner for ELL-matrices.
+     * This class specializes the ILU(p)-Preconditioner \f$M = \tilde L \cdot \tilde U\f$ for ELL-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -1009,8 +1005,8 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_> & A;
-      SparseMatrixELL<Mem_, DT_> LU;
+      const SparseMatrixELL<Mem_, DT_> & _A;
+      SparseMatrixELL<Mem_, DT_> _LU;
 
     public:
       virtual ~ILUPreconditioner()
@@ -1026,9 +1022,9 @@ namespace FEAST
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
       ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const int p) :
-        A(A)
+        _A(A)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -1036,7 +1032,7 @@ namespace FEAST
         if (p == 0)
         {
           SparseMatrixELL<Mem_, DT_> tLU(A.layout());
-          LU = tLU;
+          _LU = tLU;
 
           copy_entries(false);
         }
@@ -1059,10 +1055,10 @@ namespace FEAST
        * Creates a ILU preconditioner to the given LU-decomposition
        */
       ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & LU) :
-        A(LU),
-        LU(LU)
+        _A(LU),
+        _LU(LU)
       {
-        if (LU.columns() != LU.rows())
+        if (_LU.columns() != _LU.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -1078,20 +1074,20 @@ namespace FEAST
        */
       ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
                         const SparseLayout<Mem_, SparseMatrixELL<Mem_, DT_>::LayoutType> & layout) :
-        A(A),
-        LU(layout)
+        _A(A),
+        _LU(layout)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (LU.columns() != LU.rows())
+        if (_LU.columns() != _LU.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (A.columns() != LU.columns())
+        if (_A.columns() != _LU.columns())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrices have different sizes!");
         }
@@ -1125,12 +1121,11 @@ namespace FEAST
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pval(LU.Ax());
-        const Index * paj(LU.Aj());
-        const Index stride(LU.stride());
-        const Index * parl(LU.Arl());
-        const Index n(A.rows());
-
+        const DT_ * pval(_LU.Ax());
+        const Index * paj(_LU.Aj());
+        const Index * parl(_LU.Arl());
+        const Index stride(_LU.stride());
+        const Index n(_LU.rows());
 
         Index col;
 
@@ -1173,15 +1168,15 @@ namespace FEAST
       {
         /**
          * This algorithm has been adopted by
-         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/2014
          *    section 5.5.3; Algo 5.13.; page 132
          */
 
-        const Index n(A.rows());
-        DT_ * plu(LU.Ax());
-        const Index * pj(LU.Aj());
-        const Index * prl(LU.Arl());
-        const Index stride(LU.stride());
+        const Index n(_A.rows());
+        DT_ * plu(_LU.Ax());
+        const Index * pj(_LU.Aj());
+        const Index * prl(_LU.Arl());
+        const Index stride(_LU.stride());
 
         // integer work array of length n
         //   for saving the position of the diagonal-entries
@@ -1209,7 +1204,7 @@ namespace FEAST
                   m += stride;
                   break;
                 }
-                else if(pj[m] > pj[j])
+                else if (pj[m] > pj[j])
                 {
                   break;
                 }
@@ -1229,14 +1224,14 @@ namespace FEAST
       {
         /**
          * This algorithm has been adopted by
-         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/2014
          *    section 5.5.6; Algo 5.19.; page 142
          */
 
-        const Index n(A.rows());
-        const Index * paj(A.Aj());
-        const Index * parl(A.Arl());
-        const Index stride(A.stride());
+        const Index n(_A.rows());
+        const Index * paj(_A.Aj());
+        const Index * parl(_A.Arl());
+        const Index stride(_A.stride());
 
         // type of list-entries
         typedef std::pair<int, Index> PAIR_;
@@ -1323,11 +1318,11 @@ namespace FEAST
           nnz += Index(ll[i].size());
         }
 
-        DenseVector<Mem_, DT_> LUx(num_cols_per_row * stride);
-        DenseVector<Mem_, Index> LUj(num_cols_per_row * stride);
-        DenseVector<Mem_, Index> LUrl(n);
-        Index * pluj(LUj.elements());
-        Index * plurl(LUrl.elements());
+        DenseVector<Mem_, DT_> lux(num_cols_per_row * stride);
+        DenseVector<Mem_, Index> luj(num_cols_per_row * stride);
+        DenseVector<Mem_, Index> lurl(n);
+        Index * pluj(luj.elements());
+        Index * plurl(lurl.elements());
 
         Index used_elements(nnz);
         Index k1(0);
@@ -1343,8 +1338,8 @@ namespace FEAST
         }
 
         SparseMatrixELL<Mem_, DT_> tLU(n, n, stride, num_cols_per_row,
-                                       used_elements, LUx, LUj , LUrl);
-        LU = tLU;
+                                       used_elements, lux, luj , lurl);
+        _LU = tLU;
 
         delete[] ll;
         delete[] pldiag;
@@ -1354,9 +1349,9 @@ namespace FEAST
       {
         if (check == false)
         {
-          DT_ * plu(LU.Ax());
-          const DT_ * pa(A.Ax());
-          const Index data_length(LU.stride() * LU.num_cols_per_row());
+          DT_ * plu(_LU.Ax());
+          const DT_ * pa(_A.Ax());
+          const Index data_length(_LU.stride() * _LU.num_cols_per_row());
 
           // initialize LU array to A
           for (Index i(0); i < data_length; ++i)
@@ -1366,16 +1361,16 @@ namespace FEAST
         }
         else
         {
-          DT_ * plu(LU.Ax());
-          const Index * pluj(LU.Aj());
-          const Index * plurl(LU.Arl());
+          DT_ * plu(_LU.Ax());
+          const Index * pluj(_LU.Aj());
+          const Index * plurl(_LU.Arl());
 
-          const DT_ * pa(A.Ax());
-          const Index * paj(A.Aj());
-          const Index * parl(A.Arl());
+          const DT_ * pa(_A.Ax());
+          const Index * paj(_A.Aj());
+          const Index * parl(_A.Arl());
+          const Index stride(_A.stride());
 
-          const Index n(LU.rows());
-          const Index stride(A.stride());
+          const Index n(_A.rows());
 
           Index k, ctr;
 
@@ -1409,7 +1404,7 @@ namespace FEAST
     /**
      * \brief ILU(p)-Preconditioner for COO-matrices.
      *
-     * This class specializes the ILU(p)-Preconditioner for COO-matrices.
+     * This class specializes the ILU(p)-Preconditioner \f$M = \tilde L \cdot \tilde U\f$ for COO-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -1481,7 +1476,7 @@ namespace FEAST
     /**
      * \brief SOR-Preconditioner.
      *
-     * This class represents a dummy class for the SOR-Preconditioner.
+     * This class represents a dummy class for the SOR-Preconditioner \f$ \frac 1 \omega (D + \omega L)\f$.
      *
      * \author Christoph Lohmann
      */
@@ -1494,7 +1489,7 @@ namespace FEAST
     /**
      * \brief SOR-Preconditioner for CSR-matrices.
      *
-     * This class specializes the SOR-Preconditioner for CSR-matrices.
+     * This class specializes the SOR-Preconditioner \f$ \frac 1 \omega (D + \omega L)\f$ for CSR-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -1505,7 +1500,7 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_> & A;
+      const SparseMatrixCSR<Mem_, DT_> & _A;
       const DT_ _omega;
 
     public:
@@ -1521,11 +1516,11 @@ namespace FEAST
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
-                        DT_ omega = DT_(0.7)) :
-        A(A),
+                        const DT_ omega = DT_(0.7)) :
+        _A(A),
         _omega(omega)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -1551,30 +1546,32 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pa_val(A.val());
-        const Index * pa_col_ind(A.col_ind());
-        const Index * pa_row(A.row_ptr());
+        const DT_ * pval(_A.val());
+        const Index * pcol_ind(_A.col_ind());
+        const Index * prow(_A.row_ptr());
+        const Index n(_A.rows());
 
-        Index row;
+        Index col;
 
+        // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < A.rows(); ++i)
+        for (Index i(0); i < n; ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
-          row = pa_row[i];
+          col = prow[i];
 
-          while(pa_col_ind[row] < i)
+          while (pcol_ind[col] < i)
           {
-            pout[i] -= _omega * pa_val[row] * pout[pa_col_ind[row]];
-            ++row;
+            pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
+            ++col;
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pa_val[row];
+          pout[i] /= pval[col];
         }
 
         out.template scale<Algo::Generic>(out, DT_(1.0) / _omega);
@@ -1585,8 +1582,8 @@ namespace FEAST
     /**
      * \brief SOR-Preconditioner for COO-matrices.
      *
-     * This class specializes the SOR-Preconditioner for COO-matrices.
-     *
+     * This class specializes the SOR-Preconditioner \f$ \frac 1 \omega (D + \omega L)\f$ for COO-matrices.
+     *(
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_>
@@ -1596,7 +1593,7 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixCOO<Mem_, DT_> & A;
+      const SparseMatrixCOO<Mem_, DT_> & _A;
       const DT_ _omega;
 
     public:
@@ -1612,11 +1609,11 @@ namespace FEAST
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A,
-                        DT_ omega = DT_(0.7)) :
-        A(A),
+                        const DT_ omega = DT_(0.7)) :
+        _A(A),
         _omega(omega)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -1642,37 +1639,35 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pa_val(A.val());
-        const Index * pa_column(A.column());
-        const Index * pa_row(A.row());
+        const DT_ * pval(_A.val());
+        const Index * pcol(_A.column());
+        const Index * prow(_A.row());
+        const Index n(_A.rows());
 
-        Index row(0);
+        Index col(0);
 
-        // Notice, that the elements of A are sorted by the column.
-        // So we can solve the system with only one iteration over the data-array
-
+        // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < A.rows(); ++i)
+        for (Index i(0); i < n; ++i)
         {
-          // go to the i-th column of A
-          while (pa_row[row] < i)
+          // iteration over all elements on the left side of the main-diagonal
+          while (prow[col] < i)
           {
-            ++row;
+            ++col;
           }
 
-          // iteration over all elements on the left side of the main-diagonal
-          while (pa_column[row] < i)
+          while (pcol[col] < i)
           {
-            pout[i] -= _omega * pa_val[row] * out(pa_column[row]);
-            ++row;
+            pout[i] -= _omega * pval[col] * pout[pcol[col]];
+            ++col;
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pa_val[row];
+          pout[i] /= pval[col];
         }
 
         out.template scale<Algo::Generic>(out, DT_(1.0) / _omega);
@@ -1683,7 +1678,7 @@ namespace FEAST
     /**
      * \brief SOR-Preconditioner for ELL-matrices.
      *
-     * This class specializes the SOR-Preconditioner for ELL-matrices.
+     * This class specializes the SOR-Preconditioner \f$ \frac 1 \omega (D + \omega L)\f$ for ELL-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -1694,7 +1689,7 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_> & A;
+      const SparseMatrixELL<Mem_, DT_> & _A;
       const DT_ _omega;
 
     public:
@@ -1710,11 +1705,11 @@ namespace FEAST
        * Creates a SOR preconditioner to the given matrix and parameter
        */
       SORPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
-                        DT_ omega = DT_(0.7)) :
-        A(A),
+                        const DT_ omega = DT_(0.7)) :
+        _A(A),
         _omega(omega)
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -1740,30 +1735,33 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pa_val(A.Ax());
-        const Index * paj(A.Aj());
+        const DT_ * pval(_A.Ax());
+        const Index * paj(_A.Aj());
+        const Index stride(_A.stride());
+        const Index n(_A.rows());
 
-        Index row;
-        const Index stride(A.stride());
 
+        Index col;
+
+        // __forward-insertion__
         // iteration over all rows
-        for (Index i(0); i < A.rows(); ++i)
+        for (Index i(0); i < n; ++i)
         {
           // iteration over all elements on the left side of the main-diagonal
-          row = i;
+          col = i;
 
-          while(paj[row] < i)
+          while (paj[col] < i)
           {
-            pout[i] -= _omega * pa_val[row] * pout[paj[row]];
-            row += stride;
+            pout[i] -= _omega * pval[col] * pout[paj[col]];
+            col += stride;
           }
 
           // divide by the element on the main-diagonal
-          pout[i] /= pa_val[row];
+          pout[i] /= pval[col];
         }
 
         out.template scale<Algo::Generic>(out, DT_(1.0) / _omega);
@@ -1772,22 +1770,9 @@ namespace FEAST
 
 
     /**
-     * \brief SPAI-Preconditioner.
-     *
-     * This class represents a dummy class for the SPAI-Preconditioner.
-     *
-     * \author Christoph Lohmann
-     */
-    template <typename Algo_, typename MT_, typename VT_>
-    class SPAIPreconditioner : public Preconditioner<Algo_, MT_, VT_>
-    {
-    };
-
-
-    /**
      * \brief SSOR-Preconditioner.
      *
-     * This class represents a dummy class for the SSOR-Preconditioner.
+     * This class represents a dummy class for the SSOR-Preconditioner \f$ \frac 1 {\omega (2 - \omega)} (D + \omega L) D^{-1} (D + \omega R)\f$.
      *
      * \author Christoph Lohmann
      */
@@ -1800,7 +1785,7 @@ namespace FEAST
     /**
      * \brief SSOR-Preconditioner for CSR-matrices.
      *
-     * This class specializes the SSOR-Preconditioner for CSR-matrices.
+     * This class specializes the SSOR-Preconditioner \f$ \frac 1 {\omega (2 - \omega)} (D + \omega L) D^{-1} (D + \omega R)\f$ for CSR-matrices.
      *
      * \author Christoph Lohmann
      */
@@ -1811,10 +1796,9 @@ namespace FEAST
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixCSR<Mem_, DT_> & A;
+      const SparseMatrixCSR<Mem_, DT_> & _A;
       const DT_ _omega;
       DenseVector<Mem_, DT_> _diag;
-
 
     public:
       virtual ~SSORPreconditioner()
@@ -1829,11 +1813,11 @@ namespace FEAST
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
       SSORPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
-        A(A),
+        _A(A),
         _omega(omega),
         _diag(A.rows())
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -1843,11 +1827,11 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
         }
 
-        const Index n(A.rows());
+        const Index n(_A.rows());
 
         for (Index i(0) ; i < n ; ++i)
         {
-          _diag(i, A(i, i));
+          _diag(i, _A(i, i));
         }
       }
 
@@ -1871,14 +1855,14 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pval(A.val());
-        const Index * pcol_ind(A.col_ind());
-        const Index * prow(A.row_ptr());
-        const Index n(A.rows());
+        const DT_ * pval(_A.val());
+        const Index * pcol_ind(_A.col_ind());
+        const Index * prow(_A.row_ptr());
+        const Index n(_A.rows());
 
         Index col;
 
@@ -1889,7 +1873,7 @@ namespace FEAST
           // iteration over all elements on the left side of the main-diagonal
           col = prow[i];
 
-          while(pcol_ind[col] < i)
+          while (pcol_ind[col] < i)
           {
             pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
             ++col;
@@ -1910,7 +1894,7 @@ namespace FEAST
           // iteration over all elements on the right side of the main-diagonal
           col = prow[i+1]-1;
 
-          while(pcol_ind[col] > i)
+          while (pcol_ind[col] > i)
           {
             pout[i] -= _omega * pval[col] * pout[pcol_ind[col]];
             --col;
@@ -1926,20 +1910,20 @@ namespace FEAST
 
 
     /**
-     * \brief SSOR-Preconditioner for ELL-matrices.
+     * \brief SSOR-Preconditioner for COO-matrices.
      *
-     * This class specializes the SSOR-Preconditioner for ELL-matrices.
+     * This class specializes the SSOR-Preconditioner \f$ \frac 1 {\omega (2 - \omega)} (D + \omega L) D^{-1} (D + \omega R)\f$ for COO-matrices.
      *
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+    class SSORPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
                              DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
                               DenseVector<Mem_, DT_> >
     {
     private:
-      const SparseMatrixELL<Mem_, DT_> & A;
+      const SparseMatrixCOO<Mem_, DT_> & _A;
       const DT_ _omega;
       DenseVector<Mem_, DT_> _diag;
 
@@ -1955,12 +1939,12 @@ namespace FEAST
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
        */
-      SSORPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
-        A(A),
+      SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
+        _A(A),
         _omega(omega),
         _diag(A.rows())
       {
-        if (A.columns() != A.rows())
+        if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
@@ -1970,11 +1954,11 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
         }
 
-        const Index n(A.rows());
+        const Index n(_A.rows());
 
         for (Index i(0) ; i < n ; ++i)
         {
-          _diag(i, A(i, i));
+          _diag(i, _A(i, i));
         }
       }
 
@@ -1998,15 +1982,150 @@ namespace FEAST
                          const DenseVector<Mem_, DT_> & in)
       {
         // copy in-vector to out-vector
-        copy(out, in);
+        out.copy(in);
 
         // create pointers
         DT_ * pout(out.elements());
-        const DT_ * pval(A.Ax());
-        const Index * paj(A.Aj());
-        const Index stride(A.stride());
-        const Index * parl(A.Arl());
-        const Index n(A.rows());
+        const DT_ * pval(_A.val());
+        const Index * pcol(_A.column());
+        const Index * prow(_A.row());
+        const Index n(_A.rows());
+
+        Index col(0);
+
+        // __forward-insertion__
+        // iteration over all rows
+        for (Index i(0); i < n; ++i)
+        {
+          // iteration over all elements on the left side of the main-diagonal
+          while (prow[col] < i)
+          {
+            ++col;
+          }
+
+          while (pcol[col] < i)
+          {
+            pout[i] -= _omega * pval[col] * pout[pcol[col]];
+            ++col;
+          }
+
+          // divide by the element on the main-diagonal
+          pout[i] /= pval[col];
+        }
+
+        out.template component_product<Algo::Generic>(_diag, in);
+
+        // __backward-insertion__
+        // iteration over all rows
+        col = _A.used_elements() - 1;
+        for (Index i(n); i > 0;)
+        {
+          --i;
+
+          // iteration over all elements on the right side of the main-diagonal
+          while (prow[col] > i)
+          {
+            --col;
+          }
+
+          while (pcol[col] > i)
+          {
+            pout[i] -= _omega * pval[col] * pout[pcol[col]];
+            --col;
+          }
+
+          // divide by the element on the main-diagonal
+          pout[i] /= pval[col];
+        }
+
+        out.template scale<Algo::Generic>(out, DT_(1.0) / (_omega * (DT_(2.0) - _omega)));
+      } // function apply
+    };
+
+
+    /**
+     * \brief SSOR-Preconditioner for ELL-matrices.
+     *
+     * This class specializes the SSOR-Preconditioner \f$ \frac 1 {\omega (2 - \omega)} (D + \omega L) D^{-1} (D + \omega R)\f$ for ELL-matrices.
+     *
+     * \author Christoph Lohmann
+     */
+    template <typename Mem_, typename DT_>
+    class SSORPreconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                             DenseVector<Mem_, DT_> >
+      : public Preconditioner<Algo::Generic, SparseMatrixELL<Mem_, DT_>,
+                              DenseVector<Mem_, DT_> >
+    {
+    private:
+      const SparseMatrixELL<Mem_, DT_> & _A;
+      const DT_ _omega;
+      DenseVector<Mem_, DT_> _diag;
+
+    public:
+      virtual ~SSORPreconditioner()
+      {
+      }
+      /**
+       * \brief Constructor
+       *
+       * param[in] A The system-matrix
+       * param[in] omega A parameter of the preconditioner (default omega = 1.3)
+       *
+       * Creates a SSOR preconditioner to the given matrix and parameter
+       */
+      SSORPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
+        _A(A),
+        _omega(omega),
+        _diag(A.rows())
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+
+        if (Math::abs(_omega - DT_(2.0)) < 1e-10)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "omega too close to 2!");
+        }
+
+        const Index n(_A.rows());
+
+        for (Index i(0) ; i < n ; ++i)
+        {
+          _diag(i, _A(i, i));
+        }
+      }
+
+      /**
+       * \brief Returns a descriptive string.
+       *
+       * \returns A string describing the container.
+       */
+      static String type_name()
+      {
+        return "SSOR_Preconditioner";
+      }
+
+      /**
+       * \brief apply the preconditioner
+       *
+       * \param[out] out The preconditioner result.
+       * \param[in] in The vector to be preconditioned.
+       */
+      virtual void apply(DenseVector<Mem_, DT_> & out,
+                         const DenseVector<Mem_, DT_> & in)
+      {
+        // copy in-vector to out-vector
+        out.copy(in);
+
+        // create pointers
+        DT_ * pout(out.elements());
+        const DT_ * pval(_A.Ax());
+        const Index * paj(_A.Aj());
+        const Index stride(_A.stride());
+        const Index * parl(_A.Arl());
+
+        const Index n(_A.rows());
 
 
         Index col;
@@ -2055,37 +2174,165 @@ namespace FEAST
 
 
     /**
-     * \brief SSOR-Preconditioner for COO-matrices.
+     * \brief SPAI-Preconditioner.
      *
-     * This class specializes the SSOR-Preconditioner for COO-matrices.
+
+     * This class represents the SPAI-Preconditioner \f$M \approx A^{-1}\f$.
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_>
-    class SSORPreconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                             DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCOO<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
+    template <typename Algo_, typename MT_, typename VT_>
+    class SPAIPreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     private:
-      SSORPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                         DenseVector<Mem_, DT_> > _precond;
+      typedef typename MT_::DataType DT_;
+      typedef typename MT_::MemType Mem_;
+      typedef std::pair<DT_, Index> PAIR_;
+
+      const MT_ & _A;
+      const SparseLayout<Mem_, MT_::LayoutType> &_layout;
+      SparseMatrixCSR<Mem_, DT_> _M;
+      std::list<PAIR_> * m_columns;
+
+      const DT_ _eps_res;
+      const Index _fill_in;
+      const Index _max_iter;
+      const DT_ _eps_res_comp;
+      const DT_ _max_rho;
+
     public:
-      virtual ~SSORPreconditioner()
+      virtual ~SPAIPreconditioner()
       {
       }
+
       /**
        * \brief Constructor
        *
-       * param[in] A The system-matrix
-       * param[in] omega A parameter of the preconditioner (default omega = 1.3)
+       * param[in] A system-matrix
+       * param[in] m full band-matrix with m diagonals on either side as initial layout (\f$2m + 1\f$ bands)
+       * param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
+       * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
+       * param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
+       * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
+       * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
        *
-       * Creates a SSOR preconditioner to the given matrix and parameter
+       * Creates a SPAI preconditioner to the given matrix and the initial layout defined by a band-matrix with \f$2m + 1\f$ bands
        */
-      SSORPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const DT_ omega = DT_(1.3)) :
-        _precond(SparseMatrixCSR<Mem_, DT_> (A), omega)
+      SPAIPreconditioner(const MT_ & A,
+                         const Index m,
+                         const DT_ eps_res = 1e-2, const Index fill_in = 10, const Index max_iter = 10,
+                         const DT_ eps_res_comp = 1e-3, const DT_ max_rho = 1e-3) :
+        _A(A),
+        _layout(std::move(_A.layout())),
+        _eps_res(eps_res),
+        _fill_in(fill_in),
+        _max_iter(max_iter),
+        _eps_res_comp(eps_res_comp),
+        _max_rho(max_rho)
       {
-      }
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+
+        const Index n(_A.columns());
+        m_columns = new std::list<PAIR_>[n];
+
+        // 1. __get initial structure of the j-th column of M__
+        for (Index i(0); i < n; ++i)
+        {
+          for (Index l((m > i) ? 0 : i - m); l < Math::min(n, m + i + 1); ++l)
+          {
+            m_columns[i].emplace_back(DT_(0.0), l);
+          }
+        }
+
+        create_M();
+      } // constructor
+
+      /**
+       * \brief Constructor
+       *
+       * param[in] A system-matrix
+       * param[in] layout the initial layout of the approximate inverse \f$M \approx A^{-1}\f$
+       * param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
+       * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
+       * param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
+       * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
+       * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
+       *
+       * Creates a SPAI preconditioner to the given matrix and given initial layout
+       */
+      SPAIPreconditioner(const MT_ & A,
+                         const SparseLayout<Mem_, MT_::LayoutType> & layout,
+                         const DT_ eps_res = 1e-2, const Index fill_in = 10, const Index max_iter = 10,
+                         const DT_ eps_res_comp = 1e-3, const DT_ max_rho = 1e-3) :
+        _A(A),
+        _layout(layout),
+        _eps_res(eps_res),
+        _fill_in(fill_in),
+        _max_iter(max_iter),
+        _eps_res_comp(eps_res_comp),
+        _max_rho(max_rho)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+        if (_layout.get_scalar_index().at(1) != _layout.get_scalar_index().at(2))
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Precon-layout is not square!");
+        }
+        if (_A.columns() != _layout.get_scalar_index().at(1))
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Precon-layout and matrix do not match!");
+        }
+
+        const Index n(_A.columns());
+        m_columns = new std::list<PAIR_>[n];
+
+        // 1. __get initial structure of the j-th column of M__
+        if (typeid(MT_) == typeid(SparseMatrixCSR<Mem_, DT_>))
+        {
+          const Index * playoutcol(_layout.get_indices().at(0));
+          const Index * playoutrow(_layout.get_indices().at(1));
+
+          for (Index i(0); i < n; ++i)
+          {
+            for (Index l(playoutrow[i]); l < playoutrow[i + 1]; ++l)
+            {
+              m_columns[playoutcol[l]].emplace_back(DT_(0.0), i);
+            }
+          }
+        }
+        else if (typeid(MT_) == typeid(SparseMatrixELL<Mem_, DT_>))
+        {
+          const Index * playoutj(_layout.get_indices().at(0));
+          const Index * playoutrl(_layout.get_indices().at(1));
+          const Index stride(_layout.get_scalar_index().at(3));
+
+          for (Index i(0); i < n; ++i)
+          {
+            for (Index l(i); l < i + playoutrl[i] * stride; l += stride)
+            {
+              m_columns[playoutj[l]].emplace_back(DT_(0.0), i);
+            }
+          }
+        }
+        else if (typeid(MT_) == typeid(SparseMatrixCOO<Mem_, DT_>))
+        {
+          const Index * playoutcol(_layout.get_indices().at(1));
+          const Index * playoutrow(_layout.get_indices().at(0));
+          const Index used_elements(_layout.get_scalar_index().at(3));
+
+          for (Index i(0); i < used_elements; ++i)
+          {
+            m_columns[playoutcol[i]].emplace_back(DT_(0.0), playoutrow[i]);
+          }
+        }
+
+        create_M();
+      } // constructor
 
       /**
        * \brief Returns a descriptive string.
@@ -2094,118 +2341,69 @@ namespace FEAST
        */
       static String type_name()
       {
-        return "SSOR_Preconditioner";
+        return "SPAI_Preconditioner";
       }
 
       /**
        * \brief apply the preconditioner
        *
        * \param[out] out The preconditioner result.
-       * \param[in] in The vector to be preconditioned.
+       * \param[in] in The vector, which is applied to the preconditioning
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
                          const DenseVector<Mem_, DT_> & in)
       {
-        _precond.apply(out, in); // TODO: Warum geht das hier auf einmal nicht mehr? Segmentation fault
+        if (in.elements() == out.elements())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Input- and output-vectors must be different!");
+        }
+
+        const Index n(_M.rows());
+        const Index * pmcol(_M.col_ind());
+        const Index * pmrow(_M.row_ptr());
+        const DT_ * pm(_M.val());
+        const DT_ * pin(in.elements());
+        DT_ * pout(out.elements());
+
+        for (Index i(0); i < n; i++)
+        {
+          pout[i] = DT_(0.0);
+        }
+
+        for (Index i(0); i < n; i++)
+        {
+          for (Index c(pmrow[i]); c < pmrow[i + 1]; c++)
+          {
+            pout[pmcol[c]] += pm[c] * pin[i];
+          }
+        }
       }
-    };
 
-
-    /**
-     * \brief SPAI-Preconditioner for CSR-matrices.
-     *
-     * This class specializes the SPAI-Preconditioner for CSR-matrices.
-     *
-     * \author Christoph Lohmann
-     */
-    template <typename Mem_, typename DT_>
-    class SPAIPreconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                             DenseVector<Mem_, DT_> >
-      : public Preconditioner<Algo::Generic, SparseMatrixCSR<Mem_, DT_>,
-                              DenseVector<Mem_, DT_> >
-    {
     private:
-      const SparseMatrixCSR<Mem_, DT_> & A;
-      const SparseLayout<SparseMatrixCSR<Mem::Main, bool> > &layout;
-      SparseMatrixCSR<Mem_, DT_> M;
-
-      const DT_ _eps_res;
-      const Index _fill_in;
-      const Index _max_iter;
-      const DT_ _eps_res_comp;
-      const DT_ _max_rho;
-      const bool _column_structure;
-
-    public:
-      virtual ~SPAIPreconditioner()
+      void create_M()
       {
-      }
-      /**
-       * \brief Constructor
-       *
-       * param[in] A system-matrix
-       * param[in] layout the initial layout of the approximate inverse \f$M \approx A^{-1}\f$
-       * param[in] eps_res stopping-criterion for new fill-in: norm of residuum
-       * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column
-       * param[in] max_iter maximal number of iterations for creating new fill-in
-       * param[in] eps_res_comp criterion for accepting a residual-component
-       * param[in] max_rho criterion for acceptiong a rho-component
-       *
-       * Creates a SPAI preconditioner to the given matrix
-       */
-      SPAIPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
-                         const SparseLayout<SparseMatrixCSR<Mem::Main, bool> > & layout,
-                         DT_ eps_res = 1e6, Index fill_in = 10, Index max_iter = 10,
-                         DT_ eps_res_comp = 1e-6, DT_ max_rho = 1e-4,
-                         bool column_structure = false) :
-        A(A),
-        layout(layout),
-        _eps_res(eps_res),
-        _fill_in(fill_in),
-        _max_iter(max_iter),
-        _eps_res_comp(eps_res_comp),
-        _max_rho(max_rho),
-        _column_structure(column_structure)
-      {
-        if (A.columns() != A.rows())
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
-        }
-        if (layout._scalar_index[1] != layout._scalar_index[2])
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Precon-layout is not square!");
-        }
-        if (A.columns() != layout._scalar_index[1])
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Precon-layout and matrix do not match!");
-        }
-
         /**
          * This algorithm has been adopted by
-         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/1014
+         *    Dominik Goeddeke - Schnelle Loeser (Vorlesungsskript) 2013/2014
          *    section 5.6.1; Algo 5.21.; page 154
          */
 
-        Index n(A.rows());
-        const Index * pacol(A.col_ind());
-        const Index * parow(A.row_ptr());
-        const DT_ * pa(A.val());
-
-        const Index * playoutcol(layout._indices[0]);
-        const Index * playoutrow(layout._indices[1]);
-
-        // type of list-entries
-        typedef std::pair<DT_, Index> PAIR_;
+        Index n(_A.rows());
+        Index mm, nn, mm_new, nn_new;
+        DT_ res;
+        std::vector<DT_> d(0);
 
         std::vector<std::list<PAIR_> > a_columnwise(n);
-        std::list<PAIR_> * m_columns = new std::list<PAIR_>[n];
 
-        typename std::list<PAIR_>::iterator it_I, it_J;
+        typename std::list<PAIR_>::iterator it_I, it_J, it_I_end, it_J_end;
 
-
-        if (_column_structure == true)
+        // __create column-structure of matrix A__
+        if (typeid(MT_) == typeid(SparseMatrixCSR<Mem_, DT_>))
         {
-          // 0. __create column-structure of matrix A__
+          const Index * pacol(_A.get_indices().at(0));
+          const Index * parow(_A.get_indices().at(1));
+          const DT_ * pa(_A.get_elements().at(0));
+
           for (Index i(0); i < n; ++i)
           {
             for (Index l(parow[i]); l < parow[i + 1]; ++l)
@@ -2214,493 +2412,116 @@ namespace FEAST
             }
           }
         }
+        else if (typeid(MT_) == typeid(SparseMatrixELL<Mem_, DT_>))
+        {
+          const DT_ * pval(_A.get_elements().at(0));
+          const Index * paj(_A.get_indices().at(0));
+          const Index * parl(_A.get_indices().at(1));
+          const Index stride(_A.get_scalar_index().at(3));
+
+          for (Index i(0); i < n; ++i)
+          {
+            for (Index l(i); l < i + parl[i] * stride; l += stride)
+            {
+              a_columnwise[paj[l]].emplace_back(pval[l], i);
+            }
+          }
+        }
+        else if (typeid(MT_) == typeid(SparseMatrixCOO<Mem_, DT_>))
+        {
+          const DT_ * pa(_A.get_elements().at(0));
+          const Index * pacol(_A.get_indices().at(1));
+          const Index * parow(_A.get_indices().at(0));
+          const Index used_elements(_A.get_scalar_index().at(3));
+
+          for (Index i(0); i < used_elements; ++i)
+          {
+            a_columnwise[pacol[i]].emplace_back(pa[i], parow[i]);
+          }
+        }
 
         // Iteration over each row of \f$M \approx A^{-1}\f$
         for (Index k = 0; k < n; ++k)
         {
+          nn = 0;
+          mm = 0;
+
           // Allocate memory for indices I and J of the algorithms
           // J saves the entries of the matrix \f$M \approx A^{-1}\f$, too,
           // I saves the residual \f$r_k\f$, too.
-          // TODO: Speichern des Residuums in I nicht zwingend noetig.
           std::list<PAIR_> & J (m_columns[k]);
           std::list<PAIR_> I;
 
-          // 1. __get initial structure of the j-th column of M__
-          // Iteration over each row of A to get the initial layout of the k-th column of M
-          for (Index row = 0; row < n; ++row)
-          {
-            Index i = playoutrow[row];
-
-            while (playoutcol[i] < k && i < playoutrow[row + 1] - 1)
-            {
-              ++i;
-            }
-
-            if (playoutcol[i] == k)
-            {
-              J.emplace_back(DT_(0.0), row);
-            }
-          }
+          it_I_end = I.begin();
+          it_J_end = J.begin();
 
           // save size of J
-          Index nn = Index(J.size());
+          nn_new = Index(J.size());
 
-          // 2. __get row-indices I of matching matrix-entries__
-          if (_column_structure == true)
+          // __get row-indices I of matching matrix-entries__
+          for (it_J = J.begin(); it_J != J.end(); ++it_J)
           {
-            for (it_J = J.begin(); it_J != J.end(); ++it_J)
+            Index col = it_J->second;
+            it_I = I.begin();
+            for (auto it_col = a_columnwise[col].begin();
+                 it_col != a_columnwise[col].end(); ++it_col)
             {
-              Index col = it_J->second;
-              it_I = I.begin();
-              for(auto it_col = a_columnwise[col].begin();
-                  it_col != a_columnwise[col].end(); ++it_col)
+              Index row = it_col->second;
+              while (it_I != I.end() && it_I->second < row)
               {
-                Index row = it_col->second;
-                while (it_I != I.end() && it_I->second < row)
-                {
-                  ++it_I;
-                }
-                if (it_I == I.end() || it_I->second != row)
-                {
-                  I.emplace(it_I, DT_(0.0), row);
-                }
+                ++it_I;
               }
-            }
-          }
-          else
-          {
-            // Iteration over each row of A to get row-indices I matching to J
-            for (Index i(0); i < n; ++i)
-            {
-              it_J = J.begin();
-              for (Index l(parow[i]); l < parow[i + 1]; ++l)
+              if (it_I == I.end() || it_I->second != row)
               {
-                while (it_J != J.end() && it_J->second < pacol[l])
-                {
-                  ++it_J;
-                }
-
-                if (it_J != J.end() && it_J->second == pacol[l])
-                {
-                  I.emplace_back(DT_(0.0), i);
-                  break;
-                }
-
-                if (it_J == J.end())
-                {
-                  break;
-                }
+                I.emplace(it_I, DT_(0.0), row);
               }
             }
           }
 
           // save size of I
-          Index mm = Index(I.size());
+          mm_new = Index(I.size());
 
-          // allocate dynamic matrix for saving the transped matrices \f$QR(I,J)^\top\f$ and \f$A(I,J)^\top\f$
-          // TODO: Matrix local koennte noch entfernt werden; Mat-Vec-Mult kann mit QR durchgefuehrt werden
-          std::vector<std::vector<DT_> > local(nn, std::vector<DT_>(mm));
-          std::vector<std::vector<DT_> > qr(nn, std::vector<DT_>(mm));
-
-          // fill temporary matrix local with entries of A(I,J)
-          if (_column_structure == true)
+          // save sorted list of I
+          std::list<std::pair<Index, Index> > I_sorted(I.size());
+          auto it = I_sorted.begin();
+          auto it_I = I.begin();
+          for (Index i(0); i < mm_new; ++i, ++it, ++it_I)
           {
-            it_J = J.begin();
-            for (Index j(0); j < nn; ++j, ++it_J)
+            it->second = it_I->second;
+            it->first = i;
+          }
+
+          // allocate dynamic matrix for saving the transposed matrices \f$QR(I,J)^\top\f$ and \f$A(I,J)^\top\f$
+          std::vector<std::vector<DT_> > qr;
+          std::vector<std::vector<DT_> > local;
+
+          // __While \f$res = \|r_k\| > eps\f$, the maximal number of iterations and fill-in is not reached, repeat...__
+          Index iter(0);
+          while (true)
+          {
+            // resize matrices qr and local
+            qr.resize(nn_new, std::vector<DT_>(mm_new, DT_(0.0)));
+            local.resize(nn_new, std::vector<DT_>(mm_new, DT_(0.0)));
+
+            // fill temporary matrix qr and local with entries of A(I,J)
+            it_J = ((it_J_end == J.begin()) ? J.begin() : std::next(it_J_end));
+            for (Index j(nn); j < nn_new; ++j, ++it_J)
             {
               Index col = it_J->second;
-              it_I = I.begin();
-              Index i = 0;
-              for(auto it_col = a_columnwise[col].begin();
-                  it_col != a_columnwise[col].end(); ++it_col)
+              it = I_sorted.begin();
+              for (auto it_col = a_columnwise[col].begin();
+                   it_col != a_columnwise[col].end(); ++it_col)
               {
-                while (it_I->second < it_col->second)
+                while (it->second < it_col->second)
                 {
-                  qr[j][i] = DT_(0.0);
-                  local[j][i] = DT_(0.0);
-                  ++it_I;
-                  ++i;
+                  ++it;
                 }
-                qr[j][i] = it_col->first;
-                local[j][i] = it_col->first;
-                ++it_I;
-                ++i;
-              }
-              while (i < mm)
-              {
-                qr[j][i] = DT_(0.0);
-                local[j][i] = DT_(0.0);
-                ++it_I;
-                ++i;
-              }
-            }
-          }
-          else
-          {
-            it_I = I.begin();
-            for (Index i(0); i < mm; ++i, ++it_I)
-            {
-              Index l = parow[it_I->second];
-              it_J = J.begin();
-              for (Index j(0); j < nn; ++j, ++it_J)
-              {
-                while (pacol[l] < it_J->second && l < parow[it_I->second + 1] - 1)
-                {
-                  ++l;
-                }
-                if (pacol[l] == it_J->second)
-                {
-                  qr[j][i] = pa[l];
-                  local[j][i] = pa[l];
-                  ++l;
-                }
-                else
-                {
-                  qr[j][i] = DT_(0.0);
-                  local[j][i] = DT_(0.0);
-                }
-              }
-            }
-          }
-
-          // 3. __calculate the QR-decomposition of \f$A(I,J)\f$
-          /**
-           * This algorithm has been adopted by
-           *    Walter Gander - Algorithms for the QR-Decomposition; April 1980 (paper)
-           *    page 12
-           */
-          // allocate dynamic vector for saving the diagonal entries of R
-          std::vector<DT_> d(nn);
-
-          for (Index j(0); j < nn; ++j)
-          {
-            DT_ s = DT_(0.0);
-            for (Index i(j); i < mm; ++i)
-            {
-              s += Math::sqr(qr[j][i]);
-            }
-            s = Math::sqrt(s);
-
-            if (qr[j][j] > 0)
-            {
-              d[j] = -s;
-            }
-            else
-            {
-              d[j] = s;
-            }
-
-            DT_ fak = Math::sqrt(s * (s + Math::abs(qr[j][j])));
-            qr[j][j] -= d[j];
-
-            for (Index l(j); l < mm; ++l)
-            {
-              qr[j][l] /= fak;
-            }
-
-            for (Index i(j + 1); i < nn; ++i)
-            {
-              DT_ s = DT_(0.0);
-              for (Index l = j; l < mm; ++l)
-              {
-                s += qr[j][l] * qr[i][l];
-              }
-              for (Index l(j); l < mm; ++l)
-              {
-                qr[i][l] -= qr[j][l] * s;
-              }
-            }
-          }
-
-          // 4.a __calculate m_k as the solution of the least-squares-problem \f$A(I,J)^\top \cdot A(I,J) \cdot m_k = A^T(I,J) \cdot e_k\f$__
-          // calculate \f$e_k\f$
-          // TODO: Wir koennten auf den Vektor e verzichten und direkt in J->first rechnen; dafuer sollte J ein Vektor sein
-          std::vector<DT_> e(mm);
-          it_I = I.begin();
-          for (Index i(0); i < mm; ++i, ++it_I)
-          {
-            if (it_I->second == k)
-            {
-              e[i] = DT_(1.0);
-              it_I->first = DT_(-1.0);
-            }
-            else
-            {
-              e[i] = DT_(0.0);
-              it_I->first = DT_(0.0);
-            }
-          }
-
-          // calculate \f$e_k = Q^T * e_k\f$
-          for (Index j(0); j < nn; ++j)
-          {
-            DT_ s = DT_(0.0);
-            for (Index l(j); l < mm; ++l)
-            {
-              s += qr[j][l] * e[l];
-            }
-            for (Index l(j); l < mm; ++l)
-            {
-              e[l] -= qr[j][l] * s;
-            }
-          }
-
-          // solve \f$R^{-1} e_k k= e_k\f$
-          for (Index i(nn); i > 0;)
-          {
-            --i;
-            for (Index j(i+1); j < nn; ++j)
-            {
-              e[i] -= qr[j][i] * e[j];
-            }
-            e[i] /= d[i];
-          }
-
-          // save values of e_k in J->first
-          it_J = J.begin();
-          for (Index j(0); j < nn; ++j, ++it_J)
-          {
-            it_J->first = e[j];
-          }
-
-          // 4.b __calculate the residual \f$r_k = A(I,J) \cdot J\to first - e_k\f$__
-          it_I = I.begin();
-          for (Index i(0); i < mm; ++i, ++it_I)
-          {
-            it_J = J.begin();
-            for (Index j(0); j < nn; ++j, ++it_J)
-            {
-              it_I->first += local[j][i] * it_J->first;
-            }
-          }
-
-          // 4.c __calculate the norm of the residual \f$res = \|r_k\|\f$
-          DT_ res(DT_(0.0));
-          for (it_I = I.begin(); it_I != I.end(); ++it_I)
-          {
-            res += Math::sqr(it_I->first);
-          }
-          res = Math::sqrt(res);
-
-          // sorted list of I
-          std::list<PAIR_> I_sorted(I);
-          I_sorted.emplace_back(DT_(0.0), n);
-
-          Index iter;
-          // 5. __While \f$res = \|r_k\| > eps\f$, the maximal number of iterations and fill-in is not reached, repeat...__
-          for (iter = 0; iter < _max_iter; ++iter)
-          {
-            // termination condition
-            if (res < _eps_res)
-            {
-              break;
-            }
-
-            // allocate memory for \f$ \rho \f$
-            std::vector<DT_> rho(mm, DT_(0.0));
-
-            // 5.a __Search indices \f$i \in I\f$ with \f$i \not\in J\f$ and \f$r_k(i) \not=0\f$ and calculate \f$\rho_i\f$__
-            // notice: if iter > 1 J is not sorted
-            it_I = I.begin();
-            for (Index i(0); i < mm; ++i, ++it_I)
-            {
-              it_J = J.begin();
-              while (it_J->second != it_I->second && std::next(it_J) != J.end())
-              {
-                ++it_J;
-              }
-
-              if (it_J->second != it_I->second && Math::abs(it_I->first) > _eps_res_comp)
-              {
-                if (_column_structure == true)
-                {
-                  DT_ s(DT_(0.0));
-                  for(auto it_col = a_columnwise[i].begin();
-                      it_col != a_columnwise[i].end(); ++it_col)
-                  {
-                    s += Math::sqr(it_col->first);
-                    auto it = I.begin();
-                    while(it->second != it_col->second && std::next(it) != I.end())
-                    {
-                      ++it;
-                    }
-                    if (it->second == it_col->second)
-                    {
-                      rho[i] += it->first * it_col->first;
-                    }
-                  }
-                  rho[i] = Math::sqr(res) - Math::sqr(rho[i]) / s;
-                }
-                else
-                {
-                  Index j;
-                  DT_ s(DT_(0.0));
-                  for (Index l(0); l < n; ++l)
-                  {
-                    j = parow[l];
-                    while (pacol[j] < i && j < parow[l+1] - 1)
-                    {
-                      ++j;
-                    }
-                    if (pacol[j] == i)
-                    {
-                      s += Math::sqr(pa[j]);
-                      auto it = I.begin();
-                      while (it->second != l && std::next(it) != I.end())
-                      {
-                        ++it;
-                      }
-                      if (it->second == l)
-                      {
-                        rho[i] += it->first * pa[j];
-                      }
-                    }
-                  }
-                  rho[i] = Math::sqr(res) - Math::sqr(rho[i]) / s;
-                }
+                qr[j][it->first] = it_col->first;
+                local[j][it->first] = it_col->first;
               }
             }
 
-            // save the iterators to the last entries of I and J
-            auto it_I_end = std::prev(I.end());
-            auto it_J_end = std::prev(J.end());
-
-            // 5.b __add promising entries of \f$ \tilde J \f$ to \f$ J \f$
-            // TODO: Auswahlkriterium ueberarbeiten
-            it_I = I.begin();
-            bool first = true;
-            for (Index i(0); i < mm; ++i, ++it_I)
-            {
-              if (rho[i] > _max_rho && J.size() < _fill_in)
-              {
-                if (first == true)
-                {
-                  J.emplace_back(DT_(0.0), it_I->second);
-                  first = false;
-                  it_J = std::next(it_J_end);
-                }
-                else
-                {
-                  if (it_J->second > it_I->second)
-                  {
-                    it_J = std::next(it_J_end);
-                  }
-                  while (it_J != J.end() && it_J->second < it_I->second)
-                  {
-                    ++it_J;
-                  }
-                  it_J = J.emplace(it_J, DT_(0.0), it_I->second);
-                }
-              }
-            }
-
-            // save new size of J
-            Index nn_new(Index(J.size()));
-
-            // we can stop if no new entries have been added
-            if (nn_new == nn)
-            {
-              break;
-            }
-
-            // calculate new indices \f$ \tilde I \f$
-            if (_column_structure == true)
-            {
-              for (it_J = std::next(it_J_end); it_J != J.end(); ++it_J)
-              {
-                Index col = it_J->second;
-                it_I = I_sorted.begin();
-                for(auto it_col = a_columnwise[col].begin();
-                    it_col != a_columnwise[col].end(); ++it_col)
-                {
-                  Index row = it_col->second;
-                  while (it_I != I_sorted.end() && it_I->second < row)
-                  {
-                    ++it_I;
-                  }
-                  if (it_I == I_sorted.end() || it_I->second != row)
-                  {
-                    I_sorted.emplace(it_I, DT_(0.0), row);
-                    auto it = std::next(it_I_end);
-                    while (it != I.end() && it->second < row)
-                    {
-                      ++it;
-                    }
-                    I.emplace(it, DT_(0.0), row);
-                  }
-                }
-              }
-            }
-            else
-            {
-              it_I = I_sorted.begin();
-              Index i(0);
-              for (it_I = I_sorted.begin(); it_I != I_sorted.end(); ++it_I)
-              {
-                for (; i < it_I->second; ++i)
-                {
-                  it_J = std::next(it_J_end);
-                  for (Index l(parow[i]); l < parow[i + 1]; ++l)
-                  {
-                    while (it_J != J.end() && it_J->second < pacol[l])
-                    {
-                      ++it_J;
-                    }
-
-                    if (it_J != J.end() && it_J->second == pacol[l])
-                    {
-                      I.emplace_back(DT_(0.0), i);
-                      I_sorted.emplace(it_I, DT_(0.0), i);
-                      break;
-                    }
-
-                    if (it_J == J.end())
-                    {
-                      break;
-                    }
-                  }
-                }
-                ++i;
-              }
-            }
-
-            // save new size of I
-            Index mm_new(Index(I.size()));
-
-            // resize matrices qr and local
-            // now the storage locations of qr and local are similar to an upper triangular matrix
-            for (Index j(nn); j < nn_new; ++j)
-            {
-              qr.push_back(std::vector<DT_>(mm_new));
-              local.push_back(std::vector<DT_>(mm_new));
-            }
-
-            // fill temporary matrices local and qr with entries of A(I,J)
-            it_I = I.begin();
-            for (Index i(0); i < mm_new; ++i, ++it_I)
-            {
-              Index l = parow[it_I->second];
-              it_J = std::next(it_J_end);
-              for (Index j(nn); j < nn_new; ++j, ++it_J)
-              {
-                while (pacol[l] < it_J->second && l < parow[it_I->second + 1] - 1)
-                {
-                  ++l;
-                }
-                if (pacol[l] == it_J->second)
-                {
-                  qr[j][i] = pa[l];
-                  local[j][i] = pa[l];
-                }
-                else
-                {
-                  qr[j][i] = DT_(0.0);
-                  local[j][i] = DT_(0.0);
-                }
-              }
-            }
-
-            // mulitply last rows of matrix qr with \f$Q^\top\f$
+            // mulitply last/new rows of matrix qr with \f$Q^\top\f$
             for (Index k(nn); k < nn_new; ++k)
             {
               // calculate \f$e_k = Q^\top \cdot e_k\f$
@@ -2718,13 +2539,10 @@ namespace FEAST
               }
             }
 
-            // 5.c __calculate the qr-decomposition of \f$A(\tilde I, \tilde J\f$__
+            // __calculate the qr-decomposition of \f$A(\tilde I, \tilde J\f$__
             // notice: we only have to calculate the qr-decomposition for the new columns \f$\tilde J \setminus J\f$
-            // resizethe dynamic vector for saving the diagonal entries of R
-            for (Index j(nn); j < nn_new; ++j)
-            {
-              d.push_back(DT_(0.0));
-            }
+            // resize the dynamic vector for saving the diagonal entries of R
+            d.resize(nn_new);
 
             for (Index j(nn); j < nn_new; ++j)
             {
@@ -2766,13 +2584,9 @@ namespace FEAST
               }
             }
 
-            // 5.d __calculate m_k as the solution of the least-squares-problem \f$A(I,J)^\top \cdot A(I,J) \cdot m_k = A^T(I,J) \cdot e_k\f$__
-            // TODO: Wir koennten auf den Vektor e verzichten und direkt in J->first rechnen; dafuer sollte J ein Vektor sein
+            // __calculate m_k as the solution of the least-squares-problem \f$A(I,J)^\top \cdot A(I,J) \cdot m_k = A^T(I,J) \cdot e_k\f$__
             // calculate \f$e_k\f$
-            for (Index j(mm); j < mm_new; ++j)
-            {
-              e.push_back(DT_(0.0));
-            }
+            std::vector<DT_> e(mm_new);
             it_I = I.begin();
             for (Index i(0); i < mm_new; ++i, ++it_I)
             {
@@ -2820,7 +2634,14 @@ namespace FEAST
               it_J->first = e[j];
             }
 
-            // 5.e __calculate the residual \f$r_k = A(I,J) \cdot J\to first - e_k\f$__
+            // termination condition
+            if (iter >= _max_iter)
+            {
+              break;
+            }
+            ++iter;
+
+            // __calculate the residual \f$r_k = A(I,J) \cdot J\to first - e_k\f$__
             it_J = J.begin();
             for (Index j(0); j < nn_new; ++j, ++it_J)
             {
@@ -2831,7 +2652,7 @@ namespace FEAST
               }
             }
 
-            // 5.f __calculate the norm of the residual \f$res = \|r_k\|\f$__
+            // __calculate the norm of the residual \f$res = \|r_k\|\f$
             res = DT_(0.0);
             for (it_I = I.begin(); it_I != I.end(); ++it_I)
             {
@@ -2842,6 +2663,161 @@ namespace FEAST
             // set old dimensions of I and J to the new one
             mm = mm_new;
             nn = nn_new;
+
+            // termination condition
+            if (res < _eps_res)
+            {
+              break;
+            }
+
+            // allocate memory for \f$ \rho \f$
+            std::vector<std::pair<DT_, Index> > rho(mm);
+
+            // __Search indices \f$i \in I\f$ with \f$i \not\in J\f$ and \f$r_k(i) \not=0\f$ and calculate \f$\rho_i\f$__
+            // notice: if iter > 1 J is not sorted
+            it_I = I.begin();
+            for (Index i(0); i < mm; ++i, ++it_I)
+            {
+              if (Math::abs(it_I->first) < _eps_res_comp)
+              {
+                rho[i].first = DT_(0.0);
+                rho[i].second = it_I->second;
+                continue;
+              }
+
+              it_J = J.begin();
+              while (it_J->second != it_I->second && std::next(it_J) != J.end())
+              {
+                ++it_J;
+              }
+              if (it_J->second == it_I->second)
+              {
+                continue;
+              }
+
+              DT_ s(DT_(0.0));
+              auto it = I.begin();
+              for (auto it_col = a_columnwise[it_I->second].begin();
+                   it_col != a_columnwise[it_I->second].end(); ++it_col)
+              {
+                s += Math::sqr(it_col->first);
+                while (it->second != it_col->second && std::next(it) != I.end())
+                {
+                  ++it;
+                }
+                if (it->second == it_col->second)
+                {
+                  rho[i].first += it->first * it_col->first;
+                }
+              }
+              rho[i].first = Math::sqr(res) - Math::sqr(rho[i].first) / s;
+              rho[i].second = it_I->second;
+            }
+
+            // save the iterators to the last entries of I and J
+            it_I_end = std::prev(I.end());
+            it_J_end = std::prev(J.end());
+
+            // __add promising entries of \f$ \tilde J \f$ to \f$ J \f$
+            bool first = true;
+            while (J.size() < _fill_in)
+            {
+              // search maximal value in rho
+              DT_ max_val = DT_(0.0);
+              Index max_ind, max_sec;
+
+              for (Index i(0); i < mm; ++i)
+              {
+                if (rho[i].first > max_val)
+                {
+                  max_val = rho[i].first;
+                  max_sec = rho[i].second;
+                  max_ind = i;
+                }
+              }
+
+              if (max_val > _max_rho)
+              {
+                rho[max_ind].first = DT_(0.0);
+                if (first == true)
+                {
+                  J.emplace_back(DT_(0.0), max_sec);
+                  first = false;
+                  it_J = std::next(it_J_end);
+                }
+                else
+                {
+                  if (it_J->second > max_sec)
+                  {
+                    it_J = std::next(it_J_end);
+                  }
+                  while (it_J != J.end() && it_J->second < max_sec)
+                  {
+                    ++it_J;
+                  }
+                  it_J = J.emplace(it_J, DT_(0.0), max_sec);
+                }
+              }
+              else
+              {
+                break;
+              }
+            }
+
+            // save new size of J
+            nn_new = Index(J.size());
+
+            // we can stop if no new entries have been added
+            if (nn_new == nn)
+            {
+              break;
+            }
+
+            // calculate new indices \f$ \tilde I \f$
+            for (it_J = std::next(it_J_end); it_J != J.end(); ++it_J)
+            {
+              Index col = it_J->second;
+              auto it = I_sorted.begin();
+              for (auto it_col = a_columnwise[col].begin();
+                   it_col != a_columnwise[col].end(); ++it_col)
+              {
+                Index row = it_col->second;
+                while (it != I_sorted.end() && it->second < row)
+                {
+                  ++it;
+                }
+                if (it == I_sorted.end() || it->second != row)
+                {
+                  I_sorted.emplace(it, -1, row);
+                  it_I = std::next(it_I_end);
+                  while (it_I != I.end() && it_I->second < row)
+                  {
+                    ++it_I;
+                  }
+                  I.emplace(it_I, DT_(0.0), row);
+                }
+              }
+            }
+
+            // save new size of I
+            mm_new = Index(I.size());
+
+            // fill sorted vector sorted_I with new entries of I
+            for (auto it = I_sorted.begin(); it != I_sorted.end(); ++it)
+            {
+              if (it->first != (Index) -1)
+              {
+                continue;
+              }
+              it_I = std::next(it_I_end);
+              Index i(mm);
+              while (it_I->second != it->second)
+              {
+                ++it_I;
+                ++i;
+              }
+              it->first = i;
+            }
           }
         } // end for-loop over each row of \f$M \approx A^{-1}\f$
 
@@ -2871,54 +2847,9 @@ namespace FEAST
         }
 
         SparseMatrixCSR<Mem_, DT_> tM(n, n, col_ind, val, row_ptr);
-        M = tM;
+        _M = tM;
 
         delete[] m_columns;
-      }
-
-      /**
-       * \brief Returns a descriptive string.
-       *
-       * \returns A string describing the container.
-       */
-      static String type_name()
-      {
-        return "SPAI_Preconditioner";
-      }
-
-      /**
-       * \brief apply the preconditioner
-       *
-       * \param[out] out The preconditioner result.
-       * \param[in] in The vector, which is applied to the preconditioning
-       */
-      virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
-      {
-        if (in.elements() == out.elements())
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Input- and output-vectors must be different!");
-        }
-
-        const Index n(M.rows());
-        const Index * pmcol(M.col_ind());
-        const Index * pmrow(M.row_ptr());
-        const DT_ * pm(M.val());
-        const DT_ * pin(in.elements());
-        DT_ * pout(out.elements());
-
-        for (Index i(0); i < n; i++)
-        {
-          pout[i] = DT_(0.0);
-        }
-
-        for (Index i(0); i < n; i++)
-        {
-          for (Index c(pmrow[i]); c < pmrow[i + 1]; c++)
-          {
-            pout[pmcol[c]] += pm[c] * pin[i];
-          }
-        }
       }
     };
   }// namespace LAFEM

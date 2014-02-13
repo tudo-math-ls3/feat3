@@ -18,6 +18,7 @@ namespace FEAST
     enum class SparseLayoutType
     {
       lt_csr = 0,
+      lt_coo = 1,
       lt_ell
     };
 
@@ -101,7 +102,38 @@ namespace FEAST
 
         return *this;
       }
-    };
+
+    /**
+    * \brief Returns a list of all Index arrays.
+    *
+    * \returns A list of all Index arrays.
+    */
+    const std::vector<Index*> & get_indices() const
+    {
+      return _indices;
+    }
+
+    /**
+    * \brief Returns a list of all Index array sizes.
+    *
+    * \returns A list of all Index array sizes.
+    */
+    const std::vector<Index> & get_indices_size() const
+    {
+      return _indices_size;
+    }
+
+    /**
+    * \brief Returns a list of all scalar values with datatype index.
+    *
+    * \returns A list of all scalars with datatype index.
+    */
+    const std::vector<Index> & get_scalar_index() const
+    {
+      return _scalar_index;
+    }
+
+  };
   } // namespace LAFEM
 } // namespace FEAST
 

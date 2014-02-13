@@ -411,6 +411,9 @@ namespace FEAST
         typedef DenseVector<MemType, DataType> VectorTypeL;
         /// Compatible R-vector type
         typedef DenseVector<MemType, DataType> VectorTypeR;
+        /// Our used layout type
+        const static SparseLayoutType LayoutType = SparseLayoutType::lt_coo;
+
 
         /**
          * \brief Constructor
@@ -1144,6 +1147,17 @@ namespace FEAST
           this->_indices_size.clear();
           this->_scalar_index.at(3) = 0;
           this->_scalar_index.at(4) = 0;
+        }
+
+        /**
+         * \brief Retrieve convenient sparse matrix layout object.
+         *
+         * \return An object containing the sparse matrix layout.
+         */
+        SparseLayout<Mem_, LayoutType> layout() const
+        {
+          SparseLayout<Mem_, LayoutType> layout(this->_indices, this->_indices_size, this->_scalar_index);
+          return layout;
         }
 
         /**
