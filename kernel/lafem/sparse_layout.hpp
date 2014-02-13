@@ -13,10 +13,19 @@ namespace FEAST
   namespace LAFEM
   {
     /**
+     * Supported File modes.
+     */
+    enum SparseLayoutType
+    {
+      lt_csr = 0,
+      lt_ell
+    };
+
+    /**
      * \brief Layout scheme for sparse matrix containers.
      *
-     * \tparam SM_ The Container, the layout belongs to
-     * Note, that for technical reasons, all Container types must be typed bool.
+     * \tparam Mem_ The memory where the layout data is lying.
+     * \tparam Layout_ The Matrix Type, which represented by the layout.
      *
      * This class acts as an data wrapper for all index arrays, describing a specific sparse matrix layout.
      * It enables FEAST to store layout related data only once per layout per matrix type.
@@ -25,7 +34,7 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename SM_>
+    template <typename Mem_, SparseLayoutType Layout_>
     class SparseLayout
     {
     public:
@@ -39,7 +48,7 @@ namespace FEAST
         _scalar_index(scalar_index)
       {
         for(auto i : this->_indices)
-          MemoryPool<typename SM_::MemType>::instance()->increase_memory(i);
+          MemoryPool<Mem_>::instance()->increase_memory(i);
       }
 
       /// copy constructor
@@ -49,7 +58,7 @@ namespace FEAST
         _scalar_index(other._scalar_index)
       {
         for(auto i : this->_indices)
-          MemoryPool<typename SM_::MemType>::instance()->increase_memory(i);
+          MemoryPool<Mem_>::instance()->increase_memory(i);
       }
 
       /// move constructor
@@ -64,7 +73,7 @@ namespace FEAST
       virtual ~SparseLayout()
       {
         for(auto i : this->_indices)
-          MemoryPool<typename SM_::MemType>::instance()->release_memory(i);
+          MemoryPool<Mem_>::instance()->release_memory(i);
       }
 
       /// operator=
@@ -78,7 +87,7 @@ namespace FEAST
         _scalar_index = other._scalar_index;
 
         for(auto i : this->_indices)
-          MemoryPool<typename SM_::MemType>::instance()->increase_memory(i);
+          MemoryPool<Mem_>::instance()->increase_memory(i);
 
         return *this;
       }

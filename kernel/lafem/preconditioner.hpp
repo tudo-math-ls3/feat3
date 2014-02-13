@@ -673,7 +673,7 @@ namespace FEAST
        * Creates a ILU preconditioner to the given matrix and layout
        */
       ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
-                        const SparseLayout<SparseMatrixCSR<Mem::Main, bool> > & layout) :
+                        const SparseLayout<Mem_, SparseMatrixCSR<Mem_, DT_>::LayoutType> & layout) :
         A(A),
         LU(layout)
       {
@@ -1081,7 +1081,7 @@ namespace FEAST
        * Creates a ILU preconditioner to the given matrix and layout
        */
       ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
-                        const SparseLayout<SparseMatrixELL<Mem::Main, bool> > & layout) :
+                        const SparseLayout<Mem_, SparseMatrixELL<Mem_, DT_>::LayoutType> & layout) :
         A(A),
         LU(layout)
       {

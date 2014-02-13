@@ -377,6 +377,8 @@ namespace FEAST
         typedef DT_ DataType;
         /// Our memory architecture type
         typedef Mem_ MemType;
+        /// Our used layout type
+        const static SparseLayoutType LayoutType = lt_ell;
 
         /**
          * \brief Constructor
@@ -402,7 +404,7 @@ namespace FEAST
          *
          * Creates an empty matrix with given layout.
          */
-        explicit SparseMatrixELL(const SparseLayout<SparseMatrixELL<Mem_, bool> > & layout) :
+        explicit SparseMatrixELL(const SparseLayout<Mem_, LayoutType> & layout) :
           Container<Mem_, DT_> (layout._scalar_index.at(0))
         {
           CONTEXT("When creating SparseMatrixELL");
@@ -738,7 +740,7 @@ namespace FEAST
          *
          * Assigns a new matrix layout, discarding all old data
          */
-        SparseMatrixELL<Mem_, DT_> & operator= (const SparseLayout<SparseMatrixELL<Mem_, bool> > & layout)
+        SparseMatrixELL<Mem_, DT_> & operator= (const SparseLayout<Mem_, LayoutType> & layout)
         {
           CONTEXT("When assigning SparseMatrixELL");
 
@@ -985,9 +987,9 @@ namespace FEAST
          *
          * \return An object containing the sparse matrix layout.
          */
-        SparseLayout<SparseMatrixELL<Mem_, bool> > layout() const
+        SparseLayout<Mem_, LayoutType> layout() const
         {
-          SparseLayout<SparseMatrixELL<Mem_, bool> > layout(this->_indices, this->_indices_size, this->_scalar_index);
+          SparseLayout<Mem_, LayoutType> layout(this->_indices, this->_indices_size, this->_scalar_index);
           return layout;
         }
 
