@@ -130,7 +130,7 @@ namespace FEAST
       struct Generic :
         public InstantiationPolicy<Generic, NonCopyable>
       {
-        typedef Mem::Main mem_type;
+        typedef Mem::Main MemType;
         const static TagValue tag_value = tv_generic;
         const static Mem::TagValue memory_value = Mem::tv_main;
         static String name()
@@ -145,7 +145,7 @@ namespace FEAST
       struct MKL :
         public InstantiationPolicy<Generic, NonCopyable>
       {
-        typedef Mem::Main mem_type;
+        typedef Mem::Main MemType;
         const static TagValue tag_value = tv_mkl;
         const static Mem::TagValue memory_value = Mem::tv_main;
         static String name()
@@ -160,7 +160,7 @@ namespace FEAST
       struct CUDA :
         public InstantiationPolicy<CUDA, NonCopyable>
       {
-        typedef Mem::CUDA mem_type;
+        typedef Mem::CUDA MemType;
         const static TagValue tag_value = tv_cuda;
         const static Mem::TagValue memory_value = Mem::tv_cuda;
         static String name()

@@ -19,11 +19,11 @@ namespace FEAST
      */
     template<typename Algo_, typename DataType_>
     class MetaVectorTestBase
-      : public FEAST::TestSystem::TaggedTest<typename Algo_::mem_type, DataType_, Algo_>
+      : public FEAST::TestSystem::TaggedTest<typename Algo_::MemType, DataType_, Algo_>
     {
     public:
       typedef Algo_ AlgoType;
-      typedef typename AlgoType::mem_type MemType;
+      typedef typename AlgoType::MemType MemType;
       typedef DataType_ DataType;
 
       typedef DenseVector<MemType, DataType> ScalarVector;
@@ -31,7 +31,7 @@ namespace FEAST
       typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
       explicit MetaVectorTestBase(const char* name) :
-        FEAST::TestSystem::TaggedTest<typename Algo_::mem_type, DataType_, Algo_>(name)
+        FEAST::TestSystem::TaggedTest<typename Algo_::MemType, DataType_, Algo_>(name)
       {
       }
 

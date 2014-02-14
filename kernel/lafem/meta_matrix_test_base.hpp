@@ -26,13 +26,13 @@ namespace FEAST
     struct MetaMatrixTestHelper
     {
       /// scalar vector type
-      typedef DenseVector<typename AlgoType_::mem_type, DataType_> ScalarVector;
+      typedef DenseVector<typename AlgoType_::MemType, DataType_> ScalarVector;
       /// scalar matrix type A
-      typedef SparseMatrixCSR<typename AlgoType_::mem_type, DataType_> ScalarMatrixA;
+      typedef SparseMatrixCSR<typename AlgoType_::MemType, DataType_> ScalarMatrixA;
       /// scalar matrix type B
-      typedef SparseMatrixELL<typename AlgoType_::mem_type, DataType_> ScalarMatrixB;
+      typedef SparseMatrixELL<typename AlgoType_::MemType, DataType_> ScalarMatrixB;
       /// scalar matrix type D
-      typedef SparseMatrixCOO<typename AlgoType_::mem_type, DataType_> ScalarMatrixD;
+      typedef SparseMatrixCOO<typename AlgoType_::MemType, DataType_> ScalarMatrixD;
     };
 
     // MKL specialisation: There is no ELL implementation, so we choose COO for D matrices
@@ -103,11 +103,11 @@ namespace FEAST
      */
     template<typename Algo_, typename DataType_>
     class MetaMatrixTestBase
-      : public FEAST::TestSystem::TaggedTest<typename Algo_::mem_type, DataType_, Algo_>
+      : public FEAST::TestSystem::TaggedTest<typename Algo_::MemType, DataType_, Algo_>
     {
     public:
       typedef Algo_ AlgoType;
-      typedef typename AlgoType::mem_type MemType;
+      typedef typename AlgoType::MemType MemType;
       typedef DataType_ DataType;
       typedef MetaMatrixTestHelper<AlgoType, DataType> Helper;
 
@@ -138,7 +138,7 @@ namespace FEAST
       typedef SaddlePointMatrix<VeloMatrix, GradMatrix, DiveMatrix> SystemMatrix;
 
       explicit MetaMatrixTestBase(const char* name) :
-        FEAST::TestSystem::TaggedTest<typename Algo_::mem_type, DataType_, Algo_>(name)
+        FEAST::TestSystem::TaggedTest<typename Algo_::MemType, DataType_, Algo_>(name)
       {
       }
 

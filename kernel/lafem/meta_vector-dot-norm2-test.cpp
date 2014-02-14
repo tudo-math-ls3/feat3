@@ -18,7 +18,7 @@ class MetaVectorDotNorm2Test
 {
 public:
   typedef Algo_ AlgoType;
-  typedef typename AlgoType::mem_type MemType;
+  typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
   typedef MetaVectorTestBase<Algo_, DataType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
