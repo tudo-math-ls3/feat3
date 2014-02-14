@@ -41,9 +41,15 @@ namespace FEAST
       First_ _first;
       TupleVectorBase<Rest_...> _rest;
 
-      TupleVectorBase(First_&& first, TupleVectorBase<Rest_...>&& rest) :
+      explicit TupleVectorBase(First_&& first, TupleVectorBase<Rest_...>&& rest) :
         _first(std::move(first)),
         _rest(std::move(rest))
+      {
+      }
+
+      explicit TupleVectorBase(First_&& first, Rest_&&... rest) :
+        _first(std::move(first)),
+        _rest(std::move(rest...))
       {
       }
 
@@ -183,7 +189,7 @@ namespace FEAST
     protected:
       First_ _first;
 
-      TupleVectorBase(First_&& first) :
+      explicit TupleVectorBase(First_&& first) :
         _first(std::move(first))
       {
       }
@@ -360,7 +366,7 @@ namespace FEAST
 
     protected:
       /// data-move CTOR; this one is protected for a reason
-      TupleVector(TupleVectorBase<First_, Rest_...>&& other) :
+      explicit TupleVector(TupleVectorBase<First_, Rest_...>&& other) :
         BaseClass(std::move(other))
       {
       }
@@ -368,6 +374,12 @@ namespace FEAST
     public:
       /// default CTOR
       TupleVector()
+      {
+      }
+
+      /// Sub-Vector emplacement constructor
+      explicit TupleVector(First_&& first, Rest_&&... rest) :
+        BaseClass(std::move(first), std::move(rest...))
       {
       }
 

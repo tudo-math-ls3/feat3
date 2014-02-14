@@ -42,7 +42,7 @@ public:
     this->gen_system(7, mat_sys, vec_sol, vec_rhs);
 
     // test t <- b - A*x
-    SystemVector vec_tmp(vec_rhs.clone());
+    SystemVector vec_tmp(mat_sys.create_vector_l());
     mat_sys.template apply<AlgoType>(vec_tmp, vec_sol, vec_rhs, -DataType_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(vec_tmp.template norm2<AlgoType>(), DataType_(0), tol);
 

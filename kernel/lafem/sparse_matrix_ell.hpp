@@ -377,6 +377,10 @@ namespace FEAST
         typedef DT_ DataType;
         /// Our memory architecture type
         typedef Mem_ MemType;
+        /// Compatible L-vector type
+        typedef DenseVector<MemType, DataType> VectorTypeL;
+        /// Compatible R-vector type
+        typedef DenseVector<MemType, DataType> VectorTypeR;
         /// Our used layout type
         const static SparseLayoutType LayoutType = lt_ell;
 
@@ -1243,6 +1247,18 @@ namespace FEAST
             Arch::Axpy<Mem_, Algo_>::ell(r.elements(), alpha, x.elements(), y.elements(),
               this->Ax(), this->Aj(), this->Arl(), this->stride(), this->rows());
           }
+        }
+
+        /// Returns a new compatible L-Vector.
+        VectorTypeL create_vector_l() const
+        {
+          return VectorTypeL(this->columns());
+        }
+
+        /// Returns a new compatible R-Vector.
+        VectorTypeR create_vector_r() const
+        {
+          return VectorTypeR(this->rows());
         }
     };
 

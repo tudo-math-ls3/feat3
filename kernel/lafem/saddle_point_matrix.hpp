@@ -67,6 +67,11 @@ namespace FEAST
       /// data type
       typedef typename MatrixTypeA::DataType DataType;
 
+      /// Compatible L-vector type
+      typedef TupleVector<typename MatrixTypeA::VectorTypeL, typename MatrixTypeD::VectorTypeL> VectorTypeL;
+      /// Compatible R-vector type
+      typedef TupleVector<typename MatrixTypeA::VectorTypeR, typename MatrixTypeB::VectorTypeR> VectorTypeR;
+
       /// dummy enum
       enum
       {
@@ -227,10 +232,8 @@ namespace FEAST
        * \param[in] x
        * The multiplicant vector.
        */
-      template<typename Algo_, typename SubVector1_, typename SubVector2_>
-      void apply(
-        TupleVector<SubVector1_, SubVector2_>& r,
-        const TupleVector<SubVector1_, SubVector2_>& x)
+      template<typename Algo_>
+      void apply(VectorTypeL& r, const VectorTypeR& x)
       {
         block_a().template apply<Algo_>(r.template at<0>(), x.template at<0>());
         block_b().template apply<Algo_>(r.template at<0>(), x.template at<1>(), r.template at<0>(), DataType(1));
@@ -253,16 +256,24 @@ namespace FEAST
        * The summand vector
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_, typename SubVector1_, typename SubVector2_>
-      void apply(
-        TupleVector<SubVector1_, SubVector2_>& r,
-        const TupleVector<SubVector1_, SubVector2_>& x,
-        const TupleVector<SubVector1_, SubVector2_>& y,
-        DataType alpha = DataType(1))
+      template<typename Algo_>
+      void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
       {
         block_a().template apply<Algo_>(r.template at<0>(), x.template at<0>(), y.template at<0>(), alpha);
         block_b().template apply<Algo_>(r.template at<0>(), x.template at<1>(), r.template at<0>(), alpha);
         block_d().template apply<Algo_>(r.template at<1>(), x.template at<0>(), y.template at<1>(), alpha);
+      }
+
+      /// Returns a new compatible L-Vector.
+      VectorTypeL create_vector_l() const
+      {
+        return VectorTypeL(block_a().create_vector_l(), block_d().create_vector_l());
+      }
+
+      /// Returns a new compatible R-Vector.
+      VectorTypeR create_vector_r() const
+      {
+        return VectorTypeR(block_a().create_vector_r(), block_b().create_vector_r());
       }
     }; // class SaddlePointMatrix<...>
 

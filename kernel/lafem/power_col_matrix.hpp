@@ -43,6 +43,10 @@ namespace FEAST
       typedef typename SubMatrixType::MemType MemType;
       /// sub-matrix data type
       typedef typename SubMatrixType::DataType DataType;
+      /// Compatible L-vector type
+      typedef PowerVector<typename SubMatrixType::VectorTypeL, blocks_> VectorTypeL;
+      /// Compatible R-vector type
+      typedef typename SubMatrixType::VectorTypeR VectorTypeR;
 
       /// dummy enum
       enum
@@ -200,8 +204,8 @@ namespace FEAST
        * \param[in] x
        * The multiplicant vector.
        */
-      template<typename Algo_, typename SubVector_, typename RightVector_>
-      void apply(PowerVector<SubVector_, blocks_>& r, const RightVector_& x)
+      template<typename Algo_>
+      void apply(VectorTypeL& r, const VectorTypeR& x)
       {
         base().template apply<Algo_>(r.base(), x);
         last().template apply<Algo_>(r.last(), x);
@@ -223,12 +227,23 @@ namespace FEAST
        * The summand vector
        * \param[in] alpha A scalar to scale the product with.
        */
-      template<typename Algo_, typename SubVector_, typename RightVector_>
-      void apply(PowerVector<SubVector_, blocks_>& r, const RightVector_& x,
-        const PowerVector<SubVector_, blocks_>& y, DataType alpha = DataType(1))
+      template<typename Algo_>
+      void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
       {
         base().template apply<Algo_>(r.base(), x, y.base(), alpha);
         last().template apply<Algo_>(r.last(), x, y.last(), alpha);
+      }
+
+      /// Returns a new compatible L-Vector.
+      VectorTypeL create_vector_l() const
+      {
+        return VectorTypeL(base().create_vector_l(), last().create_vector_l());
+      }
+
+      /// Returns a new compatible R-Vector.
+      VectorTypeR create_vector_r() const
+      {
+        return base().create_vector_r();
       }
     };
 
@@ -243,6 +258,10 @@ namespace FEAST
       typedef SubType_ SubMatrixType;
       typedef typename SubMatrixType::MemType MemType;
       typedef typename SubMatrixType::DataType DataType;
+      /// Compatible L-vector type
+      typedef PowerVector<typename SubMatrixType::VectorTypeL, 1> VectorTypeL;
+      /// Compatible R-vector type
+      typedef typename SubMatrixType::VectorTypeR VectorTypeR;
 
       enum
       {
@@ -344,16 +363,28 @@ namespace FEAST
         last().clear(value);
       }
 
-      template<typename Algo_, typename SubVector_, typename RightVector_>
-      void apply(PowerVector<SubVector_, 1>& r, const RightVector_& x)
+      template<typename Algo_>
+      void apply(VectorTypeL& r, const VectorTypeR& x)
       {
         last().template apply<Algo_>(r.last(), x);
       }
 
-      template<typename Algo_, typename SubVector_, typename RightVector_>
-      void apply(PowerVector<SubVector_, 1>& r, const RightVector_& x, const PowerVector<SubVector_, 1>& y, DataType alpha = DataType(1))
+      template<typename Algo_>
+      void apply(VectorTypeL& r, const VectorTypeR& x, const VectorTypeL& y, DataType alpha = DataType(1))
       {
         last().template apply<Algo_>(r.last(), x, y.last(), alpha);
+      }
+
+      /// Returns a new compatible L-Vector.
+      VectorTypeL create_vector_l() const
+      {
+        return VectorTypeL(last().create_vector_l());
+      }
+
+      /// Returns a new compatible R-Vector.
+      VectorTypeR create_vector_r() const
+      {
+        return last().create_vector_r();
       }
     };
     /// \endcond

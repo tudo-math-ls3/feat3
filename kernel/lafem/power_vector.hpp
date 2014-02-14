@@ -59,13 +59,6 @@ namespace FEAST
       /// the last sub-vector
       SubVectorType _sub_vector;
 
-      /// base-class constructor; this one is protected for a reason
-      explicit PowerVector(BaseClass&& other_base, SubVectorType&& last_sub) :
-        BaseClass(std::move(other_base)),
-        _sub_vector(std::move(last_sub))
-      {
-      }
-
     public:
       /// default CTOR
       PowerVector()
@@ -96,6 +89,13 @@ namespace FEAST
       explicit PowerVector(Index sub_size, DataType value) :
         BaseClass(sub_size, value),
         _sub_vector(sub_size, value)
+      {
+      }
+
+      /// base-class constructor; for internal use only
+      explicit PowerVector(BaseClass&& other_base, SubVectorType&& last_sub) :
+        BaseClass(std::move(other_base)),
+        _sub_vector(std::move(last_sub))
       {
       }
 
@@ -339,11 +339,6 @@ namespace FEAST
     protected:
       SubVectorType _sub_vector;
 
-      explicit PowerVector(SubVectorType&& sub_vector) :
-        _sub_vector(sub_vector)
-      {
-      }
-
     public:
       PowerVector()
       {
@@ -356,6 +351,11 @@ namespace FEAST
 
       explicit PowerVector(Index sub_size, DataType value)
         : _sub_vector(sub_size, value)
+      {
+      }
+
+      explicit PowerVector(SubVectorType&& sub_vector) :
+        _sub_vector(sub_vector)
       {
       }
 
