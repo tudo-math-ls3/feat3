@@ -80,13 +80,13 @@ def configure_icc(cpu, buildmode):
     elif cpu == "turionx2":
       cxxflags += " -msse3"
     elif cpu == "barcelona":
-      cxxflags += " -msse4.1"
+      cxxflags += " -msse3"
     elif cpu == "shanghai":
-      cxxflags += " -msse4.1"
+      cxxflags += " -msse3"
     elif cpu == "istanbul":
-      cxxflags += " -msse4.1"
+      cxxflags += " -msse3"
     elif cpu == "magnycours":
-      cxxflags += " -msse4.1"
+      cxxflags += " -msse3"
     else:
       print ("Detected cpu type not supported by configure_icc.py, using -march=native instead.")
 
