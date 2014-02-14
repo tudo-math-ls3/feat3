@@ -117,7 +117,7 @@ namespace FEAST
          * Creates a copy of a given matrix from another memory architecture.
          */
         template <typename Arch2_, typename DT2_>
-        DenseMatrix(const DenseMatrix<Arch2_, DT2_> & other) :
+        explicit DenseMatrix(const DenseMatrix<Arch2_, DT2_> & other) :
           Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying DenseMatrix");

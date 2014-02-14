@@ -267,7 +267,7 @@ namespace FEAST
          * Creates a copy of a given vector from another memory architecture.
          */
         template <typename Mem2_, typename DT2_>
-        DenseVector(const DenseVector<Mem2_, DT2_> & other) :
+        explicit DenseVector(const DenseVector<Mem2_, DT2_> & other) :
             Container<Mem_, DT_>(other)
         {
           CONTEXT("When copying DenseVector");

@@ -107,7 +107,7 @@ namespace FEAST
          *
          * Creates a container with a given size.
          */
-        Container(Index size)
+        explicit Container(Index size)
         {
           CONTEXT("When creating Container");
           _scalar_index.push_back(size);
@@ -159,7 +159,7 @@ namespace FEAST
          * Creates a copy of a given container from another memory architecture.
          */
         template <typename Arch2_, typename DT2_>
-        Container(const Container<Arch2_, DT2_> & other) :
+        explicit Container(const Container<Arch2_, DT2_> & other) :
           _scalar_index(other.get_scalar_index()),
           _scalar_dt(other.get_scalar_dt())
         {
@@ -278,7 +278,7 @@ namespace FEAST
          * Assigns a container from another memory architecture to the current one.
          */
         template <typename Mem2_, typename DT2_>
-        void assign(const Container<Mem2_, DT_> & other)
+        void assign(const Container<Mem2_, DT2_> & other)
         {
           CONTEXT("When assigning Container");
 
