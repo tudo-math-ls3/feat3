@@ -4,9 +4,9 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/foundation/functor_error.hpp>
-#include <kernel/util/cpp11_smart_pointer.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace FEAST
 {

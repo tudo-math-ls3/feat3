@@ -34,16 +34,6 @@
 #    define FEAST_COMPILER "Intel C/C++ compiler"
 #  endif
 
-// Note: Up to version 12.1, the ICC compiler has only "experimental" C++0x support, which needs
-// to be enabled explicitly via "-std=c++0x", including the following features:
-//   1. static_assert: since v11.0
-//   2. nullptr: since v12.1
-// At least to our knowledge there is no way to detect here whether this optional has been enabled
-// or not and therefore we do not define HAVE_CPP11_NULLPTR or HAVE_CPP11_STATIC_ASSERT here.
-
-// Fortunately, at least from v10.1 on, the ICC supports the __func__ variable.
-#define HAVE_CPP11_FUNC 1
-
 #endif // !defined(FEAST_COMPILER) && defined(__INTEL_COMPILER)
 
 #endif // KERNEL_UTIL_COMPILER_INTEL_HPP

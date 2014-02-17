@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
+#include <cstddef>
 
 #ifdef FEAST_COMPILER_MICROSOFT
 #  include <string.h> // for _stricmp
@@ -720,12 +721,12 @@ namespace FEAST
     return String(item ? "true" : "false");
   }
 
-#ifdef HAVE_CPP11_NULLPTR
+#ifndef  __CUDACC__
   inline String stringify(std::nullptr_t)
   {
     return String("nullptr");
   }
-#endif // HAVE_CPP11_NULLPTR
+#endif
   /// \endcond
 
   /**

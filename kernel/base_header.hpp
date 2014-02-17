@@ -42,7 +42,7 @@
 #include <kernel/util/compiler_oracle.hpp>     // SunStudio/OracleStudio C/C++ compiler
 #include <kernel/util/compiler_open64.hpp>     // Open64 C/C++ compiler
 #include <kernel/util/compiler_pgi.hpp>        // PGI C/C++ compiler
-// The GNU compiler must be the last one in this list, because other compilers (e.g. Intel and Open64)
+// The GNU compiler must be the last one in this list, because other compilers (e.g. Intel and Open64, Clang)
 // also define the __GNUC__ macro used to identify the GNU C/C++ compiler, thus leading to incorrect
 // compiler detection.
 #include <kernel/util/compiler_gnu.hpp>        // GNU C/C++ compiler
@@ -53,30 +53,6 @@
 // If the compiler does not support a 'noinline' specifier, we'll define it as an empty macro.
 #ifndef NOINLINE
 #define NOINLINE
-#endif
-
-// If the compiler doesn't support the C++11 nullptr, we have to define it via pre-processor.
-// Be warned that this definition is not 100% compatible, as the "real" nullptr is of type "nullptr_t",
-// whereas this macro definition is of type "int", thus leading to potentially unwanted behaviour,
-// especially when function overloads for int and pointer types are present!
-#ifndef HAVE_CPP11_NULLPTR
-#  define nullptr 0
-#endif
-
-// If the compiler doesn't support the C++11 static_assert, we'll define it as an empty macro.
-// We do not use any hand-made emulations in this case, as there is no way to implement a both
-// fully working and portable solution for this feature.
-#ifndef HAVE_CPP11_STATIC_ASSERT
-#  define static_assert(expr, msg)
-#endif
-
-// If the compiler doesn't support the C99/C++11 __func__ built-in variable, we'll define it as the
-// commonly used __FUNCTION__ macro. Unfortunately, this macro is not part of any C or C++ standard,
-// so there's no guarantee that the following macro will do its job. Also, we cannot check
-// "defined(__FUNCTION__)" here, because the __FUNCTION__ macro (if the compiler supports it at all)
-// is only defined within a function body.
-#ifndef HAVE_CPP11_FUNC
-#  define __func__ __FUNCTION__
 #endif
 
 ///\endcond
@@ -95,7 +71,7 @@ namespace FEAST
     /// FEAST minor version number
     version_minor = 1,
     /// FEAST patch version number
-    version_patch = 0
+    version_patch = 1
   };
 
   /**

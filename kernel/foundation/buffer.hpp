@@ -3,8 +3,8 @@
 #define KERNEL_FOUNDATION_BUFFER_HH 1
 
 #include<kernel/base_header.hpp>
-#include<kernel/util/cpp11_smart_pointer.hpp>
 #include<vector>
+#include<memory>
 
 namespace FEAST
 {

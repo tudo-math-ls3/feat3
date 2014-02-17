@@ -16,7 +16,6 @@
 #include<kernel/lafem/vector_mirror.hpp>
 #include<kernel/lafem/sparse_matrix_csr.hpp>
 #include<kernel/lafem/unit_filter.hpp>
-#include<kernel/util/cpp11_smart_pointer.hpp>
 
 #include<kernel/foundation/communication.hpp>
 

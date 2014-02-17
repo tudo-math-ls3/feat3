@@ -22,13 +22,6 @@
 // define the noinline specifier
 #define NOINLINE __attribute__((noinline))
 
-// Now claim, that all C++11 features are offered
-#define HAVE_CPP11_NULLPTR 1
-#define HAVE_CPP11_STATIC_ASSERT 1
-#define HAVE_CPP11_EXTERN_TEMPLATE 1
-#define HAVE_CPP11_SMART_POINTER 1
-#define HAVE_CPP11_FUNC 1
-
 #endif // !defined(FEAST_COMPILER) && defined(__clang__)
 
 #endif // KERNEL_UTIL_COMPILER_CLANG_HPP

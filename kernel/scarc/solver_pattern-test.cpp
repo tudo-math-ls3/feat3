@@ -3,7 +3,6 @@
 
 #include <kernel/scarc/solver_functor.hpp>
 #include <kernel/scarc/solver_pattern.hpp>
-#include <kernel/util/cpp11_smart_pointer.hpp>
 #include <kernel/archs.hpp>
 #include<deque>
 

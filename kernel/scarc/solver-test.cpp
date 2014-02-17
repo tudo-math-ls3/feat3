@@ -2,7 +2,6 @@
 #ifdef SERIAL
 #include <test_system/test_system.hpp>
 
-#include <kernel/util/cpp11_smart_pointer.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/dense_vector.hpp>

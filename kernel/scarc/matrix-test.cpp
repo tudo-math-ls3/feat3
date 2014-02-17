@@ -2,7 +2,6 @@
 #include <test_system/test_system.hpp>
 
 #include <kernel/scarc/matrix.hpp>
-#include <kernel/util/cpp11_smart_pointer.hpp>
 #include <kernel/archs.hpp>
 #include<deque>
 

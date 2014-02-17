@@ -37,14 +37,6 @@
 #    define FEAST_COMPILER "Microsoft C/C++ compiler"
 #  endif
 
-// Now let's see what C++11 features the compiler offers
-#  if (_MSC_VER >= 1600)
-#    define HAVE_CPP11_NULLPTR 1
-#    define HAVE_CPP11_STATIC_ASSERT 1
-#    define HAVE_CPP11_SMART_POINTER 1
-#    define HAVE_CPP11_EXTERN_TEMPLATE 1
-#  endif
-
 // define the noinline specifier
 #define NOINLINE __declspec(noinline)
 
