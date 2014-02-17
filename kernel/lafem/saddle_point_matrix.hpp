@@ -5,6 +5,9 @@
 // includes, FEAST
 #include <kernel/lafem/tuple_vector.hpp>
 
+// includes, system
+#include <type_traits>
+
 namespace FEAST
 {
   namespace LAFEM
@@ -63,19 +66,19 @@ namespace FEAST
       typedef MatrixD_ MatrixTypeD;
 
       // ensure that all matrices have the same mem- and data-types
-      static_assert(SAME_TYPE(typename MatrixA_::MemType, typename MatrixB_::MemType),
+      static_assert(std::is_same<typename MatrixA_::MemType, typename MatrixB_::MemType>::value,
         "A and B have different mem-types");
-      static_assert(SAME_TYPE(typename MatrixA_::MemType, typename MatrixD_::MemType),
+      static_assert(std::is_same<typename MatrixA_::MemType, typename MatrixD_::MemType>::value,
         "A and D have different mem-types");
-      static_assert(SAME_TYPE(typename MatrixA_::DataType, typename MatrixB_::DataType),
+      static_assert(std::is_same<typename MatrixA_::DataType, typename MatrixB_::DataType>::value,
         "A and B have different data-types");
-      static_assert(SAME_TYPE(typename MatrixA_::DataType, typename MatrixD_::DataType),
+      static_assert(std::is_same<typename MatrixA_::DataType, typename MatrixD_::DataType>::value,
         "A and D have different data-types");
 
       // ensure that the compatible vector types are the same
-      static_assert(SAME_TYPE(typename MatrixA_::VectorTypeL, typename MatrixB_::VectorTypeL),
+      static_assert(std::is_same<typename MatrixA_::VectorTypeL, typename MatrixB_::VectorTypeL>::value,
         "A and B have different compatible L-vectors");
-      static_assert(SAME_TYPE(typename MatrixA_::VectorTypeR, typename MatrixD_::VectorTypeR),
+      static_assert(std::is_same<typename MatrixA_::VectorTypeR, typename MatrixD_::VectorTypeR>::value,
         "A and D have different compatible R-vectors");
 
       /// memory type

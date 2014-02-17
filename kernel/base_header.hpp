@@ -122,30 +122,6 @@ namespace FEAST
   {
   }; // class Nil
 
-  /// \cond internal
-  template<typename T1_, typename T2_>
-  struct SameType
-  {
-    enum
-    {
-      same = 0
-    };
-  };
-
-  /// partial specialisation of SameType for T1_ = T2_
-  template<typename T_>
-  struct SameType<T_, T_>
-  {
-    enum
-    {
-      same = 1
-    };
-  };
-  /// \endcond
-
-  /// Checks whether T1 and T2 are of the same type.
-  #define SAME_TYPE(T1,T2) (SameType<T1,T2>::same != 0)
-
   /**
    * \brief Modes namespace
    */

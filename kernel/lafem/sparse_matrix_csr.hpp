@@ -623,11 +623,12 @@ namespace FEAST
           CONTEXT("When copying SparseMatrixCSR");
         }
 
-        /** \brief Clone operation
+        /**
+         * \brief Clone operation
          *
          * Creates a deep copy of this matrix.
          */
-        SparseMatrixCSR<Mem_, DT_> clone()
+        SparseMatrixCSR<Mem_, DT_> clone() const
         {
           CONTEXT("When cloning SparseMatrixCSR");
 
@@ -1117,7 +1118,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate r \leftarrow this\cdot x \f$
+         * \brief Calculate \f$ r \leftarrow this\cdot x \f$
          *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.
@@ -1135,7 +1136,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculate r \leftarrow y + \alpha this\cdot x \f$
+         * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
          *
          * \param[out] r The vector that recieves the result.
          * \param[in] x The vector to be multiplied by this matrix.

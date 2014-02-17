@@ -7,6 +7,7 @@
 
 // includes, system
 #include <iostream>
+#include <type_traits>
 
 namespace FEAST
 {
@@ -41,8 +42,10 @@ namespace FEAST
       typedef typename First_::DataType DataType;
 
       // ensure that all sub-vector have the same mem- and data-type
-      static_assert(SAME_TYPE(MemType, typename RestClass::MemType), "sub-vectors have different mem-types");
-      static_assert(SAME_TYPE(DataType, typename RestClass::DataType), "sub-vectors have different data-types");
+      static_assert(std::is_same<MemType, typename RestClass::MemType>::value,
+        "sub-vectors have different mem-types");
+      static_assert(std::is_same<DataType, typename RestClass::DataType>::value,
+        "sub-vectors have different data-types");
 
     protected:
       First_ _first;
