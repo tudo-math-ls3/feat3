@@ -715,7 +715,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixELL");
 
-         this->assign(other);
+          this->assign(other);
 
           return *this;
         }
@@ -732,7 +732,7 @@ namespace FEAST
         {
           CONTEXT("When assigning SparseMatrixELL");
 
-         this->assign(other);
+          this->assign(other);
 
           return *this;
         }

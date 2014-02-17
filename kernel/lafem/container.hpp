@@ -158,8 +158,8 @@ namespace FEAST
          *
          * Creates a copy of a given container from another memory architecture.
          */
-        template <typename Arch2_, typename DT2_>
-        explicit Container(const Container<Arch2_, DT2_> & other) :
+        template <typename Mem2_, typename DT2_>
+        explicit Container(const Container<Mem2_, DT2_> & other) :
           _scalar_index(other.get_scalar_index()),
           _scalar_dt(other.get_scalar_dt())
         {
@@ -182,18 +182,32 @@ namespace FEAST
           for (Index i(0) ; i < (other.get_elements()).size() ; ++i)
           {
             const unsigned long size(other.get_elements_size().at(i));
-            DT2_ * temp((DT2_*)::malloc(size * sizeof(DT2_)));
-            MemoryPool<Arch2_>::template download<DT2_>(temp, other.get_elements().at(i), size);
-            MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(i), temp, size);
-            ::free(temp);
+            if (std::is_same<Mem_, Mem2_>::value)
+            {
+              MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other.get_elements().at(i), size);
+            }
+            else
+            {
+              DT2_ * temp((DT2_*)::malloc(size * sizeof(DT2_)));
+              MemoryPool<Mem2_>::template download<DT2_>(temp, other.get_elements().at(i), size);
+              MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(i), temp, size);
+              ::free(temp);
+            }
           }
           for (Index i(0) ; i < other.get_indices().size() ; ++i)
           {
             const unsigned long size(other.get_indices_size().at(i));
-            Index * temp((Index*)::malloc(size * sizeof(Index)));
-            MemoryPool<Arch2_>::template download<Index>(temp, other.get_indices().at(i), size);
-            MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(i), temp, size);
-            ::free(temp);
+            if (std::is_same<Mem_, Mem2_>::value)
+            {
+              MemoryPool<Mem_>::template copy<Index>(this->_indices.at(i), other.get_indices().at(i), size);
+            }
+            else
+            {
+              Index * temp((Index*)::malloc(size * sizeof(Index)));
+              MemoryPool<Mem2_>::template download<Index>(temp, other.get_indices().at(i), size);
+              MemoryPool<Mem_>::template upload<Index>(this->get_indices().at(i), temp, size);
+              ::free(temp);
+            }
           }
         }
 
@@ -307,20 +321,34 @@ namespace FEAST
           {
             const unsigned long size(this->_elements_size.at(i));
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
-            DT2_ * temp((DT2_*)::malloc(size * sizeof(DT2_)));
-            MemoryPool<Mem2_>::template download<DT2_>(temp, other.get_elements().at(0), size);
-            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), temp, size);
-            ::free(temp);
+            if (std::is_same<Mem_, Mem2_>::value)
+            {
+              MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other.get_elements().at(i), size);
+            }
+            else
+            {
+              DT2_ * temp((DT2_*)::malloc(size * sizeof(DT2_)));
+              MemoryPool<Mem2_>::template download<DT2_>(temp, other.get_elements().at(i), size);
+              MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), temp, size);
+              ::free(temp);
+            }
           }
 
           for (Index i(0) ; i < this->_indices_size.size() ; ++i)
           {
             const unsigned long size(this->_indices_size.at(i));
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(size));
-            Index * temp((Index*)::malloc(size * sizeof(Index)));
-            MemoryPool<Mem2_>::template download<Index>(temp, other.get_indices().at(0), size);
-            MemoryPool<Mem_>::template upload<Index>(this->_indices.at(0), temp, size);
-            ::free(temp);
+            if (std::is_same<Mem_, Mem2_>::value)
+            {
+              MemoryPool<Mem_>::template copy<Index>(this->_indices.at(i), other.get_indices().at(i), size);
+            }
+            else
+            {
+              Index * temp((Index*)::malloc(size * sizeof(Index)));
+              MemoryPool<Mem2_>::template download<Index>(temp, other.get_indices().at(i), size);
+              MemoryPool<Mem_>::template upload<Index>(this->_indices.at(i), temp, size);
+              ::free(temp);
+            }
           }
 
         }
