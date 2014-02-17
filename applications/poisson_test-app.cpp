@@ -481,7 +481,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
     DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
-    mirrors.push_back(target_mirror);
+    mirrors.push_back(std::move(target_mirror));
     sendbufs.push_back(sendbuf);
     recvbufs.push_back(recvbuf);
 
@@ -628,7 +628,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
                      std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_scalars(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_scalars()),
                      std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_indices(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_indices()));
 
-  data.vector_mirrors() = mirrors;
+  data.vector_mirrors() = std::move(mirrors);
   data.vector_mirror_sendbufs() = sendbufs;
   data.vector_mirror_recvbufs() = recvbufs;
   data.dest_ranks() = destranks;

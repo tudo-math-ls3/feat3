@@ -44,6 +44,30 @@ namespace FEAST
       {
       }
 
+      /// explicit constructor
+      explicit VectorMirror(MirrorMatrixType&& mirror_gather, MirrorMatrixType&& mirror_scatter) :
+        _mirror_gather(std::move(mirror_gather)),
+        _mirror_scatter(std::move(mirror_scatter))
+      {
+      }
+
+      /// move-ctor
+      VectorMirror(VectorMirror&& other) :
+        _mirror_gather(std::move(other._mirror_gather)),
+        _mirror_scatter(std::move(other._mirror_scatter))
+      {
+      }
+
+      /// move-assign operator
+      VectorMirror& operator=(VectorMirror&& other)
+      {
+        if(this == &other)
+          return *this;
+        _mirror_gather = std::move(other._mirror_gather);
+        _mirror_scatter = std::move(other._mirror_scatter);
+        return *this;
+      }
+
       /// \cond internal
       const MirrorMatrixType& get_gather_prim() const
       {
@@ -102,13 +126,17 @@ namespace FEAST
        *
        * \param[in] vector
        * A primal vector whose entries are to be gathered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
        */
       template<
         typename Tx_,
         typename Ty_>
       void gather_prim(
         LAFEM::DenseVector<Mem::Main, Tx_>& buffer,
-        const LAFEM::DenseVector<Mem::Main, Ty_>& vector) const
+        const LAFEM::DenseVector<Mem::Main, Ty_>& vector,
+        const Index buffer_offset = Index(0)) const
       {
         Tx_ * x(buffer.elements());
         const Ty_ * y(vector.elements());
@@ -116,6 +144,8 @@ namespace FEAST
         const DataType_* val(_mirror_gather.val());
         const Index * row_ptr(_mirror_gather.row_ptr());
         Index num_rows(_mirror_gather.rows());
+
+        ASSERT_(num_rows + buffer_offset <= buffer.size());
 
         // loop over all gather-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -125,7 +155,7 @@ namespace FEAST
           {
             sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
           }
-          x[row] = sum;
+          x[buffer_offset + row] = sum;
         }
       }
 
@@ -137,13 +167,17 @@ namespace FEAST
        *
        * \param[in] buffer
        * A reference to the buffer vector whose entries are to be scattered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
        */
       template<
         typename Tx_,
         typename Ty_>
       void scatter_prim(
         LAFEM::DenseVector<Mem::Main, Tx_>& vector,
-        const LAFEM::DenseVector<Mem::Main, Ty_>& buffer) const
+        const LAFEM::DenseVector<Mem::Main, Ty_>& buffer,
+        const Index buffer_offset = Index(0)) const
       {
         Tx_ * x(vector.elements());
         const Ty_ * y(buffer.elements());
@@ -151,6 +185,9 @@ namespace FEAST
         const DataType_* val(_mirror_scatter.val());
         const Index * row_ptr(_mirror_scatter.row_ptr());
         const Index num_rows(_mirror_scatter.rows());
+        const Index num_cols(_mirror_scatter.columns());
+
+        ASSERT_(num_cols + buffer_offset <= buffer.size());
 
         // loop over all scatter-matrix rows
         for (Index row(0) ; row < num_rows ; ++row)
@@ -162,7 +199,7 @@ namespace FEAST
           Tx_ sum(Tx_(0));
           for (Index i(row_ptr[row]) ; i < row_ptr[row + 1] ; ++i)
           {
-            sum += Tx_(val[i]) * Tx_(y[col_idx[i]]);
+            sum += Tx_(val[i]) * Tx_(y[buffer_offset + col_idx[i]]);
           }
           x[row] = sum;
         }
@@ -176,15 +213,19 @@ namespace FEAST
        *
        * \param[in] vector
        * A dual vector whose entries are to be gathered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
        */
       template<
         typename Tx_,
         typename Ty_>
       void gather_dual(
         LAFEM::DenseVector<Mem::Main, Tx_>& buffer,
-        const LAFEM::DenseVector<Mem::Main, Ty_>& vector) const
+        const LAFEM::DenseVector<Mem::Main, Ty_>& vector,
+        const Index buffer_offset = Index(0)) const
       {
-        gather_prim(buffer, vector);
+        gather_prim(buffer, vector, buffer_offset);
       }
 
       /**
@@ -195,15 +236,19 @@ namespace FEAST
        *
        * \param[in] buffer
        * A reference to the buffer vector whose entries are to be scattered.
+       *
+       * \param[in] buffer_offset
+       * The offset within the buffer vector.
        */
       template<
         typename Tx_,
         typename Ty_>
       void scatter_dual(
         LAFEM::DenseVector<Mem::Main, Tx_>& vector,
-        const LAFEM::DenseVector<Mem::Main, Ty_>& buffer) const
+        const LAFEM::DenseVector<Mem::Main, Ty_>& buffer,
+        const Index buffer_offset = Index(0)) const
       {
-        scatter_prim(vector, buffer);
+        scatter_prim(vector, buffer, buffer_offset);
       }
     }; // class VectorMirror<...>
   } // namespace LAFEM

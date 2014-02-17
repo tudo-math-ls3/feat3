@@ -883,7 +883,7 @@ class MeshControlPartitioningTest2D:
         DenseVector<Mem::Main, double> sendbuf(target_mirror.size());
         DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
-        mirrors.push_back(target_mirror);
+        mirrors.push_back(std::move(target_mirror));
         sendbufs.push_back(sendbuf);
         recvbufs.push_back(recvbuf);
 

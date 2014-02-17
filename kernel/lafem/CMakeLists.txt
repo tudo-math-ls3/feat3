@@ -54,6 +54,7 @@ SET (test_list
   dense_vector-test
   meta_filter-test
   meta_matrix-apply-test
+  meta_mirror-test
   meta_vector-axpy-test
   meta_vector-comp_prod-test
   meta_vector-dot-norm2-test

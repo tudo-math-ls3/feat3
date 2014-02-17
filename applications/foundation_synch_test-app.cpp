@@ -202,7 +202,7 @@ void check_synch_mirrors(int rank)
   DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
   std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
-  mirrors.push_back(target_mirror);
+  mirrors.push_back(std::move(target_mirror));
   std::vector<LAFEM::DenseVector<Mem::Main, double> > sendbufs;
   sendbufs.push_back(sendbuf);
   std::vector<LAFEM::DenseVector<Mem::Main, double> > recvbufs;
