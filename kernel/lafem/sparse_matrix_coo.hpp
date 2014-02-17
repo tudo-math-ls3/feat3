@@ -859,7 +859,7 @@ namespace FEAST
          */
         void write_out_coo(std::ostream& file) const
         {
-          if (typeid(DT_) != typeid(double))
+          if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an coo matrix with less than double precission!"<<std::endl;
 
           const Index ue(used_elements());

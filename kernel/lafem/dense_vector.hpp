@@ -447,7 +447,7 @@ namespace FEAST
          */
         void write_out_dv(std::ostream& file) const
         {
-          if (typeid(DT_) != typeid(double))
+          if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
           const Index csize(this->_scalar_index.at(0));

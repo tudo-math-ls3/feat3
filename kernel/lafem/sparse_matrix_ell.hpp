@@ -877,7 +877,7 @@ namespace FEAST
          */
         void write_out_ell(std::ostream& file) const
         {
-          if (typeid(DT_) != typeid(double))
+          if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
 
           const Index dim(this->_scalar_index.at(4) * this->_scalar_index.at(3));
@@ -999,7 +999,7 @@ namespace FEAST
           ASSERT(row < this->_scalar_index.at(1), "Error: " + stringify(row) + " exceeds sparse matrix ell row size " + stringify(this->_scalar_index.at(1)) + " !");
           ASSERT(col < this->_scalar_index.at(2), "Error: " + stringify(col) + " exceeds sparse matrix ell column size " + stringify(this->_scalar_index.at(2)) + " !");
 
-          if (typeid(Mem_) == typeid(Mem::Main))
+          if (std::is_same<Mem_, Mem::Main>::value)
           {
             Index max(this->_indices.at(1)[row]);
             for (Index i(row), j(0) ; j < max && this->_indices.at(0)[i] <= col ; i += this->_scalar_index.at(3), ++j)

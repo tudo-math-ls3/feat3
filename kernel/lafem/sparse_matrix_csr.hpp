@@ -809,7 +809,7 @@ namespace FEAST
          */
         void write_out_csr(std::ostream& file) const
         {
-          if (typeid(DT_) != typeid(double))
+          if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an csr matrix with less than double precission!"<<std::endl;
 
           Index * col_ind = MemoryPool<Mem::Main>::instance()->template allocate_memory<Index>(this->_indices_size.at(0));
@@ -941,7 +941,7 @@ namespace FEAST
           ASSERT(row < this->_scalar_index.at(1), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_scalar_index.at(1)) + " !");
           ASSERT(col < this->_scalar_index.at(2), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_scalar_index.at(2)) + " !");
 
-          if (typeid(Mem_) == typeid(Mem::Main))
+          if (std::is_same<Mem_, Mem::Main>::value)
           {
             for (unsigned long i(this->_indices.at(1)[row]) ; i < this->_indices.at(1)[row + 1] ; ++i)
             {

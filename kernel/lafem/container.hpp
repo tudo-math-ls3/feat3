@@ -189,7 +189,7 @@ namespace FEAST
         {
           CONTEXT("When copying Container");
 
-          if (typeid(DT_) != typeid(DT2_))
+          if (! std::is_same<DT_, DT2_>::value)
             throw InternalError(__func__, __FILE__, __LINE__, "type conversion not supported yet!");
 
 
@@ -366,7 +366,7 @@ namespace FEAST
         {
           CONTEXT("When assigning Container");
 
-          if (typeid(DT_) != typeid(DT2_))
+          if (! std::is_same<DT_, DT2_>::value)
             throw InternalError(__func__, __FILE__, __LINE__, "type conversion not supported yet!");
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
