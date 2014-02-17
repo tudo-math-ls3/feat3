@@ -674,7 +674,21 @@ namespace FEAST
         SparseMatrixELL(const SparseMatrixELL<Mem_, DT_> & other) :
           Container<Mem_, DT_>(other)
         {
+
           CONTEXT("When copying SparseMatrixELL");
+        }
+
+        /**
+         * \brief Move Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Moves a given matrix to this matrix.
+         */
+        SparseMatrixELL(SparseMatrixELL<Mem_, DT_> && other) :
+          Container<Mem_, DT_>(other)
+        {
+          CONTEXT("When moving SparseMatrixELL");
         }
 
         /**
@@ -716,6 +730,22 @@ namespace FEAST
           CONTEXT("When assigning SparseMatrixELL");
 
           this->assign(other);
+
+          return *this;
+        }
+
+        /**
+         * \brief Move operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Moves another matrix to the target matrix.
+         */
+        SparseMatrixELL<Mem_, DT_> & operator= (SparseMatrixELL<Mem_, DT_> && other)
+        {
+          CONTEXT("When moving SparseMatrixELL");
+
+          this->move(std::move(other));
 
           return *this;
         }

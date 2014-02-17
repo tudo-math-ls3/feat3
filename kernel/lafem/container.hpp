@@ -152,6 +152,30 @@ namespace FEAST
         }
 
         /**
+         * \brief Move Constructor
+         *
+         * \param[in] other The source container.
+         *
+         * Moves another container to this container.
+         */
+        Container(Container<Mem_, DT_> && other) :
+          _elements(std::move(other._elements)),
+          _indices(std::move(other._indices)),
+          _elements_size(other._elements_size),
+          _indices_size(other._indices_size),
+          _scalar_index(other._scalar_index),
+          _scalar_dt(other._scalar_dt)
+        {
+          CONTEXT("When moving Container");
+          other._elements.clear();
+          other._indices.clear();
+          other._elements_size.clear();
+          other._indices_size.clear();
+          other._scalar_index.clear();
+          other._scalar_dt.clear();
+        }
+
+        /**
          * \brief Copy Constructor
          *
          * \param[in] other The source container.
@@ -213,6 +237,9 @@ namespace FEAST
 
         /**
          * \brief Reset all elements of the container to a given value or zero if missing.
+         *
+         * \param[in] other The source container.
+         *
          */
         void clear(DT_ value = 0)
         {
@@ -225,6 +252,9 @@ namespace FEAST
         /** \brief Clone operation
          *
          * Become a deep copy of a given container.
+         *
+         * \param[in] other The source container.
+         *
          */
         void clone(const Container<Mem_, DT_> & other)
         {
@@ -258,6 +288,9 @@ namespace FEAST
         /** \brief Assignment operation
          *
          * Assign another container to the current one.
+         *
+         * \param[in] other The source container.
+         *
          */
         void assign(const Container<Mem_, DT_> & other)
         {
@@ -287,9 +320,46 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
+        /** \brief Assignment move operation
+         *
+         * Move another container to the current one.
+         *
+         * \param[in] other The source container.
+         *
+         */
+        void move(Container<Mem_, DT_> && other)
+        {
+          CONTEXT("When moving Container");
+
+          if (this == &other)
+            return;
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.assign(other._elements.begin(), other._elements.end());
+          this->_indices.assign(other._indices.begin(), other._indices.end());
+          this->_elements_size.assign(other._elements_size.begin(), other._elements_size.end());
+          this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
+          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
+          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
+
+          other._elements.clear();
+          other._indices.clear();
+          other._elements_size.clear();
+          other._indices_size.clear();
+          other._scalar_index.clear();
+          other._scalar_dt.clear();
+        }
+
         /** \brief Assignment operation
          *
          * Assigns a container from another memory architecture to the current one.
+         *
+         * \param[in] other The source container.
+         *
          */
         template <typename Mem2_, typename DT2_>
         void assign(const Container<Mem2_, DT2_> & other)

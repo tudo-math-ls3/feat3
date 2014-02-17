@@ -260,6 +260,19 @@ namespace FEAST
         }
 
         /**
+         * \brief Move Constructor
+         *
+         * \param[in] other The source vector.
+         *
+         * Moves another vector to this vector.
+         */
+        DenseVector(DenseVector<Mem_, DT_> && other) :
+          Container<Mem_, DT_>(other)
+        {
+          CONTEXT("When moving DenseVector");
+        }
+
+        /**
          * \brief Copy Constructor
          *
          * \param[in] other The source vector.
@@ -297,7 +310,23 @@ namespace FEAST
         {
           CONTEXT("When assigning DenseVector");
 
-         this->assign(other);
+          this->assign(other);
+
+          return *this;
+        }
+
+        /**
+         * \brief Assignment move operator
+         *
+         * \param[in] other The source vector.
+         *
+         * Moves another vector to the target vector.
+         */
+        DenseVector<Mem_, DT_> & operator= (DenseVector<Mem_, DT_> && other)
+        {
+          CONTEXT("When moving DenseVector");
+
+          this->move(std::move(other));
 
           return *this;
         }

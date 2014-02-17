@@ -610,6 +610,19 @@ namespace FEAST
         }
 
         /**
+         * \brief Move Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Moves a given matrix to this matrix.
+         */
+        SparseMatrixCSR(SparseMatrixCSR<Mem_, DT_> && other) :
+          Container<Mem_, DT_>(other)
+        {
+          CONTEXT("When moving SparseMatrixCSR");
+        }
+
+        /**
          * \brief Copy Constructor
          *
          * \param[in] other The source matrix.
@@ -649,6 +662,22 @@ namespace FEAST
           CONTEXT("When assigning SparseMatrixCSR");
 
           this->assign(other);
+
+          return *this;
+        }
+
+        /**
+         * \brief Move operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Moves another matrix to the target matrix.
+         */
+        SparseMatrixCSR<Mem_, DT_> & operator= (SparseMatrixCSR<Mem_, DT_> && other)
+        {
+          CONTEXT("When moving SparseMatrixCSR");
+
+          this->move(std::move(other));
 
           return *this;
         }

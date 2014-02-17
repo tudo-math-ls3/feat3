@@ -110,6 +110,19 @@ namespace FEAST
         }
 
         /**
+         * \brief Move Constructor
+         *
+         * \param[in] other The source matrix.
+         *
+         * Moves a given matrix to this matrix.
+         */
+        DenseMatrix(DenseMatrix<Mem_, DT_> && other) :
+          Container<Mem_, DT_>(other)
+        {
+          CONTEXT("When moving DenseMatrix");
+        }
+
+        /**
          * \brief Copy Constructor
          *
          * \param[in] other The source matrix.
@@ -148,6 +161,22 @@ namespace FEAST
           CONTEXT("When assigning DenseMatrix");
 
          this->assign(other);
+
+          return *this;
+        }
+
+        /**
+         * \brief Move operator
+         *
+         * \param[in] other The source matrix.
+         *
+         * Moves another matrix to the target matrix.
+         */
+        DenseMatrix<Mem_, DT_> & operator= (DenseMatrix<Mem_, DT_> && other)
+        {
+          CONTEXT("When moving DenseMatrix");
+
+          this->move(std::move(other));
 
           return *this;
         }
