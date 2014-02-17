@@ -209,10 +209,10 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_exp:
+            case FileMode::fm_exp:
               _read_from_exp(filename);
               break;
-            case fm_dv:
+            case FileMode::fm_dv:
               _read_from_dv(filename);
               break;
             default:
@@ -235,10 +235,10 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_exp:
+            case FileMode::fm_exp:
               _read_from_exp(file);
               break;
-            case fm_dv:
+            case FileMode::fm_dv:
               _read_from_dv(file);
               break;
             default:
@@ -360,10 +360,10 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_exp:
+            case FileMode::fm_exp:
               write_out_exp(filename);
               break;
-            case fm_dv:
+            case FileMode::fm_dv:
               write_out_dv(filename);
               break;
             default:
@@ -383,10 +383,10 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_exp:
+            case FileMode::fm_exp:
               write_out_exp(file);
               break;
-            case fm_dv:
+            case FileMode::fm_dv:
               write_out_dv(file);
               break;
             default:

@@ -99,19 +99,19 @@ public:
     }
 
     BinaryStream bs;
-    f.write_out(fm_coo, bs);
+    f.write_out(FileMode::fm_coo, bs);
     bs.seekg(0);
-    SparseMatrixCOO<Mem_, DT_> g(fm_coo, bs);
+    SparseMatrixCOO<Mem_, DT_> g(FileMode::fm_coo, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
-    f.write_out(fm_m, ts);
-    SparseMatrixCOO<Mem_, DT_> i(fm_m, ts);
+    f.write_out(FileMode::fm_m, ts);
+    SparseMatrixCOO<Mem_, DT_> i(FileMode::fm_m, ts);
     TEST_CHECK_EQUAL(i, f);
 
     std::stringstream ms;
-    f.write_out(fm_mtx, ms);
-    SparseMatrixCOO<Mem_, DT_> j(fm_mtx, ms);
+    f.write_out(FileMode::fm_mtx, ms);
+    SparseMatrixCOO<Mem_, DT_> j(FileMode::fm_mtx, ms);
     TEST_CHECK_EQUAL(j, f);
   }
 };

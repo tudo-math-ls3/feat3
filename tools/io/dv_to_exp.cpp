@@ -15,6 +15,6 @@ int main(int argc, char ** argv)
     String input(argv[1]);
     String output(argv[2]);
 
-    DenseVector<Mem::Main, double> dv(fm_dv, input);
-    dv.write_out(fm_exp, output);
+    DenseVector<Mem::Main, double> dv(FileMode::fm_dv, input);
+    dv.write_out(FileMode::fm_exp, output);
 }

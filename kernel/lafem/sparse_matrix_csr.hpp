@@ -337,7 +337,7 @@ namespace FEAST
         /// Compatible R-vector type
         typedef DenseVector<MemType, DataType> VectorTypeR;
         /// Our used layout type
-        const static SparseLayoutType LayoutType = lt_csr;
+        const static SparseLayoutType LayoutType = SparseLayoutType::lt_csr;
 
         /**
          * \brief Constructor
@@ -518,13 +518,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_m:
+            case FileMode::fm_m:
               _read_from_m(filename);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               _read_from_mtx(filename);
               break;
-            case fm_csr:
+            case FileMode::fm_csr:
               _read_from_csr(filename);
               break;
             default:
@@ -547,13 +547,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_m:
+            case FileMode::fm_m:
               _read_from_m(file);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               _read_from_mtx(file);
               break;
-            case fm_csr:
+            case FileMode::fm_csr:
               _read_from_csr(file);
               break;
             default:
@@ -748,13 +748,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_csr:
+            case FileMode::fm_csr:
               write_out_csr(filename);
               break;
-            case fm_m:
+            case FileMode::fm_m:
               write_out_m(filename);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               write_out_mtx(filename);
               break;
             default:
@@ -774,13 +774,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_csr:
+            case FileMode::fm_csr:
               write_out_csr(file);
               break;
-            case fm_m:
+            case FileMode::fm_m:
               write_out_m(file);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               write_out_mtx(file);
               break;
             default:

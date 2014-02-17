@@ -638,13 +638,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_m:
+            case FileMode::fm_m:
               _read_from_m(filename);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               _read_from_mtx(filename);
               break;
-            case fm_coo:
+            case FileMode::fm_coo:
               _read_from_coo(filename);
               break;
             default:
@@ -667,13 +667,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_m:
+            case FileMode::fm_m:
               _read_from_m(file);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               _read_from_mtx(file);
               break;
-            case fm_coo:
+            case FileMode::fm_coo:
               _read_from_coo(file);
               break;
             default:
@@ -798,13 +798,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_coo:
+            case FileMode::fm_coo:
               write_out_coo(filename);
               break;
-            case fm_m:
+            case FileMode::fm_m:
               write_out_m(filename);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               write_out_mtx(filename);
               break;
             default:
@@ -824,13 +824,13 @@ namespace FEAST
 
           switch(mode)
           {
-            case fm_coo:
+            case FileMode::fm_coo:
               write_out_coo(file);
               break;
-            case fm_m:
+            case FileMode::fm_m:
               write_out_m(file);
               break;
-            case fm_mtx:
+            case FileMode::fm_mtx:
               write_out_mtx(file);
               break;
             default:

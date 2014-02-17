@@ -23,7 +23,7 @@ namespace FEAST
       /**
        * Supported File modes.
        */
-      enum FileMode
+      enum class FileMode
       {
         fm_exp = 0, /**< Exponential ascii */
         fm_dv, /**< Binary data */

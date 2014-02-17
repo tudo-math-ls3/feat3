@@ -16,6 +16,6 @@ int main(int argc, char ** argv)
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixELL<Mem::Main, double> ell(fm_m, input);
-    ell.write_out(fm_ell, output);
+    SparseMatrixELL<Mem::Main, double> ell(FileMode::fm_m, input);
+    ell.write_out(FileMode::fm_ell, output);
 }

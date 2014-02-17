@@ -111,18 +111,18 @@ public:
     SparseMatrixELL<Mem_, DT_> f(fcoo);
 
     BinaryStream bs;
-    f.write_out(fm_ell, bs);
+    f.write_out(FileMode::fm_ell, bs);
     bs.seekg(0);
-    SparseMatrixELL<Mem_, DT_> g(fm_ell, bs);
+    SparseMatrixELL<Mem_, DT_> g(FileMode::fm_ell, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
-    f.write_out(fm_m, ts);
-    SparseMatrixELL<Mem::Main, DT_> i(fm_m, ts);
+    f.write_out(FileMode::fm_m, ts);
+    SparseMatrixELL<Mem::Main, DT_> i(FileMode::fm_m, ts);
     TEST_CHECK_EQUAL(i, f);
 
-    f.write_out(fm_mtx, ts);
-    SparseMatrixELL<Mem::Main, DT_> j(fm_mtx, ts);
+    f.write_out(FileMode::fm_mtx, ts);
+    SparseMatrixELL<Mem::Main, DT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
   }
 };

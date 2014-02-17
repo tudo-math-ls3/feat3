@@ -109,18 +109,18 @@ public:
     SparseMatrixCSR<Mem_, DT_> f(fcoo);
 
     BinaryStream bs;
-    f.write_out(fm_csr, bs);
+    f.write_out(FileMode::fm_csr, bs);
     bs.seekg(0);
-    SparseMatrixCSR<Mem_, DT_> g(fm_csr, bs);
+    SparseMatrixCSR<Mem_, DT_> g(FileMode::fm_csr, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
-    f.write_out(fm_m, ts);
-    SparseMatrixCSR<Mem::Main, DT_> i(fm_m, ts);
+    f.write_out(FileMode::fm_m, ts);
+    SparseMatrixCSR<Mem::Main, DT_> i(FileMode::fm_m, ts);
     TEST_CHECK_EQUAL(i, f);
 
-    f.write_out(fm_mtx, ts);
-    SparseMatrixCSR<Mem::Main, DT_> j(fm_mtx, ts);
+    f.write_out(FileMode::fm_mtx, ts);
+    SparseMatrixCSR<Mem::Main, DT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
   }
 };

@@ -15,7 +15,7 @@ namespace FEAST
     /**
      * Supported File modes.
      */
-    enum SparseLayoutType
+    enum class SparseLayoutType
     {
       lt_csr = 0,
       lt_ell

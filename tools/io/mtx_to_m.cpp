@@ -16,6 +16,6 @@ int main(int argc, char ** argv)
     String input(argv[1]);
     String output(argv[2]);
 
-    SparseMatrixCSR<Mem::Main, double> csr(fm_mtx, input);
-    csr.write_out(fm_m, output);
+    SparseMatrixCSR<Mem::Main, double> csr(FileMode::fm_mtx, input);
+    csr.write_out(FileMode::fm_m, output);
 }

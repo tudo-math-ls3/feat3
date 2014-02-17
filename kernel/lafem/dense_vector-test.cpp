@@ -87,15 +87,15 @@ public:
       k(i, DT_(i) / DT_(12));
 
     std::stringstream ts;
-    k.write_out(fm_exp, ts);
-    DenseVector<Mem_, DT_> l(fm_exp, ts);
+    k.write_out(FileMode::fm_exp, ts);
+    DenseVector<Mem_, DT_> l(FileMode::fm_exp, ts);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(l(i), k(i), 1e-5);
 
     BinaryStream bs;
-    k.write_out(fm_dv, bs);
+    k.write_out(FileMode::fm_dv, bs);
     bs.seekg(0);
-    DenseVector<Mem_, DT_> m(fm_dv, bs);
+    DenseVector<Mem_, DT_> m(FileMode::fm_dv, bs);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-5);
   }
