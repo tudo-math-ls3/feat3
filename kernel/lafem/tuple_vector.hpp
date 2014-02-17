@@ -27,6 +27,8 @@ namespace FEAST
       template<typename,typename...>
       friend class TupleVectorBase;
 
+      typedef TupleVectorBase<Rest_...> RestClass;
+
     public:
       /// dummy enum
       enum
@@ -35,11 +37,16 @@ namespace FEAST
         num_blocks = TupleVectorBase<Rest_...>::num_blocks + 1
       };
 
+      typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
+
+      // ensure that all sub-vector have the same mem- and data-type
+      static_assert(SAME_TYPE(MemType, typename RestClass::MemType), "sub-vectors have different mem-types");
+      static_assert(SAME_TYPE(DataType, typename RestClass::DataType), "sub-vectors have different data-types");
 
     protected:
       First_ _first;
-      TupleVectorBase<Rest_...> _rest;
+      RestClass _rest;
 
       explicit TupleVectorBase(First_&& first, TupleVectorBase<Rest_...>&& rest) :
         _first(std::move(first)),
@@ -184,6 +191,7 @@ namespace FEAST
       {
         num_blocks = 1
       };
+      typedef typename First_::MemType MemType;
       typedef typename First_::DataType DataType;
 
     protected:

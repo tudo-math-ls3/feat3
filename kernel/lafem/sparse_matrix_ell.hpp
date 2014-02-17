@@ -123,7 +123,7 @@ namespace FEAST
           Index idx(0);
           for (auto row : entries)
           {
-            tArl[idx] = row.second.size();
+            tArl[idx] = Index(row.second.size());
             this->_scalar_index.at(4) = std::max(this->_scalar_index.at(4), tArl[idx]);
             ++idx;
           }
@@ -249,7 +249,7 @@ namespace FEAST
           Index idx(0);
           for (auto row : entries)
           {
-            tArl[idx] = row.second.size();
+            tArl[idx] = Index(row.second.size());
             this->_scalar_index.at(4) = std::max(this->_scalar_index.at(4), tArl[idx]);
             ++idx;
           }

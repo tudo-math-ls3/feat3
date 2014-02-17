@@ -62,6 +62,22 @@ namespace FEAST
       /// type of sub-matrix D
       typedef MatrixD_ MatrixTypeD;
 
+      // ensure that all matrices have the same mem- and data-types
+      static_assert(SAME_TYPE(typename MatrixA_::MemType, typename MatrixB_::MemType),
+        "A and B have different mem-types");
+      static_assert(SAME_TYPE(typename MatrixA_::MemType, typename MatrixD_::MemType),
+        "A and D have different mem-types");
+      static_assert(SAME_TYPE(typename MatrixA_::DataType, typename MatrixB_::DataType),
+        "A and B have different data-types");
+      static_assert(SAME_TYPE(typename MatrixA_::DataType, typename MatrixD_::DataType),
+        "A and D have different data-types");
+
+      // ensure that the compatible vector types are the same
+      static_assert(SAME_TYPE(typename MatrixA_::VectorTypeL, typename MatrixB_::VectorTypeL),
+        "A and B have different compatible L-vectors");
+      static_assert(SAME_TYPE(typename MatrixA_::VectorTypeR, typename MatrixD_::VectorTypeR),
+        "A and D have different compatible R-vectors");
+
       /// memory type
       typedef typename MatrixTypeA::MemType MemType;
       /// data type
