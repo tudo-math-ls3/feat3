@@ -12,6 +12,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
+  typename PSF_,
   typename Algo_,
   typename SM_>
 class RichardsonTest
@@ -29,8 +30,7 @@ public:
 
   virtual void run() const
   {
-    //PointstarFactoryFD<DT_> factory(3, 2);
-    PointstarFactoryFE<DT_> factory(13);
+    PSF_ factory(13);
     SM_ sys(factory.matrix_csr());
 
     Index size(sys.rows());
@@ -43,22 +43,29 @@ public:
     JacobiPreconditioner<Algo_, SM_, DenseVector<Mem_, DT_> > jac(sys, DT_(0.7));
 
 
-    Richardson<Algo_>::value(x, sys, b, jac, 1000, DT_(1e-10));
+    Richardson<Algo_>::value(x, sys, b, jac, 5000, DT_(1e-12));
 
     DenseVector<Mem::Main, DT_> sol(size);
     sol.copy(x);
     for (Index i(0) ; i < size ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(sol(i), ref_local(i), 1e-9);
+      TEST_CHECK_EQUAL_WITHIN_EPS(sol(i), ref_local(i), 1e-8);
   }
 };
-RichardsonTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double> > coo_richardson_test_double;
-RichardsonTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double> > csr_richardson_test_double;
-RichardsonTest<Algo::Generic, SparseMatrixELL<Mem::Main, double> > ell_richardson_test_double;
+RichardsonTest<PointstarFactoryFD<double>, Algo::Generic, SparseMatrixCOO<Mem::Main, double> > coo_fd_richardson_test_double;
+RichardsonTest<PointstarFactoryFE<double>, Algo::Generic, SparseMatrixCOO<Mem::Main, double> > coo_fe_richardson_test_double;
+RichardsonTest<PointstarFactoryFD<double>, Algo::Generic, SparseMatrixCSR<Mem::Main, double> > csr_fd_richardson_test_double;
+RichardsonTest<PointstarFactoryFE<double>, Algo::Generic, SparseMatrixCSR<Mem::Main, double> > csr_fe_richardson_test_double;
+RichardsonTest<PointstarFactoryFD<double>, Algo::Generic, SparseMatrixELL<Mem::Main, double> > ell_fd_richardson_test_double;
+RichardsonTest<PointstarFactoryFE<double>, Algo::Generic, SparseMatrixELL<Mem::Main, double> > ell_fe_richardson_test_double;
 #ifdef FEAST_BACKENDS_MKL
-RichardsonTest<Algo::MKL, SparseMatrixCOO<Mem::Main, double> > mkl_coo_richardson_test_double;
-RichardsonTest<Algo::MKL, SparseMatrixCSR<Mem::Main, double> > mkl_csr_richardson_test_double;
+RichardsonTest<PointstarFactoryFD<double>, Algo::MKL, SparseMatrixCOO<Mem::Main, double> > mkl_coo_fd_richardson_test_double;
+RichardsonTest<PointstarFactoryFE<double>, Algo::MKL, SparseMatrixCOO<Mem::Main, double> > mkl_coo_fe_richardson_test_double;
+RichardsonTest<PointstarFactoryFD<double>, Algo::MKL, SparseMatrixCSR<Mem::Main, double> > mkl_csr_fd_richardson_test_double;
+RichardsonTest<PointstarFactoryFE<double>, Algo::MKL, SparseMatrixCSR<Mem::Main, double> > mkl_csr_fe_richardson_test_double;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-RichardsonTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_richardson_test_double;
-RichardsonTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_richardson_test_double;
+RichardsonTest<PointstarFactoryFD<double>, Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_fd_richardson_test_double;
+RichardsonTest<PointstarFactoryFE<double>, Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double> > cuda_csr_fe_richardson_test_double;
+RichardsonTest<PointstarFactoryFD<double>, Algo::CUDA, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_fd_richardson_test_double;
+RichardsonTest<PointstarFactoryFE<double>, Algo::CUDA, SparseMatrixELL<Mem::CUDA, double> > cuda_ell_fe_richardson_test_double;
 #endif

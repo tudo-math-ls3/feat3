@@ -169,7 +169,7 @@ namespace FEAST
        * \param[in] d
        * The dimension of the grid. Must be >= 1.
        */
-      PointstarFactoryFD(Index m, Index d) :
+      PointstarFactoryFD(Index m, Index d = Index(2)) :
         PointstarFactoryBase<DataType_>(m, d)
       {
       }
