@@ -161,10 +161,10 @@ namespace FEAST
         Container(Container<Mem_, DT_> && other) :
           _elements(std::move(other._elements)),
           _indices(std::move(other._indices)),
-          _elements_size(other._elements_size),
-          _indices_size(other._indices_size),
-          _scalar_index(other._scalar_index),
-          _scalar_dt(other._scalar_dt)
+          _elements_size(std::move(other._elements_size)),
+          _indices_size(std::move(other._indices_size)),
+          _scalar_index(std::move(other._scalar_index)),
+          _scalar_dt(std::move(other._scalar_dt))
         {
           CONTEXT("When moving Container");
           other._elements.clear();
@@ -339,19 +339,12 @@ namespace FEAST
           for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
-          this->_elements.assign(other._elements.begin(), other._elements.end());
-          this->_indices.assign(other._indices.begin(), other._indices.end());
-          this->_elements_size.assign(other._elements_size.begin(), other._elements_size.end());
-          this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
-          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
-          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
-
-          other._elements.clear();
-          other._indices.clear();
-          other._elements_size.clear();
-          other._indices_size.clear();
-          other._scalar_index.clear();
-          other._scalar_dt.clear();
+          this->_elements = std::move(other._elements);
+          this->_indices = std::move(other._indices);
+          this->_elements_size = std::move(other._elements_size);
+          this->_indices_size = std::move(other._indices_size);
+          this->_scalar_index = std::move(other._scalar_index);
+          this->_scalar_dt = std::move(other._scalar_dt);
         }
 
         /** \brief Assignment operation
