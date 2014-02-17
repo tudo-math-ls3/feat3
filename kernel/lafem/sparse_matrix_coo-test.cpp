@@ -84,6 +84,7 @@ public:
     TEST_CHECK_EQUAL(c, b);
     c(1,2,3);
     TEST_CHECK_NOT_EQUAL(c, b);
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
 
     SparseMatrixCOO<Mem_, DT_> f(10, 10);
     for (Index row(0) ; row < f.rows() ; ++row)
