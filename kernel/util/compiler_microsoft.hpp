@@ -101,6 +101,17 @@
 // This warning is disabled as it is mass-produced when compiling standard libraries.
 #  pragma warning(disable: 4820)
 
+// C5024: 'class' : move constructor was implicitly defined as deleted
+// C5025: 'class' : move assignment operator was implicitly defined as deleted
+// C5026: 'class' : move constructor was implicitly defined as deleted because
+//                  a base class move constructor is inaccessible or deleted
+// C5027: 'class' : move assignment operator was implicitly defined as deleted because
+//                  a base class move assignment operator is inaccessible or deleted
+#  pragma warning(disable: 5024)
+#  pragma warning(disable: 5025)
+#  pragma warning(disable: 5026)
+#  pragma warning(disable: 5027)
+
 // disable CRT security warnings for standard C/C++ library functions
 #ifndef _CRT_SECURE_NO_WARNINGS
 #  define _CRT_SECURE_NO_WARNINGS 1

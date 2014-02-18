@@ -5,7 +5,8 @@
 
   <!-- Set platform toolset; must be defined before the following imports -->
   <PropertyGroup Label="Configuration">
-    <PlatformToolset>v120</PlatformToolset>
+    <!--<PlatformToolset>v120</PlatformToolset> -->
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
