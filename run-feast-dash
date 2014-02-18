@@ -231,7 +231,7 @@ for branch in branches:
     run_test("mpi-gcc-opt-coverage" + addition, branch, myDB)
     run_test("serial-gcc-debug-coverage" + addition, branch, myDB)
     run_test("serial-gcc-opt-coverage" + addition, branch, myDB)
-    sys.exit()
+    continue
 
   if is_found("mpic++"):
     if is_found("g++"):
