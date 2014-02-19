@@ -168,7 +168,10 @@ namespace FEAST
     {
       // ensure that we have a context stack
       if (context_stack == nullptr)
-        throw InternalError("no context!");
+      {
+        std::cout << stderr << " Error: Context Stack empty! (exception.cpp / Context destructor)" << std::endl;
+        std::exit(1);
+      }
 
       // remove the last context from the stack
       context_stack->pop_back();

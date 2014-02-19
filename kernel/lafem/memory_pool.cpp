@@ -14,7 +14,10 @@ MemoryPool<Mem::Main>::MemoryPool()
 MemoryPool<Mem::Main>::~MemoryPool()
 {
   if (_pool.size() > 0)
-    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CPU> still contains memory chunks!");
+  {
+    std::cout << stderr << " Error: MemoryPool<CPU> still contains memory chunks on deconstructor call" << std::endl;
+    std::exit(1);
+  }
 }
 
 template <typename DT_>

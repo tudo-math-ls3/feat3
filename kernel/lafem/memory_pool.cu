@@ -1,6 +1,8 @@
 // includes, FEAST
 #include <kernel/lafem/memory_pool.hpp>
 
+#include <cstdio>
+
 namespace FEAST
 {
   namespace LAFEM
@@ -30,7 +32,10 @@ MemoryPool<Mem::CUDA>::MemoryPool()
 MemoryPool<Mem::CUDA>::~MemoryPool()
 {
   if (_pool.size() > 0)
-    throw InternalError("Memory Pool<GPU> still contains memory chunks!");
+  {
+    std::cout << stderr << " Error: MemoryPool<CUDA> still contains memory chunks on deconstructor call" << std::endl;
+    std::exit(1);
+  }
 }
 
 template <typename DT_>
