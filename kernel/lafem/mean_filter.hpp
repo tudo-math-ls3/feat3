@@ -138,7 +138,7 @@ namespace FEAST
         // compute dual integral
         DataType integ = vector.template dot<Algo_>(_vec_prim);
         // subtract mean
-        vector.template axpy<Algo_>(_vec_dual, vector, -integ / _volume)
+        vector.template axpy<Algo_>(_vec_dual, vector, -integ / _volume);
       }
 
       /**
@@ -153,7 +153,7 @@ namespace FEAST
         // compute primal integral
         DataType integ = vector.template dot<Algo_>(_vec_dual);
         // subtract mean
-        vector.template axpy<Algo_>(_vec_prim, vector, -integ / _volume)
+        vector.template axpy<Algo_>(_vec_prim, vector, -integ / _volume);
       }
 
       /**
