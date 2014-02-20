@@ -13,32 +13,46 @@ namespace FEAST
 {
   namespace LAFEM
   {
+#ifndef DOXYGEN
+    template<
+      Index i_,
+      typename First_,
+      typename... Rest_>
+    struct TupleVectorElement;
+#endif
+
     /**
-     * \brief Variadic base class for TupleVector
+     * \brief Variadic TupleVector class template
      *
-     * \attention Do not use this class template directly; use the TupleVector class template instead!
+     * This class template implements a composition of sub-vectors of arbitrary classes.
+     *
+     * \tparam First_, ...Rest_
+     * A sequence of (meta) vector classes which are to be composed.
      *
      * \author Peter Zajac
      */
     template<
       typename First_,
       typename... Rest_>
-    class TupleVectorBase
+    class TupleVector
     {
       template<typename,typename...>
-      friend class TupleVectorBase;
+      friend class TupleVector;
 
-      typedef TupleVectorBase<Rest_...> RestClass;
+      typedef TupleVector<Rest_...> RestClass;
 
     public:
       /// dummy enum
       enum
       {
         /// number of vector blocks
-        num_blocks = TupleVectorBase<Rest_...>::num_blocks + 1
+        num_blocks = TupleVector<Rest_...>::num_blocks + 1
       };
 
+
+      /// sub-vector mem-type
       typedef typename First_::MemType MemType;
+      /// sub-vector data-type
       typedef typename First_::DataType DataType;
 
       // ensure that all sub-vector have the same mem- and data-type
@@ -48,53 +62,62 @@ namespace FEAST
         "sub-vectors have different data-types");
 
     protected:
+      /// the first sub-vector
       First_ _first;
+      /// all remaining sub-vectors
       RestClass _rest;
 
-      explicit TupleVectorBase(First_&& first, TupleVectorBase<Rest_...>&& rest) :
+      /// rest-class emplacement ctor; this one is protected for a reason
+      explicit TupleVector(First_&& first, RestClass&& rest) :
         _first(std::move(first)),
         _rest(std::move(rest))
       {
       }
 
-      explicit TupleVectorBase(First_&& first, Rest_&&... rest) :
+      /// Returns a list of all sub-vector type names
+      static String sub_name_list()
+      {
+        return First_::type_name() + "," + RestClass::sub_name_list();
+      }
+
+    public:
+      /// default CTOR
+      TupleVector()
+      {
+      }
+
+      /// Sub-Vector emplacement constructor
+      explicit TupleVector(First_&& first, Rest_&&... rest) :
         _first(std::move(first)),
         _rest(std::move(rest...))
       {
       }
 
-      TupleVectorBase()
-      {
-      }
-
-      TupleVectorBase(TupleVectorBase&& other) :
+      /// move ctor
+      TupleVector(TupleVector&& other) :
         _first(std::move(other._first)),
         _rest(std::move(other._rest))
       {
       }
 
-      TupleVectorBase& operator=(TupleVectorBase&& other)
+      /// move-assign operator
+      TupleVector& operator=(TupleVector&& other)
       {
         _first = std::move(other._first);
         _rest = std::move(other._rest);
       }
 
       /// deleted copy-ctor
-      TupleVectorBase(const TupleVectorBase&) = delete;
+      TupleVector(const TupleVector&) = delete;
       /// deleted copy-assign operator
-      TupleVectorBase& operator=(const TupleVectorBase&) = delete;
+      TupleVector& operator=(const TupleVector&) = delete;
 
-      TupleVectorBase clone() const
+      /// Creates and returns a deep copy of this vector.
+      TupleVector clone() const
       {
-        return TupleVectorBase(_first.clone(), _rest.clone());
+        return TupleVector(_first.clone(), _rest.clone());
       }
 
-      static String sub_name_list()
-      {
-        return First_::type_name() + "," + TupleVectorBase<Rest_...>::sub_name_list();
-      }
-
-    public:
       /// \cond internal
       First_& first()
       {
@@ -106,22 +129,60 @@ namespace FEAST
         return _first;
       }
 
-      TupleVectorBase<Rest_...>& rest()
+      TupleVector<Rest_...>& rest()
       {
         return _rest;
       }
 
-      const TupleVectorBase<Rest_...>& rest() const
+      const TupleVector<Rest_...>& rest() const
       {
         return _rest;
       }
       /// \endcond
 
+      /**
+       * \brief Returns a sub-vector block.
+       *
+       * \tparam i_
+       * The index of the sub-vector block that is to be returned.
+       *
+       * \returns
+       * A (const) reference to the sub-vector at position \p i_.
+       */
+      template<Index i_>
+      typename TupleVectorElement<i_, First_, Rest_...>::Type& at()
+      {
+        static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
+        return TupleVectorElement<i_, First_, Rest_...>::get(*this);
+      }
+
+      /** \copydoc at() */
+      template<Index i_>
+      typename TupleVectorElement<i_, First_, Rest_...>::Type const& at() const
+      {
+        static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
+        return TupleVectorElement<i_, First_, Rest_...>::get(*this);
+      }
+
+      /// Returns the total size of this tuple-vector.
       Index size() const
       {
         return _first.size() + _rest.size();
       }
 
+      /// Returns the number of blocks in this tuple-vector.
+      Index blocks() const
+      {
+        return Index(num_blocks);
+      }
+
+      /// Returns a descriptive string for this container.
+      static String type_name()
+      {
+        return String("TupleVector<") + sub_name_list() + ">";
+      }
+
+      /// Clears the vector
       void clear(DataType value = DataType(0))
       {
         first().clear(value);
@@ -129,42 +190,42 @@ namespace FEAST
       }
 
       //template<typename First2_, typename... Rest2_>
-      void copy(const TupleVectorBase/*<First2_, Rest2_...>*/& x)
+      void copy(const TupleVector/*<First2_, Rest2_...>*/& x)
       {
         first().copy(x.first());
         rest().copy(x.rest());
       }
 
       template<typename Algo_>
-      void axpy(const TupleVectorBase& x, const TupleVectorBase& y, DataType alpha = DataType(1))
+      void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))
       {
         first().template axpy<Algo_>(x.first(), y.first(), alpha);
         rest().template axpy<Algo_>(x.rest(), y.rest(), alpha);
       }
 
       template <typename Algo_>
-      void component_product(const TupleVectorBase & x, const TupleVectorBase & y)
+      void component_product(const TupleVector & x, const TupleVector & y)
       {
         first().template component_product<Algo_>(x.first(), y.first());
         rest().template component_product<Algo_>(x.rest(), y.rest());
       }
 
       template <typename Algo_>
-      void component_product(const TupleVectorBase & x, const TupleVectorBase & y, const TupleVectorBase& z)
+      void component_product(const TupleVector & x, const TupleVector & y, const TupleVector& z)
       {
         first().template component_product<Algo_>(x.first(), y.first(), z.first());
         rest().template component_product<Algo_>(x.rest(), y.rest(), z.rest());
       }
 
       template<typename Algo_>
-      void scale(const TupleVectorBase& x, DataType alpha)
+      void scale(const TupleVector& x, DataType alpha)
       {
         first().template scale<Algo_>(x.first(), alpha);
         rest().template scale<Algo_>(x.rest(), alpha);
       }
 
       template<typename Algo_>
-      DataType dot(const TupleVectorBase& x) const
+      DataType dot(const TupleVector& x) const
       {
         return first().template dot<Algo_>(x.first()) + rest().template dot<Algo_>(x.rest());
       }
@@ -180,14 +241,14 @@ namespace FEAST
       {
         return Math::sqrt(norm2sqr<Algo_>());
       }
-    };
+    }; // class TupleVector<...>
 
     /// \cond internal
     template<typename First_>
-    class TupleVectorBase<First_>
+    class TupleVector<First_>
     {
       template<typename,typename...>
-      friend class TupleVectorBase;
+      friend class TupleVector;
 
     public:
       enum
@@ -200,41 +261,44 @@ namespace FEAST
     protected:
       First_ _first;
 
-      explicit TupleVectorBase(First_&& first) :
-        _first(std::move(first))
-      {
-      }
-
-      TupleVectorBase()
-      {
-      }
-
-      TupleVectorBase(TupleVectorBase&& other) :
-        _first(std::move(other._first))
-      {
-      }
-
-      TupleVectorBase& operator=(TupleVectorBase&& other)
-      {
-        _first = std::move(other._first);
-      }
-
-      /// deleted copy-ctor
-      TupleVectorBase(const TupleVectorBase&) = delete;
-      /// deleted copy-assign operator
-      TupleVectorBase& operator=(const TupleVectorBase&) = delete;
-
-      TupleVectorBase clone() const
-      {
-        return TupleVectorBase(_first.clone());
-      }
-
       static String sub_name_list()
       {
         return First_::type_name();
       }
 
     public:
+      TupleVector()
+      {
+      }
+
+      explicit TupleVector(First_&& first) :
+        _first(std::move(first))
+      {
+      }
+
+      /// move-ctor
+      TupleVector(TupleVector&& other) :
+        _first(std::move(other._first))
+      {
+      }
+
+      /// move-assign operator
+      TupleVector& operator=(TupleVector&& other)
+      {
+        _first = std::move(other._first);
+      }
+
+      /// deleted copy-ctor
+      TupleVector(const TupleVector&) = delete;
+      /// deleted copy-assign operator
+      TupleVector& operator=(const TupleVector&) = delete;
+
+      /// Creates and returns a deep copy of this vector.
+      TupleVector clone() const
+      {
+        return TupleVector(_first.clone());
+      }
+
       First_& first()
       {
         return _first;
@@ -250,43 +314,69 @@ namespace FEAST
         return _first.size();
       }
 
+      /// Returns the number of blocks in this tuple-vector.
+      Index blocks() const
+      {
+        return Index(num_blocks);
+      }
+
+      /// Returns a descriptive string for this container.
+      static String type_name()
+      {
+        return String("TupleVector<") + sub_name_list() + ">";
+      }
+
+      template<Index i_>
+      typename TupleVectorElement<i_, First_>::Type& at()
+      {
+        static_assert(i_ == 0, "invalid sub-vector index");
+        return first();
+      }
+
+      template<Index i_>
+      typename TupleVectorElement<i_, First_>::Type const& at() const
+      {
+        static_assert(i_ == 0, "invalid sub-vector index");
+        return first();
+      }
+
       void clear(DataType value = DataType(0))
       {
         _first.clear(value);
       }
 
       //template<typename First2_>
-      void copy(const TupleVectorBase/*<First2_>*/& x)
+      void copy(const TupleVector/*<First2_>*/& x)
       {
         first().copy(x.first());
       }
 
       template<typename Algo_>
-      void axpy(const TupleVectorBase& x, const TupleVectorBase& y, DataType alpha = DataType(1))
+      void axpy(const TupleVector& x, const TupleVector& y, DataType alpha = DataType(1))
       {
         first().template axpy<Algo_>(x.first(), y.first(), alpha);
       }
 
       template <typename Algo_>
-      void component_product(const TupleVectorBase & x, const TupleVectorBase & y)
+      void component_product(const TupleVector & x, const TupleVector & y)
       {
         first().template component_product<Algo_>(x.first(), y.first());
       }
 
       template <typename Algo_>
-      void component_product(const TupleVectorBase & x, const TupleVectorBase & y, const TupleVectorBase& z)
+      void component_product(const TupleVector & x, const TupleVector & y, const TupleVector& z)
       {
         first().template component_product<Algo_>(x.first(), y.first(), z.first());
       }
 
       template<typename Algo_>
-      void scale(const TupleVectorBase& x, DataType alpha)
+      void scale(const TupleVector& x, DataType alpha)
       {
         first().template scale<Algo_>(x.first(), alpha);
       }
 
       template<typename Algo_>
-      DataType dot(const TupleVectorBase& x) const
+      DataType dot(const TupleVector& x) const
       {
         return first().template dot<Algo_>(x.first());
       }
@@ -320,12 +410,12 @@ namespace FEAST
     {
       typedef typename TupleVectorElement<i_-1, Rest_...>::Type Type;
 
-      static Type& get(TupleVectorBase<First_, Rest_...>& meta)
+      static Type& get(TupleVector<First_, Rest_...>& meta)
       {
         return TupleVectorElement<i_-1, Rest_...>::get(meta.rest());
       }
 
-      static const Type& get(const TupleVectorBase<First_, Rest_...>& meta)
+      static const Type& get(const TupleVector<First_, Rest_...>& meta)
       {
         return TupleVectorElement<i_-1, Rest_...>::get(meta.rest());
       }
@@ -337,140 +427,26 @@ namespace FEAST
     {
       typedef First_ Type;
 
-      static Type& get(TupleVectorBase<First_, Rest_...>& meta)
+      static Type& get(TupleVector<First_, Rest_...>& meta)
       {
         return meta.first();
       }
-      static const Type& get(const TupleVectorBase<First_, Rest_...>& meta)
+      static const Type& get(const TupleVector<First_, Rest_...>& meta)
       {
         return meta.first();
       }
     };
     /// \endcond
 
-    /**
-     * \brief Variadic TupleVector class template
-     *
-     * This class template implements a composition of sub-vectors of arbitrary classes.
-     *
-     * \tparam First_, ...Rest_
-     * A sequence of (meta) vector classes which are to be composed.
-     *
-     * \author Peter Zajac
-     */
-    template<
-      typename First_,
-      typename... Rest_>
-    class TupleVector :
-      public TupleVectorBase<First_, Rest_...>
-    {
-      /// base-class typedef
-      typedef TupleVectorBase<First_, Rest_...> BaseClass;
-
-    public:
-      /// dummy enum
-      enum
-      {
-        // number of blocks in this vector
-        num_blocks = BaseClass::num_blocks
-      };
-
-    protected:
-      /// data-move CTOR; this one is protected for a reason
-      explicit TupleVector(TupleVectorBase<First_, Rest_...>&& other) :
-        BaseClass(std::move(other))
-      {
-      }
-
-    public:
-      /// default CTOR
-      TupleVector()
-      {
-      }
-
-      /// Sub-Vector emplacement constructor
-      explicit TupleVector(First_&& first, Rest_&&... rest) :
-        BaseClass(std::move(first), std::move(rest...))
-      {
-      }
-
-      /// move CTOR
-      TupleVector(TupleVector&& other) :
-        BaseClass(static_cast<BaseClass&&>(other))
-      {
-      }
-
-      /// move-assign operator
-      TupleVector& operator=(TupleVector&& other)
-      {
-        static_cast<BaseClass&>(*this).operator=(other);
-        return *this;
-      }
-
-      /// deleted copy-ctor
-      TupleVector(const TupleVector&) = delete;
-      /// deleted copy-assign operator
-      TupleVector& operator=(const TupleVector&) = delete;
-
-      /// virtual destructor
-      virtual ~TupleVector()
-      {
-      }
-
-      /**
-       * \brief Creates and returns a deep copy of this vector.
-       */
-      TupleVector clone() const
-      {
-        return TupleVector(BaseClass::clone());
-      }
-
-      /**
-       * \brief Returns a sub-vector block.
-       *
-       * \tparam i_
-       * The index of the sub-vector block that is to be returned.
-       *
-       * \returns
-       * A (const) reference to the sub-vector at position \p i_.
-       */
-      template<Index i_>
-      typename TupleVectorElement<i_, First_, Rest_...>::Type& at()
-      {
-        static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
-        return TupleVectorElement<i_, First_, Rest_...>::get(*this);
-      }
-
-      /** \copydoc at() */
-      template<Index i_>
-      typename TupleVectorElement<i_, First_, Rest_...>::Type const& at() const
-      {
-        static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
-        return TupleVectorElement<i_, First_, Rest_...>::get(*this);
-      }
-
-      /// Returns the number of blocks in this tuple-vector.
-      Index blocks() const
-      {
-        return Index(num_blocks);
-      }
-
-      /// Returns a descriptive string for this container.
-      static String type_name()
-      {
-        return String("TupleVector<") + BaseClass::sub_name_list() + ">";
-      }
-    }; // class BlockVector<...>
-
     /// \cond internal
     template <typename First_>
-    inline void dump_tuple_vector(std::ostream & os, const TupleVectorBase<First_>& x)
+    inline void dump_tuple_vector(std::ostream & os, const TupleVector<First_>& x)
     {
       os << x.first();
     }
 
     template <typename First_, typename... Rest_>
-    inline void dump_tuple_vector(std::ostream & os, const TupleVectorBase<First_, Rest_...>& x)
+    inline void dump_tuple_vector(std::ostream & os, const TupleVector<First_, Rest_...>& x)
     {
       os << x.first() << ",";
       dump_tuple_vector<Rest_...>(os, x.rest());
