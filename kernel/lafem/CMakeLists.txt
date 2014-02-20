@@ -63,6 +63,7 @@ SET (test_list
   sparse_matrix_coo-test
   sparse_matrix_csr-test
   sparse_matrix_ell-test
+  sparse_vector-test
   transposition-test
 )
 
