@@ -100,6 +100,8 @@ namespace FEAST
 
           ::memcpy(dest, src, count * sizeof(DT_));
         }
+
+        static void synchronize(){}
     };
 
     template <>
@@ -147,6 +149,8 @@ namespace FEAST
         /// Copy memory area from src to dest
         template <typename DT_>
         static void copy(DT_ * dest, const DT_ * src, const Index count);
+
+        static void synchronize();
     };
   } // namespace LAFEM
 } // namespace FEAST

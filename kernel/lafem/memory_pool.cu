@@ -124,6 +124,11 @@ void MemoryPool<Mem::CUDA>::copy(DT_ * dest, const DT_ * src, const Index count)
   cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToDevice);
 }
 
+void MemoryPool<Mem::CUDA>::synchronize()
+{
+  cudaDeviceSynchronize();
+}
+
 template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template Index * MemoryPool<Mem::CUDA>::allocate_memory<Index>(const Index);
