@@ -221,11 +221,15 @@ namespace FEAST
          */
         DT_ * elements()
         {
+          if (sorted() == 0)
+            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
           return this->_elements.at(0);
         }
 
         DT_ const * elements() const
         {
+          if (sorted() == 0)
+            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
           return this->_elements.at(0);
         }
 
@@ -236,11 +240,15 @@ namespace FEAST
          */
         Index * indices()
         {
+          if (sorted() == 0)
+            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
           return this->_indices.at(0);
         }
 
         Index const * indices() const
         {
+          if (sorted() == 0)
+            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
           return this->_indices.at(0);
         }
 
