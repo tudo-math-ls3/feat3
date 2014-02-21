@@ -25,8 +25,9 @@ endif (FEAST_GMP)
 
 
 if (FEAST_BACKENDS_CUDA)
-  CUDA_ADD_LIBRARY(kernel-lafem-cuda STATIC
+  CUDA_ADD_LIBRARY(kernel-lafem-cuda
     memory_pool.cu
+    STATIC
   )
   ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-cuda)

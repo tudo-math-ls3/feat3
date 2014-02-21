@@ -8,14 +8,14 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
-void ProductMatVec<Mem::Main, Algo::MKL>::csr(float * r, const float * const val, const Index * const col_ind, const Index * const row_ptr, const float * const x, const Index rows)
+void ProductMatVec<Mem::Main, Algo::MKL>::csr(float * r, const float * const val, const Index * const col_ind, const Index * const row_ptr, const float * const x, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
   mkl_cspblas_scsrgemv(&trans, &mrows, (float *)val, (MKL_INT*)row_ptr, (MKL_INT*)col_ind, (float *)x, r);
 }
 
-void ProductMatVec<Mem::Main, Algo::MKL>::csr(double * r, const double * const val, const Index * const col_ind, const Index * const row_ptr, const double * const x, const Index rows)
+void ProductMatVec<Mem::Main, Algo::MKL>::csr(double * r, const double * const val, const Index * const col_ind, const Index * const row_ptr, const double * const x, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';

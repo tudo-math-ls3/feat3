@@ -1160,7 +1160,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
           Arch::ProductMatVec<Mem_, Algo_>::csr(r.elements(), this->val(), this->col_ind(), this->row_ptr(),
-            x.elements(), this->rows());
+            x.elements(), this->rows(), columns(), used_elements());
         }
 
         /**
@@ -1190,7 +1190,7 @@ namespace FEAST
           if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
           {
             Arch::Defect<Mem_, Algo_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
-              this->row_ptr(), x.elements(), this->rows());
+              this->row_ptr(), x.elements(), this->rows(), columns(), used_elements());
           }
           //r <- y
           else if(Math::abs(alpha) < Math::eps<DT_>())

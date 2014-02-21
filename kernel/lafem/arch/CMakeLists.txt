@@ -44,7 +44,7 @@ if (FEAST_BACKENDS_MKL)
 endif(FEAST_BACKENDS_MKL)
 
 if (FEAST_BACKENDS_CUDA)
-  CUDA_ADD_LIBRARY(kernel-lafem-arch-cuda STATIC
+  CUDA_ADD_LIBRARY(kernel-lafem-arch-cuda
     axpy.cu
     component_product.cu
     defect.cu
@@ -54,8 +54,10 @@ if (FEAST_BACKENDS_CUDA)
     product_matvec.cu
     scale.cu
     sum.cu
+    STATIC
   )
   ADD_DEPENDENCIES(kernel-lafem-arch kernel-lafem-arch-cuda)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-arch-cuda)
+  target_link_libraries(kernel-lafem-arch-cuda ${CUDA_cusparse_LIBRARY})
   TARGET_LINK_LIBRARIES(kernel-lafem-arch kernel-lafem-arch-cuda)
 endif(FEAST_BACKENDS_CUDA)
