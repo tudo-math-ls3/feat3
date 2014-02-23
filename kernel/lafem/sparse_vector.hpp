@@ -33,8 +33,8 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_>
-    class SparseVector : public Container<Mem_, DT_>, public VectorBase
+    template <typename Mem_, typename DT_, typename IT_ = Index>
+    class SparseVector : public Container<Mem_, DT_, IT_>, public VectorBase<IT_>
     {
       private:
         template <typename T1_, typename T2_>
@@ -76,6 +76,8 @@ namespace FEAST
       public:
         /// Our datatype
         typedef DT_ DataType;
+        /// Our indextype
+        typedef IT_ IndexType;
         /// Our memory architecture type
         typedef Mem_ MemType;
 
@@ -85,7 +87,7 @@ namespace FEAST
          * Creates an empty non dimensional vector.
          */
         explicit SparseVector() :
-          Container<Mem_, DT_> (0)
+          Container<Mem_, DT_, IT_> (0)
         {
           CONTEXT("When creating SparseVector");
           this->_scalar_index.push_back(0);
@@ -103,7 +105,7 @@ namespace FEAST
          * Creates a vector with a given size.
          */
         explicit SparseVector(Index size) :
-          Container<Mem_, DT_>(size)
+          Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating SparseVector");
           this->_scalar_index.push_back(0);
@@ -124,8 +126,8 @@ namespace FEAST
          *
          * Creates a vector with a given size.
          */
-        explicit SparseVector(Index size, DenseVector<Mem_, DT_> & elements, DenseVector<Mem_, Index> & indices) :
-          Container<Mem_, DT_>(size)
+        explicit SparseVector(Index size, DenseVector<Mem_, DT_, IT_> & elements, DenseVector<Mem_, Index, IT_> & indices) :
+          Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating SparseVector");
 
@@ -156,8 +158,8 @@ namespace FEAST
          *
          * Creates a shallow copy of a given vector.
          */
-        SparseVector(const SparseVector<Mem_, DT_> & other) :
-          Container<Mem_, DT_>(other)
+        SparseVector(const SparseVector & other) :
+          Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When copying SparseVector");
         }
@@ -169,8 +171,8 @@ namespace FEAST
          *
          * Moves another vector to this vector.
          */
-        SparseVector(SparseVector<Mem_, DT_> && other) :
-          Container<Mem_, DT_>(other)
+        SparseVector(SparseVector && other) :
+          Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When moving SparseVector");
         }
@@ -182,9 +184,9 @@ namespace FEAST
          *
          * Creates a copy of a given vector from another memory architecture.
          */
-        template <typename Mem2_, typename DT2_>
-        explicit SparseVector(const SparseVector<Mem2_, DT2_> & other) :
-            Container<Mem_, DT_>(other)
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit SparseVector(const SparseVector<Mem2_, DT2_, IT2_> & other) :
+            Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When copying SparseVector");
         }
@@ -193,12 +195,12 @@ namespace FEAST
          *
          * Creates a deep copy of this vector.
          */
-        SparseVector<Mem_, DT_> clone() const
+        SparseVector clone() const
         {
           CONTEXT("When cloning SparseVector");
 
-          SparseVector<Mem_, DT_> t;
-          ((Container<Mem_, DT_>&)t).clone(*this);
+          SparseVector t;
+          ((Container<Mem_, DT_, IT_>&)t).clone(*this);
           return t;
         }
 
@@ -209,7 +211,7 @@ namespace FEAST
          *
          * Assigns another vector to the target vector.
          */
-        SparseVector<Mem_, DT_> & operator= (const SparseVector<Mem_, DT_> & other)
+        SparseVector & operator= (const SparseVector & other)
         {
           CONTEXT("When assigning SparseVector");
 
@@ -225,7 +227,7 @@ namespace FEAST
          *
          * Moves another vector to the target vector.
          */
-        SparseVector<Mem_, DT_> & operator= (SparseVector<Mem_, DT_> && other)
+        SparseVector & operator= (SparseVector && other)
         {
           CONTEXT("When moving SparseVector");
 
@@ -241,8 +243,8 @@ namespace FEAST
          *
          * Assigns a vector from another memory architecture to the target vector.
          */
-        template <typename Mem2_, typename DT2_>
-        SparseVector<Mem_, DT_> & operator= (const SparseVector<Mem2_, DT2_> & other)
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        SparseVector & operator= (const SparseVector<Mem2_, DT2_, IT2_> & other)
         {
           CONTEXT("When assigning SparseVector");
 
@@ -259,14 +261,14 @@ namespace FEAST
         DT_ * elements()
         {
           if (sorted() == 0)
-            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
+            const_cast<SparseVector *>(this)->sort();
           return this->_elements.at(0);
         }
 
         DT_ const * elements() const
         {
           if (sorted() == 0)
-            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
+            const_cast<SparseVector *>(this)->sort();
           return this->_elements.at(0);
         }
 
@@ -278,14 +280,14 @@ namespace FEAST
         Index * indices()
         {
           if (sorted() == 0)
-            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
+            const_cast<SparseVector *>(this)->sort();
           return this->_indices.at(0);
         }
 
         Index const * indices() const
         {
           if (sorted() == 0)
-            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
+            const_cast<SparseVector *>(this)->sort();
           return this->_indices.at(0);
         }
 
@@ -399,7 +401,7 @@ namespace FEAST
             return zero_element();
 
           if (sorted() == 0)
-            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
+            const_cast<SparseVector *>(this)->sort();
 
           Index i(0);
           while (i < used_elements())
@@ -440,7 +442,7 @@ namespace FEAST
         Index used_elements() const override
         {
           if (sorted() == 0)
-            const_cast<SparseVector<Mem_, DT_> *>(this)->sort();
+            const_cast<SparseVector *>(this)->sort();
           return this->_scalar_index.at(1);
         }
 
@@ -502,7 +504,7 @@ namespace FEAST
      * \param[in] a A vector to compare with.
      * \param[in] b A vector to compare with.
      */
-    template <typename Mem_, typename Mem2_, typename DT_> bool operator== (const SparseVector<Mem_, DT_> & a, const SparseVector<Mem2_, DT_> & b)
+    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const SparseVector<Mem_, DT_, IT_> & a, const SparseVector<Mem2_, DT_, IT_> & b)
     {
       CONTEXT("When comparing SparseVectors");
 
@@ -526,9 +528,9 @@ namespace FEAST
      * \param[in] lhs The target stream.
      * \param[in] b The vector to be streamed.
      */
-    template <typename Mem_, typename DT_>
+    template <typename Mem_, typename DT_, typename IT_>
     std::ostream &
-    operator<< (std::ostream & lhs, const SparseVector<Mem_, DT_> & b)
+    operator<< (std::ostream & lhs, const SparseVector<Mem_, DT_, IT_> & b)
     {
       lhs << "[";
       for (Index i(0) ; i < b.size() ; ++i)

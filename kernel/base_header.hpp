@@ -77,6 +77,7 @@ namespace FEAST
   /**
    * \brief Index data type.
    */
+// Overcome msvc's type sizes (all 64bit datatypes correspond to the 32bit ones in terms of size)
 #ifdef FEAST_INDEX_ULL
   typedef unsigned long long Index;
 #else

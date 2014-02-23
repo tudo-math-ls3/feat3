@@ -10,6 +10,7 @@ namespace FEAST
 {
   namespace LAFEM
   {
+    template <typename IT_>
     class VectorBase
     {
       public:

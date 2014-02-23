@@ -34,6 +34,7 @@ namespace FEAST
      *
      * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
+     * \tparam IT_ The indextype to be used.
      *
      * This class represents a vector of continuous data in memory. \n \n
      * Data survey: \n
@@ -42,8 +43,8 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_>
-    class DenseVector : public Container<Mem_, DT_>, public VectorBase
+    template <typename Mem_, typename DT_, typename IT_ = Index>
+    class DenseVector : public Container<Mem_, DT_, IT_>, public VectorBase<IT_>
     {
       private:
         void _read_from_exp(String filename)
@@ -84,10 +85,10 @@ namespace FEAST
 
           }
 
-          this->_scalar_index.at(0) = Index(data.size());
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size())));
-          this->_elements_size.push_back(Index(data.size()));
-          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
+          this->_scalar_index.at(0) = IT_(data.size());
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(IT_(data.size())));
+          this->_elements_size.push_back(IT_(data.size()));
+          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], IT_(data.size()));
         }
 
         void _read_from_dv(String filename)
@@ -103,14 +104,14 @@ namespace FEAST
         {
           uint64_t size;
           file.read((char *)&size, (long)(sizeof(uint64_t)));
-          this->_scalar_index.at(0) = (Index)size;
+          this->_scalar_index.at(0) = (IT_)size;
           this->_elements_size.push_back(this->_scalar_index.at(0));
 
           double * ctemp = new double[std::size_t(size)];
           file.read((char *)ctemp, (long)(size * sizeof(double)));
 
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)));
-          for (Index i(0) ; i < size ; ++i)
+          for (IT_ i(0) ; i < size ; ++i)
           {
             temp[i] = (DT_)ctemp[i];
           }
@@ -123,6 +124,8 @@ namespace FEAST
       public:
         /// Our datatype
         typedef DT_ DataType;
+        /// Our indextype
+        typedef IT_ IndexType;
         /// Our memory architecture type
         typedef Mem_ MemType;
 
@@ -132,7 +135,7 @@ namespace FEAST
          * Creates an empty non dimensional vector.
          */
         explicit DenseVector() :
-          Container<Mem_, DT_> (0)
+          Container<Mem_, DT_, IT_> (0)
         {
           CONTEXT("When creating DenseVector");
         }
@@ -144,8 +147,8 @@ namespace FEAST
          *
          * Creates a vector with a given size.
          */
-        explicit DenseVector(Index size) :
-          Container<Mem_, DT_>(size)
+        explicit DenseVector(IT_ size) :
+          Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating DenseVector");
 
@@ -161,8 +164,8 @@ namespace FEAST
          *
          * Creates a vector with given size and value.
          */
-        explicit DenseVector(Index size, DT_ value) :
-          Container<Mem_, DT_>(size)
+        explicit DenseVector(IT_ size, DT_ value) :
+          Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating DenseVector");
 
@@ -180,17 +183,17 @@ namespace FEAST
          *
          * Creates a vector with given size and given data.
          */
-        explicit DenseVector(Index size, DT_ * data) :
-          Container<Mem_, DT_>(size)
+        explicit DenseVector(IT_ size, DT_ * data) :
+          Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating DenseVector");
 
           this->_elements.push_back(data);
           this->_elements_size.push_back(size);
 
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
+          for (IT_ i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
+          for (IT_ i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
@@ -203,7 +206,7 @@ namespace FEAST
          * Creates a vector from the given source file.
          */
         explicit DenseVector(FileMode mode, String filename) :
-          Container<Mem_, DT_>(0)
+          Container<Mem_, DT_, IT_>(0)
         {
           CONTEXT("When creating DenseVector");
 
@@ -229,7 +232,7 @@ namespace FEAST
          * Creates a vector from the given source file.
          */
         explicit DenseVector(FileMode mode, std::istream& file) :
-          Container<Mem_, DT_>(0)
+          Container<Mem_, DT_, IT_>(0)
         {
           CONTEXT("When creating DenseVector");
 
@@ -253,8 +256,8 @@ namespace FEAST
          *
          * Creates a shallow copy of a given vector.
          */
-        DenseVector(const DenseVector<Mem_, DT_> & other) :
-          Container<Mem_, DT_>(other)
+        DenseVector(const DenseVector & other) :
+          Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When copying DenseVector");
         }
@@ -266,8 +269,8 @@ namespace FEAST
          *
          * Moves another vector to this vector.
          */
-        DenseVector(DenseVector<Mem_, DT_> && other) :
-          Container<Mem_, DT_>(other)
+        DenseVector(DenseVector && other) :
+          Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When moving DenseVector");
         }
@@ -279,9 +282,9 @@ namespace FEAST
          *
          * Creates a copy of a given vector from another memory architecture.
          */
-        template <typename Mem2_, typename DT2_>
-        explicit DenseVector(const DenseVector<Mem2_, DT2_> & other) :
-            Container<Mem_, DT_>(other)
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit DenseVector(const DenseVector<Mem2_, DT2_, IT2_> & other) :
+            Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When copying DenseVector");
         }
@@ -290,12 +293,12 @@ namespace FEAST
          *
          * Creates a deep copy of this vector.
          */
-        DenseVector<Mem_, DT_> clone() const
+        DenseVector clone() const
         {
           CONTEXT("When cloning DenseVector");
 
-          DenseVector<Mem_, DT_> t;
-          ((Container<Mem_, DT_>&)t).clone(*this);
+          DenseVector t;
+          ((Container<Mem_, DT_, IT_>&)t).clone(*this);
           return t;
         }
 
@@ -306,7 +309,7 @@ namespace FEAST
          *
          * Assigns another vector to the target vector.
          */
-        DenseVector<Mem_, DT_> & operator= (const DenseVector<Mem_, DT_> & other)
+        DenseVector & operator= (const DenseVector & other)
         {
           CONTEXT("When assigning DenseVector");
 
@@ -322,7 +325,7 @@ namespace FEAST
          *
          * Moves another vector to the target vector.
          */
-        DenseVector<Mem_, DT_> & operator= (DenseVector<Mem_, DT_> && other)
+        DenseVector & operator= (DenseVector && other)
         {
           CONTEXT("When moving DenseVector");
 
@@ -338,8 +341,8 @@ namespace FEAST
          *
          * Assigns a vector from another memory architecture to the target vector.
          */
-        template <typename Mem2_, typename DT2_>
-        DenseVector<Mem_, DT_> & operator= (const DenseVector<Mem2_, DT2_> & other)
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        DenseVector & operator= (const DenseVector<Mem2_, DT2_, IT2_> & other)
         {
           CONTEXT("When assigning DenseVector");
 
@@ -418,7 +421,7 @@ namespace FEAST
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)));
           MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->_scalar_index.at(0));
 
-          for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
+          for (IT_ i(0) ; i < this->_scalar_index.at(0) ; ++i)
           {
             file << std::scientific << temp[i] << std::endl;
           }
@@ -450,11 +453,11 @@ namespace FEAST
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
-          const Index csize(this->_scalar_index.at(0));
+          const IT_ csize(this->_scalar_index.at(0));
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize);
           MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize);
           double * ctemp = new double[csize];
-          for (Index i(0) ; i < csize ; ++i)
+          for (IT_ i(0) ; i < csize ; ++i)
           {
             ctemp[i] = (double)temp[i];
           }
@@ -489,7 +492,7 @@ namespace FEAST
          *
          * \returns Specific vector element.
          */
-        const DT_ operator()(Index index) const
+        const DT_ operator()(IT_ index) const
         {
           CONTEXT("When retrieving DenseVector element");
 
@@ -503,7 +506,7 @@ namespace FEAST
          * \param[in] index The index of the vector element.
          * \param[in] value The value to be set.
          */
-        void operator()(Index index, DT_ value)
+        void operator()(IT_ index, DT_ value)
         {
           CONTEXT("When setting DenseVector element");
 
@@ -517,7 +520,7 @@ namespace FEAST
          *
          * \param[in] index The index of the vector element.
          */
-        EDI<Mem_, DT_> edi(Index index)
+        EDI<Mem_, DT_> edi(IT_ index)
         {
           EDI<Mem_, DT_> t(MemoryPool<Mem_>::get_element(this->_elements.at(0), index), this->_elements.at(0) + index);
           return t;
@@ -538,7 +541,7 @@ namespace FEAST
          *
          * \param[in] x The vector to be copied.
          */
-        void copy(const DenseVector<Mem_, DT_> & x)
+        void copy(const DenseVector & x)
         {
           this->_copy_content(x);
         }
@@ -563,8 +566,8 @@ namespace FEAST
          */
         template <typename Algo_>
         void axpy(
-          const DenseVector<Mem_, DT_> & x,
-          const DenseVector<Mem_, DT_> & y,
+          const DenseVector & x,
+          const DenseVector & y,
           const DT_ alpha = DT_(1))
         {
           if (x.size() != y.size())
@@ -594,7 +597,7 @@ namespace FEAST
          * \param[in] y The second factor.
          */
         template <typename Algo_>
-        void component_product(const DenseVector<Mem_, DT_> & x, const DenseVector<Mem_, DT_> & y)
+        void component_product(const DenseVector & x, const DenseVector & y)
         {
           if (this->size() != x.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -613,9 +616,9 @@ namespace FEAST
          */
         template <typename Algo_>
         void component_product(
-          const DenseVector<Mem_, DT_> & x,
-          const DenseVector<Mem_, DT_> & y,
-          const DenseVector<Mem_, DT_> & z)
+          const DenseVector & x,
+          const DenseVector & y,
+          const DenseVector & z)
         {
           if (this->size() != x.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -634,7 +637,7 @@ namespace FEAST
          * \param[in] alpha A scalar to scale x with.
          */
         template <typename Algo_>
-        void scale(const DenseVector<Mem_, DT_> & x, const DT_ alpha)
+        void scale(const DenseVector & x, const DT_ alpha)
         {
           if (x.size() != this->size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -649,7 +652,7 @@ namespace FEAST
          * \param[in] x The other vector.
          */
         template <typename Algo_>
-        DataType dot(const DenseVector& x) const
+        DataType dot(const DenseVector & x) const
         {
           if (x.size() != this->size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
@@ -684,7 +687,7 @@ namespace FEAST
      * \param[in] a A vector to compare with.
      * \param[in] b A vector to compare with.
      */
-    template <typename Mem_, typename Mem2_, typename DT_> bool operator== (const DenseVector<Mem_, DT_> & a, const DenseVector<Mem2_, DT_> & b)
+    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const DenseVector<Mem_, DT_, IT_> & a, const DenseVector<Mem2_, DT_, IT_> & b)
     {
       CONTEXT("When comparing DenseVectors");
 
@@ -695,7 +698,7 @@ namespace FEAST
       if (a.get_indices().size() != b.get_indices().size())
         return false;
 
-      for (Index i(0) ; i < a.size() ; ++i)
+      for (IT_ i(0) ; i < a.size() ; ++i)
         if (a(i) != b(i))
           return false;
 
@@ -708,12 +711,12 @@ namespace FEAST
      * \param[in] lhs The target stream.
      * \param[in] b The vector to be streamed.
      */
-    template <typename Mem_, typename DT_>
+    template <typename Mem_, typename DT_, typename IT_>
     std::ostream &
-    operator<< (std::ostream & lhs, const DenseVector<Mem_, DT_> & b)
+    operator<< (std::ostream & lhs, const DenseVector<Mem_, DT_, IT_> & b)
     {
       lhs << "[";
-      for (Index i(0) ; i < b.size() ; ++i)
+      for (IT_ i(0) ; i < b.size() ; ++i)
       {
         lhs << "  " << b(i);
       }

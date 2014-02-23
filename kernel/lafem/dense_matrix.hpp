@@ -30,12 +30,14 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename DT_>
-    class DenseMatrix : public Container<Mem_, DT_>, public MatrixBase
+    template <typename Mem_, typename DT_, typename IT_ = Index>
+    class DenseMatrix : public Container<Mem_, DT_, IT_>, public MatrixBase<IT_>
     {
       public:
         /// Our datatype
         typedef DT_ DataType;
+        /// Our indextype
+        typedef IT_ IndexType;
         /// Our memory architecture type
         typedef Mem_ MemType;
 
@@ -45,7 +47,7 @@ namespace FEAST
          * Creates an empty non dimensional matrix.
          */
         explicit DenseMatrix() :
-          Container<Mem_, DT_> (0)
+          Container<Mem_, DT_, IT_> (0)
         {
           CONTEXT("When creating DenseMatrix");
 
@@ -62,7 +64,7 @@ namespace FEAST
          * Creates a matrix with given dimensions.
          */
         explicit DenseMatrix(Index rows, Index columns) :
-          Container<Mem_, DT_>(rows * columns)
+          Container<Mem_, DT_, IT_>(rows * columns)
         {
           CONTEXT("When creating DenseMatrix");
 
@@ -84,7 +86,7 @@ namespace FEAST
          * Creates a matrix with given dimensions and value.
          */
         explicit DenseMatrix(Index rows, Index columns, DT_ value) :
-          Container<Mem_, DT_>(rows * columns)
+          Container<Mem_, DT_, IT_>(rows * columns)
         {
           CONTEXT("When creating DenseMatrix");
 
@@ -103,8 +105,8 @@ namespace FEAST
          *
          * Creates a shallow copy of a given matrix.
          */
-        DenseMatrix(const DenseMatrix<Mem_, DT_> & other) :
-          Container<Mem_, DT_>(other)
+        DenseMatrix(const DenseMatrix & other) :
+          Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When copying DenseMatrix");
         }
@@ -116,8 +118,8 @@ namespace FEAST
          *
          * Moves a given matrix to this matrix.
          */
-        DenseMatrix(DenseMatrix<Mem_, DT_> && other) :
-          Container<Mem_, DT_>(other)
+        DenseMatrix(DenseMatrix && other) :
+          Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When moving DenseMatrix");
         }
@@ -129,9 +131,9 @@ namespace FEAST
          *
          * Creates a copy of a given matrix from another memory architecture.
          */
-        template <typename Arch2_, typename DT2_>
-        explicit DenseMatrix(const DenseMatrix<Arch2_, DT2_> & other) :
-          Container<Mem_, DT_>(other)
+        template <typename Mem2_, typename DT2_, typename ID2_>
+        explicit DenseMatrix(const DenseMatrix<Mem2_, DT2_, ID2_> & other) :
+          Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When copying DenseMatrix");
         }
@@ -140,12 +142,12 @@ namespace FEAST
          *
          * Creates a deep copy of this matrix.
          */
-        DenseMatrix<Mem_, DT_> clone()
+        DenseMatrix clone()
         {
           CONTEXT("When cloning DenseMatrix");
 
-          DenseMatrix<Mem_, DT_> t;
-          ((Container<Mem_, DT_>&)t).clone(*this);
+          DenseMatrix t;
+          ((Container<Mem_, DT_, IT_>&)t).clone(*this);
           return t;
         }
 
@@ -156,7 +158,7 @@ namespace FEAST
          *
          * Assigns another matrix to the target matrix.
          */
-        DenseMatrix<Mem_, DT_> & operator= (const DenseMatrix<Mem_, DT_> & other)
+        DenseMatrix & operator= (const DenseMatrix & other)
         {
           CONTEXT("When assigning DenseMatrix");
 
@@ -172,7 +174,7 @@ namespace FEAST
          *
          * Moves another matrix to the target matrix.
          */
-        DenseMatrix<Mem_, DT_> & operator= (DenseMatrix<Mem_, DT_> && other)
+        DenseMatrix & operator= (DenseMatrix && other)
         {
           CONTEXT("When moving DenseMatrix");
 
@@ -188,8 +190,8 @@ namespace FEAST
          *
          * Assigns a matrix from another memory architecture to the target matrix.
          */
-        template <typename Arch2_, typename DT2_>
-        DenseMatrix<Mem_, DT_> & operator= (const DenseMatrix<Arch2_, DT2_> & other)
+        template <typename Mem2_, typename DT2_, typename ID2_>
+        DenseMatrix & operator= (const DenseMatrix<Mem2_, DT2_, ID2_> & other)
         {
           CONTEXT("When assigning DenseMatrix");
 
@@ -281,7 +283,7 @@ namespace FEAST
          *
          * \param[in] x The Matrix to be copied.
          */
-        void copy(const DenseMatrix<Mem_, DT_> & x)
+        void copy(const DenseMatrix & x)
         {
           this->_copy_content(x);
         }
@@ -292,7 +294,7 @@ namespace FEAST
          * \param[in] x The Matrix to be copied.
          */
         template <typename Mem2_>
-        void copy(const DenseMatrix<Mem2_, DT_> & x)
+        void copy(const DenseMatrix<Mem2_, DT_, IT_> & x)
         {
           this->_copy_content(x);
         }
@@ -304,7 +306,7 @@ namespace FEAST
      * \param[in] a A matrix to compare with.
      * \param[in] b A matrix to compare with.
      */
-    template <typename Mem_, typename Arch2_, typename DT_> bool operator== (const DenseMatrix<Mem_, DT_> & a, const DenseMatrix<Arch2_, DT_> & b)
+    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const DenseMatrix<Mem_, DT_, IT_> & a, const DenseMatrix<Mem2_, DT_, IT_> & b)
     {
       CONTEXT("When comparing DenseMatrices");
 
@@ -333,9 +335,9 @@ namespace FEAST
      * \param[in] lhs The target stream.
      * \param[in] b The matrix to be streamed.
      */
-    template <typename Mem_, typename DT_>
+    template <typename Mem_, typename DT_, typename IT_>
       std::ostream &
-      operator<< (std::ostream & lhs, const DenseMatrix<Mem_, DT_> & b)
+      operator<< (std::ostream & lhs, const DenseMatrix<Mem_, DT_, IT_> & b)
       {
         lhs << "[" << std::endl;
         for (Index i(0) ; i < b.rows() ; ++i)

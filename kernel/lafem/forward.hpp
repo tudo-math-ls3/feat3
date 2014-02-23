@@ -10,16 +10,16 @@ namespace FEAST
   namespace LAFEM
   {
     //forward declarations
-    template <typename Mem_, typename DT_>
+    template <typename Mem_, typename DT_, typename IT_>
     class DenseVector;
 
-    template <typename Mem_, typename DT_>
+    template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixCSR;
 
-    template <typename Mem_, typename DT_>
+    template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixCOO;
 
-    template <typename Mem_, typename DT_>
+    template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixELL;
 
   } // namespace LAFEM
