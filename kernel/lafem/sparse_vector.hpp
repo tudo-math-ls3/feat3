@@ -320,6 +320,10 @@ namespace FEAST
             //first of all, mark vector as sorted, because otherwise we would call ourselves inifite times
             _sorted() = 1;
 
+            // check if there is anything to be sorted
+            if(used_elements() <= Index(0))
+              return;
+
             _insertion_sort(indices(), elements(), used_elements());
 
             // find and mark duplicate entries
