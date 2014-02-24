@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/trafo/mapping_base.hpp>
 #include <kernel/trafo/standard/evaluator.hpp>
+#include <kernel/trafo/standard/volume.hpp>
 
 namespace FEAST
 {
@@ -37,6 +38,8 @@ namespace FEAST
         typedef MappingBase<Mesh_> BaseClass;
         /// mesh type
         typedef Mesh_ MeshType;
+        /// data type
+        typedef typename MeshType::VertexSetType::CoordType CoordType;
         /// shape type
         typedef typename MeshType::ShapeType ShapeType;
 
@@ -66,6 +69,34 @@ namespace FEAST
           BaseClass(mesh)
         {
         }
+
+        /**
+         * \brief Computes the volume of one cell
+         *
+         * \tparam ShapeType_
+         * Shape type of the underlying mesh.
+         *
+         * \tparam DataType_
+         * Precision, by default the same precision as for the coordinates.
+         *
+         * \param[in] cell
+         * Index for which the volume is computed.
+         *
+         * \returns The volume of cell.
+         *
+         * \author Jordi Paul
+         */
+        template<typename ShapeType_, typename DataType_ = CoordType>
+          DataType_ compute_vol(const Index cell)
+          {
+            // Extract the transformation, the underlying mesh's index and vertex sets and stuff 'em into the
+            // CellVolumeEvaluator who does the actual work.
+            return CellVolumeEvaluator<ShapeType_>::template compute_vol<DataType_>(
+                *this,
+                this->get_mesh().template get_index_set<ShapeType_::dimension,0>(),
+                this->get_mesh().get_vertex_set(),
+                cell);
+          }
       }; // class Mapping<...>
     } // namespace Standard
   } // namespace Trafo

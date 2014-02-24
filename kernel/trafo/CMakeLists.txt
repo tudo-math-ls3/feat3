@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES("${FEAST_BINARY_DIR}" "${FEAST_SOURCE_DIR}")
 # list of trafo tests
 SET (test_list
   standard_trafo-test
+  standard_trafo_volume-test
 )
 
 # create all tests
