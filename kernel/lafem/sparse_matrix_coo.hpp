@@ -1045,6 +1045,10 @@ namespace FEAST
             //first of all, mark matrix as sorted, because otherwise we would call ourselves inifite times
             this->_scalar_index.at(6) = 1;
 
+            // check if there is anything to be sorted
+            if(used_elements() <= Index(0))
+              return;
+
             // sort elements by row index
             _insertion_sort(row(), val(), column(), used_elements());
 
