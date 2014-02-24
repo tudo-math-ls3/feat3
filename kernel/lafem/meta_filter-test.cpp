@@ -36,13 +36,13 @@ public:
   static MetaFilter gen_filter(Index m)
   {
     // create a unit-filter
-    UnitFilter<Mem::Main, DataType> unit_filter(2);
-    Index* idx(unit_filter.get_indices());
-    DataType* fv(unit_filter.get_values());
-    idx[0] = 0;
-    idx[1] = m-1;
-    fv[0] = DataType(1);
-    fv[1] = DataType(5);
+    DenseVector<Mem::Main, DataType> fv(2);
+    fv(0, DataType(1));
+    fv(1, DataType(5));
+    DenseVector<Mem::Main, Index> idx(2);
+    idx(0, 0);
+    idx(1, m-1);
+    UnitFilter<Mem::Main, DataType> unit_filter(fv, idx);
 
     // create vectors for mean-filter
     DenseVector<Mem::Main, DataType> mfv(m, DataType(1)), mfw(m, DataType(0));

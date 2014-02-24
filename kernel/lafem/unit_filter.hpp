@@ -3,7 +3,10 @@
 #define KERNEL_LAFEM_UNIT_FILTER_HPP 1
 
 // includes, FEAST
+#include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_vector.hpp>
 
 namespace FEAST
 {
@@ -11,8 +14,6 @@ namespace FEAST
   {
     /**
      * \brief Unit Filter class template.
-     *
-     * \todo Replace the internal data storage by SparseVector once it is implemented.
      *
      * \author Peter Zajac
      */
@@ -27,20 +28,14 @@ namespace FEAST
       /// data-type typedef
       typedef DataType_ DataType;
 
-    protected:
-      /// total number of entries to be filtered
-      Index _num_entries;
-      /// index array
-      Index* _indices;
-      /// value array
-      DataType* _values;
+    private:
+      /// SparseVector, containing all entries of the unit filter
+      SparseVector<MemType, DataType> _sv;
 
     public:
       /// default constructor
       UnitFilter() :
-        _num_entries(0),
-        _indices(nullptr),
-        _values(nullptr)
+        _sv()
       {
       }
 
@@ -51,21 +46,27 @@ namespace FEAST
        * The total number of entries for the unit filter.
        */
       explicit UnitFilter(Index num_entries) :
-        _num_entries(num_entries),
-        _indices(new Index[num_entries]),
-        _values(new DataType[num_entries])
+        _sv(num_entries)
       {
+      }
+
+      /**
+       * \brief Constructor.
+       *
+       * \param[in] values DenseVector containing element values
+       * \param[in] indices DenseVector containing element indices
+       */
+      explicit UnitFilter(DenseVector<MemType, DataType> & values, DenseVector<MemType, Index> & indices) :
+        _sv(values.size(), values, indices)
+      {
+        if (values.size() != indices.size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vector size missmatch!");
       }
 
       /// move-ctor
       UnitFilter(UnitFilter&& other) :
-        _num_entries(other._num_entries),
-        _indices(other._indices),
-        _values(other._values)
+        _sv(std::move(other._sv))
       {
-        other._num_entries = Index(0);
-        other._indices = nullptr;
-        other._values = nullptr;
       }
 
       /// move-assignment operator
@@ -74,17 +75,7 @@ namespace FEAST
         if(this == &other)
           return *this;
 
-        if(_indices != nullptr)
-          delete [] _indices;
-        if(_values != nullptr)
-          delete [] _values;
-
-        _num_entries = other._num_entries;
-        _indices = other._indices;
-        _values = other._values;
-        other._num_entries = Index(0);
-        other._indices = nullptr;
-        other._values = nullptr;
+        _sv = std::move(other._sv);
 
         return *this;
       }
@@ -92,14 +83,6 @@ namespace FEAST
       /// virtual destructor
       virtual ~UnitFilter()
       {
-        if(_values != nullptr)
-        {
-          delete [] _values;
-        }
-        if(_indices != nullptr)
-        {
-          delete [] _indices;
-        }
       }
 
       UnitFilter clone() const
@@ -107,47 +90,40 @@ namespace FEAST
         // create copy
         UnitFilter other(size());
 
-        // copy arrays
-        Index* indices(other.get_indices());
-        DataType* values(other.get_values());
-        for(Index i(0); i < _num_entries; ++i)
-        {
-          indices[i] = _indices[i];
-          values[i] = _values[i];
-        }
+        other._sv = _sv.clone();
 
         // return
-        return std::move(other);
+        return other;
       }
 
       /// \returns The number of entries in the filter.
       Index size() const
       {
-        return _num_entries;
+        return _sv.used_elements();
       }
 
       /// \returns The index array.
       Index* get_indices()
       {
-        return _indices;
+        return _sv.indices();
       }
 
       /// \returns The index array.
       const Index* get_indices() const
       {
-        return _indices;
+        return _sv.indices;
       }
 
       /// \returns The value array.
       DataType* get_values()
       {
-        return _values;
+        return _sv.elements();
       }
 
       /// \returns The value array.
       const DataType* get_values() const
       {
-        return _values;
+        return _sv.elements();
       }
 
       /**
@@ -163,9 +139,9 @@ namespace FEAST
         const Index* col_idx(matrix.col_ind());
         DataType* v(matrix.val());
 
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_indices[i]);
+          Index ix(_sv.indices()[i]);
           // replace by unit row
           for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
@@ -180,9 +156,9 @@ namespace FEAST
         const Index* row_ptr(matrix.row_ptr());
         DataType* v(matrix.val());
 
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          Index ix(_indices[i]);
+          Index ix(_sv.indices()[i]);
           // replace by null row
           for(Index j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
@@ -207,9 +183,9 @@ namespace FEAST
       void filter_rhs(DenseVector<MemType, DataType>& vector) const
       {
         DataType* v(vector.elements());
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          v[_indices[i]] = _values[i];
+          v[_sv.indices()[i]] = _sv.elements()[i];
         }
       }
 
@@ -236,9 +212,9 @@ namespace FEAST
       void filter_def(DenseVector<MemType, DataType>& vector) const
       {
         DataType* v(vector.elements());
-        for(Index i(0); i < _num_entries; ++i)
+        for(Index i(0); i < _sv.used_elements(); ++i)
         {
-          v[_indices[i]] = DataType(0);
+          v[_sv.indices()[i]] = DataType(0);
         }
       }
 

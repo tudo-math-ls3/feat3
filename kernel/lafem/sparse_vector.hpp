@@ -8,6 +8,7 @@
 #include <kernel/util/type_traits.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/vector_base.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 namespace FEAST
 {
@@ -110,6 +111,42 @@ namespace FEAST
           this->_scalar_index.push_back(1000);
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] size The size of the created vector.
+         * \param[in] elements A list of non zero elements.
+         * \param[in] indices A list of non zero element indices.
+         *
+         * \note The elements must be sorted by their indices.
+         *
+         * Creates a vector with a given size.
+         */
+        explicit SparseVector(Index size, DenseVector<Mem_, DT_> & elements, DenseVector<Mem_, Index> & indices) :
+          Container<Mem_, DT_>(size)
+        {
+          CONTEXT("When creating SparseVector");
+
+          if (elements.size() != elements.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size missmatch!");
+
+          this->_scalar_index.push_back(elements.size());
+          this->_scalar_index.push_back(elements.size());
+          this->_scalar_index.push_back(1000);
+          this->_scalar_index.push_back(1);
+          this->_scalar_dt.push_back(DT_(0));
+
+          this->_elements.push_back(elements.elements());
+          this->_elements_size.push_back(elements.size());
+          this->_indices.push_back(indices.elements());
+          this->_indices_size.push_back(indices.size());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
         /**

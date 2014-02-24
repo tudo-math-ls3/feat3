@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/assembly/base.hpp>
 #include <kernel/lafem/unit_filter.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 // includes, system
 #include <set>
@@ -100,22 +101,21 @@ namespace FEAST
         std::set<Index> idx_set;
         Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
 
-        // allocate a filter of the correct size
-        LAFEM::UnitFilter<MemType_, DataType_> filter(Index(idx_set.size()));
-
-        // fetch the filter's arrays
-        Index* indices(filter.get_indices());
-        DataType_* values(filter.get_values());
+        // allocate filter 'arrays'
+        LAFEM::DenseVector<MemType_, DataType_> values(idx_set.size(), DataType_(0));
+        LAFEM::DenseVector<MemType_, Index> indices(idx_set.size());
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index and set its value to zero
-          indices[i] = *it;
-          values[i] = DataType_(0);
+          // store the dof-index
+          indices(i, *it);
         }
+
+        // create a filter with given values/indices pairs
+        LAFEM::UnitFilter<MemType_, DataType_> filter(values, indices);
 
         // return filter
         return filter;
@@ -144,12 +144,9 @@ namespace FEAST
         std::map<Index, DataType_> idx_map;
         Intern::DirichletWrapper<shape_dim>::assemble(idx_map, _space, _cells, functor);
 
-        // allocate a filter of the correct size
-        LAFEM::UnitFilter<MemType_, DataType_> filter(Index(idx_map.size()));
-
-        // fetch the filter's arrays
-        Index* indices(filter.get_indices());
-        DataType_* values(filter.get_values());
+        // allocate filter 'arrays'
+        LAFEM::DenseVector<MemType_, DataType_> values(idx_map.size());
+        LAFEM::DenseVector<MemType_, Index> indices(idx_map.size());
 
         // loop over all dof-indices
         typename std::map<Index, DataType_>::const_iterator it(idx_map.begin());
@@ -157,9 +154,12 @@ namespace FEAST
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index and its value
-          indices[i] = it->first;
-          values[i] = it->second;
+          indices(i, it->first);
+          values(i, it->second);
         }
+
+        // create a filter with given values/indices pairs
+        LAFEM::UnitFilter<MemType_, DataType_> filter(values, indices);
 
         // return filter
         return filter;
