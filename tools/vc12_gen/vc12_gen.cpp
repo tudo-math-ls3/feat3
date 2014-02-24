@@ -61,6 +61,9 @@ public:
   // root path relative to project dir
   string root_path;
 
+  // specifies whether this is a test project
+  bool testing;
+
   // header file list
   set<string> hpp_list;
   // source file list
@@ -71,7 +74,8 @@ public:
 public:
   VC12Gen() :
     kernel_guid(read_kernel_guid()),
-    project_guid(gen_random_guid())
+    project_guid(gen_random_guid()),
+    testing(false)
   {
     parse_build_modes();
   }
@@ -163,49 +167,69 @@ public:
     return oss.str();
   }
 
-  /// generates the project directory tree (if it does not already exist)
-  bool gen_project_dirs(int& depth)
+  static vector<string> split_path(string path, bool nodots = true)
   {
     vector<string> dirs;
-    depth = 0u;
-
-    // separate paths
     size_t n0(0);
-    while(n0 != project_path.npos)
+    while(n0 != path.npos)
     {
       // find separators
-      size_t n1 = project_path.find_first_of('\\', n0);
-      size_t n2 = project_path.find_first_of('/', n0);
+      size_t n1 = path.find_first_of('\\', n0);
+      size_t n2 = path.find_first_of('/', n0);
       size_t n3(0);
-      if((n1 == project_path.npos) && (n2 == project_path.npos))
-      {
-        dirs.push_back(project_path.substr(n0));
-        break;
-      }
-      else if(n1 == project_path.npos)
+      if((n1 == path.npos) && (n2 == path.npos))
+        n3 = path.npos;
+      else if(n1 == path.npos)
         n3 = n2;
-      else if(n2 == project_path.npos)
+      else if(n2 == path.npos)
         n3 = n1;
       else
         n3 = min(n1, n2);
 
-      // separate strings
-      dirs.push_back(project_path.substr(n0, n3 - n0));
-      n0 = n3 + 1u;
+      // extract dirname
+      string dirname(n3 == path.npos ? path.substr(n0) : path.substr(n0, n3 - n0));
+      n0 = (n3 == path.npos ? n3 : n3 + 1u);
+
+      // skip empty paths
+      if(dirname.empty())
+        continue;
+
+      // let's see if we have to skip dots
+      if(nodots)
+      {
+        // skip current-dir marker '.'
+        if(dirname.compare(".") == 0)
+          continue;
+
+        // if we have a parent-dir marker '..', check if the last parsed dir name (if any)
+        // is not also a parent-dir marker...
+        if((dirname.compare("..") == 0) && (!dirs.empty()) && (dirs.back().compare("..") != 0))
+        {
+          dirs.pop_back();
+          continue;
+        }
+      }
+
+      // push dir name
+      dirs.push_back(dirname);
     }
 
-    // eliminate invalid paths
-    for(size_t i(0); i < dirs.size(); )
-    {
-      if(dirs[i].empty())
-        dirs.erase(dirs.begin() + i);
-      else
-        ++i;
-    }
+    // return directory vector
+    return std::move(dirs);
+  }
 
-    depth = int(dirs.size());
+  static string remove_ext(string name)
+  {
+    size_t n = name.find_last_of('.');
+    if(n == name.npos)
+      return name;
+    else
+      return name.substr(0, n);
+  }
+
+  static bool gen_dirs(vector<string>& dirs)
+  {
     bool existed = true;
-
     // create directories
     string path(".");
     for(size_t i(0); i < dirs.size(); ++i)
@@ -226,6 +250,14 @@ public:
 
     // okay
     return existed;
+  }
+
+  /// generates the project directory tree (if it does not already exist)
+  bool gen_project_dirs(int& depth)
+  {
+    vector<string> dirs(split_path(project_path));
+    depth = int(dirs.size());
+    return gen_dirs(dirs);
   }
 
   /// searches for *.hpp files in the application directory
@@ -376,6 +408,8 @@ public:
     ofs << "  <!-- Header File List -->" << endl;
     ofs << "  <!-- ********************************************************************* -->" << endl;
     ofs << "  <ItemGroup Label=\"Header-Files\">" << endl;
+    if(testing)
+      ofs << "    <ClInclude Include=\"" << root_path << "\\test_system\\*.hpp\" />" << endl;
     for(set<string>::iterator it(hpp_list.begin()); it != hpp_list.end(); ++it)
       ofs << "    <ClInclude Include=\"" << *it << "\" />" << endl;
     ofs << "  </ItemGroup>" << endl;
@@ -385,6 +419,8 @@ public:
     ofs << "  <!-- Source File List -->" << endl;
     ofs << "  <!-- ********************************************************************* -->" << endl;
     ofs << "  <ItemGroup Label=\"Source-Files\">" << endl;
+    if(testing)
+      ofs << "    <ClCompile Include=\"" << root_path << "\\test_system\\test_system.cpp\" />" << endl;
     for(set<string>::iterator it(cpp_list.begin()); it != cpp_list.end(); ++it)
       ofs << "    <ClCompile Include=\"" << *it << "\" />" << endl;
     ofs << "  </ItemGroup>" << endl;
@@ -519,6 +555,13 @@ public:
 
   void main(ArgList args)
   {
+    // check for test
+    if(args.front().compare("-test") == 0)
+    {
+      main_test(args);
+      return;
+    }
+
     // fetch project path
     project_path = args.next();
 
@@ -586,6 +629,43 @@ public:
     // generate files
     generate_files();
   }
+
+  void main_test(ArgList args)
+  {
+    // remove the '-test'
+    args.pop_front();
+    testing = true;
+
+    // fetch test file path
+    string test_path = args.next();
+
+    // split the path
+    vector<string> test_dirs(split_path(test_path));
+
+    // assume that the test is in the kernel directory
+    if(test_dirs.front().compare("kernel") != 0)
+    {
+      cout << "ERROR: '" << test_path << "' does not refer to a kernel test" << endl;
+      return;
+    }
+
+    // build the project path
+    project_path = "testing";
+    for(size_t i(1); i+1 < test_dirs.size(); ++i)
+      project_path += "\\" + test_dirs.at(i);
+
+    // set project name
+    project_name = remove_ext(test_dirs.back());
+
+    // generate dirs
+    generate_dirs();
+
+    // add test path
+    cpp_list.insert(root_path + "\\" + test_path);
+
+    // generate files
+    generate_files();
+  }
 };
 
 // application main entrypoint
@@ -608,8 +688,15 @@ int main(int argc, char** argv)
       cout << "Important: This tool must be executed from the FEAST root directory, as it" << endl;
       cout << "           will not be able to resolve references otherwise." << endl;
       cout << endl;
-      cout << "USAGE: vc12gen.exe <path> [<name>] [options]" << endl;
+      cout << "USAGE: vc12gen.exe [-test] <path> [<name>] [options]" << endl;
       cout << endl;
+      cout << "If the '-test' option is given, then <path> specifies the path to a kernel" << endl;
+      cout << "test source file for which a test project is to be generated. A corresponding" << endl;
+      cout << "test project file will be generated in the 'testing' directory of the FEAST" << endl;
+      cout << "root directory." << endl;
+      cout << endl;
+      cout << "If the '-test' option is not given, then this tool will generate an application" << endl;
+      cout << "project file, with the following supported parameters:" << endl;
       cout << "<path>             The path to the application directory relative to the FEAST" << endl;
       cout << "                   root directory." << endl;
       cout << endl;
@@ -619,15 +706,15 @@ int main(int argc, char** argv)
       cout << endl;
       cout << "Futher options:" << endl;
       cout << "-hpp:<list>        Include all C++ header files of the semicolon-separated" << endl;
-      cout << "                   list. Specify '-hpp=*' to include all C++ header files" << endl;
+      cout << "                   list. Specify '-hpp:*' to include all C++ header files" << endl;
       cout << "                   in the application directory automatically." << endl;
       cout << endl;
       cout << "-cpp:<list>        Include all C++ source files in the semicolon-separated" << endl;
-      cout << "                   list. Speficy '-cpp=*' to include all C++ source files" << endl;
+      cout << "                   list. Speficy '-cpp:*' to include all C++ source files" << endl;
       cout << "                   in the application directory automatically." << endl;
       cout << endl;
       //cout << "-cu:<list>         Include all CUDA source files in the semicolon-separated" << endl;
-      //cout << "                   list. Speficy '-cu=*' to include all CUDA source files" << endl;
+      //cout << "                   list. Speficy '-cu:*' to include all CUDA source files" << endl;
       //cout << "                   in the application directory automatically." << endl;
       //cout << endl;
       return 0;
