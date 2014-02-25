@@ -319,7 +319,7 @@ namespace FEAST
 
         /** \brief Assignment operation
          *
-         * Assigns a container from another memory architecture to the current one.
+         * Assigns a container from another memory architecture or with another data-/indextype to the current one.
          *
          * \param[in] other The source container.
          *
@@ -328,9 +328,11 @@ namespace FEAST
         void assign(const Container<Mem2_, DT2_, IT2_> & other)
         {
           CONTEXT("When assigning Container");
-
-          if (! std::is_same<DT_, DT2_>::value)
-            throw InternalError(__func__, __FILE__, __LINE__, "type conversion not supported yet!");
+          //do not use this method for complete equal typed containers
+          static_assert(! (std::is_same<Mem_, Mem2_>::value &&
+                         std::is_same<DT_, DT2_>::value &&
+                         std::is_same<IT_, IT2_>::value),
+                         "cross asign called with equal types!");
 
           for (IT_ i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
@@ -354,36 +356,77 @@ namespace FEAST
           {
             const unsigned long size(this->_elements_size.at(i));
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
-            if (std::is_same<Mem_, Mem2_>::value)
+
+            DT_ * pthis(nullptr);
+            DT2_ * pother(nullptr);
+            if (std::is_same<Mem_, Mem::Main>::value)
             {
-              MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other.get_elements().at(i), size);
+              pthis = this->_elements.at(i);
             }
             else
             {
-              DT2_ * temp((DT2_*)::malloc(size * sizeof(DT2_)));
-              MemoryPool<Mem2_>::template download<DT2_>(temp, other.get_elements().at(i), size);
-              MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), temp, size);
-              ::free(temp);
+              pthis = new DT_[size];
             }
+            if (std::is_same<Mem2_, Mem::Main>::value)
+            {
+              pother = other.get_elements().at(i);
+            }
+            else
+            {
+              pother = new DT2_[size];
+              MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), size);
+            }
+
+            for (IT_ j(0) ; j < size ; ++j)
+              pthis[j] = DT_(pother[j]);
+
+            if (! std::is_same<Mem_, Mem::Main>::value)
+            {
+              MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), pthis, size);
+              delete[] pthis;
+            }
+            if (!std::is_same<Mem2_, Mem::Main>::value)
+              delete[] pother;
           }
 
           for (IT_ i(0) ; i < this->_indices_size.size() ; ++i)
           {
             const unsigned long size(this->_indices_size.at(i));
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(size));
-            if (std::is_same<Mem_, Mem2_>::value)
+
+            IT_ * pthis(nullptr);
+            IT2_ * pother(nullptr);
+
+            if (std::is_same<Mem_, Mem::Main>::value)
             {
-              MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other.get_indices().at(i), size);
+              pthis = this->_indices.at(i);
             }
             else
             {
-              IT_ * temp((IT_*)::malloc(size * sizeof(IT_)));
-              MemoryPool<Mem2_>::template download<IT_>(temp, other.get_indices().at(i), size);
-              MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(i), temp, size);
-              ::free(temp);
+              pthis = new IT_[size];
             }
-          }
 
+            if (std::is_same<Mem2_, Mem::Main>::value)
+            {
+              pother = other.get_indices().at(i);
+            }
+            else
+            {
+              pother = new IT2_[size];
+              MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), size);
+            }
+
+            for (IT_ j(0) ; j < size ; ++j)
+              pthis[j] = IT_(pother[j]);
+
+            if (! std::is_same<Mem_, Mem::Main>::value)
+            {
+              MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(i), pthis, size);
+              delete[] pthis;
+            }
+            if (!std::is_same<Mem2_, Mem::Main>::value)
+              delete[] pother;
+          }
         }
 
 

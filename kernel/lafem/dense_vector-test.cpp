@@ -98,6 +98,13 @@ public:
     DenseVector<Mem_, DT_> m(FileMode::fm_dv, bs);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-5);
+
+    DenseVector<Mem_, float, unsigned int> xf(42, float(4711));
+    DenseVector<Mem_, float, unsigned int> xf2(xf.clone());
+    DenseVector<Mem_, double, unsigned long> xd(42);
+    xd = xf;
+    xf = xd;
+    TEST_CHECK_EQUAL(xf, xf2);
   }
 };
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
