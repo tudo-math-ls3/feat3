@@ -30,6 +30,13 @@ namespace FEAST
       typedef TupleFilter<Rest_...> RestClass;
 
     public:
+      /// dummy enum
+      enum
+      {
+        /// number of vector blocks
+        num_blocks = TupleFilter<Rest_...>::num_blocks + 1
+      };
+
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;
       /// sub-filter data-type
@@ -112,6 +119,22 @@ namespace FEAST
       }
       /// \endcond
 
+      template<Index i_>
+      typename TupleElement<i_, First_, Rest_...>::Type& at()
+      {
+        static_assert(i_ < Index(num_blocks), "invalid sub-filter index");
+        return TupleElement<i_, First_, Rest_...>::get(*this);
+      }
+
+      /** \copydoc at() */
+      template<Index i_>
+      typename TupleElement<i_, First_, Rest_...>::Type const& at() const
+      {
+        static_assert(i_ < Index(num_blocks), "invalid sub-filter index");
+        return TupleElement<i_, First_, Rest_...>::get(*this);
+      }
+
+
       /** \copydoc UnitFilter::filter_rhs() */
       template<typename Algo_, typename Ty_, typename... Tv_>
       void filter_rhs(TupleVector<Ty_, Tv_...>& vector) const
@@ -153,6 +176,11 @@ namespace FEAST
       friend class TupleFilter;
 
     public:
+      enum
+      {
+        num_blocks = 1
+      };
+
       /// sub-filter mem-type
       typedef typename First_::MemType MemType;
       /// sub-filter data-type
@@ -206,6 +234,20 @@ namespace FEAST
         return _first;
       }
       /// \endcond
+
+      template<Index i_>
+      typename TupleElement<i_, First_>::Type& at()
+      {
+        static_assert(i_ == 0, "invalid sub-filter index");
+        return first();
+      }
+
+      template<Index i_>
+      typename TupleElement<i_, First_>::Type const& at() const
+      {
+        static_assert(i_ == 0, "invalid sub-filter index");
+        return first();
+      }
 
 #ifdef FEAST_COMPILER_MICROSOFT
       /** \copydoc UnitFilter::filter_rhs() */

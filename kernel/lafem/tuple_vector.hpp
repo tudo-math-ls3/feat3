@@ -3,7 +3,7 @@
 #define KERNEL_LAFEM_TUPLE_VECTOR_HPP 1
 
 // includes, FEAST
-#include <kernel/base_header.hpp>
+#include <kernel/lafem/tuple_element.hpp>
 
 // includes, system
 #include <iostream>
@@ -13,14 +13,6 @@ namespace FEAST
 {
   namespace LAFEM
   {
-#ifndef DOXYGEN
-    template<
-      Index i_,
-      typename First_,
-      typename... Rest_>
-    struct TupleVectorElement;
-#endif
-
     /**
      * \brief Variadic TupleVector class template
      *
@@ -150,18 +142,18 @@ namespace FEAST
        * A (const) reference to the sub-vector at position \p i_.
        */
       template<Index i_>
-      typename TupleVectorElement<i_, First_, Rest_...>::Type& at()
+      typename TupleElement<i_, First_, Rest_...>::Type& at()
       {
         static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
-        return TupleVectorElement<i_, First_, Rest_...>::get(*this);
+        return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
       /** \copydoc at() */
       template<Index i_>
-      typename TupleVectorElement<i_, First_, Rest_...>::Type const& at() const
+      typename TupleElement<i_, First_, Rest_...>::Type const& at() const
       {
         static_assert(i_ < Index(num_blocks), "invalid sub-vector index");
-        return TupleVectorElement<i_, First_, Rest_...>::get(*this);
+        return TupleElement<i_, First_, Rest_...>::get(*this);
       }
 
       /// Returns the total size of this tuple-vector.
@@ -327,14 +319,14 @@ namespace FEAST
       }
 
       template<Index i_>
-      typename TupleVectorElement<i_, First_>::Type& at()
+      typename TupleElement<i_, First_>::Type& at()
       {
         static_assert(i_ == 0, "invalid sub-vector index");
         return first();
       }
 
       template<Index i_>
-      typename TupleVectorElement<i_, First_>::Type const& at() const
+      typename TupleElement<i_, First_>::Type const& at() const
       {
         static_assert(i_ == 0, "invalid sub-vector index");
         return first();
@@ -391,49 +383,6 @@ namespace FEAST
       DataType norm2() const
       {
         return first().template norm2<Algo_>();
-      }
-    };
-    /// \endcond
-
-    /**
-     * \brief TupleVector element helper class template
-     *
-     * This class template is a helper to realise the "at" member function of the TupleVector class template.
-     *
-     * \author Peter Zajac
-     */
-    template<
-      Index i_,
-      typename First_,
-      typename... Rest_>
-    struct TupleVectorElement
-    {
-      typedef typename TupleVectorElement<i_-1, Rest_...>::Type Type;
-
-      static Type& get(TupleVector<First_, Rest_...>& meta)
-      {
-        return TupleVectorElement<i_-1, Rest_...>::get(meta.rest());
-      }
-
-      static const Type& get(const TupleVector<First_, Rest_...>& meta)
-      {
-        return TupleVectorElement<i_-1, Rest_...>::get(meta.rest());
-      }
-    };
-
-    /// \cond internal
-    template<typename First_, typename... Rest_>
-    struct TupleVectorElement<0, First_, Rest_...>
-    {
-      typedef First_ Type;
-
-      static Type& get(TupleVector<First_, Rest_...>& meta)
-      {
-        return meta.first();
-      }
-      static const Type& get(const TupleVector<First_, Rest_...>& meta)
-      {
-        return meta.first();
       }
     };
     /// \endcond
