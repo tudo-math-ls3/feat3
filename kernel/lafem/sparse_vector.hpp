@@ -34,7 +34,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class SparseVector : public Container<Mem_, DT_, IT_>, public VectorBase<IT_>
+    class SparseVector : public Container<Mem_, DT_, IT_>, public VectorBase
     {
       private:
         template <typename T1_, typename T2_>
@@ -439,7 +439,7 @@ namespace FEAST
          *
          * \returns Non zero element count.
          */
-        Index used_elements() const override
+        const Index & used_elements() const override
         {
           if (sorted() == 0)
             const_cast<SparseVector *>(this)->sort();
@@ -461,7 +461,7 @@ namespace FEAST
          *
          * \return Allocated element count.
          */
-        Index allocated_elements() const
+        const Index & allocated_elements() const
         {
           return this->_scalar_index.at(2);
         }
@@ -471,7 +471,7 @@ namespace FEAST
          *
          * \return Allocation increment.
          */
-        Index alloc_increment() const
+        const Index & alloc_increment() const
         {
           return this->_scalar_index.at(3);
         }
@@ -481,7 +481,7 @@ namespace FEAST
          *
          * \return Sorting status.
          */
-        Index sorted() const
+        const Index & sorted() const
         {
           return this->_scalar_index.at(4);
         }

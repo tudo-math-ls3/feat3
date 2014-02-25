@@ -31,7 +31,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class DenseMatrix : public Container<Mem_, DT_, IT_>, public MatrixBase<IT_>
+    class DenseMatrix : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
       public:
         /// Our datatype

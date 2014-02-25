@@ -56,11 +56,11 @@ namespace FEAST
         /// List of pointers to all IT_ dependent arrays.
         std::vector<IT_*> _indices;
         /// List of corresponding datatype array sizes.
-        std::vector<IT_> _elements_size;
+        std::vector<Index> _elements_size;
         /// List of corresponding IT_ array sizes.
-        std::vector<IT_> _indices_size;
+        std::vector<Index> _indices_size;
         /// List of scalars with datatype index.
-        std::vector<IT_> _scalar_index;
+        std::vector<Index> _scalar_index;
         /// List of scalars with datatype DT_
         std::vector<DT_> _scalar_dt;
 
@@ -79,14 +79,14 @@ namespace FEAST
           if (_scalar_dt.size() != other.get_scalar_dt().size())
             throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
 
-          for (IT_ i(0) ; i < _elements.size() ; ++i)
+          for (Index i(0) ; i < _elements.size() ; ++i)
           {
             if (_elements_size.at(i) != other.get_elements_size().at(i))
               throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
             MemoryPool<Mem_>::template copy<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
           }
 
-          for (IT_ i(0) ; i < _indices.size() ; ++i)
+          for (Index i(0) ; i < _indices.size() ; ++i)
           {
             if (_indices_size.at(i) != other.get_indices_size().at(i))
               throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
@@ -112,7 +112,7 @@ namespace FEAST
          *
          * Creates a container with a given size.
          */
-        explicit Container(IT_ size)
+        explicit Container(Index size)
         {
           CONTEXT("When creating Container");
           _scalar_index.push_back(size);
@@ -127,9 +127,9 @@ namespace FEAST
         {
           CONTEXT("When destroying Container");
 
-          for (IT_ i(0) ; i < _elements.size() ; ++i)
+          for (Index i(0) ; i < _elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(_elements.at(i));
-          for (IT_ i(0) ; i < _indices.size() ; ++i)
+          for (Index i(0) ; i < _indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(_indices.at(i));
         }
 
@@ -196,7 +196,7 @@ namespace FEAST
         {
           CONTEXT("When formating Container");
 
-          for (IT_ i(0) ; i < _elements.size() ; ++i)
+          for (Index i(0) ; i < _elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
         }
 
@@ -235,20 +235,20 @@ namespace FEAST
           this->_elements_size.assign(other._elements_size.begin(), other._elements_size.end());
           this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
 
-          for (IT_ i(0) ; i < this->_elements.size() ; ++i)
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (IT_ i(0) ; i < this->_indices.size() ; ++i)
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
           this->_elements.clear();
           this->_indices.clear();
 
-          for (IT_ i(0) ; i < other._elements.size() ; ++i)
+          for (Index i(0) ; i < other._elements.size() ; ++i)
           {
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
             MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
           }
 
-          for (IT_ i(0) ; i < other._indices.size() ; ++i)
+          for (Index i(0) ; i < other._indices.size() ; ++i)
           {
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
             MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
@@ -269,9 +269,9 @@ namespace FEAST
           if (this == &other)
             return;
 
-          for (IT_ i(0) ; i < this->_elements.size() ; ++i)
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (IT_ i(0) ; i < this->_indices.size() ; ++i)
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           std::vector<DT_ *> new_elements = other.get_elements();
@@ -284,9 +284,9 @@ namespace FEAST
           this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
           this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
 
-          for (IT_ i(0) ; i < this->_elements.size() ; ++i)
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (IT_ i(0) ; i < this->_indices.size() ; ++i)
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
@@ -304,9 +304,9 @@ namespace FEAST
           if (this == &other)
             return;
 
-          for (IT_ i(0) ; i < this->_elements.size() ; ++i)
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (IT_ i(0) ; i < this->_indices.size() ; ++i)
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements = std::move(other._elements);
@@ -334,9 +334,9 @@ namespace FEAST
                          std::is_same<IT_, IT2_>::value),
                          "cross asign called with equal types!");
 
-          for (IT_ i(0) ; i < this->_elements.size() ; ++i)
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (IT_ i(0) ; i < this->_indices.size() ; ++i)
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
 
           this->_elements.clear();
@@ -352,7 +352,7 @@ namespace FEAST
           this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
 
 
-          for (IT_ i(0) ; i < this->_elements_size.size() ; ++i)
+          for (Index i(0) ; i < this->_elements_size.size() ; ++i)
           {
             const unsigned long size(this->_elements_size.at(i));
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
@@ -377,7 +377,7 @@ namespace FEAST
               MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), size);
             }
 
-            for (IT_ j(0) ; j < size ; ++j)
+            for (Index j(0) ; j < size ; ++j)
               pthis[j] = DT_(pother[j]);
 
             if (! std::is_same<Mem_, Mem::Main>::value)
@@ -389,7 +389,7 @@ namespace FEAST
               delete[] pother;
           }
 
-          for (IT_ i(0) ; i < this->_indices_size.size() ; ++i)
+          for (Index i(0) ; i < this->_indices_size.size() ; ++i)
           {
             const unsigned long size(this->_indices_size.at(i));
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(size));
@@ -416,7 +416,7 @@ namespace FEAST
               MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), size);
             }
 
-            for (IT_ j(0) ; j < size ; ++j)
+            for (Index j(0) ; j < size ; ++j)
               pthis[j] = IT_(pother[j]);
 
             if (! std::is_same<Mem_, Mem::Main>::value)
@@ -441,9 +441,9 @@ namespace FEAST
         }
 
         /**
-         * \brief Returns a list of all IT_ arrays.
+         * \brief Returns a list of all Index arrays.
          *
-         * \returns A list of all IT_ arrays.
+         * \returns A list of all Index arrays.
          */
         const std::vector<IT_*> & get_indices() const
         {
@@ -455,17 +455,17 @@ namespace FEAST
          *
          * \returns A list of all data array sizes.
          */
-        const std::vector<IT_> & get_elements_size() const
+        const std::vector<Index> & get_elements_size() const
         {
           return _elements_size;
         }
 
         /**
-         * \brief Returns a list of all IT_ array sizes.
+         * \brief Returns a list of all Index array sizes.
          *
-         * \returns A list of all IT_ array sizes.
+         * \returns A list of all Index array sizes.
          */
-        const std::vector<IT_> & get_indices_size() const
+        const std::vector<Index> & get_indices_size() const
         {
           return _indices_size;
         }
@@ -475,7 +475,7 @@ namespace FEAST
          *
          * \returns A list of all scalars with datatype index.
          */
-        const std::vector<IT_> & get_scalar_index() const
+        const std::vector<Index> & get_scalar_index() const
         {
           return _scalar_index;
         }
@@ -495,12 +495,12 @@ namespace FEAST
          *
          * \returns The containers size.
          */
-        IT_ size() const
+        Index size() const
         {
           if (_scalar_index.size() > 0)
             return _scalar_index.at(0);
           else
-            return IT_(0);
+            return Index(0);
         }
 
         /**
@@ -508,9 +508,9 @@ namespace FEAST
          *
          * \returns The number of data values.
          */
-        virtual IT_ used_elements() const
+        virtual const Index & used_elements() const
         {
-          return this->size();
+          return std::move(this->size());
         }
 
         /**

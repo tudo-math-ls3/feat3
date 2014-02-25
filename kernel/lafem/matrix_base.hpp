@@ -10,12 +10,11 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template <typename IT_>
     class MatrixBase
     {
       public:
-        virtual const IT_ & rows() const = 0;
-        virtual const IT_ & columns() const = 0;
+        virtual const Index & rows() const = 0;
+        virtual const Index & columns() const = 0;
 
         virtual ~MatrixBase()
         {

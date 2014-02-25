@@ -44,7 +44,7 @@ namespace FEAST
      * \author Dirk Ribbrock
      */
     template <typename Mem_, typename DT_, typename IT_ = Index>
-    class DenseVector : public Container<Mem_, DT_, IT_>, public VectorBase<IT_>
+    class DenseVector : public Container<Mem_, DT_, IT_>, public VectorBase
     {
       private:
         void _read_from_exp(String filename)
@@ -85,10 +85,10 @@ namespace FEAST
 
           }
 
-          this->_scalar_index.at(0) = IT_(data.size());
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(IT_(data.size())));
-          this->_elements_size.push_back(IT_(data.size()));
-          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], IT_(data.size()));
+          this->_scalar_index.at(0) = Index(data.size());
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(Index(data.size())));
+          this->_elements_size.push_back(Index(data.size()));
+          MemoryPool<Mem_>::instance()->template upload<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
         }
 
         void _read_from_dv(String filename)
@@ -104,14 +104,14 @@ namespace FEAST
         {
           uint64_t size;
           file.read((char *)&size, (long)(sizeof(uint64_t)));
-          this->_scalar_index.at(0) = (IT_)size;
+          this->_scalar_index.at(0) = (Index)size;
           this->_elements_size.push_back(this->_scalar_index.at(0));
 
           double * ctemp = new double[std::size_t(size)];
           file.read((char *)ctemp, (long)(size * sizeof(double)));
 
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)));
-          for (IT_ i(0) ; i < size ; ++i)
+          for (Index i(0) ; i < size ; ++i)
           {
             temp[i] = (DT_)ctemp[i];
           }
@@ -147,7 +147,7 @@ namespace FEAST
          *
          * Creates a vector with a given size.
          */
-        explicit DenseVector(IT_ size) :
+        explicit DenseVector(Index size) :
           Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating DenseVector");
@@ -164,7 +164,7 @@ namespace FEAST
          *
          * Creates a vector with given size and value.
          */
-        explicit DenseVector(IT_ size, DT_ value) :
+        explicit DenseVector(Index size, DT_ value) :
           Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating DenseVector");
@@ -183,7 +183,7 @@ namespace FEAST
          *
          * Creates a vector with given size and given data.
          */
-        explicit DenseVector(IT_ size, DT_ * data) :
+        explicit DenseVector(Index size, DT_ * data) :
           Container<Mem_, DT_, IT_>(size)
         {
           CONTEXT("When creating DenseVector");
@@ -191,9 +191,9 @@ namespace FEAST
           this->_elements.push_back(data);
           this->_elements_size.push_back(size);
 
-          for (IT_ i(0) ; i < this->_elements.size() ; ++i)
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (IT_ i(0) ; i < this->_indices.size() ; ++i)
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
@@ -421,7 +421,7 @@ namespace FEAST
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)));
           MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->_scalar_index.at(0));
 
-          for (IT_ i(0) ; i < this->_scalar_index.at(0) ; ++i)
+          for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
           {
             file << std::scientific << temp[i] << std::endl;
           }
@@ -453,11 +453,11 @@ namespace FEAST
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
-          const IT_ csize(this->_scalar_index.at(0));
+          const Index csize(this->_scalar_index.at(0));
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize);
           MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize);
           double * ctemp = new double[csize];
-          for (IT_ i(0) ; i < csize ; ++i)
+          for (Index i(0) ; i < csize ; ++i)
           {
             ctemp[i] = (double)temp[i];
           }
@@ -492,7 +492,7 @@ namespace FEAST
          *
          * \returns Specific vector element.
          */
-        const DT_ operator()(IT_ index) const
+        const DT_ operator()(Index index) const
         {
           CONTEXT("When retrieving DenseVector element");
 
@@ -506,7 +506,7 @@ namespace FEAST
          * \param[in] index The index of the vector element.
          * \param[in] value The value to be set.
          */
-        void operator()(IT_ index, DT_ value)
+        void operator()(Index index, DT_ value)
         {
           CONTEXT("When setting DenseVector element");
 
@@ -520,7 +520,7 @@ namespace FEAST
          *
          * \param[in] index The index of the vector element.
          */
-        EDI<Mem_, DT_> edi(IT_ index)
+        EDI<Mem_, DT_> edi(Index index)
         {
           EDI<Mem_, DT_> t(MemoryPool<Mem_>::get_element(this->_elements.at(0), index), this->_elements.at(0) + index);
           return t;
@@ -698,7 +698,7 @@ namespace FEAST
       if (a.get_indices().size() != b.get_indices().size())
         return false;
 
-      for (IT_ i(0) ; i < a.size() ; ++i)
+      for (Index i(0) ; i < a.size() ; ++i)
         if (a(i) != b(i))
           return false;
 
@@ -716,7 +716,7 @@ namespace FEAST
     operator<< (std::ostream & lhs, const DenseVector<Mem_, DT_, IT_> & b)
     {
       lhs << "[";
-      for (IT_ i(0) ; i < b.size() ; ++i)
+      for (Index i(0) ; i < b.size() ; ++i)
       {
         lhs << "  " << b(i);
       }
