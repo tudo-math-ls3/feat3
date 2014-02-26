@@ -15,17 +15,17 @@ namespace FEAST
      * \author Peter Zajac
      */
     template<
-      typename MemType_,
-      typename DataType_>
+      typename Mem_,
+      typename DT_>
     class MeanFilter
     {
     public:
       /// mem-type typedef
-      typedef MemType_ MemType;
+      typedef Mem_ MemType;
       /// data-type typedef
-      typedef DataType_ DataType;
+      typedef DT_ DataType;
       /// vector-type typedef
-      typedef DenseVector<MemType, DataType> VectorType;
+      typedef DenseVector<Mem_, DT_> VectorType;
 
     protected:
       /// primal weighting vector
@@ -33,12 +33,30 @@ namespace FEAST
       /// dual weighting vector
       VectorType _vec_dual;
       /// weight volume
-      DataType _volume;
+      DT_ _volume;
 
     public:
       // default CTOR
       MeanFilter()
       {
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \tparam Algo_
+       * An algorithm tag compatible to the vector's memory type for dot-product computation.
+       *
+       * \param[in] vec_prim, vec_dual
+       * The primal-dual weighting vector pair for the mean filter.
+       */
+      template<typename Algo_>
+      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual) :
+        _vec_prim(vec_prim),
+        _vec_dual(vec_dual)
+      {
+        // compute weight volume
+        _volume = _vec_prim.template dot<Algo_>(_vec_dual);
       }
 
       /**
@@ -50,16 +68,16 @@ namespace FEAST
        * \param[in] volume
        * The weight volume. This is simply the dot-product of the primal and dual weighting vector.
        */
-      explicit MeanFilter(VectorType&& vec_prim, VectorType&& vec_dual, DataType volume) :
+      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual, DT_ volume) :
         _vec_prim(vec_prim),
         _vec_dual(vec_dual),
         _volume(volume)
       {
-        ASSERT(_volume > Math::Limits<DataType>::epsilon(), "domain volume must not be zero");
+        ASSERT(_volume > Math::Limits<DT_>::epsilon(), "domain volume must not be zero");
       }
 
       /// move ctor
-      MeanFilter(MeanFilter&& other) :
+      MeanFilter(MeanFilter && other) :
         _vec_prim(std::move(other._vec_prim)),
         _vec_dual(std::move(other._vec_dual)),
         _volume(other._volume)
@@ -67,7 +85,7 @@ namespace FEAST
       }
 
       /// move-assign operator
-      MeanFilter& operator=(MeanFilter&& other)
+      MeanFilter & operator=(MeanFilter && other)
       {
         _vec_prim = std::move(other._vec_prim);
         _vec_dual = std::move(other._vec_dual);
@@ -87,41 +105,41 @@ namespace FEAST
       }
 
       /// \cond internal
-      VectorType& get_vec_prim()
+      VectorType & get_vec_prim()
       {
         return _vec_prim;
       }
 
-      const VectorType& get_vec_prim() const
+      const VectorType & get_vec_prim() const
       {
         return _vec_prim;
       }
 
-      VectorType& get_vec_dual()
+      VectorType & get_vec_dual()
       {
         return _vec_dual;
       }
 
-      const VectorType& get_vec_dual() const
+      const VectorType & get_vec_dual() const
       {
         return _vec_dual;
       }
       /// \endcond
 
       template<typename Algo_, typename Matrix_>
-      void filter_mat(Matrix_&) const
+      void filter_mat(Matrix_ &) const
       {
         // nothing to do here
       }
 
       template<typename Algo_, typename Matrix_>
-      void filter_offdiag_row_mat(Matrix_&) const
+      void filter_offdiag_row_mat(Matrix_ &) const
       {
         // nothing to do here
       }
 
       template<typename Algo_, typename Matrix_>
-      void filter_offdiag_col_mat(Matrix_&) const
+      void filter_offdiag_col_mat(Matrix_ &) const
       {
         // nothing to do here
       }
@@ -133,10 +151,10 @@ namespace FEAST
        * A reference to the right-hand-side vector to be filtered.
        */
       template<typename Algo_>
-      void filter_rhs(DenseVector<MemType,DataType>& vector) const
+      void filter_rhs(DenseVector<Mem_,DT_> & vector) const
       {
         // compute dual integral
-        DataType integ = vector.template dot<Algo_>(_vec_prim);
+        DT_ integ = vector.template dot<Algo_>(_vec_prim);
         // subtract mean
         vector.template axpy<Algo_>(_vec_dual, vector, -integ / _volume);
       }
@@ -148,10 +166,10 @@ namespace FEAST
        * A reference to the solution vector to be filtered.
        */
       template<typename Algo_>
-      void filter_sol(DenseVector<MemType,DataType>& vector) const
+      void filter_sol(DenseVector<Mem_,DT_> & vector) const
       {
         // compute primal integral
-        DataType integ = vector.template dot<Algo_>(_vec_dual);
+        DT_ integ = vector.template dot<Algo_>(_vec_dual);
         // subtract mean
         vector.template axpy<Algo_>(_vec_prim, vector, -integ / _volume);
       }
@@ -163,7 +181,7 @@ namespace FEAST
        * A reference to the defect vector to be filtered.
        */
       template<typename Algo_>
-      void filter_def(DenseVector<MemType,DataType>& vector) const
+      void filter_def(DenseVector<Mem_,DT_> & vector) const
       {
         // same as rhs
         filter_rhs<Algo_>(vector);
@@ -176,7 +194,7 @@ namespace FEAST
        * A reference to the correction vector to be filtered.
        */
       template<typename Algo_>
-      void filter_cor(DenseVector<MemType,DataType>& vector) const
+      void filter_cor(DenseVector<Mem_,DT_> & vector) const
       {
         // same as sol
         filter_sol<Algo_>(vector);
