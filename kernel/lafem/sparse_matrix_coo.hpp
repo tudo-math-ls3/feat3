@@ -477,6 +477,29 @@ namespace FEAST
         /**
          * \brief Constructor
          *
+         * \param[in] layout The layout to be used.
+         *
+         * Creates an empty matrix with given layout.
+         */
+        explicit SparseMatrixCOO(const SparseLayout<Mem_, LayoutType> & layout) :
+          Container<Mem_, DT_> (layout._scalar_index.at(0))
+        {
+          CONTEXT("When creating SparseMatrixCOO");
+          this->_indices.assign(layout._indices.begin(), layout._indices.end());
+          this->_indices_size.assign(layout._indices_size.begin(), layout._indices_size.end());
+          this->_scalar_index.assign(layout._scalar_index.begin(), layout._scalar_index.end());
+          this->_scalar_dt.push_back(DT_(0));
+
+          for (auto i : this->_indices)
+            MemoryPool<Mem_>::instance()->increase_memory(i);
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
+          this->_elements_size.push_back(this->_scalar_index.at(3));
+        }
+
+        /**
+         * \brief Constructor
+         *
          * \param[in] other The source ell matrix.
          *
          * Creates a matrix from the given source matrix.

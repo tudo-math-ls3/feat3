@@ -5,6 +5,9 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/bicgstab.hpp>
 #include <kernel/lafem/preconditioner.hpp>
+#include <kernel/lafem/pointstar_factory.hpp>
+
+#include <kernel/lafem/richardson.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -18,133 +21,99 @@ using namespace FEAST::TestSystem;
  *
  * \author Christoph Lohmann
  */
-template<
-  typename Mem_,
-  typename Algo_,
-  typename DT_,
-  typename MT_,
-  typename PT_>
+template< typename PSF_, typename PT_>
 class BiCGStabTest
-  : public TaggedTest<Mem_, DT_, Algo_>
+  : public TaggedTest<typename PT_::MemType,
+                      typename PT_::DataType,
+                      typename PT_::AlgoType>
 {
 private:
   const int opt;
 
 public:
+  typedef typename PT_::AlgoType   Algo_;
+  typedef typename PT_::MatrixType MT_;
+  typedef typename PT_::DataType   DT_;
+  typedef typename PT_::MemType    Mem_;
+  typedef DenseVector<Mem_, DT_>   VT_;
 
   BiCGStabTest(int opt = 0)
-    : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::name() + " "
-                                   + PT_::type_name() + " opt = "
-                                   + stringify(opt)), opt(opt)
+    : TaggedTest<Mem_, DT_, Algo_> ("bicgstab_test: "
+                                    + MT_::name()
+                                    + " "
+                                    + PT_::name()
+                                    + " opt = "
+                                    + stringify(opt)), opt(opt)
   {
   }
 
   virtual void run() const
   {
-    Index size(1024);
-    DenseVector<Mem_, DT_> x(size, DT_(1));
-    DenseVector<Mem_, DT_> b(size);
-    DenseVector<Mem_, DT_> ref(size, DT_(42));
+    PSF_ factory(13);
+    MT_ sys(factory.matrix_csr());
 
-    // Define matrix
-    SparseMatrixCOO<Mem::Main, DT_> csys(size, size);
-
-    // opt = 1: alternative matrix for polynomial preconditioner without scaling
-    if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >) && opt == 1)
-    {
-      for (Index i(0) ; i < size ; ++i)
-        csys(i, i, DT_(0.4 + 0.1 * (i%2)));
-      for (Index i(1) ; i < size ; ++i)
-        csys(i - 1, i, DT_(-0.1 - 0.02 * (i%3)));
-      for (Index i(0) ; i < size - 1; ++i)
-        csys(i + 1, i, DT_(-0.2 - 0.05 * (i%2)));
-    }
-    // default case
-    else
-    {
-      for (Index i(0) ; i < size ; ++i)
-      {
-        for (Index j(0) ; j < size ; ++j)
-        {
-          if (i == j)
-            csys(i, j, DT_(4 + (i%2)));
-          else if (i - 1 == j)
-            csys(i, j, DT_(-1 - 0.2 * (i%3)));
-          else if (i + 1 == j)
-            csys(i, j, DT_(-2 - 0.5 * (i%2)));
-          else if (i + 5 == j)
-            csys(i, j, DT_(0.1 + 0.05 * (i%2)));
-          else if (i - 5 == j)
-            csys(i, j, DT_(0.2 - 0.5 * (i%2)));
-          else if (i + 3 == j)
-          {
-            if (i%2 == 0)
-              csys(i, j, DT_(1 + 0.234 * (i%7)));
-          }
-        }
-      }
-    }
-    MT_ sys(csys);
-
-    // calculate the reference-solution
-    //b.template product_matvec<Algo_>(sys, ref);
+    Index size(sys.rows());
+    VT_ x(size, DT_(1));
+    VT_ ref(factory.vector_q2_bubble());
+    VT_ ref_local(ref);
+    VT_ b(size);
     sys.template apply<Algo_>(b, ref);
 
     // solver-paramters
-    Index max_iter = 1000;
+    Index max_iter = 5000;
     DT_ eps = 1e-12;
 
     // Define preconditioners for every matrix-type and solve the system
-    if (typeid(PT_) == typeid(NonePreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    if (typeid(PT_) == typeid(NonePreconditioner<Algo_, MT_, VT_>))
     {
-      NonePreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond;
+      NonePreconditioner<Algo_, MT_, VT_> precond;
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(JacobiPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    else if (typeid(PT_) == typeid(JacobiPreconditioner<Algo_, MT_, VT_>))
     {
-      JacobiPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond(sys, DT_(1));
+      JacobiPreconditioner<Algo_, MT_, VT_> precond(sys, DT_(1));
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(GaussSeidelPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    else if (typeid(PT_) == typeid(GaussSeidelPreconditioner<Algo_, MT_, VT_>))
     {
       GaussSeidelPreconditioner<Algo_, MT_,
-                                DenseVector<Mem_, DT_> > precond(sys, DT_(1));
+                                VT_> precond(sys, DT_(1));
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    else if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, VT_>))
     {
       PolynomialPreconditioner<Algo_, MT_,
-                               DenseVector<Mem_, DT_> > precond(sys, 20, opt == 0);
+                               VT_> precond(sys, 20, opt == 0);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(ILUPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    else if (typeid(PT_) == typeid(ILUPreconditioner<Algo_, MT_, VT_>))
     {
       ILUPreconditioner<Algo_, MT_,
-                        DenseVector<Mem_, DT_> > precond(sys, opt);
+                        VT_> precond(sys, opt);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(SORPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    else if (typeid(PT_) == typeid(SORPreconditioner<Algo_, MT_, VT_>))
     {
       SORPreconditioner<Algo_, MT_,
-                        DenseVector<Mem_, DT_> > precond(sys);
+                        VT_> precond(sys);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(SSORPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    else if (typeid(PT_) == typeid(SSORPreconditioner<Algo_, MT_, VT_>))
     {
       SSORPreconditioner<Algo_, MT_,
-                         DenseVector<Mem_, DT_> > precond(sys);
+                         VT_> precond(sys);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
-    else if (typeid(PT_) == typeid(SPAIPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> >))
+    else if (typeid(PT_) == typeid(SPAIPreconditioner<Algo_, MT_, VT_>))
     {
-      if (opt == 0)
+      if (opt%2 == 0)
       {
-        SPAIPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond(sys, 2);
+        SPAIPreconditioner<Algo_, MT_, VT_> precond(sys, 2, opt / 2);
         BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
       }
       else
       {
-        SPAIPreconditioner<Algo_, MT_, DenseVector<Mem_, DT_> > precond(sys, sys.layout());
+        SPAIPreconditioner<Algo_, MT_, VT_> precond(sys, sys.layout(), (opt - 1) / 2);
         BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
       }
     }
@@ -155,9 +124,9 @@ public:
 
 
     // check, if the result is correct
-    for (Index i(0) ; i < x.size() ; ++i)
+    for (Index i(0) ; i < size ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref(i), 1e-8);
+      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref_local(i), 1e-8);
     }
 
   }
@@ -165,258 +134,261 @@ public:
 };
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              NonePreconditioner<Algo::Generic,
                                 SparseMatrixCSR<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_none_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              NonePreconditioner<Algo::Generic,
                                 SparseMatrixCOO<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_none_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              NonePreconditioner<Algo::Generic,
                                 SparseMatrixELL<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_none_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              JacobiPreconditioner<Algo::Generic,
                                   SparseMatrixCSR<Mem::Main, double>,
                                   DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_jacobi_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              JacobiPreconditioner<Algo::Generic,
                                   SparseMatrixCOO<Mem::Main, double>,
                                   DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_jacobi_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              JacobiPreconditioner<Algo::Generic,
                                   SparseMatrixELL<Mem::Main, double>,
                                   DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_jacobi_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              GaussSeidelPreconditioner<Algo::Generic,
                                        SparseMatrixCSR<Mem::Main, double>,
                                        DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_gaussSeidel_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              GaussSeidelPreconditioner<Algo::Generic,
                                        SparseMatrixCOO<Mem::Main, double>,
                                        DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_gaussSeidel_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              GaussSeidelPreconditioner<Algo::Generic,
                                        SparseMatrixELL<Mem::Main, double>,
                                        DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_gaussSeidel_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              PolynomialPreconditioner<Algo::Generic,
                                       SparseMatrixCSR<Mem::Main, double>,
                                       DenseVector<Mem::Main, double> > >
-bicgstab_test_csr_poly_double(0);
+bicgstab_test_csr_poly_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              PolynomialPreconditioner<Algo::Generic,
                                       SparseMatrixCOO<Mem::Main, double>,
                                       DenseVector<Mem::Main, double> > >
-bicgstab_test_coo_poly_double(0);
+bicgstab_test_coo_poly_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              PolynomialPreconditioner<Algo::Generic,
                                       SparseMatrixELL<Mem::Main, double>,
                                       DenseVector<Mem::Main, double> > >
-bicgstab_test_ell_poly_double(0);
+bicgstab_test_ell_poly_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
-             PolynomialPreconditioner<Algo::Generic,
-                                      SparseMatrixCSR<Mem::Main, double>,
-                                      DenseVector<Mem::Main, double> > >
-bicgstab_test_csr_poly_no_double(1);
+// BiCGStabTest<PointstarFactoryFD<double>,
+//              PolynomialPreconditioner<Algo::Generic,
+//                                       SparseMatrixCSR<Mem::Main, double>,
+//                                       DenseVector<Mem::Main, double> > >
+// bicgstab_test_csr_poly_no_double(1);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
-             PolynomialPreconditioner<Algo::Generic,
-                                      SparseMatrixCOO<Mem::Main, double>,
-                                      DenseVector<Mem::Main, double> > >
-bicgstab_test_coo_poly_no_double(1);
+// BiCGStabTest<PointstarFactoryFD<double>,
+//              PolynomialPreconditioner<Algo::Generic,
+//                                       SparseMatrixCOO<Mem::Main, double>,
+//                                       DenseVector<Mem::Main, double> > >
+// bicgstab_test_coo_poly_no_double(1);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
-             PolynomialPreconditioner<Algo::Generic,
-                                      SparseMatrixELL<Mem::Main, double>,
-                                      DenseVector<Mem::Main, double> > >
-bicgstab_test_ell_poly_no_double(1);
+// BiCGStabTest<PointstarFactoryFD<double>,
+//              PolynomialPreconditioner<Algo::Generic,
+//                                       SparseMatrixELL<Mem::Main, double>,
+//                                       DenseVector<Mem::Main, double> > >
+// bicgstab_test_ell_poly_no_double(1);
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              ILUPreconditioner<Algo::Generic,
                                SparseMatrixCSR<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_ilu_0_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              ILUPreconditioner<Algo::Generic,
                                SparseMatrixCOO<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_ilu_0_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              ILUPreconditioner<Algo::Generic,
                                SparseMatrixELL<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_ilu_0_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              ILUPreconditioner<Algo::Generic,
                                SparseMatrixCSR<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_ilu_10_double(10);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              ILUPreconditioner<Algo::Generic,
                                SparseMatrixCOO<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_ilu_10_double(10);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              ILUPreconditioner<Algo::Generic,
                                SparseMatrixELL<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_ilu_10_double(10);
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SORPreconditioner<Algo::Generic,
                                SparseMatrixCSR<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_sor_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SORPreconditioner<Algo::Generic,
                                SparseMatrixCOO<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_sor_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SORPreconditioner<Algo::Generic,
                                SparseMatrixELL<Mem::Main, double>,
                                DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_sor_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SSORPreconditioner<Algo::Generic,
                                 SparseMatrixCSR<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_ssor_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SSORPreconditioner<Algo::Generic,
                                 SparseMatrixCOO<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_ssor_double;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SSORPreconditioner<Algo::Generic,
                                 SparseMatrixELL<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_ssor_double;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SPAIPreconditioner<Algo::Generic,
                                 SparseMatrixCSR<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_spai_double_0;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SPAIPreconditioner<Algo::Generic,
                                 SparseMatrixCOO<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_spai_double_0;
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SPAIPreconditioner<Algo::Generic,
                                 SparseMatrixELL<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_spai_double_0;
 
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SPAIPreconditioner<Algo::Generic,
                                 SparseMatrixCSR<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_csr_spai_double_1(1);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixCOO<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SPAIPreconditioner<Algo::Generic,
                                 SparseMatrixCOO<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_coo_spai_double_1(1);
 
-BiCGStabTest<Mem::Main, Algo::Generic, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              SPAIPreconditioner<Algo::Generic,
                                 SparseMatrixELL<Mem::Main, double>,
                                 DenseVector<Mem::Main, double> > >
 bicgstab_test_ell_spai_double_1(1);
 
+
+BiCGStabTest<PointstarFactoryFD<double>,
+             SPAIPreconditioner<Algo::Generic,
+                                SparseMatrixCSR<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_csr_spai_double_20(20);
+
+BiCGStabTest<PointstarFactoryFD<double>,
+             SPAIPreconditioner<Algo::Generic,
+                                SparseMatrixCOO<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_coo_spai_double_20(20);
+
+BiCGStabTest<PointstarFactoryFD<double>,
+             SPAIPreconditioner<Algo::Generic,
+                                SparseMatrixELL<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_ell_spai_double_20(20);
+
+
+BiCGStabTest<PointstarFactoryFD<double>,
+             SPAIPreconditioner<Algo::Generic,
+                                SparseMatrixCSR<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_csr_spai_double_21(21);
+
+BiCGStabTest<PointstarFactoryFD<double>,
+             SPAIPreconditioner<Algo::Generic,
+                                SparseMatrixCOO<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_coo_spai_double_21(21);
+
+BiCGStabTest<PointstarFactoryFD<double>,
+             SPAIPreconditioner<Algo::Generic,
+                                SparseMatrixELL<Mem::Main, double>,
+                                DenseVector<Mem::Main, double> > >
+bicgstab_test_ell_spai_double_21(21);
+
 /*
 #ifdef FEAST_BACKENDS_CUDA
-BiCGStabTest<Mem::CUDA, Algo::CUDA, double,
-             SparseMatrixCSR<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              NonePreconditioner<Algo::CUDA,
                                 SparseMatrixCSR<Mem::CUDA, double>,
                                 DenseVector<Mem::CUDA, double> > >
 cuda_bicgstab_test_csr_none_double(0);
 
-BiCGStabTest<Mem::CUDA, Algo::CUDA, double,
-             SparseMatrixELL<Mem::Main, double>,
+BiCGStabTest<PointstarFactoryFD<double>,
              NonePreconditioner<Algo::CUDA,
                                 SparseMatrixELL<Mem::CUDA, double>,
                                 DenseVector<Mem::CUDA, double> > >
