@@ -1,3 +1,4 @@
+#include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <iostream>

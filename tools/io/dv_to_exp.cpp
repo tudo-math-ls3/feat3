@@ -1,3 +1,4 @@
+#include <kernel/base_header.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <iostream>
 
