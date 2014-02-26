@@ -5,6 +5,7 @@
 import sys
 import os
 import shutil
+import copy
 
 sys.dont_write_bytecode = True
 from cmake_modules.detect_cpu import detect_cpu
@@ -102,7 +103,7 @@ buildid_string = buildid_string.strip("-")
 #generate handy build id array of tokens
 buildid = buildid_string.split("-")
 #list of buildid tokens, remove token when used, results in list of unused tokens
-unused_tokens = buildid
+unused_tokens = copy.deepcopy(buildid)
 
 #initialise variables
 build_mode = ""
@@ -205,6 +206,8 @@ if "ccache" in buildid:
   remove_string(unused_tokens, "ccache")
   os.environ["CC"] = "ccache " + os.environ["CC"]
   os.environ["CXX"] = "ccache " + os.environ["CXX"]
+  if "clang" in buildid or "llvm" in buildid:
+    cxxflags += " -Qunused-arguments"
 
 #additional backends
 if "cuda" in buildid:
@@ -259,6 +262,8 @@ if len(unused_tokens) == 0:
 else:
   print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
 print ("Detected CPU Type: " + cputype)
+print
+print ("cxx: " + os.environ["CXX"])
 print
 print ("cxxflags: " + os.environ["CXXFLAGS"])
 print
