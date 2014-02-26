@@ -24,7 +24,7 @@ public:
   typedef typename SM_::DataType DT_;
   typedef typename SM_::MemType Mem_;
   RichardsonTest()
-    : TaggedTest<Mem_, DT_, Algo_>("richardson_test " + SM_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("richardson_test " + SM_::name())
   {
   }
 

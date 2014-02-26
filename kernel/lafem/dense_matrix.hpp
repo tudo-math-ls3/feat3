@@ -271,7 +271,7 @@ namespace FEAST
          *
          * \returns A string describing the container.
          */
-        static String type_name()
+        static String name()
         {
           return "DenseMatrix";
         }

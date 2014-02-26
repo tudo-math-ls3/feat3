@@ -33,8 +33,8 @@ private:
 public:
 
   BiCGStabTest(int opt = 0)
-    : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::type_name() + " "
-                                    + PT_::type_name() + " opt = "
+    : TaggedTest<Mem_, DT_, Algo_>("bicgstab_test: " + MT_::name() + " "
+                                    + PT_::name() + " opt = "
                                     + stringify(opt)), opt(opt)
   {
   }
@@ -342,7 +342,7 @@ class ILUTest
 public:
 
   ILUTest()
-    : TaggedTest<Mem_, DT_, Algo_>("ilu_test" + MT_::type_name())
+    : TaggedTest<Mem_, DT_, Algo_>("ilu_test" + MT_::name())
   {
   }
 

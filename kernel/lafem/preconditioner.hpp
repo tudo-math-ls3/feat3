@@ -54,7 +54,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "None_Preconditioner";
       }
@@ -112,7 +112,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "Jacobi_Preconditioner";
       }
@@ -188,7 +188,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "GaussSeidel_Preconditioner";
       }
@@ -281,7 +281,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "GaussSeidel_Preconditioner";
       }
@@ -380,7 +380,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "GaussSeidel_Preconditioner";
       }
@@ -512,7 +512,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "Polynomial_Preconditioner";
       }
@@ -701,7 +701,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "ILU_Preconditioner";
       }
@@ -1110,7 +1110,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "ILU_Preconditioner";
       }
@@ -1480,7 +1480,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "ILU_Preconditioner";
       }

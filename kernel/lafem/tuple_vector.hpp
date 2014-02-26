@@ -69,7 +69,7 @@ namespace FEAST
       /// Returns a list of all sub-vector type names
       static String sub_name_list()
       {
-        return First_::type_name() + "," + RestClass::sub_name_list();
+        return First_::name() + "," + RestClass::sub_name_list();
       }
 
     public:
@@ -169,7 +169,7 @@ namespace FEAST
       }
 
       /// Returns a descriptive string for this container.
-      static String type_name()
+      static String name()
       {
         return String("TupleVector<") + sub_name_list() + ">";
       }
@@ -255,7 +255,7 @@ namespace FEAST
 
       static String sub_name_list()
       {
-        return First_::type_name();
+        return First_::name();
       }
 
     public:
@@ -313,7 +313,7 @@ namespace FEAST
       }
 
       /// Returns a descriptive string for this container.
-      static String type_name()
+      static String name()
       {
         return String("TupleVector<") + sub_name_list() + ">";
       }

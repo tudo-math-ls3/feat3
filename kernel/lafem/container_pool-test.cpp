@@ -34,7 +34,7 @@ class ContainerPoolTest
 public:
 
   ContainerPoolTest()
-    : TaggedTest<Mem_, DT_>("container_pool_test " + CT_::type_name())
+    : TaggedTest<Mem_, DT_>("container_pool_test " + CT_::name())
   {
   }
 

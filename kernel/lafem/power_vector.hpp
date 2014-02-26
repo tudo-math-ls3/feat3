@@ -203,9 +203,9 @@ namespace FEAST
       }
 
       /// Returns a descriptive string for this container.
-      static String type_name()
+      static String name()
       {
-        return String("PowerVector<") + SubVectorType::type_name() + "," + stringify(num_blocks) + ">";
+        return String("PowerVector<") + SubVectorType::name() + "," + stringify(num_blocks) + ">";
       }
 
       /**
@@ -423,9 +423,9 @@ namespace FEAST
         _sub_vector.clear(value);
       }
 
-      static String type_name()
+      static String name()
       {
-        return String("PowerVector<") + SubVectorType::type_name() + ",1>";
+        return String("PowerVector<") + SubVectorType::name() + ",1>";
       }
 
       template<typename SubType2_>
