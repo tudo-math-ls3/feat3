@@ -774,7 +774,7 @@ namespace FEAST
       SynchronisedPreconditionedSolverData(const SynchronisedPreconditionedSolverData& other) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(other),
-        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>(other)
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(other)
       {
       }
 
