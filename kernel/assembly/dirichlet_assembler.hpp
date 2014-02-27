@@ -101,9 +101,9 @@ namespace FEAST
         std::set<Index> idx_set;
         Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
 
-        // allocate filter 'arrays'
-        LAFEM::DenseVector<MemType_, DataType_> values(idx_set.size(), DataType_(0));
-        LAFEM::DenseVector<MemType_, Index> indices(idx_set.size());
+        // allocate filter 'vectors'
+        LAFEM::DenseVector<MemType_, DataType_> values(Index(idx_set.size()), DataType_(0));
+        LAFEM::DenseVector<MemType_, Index> indices(Index(idx_set.size()));
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
@@ -145,8 +145,8 @@ namespace FEAST
         Intern::DirichletWrapper<shape_dim>::assemble(idx_map, _space, _cells, functor);
 
         // allocate filter 'arrays'
-        LAFEM::DenseVector<MemType_, DataType_> values(idx_map.size());
-        LAFEM::DenseVector<MemType_, Index> indices(idx_map.size());
+        LAFEM::DenseVector<MemType_, DataType_> values(Index(idx_map.size()));
+        LAFEM::DenseVector<MemType_, Index> indices(Index(idx_map.size()));
 
         // loop over all dof-indices
         typename std::map<Index, DataType_>::const_iterator it(idx_map.begin());
