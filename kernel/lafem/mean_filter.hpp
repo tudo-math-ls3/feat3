@@ -44,24 +44,6 @@ namespace FEAST
       /**
        * \brief Constructor
        *
-       * \tparam Algo_
-       * An algorithm tag compatible to the vector's memory type for dot-product computation.
-       *
-       * \param[in] vec_prim, vec_dual
-       * The primal-dual weighting vector pair for the mean filter.
-       */
-      template<typename Algo_>
-      explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual) :
-        _vec_prim(vec_prim),
-        _vec_dual(vec_dual)
-      {
-        // compute weight volume
-        _volume = _vec_prim.template dot<Algo_>(_vec_dual);
-      }
-
-      /**
-       * \brief Constructor
-       *
        * \param[in] vec_prim, vec_dual
        * The primal-dual weighting vector pair for the mean filter.
        *
@@ -87,9 +69,12 @@ namespace FEAST
       /// move-assign operator
       MeanFilter & operator=(MeanFilter && other)
       {
-        _vec_prim = std::move(other._vec_prim);
-        _vec_dual = std::move(other._vec_dual);
-        _volume = other._volume;
+        if(this != &other)
+        {
+          _vec_prim = std::move(other._vec_prim);
+          _vec_dual = std::move(other._vec_dual);
+          _volume = other._volume;
+        }
         return *this;
       }
 

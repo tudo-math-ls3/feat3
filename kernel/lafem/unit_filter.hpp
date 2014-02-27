@@ -72,11 +72,10 @@ namespace FEAST
       /// move-assignment operator
       UnitFilter & operator=(UnitFilter && other)
       {
-        if(this == & other)
-          return *this;
-
-        _sv = std::move(other._sv);
-
+        if(this != &other)
+        {
+          _sv = std::move(other._sv);
+        }
         return *this;
       }
 

@@ -95,8 +95,12 @@ namespace FEAST
       /// move-assign operator
       TupleVector& operator=(TupleVector&& other)
       {
-        _first = std::move(other._first);
-        _rest = std::move(other._rest);
+        if(this != &other)
+        {
+          _first = std::move(other._first);
+          _rest = std::move(other._rest);
+        }
+        return *this;
       }
 
       /// deleted copy-ctor
@@ -277,7 +281,11 @@ namespace FEAST
       /// move-assign operator
       TupleVector& operator=(TupleVector&& other)
       {
-        _first = std::move(other._first);
+        if(this != &other)
+        {
+          _first = std::move(other._first);
+        }
+        return *this;
       }
 
       /// deleted copy-ctor

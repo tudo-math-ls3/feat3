@@ -1258,7 +1258,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
           if (x.size() != this->columns())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
-          if (y.size() != this->columns())
+          if (y.size() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
 
           // check for special cases
@@ -1282,13 +1282,13 @@ namespace FEAST
         /// Returns a new compatible L-Vector.
         VectorTypeL create_vector_l() const
         {
-          return VectorTypeL(this->columns());
+          return VectorTypeL(this->rows());
         }
 
         /// Returns a new compatible R-Vector.
         VectorTypeR create_vector_r() const
         {
-          return VectorTypeR(this->rows());
+          return VectorTypeR(this->columns());
         }
     };
 

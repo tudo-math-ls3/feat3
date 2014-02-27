@@ -109,8 +109,11 @@ namespace FEAST
       /// move-assign operator
       PowerVector& operator=(PowerVector&& other)
       {
-        base().operator=(static_cast<BaseClass&&>(other));
-        _sub_vector = std::move(other._sub_vector);
+        if(this != &other)
+        {
+          base().operator=(static_cast<BaseClass&&>(other));
+          _sub_vector = std::move(other._sub_vector);
+        }
         return *this;
       }
 
@@ -366,7 +369,10 @@ namespace FEAST
 
       PowerVector& operator=(PowerVector&& other)
       {
-        _sub_vector = std::move(other._sub_vector);
+        if(this != &other)
+        {
+          _sub_vector = std::move(other._sub_vector);
+        }
         return *this;
       }
 
