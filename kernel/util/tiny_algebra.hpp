@@ -275,12 +275,12 @@ namespace FEAST
       }
 
       /**
-       * \brief Clears the vector.
+       * \brief Format the vector.
        *
        * \param[in] alpha
        * The value that the vector is to be set to.
        */
-      void clear(T_ alpha = T_(0))
+      void format(T_ alpha = T_(0))
       {
         for(Index i(0); i < Index(n_); ++i)
         {
@@ -632,12 +632,12 @@ namespace FEAST
       }
 
       /**
-       * \brief Clears the matrix.
+       * \brief Formats the matrix.
        *
        * \param[in] alpha
        * The value that the matrix is to be set to.
        */
-      void clear(T_ alpha = T_(0))
+      void format(T_ alpha = T_(0))
       {
         for(Index i(0); i < Index(m_); ++i)
         {
@@ -825,7 +825,7 @@ namespace FEAST
       template<int l_, int sma_, int sna_, int smb_, int snb_>
       Matrix& set_mat_mat_mult(const Matrix<T_, m_, l_, sma_, sna_>& a, const Matrix<T_, l_, n_, smb_, snb_>& b)
       {
-        clear();
+        format();
         return add_mat_mat_mult(a, b);
       }
 
@@ -885,7 +885,7 @@ namespace FEAST
         const Matrix<T_, l_, n_, smd_, snd_>& d,
         T_ alpha = T_(1))
       {
-        clear();
+        format();
         return add_double_mat_mult(a, b, d, alpha);
       }
 
@@ -936,7 +936,7 @@ namespace FEAST
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
         T_ alpha = T_(1))
       {
-        clear();
+        format();
         return add_vec_tensor_mult(v, t, alpha);
       }
     }; // class Matrix
@@ -1172,8 +1172,8 @@ namespace FEAST
         return *this;
       }
 
-      /// clears the tensor
-      void clear(T_ alpha = T_(0))
+      /// formats the tensor
+      void format(T_ alpha = T_(0))
       {
         (*this) = alpha;
       }

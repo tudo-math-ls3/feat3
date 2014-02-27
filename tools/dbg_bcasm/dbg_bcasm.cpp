@@ -42,7 +42,7 @@ void test_bcasm(
   // assemble system matrix
   MatrixType mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
-  mat_sys.clear();
+  mat_sys.format();
   Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
 

@@ -173,9 +173,9 @@ namespace FEAST
 
           // initialise edge vectors
           ImagePointType edge_vec[3];
-          edge_vec[0].clear();
-          edge_vec[1].clear();
-          edge_vec[2].clear();
+          edge_vec[0].format();
+          edge_vec[1].format();
+          edge_vec[2].format();
 
           // compute barycentre
           dom_point[0] = dom_point[1] = DataType(1) / DataType(3);
@@ -183,7 +183,7 @@ namespace FEAST
 
           // nodal matrix
           Tiny::Matrix<DataType, 21, 21> node_mat;
-          node_mat.clear();
+          node_mat.format();
 
           // loop over all vertices
           for(Index vi(0); vi < Index(3); ++vi)

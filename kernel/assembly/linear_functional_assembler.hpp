@@ -105,8 +105,8 @@ namespace FEAST
           // fetch number of local dofs
           Index num_loc_dofs = test_eval.get_num_local_dofs();
 
-          // clear local matrix
-          lvad.clear();
+          // format local matrix
+          lvad.format();
 
           // loop over all quadrature points and integrate
           for(Index k(0); k < cubature_rule.get_num_points(); ++k)

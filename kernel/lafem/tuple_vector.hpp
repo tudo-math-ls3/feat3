@@ -179,10 +179,10 @@ namespace FEAST
       }
 
       /// Clears the vector
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        first().clear(value);
-        rest().clear(value);
+        first().format(value);
+        rest().format(value);
       }
 
       //template<typename First2_, typename... Rest2_>
@@ -340,9 +340,9 @@ namespace FEAST
         return first();
       }
 
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        _first.clear(value);
+        _first.format(value);
       }
 
       //template<typename First2_>

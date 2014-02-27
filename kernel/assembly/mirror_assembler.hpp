@@ -197,8 +197,8 @@ namespace FEAST
         SymbolicMatrixAssemblerBase::assemble(vec_mirror.get_scatter_prim(),
           Adjacency::Graph(Adjacency::rt_transpose, graph));
 
-        vec_mirror.get_gather_prim().clear(DataType_(1));
-        vec_mirror.get_scatter_prim().clear(DataType_(1));
+        vec_mirror.get_gather_prim().format(DataType_(1));
+        vec_mirror.get_scatter_prim().format(DataType_(1));
       }
 
       /**

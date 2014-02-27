@@ -186,10 +186,10 @@ namespace FEAST
        * \param[in] value
        * The value to which the matrix' entries are to be set to.
        */
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        base().clear(value);
-        last().clear(value);
+        base().format(value);
+        last().format(value);
       }
 
       /**
@@ -358,9 +358,9 @@ namespace FEAST
         return last().columns();
       }
 
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        last().clear(value);
+        last().format(value);
       }
 
       template<typename Algo_>

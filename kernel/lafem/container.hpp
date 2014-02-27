@@ -238,15 +238,34 @@ namespace FEAST
         /**
          * \brief Reset all elements of the container to a given value or zero if missing.
          *
-         * \param[in] other The source container.
+         * \param[in] value The value to be set (defaults to 0)
          *
          */
-        void clear(DT_ value = 0)
+        void format(DT_ value = 0)
+        {
+          CONTEXT("When formating Container");
+
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
+        }
+
+        /**
+         * \brief Free all allocated arrays
+         *
+         */
+        virtual void clear()
         {
           CONTEXT("When clearing Container");
 
           for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < _indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
         }
 
         /** \brief Clone operation

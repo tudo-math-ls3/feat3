@@ -78,7 +78,7 @@ public:
 
     // test: z <- 1; z <- x * y + z
     // purpose: general test
-    z.clear(DataType(1));
+    z.format(DataType(1));
     z.template component_product<AlgoType>(x, y, z);
     for(Index i(0); i < n00; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(z.template at<Index(0)>().template at<Index(0)>()(i), fx00(i) * fy00(i) + DataType(1), tol);

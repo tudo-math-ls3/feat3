@@ -434,9 +434,9 @@ namespace FEAST
           typename EvalTraits::HessianTensorType hess_jac;
 
           // compute inverse
-          hess_jac.clear();
+          hess_jac.format();
           hess_jac.add_double_mat_mult(trafo_data.hess_ten, trafo_data.jac_inv, trafo_data.jac_inv);
-          trafo_data.hess_inv.clear();
+          trafo_data.hess_inv.format();
           trafo_data.hess_inv.add_mat_tensor_mult(trafo_data.jac_inv, hess_jac, -DataType(1));
         }
       };

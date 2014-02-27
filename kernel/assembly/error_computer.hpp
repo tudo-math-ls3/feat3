@@ -120,8 +120,8 @@ namespace FEAST
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
-          // clear local vector
-          lvad.clear();
+          // format local vector
+          lvad.format();
 
           // initialise dof-mapping
           dof_mapping.prepare(cell);
@@ -295,8 +295,8 @@ namespace FEAST
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
-          // clear local vector
-          lvad.clear();
+          // format local vector
+          lvad.format();
 
           // initialise dof-mapping
           dof_mapping.prepare(cell);
@@ -470,8 +470,8 @@ namespace FEAST
         // loop over all cells of the mesh
         for(typename AsmTraits::CellIterator cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
         {
-          // clear local vector
-          lvad.clear();
+          // format local vector
+          lvad.format();
 
           // initialise dof-mapping
           dof_mapping.prepare(cell);

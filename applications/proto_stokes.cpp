@@ -318,11 +318,11 @@ public:
     Cubature::DynamicFactory cubature_factory_velo("gauss-legendre:3");
     Cubature::DynamicFactory cubature_factory_pres("gauss-legendre:2");
 
-    // clear all matrices
-    _matrix_a.clear();
-    _matrix_b1.clear();
-    _matrix_b2.clear();
-    _matrix_m.clear();
+    // format all matrices
+    _matrix_a.format();
+    _matrix_b1.format();
+    _matrix_b2.format();
+    _matrix_m.format();
 
     // assemble velocity laplace matrix A
     Assembly::Common::LaplaceOperator laplace;
@@ -349,8 +349,8 @@ public:
     // assemble matrix structures
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(_prol_v, _space_v, coarse._space_v);
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(_prol_p, _space_p, coarse._space_p);
-    _prol_v.clear();
-    _prol_p.clear();
+    _prol_v.format();
+    _prol_p.format();
 
     // create cubature factories
     Cubature::DynamicFactory cubature_factory_velo("gauss-legendre:3");
@@ -441,10 +441,10 @@ public:
     calc_defect_u(_vec_rhs_x, _vec_rhs_y,  rhs_x, rhs_y, sol_x, sol_y, sol_p);
     calc_defect_p(_vec_rhs_p, rhs_p, sol_x, sol_y, sol_p);
 
-    // clear local solution
-    _vec_sol_x.clear();
-    _vec_sol_y.clear();
-    _vec_sol_p.clear();
+    // format local solution
+    _vec_sol_x.format();
+    _vec_sol_y.format();
+    _vec_sol_p.format();
 
     // compute defect norm
     DataType dx = _vec_rhs_x.norm2<AlgoType>();
@@ -467,7 +467,7 @@ public:
   // applies the Schur-complement-SOR smoother
   void smooth(int nsteps, int na, int ns, DataType wa = DataType(1), DataType ws = DataType(1))
   {
-    _vec_def_p.clear();
+    _vec_def_p.format();
     for(int step(0); step < nsteps; ++step)
     {
       // dx_k = bx - B1*p_{k-1}
@@ -522,10 +522,10 @@ public:
     coarse._filter_x.filter_def<AlgoType>(coarse._vec_rhs_x);
     coarse._filter_y.filter_def<AlgoType>(coarse._vec_rhs_y);
 
-    // clear
-    coarse._vec_sol_x.clear();
-    coarse._vec_sol_y.clear();
-    coarse._vec_sol_p.clear();
+    // format
+    coarse._vec_sol_x.format();
+    coarse._vec_sol_y.format();
+    coarse._vec_sol_p.format();
   }
 };
 

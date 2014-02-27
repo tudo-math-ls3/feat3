@@ -199,10 +199,10 @@ namespace FEAST
        * \param[in] value
        * The value to which the vector's entries are to be set to.
        */
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        base().clear(value);
-        last().clear(value);
+        base().format(value);
+        last().format(value);
       }
 
       /// Returns a descriptive string for this container.
@@ -424,9 +424,9 @@ namespace FEAST
         return _sub_vector.size();
       }
 
-      void clear(DataType value = DataType(0))
+      void format(DataType value = DataType(0))
       {
-        _sub_vector.clear(value);
+        _sub_vector.format(value);
       }
 
       static String name()

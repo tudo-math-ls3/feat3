@@ -190,9 +190,9 @@ namespace FEAST
             // fetch number of local fine DOFs
             Index fine_num_loc_dofs = fine_space_eval.get_num_local_dofs();
 
-            // clear local matrices
-            mass.clear();
-            lmd.clear();
+            // format local matrices
+            mass.format();
+            lmd.format();
 
             // loop over all cubature points and integrate
             for(Index k(0); k < fine_cubature.get_num_points(); ++k)

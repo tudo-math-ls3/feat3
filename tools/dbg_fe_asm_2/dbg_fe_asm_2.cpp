@@ -38,7 +38,7 @@ void test_asm(const Space_& space, const String& cubature_name, int imat)
   Cubature::DynamicFactory cubature_factory(cubature_name);
 
   std::cout << "Assembling " << (imat == 0 ? "stiffness" : "mass") << " matrix data..." << std::endl;
-  matrix_d.clear(0.0f);
+  matrix_d.format(0.0f);
   stop_watch.reset();
   stop_watch.start();
   switch(imat)

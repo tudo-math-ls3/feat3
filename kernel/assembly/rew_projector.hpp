@@ -148,9 +148,9 @@ namespace FEAST
         // create weight scatter-axpy
         LAFEM::ScatterAxpy<VectorType> weight_scatter_axpy(weight);
 
-        // clear local weight vector
+        // format local weight vector
         if(weight_type == wt_arithmetic)
-          lwad.clear(DataType(1));
+          lwad.format(DataType(1));
 
         // loop over all cells of the mesh
         for(Index cell(trafo_eval.begin()); cell != trafo_eval.end(); ++cell)
@@ -167,9 +167,9 @@ namespace FEAST
           // fetch number of local dofs
           Index num_loc_dofs(space_eval.get_num_local_dofs());
 
-          // clear local system
-          lvad.clear();
-          mass.clear();
+          // format local system
+          lvad.format();
+          mass.format();
 
           // cell volume
           DataType volume(DataType(0));
@@ -223,7 +223,7 @@ namespace FEAST
           if(weight_type == wt_volume)
           {
             lvad *= volume;
-            lwad.clear(volume);
+            lwad.format(volume);
           }
 
           // prepare dof-mapping

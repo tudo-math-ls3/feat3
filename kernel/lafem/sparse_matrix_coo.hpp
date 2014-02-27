@@ -1129,9 +1129,9 @@ namespace FEAST
         }
 
         /**
-         * \brief Reset all elements to zero.
+         * \brief Free all allocated arrays, effectivly setting matrix to zero.
          */
-        void clear()
+        virtual void clear()
         {
           CONTEXT("When clearing SparseMatrixCOO");
           MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(0));

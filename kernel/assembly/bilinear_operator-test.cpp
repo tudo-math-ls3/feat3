@@ -63,7 +63,7 @@ public:
     // create a CSR matrices
     MatrixType matrix;
     Assembly::SymbolicMatrixAssembler<>::assemble1(matrix, space);
-    matrix.clear();
+    matrix.format();
 
     // create a cubature factory
     Cubature::DynamicFactory cubature_factory("barycentre");
@@ -100,8 +100,8 @@ public:
     MatrixType matrix_1, matrix_2;
     Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_1, space);
     Assembly::SymbolicMatrixAssembler<>::assemble1(matrix_2, space);
-    matrix_1.clear();
-    matrix_2.clear();
+    matrix_1.format();
+    matrix_2.format();
 
     // create a cubature factory
     Cubature::DynamicFactory cubature_factory_trz("trapezoidal");
@@ -147,8 +147,8 @@ public:
     {
       // fetch the local matrix
       dof_mapping.prepare(cell);
-      lmd1.clear();
-      lmd2.clear();
+      lmd1.format();
+      lmd2.format();
       gather1(lmd1);
       gather2(lmd2);
 

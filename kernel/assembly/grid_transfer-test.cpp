@@ -89,7 +89,7 @@ public:
     TEST_CHECK_EQUAL(row_ptr[9], 36u);
 
     // clear matrix
-    prol_matrix.clear(DataType_(0));
+    prol_matrix.format(DataType_(0));
 
     // assemble prolongation matrix
     Assembly::GridTransfer::
@@ -160,7 +160,7 @@ public:
     TEST_CHECK_EQUAL(row_ptr[12], 48u);
 
     // clear matrix
-    prol_matrix.clear(DataType_(0));
+    prol_matrix.format(DataType_(0));
 
     // assemble prolongation matrix
     Assembly::GridTransfer::

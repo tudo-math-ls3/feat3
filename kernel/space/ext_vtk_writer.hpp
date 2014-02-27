@@ -356,7 +356,7 @@ namespace FEAST
 
             // compute value
             BasisGradientType grad;
-            grad.clear();
+            grad.format();
             for(Index i(0); i < space_eval.get_num_local_dofs(); ++i)
               grad += loc_vec[i] * space_data.phi[i].grad;
 
@@ -444,7 +444,7 @@ namespace FEAST
 
             // compute value
             BasisHessianType hess;
-            hess.clear();
+            hess.format();
             for(Index i(0); i < space_eval.get_num_local_dofs(); ++i)
               hess += loc_vec[i] * space_data.phi[i].hess;
 

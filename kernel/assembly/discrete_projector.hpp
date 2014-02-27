@@ -116,8 +116,8 @@ namespace FEAST
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
         {
-          // clear local matrix
-          lvad.clear();
+          // format local matrix
+          lvad.format();
 
           // initialise dof-mapping
           dof_mapping.prepare(cell);
@@ -293,8 +293,8 @@ namespace FEAST
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
         {
-          // clear local matrix
-          lvad.clear();
+          // format local matrix
+          lvad.format();
 
           // initialise dof-mapping
           dof_mapping.prepare(cell);

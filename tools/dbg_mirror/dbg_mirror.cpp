@@ -84,8 +84,8 @@ void test_mirror(
   Assembly::LinearFunctionalAssembler::assemble_vector(loc_vec_1, rhs_functional, space_1, cubature_factory, 16.0);
 
   // assemble local matrices
-  loc_mat_0.clear();
-  loc_mat_1.clear();
+  loc_mat_0.format();
+  loc_mat_1.format();
   Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_0, laplace, space_0, cubature_factory, 6.0);
   Assembly::BilinearOperatorAssembler::assemble_matrix1(loc_mat_1, laplace, space_1, cubature_factory, 6.0);

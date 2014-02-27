@@ -270,7 +270,7 @@ void test_asm(const Space_& space, const String& cubature_name, const char* matx
   Cubature::DynamicFactory cubature_factory(cubature_name);
 
   std::cout << "Assembling double precision matrix data..." << std::endl;
-  matrix_d.clear(0.0f);
+  matrix_d.format(0.0f);
   stop_watch.reset();
   stop_watch.start();
   switch(imat)

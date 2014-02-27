@@ -500,7 +500,7 @@ namespace FEAST
         {
           for(Index i(0); i < image_dim; ++i)
           {
-            hess_ten.clear(DataType(0));
+            hess_ten.format(DataType(0));
           }
         }
       }; // class Evaluator<Simplex<2>,...>
@@ -683,7 +683,7 @@ namespace FEAST
         {
           for(Index i(0); i < image_dim; ++i)
           {
-            hess_ten.clear(DataType(0));
+            hess_ten.format(DataType(0));
           }
         }
       }; // class Evaluator<Simplex<3>,...>

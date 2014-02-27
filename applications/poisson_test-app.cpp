@@ -445,7 +445,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
 
   SparseMatrixCSR<Mem::Main, double> mat_sys;
   Assembly::SymbolicMatrixAssembler<>::assemble1(mat_sys, space);
-  mat_sys.clear();
+  mat_sys.format();
   Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
   Assembly::Common::LaplaceOperator laplace;
   Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_sys, laplace, space, cubature_factory);
