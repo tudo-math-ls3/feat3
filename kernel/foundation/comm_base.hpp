@@ -67,8 +67,8 @@ namespace FEAST
     class Communicator
     {
       public:
-        Communicator(Index comm) :
-          _comm(MPI_Comm(comm))
+        Communicator(MPI_Comm comm) :
+          _comm(comm)
       {
       }
 
@@ -84,8 +84,8 @@ namespace FEAST
     class Operation
     {
       public:
-        Operation(Index op) :
-          _op(MPI_Op(op))
+        Operation(MPI_Op op) :
+          _op(op)
       {
       }
 
@@ -110,7 +110,7 @@ namespace FEAST
                                          Index source_rank,
                                          Index send_tag = 0,
                                          Index recv_tag = 0,
-                                         Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                                         Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Status status;
 
@@ -133,7 +133,7 @@ namespace FEAST
                 Index num_elements_to_send,
                 Index dest_rank,
                 Index send_tag = 0,
-                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Send(sendbuf,
                            (int)num_elements_to_send,
@@ -148,7 +148,7 @@ namespace FEAST
                 Index num_elements_to_recv,
                 Index src_rank,
                 Index recv_tag = 0,
-                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Status status;
 
@@ -161,7 +161,7 @@ namespace FEAST
                            &status);
             }
 
-          static inline void barrier(Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+          static inline void barrier(Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
             MPI_Barrier(communicator.mpi_comm());
           }
@@ -170,7 +170,7 @@ namespace FEAST
             static inline void bcast(DataType_ * buf,
                 Index num_elements,
                 Index root,
-                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Bcast(buf, (int)num_elements, MPIType<DataType_>::value(), (int)root, communicator.mpi_comm());
             }
@@ -181,7 +181,7 @@ namespace FEAST
                 DataType2_ * recvbuf,
                 Index num_elements_to_recv,
                 Index root,
-                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Scatter(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
                   MPIType<DataType2_>::value(), (int)root, communicator.mpi_comm());
@@ -193,7 +193,7 @@ namespace FEAST
                 DataType2_ * recvbuf,
                 Index num_elements_to_recv,
                 Index root,
-                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Gather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(), recvbuf, (int)num_elements_to_recv,
                   MPIType<DataType2_>::value(), (int)root, communicator.mpi_comm());
@@ -205,7 +205,7 @@ namespace FEAST
                 Index num_elements_to_send,
                 Operation op,
                 Index root,
-                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Reduce(sendbuf, recvbuf, (int)num_elements_to_send, MPIType<DataType_>::value(), op.mpi_op(), (int)root, communicator.mpi_comm());
             }
@@ -215,7 +215,7 @@ namespace FEAST
                 Index num_elements_to_send,
                 DataType2_ * recvbuf,
                 Index num_elements_to_recv,
-                Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Allgather(sendbuf, (int)num_elements_to_send, MPIType<DataType1_>::value(),
                   recvbuf, (int)num_elements_to_recv, MPIType<DataType2_>::value(), communicator.mpi_comm());
@@ -226,8 +226,8 @@ namespace FEAST
             static inline void allreduce(DataType1_ * sendbuf,
                                          Index num_elements_to_send_and_receive,
                                          DataType1_ * recvbuf,
-                                         Operation op = Operation(Index(MPI_SUM)),
-                                         Communicator communicator = Communicator(Index(MPI_COMM_WORLD)))
+                                         Operation op = Operation(MPI_SUM),
+                                         Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Allreduce(sendbuf,
                             recvbuf,

@@ -274,7 +274,7 @@ void check_reduce(Index rank)
   float result(0);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  Comm::reduce(&value, &result, 1, Operation(Index(MPI_SUM)), 0);
+  Comm::reduce(&value, &result, 1, Operation(MPI_SUM), 0);
 
   if(rank == 0)
   {

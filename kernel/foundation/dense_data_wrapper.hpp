@@ -150,7 +150,7 @@ namespace FEAST
     template<typename DT_, typename IT_>
     DDVIterator<DT_> operator-(const DDVIterator<DT_>& l, const IT_& r)
     {
-      return DDVIterator<DT_>((DT_*)(typename DDVIterator<DT_>::difference_type(l.get() - r)));
+      return DDVIterator<DT_>((DT_*)((l.get() - r)));
     }
 
     template<typename DT_, typename IT_>
