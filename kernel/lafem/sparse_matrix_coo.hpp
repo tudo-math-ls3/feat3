@@ -505,8 +505,8 @@ namespace FEAST
          *
          * Creates a matrix from the given source matrix.
          */
-        template <typename Mem2_>
-        explicit SparseMatrixCOO(const SparseMatrixELL<Mem2_, DT_, IT_> & other) :
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit SparseMatrixCOO(const SparseMatrixELL<Mem2_, DT2_, IT2_> & other) :
           Container<Mem_, DT_, IT_>(other.rows() * other.columns())
         {
           CONTEXT("When creating SparseMatrixCOO from SparseMatrixELL");
@@ -567,8 +567,8 @@ namespace FEAST
          *
          * Creates a matrix from the given source matrix.
          */
-        template <typename Mem2_>
-        explicit SparseMatrixCOO(const SparseMatrixCSR<Mem2_, DT_, IT_> & other) :
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit SparseMatrixCOO(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & other) :
           Container<Mem_, DT_, IT_>(other.rows() * other.columns())
         {
           CONTEXT("When creating SparseMatrixCOO from SparseMatrixCSR");

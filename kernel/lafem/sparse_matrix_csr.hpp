@@ -384,8 +384,8 @@ namespace FEAST
          *
          * Creates a CSR matrix based on the ELL source matrix.
          */
-        template <typename Mem2_>
-        explicit SparseMatrixCSR(const SparseMatrixELL<Mem2_, DT_, IT_> & other_orig) :
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit SparseMatrixCSR(const SparseMatrixELL<Mem2_, DT2_, IT2_> & other_orig) :
           Container<Mem_, DT_, IT_>(other_orig.size())
         {
           CONTEXT("When creating SparseMatrixCSR");
@@ -444,8 +444,8 @@ namespace FEAST
          *
          * Creates a CSR matrix based on the COO source matrix.
          */
-        template <typename Mem2_>
-        explicit SparseMatrixCSR(const SparseMatrixCOO<Mem2_, DT_, IT_> & other) :
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit SparseMatrixCSR(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other) :
           Container<Mem_, DT_, IT_>(other.size())
         {
           CONTEXT("When creating SparseMatrixCSR");
@@ -1190,7 +1190,7 @@ namespace FEAST
           if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
           {
             Arch::Defect<Mem_, Algo_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
-              this->row_ptr(), x.elements(), this->rows(), columns(), used_elements());
+              this->row_ptr(), x.elements(), this->rows());
           }
           //r <- y
           else if(Math::abs(alpha) < Math::eps<DT_>())

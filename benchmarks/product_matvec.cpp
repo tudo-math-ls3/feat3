@@ -20,8 +20,7 @@ void run()
   typedef PointstarFactoryFE<DT_> PSF_;
 
   PSF_ factory(2500);
-  SparseMatrixCSR<Mem::Main, DT_, IT_> csr(factory.matrix_csr());
-  SM_ sys(csr);
+  SM_ sys(factory.matrix_csr());
   Index size(sys.rows());
   std::cout<<Mem_::name()<<" "<<Algo_::name()<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<std::endl;
   std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;

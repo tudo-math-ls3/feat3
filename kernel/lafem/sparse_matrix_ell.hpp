@@ -434,8 +434,8 @@ namespace FEAST
          *
          * Creates a ELL matrix based on the CSR source matrix.
          */
-        template <typename Mem2_>
-        explicit SparseMatrixELL(const SparseMatrixCSR<Mem2_, DT_, IT_> & other_orig) :
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit SparseMatrixELL(const SparseMatrixCSR<Mem2_, DT2_, IT2_> & other_orig) :
           Container<Mem_, DT_, IT_>(other_orig.size())
         {
           CONTEXT("When creating SparseMatrixELL");
@@ -504,8 +504,8 @@ namespace FEAST
          *
          * Creates a ELL matrix based on the COO source matrix.
          */
-        template <typename Mem2_>
-        explicit SparseMatrixELL(const SparseMatrixCOO<Mem2_, DT_, IT_> & other) :
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        explicit SparseMatrixELL(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other) :
           Container<Mem_, DT_, IT_>(other.size())
         {
           CONTEXT("When creating SparseMatrixELL");
