@@ -65,6 +65,10 @@ namespace FEAST
 
         void _copy_content(const Container<Mem_, DT_> & other)
         {
+          // avoid self-copy
+          if(this == &other)
+            return;
+
           if (_elements.size() != other.get_elements().size())
             throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
           if (_indices.size() != other.get_indices().size())
