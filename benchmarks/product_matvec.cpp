@@ -26,7 +26,7 @@ void run()
   std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<std::endl;
   //DenseVector<Mem_, DT_, IT_> b(factory.vector_q2_bubble());
   DenseVector<Mem_, DT_, IT_> b(size, DT_(1.234));
-  DenseVector<Mem_, DT_, IT_> x(size);
+  DenseVector<Mem_, DT_, IT_> x(size, DT_(4711));
 
   std::vector<double> times;
   Index iters(25);
@@ -66,6 +66,7 @@ int main(int argc, char ** argv)
   run<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double, unsigned int> >();
   run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, Index> >();
   run<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double, unsigned int> >();
+  run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index> >();
   run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> >();
   run<Algo::MKL, SparseMatrixCSR<Mem::Main, double> >();
   run<Algo::Generic, SparseMatrixELL<Mem::Main, double, Index> >();
