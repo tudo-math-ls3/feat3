@@ -35,15 +35,15 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, SparseLayoutType Layout_>
+    template <typename Mem_, typename IT_, SparseLayoutType Layout_>
     class SparseLayout
     {
     public:
-      std::vector<Index*> _indices;
-      std::vector<Index> _indices_size;
-      std::vector<Index> _scalar_index;
+      std::vector<IT_*> _indices;
+      std::vector<IT_> _indices_size;
+      std::vector<IT_> _scalar_index;
 
-      SparseLayout(const std::vector<Index *> & indices, const std::vector<Index> & indices_size, const std::vector<Index> & scalar_index) :
+      SparseLayout(const std::vector<IT_ *> & indices, const std::vector<IT_> & indices_size, const std::vector<IT_> & scalar_index) :
         _indices(indices),
         _indices_size(indices_size),
         _scalar_index(scalar_index)

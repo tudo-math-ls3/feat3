@@ -411,7 +411,7 @@ namespace FEAST
          *
          * Creates an empty matrix with given layout.
          */
-        explicit SparseMatrixELL(const SparseLayout<Mem_, LayoutType> & layout) :
+        explicit SparseMatrixELL(const SparseLayout<Mem_, IT_, LayoutType> & layout) :
           Container<Mem_, DT_, IT_> (layout._scalar_index.at(0))
         {
           CONTEXT("When creating SparseMatrixELL");
@@ -777,7 +777,7 @@ namespace FEAST
          *
          * Assigns a new matrix layout, discarding all old data
          */
-        SparseMatrixELL & operator= (const SparseLayout<Mem_, LayoutType> & layout)
+        SparseMatrixELL & operator= (const SparseLayout<Mem_, IT_, LayoutType> & layout)
         {
           CONTEXT("When assigning SparseMatrixELL");
 
@@ -1024,9 +1024,9 @@ namespace FEAST
          *
          * \return An object containing the sparse matrix layout.
          */
-        SparseLayout<Mem_, LayoutType> layout() const
+        SparseLayout<Mem_, IT_, LayoutType> layout() const
         {
-          SparseLayout<Mem_, LayoutType> layout(this->_indices, this->_indices_size, this->_scalar_index);
+          SparseLayout<Mem_, IT_, LayoutType> layout(this->_indices, this->_indices_size, this->_scalar_index);
           return layout;
         }
 
