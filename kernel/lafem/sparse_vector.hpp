@@ -418,7 +418,7 @@ namespace FEAST
         /**
          * \brief Reset all elements to zero.
          */
-        void clear()
+        void clear() override
         {
           CONTEXT("When clearing SparseVector");
           MemoryPool<Mem_>::instance()->release_memory(elements());
@@ -437,7 +437,7 @@ namespace FEAST
          *
          * \returns Non zero element count.
          */
-        Index used_elements() const
+        Index used_elements() const override
         {
           if (sorted() == 0)
             const_cast<SparseVector<Mem_, DT_> *>(this)->sort();

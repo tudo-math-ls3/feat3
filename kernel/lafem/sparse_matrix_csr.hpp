@@ -995,7 +995,7 @@ namespace FEAST
          *
          * \returns Non zero element count.
          */
-        Index used_elements() const
+        Index used_elements() const override
         {
           return this->_scalar_index.at(3);
         }

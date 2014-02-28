@@ -1131,7 +1131,7 @@ namespace FEAST
         /**
          * \brief Free all allocated arrays, effectivly setting matrix to zero.
          */
-        virtual void clear()
+        void clear() override
         {
           CONTEXT("When clearing SparseMatrixCOO");
           MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(0));
@@ -1171,7 +1171,7 @@ namespace FEAST
          *
          * \returns Non zero element count.
          */
-        Index used_elements() const
+        Index used_elements() const override
         {
           if (this->_scalar_index.at(6) == 0)
             const_cast<SparseMatrixCOO<Mem_, DT_> *>(this)->sort();
