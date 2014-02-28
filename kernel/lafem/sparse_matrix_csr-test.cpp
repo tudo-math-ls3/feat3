@@ -204,6 +204,10 @@ public:
 
 SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, float> sm_csr_apply_test_float;
 SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, double> sm_csr_apply_test_double;
+#ifdef HONEI_BACKENDS_MKL
+SparseMatrixCSRApplyTest<Mem::Main, Algo::MKL, float> mkl_sm_csr_apply_test_float;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::MKL, double> mkl_sm_csr_apply_test_double;
+#endif
 #ifdef FEAST_BACKENDS_CUDA
 SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_csr_apply_test_float;
 SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_csr_apply_test_double;

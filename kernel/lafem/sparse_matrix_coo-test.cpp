@@ -194,9 +194,9 @@ public:
 
 SparseMatrixCOOApplyTest<Mem::Main, Algo::Generic, float> sm_coo_apply_test_float;
 SparseMatrixCOOApplyTest<Mem::Main, Algo::Generic, double> sm_coo_apply_test_double;
-#ifdef FEAST_BACKENDS_CUDA
-//SparseMatrixCOOApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_coo_apply_test_float;
-//SparseMatrixCOOApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_coo_apply_test_double;
+#ifdef FEAST_BACKENDS_MKL
+SparseMatrixCOOApplyTest<Mem::Main, Algo::MKL, float> mkl_sm_coo_apply_test_float;
+SparseMatrixCOOApplyTest<Mem::Main, Algo::MKL, double> mkl_sm_coo_apply_test_double;
 #endif
 
 
