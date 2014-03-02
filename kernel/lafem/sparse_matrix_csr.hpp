@@ -940,22 +940,14 @@ namespace FEAST
           ASSERT(row < this->_scalar_index.at(1), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_scalar_index.at(1)) + " !");
           ASSERT(col < this->_scalar_index.at(2), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_scalar_index.at(2)) + " !");
 
-          if (std::is_same<Mem_, Mem::Main>::value)
+          for (unsigned long i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
           {
-            for (unsigned long i(this->_indices.at(1)[row]) ; i < this->_indices.at(1)[row + 1] ; ++i)
-            {
-              if (this->_indices.at(0)[i] == col)
-                return this->_elements.at(0)[i];
-              if (this->_indices.at(0)[i] > col)
-                return this->_scalar_dt.at(0);
-            }
-            return this->_scalar_dt.at(0);
+            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
+              return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
+            if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) > col)
+              return this->_scalar_dt.at(0);
           }
-          else
-          {
-            SparseMatrixCSR<Mem::Main, DT_, IT_> temp(*this);
-            return temp(row, col);
-          }
+          return this->_scalar_dt.at(0);
         }
 
         /**
