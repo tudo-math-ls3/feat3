@@ -79,6 +79,9 @@ namespace FEAST
           if (_scalar_dt.size() != other.get_scalar_dt().size())
             throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
 
+          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
+          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
+
           for (Index i(0) ; i < _elements.size() ; ++i)
           {
             if (_elements_size.at(i) != other.get_elements_size().at(i))
@@ -92,16 +95,46 @@ namespace FEAST
               throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
             MemoryPool<Mem_>::template copy<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
           }
-
-          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
-          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
         }
 
         template <typename Mem2_>
         void _copy_content(const Container<Mem2_, DT_, IT_> & other)
         {
-          Container temp(other);
-          this->_copy_content(temp);
+          if (_elements.size() != other.get_elements().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          if (_indices.size() != other.get_indices().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          if (_scalar_index.size() != other.get_scalar_index().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+          if (_scalar_dt.size() != other.get_scalar_dt().size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+
+          this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
+          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
+
+          for (Index i(0) ; i < _elements.size() ; ++i)
+          {
+            if (_elements_size.at(i) != other.get_elements_size().at(i))
+              throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
+              MemoryPool<Mem2_>::template download<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+            else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
+              MemoryPool<Mem_>::template upload<DT_>(_elements.at(i), other.get_elements().at(i), _elements_size.at(i));
+            else
+              throw InternalError(__func__, __FILE__, __LINE__, "Memory Backend not known!");
+          }
+
+          for (Index i(0) ; i < _indices.size() ; ++i)
+          {
+            if (_indices_size.at(i) != other.get_indices_size().at(i))
+              throw InternalError(__func__, __FILE__, __LINE__, "Container size missmatch!");
+            if (std::is_same<Mem_, Mem::Main>::value && std::is_same<Mem2_, Mem::CUDA>::value)
+              MemoryPool<Mem2_>::template download<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+            else if (std::is_same<Mem_, Mem::CUDA>::value && std::is_same<Mem2_, Mem::Main>::value)
+              MemoryPool<Mem_>::template upload<IT_>(_indices.at(i), other.get_indices().at(i), _indices_size.at(i));
+            else
+              throw InternalError(__func__, __FILE__, __LINE__, "Memory Backend not known!");
+          }
         }
 
       public:
