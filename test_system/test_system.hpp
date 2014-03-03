@@ -242,10 +242,29 @@ namespace FEAST
           */
         template<
           typename T1_,
-          typename T2_>
+          typename T2_,
+          class = typename std::enable_if<std::is_pod<T1_>::value>::type >
         TwoVarHolder(
             T1_ a,
             T2_ b)
+          : result(a == b),
+          s_a(),
+          s_b()
+        {
+          if(!result)
+          {
+            s_a = stringify(a);
+            s_b = stringify(b);
+          }
+        }
+
+        template<
+          typename T1_,
+          typename T2_,
+          class = typename std::enable_if<! std::is_pod<T1_>::value>::type >
+        TwoVarHolder(
+            T1_ & a,
+            T2_ & b)
           : result(a == b),
           s_a(),
           s_b()
@@ -279,10 +298,29 @@ namespace FEAST
           */
         template<
           typename T1_,
-          typename T2_>
+          typename T2_,
+          class = typename std::enable_if<std::is_pod<T1_>::value>::type >
         TwoVarHolder2(
             T1_ a,
             T2_ b)
+          : result(a == b),
+          s_a(),
+          s_b()
+        {
+          if(result)
+          {
+            s_a = stringify(a);
+            s_b = stringify(b);
+          }
+        }
+
+        template<
+          typename T1_,
+          typename T2_,
+          class = typename std::enable_if<! std::is_pod<T1_>::value>::type >
+        TwoVarHolder2(
+            T1_ & a,
+            T2_ & b)
           : result(a == b),
           s_a(),
           s_b()
@@ -322,10 +360,45 @@ namespace FEAST
         template<
           typename T1_,
           typename T2_,
-          typename T3_>
+          typename T3_,
+          class = typename std::enable_if<std::is_pod<T1_>::value>::type >
         WithinEpsCalculator(
             T1_ a,
             T2_ b,
+            T3_ c)
+          : s_a(),
+          s_b()
+        {
+          if(a >= b)
+          {
+            result = ((a - b) <= c);
+            if(!result)
+            {
+              s_diff = stringify(a - b);
+              s_a = stringify(a);
+              s_b = stringify(b);
+            }
+          }
+          else
+          {
+            result = ((b - a) <= c);
+            if(!result)
+            {
+              s_diff = stringify(b - a);
+              s_a = stringify(a);
+              s_b = stringify(b);
+            }
+          }
+        }
+
+        template<
+          typename T1_,
+          typename T2_,
+          typename T3_,
+          class = typename std::enable_if<! std::is_pod<T1_>::value>::type >
+        WithinEpsCalculator(
+            T1_ & a,
+            T2_ & b,
             T3_ c)
           : s_a(),
           s_b()

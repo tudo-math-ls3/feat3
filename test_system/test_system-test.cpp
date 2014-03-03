@@ -4,6 +4,32 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
+class A
+{
+  public:
+  bool flag;
+
+  A(bool f) :
+    flag(f)
+  {
+  }
+
+  A(const A & other) = delete;
+};
+
+bool operator==(A & a, A & b)
+{
+  return a.flag == b.flag;
+}
+
+std::ostream & operator<< (std::ostream & lhs, const A & b)
+{
+  lhs << "A: "<< b.flag << std::endl;
+  return lhs;
+}
+
+
+
 /**
 *
 * \brief test class for the unittest framework itself
@@ -31,9 +57,14 @@ public:
     TEST_CHECK_STRINGIFY_EQUAL(4711, 4711);
     TEST_CHECK_EQUAL_WITHIN_EPS(25,23,2.2);
     TEST_CHECK_THROWS(String("0").at(10), std::exception);
+
+    A a(true);
+    A b(true);
+    TEST_CHECK_EQUAL(a, b);
+    A c(false);
+    TEST_CHECK_NOT_EQUAL(a, c);
   }
 } unittest("UnitTest-test");
-
 
 
 
@@ -65,6 +96,12 @@ public:
     TEST_CHECK_STRINGIFY_EQUAL(4711, 4711);
     TEST_CHECK_EQUAL_WITHIN_EPS(25,23,2.2);
     TEST_CHECK_THROWS(String("0").at(10), std::exception);
+
+    A a(true);
+    A b(true);
+    TEST_CHECK_EQUAL(a, b);
+    A c(false);
+    TEST_CHECK_NOT_EQUAL(a, c);
   }
 };
 TaggedUnitTest<Archs::None, float> taggedunittestf ("TaggedUnitTest-test float");
