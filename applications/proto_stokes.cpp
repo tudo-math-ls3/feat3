@@ -170,63 +170,6 @@ public:
   }
 }; // class Factory<CellSubSet<...>>
 
-// a bilinear operator for the pressure gradient matrices
-template<int der_>
-class PressureGradientOperator :
-  public Assembly::BilinearOperator
-{
-public:
-  /// test space configuration
-  struct TestConfig :
-    public Space::ConfigBase
-  {
-    /// test-space requirement enumeration
-    enum
-    {
-      /// this functor requires test-function values
-      need_grad = 1
-    };
-  };
-
-  /// trial space configuration
-  struct TrialConfig :
-    public Space::ConfigBase
-  {
-    /// trial-space requirement enumeration
-    enum
-    {
-      /// this functor requires trial-function gradients
-      need_value = 1
-    };
-  };
-
-  template<typename AsmTraits_>
-  class Evaluator :
-    public Assembly::BilinearOperator::Evaluator<AsmTraits_>
-  {
-  public:
-    /// the data type to be used
-    typedef typename AsmTraits_::DataType DataType;
-    /// the assembler's trafo data type
-    typedef typename AsmTraits_::TrafoData TrafoData;
-    /// the assembler's test-function data type
-    typedef typename AsmTraits_::TestBasisData TestBasisData;
-    /// the assembler's trial-function data type
-    typedef typename AsmTraits_::TrialBasisData TrialBasisData;
-
-  public:
-    explicit Evaluator(const PressureGradientOperator&)
-    {
-    }
-
-    /** \copydoc BilinearOperator::Evaluator::operator() */
-    DataType operator()(const TrafoData&, const TrialBasisData& phi, const TestBasisData& psi)
-    {
-      return -phi.value * psi.grad[der_];
-    }
-  };
-}; // class PressureGradientOperator
-
 // A class containing all data for the discretised Stokes equation on a particular mesh level.
 class StokesLevel
 {
@@ -330,13 +273,16 @@ public:
 
     // assemble pressure mass matrix
     Assembly::Common::IdentityOperator identity;
-    Assembly::BilinearOperatorAssembler::assemble_matrix1(_matrix_m, identity, _space_p, cubature_factory_pres, -DataType(1));
+    Assembly::BilinearOperatorAssembler
+      ::assemble_matrix1(_matrix_m, identity, _space_p, cubature_factory_pres, -DataType(1));
 
     // assemble pressure gradient matrices B1 and B2
-    PressureGradientOperator<0> gradient_x;
-    PressureGradientOperator<1> gradient_y;
-    Assembly::BilinearOperatorAssembler::assemble_matrix2(_matrix_b1, gradient_x, _space_v, _space_p, cubature_factory_velo);
-    Assembly::BilinearOperatorAssembler::assemble_matrix2(_matrix_b2, gradient_y, _space_v, _space_p, cubature_factory_velo);
+    Assembly::Common::TestDerivativeOperator<0> gradient_x;
+    Assembly::Common::TestDerivativeOperator<1> gradient_y;
+    Assembly::BilinearOperatorAssembler
+      ::assemble_matrix2(_matrix_b1, gradient_x, _space_v, _space_p, cubature_factory_velo, -DataType(1));
+    Assembly::BilinearOperatorAssembler
+      ::assemble_matrix2(_matrix_b2, gradient_y, _space_v, _space_p, cubature_factory_velo, -DataType(1));
 
     // build velocity divergence matrices D1 and D2 by transposing B1 and B2
     _matrix_d1 = LAFEM::Transposition<AlgoType>::value(_matrix_b1);
@@ -509,9 +455,9 @@ public:
     _matrix_a.apply<AlgoType>(_vec_def_x, _vec_sol_x, _vec_rhs_x, -DataType(1));
     _matrix_b1.apply<AlgoType>(_vec_def_x, _vec_sol_p, _vec_def_x, -DataType(1));
     _matrix_a.apply<AlgoType>(_vec_def_y, _vec_sol_y, _vec_rhs_y, -DataType(1));
-    _matrix_b1.apply<AlgoType>(_vec_def_y, _vec_sol_p, _vec_def_y, -DataType(1));
+    _matrix_b2.apply<AlgoType>(_vec_def_y, _vec_sol_p, _vec_def_y, -DataType(1));
     _matrix_d1.apply<AlgoType>(_vec_def_p, _vec_sol_x, _vec_rhs_p, -DataType(1));
-    _matrix_d2.apply<AlgoType>(_vec_def_p, _vec_sol_y, _vec_rhs_p, -DataType(1));
+    _matrix_d2.apply<AlgoType>(_vec_def_p, _vec_sol_y, _vec_def_p, -DataType(1));
 
     // restrict
     _rest_v.apply<AlgoType>(coarse._vec_rhs_x, _vec_def_x);
