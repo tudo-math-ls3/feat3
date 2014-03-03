@@ -250,19 +250,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source vector.
-         *
-         * Creates a shallow copy of a given vector.
-         */
-        DenseVector(const DenseVector & other) :
-          Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying DenseVector");
-        }
-
-        /**
          * \brief Move Constructor
          *
          * \param[in] other The source vector.
@@ -273,49 +260,6 @@ namespace FEAST
           Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When moving DenseVector");
-        }
-
-        /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source vector.
-         *
-         * Creates a copy of a given vector from another memory architecture.
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        explicit DenseVector(const DenseVector<Mem2_, DT2_, IT2_> & other) :
-            Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying DenseVector");
-        }
-
-        /** \brief Clone operation
-         *
-         * Creates a deep copy of this vector.
-         */
-        DenseVector clone() const
-        {
-          CONTEXT("When cloning DenseVector");
-
-          DenseVector t;
-          ((Container<Mem_, DT_, IT_>&)t).clone(*this);
-          return t;
-        }
-
-        /**
-         * \brief Assignment operator
-         *
-         * \param[in] other The source vector.
-         *
-         * Assigns another vector to the target vector.
-         */
-        DenseVector & operator= (const DenseVector & other)
-        {
-          CONTEXT("When assigning DenseVector");
-
-          this->assign(other);
-
-          return *this;
         }
 
         /**
@@ -330,23 +274,6 @@ namespace FEAST
           CONTEXT("When moving DenseVector");
 
           this->move(std::move(other));
-
-          return *this;
-        }
-
-        /**
-         * \brief Assignment operator
-         *
-         * \param[in] other The source vector.
-         *
-         * Assigns a vector from another memory architecture to the target vector.
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        DenseVector & operator= (const DenseVector<Mem2_, DT2_, IT2_> & other)
-        {
-          CONTEXT("When assigning DenseVector");
-
-         this->assign(other);
 
           return *this;
         }
@@ -552,7 +479,7 @@ namespace FEAST
          * \param[in] x The vector to be copied.
          */
         template <typename Mem2_>
-        void copy(const DenseVector<Mem2_, DT_> & x)
+        void copy(const DenseVector<Mem2_, DT_, IT_> & x)
         {
           this->_copy_content(x);
         }

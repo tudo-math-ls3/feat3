@@ -167,20 +167,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source container.
-         *
-         * Creates a shallow copy of a given container.
-         */
-        Container(const Container & other)
-        {
-          CONTEXT("When copying Container");
-
-          assign(other);
-        }
-
-        /**
          * \brief Move Constructor
          *
          * \param[in] other The source container.
@@ -202,21 +188,6 @@ namespace FEAST
           other._indices_size.clear();
           other._scalar_index.clear();
           other._scalar_dt.clear();
-        }
-
-        /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source container.
-         *
-         * Creates a copy of a given container from another memory architecture.
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        explicit Container(const Container<Mem2_, DT2_, IT2_> & other)
-        {
-          CONTEXT("When copying Container");
-
-          assign(other);
         }
 
         /**
@@ -317,7 +288,7 @@ namespace FEAST
 
         /** \brief Assignment operation
          *
-         * Assigns a container from another memory architecture or with another data-/indextype to the current one.
+         * Assigns contents of another container
          *
          * \param[in] other The source container.
          *

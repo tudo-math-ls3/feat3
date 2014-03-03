@@ -42,45 +42,40 @@ public:
     DenseVector<Mem_, DT_> a(10, DT_(7));
     DenseVector<Mem_, DT_> b(10, DT_(5));
     b(7, DT_(42));
-    DenseVector<Mem_, DT_> c(b);
+    DenseVector<Mem_, DT_> c;
+    c.assign(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));
     TEST_CHECK_EQUAL(c, b);
-    std::list<DenseVector<Mem_, DT_> > list;
-    list.push_back(a);
-    list.push_back(b);
-    list.push_back(c);
-    DenseVector<Mem_, DT_> d = a;
-    list.push_back(d);
-    DenseVector<Mem_, DT_> e(10, DT_(42));
-    e = a;
-    TEST_CHECK_EQUAL(e(5), a(5));
-    TEST_CHECK_EQUAL(e, a);
+    DenseVector<Mem::Main, float, unsigned int> d;
+    d.assign(c);
+    DenseVector<Mem::Main, float, unsigned int> e;
+    e.assign(b);
+    TEST_CHECK_EQUAL(e.size(), d.size());
+    TEST_CHECK_EQUAL(e(7), d(7));
+    TEST_CHECK_EQUAL(e, d);
 
-    DenseVector<Mem::Main, DT_> f(e);
-    DenseVector<Mem::Main, DT_> g;
-    g = e;
-    TEST_CHECK_EQUAL(f, e);
-    TEST_CHECK_EQUAL(g, f);
-    TEST_CHECK_EQUAL(g, e);
-
-    DenseVector<Mem::Main, DT_> h(g.clone());
-    TEST_CHECK_EQUAL(h, g);
-    h(1, DT_(5));
-    TEST_CHECK_NOT_EQUAL(h, g);
-    TEST_CHECK_NOT_EQUAL((void*)h.elements(), (void*)g.elements());
+    b.clone(a);
+    TEST_CHECK_NOT_EQUAL((void*)b.elements(), (void*)a.elements());
+    c.assign(a);
+    TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
+    TEST_CHECK_EQUAL(b, c);
+    a(3, DT_(23));
+    TEST_CHECK_EQUAL(a, c);
+    TEST_CHECK_NOT_EQUAL(a, b);
 
     {
-      EDI<Mem_, DT_> t(d.edi(2));
+      EDI<Mem_, DT_> t(a.edi(2));
       t = DT_(41);
-      TEST_CHECK_NOT_EQUAL(d(2), DT_(41));
-      d.edi(1) = DT_(4);
-      TEST_CHECK_EQUAL(d(1), DT_(4));
-      d.edi(1) += DT_(4);
-      TEST_CHECK_EQUAL(d(1), DT_(8));
+      TEST_CHECK_NOT_EQUAL(a(2), DT_(41));
+      a.edi(1) = DT_(4);
+      TEST_CHECK_EQUAL(a(1), DT_(4));
+      a.edi(1) += DT_(4);
+      TEST_CHECK_EQUAL(a(1), DT_(8));
     }
-    TEST_CHECK_EQUAL(d(1), DT_(8));
-    TEST_CHECK_EQUAL(d(2), DT_(41));
+    TEST_CHECK_EQUAL(a(1), DT_(8));
+    TEST_CHECK_EQUAL(a(2), DT_(41));
+
 
     DenseVector<Mem_, DT_> k(123);
     for (Index i(0) ; i < k.size() ; ++i)
@@ -98,13 +93,6 @@ public:
     DenseVector<Mem_, DT_> m(FileMode::fm_dv, bs);
     for (Index i(0) ; i < k.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), 1e-5);
-
-    DenseVector<Mem_, float, unsigned int> xf(42, float(4711));
-    DenseVector<Mem_, float, unsigned int> xf2(xf.clone());
-    DenseVector<Mem_, double, unsigned long> xd(42);
-    xd = xf;
-    xf = xd;
-    TEST_CHECK_EQUAL(xf, xf2);
   }
 };
 DenseVectorTest<Mem::Main, float> cpu_dense_vector_test_float;
@@ -207,8 +195,10 @@ public:
         b_local(i, DT_(1) / DT_(i+1)); // b[i] = 1 / (i+1)
       }
 
-      DenseVector<Mem_, DT_> a(a_local);
-      DenseVector<Mem_, DT_> b(b_local);
+      DenseVector<Mem_, DT_> a;
+      a.assign(a_local);
+      DenseVector<Mem_, DT_> b;
+      b.assign(b_local);
 
       // a*b = 1
       DT_ ref(DT_(1));
@@ -439,7 +429,8 @@ public:
       // ||a||_2 = sqrt(2 - 2^{1-n})
       const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size-1))));
 
-      DenseVector<Mem_, DT_> a(a_local);
+      DenseVector<Mem_, DT_> a;
+      a.assign(a_local);
       DT_ c = a.template norm2<Algo_>();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
 

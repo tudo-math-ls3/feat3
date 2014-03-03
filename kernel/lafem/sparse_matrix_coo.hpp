@@ -709,19 +709,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source matrix.
-         *
-         * Creates a shallow copy of a given matrix.
-         */
-        SparseMatrixCOO(const SparseMatrixCOO & other) :
-          Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying SparseMatrixCOO");
-        }
-
-        /**
          * \brief Move Constructor
          *
          * \param[in] other The source matrix.
@@ -732,49 +719,6 @@ namespace FEAST
           Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When moving SparseMatrixCOO");
-        }
-
-        /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source matrix.
-         *
-         * Creates a copy of a given matrix from another memory architecture.
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        explicit SparseMatrixCOO(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other) :
-          Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying SparseMatrixCOO");
-        }
-
-        /** \brief Clone operation
-         *
-         * Creates a deep copy of this matrix.
-         */
-        SparseMatrixCOO clone() const
-        {
-          CONTEXT("When cloning SparseMatrixCOO");
-
-          SparseMatrixCOO t;
-          ((Container<Mem_, DT_, IT_>&)t).clone(*this);
-          return t;
-        }
-
-        /**
-         * \brief Assignment operator
-         *
-         * \param[in] other The source matrix.
-         *
-         * Assigns another matrix to the target matrix.
-         */
-        SparseMatrixCOO & operator= (const SparseMatrixCOO & other)
-        {
-          CONTEXT("When assigning SparseMatrixCOO");
-
-          this->assign(other);
-
-          return *this;
         }
 
         /**
@@ -793,21 +737,22 @@ namespace FEAST
           return *this;
         }
 
-        /**
-         * \brief Assignment operator
+        /** \brief Assignment operation
          *
-         * \param[in] other The source matrix.
+         * Assigns contents of another sparse matrix coo
          *
-         * Assigns a matrix from another memory architecture to the target matrix.
+         * \param[in] other The source container.
+         *
+         * \note This creates a deep copy in any case!
+         *
          */
         template <typename Mem2_, typename DT2_, typename IT2_>
-        SparseMatrixCOO & operator= (const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other)
+        void assign(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other)
         {
           CONTEXT("When assigning SparseMatrixCOO");
-
-          this->assign(other);
-
-          return *this;
+          SparseMatrixCOO<Mem_, DT_, IT_> t;
+          ((Container<Mem_, DT_, IT_>&)t).assign(other);
+          this->clone(t);
         }
 
         /**
@@ -947,7 +892,8 @@ namespace FEAST
          */
         void write_out_m(std::ostream& file) const
         {
-          SparseMatrixCOO<Mem::Main, DT_, IT_> temp(*this);
+          SparseMatrixCOO<Mem::Main, DT_, IT_> temp;
+          ((Container<Mem::Main, DT_, IT_>&)temp).assign(*this);
 
           file << "data = [" << std::endl;
           for (Index i(0) ; i < used_elements() ; ++i)
@@ -979,7 +925,8 @@ namespace FEAST
          */
         void write_out_mtx(std::ostream& file) const
         {
-          SparseMatrixCOO<Mem::Main, DT_, IT_> temp(*this);
+          SparseMatrixCOO<Mem::Main, DT_, IT_> temp;
+          ((Container<Mem::Main, DT_, IT_>&)temp).assign(*this);
 
           file << "%%MatrixMarket matrix coordinate real general" << std::endl;
           file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;

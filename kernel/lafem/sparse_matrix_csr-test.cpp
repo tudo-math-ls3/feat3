@@ -63,7 +63,11 @@ public:
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
-    SparseMatrixCSR<Mem_, DT_> z(b);
+    typename SparseLayout<Mem_, Index, SparseLayoutType::lt_csr>::template MatrixType<DT_> x(b.layout());
+    typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
+
+    SparseMatrixCSR<Mem_, DT_> z;
+    z.assign(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
@@ -72,30 +76,19 @@ public:
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
 
     SparseMatrixCSR<Mem_, DT_> c;
-    c = b;
-    TEST_CHECK_EQUAL(c.used_elements(), b.used_elements());
-    TEST_CHECK_EQUAL(c(0,2), b(0,2));
-    TEST_CHECK_EQUAL(c(1,2), b(1,2));
-    TEST_CHECK_EQUAL(c, b);
-
+    c.clone(b);
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
     DenseVector<Mem_, Index> col_ind(c.used_elements(), c.col_ind());
     DenseVector<Mem_, DT_> val(c.used_elements(), c.val());
     DenseVector<Mem_, Index> row_ptr(c.rows() + 1, c.row_ptr());
     SparseMatrixCSR<Mem_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
     TEST_CHECK_EQUAL(d, c);
 
-    SparseMatrixCSR<Mem::Main, DT_> e(c);
-    TEST_CHECK_EQUAL(e, c);
-    e = c;
-    TEST_CHECK_EQUAL(e, c);
-    e = c.clone();
+    SparseMatrixCSR<Mem::Main, DT_> e;
+    e.assign(c);
     TEST_CHECK_EQUAL(e, c);
     e.copy(c);
     TEST_CHECK_EQUAL(e, c);
-    TEST_CHECK_NOT_EQUAL((void*)e.val(), (void*)c.val());
-
-    //SparseMatrixCSR<Mem_, DT_> l(b.layout());
-    //b.layout().typename MatrixType<DT_> x(10, 10);
 
     SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 10);
     for (Index row(0) ; row < fcoo.rows() ; ++row)
@@ -252,17 +245,16 @@ public:
         }
       }
 
+      SparseMatrixCSR<Mem_, DT_> ref(ref_local);
       SparseMatrixCSR<Mem_, DT_> a(a_local);
-      SparseMatrixCSR<Mem_, DT_> b(a.clone());
+      SparseMatrixCSR<Mem_, DT_> b;
+      b.clone(a);
 
       b.template scale<Algo_>(a, s);
-      SparseMatrixCOO<Mem::Main, DT_> b_local(b);
-      TEST_CHECK_EQUAL(b_local, ref_local);
+      TEST_CHECK_EQUAL(b, ref);
 
       a.template scale<Algo_>(a, s);
-      SparseMatrixCOO<Mem_, DT_> a_coo(a);
-      a_local = a_coo;
-      TEST_CHECK_EQUAL(a_local, ref_local);
+      TEST_CHECK_EQUAL(a, ref);
     }
   }
 };

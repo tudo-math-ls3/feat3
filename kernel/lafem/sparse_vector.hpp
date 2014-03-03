@@ -152,19 +152,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source vector.
-         *
-         * Creates a shallow copy of a given vector.
-         */
-        SparseVector(const SparseVector & other) :
-          Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying SparseVector");
-        }
-
-        /**
          * \brief Move Constructor
          *
          * \param[in] other The source vector.
@@ -175,49 +162,6 @@ namespace FEAST
           Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When moving SparseVector");
-        }
-
-        /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source vector.
-         *
-         * Creates a copy of a given vector from another memory architecture.
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        explicit SparseVector(const SparseVector<Mem2_, DT2_, IT2_> & other) :
-            Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying SparseVector");
-        }
-
-        /** \brief Clone operation
-         *
-         * Creates a deep copy of this vector.
-         */
-        SparseVector clone() const
-        {
-          CONTEXT("When cloning SparseVector");
-
-          SparseVector t;
-          ((Container<Mem_, DT_, IT_>&)t).clone(*this);
-          return t;
-        }
-
-        /**
-         * \brief Assignment operator
-         *
-         * \param[in] other The source vector.
-         *
-         * Assigns another vector to the target vector.
-         */
-        SparseVector & operator= (const SparseVector & other)
-        {
-          CONTEXT("When assigning SparseVector");
-
-          this->assign(other);
-
-          return *this;
         }
 
         /**
@@ -236,21 +180,22 @@ namespace FEAST
           return *this;
         }
 
-        /**
-         * \brief Assignment operator
+        /** \brief Assignment operation
          *
-         * \param[in] other The source vector.
+         * Assigns contents of another sparse vector
          *
-         * Assigns a vector from another memory architecture to the target vector.
+         * \param[in] other The source container.
+         *
+         * \note This creates a deep copy in any case!
+         *
          */
         template <typename Mem2_, typename DT2_, typename IT2_>
-        SparseVector & operator= (const SparseVector<Mem2_, DT2_, IT2_> & other)
+        void assign(const SparseVector<Mem2_, DT2_, IT2_> & other)
         {
           CONTEXT("When assigning SparseVector");
-
-         this->assign(other);
-
-          return *this;
+          SparseVector<Mem_, DT_, IT_> t;
+          ((Container<Mem_, DT_, IT_>&)t).assign(other);
+          this->clone(t);
         }
 
         /**
@@ -277,14 +222,14 @@ namespace FEAST
          *
          * \returns Pointer to the indices array.
          */
-        Index * indices()
+        IT_ * indices()
         {
           if (sorted() == 0)
             const_cast<SparseVector *>(this)->sort();
           return this->_indices.at(0);
         }
 
-        Index const * indices() const
+        IT_ const * indices() const
         {
           if (sorted() == 0)
             const_cast<SparseVector *>(this)->sort();
@@ -310,11 +255,11 @@ namespace FEAST
           {
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(alloc_increment()));
             this->_elements_size.push_back(alloc_increment());
-            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(alloc_increment()));
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(alloc_increment()));
             this->_indices_size.push_back(alloc_increment());
             _allocated_elements() = alloc_increment();
             MemoryPool<Mem_>::set_memory(elements(), val);
-            MemoryPool<Mem_>::set_memory(indices(), index);
+            MemoryPool<Mem_>::set_memory(indices(), IT_(index));
             _used_elements() = 1;
           }
 
@@ -322,7 +267,7 @@ namespace FEAST
           else if(used_elements() < allocated_elements())
           {
             MemoryPool<Mem_>::set_memory(elements() + used_elements(), val);
-            MemoryPool<Mem_>::set_memory(indices() + used_elements(), index);
+            MemoryPool<Mem_>::set_memory(indices() + used_elements(), IT_(index));
             ++_used_elements();
           }
 
@@ -332,7 +277,7 @@ namespace FEAST
             _allocated_elements() += alloc_increment();
 
             DT_ * elements_new(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(allocated_elements()));
-            Index * indices_new(MemoryPool<Mem_>::instance()->template allocate_memory<Index>(allocated_elements()));
+            IT_ * indices_new(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(allocated_elements()));
 
             MemoryPool<Mem_>::copy(elements_new, elements(), used_elements());
             MemoryPool<Mem_>::copy(indices_new, indices(), used_elements());
@@ -344,7 +289,7 @@ namespace FEAST
             this->_indices.at(0) = indices_new;
 
             MemoryPool<Mem_>::set_memory(elements() + used_elements(), val);
-            MemoryPool<Mem_>::set_memory(indices() + used_elements(), index);
+            MemoryPool<Mem_>::set_memory(indices() + used_elements(), IT_(index));
 
             ++_used_elements();
             this->_elements_size.at(0) = allocated_elements();
@@ -370,14 +315,14 @@ namespace FEAST
             {
               if (MemoryPool<Mem_>::get_element(indices(), i - 1) == MemoryPool<Mem_>::get_element(indices(), i))
               {
-                MemoryPool<Mem_>::set_memory(indices(), std::numeric_limits<Index>::max());
+                MemoryPool<Mem_>::set_memory(indices(), std::numeric_limits<IT_>::max());
               }
             }
 
             // sort out marked duplicated elements
             _insertion_sort(indices(), elements(), used_elements());
             Index junk(0);
-            while (MemoryPool<Mem_>::get_element(indices(), used_elements() - 1 - junk) == std::numeric_limits<Index>::max()
+            while (MemoryPool<Mem_>::get_element(indices(), used_elements() - 1 - junk) == std::numeric_limits<IT_>::max()
                 && junk < used_elements())
               ++junk;
             _used_elements() -= junk;

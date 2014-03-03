@@ -34,9 +34,7 @@ public:
 
   virtual void run() const
   {
-    SparseVector<Mem_, DT_> a;
-    SparseVector<Mem_, DT_> aa(10);
-    a = aa;
+    SparseVector<Mem_, DT_> a(10);
     a(3, DT_(7));
     a(3, DT_(3));
     a(5, DT_(6));
@@ -44,21 +42,24 @@ public:
     TEST_CHECK_EQUAL(a(3), DT_(3));
     TEST_CHECK_EQUAL(a(2), DT_(0));
 
-    SparseVector<Mem_, DT_> b(a);
+    SparseVector<Mem_, DT_> b;
+    b.assign(a);
     TEST_CHECK_EQUAL(a, b);
     b(6, DT_(1));
-    TEST_CHECK_EQUAL(a, b);
-    b = a.clone();
+    TEST_CHECK_NOT_EQUAL(a, b);
+    b.clone(a);
     b(6, DT_(3));
     TEST_CHECK_NOT_EQUAL(a, b);
 
-    SparseVector<Mem::Main, DT_> c(a);
-    TEST_CHECK_EQUAL(a, c);
+    SparseVector<Mem::Main, float, unsigned int> c;
+    c.assign(a);
+    SparseVector<Mem::Main, float, unsigned int> d;
+    d.clone(c);
+    SparseVector<Mem::Main, float, unsigned int> e;
+    e.assign(a);
+    TEST_CHECK_EQUAL(d, e);
     c(6, DT_(1));
-    TEST_CHECK_EQUAL(a, c);
-    c = a.clone();
-    c(6, DT_(3));
-    TEST_CHECK_NOT_EQUAL(a, c);
+    TEST_CHECK_NOT_EQUAL(c, e);
 
     a.clear();
     TEST_CHECK_EQUAL(a.used_elements(), Index(0));

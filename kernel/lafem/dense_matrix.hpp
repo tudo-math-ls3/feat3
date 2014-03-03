@@ -99,19 +99,6 @@ namespace FEAST
         }
 
         /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source matrix.
-         *
-         * Creates a shallow copy of a given matrix.
-         */
-        DenseMatrix(const DenseMatrix & other) :
-          Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying DenseMatrix");
-        }
-
-        /**
          * \brief Move Constructor
          *
          * \param[in] other The source matrix.
@@ -122,49 +109,6 @@ namespace FEAST
           Container<Mem_, DT_, IT_>(other)
         {
           CONTEXT("When moving DenseMatrix");
-        }
-
-        /**
-         * \brief Copy Constructor
-         *
-         * \param[in] other The source matrix.
-         *
-         * Creates a copy of a given matrix from another memory architecture.
-         */
-        template <typename Mem2_, typename DT2_, typename ID2_>
-        explicit DenseMatrix(const DenseMatrix<Mem2_, DT2_, ID2_> & other) :
-          Container<Mem_, DT_, IT_>(other)
-        {
-          CONTEXT("When copying DenseMatrix");
-        }
-
-        /** \brief Clone operation
-         *
-         * Creates a deep copy of this matrix.
-         */
-        DenseMatrix clone()
-        {
-          CONTEXT("When cloning DenseMatrix");
-
-          DenseMatrix t;
-          ((Container<Mem_, DT_, IT_>&)t).clone(*this);
-          return t;
-        }
-
-        /**
-         * \brief Assignment operator
-         *
-         * \param[in] other The source matrix.
-         *
-         * Assigns another matrix to the target matrix.
-         */
-        DenseMatrix & operator= (const DenseMatrix & other)
-        {
-          CONTEXT("When assigning DenseMatrix");
-
-         this->assign(other);
-
-          return *this;
         }
 
         /**
@@ -179,23 +123,6 @@ namespace FEAST
           CONTEXT("When moving DenseMatrix");
 
           this->move(std::move(other));
-
-          return *this;
-        }
-
-        /**
-         * \brief Assignment operator
-         *
-         * \param[in] other The source matrix.
-         *
-         * Assigns a matrix from another memory architecture to the target matrix.
-         */
-        template <typename Mem2_, typename DT2_, typename ID2_>
-        DenseMatrix & operator= (const DenseMatrix<Mem2_, DT2_, ID2_> & other)
-        {
-          CONTEXT("When assigning DenseMatrix");
-
-         this->assign(other);
 
           return *this;
         }

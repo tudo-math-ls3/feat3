@@ -39,7 +39,8 @@ public:
     DenseMatrix<Mem_, DT_> a(10, 10);
     DenseMatrix<Mem_, DT_> b(10, 10, 5.);
     b(7, 6, DT_(42));
-    DenseMatrix<Mem_, DT_> c(b);
+    DenseMatrix<Mem_, DT_> c;
+    c.assign(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.rows(), b.rows());
     TEST_CHECK_EQUAL(c(7,6), b(7,6));
@@ -49,28 +50,12 @@ public:
     TEST_CHECK_EQUAL(e.rows(), 11ul);
     TEST_CHECK_EQUAL(e.columns(), 12ul);
 
-    DenseMatrix<Mem_, DT_> f(11, 12, 42.);
-    f = e;
-    TEST_CHECK_EQUAL(f(7,8), e(7,8));
-    TEST_CHECK_EQUAL(f, e);
-
-    DenseMatrix<Mem::Main, DT_> g(f);
-    DenseMatrix<Mem::Main, DT_> h;
-    h = f;
-    TEST_CHECK_EQUAL(g, f);
-    TEST_CHECK_EQUAL(h, g);
-    TEST_CHECK_EQUAL(h, f);
-
-    h = f.clone();
-    TEST_CHECK_EQUAL(h, f);
+    DenseMatrix<Mem_, DT_> h;
+    h.clone(c);
+    TEST_CHECK_EQUAL(h, c);
     h(1,2,3);
-    TEST_CHECK_NOT_EQUAL(h, f);
-    TEST_CHECK_NOT_EQUAL((void *)h.elements(), (void *)f.elements());
-    h.copy(f);
-    TEST_CHECK_EQUAL(h, f);
-    h(1,2,3);
-    TEST_CHECK_NOT_EQUAL(h, f);
-    TEST_CHECK_NOT_EQUAL((void *)h.elements(), (void *)f.elements());
+    TEST_CHECK_NOT_EQUAL(h, c);
+    TEST_CHECK_NOT_EQUAL((void *)h.elements(), (void *)c.elements());
   }
 };
 DenseMatrixTest<Mem::Main, float> cpu_dense_matrix_test_float;
