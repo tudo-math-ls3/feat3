@@ -50,6 +50,16 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_>
     class Container
     {
+      private:
+        /**
+         * \brief Constructor
+         *
+         * Creates an empty container.
+         *
+         * \note Internal use only
+         */
+        Container() {}
+
       protected:
         /// List of pointers to all datatype dependent arrays.
         std::vector<DT_*> _elements;
@@ -257,6 +267,22 @@ namespace FEAST
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
             MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
           }
+        }
+
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given container.
+         *
+         * \param[in] other The source container.
+         *
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void clone(const Container<Mem2_, DT2_, IT2_> & other)
+        {
+          CONTEXT("When cloning Container");
+          Container t;
+          t.assign(other);
+          clone(t);
         }
 
         /** \brief Assignment move operation

@@ -750,9 +750,7 @@ namespace FEAST
         void assign(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other)
         {
           CONTEXT("When assigning SparseMatrixCOO");
-          SparseMatrixCOO<Mem_, DT_, IT_> t;
-          ((Container<Mem_, DT_, IT_>&)t).assign(other);
-          this->clone(t);
+          this->clone(other);
         }
 
         /**
