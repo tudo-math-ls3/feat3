@@ -5,10 +5,10 @@
 #include<kernel/foundation/export.hpp>
 #include<kernel/archs.hpp>
 
-/*#include<kernel/foundation/mesh_control.hpp>
+#include<kernel/foundation/mesh_control.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/cell_sub_set.hpp>
-#include <kernel/geometry/export_vtk.hpp>*/
+#include <kernel/geometry/export_vtk.hpp>
 
 #include<deque>
 
@@ -193,7 +193,7 @@ class RefinementTest2D:
                  Algo::Generic,
                  mrt_standard>::execute(m_fine, &halos, attrs);
 
-      /*Index size_set[3];
+/*      Index size_set[3];
       MeshControl<dim_2D>::fill_sizes(m_fine, size_set);
 
       typedef ConformalMesh<Shape::Hypercube<2> > BaseMeshType;
@@ -202,10 +202,10 @@ class RefinementTest2D:
       MeshControl<dim_2D>::fill_vertex_sets(m_fine, basemesh, attrs.at(0), attrs.at(1));
 
       ExportVTK<BaseMeshType> vtkexporter(basemesh);
-      vtkexporter.write("test_mesh.vtk");*/
-
-      /*MeshExporter<VTK, Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
-      exporter.write("ref_test_2D_result.vtk");*/
+      vtkexporter.write("test_mesh.vtk");
+*/
+      MeshExporter<VTK, Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
+      exporter.write("ref_test_2D_result.vtk");
 
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_face_vertex).size(), 4ul);
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_edge_vertex).size(), 12ul);
@@ -296,3 +296,235 @@ RefinementTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index
 RefinementTest2D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test2_cpu_v_d("std::vector, std::deque");
 RefinementTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test2_cpu_d_v("std::deque, std::vector");
 RefinementTest2D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test2_cpu_d_d("std::deque, std::deque");
+
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+class RefinementTest3D:
+  public TaggedTest<Tag_, IndexType_, Algo_>
+{
+  public:
+    RefinementTest3D(const std::string & tag) :
+      TaggedTest<Tag_, Index, Algo_>("RefinementTest3D<" + tag + ">")
+    {
+    }
+
+    virtual void run() const
+    {
+      /*
+       * (0,1,1)  (1,1,1)
+       *      *----*
+       *     /    /|
+       *(0,1,0)(1,1,0)
+       *   *----*  *(1,0,1)
+       *   | /  | /
+       *   |/   |/
+       *   *----*
+       *(0,0,0) (1,0,0)
+       */
+
+      //create attributes for vertex coords
+      OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > attrs;
+      attrs.push_back(Attribute<double, OT_>()); //vertex x-coords
+      attrs.push_back(Attribute<double, OT_>()); //vertex y-coords
+      attrs.push_back(Attribute<double, OT_>()); //vertex z-coords
+
+      attrs.at(0).get_data().push_back(double(0));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(0));
+      attrs.at(1).get_data().push_back(double(1));
+      attrs.at(2).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(1));
+      attrs.at(2).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(1));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(1));
+      attrs.at(2).get_data().push_back(double(1));
+
+      attrs.at(0).get_data().push_back(double(0));
+      attrs.at(1).get_data().push_back(double(0));
+      attrs.at(2).get_data().push_back(double(1));
+
+      attrs.at(0).get_data().push_back(double(0));
+      attrs.at(1).get_data().push_back(double(1));
+      attrs.at(2).get_data().push_back(double(1));
+
+      /*  2    3
+       *  *-1--*
+       *  2    |
+       *  |    3
+       *  *--0-*
+       *  0    1
+       */
+
+      //creating foundation mesh
+      Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m(0);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+      m.add_polytope(pl_face);
+
+      m.add_polytope(pl_polyhedron);
+
+      //vertex 0
+      m.add_adjacency(pl_vertex, pl_edge, 0, 0);
+      m.add_adjacency(pl_vertex, pl_edge, 0, 2);
+      m.add_adjacency(pl_vertex, pl_edge, 0, 10);
+
+      m.add_adjacency(pl_vertex, pl_face, 0, 0);
+      m.add_adjacency(pl_vertex, pl_face, 0, 3);
+      m.add_adjacency(pl_vertex, pl_face, 0, 4);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 0, 0);
+
+      //vertex 1
+      m.add_adjacency(pl_vertex, pl_edge, 1, 0);
+      m.add_adjacency(pl_vertex, pl_edge, 1, 3);
+      m.add_adjacency(pl_vertex, pl_edge, 1, 4);
+
+      m.add_adjacency(pl_vertex, pl_face, 1, 0);
+      m.add_adjacency(pl_vertex, pl_face, 1, 2);
+      m.add_adjacency(pl_vertex, pl_face, 1, 4);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 1, 0);
+
+      //vertex 2
+      m.add_adjacency(pl_vertex, pl_edge, 2, 1);
+      m.add_adjacency(pl_vertex, pl_edge, 2, 2);
+      m.add_adjacency(pl_vertex, pl_edge, 2, 11);
+
+      m.add_adjacency(pl_vertex, pl_face, 2, 0);
+      m.add_adjacency(pl_vertex, pl_face, 2, 3);
+      m.add_adjacency(pl_vertex, pl_face, 2, 5);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 2, 0);
+
+      //vertex 3
+      m.add_adjacency(pl_vertex, pl_edge, 3, 1);
+      m.add_adjacency(pl_vertex, pl_edge, 3, 3);
+      m.add_adjacency(pl_vertex, pl_edge, 3, 5);
+
+      m.add_adjacency(pl_vertex, pl_face, 3, 2);
+      m.add_adjacency(pl_vertex, pl_face, 3, 0);
+      m.add_adjacency(pl_vertex, pl_face, 3, 5);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 3, 0);
+
+      //vertex 4
+      m.add_adjacency(pl_vertex, pl_edge, 4, 4);
+      m.add_adjacency(pl_vertex, pl_edge, 4, 6);
+      m.add_adjacency(pl_vertex, pl_edge, 4, 7);
+
+      m.add_adjacency(pl_vertex, pl_face, 4, 1);
+      m.add_adjacency(pl_vertex, pl_face, 4, 2);
+      m.add_adjacency(pl_vertex, pl_face, 4, 4);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 4, 0);
+
+      //vertex 5
+      m.add_adjacency(pl_vertex, pl_edge, 5, 5);
+      m.add_adjacency(pl_vertex, pl_edge, 5, 6);
+      m.add_adjacency(pl_vertex, pl_edge, 5, 8);
+
+      m.add_adjacency(pl_vertex, pl_face, 5, 1);
+      m.add_adjacency(pl_vertex, pl_face, 5, 2);
+      m.add_adjacency(pl_vertex, pl_face, 5, 5);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 5, 0);
+
+      //vertex 6
+      m.add_adjacency(pl_vertex, pl_edge, 6, 7);
+      m.add_adjacency(pl_vertex, pl_edge, 6, 9);
+      m.add_adjacency(pl_vertex, pl_edge, 6, 10);
+
+      m.add_adjacency(pl_vertex, pl_face, 6, 1);
+      m.add_adjacency(pl_vertex, pl_face, 6, 3);
+      m.add_adjacency(pl_vertex, pl_face, 6, 4);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 6, 0);
+
+      //vertex 7
+      m.add_adjacency(pl_vertex, pl_edge, 7, 8);
+      m.add_adjacency(pl_vertex, pl_edge, 7, 9);
+      m.add_adjacency(pl_vertex, pl_edge, 7, 11);
+
+      m.add_adjacency(pl_vertex, pl_face, 7, 1);
+      m.add_adjacency(pl_vertex, pl_face, 7, 3);
+      m.add_adjacency(pl_vertex, pl_face, 7, 5);
+
+      m.add_adjacency(pl_vertex, pl_polyhedron, 7, 0);
+/*
+
+      m.add_adjacency(pl_vertex, pl_edge, 0, 0);
+      m.add_adjacency(pl_vertex, pl_edge, 1, 0);
+*/
+      Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
+
+      OT_<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > > halos;
+      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<1, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
+      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<0, PLEdge, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
+      halos.at(0)->push_back(0);
+      halos.at(1)->push_back(3);
+
+      Refinement<Mem::Main,
+                 Algo::Generic,
+                 mrt_standard>::execute(m_fine, &halos, attrs);
+
+/*      Index size_set[4];
+      MeshControl<dim_3D>::fill_sizes(m_fine, size_set);
+
+      typedef ConformalMesh<Shape::Hypercube<3> > BaseMeshType;
+            std::cout << "TEST3" << std::endl;
+      BaseMeshType basemesh(size_set);
+
+      std::cout << "test" << std::endl;
+      MeshControl<dim_3D>::fill_adjacencies(m_fine, basemesh);
+      MeshControl<dim_3D>::fill_vertex_sets(m_fine, basemesh, attrs.at(0), attrs.at(1),attrs.at(2));
+
+      ExportVTK<BaseMeshType> vtkexporter(basemesh);
+      vtkexporter.write("test_3mesh.vtk");
+*/
+      MeshExporter<VTK, Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
+      exporter.write("ref_test_3D_result.vtk");
+
+    // TODO implement right refinement
+    }
+};
+RefinementTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test3_cpu_v_v("std::vector, std::vector");
+RefinementTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test3_cpu_v_d("std::vector, std::deque");
+RefinementTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test3_cpu_d_v("std::deque, std::vector");
+RefinementTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test3_cpu_d_d("std::deque, std::deque");
