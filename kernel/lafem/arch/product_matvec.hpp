@@ -14,9 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct ProductMatVec
-      {
-      };
+      struct ProductMatVec;
 
       template <>
       struct ProductMatVec<Mem::Main, Algo::Generic>

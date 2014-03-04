@@ -14,9 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct Defect
-      {
-      };
+      struct Defect;
 
       template <>
       struct Defect<Mem::Main, Algo::Generic>

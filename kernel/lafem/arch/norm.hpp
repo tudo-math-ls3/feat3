@@ -16,9 +16,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct Norm2
-      {
-      };
+      struct Norm2;
 
       template <>
       struct Norm2<Mem::Main, Algo::Generic>

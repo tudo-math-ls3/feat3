@@ -14,9 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct Scale
-      {
-      };
+      struct Scale;
 
       template <>
       struct Scale<Mem::Main, Algo::Generic>

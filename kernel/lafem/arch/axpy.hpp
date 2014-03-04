@@ -14,9 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct Axpy
-      {
-      };
+      struct Axpy;
 
       template <>
       struct Axpy<Mem::Main, Algo::Generic>

@@ -14,9 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct Difference
-      {
-      };
+      struct Difference;
 
       template <>
       struct Difference<Mem::Main, Algo::Generic>

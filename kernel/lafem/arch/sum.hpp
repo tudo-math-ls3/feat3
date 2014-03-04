@@ -14,9 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct Sum
-      {
-      };
+      struct Sum;
 
       template <>
       struct Sum<Mem::Main, Algo::Generic>

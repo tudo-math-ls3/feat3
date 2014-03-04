@@ -14,9 +14,7 @@ namespace FEAST
     namespace Arch
     {
       template <typename Mem_, typename Algo_>
-      struct ComponentProduct
-      {
-      };
+      struct ComponentProduct;
 
       template <>
       struct ComponentProduct<Mem::Main, Algo::Generic>
