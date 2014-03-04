@@ -22,6 +22,26 @@ namespace FEAST
       lt_ell
     };
 
+    namespace Intern
+    {
+      template <SparseLayoutType LT_>
+      struct LayoutTyper;
+
+      template <>
+      struct LayoutTyper<SparseLayoutType::lt_csr>
+      {
+        template<typename Mem_, typename DT_, typename IT_>
+        using MatrixType = SparseMatrixCSR<Mem_, DT_, IT_>;
+      };
+
+      template <>
+      struct LayoutTyper<SparseLayoutType::lt_ell>
+      {
+        template<typename Mem_, typename DT_, typename IT_>
+        using MatrixType = SparseMatrixELL<Mem_, DT_, IT_>;
+      };
+    }
+
     /**
      * \brief Layout scheme for sparse matrix containers.
      *
@@ -42,6 +62,9 @@ namespace FEAST
       std::vector<IT_*> _indices;
       std::vector<IT_> _indices_size;
       std::vector<IT_> _scalar_index;
+
+      template<typename DT_>
+      using MatrixType = typename Intern::LayoutTyper<Layout_>::template MatrixType<Mem_, DT_, IT_>;
 
       SparseLayout(const std::vector<IT_ *> & indices, const std::vector<IT_> & indices_size, const std::vector<IT_> & scalar_index) :
         _indices(indices),
