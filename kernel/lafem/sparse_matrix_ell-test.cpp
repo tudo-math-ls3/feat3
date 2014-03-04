@@ -65,7 +65,7 @@ public:
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
     SparseMatrixELL<Mem_, DT_> z;
-    z.assign(b);
+    z.convert(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
@@ -77,9 +77,11 @@ public:
     TEST_CHECK_EQUAL(z(1, 3), a(1, 3));
 
     SparseMatrixELL<Mem::Main, DT_> e;;
-    e.assign(b);
+    e.convert(b);
     TEST_CHECK_EQUAL(e, b);
     e.copy(b);
+    TEST_CHECK_EQUAL(e, b);
+    e.clone(b);
     TEST_CHECK_EQUAL(e, b);
     TEST_CHECK_NOT_EQUAL((void*)e.Ax(), (void*)b.Ax());
 

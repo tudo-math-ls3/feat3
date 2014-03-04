@@ -159,7 +159,7 @@ namespace FEAST
          * Moves another vector to this vector.
          */
         SparseVector(SparseVector && other) :
-          Container<Mem_, DT_, IT_>(other)
+          Container<Mem_, DT_, IT_>(std::move(other))
         {
           CONTEXT("When moving SparseVector");
         }
@@ -190,9 +190,9 @@ namespace FEAST
          *
          */
         template <typename Mem2_, typename DT2_, typename IT2_>
-        void assign(const SparseVector<Mem2_, DT2_, IT2_> & other)
+        void convert(const SparseVector<Mem2_, DT2_, IT2_> & other)
         {
-          CONTEXT("When assigning SparseVector");
+          CONTEXT("When converting SparseVector");
           this->clone(other);
         }
 

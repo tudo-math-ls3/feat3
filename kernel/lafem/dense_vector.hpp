@@ -257,7 +257,7 @@ namespace FEAST
          * Moves another vector to this vector.
          */
         DenseVector(DenseVector && other) :
-          Container<Mem_, DT_, IT_>(other)
+          Container<Mem_, DT_, IT_>(std::move(other))
         {
           CONTEXT("When moving DenseVector");
         }
@@ -276,6 +276,20 @@ namespace FEAST
           this->move(std::move(other));
 
           return *this;
+        }
+
+        /**
+         * \brief Convertion method
+         *
+         * \param[in] other The source vector.
+         *
+         * Use source vector content as content of current vector
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void convert(const DenseVector<Mem2_, DT2_, IT2_> & other)
+        {
+          CONTEXT("When converting DenseVector");
+          this->assign(other);
         }
 
         /**

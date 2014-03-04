@@ -43,21 +43,21 @@ public:
     DenseVector<Mem_, DT_> b(10, DT_(5));
     b(7, DT_(42));
     DenseVector<Mem_, DT_> c;
-    c.assign(b);
+    c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));
     TEST_CHECK_EQUAL(c, b);
     DenseVector<Mem::Main, float, unsigned int> d;
-    d.assign(c);
+    d.convert(c);
     DenseVector<Mem::Main, float, unsigned int> e;
-    e.assign(b);
+    e.convert(b);
     TEST_CHECK_EQUAL(e.size(), d.size());
     TEST_CHECK_EQUAL(e(7), d(7));
     TEST_CHECK_EQUAL(e, d);
 
     b.clone(a);
     TEST_CHECK_NOT_EQUAL((void*)b.elements(), (void*)a.elements());
-    c.assign(a);
+    c.convert(a);
     TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
     TEST_CHECK_EQUAL(b, c);
     a(3, DT_(23));
@@ -196,9 +196,9 @@ public:
       }
 
       DenseVector<Mem_, DT_> a;
-      a.assign(a_local);
+      a.convert(a_local);
       DenseVector<Mem_, DT_> b;
-      b.assign(b_local);
+      b.convert(b_local);
 
       // a*b = 1
       DT_ ref(DT_(1));
@@ -430,7 +430,7 @@ public:
       const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size-1))));
 
       DenseVector<Mem_, DT_> a;
-      a.assign(a_local);
+      a.convert(a_local);
       DT_ c = a.template norm2<Algo_>();
       TEST_CHECK_EQUAL_WITHIN_EPS(c, ref, eps);
 

@@ -147,171 +147,6 @@ namespace FEAST
           }
         }
 
-      public:
-        /**
-         * \brief Constructor
-         *
-         * \param[in] size The size of the created container.
-         *
-         * Creates a container with a given size.
-         */
-        explicit Container(Index size)
-        {
-          CONTEXT("When creating Container");
-          _scalar_index.push_back(size);
-        }
-
-        /**
-         * \brief Destructor
-         *
-         * Destroys a container and releases all of its used arrays.
-         */
-        virtual ~Container()
-        {
-          CONTEXT("When destroying Container");
-
-          for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(_elements.at(i));
-          for (Index i(0) ; i < _indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(_indices.at(i));
-        }
-
-        /**
-         * \brief Move Constructor
-         *
-         * \param[in] other The source container.
-         *
-         * Moves another container to this container.
-         */
-        Container(Container && other) :
-          _elements(std::move(other._elements)),
-          _indices(std::move(other._indices)),
-          _elements_size(std::move(other._elements_size)),
-          _indices_size(std::move(other._indices_size)),
-          _scalar_index(std::move(other._scalar_index)),
-          _scalar_dt(std::move(other._scalar_dt))
-        {
-          CONTEXT("When moving Container");
-          other._elements.clear();
-          other._indices.clear();
-          other._elements_size.clear();
-          other._indices_size.clear();
-          other._scalar_index.clear();
-          other._scalar_dt.clear();
-        }
-
-        /**
-         * \brief Reset all elements of the container to a given value or zero if missing.
-         *
-         * \param[in] value The value to be set (defaults to 0)
-         *
-         */
-        void format(DT_ value = 0)
-        {
-          CONTEXT("When formating Container");
-
-          for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
-        }
-
-        /**
-         * \brief Free all allocated arrays
-         *
-         */
-        virtual void clear()
-        {
-          CONTEXT("When clearing Container");
-
-          for (Index i(0) ; i < _elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < _indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-
-          this->_elements.clear();
-          this->_indices.clear();
-          this->_elements_size.clear();
-          this->_indices_size.clear();
-        }
-
-        /** \brief Clone operation
-         *
-         * Become a deep copy of a given container.
-         *
-         * \param[in] other The source container.
-         *
-         */
-        void clone(const Container & other)
-        {
-          CONTEXT("When cloning Container");
-
-          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
-          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
-          this->_elements_size.assign(other._elements_size.begin(), other._elements_size.end());
-          this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-          this->_elements.clear();
-          this->_indices.clear();
-
-          for (Index i(0) ; i < other._elements.size() ; ++i)
-          {
-            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
-            MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
-          }
-
-          for (Index i(0) ; i < other._indices.size() ; ++i)
-          {
-            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
-            MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
-          }
-        }
-
-        /** \brief Clone operation
-         *
-         * Become a deep copy of a given container.
-         *
-         * \param[in] other The source container.
-         *
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        void clone(const Container<Mem2_, DT2_, IT2_> & other)
-        {
-          CONTEXT("When cloning Container");
-          Container t;
-          t.assign(other);
-          clone(t);
-        }
-
-        /** \brief Assignment move operation
-         *
-         * Move another container to the current one.
-         *
-         * \param[in] other The source container.
-         *
-         */
-        void move(Container && other)
-        {
-          CONTEXT("When moving Container");
-
-          if (this == &other)
-            return;
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
-
-          this->_elements = std::move(other._elements);
-          this->_indices = std::move(other._indices);
-          this->_elements_size = std::move(other._elements_size);
-          this->_indices_size = std::move(other._indices_size);
-          this->_scalar_index = std::move(other._scalar_index);
-          this->_scalar_dt = std::move(other._scalar_dt);
-        }
-
         /** \brief Assignment operation
          *
          * Assigns contents of another container
@@ -451,6 +286,172 @@ namespace FEAST
           }
         }
 
+      public:
+        /**
+         * \brief Constructor
+         *
+         * \param[in] size The size of the created container.
+         *
+         * Creates a container with a given size.
+         */
+        explicit Container(Index size)
+        {
+          CONTEXT("When creating Container");
+          _scalar_index.push_back(size);
+        }
+
+        /**
+         * \brief Destructor
+         *
+         * Destroys a container and releases all of its used arrays.
+         */
+        virtual ~Container()
+        {
+          CONTEXT("When destroying Container");
+
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(_elements.at(i));
+          for (Index i(0) ; i < _indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(_indices.at(i));
+        }
+
+        /**
+         * \brief Move Constructor
+         *
+         * \param[in] other The source container.
+         *
+         * Moves another container to this container.
+         */
+        Container(Container && other) :
+          _elements(std::move(other._elements)),
+          _indices(std::move(other._indices)),
+          _elements_size(std::move(other._elements_size)),
+          _indices_size(std::move(other._indices_size)),
+          _scalar_index(std::move(other._scalar_index)),
+          _scalar_dt(std::move(other._scalar_dt))
+        {
+          CONTEXT("When moving Container");
+          other._elements.clear();
+          other._indices.clear();
+          other._elements_size.clear();
+          other._indices_size.clear();
+          other._scalar_index.clear();
+          other._scalar_dt.clear();
+        }
+
+        /**
+         * \brief Reset all elements of the container to a given value or zero if missing.
+         *
+         * \param[in] value The value to be set (defaults to 0)
+         *
+         */
+        void format(DT_ value = 0)
+        {
+          CONTEXT("When formating Container");
+
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->set_memory(_elements.at(i), value, _elements_size.at(i));
+        }
+
+        /**
+         * \brief Free all allocated arrays
+         *
+         */
+        virtual void clear()
+        {
+          CONTEXT("When clearing Container");
+
+          for (Index i(0) ; i < _elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < _indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements.clear();
+          this->_indices.clear();
+          this->_elements_size.clear();
+          this->_indices_size.clear();
+          this->_scalar_index.clear();
+          this->_scalar_dt.clear();
+        }
+
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given container.
+         *
+         * \param[in] other The source container.
+         *
+         */
+        void clone(const Container & other)
+        {
+          CONTEXT("When cloning Container");
+
+          this->_scalar_index.assign(other._scalar_index.begin(), other._scalar_index.end());
+          this->_scalar_dt.assign(other._scalar_dt.begin(), other._scalar_dt.end());
+          this->_elements_size.assign(other._elements_size.begin(), other._elements_size.end());
+          this->_indices_size.assign(other._indices_size.begin(), other._indices_size.end());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+          this->_elements.clear();
+          this->_indices.clear();
+
+          for (Index i(0) ; i < other._elements.size() ; ++i)
+          {
+            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
+            MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
+          }
+
+          for (Index i(0) ; i < other._indices.size() ; ++i)
+          {
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
+            MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
+          }
+        }
+
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given container.
+         *
+         * \param[in] other The source container.
+         *
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void clone(const Container<Mem2_, DT2_, IT2_> & other)
+        {
+          CONTEXT("When cloning Container");
+          Container t;
+          t.assign(other);
+          clone(t);
+        }
+
+        /** \brief Assignment move operation
+         *
+         * Move another container to the current one.
+         *
+         * \param[in] other The source container.
+         *
+         */
+        void move(Container && other)
+        {
+          CONTEXT("When moving Container");
+
+          if (this == &other)
+            return;
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+
+          this->_elements = std::move(other._elements);
+          this->_indices = std::move(other._indices);
+          this->_elements_size = std::move(other._elements_size);
+          this->_indices_size = std::move(other._indices_size);
+          this->_scalar_index = std::move(other._scalar_index);
+          this->_scalar_dt = std::move(other._scalar_dt);
+        }
 
         /**
          * \brief Returns a list of all data arrays.

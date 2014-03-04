@@ -40,7 +40,8 @@ public:
             a_local(row, col, DT_(-1));
         }
       }
-      SM_ a(a_local);
+      SM_ a;
+      a.convert(a_local);
 
       SM_ b;
       b = Transposition<Algo_>::value(a);

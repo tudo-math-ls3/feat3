@@ -67,7 +67,7 @@ public:
     typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
 
     SparseMatrixCSR<Mem_, DT_> z;
-    z.assign(b);
+    z.convert(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
     TEST_CHECK_EQUAL(z.rows(), a.rows());
@@ -85,7 +85,7 @@ public:
     TEST_CHECK_EQUAL(d, c);
 
     SparseMatrixCSR<Mem::Main, DT_> e;
-    e.assign(c);
+    e.convert(c);
     TEST_CHECK_EQUAL(e, c);
     e.copy(c);
     TEST_CHECK_EQUAL(e, c);

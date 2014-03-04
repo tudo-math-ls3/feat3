@@ -106,7 +106,7 @@ namespace FEAST
          * Moves a given matrix to this matrix.
          */
         DenseMatrix(DenseMatrix && other) :
-          Container<Mem_, DT_, IT_>(other)
+          Container<Mem_, DT_, IT_>(std::move(other))
         {
           CONTEXT("When moving DenseMatrix");
         }
@@ -125,6 +125,20 @@ namespace FEAST
           this->move(std::move(other));
 
           return *this;
+        }
+
+        /**
+         * \brief Convertion method
+         *
+         * \param[in] other The source matrix.
+         *
+         * Use source matrix content as content of current matrix
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void convert(const DenseMatrix<Mem2_, DT2_, IT2_> & other)
+        {
+          CONTEXT("When converting DenseMatrix");
+          this->assign(other);
         }
 
         /**

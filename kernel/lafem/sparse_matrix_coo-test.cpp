@@ -61,7 +61,7 @@ public:
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
     SparseMatrixCOO<Mem_, DT_> b;
-    b.assign(a);
+    b.convert(a);
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
     TEST_CHECK_EQUAL(b.columns(), a.columns());
@@ -169,7 +169,7 @@ public:
         }
       }
       SparseMatrixCOO<Mem_,DT_> a;
-      a.assign(a_local);
+      a.convert(a_local);
 
       DenseVector<Mem_, DT_> r(size);
       //r.template axpy<Algo_>(s, a, x, y);
@@ -234,7 +234,7 @@ public:
       }
 
       SparseMatrixCOO<Mem_, DT_> a;
-      a.assign(a_local);
+      a.convert(a_local);
       SparseMatrixCOO<Mem_, DT_> b;
       b.clone(a);
 

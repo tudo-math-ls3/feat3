@@ -40,7 +40,7 @@ public:
     DenseMatrix<Mem_, DT_> b(10, 10, 5.);
     b(7, 6, DT_(42));
     DenseMatrix<Mem_, DT_> c;
-    c.assign(b);
+    c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.rows(), b.rows());
     TEST_CHECK_EQUAL(c(7,6), b(7,6));
