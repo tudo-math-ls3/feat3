@@ -52,6 +52,11 @@ namespace FEAST
     template <typename Algo_, typename MT_, typename VT_>
     class NonePreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
+    private:
+      typedef typename MT_::DataType DT_;
+
+      const DT_ _damping;
+
     public:
       /// Our algotype
       typedef Algo_ AlgoType;
@@ -72,9 +77,11 @@ namespace FEAST
       /**
        * \brief Constructor
        *
+       * param[in] damping A damping-parameter
+       *
        * Creates a dummy preconditioner
        */
-      NonePreconditioner()
+      NonePreconditioner(const DT_ damping = DT_(0.0)) : _damping(damping)
       {
       }
 
@@ -96,7 +103,14 @@ namespace FEAST
        */
       virtual void apply(VT_ & out, const VT_ & in)
       {
-        out.copy(in);
+        if (_damping == DT_(0.0))
+        {
+          out.copy(in);
+        }
+        else
+        {
+          out.template scale<Algo_>(out, _damping);
+        }
       }
     };
 
@@ -2391,7 +2405,7 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    namespace detail
+    namespace Intern
     {
       template <typename Algo_, typename MT_, typename VT_>
       class SPAIPreconditionerMTdepending : public Preconditioner<Algo_, MT_, VT_>
@@ -2984,23 +2998,23 @@ namespace FEAST
           }
         } // function apply_m_transpose
       };
-    } // namespace detail
+    } // namespace Intern
 
 
     template <typename Algo_, typename MT_, typename VT_>
-    class SPAIPreconditioner : public detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>
+    class SPAIPreconditioner : public Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>
     {
     private:
       typedef typename MT_::DataType DT_;
       typedef typename MT_::MemType Mem_;
       typedef std::pair<DT_, Index> PAIR_;
 
-      using detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_A;
-      using detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_m;
-      using detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_layout;
-      using detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_M;
-      using detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_m_columns;
-      using detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_a_columnwise;
+      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_A;
+      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_m;
+      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_layout;
+      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_M;
+      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_m_columns;
+      using Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>::_a_columnwise;
 
 
       const DT_ _eps_res;
@@ -3047,7 +3061,7 @@ namespace FEAST
                          const Index fill_in = 10,
                          const DT_ eps_res_comp = 1e-3,
                          const DT_ max_rho = 1e-3) :
-        detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, m),
+        Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, m),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),
@@ -3100,7 +3114,7 @@ namespace FEAST
                          const Index fill_in = 10,
                          const DT_ eps_res_comp = 1e-3,
                          const DT_ max_rho = 1e-3) :
-        detail::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, layout),
+        Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, layout),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),

@@ -7,8 +7,6 @@
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
 
-#include <kernel/lafem/richardson.hpp>
-
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
@@ -60,7 +58,7 @@ public:
     sys.template apply<Algo_>(b, ref);
 
     // solver-paramters
-    Index max_iter = 5000;
+    Index max_iter = 1000;
     DT_ eps = 1e-12;
 
     // Define preconditioners for every matrix-type and solve the system
