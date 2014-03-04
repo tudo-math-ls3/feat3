@@ -120,7 +120,6 @@ namespace FEAST
           // If the number of cells is exactly 1, the facet is a boundary facet.
 
           // technical typedef mumbo-jumbo
-          typedef typename Shape::FaceTraits<Shape_, shape_dim_-1>::ShapeType FacetType;
           enum
           {
             facets_per_cell = Shape::FaceTraits<Shape_, shape_dim_-1>::count
