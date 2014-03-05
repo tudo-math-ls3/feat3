@@ -87,7 +87,7 @@ namespace FEAST
          * \author Jordi Paul
          */
         template<typename ShapeType_, typename DataType_ = CoordType>
-          DataType_ compute_vol(const Index cell)
+          DataType_ compute_vol(const Index cell) const
           {
             // Extract the transformation, the underlying mesh's index and vertex sets and stuff 'em into the
             // CellVolumeEvaluator who does the actual work.
