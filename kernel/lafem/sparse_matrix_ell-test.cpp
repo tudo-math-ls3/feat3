@@ -41,7 +41,7 @@ public:
   {
     SparseMatrixCOO<Mem::Main, DT_> a(10, 12);
     a(1,2,7);
-    a.clear();
+    a.format();
     a(1,2,7);
     a(5,5,2);
     SparseMatrixELL<Mem_, DT_> b(a);

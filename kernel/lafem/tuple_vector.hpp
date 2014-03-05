@@ -296,7 +296,9 @@ namespace FEAST
       /// Creates and returns a deep copy of this vector.
       TupleVector clone() const
       {
-        return TupleVector(_first.clone());
+        First_ f;
+        f.clone(_first);
+        return TupleVector(std::move(f));
       }
 
       First_& first()

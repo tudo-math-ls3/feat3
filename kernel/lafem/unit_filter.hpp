@@ -84,15 +84,9 @@ namespace FEAST
       {
       }
 
-      UnitFilter clone() const
+      void clone(const UnitFilter & other)
       {
-        // create copy
-        UnitFilter other(size());
-
-        other._sv = _sv.clone();
-
-        // return
-        return other;
+        _sv.clone(other._sv);
       }
 
       /// \returns The number of entries in the filter.

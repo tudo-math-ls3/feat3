@@ -31,12 +31,13 @@ public:
   virtual void run() const
   {
     PSF_ factory(13);
-    SM_ sys(factory.matrix_csr());
+    SM_ sys;
+    sys.convert(factory.matrix_csr());
 
     Index size(sys.rows());
     DenseVector<Mem_, DT_> x(size, DT_(1));
-    DenseVector<Mem_, DT_> ref(factory.vector_q2_bubble());
-    DenseVector<Mem::Main, DT_> ref_local(ref);
+    DenseVector<Mem_, DT_> ref;
+    ref.convert(factory.vector_q2_bubble());
     DenseVector<Mem_, DT_> b(size);
     sys.template apply<Algo_>(b, ref);
 
@@ -48,7 +49,7 @@ public:
     DenseVector<Mem::Main, DT_> sol(size);
     sol.copy(x);
     for (Index i(0) ; i < size ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(sol(i), ref_local(i), 1e-8);
+      TEST_CHECK_EQUAL_WITHIN_EPS(sol(i), ref(i), 1e-8);
   }
 };
 RichardsonTest<PointstarFactoryFD<double>, Algo::Generic, SparseMatrixCOO<Mem::Main, double> > coo_fd_richardson_test_double;

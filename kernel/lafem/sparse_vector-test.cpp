@@ -43,7 +43,7 @@ public:
     TEST_CHECK_EQUAL(a(2), DT_(0));
 
     SparseVector<Mem_, DT_> b;
-    b.assign(a);
+    b.convert(a);
     TEST_CHECK_EQUAL(a, b);
     b(6, DT_(1));
     TEST_CHECK_NOT_EQUAL(a, b);
@@ -52,16 +52,16 @@ public:
     TEST_CHECK_NOT_EQUAL(a, b);
 
     SparseVector<Mem::Main, float, unsigned int> c;
-    c.assign(a);
+    c.convert(a);
     SparseVector<Mem::Main, float, unsigned int> d;
     d.clone(c);
     SparseVector<Mem::Main, float, unsigned int> e;
-    e.assign(a);
+    e.convert(a);
     TEST_CHECK_EQUAL(d, e);
     c(6, DT_(1));
     TEST_CHECK_NOT_EQUAL(c, e);
 
-    a.clear();
+    a.format();
     TEST_CHECK_EQUAL(a.used_elements(), Index(0));
     TEST_CHECK_EQUAL(a(3), DT_(0));
 

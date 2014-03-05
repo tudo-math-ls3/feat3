@@ -44,7 +44,7 @@ public:
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
-    a.clear();
+    a.format();
     a(1,2,7);
     a(5,5,8);
     a(5,5,2);
@@ -52,7 +52,7 @@ public:
     TEST_CHECK_EQUAL(a(1, 2), 7.);
     TEST_CHECK_EQUAL(a(5, 5), 2.);
 
-    a.clear();
+    a.format();
     a(1,2,8);
     a(5,5,2);
     a(1,2,7);

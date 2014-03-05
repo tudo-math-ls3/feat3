@@ -51,8 +51,8 @@ namespace FEAST
        * The weight volume. This is simply the dot-product of the primal and dual weighting vector.
        */
       explicit MeanFilter(VectorType && vec_prim, VectorType && vec_dual, DT_ volume) :
-        _vec_prim(vec_prim),
-        _vec_dual(vec_dual),
+        _vec_prim(std::move(vec_prim)),
+        _vec_dual(std::move(vec_dual)),
         _volume(volume)
       {
         ASSERT(_volume > Math::Limits<DT_>::epsilon(), "domain volume must not be zero");

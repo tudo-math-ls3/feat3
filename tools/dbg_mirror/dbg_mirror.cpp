@@ -127,12 +127,16 @@ void test_mirror(
   sync_add(buf_mat_0, buf_mat_1);
 
   // clone local vectors
-  VectorType glob_vec_0(loc_vec_0.clone());
-  VectorType glob_vec_1(loc_vec_1.clone());
+  VectorType glob_vec_0;
+  glob_vec_0.clone(loc_vec_0);
+  VectorType glob_vec_1;
+  glob_vec_1.clone(loc_vec_1);
 
   // clone local matrices
-  MatrixType glob_mat_0(loc_mat_0.clone());
-  MatrixType glob_mat_1(loc_mat_1.clone());
+  MatrixType glob_mat_0;
+  glob_mat_0.clone(loc_mat_0);
+  MatrixType glob_mat_1;
+  glob_mat_1.clone(loc_mat_1);
 
   // scatter vectors
   vec_mir_0.scatter_dual(glob_vec_0, buf_vec_0);

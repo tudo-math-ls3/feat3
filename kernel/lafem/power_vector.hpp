@@ -132,7 +132,9 @@ namespace FEAST
        */
       PowerVector clone() const
       {
-        return PowerVector(base().clone(), _sub_vector.clone());
+        SubVectorType s;
+        s.clone(_sub_vector);
+        return PowerVector(base().clone(), std::move(s));
       }
 
       /**
@@ -358,7 +360,7 @@ namespace FEAST
       }
 
       explicit PowerVector(SubVectorType&& sub_vector) :
-        _sub_vector(sub_vector)
+        _sub_vector(std::move(sub_vector))
       {
       }
 
@@ -387,7 +389,9 @@ namespace FEAST
 
       PowerVector clone() const
       {
-        return PowerVector(_sub_vector.clone());
+        SubVectorType s;
+        s.clone(_sub_vector);
+        return PowerVector(std::move(s));
       }
 
       template<Index i>

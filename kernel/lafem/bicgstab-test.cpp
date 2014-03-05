@@ -166,7 +166,6 @@ public:
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref_local(i), 1e-8);
     }
-
   }
 
 };

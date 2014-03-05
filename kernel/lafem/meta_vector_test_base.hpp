@@ -81,9 +81,9 @@ namespace FEAST
 
         // construct data vector
         MetaVector x;
-        x.template at<Index(0)>().template at<Index(0)>() = ScalarVector(r00);
-        x.template at<Index(0)>().template at<Index(1)>() = ScalarVector(r01);
-        x.template at<Index(1)>() = ScalarVector(r1);
+        x.template at<Index(0)>().template at<Index(0)>().convert(r00);
+        x.template at<Index(0)>().template at<Index(1)>().convert(r01);
+        x.template at<Index(1)>().convert(r1);
         return std::move(x);
       }
 
@@ -103,9 +103,9 @@ namespace FEAST
 
         // construct data vector
         MetaVector y;
-        y.template at<Index(0)>().template at<Index(0)>() = ScalarVector(r00);
-        y.template at<Index(0)>().template at<Index(1)>() = ScalarVector(r01);
-        y.template at<Index(1)>() = ScalarVector(r1);
+        y.template at<Index(0)>().template at<Index(0)>().convert(r00);
+        y.template at<Index(0)>().template at<Index(1)>().convert(r01);
+        y.template at<Index(1)>().convert(r1);
         return std::move(y);
       }
 

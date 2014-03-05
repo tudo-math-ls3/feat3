@@ -745,8 +745,7 @@ namespace FEAST
 
         if (p == 0)
         {
-          SparseMatrixCSR<Mem_, DT_> tLU(A.layout());
-          _LU = tLU;
+          _LU = SparseMatrixCSR<Mem_, DT_>(A.layout());
 
           _copy_entries(false);
         }
@@ -776,6 +775,7 @@ namespace FEAST
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
+        this->LU.convert(LU);
       }
 
       /**
@@ -1054,8 +1054,7 @@ namespace FEAST
           prow_ptr[i+1] = k1;
         }
 
-        SparseMatrixCSR<Mem_, DT_> tLU(n, n, col_ind, val, row_ptr);
-        _LU = tLU;
+        _LU = SparseMatrixCSR<Mem_, DT_>(n, n, col_ind, val, row_ptr);
 
         delete[] ll;
         delete[] pldiag;
@@ -1164,8 +1163,7 @@ namespace FEAST
 
         if (p == 0)
         {
-          SparseMatrixELL<Mem_, DT_> tLU(A.layout());
-          _LU = tLU;
+          _LU = SparseMatrixELL<Mem_, DT_>(A.layout());
 
           _copy_entries(false);
         }
@@ -1195,6 +1193,8 @@ namespace FEAST
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
+
+        this->LU.convert(LU);
       }
 
       /**
@@ -1470,9 +1470,8 @@ namespace FEAST
           plurl[i] = Index(ll[i].size());
         }
 
-        SparseMatrixELL<Mem_, DT_> tLU(n, n, stride, num_cols_per_row,
+        _LU = SparseMatrixELL<Mem_, DT_>(n, n, stride, num_cols_per_row,
                                        used_elements, lux, luj , lurl);
-        _LU = tLU;
 
         delete[] ll;
         delete[] pldiag;

@@ -158,17 +158,17 @@ namespace FEAST
         const DenseVector<Mem::Main, DataType_> vec_bubble(ps_fd.vector_q2_bubble());
 
         // set system matrix
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(0),Index(0)>() = ScalarMatrixA(mat_fe);
-        mat_sys.template at<Index(0),Index(0)>().template at<Index(1),Index(1)>() = ScalarMatrixA(mat_fe);
-        mat_sys.template at<Index(0),Index(1)>().template at<Index(0),Index(0)>() = ScalarMatrixB(mat_fd);
-        mat_sys.template at<Index(0),Index(1)>().template at<Index(1),Index(0)>() = ScalarMatrixB(mat_fd);
-        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(0)>() = ScalarMatrixD(mat_fd);
-        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(1)>() = ScalarMatrixD(mat_fd);
+        mat_sys.template at<Index(0),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fe);
+        mat_sys.template at<Index(0),Index(0)>().template at<Index(1),Index(1)>().convert(mat_fe);
+        mat_sys.template at<Index(0),Index(1)>().template at<Index(0),Index(0)>().convert(mat_fd);
+        mat_sys.template at<Index(0),Index(1)>().template at<Index(1),Index(0)>().convert(mat_fd);
+        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(0)>().convert(mat_fd);
+        mat_sys.template at<Index(1),Index(0)>().template at<Index(0),Index(1)>().convert(mat_fd);
 
         // set solution vector
-        vec_sol.template at<Index(0)>().template at<Index(0)>() = ScalarVector(vec_bubble);
-        vec_sol.template at<Index(0)>().template at<Index(1)>() = ScalarVector(vec_eigen);
-        vec_sol.template at<Index(1)>() = ScalarVector(vec_eigen);
+        vec_sol.template at<Index(0)>().template at<Index(0)>().convert(vec_bubble);
+        vec_sol.template at<Index(0)>().template at<Index(1)>().convert(vec_eigen);
+        vec_sol.template at<Index(1)>().convert(vec_eigen);
 
         // create vectors for rhs computation
         DenseVector<Mem::Main, DataType_> vec_rhs1(vec_bubble.size());
@@ -183,9 +183,9 @@ namespace FEAST
         vec_rhs3.template axpy<Algo::Generic>(vec_eigen, vec_rhs3, ps_fd.lambda_min());
 
         // set rhs vector
-        vec_rhs.template at<Index(0)>().template at<Index(0)>() = ScalarVector(vec_rhs1);
-        vec_rhs.template at<Index(0)>().template at<Index(1)>() = ScalarVector(vec_rhs2);
-        vec_rhs.template at<Index(1)>() = ScalarVector(vec_rhs3);
+        vec_rhs.template at<Index(0)>().template at<Index(0)>().convert(vec_rhs1);
+        vec_rhs.template at<Index(0)>().template at<Index(1)>().convert(vec_rhs2);
+        vec_rhs.template at<Index(1)>().convert(vec_rhs3);
       }
     }; // MetaVectorTestBase
   } // namespace LAFEM

@@ -55,8 +55,8 @@ public:
 
     // create a power-filer
     PowerFilter2 power_filter;
-    power_filter.template at<Index(0)>() = unit_filter.clone();
-    power_filter.template at<Index(1)>() = unit_filter.clone();
+    power_filter.template at<Index(0)>().clone(unit_filter);
+    power_filter.template at<Index(1)>().clone(unit_filter);
 
     // return the tuple-filter
     return MetaFilter(std::move(power_filter), std::move(mean_filter));
@@ -84,10 +84,12 @@ public:
 
     // create a power-vector
     PowerVector2 vec;
-    vec.template at<Index(0)>() = ScalarVector(vx);
-    vec.template at<Index(1)>() = ScalarVector(vy);
+    vec.template at<Index(0)>().convert(vx);
+    vec.template at<Index(1)>().convert(vy);
 
-    return MetaVector(std::move(vec), ScalarVector(vz));
+    ScalarVector tvz;
+    tvz.convert(vz);
+    return MetaVector(std::move(vec), std::move(tvz));
   }
 
   static MetaVector gen_vector_def(Index m)
@@ -107,10 +109,12 @@ public:
 
     // create a power-vector
     PowerVector2 vec;
-    vec.template at<Index(0)>() = ScalarVector(vx);
-    vec.template at<Index(1)>() = ScalarVector(vy);
+    vec.template at<Index(0)>().convert(vx);
+    vec.template at<Index(1)>().convert(vy);
 
-    return MetaVector(std::move(vec), ScalarVector(vz));
+    ScalarVector tvz;
+    tvz.convert(vz);
+    return MetaVector(std::move(vec), std::move(tvz));
   }
   virtual void run() const
   {
