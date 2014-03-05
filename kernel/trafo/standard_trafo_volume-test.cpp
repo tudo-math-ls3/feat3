@@ -17,12 +17,13 @@ using namespace FEAST::Geometry::TestAux;
  *
  * \author Jordi Paul
  * */
+template<typename DataType_>
 class StandardTrafoVolumeTest
-: public TestSystem::TaggedTest<Archs::None, Archs::None>
+: public TestSystem::TaggedTest<Archs::None, DataType_>
 {
   public:
     StandardTrafoVolumeTest() :
-      TestSystem::TaggedTest<Archs::None, Archs::None>("standard_trafo_volume_test")
+      TestSystem::TaggedTest<Archs::None, DataType_>("standard_trafo_volume_test")
   {
   }
 
@@ -45,13 +46,14 @@ class StandardTrafoVolumeTest
       Geometry::ReferenceCellFactory<ShapeType> factory;
 
       MeshType mesh(factory);
-      static const CoordType vtx[2*1] = { 1., sqrt(2.)};
+      static const CoordType vtx[2*1] = { CoordType(1.), Math::sqrt(CoordType(2.))};
       copy_vtx((&mesh)->get_vertex_set(), vtx);
 
       TrafoType trafo(mesh);
 
-      CoordType vol = trafo.compute_vol<ShapeType>(Index(0));
-      TEST_CHECK_EQUAL(vol, sqrt(2.)-1.);
+      DataType_ vol = trafo.compute_vol<ShapeType,DataType_>(Index(0));
+      DataType_ eps = Math::eps<CoordType>();
+      TEST_CHECK_EQUAL_WITHIN_EPS(vol, Math::sqrt(DataType_(2.)) - DataType_(1.),eps);
 
     }
 
@@ -65,15 +67,17 @@ class StandardTrafoVolumeTest
       Geometry::ReferenceCellFactory<ShapeType> factory;
 
       MeshType mesh(factory);
-      static const CoordType vtx[2*1] = { 1., sqrt(2.)};
+      static const CoordType vtx[2*1] = { CoordType(1.), Math::sqrt(CoordType(2.))};
       copy_vtx((&mesh)->get_vertex_set(), vtx);
 
       TrafoType trafo(mesh);
 
-      CoordType vol = trafo.compute_vol<ShapeType>(Index(0));
-      TEST_CHECK_EQUAL(vol, sqrt(2.)-1.);
+      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      DataType_ eps = Math::eps<DataType_>();
+      TEST_CHECK_EQUAL_WITHIN_EPS(vol, Math::sqrt(DataType_(2.)) - DataType_(1.),eps);
 
     }
+
     void test_2d_simplex() const
     {
       typedef Shape::Simplex<2> ShapeType;
@@ -85,21 +89,24 @@ class StandardTrafoVolumeTest
 
       MeshType mesh(factory);
       // Sufficiently wild simplex
-      static const CoordType vtx[3*2] = { -1., -1., 1., 0.5, -0.5, 0.75};
+      static const CoordType vtx[3*2] =
+      { -CoordType(1.), -CoordType(1.),
+        CoordType(1.), CoordType(0.5),
+        -CoordType(0.5), CoordType(0.75)};
       copy_vtx((&mesh)->get_vertex_set(), vtx);
 
       TrafoType trafo(mesh);
 
       // Everything checked agains has been computed by hand
-      CoordType vol = trafo.compute_vol<ShapeType>(Index(0));
-      TEST_CHECK_EQUAL(vol, 11./8.);
+      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      TEST_CHECK_EQUAL(vol, DataType_(11.)/DataType_(8.));
       // Check volume of sub simplices
       vol = trafo.compute_vol<Shape::Simplex<1>>(Index(0));
-      TEST_CHECK_EQUAL(vol, sqrt(37./16.));
+      TEST_CHECK_EQUAL(vol, Math::sqrt(DataType_(37.)/DataType_(16.)));
       vol = trafo.compute_vol<Shape::Simplex<1>>(Index(1));
-      TEST_CHECK_EQUAL(vol, sqrt(53./16.));
+      TEST_CHECK_EQUAL(vol, Math::sqrt(DataType_(53.)/DataType_(16.)));
       vol = trafo.compute_vol<Shape::Simplex<1>>(Index(2));
-      TEST_CHECK_EQUAL(vol, 5./2.);
+      TEST_CHECK_EQUAL(vol, DataType_(5.)/DataType_(2.));
 
     }
 
@@ -124,11 +131,14 @@ class StandardTrafoVolumeTest
       TrafoType trafo(mesh);
 
       // This is just sqrt(bloody machine precision) because the computations contain a sqrt() in the end
-      CoordType eps = CoordType(1.e-7);
+      DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
       // Everything checked against has been computed by hand
-      CoordType vol = trafo.compute_vol<ShapeType>(Index(0));
-      TEST_CHECK_EQUAL_WITHIN_EPS(vol, CoordType(17025./1546.), eps);
-      static const CoordType l[4] = {10735./2713., 10788./3017., 22749./5657., 26405./9507.};
+      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      TEST_CHECK_EQUAL_WITHIN_EPS(vol, DataType_(17025./1546.), eps);
+
+      static const DataType_ l[4] = {
+        DataType_(10735./2713.), DataType_(10788./3017.),
+        DataType_(22749./5657.), DataType_(26405./9507.)};
 
       // Check volume of sub elements
       for(Index i(0); i < 4; ++i)
@@ -153,26 +163,29 @@ class StandardTrafoVolumeTest
        * by hand, so this is just a parallel piped
        */
       static const CoordType vtx[8*3] =
-      { -2., -2., -2.,
-        2., -2., -2.,
-        -2., 2., -2.,
-        2., 2., -2.,
-        -1., -2., 2.,
-        3., -2., 2.,
-        -1., 2., 2.,
-        3., 2., 2. };
+      { -CoordType(2.), -CoordType(2.), -CoordType(2.),
+        CoordType(2.), -CoordType(2.), -CoordType(2.),
+        -CoordType(2.), CoordType(2.), -CoordType(2.),
+        CoordType(2.), CoordType(2.), -CoordType(2.),
+        -CoordType(1.), -CoordType(2.), CoordType(2.),
+        CoordType(3.), -CoordType(2.), CoordType(2.),
+        -CoordType(1.), CoordType(2.), CoordType(2.),
+        CoordType(3.), CoordType(2.), CoordType(2.) };
       copy_vtx((&mesh)->get_vertex_set(), vtx);
 
       TrafoType trafo(mesh);
 
       // This is just sqrt(bloody machine precision) because the computations contain a sqrt() in the end
-      CoordType eps = CoordType(1.e-7);
+      DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.5));
       // Everything checked against has been computed by hand
-      CoordType vol = trafo.compute_vol<ShapeType>(Index(0));
-      TEST_CHECK_EQUAL_WITHIN_EPS(vol, CoordType(64.), eps);
+      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      TEST_CHECK_EQUAL_WITHIN_EPS(vol, DataType_(64.), eps);
 
       // Check the 2d volume of the faces
-      static const CoordType f[6] = {16., 16., 16., 16., 4.*Math::sqrt(17.), 4.*Math::sqrt(17.)};
+      static const DataType_ f[6] =
+      { DataType_(16.), DataType_(16.),
+        DataType_(16.), DataType_(16.),
+        DataType_(4.)*Math::sqrt(DataType_(17.)), DataType_(4.)*Math::sqrt(DataType_(17.))};
 
       for(Index i(0); i < 6; ++i)
       {
@@ -181,10 +194,10 @@ class StandardTrafoVolumeTest
       }
 
       // Check the 1d volume of the edges
-      static const CoordType l[12] = {
-        4., 4., 4., 4.,
-        4., 4., 4., 4.,
-        Math::sqrt(17.), Math::sqrt(17.), Math::sqrt(17.), Math::sqrt(17.)};
+      static const DataType_ l[12] = {
+        DataType_(4.), DataType_(4.), DataType_(4.), DataType_(4.),
+        DataType_(4.), DataType_(4.), DataType_(4.), DataType_(4.),
+        Math::sqrt(DataType_(17.)), Math::sqrt(DataType_(17.)), Math::sqrt(DataType_(17.)), Math::sqrt(DataType_(17.))};
 
       for(Index i(0); i < 12; ++i)
       {
@@ -208,19 +221,22 @@ class StandardTrafoVolumeTest
          which does not alter the volume of 2*1/d! = 1/3
          */
       static const CoordType vtx[4*3] =
-      { 0., 0., 0.,
-        1., 0., 0.,
-        0., 1., 0.,
-        0., 0.5, 2., };
+      { CoordType(0.), CoordType(0.), CoordType(0.),
+        CoordType(1.), CoordType(0.), CoordType(0.),
+        CoordType(0.), CoordType(1.), CoordType(0.),
+        CoordType(0.), CoordType(0.5), CoordType(2.), };
       copy_vtx((&mesh)->get_vertex_set(), vtx);
 
       TrafoType trafo(mesh);
 
-      CoordType vol = trafo.compute_vol<ShapeType>(Index(0));
-      TEST_CHECK_EQUAL(vol, 1./3.);
+      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      TEST_CHECK_EQUAL(vol, DataType_(1.)/DataType_(3.));
 
       /* Edge lengths computed by hand */
-      static const CoordType l[6] = {1., 1., sqrt(17./4.), sqrt(2), sqrt(21./4.), sqrt(17./4.)};
+      static const DataType_ l[6] =
+      {DataType_(1.), DataType_(1.),
+        Math::sqrt(DataType_(17.)/DataType_(4.)), Math::sqrt(DataType_(2.)),
+        Math::sqrt(DataType_(21.)/DataType_(4.)), Math::sqrt(DataType_(17.)/DataType_(4.))};
       for(Index i=0; i<6; i++)
       {
         vol = trafo.compute_vol<Shape::Simplex<1>>(Index(i));
@@ -229,25 +245,28 @@ class StandardTrafoVolumeTest
 
       /* With the edgelengths, check the volume of the sub simplices via Heron's formula */
       // s will be half the circumference of a sub simplex
-      CoordType s = 0.;
+      DataType_ s = 0.;
 
-      // Bloody machine precision
-      CoordType eps = 1.e-14;
+      // Machine precision
+      DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.5));
       // Face 0 consists of edges 3, 4, 5
-      s = 0.5*(l[3] + l[4] + l[5]);
+      s = DataType_(0.5)*(l[3] + l[4] + l[5]);
       vol = trafo.compute_vol<Shape::Simplex<2>>(Index(0));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[3]) * (s - l[4]) * (s - l[5]) ), eps);
       // Face 1 consists of edges 1, 2, 5
-      s = 0.5*(l[1] + l[2] + l[5]);
+      s = DataType_(0.5)*(l[1] + l[2] + l[5]);
       vol = trafo.compute_vol<Shape::Simplex<2>>(Index(1));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[1]) * (s - l[2]) * (s - l[5]) ), eps);
       // Face 2 consists of edges 0, 2, 4
-      s = 0.5*(l[0] + l[2] + l[4]);
+      s = DataType_(0.5)*(l[0] + l[2] + l[4]);
       vol = trafo.compute_vol<Shape::Simplex<2>>(Index(2));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[0]) * (s - l[2]) * (s - l[4]) ), eps);
       // Face 3 consists of edges 0, 1, 3
-      s = 0.5*(l[0] + l[1] + l[3]);
+      s = DataType_(0.5)*(l[0] + l[1] + l[3]);
       vol = trafo.compute_vol<Shape::Simplex<2>>(Index(3));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[0]) * (s - l[1]) * (s - l[3]) ), eps);
     }
-} standard_trafo_volume_test;
+};
+
+StandardTrafoVolumeTest<float> standard_trafo_volume_test_float;
+StandardTrafoVolumeTest<double> standard_trafo_volume_test_double;

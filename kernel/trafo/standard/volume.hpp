@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/util/math.hpp>
+#include <kernel/util/meta_math.hpp>
 
 namespace FEAST
 {
@@ -69,7 +70,7 @@ namespace FEAST
               DataType_ v = DataType_(0.);
               for(Index d = 0; d < TrafoType_::MeshType::world_dim; d++)
               {
-                v += Math::sqr(vtx[idx(cell,1)][d] - vtx[idx(cell,0)][d]);
+                v += Math::sqr(DataType_(vtx[idx(cell,1)][d]) - DataType_(vtx[idx(cell,0)][d]));
               }
               return Math::sqrt(v);
             }
@@ -163,12 +164,12 @@ namespace FEAST
               {
                 for(Index j = 0; j < shape_dim_; j++)
                 {
-                  A(i,j) = vtx[idx(cell,j+1)][i] - vtx[idx(cell,0)][i];
+                  A(i,j) = DataType_(vtx[idx(cell,j+1)][i]) - DataType_(vtx[idx(cell,0)][i]);
                 }
               }
 
               // Never forget to scale with the volume of the standard simplex.
-              return A.vol()/DataType_(Math::factorial(shape_dim_));
+              return A.vol()/DataType_(MetaMath::Factorial<shape_dim_>::value);
             }
         };
 
