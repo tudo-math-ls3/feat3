@@ -174,7 +174,8 @@ namespace FEAST
     template<Index _i,
       typename Arch_,
       typename DT_,
-      template<typename, typename> class ContType_>
+      template<typename, typename, typename> class ContType_,
+      typename IT_ = Index>
     class DenseDataWrapper
     {
       public:
@@ -201,12 +202,12 @@ namespace FEAST
           return iterator(_data.elements() + _num_non_zeros);
         }
 
-        Index size() const
+        IT_ size() const
         {
           return _num_non_zeros;
         }
 
-        Index capacity() const
+        IT_ capacity() const
         {
           return _size - _num_non_zeros;
         }
@@ -217,25 +218,25 @@ namespace FEAST
           ++_num_non_zeros;
         }
 
-        const DT_ at(Index i) const
+        const DT_ at(IT_ i) const
         {
           //todo in non-zero range check
           return _data(i);
         }
 
-        DT_ at(Index i)
+        DT_ at(IT_ i)
         {
           //todo in non-zero range check
           return _data(i);
         }
 
-        DT_ operator[](Index i) const
+        DT_ operator[](IT_ i) const
         {
           //todo in non-zero range check
           return _data(i);
         }
 
-        DT_ operator[](Index i)
+        DT_ operator[](IT_ i)
         {
           //todo in non-zero range check
           return _data(i);
@@ -273,9 +274,9 @@ namespace FEAST
         }
 
       private:
-        Index _size;
-        Index _num_non_zeros;
-        ContType_<Arch_, DT_> _data;
+        IT_ _size;
+        IT_ _num_non_zeros;
+        ContType_<Arch_, DT_, IT_> _data;
     };
   }
 }

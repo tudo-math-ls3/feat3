@@ -53,19 +53,20 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
     struct SolverDataBase
     {
       public:
         ///type exports
-        typedef VectorType_<MemTag_, DataType_> vector_type_;
-        typedef MatrixType_<MemTag_, DataType_> matrix_type_;
-        typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
-        typedef StorageType_<MatrixType_<MemTag_, DataType_>, std::allocator<MatrixType_<MemTag_, DataType_> > > matrix_storage_type_;
+        typedef VectorType_<MemTag_, DataType_, IT_> vector_type_;
+        typedef MatrixType_<MemTag_, DataType_, IT_> matrix_type_;
+        typedef StorageType_<VectorType_<MemTag_, DataType_, IT_>, std::allocator<VectorType_<MemTag_, DataType_, IT_> > > vector_storage_type_;
+        typedef StorageType_<MatrixType_<MemTag_, DataType_, IT_>, std::allocator<MatrixType_<MemTag_, DataType_, IT_> > > matrix_storage_type_;
         typedef StorageType_<DataType_, std::allocator<DataType_> > scalar_storage_type_;
-        typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
+        typedef StorageType_<IT_, std::allocator<IT_> > index_storage_type_;
 
         virtual const std::string type_name() = 0;
 
@@ -179,22 +180,22 @@ namespace FEAST
           return _stored_eps;
         }
 
-        virtual Index& max_iters()
+        virtual IT_& max_iters()
         {
           return _stored_max_iters;
         }
 
-        virtual const Index& max_iters() const
+        virtual const IT_& max_iters() const
         {
           return _stored_max_iters;
         }
 
-        virtual Index& used_iters()
+        virtual IT_& used_iters()
         {
           return _stored_used_iters;
         }
 
-        virtual const Index& used_iters() const
+        virtual const IT_& used_iters() const
         {
           return _stored_used_iters;
         }
@@ -247,16 +248,17 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector>
-    struct SolverData : public SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>
+             template<typename, typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
+    struct SolverData : public SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>
     {
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::scalar_storage_type_ scalar_storage_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::index_storage_type_ index_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::scalar_storage_type_ scalar_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::index_storage_type_ index_storage_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -268,9 +270,9 @@ namespace FEAST
       SolverData(matrix_type_& A,
                  vector_type_& x,
                  vector_type_& b,
-                 Index num_temp_vectors = 0,
-                 Index num_temp_scalars = 0,
-                 Index num_temp_indices = 0)
+                 IT_ num_temp_vectors = 0,
+                 IT_ num_temp_scalars = 0,
+                 IT_ num_temp_indices = 0)
       {
         this->_stored_sys = A;
         this->_stored_rhs = b;
@@ -281,12 +283,12 @@ namespace FEAST
           this->_stored_temp.push_back(vector_type_(x.size(), DataType_(0)));
 
         this->_stored_scalars = scalar_storage_type_(num_temp_scalars, DataType_(0));
-        this->_stored_indices = index_storage_type_(num_temp_indices, Index(0));
+        this->_stored_indices = index_storage_type_(num_temp_indices, IT_(0));
         this->_stored_norm_0 = DataType_(1000);
         this->_stored_norm = DataType_(1000);
         this->_stored_eps = DataType_(1e-8);
-        this->_stored_max_iters = Index(1000);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(1000);
+        this->_stored_used_iters = IT_(0);
       }
 
       ///copy CTOR
@@ -303,8 +305,8 @@ namespace FEAST
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(0);
+        this->_stored_used_iters = IT_(0);
       }
 
       ///assignment operator overload
@@ -324,8 +326,8 @@ namespace FEAST
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(0);
+        this->_stored_used_iters = IT_(0);
 
         return *this;
       }
@@ -374,11 +376,12 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class PreconContType_ = SparseMatrixCSR>
+             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
+             typename IT_ = Index>
     struct PreconditionerDataContainer
     {
       public:
-        typedef PreconContType_<MemTag_, DataType_> precon_type_;
+        typedef PreconContType_<MemTag_, DataType_, IT_> precon_type_;
 
         virtual precon_type_& precon()
         {
@@ -435,19 +438,20 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class PreconContType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
     struct PreconditionedSolverData :
-      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
-      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>,
+      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>
     {
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
 
-      typedef PreconContType_<MemTag_, DataType_> precon_type_;
+      typedef PreconContType_<MemTag_, DataType_, IT_> precon_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -460,9 +464,9 @@ namespace FEAST
                                precon_type_& P,
                                vector_type_& x,
                                vector_type_& b,
-                               Index num_temp_vectors = 0,
-                               Index num_temp_scalars = 0,
-                               Index num_temp_indices = 0) :
+                               IT_ num_temp_vectors = 0,
+                               IT_ num_temp_scalars = 0,
+                               IT_ num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P)
       {
@@ -492,8 +496,8 @@ namespace FEAST
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(0);
+        this->_stored_used_iters = IT_(0);
 
         this->_stored_precon = other._stored_precon;
 
@@ -520,17 +524,18 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
     struct SynchronizationDataContainer
     {
       public:
-        typedef VectorType_<MemTag_, DataType_> vector_type_;
+        typedef VectorType_<MemTag_, DataType_, IT_> vector_type_;
         typedef VectorMirrorType_<MemTag_, DataType_> vector_mirror_type_;
-        typedef StorageType_<VectorType_<MemTag_, DataType_>, std::allocator<VectorType_<MemTag_, DataType_> > > vector_storage_type_;
+        typedef StorageType_<VectorType_<MemTag_, DataType_, IT_>, std::allocator<VectorType_<MemTag_, DataType_, IT_> > > vector_storage_type_;
         typedef StorageType_<VectorMirrorType_<MemTag_, DataType_>, std::allocator<VectorMirrorType_<MemTag_, DataType_> > > vector_mirror_storage_type_;
-        typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
+        typedef StorageType_<IT_, std::allocator<IT_> > index_storage_type_;
 
         virtual vector_mirror_storage_type_& vector_mirrors()
         {
@@ -636,19 +641,20 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
     struct SynchronisedSolverData :
-      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
-      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>,
+      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_, IT_>
     {
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
       typedef StorageType_<VectorMirrorType_<MemTag_, DataType_>, std::allocator<VectorMirrorType_<MemTag_, DataType_> > > vector_mirror_storage_type_;
-      typedef StorageType_<Index, std::allocator<Index> > index_storage_type_;
+      typedef StorageType_<IT_, std::allocator<IT_> > index_storage_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -660,9 +666,9 @@ namespace FEAST
       SynchronisedSolverData(matrix_type_& A,
                              vector_type_& x,
                              vector_type_& b,
-                             Index num_temp_vectors = 0,
-                             Index num_temp_scalars = 0,
-                             Index num_temp_indices = 0) :
+                             IT_ num_temp_vectors = 0,
+                             IT_ num_temp_scalars = 0,
+                             IT_ num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
@@ -692,8 +698,8 @@ namespace FEAST
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(0);
+        this->_stored_used_iters = IT_(0);
 
         this->_stored_vector_mirrors = other._stored_vector_mirrors;
         this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
@@ -735,19 +741,20 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class PreconContType_ = SparseMatrixCSR,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
     struct SynchronisedPreconditionedSolverData :
-      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
-      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>,
-      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>,
+      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>,
+      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_, IT_>
     {
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -757,12 +764,12 @@ namespace FEAST
 
       ///CTOR from system data
       SynchronisedPreconditionedSolverData(matrix_type_& A,
-                             PreconContType_<MemTag_, DataType_>& P,
+                             PreconContType_<MemTag_, DataType_, IT_>& P,
                              vector_type_& x,
                              vector_type_& b,
-                             Index num_temp_vectors = 0,
-                             Index num_temp_scalars = 0,
-                             Index num_temp_indices = 0) :
+                             IT_ num_temp_vectors = 0,
+                             IT_ num_temp_scalars = 0,
+                             IT_ num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
@@ -795,8 +802,8 @@ namespace FEAST
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(0);
+        this->_stored_used_iters = IT_(0);
 
         this->_stored_precon = other._stored_precon;
 
@@ -897,21 +904,22 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class VectorType_ = DenseVector,
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
-             template<typename, typename> class PreconContType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
              template<typename, typename> class FilterType_ = UnitFilter,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
     struct SynchronisedPreconditionedFilteredSolverData :
-      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>,
+      public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>,
       public FilterDataContainer<DataType_, MemTag_, FilterType_>,
-      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>,
-      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>
+      public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>,
+      public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_, IT_>
     {
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -921,13 +929,13 @@ namespace FEAST
 
       ///CTOR from system data
       SynchronisedPreconditionedFilteredSolverData(matrix_type_& A,
-                                                   PreconContType_<MemTag_, DataType_>& P,
+                                                   PreconContType_<MemTag_, DataType_, IT_>& P,
                                                    vector_type_& x,
                                                    vector_type_& b,
                                                    FilterType_<MemTag_, DataType_>& filter,
-                                                   Index num_temp_vectors = 0,
-                                                   Index num_temp_scalars = 0,
-                                                   Index num_temp_indices = 0) :
+                                                   IT_ num_temp_vectors = 0,
+                                                   IT_ num_temp_scalars = 0,
+                                                   IT_ num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         FilterDataContainer<DataType_, MemTag_, FilterType_>(filter.clone()),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
@@ -937,10 +945,10 @@ namespace FEAST
 
       ///copy CTOR
       SynchronisedPreconditionedFilteredSolverData(const SynchronisedPreconditionedFilteredSolverData& other) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>(other),
         FilterDataContainer<DataType_, MemTag_, FilterType_>(other),
-        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(other),
-        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>(other)
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>(other),
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_, IT_>(other)
       {
       }
 
@@ -961,8 +969,8 @@ namespace FEAST
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(0);
+        this->_stored_used_iters = IT_(0);
 
         this->_stored_precon = other._stored_precon;
 
@@ -980,18 +988,19 @@ namespace FEAST
 
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class VectorType_ = DenseVector,
-             template<typename, typename> class MatrixType_ = SparseMatrixCSR,
+             template<typename, typename, typename> class VectorType_ = DenseVector,
+             template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
              typename TransferContType_ = SparseMatrixCSR<MemTag_, DataType_>,
              typename PreconContType_ = SparseMatrixCSR<MemTag_, DataType_>,
-             template<typename, typename> class StorageType_ = std::vector>
+             template<typename, typename> class StorageType_ = std::vector,
+             typename IT_ = Index>
     struct MultiLevelSolverData : public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>
     {
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::matrix_type_ matrix_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_type_ vector_type_;
-      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>::vector_storage_type_ vector_storage_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::matrix_type_ matrix_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_type_ vector_type_;
+      typedef typename SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>::vector_storage_type_ vector_storage_type_;
 
-      typedef StorageType_<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_> >, std::allocator<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_> > > > leveldata_storage_type_;
+      typedef StorageType_<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_> >, std::allocator<std::shared_ptr<SolverDataBase<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_> > > > leveldata_storage_type_;
 
       ///fulfill pure virtual
       virtual const std::string type_name()
@@ -1003,9 +1012,9 @@ namespace FEAST
       MultiLevelSolverData(matrix_type_& A,
                            vector_type_& x,
                            vector_type_& b,
-                           Index num_temp_vectors = 0,
-                           Index num_temp_scalars = 0,
-                           Index num_temp_indices = 0) :
+                           IT_ num_temp_vectors = 0,
+                           IT_ num_temp_scalars = 0,
+                           IT_ num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
         stored_level_data()
       {
@@ -1036,8 +1045,8 @@ namespace FEAST
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
-        this->_stored_max_iters = Index(0);
-        this->_stored_used_iters = Index(0);
+        this->_stored_max_iters = IT_(0);
+        this->_stored_used_iters = IT_(0);
 
         this->stored_level_data = other._stored_level_data;
 

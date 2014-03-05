@@ -16,7 +16,7 @@ using namespace FEAST::TestSystem;
 template<typename Tag_,
   typename DataType_,
   typename Algo_,
-  template<typename, typename> class ContType_>
+  template<typename, typename, typename> class ContType_>
 class DenseDataWrapperTest:
   public TaggedTest<Tag_, DataType_, Algo_>
 {
