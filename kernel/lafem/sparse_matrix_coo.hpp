@@ -654,35 +654,20 @@ namespace FEAST
           return *this;
         }
 
-        /** \brief Assignment operation
-         *
-         * Assigns contents of another sparse matrix coo
-         *
-         * \param[in] other The source container.
-         *
-         * \note This creates a deep copy in any case!
-         *
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        void assign(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other)
-        {
-          CONTEXT("When assigning SparseMatrixCOO");
-          this->clone(other);
-        }
-
-
         /**
          * \brief Convertion method
          *
+         * Use source matrix content as content of current matrix
+         *
          * \param[in] other The source Matrix.
          *
-         * Use source matrix content as content of current matrix
+         * \note This creates a deep copy in any case!
          */
         template <typename Mem2_, typename DT2_, typename IT2_>
         void convert(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other)
         {
           CONTEXT("When converting SparseMatrixCOO");
-          this->assign(other);
+          this->clone(other);
         }
 
         /**

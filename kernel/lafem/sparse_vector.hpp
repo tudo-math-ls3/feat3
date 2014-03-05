@@ -180,9 +180,10 @@ namespace FEAST
           return *this;
         }
 
-        /** \brief Assignment operation
+        /**
+         * \brief Convertion method
          *
-         * Assigns contents of another sparse vector
+         * Use source vector content as content of current vector
          *
          * \param[in] other The source container.
          *
