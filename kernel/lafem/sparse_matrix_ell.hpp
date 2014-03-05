@@ -715,7 +715,7 @@ namespace FEAST
           this->_scalar_index.at(4) = 0;
           for (Index i(0) ; i < this->_scalar_index.at(1) ; ++i)
           {
-            tArl[i] = other.row_ptr()[i + 1] - other.row_ptr()[i];
+            tArl[i] = cother.row_ptr()[i + 1] - cother.row_ptr()[i];
             if (tArl[i] > this->_scalar_index.at(4))
               this->_scalar_index.at(4) = tArl[i];
           }
@@ -733,11 +733,11 @@ namespace FEAST
             Index target(0);
             for (Index i(0) ; i < tArl[row] ; ++i)
             {
-              const Index row_start(other.row_ptr()[row]);
-              //if(other.val()[row_start + i] != DT_(0))
+              const Index row_start(cother.row_ptr()[row]);
+              //if(cother.val()[row_start + i] != DT_(0))
               {
-                tAj[row + target * this->_scalar_index.at(3)] = (other.col_ind())[row_start + i];
-                tAx[row + target * this->_scalar_index.at(3)] = (other.val())[row_start + i];
+                tAj[row + target * this->_scalar_index.at(3)] = (cother.col_ind())[row_start + i];
+                tAx[row + target * this->_scalar_index.at(3)] = (cother.val())[row_start + i];
                 target++;
               }
             }

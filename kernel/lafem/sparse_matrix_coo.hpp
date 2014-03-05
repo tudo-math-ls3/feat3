@@ -1186,21 +1186,32 @@ namespace FEAST
         }
 
         /**
-         * \brief Free all allocated arrays, effectivly setting matrix to zero.
+         * \brief Reset all elements of the container to a given value or zero if missing.
+         *
+         * \param[in] value The value to be set (defaults to 0)
+         *
          */
-        void clear() override
+        void format(DT_ value = DT_(0))
         {
           CONTEXT("When clearing SparseMatrixCOO");
-          MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(0));
-          MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(0));
-          MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(1));
 
-          this->_elements.clear();
-          this->_indices.clear();
-          this->_elements_size.clear();
-          this->_indices_size.clear();
-          this->_scalar_index.at(3) = 0;
-          this->_scalar_index.at(4) = 0;
+          if (value == DT_(0))
+          {
+            MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(0));
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(0));
+            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(1));
+
+            this->_elements.clear();
+            this->_indices.clear();
+            this->_elements_size.clear();
+            this->_indices_size.clear();
+            this->_scalar_index.at(3) = 0;
+            this->_scalar_index.at(4) = 0;
+          }
+          else
+          {
+            ((Container<Mem_, DT_, IT_> &)*this).format(value);
+          }
         }
 
         /**

@@ -55,7 +55,8 @@ public:
     }
 
     {
-      SparseMatrixCOO<Mem::Main, DT_> coo_m1(a);
+      SparseMatrixCOO<Mem::Main, DT_> coo_m1;
+      coo_m1.convert(a);
       SparseMatrixELL<Mem::Main, DT_> ell_m1(coo_m1);
       SparseMatrixCOO<Mem::Main, DT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
@@ -132,7 +133,8 @@ public:
     }
 
     {
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1(a);
+      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1;
+      coo_m1.convert(a);
       SparseMatrixELL<Mem::CUDA, DT_> ell_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);
@@ -162,7 +164,8 @@ public:
     }
 
     {
-      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1(a);
+      SparseMatrixCOO<Mem::CUDA, DT_> coo_m1;
+      coo_m1.convert(a);
       SparseMatrixELL<Mem::Main, DT_> ell_m1(coo_m1);
       SparseMatrixCOO<Mem::CUDA, DT_> coo_m2(ell_m1);
       TEST_CHECK_EQUAL(coo_m2, coo_m1);

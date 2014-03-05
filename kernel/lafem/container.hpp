@@ -345,7 +345,7 @@ namespace FEAST
          * \param[in] value The value to be set (defaults to 0)
          *
          */
-        void format(DT_ value = 0)
+        void format(DT_ value = DT_(0))
         {
           CONTEXT("When formating Container");
 
