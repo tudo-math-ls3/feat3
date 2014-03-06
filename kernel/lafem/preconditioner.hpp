@@ -1691,7 +1691,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "SOR_Preconditioner";
       }
@@ -1797,7 +1797,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "SOR_Preconditioner";
       }
@@ -1906,7 +1906,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "SOR_Preconditioner";
       }
@@ -2039,7 +2039,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "SSOR_Preconditioner";
       }
@@ -2179,7 +2179,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "SSOR_Preconditioner";
       }
@@ -2326,7 +2326,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "SSOR_Preconditioner";
       }
@@ -3220,11 +3220,6 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        if (m < 0)
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "m must be a positive integer!");
-        }
-
         const Index n(_A.columns());
 
         _m_columns = new std::list<PAIR_>[n];
@@ -3297,7 +3292,7 @@ namespace FEAST
        *
        * \returns A string describing the container.
        */
-      static String type_name()
+      static String name()
       {
         return "SPAI_Preconditioner";
       }

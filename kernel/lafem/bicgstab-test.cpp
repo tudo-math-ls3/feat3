@@ -102,6 +102,7 @@ public:
                          VT_> precond(sys);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
+    /// \todo test transpose=true in spai
     else if (typeid(PT_) == typeid(SPAIPreconditioner<Algo_, MT_, VT_>))
     {
       if (_opt%2 == 0)
