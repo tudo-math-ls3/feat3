@@ -2521,6 +2521,53 @@ namespace FEAST
           _M = tM;
         } // function create_m_transpose
 
+        void create_m()
+        {
+          const Index n(_A.rows());
+
+          DenseVector<Mem_, Index> trow_ptr(n + 1, Index(0));
+          Index * ptrow_ptr(trow_ptr.elements());
+
+          ptrow_ptr[0] = 0;
+          ++ptrow_ptr;
+
+          Index used_elements(0);
+          for (Index i(0); i < n; ++i)
+          {
+            used_elements += Index(_m_columns[i].size());
+            for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
+            {
+              ++ptrow_ptr[it_J->second + 1];
+            }
+          }
+          ptrow_ptr[0] = 0;
+
+          for (Index i(1); i < n - 1; ++i)
+          {
+            ptrow_ptr[i + 1] += ptrow_ptr[i];
+          }
+
+          DenseVector<Mem_, Index> tcol_ind(used_elements);
+          DenseVector<Mem_, DT_> tval(used_elements);
+          Index * ptcol_ind(tcol_ind.elements());
+          DT_ * ptval(tval.elements());
+
+          for (Index i(0); i < n; ++i)
+          {
+            for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
+            {
+              const Index l(it_J->second);
+              const Index j(ptrow_ptr[l]);
+              ptval[j] = it_J->first;
+              ptcol_ind[j] = i;
+              ++ptrow_ptr[l];
+            }
+          }
+
+          SparseMatrixCSR<Mem_, DT_> tM(n, n, tcol_ind, tval, trow_ptr);
+          _M = tM;
+        } // function create_m
+
         void create_m_without_new_entries ()
         {
           const Index n(_A.rows());
@@ -2711,6 +2758,53 @@ namespace FEAST
           MT_ tM(n, n, row_ind, col_ind, val);
           _M = tM;
         } // function create_m_transpose
+
+        void create_m()
+        {
+          const Index n(_A.rows());
+
+          DenseVector<Mem_, Index> trow_ptr(n + 1, Index(0));
+          Index * ptrow_ptr(trow_ptr.elements());
+
+          Index used_elements(0);
+          for (Index i(0); i < n; ++i)
+          {
+            used_elements += Index(_m_columns[i].size());
+            for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
+            {
+              ++ptrow_ptr[it_J->second + 1];
+            }
+          }
+          ptrow_ptr[0] = 0;
+
+          for (Index i(1); i < n - 1; ++i)
+          {
+            ptrow_ptr[i + 1] += ptrow_ptr[i];
+          }
+
+          DenseVector<Mem_, Index> tcol_ind(used_elements);
+          DenseVector<Mem_, Index> trow_ind(used_elements);
+          DenseVector<Mem_, DT_> tval(used_elements);
+          Index * ptcol_ind(tcol_ind.elements());
+          Index * ptrow_ind(trow_ind.elements());
+          DT_ * ptval(tval.elements());
+
+          for (Index i(0); i < n; ++i)
+          {
+            for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
+            {
+              const Index l(it_J->second);
+              const Index j(ptrow_ptr[l]);
+              ptval[j] = it_J->first;
+              ptcol_ind[j] = i;
+              ptrow_ind[j] = it_J->second;
+              ++ptrow_ptr[l];
+            }
+          }
+
+          SparseMatrixCOO<Mem_, DT_> tM(n, n, trow_ind, tcol_ind, tval);
+          _M = tM;
+        } // function create_m
 
         void create_m_without_new_entries ()
         {
@@ -2909,6 +3003,55 @@ namespace FEAST
           _M = tM;
         } // function create_m_transpose
 
+        void create_m()
+        {
+          const Index n(_A.rows());
+          const Index tstride(_A.stride());
+
+          DenseVector<Mem_, Index> trl(n, Index(0));
+          Index * ptrl(trl.elements());
+
+          Index used_elements(0);
+          for (Index i(0); i < n; ++i)
+          {
+            used_elements += Index(_m_columns[i].size());
+            for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
+            {
+              ++ptrl[it_J->second];
+            }
+          }
+
+          Index num_cols_per_row(0);
+          for (Index i(0); i < n; ++i)
+          {
+            if (num_cols_per_row < ptrl[i])
+            {
+              num_cols_per_row = ptrl[i];
+            }
+            ptrl[i] = 0;
+          }
+
+          DenseVector<Mem_, Index> tj(tstride * num_cols_per_row);
+          DenseVector<Mem_, DT_> tx(tstride * num_cols_per_row);
+
+          Index * ptj(tj.elements());
+          DT_ * ptx(tx.elements());
+
+          for (Index i(0); i < n; ++i)
+          {
+            for (auto it_J = _m_columns[i].begin(); it_J != _m_columns[i].end(); ++it_J)
+            {
+              const Index k(it_J->second);
+              ptj[k + ptrl[k] * tstride] = i;
+              ptx[k + ptrl[k] * tstride] = it_J->first;
+              ++ptrl[k];
+            }
+          }
+
+          SparseMatrixELL<Mem_, DT_> tM(n, n, tstride, num_cols_per_row, used_elements, tx, tj, trl);
+          _M = tM;
+        } // function create_m
+
         void create_m_without_new_entries ()
         {
           const Index n(_A.rows());
@@ -3022,6 +3165,7 @@ namespace FEAST
       const Index _max_iter;
       const DT_ _eps_res_comp;
       const DT_ _max_rho;
+      const bool _transpose;
 
     public:
       /// Our algotype
@@ -3051,6 +3195,7 @@ namespace FEAST
        * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
        * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
        * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
+       * param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
        *
        * Creates a SPAI preconditioner to the given matrix and the initial layout defined by a band-matrix with \f$2m + 1\f$ bands
        */
@@ -3060,13 +3205,15 @@ namespace FEAST
                          const DT_ eps_res = 1e-2,
                          const Index fill_in = 10,
                          const DT_ eps_res_comp = 1e-3,
-                         const DT_ max_rho = 1e-3) :
+                         const DT_ max_rho = 1e-3,
+                         const bool transpose = false) :
         Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, m),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),
         _eps_res_comp(eps_res_comp),
-        _max_rho(max_rho)
+        _max_rho(max_rho),
+        _transpose(transpose)
       {
         if (_A.columns() != _A.rows())
         {
@@ -3104,6 +3251,7 @@ namespace FEAST
        * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
        * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
        * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
+       * param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
        *
        * Creates a SPAI preconditioner to the given matrix and given initial layout
        */
@@ -3113,13 +3261,15 @@ namespace FEAST
                          const DT_ eps_res = 1e-2,
                          const Index fill_in = 10,
                          const DT_ eps_res_comp = 1e-3,
-                         const DT_ max_rho = 1e-3) :
+                         const DT_ max_rho = 1e-3,
+                         const bool transpose = false) :
         Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, layout),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),
         _eps_res_comp(eps_res_comp),
-        _max_rho(max_rho)
+        _max_rho(max_rho),
+        _transpose(transpose)
       {
         if (_A.columns() != _A.rows())
         {
@@ -3161,7 +3311,7 @@ namespace FEAST
       virtual void apply(DenseVector<Mem_, DT_> & out,
                          const DenseVector<Mem_, DT_> & in)
       {
-        if (_max_iter > 0)
+        if (_max_iter > 0 && _transpose == true)
         {
           if (in.elements() == out.elements())
           {
@@ -3579,7 +3729,14 @@ namespace FEAST
         // Create matrix M with calculated entries
         if (_max_iter > 0)
         {
-          this->create_m_transpose();
+          if (_transpose == true)
+          {
+            this->create_m_transpose();
+          }
+          else
+          {
+            this->create_m();
+          }
         }
         else
         {

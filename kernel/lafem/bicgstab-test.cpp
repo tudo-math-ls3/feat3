@@ -26,7 +26,7 @@ class BiCGStabTest
                       typename PT_::AlgoType>
 {
 private:
-  const int opt;
+  const int _opt;
 
 public:
   typedef typename PT_::AlgoType   Algo_;
@@ -41,7 +41,7 @@ public:
                                     + " "
                                     + PT_::name()
                                     + " opt = "
-                                    + stringify(opt)), opt(opt)
+                                    + stringify(opt)), _opt(opt)
   {
   }
 
@@ -81,13 +81,13 @@ public:
     else if (typeid(PT_) == typeid(PolynomialPreconditioner<Algo_, MT_, VT_>))
     {
       PolynomialPreconditioner<Algo_, MT_,
-                               VT_> precond(sys, 20, opt == 0);
+                               VT_> precond(sys, 20, _opt == 0);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
     else if (typeid(PT_) == typeid(ILUPreconditioner<Algo_, MT_, VT_>))
     {
       ILUPreconditioner<Algo_, MT_,
-                        VT_> precond(sys, opt);
+                        VT_> precond(sys, _opt);
       BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
     }
     else if (typeid(PT_) == typeid(SORPreconditioner<Algo_, MT_, VT_>))
@@ -104,14 +104,14 @@ public:
     }
     else if (typeid(PT_) == typeid(SPAIPreconditioner<Algo_, MT_, VT_>))
     {
-      if (opt%2 == 0)
+      if (_opt%2 == 0)
       {
-        SPAIPreconditioner<Algo_, MT_, VT_> precond(sys, 2, opt / 2);
+        SPAIPreconditioner<Algo_, MT_, VT_> precond(sys, 2, _opt / 2);
         BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
       }
       else
       {
-        SPAIPreconditioner<Algo_, MT_, VT_> precond(sys, sys.layout(), (opt - 1) / 2);
+        SPAIPreconditioner<Algo_, MT_, VT_> precond(sys, sys.layout(), (_opt - 1) / 2);
         BiCGStab<Algo_>::value(x, sys, b, precond, max_iter, eps);
       }
     }
