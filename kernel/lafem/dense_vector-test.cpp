@@ -40,6 +40,7 @@ public:
   virtual void run() const
   {
     DenseVector<Mem_, DT_> a(10, DT_(7));
+    TEST_CHECK_EQUAL(a.bytes_allocated(), 10 * sizeof(DT_) + sizeof(Index));
     DenseVector<Mem_, DT_> b(10, DT_(5));
     b(7, DT_(42));
     DenseVector<Mem_, DT_> c;

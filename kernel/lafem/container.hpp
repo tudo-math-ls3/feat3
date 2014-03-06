@@ -454,6 +454,32 @@ namespace FEAST
         }
 
         /**
+         * \brief Returns the total amount of bytes allocated.
+         *
+         * \returns The amount of bytes allocated in all arrays
+         */
+        Index bytes_allocated() const
+        {
+          unsigned long bytes(0);
+
+          for (Index i(0) ; i < _elements_size.size() ; ++i)
+          {
+            bytes += _elements_size.at(i) * sizeof(DT_);
+          }
+
+          for (Index i(0) ; i < _indices_size.size() ; ++i)
+          {
+            bytes += _indices_size.at(i) * sizeof(IT_);
+          }
+
+          bytes += _scalar_index.size() * sizeof(IT_);
+          bytes += _scalar_dt.size() * sizeof(DT_);
+
+          return bytes;
+        }
+
+
+        /**
          * \brief Returns a list of all data arrays.
          *
          * \returns A list of all data arrays.
