@@ -180,6 +180,12 @@ namespace FEAST
         return base().columns() + last().columns();
       }
 
+      /// Returns the total number of non-zeros in this matrix.
+      Index used_elements() const
+      {
+        return base().used_elements() + last().used_elements();
+      }
+
       /**
        * \brief Clears this matrix.
        *
@@ -356,6 +362,11 @@ namespace FEAST
       Index columns() const
       {
         return last().columns();
+      }
+
+      Index used_elements() const
+      {
+        return last().used_elements();
       }
 
       void clear(DataType value = DataType(0))

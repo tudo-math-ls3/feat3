@@ -239,6 +239,12 @@ namespace FEAST
         return _matrix_a.columns() + _matrix_b.columns();
       }
 
+      /// Returns the total number of non-zeros in this matrix.
+      Index used_elements() const
+      {
+        return _matrix_a.used_elements() + _matrix_b.used_elements() + _matrix_d.used_elements();
+      }
+
       /**
        * \brief Applies this matrix onto a vector.
        *

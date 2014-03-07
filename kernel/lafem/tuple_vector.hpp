@@ -237,6 +237,36 @@ namespace FEAST
       {
         return Math::sqrt(norm2sqr<Algo_>());
       }
+
+      const typename First_::DataType operator()(Index index) const
+      {
+        CONTEXT("When retrieving TupleVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
+        if (index < first().size())
+        {
+          return first()(index);
+        }
+        else
+        {
+          return rest()(index - first().size());
+        }
+      }
+
+      void operator()(Index index, typename First_::DataType value)
+      {
+        CONTEXT("When retrieving TupleVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
+        if (index < first().size())
+        {
+          first()(index, value);
+        }
+        else
+        {
+          rest()(index - first().size(), value);
+        }
+      }
     }; // class TupleVector<...>
 
     /// \cond internal
@@ -393,6 +423,22 @@ namespace FEAST
       DataType norm2() const
       {
         return first().template norm2<Algo_>();
+      }
+
+      const typename First_::DataType operator()(Index index) const
+      {
+        CONTEXT("When retrieving TupleVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
+        return first()(index);
+      }
+
+      void operator()(Index index, typename First_::DataType value)
+      {
+        CONTEXT("When retrieving TupleVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds tuple vector size " + stringify(size()) + " !");
+        first()(index, value);
       }
     };
     /// \endcond

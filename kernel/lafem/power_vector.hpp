@@ -316,6 +316,51 @@ namespace FEAST
       {
         return Math::sqrt(norm2sqr<Algo_>());
       }
+
+      /**
+       * \brief Retrieve specific PowerVector element.
+       *
+       * \param[in] index The index of the vector element.
+       *
+       * \returns Specific vector element.
+       */
+      const DataType operator()(Index index) const
+      {
+        CONTEXT("When retrieving PowerVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+
+        if (index < base().size())
+        {
+          return base()(index);
+        }
+        else
+        {
+          return last()(index - base().size());
+        }
+      }
+
+      /**
+       * \brief Set specific PowerVector element.
+       *
+       * \param[in] index The index of the vector element.
+       * \param[in] value The value to be set.
+       */
+      void operator()(Index index, DataType value)
+      {
+        CONTEXT("When retrieving PowerVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+
+        if (index < base().size())
+        {
+          base()(index, value);
+        }
+        else
+        {
+          last()(index - base().size(), value);
+        }
+      }
     }; // class PowerVector<...>
 
     /// \cond internal
@@ -484,6 +529,26 @@ namespace FEAST
       DataType norm2() const
       {
         return Math::sqrt(norm2sqr<Algo_>());
+      }
+
+
+
+      const DataType operator()(Index index) const
+      {
+        CONTEXT("When retrieving PowerVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+
+        return last()(index);
+      }
+
+      void operator()(Index index, DataType value)
+      {
+        CONTEXT("When retrieving PowerVector element");
+
+        ASSERT(index < size(), "Error: " + stringify(index) + " exceeds power vector size " + stringify(size()) + " !");
+
+        last()(index, value);
       }
     }; // class PowerVector<...,1>
     /// \cond internal
