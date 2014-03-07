@@ -81,7 +81,7 @@ namespace FEAST
        *
        * Creates a dummy preconditioner
        */
-      NonePreconditioner(const DT_ damping = DT_(0.0)) : _damping(damping)
+      NonePreconditioner(const DT_ damping = DT_(1)) : _damping(damping)
       {
       }
 
@@ -101,9 +101,9 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector, which is applied to the preconditioning
        */
-      virtual void apply(VT_ & out, const VT_ & in)
+      virtual void apply(VT_ & out, const VT_ & in) override
       {
-        if (_damping == DT_(0.0))
+        if (_damping == DT_(1))
         {
           out.copy(in);
         }
@@ -185,7 +185,7 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(VT_ & out, const VT_ & in)
+      virtual void apply(VT_ & out, const VT_ & in) override
       {
         out.template component_product<Algo_>(_jac, in);
       }
@@ -275,7 +275,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -382,7 +382,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -492,7 +492,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -625,7 +625,7 @@ namespace FEAST
        * \param[out] out The preconditioner result.
        * \param[in] in The vector to be preconditioned.
        */
-      virtual void apply(VT_ & out, const VT_ & in)
+      virtual void apply(VT_ & out, const VT_ & in) override
       {
         typedef typename VT_::DataType DT_;
 
@@ -736,7 +736,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const int p) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -753,7 +753,7 @@ namespace FEAST
         }
         else
         {
-          _symbolic_lu_factorisation(p);
+          _symbolic_lu_factorisation(int(p));
           _copy_entries();
         }
 
@@ -828,7 +828,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1003,7 +1003,7 @@ namespace FEAST
               col2 = it2->second;
               l2 = it2->first;
 
-              neues_level = 2*(int) n - l - l2 + 1;
+              neues_level = 2* (int)n - l - l2 + 1;
 
               // if new entries must be created, find the correct position in the list
               if (neues_level <= p)
@@ -1172,7 +1172,7 @@ namespace FEAST
         }
         else
         {
-          _symbolic_lu_factorisation(p);
+          _symbolic_lu_factorisation(int(p));
           _copy_entries();
         }
 
@@ -1248,7 +1248,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1613,7 +1613,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         _precond.apply(out, in);
       }
@@ -1703,7 +1703,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1809,7 +1809,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -1918,7 +1918,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -2051,7 +2051,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -2191,7 +2191,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -2338,7 +2338,7 @@ namespace FEAST
        * \param[in] in The vector to be preconditioned.
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         // copy in-vector to out-vector
         out.copy(in);
@@ -3304,7 +3304,7 @@ namespace FEAST
        * \param[in] in The vector, which is applied to the preconditioning
        */
       virtual void apply(DenseVector<Mem_, DT_> & out,
-                         const DenseVector<Mem_, DT_> & in)
+                         const DenseVector<Mem_, DT_> & in) override
       {
         if (_max_iter > 0 && _transpose == true)
         {
