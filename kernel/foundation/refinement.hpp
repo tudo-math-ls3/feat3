@@ -527,6 +527,8 @@ namespace FEAST
 
               //inject
               origin.get_topologies().at(ipi_face_vertex).at(i) = vf_0; //vertices are already adjacent to face i and  will be removed from all other later => done here
+              //add new vertex adjacence to f_i
+              origin.get_topologies().at(ipi_vertex_face).at(origin.num_polytopes(pl_vertex)-1).push_back(i);
             }
             else if( l == 1)
             {
@@ -932,6 +934,8 @@ namespace FEAST
 
               //inject
               origin.get_topologies().at(ipi_face_vertex).at(i) = vf_0; //vertices are already adjacent to face i and  will be removed from all other later => done here
+              //add new vertex adjacence to f_i
+              origin.get_topologies().at(ipi_vertex_face).at(origin.num_polytopes(pl_vertex)-1).push_back(i);
             }
             else if( l == 1)
             {
@@ -1191,7 +1195,7 @@ namespace FEAST
           vertex_at_polygon = v_way;
 
           //area
-          DataType_ area(0), c_x(0), c_y(0), c_z(0);
+          DataType_ c_x(0), c_y(0), c_z(0);
 
           // TODO general calculation of the center
           for(Index l(0); l < vertex_at_polygon.size()  ; ++l)
