@@ -204,9 +204,9 @@ class RefinementTest2D:
       ExportVTK<BaseMeshType> vtkexporter(basemesh);
       vtkexporter.write("test_mesh.vtk");
 */
-      MeshExporter<VTK, Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
+/*      MeshExporter<VTK, Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_>, OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > > exporter(m_fine, attrs);
       exporter.write("ref_test_2D_result.vtk");
-
+*/
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_face_vertex).size(), 4ul);
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_edge_vertex).size(), 12ul);
       TEST_CHECK_EQUAL(m_fine.get_topologies().at(ipi_vertex_edge).size(), 9ul);
@@ -259,6 +259,66 @@ class RefinementTest2D:
       TEST_CHECK_EQUAL(result_vertices_at_edge_11.size(), 2ul);
       TEST_CHECK(std::find(result_vertices_at_edge_11.begin(), result_vertices_at_edge_11.end(), 7) != result_vertices_at_edge_11.end());
       TEST_CHECK(std::find(result_vertices_at_edge_11.begin(), result_vertices_at_edge_11.end(), 8) != result_vertices_at_edge_11.end());
+
+      IT_ result_vertices_at_face_0(m_fine.get_adjacent_polytopes(pl_face, pl_vertex, 0));
+      TEST_CHECK_EQUAL(result_vertices_at_face_0.size(), 4ul);
+      TEST_CHECK(std::find(result_vertices_at_face_0.begin(), result_vertices_at_face_0.end(), 0) != result_vertices_at_face_0.end());
+      TEST_CHECK(std::find(result_vertices_at_face_0.begin(), result_vertices_at_face_0.end(), 4) != result_vertices_at_face_0.end());
+      TEST_CHECK(std::find(result_vertices_at_face_0.begin(), result_vertices_at_face_0.end(), 8) != result_vertices_at_face_0.end());
+      TEST_CHECK(std::find(result_vertices_at_face_0.begin(), result_vertices_at_face_0.end(), 6) != result_vertices_at_face_0.end());
+      IT_ result_vertices_at_face_1(m_fine.get_adjacent_polytopes(pl_face, pl_vertex, 1));
+      TEST_CHECK_EQUAL(result_vertices_at_face_1.size(), 4ul);
+      TEST_CHECK(std::find(result_vertices_at_face_1.begin(), result_vertices_at_face_1.end(), 4) != result_vertices_at_face_1.end());
+      TEST_CHECK(std::find(result_vertices_at_face_1.begin(), result_vertices_at_face_1.end(), 1) != result_vertices_at_face_1.end());
+      TEST_CHECK(std::find(result_vertices_at_face_1.begin(), result_vertices_at_face_1.end(), 7) != result_vertices_at_face_1.end());
+      TEST_CHECK(std::find(result_vertices_at_face_1.begin(), result_vertices_at_face_1.end(), 8) != result_vertices_at_face_1.end());
+      IT_ result_vertices_at_face_2(m_fine.get_adjacent_polytopes(pl_face, pl_vertex, 2));
+      TEST_CHECK_EQUAL(result_vertices_at_face_2.size(), 4ul);
+      TEST_CHECK(std::find(result_vertices_at_face_2.begin(), result_vertices_at_face_2.end(), 6) != result_vertices_at_face_2.end());
+      TEST_CHECK(std::find(result_vertices_at_face_2.begin(), result_vertices_at_face_2.end(), 8) != result_vertices_at_face_2.end());
+      TEST_CHECK(std::find(result_vertices_at_face_2.begin(), result_vertices_at_face_2.end(), 5) != result_vertices_at_face_2.end());
+      TEST_CHECK(std::find(result_vertices_at_face_2.begin(), result_vertices_at_face_2.end(), 2) != result_vertices_at_face_2.end());
+      IT_ result_vertices_at_face_3(m_fine.get_adjacent_polytopes(pl_face, pl_vertex, 3));
+      TEST_CHECK_EQUAL(result_vertices_at_face_3.size(), 4ul);
+      TEST_CHECK(std::find(result_vertices_at_face_3.begin(), result_vertices_at_face_3.end(), 8) != result_vertices_at_face_3.end());
+      TEST_CHECK(std::find(result_vertices_at_face_3.begin(), result_vertices_at_face_3.end(), 7) != result_vertices_at_face_3.end());
+      TEST_CHECK(std::find(result_vertices_at_face_3.begin(), result_vertices_at_face_3.end(), 3) != result_vertices_at_face_3.end());
+      TEST_CHECK(std::find(result_vertices_at_face_3.begin(), result_vertices_at_face_3.end(), 5) != result_vertices_at_face_3.end());
+
+      IT_ result_faces_at_vertex_0(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 0));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_0.size(), 1ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_0.begin(), result_faces_at_vertex_0.end(), 0) != result_faces_at_vertex_0.end());
+      IT_ result_faces_at_vertex_1(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 1));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_1.size(), 1ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_1.begin(), result_faces_at_vertex_1.end(), 1) != result_faces_at_vertex_1.end());
+      IT_ result_faces_at_vertex_2(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 2));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_2.size(), 1ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_2.begin(), result_faces_at_vertex_2.end(), 2) != result_faces_at_vertex_2.end());
+      IT_ result_faces_at_vertex_3(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 3));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_3.size(), 1ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_3.begin(), result_faces_at_vertex_3.end(), 3) != result_faces_at_vertex_3.end());
+      IT_ result_faces_at_vertex_4(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 4));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_4.size(), 2ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_4.begin(), result_faces_at_vertex_4.end(), 0) != result_faces_at_vertex_4.end());
+      TEST_CHECK(std::find(result_faces_at_vertex_4.begin(), result_faces_at_vertex_4.end(), 1) != result_faces_at_vertex_4.end());
+      IT_ result_faces_at_vertex_5(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 5));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_5.size(), 2ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_5.begin(), result_faces_at_vertex_5.end(), 2) != result_faces_at_vertex_5.end());
+      TEST_CHECK(std::find(result_faces_at_vertex_5.begin(), result_faces_at_vertex_5.end(), 3) != result_faces_at_vertex_5.end());
+      IT_ result_faces_at_vertex_6(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 6));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_6.size(), 2ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_6.begin(), result_faces_at_vertex_6.end(), 0) != result_faces_at_vertex_6.end());
+      TEST_CHECK(std::find(result_faces_at_vertex_6.begin(), result_faces_at_vertex_6.end(), 2) != result_faces_at_vertex_6.end());
+      IT_ result_faces_at_vertex_7(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 7));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_7.size(), 2ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_7.begin(), result_faces_at_vertex_7.end(), 1) != result_faces_at_vertex_7.end());
+      TEST_CHECK(std::find(result_faces_at_vertex_7.begin(), result_faces_at_vertex_7.end(), 3) != result_faces_at_vertex_7.end());
+      IT_ result_faces_at_vertex_8(m_fine.get_adjacent_polytopes(pl_vertex, pl_face, 8));
+      TEST_CHECK_EQUAL(result_faces_at_vertex_8.size(), 4ul);
+      TEST_CHECK(std::find(result_faces_at_vertex_8.begin(), result_faces_at_vertex_8.end(), 0) != result_faces_at_vertex_8.end());
+      TEST_CHECK(std::find(result_faces_at_vertex_8.begin(), result_faces_at_vertex_8.end(), 1) != result_faces_at_vertex_8.end());
+      TEST_CHECK(std::find(result_faces_at_vertex_8.begin(), result_faces_at_vertex_8.end(), 2) != result_faces_at_vertex_8.end());
+      TEST_CHECK(std::find(result_faces_at_vertex_8.begin(), result_faces_at_vertex_8.end(), 3) != result_faces_at_vertex_8.end());
 
       TEST_CHECK_EQUAL(halos.at(0)->get_elements().size(), IndexType_(4));
       TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(0), IndexType_(0));
