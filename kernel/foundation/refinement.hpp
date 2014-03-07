@@ -747,8 +747,6 @@ namespace FEAST
             }
           }
 
-          for(Index b(0) ; b < origin.get_topologies().at(ipi_face_vertex).size() ; ++b)
-
           //determine new vertex coordinates for mid-point
           //sorting
           vertex_at_polygon = coarse.get_adjacent_polytopes(pl_face, pl_vertex, i);
@@ -1121,6 +1119,7 @@ namespace FEAST
 
           ///all vertices at old face
           typename t_::storage_type_ vertex_at_polygon_tmp(vertex_at_polygon.size() + t_union.size());
+          std::sort(vertex_at_polygon.begin(), vertex_at_polygon.end());
           typename t_::storage_type_::iterator itu(std::set_union(vertex_at_polygon.begin(), vertex_at_polygon.end(), t_union.begin(), t_union.end(), vertex_at_polygon_tmp.begin()));
           vertex_at_polygon_tmp.resize(Index(itu - vertex_at_polygon_tmp.begin()));
           vertex_at_polygon = vertex_at_polygon_tmp;
@@ -1153,8 +1152,6 @@ namespace FEAST
               origin.get_topologies().at(ipi_vertex_face).at(diff.at(j)).erase(ite);
             }
           }
-
-          for(Index b(0) ; b < origin.get_topologies().at(ipi_face_vertex).size() ; ++b)
 
           //determine new vertex coordinates for mid-point
           //sorting
@@ -1217,7 +1214,293 @@ namespace FEAST
         const Index num_polyhedron(origin.num_polytopes(pl_polyhedron));
         for(Index i(0) ; i < num_polyhedron; i++)
         {
-          // TODO  add center, adjacent edges, adjacent faces
+          // add new vertex v_i
+          origin.add_polytope(pl_vertex);
+
+          ///vertex set T*p_i <- EMPTYSET
+          t_ t_pi;
+
+          /// operator V_p->v
+          typename t_::storage_type_ v_pc(coarse.get_adjacent_polytopes(pl_polyhedron, pl_vertex, i));
+          vertex_at_polyhedron = v_pc;
+          std::sort(vertex_at_polyhedron.begin(), vertex_at_polyhedron.end());
+
+          /// operator E_v->e
+          for(Index j(0) ; j < v_pc.size(); ++j)
+          {
+            typename t_::storage_type_ e_po_tmp(origin.get_adjacent_polytopes(pl_vertex, pl_edge, v_pc.at(j)));
+
+            /// operator V_e->v
+            typename t_::storage_type_ v_e_v;
+            for(Index k(0) ; k < e_po_tmp.size(); ++k)
+            {
+              typename t_::storage_type_ v_po_tmp(origin.get_adjacent_polytopes(pl_edge, pl_vertex, e_po_tmp.at(k)));
+              std::sort(v_po_tmp.begin(), v_po_tmp.end());
+              typename t_::storage_type_ res(v_e_v.size() + v_po_tmp.size());
+              typename t_::storage_type_::iterator it(std::set_union(v_e_v.begin(), v_e_v.end(), v_po_tmp.begin(), v_po_tmp.end(), res.begin()));
+              res.resize(Index(it - res.begin()));
+              v_e_v = res;
+            }
+            t_pi.push_back(v_e_v);
+          }
+
+          /// operator {[T*p_i] /intersect [T*p_j]} (aka only new vertices without center)
+          typename t_::storage_type_ t_union;
+          for(Index l(0) ; l < t_pi.size() ; ++l)
+          {
+            ///[T*p_l] /intersect [T*p_j]
+            t_ t_pi_l_intersect_t_pi_j;
+
+            for(Index j(0) ; j < t_pi.size() ; ++j)
+            {
+              if(l != j)
+              {
+                ///T_pi_l
+                typename t_::storage_type_ t_l(t_pi.at(l));
+                std::sort(t_l.begin(), t_l.end());
+                ///T_pi_j
+                typename t_::storage_type_ t_j(t_pi.at(j));
+                std::sort(t_j.begin(), t_j.end());
+                ///T_pi_lj
+                typename t_::storage_type_ t_lj(std::max(t_l.size(), t_j.size()));
+                typename t_::storage_type_::iterator it(std::set_intersection(t_l.begin(), t_l.end(), t_j.begin(), t_j.end(), t_lj.begin()));
+                t_lj.resize(Index(it - t_lj.begin()));
+
+                if(t_lj.size() > 0)
+                  t_pi_l_intersect_t_pi_j.push_back(t_lj);
+
+                typename t_::storage_type_ union_tmp(t_union.size() + t_lj.size());
+                typename t_::storage_type_::iterator itu(std::set_union(t_union.begin(), t_union.end(), t_lj.begin(), t_lj.end(), union_tmp.begin()));
+                union_tmp.resize(Index(itu - union_tmp.begin()));
+                t_union = union_tmp;
+              }
+            }
+          }
+
+          ///t_center: center of coarse faces
+          t_ t_unioni;
+
+          /// operator E_v->e
+          for(Index j(0) ; j < t_union.size(); ++j)
+          {
+            typename t_::storage_type_ e_union_tmp(origin.get_adjacent_polytopes(pl_vertex, pl_edge, t_union.at(j)));
+
+            /// operator V_e->v
+            typename t_::storage_type_ v_e_union;
+            for(Index k(0) ; k < e_union_tmp.size(); ++k)
+            {
+              typename t_::storage_type_ v_union_tmp(origin.get_adjacent_polytopes(pl_edge, pl_vertex, e_union_tmp.at(k)));
+              std::sort(v_union_tmp.begin(), v_union_tmp.end());
+              typename t_::storage_type_ res(v_e_union.size() + v_union_tmp.size());
+              typename t_::storage_type_::iterator it(std::set_union(v_e_union.begin(), v_e_union.end(), v_union_tmp.begin(), v_union_tmp.end(), res.begin()));
+              res.resize(Index(it - res.begin()));
+              v_e_union = res;
+            }
+            t_unioni.push_back(v_e_union);
+          }
+
+          /// operator {[T*p_i] /intersect [T*p_j]} (aka only new vertices for a new face)
+          typename t_::storage_type_ t_center;
+          for(Index l(0) ; l < t_unioni.size() ; ++l)
+          {
+            ///[T*p_l] /intersect [T*p_j]
+            t_ t_unioni_l_intersect_t_unioni_j;
+
+            for(Index j(0) ; j < t_unioni.size() ; ++j)
+            {
+              if(l != j)
+              {
+                ///T_pi_l
+                typename t_::storage_type_ t_l(t_unioni.at(l));
+                std::sort(t_l.begin(), t_l.end());
+                ///T_pi_j
+                typename t_::storage_type_ t_j(t_unioni.at(j));
+                std::sort(t_j.begin(), t_j.end());
+                ///T_pi_lj
+                typename t_::storage_type_ t_lj(std::max(t_l.size(), t_j.size()));
+                typename t_::storage_type_::iterator it(std::set_intersection(t_l.begin(), t_l.end(), t_j.begin(), t_j.end(), t_lj.begin()));
+                t_lj.resize(Index(it - t_lj.begin()));
+
+                if(t_lj.size() > 0)
+                  t_unioni_l_intersect_t_unioni_j.push_back(t_lj);
+
+                typename t_::storage_type_ union_tmp(t_center.size() + t_lj.size());
+                typename t_::storage_type_::iterator itu(std::set_union(t_center.begin(), t_center.end(), t_lj.begin(), t_lj.end(), union_tmp.begin()));
+                union_tmp.resize(Index(itu - union_tmp.begin()));
+                t_center = union_tmp;
+              }
+            }
+          }
+
+          // first, add new inner edges
+          typename t_::storage_type_ union_tmp(t_center.size());
+          std::sort(vertex_at_polyhedron.begin(), vertex_at_polyhedron.end());
+          typename t_::storage_type_::iterator itu(std::set_difference(t_center.begin(), t_center.end(), vertex_at_polyhedron.begin(), vertex_at_polyhedron.end(), union_tmp.begin()));
+          union_tmp.resize(Index(itu - union_tmp.begin()));
+          t_center = union_tmp;
+
+
+          for(Index j(0) ; j < t_center.size() ; ++j)
+          {
+            origin.add_polytope(pl_edge);
+            origin.add_adjacency(pl_vertex, pl_edge, t_center.at(j), origin.num_polytopes(pl_edge) - 1);
+            origin.add_adjacency(pl_vertex, pl_edge, origin.num_polytopes(pl_vertex) - 1, origin.num_polytopes(pl_edge) - 1);
+          }
+
+          // here, we already have all points and all edges
+          // now, add new inner faces
+          for(Index j(0) ; j < t_center.size() ; ++j)
+          {
+            // V_E_vj
+            typename t_::storage_type_ e_center_tmp(origin.get_adjacent_polytopes(pl_vertex, pl_edge, t_center.at(j)));
+
+            typename t_::storage_type_ v_e_vj;
+            for(Index k(0) ; k < e_center_tmp.size(); ++k)
+            {
+              typename t_::storage_type_ v_center_tmp(origin.get_adjacent_polytopes(pl_edge, pl_vertex, e_center_tmp.at(k)));
+              std::sort(v_center_tmp.begin(), v_center_tmp.end());
+              typename t_::storage_type_ res(v_e_vj.size() + v_center_tmp.size());
+              typename t_::storage_type_::iterator it(std::set_union(v_e_vj.begin(), v_e_vj.end(), v_center_tmp.begin(), v_center_tmp.end(), res.begin()));
+              res.resize(Index(it - res.begin()));
+              v_e_vj = res;
+            }
+
+            for(Index l(j+1) ; l < t_center.size() ; ++l)// add new inner faces
+            {
+              // V_E_vl
+              typename t_::storage_type_ e_center_tmp(origin.get_adjacent_polytopes(pl_vertex, pl_edge, t_center.at(l)));
+
+              typename t_::storage_type_ v_e_vl;
+              for(Index k(0) ; k < e_center_tmp.size(); ++k)
+              {
+                typename t_::storage_type_ v_center_tmp(origin.get_adjacent_polytopes(pl_edge, pl_vertex, e_center_tmp.at(k)));
+                std::sort(v_center_tmp.begin(), v_center_tmp.end());
+                typename t_::storage_type_ res(v_e_vl.size() + v_center_tmp.size());
+                typename t_::storage_type_::iterator it(std::set_union(v_e_vl.begin(), v_e_vl.end(), v_center_tmp.begin(), v_center_tmp.end(), res.begin()));
+                res.resize(Index(it - res.begin()));
+                v_e_vl = res;
+              }
+
+              typename t_::storage_type_ vjl(v_e_vl.size());
+              typename t_::storage_type_ vjl_tmp(v_e_vl.size());
+              typename t_::storage_type_::iterator it(std::set_intersection(v_e_vl.begin(), v_e_vl.end(), v_e_vj.begin(), v_e_vj.end(), vjl_tmp.begin()));
+              vjl_tmp.resize(Index(it - vjl_tmp.begin()));
+              typename t_::storage_type_ v_center_tmp;
+              v_center_tmp.push_back(origin.num_polytopes(pl_vertex)-1);
+              typename t_::storage_type_::iterator itu(std::set_difference(vjl_tmp.begin(), vjl_tmp.end(), v_center_tmp.begin(), v_center_tmp.end(), vjl.begin()));
+              vjl.resize(Index(itu - vjl.begin()));
+
+              if(vjl.size()>0)
+              {
+                origin.add_polytope(pl_face);
+                origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, origin.num_polytopes(pl_vertex) - 1);
+                origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_center.at(j));
+                origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, t_center.at(l));
+                origin.add_adjacency(pl_face, pl_vertex, origin.num_polytopes(pl_face) - 1, vjl.at(0) );
+              }
+
+            }
+          }
+
+          // here, we already have all faces. now, add new polyhedron
+          /// operator F_v->f
+          typename t_::storage_type_ f_vcenter(origin.get_adjacent_polytopes(pl_vertex,pl_face,origin.num_polytopes(pl_vertex) - 1));
+
+          for(Index j(0) ; j < vertex_at_polyhedron.size() ; ++j)
+          {
+            typename t_::storage_type_ f_pnew;
+
+            /// operator F_v->f
+            typename t_::storage_type_ f_vj(origin.get_adjacent_polytopes(pl_vertex,pl_face,vertex_at_polyhedron.at(j)));
+
+            for(Index k(0) ; k < f_vj.size() ; ++k)
+            {
+              for(Index l(0); l < f_vcenter.size() ; ++l)
+              {
+                /// operator E_f->e
+                typename t_::storage_type_ e_fvc(origin.get_adjacent_polytopes(pl_face, pl_edge, f_vcenter.at(l)));
+                typename t_::storage_type_ e_fvj(origin.get_adjacent_polytopes(pl_face, pl_edge, f_vj.at(k)));
+
+                typename t_::storage_type_ intersect_cj(e_fvc.size());
+                std::sort(e_fvc.begin(), e_fvc.end());
+                std::sort(e_fvj.begin(), e_fvj.end());
+                typename t_::storage_type_::iterator it(std::set_intersection(e_fvc.begin(), e_fvc.end(), e_fvj.begin(), e_fvj.end(), intersect_cj.begin()));
+                intersect_cj.resize(Index(it - intersect_cj.begin()));
+
+                if( intersect_cj.size()>0)
+                {
+                  typename t_::storage_type_ f_pnew_add;
+                  f_pnew_add.push_back(f_vj.at(k));
+                  f_pnew_add.push_back(f_vcenter.at(l));
+                  std::sort(f_pnew_add.begin(),f_pnew_add.end());
+
+                  typename t_::storage_type_ f_pnew_tmp(f_pnew.size()+f_pnew_add.size());
+                  typename t_::storage_type_::iterator itu(std::set_union(f_pnew_add.begin(), f_pnew_add.end(), f_pnew.begin(), f_pnew.end(), f_pnew_tmp.begin()));
+                  f_pnew_tmp.resize(Index(itu - f_pnew_tmp.begin()));
+
+                  f_pnew = f_pnew_tmp;
+                }
+              }
+            }
+
+            //
+            typename t_::storage_type_ v_pnew;
+            for(Index k(0) ; k < f_pnew.size() ; ++k)
+            {
+              typename t_::storage_type_ v_fk(origin.get_adjacent_polytopes(pl_face,pl_vertex,f_pnew.at(k)));
+              typename t_::storage_type_ v_pnew_tmp(v_pnew.size()+v_fk.size());
+              std::sort(v_fk.begin(), v_fk.end());
+              typename t_::storage_type_::iterator it(std::set_union(v_pnew.begin(), v_pnew.end(), v_fk.begin(), v_fk.end(), v_pnew_tmp.begin()));
+              v_pnew_tmp.resize(Index(it - v_pnew_tmp.begin()));
+              v_pnew = v_pnew_tmp;
+            }
+
+            // add polyhedron p_oi
+            if(j==0) // use polyhedron index i
+            {
+              vp_0.clear();
+              for(Index k(0) ; k < v_pnew.size() ; ++k)
+              {
+                vp_0.push_back(v_pnew.at(k));
+              }
+              //inject
+              origin.get_topologies().at(ipi_polyhedron_vertex).at(i) = vp_0; //vertices are already adjacent to polyhedron i and  will be removed from all other later => done here
+            }
+            else
+            {
+              origin.add_polytope(pl_polyhedron);
+              for(Index k(0) ; k < v_pnew.size() ; ++k)
+              {
+                origin.add_adjacency(pl_vertex, pl_polyhedron, v_pnew.at(k), origin.num_polytopes(pl_polyhedron) - 1);
+              }
+            }
+          }
+
+          ///remove v->p adjacencies from all vertices in vertex_at_polygon - vp_0
+          std::sort(vertex_at_polyhedron.begin(), vertex_at_polyhedron.end());
+          for(Index j(0) ; j < vertex_at_polyhedron.size() ; ++j)
+          {
+            typename t_::storage_type_::iterator ite(std::find(origin.get_topologies().at(ipi_vertex_polyhedron).at(vertex_at_polyhedron.at(j)).begin(),
+                                                               origin.get_topologies().at(ipi_vertex_polyhedron).at(vertex_at_polyhedron.at(j)).end(),
+                                                               i
+                                                              ));
+
+            if(ite != origin.get_topologies().at(ipi_vertex_polyhedron).at(vertex_at_polyhedron.at(j)).end())
+            {
+              origin.get_topologies().at(ipi_vertex_polyhedron).at(vertex_at_polyhedron.at(j)).erase(ite);
+            }
+          }
+
+          for(Index j(0); j < origin.get_adjacent_polytopes(pl_polyhedron,pl_vertex,i).size(); ++j)
+          {
+            //add new vertex adjacence to f_i
+            origin.get_topologies().at(ipi_vertex_polyhedron).at(origin.get_adjacent_polytopes(pl_polyhedron,pl_vertex,i).at(j)).push_back(i);
+          }
+
+          //TODO calculate center
+          origin_coords.at(0).push_back(0.5);
+          origin_coords.at(1).push_back(0.5);
+          origin_coords.at(2).push_back(0.5);
         }
       }
     };
