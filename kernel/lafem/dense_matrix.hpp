@@ -106,7 +106,7 @@ namespace FEAST
          * Moves a given matrix to this matrix.
          */
         DenseMatrix(DenseMatrix && other) :
-          Container<Mem_, DT_, IT_>(std::move(other))
+          Container<Mem_, DT_, IT_>(std::forward<DenseMatrix>(other))
         {
           CONTEXT("When moving DenseMatrix");
         }
@@ -122,7 +122,7 @@ namespace FEAST
         {
           CONTEXT("When moving DenseMatrix");
 
-          this->move(std::move(other));
+          this->move(std::forward<DenseMatrix>(other));
 
           return *this;
         }

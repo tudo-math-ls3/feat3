@@ -159,7 +159,7 @@ namespace FEAST
          * Moves another vector to this vector.
          */
         SparseVector(SparseVector && other) :
-          Container<Mem_, DT_, IT_>(std::move(other))
+          Container<Mem_, DT_, IT_>(std::forward<SparseVector>(other))
         {
           CONTEXT("When moving SparseVector");
         }
@@ -175,7 +175,7 @@ namespace FEAST
         {
           CONTEXT("When moving SparseVector");
 
-          this->move(std::move(other));
+          this->move(std::forward<SparseVector>(other));
 
           return *this;
         }

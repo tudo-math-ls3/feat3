@@ -510,7 +510,7 @@ namespace FEAST
          * Moves a given matrix to this matrix.
          */
         SparseMatrixCSR(SparseMatrixCSR && other) :
-          Container<Mem_, DT_, IT_>(std::move(other))
+          Container<Mem_, DT_, IT_>(std::forward<SparseMatrixCSR>(other))
         {
           CONTEXT("When moving SparseMatrixCSR");
         }
@@ -526,7 +526,7 @@ namespace FEAST
         {
           CONTEXT("When moving SparseMatrixCSR");
 
-          this->move(std::move(other));
+          this->move(std::forward<SparseMatrixCSR>(other));
 
           return *this;
         }

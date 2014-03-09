@@ -257,7 +257,7 @@ namespace FEAST
          * Moves another vector to this vector.
          */
         DenseVector(DenseVector && other) :
-          Container<Mem_, DT_, IT_>(std::move(other))
+          Container<Mem_, DT_, IT_>(std::forward<DenseVector>(other))
         {
           CONTEXT("When moving DenseVector");
         }
@@ -273,7 +273,7 @@ namespace FEAST
         {
           CONTEXT("When moving DenseVector");
 
-          this->move(std::move(other));
+          this->move(std::forward<DenseVector>(other));
 
           return *this;
         }

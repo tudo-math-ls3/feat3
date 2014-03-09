@@ -74,7 +74,7 @@ namespace FEAST
       {
         if(this != &other)
         {
-          _sv = std::move(other._sv);
+          _sv = std::forward<UnitFilter>(other._sv);
         }
         return *this;
       }

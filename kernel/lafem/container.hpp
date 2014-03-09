@@ -559,7 +559,7 @@ namespace FEAST
          */
         virtual const Index & used_elements() const
         {
-          return std::move(this->size());
+          return std::forward<Index>(this->size());
         }
 
         /**
