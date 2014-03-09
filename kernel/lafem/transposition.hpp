@@ -115,14 +115,11 @@ namespace FEAST
         Index * ptrow_ptr(trow_ptr.elements());
 
         ptrow_ptr[0] = 0;
-        ++ptrow_ptr;
 
         for (Index i(0); i < used_elements; ++i)
         {
           ++ptrow_ptr[pacol_ind[i] + 1];
         }
-
-        ptrow_ptr[0] = 0;
 
         for (Index i(1); i < acolumns - 1; ++i)
         {
@@ -140,6 +137,12 @@ namespace FEAST
             ++ptrow_ptr[l];
           }
         }
+
+        for (Index i(acolumns); i > 0; --i)
+        {
+          ptrow_ptr[i] = ptrow_ptr[i - 1];
+        }
+        ptrow_ptr[0] = 0;
 
         SparseMatrixCSR<Mem_, DT_> t(acolumns, arows, tcol_ind, tval, trow_ptr);
         return t;
