@@ -601,10 +601,9 @@ namespace FEAST
         if (bscale == true)
         {
           _pscale = new VT_(_A.rows());
-          DT_ *pscale_elem(_pscale->elements());
           for (Index i = 0; i < _A.rows(); ++i)
           {
-            pscale_elem[i] = -DT_(1.0) / _A(i,i);
+            (*_pscale)(i, -DT_(1.0) / _A(i,i));
           }
         }
       }
@@ -657,22 +656,22 @@ namespace FEAST
 
           for (Index i = 1; i <= _m; ++i)
           {
-            pauxs[i%2]->template axpy<Algo::Generic>(in, *pauxs[(i-1)%2]);
-            //pauxs[i%2]->template axpy<Algo::Generic>(DT_(-1.0), A, *pauxs[(i-1)%2], *pauxs[i%2]);
-            _A.template apply<Algo::Generic>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
+            pauxs[i%2]->template axpy<Algo_>(in, *pauxs[(i-1)%2]);
+            //pauxs[i%2]->template axpy<Algo_>(DT_(-1.0), A, *pauxs[(i-1)%2], *pauxs[i%2]);
+            _A.template apply<Algo_>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
           }
         }
         else
         {
-          pauxs[0]->template component_product<Algo::Generic>(*_pscale, in);
-          out.template scale<Algo::Generic>(out, DT_(-1.0));
+          pauxs[0]->template component_product<Algo_>(*_pscale, in);
+          out.template scale<Algo_>(out, DT_(-1.0));
 
           for (Index i = 1; i <= _m; ++i)
           {
-            pauxs[i%2]->template axpy<Algo::Generic>(in, *pauxs[(i-1)%2]);
+            pauxs[i%2]->template axpy<Algo_>(in, *pauxs[(i-1)%2]);
             //pauxs[i%2]->template axpy<Algo::Generic>(*pscale, A, *pauxs[(i-1)%2], *pauxs[i%2]);
-            _A.template apply<Algo::Generic>(_tmp, *pauxs[(i-1)%2]);
-            pauxs[i%2]->template component_product<Algo::Generic>(_tmp, *_pscale, *pauxs[i%2]);
+            _A.template apply<Algo_>(_tmp, *pauxs[(i-1)%2]);
+            pauxs[i%2]->template component_product<Algo_>(_tmp, *_pscale, *pauxs[i%2]);
           }
         } // function apply
 
@@ -736,7 +735,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const Index p) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const int p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -753,7 +752,7 @@ namespace FEAST
         }
         else
         {
-          _symbolic_lu_factorisation(int(p));
+          _symbolic_lu_factorisation(p);
           _copy_entries();
         }
 
@@ -1172,7 +1171,7 @@ namespace FEAST
         }
         else
         {
-          _symbolic_lu_factorisation(int(p));
+          _symbolic_lu_factorisation(p);
           _copy_entries();
         }
 

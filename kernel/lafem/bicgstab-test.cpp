@@ -73,7 +73,7 @@ template <>
 struct Precon<SparsePreconType::pt_sor>
 {
   template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new SORPreconditioner<Algo_, MT_, VT_> (sys);
     return t;
@@ -84,7 +84,7 @@ template <>
 struct Precon<SparsePreconType::pt_ssor>
 {
   template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new SSORPreconditioner<Algo_, MT_, VT_> (sys);
     return t;
@@ -532,12 +532,12 @@ BiCGStabTest<PointstarFactoryFE<double>,
              DenseVector<Mem::CUDA, double> >
 bicgstab_test_cuda_csr_none_double("none");
 
-BiCGStabTest<PointstarFactoryFE<double>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
              Algo::CUDA,
              SparseMatrixCOO<Mem::CUDA, double>,
              DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_coo_none_double("none");
+bicgstab_test_cuda_coo_none_double("none");*/
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
@@ -554,12 +554,12 @@ BiCGStabTest<PointstarFactoryFE<double>,
              DenseVector<Mem::CUDA, double> >
 bicgstab_test_cuda_csr_jac_double("jacobi");
 
-BiCGStabTest<PointstarFactoryFE<double>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
              Algo::CUDA,
              SparseMatrixCOO<Mem::CUDA, double>,
              DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_coo_jac_double("jacobi");
+bicgstab_test_cuda_coo_jac_double("jacobi");*/
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_jacobi,
@@ -569,7 +569,7 @@ BiCGStabTest<PointstarFactoryFE<double>,
 bicgstab_test_cuda_ell_jac_double("jacobi");
 
 
-BiCGStabTest<PointstarFactoryFE<double>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_gauss_seidel,
              Algo::CUDA,
              SparseMatrixCSR<Mem::CUDA, double>,
@@ -588,7 +588,7 @@ BiCGStabTest<PointstarFactoryFE<double>,
              Algo::CUDA,
              SparseMatrixELL<Mem::CUDA, double>,
              DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_ell_gs_double("gauss-seidel");
+bicgstab_test_cuda_ell_gs_double("gauss-seidel");*/
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
@@ -598,12 +598,12 @@ BiCGStabTest<PointstarFactoryFE<double>,
              DenseVector<Mem::CUDA, double> >
 bicgstab_test_cuda_csr_poly_double("polynmial");
 
-BiCGStabTest<PointstarFactoryFE<double>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
              Algo::CUDA,
              SparseMatrixCOO<Mem::CUDA, double>,
              DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_coo_poly_double("polynmial");
+bicgstab_test_cuda_coo_poly_double("polynmial");*/
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
@@ -613,7 +613,7 @@ BiCGStabTest<PointstarFactoryFE<double>,
 bicgstab_test_cuda_ell_poly_double("polynmial");
 
 
-BiCGStabTest<PointstarFactoryFE<double>,
+/*BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_ilu,
              Algo::CUDA,
              SparseMatrixCSR<Mem::CUDA, double>,
@@ -874,7 +874,7 @@ BiCGStabTest<PointstarFactoryFE<double>,
              Algo::CUDA,
              SparseMatrixELL<Mem::CUDA, double>,
              DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_ell_spai_double_83("spai", 83);
+bicgstab_test_cuda_ell_spai_double_83("spai", 83);*/
 #endif
 
 
@@ -965,8 +965,8 @@ ILUTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double> > ilu_test_cpu_coo_dou
 ILUTest<Algo::Generic, SparseMatrixELL<Mem::Main, double> > ilu_test_cpu_ell_double;
 
 
-#ifdef FEAST_BACKENDS_CUDA
+/*#ifdef FEAST_BACKENDS_CUDA
 ILUTest<Algo::CUDA, SparseMatrixCSR<Mem::CUDA, double> > ilu_test_cuda_src_double;
 ILUTest<Algo::CUDA, SparseMatrixCOO<Mem::CUDA, double> > ilu_test_cuda_coo_double;
 ILUTest<Algo::CUDA, SparseMatrixELL<Mem::CUDA, double> > ilu_test_cuda_ell_double;
-#endif
+#endif*/
