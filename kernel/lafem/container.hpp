@@ -20,18 +20,39 @@ namespace FEAST
    */
   namespace LAFEM
   {
-      /**
-       * Supported File modes.
-       */
-      enum class FileMode
+    namespace Intern
+    {
+      struct AssignStruct
       {
-        fm_exp = 0, /**< Exponential ascii */
-        fm_dv, /**< Binary data */
-        fm_m, /**< Matlab ascii */
-        fm_mtx, /**< Matrix market ascii */
-        fm_ell, /**< Binary ell data */
-        fm_csr, /**< Binary csr data */
-        fm_coo /**< Binary coo data */
+        template <typename MT_, typename T_, typename T2_>
+          static void assign(std::vector<T_ *> & own, const std::vector<T_ *> & other)
+          {
+            own.assign(other.begin(), other.end());
+
+            for (Index i(0) ; i < own.size() ; ++i)
+              MemoryPool<MT_>::instance()->increase_memory(own.at(i));
+          }
+
+        template <typename MT_, typename T_, typename T2_>
+          static void assign(std::vector<T_ *> &, const std::vector<T2_ *> &)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Should never be reached!");
+          }
+      };
+    } //namespace Intern
+
+    /**
+     * Supported File modes.
+     */
+    enum class FileMode
+    {
+      fm_exp = 0, /**< Exponential ascii */
+      fm_dv, /**< Binary data */
+      fm_m, /**< Matlab ascii */
+      fm_mtx, /**< Matrix market ascii */
+      fm_ell, /**< Binary ell data */
+      fm_csr, /**< Binary csr data */
+      fm_coo /**< Binary coo data */
       };
 
     /**
@@ -159,24 +180,6 @@ namespace FEAST
         {
           CONTEXT("When assigning Container");
 
-          struct AssignStruct
-          {
-            template <typename MT_, typename T_, typename T2_>
-            static void assign(std::vector<T_ *> & own, const std::vector<T_ *> & other)
-            {
-              own.assign(other.begin(), other.end());
-
-              for (Index i(0) ; i < own.size() ; ++i)
-                MemoryPool<MT_>::instance()->increase_memory(own.at(i));
-            }
-
-            template <typename MT_, typename T_, typename T2_>
-            static void assign(std::vector<T_ *> &, const std::vector<T2_ *> &)
-            {
-              throw InternalError(__func__, __FILE__, __LINE__, "Should never be reached!");
-            }
-          };
-
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
           for (Index i(0) ; i < this->_indices.size() ; ++i)
@@ -197,7 +200,7 @@ namespace FEAST
 
           if (std::is_same<Mem_, Mem2_>::value && std::is_same<DT_, DT2_>::value)
           {
-            AssignStruct::template assign<Mem_, DT_, DT2_>(this->_elements, other.get_elements());
+            Intern::AssignStruct::template assign<Mem_, DT_, DT2_>(this->_elements, other.get_elements());
           }
           else
           {
@@ -241,7 +244,7 @@ namespace FEAST
 
           if (std::is_same<Mem_, Mem2_>::value && std::is_same<IT_, IT2_>::value)
           {
-            AssignStruct::template assign<Mem_, IT_, IT2_>(this->_indices, other.get_indices());
+            Intern::AssignStruct::template assign<Mem_, IT_, IT2_>(this->_indices, other.get_indices());
           }
           else
           {
