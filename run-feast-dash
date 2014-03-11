@@ -208,6 +208,8 @@ raw_branches[:] = [s.strip("* ") for s in raw_branches]
 addition = "-unixmake"
 if is_found ("nvcc"):
   addition = addition + "-cuda"
+if is_found ("ccache"):
+  addition = addition + "-ccache"
 
 #iterate over all branches, that are queued for testing
 branches = BranchQueue.select()
@@ -235,21 +237,21 @@ for branch in branches:
 
   if is_found("mpic++"):
     if is_found("g++"):
-      run_test("mpi-gcc-debug-coverage-mkl-ccache" + addition, branch, myDB)
-      run_test("mpi-gcc-opt-coverage-mkl-ccache" + addition, branch, myDB)
+      run_test("mpi-gcc-debug-coverage-mkl" + addition, branch, myDB)
+      run_test("mpi-gcc-opt-coverage-mkl" + addition, branch, myDB)
     if is_found("clang++"):
-      run_test("mpi-clang-debug-mkl-ccache" + addition, branch, myDB)
-      run_test("mpi-clang-opt-mkl-ccache" + addition, branch, myDB)
+      run_test("mpi-clang-debug-mkl" + addition, branch, myDB)
+      run_test("mpi-clang-opt-mkl" + addition, branch, myDB)
     if is_found("icpc"):
-      run_test("mpi-icc-debug-mkl-ccache" + addition, branch, myDB)
-      run_test("mpi-icc-opt-mkl-ccache" + addition, branch, myDB)
+      run_test("mpi-icc-debug-mkl" + addition, branch, myDB)
+      run_test("mpi-icc-opt-mkl" + addition, branch, myDB)
 
   if is_found("g++"):
-    run_test("serial-gcc-debug-coverage-mkl-ccache" + addition, branch, myDB)
-    run_test("serial-gcc-opt-coverage-mkl-ccache" + addition, branch, myDB)
+    run_test("serial-gcc-debug-coverage-mkl" + addition, branch, myDB)
+    run_test("serial-gcc-opt-coverage-mkl" + addition, branch, myDB)
   if is_found("clang++"):
-    run_test("serial-clang-debug-mkl-ccache" + addition, branch, myDB)
-    run_test("serial-clang-opt-mkl-ccache" + addition, branch, myDB)
+    run_test("serial-clang-debug-mkl" + addition, branch, myDB)
+    run_test("serial-clang-opt-mkl" + addition, branch, myDB)
   if is_found("icpc"):
-    run_test("serial-icc-debug-mkl-ccache" + addition, branch, myDB)
-    run_test("serial-icc-opt-mkl-ccache" + addition, branch, myDB)
+    run_test("serial-icc-debug-mkl" + addition, branch, myDB)
+    run_test("serial-icc-opt-mkl" + addition, branch, myDB)
