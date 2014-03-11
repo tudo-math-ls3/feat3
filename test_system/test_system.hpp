@@ -243,7 +243,7 @@ namespace FEAST
         template<
           typename T1_,
           typename T2_,
-          class = typename std::enable_if<std::is_pod<T1_>::value>::type >
+          class = typename std::enable_if<std::is_literal_type<T1_>::value || std::is_same<T1_, String>::value>::type >
         TwoVarHolder(
             T1_ a,
             T2_ b)
@@ -261,7 +261,7 @@ namespace FEAST
         template<
           typename T1_,
           typename T2_,
-          class = typename std::enable_if<! std::is_pod<T1_>::value>::type >
+          class = typename std::enable_if<! std::is_literal_type<T1_>::value && !std::is_same<T1_, String>::value>::type >
         TwoVarHolder(
             T1_ & a,
             T2_ & b)
@@ -299,7 +299,7 @@ namespace FEAST
         template<
           typename T1_,
           typename T2_,
-          class = typename std::enable_if<std::is_pod<T1_>::value>::type >
+          class = typename std::enable_if<std::is_literal_type<T1_>::value || std::is_same<T1_, String>::value>::type >
         TwoVarHolder2(
             T1_ a,
             T2_ b)
@@ -317,7 +317,7 @@ namespace FEAST
         template<
           typename T1_,
           typename T2_,
-          class = typename std::enable_if<! std::is_pod<T1_>::value>::type >
+          class = typename std::enable_if<! std::is_literal_type<T1_>::value && !std::is_same<T1_, String>::value>::type >
         TwoVarHolder2(
             T1_ & a,
             T2_ & b)
@@ -361,7 +361,7 @@ namespace FEAST
           typename T1_,
           typename T2_,
           typename T3_,
-          class = typename std::enable_if<std::is_pod<T1_>::value>::type >
+          class = typename std::enable_if<std::is_literal_type<T1_>::value || std::is_same<T1_, String>::value>::type >
         WithinEpsCalculator(
             T1_ a,
             T2_ b,
@@ -395,7 +395,7 @@ namespace FEAST
           typename T1_,
           typename T2_,
           typename T3_,
-          class = typename std::enable_if<! std::is_pod<T1_>::value>::type >
+          class = typename std::enable_if<! std::is_literal_type<T1_>::value && !std::is_same<T1_, String>::value>::type >
         WithinEpsCalculator(
             T1_ & a,
             T2_ & b,
