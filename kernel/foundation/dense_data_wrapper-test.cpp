@@ -52,9 +52,9 @@ class DenseDataWrapperTest:
 
 
       std::vector<Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> > test1;
-      test1.push_back(test);
+      test1.push_back(std::move(test));
 
-      std::vector<Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> > test2(test1);
+      std::vector<Foundation::DenseDataWrapper<15u, Tag_, DataType_, ContType_> > test2(std::move(test1));
     }
 };
 DenseDataWrapperTest<Mem::Main, double, Algo::Generic, DenseVector> ddw_test_DV("DenseVector<double>");

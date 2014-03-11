@@ -188,6 +188,13 @@ namespace FEAST
         {
         }
 
+        DenseDataWrapper(DenseDataWrapper && other) :
+          _size(other._size),
+          _num_non_zeros(other._num_non_zeros),
+          _data(std::move(other._data))
+        {
+        }
+
         ~DenseDataWrapper()
         {
         }
@@ -261,14 +268,14 @@ namespace FEAST
           ++_num_non_zeros;
         }
 
-        DenseDataWrapper& operator=(const DenseDataWrapper& rhs)
+        DenseDataWrapper& operator=(DenseDataWrapper&& rhs)
         {
           if(this == &rhs)
             return *this;
 
           this->_size = rhs._size;
           this->_num_non_zeros = rhs._num_non_zeros;
-          this->_data = rhs._data;
+          this->_data = std::move(rhs._data);
 
           return *this;
         }
