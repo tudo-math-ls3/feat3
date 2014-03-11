@@ -235,6 +235,9 @@ for branch in branches:
     run_test("serial-gcc-opt-coverage" + addition, branch, myDB)
     continue
 
+  if is_found ("valgrind") and is_found("g++"):
+      run_test("serial-gcc-debug-coverage-mkl-valgrind" + addition, branch, myDB)
+
   if is_found("mpic++"):
     if is_found("g++"):
       run_test("mpi-gcc-debug-coverage-mkl" + addition, branch, myDB)

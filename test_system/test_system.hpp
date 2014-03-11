@@ -354,6 +354,14 @@ namespace FEAST
       }; // struct WithinEpsCalculator
     }; // class BaseTest
 
+    struct NotSet
+    {
+      static String name()
+      {
+        return "not-set";
+      }
+    };
+
     /**
      * \brief abstract base class for all tagged test classes
      *
@@ -362,7 +370,7 @@ namespace FEAST
     template<
       typename Tag_,
       typename DataType_,
-      typename Algo_ = Archs::None>
+      typename Algo_ = NotSet>
     class TaggedTest
       : public BaseTest
     {

@@ -12,9 +12,6 @@ ENABLE_TESTING()
 configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.cmake COPONLY)
 configure_file (${FEAST_SOURCE_DIR}/CTestCustom.cmake.in ${FEAST_BINARY_DIR}/CTestCustom.ctest COPONLY)
 
-find_program(MEMORYCHECK_COMMAND NAMES valgrind)
-set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full" CACHE STRING "valgrind options")
-
 if (FEAST_BACKENDS_CUDA)
   set (CUDA_VERBOSE_BUILD ON)
   FIND_PACKAGE(CUDA)
@@ -27,6 +24,13 @@ endif(FEAST_BACKENDS_CUDA)
 if (FEAST_MPI)
   find_package(MPI REQUIRED)
 endif (FEAST_MPI)
+
+if (FEAST_VALGRIND)
+  find_program(VALGRIND_EXE valgrind)
+  set (VALGRIND_EXE ${VALGRIND_EXE} --fullpath-after=${FEAST_SOURCE_DIR} --leak-check=full
+    --track-origins=yes --partial-loads-ok=yes)
+  #--keep-stacktraces=alloc-and-free
+endif (FEAST_VALGRIND)
 
 
 # store all variables describing the build in a custom header file

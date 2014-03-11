@@ -58,6 +58,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Backends: cuda, mkl, gmp(not implemented yet)")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scalasca (not implemented yet)")
+  print ("  Debuging: valgrind")
   print ("")
   print ("Note, that you need to provide at least a build mode, a parallelisation mode and a compiler.")
   print ("Note, that the actual compiler version and mpi implementation is choosen by first come, fist serve")
@@ -223,6 +224,12 @@ if "mkl" in buildid:
 if "gmp" in buildid:
   remove_string(unused_tokens, "gmp")
   cmake_flags += " -DFEAST_GMP:BOOL=ON"
+if "valgrind" in buildid:
+  if not is_found("valgrind"):
+    print ("Error: Choosen debugger valgrind not found!")
+    sys.exit(1)
+  remove_string(unused_tokens, "valgrind")
+  cmake_flags += " -DFEAST_VALGRIND:BOOL=ON"
 
 
 # clean up previous configurations

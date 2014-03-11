@@ -37,10 +37,14 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/scarc/${test}" none)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/scarc/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
+  if (FEAST_VALGRIND)
+    SET_PROPERTY(TEST ${test}_none PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+    SET_PROPERTY(TEST ${test}_none PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  endif (FEAST_VALGRIND)
 
-  ADD_TEST(${test}_cpu ${CMAKE_CTEST_COMMAND}
+  ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
@@ -48,8 +52,12 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/scarc/${test}" main)
-  SET_PROPERTY(TEST ${test}_cpu PROPERTY LABELS "main")
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/scarc/${test} main)
+  SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
+  if (FEAST_VALGRIND)
+    SET_PROPERTY(TEST ${test}_main PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+    SET_PROPERTY(TEST ${test}_main PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+  endif (FEAST_VALGRIND)
 ENDFOREACH(test)
 
 #add all tests to scarc_tests
