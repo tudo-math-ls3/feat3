@@ -64,7 +64,7 @@ void Defect<Mem::Main, Algo::Generic>::coo(DT_ * r, const DT_ * const rhs, const
   for (Index row(0); row < rows; ++row)
   {
     DT_ sum(DT_(0));
-    while (row_ptr[iter] == row && iter < used_elements)
+    while (iter < used_elements && row_ptr[iter] == row)
     {
       sum += val[iter] * x[col_ptr[iter]];
       ++iter;
