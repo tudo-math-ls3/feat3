@@ -47,7 +47,7 @@ def configure_clang(cpu, buildmode):
     elif cpu == "ivybridge":
       cxxflags += " -march=corei7-avx"
     elif cpu == "haswell":
-      cxxflags += " -march=corei7-avx2"
+      cxxflags += " -march=core-avx2"
     elif cpu == "itanium":
       cxxflags += " -march=itanium"
     elif cpu == "pentium4":
