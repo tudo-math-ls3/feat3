@@ -52,7 +52,7 @@ class StandardTrafoVolumeTest
       TrafoType trafo(mesh);
 
       DataType_ vol = trafo.compute_vol<ShapeType,DataType_>(Index(0));
-      DataType_ eps = Math::eps<CoordType>();
+      DataType_ eps = Math::eps<DataType_>();
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, Math::sqrt(DataType_(2.)) - DataType_(1.),eps);
 
     }
@@ -72,7 +72,7 @@ class StandardTrafoVolumeTest
 
       TrafoType trafo(mesh);
 
-      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      DataType_ vol = trafo.compute_vol<ShapeType,DataType_>(Index(0));
       DataType_ eps = Math::eps<DataType_>();
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, Math::sqrt(DataType_(2.)) - DataType_(1.),eps);
 
@@ -98,14 +98,14 @@ class StandardTrafoVolumeTest
       TrafoType trafo(mesh);
 
       // Everything checked agains has been computed by hand
-      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      DataType_ vol = trafo.compute_vol<ShapeType, DataType_>(Index(0));
       TEST_CHECK_EQUAL(vol, DataType_(11.)/DataType_(8.));
       // Check volume of sub simplices
-      vol = trafo.compute_vol<Shape::Simplex<1>>(Index(0));
+      vol = trafo.compute_vol<Shape::Simplex<1>, DataType_>(Index(0));
       TEST_CHECK_EQUAL(vol, Math::sqrt(DataType_(37.)/DataType_(16.)));
-      vol = trafo.compute_vol<Shape::Simplex<1>>(Index(1));
+      vol = trafo.compute_vol<Shape::Simplex<1>, DataType_>(Index(1));
       TEST_CHECK_EQUAL(vol, Math::sqrt(DataType_(53.)/DataType_(16.)));
-      vol = trafo.compute_vol<Shape::Simplex<1>>(Index(2));
+      vol = trafo.compute_vol<Shape::Simplex<1>, DataType_>(Index(2));
       TEST_CHECK_EQUAL(vol, DataType_(5.)/DataType_(2.));
 
     }
@@ -133,7 +133,7 @@ class StandardTrafoVolumeTest
       // This is just sqrt(bloody machine precision) because the computations contain a sqrt() in the end
       DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
       // Everything checked against has been computed by hand
-      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      DataType_ vol = trafo.compute_vol<ShapeType, DataType_>(Index(0));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, DataType_(17025./1546.), eps);
 
       static const DataType_ l[4] = {
@@ -143,7 +143,7 @@ class StandardTrafoVolumeTest
       // Check volume of sub elements
       for(Index i(0); i < 4; ++i)
       {
-        vol = trafo.compute_vol<Shape::Hypercube<1>>(i);
+        vol = trafo.compute_vol<Shape::Hypercube<1>,DataType_>(i);
         TEST_CHECK_EQUAL_WITHIN_EPS(vol, l[i], eps);
       }
 
@@ -178,7 +178,7 @@ class StandardTrafoVolumeTest
       // This is just sqrt(bloody machine precision) because the computations contain a sqrt() in the end
       DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.5));
       // Everything checked against has been computed by hand
-      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      DataType_ vol = trafo.compute_vol<ShapeType, DataType_>(Index(0));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, DataType_(64.), eps);
 
       // Check the 2d volume of the faces
@@ -189,7 +189,7 @@ class StandardTrafoVolumeTest
 
       for(Index i(0); i < 6; ++i)
       {
-        vol = trafo.compute_vol<Shape::Hypercube<2>>(i);
+        vol = trafo.compute_vol<Shape::Hypercube<2>, DataType_>(i);
         TEST_CHECK_EQUAL_WITHIN_EPS(vol, f[i], eps);
       }
 
@@ -201,7 +201,7 @@ class StandardTrafoVolumeTest
 
       for(Index i(0); i < 12; ++i)
       {
-        vol = trafo.compute_vol<Shape::Hypercube<1>>(i);
+        vol = trafo.compute_vol<Shape::Hypercube<1>, DataType_>(i);
         TEST_CHECK_EQUAL_WITHIN_EPS(vol, l[i], eps);
       }
 
@@ -229,7 +229,7 @@ class StandardTrafoVolumeTest
 
       TrafoType trafo(mesh);
 
-      DataType_ vol = trafo.compute_vol<ShapeType>(Index(0));
+      DataType_ vol = trafo.compute_vol<ShapeType, DataType_>(Index(0));
       TEST_CHECK_EQUAL(vol, DataType_(1.)/DataType_(3.));
 
       /* Edge lengths computed by hand */
@@ -239,7 +239,7 @@ class StandardTrafoVolumeTest
         Math::sqrt(DataType_(21.)/DataType_(4.)), Math::sqrt(DataType_(17.)/DataType_(4.))};
       for(Index i=0; i<6; i++)
       {
-        vol = trafo.compute_vol<Shape::Simplex<1>>(Index(i));
+        vol = trafo.compute_vol<Shape::Simplex<1>, DataType_>(Index(i));
         TEST_CHECK_EQUAL(vol, l[i]);
       }
 
@@ -251,19 +251,19 @@ class StandardTrafoVolumeTest
       DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.5));
       // Face 0 consists of edges 3, 4, 5
       s = DataType_(0.5)*(l[3] + l[4] + l[5]);
-      vol = trafo.compute_vol<Shape::Simplex<2>>(Index(0));
+      vol = trafo.compute_vol<Shape::Simplex<2>, DataType_>(Index(0));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[3]) * (s - l[4]) * (s - l[5]) ), eps);
       // Face 1 consists of edges 1, 2, 5
       s = DataType_(0.5)*(l[1] + l[2] + l[5]);
-      vol = trafo.compute_vol<Shape::Simplex<2>>(Index(1));
+      vol = trafo.compute_vol<Shape::Simplex<2>, DataType_>(Index(1));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[1]) * (s - l[2]) * (s - l[5]) ), eps);
       // Face 2 consists of edges 0, 2, 4
       s = DataType_(0.5)*(l[0] + l[2] + l[4]);
-      vol = trafo.compute_vol<Shape::Simplex<2>>(Index(2));
+      vol = trafo.compute_vol<Shape::Simplex<2>, DataType_>(Index(2));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[0]) * (s - l[2]) * (s - l[4]) ), eps);
       // Face 3 consists of edges 0, 1, 3
       s = DataType_(0.5)*(l[0] + l[1] + l[3]);
-      vol = trafo.compute_vol<Shape::Simplex<2>>(Index(3));
+      vol = trafo.compute_vol<Shape::Simplex<2>, DataType_>(Index(3));
       TEST_CHECK_EQUAL_WITHIN_EPS(vol, sqrt(s * (s - l[0]) * (s - l[1]) * (s - l[3]) ), eps);
     }
 };

@@ -105,7 +105,7 @@ namespace FEAST
                * quadrature, which acts on [-1, 1] with quadrature points xq \in {-sqrt(1/3), sqrt(1/3)} and weights
                * wq = 1
                */
-              const DataType_ x = 1./Math::sqrt(DataType_(3.));
+              const DataType_ x = DataType_(1.)/Math::sqrt(DataType_(3.));
 
               // Evaluator for the trafo
               Evaluator trafo_eval(trafo);
