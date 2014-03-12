@@ -115,6 +115,8 @@ public:
     ShapeConvertFactory<TetraMesh> convertor(*hexa_mesh);
     TetraMesh tetra_mesh(convertor);
 
+    delete hexa_mesh;
+
     // check counts
     TEST_CHECK_EQUAL(tetra_mesh.get_num_entities(0), Index(8+6+1)); // 15 vertices
     TEST_CHECK_EQUAL(tetra_mesh.get_num_entities(1), Index(12+4*6+8+6)); // 50 edges
@@ -458,6 +460,8 @@ public:
     // convert tetra to hexa
     ShapeConvertFactory<HexaMesh> convertor(*tetra_mesh);
     HexaMesh hexa_mesh(convertor);
+
+    delete tetra_mesh;
 
     // check counts
     TEST_CHECK_EQUAL(hexa_mesh.get_num_entities(0), Index(4+6+4+1)); // 15 vertices
