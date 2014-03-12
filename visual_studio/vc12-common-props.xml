@@ -21,6 +21,26 @@
   <!-- ********************************************************************* -->
   <!-- FEAST Paths and Names -->
   <!-- ********************************************************************* -->
+
+  <!-- define FEAST debug prefix -->
+  <PropertyGroup Condition="'$(DebugMode)'=='true'">
+    <FeastDebugPrefix>dbg</FeastDebugPrefix>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DebugMode)'!='true'">
+    <FeastDebugPrefix>opt</FeastDebugPrefix>
+  </PropertyGroup>
+
+  <!-- define FEAST platform postfix -->
+  <PropertyGroup Condition="'$(Platform)'=='Win32'">
+    <FeastPlatform>x86</FeastPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <FeastPlatform>x64</FeastPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='ARM'">
+    <FeastPlatform>arm</FeastPlatform>
+  </PropertyGroup>
+
   <!-- set default obj-path if necessary -->
   <PropertyGroup Condition="'$(FeastObjPath)'==''">
     <FeastObjPath>$(FeastRootPath)\obj</FeastObjPath>
@@ -37,14 +57,16 @@
   </PropertyGroup>
 
   <!-- set default build name -->
-  <PropertyGroup Condition="'$(FeastBuildName)'=='' And '$(Platform)'=='Win32'">
-    <FeastBuildName>$(FeastAppName).vc12-$(Configuration)-x86</FeastBuildName>
+  <PropertyGroup Condition="'$(FeastBuildName)'==''">
+    <FeastBuildName>$(FeastAppName).vc12-$(Configuration)-$(FeastPlatform)</FeastBuildName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(FeastBuildName)'=='' And '$(Platform)'=='x64'">
-    <FeastBuildName>$(FeastAppName).vc12-$(Configuration)-x64</FeastBuildName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(FeastBuildName)'=='' And '$(Platform)'=='ARM'">
-    <FeastBuildName>$(FeastAppName).vc12-$(Configuration)-arm</FeastBuildName>
+
+  <!-- ********************************************************************* -->
+  <!-- FEAST Third-Party Library Detection -->
+  <!-- ********************************************************************* -->
+  <PropertyGroup Condition="Exists('..\lib\umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
+  <!--<PropertyGroup Condition="Exists('$(FeastLibPath)\umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">-->
+    <FeastHaveUmfpack>true</FeastHaveUmfpack>
   </PropertyGroup>
 
   <!-- ********************************************************************* -->
@@ -63,6 +85,8 @@
       Include="FEAST_BACKENDS_CUDA" />
     <FeastDef Condition="'$(BackendMKL)'=='true'"
       Include="FEAST_BACKENDS_MKL" />
+    <FeastDef Condition="'$(FeastHaveUmfpack)'=='true'"
+      Include="FEAST_HAVE_UMFPACK" />
   </ItemGroup>
 
   <!-- FEAST additional include directory list -->
@@ -71,10 +95,13 @@
       Include="$(MSMPI_INC)" />
     <FeastIncDir Condition="'$(BackendMKL)'=='true'"
       Include="$(MKL_PATH)\include" />
+    <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
+      Include="$(FeastRootPath)\thirdparty\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse_config;$(FeastRootPath)\thirdparty\UMFPACK\Include" />
   </ItemGroup>
 
   <!-- FEAST additional library search path list -->
   <ItemGroup Label="FEAST Library Search Paths">
+    <FeastLibDir Include="$(FeastLibPath)" />
     <FeastLibDir Condition="'$(SerialMode)'=='false' And '$(Platform)'=='Win32'"
       Include="$(MSMPI_LIB32)" />
     <FeastLibDir Condition="'$(SerialMode)'=='false' And '$(Platform)'=='x64'"
@@ -99,6 +126,8 @@
       Include="mkl_intel_c.lib" />
     <FeastLibDep Condition="'$(BackendMKL)'=='true' And '$(Platform)'=='x64'"
       Include="mkl_intel_lp64.lib" />
+    <FeastLibDep Condition="'$(FeastHaveUmfpack)'=='true'"
+      Include="umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->

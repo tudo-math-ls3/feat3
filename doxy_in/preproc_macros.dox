@@ -165,6 +165,15 @@ If defined, the LAFEM subsystem of the FEAST kernel will offer corresponding spe
 the MKL as a work-horse.
 
 <hr>
+\subsection ppm_feast_have_umfpack FEAST_HAVE_UMFPACK
+This macro is defined by the build system if the FEAST kernel is linked agains the UMFPACK library.
+
+If defined, the LAFEM subsystem of the FEAST kernel will implement the "LAFEM::Umfpack" solver class.
+
+\note The Visual Studio build system detects whether an umfpack library suitable for the current build-id
+has been compiled and linked. If so, it will define the FEAST_HAVE_UMFPACK macro automatically.
+
+<hr>
 \subsection ppm_feast_gmp FEAST_GMP
 This macro is defined by the build system if the FEAST kernel is linked against the GNU multi-precision library.
 
