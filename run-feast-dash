@@ -236,6 +236,9 @@ for branch in branches:
     continue
 
   if is_found ("valgrind") and is_found("g++"):
+    if is_found ("nvcc"):
+      run_test("serial-gcc-debug-coverage-mkl-valgrind-cudamemcheck" + addition, branch, myDB)
+    else:
       run_test("serial-gcc-debug-coverage-mkl-valgrind" + addition, branch, myDB)
 
   if is_found("mpic++"):

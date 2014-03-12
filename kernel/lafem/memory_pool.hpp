@@ -151,6 +151,8 @@ namespace FEAST
         static void copy(DT_ * dest, const DT_ * src, const Index count);
 
         static void synchronize();
+
+        static void reset_device();
     };
   } // namespace LAFEM
 } // namespace FEAST

@@ -58,8 +58,9 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Backends: cuda, mkl, gmp(not implemented yet)")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scalasca (not implemented yet)")
-  print ("  Debuging: valgrind")
+  print ("  Debugging: valgrind, cudamemcheck")
   print ("")
+  print ("Note, that cudamemcheck is only active, if cuda is activated, too.")
   print ("Note, that you need to provide at least a build mode, a parallelisation mode and a compiler.")
   print ("Note, that the actual compiler version and mpi implementation is choosen by first come, fist serve")
   print ("corresponding to your $PATH settings.")
@@ -217,6 +218,9 @@ if "cuda" in buildid:
     sys.exit(1)
   remove_string(unused_tokens, "cuda")
   cmake_flags += " -DFEAST_BACKENDS_CUDA:BOOL=ON"
+  if "cudamemcheck" in buildid:
+    remove_string(unused_tokens, "cudamemcheck")
+    cmake_flags += " -DFEAST_CUDAMEMCHECK:BOOL=ON"
 if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
   cmake_flags += " -DFEAST_BACKENDS_MKL:BOOL=ON"

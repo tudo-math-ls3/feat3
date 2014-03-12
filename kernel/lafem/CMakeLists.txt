@@ -112,8 +112,13 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/lafem/${test}" cuda)
+    --test-command ${CUDA_MEMCHECK_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} cuda cudadevicereset)
   SET_PROPERTY(TEST ${test}_cuda PROPERTY LABELS "cuda")
+  if (FEAST_VALGRIND AND FEAST_BACKENDS_CUDA)
+    SET_PROPERTY(TEST ${test}_cuda PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")
+    SET_PROPERTY(TEST ${test}_cuda PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+    SET_PROPERTY(TEST ${test}_cuda PROPERTY FAIL_REGULAR_EXPRESSION "= Leaked")
+  endif (FEAST_VALGRIND AND FEAST_BACKENDS_CUDA)
 ENDFOREACH(test)
 
 # add all tests to lafem_tests

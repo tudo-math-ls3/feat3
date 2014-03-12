@@ -129,6 +129,11 @@ void MemoryPool<Mem::CUDA>::synchronize()
   cudaDeviceSynchronize();
 }
 
+void MemoryPool<Mem::CUDA>::reset_device()
+{
+  cudaDeviceReset();
+}
+
 template float * MemoryPool<Mem::CUDA>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template Index * MemoryPool<Mem::CUDA>::allocate_memory<Index>(const Index);

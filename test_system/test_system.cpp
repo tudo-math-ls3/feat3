@@ -1,4 +1,5 @@
 #include <test_system/test_system.hpp>
+#include <kernel/lafem/memory_pool.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -7,6 +8,7 @@ int main(int argc, char** argv)
 {
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
   int result(EXIT_SUCCESS);
+  bool cudadevicereset(false);
 
   if(argc > 1)
   {
@@ -15,6 +17,11 @@ int main(int argc, char** argv)
     {
       labels.push_back(argv[i]);
     }
+
+#ifdef FEAST_BACKENDS_CUDA
+    if (find(labels.begin(), labels.end(), "cudadevicereset") != labels.end())
+      cudadevicereset = true;
+#endif
     for(TestList::Iterator i(TestList::instance()->begin_tests()), i_end(TestList::instance()->end_tests()) ;
         i != i_end ; )
     {
@@ -73,6 +80,11 @@ int main(int argc, char** argv)
     std::cout << tests_passed << " of " << list_size << " tests PASSED, "
       << tests_failed << " tests FAILED!" << std::endl;
   }
+
+#ifdef FEAST_BACKENDS_CUDA
+  if (cudadevicereset)
+    LAFEM::MemoryPool<Mem::CUDA>::reset_device();
+#endif
 
   return result;
 }
