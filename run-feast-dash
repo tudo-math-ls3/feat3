@@ -140,6 +140,10 @@ def run_test(build_id, branch, myDB):
   process_compiler_output("warning", make_output)
   process_compiler_output("error", make_output)
 
+#workaround for network base file system to prevent rebuilding everything in ctest phase
+  if is_found("sync"):
+    get_output("sync")
+
 ######### TEST #####################
   test_output = get_output_utf8("ctest --output-on-failure --schedule-random")
 
@@ -236,10 +240,11 @@ for branch in branches:
     continue
 
   if is_found ("valgrind") and is_found("g++"):
-    if is_found ("nvcc"):
-      run_test("serial-gcc-debug-coverage-mkl-valgrind-cudamemcheck" + addition, branch, myDB)
-    else:
       run_test("serial-gcc-debug-coverage-mkl-valgrind" + addition, branch, myDB)
+  elif is_found ("nvcc") and is_found("g++"):
+      run_test("serial-gcc-debug-coverage-mkl-cudamemcheck" + addition, branch, myDB)
+  elif is_found ("valgrind") and is_found ("nvcc") and is_found("g++"):
+      run_test("serial-gcc-debug-coverage-mkl-valgrind-cudamemcheck" + addition, branch, myDB)
 
   if is_found("mpic++"):
     if is_found("g++"):
