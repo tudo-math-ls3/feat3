@@ -253,8 +253,14 @@ namespace FEAST
         {
           if(!result)
           {
-            s_a = stringify(a);
-            s_b = stringify(b);
+            if (std::is_floating_point<T1_>::value)
+              s_a = scientify(a);
+            else
+              s_a = stringify(a);
+            if (std::is_floating_point<T2_>::value)
+              s_b = scientify(b);
+            else
+              s_b = stringify(b);
           }
         }
 
@@ -309,8 +315,14 @@ namespace FEAST
         {
           if(result)
           {
-            s_a = stringify(a);
-            s_b = stringify(b);
+            if (std::is_floating_point<T1_>::value)
+              s_a = scientify(a);
+            else
+              s_a = stringify(a);
+            if (std::is_floating_point<T2_>::value)
+              s_b = scientify(b);
+            else
+              s_b = stringify(b);
           }
         }
 
