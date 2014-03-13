@@ -1,5 +1,5 @@
 #include <test_system/test_system.hpp>
-#include <kernel/lafem/memory_pool.hpp>
+#include <test_system/cuda.hpp>
 
 using namespace FEAST;
 using namespace FEAST::TestSystem;
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 
 #ifdef FEAST_BACKENDS_CUDA
   if (cudadevicereset)
-    LAFEM::MemoryPool<Mem::CUDA>::reset_device();
+    reset_device();
 #endif
 
   return result;
