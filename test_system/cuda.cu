@@ -3,7 +3,7 @@
 using namespace FEAST;
 using namespace FEAST::TestSystem;
 
-void reset_device()
+void FEAST::TestSystem::reset_device()
 {
   cudaDeviceReset();
 }
