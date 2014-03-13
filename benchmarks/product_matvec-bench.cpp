@@ -58,6 +58,16 @@ void run()
   flops /= 1000; // mega
   flops /= 1000; // giga
   std::cout<<"GFlop/s: "<<flops<<std::endl;
+  double bytes(sys.used_elements());
+  bytes *= 2;
+  bytes += size;
+  bytes *= sizeof(DT_);
+  bytes *= iters;
+  bytes /= mean;
+  bytes /= 1024; // kilo
+  bytes /= 1024; // mega
+  bytes /= 1024; // giga
+  std::cout<<"GByte/s: "<<bytes<<std::endl;
   std::cout<<"=============================================="<<std::endl;
 }
 
