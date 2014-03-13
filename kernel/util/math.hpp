@@ -9,6 +9,43 @@
 #include <cmath>
 #include <limits>
 
+#ifdef FEAST_HAVE_QUADMATH
+extern "C"
+{
+#    include <quadmath.h>
+}
+#  define CAT_(x,y) x##y
+#  define CAT(x,y) CAT_(x,y)
+#  define WRAP_QUAD_MATH1(func) \
+    inline __float128 func(__float128 x) {return ::CAT(func,q)(x);}
+#  define WRAP_QUAD_MATH2(func) \
+    inline __float128 func(__float128 x, __float128 y) {return ::CAT(func,q)(x, y);}
+#  define WRAP_QUAD_MATH2PTR(func) \
+    inline __float128 func(__float128 x, __float128* y) {return ::CAT(func,q)(x, y);}
+#else
+#  define WRAP_QUAD_MATH1(func)
+#  define WRAP_QUAD_MATH2(func)
+#  define WRAP_QUAD_MATH2PTR(func)
+#endif // FEAST_HAVE_QUADMATH
+
+    // single argument function wrapper
+#define WRAP_STD_MATH1(func) \
+    inline float func(float x) {return std::func(x);} \
+    inline double func(double x) {return std::func(x);} \
+    inline long double func(long double x) {return std::func(x);}
+
+    // double argument function wrapper
+#define WRAP_STD_MATH2(func) \
+    inline float func(float x, float y) {return std::func(x,y);} \
+    inline double func(double x, double y) {return std::func(x,y);} \
+    inline long double func(long double x, long double y) {return std::func(x,y);}
+
+    // double argument function wrapper
+#define WRAP_STD_MATH2PTR(func) \
+    inline float func(float x, float* y) {return std::func(x,y);} \
+    inline double func(double x, double* y) {return std::func(x,y);} \
+    inline long double func(long double x, long double* y) {return std::func(x,y);}
+
 namespace FEAST
 {
   /**
@@ -20,10 +57,16 @@ namespace FEAST
   namespace Math
   {
     // include C++ overloads of C89 math functions
-    using std::ceil;
-    using std::floor;
-    using std::fmod;
-    using std::modf;
+    WRAP_STD_MATH1(ceil)
+    WRAP_STD_MATH1(floor)
+    WRAP_STD_MATH2(fmod)
+    WRAP_STD_MATH2PTR(modf)
+
+    // wrap quadmath functions
+    WRAP_QUAD_MATH1(ceil)
+    WRAP_QUAD_MATH1(floor)
+    WRAP_QUAD_MATH2(fmod)
+    WRAP_QUAD_MATH2PTR(modf)
 
     /**
      * \brief Returns the square of a value.
@@ -111,18 +154,6 @@ namespace FEAST
       return (x < T_(0) ? -T_(1) : (x > T_(0) ? T_(1) : T_(0)));
     }
 
-    // single argument function wrapper
-#define WRAP_STD_MATH1(func) \
-    inline float func(float x) {return std::func(x);} \
-    inline double func(double x) {return std::func(x);} \
-    inline long double func(long double x) {return std::func(x);}
-
-    // double argument function wrapper
-#define WRAP_STD_MATH2(func) \
-    inline float func(float x, float y) {return std::func(x,y);} \
-    inline double func(double x, double y) {return std::func(x,y);} \
-    inline long double func(long double x, long double y) {return std::func(x,y);}
-
     /**
      * \brief Returns the absolute value.
      *
@@ -138,6 +169,9 @@ namespace FEAST
 
     // wrap std::abs
     WRAP_STD_MATH1(abs)
+#ifdef FEAST_HAVE_QUADMATH
+    inline __float128 abs(__float128 x) {return ::fabsq(x);}
+#endif // FEAST_HAVE_QUADMATH
 
     /**
      * \brief Returns the square-root of a value.
@@ -169,6 +203,7 @@ namespace FEAST
 
     // wrap std::sqrt
     WRAP_STD_MATH1(sqrt)
+    WRAP_QUAD_MATH1(sqrt)
 
     /**
      * \brief Returns the sine of a value.
@@ -201,6 +236,7 @@ namespace FEAST
 
     // wrap std::sin
     WRAP_STD_MATH1(sin)
+    WRAP_QUAD_MATH1(sin)
 
     /**
      * \brief Returns the cosine of a value.
@@ -233,6 +269,7 @@ namespace FEAST
 
     // wrap std::cos
     WRAP_STD_MATH1(cos)
+    WRAP_QUAD_MATH1(cos)
 
     /**
      * \brief Returns the tangent of a value.
@@ -249,6 +286,7 @@ namespace FEAST
 
     // wrap std::tan
     WRAP_STD_MATH1(tan)
+    WRAP_QUAD_MATH1(tan)
 
     /**
      * \brief Returns the exponential of a value.
@@ -272,6 +310,7 @@ namespace FEAST
 
     // wrap std::exp
     WRAP_STD_MATH1(exp)
+    WRAP_QUAD_MATH1(exp)
 
     /**
      * \brief Returns the natural logarithm of a value.
@@ -296,6 +335,7 @@ namespace FEAST
 
     // wrap std::log
     WRAP_STD_MATH1(log)
+    WRAP_QUAD_MATH1(log)
 
     /**
      * \brief Returns the logarithm to the base 10 of a value.
@@ -312,6 +352,7 @@ namespace FEAST
 
     // wrap std::log10
     WRAP_STD_MATH1(log10)
+    WRAP_QUAD_MATH1(log10)
 
     /**
      * \brief Returns x raised to the power of y.
@@ -329,6 +370,7 @@ namespace FEAST
 
     // wrap std::pow
     WRAP_STD_MATH2(pow)
+    WRAP_QUAD_MATH2(pow)
 
     /**
      * \brief Returns the arctangent of a value.
@@ -364,6 +406,7 @@ namespace FEAST
 
     // wrap std::atan
     WRAP_STD_MATH1(atan)
+    WRAP_QUAD_MATH1(atan)
 
     /**
      * \brief Returns the arctangent of y/x.
@@ -382,6 +425,7 @@ namespace FEAST
 
     // wrap std::atan2
     WRAP_STD_MATH2(atan2)
+    WRAP_QUAD_MATH2(atan2)
 
     /**
      * \brief Returns the mathematical constant pi = 3.1415...
@@ -461,6 +505,14 @@ namespace FEAST
     {
       return std::numeric_limits<long double>::epsilon();
     }
+
+#ifdef FEAST_HAVE_QUADMATH
+    template<>
+    inline __float128 eps<__float128>()
+    {
+      return FLT128_EPSILON;
+    }
+#endif // FEAST_HAVE_QUADMATH
     /// \endcond
 
     /**
@@ -477,6 +529,7 @@ namespace FEAST
     }
 
     WRAP_STD_MATH1(asin)
+    WRAP_QUAD_MATH1(asin)
 
     /**
      * \brief Returns the arccosine of a value.
@@ -492,6 +545,7 @@ namespace FEAST
     }
 
     WRAP_STD_MATH1(acos)
+    WRAP_QUAD_MATH1(acos)
 
     /**
      * \brief Calculates the (partial) factorial.
@@ -589,6 +643,47 @@ namespace FEAST
         return Math::pi<T_>();
       }
     }; // class Limits<...>
+
+#ifdef FEAST_HAVE_QUADMATH
+    template<>
+    class Limits<__float128>
+    {
+    public:
+      static constexpr bool is_specialized = true;
+      static /*constexpr*/ __float128 min() noexcept { return FLT128_MIN; }
+      static /*constexpr*/ __float128 max() noexcept { return FLT128_MAX; }
+      static /*constexpr*/ __float128 lowest() noexcept { return -FLT128_MAX; }
+      static constexpr int digits = FLT128_MANT_DIG;
+      static constexpr int digits10 = FLT128_DIG;
+      // Note: The following formula was taken from the MSC implementation...
+      static constexpr int max_digits10 = (2 + FLT128_MANT_DIG * 301 / 1000);
+      static constexpr bool is_signed = true;
+      static constexpr bool is_integer = false;
+      static constexpr bool is_exact = false;
+      static constexpr int radix = 2;
+      static /*constexpr*/ __float128 epsilon() noexcept { return FLT128_EPSILON; }
+      static constexpr __float128 round_error() noexcept { return __float128(0.5); }
+      static constexpr int min_exponent = FLT128_MIN_EXP;
+      static constexpr int min_exponent10 = FLT128_MIN_10_EXP;
+      static constexpr int max_exponent = FLT128_MAX_EXP;
+      static constexpr int max_exponent10 = FLT128_MAX_10_EXP;
+      static constexpr bool has_infinity = true;
+      static constexpr bool has_quiet_NaN = true;
+      static constexpr bool has_signaling_NaN = false;
+      static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+      static constexpr bool has_denorm_loss = false;
+      static /*constexpr*/ __float128 infinity() noexcept { return max()*max(); }
+      static /*constexpr*/ __float128 quiet_NaN() noexcept { return ::nanq(nullptr); }
+      static /*constexpr*/ __float128 signaling_NaN() noexcept { return ::nanq(nullptr); }
+      static /*constexpr*/ __float128 denorm_min() noexcept { return FLT128_DENORM_MIN; }
+      static constexpr bool is_iec559 = false;
+      static constexpr bool is_bounded = true;
+      static constexpr bool is_modulo = false;
+      static constexpr bool traps = true;
+      static constexpr bool tinyness_before = true;
+      static constexpr std::float_round_style round_style = std::round_to_nearest;
+    };
+#endif // FEAST_HAVE_QUADMATH
   } // namespace Math
 } // namespace FEAST
 

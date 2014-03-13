@@ -436,5 +436,8 @@ class LinAlgTest :
 #undef ZERO
 }; // class LinAlgTest
 
-LinAlgTest<double> tagged_linalg_test_d("LinearAlgebraTest<double>");
-LinAlgTest<float>  tagged_linalg_test_f("LinearAlgebraTest<float>");
+LinAlgTest<double> tagged_linalg_test_double("LinearAlgebraTest<double>");
+LinAlgTest<float>  tagged_linalg_test_float("LinearAlgebraTest<float>");
+#ifdef FEAST_HAVE_QUADMATH
+LinAlgTest<__float128>  tagged_linalg_test_f128("LinearAlgebraTest<__float128>");
+#endif // FEAST_HAVE_QUADMATH

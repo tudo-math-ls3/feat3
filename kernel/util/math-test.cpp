@@ -196,3 +196,6 @@ public:
 };
 
 MathTest<double> math_test_double;
+#ifdef FEAST_HAVE_QUADMATH
+MathTest<__float128> math_test_float128;
+#endif // FEAST_HAVE_QUADMATH

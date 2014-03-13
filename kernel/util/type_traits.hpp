@@ -488,6 +488,39 @@ namespace FEAST
         return "bool";
       }
     };
+
+#ifdef FEAST_HAVE_QUADMATH
+    /**
+     * \brief Type Traits specialisation for <c>__float128</c>
+     *
+     * \author Peter Zajac
+     */
+    template<>
+    struct Traits<__float128>
+    {
+      /// dummy enum
+      enum
+      {
+        /// this type is not integral
+        is_int = 0,
+        /// this type is floating
+        is_float = 1,
+        /// this type is not boolean
+        is_bool = 0,
+        /// this type is signed
+        is_signed = 1
+      };
+
+      /// this type is of floating class
+      typedef FloatingClass TypeClass;
+
+      /// returns a string identifying the datatype
+      static String name()
+      {
+        return "__float128";
+      }
+    };
+#endif // FEAST_HAVE_QUADMATH
   } // namespace Type
 } // namespace FEAST
 

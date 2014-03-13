@@ -17,6 +17,15 @@
 #  include <string.h> // for _stricmp
 #endif
 
+#ifndef __CUDACC__
+#ifdef FEAST_HAVE_QUADMATH
+extern "C"
+{
+#    include <quadmath.h>
+}
+#endif // FEAST_HAVE_QUADMATH
+#endif // __CUDACC__
+
 namespace FEAST
 {
   /**
@@ -622,6 +631,24 @@ namespace FEAST
       s.assign(*this);
       return true;
     }
+
+#ifndef __CUDACC__
+#ifdef FEAST_HAVE_QUADMATH
+    bool parse(__float128& x) const
+    {
+      if(this->empty())
+        return false;
+
+      const char* nptr(this->c_str());
+      char* endptr(nullptr);
+      x = strtoflt128(nptr, &endptr);
+      // Note: According to the C-Standard (ISO/IEC 9899:1190 (E), 7.10.1.4 The strod function),
+      // the 'strtod' function sets 'endptr' to 'nptr' if the conversion fails, so we simply
+      // hope that the quadmath function for __float128 honors this convention...
+      return (nptr != endptr);
+    }
+#endif // FEAST_HAVE_QUADMATH
+#endif // __CUDACC__
     /// \endcond
 
     /**
@@ -721,12 +748,26 @@ namespace FEAST
     return String(item ? "true" : "false");
   }
 
-#ifndef  __CUDACC__
+#ifndef __CUDACC__
   inline String stringify(std::nullptr_t)
   {
     return String("nullptr");
   }
-#endif
+
+#ifdef FEAST_HAVE_QUADMATH
+  inline String stringify(__float128 value)
+  {
+    // get buffer length
+    int len = ::quadmath_snprintf(nullptr, 0, "%Qg", value);
+    // allocate buffer
+    std::vector<char> buffer(len+16);
+    // print to buffer
+    quadmath_snprintf(buffer.data(), buffer.size(), "%Qg", value);
+    // convert buffer to string
+    return String(buffer.data());
+  }
+#endif // FEAST_HAVE_QUADMATH
+#endif // __CUDACC__
   /// \endcond
 
   /**
@@ -764,6 +805,56 @@ namespace FEAST
     oss << value;
     return oss.str();
   }
+
+#ifndef __CUDACC__
+#ifdef FEAST_HAVE_QUADMATH
+  inline String scientify(__float128 value, int precision = 0, int width = 0)
+  {
+    String format("%");
+    if(width > 0)
+      format.append(stringify(width));
+    if(precision > 0)
+    {
+      format.append(".");
+      format.append(stringify(precision));
+    }
+    format.append("Qe");
+    // get buffer length
+    int len = ::quadmath_snprintf(nullptr, 0, format.c_str(), value);
+    // allocate buffer
+    std::vector<char> buffer(len+16);
+    // print to buffer
+    quadmath_snprintf(buffer.data(), buffer.size(), format.c_str(), value);
+    // convert buffer to string
+    return String(buffer.data());
+  }
+
+  inline std::ostream& operator<<(std::ostream& os, __float128 x)
+  {
+    // write to stream
+    return (os << stringify(x));
+  }
+
+  inline std::istream& operator>>(std::istream& is, __float128& x)
+  {
+    String buffer;
+    // try to parse a string
+    if(!(is >> buffer).fail())
+    {
+      if(!buffer.parse(x))
+      {
+        // parse failed, so put back the string
+        for(std::size_t i(0); i < buffer.size(); ++i)
+          is.putback(buffer.at(i));
+
+        // set failbit
+        is.setstate(std::ios_base::failbit);
+      }
+    }
+    return is;
+  }
+#endif // FEAST_HAVE_QUADMATH
+#endif // __CUDACC__
 } // namespace FEAST
 
 #endif // KERNEL_UTIL_STRING_HPP

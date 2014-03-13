@@ -127,3 +127,6 @@ public:
 
 TinyAlgebraTest<float> tagged_tiny_test_f("TinyAlgebraTest<float>");
 TinyAlgebraTest<double> tagged_tiny_test_d("TinyAlgebraTest<double>");
+#ifdef FEAST_HAVE_QUADMATH
+TinyAlgebraTest<__float128> tagged_tiny_test_f128("TinyAlgebraTest<__float128>");
+#endif // FEAST_HAVE_QUADMATH
