@@ -55,10 +55,11 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Parallelisation: serial, mpi")
   print ("  Compiler: gcc, icc, clang")
   print ("  Compiler frontends: ccache")
-  print ("  Backends: cuda, mkl, gmp(not implemented yet)")
+  print ("  Backends: cuda, mkl")
   print ("  Generators: unixmake, ninja, xcode, mingw, msys - defaults to unixmake if none is choosen")
   print ("  Instrumentation: scalasca (not implemented yet)")
   print ("  Debugging: valgrind, cudamemcheck")
+  print ("  Precision extensions: quadmath")
   print ("")
   print ("Note, that cudamemcheck is only active, if cuda is activated, too.")
   print ("Note, that you need to provide at least a build mode, a parallelisation mode and a compiler.")
@@ -93,7 +94,7 @@ if len(sys.argv) == 1 or "guess" in sys.argv:
 
   if is_found("nvcc"):
     buildid_string += "-cuda"
-#TODO suchen nach mkl und gmp
+#TODO suchen nach mkl
 
 # use provided build id
 else:
@@ -225,9 +226,10 @@ if "mkl" in buildid:
   remove_string(unused_tokens, "mkl")
   cmake_flags += " -DFEAST_BACKENDS_MKL:BOOL=ON"
   cxxflags += " -DMKL_ILP64"
-if "gmp" in buildid:
-  remove_string(unused_tokens, "gmp")
-  cmake_flags += " -DFEAST_GMP:BOOL=ON"
+if "quadmath" in buildid:
+  remove_string(unused_tokens, "quadmath")
+  cmake_flags += " -DFEAST_HAVE_QUADMATH:BOOL=ON"
+  cxxflags += " -lquadmath"
 if "valgrind" in buildid:
   if not is_found("valgrind"):
     print ("Error: Choosen debugger valgrind not found!")

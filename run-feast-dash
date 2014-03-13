@@ -230,7 +230,6 @@ for branch in branches:
     continue
 
   run_test("guess", branch, myDB)
-#TODO reactivate gmp everywhere
 
   if platform.system() == "Darwin": # schwarzkopf has no mkl
     run_test("mpi-gcc-debug-coverage" + addition, branch, myDB)
@@ -240,29 +239,29 @@ for branch in branches:
     continue
 
   if is_found ("valgrind") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-valgrind" + addition, branch, myDB)
+      run_test("serial-gcc-debug-coverage-mkl-quadmath-valgrind" + addition, branch, myDB)
   elif is_found ("nvcc") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-cudamemcheck" + addition, branch, myDB)
+      run_test("serial-gcc-debug-coverage-mkl-quadmath-cudamemcheck" + addition, branch, myDB)
   elif is_found ("valgrind") and is_found ("nvcc") and is_found("g++"):
-      run_test("serial-gcc-debug-coverage-mkl-valgrind-cudamemcheck" + addition, branch, myDB)
+      run_test("serial-gcc-debug-coverage-mkl-quadmath-valgrind-cudamemcheck" + addition, branch, myDB)
 
   if is_found("mpic++"):
     if is_found("g++"):
-      run_test("mpi-gcc-debug-coverage-mkl" + addition, branch, myDB)
-      run_test("mpi-gcc-opt-coverage-mkl" + addition, branch, myDB)
+      run_test("mpi-gcc-debug-coverage-quadmath-mkl" + addition, branch, myDB)
+      run_test("mpi-gcc-opt-coverage-quadmath-mkl" + addition, branch, myDB)
     if is_found("clang++"):
       run_test("mpi-clang-debug-mkl" + addition, branch, myDB)
       run_test("mpi-clang-opt-mkl" + addition, branch, myDB)
     if is_found("icpc"):
-      run_test("mpi-icc-debug-mkl" + addition, branch, myDB)
-      run_test("mpi-icc-opt-mkl" + addition, branch, myDB)
+      run_test("mpi-icc-debug-quadmath-mkl" + addition, branch, myDB)
+      run_test("mpi-icc-opt-quadmath-mkl" + addition, branch, myDB)
 
   if is_found("g++"):
-    run_test("serial-gcc-debug-coverage-mkl" + addition, branch, myDB)
-    run_test("serial-gcc-opt-coverage-mkl" + addition, branch, myDB)
+    run_test("serial-gcc-debug-coverage-quadmath-mkl" + addition, branch, myDB)
+    run_test("serial-gcc-opt-coverage-quadmath-mkl" + addition, branch, myDB)
   if is_found("clang++"):
     run_test("serial-clang-debug-mkl" + addition, branch, myDB)
     run_test("serial-clang-opt-mkl" + addition, branch, myDB)
   if is_found("icpc"):
-    run_test("serial-icc-debug-mkl" + addition, branch, myDB)
-    run_test("serial-icc-opt-mkl" + addition, branch, myDB)
+    run_test("serial-icc-debug-quadmath-mkl" + addition, branch, myDB)
+    run_test("serial-icc-opt-quadmath-mkl" + addition, branch, myDB)
