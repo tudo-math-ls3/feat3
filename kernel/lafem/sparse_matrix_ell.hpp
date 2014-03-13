@@ -892,7 +892,7 @@ namespace FEAST
           MemoryPool<Mem_>::template download<DT_>(Ax, this->_elements.at(0), dim);
           double * cAx = new double[dim];
           for (Index i(0) ; i < dim ; ++i)
-            cAx[i] = Type::Traits<DT_>::to_double(Ax[i]);
+            cAx[i] = (double)Ax[i];
           MemoryPool<Mem::Main>::instance()->release_memory(Ax);
 
           uint64_t tdim(dim);
@@ -941,7 +941,7 @@ namespace FEAST
           {
             if (temp.Ax()[i] != DT_(0))
             {
-              file << (i%this->_scalar_index.at(3)) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << Type::Traits<DT_>::to_double(temp.Ax()[i]) << ";" << std::endl;
+              file << (i%this->_scalar_index.at(3)) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
             }
           }
           file << "];" << std::endl;
@@ -979,7 +979,7 @@ namespace FEAST
           {
             if (temp.Ax()[i] != DT_(0))
             {
-              file << (i%this->_scalar_index.at(3)) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << Type::Traits<DT_>::to_double(temp.Ax()[i]) << ";" << std::endl;
+              file << (i%this->_scalar_index.at(3)) + 1 << " " << temp.Aj()[i] + 1 << " " << std::scientific << temp.Ax()[i] << ";" << std::endl;
             }
           }
         }

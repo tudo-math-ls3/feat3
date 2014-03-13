@@ -71,12 +71,6 @@ namespace FEAST
       {
         return "float";
       }
-
-      /// returns the items value in double precision
-      static double to_double(float val)
-      {
-        return (double)val;
-      }
     };
 
     /**
@@ -108,12 +102,6 @@ namespace FEAST
       static String name()
       {
         return "double";
-      }
-
-      /// returns the items value in double precision
-      static double to_double(double val)
-      {
-        return val;
       }
     };
 
@@ -370,12 +358,6 @@ namespace FEAST
       static String name()
       {
         return "unsigned long";
-      }
-
-      /// returns the items value in double precision
-      static double to_double(unsigned long val)
-      {
-        return (double)val;
       }
     };
 

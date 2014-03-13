@@ -881,7 +881,7 @@ namespace FEAST
           MemoryPool<Mem_>::template download<DT_>(val, this->_elements.at(0), ue);
           double * cval = new double[ue];
           for (Index i(0) ; i < ue ; ++i)
-            cval[i] = Type::Traits<DT_>::to_double(val[i]);
+            cval[i] = (double)val[i];
           MemoryPool<Mem::Main>::instance()->release_memory(val);
 
           uint64_t rows(this->_scalar_index.at(1));
@@ -925,7 +925,7 @@ namespace FEAST
           file << "data = [" << std::endl;
           for (Index i(0) ; i < used_elements() ; ++i)
           {
-            file << temp.row()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << Type::Traits<DT_>::to_double(temp.val()[i]) << ";" << std::endl;
+            file << temp.row()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
@@ -959,7 +959,7 @@ namespace FEAST
 
           for (Index i(0) ; i < used_elements() ; ++i)
           {
-            file << temp.row()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << Type::Traits<DT_>::to_double(temp.val()[i]) << std::endl;
+            file << temp.row()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << temp.val()[i] << std::endl;
           }
         }
 

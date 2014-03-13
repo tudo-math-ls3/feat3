@@ -830,7 +830,7 @@ namespace FEAST
           MemoryPool<Mem_>::template download<DT_>(val, this->_elements.at(0), this->_elements_size.at(0));
           double * cval = new double[this->_elements_size.at(0)];
           for (Index i(0) ; i < this->_elements_size.at(0) ; ++i)
-            cval[i] = Type::Traits<DT_>::to_double(val[i]);
+            cval[i] = (double)val[i];
           MemoryPool<Mem::Main>::instance()->release_memory(val);
 
           uint64_t rows(this->_scalar_index.at(1));
@@ -879,7 +879,7 @@ namespace FEAST
             {
               if (temp.val()[i] != DT_(0))
               {
-                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << Type::Traits<DT_>::to_double(temp.val()[i]) << ";" << std::endl;
+                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
               }
             }
           }
@@ -920,7 +920,7 @@ namespace FEAST
             {
               if (temp.val()[i] != DT_(0))
               {
-                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << Type::Traits<DT_>::to_double(temp.val()[i]) << ";" << std::endl;
+                file << row + 1 << " " << temp.col_ind()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
               }
             }
           }

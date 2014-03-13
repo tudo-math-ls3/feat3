@@ -420,7 +420,7 @@ namespace FEAST
 
           for (Index i(0) ; i < this->_scalar_index.at(0) ; ++i)
           {
-            file << std::scientific << Type::Traits<DT_>::to_double(temp[i]) << std::endl;
+            file << std::scientific << temp[i] << std::endl;
           }
 
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
@@ -456,7 +456,7 @@ namespace FEAST
           double * ctemp = new double[csize];
           for (Index i(0) ; i < csize ; ++i)
           {
-            ctemp[i] = Type::Traits<DT_>::to_double(temp[i]);
+            ctemp[i] = (double)temp[i];
           }
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
 
