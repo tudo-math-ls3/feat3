@@ -7,6 +7,7 @@ def configure_icc(cpu, buildmode):
   major = int(version["__INTEL_COMPILER"][0:2])
   minor = int(version["__INTEL_COMPILER"][-2:])
   minor2 = int(version["__INTEL_COMPILER_UPDATE"])
+  print ("Detected icc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
   cxxflags = "-std=c++11 -g"
   if buildmode == "debug":

@@ -7,6 +7,7 @@ def configure_clang(cpu, buildmode):
   major = int(version["__clang_major__"])
   minor = int(version["__clang_minor__"])
   minor2 = int(version["__clang_patchlevel__"])
+  print ("Detected clang version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
 
   cxxflags = "-pipe  -Wno-unused-parameter -std=c++11 -ggdb -fcolor-diagnostics -m64"

@@ -8,6 +8,7 @@ def configure_gcc(cpu, buildmode):
   major = int(version["__GNUC__"])
   minor = int(version["__GNUC_MINOR__"])
   minor2 = int(version["__GNUC_PATCHLEVEL__"])
+  print ("Detected gcc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
   if major <= 4 and minor <= 4:
     print ("GNU Compiler version less then 4.4 is not supported, please update your compiler!")
