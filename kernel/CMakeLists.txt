@@ -56,7 +56,7 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/${test}" none)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
 
   ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
@@ -67,7 +67,7 @@ FOREACH (test ${test_list} )
     --build-nocmake
     --build-noclean
     --build-exe-dir "${CURRENT_BINARY_DIR}"
-    --test-command "${FEAST_BINARY_DIR}/kernel/${test}" main)
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/${test} main)
   SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
 ENDFOREACH(test)
 
