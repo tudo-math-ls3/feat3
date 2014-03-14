@@ -735,7 +735,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const int p) :
+      ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -752,7 +752,7 @@ namespace FEAST
         }
         else
         {
-          _symbolic_lu_factorisation(p);
+          _symbolic_lu_factorisation((int) p);
           _copy_entries();
         }
 
@@ -1002,7 +1002,7 @@ namespace FEAST
               col2 = it2->second;
               l2 = it2->first;
 
-              neues_level = 2* (int)n - l - l2 + 1;
+              neues_level = 2* (int) n - l - l2 + 1;
 
               // if new entries must be created, find the correct position in the list
               if (neues_level <= p)
@@ -1154,7 +1154,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const int p) :
+      ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & A, const Index p) :
         _A(A)
       {
         if (_A.columns() != _A.rows())
@@ -1171,7 +1171,7 @@ namespace FEAST
         }
         else
         {
-          _symbolic_lu_factorisation(p);
+          _symbolic_lu_factorisation((int) p);
           _copy_entries();
         }
 
@@ -1576,7 +1576,7 @@ namespace FEAST
        *
        * Creates a ILU preconditioner to the given matrix and level of fillin
        */
-      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const int p) :
+      ILUPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A, const Index p) :
         _precond(SparseMatrixCSR<Mem_, DT_> (A), p)
       {
       }
