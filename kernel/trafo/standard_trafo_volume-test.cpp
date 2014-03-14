@@ -151,7 +151,7 @@ class StandardTrafoVolumeTest
 
     void test_3d_quad() const
     {
-      const DataType_ tol = Math::pow(Math::eps<DataType_>(), DataType_(0.6));
+      const DataType_ tol = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
 
       typedef Shape::Hypercube<3> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
