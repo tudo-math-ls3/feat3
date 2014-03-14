@@ -8,7 +8,9 @@ int main(int argc, char** argv)
 {
   std::cout<<"CTEST_FULL_OUTPUT"<<std::endl;
   int result(EXIT_SUCCESS);
+#ifdef FEAST_BACKENDS_CUDA
   bool cudadevicereset(false);
+#endif
 
   if(argc > 1)
   {
