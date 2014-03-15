@@ -493,8 +493,8 @@ namespace FEAST
           for (auto i : this->_indices)
             MemoryPool<Mem_>::instance()->increase_memory(i);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
-          this->_elements_size.push_back(this->_scalar_index.at(3));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(4)));
+          this->_elements_size.push_back(this->_scalar_index.at(4));
         }
 
         /**
