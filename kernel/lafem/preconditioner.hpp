@@ -3340,7 +3340,7 @@ namespace FEAST
         this->create_a_columnwise();
 
         // Iteration over each row of \f$M \approx A^{-1}\f$
-        for (Index k = 0; k < n; ++k)
+        for (Index k(0); k < n; ++k)
         {
           nn = 0;
           mm = 0;
