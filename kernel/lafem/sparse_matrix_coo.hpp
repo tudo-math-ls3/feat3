@@ -1176,10 +1176,16 @@ namespace FEAST
          * \brief Retrieve convenient sparse matrix layout object.
          *
          * \return An object containing the sparse matrix layout.
+         *
+         * \note This methods creates a deep copy of its own layout and returns it.
+         * This is necessary because coo layouts may change after creation and thus cannot be used by two different SparseMatrix Objects.
+         * Nevertheless it is usefull to extract a matrix' layout, to create another matrix with the same matrix (same as 'same' at the moment of creation).
          */
         SparseLayout<Mem_, LayoutType> layout() const
         {
-          SparseLayout<Mem_, LayoutType> layout(this->_indices, this->_indices_size, this->_scalar_index);
+          SparseMatrixCOO t;
+          t = this->clone();
+          SparseLayout<Mem_, LayoutType> layout(t._indices, t._indices_size, t._scalar_index);
           return layout;
         }
 
