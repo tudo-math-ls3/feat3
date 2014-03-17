@@ -456,8 +456,9 @@ namespace FEAST
       /// the data type of the matrix
       typedef T_ DataType;
 
-      /// actual matrix data
-      T_ v[sm_][sn_];
+      /// actual matrix data; that's an array of vectors
+      typedef Vector<T_, n_, sn_> RowType;
+      RowType v[sm_];
 
       /// default constructor
       Matrix()
@@ -469,10 +470,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j]= value;
-          }
+          v[i] = value;
         }
       }
 
@@ -482,10 +480,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j] = a.v[i][j];
-          }
+          v[i] = a.v[i];
         }
       }
 
@@ -494,10 +489,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j]= value;
-          }
+          v[i] = value;
         }
         return *this;
       }
@@ -508,10 +500,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j] = a.v[i][j];
-          }
+          v[i] = a.v[i];
         }
         return *this;
       }
@@ -549,14 +538,14 @@ namespace FEAST
        * \returns
        * A (const) pointer to the <c>i</c>-th row of the matrix.S
        */
-      T_* operator[](Index i)
+      RowType& operator[](Index i)
       {
         ASSERT(i < Index(m_), "index i out-of-bounds");
         return v[i];
       }
 
       /** \copydoc operator[]() */
-      const T_* operator[](Index i) const
+      const RowType& operator[](Index i) const
       {
         ASSERT(i < Index(m_), "index i out-of-bounds");
         return v[i];
@@ -595,10 +584,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j] *= alpha;
-          }
+          v[i] *= alpha;
         }
         return *this;
       }
@@ -609,10 +595,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j] += a.v[i][j];
-          }
+          v[i] += a.v[i];
         }
         return *this;
       }
@@ -623,10 +606,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j] -= a.v[i][j];
-          }
+          v[i] -= a.v[i];
         }
         return *this;
       }
@@ -641,10 +621,7 @@ namespace FEAST
       {
         for(Index i(0); i < Index(m_); ++i)
         {
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            v[i][j] = alpha;
-          }
+          v[i].format(alpha);
         }
       }
 
@@ -684,7 +661,8 @@ namespace FEAST
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
-        return Intern::DetHelper<m_, n_>::template compute<T_, sm_, sn_>(v);
+        typedef T_ Tv[sm_][sn_];
+        return Intern::DetHelper<m_, n_>::template compute<T_, sm_, sn_>(*reinterpret_cast<const Tv*>(this));
       }
 
       /**
@@ -702,7 +680,8 @@ namespace FEAST
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
-        return Intern::VolHelper<m_, n_>::template compute<T_, sm_, sn_>(v);
+        typedef T_ Tv[sm_][sn_];
+        return Intern::VolHelper<m_, n_>::template compute<T_, sm_, sn_>(*reinterpret_cast<const Tv*>(this));
       }
 
       /**
@@ -720,7 +699,10 @@ namespace FEAST
       {
         // Note: We need to specify the template arguments for the 'compute' function explicitly as the
         //       Intel C++ compiler cannot deduct the arguments automatically due to a compiler bug.
-        Intern::InverseHelper<m_,n_>::template compute<T_, sm_, sn_, sma_, sna_>(v, a.v);
+        typedef T_ Tv[sm_][sn_];
+        typedef T_ Ta[sma_][sna_];
+        Intern::InverseHelper<m_,n_>::template compute<T_, sm_, sn_, sma_, sna_>(
+          *reinterpret_cast<Tv*>(this), *reinterpret_cast<const Ta*>(&a));
         return *this;
       }
 
@@ -766,12 +748,7 @@ namespace FEAST
         T_ r(T_(0));
         for(Index i(0); i < Index(m_); ++i)
         {
-          T_ t(T_(0));
-          for(Index j(0); j < Index(n_); ++j)
-          {
-            t += v[i][j] * y[j];
-          }
-          r += x[i] * t;
+          r += x[i] * dot(v[i], y);
         }
         return r;
       }
@@ -1026,7 +1003,7 @@ namespace FEAST
       /// the data type of the tensor
       typedef T_ DataType;
 
-      /// tensor data; that's a tuple of matrices
+      /// tensor data; that's an array of matrices
       typedef Matrix<T_, m_, n_, sm_, sn_> PlaneType;
       PlaneType v[sl_];
 
