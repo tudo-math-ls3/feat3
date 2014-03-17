@@ -50,8 +50,7 @@ public:
     // test t <- A*x; t <- t - b
     vec_sol.template scale<Algo_>(vec_sol, DT_(0));
 
-    MT_ mat_sys_scalar (MatBlockToScalar<Algo_>::template value<SystemMatrix, MT_::LayoutType>(mat_sys));
-    // MT_ mat_sys_scalar (MatBlockToScalar<Algo_>::template value<SparseLayoutType::lt_coo>(mat_sys));
+    MT_ mat_sys_scalar (MatBlockToScalar<Algo_>::template value<MT_::LayoutType>(mat_sys));
 
     DenseVector<Mem_, DT_> vec_rhs_scalar(mat_sys_scalar.rows());
     DenseVector<Mem_, DT_> vec_rhs_scalar2(mat_sys_scalar.rows());
