@@ -20,25 +20,6 @@ namespace FEAST
 {
   namespace LAFEM
   {
-    template<typename Mem_, typename DT_, SparseLayoutType>
-    struct Matrix
-    {
-      typedef SparseMatrixCOO<Mem_, DT_> Type;
-    };
-
-    template<typename Mem_, typename DT_>
-    struct Matrix<Mem_, DT_, SparseLayoutType::lt_csr>
-    {
-      typedef SparseMatrixCSR<Mem_, DT_> Type;
-    };
-
-    template<typename Mem_, typename DT_>
-    struct Matrix<Mem_, DT_, SparseLayoutType::lt_ell>
-    {
-      typedef SparseMatrixELL<Mem_, DT_> Type;
-    };
-
-
     template<typename Algo_>
     struct MatBlockToScalar;
 
@@ -503,17 +484,23 @@ namespace FEAST
 
 
 
-      template<SparseLayoutType LT_, typename MT_>
-      static typename Matrix<typename MT_::MemType, typename MT_::DataType, LT_>::Type value(const MT_ & a)
+      template<typename MT_, SparseLayoutType LT_>
+      static SparseMatrixCOO<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutType::lt_coo>::type* = 0)
       {
         return value_coo(a);
       }
 
-      // template<typename MT_>
-      // static SparseMatrixELL<typename MT_::MemType, typename MT_::DataType> value<SparseLayoutType::lt_ell, MT_>(const MT_ & a)
-      // {
-      //   return value_ell(a);
-      // }
+      template<typename MT_, SparseLayoutType LT_>
+      static SparseMatrixCSR<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutType::lt_csr>::type* = 0)
+      {
+        return value_csr(a);
+      }
+
+      template<typename MT_, SparseLayoutType LT_>
+      static SparseMatrixELL<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutType::lt_ell>::type* = 0)
+      {
+        return value_ell(a);
+      }
     };
 
     template<typename Algo_>

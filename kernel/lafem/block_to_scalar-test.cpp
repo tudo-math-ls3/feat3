@@ -50,7 +50,7 @@ public:
     // test t <- A*x; t <- t - b
     vec_sol.template scale<Algo_>(vec_sol, DT_(0));
 
-    MT_ mat_sys_scalar (MatBlockToScalar<Algo_>::value_coo(mat_sys));
+    MT_ mat_sys_scalar (MatBlockToScalar<Algo_>::template value<SystemMatrix, MT_::LayoutType>(mat_sys));
     // MT_ mat_sys_scalar (MatBlockToScalar<Algo_>::template value<SparseLayoutType::lt_coo>(mat_sys));
 
     DenseVector<Mem_, DT_> vec_rhs_scalar(mat_sys_scalar.rows());
@@ -74,4 +74,6 @@ public:
   }
 };
 
-BlockToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double> > meta_matrix_apply_test_generic_double;
+BlockToScalarTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double> > meta_matrix_to_coo_test_generic_double;
+BlockToScalarTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double> > meta_matrix_to_csr_test_generic_double;
+BlockToScalarTest<Algo::Generic, SparseMatrixELL<Mem::Main, double> > meta_matrix_to_ell_test_generic_double;
