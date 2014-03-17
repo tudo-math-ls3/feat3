@@ -40,9 +40,7 @@ namespace FEAST
 
 
     template<typename Algo_>
-    struct MatBlockToScalar
-    {
-    };
+    struct MatBlockToScalar;
 
     /**
      * \brief Convert any matrix to scalar matrix
@@ -519,9 +517,7 @@ namespace FEAST
     };
 
     template<typename Algo_>
-    struct VecBlockToScalar
-    {
-    };
+    struct VecBlockToScalar;
 
     /**
      * \brief Convert any vector to scalar vector
