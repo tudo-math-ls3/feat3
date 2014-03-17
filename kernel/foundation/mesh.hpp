@@ -98,8 +98,8 @@ namespace FEAST
           _mp_rank(mp_rank),
           _num_inter_topologies(Dim_::required_num_topologies),
           _num_levels((unsigned)(Dim_::required_num_topologies/2u) + 1u),
-          _topologies(Dim_::required_num_topologies),
-          _history(true)
+          _topologies(Dim_::required_num_topologies)//,
+          //_history(true)
         {
         }
 
@@ -110,8 +110,8 @@ namespace FEAST
           _mp_rank(other._mp_rank),
           _num_inter_topologies(other._num_inter_topologies),
           _num_levels(other._num_levels),
-          _topologies(other._topologies),
-          _history()
+          _topologies(other._topologies)//,
+          //_history()
         {
         }
 
@@ -128,7 +128,7 @@ namespace FEAST
           this-> _num_inter_topologies = rhs._num_inter_topologies;
           this-> _num_levels = rhs._num_levels;
           this-> _topologies = rhs._topologies;
-          this-> _history = rhs._history;
+          //this-> _history = rhs._history;
 
           return *this;
         }
@@ -156,25 +156,25 @@ namespace FEAST
           {
             case pl_vertex:
               {
-                _history.add_functor(new CompoundFunctor<OuterStorageType_>(true)); //do not execute since this is done by low-level functor
+                //_history.add_functor(new CompoundFunctor<OuterStorageType_>(true)); //do not execute since this is done by low-level functor
 
                 if(_num_levels > pl_edge)
                 {
                   _topologies.at(ipi_vertex_edge).push_back();
 
-                  ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_edge).get_history().get_functors().at(_topologies.at(ipi_vertex_edge).get_history().size() - 1));
+                  //((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_edge).get_history().get_functors().at(_topologies.at(ipi_vertex_edge).get_history().size() - 1));
                 }
                 if(_num_levels > pl_face)
                 {
                   _topologies.at(ipi_vertex_face).push_back();
 
-                  ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_face).get_history().get_functors().at(_topologies.at(ipi_vertex_face).get_history().size() - 1));
+                  //((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_face).get_history().get_functors().at(_topologies.at(ipi_vertex_face).get_history().size() - 1));
                 }
                 if(_num_levels > pl_polyhedron)
                 {
                   _topologies.at(ipi_vertex_polyhedron).push_back();
 
-                  ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_polyhedron).get_history().get_functors().at(_topologies.at(ipi_vertex_polyhedron).get_history().size() - 1));
+                  //((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi_vertex_polyhedron).get_history().get_functors().at(_topologies.at(ipi_vertex_polyhedron).get_history().size() - 1));
                 }
               }
               break;
@@ -183,7 +183,7 @@ namespace FEAST
               {
                   _topologies.at(ipi_edge_vertex).push_back();
 
-                  _history.add_functor(_topologies.at(ipi_edge_vertex).get_history().get_functors().at(_topologies.at(ipi_edge_vertex).get_history().size() - 1));
+                  //_history.add_functor(_topologies.at(ipi_edge_vertex).get_history().get_functors().at(_topologies.at(ipi_edge_vertex).get_history().size() - 1));
               }
               break;
 
@@ -191,7 +191,7 @@ namespace FEAST
               {
                   _topologies.at(ipi_face_vertex).push_back();
 
-                  _history.add_functor(_topologies.at(ipi_face_vertex).get_history().get_functors().at(_topologies.at(ipi_face_vertex).get_history().size() - 1));
+                  //_history.add_functor(_topologies.at(ipi_face_vertex).get_history().get_functors().at(_topologies.at(ipi_face_vertex).get_history().size() - 1));
               }
               break;
 
@@ -199,7 +199,7 @@ namespace FEAST
               {
                   _topologies.at(ipi_polyhedron_vertex).push_back();
 
-                  _history.add_functor(_topologies.at(ipi_polyhedron_vertex).get_history().get_functors().at(_topologies.at(ipi_polyhedron_vertex).get_history().size() - 1));
+                  //_history.add_functor(_topologies.at(ipi_polyhedron_vertex).get_history().get_functors().at(_topologies.at(ipi_polyhedron_vertex).get_history().size() - 1));
               }
               break;
 
@@ -262,10 +262,10 @@ namespace FEAST
           _topologies.at(ipi).insert(polytope_index, value);
           _topologies.at(ipit).insert(value, polytope_index);
 
-          _history.add_functor(new CompoundFunctor<OuterStorageType_>(true));
-          ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi).get_history().get_functors().at(_topologies.at(ipi).get_history().size() - 1));
+          //_history.add_functor(new CompoundFunctor<OuterStorageType_>(true));
+          //((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipi).get_history().get_functors().at(_topologies.at(ipi).get_history().size() - 1));
 
-          ((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipit).get_history().get_functors().at(_topologies.at(ipit).get_history().size() - 1));
+          //((CompoundFunctor<OuterStorageType_>*)(_history.get_functors().at(_history.size() - 1).get()))->add_functor(_topologies.at(ipit).get_history().get_functors().at(_topologies.at(ipit).get_history().size() - 1));
         }
 
         /**
@@ -429,7 +429,7 @@ namespace FEAST
          * \brief undo last insertion or removal of polytopes or their adjacencies
          *
          */
-        std::shared_ptr<FunctorBase> undo()
+        /*std::shared_ptr<FunctorBase> undo()
         {
           if(_history.size() == 0)
             throw MeshError("Already cleared!");
@@ -438,25 +438,25 @@ namespace FEAST
           std::shared_ptr<FunctorBase> func(_history.get_functors().at(_history.size() - 1));
           _history.get_functors().pop_back();
           return func;
-        }
+        }*/
 
         /**
          * \brief reset all data (undo the complete history)
          *
          */
-        void reset()
+        /*void reset()
         {
           if(_history.size() == 0)
             throw MeshError("Already cleared!");
 
           _history.undo();
-        }
+        }*/
 
         /**
          * \brief clear all data (undo the complete history) but return it
          *
          */
-        CompoundFunctor<OuterStorageType_> clear()
+        /*CompoundFunctor<OuterStorageType_> clear()
         {
           if(_history.size() == 0)
             throw MeshError("Already cleared!");
@@ -467,18 +467,18 @@ namespace FEAST
             _topologies.at(i).get_topology().clear();
 
           return _history;
-        }
+        }*/
 
 
         /**
          * \brief redo last undone action
          *
          */
-        void redo(const std::shared_ptr<FunctorBase> func)
+        /*void redo(const std::shared_ptr<FunctorBase> func)
         {
           func.get()->execute();
           _history.add_functor(func);
-        }
+        }*/
 
         ///further needed getter fcts
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
@@ -491,7 +491,7 @@ namespace FEAST
           return _topologies;
         }
 
-        CompoundFunctor<OuterStorageType_>& get_history()
+        /*CompoundFunctor<OuterStorageType_>& get_history()
         {
           return _history;
         }
@@ -499,7 +499,7 @@ namespace FEAST
         const CompoundFunctor<OuterStorageType_>& get_history() const
         {
           return _history;
-        }
+        }*/
 
         const index_type_ num_polytopes(PolytopeLevels level) const
         {
@@ -527,7 +527,7 @@ namespace FEAST
         unsigned _num_levels;
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
-        CompoundFunctor<OuterStorageType_> _history;
+        //CompoundFunctor<OuterStorageType_> _history;
 
         inline unsigned _level_difference(const unsigned from, const unsigned to)
         {
