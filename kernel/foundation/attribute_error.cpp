@@ -4,8 +4,8 @@
 using namespace FEAST;
 using namespace Foundation;
 
-AttributeError::AttributeError(const std::string & message) throw () :
-    Exception(message)
+AttributeError::AttributeError(const std::string & message_in) throw () :
+    Exception(message_in)
 {
 }
 

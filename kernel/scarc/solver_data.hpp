@@ -863,7 +863,7 @@ namespace FEAST
         {
         }
 
-        FilterDataContainer(FilterDataContainer& other)
+        FilterDataContainer(const FilterDataContainer& other)
         {
           this->_stored_filter = std::move(other._stored_filter.clone());
         }

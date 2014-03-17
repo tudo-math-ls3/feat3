@@ -1660,13 +1660,13 @@ namespace FEAST
   } // MeshStreamer::MeshDataContainer::_parse_adjacency_chunk
 
   // converts meshtype (MeshType to String)
-  String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshStreamer::MeshDataContainer::MeshType mesh_type)
+  String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshStreamer::MeshDataContainer::MeshType mesh_type_in)
   {
-    if(mesh_type == mt_conformal)
+    if(mesh_type_in == mt_conformal)
     {
       return "conformal";
     }
-    else if (mesh_type == mt_structured)
+    else if (mesh_type_in == mt_structured)
     {
       return "structured";
     }
@@ -1678,13 +1678,13 @@ namespace FEAST
   }// String MeshStreamer::MeshDataContainer::convert_mesh_type(const MeshType mesh_type) const
 
   // converts meshtype (String to MeshType)
-  MeshStreamer::MeshDataContainer::MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type)
+  MeshStreamer::MeshDataContainer::MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type_in)
   {
-    if(mesh_type == "conformal")
+    if(mesh_type_in == "conformal")
     {
       return mt_conformal;
     }
-    else if(mesh_type == "structured")
+    else if(mesh_type_in == "structured")
     {
       return mt_structured;
     }
@@ -1695,33 +1695,33 @@ namespace FEAST
   } // MeshType MeshStreamer::MeshDataContainer::convert_mesh_type(const String mesh_type) const
 
   // converts shapetype (ShapeType to String)
-  String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType shape_type)
+  String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType shape_type_in)
   {
-    if(shape_type == st_edge)
+    if(shape_type_in == st_edge)
     {
       return "edge";
     }
-    else if(shape_type == st_tria)
+    else if(shape_type_in == st_tria)
     {
       return "tria";
     }
-    else if(shape_type == st_quad)
+    else if(shape_type_in == st_quad)
     {
       return "quad";
     }
-    else if(shape_type == st_hexa)
+    else if(shape_type_in == st_hexa)
     {
       return "hexa";
     }
-    else if(shape_type == st_tetra)
+    else if(shape_type_in == st_tetra)
     {
       return "tetra";
     }
-    else if(shape_type == st_tria_quad)
+    else if(shape_type_in == st_tria_quad)
     {
       return "tria-quad";
     }
-    else if(shape_type == st_tetra_hexa)
+    else if(shape_type_in == st_tetra_hexa)
     {
       return "tetra-hexa";
     }
@@ -1732,33 +1732,33 @@ namespace FEAST
   } // String MeshStreamer::MeshDataContainer::convert_shape_type(const MeshStreamer::MeshDataContainer::ShapeType  shape_type) const
 
   // converts shapetype (String to ShapeType)
-  MeshStreamer::MeshDataContainer::ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type)
+  MeshStreamer::MeshDataContainer::ShapeType MeshStreamer::MeshDataContainer::convert_shape_type(const String shape_type_in)
   {
-    if(shape_type == "edge")
+    if(shape_type_in == "edge")
     {
       return st_edge;
     }
-    else if(shape_type == "tria")
+    else if(shape_type_in == "tria")
     {
       return st_tria;
     }
-    else if(shape_type == "quad")
+    else if(shape_type_in == "quad")
     {
       return st_quad;
     }
-    else if(shape_type == "hexa")
+    else if(shape_type_in == "hexa")
     {
       return st_hexa;
     }
-    else if(shape_type == "tetra")
+    else if(shape_type_in == "tetra")
     {
       return st_tetra;
     }
-    else if(shape_type == "tria-quad")
+    else if(shape_type_in == "tria-quad")
     {
       return st_tria_quad;
     }
-    else if(shape_type == "tetra-hexa")
+    else if(shape_type_in == "tetra-hexa")
     {
       return st_tetra_hexa;
     }

@@ -565,7 +565,7 @@ namespace FEAST
        *
        * deletes a vector, which was only used if bscale was true
        */
-      ~PolynomialPreconditioner()
+      virtual ~PolynomialPreconditioner()
       {
         if (_pscale != nullptr)
         {

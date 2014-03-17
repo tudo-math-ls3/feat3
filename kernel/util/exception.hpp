@@ -106,8 +106,8 @@ namespace FEAST
     * \param message
     * A short error message.
     */
-    InternalError(const String & message) :
-      Exception("Internal error: " + message)
+    InternalError(const String & message_in) :
+      Exception("Internal error: " + message_in)
     {
     }
 
@@ -123,8 +123,8 @@ namespace FEAST
         const char* const function,
         const char* const file,
         const long line,
-        const String & message) :
-      Exception(function, file, line, "Internal error: " + message)
+        const String & message_in) :
+      Exception(function, file, line, "Internal error: " + message_in)
     {
     }
   };
@@ -156,9 +156,9 @@ namespace FEAST
      * The name of the file in which the syntax error has been detected.
      */
      explicit SyntaxError(
-     String message,
+     String message_in,
       String filename = ""):
-      Exception(message + (filename.empty() ? "": " in file " + filename)),
+      Exception(message_in + (filename.empty() ? "": " in file " + filename)),
       _filename(filename)
     {
     }

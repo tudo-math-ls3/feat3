@@ -20,8 +20,8 @@ namespace FEAST
      * \param[in] message
      * The error message.
      */
-    explicit FileError(const String& message) :
-      Exception(message)
+    explicit FileError(const String& message_in) :
+      Exception(message_in)
     {
     }
     virtual ~FileError() throw()

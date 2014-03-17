@@ -4,7 +4,7 @@
 using namespace FEAST;
 using namespace ScaRC;
 
-ScaRCError::ScaRCError(const std::string & message) throw () :
-    Exception(message)
+ScaRCError::ScaRCError(const std::string & message_in) throw () :
+    Exception(message_in)
 {
 }

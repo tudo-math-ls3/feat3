@@ -54,8 +54,8 @@ namespace FEAST
       const char * const function,
       const char * const file,
       const long line,
-      const String & message)
-      : Exception(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message)
+      const String & message_in)
+      : Exception(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message_in)
     {
 #ifndef FEAST_NO_CONTEXT
       std::cout << backtrace("\n") << this->message() << std::endl;

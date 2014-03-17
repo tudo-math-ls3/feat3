@@ -39,11 +39,11 @@ namespace FEAST
   };
 #endif // FEAST_NO_CONTEXT
 
-  Exception::Exception(const String & message) :
+  Exception::Exception(const String & message_in) :
 #ifndef FEAST_NO_CONTEXT
     _context_data(new ContextData),
 #endif // FEAST_NO_CONTEXT
-    _message(message)
+    _message(message_in)
   {
   }
 
@@ -51,11 +51,11 @@ namespace FEAST
       const char* const function,
       const char* const file,
       const long line,
-      const String & message) :
+      const String & message_in) :
 #ifndef FEAST_NO_CONTEXT
     _context_data(new ContextData),
 #endif // FEAST_NO_CONTEXT
-    _message(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message )
+    _message(stringify(file) + ":" + stringify(line) + ": in " + stringify(function) + ": " + message_in)
   {
   }
 

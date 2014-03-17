@@ -170,8 +170,8 @@ namespace FEAST
         * \param[in] id
         * the testcase's id string
         */
-      BaseTest(const String& id)
-        : _id(id),
+      BaseTest(const String& id_in)
+        : _id(id_in),
         _tag_name(Type::Traits<Archs::None>::name()),
         _prec_name(Type::Traits<Archs::None>::name()),
         _algo_name(Type::Traits<Archs::None>::name())
