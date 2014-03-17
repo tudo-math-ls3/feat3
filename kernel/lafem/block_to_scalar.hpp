@@ -69,6 +69,7 @@ namespace FEAST
       static Index _get_length_of_line(const SparseMatrixCOO<Mem::Main, DT_> & matrix, const Index row)
       {
         const Index * prow(matrix.row());
+        const Index used_elements(matrix.used_elements());
 
         Index i(0);
         while (prow[i] < row)
@@ -77,7 +78,7 @@ namespace FEAST
         }
 
         Index j(i);
-        while (prow[j] == row)
+        while (j < used_elements && prow[j] == row)
         {
           ++j;
         }
