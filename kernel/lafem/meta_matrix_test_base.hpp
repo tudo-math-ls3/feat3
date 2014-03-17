@@ -137,7 +137,7 @@ namespace FEAST
       /// system matrix type
       typedef SaddlePointMatrix<VeloMatrix, GradMatrix, DiveMatrix> SystemMatrix;
 
-      explicit MetaMatrixTestBase(const char* name) :
+      explicit MetaMatrixTestBase(const String & name) :
         FEAST::TestSystem::TaggedTest<typename Algo_::MemType, DataType_, Algo_>(name)
       {
       }
