@@ -2528,7 +2528,6 @@ namespace FEAST
           Index * ptrow_ptr(trow_ptr.elements());
 
           ptrow_ptr[0] = 0;
-          ++ptrow_ptr;
 
           Index used_elements(0);
           for (Index i(0); i < n; ++i)
@@ -2539,7 +2538,6 @@ namespace FEAST
               ++ptrow_ptr[it_J->second + 1];
             }
           }
-          ptrow_ptr[0] = 0;
 
           for (Index i(1); i < n - 1; ++i)
           {
@@ -2562,6 +2560,12 @@ namespace FEAST
               ++ptrow_ptr[l];
             }
           }
+
+          for (Index i(n); i > 0; --i)
+          {
+            ptrow_ptr[i] = ptrow_ptr[i - 1];
+          }
+          ptrow_ptr[0] = 0;
 
           SparseMatrixCSR<Mem_, DT_> tM(n, n, tcol_ind, tval, trow_ptr);
           _M = tM;
