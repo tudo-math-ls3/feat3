@@ -53,21 +53,21 @@ namespace FEAST
 
         ///CTOR
         Topology() :
-          _topology(),
-          _history()
+          _topology()//,
+          //_history()
         {
         }
 
         Topology(IndexType_ i) :
-          _topology(i),
-          _history()
+          _topology(i)//,
+          //_history()
         {
         }
 
         ///Copy CTOR
         Topology(const Topology& other) :
-          _topology(other._topology),
-          _history()
+          _topology(other._topology)//,
+          //_history()
         {
         };
 
@@ -97,21 +97,24 @@ namespace FEAST
          */
         void push_back(const StorageType_& s)
         {
-          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, IndexType_(_topology.size()), s));
-          _history.get_functors().at(_history.size() - 1).get()->execute();
+          _topology.push_back(std::move(s));
+          //_history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, IndexType_(_topology.size()), s));
+          //_history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
         void erase(IndexType_ i)
         {
-          _history.add_functor(new EraseFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, i, _topology.at(i)));
-          _history.get_functors().at(_history.size() - 1).get()->execute();
+          _topology.erase(_topology.begin() + (const typename compound_storage_type_::difference_type)i);
+          //_history.add_functor(new EraseFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, i, _topology.at(i)));
+          //_history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
         ///insert value into list i (not an insert in the STL-sense)
         void insert(IndexType_ i, IndexType_ value)
         {
-          _history.add_functor(new PushBackFunctor<storage_type_, IndexType_, IndexType_>(_topology.at(i), IndexType_(_topology.at(i).size()), value));
-          _history.get_functors().at(_history.size() - 1).get()->execute();
+          _topology.at(i).push_back(value);
+         // _history.add_functor(new PushBackFunctor<storage_type_, IndexType_, IndexType_>(_topology.at(i), IndexType_(_topology.at(i).size()), value));
+         // _history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
         /**
@@ -153,14 +156,16 @@ namespace FEAST
         void push_back()
         {
           StorageType_ s;
-          _history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, (IndexType_)(_topology.size()), s));
-          _history.get_functors().at(_history.size() - 1).get()->execute();
+          _topology.push_back(std::move(s));
+          //_history.add_functor(new PushBackFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, (IndexType_)(_topology.size()), s));
+          //_history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
         void erase()
         {
-          _history.add_functor(new EraseFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, _topology.size() - 1, _topology.at(_topology.size() - 1)));
-          _history.get_functors().at(_history.size() - 1).get()->execute();
+          _topology.pop_back();
+          //_history.add_functor(new EraseFunctor<compound_storage_type_, IndexType_, StorageType_>(_topology, _topology.size() - 1, _topology.at(_topology.size() - 1)));
+          //_history.get_functors().at(_history.size() - 1).get()->execute();
         }
 
         Topology& operator=(const Topology& rhs)
@@ -169,20 +174,20 @@ namespace FEAST
             return *this;
 
           this-> _topology = rhs._topology;
-          this-> _history = CompoundFunctor<OuterStorageType_>();
+          //this-> _history = CompoundFunctor<OuterStorageType_>();
 
           return *this;
         }
 
-        CompoundFunctor<OuterStorageType_>& get_history()
+        /*CompoundFunctor<OuterStorageType_>& get_history()
         {
           return _history;
-        }
+        }*/
 
-        const CompoundFunctor<OuterStorageType_>& get_history() const
+        /*const CompoundFunctor<OuterStorageType_>& get_history() const
         {
           return _history;
-        }
+        }*/
 
         OuterStorageType_<StorageType_, std::allocator<StorageType_> >& get_topology()
         {
@@ -238,7 +243,7 @@ namespace FEAST
         virtual void from_buffer(const BufferedData<OuterStorageType_>& buffer)
         {
           _topology.clear();
-          _history.get_functors().clear();
+          //_history.get_functors().clear();
 
           //IndexType_ left(0);
           IndexType_ head(0);
@@ -291,7 +296,7 @@ namespace FEAST
         ///data
         OuterStorageType_<StorageType_, std::allocator<StorageType_> > _topology;
         ///history
-        CompoundFunctor<OuterStorageType_> _history;
+        //CompoundFunctor<OuterStorageType_> _history;
     };
   }
 }

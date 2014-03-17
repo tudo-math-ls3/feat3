@@ -72,7 +72,7 @@ public:
     m3.add_polytope(Foundation::pl_face);
     m3.add_polytope(Foundation::pl_face);
 
-    if(m3.get_topologies().at(Foundation::ipi_vertex_edge).get_history().get_functors().size() != 6) return false;
+    //if(m3.get_topologies().at(Foundation::ipi_vertex_edge).get_history().get_functors().size() != 6) return false;
     if(m3.get_topologies().at(Foundation::ipi_vertex_edge).size() != 6u) return false;
     if(m3.get_topologies().at(Foundation::ipi_vertex_face).size() != 6u) return false;
     if(m3.get_topologies().at(Foundation::ipi_edge_vertex).size() != 7u) return false;
