@@ -39,7 +39,7 @@ public:
   typedef DataType DT_;
 
   BlockToScalarTest()
-    : BaseClass("block_to_scalar_test") {}
+    : BaseClass("block_to_scalar_test: " + MT_::name()) {}
 
   virtual void run() const
   {
@@ -196,7 +196,7 @@ struct Precon<SparsePreconType::pt_spai>
  * \author Christoph Lohmann
  */
 template<typename PSF_, SparsePreconType PType_, typename Algo_, typename MT_, typename VT_>
-class BiCGStabTest
+class BiCGStabSaddlePointTest
   : public MetaMatrixTestBase<Algo_, typename MT_::DataType>
 {
 private:
@@ -209,8 +209,13 @@ public:
   typedef typename BaseClass::SystemMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 
-  BiCGStabTest(String pname, Index opt = 0)
-    : BaseClass("bicgstab_test"), _opt(opt)
+  BiCGStabSaddlePointTest(String pname, Index opt = 0)
+    : BaseClass("bicgstab_saddle_point_test: "
+                + MT_::name()
+                + " "
+                + pname
+                + " opt = "
+                + stringify(opt)), _opt(opt)
   {
   }
 
@@ -244,111 +249,111 @@ public:
 };
 
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
              Algo::Generic,
              SparseMatrixCSR<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_csr_none_double("none");
+bicgstab_saddle_point_test_cpu_csr_none_double("none");
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
              Algo::Generic,
              SparseMatrixCOO<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_coo_none_double("none");
+bicgstab_saddle_point_test_cpu_coo_none_double("none");
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_none,
              Algo::Generic,
              SparseMatrixELL<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_ell_none_double("none");
+bicgstab_saddle_point_test_cpu_ell_none_double("none");
 
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCSR<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_csr_spai_double_2("spai", 2);
+bicgstab_saddle_point_test_cpu_csr_spai_double_2("spai", 2);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCOO<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_coo_spai_double_2("spai", 2);
+bicgstab_saddle_point_test_cpu_coo_spai_double_2("spai", 2);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixELL<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_ell_spai_double_2("spai", 2);
+bicgstab_saddle_point_test_cpu_ell_spai_double_2("spai", 2);
 
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCSR<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_csr_spai_double_3("spai", 3);
+bicgstab_saddle_point_test_cpu_csr_spai_double_3("spai", 3);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCOO<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_coo_spai_double_3("spai", 3);
+bicgstab_saddle_point_test_cpu_coo_spai_double_3("spai", 3);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixELL<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_ell_spai_double_3("spai", 3);
+bicgstab_saddle_point_test_cpu_ell_spai_double_3("spai", 3);
 
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCSR<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_csr_spai_double_82("spai", 82);
+bicgstab_saddle_point_test_cpu_csr_spai_double_82("spai", 82);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCOO<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_coo_spai_double_82("spai", 82);
+bicgstab_saddle_point_test_cpu_coo_spai_double_82("spai", 82);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixELL<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_ell_spai_double_82("spai", 82);
+bicgstab_saddle_point_test_cpu_ell_spai_double_82("spai", 82);
 
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCSR<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_csr_spai_double_83("spai", 83);
+bicgstab_saddle_point_test_cpu_csr_spai_double_83("spai", 83);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixCOO<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_coo_spai_double_83("spai", 83);
+bicgstab_saddle_point_test_cpu_coo_spai_double_83("spai", 83);
 
-BiCGStabTest<PointstarFactoryFE<double>,
+BiCGStabSaddlePointTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_spai,
              Algo::Generic,
              SparseMatrixELL<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_ell_spai_double_83("spai", 83);
+bicgstab_saddle_point_test_cpu_ell_spai_double_83("spai", 83);
