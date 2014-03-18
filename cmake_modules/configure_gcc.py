@@ -14,10 +14,16 @@ def configure_gcc(cpu, buildmode):
     print ("GNU Compiler version less then 4.4 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-pipe -std=c++0x -ggdb"
+  cxxflags = "-pipe -std=c++11 -ggdb"
 
   if "coverage" in buildmode:
     cxxflags += " -fprofile-arcs -ftest-coverage"
+
+  # For 'quadmath', we need to enable extended numeric literals, as otherwise the g++ will
+  # not recognise the 'q' suffix for __float128 constants when compiling with --std=c++11 starting from gcc version 4.8.
+  if major >= 4 and minor >= 8 and "quadmath" in buildmode:
+    cxxflags += " -fext-numeric-literals"
+
   if "debug" in buildmode:
     cxxflags += " -O0 -Wall -Wextra -Wundef -Wno-unused-parameter -D_GLIBCXX_DEBUG"
   elif "opt" in buildmode:
