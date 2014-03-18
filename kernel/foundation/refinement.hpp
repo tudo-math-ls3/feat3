@@ -1522,11 +1522,8 @@ namespace FEAST
             origin.get_topologies().at(ipi_vertex_polyhedron).at(origin.get_adjacent_polytopes(pl_polyhedron,pl_vertex,i).at(j)).push_back(i);
           }
 
-          /* volume integrals */
-          static double T0, T1[3], r[3];
+          DataType_ vol(0), c_x(0), c_y(0), c_z(0);
           Index num_faces(coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i).size());
-          T0 = T1[0] = T1[1] = T1[2] = 0;
-
           for(Index j(0) ; j < num_faces; j++)
           {
             //sorting
@@ -1566,121 +1563,38 @@ namespace FEAST
             while(v_current != v_start);
             vertex_at_polygon = v_way;
 
-            // Calculate center based on Brian Mirtich, "Fast and Accurate Computation of Polyhedral Mass Properties", journal of graphics tools, volume 1, number 2, 1996
-            double n[3];
-            double w;
-            static int A;   /* alpha */
-            static int B;   /* beta */
-            static int C;   /* gamma */
-
-            /* projection integrals */
-            static double P1, Pa, Pb, Paa, Pab, Pbb, Paaa, Paab, Pabb, Pbbb;
-
-            /* face integrals */
-            static double Fa, Fb, Fc, Faa, Fbb, Fcc;
-
-            double len;
-
-            /* projection of face */
-            double a0, a1, da;
-            double b0, b1, db;
-            double a0_2, a0_3, a0_4, b0_2, b0_3, b0_4;
-            double a1_2, a1_3, b1_2, b1_3;
-            double C1, Ca, Caa, Caaa, Cb, Cbb, Cbbb;
-            double Cab, Kab, Caab, Kaab, Cabb, Kabb;
-
-            double k1, k2, k3;
-
-            //surface normal
-            n[0] = (origin_coords.at(1).at(vertex_at_polygon.at(1)) - origin_coords.at(1).at(vertex_at_polygon.at(0))) * (origin_coords.at(2).at(vertex_at_polygon.at(2)) - origin_coords.at(2).at(vertex_at_polygon.at(1))) - (origin_coords.at(1).at(vertex_at_polygon.at(2)) - origin_coords.at(1).at(vertex_at_polygon.at(1))) * (origin_coords.at(2).at(vertex_at_polygon.at(1)) - origin_coords.at(2).at(vertex_at_polygon.at(0)));
-            n[1] = (origin_coords.at(2).at(vertex_at_polygon.at(1)) - origin_coords.at(2).at(vertex_at_polygon.at(0))) * (origin_coords.at(0).at(vertex_at_polygon.at(2)) - origin_coords.at(0).at(vertex_at_polygon.at(1))) - (origin_coords.at(2).at(vertex_at_polygon.at(2)) - origin_coords.at(2).at(vertex_at_polygon.at(1))) * (origin_coords.at(0).at(vertex_at_polygon.at(1)) - origin_coords.at(0).at(vertex_at_polygon.at(0)));
-            n[2] = (origin_coords.at(0).at(vertex_at_polygon.at(1)) - origin_coords.at(0).at(vertex_at_polygon.at(0))) * (origin_coords.at(1).at(vertex_at_polygon.at(2)) - origin_coords.at(1).at(vertex_at_polygon.at(1))) - (origin_coords.at(0).at(vertex_at_polygon.at(2)) - origin_coords.at(0).at(vertex_at_polygon.at(1))) * (origin_coords.at(1).at(vertex_at_polygon.at(1)) - origin_coords.at(1).at(vertex_at_polygon.at(0)));
-            len = sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
-            n[0] = n[0] / len;
-            n[1] = n[1] / len;
-            n[2] = n[2] / len;
-            w = - n[0] * origin_coords.at(0).at(vertex_at_polygon.at(0)) - n[1] * origin_coords.at(1).at(vertex_at_polygon.at(0)) - n[2] * origin_coords.at(2).at(vertex_at_polygon.at(0));
-
-            if (fabs(n[0]) > fabs(n[1]) && fabs(n[0]) > fabs(n[2])) C = 0;
-            else C = (fabs(n[1]) > fabs(n[2])) ? 1 : 2;
-            A = (C + 1) % 3;
-            B = (A + 1) % 3;
-
-            P1 = Pa = Pb = Paa = Pab = Pbb = Paaa = Paab = Pabb = Pbbb = 0.0;
-
-            for (Index k = 0; k < vertex_at_polygon.size(); k++)
+            // Calculating centroid of polyhedron
+            Index num_vertices(coarse.get_adjacent_polytopes(pl_face, pl_vertex, j).size());
+            for(Index k(0) ; k < num_vertices ; k++)
             {
-              a0 = origin_coords.at(A).at(vertex_at_polygon.at(k));
-              b0 = origin_coords.at(B).at(vertex_at_polygon.at(k));
-              a1 = origin_coords.at(A).at(vertex_at_polygon.at((k+1) % vertex_at_polygon.size()));
-              b1 = origin_coords.at(B).at(vertex_at_polygon.at((k+1) % vertex_at_polygon.size()));
-              da = a1 - a0;
-              db = b1 - b0;
-              a0_2 = a0 * a0; a0_3 = a0_2 * a0; a0_4 = a0_3 * a0;
-              b0_2 = b0 * b0; b0_3 = b0_2 * b0; b0_4 = b0_3 * b0;
-              a1_2 = a1 * a1; a1_3 = a1_2 * a1;
-              b1_2 = b1 * b1; b1_3 = b1_2 * b1;
+              double n[3];
+              DataType_ areak(0);
+              n[0] = (origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices)) - origin_coords.at(1).at(vertex_at_polygon.at(k))) * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)) - origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices))) - (origin_coords.at(1).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)) - origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices)) - origin_coords.at(2).at(vertex_at_polygon.at(k)));
+              n[1] = (origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices)) - origin_coords.at(2).at(vertex_at_polygon.at(k))) * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)) - origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices))) - (origin_coords.at(2).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)) - origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices)) - origin_coords.at(0).at(vertex_at_polygon.at(k)));
+              n[2] = (origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices)) - origin_coords.at(0).at(vertex_at_polygon.at(k))) * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)) - origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices))) - (origin_coords.at(0).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)) - origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices)) - origin_coords.at(1).at(vertex_at_polygon.at(k)));
 
-              C1 = a1 + a0;
-              Ca = a1*C1 + a0_2; Caa = a1*Ca + a0_3; Caaa = a1*Caa + a0_4;
-              Cb = b1*(b1 + b0) + b0_2; Cbb = b1*Cb + b0_3; Cbbb = b1*Cbb + b0_4;
-              Cab = 3.0*a1_2 + 2.0*a1*a0 + a0_2; Kab = a1_2 + 2.0*a1*a0 + 3.0*a0_2;
-              Caab = a0*Cab + 4.0*a1_3; Kaab = a1*Kab + 4.0*a0_3;
-              Cabb = 4.0*b1_3 + 3.0*b1_2*b0 + 2.0*b1*b0_2 + b0_3;
-              Kabb = b1_3 + 2.0*b1_2*b0 + 3.0*b1*b0_2 + 4.0*b0_3;
+              areak= origin_coords.at(0).at(vertex_at_polygon.at(k)) *n[0] + origin_coords.at(1).at(vertex_at_polygon.at(k)) *n[1] + origin_coords.at(2).at(vertex_at_polygon.at(k)) *n[2];
+              if (areak < 0) //outer normal
+                for(Index m(0); m < 3 ;m++) n[m] *= DataType_(-1);
+              vol += fabs(areak);
 
-              P1 += db*C1;
-              Pa += db*Ca;
-              Paa += db*Caa;
-              Paaa += db*Caaa;
-              Pb += da*Cb;
-              Pbb += da*Cbb;
-              Pbbb += da*Cbbb;
-              Pab += db*(b1*Cab + b0*Kab);
-              Paab += db*(b1*Caab + b0*Kaab);
-              Pabb += da*(a1*Cabb + a0*Kabb);
-            }
+              c_x += n[0] * ( ((origin_coords.at(0).at(vertex_at_polygon.at(k))+origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(0).at(vertex_at_polygon.at(k))+origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices))))
+                          + ((origin_coords.at(0).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))+origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))+origin_coords.at(0).at(vertex_at_polygon.at((k+1)%num_vertices))))
+                          + ((origin_coords.at(0).at(vertex_at_polygon.at(k))+origin_coords.at(0).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))) * (origin_coords.at(0).at(vertex_at_polygon.at(k))+origin_coords.at(0).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)))) );
 
-            P1 /= 2.0;P1=abs(P1);
-            Pa /= 6.0;
-            Paa /= 12.0;
-            Paaa /= 20.0;
-            Pb /= -6.0;
-            Pbb /= -12.0;
-            Pbbb /= -20.0;
-            Pab /= 24.0;
-            Paab /= 60.0;
-            Pabb /= -60.0;
+               c_y += n[1] * ( ((origin_coords.at(1).at(vertex_at_polygon.at(k))+origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(1).at(vertex_at_polygon.at(k))+origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices))))
+                           + ((origin_coords.at(1).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))+origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))+origin_coords.at(1).at(vertex_at_polygon.at((k+1)%num_vertices))))
+                           + ((origin_coords.at(1).at(vertex_at_polygon.at(k))+origin_coords.at(1).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))) * (origin_coords.at(1).at(vertex_at_polygon.at(k))+origin_coords.at(1).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)))) );
 
-            k1 = 1 / n[C]; k2 = k1 * k1; k3 = k2 * k1;
+               c_z += n[2] * ( ((origin_coords.at(2).at(vertex_at_polygon.at(k))+origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(2).at(vertex_at_polygon.at(k))+origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices))))
+                           + ((origin_coords.at(2).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))+origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices))) * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))+origin_coords.at(2).at(vertex_at_polygon.at((k+1)%num_vertices))))
+                           + ((origin_coords.at(2).at(vertex_at_polygon.at(k))+origin_coords.at(2).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1))) * (origin_coords.at(2).at(vertex_at_polygon.at(k))+origin_coords.at(2).at(origin.num_polytopes(pl_vertex)-(num_faces-j+1)))) );
+             }
 
-            Fa = k1 * Pa;
-            Fb = k1 * Pb;
-            Fc = -k2 * (n[A]*Pa + n[B]*Pb + w*P1);
-
-            Faa = k1 * Paa;
-            Fbb = k1 * Pbb;
-            Fcc = k3 * ((n[A]*n[A])*Paa + 2.0*n[A]*n[B]*Pab + (n[B]*n[B])*Pbb
-                  + w*(2.0*(n[A]*Pa + n[B]*Pb) + w*P1));
-
-            T0 += n[0] * ((A == 0) ? Fa : ((B == 0) ? Fb : Fc));
-
-            T1[A] += n[A] * Faa;
-            T1[B] += n[B] * Fbb;
-            T1[C] += n[C] * Fcc;
-
-          }
-
-          T1[0] /= 2.0; T1[1] /= 2.0; T1[2] /= 2.0;
-
-          /* compute center of mass */
-          r[0] = T1[0] / T0;
-          r[1] = T1[1] / T0;
-          r[2] = T1[2] / T0;
-
-          origin_coords.at(0).push_back(r[0]);
-          origin_coords.at(1).push_back(r[1]);
-          origin_coords.at(2).push_back(r[2]);
+           }
+           origin_coords.at(0).push_back(c_x / (DataType_(8) * vol));
+           origin_coords.at(1).push_back(c_y / (DataType_(8) * vol));
+           origin_coords.at(2).push_back(c_z / (DataType_(8) * vol));
         }
       }
     };
