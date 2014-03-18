@@ -97,7 +97,8 @@ class SolverFunctorTest:
       cf1.execute();
 
       DenseVector<Tag_, DataType_> u_ref(1000, DataType_(47.11));
-      DenseVector<Tag_, DataType_> v_ref(u_ref.clone());
+      DenseVector<Tag_, DataType_> v_ref;
+      v_ref.clone(u_ref);
 
       A.template apply<Algo_>(u_ref, v_ref);
       u_ref.template axpy<Algo_>(v_ref, u_ref);

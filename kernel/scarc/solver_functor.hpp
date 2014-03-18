@@ -165,7 +165,7 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _l = arg;
+          _l.convert(arg);
           this->_complete = true;
         }
 
@@ -221,8 +221,8 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _y = arg;
-          _l = arg;
+          _y.convert(arg);
+          _l.convert(arg);
           this->_complete = true;
         }
 
@@ -278,9 +278,9 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _y = arg;
-          _l = arg;
-          _r = arg;
+          _y.convert(arg);
+          _l.convert(arg);
+          _r.convert(arg);
           this->_complete = true;
         }
 
@@ -615,7 +615,7 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _r = arg;
+          _r.convert(arg);
           this->_complete = true;
         }
 
@@ -672,8 +672,8 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _y = arg;
-          _r = arg;
+          _y.convert(arg);
+          _r.convert(arg);
           this->_complete = true;
         }
 
@@ -783,7 +783,7 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _r = arg;
+          _r.convert(arg);
           this->_complete = true;
         }
 
@@ -1042,7 +1042,7 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _y = arg;
+          _y.convert(arg);
           _substitution_complete = true;
           this->_complete = this->_substitution_complete && _precon_complete;
         }
@@ -1268,7 +1268,7 @@ namespace FEAST
 
         virtual void substitute(VT_& arg)
         {
-          _y = arg;
+          _y.convert(arg);
           this->_complete = true;
         }
 
@@ -1930,7 +1930,7 @@ namespace FEAST
 
         virtual void execute()
         {
-          std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " with value " << T_(_y) << " !" << std::endl;
+          std::cout << _tracetag << "| element of size " << sizeof(T_) << " at address " << &_y << " !" << std::endl;
         }
 
         InspectionFunctor& operator=(const InspectionFunctor& rhs)

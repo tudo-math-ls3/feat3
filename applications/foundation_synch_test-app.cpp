@@ -204,9 +204,9 @@ void check_synch_mirrors(int rank)
   std::vector<LAFEM::VectorMirror<Mem::Main, double> > mirrors;
   mirrors.push_back(std::move(target_mirror));
   std::vector<LAFEM::DenseVector<Mem::Main, double> > sendbufs;
-  sendbufs.push_back(sendbuf);
+  sendbufs.push_back(std::move(sendbuf));
   std::vector<LAFEM::DenseVector<Mem::Main, double> > recvbufs;
-  recvbufs.push_back(recvbuf);
+  recvbufs.push_back(std::move(recvbuf));
   std::vector<Index> destranks;
   destranks.push_back(rank == 0 ? 1 : 0);
   std::vector<Index> sourceranks;

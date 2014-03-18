@@ -28,60 +28,80 @@ class SolverDataTest:
       for(Index i(0) ; i < 1000 ; ++i)
         T(i, i, DataType_(1));
       SparseMatrixCSR<Tag_, DataType_> A(T);
+      SparseMatrixCSR<Tag_, DataType_> P;
+      P.clone(A);
+      SolverData<> sd0(std::move(A), std::move(x), std::move(b));
 
-      SolverData<> sd0(A, x, b);
-      TEST_CHECK_EQUAL(sd0.sys(), A);
-      TEST_CHECK_EQUAL(sd0.sol(), x);
-      TEST_CHECK_EQUAL(sd0.rhs(), b);
-      TEST_CHECK_EQUAL(sd0.temp().size(), Index(0));
-
-      SolverData<> sd1(A, x, b, 2);
-      TEST_CHECK_EQUAL(sd1.sys(), A);
-      TEST_CHECK_EQUAL(sd1.sol(), x);
-      TEST_CHECK_EQUAL(sd1.rhs(), b);
+      DenseVector<Tag_, DataType_> x1(1000, DataType_(1)), b1(1000, DataType_(1));
+      SparseMatrixCOO<Mem::Main, DataType_> T1(1000, 1000);
+      for(Index i(0) ; i < 1000 ; ++i)
+        T1(i, i, DataType_(1));
+      SparseMatrixCSR<Tag_, DataType_> A1(T1);
+      SparseMatrixCSR<Tag_, DataType_> P1;
+      P1.clone(A1);
+      SolverData<> sd1(std::move(A1), std::move(x1), std::move(b1), 2);
       TEST_CHECK_EQUAL(sd1.temp().size(), Index(2));
-      TEST_CHECK_EQUAL(sd1.temp().at(0).size(), x.size());
-      TEST_CHECK_EQUAL(sd1.temp().at(1).size(), x.size());
+      TEST_CHECK_EQUAL(sd1.temp().at(0).size(), 1000);
+      TEST_CHECK_EQUAL(sd1.temp().at(1).size(), 1000);
 
-      PreconditionedSolverData<> psd(A, A, x, b, 3);
-      TEST_CHECK_EQUAL(psd.sys(), A);
-      TEST_CHECK_EQUAL(psd.precon(), A);
-      TEST_CHECK_EQUAL(psd.sol(), x);
-      TEST_CHECK_EQUAL(psd.rhs(), b);
+      DenseVector<Tag_, DataType_> x2(1000, DataType_(1)), b2(1000, DataType_(1));
+      SparseMatrixCOO<Mem::Main, DataType_> T2(1000, 1000);
+      for(Index i(0) ; i < 1000 ; ++i)
+        T2(i, i, DataType_(1));
+      SparseMatrixCSR<Tag_, DataType_> A2(T2);
+      SparseMatrixCSR<Tag_, DataType_> P2;
+      P2.clone(A2);
+      PreconditionedSolverData<> psd(std::move(A2), std::move(P2), std::move(x2), std::move(b2), 3);
       TEST_CHECK_EQUAL(psd.temp().size(), Index(3));
-      TEST_CHECK_EQUAL(psd.temp().at(0).size(), x.size());
-      TEST_CHECK_EQUAL(psd.temp().at(1).size(), x.size());
-      TEST_CHECK_EQUAL(psd.temp().at(2).size(), x.size());
+      TEST_CHECK_EQUAL(psd.temp().at(0).size(), 1000);
+      TEST_CHECK_EQUAL(psd.temp().at(1).size(), 1000);
+      TEST_CHECK_EQUAL(psd.temp().at(2).size(), 1000);
 
-      SynchronisedSolverData<> sd3(A, x, b, 3);
-      TEST_CHECK_EQUAL(sd3.sys(), A);
-      TEST_CHECK_EQUAL(sd3.sol(), x);
-      TEST_CHECK_EQUAL(sd3.rhs(), b);
+      DenseVector<Tag_, DataType_> x3(1000, DataType_(1)), b3(1000, DataType_(1));
+      SparseMatrixCOO<Mem::Main, DataType_> T3(1000, 1000);
+      for(Index i(0) ; i < 1000 ; ++i)
+        T3(i, i, DataType_(1));
+      SparseMatrixCSR<Tag_, DataType_> A3(T3);
+      SparseMatrixCSR<Tag_, DataType_> P3;
+      P3.clone(A3);
+      SynchronisedSolverData<> sd3(std::move(A3), std::move(x3), std::move(b3), 3);
       TEST_CHECK_EQUAL(sd3.temp().size(), Index(3));
-      TEST_CHECK_EQUAL(sd3.temp().at(0).size(), x.size());
-      TEST_CHECK_EQUAL(sd3.temp().at(1).size(), x.size());
-      TEST_CHECK_EQUAL(sd3.temp().at(2).size(), x.size());
+      TEST_CHECK_EQUAL(sd3.temp().at(0).size(), 1000);
+      TEST_CHECK_EQUAL(sd3.temp().at(1).size(), 1000);
+      TEST_CHECK_EQUAL(sd3.temp().at(2).size(), 1000);
       TEST_CHECK_EQUAL(sd3.vector_mirrors().size(), Index(0));
       TEST_CHECK_EQUAL(sd3.vector_mirror_sendbufs().size(), Index(0));
       TEST_CHECK_EQUAL(sd3.vector_mirror_recvbufs().size(), Index(0));
       TEST_CHECK_EQUAL(sd3.dest_ranks().size(), Index(0));
       TEST_CHECK_EQUAL(sd3.source_ranks().size(), Index(0));
 
-      SynchronisedPreconditionedSolverData<> sd4(A, A, x, b, 3);
-      TEST_CHECK_EQUAL(sd4.sys(), A);
-      TEST_CHECK_EQUAL(sd4.sol(), x);
-      TEST_CHECK_EQUAL(sd4.rhs(), b);
+      DenseVector<Tag_, DataType_> x4(1000, DataType_(1)), b4(1000, DataType_(1));
+      SparseMatrixCOO<Mem::Main, DataType_> T4(1000, 1000);
+      for(Index i(0) ; i < 1000 ; ++i)
+        T4(i, i, DataType_(1));
+      SparseMatrixCSR<Tag_, DataType_> A4(T4);
+      SparseMatrixCSR<Tag_, DataType_> P4;
+      P4.clone(A4);
+      SynchronisedPreconditionedSolverData<> sd4(std::move(A4), std::move(P4), std::move(x4), std::move(b4), 3);
       TEST_CHECK_EQUAL(sd4.temp().size(), Index(3));
-      TEST_CHECK_EQUAL(sd4.temp().at(0).size(), x.size());
-      TEST_CHECK_EQUAL(sd4.temp().at(1).size(), x.size());
-      TEST_CHECK_EQUAL(sd4.temp().at(2).size(), x.size());
+      TEST_CHECK_EQUAL(sd4.temp().at(0).size(), 1000);
+      TEST_CHECK_EQUAL(sd4.temp().at(1).size(), 1000);
+      TEST_CHECK_EQUAL(sd4.temp().at(2).size(), 1000);
       TEST_CHECK_EQUAL(sd4.vector_mirrors().size(), Index(0));
       TEST_CHECK_EQUAL(sd4.vector_mirror_sendbufs().size(), Index(0));
       TEST_CHECK_EQUAL(sd4.vector_mirror_recvbufs().size(), Index(0));
       TEST_CHECK_EQUAL(sd4.dest_ranks().size(), Index(0));
       TEST_CHECK_EQUAL(sd4.source_ranks().size(), Index(0));
       //-------------------------------------------------------------------------
-      MultiLevelSolverData<> mlsd(A, b, x);
+
+      DenseVector<Tag_, DataType_> x5(1000, DataType_(1)), b5(1000, DataType_(1));
+      SparseMatrixCOO<Mem::Main, DataType_> T5(1000, 1000);
+      for(Index i(0) ; i < 1000 ; ++i)
+        T4(i, i, DataType_(1));
+      SparseMatrixCSR<Tag_, DataType_> A5(T5);
+      SparseMatrixCSR<Tag_, DataType_> P5;
+      P5.clone(A5);
+      MultiLevelSolverData<> mlsd(std::move(A5), std::move(b5), std::move(x5));
     }
 };
 SolverDataTest<Mem::Main, Algo::Generic,  double> sf_cpu_double("StorageType: std::vector, DataType: double");

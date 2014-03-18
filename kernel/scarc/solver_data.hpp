@@ -266,21 +266,21 @@ namespace FEAST
         return "SolverData";
       }
 
-      ///CTOR from system data
-      SolverData(matrix_type_& A,
-                 vector_type_& x,
-                 vector_type_& b,
+      ///CTOR from system data, moves data to solver data
+      SolverData(matrix_type_&& A,
+                 vector_type_&& x,
+                 vector_type_&& b,
                  IT_ num_temp_vectors = 0,
                  IT_ num_temp_scalars = 0,
                  IT_ num_temp_indices = 0)
       {
-        this->_stored_sys = A;
-        this->_stored_rhs = b;
-        this->_stored_sol = x;
-        this->_stored_def = vector_type_(x.size());
+        this->_stored_sys = std::move(A);
+        this->_stored_rhs = std::move(b);
+        this->_stored_sol = std::move(x);
+        this->_stored_def = vector_type_(this->_stored_rhs.size());
         this->_stored_temp = vector_storage_type_();
         for(unsigned long i(0) ; i < num_temp_vectors ; ++i)
-          this->_stored_temp.push_back(vector_type_(x.size(), DataType_(0)));
+          this->_stored_temp.push_back(vector_type_(this->_stored_sol.size(), DataType_(0)));
 
         this->_stored_scalars = scalar_storage_type_(num_temp_scalars, DataType_(0));
         this->_stored_indices = index_storage_type_(num_temp_indices, IT_(0));
@@ -291,17 +291,17 @@ namespace FEAST
         this->_stored_used_iters = IT_(0);
       }
 
-      ///copy CTOR
-      SolverData(const SolverData& other)
+      ///move CTOR
+      SolverData(SolverData&& other)
       {
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
+        this->_stored_sys = std::move(other._stored_sys);
+        this->_stored_localsys = std::move(other._stored_localsys);
+        this->_stored_rhs = std::move(other._stored_rhs);
+        this->_stored_sol = std::move(other._stored_sol);
+        this->_stored_def = std::move(other._stored_def);
+        this->_stored_temp = std::move(other._stored_temp);
+        this->_stored_scalars = std::move(other._stored_scalars);
+        this->_stored_indices = std::move(other._stored_indices);
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -309,20 +309,20 @@ namespace FEAST
         this->_stored_used_iters = IT_(0);
       }
 
-      ///assignment operator overload
-      SolverData& operator=(const SolverData& other)
+      ///move assignment operator overload
+      SolverData& operator=(SolverData&& other)
       {
           if(this == &other)
             return *this;
 
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
+        this->_stored_sys = std::move(other._stored_sys);
+        this->_stored_localsys = std::move(other._stored_localsys);
+        this->_stored_rhs = std::move(other._stored_rhs);
+        this->_stored_sol = std::move(other._stored_sol);
+        this->_stored_def = std::move(other._stored_def);
+        this->_stored_temp = std::move(other._stored_temp);
+        this->_stored_scalars = std::move(other._stored_scalars);
+        this->_stored_indices = std::move(other._stored_indices);
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
@@ -399,15 +399,15 @@ namespace FEAST
         }
 
       protected:
-        ///CTORs to be used in subclasses
-        PreconditionerDataContainer(const precon_type_& precon) :
-          _stored_precon(precon)
+        ///CTORs to be used in subclasses, moves data into interface
+        PreconditionerDataContainer(precon_type_&& precon) :
+          _stored_precon(std::move(precon))
         {
         }
 
-        PreconditionerDataContainer(const PreconditionerDataContainer& other)
+        PreconditionerDataContainer(PreconditionerDataContainer&& other)
         {
-          this->_stored_precon = other._stored_precon;
+          this->_stored_precon = std::move(other._stored_precon);
         }
 
         precon_type_ _stored_precon;
@@ -460,46 +460,46 @@ namespace FEAST
       }
 
       ///CTOR from system data
-      PreconditionedSolverData(matrix_type_& A,
-                               precon_type_& P,
-                               vector_type_& x,
-                               vector_type_& b,
+      PreconditionedSolverData(matrix_type_&& A,
+                               precon_type_&& P,
+                               vector_type_&& x,
+                               vector_type_&& b,
                                IT_ num_temp_vectors = 0,
                                IT_ num_temp_scalars = 0,
                                IT_ num_temp_indices = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
-        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P)
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(A), std::move(x), std::move(b), num_temp_vectors, num_temp_scalars, num_temp_indices),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(std::move(P))
       {
       }
 
-      ///copy CTOR
-      PreconditionedSolverData(const PreconditionedSolverData& other) :
+      ///move CTOR
+      PreconditionedSolverData(PreconditionedSolverData&& other) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(other)
       {
       }
 
-      ///assignment operator overload
-      PreconditionedSolverData& operator=(const PreconditionedSolverData& other)
+      ///move assignment operator overload
+      PreconditionedSolverData& operator=(PreconditionedSolverData&& other)
       {
           if(this == &other)
             return *this;
 
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
+        this->_stored_sys = std::move(other._stored_sys);
+        this->_stored_localsys = std::move(other._stored_localsys);
+        this->_stored_rhs = std::move(other._stored_rhs);
+        this->_stored_sol = std::move(other._stored_sol);
+        this->_stored_def = std::move(other._stored_def);
+        this->_stored_temp = std::move(other._stored_temp);
+        this->_stored_scalars = std::move(other._stored_scalars);
+        this->_stored_indices = std::move(other._stored_indices);
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
         this->_stored_max_iters = IT_(0);
         this->_stored_used_iters = IT_(0);
 
-        this->_stored_precon = other._stored_precon;
+        this->_stored_precon = std::move(other._stored_precon);
 
         return *this;
       }
@@ -597,13 +597,13 @@ namespace FEAST
         {
         }
 
-        SynchronizationDataContainer(const SynchronizationDataContainer& other)
+        SynchronizationDataContainer(SynchronizationDataContainer&& other)
         {
-          this->_stored_vector_mirrors = other._stored_vector_mirrors;
-          this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
-          this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
-          this->_stored_dest_ranks = other.stored_dest_ranks;
-          this->_stored_source_ranks = other.stored_source_ranks;
+          this->_stored_vector_mirrors = std::move(other._stored_vector_mirrors);
+          this->_stored_vector_mirror_sendbufs = std::move(other._stored_vector_mirror_sendbufs);
+          this->_stored_vector_mirror_recvbufs = std::move(other._stored_vector_mirror_recvbufs);
+          this->_stored_dest_ranks = std::move(other.stored_dest_ranks);
+          this->_stored_source_ranks = std::move(other.stored_source_ranks);
         }
 
         vector_mirror_storage_type_ _stored_vector_mirrors;
@@ -663,49 +663,49 @@ namespace FEAST
       }
 
       ///CTOR from system data
-      SynchronisedSolverData(matrix_type_& A,
-                             vector_type_& x,
-                             vector_type_& b,
+      SynchronisedSolverData(matrix_type_&& A,
+                             vector_type_&& x,
+                             vector_type_&& b,
                              IT_ num_temp_vectors = 0,
                              IT_ num_temp_scalars = 0,
                              IT_ num_temp_indices = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(A), std::move(x), std::move(b), num_temp_vectors, num_temp_scalars, num_temp_indices),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
       }
 
-      ///copy CTOR
-      SynchronisedSolverData(const SynchronisedSolverData& other) :
+      ///move CTOR
+      SynchronisedSolverData(SynchronisedSolverData&& other) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>(other)
       {
       }
 
-      ///assignment operator overload
-      SynchronisedSolverData& operator=(const SynchronisedSolverData& other)
+      ///move assignment operator overload
+      SynchronisedSolverData& operator=(SynchronisedSolverData&& other)
       {
           if(this == &other)
             return *this;
 
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
+        this->_stored_sys = std::move(other._stored_sys);
+        this->_stored_localsys = std::move(other._stored_localsys);
+        this->_stored_rhs = std::move(other._stored_rhs);
+        this->_stored_sol = std::move(other._stored_sol);
+        this->_stored_def = std::move(other._stored_def);
+        this->_stored_temp = std::move(other._stored_temp);
+        this->_stored_scalars = std::move(other._stored_scalars);
+        this->_stored_indices = std::move(other._stored_indices);
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
         this->_stored_max_iters = IT_(0);
         this->_stored_used_iters = IT_(0);
 
-        this->_stored_vector_mirrors = other._stored_vector_mirrors;
-        this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
-        this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
-        this->_stored_dest_ranks = other._stored_dest_ranks;
-        this->_stored_source_ranks = other._stored_source_ranks;
+        this->_stored_vector_mirrors = std::move(other._stored_vector_mirrors);
+        this->_stored_vector_mirror_sendbufs = std::move(other._stored_vector_mirror_sendbufs);
+        this->_stored_vector_mirror_recvbufs = std::move(other._stored_vector_mirror_recvbufs);
+        this->_stored_dest_ranks = std::move(other._stored_dest_ranks);
+        this->_stored_source_ranks = std::move(other._stored_source_ranks);
 
         return *this;
       }
@@ -763,55 +763,55 @@ namespace FEAST
       }
 
       ///CTOR from system data
-      SynchronisedPreconditionedSolverData(matrix_type_& A,
-                             PreconContType_<MemTag_, DataType_, IT_>& P,
-                             vector_type_& x,
-                             vector_type_& b,
-                             IT_ num_temp_vectors = 0,
-                             IT_ num_temp_scalars = 0,
-                             IT_ num_temp_indices = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
-        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
+      SynchronisedPreconditionedSolverData(matrix_type_&& A,
+                                           PreconContType_<MemTag_, DataType_, IT_>&& P,
+                                           vector_type_&& x,
+                                           vector_type_&& b,
+                                           IT_ num_temp_vectors = 0,
+                                           IT_ num_temp_scalars = 0,
+                                           IT_ num_temp_indices = 0) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(A), std::move(x), std::move(b), num_temp_vectors, num_temp_scalars, num_temp_indices),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(std::move(P)),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
 
       {
       }
 
-      ///copy CTOR
-      SynchronisedPreconditionedSolverData(const SynchronisedPreconditionedSolverData& other) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
-        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(other),
-        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(other)
+      ///move CTOR
+      SynchronisedPreconditionedSolverData(SynchronisedPreconditionedSolverData&& other) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(other)),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(std::move(other)),
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_>(std::move(other))
       {
       }
 
       ///assignment operator overload
-      SynchronisedPreconditionedSolverData& operator=(const SynchronisedPreconditionedSolverData& other)
+      SynchronisedPreconditionedSolverData& operator=(SynchronisedPreconditionedSolverData&& other)
       {
           if(this == &other)
             return *this;
 
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
+        this->_stored_sys = std::move(other._stored_sys);
+        this->_stored_localsys = std::move(other._stored_localsys);
+        this->_stored_rhs = std::move(other._stored_rhs);
+        this->_stored_sol = std::move(other._stored_sol);
+        this->_stored_def = std::move(other._stored_def);
+        this->_stored_temp = std::move(other._stored_temp);
+        this->_stored_scalars = std::move(other._stored_scalars);
+        this->_stored_indices = std::move(other._stored_indices);
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
         this->_stored_max_iters = IT_(0);
         this->_stored_used_iters = IT_(0);
 
-        this->_stored_precon = other._stored_precon;
+        this->_stored_precon = std::move(other._stored_precon);
 
-        this->_stored_vector_mirrors = other._stored_vector_mirrors;
-        this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
-        this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
-        this->_stored_dest_ranks = other._stored_dest_ranks;
-        this->_stored_source_ranks = other._stored_source_ranks;
+        this->_stored_vector_mirrors = std::move(other._stored_vector_mirrors);
+        this->_stored_vector_mirror_sendbufs = std::move(other._stored_vector_mirror_sendbufs);
+        this->_stored_vector_mirror_recvbufs = std::move(other._stored_vector_mirror_recvbufs);
+        this->_stored_dest_ranks = std::move(other._stored_dest_ranks);
+        this->_stored_source_ranks = std::move(other._stored_source_ranks);
 
         return *this;
       }
@@ -858,14 +858,14 @@ namespace FEAST
 
       protected:
         ///CTORs to be used in subclasses
-        FilterDataContainer(const filter_type_& filter) :
-          _stored_filter(filter.clone())
+        FilterDataContainer(filter_type_&& filter) :
+          _stored_filter(std::move(filter))
         {
         }
 
-        FilterDataContainer(const FilterDataContainer& other)
+        FilterDataContainer(FilterDataContainer&& other)
         {
-          this->_stored_filter = std::move(other._stored_filter.clone());
+          this->_stored_filter = std::move(other._stored_filter);
         }
 
         filter_type_ _stored_filter;
@@ -928,59 +928,59 @@ namespace FEAST
       }
 
       ///CTOR from system data
-      SynchronisedPreconditionedFilteredSolverData(matrix_type_& A,
-                                                   PreconContType_<MemTag_, DataType_, IT_>& P,
-                                                   vector_type_& x,
-                                                   vector_type_& b,
-                                                   FilterType_<MemTag_, DataType_>& filter,
+      SynchronisedPreconditionedFilteredSolverData(matrix_type_&& A,
+                                                   PreconContType_<MemTag_, DataType_, IT_>&& P,
+                                                   vector_type_&& x,
+                                                   vector_type_&& b,
+                                                   FilterType_<MemTag_, DataType_>&& filter,
                                                    IT_ num_temp_vectors = 0,
                                                    IT_ num_temp_scalars = 0,
                                                    IT_ num_temp_indices = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
-        FilterDataContainer<DataType_, MemTag_, FilterType_>(filter.clone()),
-        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(P),
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(A), std::move(x), std::move(b), num_temp_vectors, num_temp_scalars, num_temp_indices),
+        FilterDataContainer<DataType_, MemTag_, FilterType_>(std::move(filter)),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(std::move(P)),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
       }
 
-      ///copy CTOR
-      SynchronisedPreconditionedFilteredSolverData(const SynchronisedPreconditionedFilteredSolverData& other) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>(other),
-        FilterDataContainer<DataType_, MemTag_, FilterType_>(other),
-        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>(other),
-        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_, IT_>(other)
+      ///move CTOR
+      SynchronisedPreconditionedFilteredSolverData(SynchronisedPreconditionedFilteredSolverData&& other) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>(std::move(other)),
+        FilterDataContainer<DataType_, MemTag_, FilterType_>(std::move(other)),
+        PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>(std::move(other)),
+        SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_, IT_>(std::move(other))
       {
       }
 
-      ///assignment operator overload
-      SynchronisedPreconditionedFilteredSolverData& operator=(const SynchronisedPreconditionedFilteredSolverData& other)
+      ///move assignment operator overload
+      SynchronisedPreconditionedFilteredSolverData& operator=(SynchronisedPreconditionedFilteredSolverData&& other)
       {
           if(this == &other)
             return *this;
 
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
+        this->_stored_sys = std::move(other._stored_sys);
+        this->_stored_localsys = std::move(other._stored_localsys);
+        this->_stored_rhs = std::move(other._stored_rhs);
+        this->_stored_sol = std::move(other._stored_sol);
+        this->_stored_def = std::move(other._stored_def);
+        this->_stored_temp = std::move(other._stored_temp);
+        this->_stored_scalars = std::move(other._stored_scalars);
+        this->_stored_indices = std::move(other._stored_indices);
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
         this->_stored_max_iters = IT_(0);
         this->_stored_used_iters = IT_(0);
 
-        this->_stored_precon = other._stored_precon;
+        this->_stored_precon = std::move(other._stored_precon);
 
-        this->_stored_vector_mirrors = other._stored_vector_mirrors;
-        this->_stored_vector_mirror_sendbufs = other._stored_vector_mirror_sendbufs;
-        this->_stored_vector_mirror_recvbufs = other._stored_vector_mirror_recvbufs;
-        this->_stored_dest_ranks = other._stored_dest_ranks;
-        this->_stored_source_ranks = other._stored_source_ranks;
+        this->_stored_vector_mirrors = std::move(other._stored_vector_mirrors);
+        this->_stored_vector_mirror_sendbufs = std::move(other._stored_vector_mirror_sendbufs);
+        this->_stored_vector_mirror_recvbufs = std::move(other._stored_vector_mirror_recvbufs);
+        this->_stored_dest_ranks = std::move(other._stored_dest_ranks);
+        this->_stored_source_ranks = std::move(other._stored_source_ranks);
 
-        this->_stored_filter = other._stored_filter.clone();
+        this->_stored_filter = std::move(other._stored_filter);
 
         return *this;
       }
@@ -1009,46 +1009,46 @@ namespace FEAST
       }
 
       ///CTOR from system
-      MultiLevelSolverData(matrix_type_& A,
-                           vector_type_& x,
-                           vector_type_& b,
+      MultiLevelSolverData(matrix_type_&& A,
+                           vector_type_&& x,
+                           vector_type_&& b,
                            IT_ num_temp_vectors = 0,
                            IT_ num_temp_scalars = 0,
                            IT_ num_temp_indices = 0) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(A, x, b, num_temp_vectors, num_temp_scalars, num_temp_indices),
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(A), std::move(x), std::move(b), num_temp_vectors, num_temp_scalars, num_temp_indices),
         stored_level_data()
       {
         ///TODO
       }
 
-      ///copy CTOR
-      MultiLevelSolverData(const MultiLevelSolverData& other) :
-        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(other),
-        stored_level_data(other.stored_level_data)
+      ///move CTOR
+      MultiLevelSolverData(MultiLevelSolverData&& other) :
+        SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(other)),
+        stored_level_data(std::move(other.stored_level_data))
       {
       }
 
-      ///assignment operator overload
-      MultiLevelSolverData& operator=(const MultiLevelSolverData& other)
+      ///move assignment operator overload
+      MultiLevelSolverData& operator=(MultiLevelSolverData&& other)
       {
           if(this == &other)
             return *this;
 
-        this->_stored_sys = other._stored_sys;
-        this->_stored_localsys = other._stored_localsys;
-        this->_stored_rhs = other._stored_rhs;
-        this->_stored_sol = other._stored_sol;
-        this->_stored_def = other._stored_def;
-        this->_stored_temp = other._stored_temp;
-        this->_stored_scalars = other._stored_scalars;
-        this->_stored_indices = other._stored_indices;
+        this->_stored_sys = std::move(other._stored_sys);
+        this->_stored_localsys = std::move(other._stored_localsys);
+        this->_stored_rhs = std::move(other._stored_rhs);
+        this->_stored_sol = std::move(other._stored_sol);
+        this->_stored_def = std::move(other._stored_def);
+        this->_stored_temp = std::move(other._stored_temp);
+        this->_stored_scalars = std::move(other._stored_scalars);
+        this->_stored_indices = std::move(other._stored_indices);
         this->_stored_norm_0 = other._stored_norm_0;
         this->_stored_norm = other._stored_norm;
         this->_stored_eps = other._stored_eps;
         this->_stored_max_iters = IT_(0);
         this->_stored_used_iters = IT_(0);
 
-        this->stored_level_data = other._stored_level_data;
+        this->stored_level_data = std::move(other._stored_level_data);
 
         return *this;
       }

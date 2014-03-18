@@ -482,8 +482,8 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     DenseVector<Mem::Main, double> recvbuf(target_mirror.size());
 
     mirrors.push_back(std::move(target_mirror));
-    sendbufs.push_back(sendbuf);
-    recvbufs.push_back(recvbuf);
+    sendbufs.push_back(std::move(sendbuf));
+    recvbufs.push_back(std::move(recvbuf));
 
     destranks.push_back(macro_comm_halos.at(i)->get_other());
     sourceranks.push_back(macro_comm_halos.at(i)->get_other());
@@ -497,7 +497,8 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   std::vector<DenseVector<Mem::Main, Index> > rp_sendbufs;
   std::vector<DenseVector<Mem::Main, Index> > rp_recvbufs;
 
-  SparseMatrixCSR<Mem::Main, double> mat_localsys(mat_sys.clone());
+  SparseMatrixCSR<Mem::Main, double> mat_localsys;
+  mat_localsys.clone(mat_sys);
   for(Index i(0) ; i < macro_comm_halos.size() ; ++i)
   {
     //gather data, exchange
@@ -548,12 +549,12 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
                               macro_comm_halos.at(i)->get_other());
 #endif
 
-    val_sendbufs.push_back(val_sendbuf);
-    val_recvbufs.push_back(val_recvbuf);
-    colind_sendbufs.push_back(colind_sendbuf);
-    colind_recvbufs.push_back(colind_recvbuf);
-    rp_sendbufs.push_back(rp_sendbuf);
-    rp_recvbufs.push_back(rp_recvbuf);
+    val_sendbufs.push_back(std::move(val_sendbuf));
+    val_recvbufs.push_back(std::move(val_recvbuf));
+    colind_sendbufs.push_back(std::move(colind_sendbuf));
+    colind_recvbufs.push_back(std::move(colind_recvbuf));
+    rp_sendbufs.push_back(std::move(rp_sendbuf));
+    rp_recvbufs.push_back(std::move(rp_recvbuf));
   }
 #ifndef SERIAL
   MPI_Barrier(MPI_COMM_WORLD);
@@ -623,17 +624,17 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     VectorMirror,
     SparseMatrixCSR,
     SparseMatrixCSR,
-    UnitFilter> data(mat_sys, mat_precon, vec_sol, vec_rhs, filter,
+    UnitFilter> data(std::move(mat_sys), std::move(mat_precon), std::move(vec_sol), std::move(vec_rhs), std::move(filter),
                      std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_vectors(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_vectors()),
                      std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_scalars(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_scalars()),
                      std::max(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::min_num_temp_indices(), SolverPatternGeneration<RichardsonLayer, Algo::Generic>::min_num_temp_indices()));
 
   data.vector_mirrors() = std::move(mirrors);
-  data.vector_mirror_sendbufs() = sendbufs;
-  data.vector_mirror_recvbufs() = recvbufs;
-  data.dest_ranks() = destranks;
-  data.source_ranks() = sourceranks;
-  data.localsys() = mat_localsys;
+  data.vector_mirror_sendbufs() = std::move(sendbufs);
+  data.vector_mirror_recvbufs() = std::move(recvbufs);
+  data.dest_ranks() = std::move(destranks);
+  data.source_ranks() = std::move(sourceranks);
+  data.localsys() = std::move(mat_localsys);
 
   std::shared_ptr<SolverFunctorBase<DenseVector<Mem::Main, double> > > solver(SolverPatternGeneration<ScaRCBlockSmoother, Algo::Generic>::execute(data, 1000, 1e-8));
 

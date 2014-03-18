@@ -30,17 +30,27 @@ class SolverPatternTest:
       for(Index i(0) ; i < 100 ; ++i)
         T(i, i, DataType_(1));
       SparseMatrixCSR<Tag_, DataType_> A(T);
+      SparseMatrixCSR<Tag_, DataType_> P;
+      P.clone(A);
 
-      PreconditionedSolverData<> data(A, A, x, b,
+      PreconditionedSolverData<> data(std::move(A), std::move(P), std::move(x), std::move(b),
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_vectors(),
                         SolverPatternGeneration<Richardson, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver(SolverPatternGeneration<Richardson, Algo_>::execute(data, 20, 1e-8));
       TEST_CHECK_EQUAL(solver->type_name(), "CompoundSolverFunctor[DefectFunctor, NormFunctor2, IterateFunctor[CompoundSolverFunctor[ProductFunctor, SumFunctor, DefectFunctor, NormFunctor2, DivFunctor]]]");
       solver->execute();
 
+      DenseVector<Tag_, DataType_> x1(100, DataType_(1)), b1(100, DataType_(1));
+      SparseMatrixCOO<Mem::Main, DataType_> T1(100, 100);
+      for(Index i(0) ; i < 100 ; ++i)
+        T1(i, i, DataType_(1));
+      SparseMatrixCSR<Tag_, DataType_> A1(T1);
+      SparseMatrixCSR<Tag_, DataType_> P1;
+      P1.clone(A1);
+
       //---------------------------------------------------------------------------------------------------------------------------------------------
       DenseVector<Tag_, DataType_> dummy;
-      PreconditionedSolverData<> data3(A, A, x, b,
+      PreconditionedSolverData<> data3(std::move(A1), std::move(P1), std::move(x1), std::move(b1),
                          SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_vectors(),
                          SolverPatternGeneration<RichardsonLayer, Algo_>::min_num_temp_scalars());
       std::shared_ptr<SolverFunctorBase<DenseVector<Tag_, DataType_> > > solver3(SolverPatternGeneration<RichardsonLayer, Algo_>::execute(data3, dummy, 20, 1e-8));
