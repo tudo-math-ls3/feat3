@@ -148,12 +148,14 @@ public:
   virtual void run() const
   {
     PSF_ factory(13);
-    MT_ sys(factory.matrix_csr());
+    MT_ sys;
+    sys.convert(factory.matrix_csr());
 
     Index size(sys.rows());
     VT_ x(size, DT_(1));
-    VT_ ref(factory.vector_q2_bubble());
-    VT_ ref_local(ref);
+    VT_ ref;
+    ref.convert(factory.vector_q2_bubble());
+    VT_ ref_local(ref.size());
     VT_ b(size);
     sys.template apply<Algo_>(b, ref);
 
@@ -161,6 +163,7 @@ public:
     BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, 1e-12);
     delete precond;
 
+    ref_local.copy(ref);
     // check, if the result is correct
     for (Index i(0) ; i < size ; ++i)
     {
@@ -935,9 +938,12 @@ public:
       cLU(i, i + 1, DT_(-0.7 - 0.2 * (i%3)));
     }
 
-    MT_ L(cL);
-    MT_ U(cU);
-    MT_ LU(cLU);
+    MT_ L;
+    L.convert(cL);
+    MT_ U;
+    U.convert(cU);
+    MT_ LU;
+    LU.convert(cLU);
 
     // calculate the reference-solution
     //tmp.template product_matvec<Algo_>(U, x);

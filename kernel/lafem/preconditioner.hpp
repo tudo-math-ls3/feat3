@@ -768,14 +768,13 @@ namespace FEAST
        * Creates a ILU preconditioner to the given LU-decomposition
        */
       ILUPreconditioner(const SparseMatrixCSR<Mem_, DT_> & LU) :
-        _A(LU),
-        _LU(LU)
+        _A(LU)
       {
         if (_LU.columns() != _LU.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
-        this->LU.convert(LU);
+        this->_LU.convert(LU);
       }
 
       /**
@@ -1186,15 +1185,14 @@ namespace FEAST
        * Creates a ILU preconditioner to the given LU-decomposition
        */
       ILUPreconditioner(const SparseMatrixELL<Mem_, DT_> & LU) :
-        _A(LU),
-        _LU(LU)
+        _A(LU)
       {
         if (_LU.columns() != _LU.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
 
-        this->LU.convert(LU);
+        this->_LU.convert(LU);
       }
 
       /**
@@ -2423,7 +2421,7 @@ namespace FEAST
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, MatrixType::LayoutType> _layout;
+        const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::LayoutType> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2439,7 +2437,7 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, MatrixType::LayoutType> layout) :
+                                      const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::LayoutType> layout) :
           _A(A),
           _layout(layout),
           _m((Index) -1),
@@ -2514,8 +2512,7 @@ namespace FEAST
             prow_ptr[k+1] = nz;
           }
 
-          MatrixType tM(n, n, col_ind, val, row_ptr);
-          _M = tM;
+          _M = MatrixType(n, n, col_ind, val, row_ptr);
         } // function create_m_transpose
 
         void create_m()
@@ -2565,8 +2562,7 @@ namespace FEAST
           }
           ptrow_ptr[0] = 0;
 
-          SparseMatrixCSR<Mem_, DT_> tM(n, n, tcol_ind, tval, trow_ptr);
-          _M = tM;
+          _M = SparseMatrixCSR<Mem_, DT_>(n, n, tcol_ind, tval, trow_ptr);
         } // function create_m
 
         void create_m_without_new_entries ()
@@ -2606,13 +2602,11 @@ namespace FEAST
               }
             }
 
-            MatrixType tM(n, n, col_ind, val, row_ptr);
-            _M = tM;
+            _M = MatrixType(n, n, col_ind, val, row_ptr);
           }
           else
           {
-            MatrixType tM(_layout);
-            _M = tM;
+            _M = MatrixType(_layout);
 
             DT_ * pval(_M.val());
             const Index * pcol_ind(_M.col_ind());
@@ -2673,7 +2667,7 @@ namespace FEAST
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, MatrixType::LayoutType> _layout;
+        const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::LayoutType> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2689,7 +2683,7 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, MatrixType::LayoutType> layout) :
+                                      const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::LayoutType> layout) :
           _A(A),
           _layout(layout),
           _m((Index) -1),
@@ -2756,8 +2750,7 @@ namespace FEAST
             }
           }
 
-          MatrixType tM(n, n, row_ind, col_ind, val);
-          _M = tM;
+          _M = MatrixType(n, n, row_ind, col_ind, val);
         } // function create_m_transpose
 
         void create_m()
@@ -2803,8 +2796,7 @@ namespace FEAST
             }
           }
 
-          SparseMatrixCOO<Mem_, DT_> tM(n, n, trow_ind, tcol_ind, tval);
-          _M = tM;
+          _M = SparseMatrixCOO<Mem_, DT_>(n, n, trow_ind, tcol_ind, tval);
         } // function create_m
 
         void create_m_without_new_entries ()
@@ -2847,13 +2839,11 @@ namespace FEAST
               }
             }
 
-            MatrixType tM(n, n, row_ind, col_ind, val);
-            _M = tM;
+            _M = MatrixType(n, n, row_ind, col_ind, val);
           }
           else
           {
-            MatrixType tM(_layout);
-            _M = tM;
+            _M = MatrixType(_layout);
 
             for (Index i(0); i < n; ++i)
             {
@@ -2901,7 +2891,7 @@ namespace FEAST
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, MatrixType::LayoutType> _layout;
+        const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::LayoutType> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2917,7 +2907,7 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, MatrixType::LayoutType> layout) :
+                                      const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::LayoutType> layout) :
           _A(A),
           _layout(layout),
           _m((Index) -1),
@@ -2999,9 +2989,8 @@ namespace FEAST
             pmrl[i] = Index(_m_columns[i].size());
           }
 
-          MatrixType tM(n, n, stride, num_cols_per_row,
+          _M = MatrixType(n, n, stride, num_cols_per_row,
                  used_elements, mx, mj , mrl);
-          _M = tM;
         } // function create_m_transpose
 
         void create_m()
@@ -3049,8 +3038,7 @@ namespace FEAST
             }
           }
 
-          SparseMatrixELL<Mem_, DT_> tM(n, n, tstride, num_cols_per_row, used_elements, tx, tj, trl);
-          _M = tM;
+          _M = SparseMatrixELL<Mem_, DT_>(n, n, tstride, num_cols_per_row, used_elements, tx, tj, trl);
         } // function create_m
 
         void create_m_without_new_entries ()
@@ -3089,13 +3077,11 @@ namespace FEAST
               }
             }
 
-            MatrixType tM(n, n, stride, num_cols_per_row, used_elements, mx, mj, mrl);
-            _M = tM;
+            _M = MatrixType(n, n, stride, num_cols_per_row, used_elements, mx, mj, mrl);
           }
           else
           {
-            MatrixType tM(_layout);
-            _M = tM;
+            _M = MatrixType(_layout);
 
             DT_ * pmx(_M.Ax());
             const Index * pmj(_M.Aj());
@@ -3252,7 +3238,7 @@ namespace FEAST
        * Creates a SPAI preconditioner to the given matrix and given initial layout
        */
       SPAIPreconditioner(const MT_ & A,
-                         const SparseLayout<Mem_, MT_::LayoutType> & layout,
+                         const SparseLayout<Mem_, typename MT_::IndexType, MT_::LayoutType> & layout,
                          const Index max_iter = 10,
                          const DT_ eps_res = 1e-2,
                          const Index fill_in = 10,

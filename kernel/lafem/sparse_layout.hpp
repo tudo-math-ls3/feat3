@@ -40,6 +40,13 @@ namespace FEAST
         template<typename Mem_, typename DT_, typename IT_>
         using MatrixType = SparseMatrixELL<Mem_, DT_, IT_>;
       };
+
+      template <>
+      struct LayoutTyper<SparseLayoutType::lt_coo>
+      {
+        template<typename Mem_, typename DT_, typename IT_>
+        using MatrixType = SparseMatrixCOO<Mem_, DT_, IT_>;
+      };
     }
 
     /**
