@@ -3339,6 +3339,7 @@ namespace FEAST
         std::vector<DT_> d(0);
 
         typename std::list<PAIR_>::iterator it_I, it_J, it_I_end, it_J_end;
+        typename std::list<std::pair<Index, Index> >::iterator it_I_sorted;
 
         // __create column-structure of matrix A__
         this->create_a_columnwise();
@@ -3386,12 +3387,12 @@ namespace FEAST
 
           // save sorted list of I
           std::list<std::pair<Index, Index> > I_sorted(I.size());
-          auto it = I_sorted.begin();
-          auto it_I = I.begin();
-          for (Index i(0); i < mm_new; ++i, ++it, ++it_I)
+          it_I_sorted = I_sorted.begin();
+          it_I = I.begin();
+          for (Index i(0); i < mm_new; ++i, ++it_I_sorted, ++it_I)
           {
-            it->second = it_I->second;
-            it->first = i;
+            it_I_sorted->second = it_I->second;
+            it_I_sorted->first = i;
           }
 
           // allocate dynamic matrix for saving the transposed matrices \f$QR(I,J)^\top\f$ and \f$A(I,J)^\top\f$
@@ -3411,16 +3412,16 @@ namespace FEAST
             for (Index j(nn); j < nn_new; ++j, ++it_J)
             {
               Index col = it_J->second;
-              it = I_sorted.begin();
+              it_I_sorted = I_sorted.begin();
               for (auto it_col = _a_columnwise[col].begin();
                    it_col != _a_columnwise[col].end(); ++it_col)
               {
-                while (it->second < it_col->second)
+                while (it_I_sorted->second < it_col->second)
                 {
-                  ++it;
+                  ++it_I_sorted;
                 }
-                qr[j][it->first] = it_col->first;
-                local[j][it->first] = it_col->first;
+                qr[j][it_I_sorted->first] = it_col->first;
+                local[j][it_I_sorted->first] = it_col->first;
               }
             }
 
@@ -3475,7 +3476,7 @@ namespace FEAST
 
               for (Index i(j + 1); i < nn_new; ++i)
               {
-                DT_ s = DT_(0.0);
+                s = DT_(0.0);
                 for (Index l = j; l < mm_new; ++l)
                 {
                   s += qr[j][l] * qr[i][l];
@@ -3680,18 +3681,18 @@ namespace FEAST
             for (it_J = std::next(it_J_end); it_J != J.end(); ++it_J)
             {
               Index col = it_J->second;
-              auto it = I_sorted.begin();
+              it_I_sorted = I_sorted.begin();
               for (auto it_col = _a_columnwise[col].begin();
                    it_col != _a_columnwise[col].end(); ++it_col)
               {
                 Index row = it_col->second;
-                while (it != I_sorted.end() && it->second < row)
+                while (it_I_sorted != I_sorted.end() && it_I_sorted->second < row)
                 {
-                  ++it;
+                  ++it_I_sorted;
                 }
-                if (it == I_sorted.end() || it->second != row)
+                if (it_I_sorted == I_sorted.end() || it_I_sorted->second != row)
                 {
-                  I_sorted.emplace(it, -1, row);
+                  I_sorted.emplace(it_I_sorted, -1, row);
                   it_I = std::next(it_I_end);
                   while (it_I != I.end() && it_I->second < row)
                   {
@@ -3706,20 +3707,20 @@ namespace FEAST
             mm_new = Index(I.size());
 
             // fill sorted vector sorted_I with new entries of I
-            for (auto it = I_sorted.begin(); it != I_sorted.end(); ++it)
+            for (it_I_sorted = I_sorted.begin(); it_I_sorted != I_sorted.end(); ++it_I_sorted)
             {
-              if (it->first != (Index) -1)
+              if (it_I_sorted->first != (Index) -1)
               {
                 continue;
               }
               it_I = std::next(it_I_end);
               Index i(mm);
-              while (it_I->second != it->second)
+              while (it_I->second != it_I_sorted->second)
               {
                 ++it_I;
                 ++i;
               }
-              it->first = i;
+              it_I_sorted->first = i;
             }
           }
         } // end for-loop over each row of \f$M \approx A^{-1}\f$
