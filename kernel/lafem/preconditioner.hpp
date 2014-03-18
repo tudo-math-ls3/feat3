@@ -3627,7 +3627,7 @@ namespace FEAST
             {
               // search maximal value in rho
               DT_ max_val = DT_(0.0);
-              Index max_ind, max_sec;
+              Index max_ind(0), max_sec(0);
 
               for (Index i(0); i < mm; ++i)
               {
