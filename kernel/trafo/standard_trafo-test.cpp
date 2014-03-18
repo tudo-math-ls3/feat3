@@ -92,8 +92,8 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.5)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.5));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
@@ -156,8 +156,8 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.4375))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.5625)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.4375))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.5625));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
@@ -216,9 +216,9 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.5))
-                           + Math::sqr(trafo_data.img_point[2] - DataType_(0.5)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.5))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(0.5));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
@@ -288,9 +288,9 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.4875))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.475))
-                           + Math::sqr(trafo_data.img_point[2] - DataType_(0.46875)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.4875))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.475))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(0.46875));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
@@ -378,8 +378,8 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.0)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.0));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
@@ -448,8 +448,8 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.275))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.225)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.275))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.225));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
@@ -516,9 +516,9 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.25))
-                           + Math::sqr(trafo_data.img_point[2] - DataType_(0.125)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.25))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(0.125));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
@@ -594,9 +594,9 @@ public:
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqrt(Math::sqr(trafo_data.img_point[0] - DataType_(0.475))
-                           + Math::sqr(trafo_data.img_point[1] - DataType_(0.2))
-                           + Math::sqr(trafo_data.img_point[2] - DataType_(0.1875)));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.475))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0.2))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(0.1875));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix

@@ -244,8 +244,8 @@ class LinAlgTest :
 
     void test_vec_norm_euclid() const
     {
-      // set tolerance
-      const DataType_ tol(Math::pow(_eps, DataType_(0.9)));
+      // set tolerance; this needs to be weaker for sqrt
+      const DataType_ tol(Math::pow(_eps, DataType_(0.4)));
 
 #define N size_t(16)
       DataType_ x[N];

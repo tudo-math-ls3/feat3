@@ -898,7 +898,7 @@ namespace FEAST
        *
        * \note This function is used for the computation of second-order derivatives by the chain rule.
        *
-       * \param[in] v
+       * \param[in] x
        * The l-size vector that serves as a left multiplicant.
        *
        * \param[in] t
@@ -911,7 +911,7 @@ namespace FEAST
        */
       template<int l_, int snv_, int slt_, int smt_, int snt_>
       Matrix& add_vec_tensor_mult(
-        const Vector<T_, l_, snv_>& v,
+        const Vector<T_, l_, snv_>& x,
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
         T_ alpha = T_(1))
       {
@@ -922,7 +922,7 @@ namespace FEAST
             T_ r(0);
             for(Index k(0); k < Index(l_); ++k)
             {
-              r += v(k) * t(k,i,j);
+              r += x(k) * t(k,i,j);
             }
             operator()(i,j) += alpha * r;
           }
@@ -932,12 +932,12 @@ namespace FEAST
 
       template<int l_, int snv_, int slt_, int smt_, int snt_>
       Matrix& set_vec_tensor_mult(
-        const Vector<T_, l_, snv_>& v,
+        const Vector<T_, l_, snv_>& x,
         const Tensor3<T_, l_, m_, n_, slt_, smt_, snt_>& t,
         T_ alpha = T_(1))
       {
         format();
-        return add_vec_tensor_mult(v, t, alpha);
+        return add_vec_tensor_mult(x, t, alpha);
       }
     }; // class Matrix
 

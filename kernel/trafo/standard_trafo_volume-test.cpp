@@ -38,7 +38,7 @@ class StandardTrafoVolumeTest
     }
     void test_1d_quad() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
 
       typedef Shape::Hypercube<1> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -59,7 +59,7 @@ class StandardTrafoVolumeTest
 
     void test_1d_simplex() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
 
       typedef Shape::Simplex<1> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -80,7 +80,7 @@ class StandardTrafoVolumeTest
 
     void test_2d_simplex() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
 
       typedef Shape::Simplex<2> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -209,7 +209,7 @@ class StandardTrafoVolumeTest
 
     void test_3d_simplex() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.6));
+      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
       typedef Shape::Simplex<3> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;

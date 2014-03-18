@@ -64,6 +64,9 @@ public:
 
   void test_sqrt() const
   {
+    // we need a weaker tolerance for sqrt
+    const double tol(Math::pow(Math::eps<double>(), 0.4));
+
     // exact root tests
     TEST_CHECK_EQUAL(Math::sqrt<double>(0.0), 0.0);
     TEST_CHECK_EQUAL(Math::sqrt<double>(1.0), 1.0);
