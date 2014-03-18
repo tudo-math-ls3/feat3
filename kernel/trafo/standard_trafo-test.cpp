@@ -85,22 +85,22 @@ public:
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.0);
-    dom_point[1] = DataType_(0.0);
+    dom_point[0] = DataType_(0);
+    dom_point[1] = DataType_(0);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.5));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(1)/DataType_(2))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(1)/DataType_(2));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_(0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(0.5), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
     for(Index i(0); i < 2; ++i)
@@ -109,7 +109,7 @@ public:
       {
         for(Index k(0); k < 2; ++k)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0.0), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
       }
     }
@@ -143,38 +143,38 @@ public:
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
 
-    mesh.get_vertex_set()[0][0] = DataType_(-0.25);
-    mesh.get_vertex_set()[0][1] = DataType_( 0.25);
+    mesh.get_vertex_set()[0][0] = -DataType_(1)/DataType_(4);
+    mesh.get_vertex_set()[0][1] =  DataType_(1)/DataType_(4);
 
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.0);
-    dom_point[1] = DataType_(0.0);
+    dom_point[0] = DataType_(0);
+    dom_point[1] = DataType_(0);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.4375))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.5625));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(7)/DataType_(16))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(9)/DataType_(16));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_( 0.5625), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_( 0.0625), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(-0.0625), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_( 0.4375), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0],  DataType_(9)/DataType_(16), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1],  DataType_(1)/DataType_(16), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], -DataType_(1)/DataType_(16), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1],  DataType_(7)/DataType_(16), eps);
 
     // check hessian tensor
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][0], DataType_(0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][1], DataType_(-0.0625), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][0], DataType_(-0.0625), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][1], DataType_(0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][0], DataType_(0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][1], DataType_(0.0625), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][0], DataType_(0.0625), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][1], DataType_(0.0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][1], -DataType_(1)/DataType_(16), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][0], -DataType_(1)/DataType_(16), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][1], DataType_(1)/DataType_(16), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][0], DataType_(1)/DataType_(16), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][1], DataType_(0), eps);
 
     trafo_eval.finish();
   }// test_quad()
@@ -208,29 +208,29 @@ public:
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.0);
-    dom_point[1] = DataType_(0.0);
-    dom_point[2] = DataType_(0.0);
+    dom_point[0] = DataType_(0);
+    dom_point[1] = DataType_(0);
+    dom_point[2] = DataType_(0);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.5))
-                + Math::sqr(trafo_data.img_point[2] - DataType_(0.5));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(1)/DataType_(2))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(1)/DataType_(2))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(1)/DataType_(2));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_( 0.5), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
     for(Index i(0); i < 3; ++i)
@@ -239,7 +239,7 @@ public:
       {
         for(Index k(0); k < 3; ++k)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0.0), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
       }
     }
@@ -273,65 +273,65 @@ public:
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
 
-    mesh.get_vertex_set()[7][0] = DataType_(0.9);
-    mesh.get_vertex_set()[7][1] = DataType_(0.8);
-    mesh.get_vertex_set()[7][2] = DataType_(0.75);
+    mesh.get_vertex_set()[7][0] = DataType_(9)/DataType_(10);
+    mesh.get_vertex_set()[7][1] = DataType_(8)/DataType_(10);
+    mesh.get_vertex_set()[7][2] = DataType_(3)/DataType_(4);
 
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.0);
-    dom_point[1] = DataType_(0.0);
-    dom_point[2] = DataType_(0.0);
+    dom_point[0] = DataType_(0);
+    dom_point[1] = DataType_(0);
+    dom_point[2] = DataType_(0);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.4875))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.475))
-                + Math::sqr(trafo_data.img_point[2] - DataType_(0.46875));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(39)/DataType_(80))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(19)/DataType_(40))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(15)/DataType_(32));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_( 0.4875), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_( 0.475), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_( 0.46875), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(39)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(19)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_(15)/DataType_(32), eps);
 
     // check hessian tensor
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][1], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][2], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][0], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][1], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][2], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][2][0], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][2][1], DataType_(-0.0125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][2][2], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][1], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][2], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][0], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][1], DataType_(0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][2], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][2][0], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][2][1], DataType_(-0.025), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][2][2], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][0][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][0][1], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][0][2], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][1][0], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][1][1], DataType_(0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][1][2], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][2][0], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][2][1], DataType_(-0.03125), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][2][2], DataType_(0.0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][1], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][0][2], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][0], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][1][2], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][2][0], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][2][1], -DataType_(1)/DataType_(80), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[0][2][2], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][1], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][0][2], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][0], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][1][2], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][2][0], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][2][1], -DataType_(1)/DataType_(40), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[1][2][2], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][0][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][0][1], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][0][2], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][1][0], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][1][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][1][2], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][2][0], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][2][1], -DataType_(1)/DataType_(32), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[2][2][2], DataType_(0), eps);
 
     trafo_eval.finish();
   } // test_cube()
@@ -371,22 +371,22 @@ public:
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.5);
-    dom_point[1] = DataType_(0.5);
+    dom_point[0] = DataType_(1)/DataType_(2);
+    dom_point[1] = DataType_(1)/DataType_(2);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.0));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(1)/DataType_(2))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(0));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(-0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(-0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(-0.5), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], -DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1],  DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], -DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], -DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
     for(Index i(0); i < 2; ++i)
@@ -395,7 +395,7 @@ public:
       {
         for(Index k(0); k < 2; ++k)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0.0), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
       }
     }
@@ -435,28 +435,28 @@ public:
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
 
-    mesh.get_vertex_set()[1][0] = DataType_( 0.1);
-    mesh.get_vertex_set()[1][1] = DataType_(-0.1);
+    mesh.get_vertex_set()[1][0] =  DataType_(1)/DataType_(10);
+    mesh.get_vertex_set()[1][1] = -DataType_(1)/DataType_(10);
 
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.25);
-    dom_point[1] = DataType_(0.25);
+    dom_point[0] = DataType_(1)/DataType_(4);
+    dom_point[1] = DataType_(1)/DataType_(4);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.275))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.225));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(11)/DataType_(40))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(9)/DataType_(40));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(-0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_(-0.4), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(-0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(-0.6), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], -DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], -DataType_(4)/DataType_(10), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], -DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], -DataType_(6)/DataType_(10), eps);
 
     // check hessian tensor
     for(Index i(0); i < 2; ++i)
@@ -465,7 +465,7 @@ public:
       {
         for(Index k(0); k < 2; ++k)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0.0), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
       }
     }
@@ -508,29 +508,29 @@ public:
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.25);
-    dom_point[1] = DataType_(0.25);
-    dom_point[2] = DataType_(0.25);
+    dom_point[0] = DataType_(1)/DataType_(4);
+    dom_point[1] = DataType_(1)/DataType_(4);
+    dom_point[2] = DataType_(1)/DataType_(4);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.5))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.25))
-                + Math::sqr(trafo_data.img_point[2] - DataType_(0.125));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(1)/DataType_(2))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(1)/DataType_(4))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(1)/DataType_(8));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_( 1.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_( 0.5), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(1), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
     for(Index i(0); i < 3; ++i)
@@ -539,7 +539,7 @@ public:
       {
         for(Index k(0); k < 3; ++k)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0.0), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
       }
     }
@@ -579,36 +579,36 @@ public:
     // create a domain point
     typename TrafoEvaluator::DomainPointType dom_point;
 
-    mesh.get_vertex_set()[8][0] = DataType_(0.4);
-    mesh.get_vertex_set()[8][1] = DataType_(0.3);
-    mesh.get_vertex_set()[8][2] = DataType_(0.25);
+    mesh.get_vertex_set()[8][0] = DataType_(4)/DataType_(10);
+    mesh.get_vertex_set()[8][1] = DataType_(3)/DataType_(10);
+    mesh.get_vertex_set()[8][2] = DataType_(1)/DataType_(4);
 
     // prepare trafo evaluator
     trafo_eval.prepare(0);
 
-    dom_point[0] = DataType_(0.25);
-    dom_point[1] = DataType_(0.25);
-    dom_point[2] = DataType_(0.25);
+    dom_point[0] = DataType_(1)/DataType_(4);
+    dom_point[1] = DataType_(1)/DataType_(4);
+    dom_point[2] = DataType_(1)/DataType_(4);
 
     // evaluate trafo
     trafo_eval(trafo_data, dom_point);
 
     // check image point coordinates
-    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(0.475))
-                + Math::sqr(trafo_data.img_point[1] - DataType_(0.2))
-                + Math::sqr(trafo_data.img_point[2] - DataType_(0.1875));
+    DataType_ x = Math::sqr(trafo_data.img_point[0] - DataType_(19)/DataType_(40))
+                + Math::sqr(trafo_data.img_point[1] - DataType_(1)/DataType_(5))
+                + Math::sqr(trafo_data.img_point[2] - DataType_(3)/DataType_(16));
     TEST_CHECK_EQUAL_WITHIN_EPS(x, DataType_(0), eps);
 
     // check jacobian matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_( 1.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_( 0.4), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_( 0.3), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], DataType_( 0.5), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], DataType_( 0.0), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], DataType_( 0.25), eps);
-    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_( 0.5), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][0], DataType_(1), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][1], DataType_(4)/DataType_(10), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[0][2], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][1], DataType_(3)/DataType_(10), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[1][2], DataType_(1)/DataType_(2), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][0], DataType_(0), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][1], DataType_(1)/DataType_(4), eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.jac_mat[2][2], DataType_(1)/DataType_(2), eps);
 
     // check hessian tensor
     for(Index i(0); i < 3; ++i)
@@ -617,7 +617,7 @@ public:
       {
         for(Index k(0); k < 3; ++k)
         {
-          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0.0), eps);
+          TEST_CHECK_EQUAL_WITHIN_EPS(trafo_data.hess_ten[i][j][k], DataType_(0), eps);
         }
       }
     }
