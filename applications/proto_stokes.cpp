@@ -254,7 +254,7 @@ public:
     // assemble matrix structures
     Assembly::SymbolicMatrixAssembler<>::assemble1(_matrix_a, _space_v);
     Assembly::SymbolicMatrixAssembler<>::assemble2(_matrix_b1, _space_v, _space_p);
-    _matrix_b2 = _matrix_b1.clone();
+    _matrix_b2.clone(_matrix_b1);
     Assembly::SymbolicMatrixAssembler<>::assemble1(_matrix_m, _space_p);
 
     // create cubature factories

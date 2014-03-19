@@ -596,7 +596,7 @@ namespace FEAST
           trow_ptr[current_row] = 0;
           for (Index it(0) ; it < cother.used_elements() ; ++it)
           {
-            Index row(cother.row()[it]);
+            Index row(cother.row_indices()[it]);
             Index column(cother.column()[it]);
 
             if (current_row < row)

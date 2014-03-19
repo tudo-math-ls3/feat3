@@ -543,7 +543,7 @@ namespace FEAST
          */
         explicit SparseMatrixCOO(const Index rows_in, const Index columns_in, DenseVector<Mem_, IT_> & row_ind,
             DenseVector<Mem_, IT_> & col_ind, DenseVector<Mem_, DT_, IT_> & val_in) :
-          Container<Mem_, DT_, IT_>(rows * columns)
+          Container<Mem_, DT_, IT_>(rows_in * columns_in)
         {
           CONTEXT("When creating SparseMatrixCOO");
           this->_scalar_index.push_back(rows_in);
