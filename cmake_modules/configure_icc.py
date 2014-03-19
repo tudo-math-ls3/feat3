@@ -10,7 +10,7 @@ def configure_icc(cpu, buildmode):
   print ("Detected icc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
   cxxflags = "-std=c++11 -g"
-  if buildmode == "debug":
+  if "debug" in buildmode:
     cxxflags += "  -O0 -Wall -Wp64 -Wshorten-64-to-32 -debug all -ftrapuv"
   elif "opt" in buildmode:
     cxxflags += " -O3"
