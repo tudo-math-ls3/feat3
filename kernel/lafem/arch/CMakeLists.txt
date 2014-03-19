@@ -35,6 +35,14 @@ endif(FEAST_BACKENDS_MKL)
 
 ADD_LIBRARY(kernel-lafem-arch STATIC ${kernel-lafem-arch-list})
 
+if (FEAST_BACKENDS_MKL)
+  TARGET_LINK_LIBRARIES(kernel-lafem-arch
+    libmkl_intel_ilp64.a
+    libmkl_sequential.a
+    libmkl_core.a
+  )
+endif(FEAST_BACKENDS_MKL)
+
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-arch-cuda STATIC
     axpy.cu

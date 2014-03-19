@@ -13,21 +13,8 @@ SET (kernel-lafem-list
   memory_pool.cpp
   )
 
-if (FEAST_BACKENDS_MKL)
-  SET (kernel-lafem-list ${kernel-lafem-list}
-  )
-endif(FEAST_BACKENDS_MKL)
-
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch)
-
-if (FEAST_BACKENDS_MKL)
-  TARGET_LINK_LIBRARIES(kernel-lafem
-    libmkl_intel_ilp64.a
-    libmkl_sequential.a
-    libmkl_core.a
-  )
-endif(FEAST_BACKENDS_MKL)
 
 if (FEAST_GMP)
 TARGET_LINK_LIBRARIES(kernel-lafem
