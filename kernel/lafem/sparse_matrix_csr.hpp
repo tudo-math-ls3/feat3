@@ -611,7 +611,7 @@ namespace FEAST
           for (Index it(0) ; it < cother.used_elements() ; ++it)
           {
             Index row(cother.row_indices()[it]);
-            Index column(cother.column()[it]);
+            Index column(cother.column_indices()[it]);
 
             if (current_row < row)
             {

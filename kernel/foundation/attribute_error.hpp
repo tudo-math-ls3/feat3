@@ -14,7 +14,7 @@ namespace FEAST
         public Exception
     {
         public:
-            AttributeError(const std::string & message) throw ();
+            AttributeError(const std::string & message_in) throw ();
     };
 
     class AttributeTypeMismatch :

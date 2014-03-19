@@ -63,14 +63,14 @@ namespace FEAST
          *
          * Creates a matrix with given dimensions.
          */
-        explicit DenseMatrix(Index rows, Index columns) :
-          Container<Mem_, DT_, IT_>(rows * columns)
+        explicit DenseMatrix(Index rows_in, Index columns_in) :
+          Container<Mem_, DT_, IT_>(rows_in * columns_in)
         {
           CONTEXT("When creating DenseMatrix");
 
-          this->_scalar_index.at(0) = rows * columns;
-          this->_scalar_index.push_back(rows);
-          this->_scalar_index.push_back(columns);
+          this->_scalar_index.at(0) = rows_in * columns_in;
+          this->_scalar_index.push_back(rows_in);
+          this->_scalar_index.push_back(columns_in);
 
           this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
           this->_elements_size.push_back(this->_scalar_index.at(0));
@@ -85,14 +85,14 @@ namespace FEAST
          *
          * Creates a matrix with given dimensions and value.
          */
-        explicit DenseMatrix(Index rows, Index columns, DT_ value) :
-          Container<Mem_, DT_, IT_>(rows * columns)
+        explicit DenseMatrix(Index rows_in, Index columns_in, DT_ value) :
+          Container<Mem_, DT_, IT_>(rows_in * columns_in)
         {
           CONTEXT("When creating DenseMatrix");
 
-          this->_scalar_index.at(0) = rows * columns;
-          this->_scalar_index.push_back(rows);
-          this->_scalar_index.push_back(columns);
+          this->_scalar_index.at(0) = rows_in * columns_in;
+          this->_scalar_index.push_back(rows_in);
+          this->_scalar_index.push_back(columns_in);
           this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(0)));
           this->_elements_size.push_back(this->_scalar_index.at(0));
           MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));

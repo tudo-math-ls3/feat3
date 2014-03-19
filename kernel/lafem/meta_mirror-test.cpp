@@ -49,8 +49,7 @@ public:
     for(Index i(0); i < m; ++i)
       ci[i] = m2+i;
 
-    SparseMatrixCSR<Mem::Main, DataType> sm(m, m*m, col_idx, data, row_ptr);
-    return ScalarMatrix(sm);
+    return SparseMatrixCSR<Mem::Main, DataType>(m, m*m, col_idx, data, row_ptr);
   }
 
   static ScalarMatrix gen_mir_y(Index m)
@@ -67,8 +66,7 @@ public:
     for(Index i(0); i < m; ++i)
       ci[i] = i;
 
-    SparseMatrixCSR<Mem::Main, DataType> sm(m, m*m, col_idx, data, row_ptr);
-    return ScalarMatrix(sm);
+    return SparseMatrixCSR<Mem::Main, DataType>(m, m*m, col_idx, data, row_ptr);
   }
 
   virtual void run() const

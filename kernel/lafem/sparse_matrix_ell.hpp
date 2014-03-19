@@ -645,7 +645,7 @@ namespace FEAST
           for (Index i(0) ; i < this->_scalar_index.at(5) ; ++i)
 
           {
-            Index cur_row(cother.row()[i]);
+            Index cur_row(cother.row_indices()[i]);
             ++tArl[cur_row];
             if (tArl[cur_row] > this->_scalar_index.at(4))
               this->_scalar_index.at(4) = tArl[cur_row];
@@ -659,17 +659,17 @@ namespace FEAST
           IT_ * tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(4) * this->_scalar_index.at(3));
           MemoryPool<Mem::Main>::instance()->set_memory(tAj, IT_(0), this->_scalar_index.at(4) * this->_scalar_index.at(3));
 
-          Index last_row(cother.row()[0]);
+          Index last_row(cother.row_indices()[0]);
           Index target(0);
           for (Index i(0) ; i < this->_scalar_index.at(5) ; ++i)
           {
-            Index row(cother.row()[i]);
+            Index row(cother.row_indices()[i]);
             if (row != last_row)
             {
               target = 0;
               last_row = row;
             }
-            tAj[row + target * this->_scalar_index.at(3)] = (cother.column())[i];
+            tAj[row + target * this->_scalar_index.at(3)] = (cother.column_indices())[i];
             tAx[row + target * this->_scalar_index.at(3)] = (cother.val())[i];
             target++;
           }

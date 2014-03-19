@@ -390,8 +390,8 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_A.val());
-        const Index * pcol(_A.column());
-        const Index * prow(_A.row());
+        const Index * pcol(_A.column_indices());
+        const Index * prow(_A.row_indices());
         const Index n(_A.rows());
 
         Index col(0);
@@ -1813,8 +1813,8 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_A.val());
-        const Index * pcol(_A.column());
-        const Index * prow(_A.row());
+        const Index * pcol(_A.column_indices());
+        const Index * prow(_A.row_indices());
         const Index n(_A.rows());
 
         Index col(0);
@@ -2195,8 +2195,8 @@ namespace FEAST
         // create pointers
         DT_ * pout(out.elements());
         const DT_ * pval(_A.val());
-        const Index * pcol(_A.column());
-        const Index * prow(_A.row());
+        const Index * pcol(_A.column_indices());
+        const Index * prow(_A.row_indices());
         const Index n(_A.rows());
 
         Index col(0);
@@ -2860,8 +2860,8 @@ namespace FEAST
           const Index used_elements(_M.used_elements());
           const Index n(_M.rows());
           const DT_ * pval(_M.val());
-          const Index * pcol(_M.column());
-          const Index * prow(_M.row());
+          const Index * pcol(_M.column_indices());
+          const Index * prow(_M.row_indices());
           const DT_ * pin(in.elements());
           DT_ * pout(out.elements());
 

@@ -980,7 +980,7 @@ namespace FEAST
           file << "data = [" << std::endl;
           for (Index i(0) ; i < used_elements() ; ++i)
           {
-            file << temp.row_indices()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
+            file << temp.row_indices()[i] + 1 << " " << temp.column_indices()[i] + 1 << " " << std::scientific << temp.val()[i] << ";" << std::endl;
           }
           file << "];" << std::endl;
           file << "mat=sparse(data(:,1),data(:,2),data(:,3));";
@@ -1015,7 +1015,7 @@ namespace FEAST
 
           for (Index i(0) ; i < used_elements() ; ++i)
           {
-            file << temp.row_indices()[i] + 1 << " " << temp.column()[i] + 1 << " " << std::scientific << temp.val()[i] << std::endl;
+            file << temp.row_indices()[i] + 1 << " " << temp.column_indices()[i] + 1 << " " << std::scientific << temp.val()[i] << std::endl;
           }
         }
 
@@ -1106,7 +1106,7 @@ namespace FEAST
               return;
 
             // sort elements by row index
-            _insertion_sort(row_indices(), val(), column(), used_elements());
+            _insertion_sort(row_indices(), val(), column_indices(), used_elements());
 
             Index row_start(0);
             for (Index rowi(0) ; rowi < rows() ; ++rowi)
@@ -1115,11 +1115,11 @@ namespace FEAST
               // explore range of elements in given row
               for ( ; row_start + offset < used_elements() && MemoryPool<Mem_>::get_element(row_indices(), row_start + offset) == rowi ; ++offset) ;
               // sort range of elements in given row by column index
-              _insertion_sort(column() + row_start, val() + row_start, row_indices() + row_start, offset);
+              _insertion_sort(column_indices() + row_start, val() + row_start, row_indices() + row_start, offset);
               // find and mark duplicate entries
               for (Index i(row_start + 1) ; i < row_start + offset ; ++i)
               {
-                if (MemoryPool<Mem_>::get_element(column(), i - 1) == MemoryPool<Mem_>::get_element(column(), i))
+                if (MemoryPool<Mem_>::get_element(column_indices(), i - 1) == MemoryPool<Mem_>::get_element(column_indices(), i))
                 {
                   MemoryPool<Mem_>::set_memory(row_indices() + i - 1, std::numeric_limits<IT_>::max());
                 }
@@ -1128,7 +1128,7 @@ namespace FEAST
             }
 
             // sort out marked duplicated elements
-            _insertion_sort(row_indices(), val(), column(), used_elements());
+            _insertion_sort(row_indices(), val(), column_indices(), used_elements());
             Index junk(0);
             while (MemoryPool<Mem_>::get_element(row_indices(), used_elements() - 1 - junk) == std::numeric_limits<IT_>::max()
                 && junk < used_elements())
@@ -1304,14 +1304,14 @@ namespace FEAST
          *
          * \returns Column coordinate array.
          */
-        IT_ * column()
+        IT_ * column_indices()
         {
           if (this->_scalar_index.at(6) == 0)
             const_cast<SparseMatrixCOO *>(this)->sort();
           return this->_indices.at(1);
         }
 
-        IT_ const * column() const
+        IT_ const * column_indices() const
         {
           if (this->_scalar_index.at(6) == 0)
             const_cast<SparseMatrixCOO *>(this)->sort();
@@ -1468,7 +1468,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
           Arch::ProductMatVec<Mem_, Algo_>::coo(r.elements(), this->val(), this->row_indices(),
-            this->column(), x.elements(), this->rows(), this->used_elements());
+            this->column_indices(), x.elements(), this->rows(), this->used_elements());
         }
 
         /**
@@ -1498,7 +1498,7 @@ namespace FEAST
           if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
           {
             Arch::Defect<Mem_, Algo_>::coo(r.elements(), y.elements(), this->val(),
-                this->row_indices(), this->column(), x.elements(), this->rows(), this->used_elements());
+                this->row_indices(), this->column_indices(), x.elements(), this->rows(), this->used_elements());
           }
           // r <- y
           else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -1507,7 +1507,7 @@ namespace FEAST
           else
           {
             Arch::Axpy<Mem_, Algo_>::coo(r.elements(), alpha, x.elements(), y.elements(),
-              this->val(), this->row_indices(), this->column(), this->rows(), this->used_elements());
+              this->val(), this->row_indices(), this->column_indices(), this->rows(), this->used_elements());
           }
         }
 
@@ -1548,7 +1548,7 @@ namespace FEAST
             return false;
         if (MemoryPool<Mem_>::get_element(a.row_indices(), i) != MemoryPool<Mem2_>::get_element(b.row_indices(), i))
             return false;
-        if (MemoryPool<Mem_>::get_element(a.column(), i) != MemoryPool<Mem2_>::get_element(b.column(), i))
+        if (MemoryPool<Mem_>::get_element(a.column_indices(), i) != MemoryPool<Mem2_>::get_element(b.column_indices(), i))
             return false;
       }
 

@@ -4,8 +4,8 @@
 using namespace FEAST;
 using namespace Foundation;
 
-CommunicationError::CommunicationError(const std::string & message) throw () :
-    Exception(message)
+CommunicationError::CommunicationError(const std::string & message_in) throw () :
+    Exception(message_in)
 {
 }
 

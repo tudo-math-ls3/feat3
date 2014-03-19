@@ -14,7 +14,7 @@ namespace FEAST
         public Exception
     {
         public:
-            CommunicationError(const std::string & message) throw ();
+            CommunicationError(const std::string & message_in) throw ();
     };
 
     class CommunicationHaloOverlapMismatch :

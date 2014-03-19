@@ -102,16 +102,16 @@ namespace FEAST
 
         void _read_from_dv(std::istream& file)
         {
-          uint64_t size;
-          file.read((char *)&size, (long)(sizeof(uint64_t)));
-          this->_scalar_index.at(0) = (Index)size;
+          uint64_t tsize;
+          file.read((char *)&tsize, (long)(sizeof(uint64_t)));
+          this->_scalar_index.at(0) = (Index)tsize;
           this->_elements_size.push_back(this->_scalar_index.at(0));
 
-          double * ctemp = new double[std::size_t(size)];
-          file.read((char *)ctemp, (long)(size * sizeof(double)));
+          double * ctemp = new double[std::size_t(tsize)];
+          file.read((char *)ctemp, (long)(tsize * sizeof(double)));
 
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->_scalar_index.at(0)));
-          for (Index i(0) ; i < size ; ++i)
+          for (Index i(0) ; i < tsize ; ++i)
           {
             temp[i] = (DT_)ctemp[i];
           }
@@ -147,13 +147,13 @@ namespace FEAST
          *
          * Creates a vector with a given size.
          */
-        explicit DenseVector(Index size) :
-          Container<Mem_, DT_, IT_>(size)
+        explicit DenseVector(Index size_in) :
+          Container<Mem_, DT_, IT_>(size_in)
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
-          this->_elements_size.push_back(size);
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
+          this->_elements_size.push_back(size_in);
         }
 
         /**
@@ -164,15 +164,15 @@ namespace FEAST
          *
          * Creates a vector with given size and value.
          */
-        explicit DenseVector(Index size, DT_ value) :
-          Container<Mem_, DT_, IT_>(size)
+        explicit DenseVector(Index size_in, DT_ value) :
+          Container<Mem_, DT_, IT_>(size_in)
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
-          this->_elements_size.push_back(size);
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size_in));
+          this->_elements_size.push_back(size_in);
 
-          MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, size);
+          MemoryPool<Mem_>::instance()->set_memory(this->_elements.at(0), value, size_in);
         }
 
         /**
@@ -183,13 +183,13 @@ namespace FEAST
          *
          * Creates a vector with given size and given data.
          */
-        explicit DenseVector(Index size, DT_ * data) :
-          Container<Mem_, DT_, IT_>(size)
+        explicit DenseVector(Index size_in, DT_ * data) :
+          Container<Mem_, DT_, IT_>(size_in)
         {
           CONTEXT("When creating DenseVector");
 
           this->_elements.push_back(data);
-          this->_elements_size.push_back(size);
+          this->_elements_size.push_back(size_in);
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
@@ -419,9 +419,9 @@ namespace FEAST
           }
           MemoryPool<Mem::Main>::instance()->release_memory(temp);
 
-          uint64_t size(csize);
-          file.write((const char *)&size, sizeof(uint64_t));
-          file.write((const char *)ctemp, (long)(size * sizeof(double)));
+          uint64_t tsize(csize);
+          file.write((const char *)&tsize, sizeof(uint64_t));
+          file.write((const char *)ctemp, (long)(tsize * sizeof(double)));
 
           delete[] ctemp;
         }

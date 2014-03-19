@@ -46,8 +46,8 @@ namespace FEAST
         const Index acolumns(a.columns());
         const Index used_elements(a.used_elements());
 
-        const Index * parow_ind(a.row());
-        const Index * pacol_ind(a.column());
+        const Index * parow_ind(a.row_indices());
+        const Index * pacol_ind(a.column_indices());
         const DT_ * paval(a.val());
 
         DenseVector<Mem_, Index> tcol_ind(used_elements);

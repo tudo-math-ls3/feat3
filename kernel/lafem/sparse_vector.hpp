@@ -104,8 +104,8 @@ namespace FEAST
          *
          * Creates a vector with a given size.
          */
-        explicit SparseVector(Index size) :
-          Container<Mem_, DT_, IT_>(size)
+        explicit SparseVector(Index size_in) :
+          Container<Mem_, DT_, IT_>(size_in)
         {
           CONTEXT("When creating SparseVector");
           this->_scalar_index.push_back(0);
@@ -126,24 +126,24 @@ namespace FEAST
          *
          * Creates a vector with a given size.
          */
-        explicit SparseVector(Index size, DenseVector<Mem_, DT_, IT_> & elements, DenseVector<Mem_, Index, IT_> & indices) :
-          Container<Mem_, DT_, IT_>(size)
+        explicit SparseVector(Index size_in, DenseVector<Mem_, DT_, IT_> & elements_in, DenseVector<Mem_, Index, IT_> & indices_in) :
+          Container<Mem_, DT_, IT_>(size_in)
         {
           CONTEXT("When creating SparseVector");
 
-          if (elements.size() != elements.size())
+          if (indices_in.size() != elements_in.size())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size missmatch!");
 
-          this->_scalar_index.push_back(elements.size());
-          this->_scalar_index.push_back(elements.size());
+          this->_scalar_index.push_back(elements_in.size());
+          this->_scalar_index.push_back(elements_in.size());
           this->_scalar_index.push_back(1000);
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
 
-          this->_elements.push_back(elements.elements());
-          this->_elements_size.push_back(elements.size());
-          this->_indices.push_back(indices.elements());
-          this->_indices_size.push_back(indices.size());
+          this->_elements.push_back(elements_in.elements());
+          this->_elements_size.push_back(elements_in.size());
+          this->_indices.push_back(indices_in.elements());
+          this->_indices_size.push_back(indices_in.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
