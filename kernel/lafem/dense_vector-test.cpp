@@ -43,7 +43,10 @@ public:
     TEST_CHECK_EQUAL(a.bytes_allocated(), 10 * sizeof(DT_) + sizeof(Index));
     DenseVector<Mem_, DT_> b(10, DT_(5));
     b(7, DT_(42));
-    DenseVector<Mem_, DT_> c;
+    DenseVector<Mem_, DT_> c(b.clone());
+    TEST_CHECK_EQUAL(c.size(), b.size());
+    TEST_CHECK_EQUAL(c(7), b(7));
+    TEST_CHECK_EQUAL(c, b);
     c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));

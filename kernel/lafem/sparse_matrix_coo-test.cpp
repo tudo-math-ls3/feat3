@@ -69,7 +69,10 @@ public:
     TEST_CHECK_EQUAL(a(0,2), b(0,2));
     TEST_CHECK_EQUAL(a, b);
 
-    SparseMatrixCOO<Mem_, DT_> c;
+    SparseMatrixCOO<Mem_, DT_> c(b.clone());
+    TEST_CHECK_EQUAL(c, b);
+    c(1,2,3);
+    TEST_CHECK_NOT_EQUAL(c, b);
     c.clone(b);
     TEST_CHECK_EQUAL(c, b);
     c(1,2,3);
