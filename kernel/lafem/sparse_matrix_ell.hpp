@@ -1308,12 +1308,35 @@ namespace FEAST
       if (a.num_cols_per_row() != b.num_cols_per_row())
         return false;
 
-      for (Index i(0) ; i < a.stride() * a.num_cols_per_row() ; ++i)
+      for (Index i(0) ; i < a.rows() ; ++i)
       {
-        if (MemoryPool<Mem_>::get_element(a.Ax(), i) != MemoryPool<Mem2_>::get_element(b.Ax(), i))
+        if (MemoryPool<Mem_>::get_element(a.Arl(), i) != MemoryPool<Mem2_>::get_element(b.Arl(), i))
           return false;
-        if (MemoryPool<Mem_>::get_element(a.Aj(), i) != MemoryPool<Mem2_>::get_element(b.Aj(), i))
-          return false;
+      }
+
+      Index stride(a.stride());
+      for (Index row(0) ; row < a.rows() ; ++row)
+      {
+        const IT_ * tAj(a.Aj());
+        const DT_ * tAx(a.Ax());
+        const IT_ * tAj2(b.Aj());
+        const DT_ * tAx2(b.Ax());
+        tAj += row;
+        tAx += row;
+        tAj2 += row;
+        tAx2 += row;
+
+        const IT_ max(MemoryPool<Mem_>::get_element(a.Arl(), row));
+        for(IT_ n(0); n < max ; n++)
+        {
+        if (MemoryPool<Mem_>::get_element(tAj, 0) != MemoryPool<Mem2_>::get_element(tAj2, 0))
+        if (MemoryPool<Mem_>::get_element(tAx, 0) != MemoryPool<Mem2_>::get_element(tAx2, 0))
+
+          tAj += stride;
+          tAx += stride;
+          tAj2 += stride;
+          tAx2 += stride;
+        }
       }
 
       return true;
