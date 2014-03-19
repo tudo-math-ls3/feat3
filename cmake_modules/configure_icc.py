@@ -18,9 +18,10 @@ def configure_icc(cpu, buildmode):
   if "debug" in buildmode:
     cxxflags += "  -O0 -Wall -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -debug all -ftrapuv  -diag-disable 2304 -diag-disable 2305"
   elif "opt" in buildmode:
-    cxxflags += " -O3"
+    cxxflags += " -O3 -no-prec-div -ansi-alias -ip"
     if cpu == "unknown":
-      pass
+      # generate code for every simd unit, existing so far
+      cxxflags += " -axCORE-AVX2"
 
     # INTEL
     elif cpu == "i486":
@@ -48,11 +49,11 @@ def configure_icc(cpu, buildmode):
     elif cpu == "westmere":
       cxxflags += " -xsse4.2"
     elif cpu == "sandybridge":
-      cxxflags += " -xsse4.2 -axAVX"
+      cxxflags += " -xAVX"
     elif cpu == "ivybridge":
-      cxxflags += " -xsse4.2 -axAVX"
+      cxxflags += " -xAVX"
     elif cpu == "haswell":
-      cxxflags += " -xsse4.2 -axCORE-AVX2"
+      cxxflags += " -aCORE-AVX2"
     elif cpu == "itanium":
       # no setting necessary, the itanium version of the intel compiler
       # sets everything automatically
