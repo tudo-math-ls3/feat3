@@ -551,10 +551,12 @@ class RefinementTest3D:
       Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
 
       OT_<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > > halos;
-      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<1, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
+      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<1, PLPolyhedron, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
+      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
       halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<0, PLEdge, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
       halos.at(0)->push_back(0);
       halos.at(1)->push_back(3);
+      halos.at(2)->push_back(3);
 
       Refinement<Mem::Main,
                  Algo::Generic,
@@ -1237,6 +1239,26 @@ class RefinementTest3D:
       TEST_CHECK(std::find(result_polyhedron_at_vertex_26.begin(), result_polyhedron_at_vertex_26.end(), 5) != result_polyhedron_at_vertex_26.end());
       TEST_CHECK(std::find(result_polyhedron_at_vertex_26.begin(), result_polyhedron_at_vertex_26.end(), 6) != result_polyhedron_at_vertex_26.end());
       TEST_CHECK(std::find(result_polyhedron_at_vertex_26.begin(), result_polyhedron_at_vertex_26.end(), 7) != result_polyhedron_at_vertex_26.end());
+
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().size(), IndexType_(8));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(0), IndexType_(0));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(1), IndexType_(7));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(2), IndexType_(6));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(3), IndexType_(5));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(4), IndexType_(4));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(5), IndexType_(3));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(6), IndexType_(2));
+      TEST_CHECK_EQUAL(halos.at(0)->get_elements().at(7), IndexType_(1));
+
+      TEST_CHECK_EQUAL(halos.at(1)->get_elements().size(), IndexType_(4));
+      TEST_CHECK_EQUAL(halos.at(1)->get_elements().at(0), IndexType_(3));
+      TEST_CHECK_EQUAL(halos.at(1)->get_elements().at(1), IndexType_(17));
+      TEST_CHECK_EQUAL(halos.at(1)->get_elements().at(2), IndexType_(16));
+      TEST_CHECK_EQUAL(halos.at(1)->get_elements().at(3), IndexType_(15));
+
+      TEST_CHECK_EQUAL(halos.at(2)->get_elements().size(), IndexType_(2));
+      TEST_CHECK_EQUAL(halos.at(2)->get_elements().at(0), IndexType_(3));
+      TEST_CHECK_EQUAL(halos.at(2)->get_elements().at(1), IndexType_(15));
 
       TEST_CHECK_EQUAL(attrs.at(0).get_data().size(), 27ul);
       TEST_CHECK_EQUAL(attrs.at(1).get_data().size(), 27ul);

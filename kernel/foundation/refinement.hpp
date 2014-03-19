@@ -792,7 +792,7 @@ namespace FEAST
             Index lp1(l == vertex_at_polygon.size() - 1 ? 0 : l + 1);
             area += origin_coords.at(0).at(vertex_at_polygon.at(l)) * origin_coords.at(1).at(vertex_at_polygon.at(lp1)) - origin_coords.at(0).at(vertex_at_polygon.at(lp1)) * origin_coords.at(1).at(vertex_at_polygon.at(l));
           }
-          area =  DataType_(1./2.) * std::abs(area);
+          area =  DataType_(1./2.) * fabs(area);
 
           //area multiplier
           area = DataType_(1) / (DataType_(6) * area);
@@ -952,7 +952,7 @@ namespace FEAST
                   for(Index hi(0) ; hi < halos->size() ; ++hi)
                   {
                     //only do this for face halos with delta > 0
-                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    if(halos->at(hi)->get_level() == pl_face)// && halos->at(hi)->get_overlap() > 0)
                     {
                       typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
                       if(iter != halos->at(hi)->get_elements().end())
@@ -988,7 +988,7 @@ namespace FEAST
                   for(Index hi(0) ; hi < halos->size() ; ++hi)
                   {
                     //only do this for face halos with delta > 0
-                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    if(halos->at(hi)->get_level() == pl_face)// && halos->at(hi)->get_overlap() > 0)
                     {
                       typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
                       if(iter != halos->at(hi)->get_elements().end())
@@ -1024,7 +1024,7 @@ namespace FEAST
                   for(Index hi(0) ; hi < halos->size() ; ++hi)
                   {
                     //only do this for face halos with delta > 0
-                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    if(halos->at(hi)->get_level() == pl_face)// && halos->at(hi)->get_overlap() > 0)
                     {
                       typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
                       if(iter != halos->at(hi)->get_elements().end())
@@ -1060,7 +1060,7 @@ namespace FEAST
                   for(Index hi(0) ; hi < halos->size() ; ++hi)
                   {
                     //only do this for face halos with delta > 0
-                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    if(halos->at(hi)->get_level() == pl_face)// && halos->at(hi)->get_overlap() > 0)
                     {
                       typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
                       if(iter != halos->at(hi)->get_elements().end())
@@ -1096,7 +1096,7 @@ namespace FEAST
                   for(Index hi(0) ; hi < halos->size() ; ++hi)
                   {
                     //only do this for face halos with delta > 0
-                    if(halos->at(hi)->get_level() == pl_face && halos->at(hi)->get_overlap() > 0)
+                    if(halos->at(hi)->get_level() == pl_face)// && halos->at(hi)->get_overlap() > 0)
                     {
                       typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
                       if(iter != halos->at(hi)->get_elements().end())
@@ -1497,6 +1497,34 @@ namespace FEAST
               for(Index k(0) ; k < v_pnew.size() ; ++k)
               {
                 origin.add_adjacency(pl_vertex, pl_polyhedron, v_pnew.at(k), origin.num_polytopes(pl_polyhedron) - 1);
+              }
+
+             //for each refined face, insert the new face numbers into halos with delta > 0 AFTER the old face (covers Halo<k>, k > 0)
+              if(hrt_ == hrt_refine)
+              {
+                //refine halo faces
+                if(halos != nullptr)
+                {
+                  for(Index hi(0) ; hi < halos->size() ; ++hi)
+                  {
+                    //only do this for face halos with delta > 0
+                    if(halos->at(hi)->get_level() == pl_polyhedron && halos->at(hi)->get_overlap() > 0)
+                    {
+                      typename t_::storage_type_::iterator iter(std::find(halos->at(hi)->get_elements().begin(), halos->at(hi)->get_elements().end(), i));
+                      if(iter != halos->at(hi)->get_elements().end())
+                      {
+                        if(iter + 1 == halos->at(hi)->get_elements().end())
+                        {
+                          halos->at(hi)->get_elements().push_back(origin.get_topologies().at(ipi_polyhedron_vertex).size() - 1);
+                        }
+                        else
+                        {
+                          halos->at(hi)->get_elements().insert(iter + 1, origin.get_topologies().at(ipi_polyhedron_vertex).size() - 1); //insertion after ///TODO QUAD
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
