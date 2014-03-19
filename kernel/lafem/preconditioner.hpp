@@ -2424,7 +2424,7 @@ namespace FEAST
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, MatrixType::LayoutType> &_layout;
+        const SparseLayout<Mem_, MatrixType::LayoutType> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2433,14 +2433,14 @@ namespace FEAST
       public:
         SPAIPreconditionerMTdepending(const MatrixType & A, const Index m) :
           _A(A),
-          _layout(std::move(_A.layout())),
+          _layout(_A.layout()),
           _m(m),
           _a_columnwise(_A.rows())
         {
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, MatrixType::LayoutType> & layout) :
+                                      const SparseLayout<Mem_, MatrixType::LayoutType> layout) :
           _A(A),
           _layout(layout),
           _m((Index) -1),
@@ -2674,7 +2674,7 @@ namespace FEAST
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, MatrixType::LayoutType> &_layout;
+        const SparseLayout<Mem_, MatrixType::LayoutType> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2683,14 +2683,14 @@ namespace FEAST
       public:
         SPAIPreconditionerMTdepending(const MatrixType & A, const Index m) :
           _A(A),
-          _layout(std::move(_A.layout())),
+          _layout(_A.layout()),
           _m(m),
           _a_columnwise(_A.rows())
         {
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, MatrixType::LayoutType> & layout) :
+                                      const SparseLayout<Mem_, MatrixType::LayoutType> layout) :
           _A(A),
           _layout(layout),
           _m((Index) -1),
@@ -2902,7 +2902,7 @@ namespace FEAST
 
       protected:
         const MatrixType & _A;
-        const SparseLayout<Mem_, MatrixType::LayoutType> &_layout;
+        const SparseLayout<Mem_, MatrixType::LayoutType> _layout;
         const Index _m;
         MatrixType _M;
         std::list<PAIR_> * _m_columns;
@@ -2911,14 +2911,14 @@ namespace FEAST
       public:
         SPAIPreconditionerMTdepending(const MatrixType & A, const Index m) :
           _A(A),
-          _layout(std::move(_A.layout())),
+          _layout(_A.layout()),
           _m(m),
           _a_columnwise(_A.rows())
         {
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, MatrixType::LayoutType> & layout) :
+                                      const SparseLayout<Mem_, MatrixType::LayoutType> layout) :
           _A(A),
           _layout(layout),
           _m((Index) -1),
