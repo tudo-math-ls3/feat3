@@ -4,7 +4,7 @@
 using namespace FEAST;
 using namespace Foundation;
 
-FunctorError::FunctorError(const std::string & message) throw () :
-    Exception(message)
+FunctorError::FunctorError(const std::string & message_in) throw () :
+    Exception(message_in)
 {
 }

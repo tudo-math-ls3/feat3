@@ -206,8 +206,8 @@ namespace FEAST
           {
             for (Index i(0) ; i < this->_elements_size.size() ; ++i)
             {
-              const unsigned long size(this->_elements_size.at(i));
-              this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(size));
+              const unsigned long tsize(this->_elements_size.at(i));
+              this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(tsize));
 
               DT_ * pthis(nullptr);
               DT2_ * pother(nullptr);
@@ -217,7 +217,7 @@ namespace FEAST
               }
               else
               {
-                pthis = new DT_[size];
+                pthis = new DT_[tsize];
               }
               if (std::is_same<Mem2_, Mem::Main>::value)
               {
@@ -225,16 +225,16 @@ namespace FEAST
               }
               else
               {
-                pother = new DT2_[size];
-                MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), size);
+                pother = new DT2_[tsize];
+                MemoryPool<Mem2_>::template download<DT2_>(pother, other.get_elements().at(i), tsize);
               }
 
-              for (Index j(0) ; j < size ; ++j)
+              for (Index j(0) ; j < tsize ; ++j)
                 pthis[j] = DT_(pother[j]);
 
               if (! std::is_same<Mem_, Mem::Main>::value)
               {
-                MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), pthis, size);
+                MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(i), pthis, tsize);
                 delete[] pthis;
               }
               if (!std::is_same<Mem2_, Mem::Main>::value)
@@ -250,8 +250,8 @@ namespace FEAST
           {
             for (Index i(0) ; i < this->_indices_size.size() ; ++i)
             {
-              const unsigned long size(this->_indices_size.at(i));
-              this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(size));
+              const unsigned long tsize(this->_indices_size.at(i));
+              this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(tsize));
 
               IT_ * pthis(nullptr);
               IT2_ * pother(nullptr);
@@ -262,7 +262,7 @@ namespace FEAST
               }
               else
               {
-                pthis = new IT_[size];
+                pthis = new IT_[tsize];
               }
 
               if (std::is_same<Mem2_, Mem::Main>::value)
@@ -271,16 +271,16 @@ namespace FEAST
               }
               else
               {
-                pother = new IT2_[size];
-                MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), size);
+                pother = new IT2_[tsize];
+                MemoryPool<Mem2_>::template download<IT2_>(pother, other.get_indices().at(i), tsize);
               }
 
-              for (Index j(0) ; j < size ; ++j)
+              for (Index j(0) ; j < tsize ; ++j)
                 pthis[j] = IT_(pother[j]);
 
               if (! std::is_same<Mem_, Mem::Main>::value)
               {
-                MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(i), pthis, size);
+                MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(i), pthis, tsize);
                 delete[] pthis;
               }
               if (!std::is_same<Mem2_, Mem::Main>::value)
@@ -297,10 +297,10 @@ namespace FEAST
          *
          * Creates a container with a given size.
          */
-        explicit Container(Index size)
+        explicit Container(Index size_in)
         {
           CONTEXT("When creating Container");
-          _scalar_index.push_back(size);
+          _scalar_index.push_back(size_in);
         }
 
         /**

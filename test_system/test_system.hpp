@@ -466,8 +466,8 @@ namespace FEAST
       * \param[in] id
       * the testcase's id string
       */
-      TaggedTest(const String & id)
-        : BaseTest(id)
+      TaggedTest(const String & id_in)
+        : BaseTest(id_in)
       {
         _tag_name = Type::Traits<Tag_>::name();
         _prec_name = Type::Traits<DataType_>::name();

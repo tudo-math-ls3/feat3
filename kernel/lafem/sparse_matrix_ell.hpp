@@ -306,21 +306,21 @@ namespace FEAST
         void _read_from_ell(std::istream& file)
         {
           uint64_t dim;
-          uint64_t rows;
-          uint64_t columns;
-          uint64_t stride;
-          uint64_t num_cols_per_row;
+          uint64_t trows;
+          uint64_t tcolumns;
+          uint64_t tstride;
+          uint64_t tnum_cols_per_row;
           file.read((char *)&dim, sizeof(uint64_t));
-          file.read((char *)&rows, sizeof(uint64_t));
-          file.read((char *)&columns, sizeof(uint64_t));
-          file.read((char *)&stride, sizeof(uint64_t));
-          file.read((char *)&num_cols_per_row, sizeof(uint64_t));
+          file.read((char *)&trows, sizeof(uint64_t));
+          file.read((char *)&tcolumns, sizeof(uint64_t));
+          file.read((char *)&tstride, sizeof(uint64_t));
+          file.read((char *)&tnum_cols_per_row, sizeof(uint64_t));
 
-          this->_scalar_index.at(0) = Index(rows * columns);
-          this->_scalar_index.push_back((Index)rows);
-          this->_scalar_index.push_back((Index)columns);
-          this->_scalar_index.push_back((Index)stride);
-          this->_scalar_index.push_back((Index)num_cols_per_row);
+          this->_scalar_index.at(0) = Index(trows * tcolumns);
+          this->_scalar_index.push_back((Index)trows);
+          this->_scalar_index.push_back((Index)tcolumns);
+          this->_scalar_index.push_back((Index)tstride);
+          this->_scalar_index.push_back((Index)tnum_cols_per_row);
           this->_scalar_index.push_back(0);
           this->_scalar_dt.push_back(DT_(0));
 
@@ -345,7 +345,7 @@ namespace FEAST
           for (Index row(0) ; row < this->_scalar_index.at(1) ; ++row)
           {
             Index count(0);
-            for (Index i(row) ; i < Index(dim) ; i += Index(stride))
+            for (Index i(row) ; i < Index(dim) ; i += Index(tstride))
             {
                 if (tAx[i] == DT_(0))
                 {
@@ -411,13 +411,13 @@ namespace FEAST
          *
          * Creates an empty matrix with given layout.
          */
-        explicit SparseMatrixELL(const SparseLayout<Mem_, IT_, LayoutType> & layout) :
-          Container<Mem_, DT_, IT_> (layout._scalar_index.at(0))
+        explicit SparseMatrixELL(const SparseLayout<Mem_, IT_, LayoutType> & layout_in) :
+          Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
         {
           CONTEXT("When creating SparseMatrixELL");
-          this->_indices.assign(layout._indices.begin(), layout._indices.end());
-          this->_indices_size.assign(layout._indices_size.begin(), layout._indices_size.end());
-          this->_scalar_index.assign(layout._scalar_index.begin(), layout._scalar_index.end());
+          this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+          this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
+          this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
           this->_scalar_dt.push_back(DT_(0));
 
           for (auto i : this->_indices)
@@ -470,27 +470,27 @@ namespace FEAST
          *
          * Creates a matrix with given dimensions and content.
          */
-        explicit SparseMatrixELL(const Index rows, const Index columns,
-            const Index stride, const Index num_cols_per_row, const Index used_elements,
-            DenseVector<Mem_, DT_, IT_> & Ax,
-            DenseVector<Mem_, IT_> & Aj,
-            DenseVector<Mem_, IT_> & Arl) :
-          Container<Mem_, DT_, IT_>(rows * columns)
+        explicit SparseMatrixELL(const Index rows_in, const Index columns_in,
+            const Index stride_in, const Index num_cols_per_row_in, const Index used_elements_in,
+            DenseVector<Mem_, DT_, IT_> & Ax_in,
+            DenseVector<Mem_, IT_> & Aj_in,
+            DenseVector<Mem_, IT_> & Arl_in) :
+          Container<Mem_, DT_, IT_>(rows_in * columns_in)
         {
           CONTEXT("When creating SparseMatrixELL");
-          this->_scalar_index.push_back(rows);
-          this->_scalar_index.push_back(columns);
-          this->_scalar_index.push_back(stride);
-          this->_scalar_index.push_back(num_cols_per_row);
-          this->_scalar_index.push_back(used_elements);
+          this->_scalar_index.push_back(rows_in);
+          this->_scalar_index.push_back(columns_in);
+          this->_scalar_index.push_back(stride_in);
+          this->_scalar_index.push_back(num_cols_per_row_in);
+          this->_scalar_index.push_back(used_elements_in);
           this->_scalar_dt.push_back(DT_(0));
 
-          this->_elements.push_back(Ax.elements());
-          this->_elements_size.push_back(Ax.size());
-          this->_indices.push_back(Aj.elements());
-          this->_indices_size.push_back(Aj.size());
-          this->_indices.push_back(Arl.elements());
-          this->_indices_size.push_back(Arl.size());
+          this->_elements.push_back(Ax_in.elements());
+          this->_elements_size.push_back(Ax_in.size());
+          this->_indices.push_back(Aj_in.elements());
+          this->_indices_size.push_back(Aj_in.size());
+          this->_indices.push_back(Arl_in.elements());
+          this->_indices_size.push_back(Arl_in.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
@@ -774,7 +774,7 @@ namespace FEAST
          *
          * Assigns a new matrix layout, discarding all old data
          */
-        SparseMatrixELL & operator= (const SparseLayout<Mem_, IT_, LayoutType> & layout)
+        SparseMatrixELL & operator= (const SparseLayout<Mem_, IT_, LayoutType> & layout_in)
         {
           CONTEXT("When assigning SparseMatrixELL");
 
@@ -790,9 +790,9 @@ namespace FEAST
           this->_scalar_index.clear();
           this->_scalar_dt.clear();
 
-          this->_indices.assign(layout._indices.begin(), layout._indices.end());
-          this->_indices_size.assign(layout._indices_size.begin(), layout._indices_size.end());
-          this->_scalar_index.assign(layout._scalar_index.begin(), layout._scalar_index.end());
+          this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+          this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
+          this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
           this->_scalar_dt.push_back(DT_(0));
 
           for (auto i : this->_indices)
@@ -881,30 +881,30 @@ namespace FEAST
             std::cout<<"Warning: You are writing out an ell matrix with less than double precission!"<<std::endl;
 
           const Index dim(this->_scalar_index.at(4) * this->_scalar_index.at(3));
-          IT_ * Aj = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(dim);
-          MemoryPool<Mem_>::template download<IT_>(Aj, this->_indices.at(0), dim);
+          IT_ * tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(dim);
+          MemoryPool<Mem_>::template download<IT_>(tAj, this->_indices.at(0), dim);
           uint64_t * cAj = new uint64_t[dim];
           for (Index i(0) ; i < dim ; ++i)
-            cAj[i] = Aj[i];
-          MemoryPool<Mem::Main>::instance()->release_memory(Aj);
+            cAj[i] = tAj[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(tAj);
 
-          DT_ * Ax = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(dim);
-          MemoryPool<Mem_>::template download<DT_>(Ax, this->_elements.at(0), dim);
+          DT_ * tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(dim);
+          MemoryPool<Mem_>::template download<DT_>(tAx, this->_elements.at(0), dim);
           double * cAx = new double[dim];
           for (Index i(0) ; i < dim ; ++i)
-            cAx[i] = (double)Ax[i];
-          MemoryPool<Mem::Main>::instance()->release_memory(Ax);
+            cAx[i] = (double)tAx[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(tAx);
 
           uint64_t tdim(dim);
-          uint64_t rows(this->_scalar_index.at(1));
-          uint64_t columns(this->_scalar_index.at(2));
-          uint64_t stride(this->_scalar_index.at(3));
-          uint64_t num_cols_per_row(this->_scalar_index.at(4));
+          uint64_t trows(this->_scalar_index.at(1));
+          uint64_t tcolumns(this->_scalar_index.at(2));
+          uint64_t tstride(this->_scalar_index.at(3));
+          uint64_t tnum_cols_per_row(this->_scalar_index.at(4));
           file.write((const char *)&tdim, sizeof(uint64_t));
-          file.write((const char *)&rows, sizeof(uint64_t));
-          file.write((const char *)&columns, sizeof(uint64_t));
-          file.write((const char *)&stride, sizeof(uint64_t));
-          file.write((const char *)&num_cols_per_row, sizeof(uint64_t));
+          file.write((const char *)&trows, sizeof(uint64_t));
+          file.write((const char *)&tcolumns, sizeof(uint64_t));
+          file.write((const char *)&tstride, sizeof(uint64_t));
+          file.write((const char *)&tnum_cols_per_row, sizeof(uint64_t));
           file.write((const char *)cAj, (long)(tdim * sizeof(uint64_t)));
           file.write((const char *)cAx, (long)(tdim * sizeof(double)));
 
@@ -1017,8 +1017,7 @@ namespace FEAST
          */
         SparseLayout<Mem_, IT_, LayoutType> layout() const
         {
-          SparseLayout<Mem_, IT_, LayoutType> layout(this->_indices, this->_indices_size, this->_scalar_index);
-          return layout;
+          return SparseLayout<Mem_, IT_, LayoutType>(this->_indices, this->_indices_size, this->_scalar_index);
         }
 
         /**

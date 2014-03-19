@@ -273,8 +273,8 @@ namespace FEAST
         bool _mapped;
 
       public:
-        explicit DriverFactoryAliasMapper(const String& name) :
-          _name(name),
+        explicit DriverFactoryAliasMapper(const String& name_in) :
+          _name(name_in),
           _mapped(false)
         {
         }
@@ -305,8 +305,8 @@ namespace FEAST
         bool _mapped;
 
       public:
-        explicit DriverFactoryAliasMapper(const String& name) :
-          _name(name),
+        explicit DriverFactoryAliasMapper(const String& name_in) :
+          _name(name_in),
           _mapped(false)
         {
         }

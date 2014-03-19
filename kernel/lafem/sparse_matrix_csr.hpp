@@ -102,9 +102,9 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String sval(line, 0, end);
-            DT_ val((DT_)atof(sval.c_str()));
+            DT_ tval((DT_)atof(sval.c_str()));
 
-            entries[row].insert(std::pair<IT_, DT_>(col, val));
+            entries[row].insert(std::pair<IT_, DT_>(col, tval));
             ++ue;
           }
           this->_scalar_index.at(0) = this->rows() * this->columns();
@@ -213,9 +213,9 @@ namespace FEAST
             line.erase(0, begin);
             end = line.find_first_of(" ");
             String sval(line, 0, end);
-            DT_ val((DT_)atof(sval.c_str()));
+            DT_ tval((DT_)atof(sval.c_str()));
 
-            entries[row].insert(std::pair<IT_, DT_>(col, val));
+            entries[row].insert(std::pair<IT_, DT_>(col, tval));
             ++ue;
           }
           this->_scalar_index.at(0) = this->rows() * this->columns();
@@ -275,13 +275,13 @@ namespace FEAST
           file.read((char *)&rows64, sizeof(uint64_t));
           file.read((char *)&columns64, sizeof(uint64_t));
           file.read((char *)&elements64, sizeof(uint64_t));
-          Index rows = (Index)rows64;
-          Index columns = (Index)columns64;
+          Index trows = (Index)rows64;
+          Index tcolumns = (Index)columns64;
           Index elements = (Index)elements64;
 
-          this->_scalar_index.at(0) = Index(rows * columns);
-          this->_scalar_index.push_back(Index(rows));
-          this->_scalar_index.push_back(Index(columns));
+          this->_scalar_index.at(0) = Index(trows * tcolumns);
+          this->_scalar_index.push_back(Index(trows));
+          this->_scalar_index.push_back(Index(tcolumns));
           this->_scalar_index.push_back(elements);
           this->_scalar_dt.push_back(DT_(0));
 
@@ -292,10 +292,10 @@ namespace FEAST
             tcol_ind[i] = IT_(ccol_ind[i]);
           delete[] ccol_ind;
 
-          uint64_t * crow_ptr = new uint64_t[std::size_t(rows + 1)];
-          file.read((char *)crow_ptr, (long)((rows + 1) * sizeof(uint64_t)));
-          IT_ * trow_ptr = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(rows + 1);
-          for (Index i(0) ; i < rows + 1 ; ++i)
+          uint64_t * crow_ptr = new uint64_t[std::size_t(trows + 1)];
+          file.read((char *)crow_ptr, (long)((trows + 1) * sizeof(uint64_t)));
+          IT_ * trow_ptr = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(trows + 1);
+          for (Index i(0) ; i < trows + 1 ; ++i)
             trow_ptr[i] = IT_(crow_ptr[i]);
           delete[] crow_ptr;
 
@@ -361,13 +361,13 @@ namespace FEAST
          *
          * Creates an empty matrix with given layout.
          */
-        explicit SparseMatrixCSR(const SparseLayout<Mem_, IT_, LayoutType> & layout) :
-          Container<Mem_, DT_, IT_> (layout._scalar_index.at(0))
+        explicit SparseMatrixCSR(const SparseLayout<Mem_, IT_, LayoutType> & layout_in) :
+          Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
         {
           CONTEXT("When creating SparseMatrixCSR");
-          this->_indices.assign(layout._indices.begin(), layout._indices.end());
-          this->_indices_size.assign(layout._indices_size.begin(), layout._indices_size.end());
-          this->_scalar_index.assign(layout._scalar_index.begin(), layout._scalar_index.end());
+          this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+          this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
+          this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
           this->_scalar_dt.push_back(DT_(0));
 
           for (auto i : this->_indices)
@@ -479,22 +479,22 @@ namespace FEAST
          *
          * Creates a matrix with given dimensions and content.
          */
-        explicit SparseMatrixCSR(const Index rows, const Index columns,
-            DenseVector<Mem_, IT_> & col_ind, DenseVector<Mem_, DT_, IT_> & val, DenseVector<Mem_, IT_> & row_ptr) :
-          Container<Mem_, DT_, IT_>(rows * columns)
+        explicit SparseMatrixCSR(const Index rows_in, const Index columns_in,
+            DenseVector<Mem_, IT_> & col_ind_in, DenseVector<Mem_, DT_, IT_> & val_in, DenseVector<Mem_, IT_> & row_ptr_in) :
+          Container<Mem_, DT_, IT_>(rows_in * columns_in)
         {
           CONTEXT("When creating SparseMatrixCSR");
-          this->_scalar_index.push_back(rows);
-          this->_scalar_index.push_back(columns);
-          this->_scalar_index.push_back(val.size());
+          this->_scalar_index.push_back(rows_in);
+          this->_scalar_index.push_back(columns_in);
+          this->_scalar_index.push_back(val_in.size());
           this->_scalar_dt.push_back(DT_(0));
 
-          this->_elements.push_back(val.elements());
-          this->_elements_size.push_back(val.size());
-          this->_indices.push_back(col_ind.elements());
-          this->_indices_size.push_back(col_ind.size());
-          this->_indices.push_back(row_ptr.elements());
-          this->_indices_size.push_back(row_ptr.size());
+          this->_elements.push_back(val_in.elements());
+          this->_elements_size.push_back(val_in.size());
+          this->_indices.push_back(col_ind_in.elements());
+          this->_indices_size.push_back(col_ind_in.size());
+          this->_indices.push_back(row_ptr_in.elements());
+          this->_indices_size.push_back(row_ptr_in.size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
@@ -715,7 +715,7 @@ namespace FEAST
          *
          * Assigns a new matrix layout, discarding all old data
          */
-        SparseMatrixCSR & operator= (const SparseLayout<Mem_, IT_, LayoutType> & layout)
+        SparseMatrixCSR & operator= (const SparseLayout<Mem_, IT_, LayoutType> & layout_in)
         {
           CONTEXT("When assigning SparseMatrixCSR");
 
@@ -731,9 +731,9 @@ namespace FEAST
           this->_scalar_index.clear();
           this->_scalar_dt.clear();
 
-          this->_indices.assign(layout._indices.begin(), layout._indices.end());
-          this->_indices_size.assign(layout._indices_size.begin(), layout._indices_size.end());
-          this->_scalar_index.assign(layout._scalar_index.begin(), layout._scalar_index.end());
+          this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+          this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
+          this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
           this->_scalar_dt.push_back(DT_(0));
 
           for (auto i : this->_indices)
@@ -821,35 +821,35 @@ namespace FEAST
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an csr matrix with less than double precission!"<<std::endl;
 
-          IT_ * col_ind = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(this->_indices_size.at(0));
-          MemoryPool<Mem_>::template download<IT_>(col_ind, this->_indices.at(0), this->_indices_size.at(0));
+          IT_ * tcol_ind = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(this->_indices_size.at(0));
+          MemoryPool<Mem_>::template download<IT_>(tcol_ind, this->_indices.at(0), this->_indices_size.at(0));
           uint64_t * ccol_ind = new uint64_t[this->_indices_size.at(0)];
           for (Index i(0) ; i < this->_indices_size.at(0) ; ++i)
-            ccol_ind[i] = col_ind[i];
-          MemoryPool<Mem::Main>::instance()->release_memory(col_ind);
+            ccol_ind[i] = tcol_ind[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
 
-          IT_ * row_ptr = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(this->_indices_size.at(1));
-          MemoryPool<Mem_>::template download<IT_>(row_ptr, this->_indices.at(1), this->_indices_size.at(1));
+          IT_ * trow_ptr = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(this->_indices_size.at(1));
+          MemoryPool<Mem_>::template download<IT_>(trow_ptr, this->_indices.at(1), this->_indices_size.at(1));
           uint64_t * crow_ptr = new uint64_t[this->_indices_size.at(1)];
           for (Index i(0) ; i < this->_indices_size.at(1) ; ++i)
-            crow_ptr[i] = row_ptr[i];
-          MemoryPool<Mem::Main>::instance()->release_memory(row_ptr);
+            crow_ptr[i] = trow_ptr[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
 
-          DT_ * val = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_elements_size.at(0));
-          MemoryPool<Mem_>::template download<DT_>(val, this->_elements.at(0), this->_elements_size.at(0));
+          DT_ * tval = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(this->_elements_size.at(0));
+          MemoryPool<Mem_>::template download<DT_>(tval, this->_elements.at(0), this->_elements_size.at(0));
           double * cval = new double[this->_elements_size.at(0)];
           for (Index i(0) ; i < this->_elements_size.at(0) ; ++i)
-            cval[i] = (double)val[i];
-          MemoryPool<Mem::Main>::instance()->release_memory(val);
+            cval[i] = (double)tval[i];
+          MemoryPool<Mem::Main>::instance()->release_memory(tval);
 
-          uint64_t rows(this->_scalar_index.at(1));
-          uint64_t columns(this->_scalar_index.at(2));
+          uint64_t trows(this->_scalar_index.at(1));
+          uint64_t tcolumns(this->_scalar_index.at(2));
           uint64_t elements(this->_indices_size.at(0));
-          file.write((const char *)&rows, sizeof(uint64_t));
-          file.write((const char *)&columns, sizeof(uint64_t));
+          file.write((const char *)&trows, sizeof(uint64_t));
+          file.write((const char *)&tcolumns, sizeof(uint64_t));
           file.write((const char *)&elements, sizeof(uint64_t));
           file.write((const char *)ccol_ind, (long)(elements * sizeof(uint64_t)));
-          file.write((const char *)crow_ptr, (long)((rows + 1) * sizeof(uint64_t)));
+          file.write((const char *)crow_ptr, (long)((trows + 1) * sizeof(uint64_t)));
           file.write((const char *)cval, (long)(elements * sizeof(double)));
 
           delete[] ccol_ind;
@@ -969,8 +969,7 @@ namespace FEAST
          */
         SparseLayout<Mem_, IT_, LayoutType> layout() const
         {
-          SparseLayout<Mem_, IT_, LayoutType> layout(this->_indices, this->_indices_size, this->_scalar_index);
-          return layout;
+          return SparseLayout<Mem_, IT_, LayoutType>(this->_indices, this->_indices_size, this->_scalar_index);
         }
 
         /**

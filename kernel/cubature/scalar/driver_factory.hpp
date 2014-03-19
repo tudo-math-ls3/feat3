@@ -209,10 +209,10 @@ namespace FEAST
          * a valid name of the cubature rule implemented by this factory.
          */
         template<typename Weight_, typename Coord_>
-        static bool create(Rule<Weight_, Coord_>& rule, const String& name)
+        static bool create(Rule<Weight_, Coord_>& rule, const String& name_in)
         {
           // map alias names
-          Intern::DriverFactoryAliasMapper<DriverType> mapper(name);
+          Intern::DriverFactoryAliasMapper<DriverType> mapper(name_in);
           DriverType::alias(mapper);
           String mapped_name(mapper.name());
 
@@ -267,8 +267,8 @@ namespace FEAST
           bool _mapped;
 
         public:
-          explicit DriverFactoryAliasMapper(const String& name) :
-            _name(name),
+          explicit DriverFactoryAliasMapper(const String& name_in) :
+            _name(name_in),
             _mapped(false)
           {
           }
@@ -299,8 +299,8 @@ namespace FEAST
           bool _mapped;
 
         public:
-          explicit DriverFactoryAliasMapper(const String& name) :
-            _name(name),
+          explicit DriverFactoryAliasMapper(const String& name_in) :
+            _name(name_in),
             _mapped(false)
           {
           }
