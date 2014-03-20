@@ -41,8 +41,8 @@ class SolverDataTest:
       P1.clone(A1);
       SolverData<> sd1(std::move(A1), std::move(x1), std::move(b1), 2);
       TEST_CHECK_EQUAL(sd1.temp().size(), Index(2));
-      TEST_CHECK_EQUAL(sd1.temp().at(0).size(), 1000);
-      TEST_CHECK_EQUAL(sd1.temp().at(1).size(), 1000);
+      TEST_CHECK_EQUAL(sd1.temp().at(0).size(), 1000ul);
+      TEST_CHECK_EQUAL(sd1.temp().at(1).size(), 1000ul);
 
       DenseVector<Tag_, DataType_> x2(1000, DataType_(1)), b2(1000, DataType_(1));
       SparseMatrixCOO<Mem::Main, DataType_> T2(1000, 1000);
@@ -53,9 +53,9 @@ class SolverDataTest:
       P2.clone(A2);
       PreconditionedSolverData<> psd(std::move(A2), std::move(P2), std::move(x2), std::move(b2), 3);
       TEST_CHECK_EQUAL(psd.temp().size(), Index(3));
-      TEST_CHECK_EQUAL(psd.temp().at(0).size(), 1000);
-      TEST_CHECK_EQUAL(psd.temp().at(1).size(), 1000);
-      TEST_CHECK_EQUAL(psd.temp().at(2).size(), 1000);
+      TEST_CHECK_EQUAL(psd.temp().at(0).size(), 1000ul);
+      TEST_CHECK_EQUAL(psd.temp().at(1).size(), 1000ul);
+      TEST_CHECK_EQUAL(psd.temp().at(2).size(), 1000ul);
 
       DenseVector<Tag_, DataType_> x3(1000, DataType_(1)), b3(1000, DataType_(1));
       SparseMatrixCOO<Mem::Main, DataType_> T3(1000, 1000);
@@ -66,9 +66,9 @@ class SolverDataTest:
       P3.clone(A3);
       SynchronisedSolverData<> sd3(std::move(A3), std::move(x3), std::move(b3), 3);
       TEST_CHECK_EQUAL(sd3.temp().size(), Index(3));
-      TEST_CHECK_EQUAL(sd3.temp().at(0).size(), 1000);
-      TEST_CHECK_EQUAL(sd3.temp().at(1).size(), 1000);
-      TEST_CHECK_EQUAL(sd3.temp().at(2).size(), 1000);
+      TEST_CHECK_EQUAL(sd3.temp().at(0).size(), 1000ul);
+      TEST_CHECK_EQUAL(sd3.temp().at(1).size(), 1000ul);
+      TEST_CHECK_EQUAL(sd3.temp().at(2).size(), 1000ul);
       TEST_CHECK_EQUAL(sd3.vector_mirrors().size(), Index(0));
       TEST_CHECK_EQUAL(sd3.vector_mirror_sendbufs().size(), Index(0));
       TEST_CHECK_EQUAL(sd3.vector_mirror_recvbufs().size(), Index(0));
@@ -84,9 +84,9 @@ class SolverDataTest:
       P4.clone(A4);
       SynchronisedPreconditionedSolverData<> sd4(std::move(A4), std::move(P4), std::move(x4), std::move(b4), 3);
       TEST_CHECK_EQUAL(sd4.temp().size(), Index(3));
-      TEST_CHECK_EQUAL(sd4.temp().at(0).size(), 1000);
-      TEST_CHECK_EQUAL(sd4.temp().at(1).size(), 1000);
-      TEST_CHECK_EQUAL(sd4.temp().at(2).size(), 1000);
+      TEST_CHECK_EQUAL(sd4.temp().at(0).size(), 1000ul);
+      TEST_CHECK_EQUAL(sd4.temp().at(1).size(), 1000ul);
+      TEST_CHECK_EQUAL(sd4.temp().at(2).size(), 1000ul);
       TEST_CHECK_EQUAL(sd4.vector_mirrors().size(), Index(0));
       TEST_CHECK_EQUAL(sd4.vector_mirror_sendbufs().size(), Index(0));
       TEST_CHECK_EQUAL(sd4.vector_mirror_recvbufs().size(), Index(0));
