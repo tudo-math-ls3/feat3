@@ -36,6 +36,10 @@ public:
 
   virtual void run() const
   {
+    DenseMatrix<Mem_, DT_> zero1;
+    DenseMatrix<Mem::Main, DT_> zero2;
+    TEST_CHECK_EQUAL(zero1, zero2);
+
     DenseMatrix<Mem_, DT_> a(10, 10);
     DenseMatrix<Mem_, DT_> b(10, 10, 5.);
     b(7, 6, DT_(42));

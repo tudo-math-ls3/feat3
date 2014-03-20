@@ -34,6 +34,10 @@ public:
 
   virtual void run() const
   {
+    SparseVector<Mem_, DT_> zero1;
+    SparseVector<Mem::Main, DT_> zero2;
+    TEST_CHECK_EQUAL(zero1, zero2);
+
     SparseVector<Mem_, DT_> a(10);
     a(3, DT_(7));
     a(3, DT_(3));

@@ -1283,6 +1283,9 @@ namespace FEAST
       if (a.zero_element() != b.zero_element())
         return false;
 
+      if(a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
+        return true;
+
       for (Index i(0) ; i < a.used_elements() ; ++i)
       {
         if (MemoryPool<Mem_>::get_element(a.col_ind(), i) != MemoryPool<Mem2_>::get_element(b.col_ind(), i))

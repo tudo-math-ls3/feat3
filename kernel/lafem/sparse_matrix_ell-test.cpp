@@ -39,6 +39,10 @@ public:
 
   virtual void run() const
   {
+    SparseMatrixELL<Mem_, DT_> zero1;
+    SparseMatrixELL<Mem::Main, DT_> zero2;
+    TEST_CHECK_EQUAL(zero1, zero2);
+
     SparseMatrixCOO<Mem::Main, DT_> a(10, 12);
     a(1,2,7);
     a.format();

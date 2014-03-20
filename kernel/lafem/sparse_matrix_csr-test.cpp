@@ -38,6 +38,10 @@ public:
 
   virtual void run() const
   {
+    SparseMatrixCSR<Mem_, DT_> zero1;
+    SparseMatrixCSR<Mem::Main, DT_> zero2;
+    TEST_CHECK_EQUAL(zero1, zero2);
+
     SparseMatrixCOO<Mem::Main, DT_> a(10, 10);
     a(1,2,7);
     a.format();
