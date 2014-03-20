@@ -88,6 +88,9 @@ public:
     TEST_CHECK_NOT_EQUAL(c, b);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
 
+    decltype(c) d(c.layout());
+    TEST_CHECK_NOT_EQUAL((void*)d.row_indices(), (void*)c.row_indices());
+
     SparseMatrixCOO<Mem_, DT_> f(10, 10);
     for (Index row(0) ; row < f.rows() ; ++row)
     {
