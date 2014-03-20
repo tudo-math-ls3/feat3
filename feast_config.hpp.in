@@ -34,4 +34,7 @@
 /// Do we have QUADMATH support enabled?
 #cmakedefine FEAST_HAVE_QUADMATH
 
+/// Do we have ALGLIB support enabled?
+#cmakedefine FEAST_HAVE_ALGLIB
+
 #endif // FEAST_CONFIG_HPP

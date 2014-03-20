@@ -60,11 +60,14 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Instrumentation: scalasca (not implemented yet)")
   print ("  Debugging: valgrind, cudamemcheck")
   print ("  Precision extensions: quadmath")
+  print ("  Third party source code: alglib")
   print ("")
   print ("Note, that cudamemcheck is only active, if cuda is activated, too.")
   print ("Note, that you need to provide at least a build mode, a parallelisation mode and a compiler.")
   print ("Note, that the actual compiler version and mpi implementation is choosen by first come, fist serve")
   print ("corresponding to your $PATH settings.")
+  print ("Note, that you need to provide thrid party source code libraries on your own.")
+  #TODO download script erwaehnen
   print ("The target cpu is detected automatic, manual override options are not implemented yet.")
   sys.exit()
 
@@ -237,6 +240,9 @@ if "valgrind" in buildid:
     sys.exit(1)
   remove_string(unused_tokens, "valgrind")
   cmake_flags += " -DFEAST_VALGRIND:BOOL=ON"
+if "alglib" in buildid:
+  remove_string(unused_tokens, "alglib")
+  cmake_flags += " -DFEAST_HAVE_ALGLIB:BOOL=ON"
 
 
 # clean up previous configurations
