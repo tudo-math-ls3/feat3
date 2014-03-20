@@ -97,55 +97,6 @@ This macro is defined if the PGI C++ compiler is detected. Unfortunately, it is 
 be deduced at compile-time, therefore this macro is simply defined as 1.
 
 <hr><hr>
-\section preproc_sec_cpp_features C++ Language Feature Macros
-This section enlists macros specifying the C++ language features of the compiler in use. These macros are automatically
-defined for all officially supported and tested compilers by the compiler detection headers, but they may as well be
-defined by the user via the build-system for new or unsupported compilers.
-
-\note As FEAST shall be 'migrated' to officially require a C++11 conforming compiler, these macros and their effects
-are temporary solutions, as all the emulated features will be mandatory from then on.
-
-<hr>
-\subsection ppm_have_cpp11_extern_template HAVE_CPP11_EXTERN_TEMPLATE
-This macro is defined as 1 if the compiler in use supports the C++11 <c>extern template</c> declaration.
-
-<b>Effects:</b><br>
-As the extern template support is not yet in use, this macro has currently no effect.
-
-<hr>
-\subsection ppm_have_cpp11_func HAVE_CPP11_FUNC
-This macro is defined as 1 if the compiler in use supports the C99/C++11 build-in <c>__func__</c> variable.
-
-<b>Effects:</b><br>
-If undefined, the kernel base-header will define <c>__func__</c> as <c>__FUNCTION__</c> in the blind hope that the
-compiler supports this macro instead.
-
-<hr>
-\subsection ppm_have_cpp11_nullptr HAVE_CPP11_NULLPTR
-This macro is defined as 1 if the compiler in use supports the C++11 <c>nullptr</c> keyword.
-
-<b>Effects:</b><br>
-If undefined, the kernel base-header will define <c>nullptr</c> as 0, therefore 'emulating' the C++11 keyword.
-
-<hr>
-\subsection ppm_have_cpp11_smart_pointer HAVE_CPP11_SMART_POINTER
-This macro is defined as 1 if the compiler's standard library implements the <c>std::shared_ptr</c> class template.
-
-<b>Effects:</b><br>
-This macro affects the contents of the <c>kernel/util/cpp11_smart_pointer.hpp</c> header:
-- If defined, the header will simply include the standard library <c>memory</c> header, which contains the library's
-<c>std::shared_ptr</c> implementation.
-- If undefined, the header will provide a custom implementation of the <c>std::shared_ptr</c> class template.<br>
-
-<hr>
-\subsection ppm_have_cpp11_static_assert HAVE_CPP11_STATIC_ASSERT
-This macro is defined as 1 if the compiler in use supports the C++11 <c>static_assert</c> keyword.
-
-<b>Effects:</b><br>
-If undefined, the kernel base-header will define <c>static_assert</c> as an empty macro, therefore ignoring all static
-assertions.
-
-<hr><hr>
 \section preproc_sec_backends Backend / Library Macros
 This section enlists macros defined by the build system, which specify what types of third-party libraries and backends
 are available to FEAST.
@@ -174,10 +125,13 @@ If defined, the LAFEM subsystem of the FEAST kernel will implement the "LAFEM::U
 has been compiled and linked. If so, it will define the FEAST_HAVE_UMFPACK macro automatically.
 
 <hr>
-\subsection ppm_feast_gmp FEAST_GMP
-This macro is defined by the build system if the FEAST kernel is linked against the GNU multi-precision library.
+\subsection ppm_feast_have_alglib FEAST_HAVE_ALGLIB
+This macro is defined by the build system if the FEAST kernel is linked against the ALGLIB library.
 
-If defined, the GNU multi-precision types are added to the type-traits classes as well as to the LAFEM containers.
+<hr>
+\subsection ppm_feast_have_quadmath FEAST_HAVE_QUADMATH
+This macro is defined by the build system if the FEAST kernel has support for quadmath datatypes.
+The datatypes name is __float128.
 
 <hr>
 \subsection ppm_feast_mpi FEAST_MPI
