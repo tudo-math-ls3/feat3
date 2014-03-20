@@ -25,7 +25,10 @@ def configure_gcc(cpu, buildmode):
     cxxflags += " -fext-numeric-literals"
 
   if "debug" in buildmode:
-    cxxflags += " -O0 -Wall -Wextra -Wundef -Wno-unused-parameter -D_GLIBCXX_DEBUG"
+    cxxflags += " -O0 -Wall -Wextra -Wundef -Wno-unused-parameter"
+    #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
+    if platform.system() != "Darwin":
+      cxxflags += " -D_GLIBCXX_DEBUG"
   elif "opt" in buildmode:
     cxxflags += " -O3"
     if cpu == "unknown":
