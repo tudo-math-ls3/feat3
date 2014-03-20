@@ -269,8 +269,10 @@ namespace FEAST
           {
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(alloc_increment()));
             this->_elements_size.push_back(alloc_increment());
+            MemoryPool<Mem_>::instance()->template set_memory<DT_>(this->_elements.back(), DT_(4711), alloc_increment());
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(alloc_increment()));
             this->_indices_size.push_back(alloc_increment());
+            MemoryPool<Mem_>::instance()->template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
             _allocated_elements() = alloc_increment();
             MemoryPool<Mem_>::set_memory(elements(), val);
             MemoryPool<Mem_>::set_memory(indices(), IT_(index));
@@ -291,7 +293,9 @@ namespace FEAST
             _allocated_elements() += alloc_increment();
 
             DT_ * elements_new(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(allocated_elements()));
+            MemoryPool<Mem_>::instance()->template set_memory<DT_>(elements_new, DT_(4711), allocated_elements());
             IT_ * indices_new(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(allocated_elements()));
+            MemoryPool<Mem_>::instance()->template set_memory<IT_>(indices_new, IT_(4711), allocated_elements());
 
             MemoryPool<Mem_>::copy(elements_new, elements(), used_elements());
             MemoryPool<Mem_>::copy(indices_new, indices(), used_elements());
@@ -370,7 +374,7 @@ namespace FEAST
             ++i;
           }
 
-          if (MemoryPool<Mem_>::get_element(indices(), i) == index)
+          if (i < used_elements() && MemoryPool<Mem_>::get_element(indices(), i) == index)
             return MemoryPool<Mem_>::get_element(elements(), i);
           else
             return zero_element();

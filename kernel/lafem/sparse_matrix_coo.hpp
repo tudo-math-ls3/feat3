@@ -1039,10 +1039,13 @@ namespace FEAST
           {
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(alloc_increment()));
             this->_elements_size.push_back(alloc_increment());
+            MemoryPool<Mem_>::instance()->template set_memory<DT_>(this->_elements.back(), DT_(4711), alloc_increment());
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(alloc_increment()));
             this->_indices_size.push_back(alloc_increment());
+            MemoryPool<Mem_>::instance()->template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
             this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(alloc_increment()));
             this->_indices_size.push_back(alloc_increment());
+            MemoryPool<Mem_>::instance()->template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
 
             MemoryPool<Mem_>::set_memory(this->_elements.at(0), value);
             MemoryPool<Mem_>::set_memory(this->_indices.at(0), row);
@@ -1068,8 +1071,11 @@ namespace FEAST
             this->_scalar_index.at(4) += alloc_increment();
 
             DT_ * elements_new(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(allocated_elements()));
+            MemoryPool<Mem_>::instance()->template set_memory<DT_>(elements_new, DT_(4711), allocated_elements());
             IT_ * rows_new(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(allocated_elements()));
+            MemoryPool<Mem_>::instance()->template set_memory<IT_>(rows_new, IT_(4711), allocated_elements());
             IT_ * cols_new(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(allocated_elements()));
+            MemoryPool<Mem_>::instance()->template set_memory<IT_>(cols_new, IT_(4711), allocated_elements());
 
             MemoryPool<Mem_>::copy(elements_new, this->_elements.at(0), used_elements());
             MemoryPool<Mem_>::copy(rows_new, this->_indices.at(0), used_elements());
@@ -1173,10 +1179,8 @@ namespace FEAST
               break;
             ++i;
           }
-          if (i == this->_scalar_index.at(3))
-            return this->_scalar_dt.at(0);
 
-          if(MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == row && MemoryPool<Mem_>::get_element(this->_indices.at(1), i) == col)
+          if(i < this->_scalar_index.at(3) && MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == row && MemoryPool<Mem_>::get_element(this->_indices.at(1), i) == col)
           {
             return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
           }
