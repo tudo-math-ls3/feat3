@@ -10,6 +10,11 @@ def configure_icc(cpu, buildmode):
   print ("Detected icc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
   cxxflags = "-std=c++11 -g"
+
+  # do not use stone old clang libc++ from apple, hopefully any gcc headers are present
+  if platform.system() == "Darwin":
+    cxxflags += "-no-use-clang-env"
+
   if "debug" in buildmode:
     cxxflags += "  -O0 -Wall -Wp64 -Wshorten-64-to-32 -debug all -ftrapuv"
   elif "opt" in buildmode:
