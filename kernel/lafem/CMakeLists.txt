@@ -16,14 +16,6 @@ SET (kernel-lafem-list
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch)
 
-if (FEAST_GMP)
-TARGET_LINK_LIBRARIES(kernel-lafem
-  libgmpxx.a
-  libgmp.a
-  )
-endif (FEAST_GMP)
-
-
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-cuda
     memory_pool.cu
