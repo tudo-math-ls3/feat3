@@ -11,4 +11,5 @@ if (FEAST_HAVE_ALGLIB)
   file(GLOB alglib-list "${FEAST_SOURCE_DIR}/thirdparty/alglib/src/*.cpp")
 
   ADD_LIBRARY(thirdparty-alglib STATIC ${alglib-list})
+  SET_PROPERTY(TARGET thirdparty-alglib PROPERTY COMPILE_FLAGS " -w")
 endif (FEAST_HAVE_ALGLIB)
