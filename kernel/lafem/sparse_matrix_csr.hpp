@@ -86,7 +86,7 @@ namespace FEAST
             String srow(line, 0, end);
             Index row((Index)atol(srow.c_str()));
             --row;
-            this->_scalar_index.at(1) = std::max(row+1, this->rows());
+            _rows() = std::max(row+1, this->rows());
             line.erase(0, end);
 
             begin = line.find_first_not_of(" ");
@@ -95,7 +95,7 @@ namespace FEAST
             String scol(line, 0, end);
             Index col((Index)atol(scol.c_str()));
             --col;
-            this->_scalar_index.at(2) = std::max(col+1, this->columns());
+            _columns() = std::max(col+1, this->columns());
             line.erase(0, end);
 
             begin = line.find_first_not_of(" ");
@@ -107,8 +107,8 @@ namespace FEAST
             entries[row].insert(std::pair<IT_, DT_>(col, tval));
             ++ue;
           }
-          this->_scalar_index.at(0) = this->rows() * this->columns();
-          this->_scalar_index.at(3) = ue;
+          _size() = this->rows() * this->columns();
+          _used_elements() = ue;
 
           DT_ * tval = new DT_[ue];
           IT_ * tcol_ind = new IT_[ue];
@@ -131,15 +131,15 @@ namespace FEAST
           trow_ptr[rows()] = ue;
           entries.clear();
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
-          this->_elements_size.push_back(this->_scalar_index.at(3));
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(3)));
-          this->_indices_size.push_back(this->_scalar_index.at(3));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
           this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(rows() + 1));
           this->_indices_size.push_back(rows() + 1);
 
-          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
-          MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
+          MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
           MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, rows() + 1);
 
           delete[] tval;
@@ -183,9 +183,9 @@ namespace FEAST
             String scol(line, 0, end);
             Index col((Index)atol(scol.c_str()));
             line.erase(0, end);
-            this->_scalar_index.at(1) = row;
-            this->_scalar_index.at(2) = col;
-            this->_scalar_index.at(0) = this->rows() * this->columns();
+            _rows() = row;
+            _columns() = col;
+            _size() = this->rows() * this->columns();
           }
           while(!file.eof())
           {
@@ -218,8 +218,8 @@ namespace FEAST
             entries[row].insert(std::pair<IT_, DT_>(col, tval));
             ++ue;
           }
-          this->_scalar_index.at(0) = this->rows() * this->columns();
-          this->_scalar_index.at(3) = ue;
+          _size() = this->rows() * this->columns();
+          _used_elements() = ue;
 
           DT_ * tval = new DT_[ue];
           IT_ * tcol_ind = new IT_[ue];
@@ -242,15 +242,15 @@ namespace FEAST
           trow_ptr[rows()] = ue;
           entries.clear();
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
-          this->_elements_size.push_back(this->_scalar_index.at(3));
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(3)));
-          this->_indices_size.push_back(this->_scalar_index.at(3));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
           this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(rows() + 1));
           this->_indices_size.push_back(rows() + 1);
 
-          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
-          MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
+          MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
+          MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
           MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, rows() + 1);
 
           delete[] tval;
@@ -279,7 +279,7 @@ namespace FEAST
           Index tcolumns = (Index)columns64;
           Index elements = (Index)elements64;
 
-          this->_scalar_index.at(0) = Index(trows * tcolumns);
+          _size() = Index(trows * tcolumns);
           this->_scalar_index.push_back(Index(trows));
           this->_scalar_index.push_back(Index(tcolumns));
           this->_scalar_index.push_back(elements);
@@ -310,15 +310,35 @@ namespace FEAST
           this->_elements_size.push_back(elements);
           this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(elements));
           this->_indices_size.push_back(elements);
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(1) + 1));
-          this->_indices_size.push_back(this->_scalar_index.at(1) + 1);
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows() + 1));
+          this->_indices_size.push_back(_rows() + 1);
 
           MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tval, elements);
           MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tcol_ind, elements);
-          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), trow_ptr, this->_scalar_index.at(1)  + 1);
+          MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), trow_ptr, _rows()  + 1);
           MemoryPool<Mem::Main>::instance()->release_memory(tval);
           MemoryPool<Mem::Main>::instance()->release_memory(tcol_ind);
           MemoryPool<Mem::Main>::instance()->release_memory(trow_ptr);
+        }
+
+        Index & _size()
+        {
+          return this->_scalar_index.at(0);
+        }
+
+        Index & _rows()
+        {
+          return this->_scalar_index.at(1);
+        }
+
+        Index & _columns()
+        {
+          return this->_scalar_index.at(2);
+        }
+
+        Index & _used_elements()
+        {
+          return this->_scalar_index.at(3);
         }
 
       public:
@@ -373,8 +393,8 @@ namespace FEAST
           for (auto i : this->_indices)
             MemoryPool<Mem_>::instance()->increase_memory(i);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
-          this->_elements_size.push_back(this->_scalar_index.at(3));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
         }
 
         /**
@@ -582,12 +602,12 @@ namespace FEAST
           SparseMatrixCOO<Mem::Main, DT_, IT_> cother;
           cother.convert(other);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
-          this->_elements_size.push_back(this->_scalar_index.at(3));
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(3)));
-          this->_indices_size.push_back(this->_scalar_index.at(3));
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(1) + 1));
-          this->_indices_size.push_back(this->_scalar_index.at(1) + 1);
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows() + 1));
+          this->_indices_size.push_back(_rows() + 1);
 
           DT_ * tval(nullptr);
           IT_ * tcol_ind(nullptr);
@@ -626,17 +646,17 @@ namespace FEAST
             tcol_ind[ait] = column;
             ++ait;
           }
-          for (unsigned long i(current_row + 1) ; i < this->_scalar_index.at(1) ; ++i)
+          for (unsigned long i(current_row + 1) ; i < _rows() ; ++i)
           {
             trow_ptr[i] = ait;
           }
-          trow_ptr[this->_scalar_index.at(1)] = ait;
+          trow_ptr[_rows()] = ait;
 
           if (! std::is_same<Mem_, Mem::Main>::value)
           {
-            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
-            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
-            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, this->_scalar_index.at(1) + 1);
+            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, _rows() + 1);
             delete[] tval;
             delete[] tcol_ind;
             delete[] trow_ptr;
@@ -666,12 +686,12 @@ namespace FEAST
           SparseMatrixELL<Mem::Main, DT_, IT_> cother;
           cother.convert(other);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
-          this->_elements_size.push_back(this->_scalar_index.at(3));
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(3)));
-          this->_indices_size.push_back(this->_scalar_index.at(3));
-          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_scalar_index.at(1) + 1));
-          this->_indices_size.push_back(this->_scalar_index.at(1) + 1);
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows() + 1));
+          this->_indices_size.push_back(_rows() + 1);
 
           DT_ * tval(nullptr);
           IT_ * tcol_ind(nullptr);
@@ -713,9 +733,9 @@ namespace FEAST
 
           if (! std::is_same<Mem_, Mem::Main>::value)
           {
-            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, this->_scalar_index.at(3));
-            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, this->_scalar_index.at(3));
-            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, this->_scalar_index.at(1) + 1);
+            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, _rows() + 1);
             delete[] tval;
             delete[] tcol_ind;
             delete[] trow_ptr;
@@ -753,8 +773,8 @@ namespace FEAST
           for (auto i : this->_indices)
             MemoryPool<Mem_>::instance()->increase_memory(i);
 
-          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_scalar_index.at(3)));
-          this->_elements_size.push_back(this->_scalar_index.at(3));
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
 
           return *this;
         }
@@ -856,8 +876,8 @@ namespace FEAST
             cval[i] = (double)tval[i];
           MemoryPool<Mem::Main>::instance()->release_memory(tval);
 
-          uint64_t trows(this->_scalar_index.at(1));
-          uint64_t tcolumns(this->_scalar_index.at(2));
+          uint64_t trows(rows());
+          uint64_t tcolumns(columns());
           uint64_t elements(this->_indices_size.at(0));
           file.write((const char *)&trows, sizeof(uint64_t));
           file.write((const char *)&tcolumns, sizeof(uint64_t));
@@ -896,7 +916,7 @@ namespace FEAST
           temp.convert(*this);
 
           file << "data = [" << std::endl;
-          for (Index row(0) ; row < this->_scalar_index.at(1) ; ++row)
+          for (Index row(0) ; row < rows() ; ++row)
           {
             const Index end(temp.row_ptr()[row + 1]);
             for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
@@ -938,7 +958,7 @@ namespace FEAST
           file << "%%MatrixMarket matrix coordinate real general" << std::endl;
           file << temp.rows() << " " << temp.columns() << " " << temp.used_elements() << std::endl;
 
-          for (Index row(0) ; row < this->_scalar_index.at(1) ; ++row)
+          for (Index row(0) ; row < rows() ; ++row)
           {
             const Index end(temp.row_ptr()[row + 1]);
             for (Index i(temp.row_ptr()[row]) ; i < end ; ++i)
@@ -963,8 +983,8 @@ namespace FEAST
         {
           CONTEXT("When retrieving SparseMatrixCSR element");
 
-          ASSERT(row < this->_scalar_index.at(1), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(this->_scalar_index.at(1)) + " !");
-          ASSERT(col < this->_scalar_index.at(2), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(this->_scalar_index.at(2)) + " !");
+          ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
+          ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
 
           for (unsigned long i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
           {
@@ -1239,19 +1259,19 @@ namespace FEAST
         /** \copydoc Adjactor::get_num_nodes_domain() */
         const inline Index & get_num_nodes_domain() const
         {
-          return this->_scalar_index.at(1);
+          return _rows();
         }
 
         /** \copydoc Adjactor::get_num_nodes_image() */
         const inline Index & get_num_nodes_image() const
         {
-          return this->_scalar_index.at(2);
+          return _columns();
         }
 
         /** \copydoc Adjactor::image_begin() */
         inline ImageIterator image_begin(Index domain_node) const
         {
-          ASSERT(domain_node < this->_scalar_index.at(1), "Domain node index out of range");
+          ASSERT(domain_node < _rows(), "Domain node index out of range");
           return &this->_indices.at(0)[this->_indices.at(1)[domain_node]];
         }
 
@@ -1259,7 +1279,7 @@ namespace FEAST
         inline ImageIterator image_end(Index domain_node) const
         {
           CONTEXT("Graph::image_end()");
-          ASSERT(domain_node < this->_scalar_index.at(1), "Domain node index out of range");
+          ASSERT(domain_node < _rows(), "Domain node index out of range");
           return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
         }
     };

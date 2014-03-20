@@ -33,6 +33,17 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_ = Index>
     class DenseMatrix : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
+      private:
+        Index & _rows()
+        {
+          return _rows();
+        }
+
+        Index & _columns()
+        {
+          return _columns();
+        }
+
       public:
         /// Our datatype
         typedef DT_ DataType;
