@@ -27,14 +27,13 @@ if exist %OBJPATH% (
 )
 
 rem Set Compiler flags
-set CXXFLAGS=%CXXFLAGS% /c /GS /Gd /TC /W3 /WX- /Zc:wchar_t /Zi /Zc:forScope /errorReport:prompt /EHsc /nologo
+set CXXFLAGS=%CXXFLAGS% /c /GS /Gd /TC /W3 /WX- /Zc:wchar_t /Zi /Zc:forScope /errorReport:none /EHsc /nologo
 set CXXFLAGS=%CXXFLAGS% /wd"4068" /wd"4244" /wd"4267" /wd"4996"
 set CXXFLAGS=%CXXFLAGS% /I"./UMFPACK/Include" /I"./AMD/Include" /I"./SuiteSparse_config"
 set CXXFLAGS=%CXXFLAGS% /D "NBLAS" /D "NCHOLMOD" /D "_MBCS"
 set CXXFLAGS=%CXXFLAGS% /Fd"../obj/umfpack.vc12-%1-%2/umfpack.vc12-%1-%2.pdb"
 set CXXFLAGS=%CXXFLAGS% /Fp"../obj/umfpack.vc12-%1-%2/umfpack.vc12-%1-%2.pch"
 
-echo.
 echo Compiling SuiteSparse_config Sources...
 cl.exe %CXXFLAGS% ./SuiteSparse_config/SuiteSparse_config.c /Fo"%OBJPATH%/SuiteSparse_config.obj"
 cl.exe %CXXFLAGS% ./SuiteSparse_config/xerbla/xerbla.c /Fo"%OBJPATH%/xerbla.obj"
@@ -248,6 +247,7 @@ set LIBFLAGS=%LIBFLAGS% /NOLOGO
 echo.
 echo Linking 'umfpack.vc12-%1-%2'
 lib %LIBFLAGS% /OUT:"..\lib\umfpack.vc12-%1-%2.lib" ..\obj\umfpack.vc12-%1-%2\*.obj
+echo.
 
 rem ===============================================================================================
 :end

@@ -68,6 +68,10 @@
   <!--<PropertyGroup Condition="Exists('$(FeastLibPath)\umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">-->
     <FeastHaveUmfpack>true</FeastHaveUmfpack>
   </PropertyGroup>
+  <PropertyGroup Condition="Exists('..\lib\alglib.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">
+  <!--<PropertyGroup Condition="Exists('$(FeastLibPath)\alglib.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib')">-->
+    <FeastHaveAlgLib>true</FeastHaveAlgLib>
+  </PropertyGroup>
 
   <!-- ********************************************************************* -->
   <!-- FEAST Additional Paths and Dependencies -->
@@ -87,6 +91,8 @@
       Include="FEAST_BACKENDS_MKL" />
     <FeastDef Condition="'$(FeastHaveUmfpack)'=='true'"
       Include="FEAST_HAVE_UMFPACK" />
+    <FeastDef Condition="'$(FeastHaveAlgLib)'=='true'"
+      Include="FEAST_HAVE_ALGLIB" />
   </ItemGroup>
 
   <!-- FEAST additional include directory list -->
@@ -97,6 +103,8 @@
       Include="$(MKL_PATH)\include" />
     <FeastIncDir Condition="'$(FeastHaveUmfpack)'=='true'"
       Include="$(FeastRootPath)\thirdparty\AMD\Include;$(FeastRootPath)\thirdparty\SuiteSparse_config;$(FeastRootPath)\thirdparty\UMFPACK\Include" />
+    <FeastIncDir Condition="'$(FeastHaveAlgLib)'=='true'"
+      Include="$(FeastRootPath)\thirdparty\ALGLIB\src;" />
   </ItemGroup>
 
   <!-- FEAST additional library search path list -->
@@ -128,6 +136,8 @@
       Include="mkl_intel_lp64.lib" />
     <FeastLibDep Condition="'$(FeastHaveUmfpack)'=='true'"
       Include="umfpack.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
+    <FeastLibDep Condition="'$(FeastHaveAlgLib)'=='true'"
+      Include="alglib.vc12-$(FeastDebugPrefix)-$(FeastPlatform).lib" />
   </ItemGroup>
 
   <!-- build properties from item lists -->
