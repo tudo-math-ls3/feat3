@@ -47,6 +47,10 @@ def run_test(build_id, branch, myDB):
   m.save()
   os.chdir(build_dirname)
 
+#workaround for network base file system to prevent rebuilding everything in ctest phase
+  if is_found("sync"):
+    get_output("sync")
+
 ######### CONFIGURE #########
   configure_command = src_dirname + os.sep + "configure-feast " + build_id
   configure_output = get_output(configure_command)
@@ -63,6 +67,10 @@ def run_test(build_id, branch, myDB):
 
   m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="configure_output", body=configure_output)
   m.save()
+
+#workaround for network base file system to prevent rebuilding everything in ctest phase
+  if is_found("sync"):
+    get_output("sync")
 
 ######### MAKE ###############
   def process_compiler_output(token, output):
