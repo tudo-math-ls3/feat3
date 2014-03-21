@@ -5,21 +5,12 @@ using namespace FEAST;
 using namespace FEAST::TestSystem;
 using namespace FEAST::Math;
 
-/**
- * \brief Test class for the Math functions.
- *
- * \test Tests the class templates in the MetaMath namespace.
- *
- * \author Peter Zajac
- */
-class MathTest
+class BasicMathTest
   : public TaggedTest<Archs::None, Archs::None>
 {
 public:
-  const double tol;
-  MathTest() :
-    TaggedTest<Archs::None, Archs::None>("MathTest"),
-    tol(Math::pow(Math::eps<double>(), 0.9))
+  BasicMathTest() :
+    TaggedTest<Archs::None, Archs::None>("BasicMathTest")
   {
   }
 
@@ -27,18 +18,6 @@ public:
   {
     test_factorial();
     test_binomial();
-    test_sqrt();
-    test_sin();
-    test_cos();
-    test_exp();
-    test_log();
-    test_log10();
-    test_pow();
-    test_atan();
-    test_atan2();
-    test_pi();
-    test_asin();
-    test_acos();
   }
 
   void test_factorial() const
@@ -61,122 +40,159 @@ public:
     TEST_CHECK_EQUAL(binomial(5,2), 10);
     TEST_CHECK_EQUAL(binomial(49,6), 13983816);
   }
+} basic_math_test;
+
+/**
+ * \brief Test class for the Math functions.
+ *
+ * \test Tests the class templates in the MetaMath namespace.
+ *
+ * \author Peter Zajac
+ */
+template<typename DT_>
+class MathTest
+  : public TaggedTest<Archs::None, DT_>
+{
+public:
+  const DT_ tol;
+  MathTest() :
+    TaggedTest<Archs::None, DT_>("MathTest"),
+    tol(Math::pow(Math::eps<DT_>(), DT_(0.9)))
+  {
+  }
+
+  virtual void run() const
+  {
+    test_sqrt();
+    test_sin();
+    test_cos();
+    test_exp();
+    test_log();
+    test_log10();
+    test_pow();
+    test_atan();
+    test_atan2();
+    test_pi();
+    test_asin();
+    test_acos();
+  }
 
   void test_sqrt() const
   {
     // we need a weaker tolerance for sqrt
-    const double tol(Math::pow(Math::eps<double>(), 0.4));
+    const DT_ tol2(Math::pow(Math::eps<DT_>(), DT_(0.4)));
 
     // exact root tests
-    TEST_CHECK_EQUAL(Math::sqrt<double>(0.0), 0.0);
-    TEST_CHECK_EQUAL(Math::sqrt<double>(1.0), 1.0);
-    TEST_CHECK_EQUAL(Math::sqrt<double>(64.0), 8.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(0)), DT_(0), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(1)), DT_(1), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(64)), DT_(8), tol2);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<double>(2.0), std::sqrt(2.0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<double>(0.5), std::sqrt(0.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(2)), Math::sqrt(DT_(2)), tol2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqrt<DT_>(DT_(0.5)), Math::sqrt(DT_(0.5)), tol2);
   }
 
   void test_sin() const
   {
     // test exact
-    TEST_CHECK_EQUAL(Math::sin<double>(0.0), 0.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sin<DT_>(DT_(0)), DT_(0), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sin<double>(0.7), std::sin(0.7), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sin<DT_>(DT_(0.7)), Math::sin(DT_(0.7)), tol);
   }
 
   void test_cos() const
   {
     // test exact
-    TEST_CHECK_EQUAL(Math::cos<double>(0.0), 1.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos<DT_>(DT_(0)), DT_(1), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos<double>(0.7), std::cos(0.7), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::cos<DT_>(DT_(0.7)), Math::cos(DT_(0.7)), tol);
   }
 
   void test_exp() const
   {
     // test exact
-    TEST_CHECK_EQUAL(Math::exp<double>(0.0), 1.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::exp<DT_>(DT_(0)), DT_(1), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::exp<double>( 2.0), std::exp( 2.0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::exp<double>(-2.0), std::exp(-2.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::exp<DT_>( DT_(2)), Math::exp( DT_(2)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::exp<DT_>(-DT_(2)), Math::exp(-DT_(2)), tol);
   }
 
   void test_log() const
   {
     // test exact
-    TEST_CHECK_EQUAL(Math::log<double>(1.0), 0.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log<DT_>(DT_(1)), DT_(0), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log<double>(0.5), std::log(0.5), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log<double>(2.0), std::log(2.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log<DT_>(DT_(0.5)), Math::log(DT_(0.5)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log<DT_>(DT_(2)), Math::log(DT_(2)), tol);
   }
 
   void test_log10() const
   {
     // test exact
-    TEST_CHECK_EQUAL(Math::log10<double>(1.0), 0.0);
-    TEST_CHECK_EQUAL(Math::log10<double>(10.0), 1.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log10<DT_>(DT_(1)), DT_(0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log10<DT_>(DT_(10)), DT_(1), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log10<double>(0.5), std::log10(0.5), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log10<double>(2.0), std::log10(2.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log10<DT_>(DT_(0.5)), Math::log10(DT_(0.5)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::log10<DT_>(DT_(2)), Math::log10(DT_(2)), tol);
   }
 
   void test_pow() const
   {
     // test exact
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<double>(1.0, 1.0), 1.0, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<double>(2.0, 3.0), 8.0, tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<double>(4.0, 0.5), 2.0, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<DT_>(DT_(1), DT_(1)), DT_(1), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<DT_>(DT_(2), DT_(3)), DT_(8), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<DT_>(DT_(4), DT_(0.5)), DT_(2), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<double>(0.7, 3.1), std::pow(0.7, 3.1), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<double>(3.1, 0.7), std::pow(3.1, 0.7), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<DT_>(DT_(0.7), DT_(3.1)), Math::pow(DT_(0.7), DT_(3.1)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pow<DT_>(DT_(3.1), DT_(0.7)), Math::pow(DT_(3.1), DT_(0.7)), tol);
   }
 
   void test_atan() const
   {
     // test exact
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan<double>(0.0), 0.0, tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan<DT_>(DT_(0)), DT_(0), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan<double>( 1.5), std::atan( 1.5), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan<double>(-1.5), std::atan(-1.5), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan<DT_>( DT_(1.5)), Math::atan( DT_(1.5)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan<DT_>(-DT_(1.5)), Math::atan(-DT_(1.5)), tol);
   }
 
   void test_atan2() const
   {
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan2<double>(0.7, 3.1), std::atan2(0.7, 3.1), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan2<double>(3.1, 0.7), std::atan2(3.1, 0.7), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan2<DT_>(DT_(0.7), DT_(3.1)), Math::atan2(DT_(0.7), DT_(3.1)), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::atan2<DT_>(DT_(3.1), DT_(0.7)), Math::atan2(DT_(3.1), DT_(0.7)), tol);
   }
 
   void test_pi() const
   {
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pi<double>(), 2.0*std::acos(0.0), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::pi<DT_>(), DT_(2)*Math::acos(DT_(0)), tol);
   }
 
   void test_asin() const
   {
     // test exact
-    TEST_CHECK_EQUAL(Math::asin<double>(0.0), 0.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::asin<DT_>(DT_(0)), DT_(0), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::asin<double>(0.7), std::asin(0.7), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::asin<DT_>(DT_(0.7)), Math::asin(DT_(0.7)), tol);
   }
 
   void test_acos() const
   {
     // test exact
-    TEST_CHECK_EQUAL(Math::acos<double>(1.0), 0.0);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::acos<DT_>(DT_(1)), DT_(0), tol);
 
     // test against std
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::acos<double>(0.7), std::acos(0.7), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(Math::acos<DT_>(DT_(0.7)), Math::acos(DT_(0.7)), tol);
   }
+};
 
-} math_test;
+MathTest<double> math_test_double;
