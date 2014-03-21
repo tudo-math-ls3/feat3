@@ -28,6 +28,16 @@ SET (app_list
   stokes_vortex_2d
   )
 
+# only add mesh_smoother_*-app if ALGLIB is used
+if (FEAST_HAVE_ALGLIB)
+  SET (app_list
+    ${app_list}
+    mesh_smoother_bdry_deform-app
+    mesh_smoother_lvlset-app
+    mesh_smoother_resize-app
+  )
+endif (FEAST_HAVE_ALGLIB)
+
 FOREACH (app ${app_list} )
   ADD_EXECUTABLE(${app} ${app}.cpp)
   TARGET_LINK_LIBRARIES(${app} feast)
