@@ -18,43 +18,6 @@ from cmake_modules.feast_util import get_output_utf8
 
 sys.dont_write_bytecode = True
 
-src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
-myDB = pw.MySQLDatabase("feastdash", host="augias", port=3306, user="feastdash", passwd="feastdash", threadlocals=True)
-myDB.connect()
-
-class MySQLModel(pw.Model):
-  """A base model that will use our MySQL database"""
-  class Meta:
-    database = myDB
-
-class User(MySQLModel):
-  username = pw.CharField()
-
-class BranchQueue(MySQLModel):
-  branch = pw.CharField()
-
-class Run(MySQLModel):
-  branch = pw.CharField()
-  hostname = pw.CharField()
-  build = pw.CharField()
-  starttime = pw.IntegerField()
-  endtime = pw.IntegerField()
-  notes = pw.TextField()
-
-class Message(MySQLModel):
-  runid = pw.ForeignKeyField(Run, related_name="messages", db_column="runid")
-  stage = pw.CharField()
-  status = pw.CharField()
-  timestamp = pw.IntegerField()
-  title = pw.CharField()
-  body = pw.TextField()
-
-class Attachment(MySQLModel):
-  messageid = pw.ForeignKeyField(Message, related_name="attachments", db_column="messageid")
-  name = pw.CharField()
-  mimetype = pw.CharField()
-  data = pw.BlobField()
-
 def run_test(build_id, branch, myDB):
   failed = False
   hostname = socket.gethostname()
@@ -138,7 +101,7 @@ def run_test(build_id, branch, myDB):
   process_compiler_output("warning", make_output)
   process_compiler_output("error", make_output)
   if dump_filename != "":
-    dump_file.write"\nmake -j 4 -O -k all tests\n\n"
+    dump_file.write("\nmake -j 4 -O -k all tests\n\n")
     dump_file.write("\n".join(make_output))
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
@@ -183,7 +146,7 @@ def run_test(build_id, branch, myDB):
       idx += 1
 
   if dump_filename != "":
-    dump_file.write"\nctest --output-on-failure --schedule-random\n\n"
+    dump_file.write("\nctest --output-on-failure --schedule-random\n\n")
     dump_file.write("\n".join(test_output))
     dump_file.close()
 
@@ -200,15 +163,62 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("This python scripts starts regression tests and submits them to a cdash server")
   print ("Options:")
   print ("dump=absolute_path")
-  print ("  dump complete make/ctest output into file given with absolute path, the filename is extended by run specific identifiers")
+  print ("  dump complete make/ctest output into file given with absolute path, the filename is extended by run specific identifiers.")
+  print ("sqlhost=hostname")
+  print ("  set hostname as server that runs the sql daemon.")
+  print ("sqlport=port")
+  print ("  setup port of sql server.")
   sys.exit();
 
 dump_filename = ""
+sqlhost = "augias"
+sqlport = 3306
 
 for i in range(1, len(sys.argv)):
-  #buildid_string += sys.argv[i] + "-"
   if sys.argv[i].startswith("dump="):
     dump_filename = sys.argv[i].replace("dump=", "", 1)
+  if sys.argv[i].startswith("sqlhost="):
+    sqlhost = sys.argv[i].replace("sqlhost=", "", 1)
+  if sys.argv[i].startswith("sqlport="):
+    sqlport = int(sys.argv[i].replace("sqlport=", "", 1))
+
+src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
+myDB.connect()
+
+class MySQLModel(pw.Model):
+  """A base model that will use our MySQL database"""
+  class Meta:
+    database = myDB
+
+class User(MySQLModel):
+  username = pw.CharField()
+
+class BranchQueue(MySQLModel):
+  branch = pw.CharField()
+
+class Run(MySQLModel):
+  branch = pw.CharField()
+  hostname = pw.CharField()
+  build = pw.CharField()
+  starttime = pw.IntegerField()
+  endtime = pw.IntegerField()
+  notes = pw.TextField()
+
+class Message(MySQLModel):
+  runid = pw.ForeignKeyField(Run, related_name="messages", db_column="runid")
+  stage = pw.CharField()
+  status = pw.CharField()
+  timestamp = pw.IntegerField()
+  title = pw.CharField()
+  body = pw.TextField()
+
+class Attachment(MySQLModel):
+  messageid = pw.ForeignKeyField(Message, related_name="attachments", db_column="messageid")
+  name = pw.CharField()
+  mimetype = pw.CharField()
+  data = pw.BlobField()
+
 
 if not is_found("cmake"):
   print ("cmake not found! aborting...")
