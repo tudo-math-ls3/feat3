@@ -557,8 +557,8 @@ namespace FEAST
       template<typename First_, typename... Rest_>
       static void _set_vec(const TupleVector<First_, Rest_...> & vec, typename First_::DataType * pval_set)
       {
-        _set_vec(vec.template at<0>(), pval_set);
-        _set_vec(vec.template at<1>(), pval_set + vec.template at<0>().size());
+        _set_vec(vec.first(), pval_set);
+        _set_vec(vec.rest(), pval_set + vec.first().size());
       }
 
       template<typename First_>
