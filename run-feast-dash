@@ -58,6 +58,10 @@ class Attachment(MySQLModel):
 def run_test(build_id, branch, myDB):
   failed = False
   hostname = socket.gethostname()
+
+  if dump_filename != "":
+    dump_file = open(dump_filename+"-"+hostname+"-"+branch+"-"+build_id, "w")
+
   os.chdir(src_dirname)
   build_dirname = src_dirname + os.sep + "build"
 
@@ -133,6 +137,9 @@ def run_test(build_id, branch, myDB):
   make_output = get_output_utf8("make -j 4 -O -k all tests")
   process_compiler_output("warning", make_output)
   process_compiler_output("error", make_output)
+  if dump_filename != "":
+    dump_file.write"\nmake -j 4 -O -k all tests\n\n"
+    dump_file.write("\n".join(make_output))
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
   if is_found("sync"):
@@ -175,6 +182,11 @@ def run_test(build_id, branch, myDB):
     else:
       idx += 1
 
+  if dump_filename != "":
+    dump_file.write"\nctest --output-on-failure --schedule-random\n\n"
+    dump_file.write("\n".join(test_output))
+    dump_file.close()
+
   r.endtime = time.time()
   r.save()
 
@@ -182,11 +194,21 @@ def run_test(build_id, branch, myDB):
 
 ################## MAIN ######################
 
-#TODO help, ? und guess nicht in sys.argv[0] suchen
+#TODO help, ? und nicht in sys.argv[0] suchen
 # output help screen
 if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.argv)):
   print ("This python scripts starts regression tests and submits them to a cdash server")
-  sys.exit()
+  print ("Options:")
+  print ("dump=absolute_path")
+  print ("  dump complete make/ctest output into file given with absolute path, the filename is extended by run specific identifiers")
+  sys.exit();
+
+dump_filename = ""
+
+for i in range(1, len(sys.argv)):
+  #buildid_string += sys.argv[i] + "-"
+  if sys.argv[i].startswith("dump="):
+    dump_filename = sys.argv[i].replace("dump=", "", 1)
 
 if not is_found("cmake"):
   print ("cmake not found! aborting...")
