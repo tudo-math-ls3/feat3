@@ -43,8 +43,8 @@ class UnitTest
 {
 public:
   /// Constructor
-  UnitTest(const String & id)
-    : BaseTest(id)
+  UnitTest(const String & id_in)
+    : BaseTest(id_in)
   {
   }
 
@@ -82,8 +82,8 @@ class TaggedUnitTest
 {
 public:
   /// Constructor
-  TaggedUnitTest(const String & id)
-    : TaggedTest<Tag_, DT_>(id)
+  TaggedUnitTest(const String & id_in)
+    : TaggedTest<Tag_, DT_>(id_in)
   {
   }
 

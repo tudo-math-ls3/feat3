@@ -1259,19 +1259,19 @@ namespace FEAST
         /** \copydoc Adjactor::get_num_nodes_domain() */
         const inline Index & get_num_nodes_domain() const
         {
-          return _rows();
+          return rows();
         }
 
         /** \copydoc Adjactor::get_num_nodes_image() */
         const inline Index & get_num_nodes_image() const
         {
-          return _columns();
+          return columns();
         }
 
         /** \copydoc Adjactor::image_begin() */
         inline ImageIterator image_begin(Index domain_node) const
         {
-          ASSERT(domain_node < _rows(), "Domain node index out of range");
+          ASSERT(domain_node < rows(), "Domain node index out of range");
           return &this->_indices.at(0)[this->_indices.at(1)[domain_node]];
         }
 
@@ -1279,7 +1279,7 @@ namespace FEAST
         inline ImageIterator image_end(Index domain_node) const
         {
           CONTEXT("Graph::image_end()");
-          ASSERT(domain_node < _rows(), "Domain node index out of range");
+          ASSERT(domain_node < rows(), "Domain node index out of range");
           return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
         }
     };

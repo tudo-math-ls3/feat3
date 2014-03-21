@@ -51,9 +51,9 @@ def configure_icc(cpu, buildmode):
     elif cpu == "sandybridge":
       cxxflags += " -xAVX"
     elif cpu == "ivybridge":
-      cxxflags += " -xAVX"
+      cxxflags += " -xCORE-AVX-I"
     elif cpu == "haswell":
-      cxxflags += " -aCORE-AVX2"
+      cxxflags += " -xCORE-AVX2"
     elif cpu == "itanium":
       # no setting necessary, the itanium version of the intel compiler
       # sets everything automatically
