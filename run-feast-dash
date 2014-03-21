@@ -70,10 +70,8 @@ def run_test(build_id, branch, myDB):
   #prepare build dir
   shutil.rmtree(build_dirname, True)
   os.mkdir(build_dirname)
-  os.chdir(build_dirname)
 
   #git pull
-  os.chdir(src_dirname)
   git_output = get_output("git gc --auto")
   git_output += get_output("git checkout -f --no-track -B test123" + hostname + " origin/" + branch)
   git_output.append("git HEAD:")
@@ -101,40 +99,36 @@ def run_test(build_id, branch, myDB):
 
 ######### MAKE ###############
   def process_compiler_output(token, output):
-    failed = False
     last_idx = 0
     part_name = ""
     idx = 0
-    while idx < len(make_output):
+    while idx < len(output):
       #search for building blocks aka all output corresonponding to one build target
-      if "Building" in make_output[idx]:
+      if "Building" in output[idx] or "Linking" in output[idx]:
         last_idx = idx
-        part_name = make_output[idx].split("/")[-1]
+        part_name = output[idx].split("/")[-1]
         part_name = part_name.split(".o")[0]
         idx += 1
 
       # error/warning in building block
-      elif token+":" in make_output[idx].lower() or token+" #" in make_output[idx].lower():
-        failed = True
+      elif token+":" in output[idx].lower() or token+" #" in output[idx].lower():
         #search for end of block
-        iend = len(make_output)
-        for i in range(idx, len(make_output)):
-          if "Building" in make_output[i]:
+        iend = len(output)
+        for i in range(idx, len(output)):
+          if "Building" in output[i] or "Linking" in output[idx]:
             iend = i
             break
         idx = iend
         #end of block found, dump corresponding lines to message
         part_output = ""
         for j in range(last_idx, idx):
-          part_output += make_output[j] + "\n"
+          part_output += output[j] + "\n"
 
         m = Message.create(runid=r, stage="build", status=token, timestamp=time.time(), title=part_name, body=part_output)
         m.save()
-        last_idx = idx
 
       else:
         idx += 1
-    return failed
 
   make_output = get_output_utf8("make -j 4 -O -k all tests")
   process_compiler_output("warning", make_output)
