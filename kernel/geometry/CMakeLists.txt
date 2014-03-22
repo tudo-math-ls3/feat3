@@ -31,6 +31,7 @@ SET (test_list
 # create all tests
 FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
+  ADD_DEPENDENCIES(${test} kernel-geometry-test-aux)
   TARGET_LINK_LIBRARIES(${test} feast test_system kernel-geometry-test-aux)
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
     --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
