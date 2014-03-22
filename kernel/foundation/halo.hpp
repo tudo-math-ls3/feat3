@@ -44,14 +44,14 @@ namespace FEAST
 
         ///CTOR from buffer
         template<typename BufferType_>
-        HaloBase(const BufferType_& buffer, MeshType_& new_mesh, index_type_ new_other_rank) :
+        HaloBase(const BufferType_& b, MeshType_& new_mesh, index_type_ new_other_rank) :
           _halo_elements(),
           _mesh(&new_mesh),
           _other(new_other_rank)
         {
-          for(index_type_ i(0) ; i < buffer.size() ; ++i)
+          for(index_type_ i(0) ; i < b.size() ; ++i)
           {
-            _halo_elements.push_back(buffer.get_element(i));
+            _halo_elements.push_back(b.get_element(i));
           }
         }
 
@@ -142,21 +142,21 @@ namespace FEAST
           return result;
         }
 
-        virtual void to_buffer(BufferedData<BufferStorageType_>& buffer)
+        virtual void to_buffer(BufferedData<BufferStorageType_>& b)
         {
           for(index_type_ i(0) ; i < _halo_elements.size() ; ++i)
           {
-            (*(BufferedSharedArray<index_type_>*)((buffer.get().at(1).get())))[i] = _halo_elements.at(i);
+            (*(BufferedSharedArray<index_type_>*)((b.get().at(1).get())))[i] = _halo_elements.at(i);
           }
         }
 
-        virtual void from_buffer(const BufferedData<BufferStorageType_>& buffer)
+        virtual void from_buffer(const BufferedData<BufferStorageType_>& b)
         {
           _halo_elements.clear();
 
-          for(index_type_ i(0) ; i < (*(BufferedSharedArray<index_type_>*)((buffer.get().at(0).get())))[1] ; ++i)
+          for(index_type_ i(0) ; i < (*(BufferedSharedArray<index_type_>*)((b.get().at(0).get())))[1] ; ++i)
           {
-            _halo_elements.push_back( (*(BufferedSharedArray<index_type_>*)((buffer.get().at(1).get())))[i] );
+            _halo_elements.push_back( (*(BufferedSharedArray<index_type_>*)((b.get().at(1).get())))[i] );
           }
         }
 

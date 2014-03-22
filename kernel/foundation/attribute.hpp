@@ -129,20 +129,20 @@ namespace FEAST
           return result;
         }
 
-        virtual void to_buffer(BufferedData<StorageType_>& buffer)
+        virtual void to_buffer(BufferedData<StorageType_>& b)
         {
           for(Index i(0) ; i < (Index)(_data.size()) ; ++i)
           {
-            (*(BufferedSharedArray<DataType_>*)((buffer.get().at(1).get())))[i] = _data.at(i);
+            (*(BufferedSharedArray<DataType_>*)((b.get().at(1).get())))[i] = _data.at(i);
           }
         }
 
-        virtual void from_buffer(const BufferedData<StorageType_>& buffer)
+        virtual void from_buffer(const BufferedData<StorageType_>& b)
         {
           _data.clear();
-          for(Index i(0) ; i < (*(BufferedSharedArray<Index>*)((buffer.get().at(0).get())))[1] ; ++i)
+          for(Index i(0) ; i < (*(BufferedSharedArray<Index>*)((b.get().at(0).get())))[1] ; ++i)
           {
-            _data.push_back( (DataType_)(*(BufferedSharedArray<DataType_>*)((buffer.get().at(1).get())))[i] );
+            _data.push_back( (DataType_)(*(BufferedSharedArray<DataType_>*)((b.get().at(1).get())))[i] );
           }
         }
 

@@ -202,7 +202,7 @@ namespace FEAST
           return result;
         }
 
-        virtual void to_buffer(BufferedData<OuterStorageType_>& buffer)
+        virtual void to_buffer(BufferedData<OuterStorageType_>& b)
         {
           IndexType_ head(0);
 
@@ -210,24 +210,24 @@ namespace FEAST
           {
             for(IndexType_ j(0) ; j < _topology.at(i).size() ; ++j)
             {
-              (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(2).get())))[head] = _topology.at(i).at(j);
+              (*(BufferedSharedArray<IndexType_>*)((b.get().at(2).get())))[head] = _topology.at(i).at(j);
               ++head;
             }
           }
         }
 
-        virtual void from_buffer(const BufferedData<OuterStorageType_>& buffer)
+        virtual void from_buffer(const BufferedData<OuterStorageType_>& b)
         {
           _topology.clear();
 
           //IndexType_ left(0);
           IndexType_ head(0);
-          for(Index i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(0).get())))[1] ; ++i) //times the real #polytopes
+          for(Index i(0) ; i < (*(BufferedSharedArray<IndexType_>*)((b.get().at(0).get())))[1] ; ++i) //times the real #polytopes
           {
             push_back();
-            for(Index j(0) ; j < (*(BufferedSharedArray<IndexType_>*)((buffer.get().at(1).get())))[i]; ++j)
+            for(Index j(0) ; j < (*(BufferedSharedArray<IndexType_>*)((b.get().at(1).get())))[i]; ++j)
             {
-              _topology.at(i).push_back((*(BufferedSharedArray<IndexType_>*)((buffer.get().at(2).get())))[head]);
+              _topology.at(i).push_back((*(BufferedSharedArray<IndexType_>*)((b.get().at(2).get())))[head]);
               ++head;
             }
           }

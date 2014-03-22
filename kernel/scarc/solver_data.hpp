@@ -400,8 +400,8 @@ namespace FEAST
 
       protected:
         ///CTORs to be used in subclasses, moves data into interface
-        PreconditionerDataContainer(precon_type_&& precon) :
-          _stored_precon(std::move(precon))
+        PreconditionerDataContainer(precon_type_&& p) :
+          _stored_precon(std::move(p))
         {
         }
 
@@ -858,8 +858,8 @@ namespace FEAST
 
       protected:
         ///CTORs to be used in subclasses
-        FilterDataContainer(filter_type_&& filter) :
-          _stored_filter(std::move(filter))
+        FilterDataContainer(filter_type_&& f) :
+          _stored_filter(std::move(f))
         {
         }
 
@@ -932,12 +932,12 @@ namespace FEAST
                                                    PreconContType_<MemTag_, DataType_, IT_>&& P,
                                                    vector_type_&& x,
                                                    vector_type_&& b,
-                                                   FilterType_<MemTag_, DataType_>&& filter,
+                                                   FilterType_<MemTag_, DataType_>&& f,
                                                    IT_ num_temp_vectors = 0,
                                                    IT_ num_temp_scalars = 0,
                                                    IT_ num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(A), std::move(x), std::move(b), num_temp_vectors, num_temp_scalars, num_temp_indices),
-        FilterDataContainer<DataType_, MemTag_, FilterType_>(std::move(filter)),
+        FilterDataContainer<DataType_, MemTag_, FilterType_>(std::move(f)),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(std::move(P)),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
