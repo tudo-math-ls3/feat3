@@ -12,7 +12,7 @@ def configure_clang(cpu, buildmode):
 
   cxxflags = "-pipe  -Wno-unused-parameter -std=c++11 -ggdb -fcolor-diagnostics -m64"
   if "debug" in buildmode:
-    cxxflags += " -O0 -Wall -Wextra -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wno-unused-value"
+    cxxflags += " -O0 -Wall -Wextra -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wno-unused-value  -fdiagnostics-show-template-tree -fdiagnostics-show-category=name"
   elif "opt" in buildmode:
     cxxflags += " -O3"
     if cpu == "unknown":
