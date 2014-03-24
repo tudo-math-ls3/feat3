@@ -1421,8 +1421,8 @@ namespace FEAST
               vjl_tmp.resize(Index(it - vjl_tmp.begin()));
               typename t_::storage_type_ v_center_tmp;
               v_center_tmp.push_back(origin.num_polytopes(pl_vertex) - 1);
-              typename t_::storage_type_::iterator itu(std::set_difference(vjl_tmp.begin(), vjl_tmp.end(), v_center_tmp.begin(), v_center_tmp.end(), vjl.begin()));
-              vjl.resize(Index(itu - vjl.begin()));
+              typename t_::storage_type_::iterator itu1(std::set_difference(vjl_tmp.begin(), vjl_tmp.end(), v_center_tmp.begin(), v_center_tmp.end(), vjl.begin()));
+              vjl.resize(Index(itu1 - vjl.begin()));
 
               if(vjl.size() > 0)
               {
@@ -1469,8 +1469,8 @@ namespace FEAST
                   std::sort(f_pnew_add.begin(),f_pnew_add.end());
 
                   typename t_::storage_type_ f_pnew_tmp(f_pnew.size()+f_pnew_add.size());
-                  typename t_::storage_type_::iterator itu(std::set_union(f_pnew_add.begin(), f_pnew_add.end(), f_pnew.begin(), f_pnew.end(), f_pnew_tmp.begin()));
-                  f_pnew_tmp.resize(Index(itu - f_pnew_tmp.begin()));
+                  typename t_::storage_type_::iterator itu2(std::set_union(f_pnew_add.begin(), f_pnew_add.end(), f_pnew.begin(), f_pnew.end(), f_pnew_tmp.begin()));
+                  f_pnew_tmp.resize(Index(itu2 - f_pnew_tmp.begin()));
 
                   f_pnew = f_pnew_tmp;
                 }
@@ -1560,8 +1560,8 @@ namespace FEAST
           }
 
           DataType_ vol(0), c_x(0), c_y(0), c_z(0);
-          Index num_faces(coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i).size());
-          for(Index j(0) ; j < num_faces; j++)
+          Index num_faces1(coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i).size());
+          for(Index j(0) ; j < num_faces1; j++)
           {
             //sorting
             vertex_at_polygon = coarse.get_adjacent_polytopes(pl_face, pl_vertex, j);
@@ -1607,13 +1607,13 @@ namespace FEAST
               double n[3];
               DataType_ areak(0);
               n[0] = (origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(1).at(vertex_at_polygon.at(k)))
-                   * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) - origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) - origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
+                   * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
                    * (origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(2).at(vertex_at_polygon.at(k)));
               n[1] = (origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(2).at(vertex_at_polygon.at(k)))
-                   * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) - origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) - origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
+                   * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
                    * (origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(0).at(vertex_at_polygon.at(k)));
               n[2] = (origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(0).at(vertex_at_polygon.at(k)))
-                   * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) - origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) - origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
+                   * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))) - (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) - origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
                    * (origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)) - origin_coords.at(1).at(vertex_at_polygon.at(k)));
 
               areak= origin_coords.at(0).at(vertex_at_polygon.at(k)) * n[0] + origin_coords.at(1).at(vertex_at_polygon.at(k)) * n[1] + origin_coords.at(2).at(vertex_at_polygon.at(k)) * n[2];
@@ -1623,24 +1623,24 @@ namespace FEAST
 
               c_x += n[0] * (((origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
                             * (origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)))
-                            * (origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)))) );
+                           + ((origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices)))
+                            * (origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(0).at(vertex_at_polygon.at((k + 1) % num_vertices))))
+                           + ((origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))
+                            * (origin_coords.at(0).at(vertex_at_polygon.at(k)) + origin_coords.at(0).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))) );
 
               c_y += n[1] * (((origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
                             * (origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)))
-                            * (origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)))) );
+                           + ((origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices)))
+                            * (origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(1).at(vertex_at_polygon.at((k + 1) % num_vertices))))
+                           + ((origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))
+                            * (origin_coords.at(1).at(vertex_at_polygon.at(k)) + origin_coords.at(1).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))) );
 
               c_z += n[2] * (((origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
                             * (origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices))))
-                           + ((origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) + origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
-                            * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)) + origin_coords.at(2).at(vertex_at_polygon.at(( k + 1) % num_vertices))))
-                           + ((origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)))
-                            * (origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces - j + 1)))) );
+                           + ((origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(2).at(vertex_at_polygon.at((k + 1) % num_vertices)))
+                            * (origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)) + origin_coords.at(2).at(vertex_at_polygon.at(( k + 1) % num_vertices))))
+                           + ((origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))
+                            * (origin_coords.at(2).at(vertex_at_polygon.at(k)) + origin_coords.at(2).at(origin.num_polytopes(pl_vertex) - (num_faces1 - j + 1)))) );
              }
 
            }
