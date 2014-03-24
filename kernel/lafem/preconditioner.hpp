@@ -601,8 +601,8 @@ namespace FEAST
         _A(A),
         _m(m),
         _aux1(_A.rows()),
-        _aux2(_A.rows()),
-        _aux3(_A.rows()),
+        _aux2(),
+        _aux3(),
         _precond(precond)
       {
         if (_A.columns() != _A.rows())
@@ -654,15 +654,45 @@ namespace FEAST
          *   ||I - \tilde M^{-1} A||_2 < 1.
          */
 
-        _precond->apply(out, in);
-        _aux3.copy(out);
-
-        for (Index i = 1; i <= _m; ++i)
+        if (typeid(*_precond) ==typeid(NonePreconditioner<Algo_, MT_, VT_>)) // if preconditioner = NonePreconditioner
         {
-          _A.template apply<Algo_>(_aux1, out);
-          _precond->apply(_aux2, _aux1);
-          out.template axpy<Algo_>(out, _aux3);
-          out.template axpy<Algo_>(_aux2, out, DataType(-1.0));
+          VT_ * pauxs[2];
+
+          if (_m%2 == 0)
+          {
+            pauxs[0] = &out;
+            pauxs[1] = &_aux1;
+          }
+          else
+          {
+            pauxs[1] = &out;
+            pauxs[0] = &_aux1;
+          }
+
+          pauxs[0]->copy(in);
+
+          for (Index i = 1; i <= _m; ++i)
+          {
+            pauxs[i%2]->template axpy<Algo_>(in, *pauxs[(i-1)%2]);
+            _A.template apply<Algo_>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
+          }
+        }
+        else if (typeid(*_precond) ==typeid(NonePreconditioner<Algo_, MT_, VT_>)) // if preconditioner = JacobiPreconditioner
+        {
+          // TODO
+        }
+        else // if another preconditioner
+        {
+          _precond->apply(out, in);
+          _aux3.copy(out);
+
+          for (Index i = 1; i <= _m; ++i)
+          {
+            _A.template apply<Algo_>(_aux1, out);
+            _precond->apply(_aux2, _aux1);
+            out.template axpy<Algo_>(out, _aux3);
+            out.template axpy<Algo_>(_aux2, out, DataType(-1.0));
+          }
         }
       } // function apply
     };
