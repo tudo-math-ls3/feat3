@@ -555,17 +555,27 @@ namespace FEAST
        * TupleVector
        */
       template<typename First_, typename Second_, typename... Rest_>
-      static void _set_vec(const TupleVector<First_, Second_, Rest_...> & vec, typename First_::DataType * pval_set)
+      static void _set_vec(const TupleVector<First_, Second_, Rest_...> & vec, typename TupleVector<First_, Second_, Rest_...>::DataType * pval_set)
       {
         _set_vec(vec.first(), pval_set);
         _set_vec(vec.rest(), pval_set + vec.first().size());
       }
 
+#ifdef FEAST_COMPILER_MICROSOFT
+      // compiler hack...
+      template<typename... First_>
+      static void _set_vec(const TupleVector<First_...> & vec, typename TupleVector<First_...>::DataType * pval_set)
+      {
+        static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
+        _set_vec(vec.first(), pval_set);
+      }
+#else // all other compilers
       template<typename First_>
-      static void _set_vec(const TupleVector<First_> & vec, typename First_::DataType * pval_set)
+      static void _set_vec(const TupleVector<First_> & vec, typename TupleVector<First_>::DataType * pval_set)
       {
         _set_vec(vec.first(), pval_set);
       }
+#endif
 
     public:
       /**
