@@ -578,9 +578,7 @@ namespace FEAST
        *
        * param[in] A system-matrix
        * param[in] m order of the polynom
-       * param[in] bscale optional paramter: true convergence of neumann-series
-       *                                     for strict diagonaldominant matrices
-       *                                     false (default), dont scale at all
+       * param[in] precond A preconditioner used for the Polynomial preconditioner
        *
        * Creates a Polynomial preconditioner to the given matrix and the given order
        */
@@ -597,6 +595,36 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
         }
       }
+
+      /// \cond internal
+      PolynomialPreconditioner(const MT_ & A, Index m, NonePreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(_A.rows()),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      PolynomialPreconditioner(const MT_ & A, Index m, JacobiPreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(_A.rows()),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+      /// \endcond
 
       /**
        * \brief Returns a descriptive string.
