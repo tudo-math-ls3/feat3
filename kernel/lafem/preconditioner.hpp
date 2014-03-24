@@ -663,25 +663,16 @@ namespace FEAST
 
         if (_num_of_auxs == 1) // if preconditioner = NonePreconditioner
         {
-          VT_ * pauxs[2];
-
-          if (_m%2 == 0)
-          {
-            pauxs[0] = &out;
-            pauxs[1] = &_aux1;
-          }
-          else
-          {
-            pauxs[1] = &out;
-            pauxs[0] = &_aux1;
-          }
-
-          pauxs[0]->copy(in);
+          out.copy(in);
 
           for (Index i = 1; i <= _m; ++i)
           {
-            pauxs[i%2]->template axpy<Algo_>(in, *pauxs[(i-1)%2]);
-            _A.template apply<Algo_>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
+            // _A.template apply<Algo_>(_aux1, in, out, DataType(-1.0));
+            // out.template axpy<Algo_>(out, _aux1);
+
+            _A.template apply<Algo_>(_aux1, out);
+            out.template axpy<Algo_>(out, in);
+            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
           }
         }
         else if (_num_of_auxs == 2) // if out and in can be the same vectors
