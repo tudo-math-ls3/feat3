@@ -544,9 +544,13 @@ namespace FEAST
       typedef typename MT_::MemType Mem_;
       typedef typename MT_::DataType DT_;
 
-      const MT_ & _A;          // system-matrix
-      Index _m;                // order m of preconditioner
-      VT_ _aux1, _aux2, _aux3; // auxilary-vector
+      const MT_ & _A;                              // system-matrix
+      const Index _m;                              // order m of preconditioner
+      const Index _num_of_auxs;                    // number of auxilary-vectors
+                                                   // 1 for NonePreconditioner
+                                                   // 2 if out and in can be the same vectors for _precon.apply
+                                                   // 3 else
+      VT_ _aux1, _aux2, _aux3;                     // auxilary-vector
       Preconditioner<Algo_, MT_, VT_> * _precond;
 
     public:
@@ -585,6 +589,7 @@ namespace FEAST
       PolynomialPreconditioner(const MT_ & A, Index m, Preconditioner<Algo_, MT_, VT_> * precond) :
         _A(A),
         _m(m),
+        _num_of_auxs(3),
         _aux1(_A.rows()),
         _aux2(_A.rows()),
         _aux3(_A.rows()),
@@ -600,6 +605,7 @@ namespace FEAST
       PolynomialPreconditioner(const MT_ & A, Index m, NonePreconditioner<Algo_, MT_, VT_> * precond) :
         _A(A),
         _m(m),
+        _num_of_auxs(1),
         _aux1(_A.rows()),
         _aux2(),
         _aux3(),
@@ -614,9 +620,10 @@ namespace FEAST
       PolynomialPreconditioner(const MT_ & A, Index m, JacobiPreconditioner<Algo_, MT_, VT_> * precond) :
         _A(A),
         _m(m),
+        _num_of_auxs(2),
         _aux1(_A.rows()),
         _aux2(_A.rows()),
-        _aux3(_A.rows()),
+        _aux3(),
         _precond(precond)
       {
         if (_A.columns() != _A.rows())
@@ -654,7 +661,7 @@ namespace FEAST
          *   ||I - \tilde M^{-1} A||_2 < 1.
          */
 
-        if (typeid(*_precond) ==typeid(NonePreconditioner<Algo_, MT_, VT_>)) // if preconditioner = NonePreconditioner
+        if (_num_of_auxs == 1) // if preconditioner = NonePreconditioner
         {
           VT_ * pauxs[2];
 
@@ -677,11 +684,20 @@ namespace FEAST
             _A.template apply<Algo_>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
           }
         }
-        else if (typeid(*_precond) ==typeid(NonePreconditioner<Algo_, MT_, VT_>)) // if preconditioner = JacobiPreconditioner
+        else if (_num_of_auxs == 2) // if out and in can be the same vectors
         {
-          // TODO
+          _precond->apply(out, in);
+          _aux2.copy(out);
+
+          for (Index i = 1; i <= _m; ++i)
+          {
+            _A.template apply<Algo_>(_aux1, out);
+            _precond->apply(_aux1, _aux1);
+            out.template axpy<Algo_>(out, _aux2);
+            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
+          }
         }
-        else // if another preconditioner
+        else // if out and in must be different vectors
         {
           _precond->apply(out, in);
           _aux3.copy(out);
