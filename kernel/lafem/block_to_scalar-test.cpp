@@ -230,7 +230,8 @@ public:
     Index size(mat_sys_scalar.rows());
     VT_ x(size, DT_(1));
     VT_ ref(VecBlockToScalar<Algo_>::value(vec_sol));
-    VT_ ref_local(ref);
+    VT_ ref_local;
+    ref_local.convert(ref);
     VT_ b(size);
     mat_sys_scalar.template apply<Algo_>(b, ref);
 

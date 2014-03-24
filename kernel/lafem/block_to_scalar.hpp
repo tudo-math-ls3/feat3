@@ -68,7 +68,7 @@ namespace FEAST
       template<typename DT_>
       static Index _get_length_of_line(const SparseMatrixCOO<Mem::Main, DT_> & matrix, const Index row)
       {
-        const Index * prow(matrix.row());
+        const Index * prow(matrix.row_indices());
         const Index used_elements(matrix.used_elements());
 
         Index i(0);
@@ -89,8 +89,8 @@ namespace FEAST
       static void _set_line(const SparseMatrixCOO<Mem::Main, DT_> & matrix,
                             const Index row, DT_ * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
       {
-        const Index * prow(matrix.row());
-        const Index * pcol(matrix.column());
+        const Index * prow(matrix.row_indices());
+        const Index * pcol(matrix.column_indices());
         const DT_ * pval(matrix.val());
 
         const Index used_elements(matrix.used_elements());
