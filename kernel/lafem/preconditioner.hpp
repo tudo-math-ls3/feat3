@@ -153,7 +153,7 @@ namespace FEAST
        *
        * Creates a Jacobi preconditioner to the given matrix and damping-parameter
        */
-      JacobiPreconditioner(const MT_ & A, const typename VT_::DataType damping) :
+      JacobiPreconditioner(const MT_ & A, const typename VT_::DataType damping = DataType(1)) :
         _jac(A.rows())
       {
         if (A.columns() != A.rows())
@@ -248,7 +248,7 @@ namespace FEAST
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
       GaussSeidelPreconditioner(const SparseMatrixCSR<Mem_, DT_> & A,
-                                const DT_ damping) :
+                                const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -355,7 +355,7 @@ namespace FEAST
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
       GaussSeidelPreconditioner(const SparseMatrixCOO<Mem_, DT_> & A,
-                                const DT_ damping) :
+                                const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -465,7 +465,7 @@ namespace FEAST
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
        */
       GaussSeidelPreconditioner(const SparseMatrixELL<Mem_, DT_> & A,
-                                const DT_ damping) :
+                                const DT_ damping = DT_(1)) :
         _damping(damping),
         _A(A)
       {
@@ -578,7 +578,7 @@ namespace FEAST
       }
 
       /**
-       * \brief Constuctor of Neumann-Polynomial-Preconditioner.
+       * \brief Constructor of Neumann-Polynomial-Preconditioner.
        *
        * param[in] A system-matrix
        * param[in] m order of the polynom
