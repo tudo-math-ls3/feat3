@@ -2390,6 +2390,7 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
+    /// \cond internal
     namespace Intern
     {
       template <typename Algo_, typename MT_, typename VT_>
@@ -3118,6 +3119,7 @@ namespace FEAST
         } // function apply_m_transpose
       };
     } // namespace Intern
+    /// \endcond
 
 
     template <typename Algo_, typename MT_, typename VT_>
