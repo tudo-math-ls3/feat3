@@ -21,8 +21,31 @@ namespace FEAST
       struct DotProduct<Mem::Main, Algo::Generic>
       {
         template <typename DT_>
-        static DT_ value(const DT_ * const x, const DT_ * const y, const Index size);
+        static DT_ value(const DT_ * const x, const DT_ * const y, const Index size)
+        {
+          DT_ r(0);
+
+          if(x == y)
+          {
+            for (Index i(0) ; i < size ; ++i)
+            {
+              r += x[i] * x[i];
+            }
+          }
+          else
+          {
+            for (Index i(0) ; i < size ; ++i)
+            {
+              r += x[i] * y[i];
+            }
+          }
+
+          return r;
+        }
       };
+
+      extern template float DotProduct<Mem::Main, Algo::Generic>::value(const float * const, const float * const, const Index);
+      extern template double DotProduct<Mem::Main, Algo::Generic>::value(const double * const, const double * const, const Index);
 
       template <>
       struct DotProduct<Mem::Main, Algo::MKL>

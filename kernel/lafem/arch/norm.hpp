@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/util/math.hpp>
 
 #include <cmath>
 
@@ -22,8 +23,20 @@ namespace FEAST
       struct Norm2<Mem::Main, Algo::Generic>
       {
         template <typename DT_>
-        static DT_ value(const DT_ * const x, const Index size);
+        static DT_ value(const DT_ * const x, const Index size)
+        {
+          DT_ r(0);
+          for (Index i(0) ; i < size ; ++i)
+          {
+            r += x[i] * x[i];
+          }
+
+          return (DT_)Math::sqrt(r);
+        }
       };
+
+      extern template float Norm2<Mem::Main, Algo::Generic>::value(const float * const, const Index);
+      extern template double Norm2<Mem::Main, Algo::Generic>::value(const double * const, const Index);
 
       template <>
       struct Norm2<Mem::Main, Algo::MKL>

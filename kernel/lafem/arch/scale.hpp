@@ -20,8 +20,27 @@ namespace FEAST
       struct Scale<Mem::Main, Algo::Generic>
       {
         template <typename DT_>
-        static void value(DT_ * r, const DT_ * const x, const DT_, const Index size);
+        static void value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
+        {
+          if (x == r)
+          {
+            for (Index i(0) ; i < size ; ++i)
+            {
+              r[i] *= s;
+            }
+          }
+          else
+          {
+            for (Index i(0) ; i < size ; ++i)
+            {
+              r[i] = x[i] * s;
+            }
+          }
+        }
       };
+
+      extern template void Scale<Mem::Main, Algo::Generic>::value(float *, const float * const, const float, const Index);
+      extern template void Scale<Mem::Main, Algo::Generic>::value(double *, const double * const, const double, const Index);
 
       template <>
       struct Scale<Mem::Main, Algo::MKL>
