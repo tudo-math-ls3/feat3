@@ -25,7 +25,7 @@ def configure_gcc(cpu, buildmode):
     cxxflags += " -fext-numeric-literals"
 
   if "debug" in buildmode:
-    cxxflags += " -O0 -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -fdiagnostics-show-option"
+    cxxflags += " -O0 -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -fdiagnostics-show-option"
     #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
     if platform.system() != "Darwin":
       cxxflags += " -D_GLIBCXX_DEBUG"

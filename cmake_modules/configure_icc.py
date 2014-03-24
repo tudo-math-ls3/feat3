@@ -16,7 +16,7 @@ def configure_icc(cpu, buildmode):
     cxxflags += " -no-use-clang-env"
 
   if "debug" in buildmode:
-    cxxflags += "  -O0 -Wall -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -debug all -ftrapuv  -diag-disable 2304 -diag-disable 2305"
+    cxxflags += "  -O0 -Wall -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -debug all -ftrapuv  -diag-disable 2304 -diag-disable 2305"
   elif "opt" in buildmode:
     cxxflags += " -O3 -no-prec-div -ansi-alias -ip"
     if cpu == "unknown":
