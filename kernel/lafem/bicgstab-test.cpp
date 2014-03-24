@@ -53,7 +53,12 @@ struct Precon<SparsePreconType::pt_polynomial>
   template <typename Algo_, typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
-    Preconditioner<Algo_, MT_, VT_> * t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, 20, opt == 0);
+    // Preconditioner<Algo_, MT_, VT_> * temp = new JacobiPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
+    // Preconditioner<Algo_, MT_, VT_> * temp = new GaussSeidelPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
+    // Preconditioner<Algo_, MT_, VT_> * temp = new SORPreconditioner<Algo_, MT_, VT_> (sys);
+    // Preconditioner<Algo_, MT_, VT_> * temp = new SPAIPreconditioner<Algo_, MT_, VT_> (sys, sys.layout());
+    Preconditioner<Algo_, MT_, VT_> * temp = new ILUPreconditioner<Algo_, MT_, VT_> (sys, 0);
+    Preconditioner<Algo_, MT_, VT_> * t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, 2, temp);
     return t;
   }
 };

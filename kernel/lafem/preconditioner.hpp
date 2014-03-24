@@ -533,7 +533,7 @@ namespace FEAST
     /**
      * \brief Polynomial-Preconditioner.
      *
-     * This class represents the Neumann-Polynomial-Preconditioner \f$M = \sum_{k=0}^m (I - A)^k\f$
+     * This class represents the Neumann-Polynomial-Preconditioner \f$M^{-1} = \sum_{k=0}^m (I - \tilde M^{-1}A)^k \tilde M^{-1}\f$
      *
      * \author Christoph Lohmann
      */
@@ -541,10 +541,13 @@ namespace FEAST
     class PolynomialPreconditioner : public Preconditioner<Algo_, MT_, VT_>
     {
     private:
-      const MT_ & _A;        // system-matrix
-      Index _m;              // order m of preconditioner
-      VT_ _aux, _tmp;              // auxilary-vector
-      VT_ * _pscale;         // scaling-vector (if check is true)
+      typedef typename MT_::MemType Mem_;
+      typedef typename MT_::DataType DT_;
+
+      const MT_ & _A;          // system-matrix
+      Index _m;                // order m of preconditioner
+      VT_ _aux1, _aux2, _aux3; // auxilary-vector
+      Preconditioner<Algo_, MT_, VT_> * _precond;
 
     public:
       /// Our algotype
@@ -563,14 +566,11 @@ namespace FEAST
       /**
        * \brief Destructor
        *
-       * deletes a vector, which was only used if bscale was true
+       * deletes the preconditionier _precond
        */
       virtual ~PolynomialPreconditioner()
       {
-        if (_pscale != nullptr)
-        {
-          delete _pscale;
-        }
+        delete _precond;
       }
 
       /**
@@ -584,27 +584,17 @@ namespace FEAST
        *
        * Creates a Polynomial preconditioner to the given matrix and the given order
        */
-      PolynomialPreconditioner(const MT_ & A, Index m, bool bscale = false) :
+      PolynomialPreconditioner(const MT_ & A, Index m, Preconditioner<Algo_, MT_, VT_> * precond) :
         _A(A),
         _m(m),
-        _aux(_A.rows()),
-        _tmp(_A.rows()),
-        _pscale(nullptr)
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(_A.rows()),
+        _precond(precond)
       {
         if (_A.columns() != _A.rows())
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
-        }
-
-        typedef typename VT_::DataType DT_;
-
-        if (bscale == true)
-        {
-          _pscale = new VT_(_A.rows());
-          for (Index i = 0; i < _A.rows(); ++i)
-          {
-            (*_pscale)(i, -DT_(1.0) / _A(i,i));
-          }
         }
       }
 
@@ -630,52 +620,23 @@ namespace FEAST
 
         /*
          * preconditioner is given by
-         *   M^-1 = I + (I - A) + ... + (I - A)^m
+         *   \f$ M^-1 = \left(I + (I - \tilde M^{-1}A) + ... + (I - \tilde M^{-1 }A)^m\right) \tilde M^{-1} \f$
          *
          * the preconditioner only works, if
-         *   ||I - A||_2 < 1.
+         *   ||I - \tilde M^{-1} A||_2 < 1.
          */
 
-        VT_ * pauxs[2];
+        _precond->apply(out, in);
+        _aux3.copy(out);
 
-        if (_m%2 == 0)
+        for (Index i = 1; i <= _m; ++i)
         {
-          pauxs[0] = &out;
-          pauxs[1] = &_aux;
+          _A.template apply<Algo_>(_aux1, out);
+          _precond->apply(_aux2, _aux1);
+          out.template axpy<Algo_>(out, _aux3);
+          out.template axpy<Algo_>(_aux2, out, DataType(-1.0));
         }
-        else
-        {
-          pauxs[1] = &out;
-          pauxs[0] = &_aux;
-
-        }
-
-        if (_pscale == nullptr)
-        {
-          pauxs[0]->copy(in);
-
-          for (Index i = 1; i <= _m; ++i)
-          {
-            pauxs[i%2]->template axpy<Algo_>(in, *pauxs[(i-1)%2]);
-            //pauxs[i%2]->template axpy<Algo_>(DT_(-1.0), A, *pauxs[(i-1)%2], *pauxs[i%2]);
-            _A.template apply<Algo_>(*pauxs[i%2], *pauxs[(i-1)%2], *pauxs[i%2], -DT_(1));
-          }
-        }
-        else
-        {
-          pauxs[0]->template component_product<Algo_>(*_pscale, in);
-          out.template scale<Algo_>(out, DT_(-1.0));
-
-          for (Index i = 1; i <= _m; ++i)
-          {
-            pauxs[i%2]->template axpy<Algo_>(in, *pauxs[(i-1)%2]);
-            //pauxs[i%2]->template axpy<Algo::Generic>(*pscale, A, *pauxs[(i-1)%2], *pauxs[i%2]);
-            _A.template apply<Algo_>(_tmp, *pauxs[(i-1)%2]);
-            pauxs[i%2]->template component_product<Algo_>(_tmp, *_pscale, *pauxs[i%2]);
-          }
-        } // function apply
-
-      }
+      } // function apply
     };
 
 
