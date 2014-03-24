@@ -17,7 +17,7 @@ class A
   A(const A & other) = delete;
 };
 
-bool operator==(A & a, A & b)
+bool operator==(const A & a, const A & b)
 {
   return a.flag == b.flag;
 }

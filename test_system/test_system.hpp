@@ -242,35 +242,10 @@ namespace FEAST
           */
         template<
           typename T1_,
-          typename T2_,
-          class = typename std::enable_if<std::is_literal_type<T1_>::value || std::is_same<T1_, String>::value>::type >
+          typename T2_>
         TwoVarHolder(
-            T1_ a,
-            T2_ b)
-          : result(a == b),
-          s_a(),
-          s_b()
-        {
-          if(!result)
-          {
-            if (std::is_floating_point<T1_>::value)
-              s_a = scientify(a);
-            else
-              s_a = stringify(a);
-            if (std::is_floating_point<T2_>::value)
-              s_b = scientify(b);
-            else
-              s_b = stringify(b);
-          }
-        }
-
-        template<
-          typename T1_,
-          typename T2_,
-          class = typename std::enable_if<! std::is_literal_type<T1_>::value && !std::is_same<T1_, String>::value>::type >
-        TwoVarHolder(
-            T1_ & a,
-            T2_ & b)
+            const T1_ & a,
+            const T2_ & b)
           : result(a == b),
           s_a(),
           s_b()
@@ -304,35 +279,10 @@ namespace FEAST
           */
         template<
           typename T1_,
-          typename T2_,
-          class = typename std::enable_if<std::is_literal_type<T1_>::value || std::is_same<T1_, String>::value>::type >
+          typename T2_>
         TwoVarHolder2(
-            T1_ a,
-            T2_ b)
-          : result(a == b),
-          s_a(),
-          s_b()
-        {
-          if(result)
-          {
-            if (std::is_floating_point<T1_>::value)
-              s_a = scientify(a);
-            else
-              s_a = stringify(a);
-            if (std::is_floating_point<T2_>::value)
-              s_b = scientify(b);
-            else
-              s_b = stringify(b);
-          }
-        }
-
-        template<
-          typename T1_,
-          typename T2_,
-          class = typename std::enable_if<! std::is_literal_type<T1_>::value && !std::is_same<T1_, String>::value>::type >
-        TwoVarHolder2(
-            T1_ & a,
-            T2_ & b)
+            const T1_ & a,
+            const T2_ & b)
           : result(a == b),
           s_a(),
           s_b()
