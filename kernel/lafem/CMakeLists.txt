@@ -13,6 +13,13 @@ SET (kernel-lafem-list
   memory_pool.cpp
   )
 
+if (FEAST_HAVE_UMFPACK)
+  SET(kernel-lafem-list ${kernel-lafem-list} umfpack.cpp)
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/SuiteSparse_config/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/AMD/Include/")
+  INCLUDE_DIRECTORIES("${FEAST_SOURCE_DIR}/thirdparty/UMFPACK/Include/")
+endif (FEAST_HAVE_UMFPACK)
+
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
 TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch kernel-util kernel-adjacency)
 

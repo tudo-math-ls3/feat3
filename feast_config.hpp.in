@@ -37,4 +37,7 @@
 /// Do we have ALGLIB support enabled?
 #cmakedefine FEAST_HAVE_ALGLIB
 
+/// Do we have UMFPACK support enabled?
+#cmakedefine FEAST_HAVE_UMFPACK
+
 #endif // FEAST_CONFIG_HPP

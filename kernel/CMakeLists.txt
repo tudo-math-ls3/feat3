@@ -39,6 +39,10 @@ if (FEAST_HAVE_ALGLIB)
   TARGET_LINK_LIBRARIES (feast thirdparty-alglib)
 endif(FEAST_HAVE_ALGLIB)
 
+if (FEAST_HAVE_UMFPACK)
+  TARGET_LINK_LIBRARIES (feast thirdparty-umfpack)
+endif(FEAST_HAVE_UMFPACK)
+
 # list of kernel tests
 SET (test_list
   shape-test

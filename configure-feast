@@ -60,7 +60,7 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("  Instrumentation: scalasca (not implemented yet)")
   print ("  Debugging: valgrind, cudamemcheck")
   print ("  Precision extensions: quadmath")
-  print ("  Third party source code: alglib")
+  print ("  Third party source code: alglib, umfpack")
   print ("")
   print ("Note, that cudamemcheck is only active, if cuda is activated, too.")
   print ("Note, that you need to provide at least a build mode, a parallelisation mode and a compiler.")
@@ -243,6 +243,9 @@ if "valgrind" in buildid:
 if "alglib" in buildid:
   remove_string(unused_tokens, "alglib")
   cmake_flags += " -DFEAST_HAVE_ALGLIB:BOOL=ON"
+if "umfpack" in buildid:
+  remove_string(unused_tokens, "umfpack")
+  cmake_flags += " -DFEAST_HAVE_UMFPACK:BOOL=ON"
 
 
 # clean up previous configurations
