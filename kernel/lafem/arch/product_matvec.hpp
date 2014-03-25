@@ -20,7 +20,7 @@ namespace FEAST
       struct ProductMatVec<Mem::Main, Algo::Generic>
       {
         template <typename DT_, typename IT_>
-        static void csr(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+        static void csr(DT_ * r, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
         {
           for (Index row(0) ; row < rows ; ++row)
           {
