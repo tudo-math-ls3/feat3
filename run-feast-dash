@@ -45,6 +45,8 @@ def run_test(build_id, branch, myDB):
   git_output += get_output("git log HEAD -n1")
   m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="git output", body="\n".join(git_output))
   m.save()
+  if dump_filename != "":
+    dump_file.write("\n" + "\n".join(git_output))
   os.chdir(build_dirname)
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
@@ -67,6 +69,10 @@ def run_test(build_id, branch, myDB):
 
   m = Message.create(runid=r, stage="intern", status="ok", timestamp=time.time(), title="configure_output", body=configure_output)
   m.save()
+
+  if dump_filename != "":
+    dump_file.write("\n" + src_dirname + os.sep + "configure-feast " + build_id + "\n")
+    dump_file.write("\n" + configure_output)
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
   if is_found("sync"):
@@ -105,11 +111,13 @@ def run_test(build_id, branch, myDB):
       else:
         idx += 1
 
-  make_output = get_output_utf8("make -j 4 -O -k all tests")
+  make_command = "make -j 4 -O -k all tests"
+  make_output = get_output_utf8(make_command)
   process_compiler_output("warning", make_output)
   process_compiler_output("error", make_output)
+  process_compiler_output("failed", make_output)
   if dump_filename != "":
-    dump_file.write("\nmake -j 4 -O -k all tests\n\n")
+    dump_file.write("\n" + make_command + "\n\n")
     dump_file.write("\n".join(make_output))
 
 #workaround for network base file system to prevent rebuilding everything in ctest phase
