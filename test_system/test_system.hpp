@@ -272,13 +272,13 @@ namespace FEAST
 /// checks if a == b
 #define TEST_CHECK_EQUAL(a, b) \
   do { \
-    CHECK_INTERNAL(a==b, this->_id + "\n" +  "Expected '" #a "' to equal \n'" + FEAST::stringify(b) + "'\nbut got\n'" + FEAST::stringify(a) + "'")\
+    CHECK_INTERNAL((a)==(b), this->_id + "\n" +  "Expected '" #a "' to equal \n'" + FEAST::stringify(b) + "'\nbut got\n'" + FEAST::stringify(a) + "'")\
   } while (false)
 
 /// checks if a != b
 #define TEST_CHECK_NOT_EQUAL(a, b) \
   do { \
-    CHECK_INTERNAL(!(a==b), this->_id + "\n" +  "Expected '" #a "' that is'" + FEAST::stringify(a) + "' to equal not '" + FEAST::stringify(b) + "'")\
+    CHECK_INTERNAL(!((a)==(b)), this->_id + "\n" +  "Expected '" #a "' that is'" + FEAST::stringify(a) + "' to equal not '" + FEAST::stringify(b) + "'")\
   } while (false)
 
 /// checks if stringify(a) == stringify(b)
@@ -327,9 +327,9 @@ namespace FEAST
 /// checks if a - b < epsilon
 #define TEST_CHECK_EQUAL_WITHIN_EPS(a, b, eps) \
   do { \
-    CHECK_INTERNAL(std::abs(a-(b)) < eps,\
+    CHECK_INTERNAL(std::abs((a)-(b)) < eps,\
         this->_id + "\n" + "Expected '|" #a " - " #b \
-        "|' < '" + FEAST::stringify(eps) + "' but was '" + FEAST::stringify(std::abs(a-b)) +"'" \
+        "|' < '" + FEAST::stringify(eps) + "' but was '" + FEAST::stringify(std::abs((a)-(b))) +"'" \
         + ", with " #a "=" + FEAST::stringify(a) + " and " #b "=" + FEAST::stringify(b))\
   } while (false)
 
