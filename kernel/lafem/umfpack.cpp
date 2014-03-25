@@ -48,6 +48,7 @@ namespace FEAST
       static int solve(int sys, const Idx_* row_ptr, const Idx_* col_idx, const double* data,
         double* x, const double* b, void* nume, const double* control, double* info)
       {
+        static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
         return ::umfpack_di_solve(static_cast<int>(sys),
           reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
           data, x, b, nume, control, info);
@@ -65,7 +66,7 @@ namespace FEAST
       static int init_symbolic(Idx_ nrows, Idx_ ncols, const Idx_* row_ptr, const Idx_* col_idx,
         const double* data, void** symb, const double* ctrl, double* info)
       {
-        static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
+        static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
         return ::umfpack_dl_symbolic(static_cast<SuiteSparse_long>(nrows), static_cast<SuiteSparse_long>(ncols),
           reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
           data, symb, ctrl, info);
@@ -74,7 +75,7 @@ namespace FEAST
       static int init_numeric(const Idx_* row_ptr, const Idx_* col_idx,
         const double* data, void* symb, void** nume, const double* ctrl, double* info)
       {
-        static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
+        static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
         return ::umfpack_dl_numeric(
           reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
           data, symb, nume, ctrl, info);
@@ -93,6 +94,7 @@ namespace FEAST
       static int solve(int sys, const Idx_* row_ptr, const Idx_* col_idx, const double* data,
         double* x, const double* b, void* nume, const double* control, double* info)
       {
+        static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
         return ::umfpack_dl_solve(static_cast<SuiteSparse_long>(sys),
           reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
           data, x, b, nume, control, info);
