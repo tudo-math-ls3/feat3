@@ -6,6 +6,7 @@ from __future__ import print_function
 import sys
 import platform
 import os
+import re
 import subprocess
 import socket
 import shutil
@@ -79,7 +80,7 @@ def run_test(build_id, branch, myDB):
     get_output("sync")
 
 ######### MAKE ###############
-  def process_compiler_output(token, output):
+  def process_compiler_output(pattern, token, output):
     last_idx = 0
     part_name = ""
     idx = 0
@@ -96,7 +97,7 @@ def run_test(build_id, branch, myDB):
         idx += 1
 
       # error/warning in building block
-      elif token+":" in output[idx].lower() or token+" #" in output[idx].lower():
+      elif pattern.search(output[idx].lower()):
         #search for end of block
         iend = len(output)
         for i in range(idx, len(output)):
@@ -117,9 +118,11 @@ def run_test(build_id, branch, myDB):
 
   make_command = "make -j 4 -O -k all tests"
   make_output = get_output_utf8(make_command)
-  process_compiler_output("warning", make_output)
-  process_compiler_output("error", make_output)
-  process_compiler_output("failed", make_output)
+  process_compiler_output(re.compile("warning:"), "warning", make_output)
+  process_compiler_output(re.compile("warning #"), "warning", make_output)
+  process_compiler_output(re.compile("error:"), "error", make_output)
+  process_compiler_output(re.compile("error #"), "error", make_output)
+  process_compiler_output(re.compile("recipe for target '.*' failed"), "error", make_output)
   if dump_filename != "":
     dump_file.write("\n" + make_command + "\n\n")
     dump_file.write("\n".join(make_output))
