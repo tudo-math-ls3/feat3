@@ -44,3 +44,9 @@ template void Axpy<Mem::Main, Algo::Generic>::coo(float *, const float * const, 
 template void Axpy<Mem::Main, Algo::Generic>::coo(float *, const float * const, const float * const, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
 template void Axpy<Mem::Main, Algo::Generic>::coo(double *, const double * const, const double * const, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const Index, const Index);
 template void Axpy<Mem::Main, Algo::Generic>::coo(double *, const double * const, const double * const, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const Index, const Index);
+
+template void Axpy<Mem::Main, Algo::Generic>::band_q2_d2(float *, const float, const float * const, const float * const, const float * const, const Index, const Index);
+template void Axpy<Mem::Main, Algo::Generic>::band_q2_d2(double *, const double, const double * const, const double * const, const double * const, const Index, const Index);
+
+template void Axpy<Mem::Main, Algo::Generic>::band_q2_d2(float *, const float * const, const float * const, const float * const, const float * const, const Index, const Index);
+template void Axpy<Mem::Main, Algo::Generic>::band_q2_d2(double *, const double * const, const double * const, const double * const, const double * const, const Index, const Index);
