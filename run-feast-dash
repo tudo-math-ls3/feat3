@@ -85,10 +85,14 @@ def run_test(build_id, branch, myDB):
     idx = 0
     while idx < len(output):
       #search for building blocks aka all output corresonponding to one build target
-      if "Building" in output[idx] or "Linking" in output[idx]:
+      if "Building" in output[idx]:
         last_idx = idx
         part_name = output[idx].split("/")[-1]
         part_name = part_name.split(".o")[0]
+        idx += 1
+      elif "Linking" in output[idx]:
+        last_idx = idx
+        part_name = output[idx].split(" ")[-1]
         idx += 1
 
       # error/warning in building block
