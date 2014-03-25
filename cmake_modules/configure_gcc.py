@@ -14,7 +14,7 @@ def configure_gcc(cpu, buildmode):
     print ("GNU Compiler version less then 4.4 is not supported, please update your compiler!")
     sys.exit(1)
 
-  cxxflags = "-pipe -std=c++11 -ggdb"
+  cxxflags = "-pipe -std=c++11 -ggdb -gdwarf-4"
 
   if "coverage" in buildmode:
     cxxflags += " -fprofile-arcs -ftest-coverage"
