@@ -53,15 +53,48 @@ struct Precon<SparsePreconType::pt_polynomial>
   template <typename Algo_, typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
-    // auto * temp = new NonePreconditioner<Algo_, MT_, VT_> (typename VT_::DataType(1));
-    auto * temp = new JacobiPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
-    // auto * temp = new GaussSeidelPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
-    // auto * temp = new SORPreconditioner<Algo_, MT_, VT_> (sys);
-    // auto * temp = new SPAIPreconditioner<Algo_, MT_, VT_> (sys, sys.layout());
-    // auto * temp = new ILUPreconditioner<Algo_, MT_, VT_> (sys, 0);
-    // auto * temp = new SPAIPreconditioner<Algo_, MT_, VT_> (sys, 0, 0);
+    const Index iter_poly(2);
+    Preconditioner<Algo_, MT_, VT_> * t;
 
-    auto * t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, 2, temp);
+    if (opt%10 == 0)
+    {
+      auto * temp = Precon<SparsePreconType::pt_none>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 1)
+    {
+      auto * temp = Precon<SparsePreconType::pt_jacobi>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 2)
+    {
+      auto * temp = Precon<SparsePreconType::pt_gauss_seidel>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 3)
+    {
+      auto * temp = Precon<SparsePreconType::pt_sor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 4)
+    {
+      auto * temp = Precon<SparsePreconType::pt_ssor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 5)
+    {
+      auto * temp = Precon<SparsePreconType::pt_ilu>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 6)
+    {
+      auto * temp = Precon<SparsePreconType::pt_spai>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else
+    {
+      throw InternalError(__func__, __FILE__, __LINE__, "Parameter opt not allowed!");
+    }
 
     return t;
   }
@@ -254,21 +287,153 @@ BiCGStabTest<PointstarFactoryFE<double>,
              Algo::Generic,
              SparseMatrixCSR<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_csr_poly_double("polynmial");
+bicgstab_test_cpu_csr_poly_double_0("polynmial", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
              Algo::Generic,
              SparseMatrixCOO<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_coo_poly_double("polynmial");
+bicgstab_test_cpu_coo_poly_double_0("polynmial", 0);
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
              Algo::Generic,
              SparseMatrixELL<Mem::Main, double>,
              DenseVector<Mem::Main, double> >
-bicgstab_test_cpu_ell_poly_double("polynmial");
+bicgstab_test_cpu_ell_poly_double_0("polynmial", 0);
+
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCSR<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_csr_poly_double_1("polynmial", 1);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCOO<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_coo_poly_double_1("polynmial", 1);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixELL<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_ell_poly_double_1("polynmial", 1);
+
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCSR<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_csr_poly_double_2("polynmial", 2);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCOO<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_coo_poly_double_2("polynmial", 2);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixELL<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_ell_poly_double_2("polynmial", 2);
+
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCSR<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_csr_poly_double_3("polynmial", 3);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCOO<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_coo_poly_double_3("polynmial", 3);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixELL<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_ell_poly_double_3("polynmial", 3);
+
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCSR<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_csr_poly_double_4("polynmial", 4);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCOO<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_coo_poly_double_4("polynmial", 4);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixELL<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_ell_poly_double_4("polynmial", 4);
+
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCSR<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_csr_poly_double_5("polynmial", 5);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCOO<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_coo_poly_double_5("polynmial", 5);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixELL<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_ell_poly_double_5("polynmial", 5);
+
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCSR<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_csr_poly_double_6("polynmial", 6);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixCOO<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_coo_poly_double_6("polynmial", 6);
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::Generic,
+             SparseMatrixELL<Mem::Main, double>,
+             DenseVector<Mem::Main, double> >
+bicgstab_test_cpu_ell_poly_double_6("polynmial", 6);
 
 
 BiCGStabTest<PointstarFactoryFE<double>,
