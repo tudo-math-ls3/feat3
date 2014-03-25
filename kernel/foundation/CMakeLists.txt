@@ -31,7 +31,9 @@ SET (test_list
   mesh-test
   mesh_control-test
   partitioning-test
-  refinement-test
+  refinement_1D-test
+  refinement_2D-test
+  refinement_3D-test
   sub_mesh-test
   topology-test
 )
