@@ -18,6 +18,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
+#include <kernel/adjacency/graph.hpp>
 
 #include <fstream>
 
@@ -427,6 +428,45 @@ namespace FEAST
           CONTEXT("When creating SparseMatrixCSR");
 
           convert(other);
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] graph The.graph to create the matrix from
+         *
+         * Creates a CSR matrix based on a given adjacency graph, representing the sparsity pattern.
+         */
+        explicit SparseMatrixCSR(const Adjacency::Graph & graph) :
+          Container<Mem_, DT_, IT_>(0)
+        {
+          CONTEXT("When creating SparseMatrixCSR");
+
+          Index num_rows = graph.get_num_nodes_domain();
+          Index num_cols = graph.get_num_nodes_image();
+          Index num_nnze = graph.get_num_indices();
+
+          // create temporary vectors
+          LAFEM::DenseVector<Mem::Main, IT_> vrow_ptr(num_rows+1);
+          LAFEM::DenseVector<Mem::Main, IT_> vcol_idx(num_nnze);
+          LAFEM::DenseVector<Mem::Main, DT_> vdata(num_nnze, DT_(0));
+
+          const Index* dom_ptr(graph.get_domain_ptr());
+          const Index* img_idx(graph.get_image_idx());
+          Index* row_ptr(vrow_ptr.elements());
+          Index* col_idx(vcol_idx.elements());
+
+          // build row-end
+          row_ptr[0] = dom_ptr[0];
+          for(Index i(0); i < num_rows; ++i)
+            row_ptr[i+1] = dom_ptr[i+1];
+
+          // build col-idx
+          for(Index i(0); i < num_nnze; ++i)
+          col_idx[i] = img_idx[i];
+
+          // build the matrix
+          this->assign(SparseMatrixCSR<Mem::Main, DT_, IT_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
         }
 
         /**

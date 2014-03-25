@@ -237,40 +237,20 @@ namespace FEAST
       /**
        * \brief Assembles a CSR-Matrix from a Graph.
        *
+       * \tparam MatrixType_
+       * The type of the lafem matrix to be assembled.
+       *
        * \param[out] matrix
-       * A reference to the CSR-matrix to be assembled.
+       * A reference to the matrix to be assembled.
        *
        * \param[in] graph
        * The graph representing the sparsity pattern.
        */
-      template<typename MemType_, typename DataType_>
-      static void assemble(LAFEM::SparseMatrixCSR<MemType_, DataType_>& matrix, const Adjacency::Graph& graph)
+      template<typename MatrixType_>
+      static void assemble(MatrixType_& matrix, const Adjacency::Graph& graph)
       {
-        Index num_rows = graph.get_num_nodes_domain();
-        Index num_cols = graph.get_num_nodes_image();
-        Index num_nnze = graph.get_num_indices();
-
-        // create temporary vectors
-        LAFEM::DenseVector<Mem::Main, Index> vrow_ptr(num_rows+1);
-        LAFEM::DenseVector<Mem::Main, Index> vcol_idx(num_nnze);
-        LAFEM::DenseVector<Mem::Main, DataType_> vdata(num_nnze, DataType_(0));
-
-        const Index* dom_ptr(graph.get_domain_ptr());
-        const Index* img_idx(graph.get_image_idx());
-        Index* row_ptr(vrow_ptr.elements());
-        Index* col_idx(vcol_idx.elements());
-
-        // build row-end
-        row_ptr[0] = dom_ptr[0];
-        for(Index i(0); i < num_rows; ++i)
-          row_ptr[i+1] = dom_ptr[i+1];
-
-        // build col-idx
-        for(Index i(0); i < num_nnze; ++i)
-          col_idx[i] = img_idx[i];
-
         // build the matrix
-        matrix = LAFEM::SparseMatrixCSR<MemType_, DataType_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr);
+        matrix = MatrixType_(graph);
       }
     };
 

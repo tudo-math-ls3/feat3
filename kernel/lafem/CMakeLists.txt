@@ -14,14 +14,13 @@ SET (kernel-lafem-list
   )
 
 ADD_LIBRARY(kernel-lafem STATIC ${kernel-lafem-list})
-TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch)
+TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-arch kernel-util kernel-adjacency)
 
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-cuda
     memory_pool.cu
     STATIC
   )
-  ADD_DEPENDENCIES(kernel-lafem kernel-lafem-cuda)
   CUDA_ADD_CUBLAS_TO_TARGET(kernel-lafem-cuda)
   TARGET_LINK_LIBRARIES(kernel-lafem kernel-lafem-cuda)
 endif(FEAST_BACKENDS_CUDA)
