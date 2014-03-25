@@ -18,6 +18,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
+#include <cmath>
+
+#define CHECK_INTERNAL(was_ok, message)\
+        if(! (was_ok))\
+          throw TestFailedException(__func__, __FILE__, __LINE__, message);
 
 /**
 * \file
@@ -188,7 +193,7 @@ namespace FEAST
         return _id;
       }
 
-      /// utility method used bei TEST_CHECK_*
+      /// utility method used bei TEST_CHECK_THROWS
       virtual void check(const char * const function, const char * const file,
           const long line, bool was_ok, const String & message) const
       {
@@ -220,173 +225,6 @@ namespace FEAST
       {
         return _algo_name;
       }
-
-      /// utility class used by TEST_CHECK_EQUAL
-      struct TwoVarHolder
-      {
-        /// result of comparison
-        bool result;
-        /// string representation of first parameter
-        String s_a;
-        /// string representation of second parameter
-        String s_b;
-
-        /**
-          * \brief CTOR
-          *
-          * \param[in] a
-          * First value to compare
-          *
-          * \param[in] b
-          * Second value to compare
-          */
-        template<
-          typename T1_,
-          typename T2_>
-        TwoVarHolder(
-            const T1_ & a,
-            const T2_ & b)
-          : result(a == b),
-          s_a(),
-          s_b()
-        {
-          if(!result)
-          {
-            s_a = stringify(a);
-            s_b = stringify(b);
-          }
-        }
-      }; // TwoVarHolder
-
-      /// utility class used by TEST_CHECK_NOT_EQUAL
-      struct TwoVarHolder2
-      {
-        /// result of comparison
-        bool result;
-        /// string representation of first parameter
-        String s_a;
-        /// string representation of second parameter
-        String s_b;
-
-        /**
-          * \brief Constructor
-          *
-          * \param[in] a
-          * First value to compare
-          *
-          * \param[in] b
-          * Second value to compare
-          */
-        template<
-          typename T1_,
-          typename T2_>
-        TwoVarHolder2(
-            const T1_ & a,
-            const T2_ & b)
-          : result(a == b),
-          s_a(),
-          s_b()
-        {
-          if(result)
-          {
-            s_a = stringify(a);
-            s_b = stringify(b);
-          }
-        }
-      }; // TwoVarHolder2
-
-      /// utility class used by TEST_CHECK_EQUAL_WITHIN_EPS.
-      struct WithinEpsCalculator
-      {
-        /// result of comparison
-        bool result;
-        /// string representation of first parameter
-        String s_a;
-        /// string representation of second parameter
-        String s_b;
-        /// string representation of eps
-        String s_diff;
-
-        /**
-          * \brief Constructor
-          *
-          * \param[in] a
-          * first value to compare
-          *
-          * \param[in] b
-          * second value to compare
-          *
-          * \param[in] c
-          * maximum epsilon the values a and b are allowed to differ from each other
-          */
-        template<
-          typename T1_,
-          typename T2_,
-          typename T3_,
-          class = typename std::enable_if<std::is_literal_type<T1_>::value || std::is_same<T1_, String>::value>::type >
-        WithinEpsCalculator(
-            T1_ a,
-            T2_ b,
-            T3_ c)
-          : s_a(),
-          s_b()
-        {
-          if(a >= b)
-          {
-            result = ((a - b) <= c);
-            if(!result)
-            {
-              s_diff = stringify(a - b);
-              s_a = stringify(a);
-              s_b = stringify(b);
-            }
-          }
-          else
-          {
-            result = ((b - a) <= c);
-            if(!result)
-            {
-              s_diff = stringify(b - a);
-              s_a = stringify(a);
-              s_b = stringify(b);
-            }
-          }
-        }
-
-        template<
-          typename T1_,
-          typename T2_,
-          typename T3_,
-          class = typename std::enable_if<! std::is_literal_type<T1_>::value && !std::is_same<T1_, String>::value>::type >
-        WithinEpsCalculator(
-            T1_ & a,
-            T2_ & b,
-            T3_ c)
-          : s_a(),
-          s_b()
-        {
-          if(a >= b)
-          {
-            result = ((a - b) <= c);
-            if(!result)
-            {
-              s_diff = stringify(a - b);
-              s_a = stringify(a);
-              s_b = stringify(b);
-            }
-          }
-          else
-          {
-            result = ((b - a) <= c);
-            if(!result)
-            {
-              s_diff = stringify(b - a);
-              s_a = stringify(a);
-              s_b = stringify(b);
-            }
-          }
-        }
-      }; // struct WithinEpsCalculator
     }; // class BaseTest
 
     struct NotSet
@@ -431,95 +269,36 @@ namespace FEAST
     }; // class TaggedTest
   } // namespace TestSystem
 } // namespace FEAST
-
 /// checks if a == b
 #define TEST_CHECK_EQUAL(a, b) \
   do { \
-    try { \
-      BaseTest::TwoVarHolder test_h(a, b); \
-      this->check(__func__, __FILE__, __LINE__, test_h.result, \
-          this->_id + "\n" +  "Expected '" #a "' to equal \n'" + test_h.s_b + \
-          "'\nbut got\n'" + test_h.s_a + "'"); \
-    } catch (const TestFailedException &) { \
-      throw; \
-    } \
+    CHECK_INTERNAL(a==b, this->_id + "\n" +  "Expected '" #a "' to equal \n'" + FEAST::stringify(b) + "'\nbut got\n'" + FEAST::stringify(a) + "'")\
   } while (false)
 
 /// checks if a != b
 #define TEST_CHECK_NOT_EQUAL(a, b) \
   do { \
-    try { \
-      BaseTest::TwoVarHolder2 test_h(a, b); \
-      this->check(__func__, __FILE__, __LINE__, !test_h.result, \
-          this->_id + "\n" +  "Expected '" #a "' that is'" + test_h.s_a + \
-          "' to equal not '" + test_h.s_b + "'"); \
-    } catch (const TestFailedException &) { \
-      throw; \
-    } catch (const std::exception & test_e) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
-          " inside a TEST_CHECK_NOT_EQUAL block"); \
-    } catch (...) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected unknown exception inside a TEST_CHECK_NOT_EQUAL block"); \
-    } \
+    CHECK_INTERNAL(!(a==b), this->_id + "\n" +  "Expected '" #a "' that is'" + FEAST::stringify(a) + "' to equal not '" + FEAST::stringify(b) + "'")\
   } while (false)
 
 /// checks if stringify(a) == stringify(b)
 #define TEST_CHECK_STRINGIFY_EQUAL(a, b) \
   do { \
-    try { \
-      String s_a(FEAST::stringify(a)); \
-      String s_b(FEAST::stringify(b)); \
-      this->check(__func__, __FILE__, __LINE__, s_a == s_b, \
-          this->_id + "\n" +  "Expected '" #a "' to equal '" + s_b + \
-          "'\nbut got\n'" + s_a + "'"); \
-    } catch (const TestFailedException &) { \
-      throw; \
-    } catch (const std::exception & test_e) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
-          " inside a TEST_CHECK_STRINGIFY_EQUAL block"); \
-    } catch (...) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected unknown exception inside a TEST_CHECK_STRINGIFY_EQUAL block"); \
-    } \
+    String s_a(FEAST::stringify(a)); \
+    String s_b(FEAST::stringify(b)); \
+    CHECK_INTERNAL(s_a == s_b, this->_id + "\n" +  "Expected '" #a "' to equal '" + s_b + "'\nbut got\n'" + s_a + "'")\
   } while (false)
 
 /// checks if a is true
 #define TEST_CHECK(a) \
   do { \
-    try { \
-      this->check(__func__, __FILE__, __LINE__, a, \
-          this->_id + "\n" +  "Check '" #a "' failed"); \
-    } catch (const TestFailedException &) { \
-      throw; \
-    } catch (const std::exception & test_e) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
-          " inside a TEST_CHECK block"); \
-    } catch (...) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected unknown exception inside a TEST_CHECK block"); \
-    } \
+    CHECK_INTERNAL(a, this->_id + "\n" +  "Check '" #a "' failed") \
   } while (false)
 
 /// checks if \c a is true; prints \c msg if \c a is false
 #define TEST_CHECK_MSG(a,msg) \
   do { \
-    try { \
-      this->check(__func__, __FILE__, __LINE__, a, \
-          this->_id + "\n" + (msg)); \
-    } catch (const TestFailedException &) { \
-      throw; \
-    } catch (const std::exception & test_e) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected exception "+ FEAST::stringify(test_e.what()) + \
-          " inside a TEST_CHECK block"); \
-    } catch (...) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected unknown exception inside a TEST_CHECK block"); \
-    } \
+    CHECK_INTERNAL(a, this->_id + "\n" + (msg))\
   } while (false)
 
 /// checks if a throws an exception of type b
@@ -548,22 +327,10 @@ namespace FEAST
 /// checks if a - b < epsilon
 #define TEST_CHECK_EQUAL_WITHIN_EPS(a, b, eps) \
   do { \
-    try { \
-      BaseTest::WithinEpsCalculator calc(a, b, eps); \
-      this->check(__func__, __FILE__, __LINE__, calc.result,  \
-          this->_id + "\n" + "Expected '|" #a " - " #b \
-          "|' < '" + FEAST::stringify(eps) + "' but was '" + calc.s_diff +"'" \
-          + ", with " #a "=" + FEAST::stringify(a) + " and " #b "=" + FEAST::stringify(b)); \
-    } catch (const TestFailedException &) { \
-      throw;  \
-    } catch (const std::exception & test_e) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected exception  "+ FEAST::stringify(test_e.what()) + \
-          " inside a TEST_CHECK_EQUAL_WITHIN_EPS block"); \
-    } catch (...) { \
-      throw TestFailedException(__func__, __FILE__, __LINE__, \
-          "Test threw unexpected unknown exception inside a TEST_CHECK_EQUAL_WITHIN_EPS block"); \
-    } \
+    CHECK_INTERNAL(std::abs(a-(b)) < eps,\
+        this->_id + "\n" + "Expected '|" #a " - " #b \
+        "|' < '" + FEAST::stringify(eps) + "' but was '" + FEAST::stringify(std::abs(a-b)) +"'" \
+        + ", with " #a "=" + FEAST::stringify(a) + " and " #b "=" + FEAST::stringify(b))\
   } while (false)
 
 /// runs the given test with pre- and postprocessing
