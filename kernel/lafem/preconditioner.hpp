@@ -531,181 +531,6 @@ namespace FEAST
 
 
     /**
-     * \brief Polynomial-Preconditioner.
-     *
-     * This class represents the Neumann-Polynomial-Preconditioner \f$M^{-1} = \sum_{k=0}^m (I - \tilde M^{-1}A)^k \tilde M^{-1}\f$
-     *
-     * \author Christoph Lohmann
-     */
-    template <typename Algo_, typename MT_, typename VT_>
-    class PolynomialPreconditioner : public Preconditioner<Algo_, MT_, VT_>
-    {
-    private:
-      typedef typename MT_::MemType Mem_;
-      typedef typename MT_::DataType DT_;
-
-      const MT_ & _A;                              // system-matrix
-      const Index _m;                              // order m of preconditioner
-      const Index _num_of_auxs;                    // number of auxilary-vectors
-                                                   // 1 for NonePreconditioner
-                                                   // 2 if out and in can be the same vectors for _precon.apply
-                                                   // 3 else
-      VT_ _aux1, _aux2, _aux3;                     // auxilary-vector
-      Preconditioner<Algo_, MT_, VT_> * _precond;
-
-    public:
-      /// Our algotype
-      typedef Algo_ AlgoType;
-      /// Our datatype
-      typedef typename MT_::DataType DataType;
-      /// Our memory architecture type
-      typedef typename MT_::MemType MemType;
-      /// Our vectortype
-      typedef VT_ VectorType;
-      /// Our matrixtype
-      typedef MT_ MatrixType;
-      /// Our used precon type
-      const static SparsePreconType PreconType = SparsePreconType::pt_polynomial;
-
-      /**
-       * \brief Destructor
-       *
-       * deletes the preconditionier _precond
-       */
-      virtual ~PolynomialPreconditioner()
-      {
-        delete _precond;
-      }
-
-      /**
-       * \brief Constructor of Neumann-Polynomial-Preconditioner.
-       *
-       * param[in] A system-matrix
-       * param[in] m order of the polynom
-       * param[in] precond A preconditioner used for the Polynomial preconditioner
-       *
-       * Creates a Polynomial preconditioner to the given matrix and the given order
-       */
-      PolynomialPreconditioner(const MT_ & A, Index m, Preconditioner<Algo_, MT_, VT_> * precond) :
-        _A(A),
-        _m(m),
-        _num_of_auxs(3),
-        _aux1(_A.rows()),
-        _aux2(_A.rows()),
-        _aux3(_A.rows()),
-        _precond(precond)
-      {
-        if (_A.columns() != _A.rows())
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
-        }
-      }
-
-      /// \cond internal
-      PolynomialPreconditioner(const MT_ & A, Index m, NonePreconditioner<Algo_, MT_, VT_> * precond) :
-        _A(A),
-        _m(m),
-        _num_of_auxs(1),
-        _aux1(_A.rows()),
-        _aux2(),
-        _aux3(),
-        _precond(precond)
-      {
-        if (_A.columns() != _A.rows())
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
-        }
-      }
-
-      PolynomialPreconditioner(const MT_ & A, Index m, JacobiPreconditioner<Algo_, MT_, VT_> * precond) :
-        _A(A),
-        _m(m),
-        _num_of_auxs(2),
-        _aux1(_A.rows()),
-        _aux2(_A.rows()),
-        _aux3(),
-        _precond(precond)
-      {
-        if (_A.columns() != _A.rows())
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
-        }
-      }
-      /// \endcond
-
-      /**
-       * \brief Returns a descriptive string.
-       *
-       * \returns A string describing the container.
-       */
-      static String name()
-      {
-        return "Polynomial_Preconditioner";
-      }
-
-      /**
-       * \brief apply the preconditioner
-       *
-       * \param[out] out The preconditioner result.
-       * \param[in] in The vector to be preconditioned.
-       */
-      virtual void apply(VT_ & out, const VT_ & in) override
-      {
-        typedef typename VT_::DataType DT_;
-
-        /*
-         * preconditioner is given by
-         *   \f$ M^-1 = \left(I + (I - \tilde M^{-1}A) + ... + (I - \tilde M^{-1 }A)^m\right) \tilde M^{-1} \f$
-         *
-         * the preconditioner only works, if
-         *   ||I - \tilde M^{-1} A||_2 < 1.
-         */
-
-        if (_num_of_auxs == 1) // if preconditioner = NonePreconditioner
-        {
-          out.copy(in);
-
-          for (Index i = 1; i <= _m; ++i)
-          {
-            // _A.template apply<Algo_>(_aux1, in, out, DataType(-1.0));
-            // out.template axpy<Algo_>(out, _aux1);
-
-            _A.template apply<Algo_>(_aux1, out);
-            out.template axpy<Algo_>(out, in);
-            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
-          }
-        }
-        else if (_num_of_auxs == 2) // if out and in can be the same vectors
-        {
-          _precond->apply(out, in);
-          _aux2.copy(out);
-
-          for (Index i = 1; i <= _m; ++i)
-          {
-            _A.template apply<Algo_>(_aux1, out);
-            _precond->apply(_aux1, _aux1);
-            out.template axpy<Algo_>(out, _aux2);
-            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
-          }
-        }
-        else // if out and in must be different vectors
-        {
-          _precond->apply(out, in);
-          _aux3.copy(out);
-
-          for (Index i = 1; i <= _m; ++i)
-          {
-            _A.template apply<Algo_>(_aux1, out);
-            _precond->apply(_aux2, _aux1);
-            out.template axpy<Algo_>(out, _aux3);
-            out.template axpy<Algo_>(_aux2, out, DataType(-1.0));
-          }
-        }
-      } // function apply
-    };
-
-
-    /**
      * \brief ILU(p)-Preconditioner.
      *
      * This class represents a dummy class for the ILU(p)-Preconditioner \f$M = \tilde L \cdot \tilde U\f$.
@@ -3756,6 +3581,241 @@ namespace FEAST
 
         delete[] _m_columns;
       } // function _create_m
+    };
+
+
+    /**
+     * \brief Polynomial-Preconditioner.
+     *
+     * This class represents the Neumann-Polynomial-Preconditioner \f$M^{-1} = \sum_{k=0}^m (I - \tilde M^{-1}A)^k \tilde M^{-1}\f$
+     *
+     * \author Christoph Lohmann
+     */
+    template <typename Algo_, typename MT_, typename VT_>
+    class PolynomialPreconditioner : public Preconditioner<Algo_, MT_, VT_>
+    {
+    private:
+      typedef typename MT_::MemType Mem_;
+      typedef typename MT_::DataType DT_;
+
+      const MT_ & _A;                              // system-matrix
+      const Index _m;                              // order m of preconditioner
+      const Index _num_of_auxs;                    // number of auxilary-vectors
+                                                   // 1 for NonePreconditioner
+                                                   // 2 if out and in can be the same vectors for _precon.apply
+                                                   // 3 else
+      VT_ _aux1, _aux2, _aux3;                     // auxilary-vector
+      Preconditioner<Algo_, MT_, VT_> * _precond;
+
+    public:
+      /// Our algotype
+      typedef Algo_ AlgoType;
+      /// Our datatype
+      typedef typename MT_::DataType DataType;
+      /// Our memory architecture type
+      typedef typename MT_::MemType MemType;
+      /// Our vectortype
+      typedef VT_ VectorType;
+      /// Our matrixtype
+      typedef MT_ MatrixType;
+      /// Our used precon type
+      const static SparsePreconType PreconType = SparsePreconType::pt_polynomial;
+
+      /**
+       * \brief Destructor
+       *
+       * deletes the preconditionier _precond
+       */
+      virtual ~PolynomialPreconditioner()
+      {
+        delete _precond;
+      }
+
+      /**
+       * \brief Constructor of Neumann-Polynomial-Preconditioner.
+       *
+       * param[in] A system-matrix
+       * param[in] m order of the polynom
+       * param[in] precond A preconditioner used for the Polynomial preconditioner
+       *
+       * Creates a Polynomial preconditioner to the given matrix and the given order
+       */
+      PolynomialPreconditioner(const MT_ & A, Index m, Preconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _num_of_auxs(3),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(_A.rows()),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      /// \cond internal
+      PolynomialPreconditioner(const MT_ & A, Index m, NonePreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _num_of_auxs(1),
+        _aux1(_A.rows()),
+        _aux2(),
+        _aux3(),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      PolynomialPreconditioner(const MT_ & A, Index m, JacobiPreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _num_of_auxs(2),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      PolynomialPreconditioner(const MT_ & A, Index m, GaussSeidelPreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _num_of_auxs(2),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      PolynomialPreconditioner(const MT_ & A, Index m, ILUPreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _num_of_auxs(2),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      PolynomialPreconditioner(const MT_ & A, Index m, SORPreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _num_of_auxs(2),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+
+      PolynomialPreconditioner(const MT_ & A, Index m, SSORPreconditioner<Algo_, MT_, VT_> * precond) :
+        _A(A),
+        _m(m),
+        _num_of_auxs(2),
+        _aux1(_A.rows()),
+        _aux2(_A.rows()),
+        _aux3(),
+        _precond(precond)
+      {
+        if (_A.columns() != _A.rows())
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Matrix is not square!");
+        }
+      }
+      /// \endcond
+
+      /**
+       * \brief Returns a descriptive string.
+       *
+       * \returns A string describing the container.
+       */
+      static String name()
+      {
+        return "Polynomial_Preconditioner";
+      }
+
+      /**
+       * \brief apply the preconditioner
+       *
+       * \param[out] out The preconditioner result.
+       * \param[in] in The vector to be preconditioned.
+       */
+      virtual void apply(VT_ & out, const VT_ & in) override
+      {
+        typedef typename VT_::DataType DT_;
+
+        /*
+         * preconditioner is given by
+         *   \f$ M^-1 = \left(I + (I - \tilde M^{-1}A) + ... + (I - \tilde M^{-1 }A)^m\right) \tilde M^{-1} \f$
+         *
+         * the preconditioner only works, if
+         *   ||I - \tilde M^{-1} A||_2 < 1.
+         */
+
+        if (_num_of_auxs == 1) // if preconditioner = NonePreconditioner
+        {
+          out.copy(in);
+
+          for (Index i = 1; i <= _m; ++i)
+          {
+            // _A.template apply<Algo_>(_aux1, in, out, DataType(-1.0));
+            // out.template axpy<Algo_>(out, _aux1);
+
+            _A.template apply<Algo_>(_aux1, out);
+            out.template axpy<Algo_>(out, in);
+            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
+          }
+        }
+        else if (_num_of_auxs == 2) // if out and in can be the same vectors
+        {
+          _precond->apply(out, in);
+          _aux2.copy(out);
+
+          for (Index i = 1; i <= _m; ++i)
+          {
+            _A.template apply<Algo_>(_aux1, out);
+            _precond->apply(_aux1, _aux1);
+            out.template axpy<Algo_>(out, _aux2);
+            out.template axpy<Algo_>(_aux1, out, DataType(-1.0));
+          }
+        }
+        else // if out and in must be different vectors
+        {
+          _precond->apply(out, in);
+          _aux3.copy(out);
+
+          for (Index i = 1; i <= _m; ++i)
+          {
+            _A.template apply<Algo_>(_aux1, out);
+            _precond->apply(_aux2, _aux1);
+            out.template axpy<Algo_>(out, _aux3);
+            out.template axpy<Algo_>(_aux2, out, DataType(-1.0));
+          }
+        }
+      } // function apply
     };
   }// namespace LAFEM
 } // namespace FEAST
