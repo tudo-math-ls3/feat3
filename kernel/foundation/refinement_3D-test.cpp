@@ -1011,7 +1011,9 @@ class RefinementTest3D:
 
       //testing all find calls simultaneously in order to not overencumber the function inliner
       for(auto res_i : res)
+      {
         TEST_CHECK(res_i);
+      }
     }
 };
 RefinementTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > ref_test3_cpu_v_v("std::vector, std::vector");
