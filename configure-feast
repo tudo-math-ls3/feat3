@@ -71,6 +71,9 @@ if len(sys.argv) > 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.ar
   print ("The target cpu is detected automatic, manual override options are not implemented yet.")
   sys.exit()
 
+#get path to feast source trunk
+trunk_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
+
 #clear all related
 os.environ["CXXFLAGS"] = ""
 os.environ["CXX"] = ""
@@ -241,33 +244,43 @@ if "valgrind" in buildid:
   remove_string(unused_tokens, "valgrind")
   cmake_flags += " -DFEAST_VALGRIND:BOOL=ON"
 if "alglib" in buildid:
+  if not os.path.isdir(trunk_dirname+os.sep+"thirdparty"+os.sep+"alglib"):
+    print ("Error: alglib enabled, but no directory found with name " + trunk_dirname+os.sep+"thirdparty"+os.sep+"alglib")
+    sys.exit(1)
   remove_string(unused_tokens, "alglib")
   cmake_flags += " -DFEAST_HAVE_ALGLIB:BOOL=ON"
 if "umfpack" in buildid:
+  if not os.path.isdir(trunk_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse_config"):
+    print ("Error: umfpack enabled, but no directory found with name " + trunk_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse_config")
+    sys.exit(1)
+  if not os.path.isdir(trunk_dirname+os.sep+"thirdparty"+os.sep+"AMD"):
+    print ("Error: umfpack enabled, but no directory found with name " + trunk_dirname+os.sep+"thirdparty"+os.sep+"AMD")
+    sys.exit(1)
+  if not os.path.isdir(trunk_dirname+os.sep+"thirdparty"+os.sep+"UMFPACK"):
+    print ("Error: umfpack enabled, but no directory found with name " + trunk_dirname+os.sep+"thirdparty"+os.sep+"UMFPACK")
+    sys.exit(1)
   remove_string(unused_tokens, "umfpack")
   cmake_flags += " -DFEAST_HAVE_UMFPACK:BOOL=ON"
 
 
 # clean up previous configurations
-dirname = os.path.dirname(sys.argv[0])
-clean = [ "CMakeCache.txt", dirname+os.sep+"CMakeCache.txt" ]
+clean = [ "CMakeCache.txt", trunk_dirname+os.sep+"CMakeCache.txt" ]
 for i in clean:
   if os.path.exists(i):
     os.unlink(i)
-dirname = os.path.dirname(sys.argv[0])
-clean = [ "feast_config.hpp", dirname+os.sep+"feast_config.hpp" ]
+clean = [ "feast_config.hpp", trunk_dirname+os.sep+"feast_config.hpp" ]
 for i in clean:
   if os.path.exists(i):
     os.unlink(i)
-clean = [ "rules.ninja", dirname+os.sep+"rules.ninja" ]
+clean = [ "rules.ninja", trunk_dirname+os.sep+"rules.ninja" ]
 for i in clean:
   if os.path.exists(i):
     os.unlink(i)
-clean = [ "build.ninja", dirname+os.sep+"build.ninja" ]
+clean = [ "build.ninja", trunk_dirname+os.sep+"build.ninja" ]
 for i in clean:
   if os.path.exists(i):
     os.unlink(i)
-clean = [ "CMakeFiles", dirname+os.sep+"CMakeFiles" ]
+clean = [ "CMakeFiles", trunk_dirname+os.sep+"CMakeFiles" ]
 for i in clean:
   if os.path.exists(i):
     shutil.rmtree(i)
@@ -294,10 +307,10 @@ print ("ldflags: " + os.environ["LDFLAGS"])
 print
 print ("Generator: " + generator)
 print
-print ("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, dirname))
+print ("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, trunk_dirname))
 print
 #start actual configuration
 print ("============== CMAKE =====================")
 sys.stdout.flush()
 sys.stderr.flush()
-os.system("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, dirname))
+os.system("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, trunk_dirname))
