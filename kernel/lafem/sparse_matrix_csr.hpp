@@ -453,17 +453,17 @@ namespace FEAST
 
           const Index* dom_ptr(graph.get_domain_ptr());
           const Index* img_idx(graph.get_image_idx());
-          Index* row_ptr(vrow_ptr.elements());
-          Index* col_idx(vcol_idx.elements());
+          Index* prow_ptr(vrow_ptr.elements());
+          Index* pcol_idx(vcol_idx.elements());
 
           // build row-end
-          row_ptr[0] = dom_ptr[0];
+          prow_ptr[0] = dom_ptr[0];
           for(Index i(0); i < num_rows; ++i)
-            row_ptr[i+1] = dom_ptr[i+1];
+            prow_ptr[i+1] = dom_ptr[i+1];
 
           // build col-idx
           for(Index i(0); i < num_nnze; ++i)
-          col_idx[i] = img_idx[i];
+          pcol_idx[i] = img_idx[i];
 
           // build the matrix
           this->assign(SparseMatrixCSR<Mem::Main, DT_, IT_>(num_rows, num_cols, vcol_idx, vdata, vrow_ptr));
