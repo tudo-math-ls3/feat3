@@ -1560,7 +1560,7 @@ namespace FEAST
           }
 
           DataType_ vol(0), c_x(0), c_y(0), c_z(0);
-          Index num_faces1(coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i).size());
+          Index num_faces1((Index)coarse.get_adjacent_polytopes(pl_polyhedron, pl_face, i).size());
           for(Index j(0) ; j < num_faces1; j++)
           {
             //sorting
@@ -1601,7 +1601,7 @@ namespace FEAST
             vertex_at_polygon = v_way;
 
             // Calculating centroid of polyhedron
-            Index num_vertices(coarse.get_adjacent_polytopes(pl_face, pl_vertex, j).size());
+            Index num_vertices((Index)coarse.get_adjacent_polytopes(pl_face, pl_vertex, j).size());
             for(Index k(0) ; k < num_vertices ; k++)
             {
               double n[3];
