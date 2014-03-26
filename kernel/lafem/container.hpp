@@ -206,7 +206,7 @@ namespace FEAST
           {
             for (Index i(0) ; i < this->_elements_size.size() ; ++i)
             {
-              const unsigned long tsize(this->_elements_size.at(i));
+              const Index tsize(this->_elements_size.at(i));
               this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(tsize));
 
               DT_ * pthis(nullptr);
@@ -250,7 +250,7 @@ namespace FEAST
           {
             for (Index i(0) ; i < this->_indices_size.size() ; ++i)
             {
-              const unsigned long tsize(this->_indices_size.at(i));
+              const Index tsize(this->_indices_size.at(i));
               this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(tsize));
 
               IT_ * pthis(nullptr);
