@@ -24,5 +24,5 @@ def get_output(command):
 def get_output_utf8(command):
   pipe = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
   pipe.stdin.close()
-  output = pipe.stdout.read().splitlines()
+  output = pipe.stdout.read().decode(encoding="UTF-8").splitlines()
   return output
