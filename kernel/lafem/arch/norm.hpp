@@ -12,6 +12,28 @@ namespace FEAST
   {
     namespace Arch
     {
+      template <typename Mem_, typename Algo_, typename VectorT_>
+      class Norm2GatewayBase
+      {
+        public:
+          virtual typename VectorT_::DataType value(const VectorT_& x) const = 0;
+
+          virtual ~Norm2GatewayBase()
+          {
+          }
+      };
+
+      template <typename Mem_, typename Algo_, typename VectorT_>
+      class Norm2SquaredGatewayBase
+      {
+        public:
+          virtual typename VectorT_::DataType value(const VectorT_& x) const = 0;
+
+          virtual ~Norm2SquaredGatewayBase()
+          {
+          }
+      };
+
       template <typename Mem_, typename Algo_>
       struct Norm2;
 

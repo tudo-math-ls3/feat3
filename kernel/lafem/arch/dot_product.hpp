@@ -14,6 +14,17 @@ namespace FEAST
   {
     namespace Arch
     {
+      template <typename Mem_, typename Algo_, typename VectorT_>
+      class DotGatewayBase
+      {
+        public:
+          virtual typename VectorT_::DataType value(const VectorT_& x, const VectorT_& y) const = 0;
+
+          virtual ~DotGatewayBase()
+          {
+          }
+      };
+
       template <typename Mem_, typename Algo_>
       struct DotProduct;
 

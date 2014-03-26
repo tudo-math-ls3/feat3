@@ -21,6 +21,7 @@ TARGET_LINK_LIBRARIES (kernel-foundation kernel-util kernel-lafem)
 # list of foundation tests
 SET (test_list
   attribute-test
+  aura-test
   buffer-test
   data-test
   dense_data_wrapper-test
@@ -30,6 +31,7 @@ SET (test_list
   load_balancing-test
   mesh-test
   mesh_control-test
+  mesh_util-test
   partitioning-test
   refinement_1D-test
   refinement_2D-test

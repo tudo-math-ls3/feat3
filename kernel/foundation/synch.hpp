@@ -33,12 +33,14 @@ namespace FEAST
       {
         mirror.gather_dual(sendbuf, target);
 
+        Status s;
         Comm::send_recv(sendbuf.elements(),
-                               sendbuf.size(),
-                               dest_rank,
-                               recvbuf.elements(),
-                               recvbuf.size(),
-                               source_rank);
+                        sendbuf.size(),
+                        dest_rank,
+                        recvbuf.elements(),
+                        recvbuf.size(),
+                        source_rank,
+                        s);
 
         mirror.scatter_dual(target, recvbuf);
       }
@@ -78,12 +80,14 @@ namespace FEAST
       {
         mirror.gather_dual(sendbuf, target);
 
+        Status s;
         Comm::send_recv(sendbuf.elements(),
                                sendbuf.size(),
                                dest_rank,
                                recvbuf.elements(),
                                recvbuf.size(),
-                               source_rank);
+                               source_rank,
+                               s);
 
         recvbuf.template axpy<Tag_>(sendbuf, recvbuf);
 
@@ -108,12 +112,14 @@ namespace FEAST
         {
           mirrors.at(i).gather_dual(sendbufs.at(i), target);
 
+          Status s;
           Comm::send_recv(sendbufs.at(i).elements(),
               sendbufs.at(i).size(),
               dest_ranks.at(i),
               recvbufs.at(i).elements(),
               recvbufs.at(i).size(),
-              source_ranks.at(i));
+              source_ranks.at(i),
+              s);
         }
 
         Comm::barrier();

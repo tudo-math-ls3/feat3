@@ -210,7 +210,7 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
       }
     }
   }
-  std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<Dim2D, Topology<> >, std::vector>);
+  std::sort(macro_comm_halos.begin(), macro_comm_halos.end(), compare_other<Mesh<Dim2D, Topology<> >, double, std::vector>);
 
   ///get adjacencies of halos
   std::vector<std::vector<Index> > halo_adjacencies;
@@ -529,24 +529,30 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
     }
 
 #ifndef SERIAL
+    Status s1;
     Comm::send_recv(val_sendbuf.elements(),
                               val_sendbuf.size(),
                               macro_comm_halos.at(i)->get_other(),
                               val_recvbuf.elements(),
                               val_recvbuf.size(),
-                              macro_comm_halos.at(i)->get_other());
+                              macro_comm_halos.at(i)->get_other(),
+                              s1);
+    Status s2;
     Comm::send_recv(colind_sendbuf.elements(),
                               colind_sendbuf.size(),
                               macro_comm_halos.at(i)->get_other(),
                               colind_recvbuf.elements(),
                               colind_recvbuf.size(),
-                              macro_comm_halos.at(i)->get_other());
+                              macro_comm_halos.at(i)->get_other(),
+                              s2);
+    Status s3;
     Comm::send_recv(rp_sendbuf.elements(),
                               rp_sendbuf.size(),
                               macro_comm_halos.at(i)->get_other(),
                               rp_recvbuf.elements(),
                               rp_recvbuf.size(),
-                              macro_comm_halos.at(i)->get_other());
+                              macro_comm_halos.at(i)->get_other(),
+                              s3);
 #endif
 
     val_sendbufs.push_back(std::move(val_sendbuf));

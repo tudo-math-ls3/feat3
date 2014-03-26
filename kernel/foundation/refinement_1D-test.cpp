@@ -59,8 +59,8 @@ class RefinementTest1D:
       Foundation::Mesh<Dim1D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
 
       //set up halos
-      OT_<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > > halos;
-      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<1, PLEdge, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m)));
+      OT_<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > > halos;
+      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >(new Halo<1, PLEdge, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m)));
       halos.at(0)->push_back(0);
 
 

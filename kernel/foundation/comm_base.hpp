@@ -64,6 +64,16 @@ namespace FEAST
           }
       };
 
+    template <>
+      class MPIType<char>
+      {
+        public:
+          static inline MPI_Datatype value()
+          {
+            return MPI_CHAR;
+          }
+      };
+
     class Communicator
     {
       public:
@@ -98,6 +108,40 @@ namespace FEAST
         MPI_Op _op;
     };
 
+    class Request
+    {
+      public:
+        Request() :
+          _r(MPI_Request())
+        {
+        }
+
+        MPI_Request& mpi_request()
+        {
+          return _r;
+        }
+
+      private:
+        MPI_Request _r;
+    };
+
+    class Status
+    {
+      public:
+        Status() :
+          _s(MPI_Status())
+        {
+        }
+
+        MPI_Status& mpi_status()
+        {
+          return _s;
+        }
+
+      private:
+        MPI_Status _s;
+    };
+
       class Comm
       {
         public:
@@ -108,12 +152,11 @@ namespace FEAST
                                          DataType2_* recvbuf,
                                          Index num_elements_to_recv,
                                          Index source_rank,
+                                         Status& s,
                                          Index send_tag = 0,
                                          Index recv_tag = 0,
                                          Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
-              MPI_Status status;
-
               MPI_Sendrecv(sendbuf,
                            (int)num_elements_to_send,
                            MPIType<DataType1_>::value(),
@@ -125,41 +168,84 @@ namespace FEAST
                            (int)source_rank,
                            (int)recv_tag,
                            communicator.mpi_comm(),
-                           &status);
+                           &(s.mpi_status()));
             }
 
           template<typename DataType_>
             static inline void send(DataType_ * sendbuf,
-                Index num_elements_to_send,
-                Index dest_rank,
-                Index send_tag = 0,
-                Communicator communicator = Communicator(MPI_COMM_WORLD))
+                                    Index num_elements_to_send,
+                                    Index dest_rank,
+                                    Index send_tag = 0,
+                                    Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
               MPI_Send(sendbuf,
-                           (int)num_elements_to_send,
-                           MPIType<DataType_>::value(),
-                           (int)dest_rank,
-                           (int)send_tag,
-                           communicator.mpi_comm());
+                        (int)num_elements_to_send,
+                        MPIType<DataType_>::value(),
+                        (int)dest_rank,
+                        (int)send_tag,
+                        communicator.mpi_comm());
+            }
+
+          template<typename DataType_>
+          static inline void isend(DataType_ * sendbuf,
+                                   Index num_elements_to_send,
+                                   Index dest_rank,
+                                   Request& r,
+                                   Index send_tag = 0,
+                                   Communicator communicator = Communicator(MPI_COMM_WORLD))
+            {
+              MPI_Isend(sendbuf,
+                        (int)num_elements_to_send,
+                        MPIType<DataType_>::value(),
+                        (int)dest_rank,
+                        (int)send_tag,
+                        communicator.mpi_comm(),
+                        &(r.mpi_request()));
+            }
+
+          template<typename DataType_>
+          static inline void irecv(DataType_ * recvbuf,
+                                  Index num_elements_to_recv,
+                                  Index src_rank,
+                                  Request& r,
+                                  Index recv_tag = 0,
+                                  Communicator communicator = Communicator(MPI_COMM_WORLD))
+            {
+              MPI_Irecv(recvbuf,
+                        (int)num_elements_to_recv,
+                        MPIType<DataType_>::value(),
+                        (int)src_rank,
+                        (int)recv_tag,
+                        communicator.mpi_comm(),
+                        &(r.mpi_request()));
             }
 
           template<typename DataType_>
             static inline void recv(DataType_ * recvbuf,
                 Index num_elements_to_recv,
                 Index src_rank,
+                Status& s,
                 Index recv_tag = 0,
                 Communicator communicator = Communicator(MPI_COMM_WORLD))
             {
-              MPI_Status status;
-
               MPI_Recv(recvbuf,
-                           (int)num_elements_to_recv,
-                           MPIType<DataType_>::value(),
-                           (int)src_rank,
-                           (int)recv_tag,
-                           communicator.mpi_comm(),
-                           &status);
+                       (int)num_elements_to_recv,
+                       MPIType<DataType_>::value(),
+                       (int)src_rank,
+                       (int)recv_tag,
+                       communicator.mpi_comm(),
+                       &(s.mpi_status()));
             }
+
+          static inline void wait(Request& r, Status& s)
+          {
+            MPI_Wait(&(r.mpi_request()), &(s.mpi_status()));
+          }
+
+          static inline void test(Request& r, int& flag, Status& s)
+          {
+            MPI_Test(&(r.mpi_request()), &flag, &(s.mpi_status()));
+          }
 
           static inline void barrier(Communicator communicator = Communicator(MPI_COMM_WORLD))
           {
@@ -236,6 +322,42 @@ namespace FEAST
                             op.mpi_op(),
                             communicator.mpi_comm());
             }
+
+          template<typename DataType1_>
+            static inline void iallreduce(DataType1_ * sendbuf,
+                                          Index num_elements_to_send_and_receive,
+                                          DataType1_ * recvbuf,
+                                          Request& r,
+                                          Operation op = Operation(MPI_SUM),
+                                          Communicator communicator = Communicator(MPI_COMM_WORLD))
+            {
+              MPI_Iallreduce(sendbuf,
+                            recvbuf,
+                            (int)num_elements_to_send_and_receive,
+                            MPIType<DataType1_>::value(),
+                            op.mpi_op(),
+                            communicator.mpi_comm(),
+                            &(r.mpi_request()));
+            }
+
+          static inline Index rank(Communicator c = Communicator(MPI_COMM_WORLD))
+          {
+            int r;
+
+            MPI_Comm_rank(c.mpi_comm(), &r);
+
+            return Index(r);
+          }
+
+          static inline Index size(Communicator c = Communicator(MPI_COMM_WORLD))
+          {
+            int r;
+
+            MPI_Comm_size(c.mpi_comm(), &r);
+
+            return Index(r);
+          }
+
           //TODO
       };
   }
@@ -269,6 +391,40 @@ namespace FEAST
         Index _op;
     };
 
+    class Request
+    {
+      public:
+        Request() :
+          _r(0)
+        {
+        }
+
+        Index mpi_request()
+        {
+          return _r;
+        }
+
+      private:
+        Index _r;
+    };
+
+    class Status
+    {
+      public:
+        Status() :
+          _s(0)
+        {
+        }
+
+        Index mpi_status()
+        {
+          return _s;
+        }
+
+      private:
+        Index _s;
+    };
+
     class Comm
     {
       public:
@@ -279,7 +435,7 @@ namespace FEAST
               DataType2_*,
               Index,
               Index,
-              Index = 0,
+              Status,
               Index = 0,
               Communicator = Communicator(0))
           {
@@ -362,6 +518,34 @@ namespace FEAST
               Operation = Operation(0),
               Communicator = Communicator(0))
           {
+          }
+
+          template<typename DataType1_>
+            static inline void iallreduce(DataType1_ *,
+                                          Index,
+                                          DataType1_ *,
+                                          Request&,
+                                          Operation,
+                                          Communicator)
+            {
+            }
+
+          static inline void wait(Request&, Status&)
+          {
+          }
+
+          static inline void test(Request&, int&, Status&)
+          {
+          }
+
+          static inline Index rank(Communicator = Communicator(0))
+          {
+            return Index(0);
+          }
+
+          static inline Index size(Communicator = Communicator(0))
+          {
+            return Index(1);
           }
         //TODO
     };

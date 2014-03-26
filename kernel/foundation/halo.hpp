@@ -14,13 +14,69 @@ namespace FEAST
   namespace Foundation
   {
     template<typename MeshType_,
+             typename WT_ = double,
              template<typename, typename> class BufferStorageType_ = std::vector>
     class HaloBase :
       public Bufferable<BufferedData<BufferStorageType_> >,
       public Communicateable<BufferedData<BufferStorageType_>, com_send_receive>
     {
       public:
+
+        ///CommLink nested type
+        template<typename WeightType_ = WT_>
+        class CommLink
+        {
+          public:
+
+            typedef WT_ weight_data_type_;
+
+            CommLink() :
+              _rank(typename MeshType_::index_type_(0)),
+              _weight(WT_(0.5)),
+              _complete(false)
+            {
+            }
+
+            CommLink(typename MeshType_::index_type_ rank, WeightType_ w) :
+              _rank(rank),
+              _weight(w),
+              _complete(true)
+            {
+            }
+
+            typename MeshType_::index_type_ get_rank() const
+            {
+              return _rank;
+            }
+
+            typename MeshType_::index_type_& get_rank()
+            {
+              return _rank;
+            }
+
+            WeightType_ weight() const
+            {
+              return _weight;
+            }
+
+            WeightType_& weight()
+            {
+              return _weight;
+            }
+
+            bool complete()
+            {
+              return _complete;
+            }
+
+          private:
+            typename MeshType_::index_type_ _rank;
+            WeightType_ _weight;
+            bool _complete;
+        };
+
         ///type exports:
+        typedef CommLink<WT_> comm_link_type_;
         typedef typename MeshType_::topology_type_::storage_type_ compound_storage_type_;
         typedef typename MeshType_::topology_type_::index_type_ index_type_;
         typedef MeshType_ mesh_type_;
@@ -30,7 +86,7 @@ namespace FEAST
         HaloBase() :
           _halo_elements(),
           _mesh(nullptr),
-          _other(0)
+          _cl()
         {
         }
 
@@ -38,16 +94,16 @@ namespace FEAST
         HaloBase(MeshType_ & mesh, index_type_ other = 0) : //TODO move to template
           _halo_elements(),
           _mesh(&mesh),
-          _other(other)
+          _cl(other, WT_(0.5))
         {
         }
 
         ///CTOR from buffer
         template<typename BufferType_>
-        HaloBase(const BufferType_& b, MeshType_& new_mesh, index_type_ new_other_rank) :
+        HaloBase(const BufferType_& b, MeshType_& new_mesh, index_type_ new_other_rank, WT_ w = WT_(0.5)) :
           _halo_elements(),
           _mesh(&new_mesh),
-          _other(new_other_rank)
+          _cl(new_other_rank, w)
         {
           for(index_type_ i(0) ; i < b.size() ; ++i)
           {
@@ -59,7 +115,7 @@ namespace FEAST
         HaloBase(const HaloBase& other) : //TODO move to template
           _halo_elements(other._halo_elements),
           _mesh(other._mesh),
-          _other(other._other)
+          _cl(other._cl)
         {
         }
 
@@ -108,12 +164,12 @@ namespace FEAST
 
         virtual index_type_ get_other() const
         {
-          return _other;
+          return _cl.get_rank();
         }
 
         virtual void reset_other(index_type_ i)
         {
-          _other = i;
+          _cl.get_rank() = i;
         }
 
         virtual unsigned get_overlap() const = 0;
@@ -127,6 +183,11 @@ namespace FEAST
         virtual const compound_storage_type_& get_elements() const
         {
           return _halo_elements;
+        }
+
+        virtual void set_elements(compound_storage_type_&& data)
+        {
+          _halo_elements = data;
         }
 
         ///implementation of Bufferable interface
@@ -162,31 +223,51 @@ namespace FEAST
 
         ///implementation of Communicateable interface
         virtual void send_recv(BufferedData<BufferStorageType_>& sendbuffers,
-                       Index destrank,
+                       typename MeshType_::index_type_ destrank,
                        BufferedData<BufferStorageType_>& recvbuffers,
-                       Index sourcerank)
+                       typename MeshType_::index_type_ sourcerank)
         {
+          Status s1;
           Comm::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(0).get())->get(),
               2,
               destrank,
               ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(0).get())->get(),
               2,
-              sourcerank);
+              sourcerank,
+              s1);
 
+          Status s2;
           Comm::send_recv(((BufferedSharedArray<index_type_>*)sendbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<index_type_>*)((sendbuffers.get().at(0).get())))[1],
               destrank,
               ((BufferedSharedArray<index_type_>*)recvbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<index_type_>*)((recvbuffers.get().at(0).get())))[1],
-              sourcerank);
+              sourcerank,
+              s2);
+        }
+
+
+        virtual comm_link_type_& comm_link()
+        {
+          return _cl;
+        }
+
+        comm_link_type_& comm_link() const
+        {
+          return _cl;
+        }
+
+        virtual const compound_storage_type_* elements() const
+        {
+          return &_halo_elements;
         }
 
       protected:
         compound_storage_type_ _halo_elements;
 
         mesh_type_* _mesh;
-        index_type_ _other;
 
+        comm_link_type_ _cl;
     };
 
     /**
@@ -209,19 +290,22 @@ namespace FEAST
     template<unsigned delta_,
              typename Level_,
              typename MeshType_,
+             typename WT_ = double,
              template<typename, typename> class BufferStorageType_ = std::vector>
     class Halo :
-      public HaloBase<MeshType_, BufferStorageType_>
+      public HaloBase<MeshType_, WT_, BufferStorageType_>
     {
       public:
         ///type exports:
-        typedef typename HaloBase<MeshType_, BufferStorageType_>::index_type_ index_type_;
-        typedef typename HaloBase<MeshType_, BufferStorageType_>::mesh_type_ mesh_type_;
-        typedef typename HaloBase<MeshType_, BufferStorageType_>::buffer_type_ buffer_type_;
+        typedef typename HaloBase<MeshType_, WT_, BufferStorageType_>::template CommLink<WT_> comm_link_type_;
+        typedef typename HaloBase<MeshType_, WT_, BufferStorageType_>::index_type_ index_type_;
+        typedef typename HaloBase<MeshType_, WT_, BufferStorageType_>::mesh_type_ mesh_type_;
+        typedef typename HaloBase<MeshType_, WT_, BufferStorageType_>::buffer_type_ buffer_type_;
+        typedef Level_ level_;
 
         ///CTOR
         Halo() :
-          HaloBase<MeshType_, BufferStorageType_>(),
+          HaloBase<MeshType_, WT_, BufferStorageType_>(),
           _overlap(delta_),
           _level(Level_::tag_value)
         {
@@ -229,7 +313,7 @@ namespace FEAST
 
         ///CTOR
         Halo(MeshType_ & mesh, index_type_ other = 0) : //TODO move to template
-          HaloBase<MeshType_, BufferStorageType_>(mesh, other),
+          HaloBase<MeshType_, WT_, BufferStorageType_>(mesh, other),
           _overlap(delta_),
           _level(Level_::tag_value)
         {
@@ -238,7 +322,7 @@ namespace FEAST
         ///CTOR from buffer
         template<typename BufferType_>
         Halo(const BufferType_& buffer, MeshType_& new_mesh, index_type_ new_other_rank) :
-          HaloBase<MeshType_, BufferStorageType_>(buffer, new_mesh, new_other_rank),
+          HaloBase<MeshType_, WT_, BufferStorageType_>(buffer, new_mesh, new_other_rank),
           _overlap(delta_),
           _level(Level_::tag_value)
         {
@@ -250,7 +334,7 @@ namespace FEAST
 
         ///copy-CTOR
         Halo(const Halo& other) : //TODO move to template
-          HaloBase<MeshType_, BufferStorageType_>(other),
+          HaloBase<MeshType_, WT_, BufferStorageType_>(other),
           _overlap(other._overlap),
           _level(other._level)
         {
@@ -273,7 +357,7 @@ namespace FEAST
 
           this->_halo_elements = rhs._halo_elements;
           this->_mesh = rhs._mesh;
-          this->_other = rhs._other;
+          this->_cl = rhs._cl;
           this->_overlap = rhs._overlap;
           this->_level = rhs._level;
 
@@ -288,8 +372,9 @@ namespace FEAST
 
 
     template<typename MeshType_,
-             template<typename, typename> class StorageType_>
-    bool compare_other(const std::shared_ptr<HaloBase<MeshType_, StorageType_> >& l, const std::shared_ptr<HaloBase<MeshType_, StorageType_> >& r)
+             typename WT_ = double,
+             template<typename, typename> class StorageType_ = std::vector>
+    bool compare_other(const std::shared_ptr<HaloBase<MeshType_, WT_, StorageType_> >& l, const std::shared_ptr<HaloBase<MeshType_, WT_, StorageType_> >& r)
     {
       return (l->get_other() < r->get_other());
     }

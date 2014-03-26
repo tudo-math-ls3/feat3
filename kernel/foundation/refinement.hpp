@@ -4,6 +4,7 @@
 #include<kernel/foundation/attribute.hpp>
 #include<kernel/foundation/mesh.hpp>
 #include<kernel/foundation/halo.hpp>
+#include<kernel/foundation/mesh_util.hpp>
 
 using namespace FEAST;
 
@@ -53,7 +54,7 @@ namespace FEAST
       static void execute(
                           Index edge_index,
                           MeshType_<Dim_, t_, os_>& target,
-                          os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> > > >* halos,
+                          os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_> > > >* halos,
                           os_<Attribute<DataType_, os_>, std::allocator<Attribute<DataType_, os_> > >& origin_coords)
       {
         //get adjacent vertices *____*
@@ -104,7 +105,7 @@ namespace FEAST
               //only do this for edge halos with delta > 0
               if(halos->at(i)->get_level() == pl_edge && halos->at(i)->get_overlap() > 0)
               {
-                typename HaloBase<MeshType_<Dim_, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(i)->get_elements().begin(), halos->at(i)->get_elements().end(), edge_index));
+                typename HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_>::compound_storage_type_::iterator iter(std::find(halos->at(i)->get_elements().begin(), halos->at(i)->get_elements().end(), edge_index));
                 if(iter != halos->at(i)->get_elements().end())
                 {
                   if(iter + 1 == halos->at(i)->get_elements().end())
@@ -144,7 +145,7 @@ namespace FEAST
       static void execute(
                           Index edge_index,
                           MeshType_<Dim_, t_, os_>& target,
-                          os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> > > >* halos,
+                          os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_> > > >* halos,
                           os_<Attribute<DataType_, os_>, std::allocator<Attribute<DataType_, os_> > >& origin_coords)
       {
         //get adjacent vertices *____*
@@ -190,7 +191,7 @@ namespace FEAST
               //only do this for edge halos with delta > 0
               if(halos->at(i)->get_level() == pl_edge) //&&halos->at(i)->get_overlap() > 0)
               {
-                typename HaloBase<MeshType_<Dim_, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(i)->get_elements().begin(), halos->at(i)->get_elements().end(), edge_index));
+                typename HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_>::compound_storage_type_::iterator iter(std::find(halos->at(i)->get_elements().begin(), halos->at(i)->get_elements().end(), edge_index));
                 if(iter != halos->at(i)->get_elements().end())
                 {
                   if(iter + 1 == halos->at(i)->get_elements().end())
@@ -269,7 +270,7 @@ namespace FEAST
       static void execute(
                           Index edge_index,
                           MeshType_<Dim_, t_, os_>& target,
-                          os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> > > >* halos,
+                          os_<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_> > > >* halos,
                           os_<Attribute<DataType_, os_>, std::allocator<Attribute<DataType_, os_> > >& origin_coords)
       {
         //get adjacent vertices *____*
@@ -317,7 +318,7 @@ namespace FEAST
               //only do this for edge halos with delta > 0
               if(halos->at(i)->get_level() == pl_edge) //&&halos->at(i)->get_overlap() > 0)
               {
-                typename HaloBase<MeshType_<Dim_, t_, os_>, os_>::compound_storage_type_::iterator iter(std::find(halos->at(i)->get_elements().begin(), halos->at(i)->get_elements().end(), edge_index));
+                typename HaloBase<MeshType_<Dim_, t_, os_>, DataType_, os_>::compound_storage_type_::iterator iter(std::find(halos->at(i)->get_elements().begin(), halos->at(i)->get_elements().end(), edge_index));
                 if(iter != halos->at(i)->get_elements().end())
                 {
                   if(iter + 1 == halos->at(i)->get_elements().end())
@@ -398,7 +399,7 @@ namespace FEAST
         typename DataType_>
       static void execute(
                           MeshType_<Dim1D, t_, os_>& origin,
-                          os_<std::shared_ptr<HaloBase<MeshType_<Dim1D, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim1D, t_, os_>, os_> > > >* halos,
+                          os_<std::shared_ptr<HaloBase<MeshType_<Dim1D, t_, os_>, DataType_, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim1D, t_, os_>, DataType_, os_> > > >* halos,
                           os_<Attribute<DataType_, os_>, std::allocator<Attribute<DataType_, os_> > >& origin_coords)
       {
         const Index num_edges(origin.get_topologies().at(ipi_edge_vertex).size());
@@ -424,7 +425,7 @@ namespace FEAST
         typename DataType_>
       static void execute(
                           MeshType_<Dim2D, t_, os_>& origin,
-                          os_<std::shared_ptr<HaloBase<MeshType_<Dim2D, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim2D, t_, os_>, os_> > > >* halos,
+                          os_<std::shared_ptr<HaloBase<MeshType_<Dim2D, t_, os_>, DataType_, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim2D, t_, os_>, DataType_, os_> > > >* halos,
                           os_<Attribute<DataType_, os_>, std::allocator<Attribute<DataType_, os_> > >& origin_coords)
       {
         ///TODO assumes QUAD, needs coarse copy
@@ -747,6 +748,7 @@ namespace FEAST
             }
           }
 
+
           //determine new vertex coordinates for mid-point
           //sorting
           vertex_at_polygon = coarse.get_adjacent_polytopes(pl_face, pl_vertex, i);
@@ -817,6 +819,7 @@ namespace FEAST
           origin_coords.at(0).push_back(c_x);
           origin_coords.at(1).push_back(c_y);
         }
+        MeshUtil::establish_iz_property(origin, origin_coords.at(0), origin_coords.at(1));
       }
 
       ///3D
@@ -828,7 +831,7 @@ namespace FEAST
         typename DataType_>
       static void execute(
                           MeshType_<Dim3D, t_, os_>& origin,
-                          os_<std::shared_ptr<HaloBase<MeshType_<Dim3D, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim3D, t_, os_>, os_> > > >* halos,
+                          os_<std::shared_ptr<HaloBase<MeshType_<Dim3D, t_, os_>, DataType_, os_> >, std::allocator<std::shared_ptr<HaloBase<MeshType_<Dim3D, t_, os_>, DataType_, os_> > > >* halos,
                           os_<Attribute<DataType_, os_>, std::allocator<Attribute<DataType_, os_> > >& origin_coords)
       {
         ///TODO assumes QUAD, needs coarse copy

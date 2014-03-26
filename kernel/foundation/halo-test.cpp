@@ -118,6 +118,10 @@ class HaloTest:
       TEST_CHECK_EQUAL(h.get_element(0u), 5u);
       TEST_CHECK_EQUAL(h.get_element(1u), 6u);
 
+      //test comm links
+      typename Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_> > >::template CommLink<double> cl1(1, 2.);
+      //typename decltype(h)::template CommLink<double> cl2(1, 2.);
+      //typedef typename decltype(h)::template CommLink<double> CommLinkT_;
     }
 };
 HaloTest<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > halo_test_cpu_v_v("std::vector, std::vector");

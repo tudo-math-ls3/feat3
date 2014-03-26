@@ -93,9 +93,9 @@ class RefinementTest2D:
 
       Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
 
-      OT_<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > > halos;
-      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<1, PLFace, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
-      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >(new Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m_fine)));
+      OT_<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > > halos;
+      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >(new Halo<1, PLFace, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m_fine)));
+      halos.push_back(std::shared_ptr<HaloBase<Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >(new Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m_fine)));
       halos.at(0)->push_back(0);
       halos.at(1)->push_back(3);
 

@@ -2,6 +2,7 @@
 #include <test_system/test_system.hpp>
 
 #include<kernel/foundation/partitioning.hpp>
+#include<kernel/foundation/aura.hpp>
 #include<kernel/archs.hpp>
 
 #include<deque>
@@ -49,11 +50,11 @@ class PartitioningTest1D:
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 0, 0);
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 1, 0);
 
-      OT_<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > > halos;
-      OT_<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>, std::allocator<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > boundaries;
+      OT_<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > > halos;
+      OT_<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>, std::allocator<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > boundaries;
 
-      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
+      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
       boundaries.at(0).push_back(0);
       boundaries.at(1).push_back(1);
 
@@ -190,11 +191,11 @@ class PartitioningTest2D:
 
       Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
 
-      OT_<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>, std::allocator<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > boundaries;
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
+      OT_<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>, std::allocator<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > boundaries;
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
       boundaries.at(0).push_back(0);
       boundaries.at(1).push_back(1);
       boundaries.at(2).push_back(2);
@@ -276,8 +277,8 @@ class PartitioningTest2D:
 
       auto sm_edge_6_adj_vert(p0.submesh->get_adjacent_polytopes(pl_edge, pl_vertex, 6));
       TEST_CHECK_EQUAL(sm_edge_6_adj_vert.size(), 2ul);
-      TEST_CHECK_EQUAL(sm_edge_6_adj_vert.at(0), 4ul);
-      TEST_CHECK_EQUAL(sm_edge_6_adj_vert.at(1), 5ul);
+      TEST_CHECK_EQUAL(sm_edge_6_adj_vert.at(0), 5ul);
+      TEST_CHECK_EQUAL(sm_edge_6_adj_vert.at(1), 4ul);
 
       //=> comm_intersection on edge level must be {4}
       auto edge_comm_int_for_faces_0_1(p0.submesh->get_comm_intersection(pl_face, pl_edge, 0, 1));
@@ -543,13 +544,13 @@ class PartitioningTest3D:
 
       Foundation::Mesh<Dim3D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
 
-      OT_<Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>, std::allocator<Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > boundaries;
-      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
+      OT_<Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>, std::allocator<Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > boundaries;
+      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLFace, Mesh<Dim3D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
       boundaries.at(0).push_back(0);
       boundaries.at(1).push_back(1);
       boundaries.at(2).push_back(2);
@@ -802,3 +803,170 @@ PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Ind
 PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::vector, std::deque<Index> > ref_test_cpu_v_d_3d("std::vector, std::deque");
 PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::vector<Index> > ref_test_cpu_d_v_3d("std::deque, std::vector");
 PartitioningTest3D<Mem::Main, Index, Algo::Generic, std::deque, std::deque<Index> > ref_test_cpu_d_d_3d("std::deque, std::deque");
+
+template<typename Tag_, typename IndexType_, typename Algo_, template<typename, typename> class OT_, typename IT_>
+class PartitioningTest2DHaloOrdering:
+  public TaggedTest<Tag_, IndexType_, Algo_>
+{
+  public:
+    PartitioningTest2DHaloOrdering(const std::string & tag) :
+      TaggedTest<Tag_, Index, Algo_>("PartitioningTest2DHaloOrdering<" + tag + ">")
+    {
+    }
+
+    virtual void run() const
+    {
+      /*(0,1) (1,1)
+       *  *----*
+       *  |    |
+       *  |    |
+       *  *----*
+       *(0,0) (1,0)
+       */
+
+      //create attributes for vertex coords
+      OT_<Attribute<double, OT_>, std::allocator<Attribute<double, OT_> > > attrs;
+      attrs.push_back(Attribute<double, OT_>()); //vertex x-coords
+      attrs.push_back(Attribute<double, OT_>()); //vertex y-coords
+
+      attrs.at(0).get_data().push_back(double(0));
+      attrs.at(1).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(0));
+
+      attrs.at(0).get_data().push_back(double(0));
+      attrs.at(1).get_data().push_back(double(1));
+
+      attrs.at(0).get_data().push_back(double(1));
+      attrs.at(1).get_data().push_back(double(1));
+
+      /*  2    3
+       *  *-1--*
+       *  2    |
+       *  |    3
+       *  *--0-*
+       *  0    1
+       */
+
+      //creating foundation mesh
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m(0);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+      m.add_polytope(pl_vertex);
+
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+      m.add_polytope(pl_edge);
+
+      m.add_polytope(pl_face);
+
+      m.add_adjacency(pl_vertex, pl_edge, 0, 0);
+      m.add_adjacency(pl_vertex, pl_edge, 0, 2);
+      m.add_adjacency(pl_vertex, pl_face, 0, 0);
+
+      m.add_adjacency(pl_vertex, pl_edge, 1, 0);
+      m.add_adjacency(pl_vertex, pl_edge, 1, 3);
+      m.add_adjacency(pl_vertex, pl_face, 1, 0);
+
+      m.add_adjacency(pl_vertex, pl_edge, 2, 1);
+      m.add_adjacency(pl_vertex, pl_edge, 2, 2);
+      m.add_adjacency(pl_vertex, pl_face, 2, 0);
+
+      m.add_adjacency(pl_vertex, pl_edge, 3, 1);
+      m.add_adjacency(pl_vertex, pl_edge, 3, 3);
+      m.add_adjacency(pl_vertex, pl_face, 3, 0);
+
+      Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
+
+      OT_<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>, std::allocator<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > boundaries;
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.at(0).push_back(0);
+      boundaries.at(1).push_back(1);
+      boundaries.at(2).push_back(2);
+      boundaries.at(3).push_back(3);
+
+      PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p0(Partitioning<Tag_,
+                                                                                      Algo_,
+                                                                                      Dim2D,
+                                                                                      0,
+                                                                                      pl_vertex>::execute(m,
+                                                                                                          boundaries,
+                                                                                                          2, 0,
+                                                                                                          attrs
+                                                                                                          ));
+      PData<Dim2D, Topology<IndexType_, OT_, IT_>, OT_, Mesh, double> p1(Partitioning<Tag_,
+                                                                                      Algo_,
+                                                                                      Dim2D,
+                                                                                      0,
+                                                                                      pl_vertex>::execute(m,
+                                                                                                          boundaries,
+                                                                                                          2, 1,
+                                                                                                          attrs
+                                                                                                          ));
+
+      for(auto& h0_i : p0.comm_halos)
+        for(auto& h1_i : p1.comm_halos)
+          if(h0_i->get_other() == h1_i->get_other())
+          {
+            //every halo element must appear with same index in both patches' submeshes' maps
+            for(Index i(0) ; i < h0_i->size() ; ++i)
+            {
+              Index elem_nr_loc_0(h0_i->get_element(i));
+              Index elem_nr_loc_1(h1_i->get_element(i));
+
+              auto adj_v_0(p0.submesh->get_adjacent_polytopes(pl_edge, pl_vertex, elem_nr_loc_0));
+              auto adj_v_1(p1.submesh->get_adjacent_polytopes(pl_edge, pl_vertex, elem_nr_loc_1));
+              TEST_CHECK_EQUAL(
+                  ((Attribute<double, OT_>*)(p0.attrs.at(0).get()))->get_data().at(adj_v_0.at(0)),
+                  ((Attribute<double, OT_>*)(p1.attrs.at(0).get()))->get_data().at(adj_v_1.at(0))
+                  ); //x coords of first vertex
+              TEST_CHECK_EQUAL(
+                  ((Attribute<double, OT_>*)(p0.attrs.at(0).get()))->get_data().at(adj_v_0.at(1)),
+                  ((Attribute<double, OT_>*)(p1.attrs.at(0).get()))->get_data().at(adj_v_1.at(1))
+                  ); //x coords of second vertex
+              TEST_CHECK_EQUAL(
+                  ((Attribute<double, OT_>*)(p0.attrs.at(1).get()))->get_data().at(adj_v_0.at(0)),
+                  ((Attribute<double, OT_>*)(p1.attrs.at(1).get()))->get_data().at(adj_v_1.at(0))
+                  ); //y coords of first vertex
+              TEST_CHECK_EQUAL(
+                  ((Attribute<double, OT_>*)(p0.attrs.at(1).get()))->get_data().at(adj_v_0.at(1)),
+                  ((Attribute<double, OT_>*)(p1.attrs.at(1).get()))->get_data().at(adj_v_1.at(1))
+                  ); //y coords of second vertex
+            }
+          }
+
+      auto h_new0(Aura<Mem::Main, Algo::Generic, Halo<0, PLEdge, Mesh<Dim2D> > >::value(p0.comm_halos));
+      auto h_new1(Aura<Mem::Main, Algo::Generic, Halo<0, PLEdge, Mesh<Dim2D> > >::value(p1.comm_halos));
+      for(Index i(0) ; i < h_new0.size() ; ++i)
+      {
+        Index elem_nr_loc_0(h_new0.get_element(i));
+        Index elem_nr_loc_1(h_new1.get_element(i));
+
+        auto adj_v_0(p0.submesh->get_adjacent_polytopes(pl_edge, pl_vertex, elem_nr_loc_0));
+        auto adj_v_1(p1.submesh->get_adjacent_polytopes(pl_edge, pl_vertex, elem_nr_loc_1));
+        TEST_CHECK_EQUAL(
+            ((Attribute<double, OT_>*)(p0.attrs.at(0).get()))->get_data().at(adj_v_0.at(0)),
+            ((Attribute<double, OT_>*)(p1.attrs.at(0).get()))->get_data().at(adj_v_1.at(0))
+            ); //x coords of first vertex
+        TEST_CHECK_EQUAL(
+            ((Attribute<double, OT_>*)(p0.attrs.at(0).get()))->get_data().at(adj_v_0.at(1)),
+            ((Attribute<double, OT_>*)(p1.attrs.at(0).get()))->get_data().at(adj_v_1.at(1))
+            ); //x coords of second vertex
+        TEST_CHECK_EQUAL(
+            ((Attribute<double, OT_>*)(p0.attrs.at(1).get()))->get_data().at(adj_v_0.at(0)),
+            ((Attribute<double, OT_>*)(p1.attrs.at(1).get()))->get_data().at(adj_v_1.at(0))
+            ); //y coords of first vertex
+        TEST_CHECK_EQUAL(
+            ((Attribute<double, OT_>*)(p0.attrs.at(1).get()))->get_data().at(adj_v_0.at(1)),
+            ((Attribute<double, OT_>*)(p1.attrs.at(1).get()))->get_data().at(adj_v_1.at(1))
+            ); //y coords of second vertex
+      }
+    }
+};
+PartitioningTest2DHaloOrdering<Mem::Main, Index, Algo::Generic, std::vector, std::vector<Index> > parthaloorder_test_cpu_v_v_2d("std::vector, std::vector");

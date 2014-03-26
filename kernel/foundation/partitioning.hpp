@@ -95,8 +95,8 @@ namespace FEAST
         template <typename, typename, template<typename, typename> class > class MeshType_,
         typename DT_>
       static PData<Dim_, t_, os_, MeshType_, DT_> execute(MeshType_<Dim_, t_, os_>& mesh,
-                                                          os_<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, os_>,
-                                                              std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, os_> > >& boundaries,
+                                                          os_<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, DT_, os_>,
+                                                              std::allocator<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, DT_, os_> > >& boundaries,
                                                           const Index num_procs,
                                                           const Index proc_rank,
                                                           os_<Attribute<DT_, os_>, std::allocator<Attribute<DT_, os_> > >& origin_coords)
@@ -119,9 +119,9 @@ namespace FEAST
           Index num_refs(_OnPartitioning<Dim_, mrt_>::num_refinements_needed(result.basemesh.get_topologies().at(result.basemesh.get_topologies().size() - 1).size(), num_procs));
 
           ///TODO opt:
-          os_<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> > > > boundaries_copy;
+          os_<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, DT_, os_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, DT_, os_> > > > boundaries_copy;
           for(Index i(0) ; i < boundaries.size() ; ++i)
-            boundaries_copy.push_back(std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, os_>(boundaries.at(i))));
+            boundaries_copy.push_back(std::shared_ptr<HaloBase<Mesh<Dim_, t_, os_>, DT_, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, DT_, os_>(boundaries.at(i))));
 
           for(Index i(0) ; i < num_refs ; ++i)
           {
@@ -132,7 +132,7 @@ namespace FEAST
 
           boundaries.clear();
           for(Index i(0) ; i < boundaries_copy.size() ; ++i)
-            boundaries.push_back(*((Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, os_>*)(boundaries_copy.at(i).get())));
+            boundaries.push_back(*((Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, Mesh<Dim_, t_, os_>, DT_, os_>*)(boundaries_copy.at(i).get())));
         }
 
         ///Phase 2: initial geometric partitioning
@@ -174,9 +174,9 @@ namespace FEAST
         }
 
         //create commhalos (global view)
-        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_> > comm_halos_globalview;
-        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_> > comm_halos_globalview_sub;
-        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_> > comm_halos_globalview_sub_sub;
+        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_> > comm_halos_globalview;
+        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_> > comm_halos_globalview_sub;
+        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_> > comm_halos_globalview_sub_sub;
 
         typename t_::storage_type_ comm_halo_originating_from_element;
         typename t_::storage_type_ comm_halo_originating_from_element_sub;
@@ -206,7 +206,7 @@ namespace FEAST
                                                                                     elements_for_process.at(k).at(l)));
                   if(tmp.size() > 0)
                   {
-                    comm_halos_globalview.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(result.basemesh, k));
+                    comm_halos_globalview.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
                     comm_halo_originating_from_element.push_back(elements_for_process.at(i).at(j));
                     comm_halo_originating_from_process.push_back(i);
 
@@ -219,7 +219,7 @@ namespace FEAST
                   {
                     if(tmp_sub.size() > 0)
                     {
-                      comm_halos_globalview_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(result.basemesh, k));
+                      comm_halos_globalview_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
                       comm_halo_originating_from_element_sub.push_back(elements_for_process.at(i).at(j));
                       comm_halo_originating_from_process_sub.push_back(i);
 
@@ -233,7 +233,7 @@ namespace FEAST
                   {
                     if(tmp_sub_sub.size() > 0)
                     {
-                      comm_halos_globalview_sub_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(result.basemesh, k));
+                      comm_halos_globalview_sub_sub.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(result.basemesh, k));
                       comm_halo_originating_from_element_sub_sub.push_back(elements_for_process.at(i).at(j));
                       comm_halo_originating_from_process_sub_sub.push_back(i);
 
@@ -247,7 +247,7 @@ namespace FEAST
         ///-->Each process for its patch
         ///submesh and halo generation; here not delta_ may be used but rather delta=0, delta_ applies later for the micro-mesh
         //create submesh
-        std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_ > > submeshproxy(new Halo<0, typename Dim_::ElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(result.basemesh));
+        std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DT_, os_ > > submeshproxy(new Halo<0, typename Dim_::ElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_ >(result.basemesh));
         for(unsigned long i(0) ; i < elements_for_process.at(proc_rank).size() ; ++i)
           submeshproxy->push_back(elements_for_process.at(proc_rank).at(i));
 
@@ -255,12 +255,12 @@ namespace FEAST
 
 
         //restrict boundary components belonging to this patch to submesh
-        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ > > local_boundaries;
+        std::vector<Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_ > > local_boundaries;
 
         const Index i_end(Index(boundaries.size()));
         for(unsigned long i(0) ; i < i_end; ++i)
         {
-          local_boundaries.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >(result.basemesh));
+          local_boundaries.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_ >(result.basemesh));
 
           const Index j_end(boundaries.at(i).size());
           for(unsigned long j(0) ; j <  j_end ; ++j)
@@ -288,8 +288,8 @@ namespace FEAST
         for(Index i(0) ; i < local_boundaries.size() ; ++i)
           if(local_boundaries.at(i).size() > 0)
           {
-            result.boundaries.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_>(local_boundaries.at(i)));
-            result.boundaries.at(result.boundaries.size() - 1).reset_mesh((MeshType_<Dim_, t_, os_>*)&result.submesh); ///TODO conceptual: only result.comm_halos of Mesh (and not SubMesh) needed?
+            result.boundaries.push_back(Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_>(local_boundaries.at(i)));
+            result.boundaries.at(result.boundaries.size() - 1).reset_mesh(result.submesh.get()); ///TODO conceptual: only result.comm_halos of Mesh (and not SubMesh) needed?
           }
 
         //create commhalos (local view)
@@ -309,8 +309,8 @@ namespace FEAST
 
             Index halo_position_in_adj_list(Index(std::find(tmp_globalview.begin(), tmp_globalview.end(), comm_halos_globalview.at(i).get_element(0)) - tmp_globalview.begin()));
             //create new halo
-            result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >()));
-            result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh((MeshType_<Dim_, t_, os_>*)&result.submesh);
+            result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DT_, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_ >()));
+            result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh(result.submesh.get());
             result.comm_halos.at(result.comm_halos.size() -1)->reset_other(comm_halos_globalview.at(i).get_other());
             result.comm_halos.at(result.comm_halos.size() -1)->push_back(tmp_localview.at(halo_position_in_adj_list));
           }
@@ -332,8 +332,8 @@ namespace FEAST
 
             Index halo_position_in_adj_list(Index(std::find(tmp_globalview_sub.begin(), tmp_globalview_sub.end(), comm_halos_globalview_sub.at(i).get_element(0)) - tmp_globalview_sub.begin()));
             //create new halo
-            result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >()));
-            result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh((MeshType_<Dim_, t_, os_>*)&result.submesh);
+            result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DT_, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_ >()));
+            result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh(result.submesh.get());
             result.comm_halos.at(result.comm_halos.size() -1)->reset_other(comm_halos_globalview_sub.at(i).get_other());
             result.comm_halos.at(result.comm_halos.size() -1)->push_back(tmp_localview.at(halo_position_in_adj_list));
           }
@@ -355,13 +355,13 @@ namespace FEAST
 
             Index halo_position_in_adj_list(Index(std::find(tmp_globalview_sub_sub.begin(), tmp_globalview_sub_sub.end(), comm_halos_globalview_sub_sub.at(i).get_element(0)) - tmp_globalview_sub_sub.begin()));
             //create new halo
-            result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, os_ >()));
-            result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh((MeshType_<Dim_, t_, os_>*)&result.submesh);
+            result.comm_halos.push_back(std::shared_ptr<HaloBase<MeshType_<Dim_, t_, os_>, DT_, os_> >(new Halo<0, typename Dim_::ElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_::SubElementPolytopeType_, MeshType_<Dim_, t_, os_>, DT_, os_ >()));
+            result.comm_halos.at(result.comm_halos.size() -1)->reset_mesh(result.submesh.get());
             result.comm_halos.at(result.comm_halos.size() -1)->reset_other(comm_halos_globalview_sub_sub.at(i).get_other());
             result.comm_halos.at(result.comm_halos.size() -1)->push_back(tmp_localview.at(halo_position_in_adj_list));
           }
         }
-        std::sort(result.comm_halos.begin(), result.comm_halos.end(), compare_other<MeshType_<Dim_, t_, os_>, os_>);
+        std::sort(result.comm_halos.begin(), result.comm_halos.end(), compare_other<MeshType_<Dim_, t_, os_>, double, os_>);
 
         //restrict x_coords attr to submesh
         result.attrs.push_back(std::shared_ptr<AttributeBase<os_> >(new Attribute<DT_, os_>())); //local parts, empty at first

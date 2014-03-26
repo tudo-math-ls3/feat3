@@ -1709,6 +1709,27 @@ namespace FEAST
         }
 
         /**
+         * \brief Calculate \f$ r \leftarrow this\cdot x \f$, global version.
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         * \param[in] gate The gate base pointer
+         */
+        template<typename Algo_>
+        void apply(DenseVector<Mem_,DT_, IT_>& r,
+                   const DenseVector<Mem_, DT_, IT_>& x,
+                   Arch::ProductMat0Vec1GatewayBase<Mem_, Algo_, DenseVector<Mem_, DT_, IT_>, SparseMatrixCOO<Mem_, DT_, IT_> >* gate
+                  )
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+
+          gate->value(r, *this, x);
+        }
+
+        /**
          * \brief Calculate \f$r \leftarrow y + \alpha this\cdot x \f$
          *
          * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.

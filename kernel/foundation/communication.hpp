@@ -121,10 +121,11 @@ namespace FEAST
           template<unsigned,
                    typename,
                    typename,
+                   typename,
                    template<typename, typename> class>
            class HaloType_,
            typename AT_>
-         static void execute(const HaloType_<delta_, a_, b_, c_>& interface, AT_& fct)
+         static void execute(const HaloType_<delta_, a_, b_, typename AT_::data_type_, c_>& interface, AT_& fct)
          {
            //acquire buffers
            std::shared_ptr<SharedArrayBase > sendbuf(BufferedSharedArray<typename AT_::data_type_>::create(interface.size()));
@@ -138,12 +139,14 @@ namespace FEAST
 
            //post send_recv
            ///TODO validate via mesh reference, that polytope level is correct
-          Comm::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
+           Status s;
+           Comm::send_recv(((BufferedSharedArray<typename AT_::data_type_>*)(sendbuf.get()))->get(),
               interface.size(),
               interface.get_other(),
               ((BufferedSharedArray<typename AT_::data_type_>*)(recvbuf.get()))->get(),
               interface.size(),
-              interface.get_other());
+              interface.get_other(),
+              s);
 
           //reset values
            for(Index i(0) ; i < interface.size() ; ++i)
@@ -163,10 +166,11 @@ namespace FEAST
           template<unsigned,
                    typename,
                    typename,
+                   typename,
                    template<typename, typename> class>
            class HaloType_,
-           typename DT_>
-         static void execute(const HaloType_<delta_, a_, b_, c_>& interface, DenseVector<ContainerBackend_, DT_>& fct)
+           typename DT_ = double>
+         static void execute(const HaloType_<delta_, a_, b_, DT_, c_>& interface, DenseVector<ContainerBackend_, DT_>& fct)
          {
            ///TODO: does assume, attribute for level a_ is stored in fct
            //acquire buffers
@@ -181,12 +185,14 @@ namespace FEAST
 
            //post send_recv
            ///TODO validate via mesh reference, that polytope level is correct
-          Comm::send_recv(sendbuf.elements(),
+           Status s;
+           Comm::send_recv(sendbuf.elements(),
               interface.size(),
               interface.get_other(),
               recvbuf.elements(),
               interface.size(),
-              interface.get_other());
+              interface.get_other(),
+              s);
 
           //reset values
            for(Index i(0) ; i < interface.size() ; ++i)
@@ -196,7 +202,8 @@ namespace FEAST
          }
 
         ///implementation for lafem smcsr
-        template<
+        //TODO fails since openmpi v.1.8.0
+        /*template<
           unsigned delta_,
           typename a_,
           typename b_,
@@ -204,10 +211,11 @@ namespace FEAST
           template<unsigned,
                    typename,
                    typename,
+                   typename,
                    template<typename, typename> class>
            class HaloType_,
-           typename DT_>
-         static void execute(const HaloType_<delta_, a_, b_, c_>& interface, SparseMatrixCSR<ContainerBackend_, DT_>& mat)
+           typename DT_ = double>
+         static void execute(const HaloType_<delta_, a_, b_, DT_, c_>& interface, SparseMatrixCSR<ContainerBackend_, DT_>& mat)
          {
            DT_* val(mat.val());
            Index* row_ptr(mat.row_ptr());
@@ -218,14 +226,18 @@ namespace FEAST
            //directly replace row i
            for(Index i(0); i < interface.size() ; ++i)
            {
+             Status s;
              Comm::send_recv(&val[row_ptr[interface.get_element(i)]],
                  row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
                  interface.get_other(),
                  &val[row_ptr[interface.get_element(i)]],
                  row_ptr[interface.get_element(i) + 1] - row_ptr[interface.get_element(i)],
-                 interface.get_other());
+                 interface.get_other(),
+                 s,
+                 i,
+                 i);
            }
-         }
+         }*/
     };
   }
 }

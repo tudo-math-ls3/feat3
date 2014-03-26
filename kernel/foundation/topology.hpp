@@ -240,14 +240,17 @@ namespace FEAST
                        Index sourcerank)
         {
           //get sizes
+          Status s1;
           Comm::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(0).get())->get(),
                                     (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[0],
                                     destrank,
                                     ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(0).get())->get(),
                                     (*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[0],
-                                    sourcerank);
+                                    sourcerank,
+                                    s1);
 
           //get row_ptrs
+          Status s2;
           IndexType_ recv_num_polytopes((*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[1]);
 
           Comm::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(1).get())->get(),
@@ -255,16 +258,19 @@ namespace FEAST
                                     destrank,
                                     ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(1).get())->get(),
                                     recv_num_polytopes,
-                                    sourcerank);
+                                    sourcerank,
+                                    s2);
           //get data
           IndexType_ recv_datasize((*(BufferedSharedArray<IndexType_>*)((recvbuffers.get().at(0).get())))[2]);
 
+          Status s3;
           Comm::send_recv(((BufferedSharedArray<IndexType_>*)sendbuffers.get().at(2).get())->get(),
                                     (*(BufferedSharedArray<IndexType_>*)((sendbuffers.get().at(0).get())))[2],
                                     destrank,
                                     ((BufferedSharedArray<IndexType_>*)recvbuffers.get().at(2).get())->get(),
                                     recv_datasize,
-                                    sourcerank);
+                                    sourcerank,
+                                    s3);
         }
 
       private:

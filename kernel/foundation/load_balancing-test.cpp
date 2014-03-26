@@ -50,11 +50,11 @@ class LoadBalancingTest1D:
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 0, 0);
       m.add_adjacency(Foundation::pl_vertex, Foundation::pl_edge, 1, 0);
 
-      OT_<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > > halos;
-      OT_<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>, std::allocator<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > boundaries;
+      OT_<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> >, std::allocator<std::shared_ptr<HaloBase<Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > > halos;
+      OT_<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>, std::allocator<Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > boundaries;
 
-      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
+      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLVertex, Mesh<Dim1D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
       boundaries.at(0).push_back(0);
       boundaries.at(1).push_back(1);
 
@@ -161,11 +161,11 @@ class LoadBalancingTest2D:
 
       Foundation::Mesh<Dim2D, Foundation::Topology<IndexType_, OT_, IT_>, OT_> m_fine(m);
 
-      OT_<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>, std::allocator<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_> > > boundaries;
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
-      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, OT_>(m));
+      OT_<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>, std::allocator<Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_> > > boundaries;
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
+      boundaries.push_back(Halo<0, PLEdge, Mesh<Dim2D, Topology<IndexType_, OT_, IT_>, OT_>, double, OT_>(m));
       boundaries.at(0).push_back(0);
       boundaries.at(1).push_back(1);
       boundaries.at(2).push_back(2);

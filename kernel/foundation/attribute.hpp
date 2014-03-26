@@ -152,19 +152,23 @@ namespace FEAST
                        BufferedData<StorageType_>& recvbuffers,
                        Index sourcerank)
         {
+          Status s1;
           Comm::send_recv(((BufferedSharedArray<Index>*)sendbuffers.get().at(0).get())->get(),
               (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[0],
               destrank,
               ((BufferedSharedArray<Index>*)recvbuffers.get().at(0).get())->get(),
               (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[0],
-              sourcerank);
+              sourcerank,
+              s1);
 
+          Status s2;
           Comm::send_recv(((BufferedSharedArray<DataType_>*)sendbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<Index>*)((sendbuffers.get().at(0).get())))[1],
               destrank,
               ((BufferedSharedArray<DataType_>*)recvbuffers.get().at(1).get())->get(),
               (*(BufferedSharedArray<Index>*)((recvbuffers.get().at(0).get())))[1],
-              sourcerank);
+              sourcerank,
+              s2);
         }
 
       protected:

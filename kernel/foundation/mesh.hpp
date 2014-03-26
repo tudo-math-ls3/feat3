@@ -90,6 +90,7 @@ namespace FEAST
         typedef typename TopologyType_::index_type_ index_type_;
         typedef typename TopologyType_::storage_type_ storage_type_;
         typedef typename TopologyType_::buffer_type_ buffer_type_;
+        typedef Dim_ dim_;
 
         ///CTOR
         Mesh(const typename TopologyType_::index_type_ id = 0, const typename TopologyType_::index_type_ pp_rank = 0, const typename TopologyType_::index_type_ mp_rank = 0) :
@@ -131,7 +132,7 @@ namespace FEAST
         }
 
         ///DTOR
-        ~Mesh()
+        virtual ~Mesh()
         {
         }
 
@@ -142,7 +143,7 @@ namespace FEAST
          * level to add a polytope to anonymously
          *
          */
-        void add_polytope(const PolytopeLevels level)
+        virtual void add_polytope(const PolytopeLevels level)
         {
           CONTEXT("When adding polytope to Mesh<>");
 #ifdef FOUNDATION_DEBUG
@@ -207,7 +208,7 @@ namespace FEAST
          * \param[in] index
          * index of the polytope to be removed
          */
-        void remove_polytope(const PolytopeLevels /*level*/, index_type_ /*i*/)
+        virtual void remove_polytope(const PolytopeLevels /*level*/, index_type_ /*i*/)
         {
           //TODO
         }
@@ -227,7 +228,7 @@ namespace FEAST
          * \param[in] value
          * index of the polytope (target)
          */
-        void add_adjacency(
+        virtual void add_adjacency(
             const PolytopeLevels from_level,
             const PolytopeLevels to_level,
             const index_type_ polytope_index,
@@ -266,7 +267,7 @@ namespace FEAST
          * index of the polytope for which the adjacencies are to be computed
          *
          */
-        const typename TopologyType_::storage_type_ get_adjacent_polytopes(
+        virtual const typename TopologyType_::storage_type_ get_adjacent_polytopes(
                                                                      const PolytopeLevels from_level,
                                                                      const PolytopeLevels to_level,
                                                                      index_type_ i) const
@@ -354,7 +355,7 @@ namespace FEAST
          * \param[in] b
          * index of the second element
          */
-        const typename TopologyType_::storage_type_ get_comm_intersection(
+        virtual const typename TopologyType_::storage_type_ get_comm_intersection(
                                                                      const PolytopeLevels intersecting_elements_level,
                                                                      const PolytopeLevels intersection_level,
                                                                      index_type_ a,
@@ -379,49 +380,91 @@ namespace FEAST
         }
 
         ///needed public access functions
-        typename TopologyType_::index_type_ get_num_levels()
+        virtual typename TopologyType_::index_type_ get_num_levels()
         {
           return _num_levels;
         }
 
         ///Further needed access functions
-        typename TopologyType_::index_type_ get_id()
+        virtual typename TopologyType_::index_type_ get_id()
         {
           return _id;
         }
 
-        typename TopologyType_::index_type_ get_pp_rank()
+        virtual typename TopologyType_::index_type_ get_pp_rank()
         {
           return _pp_rank;
         }
 
-        typename TopologyType_::index_type_ get_mp_rank()
+        virtual typename TopologyType_::index_type_ get_mp_rank()
         {
           return _mp_rank;
         }
 
-        void set_pp_rank(typename TopologyType_::index_type_ rank)
+        virtual void set_pp_rank(typename TopologyType_::index_type_ rank)
         {
           _pp_rank = rank;
         }
 
-        void set_mp_rank(typename TopologyType_::index_type_ rank)
+        virtual void set_mp_rank(typename TopologyType_::index_type_ rank)
         {
           _mp_rank = rank;
         }
 
         ///further needed getter fcts
-        OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
+        virtual OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies()
         {
           return _topologies;
         }
 
-        const OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies() const
+        virtual const OuterStorageType_<TopologyType_, std::allocator<TopologyType_> >& get_topologies() const
         {
           return _topologies;
         }
 
-        const index_type_ num_polytopes(PolytopeLevels level) const
+        virtual TopologyType_& get_topology_by_primal_level(PolytopeLevels l)
+        {
+          switch(l)
+          {
+            case pl_vertex:
+              return _topologies.at(ipi_vertex_edge);
+              break;
+            case pl_edge:
+              return _topologies.at(ipi_edge_vertex);
+              break;
+            case pl_face:
+              return _topologies.at(ipi_face_vertex);
+              break;
+            case pl_polyhedron:
+              return _topologies.at(ipi_polyhedron_vertex);
+              break;
+            default:
+              throw MeshError("Invalid polytope level!");
+          }
+        }
+
+        virtual const TopologyType_& get_topology_by_primal_level(PolytopeLevels l) const
+        {
+          switch(l)
+          {
+            case pl_vertex:
+              return _topologies.at(ipi_vertex_edge);
+              break;
+            case pl_edge:
+              return _topologies.at(ipi_edge_vertex);
+              break;
+            case pl_face:
+              return _topologies.at(ipi_face_vertex);
+              break;
+            case pl_polyhedron:
+              return _topologies.at(ipi_polyhedron_vertex);
+              break;
+            default:
+              throw MeshError("Invalid polytope level!");
+          }
+        }
+
+        virtual const index_type_ num_polytopes(PolytopeLevels level) const
         {
           switch(level)
           {
@@ -438,6 +481,10 @@ namespace FEAST
           }
         }
 
+        virtual Dimensions dim()
+        {
+          return Dim_::tag_value;
+        }
 
       private:
         typename TopologyType_::index_type_ _id;
@@ -448,12 +495,12 @@ namespace FEAST
 
         OuterStorageType_<TopologyType_, std::allocator<TopologyType_> > _topologies;
 
-        inline unsigned _level_difference(const unsigned from, const unsigned to)
+        virtual inline unsigned _level_difference(const unsigned from, const unsigned to)
         {
           return from == to ? 1u : ( from > to ? (unsigned)std::abs((double)(from - to)) - 1u : (unsigned)std::abs((double)(to - from)) - 1u);
         }
 
-        InternalPrimaryAccess _get_primary_index(const PolytopeLevels from, const PolytopeLevels to) const
+        virtual InternalPrimaryAccess _get_primary_index(const PolytopeLevels from, const PolytopeLevels to) const
         {
           switch(from)
           {
@@ -517,12 +564,12 @@ namespace FEAST
           }
         }
 
-        InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to) const
+        virtual InternalSecondaryAccess _get_secondary_index(PolytopeLevels from, PolytopeLevels to) const
         {
           return from == pl_vertex && to == pl_vertex ? InternalSecondaryAccess(1) : InternalSecondaryAccess((to - 1) * 2);
         }
 
-        InternalPolytopeIndices _get_internal_index(PolytopeLevels from, PolytopeLevels to)
+        virtual InternalPolytopeIndices _get_internal_index(PolytopeLevels from, PolytopeLevels to)
         {
           switch(from)
           {
@@ -607,12 +654,12 @@ namespace FEAST
           }
         }
 
-        bool _secondary_access_needed(PolytopeLevels from, PolytopeLevels to) const
+        virtual bool _secondary_access_needed(PolytopeLevels from, PolytopeLevels to) const
         {
           return (from != pl_vertex && to != pl_vertex) || (from == pl_vertex && to == from);
         }
 
-        InternalPolytopeIndices _transpose_internal_index(InternalPolytopeIndices ipi)
+        virtual InternalPolytopeIndices _transpose_internal_index(InternalPolytopeIndices ipi)
         {
           return (InternalPolytopeIndices)(ipi == ipi_vertex_edge ? ipi_edge_vertex : (ipi % 2 == 0 ? ipi + 1 : ipi - 1));
         }

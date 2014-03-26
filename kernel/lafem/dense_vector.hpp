@@ -20,6 +20,7 @@
 #include <kernel/lafem/arch/scale.hpp>
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/component_product.hpp>
+#include <kernel/lafem/arch/synch.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -914,7 +915,24 @@ namespace FEAST
         }
 
         /**
-         * \brief Calculates and returns the euclid norm of this vector.
+         * \brief Calculate \f$r \leftarrow this \cdot x\f$
+         *
+         * \param[out] r The dot product result.
+         * \param[in] x The other vector.
+         * \param[in] gate The gateway to be used for the global operation.
+         *
+         */
+        template <typename Algo_>
+        DataType dot(const DenseVector & x, const Arch::DotGatewayBase<Mem_, Algo_, DenseVector>* gate) const
+        {
+          if (x.size() != this->size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+
+          return gate->value(*this, x);
+        }
+
+        /**
+         * \brief Calculates and returns the euclid norm of this vector, global version.
          *
          * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
          *
@@ -922,9 +940,33 @@ namespace FEAST
          *
          */
         template <typename Algo_>
+        DT_ norm2(const Arch::Norm2GatewayBase<Mem_, Algo_, DenseVector>* gate) const
+        {
+          return gate->value(*this);
+        }
+
+        /**
+         * \brief Calculates and returns the euclid norm of this vector.
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
+         */
+        template <typename Algo_>
         DT_ norm2() const
         {
           return Arch::Norm2<Mem_, Algo_>::value(this->elements(), this->size());
+        }
+
+        /**
+         * \brief Calculates and returns the euclid norm of this vector, global version.
+         *
+         * \tparam Algo_ The \ref FEAST::Algo "algorithm" to be used.
+         *
+         */
+        template <typename Algo_>
+        DT_ norm2sqr(const Arch::Norm2SquaredGatewayBase<Mem_, Algo_, DenseVector>* gate) const
+        {
+          return gate->value(*this);
         }
 
         /**
@@ -941,9 +983,27 @@ namespace FEAST
           // fallback
           return Math::sqr(this->norm2<Algo_>());
         }
-        ///@}
 
-        /// \cond internal
+        /**
+         * \brief Synchronise type-0 vector
+         *
+         */
+        template <typename Algo_>
+        DenseVector& synch0(const Arch::SynchVec0GatewayBase<Mem_, Algo_, DenseVector>* gate)
+        {
+          return gate->value(*this);
+        }
+
+        /**
+         * \brief Synchronise type-1 vector
+         *
+         */
+        template <typename Algo_>
+        DenseVector& synch1(const Arch::SynchVec1GatewayBase<Mem_, Algo_, DenseVector>* gate)
+        {
+          return gate->value(*this);
+        }
+        ///@}
 
         /// Writes the vector-entries in an allocated array
         void set_vec(DT_ * const pval_set) const

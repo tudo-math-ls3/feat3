@@ -741,7 +741,7 @@ class MeshControlPartitioningTest2D:
           }
         }
       }
-      std::sort(halos.begin(), halos.end(), compare_other<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> >, OT_>);
+      std::sort(halos.begin(), halos.end(), compare_other<Mesh<Dim2D, Topology<IndexType_, OT_, IT_> >, double, OT_>);
 
       TEST_CHECK_EQUAL(halos.size(), Index(3));
       TEST_CHECK_EQUAL(halos.at(0)->get_other(), Index(1));
