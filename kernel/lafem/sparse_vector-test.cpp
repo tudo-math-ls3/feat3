@@ -73,9 +73,9 @@ public:
 };
 SparseVectorTest<Mem::Main, float> cpu_sparse_vector_test_float;
 SparseVectorTest<Mem::Main, double> cpu_sparse_vector_test_double;
-SparseVectorTest<Mem::Main, Index> cpu_sparse_vector_test_index;
+//SparseVectorTest<Mem::Main, Index> cpu_sparse_vector_test_index;
 #ifdef FEAST_BACKENDS_CUDA
 SparseVectorTest<Mem::CUDA, float> cuda_sparse_vector_test_float;
 SparseVectorTest<Mem::CUDA, double> cuda_sparse_vector_test_double;
-SparseVectorTest<Mem::CUDA, Index> cuda_sparse_vector_test_index;
+//SparseVectorTest<Mem::CUDA, Index> cuda_sparse_vector_test_index;
 #endif
