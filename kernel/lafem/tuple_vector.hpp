@@ -60,9 +60,9 @@ namespace FEAST
       RestClass _rest;
 
       /// rest-class emplacement ctor; this one is protected for a reason
-      explicit TupleVector(First_&& first, RestClass&& rest) :
-        _first(std::move(first)),
-        _rest(std::move(rest))
+      explicit TupleVector(First_&& the_first, RestClass&& the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest))
       {
       }
 
@@ -79,9 +79,9 @@ namespace FEAST
       }
 
       /// Sub-Vector emplacement constructor
-      explicit TupleVector(First_&& first, Rest_&&... rest) :
-        _first(std::move(first)),
-        _rest(std::move(rest...))
+      explicit TupleVector(First_&& the_first, Rest_&&... the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest...))
       {
       }
 
@@ -297,8 +297,8 @@ namespace FEAST
       {
       }
 
-      explicit TupleVector(First_&& first) :
-        _first(std::move(first))
+      explicit TupleVector(First_&& the_first) :
+        _first(std::move(the_first))
       {
       }
 

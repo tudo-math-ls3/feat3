@@ -55,9 +55,9 @@ namespace FEAST
       RestClass _rest;
 
       /// data-emplacement ctor; this one is protected for a reason
-      explicit TupleFilter(First_&& first, RestClass&& rest) :
-        _first(std::move(first)),
-        _rest(std::move(rest))
+      explicit TupleFilter(First_&& the_first, RestClass&& the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest))
       {
       }
 
@@ -68,9 +68,9 @@ namespace FEAST
       }
 
       /// sub-filter emplacement ctor
-      explicit TupleFilter(First_&& first, Rest_&&... rest) :
-        _first(std::move(first)),
-        _rest(std::move(rest...))
+      explicit TupleFilter(First_&& the_first, Rest_&&... the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest...))
       {
       }
 
@@ -197,8 +197,8 @@ namespace FEAST
       }
 
       /// sub-filter emplacement ctor
-      explicit TupleFilter(First_&& first) :
-        _first(std::move(first))
+      explicit TupleFilter(First_&& the_first) :
+        _first(std::move(the_first))
       {
       }
 

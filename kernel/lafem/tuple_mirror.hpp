@@ -60,9 +60,9 @@ namespace FEAST
       RestClass _rest;
 
       /// data-move ctor; this one is protected for a reason
-      TupleMirror(First_&& first, RestClass&& rest) :
-        _first(std::move(first)),
-        _rest(std::move(rest))
+      TupleMirror(First_&& the_first, RestClass&& the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest))
       {
       }
 
@@ -73,9 +73,9 @@ namespace FEAST
       }
 
       /// sub-mirror emplacement ctor
-      explicit TupleMirror(First_&& first, Rest_&&... rest) :
-        _first(std::move(first)),
-        _rest(std::move(rest...))
+      explicit TupleMirror(First_&& the_first, Rest_&&... the_rest) :
+        _first(std::move(the_first)),
+        _rest(std::move(the_rest...))
       {
       }
 
@@ -208,8 +208,8 @@ namespace FEAST
       {
       }
 
-      explicit TupleMirror(First_&& first) :
-        _first(std::move(first))
+      explicit TupleMirror(First_&& the_first) :
+        _first(std::move(the_first))
       {
       }
 

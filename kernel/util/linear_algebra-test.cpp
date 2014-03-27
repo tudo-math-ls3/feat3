@@ -134,8 +134,8 @@ class LinAlgTest :
 
   public:
     // constructor
-    LinAlgTest(const std::string& id) :
-      TaggedTest<Archs::None, DataType_>(id),
+    LinAlgTest(const std::string& test_name) :
+      TaggedTest<Archs::None, DataType_>(test_name),
       _eps(Math::eps<DataType_>())
     {
     }
