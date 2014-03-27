@@ -324,12 +324,13 @@ namespace FEAST
     } \
   } while (false)
 
-/// checks if a - b < epsilon
+/// checks if |a - b| <= epsilon
 #define TEST_CHECK_EQUAL_WITHIN_EPS(a, b, eps) \
   do { \
-    CHECK_INTERNAL(std::abs((a)-(b)) < eps,\
+    CHECK_INTERNAL(((a) <= ((b) + (eps))) && ((b) <= ((a) + (eps))), \
         this->_id + "\n" + "Expected '|" #a " - " #b \
-        "|' < '" + FEAST::stringify(eps) + "' but was '" + FEAST::stringify(std::abs((a)-(b))) +"'" \
+        "|' <= '" + FEAST::stringify(eps) + "' but was '" + \
+        FEAST::stringify((a) < (b) ? (b) - (a) : (a) - (b)) + "'" \
         + ", with " #a "=" + FEAST::stringify(a) + " and " #b "=" + FEAST::stringify(b))\
   } while (false)
 

@@ -56,6 +56,7 @@ public:
     TEST_CHECK_NOT_EQUAL(1, 0.5);
     TEST_CHECK_STRINGIFY_EQUAL(4711, 4711);
     TEST_CHECK_EQUAL_WITHIN_EPS(25,23,2.2);
+    TEST_CHECK_EQUAL_WITHIN_EPS(6, 7, 1);
     TEST_CHECK_THROWS(String("0").at(10), std::exception);
 
     A a(true);
