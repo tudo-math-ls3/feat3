@@ -21,18 +21,18 @@ namespace FEAST
         const double* data, void** symb, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
-        return ::umfpack_di_symbolic(static_cast<int>(nrows), static_cast<int>(ncols),
+        return int(::umfpack_di_symbolic(static_cast<int>(nrows), static_cast<int>(ncols),
           reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
-          data, symb, ctrl, info);
+          data, symb, ctrl, info));
       }
 
       static int init_numeric(const Idx_* row_ptr, const Idx_* col_idx,
         const double* data, void* symb, void** nume, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
-        return ::umfpack_di_numeric(
+        return int(::umfpack_di_numeric(
           reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
-          data, symb, nume, ctrl, info);
+          data, symb, nume, ctrl, info));
       }
 
       static void free_symbolic(void** symb)
@@ -49,9 +49,9 @@ namespace FEAST
         double* x, const double* b, void* nume, const double* control, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(int), "invalid index size");
-        return ::umfpack_di_solve(static_cast<int>(sys),
+        return int(::umfpack_di_solve(static_cast<int>(sys),
           reinterpret_cast<const int*>(row_ptr), reinterpret_cast<const int*>(col_idx),
-          data, x, b, nume, control, info);
+          data, x, b, nume, control, info));
       }
     };
 
@@ -67,18 +67,18 @@ namespace FEAST
         const double* data, void** symb, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
-        return ::umfpack_dl_symbolic(static_cast<SuiteSparse_long>(nrows), static_cast<SuiteSparse_long>(ncols),
+        return int(::umfpack_dl_symbolic(static_cast<SuiteSparse_long>(nrows), static_cast<SuiteSparse_long>(ncols),
           reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
-          data, symb, ctrl, info);
+          data, symb, ctrl, info));
       }
 
       static int init_numeric(const Idx_* row_ptr, const Idx_* col_idx,
         const double* data, void* symb, void** nume, const double* ctrl, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
-        return ::umfpack_dl_numeric(
+        return int(::umfpack_dl_numeric(
           reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
-          data, symb, nume, ctrl, info);
+          data, symb, nume, ctrl, info));
       }
 
       static void free_symbolic(void** symb)
@@ -95,9 +95,9 @@ namespace FEAST
         double* x, const double* b, void* nume, const double* control, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
-        return ::umfpack_dl_solve(static_cast<SuiteSparse_long>(sys),
+        return int(::umfpack_dl_solve(static_cast<SuiteSparse_long>(sys),
           reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
-          data, x, b, nume, control, info);
+          data, x, b, nume, control, info));
       }
     };
 
@@ -116,8 +116,18 @@ namespace FEAST
     }
 
     Umfpack::Umfpack(const MatrixType* system_matrix) :
-      Umfpack()
+      _system_matrix(nullptr),
+      _umf_control(new double[UMFPACK_CONTROL]),
+      _umf_symbolic(nullptr),
+      _umf_numeric(nullptr),
+      _sym_peak_size(0),
+      _sym_mem_size(0),
+      _num_mem_size(0),
+      _umf_peak_size(0)
     {
+      // initialise default umfpack control values
+      UmfpackWrapper<Index>::init_defaults(_umf_control);
+      // initialise solver
       init(system_matrix);
     }
 
