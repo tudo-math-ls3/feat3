@@ -24,20 +24,35 @@ namespace FEAST
     {
       struct AssignStruct
       {
-        template <typename MT_, typename T_, typename T2_>
-          static void assign(std::vector<T_ *> & own, const std::vector<T_ *> & other)
-          {
-            own.assign(other.begin(), other.end());
+        template <typename MT_, typename T1_, typename T2_>
+        static void assign(std::vector<T1_ *> & own, const std::vector<T1_ *> & other)
+        {
+          own.assign(other.begin(), other.end());
 
-            for (Index i(0) ; i < own.size() ; ++i)
-              MemoryPool<MT_>::instance()->increase_memory(own.at(i));
-          }
+          for (Index i(0) ; i < own.size() ; ++i)
+            MemoryPool<MT_>::instance()->increase_memory(own.at(i));
+        }
 
-        template <typename MT_, typename T_, typename T2_>
-          static void assign(std::vector<T_ *> &, const std::vector<T2_ *> &)
+        template <typename MT_, typename T1_, typename T2_>
+        static void assign(std::vector<T1_ *> &, const std::vector<T2_ *> &)
+        {
+          throw InternalError(__func__, __FILE__, __LINE__, "Should never be reached!");
+        }
+
+        template <typename T_>
+        static void assign_scalar(std::vector<T_> & own, const std::vector<T_> & other)
+        {
+          own(other.begin(), other.end());
+        }
+
+        template <typename T1_, typename T2_>
+        static void assign_scalar(std::vector<T1_> & own, const std::vector<T2_> & other)
+        {
+          for(auto t : other)
           {
-            throw InternalError(__func__, __FILE__, __LINE__, "Should never be reached!");
+            own.push_back(T1_(t));
           }
+        }
       };
     } //namespace Intern
 
@@ -195,7 +210,7 @@ namespace FEAST
           this->_elements_size.assign(other.get_elements_size().begin(), other.get_elements_size().end());
           this->_indices_size.assign(other.get_indices_size().begin(), other.get_indices_size().end());
           this->_scalar_index.assign(other.get_scalar_index().begin(), other.get_scalar_index().end());
-          this->_scalar_dt.assign(other.get_scalar_dt().begin(), other.get_scalar_dt().end());
+          Intern::AssignStruct::template assign_scalar<DT_, DT2_>(this->_scalar_dt, other.get_scalar_dt());
 
 
           if (std::is_same<Mem_, Mem2_>::value && std::is_same<DT_, DT2_>::value)
