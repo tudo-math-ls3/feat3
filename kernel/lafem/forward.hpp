@@ -13,6 +13,12 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_>
     class DenseVector;
 
+    template <typename Mem_, typename DT_, typename IT_, Index BlockSize_>
+    class DenseVectorBlocked;
+
+    template <typename Mem_, typename DT_, typename IT_>
+    class DenseMatrix;
+
     template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixCSR;
 

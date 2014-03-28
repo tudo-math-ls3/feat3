@@ -38,6 +38,7 @@ SET (test_list
   block_to_scalar-test
   dense_matrix-test
   dense_vector-test
+  dense_vector_blocked-test
   meta_filter-test
   meta_matrix-apply-test
   meta_mirror-test

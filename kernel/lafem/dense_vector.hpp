@@ -10,6 +10,7 @@
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/vector_base.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/edi.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 #include <kernel/lafem/arch/difference.hpp>
@@ -126,11 +127,6 @@ namespace FEAST
           return this->_scalar_index.at(0);
         }
 
-        Index _size() const
-        {
-          return this->_scalar_index.at(0);
-        }
-
       public:
         /// Our datatype
         typedef DT_ DataType;
@@ -200,6 +196,28 @@ namespace FEAST
 
           this->_elements.push_back(data);
           this->_elements_size.push_back(size_in);
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+        }
+
+        /**
+         * \brief Constructor
+         *
+         * \param[in] other The source blocked vector
+         *
+         * Creates a vector from a given source blocked vector
+         */
+        template <Index BS_>
+        explicit DenseVector(const DenseVectorBlocked<Mem_, DT_, IT_, BS_> & other) :
+          Container<Mem_, DT_, IT_>(other.raw_size())
+        {
+          CONTEXT("When creating DenseVector");
+
+          this->_elements.push_back(other.get_elements().at(0));
+          this->_elements_size.push_back(this->size());
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
@@ -384,10 +402,10 @@ namespace FEAST
          */
         void write_out_exp(std::ostream& file) const
         {
-          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((_size()));
-          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), _size());
+          DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>((this->size()));
+          MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), this->size());
 
-          for (Index i(0) ; i < _size() ; ++i)
+          for (Index i(0) ; i < this->size() ; ++i)
           {
             file << std::scientific << temp[i] << std::endl;
           }
@@ -419,7 +437,7 @@ namespace FEAST
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out an dense vector with less than double precission!"<<std::endl;
 
-          const Index csize(_size());
+          const Index csize(this->size());
           DT_ * temp = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(csize);
           MemoryPool<Mem_>::template download<DT_>(temp, this->_elements.at(0), csize);
           double * ctemp = new double[csize];
@@ -462,7 +480,7 @@ namespace FEAST
         {
           CONTEXT("When retrieving DenseVector element");
 
-          ASSERT(index < _size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(_size()) + " !");
+          ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
           return MemoryPool<Mem_>::get_element(this->_elements.at(0), index);
         }
 
@@ -476,7 +494,7 @@ namespace FEAST
         {
           CONTEXT("When setting DenseVector element");
 
-          ASSERT(index < _size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(_size()) + " !");
+          ASSERT(index < this->size(), "Error: " + stringify(index) + " exceeds dense vector size " + stringify(this->size()) + " !");
           MemoryPool<Mem_>::set_memory(this->_elements.at(0) + index, value);
         }
 

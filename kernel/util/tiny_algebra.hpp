@@ -252,6 +252,17 @@ namespace FEAST
         return *this;
       }
 
+      /// element-wise-multiply operator
+      template <int sx_>
+      Vector& operator*=(const Vector<T_, n_, sx_>& x)
+      {
+        for(Index i(0); i < Index(n_); ++i)
+        {
+          v[i] *= x.v[i];
+        }
+        return *this;
+      }
+
       /// vector-add operator
       template<int sx_>
       Vector& operator+=(const Vector<T_, n_, sx_>& x)
@@ -409,6 +420,13 @@ namespace FEAST
     inline Vector<T_, n_> operator*(const Vector<T_, n_, s_>& x, T_ alpha)
     {
       return Vector<T_, n_>(x) *= alpha;
+    }
+
+    /// vector element-wise-product operator
+    template<typename T_, int n_, int sa_, int sb_>
+    inline Vector<T_, n_> operator*(const Vector<T_, n_, sa_>& a, const Vector<T_, n_, sb_>& b)
+    {
+      return Vector<T_, n_>(a) *= b;
     }
 
     /// vector addition operator
