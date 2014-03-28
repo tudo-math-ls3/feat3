@@ -5,7 +5,9 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+#ifndef  __CUDACC__
 #include <kernel/util/math.hpp>
+#endif
 
 #include <cmath>
 
@@ -19,6 +21,7 @@ namespace FEAST
       template <typename Mem_, typename Algo_>
       struct Norm2;
 
+#ifndef  __CUDACC__
       template <>
       struct Norm2<Mem::Main, Algo::Generic>
       {
@@ -37,6 +40,7 @@ namespace FEAST
 
       extern template float Norm2<Mem::Main, Algo::Generic>::value(const float * const, const Index);
       extern template double Norm2<Mem::Main, Algo::Generic>::value(const double * const, const Index);
+#endif
 
       template <>
       struct Norm2<Mem::Main, Algo::MKL>
