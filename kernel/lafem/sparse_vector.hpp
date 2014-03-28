@@ -185,7 +185,7 @@ namespace FEAST
          * Create a deep copy of itself.
          *
          */
-        SparseVector clone()
+        SparseVector clone() const
         {
           SparseVector t;
           t.clone(*this);

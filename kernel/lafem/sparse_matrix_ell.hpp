@@ -615,7 +615,7 @@ namespace FEAST
          * Create a deep copy of itself.
          *
          */
-        SparseMatrixELL clone()
+        SparseMatrixELL clone() const
         {
           SparseMatrixELL t;
           t.clone(*this);

@@ -294,7 +294,7 @@ namespace FEAST
          * Create a deep copy of itself.
          *
          */
-        DenseVector clone()
+        DenseVector clone() const
         {
           DenseVector t;
           t.clone(*this);

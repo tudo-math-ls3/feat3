@@ -694,7 +694,7 @@ namespace FEAST
          * Create a deep copy of itself.
          *
          */
-        SparseMatrixCOO clone()
+        SparseMatrixCOO clone() const
         {
           SparseMatrixCOO t;
           t.clone(*this);

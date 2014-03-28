@@ -143,7 +143,7 @@ namespace FEAST
          * Create a deep copy of itself.
          *
          */
-        DenseMatrix clone()
+        DenseMatrix clone() const
         {
           DenseMatrix t;
           t.clone(*this);
