@@ -51,13 +51,12 @@ FOREACH (test ${test_list} )
       LINK_FLAGS "${MPI_LINK_FLAGS}")
   endif()
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --build-exe-dir "${CURRENT_BINARY_DIR}"
     --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/foundation/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
   if (FEAST_VALGRIND)
@@ -66,13 +65,12 @@ FOREACH (test ${test_list} )
   endif (FEAST_VALGRIND)
 
   ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --build-exe-dir "${CURRENT_BINARY_DIR}"
     --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/foundation/${test} main)
   SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
   if (FEAST_VALGRIND)

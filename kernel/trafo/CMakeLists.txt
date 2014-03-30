@@ -20,13 +20,12 @@ FOREACH (test ${test_list} )
   ADD_EXECUTABLE(${test} EXCLUDE_FROM_ALL ${test}.cpp)
   TARGET_LINK_LIBRARIES(${test} feast test_system kernel-geometry-test-aux)
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --build-exe-dir "${CURRENT_BINARY_DIR}"
     --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/trafo/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
   if (FEAST_VALGRIND)

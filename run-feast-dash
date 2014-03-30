@@ -116,7 +116,10 @@ def run_test(build_id, branch, myDB):
       else:
         idx += 1
 
-  make_command = "make -j 4 -O -k all tests"
+  if "ninja" in build_id:
+    make_command = "ninja -k 999 all tests"
+  else:
+    make_command = "make -j 4 -O -k all tests"
   make_output = get_output_utf8(make_command)
   process_compiler_output(re.compile("warning:"), "warning", make_output)
   process_compiler_output(re.compile("warning #"), "warning", make_output)
@@ -258,7 +261,11 @@ get_output("git fetch -v -p")
 raw_branches = get_output("git branch -a")
 raw_branches[:] = [s.strip("* ") for s in raw_branches]
 
-addition = "-unixmake"
+addition = ""
+if is_found ("ninja"):
+  addition += "-unixmake"
+else:
+  addition += "-ninja"
 if is_found ("nvcc"):
   addition = addition + "-cuda"
 if is_found ("ccache"):

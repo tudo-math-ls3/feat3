@@ -62,13 +62,12 @@ FOREACH (test ${test_list} )
   TARGET_LINK_LIBRARIES(${test} feast test_system)
 
   ADD_TEST(${test}_none ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --build-exe-dir "${CURRENT_BINARY_DIR}"
     --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} none)
   SET_PROPERTY(TEST ${test}_none PROPERTY LABELS "none")
   if (FEAST_VALGRIND)
@@ -77,13 +76,12 @@ FOREACH (test ${test_list} )
   endif (FEAST_VALGRIND)
 
   ADD_TEST(${test}_main ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --build-exe-dir "${CURRENT_BINARY_DIR}"
     --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} main)
   SET_PROPERTY(TEST ${test}_main PROPERTY LABELS "main")
   if (FEAST_VALGRIND)
@@ -92,13 +90,12 @@ FOREACH (test ${test_list} )
   endif (FEAST_VALGRIND)
 
   ADD_TEST(${test}_cuda ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAST_SOURCE_DIR}" "${CURRENT_BINARY_DIR}"
+    --build-and-test "${FEAST_SOURCE_DIR}" "${FEAST_BINARY_DIR}"
     --build-generator ${CMAKE_GENERATOR}
     --build-makeprogram ${CMAKE_MAKE_PROGRAM}
     --build-target ${test}
     --build-nocmake
     --build-noclean
-    --build-exe-dir "${CURRENT_BINARY_DIR}"
     --test-command ${CUDA_MEMCHECK_EXE} ${FEAST_BINARY_DIR}/kernel/lafem/${test} cuda cudadevicereset)
   SET_PROPERTY(TEST ${test}_cuda PROPERTY LABELS "cuda")
   if (FEAST_CUDAMEMCHECK AND FEAST_BACKENDS_CUDA)
