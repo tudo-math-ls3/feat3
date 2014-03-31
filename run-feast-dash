@@ -263,9 +263,9 @@ raw_branches[:] = [s.strip("* ") for s in raw_branches]
 
 addition = ""
 if is_found ("ninja"):
-  addition += "-unixmake"
-else:
   addition += "-ninja"
+else:
+  addition += "-unixmake"
 if is_found ("nvcc"):
   addition = addition + "-cuda"
 if is_found ("ccache"):
