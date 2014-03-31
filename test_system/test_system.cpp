@@ -29,7 +29,8 @@ int main(int argc, char** argv)
     {
       if((find(labels.begin(), labels.end(), (*i)->get_memory_name()) == labels.end()) &&
           (find(labels.begin(), labels.end(), (*i)->get_algo_name()) == labels.end()) &&
-          (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()) )
+          (find(labels.begin(), labels.end(), (*i)->get_prec_name()) == labels.end()) &&
+          (find(labels.begin(), labels.end(), (*i)->get_index_name()) == labels.end()) )
       {
         i = TestList::instance()->erase(i);
         continue;
@@ -52,6 +53,7 @@ int main(int argc, char** argv)
         << " [Memory: " << (*i)->get_memory_name() << "]"
         << " [Algo: " << (*i)->get_algo_name() << "]"
         << " [Precision: "<< (*i)->get_prec_name() << "]"
+        << " [Indexing: "<< (*i)->get_index_name() << "]"
         << std::endl;
       (*i)->run();
       std::cout << "PASSED" << std::endl;

@@ -109,3 +109,42 @@ TaggedUnitTest<Archs::None, float> taggedunittestf ("TaggedUnitTest-test float")
 TaggedUnitTest<Archs::None, double> taggedunittestd ("TaggedUnitTest-test double");
 TaggedUnitTest<Archs::None, unsigned long> taggedunittestul ("TaggedUnitTest-test unsigned long");
 TaggedUnitTest<Archs::None, int> taggedunittesti ("TaggedUnitTest-test int");
+
+/**
+* \brief full-tagged-test class for the unittest framework itself
+*
+* \test
+* test description missing
+*
+* \author Dirk Ribbrock
+*/
+template <typename Mem_, typename Algo_, typename DT_, typename IT_>
+class FullTaggedUnitTest
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+{
+public:
+  /// Constructor
+  FullTaggedUnitTest(const String & id_in)
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>(id_in)
+  {
+  }
+
+  /// runs the tests
+  virtual void run() const
+  {
+    TEST_CHECK(true);
+    TEST_CHECK_EQUAL(1,1);
+    TEST_CHECK_NOT_EQUAL(1, 0.5);
+    TEST_CHECK_STRINGIFY_EQUAL(4711, 4711);
+    TEST_CHECK_EQUAL_WITHIN_EPS(25,23,2.2);
+    TEST_CHECK_THROWS(String("0").at(10), std::exception);
+
+    A a(true);
+    A b(true);
+    TEST_CHECK_EQUAL(a, b);
+    A c(false);
+    TEST_CHECK_NOT_EQUAL(a, c);
+  }
+};
+FullTaggedUnitTest<Archs::None, Archs::None, float, Index> fulltaggedunittestf ("FullTaggedUnitTest-test float");
+FullTaggedUnitTest<Archs::None, Archs::None, double, Index> fulltaggedunittestd ("FullTaggedUnitTest-test double");

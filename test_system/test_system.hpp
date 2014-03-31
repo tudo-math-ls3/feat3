@@ -159,12 +159,14 @@ namespace FEAST
 
       /// test description String
       const String _id;
-      /// architecture description String
-      String _tag_name;
-      /// precision description String
-      String _prec_name;
+      /// memory description String
+      String _mem_name;
       /// algorithm description String
       String _algo_name;
+      /// precision description String
+      String _prec_name;
+      /// index type description String
+      String _index_name;
 
 
     public:
@@ -177,9 +179,10 @@ namespace FEAST
         */
       BaseTest(const String& id_in)
         : _id(id_in),
-        _tag_name(Type::Traits<Archs::None>::name()),
+        _mem_name(Type::Traits<Archs::None>::name()),
+        _algo_name(Type::Traits<Archs::None>::name()),
         _prec_name(Type::Traits<Archs::None>::name()),
-        _algo_name(Type::Traits<Archs::None>::name())
+        _index_name(Type::Traits<Archs::None>::name())
       {
         TestList::instance()->register_test(this);
       }
@@ -211,7 +214,7 @@ namespace FEAST
       /// returns our target platform
       virtual String get_memory_name()
       {
-        return _tag_name;
+        return _mem_name;
       }
 
       /// returns our target platform
@@ -225,6 +228,12 @@ namespace FEAST
       {
         return _algo_name;
       }
+
+      /// returns our target platform
+      virtual String get_index_name()
+      {
+        return _index_name;
+      }
     }; // class BaseTest
 
     struct NotSet
@@ -236,12 +245,12 @@ namespace FEAST
     };
 
     /**
-     * \brief abstract base class for all tagged test classes
+     * \brief abstract base class for all memory tagged test classes
      *
      * \author Dirk Ribbrock
      */
     template<
-      typename Tag_,
+      typename Mem_,
       typename DataType_,
       typename Algo_ = NotSet>
     class TaggedTest
@@ -257,16 +266,52 @@ namespace FEAST
       TaggedTest(const String & id_in)
         : BaseTest(id_in)
       {
-        _tag_name = Type::Traits<Tag_>::name();
-        _prec_name = Type::Traits<DataType_>::name();
+        _mem_name = Type::Traits<Mem_>::name();
         _algo_name = Type::Traits<Algo_>::name();
-      };
+        _prec_name = Type::Traits<DataType_>::name();
+        _index_name = NotSet::name();
+      }
 
       /// DTOR
       virtual ~TaggedTest()
       {
       }
     }; // class TaggedTest
+
+    /**
+     * \brief abstract base class for all full tagged test classes
+     *
+     * \author Dirk Ribbrock
+     */
+    template<
+      typename Mem_,
+      typename Algo_,
+      typename DT_,
+      typename IT_>
+    class FullTaggedTest
+      : public BaseTest
+    {
+    public:
+      /**
+      * \brief CTOR
+      *
+      * \param[in] id
+      * the testcase's id string
+      */
+      FullTaggedTest(const String & id_in)
+        : BaseTest(id_in)
+      {
+        _mem_name = Type::Traits<Mem_>::name();
+        _algo_name = Type::Traits<Algo_>::name();
+        _prec_name = Type::Traits<DT_>::name();
+        _index_name = Type::Traits<IT_>::name();
+      }
+
+      /// DTOR
+      virtual ~FullTaggedTest()
+      {
+      }
+    }; // class FullTaggedTest
   } // namespace TestSystem
 } // namespace FEAST
 /// checks if a == b
