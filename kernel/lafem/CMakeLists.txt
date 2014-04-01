@@ -50,7 +50,7 @@ SET (test_list
   pointstar_factory-test
   richardson-test
   sparse_matrix_conversion-test
-  sparse_matrix_band-test
+  sparse_matrix_banded-test
   sparse_matrix_coo-test
   sparse_matrix_csr-test
   sparse_matrix_ell-test

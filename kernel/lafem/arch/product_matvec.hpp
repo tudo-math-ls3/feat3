@@ -78,7 +78,7 @@ namespace FEAST
         }
 
         template <typename DT_>
-        static void band_q2_d2(DT_ * r, const DT_ * const val, const DT_ * const x, const Index nodes_per_row, const Index nodes_per_column)
+        static void banded_q1_d2(DT_ * r, const DT_ * const val, const DT_ * const x, const Index nodes_per_row, const Index nodes_per_column)
         {
           const Index rows(nodes_per_row * nodes_per_column);
           const Index m(nodes_per_row);
@@ -179,8 +179,8 @@ namespace FEAST
       extern template void ProductMatVec<Mem::Main, Algo::Generic>::coo(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
       extern template void ProductMatVec<Mem::Main, Algo::Generic>::coo(double *, const double * const, const Index * const, const Index * const, const double * const, const Index, const Index);
 
-      extern template void ProductMatVec<Mem::Main, Algo::Generic>::band_q2_d2(float *, const float * const, const float * const, const Index, const Index);
-      extern template void ProductMatVec<Mem::Main, Algo::Generic>::band_q2_d2(double *, const double * const, const double * const, const Index, const Index);
+      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded_q1_d2(float *, const float * const, const float * const, const Index, const Index);
+      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded_q1_d2(double *, const double * const, const double * const, const Index, const Index);
 
       template <>
       struct ProductMatVec<Mem::Main, Algo::MKL>

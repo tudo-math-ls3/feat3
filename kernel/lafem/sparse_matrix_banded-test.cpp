@@ -1,7 +1,7 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 #include <test_system/test_system.hpp>
-#include <kernel/lafem/sparse_matrix_band.hpp>
+#include <kernel/lafem/sparse_matrix_banded.hpp>
 #include <kernel/util/binary_stream.hpp>
 
 #include <kernel/util/random.hpp>
@@ -27,16 +27,16 @@ using namespace FEAST::TestSystem;
 template<
   typename Mem_,
   typename DT_>
-class SparseMatrixBandTest
+class SparseMatrixBandedTest
   : public TaggedTest<Mem_, DT_>
 {
 public:
-  SparseMatrixBandTest()
-    : TaggedTest<Mem_, DT_>("SparseMatrixBandTest")
+  SparseMatrixBandedTest()
+    : TaggedTest<Mem_, DT_>("SparseMatrixBandedTest")
   {
   }
 
-  typedef SparseMatrixBand<Mem_, DT_, FiniteElementType::fe_q1, Index> BM_;
+  typedef SparseMatrixBanded<Mem_, DT_, FiniteElementType::fe_q1, Index> BM_;
   typedef Algo::Generic Algo_;
 
   virtual void run() const
@@ -105,11 +105,11 @@ public:
     }
 }
 };
-SparseMatrixBandTest<Mem::Main, float> cpu_sparse_matrix_band_test_float;
-SparseMatrixBandTest<Mem::Main, double> cpu_sparse_matrix_band_test_double;
+SparseMatrixBandedTest<Mem::Main, float> cpu_sparse_matrix_banded_test_float;
+SparseMatrixBandedTest<Mem::Main, double> cpu_sparse_matrix_banded_test_double;
 // #ifdef FEAST_BACKENDS_CUDA
-// SparseMatrixBandTest<Mem::CUDA, float> cuda_sparse_matrix_band_test_float;
-// SparseMatrixBandTest<Mem::CUDA, double> cuda_sparse_matrix_band_test_double;
+// SparseMatrixBandedTest<Mem::CUDA, float> cuda_sparse_matrix_banded_test_float;
+// SparseMatrixBandedTest<Mem::CUDA, double> cuda_sparse_matrix_banded_test_double;
 // #endif
 
 
@@ -117,12 +117,12 @@ SparseMatrixBandTest<Mem::Main, double> cpu_sparse_matrix_band_test_double;
 //   typename Mem_,
 //   typename Algo_,
 //   typename DT_>
-// class SparseMatrixBandApplyTest
+// class SparseMatrixBandedApplyTest
 //   : public TaggedTest<Mem_, DT_, Algo_>
 // {
 // public:
-//   SparseMatrixBandApplyTest()
-//     : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixBandApplyTest")
+//   SparseMatrixBandedApplyTest()
+//     : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixBandedApplyTest")
 //   {
 //   }
 
@@ -131,27 +131,27 @@ SparseMatrixBandTest<Mem::Main, double> cpu_sparse_matrix_band_test_double;
 //   }
 // };
 
-// SparseMatrixBandApplyTest<Mem::Main, Algo::Generic, float> sm_band_apply_test_float;
-// SparseMatrixBandApplyTest<Mem::Main, Algo::Generic, double> sm_band_apply_test_double;
+// SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float> sm_banded_apply_test_float;
+// SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double> sm_banded_apply_test_double;
 // // #ifdef HONEI_BACKENDS_MKL
-// // SparseMatrixBandApplyTest<Mem::Main, Algo::MKL, float> mkl_sm_band_apply_test_float;
-// // SparseMatrixBandApplyTest<Mem::Main, Algo::MKL, double> mkl_sm_band_apply_test_double;
+// // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, float> mkl_sm_banded_apply_test_float;
+// // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, double> mkl_sm_banded_apply_test_double;
 // // #endif
 // // #ifdef FEAST_BACKENDS_CUDA
-// // SparseMatrixBandApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_band_apply_test_float;
-// // SparseMatrixBandApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_band_apply_test_double;
+// // SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_banded_apply_test_float;
+// // SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_banded_apply_test_double;
 // // #endif
 
 // template<
 //   typename Mem_,
 //   typename Algo_,
 //   typename DT_>
-// class SparseMatrixBandScaleTest
+// class SparseMatrixBandedScaleTest
 //   : public TaggedTest<Mem_, DT_, Algo_>
 // {
 // public:
-//   SparseMatrixBandScaleTest()
-//     : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixBandScaleTest")
+//   SparseMatrixBandedScaleTest()
+//     : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixBandedScaleTest")
 //   {
 //   }
 
@@ -159,13 +159,13 @@ SparseMatrixBandTest<Mem::Main, double> cpu_sparse_matrix_band_test_double;
 //   {
 //   }
 // };
-// SparseMatrixBandScaleTest<Mem::Main, Algo::Generic, float> sm_band_scale_test_float;
-// SparseMatrixBandScaleTest<Mem::Main, Algo::Generic, double> sm_band_scale_test_double;
+// SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, float> sm_banded_scale_test_float;
+// SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, double> sm_banded_scale_test_double;
 // // #ifdef FEAST_BACKENDS_MKL
-// // SparseMatrixBandScaleTest<Mem::Main, Algo::MKL, float> mkl_sm_band_scale_test_float;
-// // SparseMatrixBandScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_band_scale_test_double;
+// // SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, float> mkl_sm_banded_scale_test_float;
+// // SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_banded_scale_test_double;
 // // #endif
 // // #ifdef FEAST_BACKENDS_CUDA
-// // SparseMatrixBandScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_band_scale_test_float;
-// // SparseMatrixBandScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_band_scale_test_double;
+// // SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_banded_scale_test_float;
+// // SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_banded_scale_test_double;
 // // #endif

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_LAFEM_SPARSE_MATRIX_BAND_HPP
-#define KERNEL_LAFEM_SPARSE_MATRIX_BAND_HPP 1
+#ifndef KERNEL_LAFEM_SPARSE_MATRIX_BANDED_HPP
+#define KERNEL_LAFEM_SPARSE_MATRIX_BANDED_HPP 1
 
 // includes, FEAST
 #include <kernel/base_header.hpp>
@@ -30,12 +30,12 @@ namespace FEAST
      */
     enum class FiniteElementType
     {
-      fe_q2 = 0,
-      fe_q1
+      fe_q1 = 0,
+      fe_q2
     };
 
     template <typename Mem_, typename DT_, FiniteElementType BT_, typename IT_>
-    class SparseMatrixBand : public Container<Mem_, DT_, IT_>, public MatrixBase
+    class SparseMatrixBanded : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
     };
 
@@ -61,7 +61,7 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template <typename Mem_, typename DT_, typename IT_>
-    class SparseMatrixBand<Mem_, DT_, FiniteElementType::fe_q1, IT_> : public Container<Mem_, DT_, IT_>, public MatrixBase
+    class SparseMatrixBanded<Mem_, DT_, FiniteElementType::fe_q1, IT_> : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
     private:
       Index & _size()
@@ -119,10 +119,10 @@ namespace FEAST
        *
        * Creates an empty non dimensional matrix.
        */
-      explicit SparseMatrixBand() :
+      explicit SparseMatrixBanded() :
         Container<Mem_, DT_, IT_> (0)
       {
-        CONTEXT("When creating SparseMatrixBand");
+        CONTEXT("When creating SparseMatrixBanded");
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -142,8 +142,8 @@ namespace FEAST
        *
        * Creates a matrix with given dimensions and content.
        */
-      explicit SparseMatrixBand(const Index nodes_per_row_in, const Index nodes_per_column_in,
-                                DenseVector<Mem_, DT_, IT_> & val_in) :
+      explicit SparseMatrixBanded(const Index nodes_per_row_in, const Index nodes_per_column_in,
+                                  DenseVector<Mem_, DT_, IT_> & val_in) :
         Container<Mem_, DT_, IT_>(nodes_per_row_in * nodes_per_row_in * nodes_per_column_in * nodes_per_column_in)
       {
         if (val_in.size() != 9 * nodes_per_row_in * nodes_per_column_in)
@@ -151,7 +151,7 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Size of vector does not match to number of nodes!");
         }
 
-        CONTEXT("When creating SparseMatrixBand");
+        CONTEXT("When creating SparseMatrixBanded");
         this->_scalar_index.push_back(nodes_per_row_in * nodes_per_column_in);
         this->_scalar_index.push_back(nodes_per_row_in * nodes_per_column_in);
         this->_scalar_index.push_back(9 * nodes_per_row_in * nodes_per_column_in - 6 * nodes_per_row_in - 2);
@@ -175,8 +175,8 @@ namespace FEAST
        *
        * Creates a matrix with given dimensions and content.
        */
-      explicit SparseMatrixBand(const Index size_in,
-                                DenseVector<Mem_, DT_, IT_> & val_in) :
+      explicit SparseMatrixBanded(const Index size_in,
+                                  DenseVector<Mem_, DT_, IT_> & val_in) :
         Container<Mem_, DT_, IT_>(size_in * size_in * size_in * size_in)
       {
         const Index size_in_sqr(Math::sqr(size_in));
@@ -185,7 +185,7 @@ namespace FEAST
         {
           throw InternalError(__func__, __FILE__, __LINE__, "Size of vector does not match to number of nodes!");
         }
-        CONTEXT("When creating SparseMatrixBand");
+        CONTEXT("When creating SparseMatrixBanded");
         this->_scalar_index.push_back(size_in_sqr);
         this->_scalar_index.push_back(size_in_sqr);
         this->_scalar_index.push_back(9 * size_in_sqr - 6 * size_in - 2);
@@ -208,10 +208,10 @@ namespace FEAST
        *
        * Moves a given matrix to this matrix.
        */
-      SparseMatrixBand(SparseMatrixBand && other) :
-        Container<Mem_, DT_, IT_>(std::forward<SparseMatrixBand>(other))
+      SparseMatrixBanded(SparseMatrixBanded && other) :
+        Container<Mem_, DT_, IT_>(std::forward<SparseMatrixBanded>(other))
       {
-        CONTEXT("When moving SparseMatrixBand");
+        CONTEXT("When moving SparseMatrixBanded");
       }
 
       /**
@@ -221,11 +221,11 @@ namespace FEAST
        *
        * Moves another matrix to the target matrix.
        */
-      SparseMatrixBand & operator= (SparseMatrixBand && other)
+      SparseMatrixBanded & operator= (SparseMatrixBanded && other)
       {
-        CONTEXT("When moving SparseMatrixBand");
+        CONTEXT("When moving SparseMatrixBanded");
 
-        this->move(std::forward<SparseMatrixBand>(other));
+        this->move(std::forward<SparseMatrixBanded>(other));
 
         return *this;
       }
@@ -235,9 +235,9 @@ namespace FEAST
        * Create a deep copy of itself.
        *
        */
-      SparseMatrixBand clone()
+      SparseMatrixBanded clone()
       {
-        SparseMatrixBand t;
+        SparseMatrixBanded t;
         t.clone(*this);
         return t;
       }
@@ -252,9 +252,9 @@ namespace FEAST
        * Use source matrix content as content of current matrix
        */
       template <typename Mem2_, typename DT2_, typename IT2_>
-      void convert(const SparseMatrixBand<Mem2_, DT2_, FiniteElementType::fe_q1, IT2_> & other)
+      void convert(const SparseMatrixBanded<Mem2_, DT2_, FiniteElementType::fe_q1, IT2_> & other)
       {
-        CONTEXT("When converting SparseMatrixBand");
+        CONTEXT("When converting SparseMatrixBanded");
         this->assign(other);
       }
 
@@ -268,7 +268,7 @@ namespace FEAST
        */
       DT_ operator()(Index row, Index col) const
       {
-        CONTEXT("When retrieving SparseMatrixBand element");
+        CONTEXT("When retrieving SparseMatrixBanded element");
 
         ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix band row size " + stringify(rows()) + " !");
         ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix band column size " + stringify(columns()) + " !");
@@ -408,7 +408,7 @@ namespace FEAST
        */
       static String name()
       {
-        return "SparseMatrixBand";
+        return "SparseMatrixBanded";
       }
 
       /**
@@ -416,7 +416,7 @@ namespace FEAST
        *
        * \param[in] x The Matrix to be copied.
        */
-      void copy(const SparseMatrixBand & x)
+      void copy(const SparseMatrixBanded & x)
       {
         this->_copy_content(x);
       }
@@ -427,7 +427,7 @@ namespace FEAST
        * \param[in] x The Matrix to be copied.
        */
       template <typename Mem2_>
-      void copy(const SparseMatrixBand<Mem2_, DT_, FiniteElementType::fe_q1, IT_> & x)
+      void copy(const SparseMatrixBanded<Mem2_, DT_, FiniteElementType::fe_q1, IT_> & x)
       {
         this->_copy_content(x);
       }
@@ -441,8 +441,8 @@ namespace FEAST
        */
       template <typename Algo_>
       void axpy(
-                const SparseMatrixBand & x,
-                const SparseMatrixBand & y,
+                const SparseMatrixBanded & x,
+                const SparseMatrixBanded & y,
                 const DT_ alpha = DT_(1))
       {
         if (x.nodes_per_row() != y.nodes_per_row())
@@ -476,7 +476,7 @@ namespace FEAST
        * \param[in] alpha A scalar to scale x with.
        */
       template <typename Algo_>
-      void scale(const SparseMatrixBand & x, const DT_ alpha)
+      void scale(const SparseMatrixBanded & x, const DT_ alpha)
       {
         if (x.nodes_per_row() != this->nodes_per_row())
           throw InternalError(__func__, __FILE__, __LINE__, "Matrix number of nodes per row do not match!");
@@ -500,11 +500,11 @@ namespace FEAST
         if (x.size() != this->columns())
           throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
-        Arch::ProductMatVec<Mem_, Algo_>::band_q2_d2(r.elements(),
-                                                     this->val(),
-                                                     x.elements(),
-                                                     this->_scalar_index.at(5),
-                                                     this->_scalar_index.at(6));
+        Arch::ProductMatVec<Mem_, Algo_>::banded_q1_d2(r.elements(),
+                                                       this->val(),
+                                                       x.elements(),
+                                                       this->_scalar_index.at(5),
+                                                       this->_scalar_index.at(6));
       }
 
       /**
@@ -532,12 +532,12 @@ namespace FEAST
         // r <- y - A*x
         if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
         {
-          Arch::Defect<Mem_, Algo_>::band_q2_d2(r.elements(),
-                                                y.elements(),
-                                                this->val(),
-                                                x.elements(),
-                                                this->_scalar_index.at(5),
-                                                this->_scalar_index.at(6));
+          Arch::Defect<Mem_, Algo_>::banded_q1_d2(r.elements(),
+                                                  y.elements(),
+                                                  this->val(),
+                                                  x.elements(),
+                                                  this->_scalar_index.at(5),
+                                                  this->_scalar_index.at(6));
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -545,13 +545,13 @@ namespace FEAST
         // r <- y + alpha*x
         else
         {
-          Arch::Axpy<Mem_, Algo_>::band_q2_d2(r.elements(),
-                                              alpha,
-                                              x.elements(),
-                                              y.elements(),
-                                              this->val(),
-                                              this->_scalar_index.at(5),
-                                              this->_scalar_index.at(6));
+          Arch::Axpy<Mem_, Algo_>::banded_q1_d2(r.elements(),
+                                                alpha,
+                                                x.elements(),
+                                                y.elements(),
+                                                this->val(),
+                                                this->_scalar_index.at(5),
+                                                this->_scalar_index.at(6));
         }
       }
 
@@ -569,14 +569,14 @@ namespace FEAST
     };
 
     /**
-     * \brief SparseMatrixBand streaming operator
+     * \brief SparseMatrixBanded streaming operator
      *
      * \param[in] lhs The target stream.
      * \param[in] b The matrix to be streamed.
      */
     template <typename Mem_, typename DT_, typename IT_>
     std::ostream &
-    operator<< (std::ostream & lhs, const SparseMatrixBand<Mem_, DT_, FiniteElementType::fe_q1, IT_> & b)
+    operator<< (std::ostream & lhs, const SparseMatrixBanded<Mem_, DT_, FiniteElementType::fe_q1, IT_> & b)
     {
       lhs << "[" << std::endl;
       for (Index i(0) ; i < b.rows() ; ++i)
@@ -596,4 +596,4 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_SPARSE_MATRIX_BAND_HPP
+#endif // KERNEL_LAFEM_SPARSE_MATRIX_BANDED_HPP
