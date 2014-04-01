@@ -49,7 +49,6 @@ public:
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::BognerFoxSchmit::Element<TrafoType> SpaceType;
-    typedef typename SpaceType::DofMappingType DofMapping;
     typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 1> > CubatureRule;
 
     // compute eps

@@ -43,14 +43,9 @@ public:
 
     try
     {
-
       // typedef index set type
       typedef IndexSet<2> IndexSetTypeEV;
       typedef IndexSet<4> IndexSetTypeQV;
-
-      // typedef index vector reference
-      typedef IndexSetTypeEV::ConstIndexVectorReference ConstIndexVectorReferenceEV;
-      typedef IndexSetTypeQV::ConstIndexVectorReference ConstIndexVectorReferenceQV;
 
       // fetch the quad-vertex- and the edge-vertex-index set
       const IndexSetTypeEV& index_set_e_v = mesh->get_index_set<1,0>();
@@ -90,14 +85,9 @@ public:
 
     try
     {
-
       // typedef index set type
       typedef IndexSet<2> IndexSetTypeEV;
       typedef IndexSet<3> IndexSetTypeTV;
-
-      // typedef index vector reference
-      typedef IndexSetTypeEV::ConstIndexVectorReference ConstIndexVectorReferenceEV;
-      typedef IndexSetTypeTV::ConstIndexVectorReference ConstIndexVectorReferenceTV;
 
       // fetch the triangle-vertex- and the edge-vertex index set
       const IndexSetTypeEV& index_set_e_v = mesh->get_index_set<1,0>();
@@ -142,7 +132,6 @@ public:
 
     try
     {
-
       // typedef index set types
       typedef IndexSet<2> IndexSetTypeEV;
 
