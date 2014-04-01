@@ -34,6 +34,9 @@ for further application development.
 
 using namespace FEAST;
 
+namespace ProtoStokes
+{
+
 // basic typedefs
 typedef double DataType;
 typedef Mem::Main MemType;
@@ -666,4 +669,11 @@ int main(int /*argc*/, char** /*argv*/)
 
   // okay
   return 0;
+}
+
+} // namespace ProtoStokes
+
+int main(int argc, char** argv)
+{
+  return ProtoStokes::main(argc, argv);
 }

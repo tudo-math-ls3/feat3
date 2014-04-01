@@ -13,8 +13,6 @@
 
 using namespace FEAST;
 
-typedef double DataType;
-
 typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 typedef Geometry::RefinedUnitCubeFactory<QuadMesh> QuadMeshFactory;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
@@ -22,8 +20,6 @@ typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 typedef Space::Discontinuous::Element<QuadTrafo> QuadSpaceQ0;
-
-typedef LAFEM::DenseVector<Mem::Main, DataType> VectorType;
 
 template<typename Space_>
 void test_interpolation(Index level)
@@ -44,13 +40,13 @@ void test_interpolation(Index level)
   Assembly::Common::SineBubbleFunction sine_bubble;
 
   // interpolate functor into FE space
-  VectorType vector;
+  LAFEM::DenseVector<Mem::Main, double> vector;
   Assembly::Interpolator::project(vector, sine_bubble, space);
 
   // compute L2-error
   Cubature::DynamicFactory cubature_factory("auto-degree:10");
-  DataType l2err = Assembly::ScalarErrorComputerL2::compute(vector, sine_bubble, space, cubature_factory);
-  DataType h1err = Assembly::ScalarErrorComputerH1::compute(vector, sine_bubble, space, cubature_factory);
+  double l2err = Assembly::ScalarErrorComputerL2::compute(vector, sine_bubble, space, cubature_factory);
+  double h1err = Assembly::ScalarErrorComputerH1::compute(vector, sine_bubble, space, cubature_factory);
 
   // print error
   std::cout << "Level: " << level <<

@@ -22,8 +22,8 @@ typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
 
-typedef LAFEM::DenseVector<Mem::Main, double> VectorType;
-typedef LAFEM::SparseMatrixCSR<Mem::Main, double> MatrixType;
+typedef LAFEM::DenseVector<Mem::Main, double> MyVectorType;
+typedef LAFEM::SparseMatrixCSR<Mem::Main, double> MyMatrixType;
 
 typedef LAFEM::VectorMirror<Mem::Main, double> VectorMirrorType;
 typedef LAFEM::MatrixMirror<Mem::Main, double> MatrixMirrorType;
@@ -31,7 +31,7 @@ typedef LAFEM::MatrixMirror<Mem::Main, double> MatrixMirrorType;
 void fill_cell_set(QuadCellSet& cell, int face);
 void fill_quad_mesh_2d(QuadMesh& mesh, Real x = 0.0, Real y = 0.0);
 
-void sync_add(VectorType& a, VectorType& b)
+void sync_add(MyVectorType& a, MyVectorType& b)
 {
   double * av(a.elements());
   double * bv(b.elements());
@@ -40,7 +40,7 @@ void sync_add(VectorType& a, VectorType& b)
     av[i] = bv[i] = av[i] + bv[i];
 }
 
-void sync_add(MatrixType& a, MatrixType& b)
+void sync_add(MyMatrixType& a, MyMatrixType& b)
 {
   double * av(a.val());
   double * bv(b.val());
@@ -66,12 +66,12 @@ void test_mirror(
   Adjacency::Graph dof_mir_1(Assembly::MirrorAssembler::assemble_mirror_graph(space_1, cell_1));
 
   // allocate local vectors
-  VectorType loc_vec_0(space_0.get_num_dofs(), Real(0));
-  VectorType loc_vec_1(space_1.get_num_dofs(), Real(0));
+  MyVectorType loc_vec_0(space_0.get_num_dofs(), Real(0));
+  MyVectorType loc_vec_1(space_1.get_num_dofs(), Real(0));
 
   // allocate local matrices
-  MatrixType loc_mat_0;
-  MatrixType loc_mat_1;
+  MyMatrixType loc_mat_0;
+  MyMatrixType loc_mat_1;
   Assembly::SymbolicMatrixAssemblerBase::assemble(loc_mat_0, dof_adj_0);
   Assembly::SymbolicMatrixAssemblerBase::assemble(loc_mat_1, dof_adj_1);
 
@@ -101,14 +101,14 @@ void test_mirror(
   MatrixMirrorType mat_mir_1(vec_mir_1, vec_mir_1);
 
   // allocate buffer vectors
-  VectorType buf_vec_0;
-  VectorType buf_vec_1;
+  MyVectorType buf_vec_0;
+  MyVectorType buf_vec_1;
   Assembly::MirrorAssembler::assemble_buffer_vector(buf_vec_0, vec_mir_0, loc_vec_0);
   Assembly::MirrorAssembler::assemble_buffer_vector(buf_vec_1, vec_mir_1, loc_vec_1);
 
   // allocate buffer matrices
-  MatrixType buf_mat_0;
-  MatrixType buf_mat_1;
+  MyMatrixType buf_mat_0;
+  MyMatrixType buf_mat_1;
   Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat_0, mat_mir_0, loc_mat_0);
   Assembly::MirrorAssembler::assemble_buffer_matrix(buf_mat_1, mat_mir_1, loc_mat_1);
 
@@ -127,15 +127,15 @@ void test_mirror(
   sync_add(buf_mat_0, buf_mat_1);
 
   // clone local vectors
-  VectorType glob_vec_0;
+  MyVectorType glob_vec_0;
   glob_vec_0.clone(loc_vec_0);
-  VectorType glob_vec_1;
+  MyVectorType glob_vec_1;
   glob_vec_1.clone(loc_vec_1);
 
   // clone local matrices
-  MatrixType glob_mat_0;
+  MyMatrixType glob_mat_0;
   glob_mat_0.clone(loc_mat_0);
-  MatrixType glob_mat_1;
+  MyMatrixType glob_mat_1;
   glob_mat_1.clone(loc_mat_1);
 
   // scatter vectors

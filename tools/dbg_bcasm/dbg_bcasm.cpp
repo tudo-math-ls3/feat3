@@ -14,19 +14,12 @@
 
 using namespace FEAST;
 
-typedef double DataType;
-
 typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 typedef Geometry::CellSubSet<Shape::Quadrilateral> QuadCellSet;
 typedef Trafo::Standard::Mapping<QuadMesh> QuadTrafo;
 
 typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 typedef Space::RannacherTurek::Element<QuadTrafo> QuadSpaceQ1T;
-
-typedef LAFEM::DenseVector<Mem::Main, DataType> VectorType;
-typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType> MatrixType;
-
-typedef LAFEM::UnitFilter<Mem::Main, DataType> UnitFilterType;
 
 void fill_cell_set(QuadCellSet& cell, int face);
 void fill_quad_mesh_2d(QuadMesh& mesh, Real x = 0.0, Real y = 0.0);
@@ -37,6 +30,12 @@ void test_bcasm(
   const CellSet_& cell,
   const String cubature_name = "gauss-legendre:2")
 {
+  typedef double DataType;
+  typedef LAFEM::DenseVector<Mem::Main, DataType> VectorType;
+  typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType> MatrixType;
+
+  typedef LAFEM::UnitFilter<Mem::Main, DataType> UnitFilterType;
+
   Cubature::DynamicFactory cubature_factory(cubature_name);
 
   // assemble system matrix
