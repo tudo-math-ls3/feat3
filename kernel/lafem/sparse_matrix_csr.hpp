@@ -1343,23 +1343,85 @@ namespace FEAST
       if (a.zero_element() != b.zero_element())
         return false;
 
-      if(a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
+      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
         return true;
+
+      IT_ * col_ind_a;
+      IT_ * col_ind_b;
+      DT_ * val_a;
+      DT_ * val_b;
+      IT_ * row_ptr_a;
+      IT_ * row_ptr_b;
+
+      bool ret(true);
+
+      if(std::is_same<Mem::Main, Mem_>::value)
+      {
+        col_ind_a = (IT_*)a.col_ind();
+        val_a = (DT_*)a.val();
+        row_ptr_a = (IT_*)a.row_ptr();
+      }
+      else
+      {
+        col_ind_a = new IT_[a.used_elements()];
+        MemoryPool<Mem_>::instance()->template download<IT_>(col_ind_a, a.col_ind(), a.used_elements());
+        val_a = new DT_[a.used_elements()];
+        MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.val(), a.used_elements());
+        row_ptr_a = new IT_[a.rows() + 1];
+        MemoryPool<Mem_>::instance()->template download<IT_>(row_ptr_a, a.row_ptr(), a.rows() + 1);
+      }
+      if(std::is_same<Mem::Main, Mem2_>::value)
+      {
+        col_ind_b = (IT_*)b.col_ind();
+        val_b = (DT_*)b.val();
+        row_ptr_b = (IT_*)b.row_ptr();
+      }
+      else
+      {
+        col_ind_b = new IT_[b.used_elements()];
+        MemoryPool<Mem2_>::instance()->template download<IT_>(col_ind_b, b.col_ind(), b.used_elements());
+        val_b = new DT_[b.used_elements()];
+        MemoryPool<Mem2_>::instance()->template download<DT_>(val_b, b.val(), b.used_elements());
+        row_ptr_b = new IT_[b.rows() + 1];
+        MemoryPool<Mem2_>::instance()->template download<IT_>(row_ptr_b, b.row_ptr(), b.rows() + 1);
+      }
 
       for (Index i(0) ; i < a.used_elements() ; ++i)
       {
-        if (MemoryPool<Mem_>::get_element(a.col_ind(), i) != MemoryPool<Mem2_>::get_element(b.col_ind(), i))
-          return false;
-        if (MemoryPool<Mem_>::get_element(a.val(), i) != MemoryPool<Mem2_>::get_element(b.val(), i))
-          return false;
+        if (col_ind_a[i] != col_ind_b[i])
+        {
+          ret = false;
+          break;
+        }
+        if (val_a[i] != val_b[i])
+        {
+          ret = false;
+          break;
+        }
       }
       for (Index i(0) ; i < a.rows() + 1; ++i)
       {
-        if (MemoryPool<Mem_>::get_element(a.row_ptr(), i) != MemoryPool<Mem2_>::get_element(b.row_ptr(), i))
-          return false;
+        if (row_ptr_a[i] != row_ptr_b[i])
+        {
+          ret = false;
+          break;
+        }
       }
 
-      return true;
+      if(! std::is_same<Mem::Main, Mem_>::value)
+      {
+        delete[] col_ind_a;
+        delete[] val_a;
+        delete[] row_ptr_a;
+      }
+      if(! std::is_same<Mem::Main, Mem2_>::value)
+      {
+        delete[] col_ind_b;
+        delete[] val_b;
+        delete[] row_ptr_b;
+      }
+
+      return ret;
     }
 
     /**
