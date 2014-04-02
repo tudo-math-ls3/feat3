@@ -287,12 +287,42 @@ namespace FEAST
       if (a.columns() != b.columns())
         return false;
 
-      for (Index i(0) ; i < a.rows() ; ++i)
-        for (Index j(0) ; j < a.columns() ; ++j)
-        if (a(i, j) != b(i, j))
-          return false;
+      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
+        return true;
 
-      return true;
+      bool ret(true);
+
+      DT_ * ta;
+      DT_ * tb;
+
+      if(std::is_same<Mem::Main, Mem_>::value)
+        ta = (DT_*)a.elements();
+      else
+      {
+        ta = new DT_[a.size()];
+        MemoryPool<Mem_>::instance()->template download<DT_>(ta, a.elements(), a.size());
+      }
+      if(std::is_same<Mem::Main, Mem2_>::value)
+        tb = (DT_*)b.elements();
+      else
+      {
+        tb = new DT_[b.size()];
+        MemoryPool<Mem2_>::instance()->template download<DT_>(tb, b.elements(), b.size());
+      }
+
+      for (Index i(0) ; i < a.size() ; ++i)
+        if (ta[i] != tb[i])
+        {
+          ret = false;
+          break;
+        }
+
+      if(! std::is_same<Mem::Main, Mem_>::value)
+        delete[] ta;
+      if(! std::is_same<Mem::Main, Mem2_>::value)
+        delete[] tb;
+
+      return ret;
     }
 
     /**
