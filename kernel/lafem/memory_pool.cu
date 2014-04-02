@@ -43,9 +43,9 @@ DT_ * MemoryPool<Mem::CUDA>::allocate_memory(const Index count)
 {
   DT_ * memory(NULL);
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, count * sizeof(DT_)))
-    throw InternalError("MemoryPool<GPU> cuda allocation error (cudaErrorMemoryAllocation)");
+    throw InternalError("MemoryPool<CUDA> cuda allocation error (cudaErrorMemoryAllocation)");
   if (memory == NULL)
-    throw InternalError("MemoryPool<GPU> allocation error (null pointer returned)");
+    throw InternalError("MemoryPool<CUDA> allocation error (null pointer returned)");
   Intern::MemoryInfo mi;
   mi.counter = 1;
   mi.size = count * sizeof(DT_);
@@ -57,7 +57,7 @@ void MemoryPool<Mem::CUDA>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("MemoryPool<GPU>::increase_memory: Memory address not found!");
+    throw InternalError("MemoryPool<CUDA>::increase_memory: Memory address not found!");
   else
   {
     it->second.counter = it->second.counter + 1;
@@ -68,12 +68,13 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("MemoryPool<GPU>::relase_memory: Memory address not found!");
+    throw InternalError("MemoryPool<CUDA>::relase_memory: Memory address not found!");
   else
   {
     if(it->second.counter == 1)
     {
-      cudaFree(address);
+      if (cudaSuccess != cudaFree(address))
+        throw InternalError("MemoryPool<CUDA>::release_memory: cudaFree failed!");
       _pool.erase(it);
     }
     else
