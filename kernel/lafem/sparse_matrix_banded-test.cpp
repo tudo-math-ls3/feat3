@@ -49,15 +49,15 @@ public:
 
     offsets(0, 3);
     offsets(1, 4);
-    offsets(2, 8);
-    offsets(3, 13);
+    offsets(2, 9);
+    offsets(3, 12);
 
     for (Index i(0); i < val.size(); ++i)
     {
       val(i, random(DT_(0), DT_(10)));
     }
 
-    BM_ sys(size, size - 1, val, offsets);
+    BM_ sys(size, size + 1, val, offsets);
 
     auto x(sys.create_vector_r());
     auto y1(sys.create_vector_l());
@@ -89,30 +89,30 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(y1(i), y2(i), 1e-8);
     }
 
-    // sys.template apply<Algo_>(y2, x, y1, DT_(-1.0));
+    sys.template apply<Algo_>(y2, x, y1, DT_(-1.0));
 
-    // // check, if the result is correct
-    // for (Index i(0) ; i < y1.size() ; ++i)
-    // {
-    //   TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
-    // }
+    // check, if the result is correct
+    for (Index i(0) ; i < y1.size() ; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
+    }
 
-    // DenseVector<Mem_, DT_, Index> val2(9 * npr * npc);
-    // for (Index i(0); i < val2.size(); ++i)
-    // {
-    //   val2(i, val(i));
-    // }
-    // BM_ sys2(npr, npc, val2, offsets);
-    // sys2.template scale<Algo_>(sys, DT_(2.0));
-    // sys2.template apply<Algo_>(y1, x);
+    DenseVector<Mem_, DT_, Index> val2(offsets.size() * size);
+    for (Index i(0); i < val2.size(); ++i)
+    {
+      val2(i, val(i));
+    }
+    BM_ sys2(size, size + 1, val2, offsets);
+    sys2.template scale<Algo_>(sys, DT_(2.0));
+    sys2.template apply<Algo_>(y1, x);
 
-    // sys.template apply<Algo_>(y2, x, y1, DT_(-2.0));
+    sys.template apply<Algo_>(y2, x, y1, DT_(-2.0));
 
-    // // check, if the result is correct
-    // for (Index i(0) ; i < y1.size() ; ++i)
-    // {
-    //   TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
-    // }
+    // check, if the result is correct
+    for (Index i(0) ; i < y1.size() ; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
+    }
   }
 };
 SparseMatrixBandedTest<Mem::Main, float> cpu_sparse_matrix_banded_test_float;

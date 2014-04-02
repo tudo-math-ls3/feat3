@@ -137,7 +137,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Offset out of matrix!");
           }
 
-          tused_elements += std::min(rows_in, columns_in + rows_in - toffset - 1) - std::max(columns_in + rows_in - toffset - 1, columns_in) + columns_in;
+          tused_elements += columns_in + std::min(rows_in, columns_in + rows_in - toffset - 1) - std::max(columns_in + rows_in - toffset - 1, columns_in);
         }
 
         this->_scalar_index.push_back(tused_elements);
@@ -437,7 +437,7 @@ namespace FEAST
                                                  x.elements(),
                                                  this->num_of_offsets(),
                                                  this->rows(),
-                                                 this->columns()); // TODO
+                                                 this->columns());
       }
 
       /**
@@ -468,9 +468,11 @@ namespace FEAST
           Arch::Defect<Mem_, Algo_>::banded(r.elements(),
                                             y.elements(),
                                             this->val(),
+                                            this->offsets(),
                                             x.elements(),
-                                            this->_scalar_index.at(5),
-                                            this->_scalar_index.at(6)); // TODO
+                                            this->num_of_offsets(),
+                                            this->rows(),
+                                            this->columns());
         }
         //r <- y
         else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -479,12 +481,14 @@ namespace FEAST
         else
         {
           Arch::Axpy<Mem_, Algo_>::banded(r.elements(),
-                                          alpha,
-                                          x.elements(),
                                           y.elements(),
+                                          alpha,
                                           this->val(),
-                                          this->_scalar_index.at(5),
-                                          this->_scalar_index.at(6)); // TODO
+                                          this->offsets(),
+                                          x.elements(),
+                                          this->num_of_offsets(),
+                                          this->rows(),
+                                          this->columns());
         }
       }
 

@@ -114,7 +114,7 @@ namespace FEAST
                 DT_ s(0);
                 for (Index a(i); a < j; ++a)
                 {
-                  s += val[a * rows + l] * x[l - columns + offsets[a]];
+                  s += val[a * rows + l] * x[l + offsets[a] + 1 - rows];
                 }
                 r[l] = s;
               }
