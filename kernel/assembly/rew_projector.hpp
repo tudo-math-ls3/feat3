@@ -88,7 +88,6 @@ namespace FEAST
         typedef Function_ FunctionType;
         typedef Space_ SpaceType;
         typedef typename SpaceType::TrafoType TrafoType;
-        typedef typename TrafoType::MeshType MeshType;
 
         static_assert(Function_::can_value != 0, "analytic function can't compute function values");
 

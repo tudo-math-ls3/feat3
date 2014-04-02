@@ -25,8 +25,6 @@ class SubMeshTest :
 
     void run() const
     {
-      typedef typename Foundation::Topology<IndexType_, OT_, IT_>::storage_type_ TopologyStorageType;
-
       /*(0,1) (1,1)
        *  *----*
        *  |    |
