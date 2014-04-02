@@ -68,11 +68,11 @@ namespace FEAST
 
         /// download memory chunk to host memory
         template <typename DT_>
-        static void download(DT_ * dest, DT_ * src, const Index count);
+        static void download(DT_ * dest, const DT_ * const src, const Index count);
 
         /// upload memory chunk from host memory to device memory
         template <typename DT_>
-        static void upload(DT_ * dest, DT_ * src, const Index count);
+        static void upload(DT_ * dest, const DT_ * const src, const Index count);
 
         /// recieve element
         template <typename DT_>
@@ -132,11 +132,11 @@ namespace FEAST
 
         /// download memory chunk to host memory
         template <typename DT_>
-        static void download(DT_ * dest, DT_ * src, const Index count);
+        static void download(DT_ * dest, const DT_ * const src, const Index count);
 
         /// upload memory chunk from host memory to device memory
         template <typename DT_>
-        static void upload(DT_ * dest, DT_ * src, const Index count);
+        static void upload(DT_ * dest, const DT_ * const src, const Index count);
 
         /// recieve element
         template <typename DT_>

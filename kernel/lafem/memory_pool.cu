@@ -85,13 +85,13 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::CUDA>::download(DT_ * dest, DT_ * src, const Index count)
+void MemoryPool<Mem::CUDA>::download(DT_ * dest, const DT_ * const src, const Index count)
 {
   cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyDeviceToHost);
 }
 
 template <typename DT_>
-void MemoryPool<Mem::CUDA>::upload(DT_ * dest, DT_ * src, const Index count)
+void MemoryPool<Mem::CUDA>::upload(DT_ * dest, const DT_ * const src, const Index count)
 {
   cudaMemcpy(dest, src, count * sizeof(DT_), cudaMemcpyHostToDevice);
 }
@@ -140,15 +140,15 @@ template double * MemoryPool<Mem::CUDA>::allocate_memory<double>(const Index);
 template unsigned int * MemoryPool<Mem::CUDA>::allocate_memory<unsigned int>(const Index);
 template unsigned long * MemoryPool<Mem::CUDA>::allocate_memory<unsigned long>(const Index);
 
-template void MemoryPool<Mem::CUDA>::download<float>(float *, float *, const Index);
-template void MemoryPool<Mem::CUDA>::download<double>(double *, double *, const Index);
-template void MemoryPool<Mem::CUDA>::download<unsigned int>(unsigned int *, unsigned int *, const Index);
-template void MemoryPool<Mem::CUDA>::download<unsigned long>(unsigned long *, unsigned long *, const Index);
+template void MemoryPool<Mem::CUDA>::download<float>(float *, const float * const, const Index);
+template void MemoryPool<Mem::CUDA>::download<double>(double *, const double * const, const Index);
+template void MemoryPool<Mem::CUDA>::download<unsigned int>(unsigned int *, const unsigned int * const, const Index);
+template void MemoryPool<Mem::CUDA>::download<unsigned long>(unsigned long *, const unsigned long * const, const Index);
 
-template void MemoryPool<Mem::CUDA>::upload<float>(float *, float *, const Index);
-template void MemoryPool<Mem::CUDA>::upload<double>(double *, double *, const Index);
-template void MemoryPool<Mem::CUDA>::upload<unsigned int>(unsigned int *, unsigned int *, const Index);
-template void MemoryPool<Mem::CUDA>::upload<unsigned long>(unsigned long *, unsigned long *, const Index);
+template void MemoryPool<Mem::CUDA>::upload<float>(float *, const float * const, const Index);
+template void MemoryPool<Mem::CUDA>::upload<double>(double *, const double * const , const Index);
+template void MemoryPool<Mem::CUDA>::upload<unsigned int>(unsigned int *, const unsigned int * const, const Index);
+template void MemoryPool<Mem::CUDA>::upload<unsigned long>(unsigned long *, const unsigned long * const, const Index);
 
 template float MemoryPool<Mem::CUDA>::get_element(const float *, const Index);
 template double MemoryPool<Mem::CUDA>::get_element(const double *, const Index);

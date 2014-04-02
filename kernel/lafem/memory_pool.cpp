@@ -67,7 +67,7 @@ void MemoryPool<Mem::Main>::release_memory(void * address)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::Main>::download(DT_ * dest, DT_ * src, const Index count)
+void MemoryPool<Mem::Main>::download(DT_ * dest, const DT_ * const src, const Index count)
 {
   if (dest == src)
     return;
@@ -76,7 +76,7 @@ void MemoryPool<Mem::Main>::download(DT_ * dest, DT_ * src, const Index count)
 }
 
 template <typename DT_>
-void MemoryPool<Mem::Main>::upload(DT_ * dest, DT_ * src, const Index count)
+void MemoryPool<Mem::Main>::upload(DT_ * dest, const DT_ * const src, const Index count)
 {
   if (dest == src)
     return;
@@ -89,12 +89,12 @@ template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
 template unsigned int * MemoryPool<Mem::Main>::allocate_memory<unsigned int>(const Index);
 template unsigned long * MemoryPool<Mem::Main>::allocate_memory<unsigned long>(const Index);
 
-template void MemoryPool<Mem::Main>::download<float>(float *, float *, const Index);
-template void MemoryPool<Mem::Main>::download<double>(double *, double *, const Index);
-template void MemoryPool<Mem::Main>::download<unsigned int>(unsigned int *, unsigned int *, const Index);
-template void MemoryPool<Mem::Main>::download<unsigned long>(unsigned long *, unsigned long *, const Index);
+template void MemoryPool<Mem::Main>::download<float>(float *, const float * const, const Index);
+template void MemoryPool<Mem::Main>::download<double>(double *, const double * const, const Index);
+template void MemoryPool<Mem::Main>::download<unsigned int>(unsigned int *, const unsigned int * const, const Index);
+template void MemoryPool<Mem::Main>::download<unsigned long>(unsigned long *, const unsigned long * const, const Index);
 
-template void MemoryPool<Mem::Main>::upload<float>(float *, float *, const Index);
-template void MemoryPool<Mem::Main>::upload<double>(double *, double *, const Index);
-template void MemoryPool<Mem::Main>::upload<unsigned int>(unsigned int *, unsigned int *, const Index);
-template void MemoryPool<Mem::Main>::upload<unsigned long>(unsigned long *, unsigned long *, const Index);
+template void MemoryPool<Mem::Main>::upload<float>(float *, const float * const, const Index);
+template void MemoryPool<Mem::Main>::upload<double>(double *, const double * const, const Index);
+template void MemoryPool<Mem::Main>::upload<unsigned int>(unsigned int *, const unsigned int * const, const Index);
+template void MemoryPool<Mem::Main>::upload<unsigned long>(unsigned long *, const unsigned long * const, const Index);
