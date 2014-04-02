@@ -1347,38 +1347,100 @@ namespace FEAST
       if (a.num_cols_per_row() != b.num_cols_per_row())
         return false;
 
-      for (Index i(0) ; i < a.rows() ; ++i)
+      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
+        return true;
+
+      IT_ * aj_a;
+      IT_ * aj_b;
+      DT_ * ax_a;
+      DT_ * ax_b;
+      IT_ * arl_a;
+      IT_ * arl_b;
+
+      bool ret(true);
+
+      if(std::is_same<Mem::Main, Mem_>::value)
       {
-        if (MemoryPool<Mem_>::get_element(a.Arl(), i) != MemoryPool<Mem2_>::get_element(b.Arl(), i))
-          return false;
+        aj_a = (IT_*)a.Aj();
+        ax_a = (DT_*)a.Ax();
+        arl_a = (IT_*)a.Arl();
+      }
+      else
+      {
+        aj_a = new IT_[a.stride() * a.num_cols_per_row()];
+        MemoryPool<Mem_>::instance()->template download<IT_>(aj_a, a.Aj(), a.stride() * a.num_cols_per_row());
+        ax_a = new DT_[a.stride() * a.num_cols_per_row()];
+        MemoryPool<Mem_>::instance()->template download<DT_>(ax_a, a.Ax(), a.stride() * a.num_cols_per_row());
+        arl_a = new IT_[a.rows()];
+        MemoryPool<Mem_>::instance()->template download<IT_>(arl_a, a.Arl(), a.rows());
+      }
+      if(std::is_same<Mem::Main, Mem2_>::value)
+      {
+        aj_b = (IT_*)b.Aj();
+        ax_b = (DT_*)b.Ax();
+        arl_b = (IT_*)b.Arl();
+      }
+      else
+      {
+        aj_b = new IT_[b.stride() * b.num_cols_per_row()];
+        MemoryPool<Mem2_>::instance()->template download<IT_>(aj_b, b.Aj(), b.stride() * b.num_cols_per_row());
+        ax_b = new DT_[b.stride() * b.num_cols_per_row()];
+        MemoryPool<Mem2_>::instance()->template download<DT_>(ax_b, b.Ax(), b.stride() * b.num_cols_per_row());
+        arl_b = new IT_[b.rows()];
+        MemoryPool<Mem2_>::instance()->template download<IT_>(arl_b, b.Arl(), b.rows());
       }
 
-      Index stride(a.stride());
-      for (Index row(0) ; row < a.rows() ; ++row)
+      for (Index i(0) ; i < a.rows() ; ++i)
       {
-        const IT_ * tAj(a.Aj());
-        const DT_ * tAx(a.Ax());
-        const IT_ * tAj2(b.Aj());
-        const DT_ * tAx2(b.Ax());
-        tAj += row;
-        tAx += row;
-        tAj2 += row;
-        tAx2 += row;
+        if(arl_a[i] != arl_b[i])
+          ret = false;
+        break;
+      }
 
-        const IT_ max(MemoryPool<Mem_>::get_element(a.Arl(), row));
-        for(IT_ n(0); n < max ; n++)
+      if (ret)
+      {
+        Index stride(a.stride());
+        for (Index row(0) ; row < a.rows() ; ++row)
         {
-        if (MemoryPool<Mem_>::get_element(tAj, 0) != MemoryPool<Mem2_>::get_element(tAj2, 0))
-        if (MemoryPool<Mem_>::get_element(tAx, 0) != MemoryPool<Mem2_>::get_element(tAx2, 0))
+          const IT_ * tAj(aj_a);
+          const DT_ * tAx(ax_a);
+          const IT_ * tAj2(aj_b);
+          const DT_ * tAx2(ax_b);
+          tAj += row;
+          tAx += row;
+          tAj2 += row;
+          tAx2 += row;
 
-          tAj += stride;
-          tAx += stride;
-          tAj2 += stride;
-          tAx2 += stride;
+          const IT_ max(arl_a[row]);
+          for(IT_ n(0); n < max ; n++)
+          {
+            if (*tAj != *tAj2 || *tAx != *tAx2)
+            {
+              ret = false;
+              break;
+            }
+            tAj += stride;
+            tAx += stride;
+            tAj2 += stride;
+            tAx2 += stride;
+          }
         }
       }
 
-      return true;
+      if(! std::is_same<Mem::Main, Mem_>::value)
+      {
+        delete[] aj_a;
+        delete[] ax_a;
+        delete[] arl_a;
+      }
+      if(! std::is_same<Mem::Main, Mem2_>::value)
+      {
+        delete[] aj_b;
+        delete[] ax_b;
+        delete[] arl_b;
+      }
+
+      return ret;
     }
 
     /**

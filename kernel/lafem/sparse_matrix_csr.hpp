@@ -1399,12 +1399,15 @@ namespace FEAST
           break;
         }
       }
-      for (Index i(0) ; i < a.rows() + 1; ++i)
+      if (ret)
       {
-        if (row_ptr_a[i] != row_ptr_b[i])
+        for (Index i(0) ; i < a.rows() + 1; ++i)
         {
-          ret = false;
-          break;
+          if (row_ptr_a[i] != row_ptr_b[i])
+          {
+            ret = false;
+            break;
+          }
         }
       }
 
