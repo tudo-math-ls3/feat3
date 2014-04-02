@@ -16,9 +16,24 @@ namespace FEAST
       String _name;
 
     public:
-      explicit DynamicFactory(const String& name) :
+      DynamicFactory()
+      {
+      }
+
+      explicit DynamicFactory(String name) :
         _name(name)
       {
+      }
+
+      DynamicFactory(const DynamicFactory& other) :
+        _name(other._name)
+      {
+      }
+
+      DynamicFactory& operator=(const DynamicFactory& other)
+      {
+        _name = other._name;
+        return *this;
       }
 
       template<typename Shape_, typename Weight_, typename Coord_, typename Point_>
