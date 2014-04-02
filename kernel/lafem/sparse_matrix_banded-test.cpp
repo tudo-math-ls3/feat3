@@ -22,7 +22,7 @@ using namespace FEAST::TestSystem;
 * \tparam DT_
 * description missing
 *
-* \author Christoph Lohmnn
+* \author Christoph Lohmann
 */
 template<
   typename Mem_,
@@ -41,57 +41,53 @@ public:
 
   virtual void run() const
   {
-    Random rand;
-    const Index npr(5);
-    const Index npc(4);
+    Random random;
+    const Index size(9);
 
-    DenseVector<Mem_, DT_, Index> val(9 * npr * npc);
-    DenseVector<Mem_, Index> offsets(9);
+    DenseVector<Mem_, Index, Index> offsets(4);
+    DenseVector<Mem_, DT_, Index> val(offsets.size() * size);
 
-    offsets(0, npr * npc - npr - 2);
-    offsets(1, npr * npc - npr - 1);
-    offsets(2, npr * npc - npr);
-    offsets(3, npr * npc - 2);
-    offsets(4, npr * npc - 1);
-    offsets(5, npr * npc);
-    offsets(6, npr * npc + npr - 2);
-    offsets(7, npr * npc + npr - 1);
-    offsets(8, npr * npc + npr);
+    offsets(0, 3);
+    offsets(1, 4);
+    offsets(2, 8);
+    offsets(3, 13);
 
     for (Index i(0); i < val.size(); ++i)
     {
-      val(i, DT_(7)); // rand(DT_(0), DT_(1)));
+      val(i, random(DT_(0), DT_(10)));
     }
 
-    BM_ sys(npr * npc, npr * npc - 7, val, offsets);
+    BM_ sys(size, size - 1, val, offsets);
 
-    std::cout << sys << std::endl;
+    auto x(sys.create_vector_r());
+    auto y1(sys.create_vector_l());
+    auto y2(sys.create_vector_l());
 
-    // auto x(sys.create_vector_r());
-    // auto y1(sys.create_vector_l());
-    // auto y2(sys.create_vector_l());
+    for (Index i(0); i < x.size(); ++i)
+    {
+      x(i, random(DT_(-1), DT_(1)));
+    }
 
-    // for (Index i(0); i < x.size(); ++i)
-    // {
-    //   x(i, rand(DT_(-1), DT_(1)));
-    //   y2(i, DT_(0));
-    // }
+    for (Index i(0); i < y2.size(); ++i)
+    {
+      y2(i, 0);
+    }
 
-    // sys.template apply<Algo_>(y1, x);
+    sys.template apply<Algo_>(y1, x);
 
-    // for(Index i(0); i < sys.rows(); ++i)
-    // {
-    //   for(Index j(0); j < sys.columns(); ++j)
-    //   {
-    //     y2(i, y2(i) + sys(i, j) * x(j));
-    //   }
-    // }
+    for(Index i(0); i < sys.rows(); ++i)
+    {
+      for(Index j(0); j < sys.columns(); ++j)
+      {
+        y2(i, y2(i) + sys(i, j) * x(j));
+      }
+    }
 
-    // // check, if the result is correct
-    // for (Index i(0) ; i < y1.size() ; ++i)
-    // {
-    //   TEST_CHECK_EQUAL_WITHIN_EPS(y1(i), y2(i), 1e-8);
-    // }
+    // check, if the result is correct
+    for (Index i(0) ; i < y1.size() ; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(y1(i), y2(i), 1e-8);
+    }
 
     // sys.template apply<Algo_>(y2, x, y1, DT_(-1.0));
 

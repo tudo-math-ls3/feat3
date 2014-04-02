@@ -24,5 +24,7 @@ template void ProductMatVec<Mem::Main, Algo::Generic>::coo(double *, const doubl
 template void ProductMatVec<Mem::Main, Algo::Generic>::coo(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
 template void ProductMatVec<Mem::Main, Algo::Generic>::coo(double *, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);
 
-template void ProductMatVec<Mem::Main, Algo::Generic>::banded_q1_d2(float *, const float * const, const float * const, const Index, const Index);
-template void ProductMatVec<Mem::Main, Algo::Generic>::banded_q1_d2(double *, const double * const, const double * const, const Index, const Index);
+template void ProductMatVec<Mem::Main, Algo::Generic>::banded(float *, const float * const, const Index * const, const float * const, const Index, const Index, const Index);
+template void ProductMatVec<Mem::Main, Algo::Generic>::banded(double *, const double * const, const Index * const, const double * const, const Index, const Index, const Index);
+template void ProductMatVec<Mem::Main, Algo::Generic>::banded(float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void ProductMatVec<Mem::Main, Algo::Generic>::banded(double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);

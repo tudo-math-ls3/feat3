@@ -40,7 +40,7 @@ namespace FEAST
      * _scalar_index[1]: row count \n
      * _scalar_index[2]: column count \n
      * _scalar_index[3]: non zero element count (used elements) \n
-     * _scalar_index[4]: number of bands \n
+     * _scalar_index[4]: number of offsets \n
      * _scalar_dt[0]: zero element
      *
      * \author Christoph Lohmann
@@ -85,9 +85,6 @@ namespace FEAST
       typedef DenseVector<MemType, DataType> VectorTypeL;
       /// Compatible R-vector type
       typedef DenseVector<MemType, DataType> VectorTypeR;
-      /// ImageIterator typedef for Adjactor interface implementation
-      typedef const IT_* ImageIterator;
-
 
       /**
        * \brief Constructor
@@ -117,7 +114,7 @@ namespace FEAST
        */
       explicit SparseMatrixBanded(const Index rows_in, const Index columns_in,
                                   DenseVector<Mem_, DT_, IT_> & val_in,
-                                  DenseVector<Mem_, IT_> & offsets_in) :
+                                  DenseVector<Mem_, IT_, IT_> & offsets_in) :
         Container<Mem_, DT_, IT_>(rows_in * columns_in)
       {
         if (val_in.size() != rows_in * offsets_in.size())
@@ -125,21 +122,25 @@ namespace FEAST
           throw InternalError(__func__, __FILE__, __LINE__, "Size of values does not match to number of offsets and row count!");
         }
 
-        const Index offset0(offsets_in(0));
-        const Index offset1(offsets_in(offsets_in.size() - 1));
-
-        const Index row0(             rows_in - offset0 - 1);
-        const Index row1(columns_in + rows_in - offset1 - 1);
-
-        if (offset0 < rows_in - 1 && offset1 >= rows_in && row0 >= row1)
-        {
-          throw InternalError(__func__, __FILE__, __LINE__, "Offsets can't be used for this matrix-dimensions!");
-        }
-
         CONTEXT("When creating SparseMatrixBanded");
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
-        this->_scalar_index.push_back(0); // TODO: Muss noch berechnet werden
+
+        Index tused_elements(0);
+
+        for (Index i(0); i < offsets_in.size(); ++i)
+        {
+          const Index toffset(offsets_in(i));
+
+          if (toffset + 2 > rows_in + columns_in)
+          {
+            throw InternalError(__func__, __FILE__, __LINE__, "Offset out of matrix!");
+          }
+
+          tused_elements += std::min(rows_in, columns_in + rows_in - toffset - 1) - std::max(columns_in + rows_in - toffset - 1, columns_in) + columns_in;
+        }
+
+        this->_scalar_index.push_back(tused_elements);
         this->_scalar_index.push_back(offsets_in.size());
         this->_scalar_dt.push_back(DT_(0));
 
@@ -188,7 +189,7 @@ namespace FEAST
        * Create a deep copy of itself.
        *
        */
-      SparseMatrixBanded clone()
+      SparseMatrixBanded clone() const
       {
         SparseMatrixBanded t;
         t.clone(*this);
@@ -236,7 +237,7 @@ namespace FEAST
             return MemoryPool<Mem_>::get_element(this->_elements.at(0), i * trows + row);
           }
         }
-        return this->_scalar_dt.at(0);
+        return zero_element();
       }
 
       /**
@@ -299,12 +300,12 @@ namespace FEAST
        *
        * \returns offsets array.
        */
-      DT_ * offsets()
+      IT_ * offsets()
       {
         return this->_indices.at(0);
       }
 
-      DT_ const * offsets() const
+      IT_ const * offsets() const
       {
         return this->_indices.at(0);
       }
@@ -432,9 +433,11 @@ namespace FEAST
 
         Arch::ProductMatVec<Mem_, Algo_>::banded(r.elements(),
                                                  this->val(),
+                                                 this->offsets(),
                                                  x.elements(),
-                                                 this->_scalar_index.at(5),
-                                                 this->_scalar_index.at(6)); // TODO
+                                                 this->num_of_offsets(),
+                                                 this->rows(),
+                                                 this->columns()); // TODO
       }
 
       /**

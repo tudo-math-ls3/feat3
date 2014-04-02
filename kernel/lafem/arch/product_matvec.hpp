@@ -6,8 +6,6 @@
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
 
-#include <iostream> // TODO: Muss noch entfernt werden
-
 namespace FEAST
 {
   namespace LAFEM
@@ -77,90 +75,54 @@ namespace FEAST
           }
         }
 
-        template <typename DT_>
-        static void banded_q1_d2(DT_ * r, const DT_ * const val, const DT_ * const x, const Index nodes_per_row, const Index nodes_per_column)
+        template <typename DT_, typename IT_>
+        static void banded(DT_ * r, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
         {
-          const Index rows(nodes_per_row * nodes_per_column);
-          const Index m(nodes_per_row);
+          #ifdef START_OFFSET
+            #warning Overwriting definition of START_OFFSET
+            #undef START_OFFSET
+          #endif
 
-          r[0] = val[4 * rows] * x[0]
-            + val[5 * rows] * x[1]
-            + val[6 * rows] * x[m - 1]
-            + val[7 * rows] * x[m]
-            + val[8 * rows] * x[m + 1];
+          #ifdef END_OFFSET
+            #error Overwriting definition of END_OFFSET
+            #undef END_OFFSET
+          #endif
 
-          for (Index i(1); i < m - 1; ++i)
+          #define START_OFFSET(j) ((j == Index(-1)) ? rows : ((j == k) ? 0 : rows - offsets[j] - 1))
+          #define END_OFFSET(j) ((j + 1 == k) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
+
+          // Search first offset of the upper triangular matrix
+          Index k(0);
+          while (k < num_of_offsets && offsets[k] + 1 < rows)
           {
-            r[i] = val[3 * rows + i] * x[i - 1]
-              + val[4 * rows + i] * x[i]
-              + val[5 * rows + i] * x[i + 1]
-              + val[6 * rows + i] * x[m + i - 1]
-              + val[7 * rows + i] * x[m + i]
-              + val[8 * rows + i] * x[m + i + 1];
+            ++k;
           }
 
-          r[m - 1] = val[2 * rows + m - 1] * x[0]
-            + val[3 * rows + m - 1] * x[m - 2]
-            + val[4 * rows + m - 1] * x[m - 1]
-            + val[5 * rows + m - 1] * x[m]
-            + val[6 * rows + m - 1] * x[2 * m - 2]
-            + val[7 * rows + m - 1] * x[2 * m - 1]
-            + val[8 * rows + m - 1] * x[2 * m];
-
-          r[m] = val[1 * rows + m] * x[0]
-            + val[2 * rows + m] * x[1]
-            + val[3 * rows + m] * x[m - 1]
-            + val[4 * rows + m] * x[m]
-            + val[5 * rows + m] * x[m + 1]
-            + val[6 * rows + m] * x[2 * m - 1]
-            + val[7 * rows + m] * x[2 * m]
-            + val[8 * rows + m] * x[2 * m + 1];
-
-          for (Index i(1); i < rows - 2 * m - 1; ++i)
+          // iteration over all offsets of the lower triangular matrix
+          for (Index i(k + 1); i > 0;)
           {
-          r[m + i] = val[m + i] * x[i - 1]
-            + val[1 * rows + m + i] * x[i]
-            + val[2 * rows + m + i] * x[i + 1]
-            + val[3 * rows + m + i] * x[m + i - 1]
-            + val[4 * rows + m + i] * x[m + i]
-            + val[5 * rows + m + i] * x[m + i + 1]
-            + val[6 * rows + m + i] * x[2 * m + i - 1]
-            + val[7 * rows + m + i] * x[2 * m + i]
-            + val[8 * rows + m + i] * x[2 * m + i + 1];
+            --i;
+
+            // iteration over all offsets of the upper triangular matrix
+            for (Index j(num_of_offsets + 1); j > k;)
+            {
+              --j;
+
+              // iteration over all rows which contain the offsets between offset i and offset j
+              for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
+              {
+                DT_ s(0);
+                for (Index a(i); a < j; ++a)
+                {
+                  s += val[a * rows + l] * x[l - columns + offsets[a]];
+                }
+                r[l] = s;
+              }
+            }
           }
 
-          r[rows - m - 1] = val[rows - m - 1] * x[rows - 2 * m - 2]
-            + val[2 * rows - m - 1] * x[rows - 2 * m - 1]
-            + val[3 * rows - m - 1] * x[rows - 2 * m]
-            + val[4 * rows - m - 1] * x[rows - m - 2]
-            + val[5 * rows - m - 1] * x[rows - m - 1]
-            + val[6 * rows - m - 1] * x[rows - m]
-            + val[7 * rows - m - 1] * x[rows - 2]
-            + val[8 * rows - m - 1] * x[rows - 1];
-
-          r[rows - m] = val[rows - m] * x[rows - 2 * m - 1]
-            + val[2 * rows - m] * x[rows - 2 * m]
-            + val[3 * rows - m] * x[rows - 2 * m + 1]
-            + val[4 * rows - m] * x[rows - m - 1]
-            + val[5 * rows - m] * x[rows - m]
-            + val[6 * rows - m] * x[rows - m + 1]
-            + val[7 * rows - m] * x[rows - 1];
-
-          for (Index i(1); i < m - 1; ++i)
-          {
-            r[rows - m + i] = val[rows - m + i] * x[rows - 2 * m + i - 1]
-              + val[2 * rows - m + i] * x[rows - 2 * m + i]
-              + val[3 * rows - m + i] * x[rows - 2 * m + i + 1]
-              + val[4 * rows - m + i] * x[rows - m + i - 1]
-              + val[5 * rows - m + i] * x[rows - m + i]
-              + val[6 * rows - m + i] * x[rows - m + i + 1];
-          }
-
-          r[rows - 1] = val[rows - 1] * x[rows - m - 2]
-            + val[2 * rows - 1] * x[rows - m - 1]
-            + val[3 * rows - 1] * x[rows - m]
-            + val[4 * rows - 1] * x[rows - 2]
-            + val[5 * rows - 1] * x[rows - 1];
+          #undef START_OFFSET
+          #undef END_OFFSET
         }
       };
 
@@ -179,8 +141,11 @@ namespace FEAST
       extern template void ProductMatVec<Mem::Main, Algo::Generic>::coo(float *, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
       extern template void ProductMatVec<Mem::Main, Algo::Generic>::coo(double *, const double * const, const Index * const, const Index * const, const double * const, const Index, const Index);
 
-      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded_q1_d2(float *, const float * const, const float * const, const Index, const Index);
-      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded_q1_d2(double *, const double * const, const double * const, const Index, const Index);
+      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded(float *, const float * const, const Index * const, const float * const, const Index, const Index, const Index);
+      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded(double *, const double * const, const Index * const, const double * const, const Index, const Index, const Index);
+      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded(float *, const float * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+      extern template void ProductMatVec<Mem::Main, Algo::Generic>::banded(double *, const double * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+
 
       template <>
       struct ProductMatVec<Mem::Main, Algo::MKL>
