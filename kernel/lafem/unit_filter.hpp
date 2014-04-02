@@ -84,9 +84,26 @@ namespace FEAST
       {
       }
 
+      UnitFilter clone() const
+      {
+        UnitFilter other;
+        other.clone(*this);
+        return std::move(other);
+      }
+
       void clone(const UnitFilter & other)
       {
         _sv.clone(other._sv);
+      }
+
+      void clear()
+      {
+        _sv.clear();
+      }
+
+      void add(Index idx, DataType val)
+      {
+        _sv(idx, val);
       }
 
       /// \returns The number of entries in the filter.

@@ -862,7 +862,8 @@ class MeshControlPartitioningTest2D:
       DenseVector<Mem::Main, double> vec_sol(space.get_num_dofs(), double(0));
 
       // assemble filter:
-      UnitFilter<Mem::Main, double> filter(dirichlet.template assemble<Mem::Main, double>());
+      UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
+      dirichlet.assemble(filter);
 
       // filter system
       filter.filter_mat<Algo::Generic>(mat_sys);

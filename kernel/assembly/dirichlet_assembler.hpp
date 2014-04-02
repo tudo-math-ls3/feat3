@@ -91,19 +91,15 @@ namespace FEAST
        *
        * This function assembles a unit-filter implementing the homogene Dirichlet boundary conditions.
        *
-       * \returns
-       * A unit-filter implementing the boundary conditions.
+       * \param[in,out] filter
+       * A reference to the unit-filter where the entries are to be added.
        */
       template<typename MemType_, typename DataType_>
-      LAFEM::UnitFilter<MemType_, DataType_> assemble() const
+      void assemble(LAFEM::UnitFilter<MemType_, DataType_>& filter) const
       {
         // build index set
         std::set<Index> idx_set;
         Intern::DirichletWrapper<shape_dim>::assemble(idx_set, _space, _cells);
-
-        // allocate filter 'vectors'
-        LAFEM::DenseVector<MemType_, DataType_> values(Index(idx_set.size()), DataType_(0));
-        LAFEM::DenseVector<MemType_, Index> indices(Index(idx_set.size()));
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
@@ -111,14 +107,8 @@ namespace FEAST
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          indices(i, *it);
+          filter.add(*it, DataType_(0));
         }
-
-        // create a filter with given values/indices pairs
-        LAFEM::UnitFilter<MemType_, DataType_> filter(values, indices);
-
-        // return filter
-        return filter;
       }
 
       /**
@@ -127,42 +117,31 @@ namespace FEAST
        * This function assembles a unit-filter implementing Dirichlet boundary conditions based on
        * a functor.
        *
+       * \param[in,out] filter
+       * A reference to the unit-filter where the entries are to be added.
+       *
        * \param[in] functor
        * An object implementing the Analytic::Functor interface representing the boundary value
        * function.
-       *
-       * \returns
-       * A unit-filter implementing the boundary conditions.
        */
       template<
         typename MemType_,
         typename DataType_,
         typename Functor_>
-      LAFEM::UnitFilter<MemType_, DataType_> assemble(const Functor_& functor) const
+      void assemble(LAFEM::UnitFilter<MemType_, DataType_>& filter, const Functor_& functor) const
       {
         // build index-value map
         std::map<Index, DataType_> idx_map;
         Intern::DirichletWrapper<shape_dim>::assemble(idx_map, _space, _cells, functor);
-
-        // allocate filter 'arrays'
-        LAFEM::DenseVector<MemType_, DataType_> values(Index(idx_map.size()));
-        LAFEM::DenseVector<MemType_, Index> indices(Index(idx_map.size()));
 
         // loop over all dof-indices
         typename std::map<Index, DataType_>::const_iterator it(idx_map.begin());
         typename std::map<Index, DataType_>::const_iterator jt(idx_map.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index and its value
-          indices(i, it->first);
-          values(i, it->second);
+          // store the dof-index
+          filter.add(it->first, it->second);
         }
-
-        // create a filter with given values/indices pairs
-        LAFEM::UnitFilter<MemType_, DataType_> filter(values, indices);
-
-        // return filter
-        return filter;
       }
     }; // class DirichletAssembler
 

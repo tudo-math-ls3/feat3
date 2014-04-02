@@ -604,7 +604,8 @@ void test_hypercube_2d(Index rank, Index num_patches, Index desired_refinement_l
   }*/
 
   // assemble filter:
-  UnitFilter<Mem::Main, double> filter(dirichlet.assemble<Mem::Main, double>());
+  UnitFilter<Mem::Main, double> filter(space.get_num_dofs());
+  dirichlet.assemble(filter);
 
   ///filter system
   filter.filter_mat<Algo::Generic>(mat_sys);

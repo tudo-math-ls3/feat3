@@ -59,11 +59,12 @@ void test_bcasm(
   dirichlet.add_cell_set(cell);
 
   // assemble filter:
+  UnitFilterType filter(space.get_num_dofs());
   // a) homogene Dirichlet BCs
-  //UnitFilterType filter(dirichlet.template assemble<Mem::Main, DataType>());
+  //dirichlet.assemble(filter);
   // b) inhomogene Dirichlet BCs
   Assembly::Common::ConstantFunction bc_func(17.0);
-  UnitFilterType filter(dirichlet.template assemble<Mem::Main, DataType>(bc_func));
+  dirichlet.assemble(filter, bc_func);
 
   // filter system
   filter.filter_mat<Algo::Generic>(mat_sys);

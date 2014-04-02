@@ -231,6 +231,8 @@ public:
     _trafo(_mesh),
     _space_v(_trafo),
     _space_p(_trafo),
+    _filter_x(_space_v.get_num_dofs()),
+    _filter_y(_space_v.get_num_dofs()),
     _vec_rhs_x(_space_v.get_num_dofs()),
     _vec_rhs_y(_space_v.get_num_dofs()),
     _vec_rhs_p(_space_p.get_num_dofs()),
@@ -327,10 +329,10 @@ public:
 
     // assemble X-velocity BC values
     FuncSolX sol_x;
-    _filter_x = dirichlet_x.assemble<MemType, DataType>(sol_x);
+    dirichlet_x.assemble(_filter_x, sol_x);
 
     // assemble Y-velocity BC values
-    _filter_y = dirichlet_y.assemble<MemType, DataType>();
+    dirichlet_y.assemble(_filter_y);
 
     // filter matrices
     _filter_x.filter_mat<AlgoType>(_matrix_a);
