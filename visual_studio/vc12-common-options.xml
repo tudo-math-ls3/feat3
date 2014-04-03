@@ -31,6 +31,7 @@
       <PreprocessorDefinitions>VISUAL_STUDIO;FEAST_NO_CONFIG;FEAST_STDC_ASSERT;$(FeastDefList)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(FeastRootPath);$(FeastIncDirList)</AdditionalIncludeDirectories>
       <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <DisableLanguageExtensions>true</DisableLanguageExtensions>
     </ClCompile>
