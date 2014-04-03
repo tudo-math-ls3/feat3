@@ -1195,7 +1195,7 @@ namespace FEAST
           ASSERT(col < this->columns(), "Error: " + stringify(col) + " exceeds sparse matrix coo column size " + stringify(this->columns()) + " !");
 
           if (this->_elements.size() == 0)
-            return this->_scalar_dt.at(0);
+            return zero_element();
 
           if (sorted() == 0)
             const_cast<SparseMatrixCOO *>(this)->sort();
@@ -1220,7 +1220,7 @@ namespace FEAST
             return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
           }
           else
-            return this->_scalar_dt.at(0);
+            return zero_element();
         }
 
         /**

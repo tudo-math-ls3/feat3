@@ -1046,7 +1046,7 @@ namespace FEAST
             if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
               return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
           }
-          return this->_scalar_dt.at(0);
+          return zero_element();
         }
 
         /**
