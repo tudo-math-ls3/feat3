@@ -72,6 +72,10 @@ public:
     TEST_CHECK_EQUAL(a, c);
     TEST_CHECK_NOT_EQUAL(a, b);
 
+    DenseVector<Mem_, DT_> g(b.size(), b.elements());
+    TEST_CHECK_EQUAL(g, b);
+    TEST_CHECK_EQUAL((void*)g.elements(), (void*)b.elements());
+
     {
       EDI<Mem_, DT_> t(a.edi(2));
       t = DT_(41);
