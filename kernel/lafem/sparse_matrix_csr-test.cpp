@@ -140,13 +140,14 @@ SparseMatrixCSRTest<Mem::CUDA, double> cuda_sparse_matrix_csr_test_double;
 template<
   typename Mem_,
   typename Algo_,
-  typename DT_>
+  typename DT_,
+  typename IT_>
 class SparseMatrixCSRApplyTest
-  : public TaggedTest<Mem_, DT_, Algo_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
   SparseMatrixCSRApplyTest()
-    : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixCSRApplyTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCSRApplyTest")
   {
   }
 
@@ -155,20 +156,20 @@ public:
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size);
-      DenseVector<Mem::Main, DT_> x_local(size);
-      DenseVector<Mem::Main, DT_> y_local(size);
-      DenseVector<Mem::Main, DT_> ref_local(size);
-      DenseVector<Mem_, DT_> ref(size);
-      DenseVector<Mem::Main, DT_> result_local(size);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      DenseVector<Mem::Main, DT_, IT_> x_local(size);
+      DenseVector<Mem::Main, DT_, IT_> y_local(size);
+      DenseVector<Mem::Main, DT_, IT_> ref_local(size);
+      DenseVector<Mem_, DT_, IT_> ref(size);
+      DenseVector<Mem::Main, DT_, IT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         x_local(i, DT_(i % 100 * DT_(1.234)));
         y_local(i, DT_(2 - DT_(i % 42)));
       }
-      DenseVector<Mem_, DT_> x(size);
+      DenseVector<Mem_, DT_, IT_> x(size);
       x.copy(x_local);
-      DenseVector<Mem_, DT_> y(size);
+      DenseVector<Mem_, DT_, IT_> y(size);
       y.copy(y_local);
 
       Index ue(0);
@@ -188,9 +189,9 @@ public:
           }
         }
       }
-      SparseMatrixCSR<Mem_,DT_> a(a_local);
+      SparseMatrixCSR<Mem_,DT_, IT_> a(a_local);
 
-      DenseVector<Mem_, DT_> r(size);
+      DenseVector<Mem_, DT_, IT_> r(size);
       //r.template axpy<Algo_>(s, a, x, y);
       a.template apply<Algo_>(r, x, y, s);
       result_local.copy(r);
@@ -207,15 +208,19 @@ public:
   }
 };
 
-SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, float> sm_csr_apply_test_float;
-SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, double> sm_csr_apply_test_double;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, float, unsigned long> sm_csr_apply_test_float_ulong;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, double, unsigned long> sm_csr_apply_test_double_ulong;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, float, unsigned int> sm_csr_apply_test_float_uint;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::Generic, double, unsigned int> sm_csr_apply_test_double_uint;
 #ifdef HONEI_BACKENDS_MKL
-SparseMatrixCSRApplyTest<Mem::Main, Algo::MKL, float> mkl_sm_csr_apply_test_float;
-SparseMatrixCSRApplyTest<Mem::Main, Algo::MKL, double> mkl_sm_csr_apply_test_double;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sm_csr_apply_test_float_ulong;
+SparseMatrixCSRApplyTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sm_csr_apply_test_double_ulong;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_csr_apply_test_float;
-SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_csr_apply_test_double;
+SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_csr_apply_test_float_ulong;
+SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_csr_apply_test_double_ulong;
+SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_csr_apply_test_float_uint;
+SparseMatrixCSRApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_csr_apply_test_double_uint;
 #endif
 
 template<

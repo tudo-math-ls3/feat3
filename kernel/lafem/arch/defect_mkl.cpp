@@ -8,7 +8,7 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
-void Defect<Mem::Main, Algo::MKL>::csr(float * r, const float * const rhs, const float * const val, const Index * const col_ind, const Index * const row_ptr, const float * const x, const Index rows)
+void Defect<Mem::Main, Algo::MKL>::csr(float * r, const float * const rhs, const float * const val, const Index * const col_ind, const Index * const row_ptr, const float * const x, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -16,7 +16,7 @@ void Defect<Mem::Main, Algo::MKL>::csr(float * r, const float * const rhs, const
   vsSub(mrows, rhs, r, r);
 }
 
-void Defect<Mem::Main, Algo::MKL>::csr(double * r, const double * const rhs, const double * const val, const Index * const col_ind, const Index * const row_ptr, const double * const x, const Index rows)
+void Defect<Mem::Main, Algo::MKL>::csr(double * r, const double * const rhs, const double * const val, const Index * const col_ind, const Index * const row_ptr, const double * const x, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';

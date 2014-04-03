@@ -1061,7 +1061,7 @@ namespace FEAST
          * \param[in] col The column of the matrix element.
          * \param[in] value The value to be set.
          */
-        void operator()(IT_ row, IT_ col, DT_ value)
+        void operator()(Index row, Index col, DT_ value)
         {
           CONTEXT("When setting SparseMatrixCOO element");
 
@@ -1083,8 +1083,8 @@ namespace FEAST
             MemoryPool<Mem_>::instance()->template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
 
             MemoryPool<Mem_>::set_memory(this->_elements.at(0), value);
-            MemoryPool<Mem_>::set_memory(this->_indices.at(0), row);
-            MemoryPool<Mem_>::set_memory(this->_indices.at(1), col);
+            MemoryPool<Mem_>::set_memory(this->_indices.at(0), IT_(row));
+            MemoryPool<Mem_>::set_memory(this->_indices.at(1), IT_(col));
 
             _used_elements() = 1;
             _allocated_elements() = alloc_increment();
@@ -1095,8 +1095,8 @@ namespace FEAST
           if (_used_elements() < _allocated_elements())
           {
             MemoryPool<Mem_>::set_memory(this->_elements.at(0) + _used_elements(), value);
-            MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), row);
-            MemoryPool<Mem_>::set_memory(this->_indices.at(1) + _used_elements(), col);
+            MemoryPool<Mem_>::set_memory(this->_indices.at(0) + _used_elements(), IT_(row));
+            MemoryPool<Mem_>::set_memory(this->_indices.at(1) + _used_elements(), IT_(col));
 
             ++_used_elements();
           }
@@ -1125,8 +1125,8 @@ namespace FEAST
             this->_indices.at(1) = cols_new;
 
             MemoryPool<Mem_>::set_memory(this->_elements.at(0) + used_elements(), value);
-            MemoryPool<Mem_>::set_memory(this->_indices.at(0) + used_elements(), row);
-            MemoryPool<Mem_>::set_memory(this->_indices.at(1) + used_elements(), col);
+            MemoryPool<Mem_>::set_memory(this->_indices.at(0) + used_elements(), IT_(row));
+            MemoryPool<Mem_>::set_memory(this->_indices.at(1) + used_elements(), IT_(col));
 
             ++_used_elements();
             this->_elements_size.at(0) = allocated_elements();

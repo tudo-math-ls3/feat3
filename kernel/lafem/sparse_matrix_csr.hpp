@@ -665,17 +665,17 @@ namespace FEAST
             trow_ptr = new IT_[other.rows() + 1];
           }
 
-          Index ait(0);
+          IT_ ait(0);
           Index current_row(0);
-          trow_ptr[current_row] = 0;
+          trow_ptr[current_row] = IT_(0);
           for (Index it(0) ; it < cother.used_elements() ; ++it)
           {
             Index row(cother.row_indices()[it]);
-            Index column(cother.column_indices()[it]);
+            IT_ column(cother.column_indices()[it]);
 
             if (current_row < row)
             {
-              for (unsigned long i(current_row + 1) ; i < row ; ++i)
+              for (Index i(current_row + 1) ; i < row ; ++i)
               {
                 trow_ptr[i] = ait;
               }
@@ -686,7 +686,7 @@ namespace FEAST
             tcol_ind[ait] = column;
             ++ait;
           }
-          for (unsigned long i(current_row + 1) ; i < _rows() ; ++i)
+          for (Index i(current_row + 1) ; i < _rows() ; ++i)
           {
             trow_ptr[i] = ait;
           }
@@ -749,9 +749,10 @@ namespace FEAST
             trow_ptr = new IT_[other.rows() + 1];
           }
 
-          trow_ptr[0] = 0;
+          trow_ptr[0] = IT_(0);
           const Index stride(cother.stride());
-          for (Index row(0), ue(0); row < cother.rows() ; ++row)
+          IT_ ue(0);
+          for (Index row(0) ; row < cother.rows() ; ++row)
           {
             const IT_ * tAj(cother.Aj());
             const DT_ * tAx(cother.Ax());
@@ -1026,7 +1027,7 @@ namespace FEAST
           ASSERT(row < rows(), "Error: " + stringify(row) + " exceeds sparse matrix csr row size " + stringify(rows()) + " !");
           ASSERT(col < columns(), "Error: " + stringify(col) + " exceeds sparse matrix csr column size " + stringify(columns()) + " !");
 
-          for (unsigned long i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
+          for (Index i(MemoryPool<Mem_>::get_element(this->_indices.at(1), row)) ; i < MemoryPool<Mem_>::get_element(this->_indices.at(1), row + 1) ; ++i)
           {
             if (MemoryPool<Mem_>::get_element(this->_indices.at(0), i) == col)
               return MemoryPool<Mem_>::get_element(this->_elements.at(0), i);
@@ -1267,7 +1268,7 @@ namespace FEAST
           if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
           {
             Arch::Defect<Mem_, Algo_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
-              this->row_ptr(), x.elements(), this->rows());
+              this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
           }
           //r <- y
           else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -1276,7 +1277,7 @@ namespace FEAST
           else
           {
             Arch::Axpy<Mem_, Algo_>::csr(r.elements(), alpha, x.elements(), y.elements(),
-              this->val(), this->col_ind(), this->row_ptr(), this->rows());
+              this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
           }
         }
 

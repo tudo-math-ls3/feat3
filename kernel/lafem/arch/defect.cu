@@ -1,5 +1,8 @@
 // includes, FEAST
 #include <kernel/lafem/arch/defect.hpp>
+#include <kernel/lafem/arch/difference.hpp>
+#include <kernel/lafem/arch/product_matvec.hpp>
+#include "cusparse_v2.h"
 
 namespace FEAST
 {
@@ -8,8 +11,8 @@ namespace FEAST
     namespace Intern
     {
       template <typename DT_>
-      __global__ void cuda_product_matvec_csr(DT_ * r, const DT_ * rhs, const DT_ * b, const DT_ * val, const Index * col_ind,
-          const Index * row_ptr, const Index count)
+      __global__ void cuda_defect_csr(DT_ * r, const DT_ * rhs, const DT_ * b, const DT_ * val, const unsigned long * col_ind,
+          const unsigned long * row_ptr, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
@@ -24,16 +27,16 @@ namespace FEAST
         r[idx] = rhs[idx] - sum;
       }
 
-      template <typename DT_>
-      __global__ void cuda_product_matvec_ell(DT_ * r, const DT_ * rhs, const DT_ * b, const DT_ * Ax, const Index * Aj,
-          const Index * Arl, const Index stride, const Index count)
+      template <typename DT_, typename IT_>
+      __global__ void cuda_defect_ell(DT_ * r, const DT_ * rhs, const DT_ * b, const DT_ * Ax, const IT_ * Aj,
+          const IT_ * Arl, const Index stride, const Index count)
       {
         Index idx = threadIdx.x + blockDim.x * blockIdx.x;
         if (idx >= count)
           return;
 
         const Index row(idx);
-        const Index * tAj(Aj);
+        const IT_ * tAj(Aj);
         const DT_ * tAx(Ax);
         DT_ sum(0);
         tAj += row;
@@ -62,7 +65,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::LAFEM::Arch;
 
 template <typename DT_>
-void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const Index * const col_ind, const Index * const row_ptr, const DT_ * const x, const Index rows)
+void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
 {
   Index blocksize(128);
   dim3 grid;
@@ -70,14 +73,23 @@ void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_product_matvec_csr<<<grid, block>>>(r, rhs, x, val, col_ind, row_ptr, rows);
+  FEAST::LAFEM::Intern::cuda_defect_csr<<<grid, block>>>(r, rhs, x, val, col_ind, row_ptr, rows);
 }
-template void Defect<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const Index * const, const Index * const, const float * const, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const Index * const, const Index * const, const double * const, const Index);
-
+template void Defect<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index, const Index);
 
 template <typename DT_>
-void Defect<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const Ax, const Index * const Aj, const Index * const Arl, const DT_ * const x, const Index stride, const Index rows)
+void Defect<Mem::CUDA, Algo::CUDA>::csr(DT_ * r, const DT_ * const rhs, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements)
+{
+  FEAST::LAFEM::Arch::ProductMatVec<Mem::CUDA, Algo::CUDA>::csr(r, val, col_ind, row_ptr, x, rows, columns, used_elements);
+  FEAST::LAFEM::Arch::Difference<Mem::CUDA, Algo::CUDA>::value(r, rhs, r, rows);
+}
+template void Defect<Mem::CUDA, Algo::CUDA>::csr(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index, const Index);
+template void Defect<Mem::CUDA, Algo::CUDA>::csr(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index, const Index);
+
+
+template <typename DT_, typename IT_>
+void Defect<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
 {
   Index blocksize(128);
   dim3 grid;
@@ -85,7 +97,9 @@ void Defect<Mem::CUDA, Algo::CUDA>::ell(DT_ * r, const DT_ * const rhs, const DT
   block.x = blocksize;
   grid.x = (unsigned)ceil((rows)/(double)(block.x));
 
-  FEAST::LAFEM::Intern::cuda_product_matvec_ell<<<grid, block>>>(r, rhs, x, Ax, Aj, Arl, stride, rows);
+  FEAST::LAFEM::Intern::cuda_defect_ell<<<grid, block>>>(r, rhs, x, Ax, Aj, Arl, stride, rows);
 }
-template void Defect<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const Index * const, const Index * const, const float * const, const Index, const Index);
-template void Defect<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const Index * const, const Index * const, const double * const, const Index, const Index);
+template void Defect<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index);
+template void Defect<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const unsigned long * const, const unsigned long * const, const double * const, const Index, const Index);
+template void Defect<Mem::CUDA, Algo::CUDA>::ell(float *, const float * const, const float * const, const unsigned int * const, const unsigned int * const, const float * const, const Index, const Index);
+template void Defect<Mem::CUDA, Algo::CUDA>::ell(double *, const double * const, const double * const, const unsigned int * const, const unsigned int * const, const double * const, const Index, const Index);

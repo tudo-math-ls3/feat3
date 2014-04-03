@@ -106,7 +106,7 @@ namespace FEAST
       struct ProductMatVec<Mem::CUDA, Algo::CUDA>
       {
         template <typename DT_>
-        static void csr(DT_ * r, const DT_ * const val, const Index * const col_ind, const Index * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements);
+        static void csr(DT_ * r, const DT_ * const val, const unsigned long * const col_ind, const unsigned long * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements);
 
         template <typename DT_>
         static void csr(DT_ * r, const DT_ * const val, const unsigned int * const col_ind, const unsigned int * const row_ptr, const DT_ * const x, const Index rows, const Index columns, const Index used_elements);

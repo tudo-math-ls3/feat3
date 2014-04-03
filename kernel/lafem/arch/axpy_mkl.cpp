@@ -93,7 +93,7 @@ void Axpy<Mem::Main, Algo::MKL>::dv(double * r, const double * const a, const do
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows)
+void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -126,7 +126,7 @@ void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float a, const float * con
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::csr(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows)
+void Axpy<Mem::Main, Algo::MKL>::csr(double * r, const double a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -159,7 +159,7 @@ void Axpy<Mem::Main, Algo::MKL>::csr(double * r, const double a, const double * 
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float * const a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows)
+void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float * const a, const float * const x, const float * const y, const float * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
@@ -189,7 +189,7 @@ void Axpy<Mem::Main, Algo::MKL>::csr(float * r, const float * const a, const flo
   }
 }
 
-void Axpy<Mem::Main, Algo::MKL>::csr(double * r, const double * const a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows)
+void Axpy<Mem::Main, Algo::MKL>::csr(double * r, const double * const a, const double * const x, const double * const y, const double * const val, const Index * const col_ind, const Index * const row_ptr, const Index rows, const Index, const Index)
 {
   MKL_INT mrows = (MKL_INT)rows;
   char trans = 'N';
