@@ -133,13 +133,14 @@ SparseMatrixELLTest<Mem::CUDA, double> cuda_sparse_matrix_ell_test_double;
 template<
   typename Mem_,
   typename Algo_,
-  typename DT_>
+  typename DT_,
+  typename IT_>
 class SparseMatrixELLApplyTest
-  : public TaggedTest<Mem_, DT_, Algo_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
   SparseMatrixELLApplyTest()
-    : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixELLApplyTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixELLApplyTest")
   {
   }
 
@@ -148,20 +149,20 @@ public:
     DT_ s(DT_(4711.1));
     for (Index size(1) ; size < 1e3 ; size*=2)
     {
-      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size);
-      DenseVector<Mem::Main, DT_> x_local(size);
-      DenseVector<Mem::Main, DT_> y_local(size);
-      DenseVector<Mem::Main, DT_> ref_local(size);
-      DenseVector<Mem_, DT_> ref(size);
-      DenseVector<Mem::Main, DT_> result_local(size);
+      SparseMatrixCOO<Mem::Main, DT_, IT_> a_local(size, size);
+      DenseVector<Mem::Main, DT_, IT_> x_local(size);
+      DenseVector<Mem::Main, DT_, IT_> y_local(size);
+      DenseVector<Mem::Main, DT_, IT_> ref_local(size);
+      DenseVector<Mem_, DT_, IT_> ref(size);
+      DenseVector<Mem::Main, DT_, IT_> result_local(size);
       for (Index i(0) ; i < size ; ++i)
       {
         x_local(i, DT_(i % 100 * DT_(1.234)));
         y_local(i, DT_(2 - DT_(i % 42)));
       }
-      DenseVector<Mem_, DT_> x(size);
+      DenseVector<Mem_, DT_, IT_> x(size);
       x.copy(x_local);
-      DenseVector<Mem_, DT_> y(size);
+      DenseVector<Mem_, DT_, IT_> y(size);
       y.copy(y_local);
 
       Index ue(0);
@@ -181,9 +182,9 @@ public:
           }
         }
       }
-      SparseMatrixELL<Mem_,DT_> a(a_local);
+      SparseMatrixELL<Mem_,DT_, IT_> a(a_local);
 
-      DenseVector<Mem_, DT_> r(size);
+      DenseVector<Mem_, DT_, IT_> r(size);
       //r.template axpy<Algo_>(s, a, x, y);
       a.template apply<Algo_>(r, x, y, s);
       result_local.copy(r);
@@ -199,11 +200,15 @@ public:
     }
   }
 };
-SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, float> sm_ell_apply_test_float;
-SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, double> sm_ell_apply_test_double;
+SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, float, unsigned long> sm_ell_apply_test_float_ulong;
+SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, double, unsigned long> sm_ell_apply_test_double_ulong;
+SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, float, unsigned int> sm_ell_apply_test_float_uint;
+SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, double, unsigned int> sm_ell_apply_test_double_uint;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_ell_apply_test_float;
-SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_ell_apply_test_double;
+SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_ell_apply_test_float_ulong;
+SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_ell_apply_test_double_ulong;
+SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sm_ell_apply_test_float_uint;
+SparseMatrixELLApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sm_ell_apply_test_double_uint;
 #endif
 
 template<
