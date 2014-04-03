@@ -48,59 +48,6 @@ struct Precon<SparsePreconType::pt_gauss_seidel>
 };
 
 template <>
-struct Precon<SparsePreconType::pt_polynomial>
-{
-  template <typename Algo_, typename MT_, typename VT_>
-  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
-  {
-    const Index iter_poly(2);
-    Preconditioner<Algo_, MT_, VT_> * t;
-
-    if (opt%10 == 0)
-    {
-      auto * temp = Precon<SparsePreconType::pt_none>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else if (opt%10 == 1)
-    {
-      auto * temp = Precon<SparsePreconType::pt_jacobi>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else if (opt%10 == 2)
-    {
-      auto * temp = Precon<SparsePreconType::pt_gauss_seidel>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else if (opt%10 == 3)
-    {
-      auto * temp = Precon<SparsePreconType::pt_sor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else if (opt%10 == 4)
-    {
-      auto * temp = Precon<SparsePreconType::pt_ssor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else if (opt%10 == 5)
-    {
-      auto * temp = Precon<SparsePreconType::pt_ilu>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else if (opt%10 == 6)
-    {
-      auto * temp = Precon<SparsePreconType::pt_spai>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
-      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
-    }
-    else
-    {
-      throw InternalError(__func__, __FILE__, __LINE__, "Parameter opt not allowed!");
-    }
-
-    return t;
-  }
-};
-
-template <>
 struct Precon<SparsePreconType::pt_ilu>
 {
   template <typename Algo_, typename MT_, typename VT_>
@@ -156,6 +103,60 @@ struct Precon<SparsePreconType::pt_spai>
     return t;
   }
 };
+
+template <>
+struct Precon<SparsePreconType::pt_polynomial>
+{
+  template <typename Algo_, typename MT_, typename VT_>
+  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  {
+    const Index iter_poly(2);
+    Preconditioner<Algo_, MT_, VT_> * t;
+
+    if (opt%10 == 0)
+    {
+      auto * temp = Precon<SparsePreconType::pt_none>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 1)
+    {
+      auto * temp = Precon<SparsePreconType::pt_jacobi>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 2)
+    {
+      auto * temp = Precon<SparsePreconType::pt_gauss_seidel>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 3)
+    {
+      auto * temp = Precon<SparsePreconType::pt_sor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 4)
+    {
+      auto * temp = Precon<SparsePreconType::pt_ssor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 5)
+    {
+      auto * temp = Precon<SparsePreconType::pt_ilu>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 6)
+    {
+      auto * temp = Precon<SparsePreconType::pt_spai>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else
+    {
+      throw InternalError(__func__, __FILE__, __LINE__, "Parameter opt not allowed!");
+    }
+
+    return t;
+  }
+};
+
 
 /**
  * \brief BiCGStabTest
