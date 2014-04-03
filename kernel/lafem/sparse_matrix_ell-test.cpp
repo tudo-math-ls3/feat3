@@ -128,7 +128,7 @@ SparseMatrixELLTest<Mem::Main, double> cpu_sparse_matrix_ell_test_double;
 SparseMatrixELLTest<Mem::CUDA, float> cuda_sparse_matrix_ell_test_float;
 SparseMatrixELLTest<Mem::CUDA, double> cuda_sparse_matrix_ell_test_double;
 #endif
-/*
+
 
 template<
   typename Mem_,
@@ -199,7 +199,6 @@ public:
     }
   }
 };
-
 SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, float> sm_ell_apply_test_float;
 SparseMatrixELLApplyTest<Mem::Main, Algo::Generic, double> sm_ell_apply_test_double;
 #ifdef FEAST_BACKENDS_CUDA
@@ -253,7 +252,7 @@ public:
 
       a.template scale<Algo_>(a, s);
       SparseMatrixCOO<Mem_, DT_> a_coo(a);
-      a_local = a_coo;
+      a_local.convert(a_coo);
       TEST_CHECK_EQUAL(a_local, ref_local);
     }
   }
@@ -268,4 +267,3 @@ SparseMatrixELLScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_ell_scale_test_dou
 SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_ell_scale_test_float;
 SparseMatrixELLScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_ell_scale_test_double;
 #endif
-*/
