@@ -14,7 +14,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for the dense vector class.
+* \brief Test class for the dense vector blocked class.
 *
 * \test test description missing
 *

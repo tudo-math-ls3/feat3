@@ -12,7 +12,7 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 /**
-* \brief Test class for the sparse matrix coo class.
+* \brief Test class for the sparse matrix csr class.
 *
 * \test test description missing
 *
