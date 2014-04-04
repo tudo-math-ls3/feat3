@@ -11,6 +11,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
+#include <kernel/lafem/sparse_matrix_csr_blocked.hpp>
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
 #include <kernel/lafem/arch/scale_row_col.hpp>
@@ -733,9 +734,9 @@ namespace FEAST
           }
           else
           {
-            tval = new DT_[other.used_elements()];
-            tcol_ind = new IT_[other.used_elements()];
-            trow_ptr = new IT_[other.rows() + 1];
+            tval = new DT_[used_elements()];
+            tcol_ind = new IT_[used_elements()];
+            trow_ptr = new IT_[rows() + 1];
           }
 
           trow_ptr[0] = IT_(0);
@@ -872,6 +873,84 @@ namespace FEAST
           }
           #undef START_OFFSET
           #undef END_OFFSET
+
+          if (! std::is_same<Mem_, Mem::Main>::value)
+          {
+            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, _rows() + 1);
+            delete[] tval;
+            delete[] tcol_ind;
+            delete[] trow_ptr;
+          }
+        }
+
+        /**
+         * \brief Convertion method
+         *
+         * \param[in] other The source Matrix.
+         *
+         * Use source matrix content as content of current matrix
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_, Index BlockHeight_, Index BlockWidth_>
+        void convert(const SparseMatrixCSRBlocked<Mem2_, DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
+        {
+          CONTEXT("When converting SparseMatrixCSR");
+
+          this->clear();
+
+          this->_scalar_index.push_back(other.raw_rows() * other.raw_columns());
+          this->_scalar_index.push_back(other.raw_rows());
+          this->_scalar_index.push_back(other.raw_columns());
+          this->_scalar_index.push_back(other.raw_used_elements());
+          this->_scalar_dt.push_back(other.zero_element());
+
+          SparseMatrixCSRBlocked<Mem::Main, DT_, IT_, BlockHeight_, BlockWidth_> cother;
+          cother.convert(other);
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows() + 1));
+          this->_indices_size.push_back(_rows() + 1);
+
+          DT_ * tval(nullptr);
+          IT_ * tcol_ind(nullptr);
+          IT_ * trow_ptr(nullptr);
+          if (std::is_same<Mem_, Mem::Main>::value)
+          {
+            tval = this->_elements.at(0);
+            tcol_ind = this->_indices.at(0);
+            trow_ptr = this->_indices.at(1);
+          }
+          else
+          {
+            tval = new DT_[used_elements()];
+            tcol_ind = new IT_[used_elements()];
+            trow_ptr = new IT_[rows() + 1];
+          }
+
+          Index ait(0);
+          trow_ptr[0] = IT_(0);
+          Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *mval(reinterpret_cast<Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *>(cother.val()));
+          for (Index orow(0) ; orow < cother.rows() ; ++orow)
+          {
+            for (Index row(0) ; row < BlockHeight_ ; ++row)
+            {
+              for(Index ocol(cother.row_ptr()[orow]) ; ocol < cother.row_ptr()[orow + 1] ; ++ocol)
+              {
+                Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> *tbm(mval + ocol);
+                for (Index col(0) ; col < BlockWidth_ ; ++col)
+                {
+                  tval[ait] = (*tbm)(row,col);
+                  tcol_ind[ait] = cother.col_ind()[ocol] * (IT_)BlockWidth_ + (IT_)col;
+                  ++ait;
+                }
+              }
+              trow_ptr[orow * BlockHeight_ + row + 1] = (IT_)ait;
+            }
+          }
 
           if (! std::is_same<Mem_, Mem::Main>::value)
           {
@@ -1375,7 +1454,7 @@ namespace FEAST
          * \param[in] x The vector to be multiplied by this matrix.
          */
         template<typename Algo_>
-        void apply(DenseVector<Mem_,DT_, IT_>& r, const DenseVector<Mem_, DT_, IT_>& x) const
+        void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
         {
           if (r.size() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
@@ -1396,9 +1475,9 @@ namespace FEAST
          */
         template<typename Algo_>
         void apply(
-          DenseVector<Mem_,DT_, IT_>& r,
-          const DenseVector<Mem_, DT_, IT_>& x,
-          const DenseVector<Mem_, DT_, IT_>& y,
+          DenseVector<Mem_,DT_, IT_> & r,
+          const DenseVector<Mem_, DT_, IT_> & x,
+          const DenseVector<Mem_, DT_, IT_> & y,
           const DT_ alpha = DT_(1)) const
         {
           if (r.size() != this->rows())

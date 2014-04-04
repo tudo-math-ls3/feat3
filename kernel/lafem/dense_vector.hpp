@@ -217,13 +217,7 @@ namespace FEAST
         {
           CONTEXT("When creating DenseVector");
 
-          this->_elements.push_back(other.get_elements().at(0));
-          this->_elements_size.push_back(this->size());
-
-          for (Index i(0) ; i < this->_elements.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
+          convert(other);
         }
 
         /**
@@ -335,6 +329,30 @@ namespace FEAST
         {
           CONTEXT("When converting DenseVector");
           this->assign(other);
+        }
+
+        /**
+         * \brief Conversion method
+         *
+         * \param[in] other The source vector.
+         *
+         * Use source vector content as content of current vector
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_, Index BS2_>
+        void convert(const DenseVectorBlocked<Mem2_, DT2_, IT2_, BS2_> & other)
+        {
+          CONTEXT("When converting DenseVector");
+
+          this->clear();
+
+          this->_scalar_index.push_back(other.raw_size());
+          this->_elements.push_back(other.get_elements().at(0));
+          this->_elements_size.push_back(this->size());
+
+          for (Index i(0) ; i < this->_elements.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_elements.at(i));
+          for (Index i(0) ; i < this->_indices.size() ; ++i)
+            MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
         }
 
         /**

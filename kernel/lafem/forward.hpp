@@ -22,6 +22,9 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixCSR;
 
+    template <typename Mem_, typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+    class SparseMatrixCSRBlocked;
+
     template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixCOO;
 
