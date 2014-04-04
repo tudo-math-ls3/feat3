@@ -32,6 +32,7 @@ namespace FEAST
      *
      * \tparam Mem_ The memory architecture to be used.
      * \tparam DT_ The datatype to be used.
+     * \tparam IT_ The indexing type to be used.
      *
      * This class represents a sparse matrix, that stores its non zero elements in the compressed sparse row format.\n\n
      * Data survey: \n
