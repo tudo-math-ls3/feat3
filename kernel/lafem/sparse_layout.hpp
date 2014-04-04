@@ -67,13 +67,13 @@ namespace FEAST
     {
     public:
       std::vector<IT_*> _indices;
-      std::vector<IT_> _indices_size;
-      std::vector<IT_> _scalar_index;
+      std::vector<Index> _indices_size;
+      std::vector<Index> _scalar_index;
 
       template<typename DT_>
       using MatrixType = typename Intern::LayoutTyper<Layout_>::template MatrixType<Mem_, DT_, IT_>;
 
-      SparseLayout(const std::vector<IT_ *> & indices, const std::vector<IT_> & indices_size, const std::vector<IT_> & scalar_index) :
+      SparseLayout(const std::vector<IT_ *> & indices, const std::vector<Index> & indices_size, const std::vector<Index> & scalar_index) :
         _indices(indices),
         _indices_size(indices_size),
         _scalar_index(scalar_index)
@@ -138,7 +138,7 @@ namespace FEAST
     *
     * \returns A list of all Index arrays.
     */
-    const std::vector<Index*> & get_indices() const
+    const std::vector<IT_*> & get_indices() const
     {
       return _indices;
     }
