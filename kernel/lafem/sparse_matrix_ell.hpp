@@ -499,8 +499,8 @@ namespace FEAST
         explicit SparseMatrixELL(const Index rows_in, const Index columns_in,
             const Index stride_in, const Index num_cols_per_row_in, const Index used_elements_in,
             DenseVector<Mem_, DT_, IT_> & Ax_in,
-            DenseVector<Mem_, IT_> & Aj_in,
-            DenseVector<Mem_, IT_> & Arl_in) :
+            DenseVector<Mem_, IT_, IT_> & Aj_in,
+            DenseVector<Mem_, IT_, IT_> & Arl_in) :
           Container<Mem_, DT_, IT_>(rows_in * columns_in)
         {
           CONTEXT("When creating SparseMatrixELL");
