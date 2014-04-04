@@ -36,6 +36,10 @@ MemoryPool<Mem::CUDA>::~MemoryPool()
     std::cout << stderr << " Error: MemoryPool<CUDA> still contains memory chunks on deconstructor call" << std::endl;
     std::exit(1);
   }
+
+  cudaError_t last_error(cudaGetLastError());
+  if (cudaSuccess != last_error)
+    throw InternalError(__func__, __FILE__, __LINE__, "Pending cuda errors occured in execution!\n" + stringify(cudaGetErrorString(last_error)));
 }
 
 template <typename DT_>
@@ -45,7 +49,7 @@ DT_ * MemoryPool<Mem::CUDA>::allocate_memory(const Index count)
   if (cudaErrorMemoryAllocation == cudaMalloc((void**)&memory, count * sizeof(DT_)))
     throw InternalError("MemoryPool<CUDA> cuda allocation error (cudaErrorMemoryAllocation)");
   if (memory == NULL)
-    throw InternalError("MemoryPool<CUDA> allocation error (null pointer returned)");
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA> allocation error (null pointer returned)");
   Intern::MemoryInfo mi;
   mi.counter = 1;
   mi.size = count * sizeof(DT_);
@@ -57,7 +61,7 @@ void MemoryPool<Mem::CUDA>::increase_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("MemoryPool<CUDA>::increase_memory: Memory address not found!");
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::increase_memory: Memory address not found!");
   else
   {
     it->second.counter = it->second.counter + 1;
@@ -68,13 +72,13 @@ void MemoryPool<Mem::CUDA>::release_memory(void * address)
 {
   std::map<void*, Intern::MemoryInfo>::iterator it(_pool.find(address));
   if (it == _pool.end())
-    throw InternalError("MemoryPool<CUDA>::relase_memory: Memory address not found!");
+    throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::relase_memory: Memory address not found!");
   else
   {
     if(it->second.counter == 1)
     {
       if (cudaSuccess != cudaFree(address))
-        throw InternalError("MemoryPool<CUDA>::release_memory: cudaFree failed!");
+        throw InternalError(__func__, __FILE__, __LINE__, "MemoryPool<CUDA>::release_memory: cudaFree failed!");
       _pool.erase(it);
     }
     else
