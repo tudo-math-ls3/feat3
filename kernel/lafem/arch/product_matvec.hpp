@@ -120,9 +120,41 @@ namespace FEAST
               }
             }
           }
-
           #undef START_OFFSET
           #undef END_OFFSET
+
+          /**
+           * \TODO: Implementation for CUDA
+           */
+
+          /*
+          const Index k1(rows - 1);
+          const Index k2(rows + columns - 1);
+
+          for (Index i(0); i < rows; ++i)
+          {
+            Index start(0);
+
+            while (k1 > offsets[start] + i)
+            {
+              ++start;
+            }
+
+            Index end(start);
+
+            while (end < num_of_offsets && i + offsets[end] <= k2)
+            {
+              ++end;
+            }
+
+            DT_ gamma(DT_(0.0));
+            for (Index diag(start); diag < end; ++diag)
+            {
+              gamma += val[rows * diag + i] * x[i + offsets[diag] - rows + 1];
+            }
+            r[i] = gamma;
+          }
+           */
         }
       };
 
