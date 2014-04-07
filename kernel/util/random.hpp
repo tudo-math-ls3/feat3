@@ -242,7 +242,7 @@ namespace FEAST
         // call gen() prior to the if-clause to advance the rng in any case
         T_ x(gen(rng));
         if(a + eps < b)
-          return a + x / (b - a);
+          return a + x * (b - a);
         else
           return a;
       }
