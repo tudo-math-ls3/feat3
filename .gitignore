@@ -48,6 +48,15 @@ test_system/Testing/
 # Ignore Doxygen output files
 doc/*
 
+# Ignore third-party sources and tarballs
+thirdparty/*.gz
+thirdparty/*.tgz
+thirdparty/*.zip
+thirdparty/alglib/*
+thirdparty/AMD/*
+thirdparty/SuiteSparse_config/*
+thirdparty/UMFPACK/*
+
 # Ignore Visual Studio user/filter files
 *.vcxproj.user
 *.vcxproj.filters
@@ -67,5 +76,4 @@ ipch
 *.lnk
 
 # Ignore Visual Studio user-configfiles
-config-vc10.xml
-config-vc11.xml
+config-vc12.xml
