@@ -42,6 +42,7 @@ def run_test(build_id, branch, myDB):
   os.mkdir(build_dirname)
 
   #git pull
+  os.chdir(src_dirname)
   git_output = get_output("git gc --auto")
   git_output += get_output("git checkout -f --no-track -B test123" + hostname + " origin/" + branch)
   git_output.append("git HEAD:")
