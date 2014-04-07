@@ -26,28 +26,30 @@ using namespace FEAST::TestSystem;
 */
 template<
   typename Mem_,
-  typename DT_>
+  typename Algo_,
+  typename DT_,
+  typename IT_>
 class SparseMatrixCSRTest
-  : public TaggedTest<Mem_, DT_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
   SparseMatrixCSRTest()
-    : TaggedTest<Mem_, DT_>("SparseMatrixCSRTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixCSRTest")
   {
   }
 
   virtual void run() const
   {
-    SparseMatrixCSR<Mem_, DT_> zero1;
-    SparseMatrixCSR<Mem::Main, DT_> zero2;
+    SparseMatrixCSR<Mem_, DT_, IT_> zero1;
+    SparseMatrixCSR<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
-    SparseMatrixCOO<Mem::Main, DT_> a(10, 10);
+    SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 10);
     a(1,2,7);
     a.format();
     a(1,2,7);
     a(5,5,2);
-    SparseMatrixCSR<Mem_, DT_> b(a);
+    SparseMatrixCSR<Mem_, DT_, IT_> b(a);
     TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
@@ -55,7 +57,7 @@ public:
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
 
-    SparseMatrixCSR<Mem_, DT_> bl(b.layout());
+    SparseMatrixCSR<Mem_, DT_, IT_> bl(b.layout());
     TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
     TEST_CHECK_EQUAL(bl.size(), b.size());
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
@@ -67,7 +69,7 @@ public:
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
-    typename SparseLayout<Mem_, Index, SparseLayoutType::lt_csr>::template MatrixType<DT_> x(b.layout());
+    typename SparseLayout<Mem_, IT_, SparseLayoutType::lt_csr>::template MatrixType<DT_> x(b.layout());
     // icc 14.0.2 does not understand the following line, so we need a typedef hier
     //typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
     typedef decltype(b.layout()) LayoutType;
@@ -76,7 +78,7 @@ public:
     TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
 
 
-    SparseMatrixCSR<Mem_, DT_> z;
+    SparseMatrixCSR<Mem_, DT_, IT_> z;
     z.convert(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
@@ -85,22 +87,22 @@ public:
     TEST_CHECK_EQUAL(z(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
 
-    SparseMatrixCSR<Mem_, DT_> c;
+    SparseMatrixCSR<Mem_, DT_, IT_> c;
     c.clone(b);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
-    DenseVector<Mem_, Index> col_ind(c.used_elements(), c.col_ind());
-    DenseVector<Mem_, DT_> val(c.used_elements(), c.val());
-    DenseVector<Mem_, Index> row_ptr(c.rows() + 1, c.row_ptr());
-    SparseMatrixCSR<Mem_, DT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
+    DenseVector<Mem_, IT_, IT_> col_ind(c.used_elements(), c.col_ind());
+    DenseVector<Mem_, DT_, IT_> val(c.used_elements(), c.val());
+    DenseVector<Mem_, IT_, IT_> row_ptr(c.rows() + 1, c.row_ptr());
+    SparseMatrixCSR<Mem_, DT_, IT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
     TEST_CHECK_EQUAL(d, c);
 
-    SparseMatrixCSR<Mem::Main, DT_> e;
+    SparseMatrixCSR<Mem::Main, DT_, IT_> e;
     e.convert(c);
     TEST_CHECK_EQUAL(e, c);
     e.copy(c);
     TEST_CHECK_EQUAL(e, c);
 
-    SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 10);
+    SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
     for (Index row(0) ; row < fcoo.rows() ; ++row)
     {
       for (Index col(0) ; col < fcoo.columns() ; ++col)
@@ -111,29 +113,33 @@ public:
           fcoo(row, col, DT_(-1));
       }
     }
-    SparseMatrixCSR<Mem_, DT_> f(fcoo);
+    SparseMatrixCSR<Mem_, DT_, IT_> f(fcoo);
 
     BinaryStream bs;
     f.write_out(FileMode::fm_csr, bs);
     bs.seekg(0);
-    SparseMatrixCSR<Mem_, DT_> g(FileMode::fm_csr, bs);
+    SparseMatrixCSR<Mem_, DT_, IT_> g(FileMode::fm_csr, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
     f.write_out(FileMode::fm_m, ts);
-    SparseMatrixCSR<Mem::Main, DT_> i(FileMode::fm_m, ts);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> i(FileMode::fm_m, ts);
     TEST_CHECK_EQUAL(i, f);
 
     f.write_out(FileMode::fm_mtx, ts);
-    SparseMatrixCSR<Mem::Main, DT_> j(FileMode::fm_mtx, ts);
+    SparseMatrixCSR<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
   }
 };
-SparseMatrixCSRTest<Mem::Main, float> cpu_sparse_matrix_csr_test_float;
-SparseMatrixCSRTest<Mem::Main, double> cpu_sparse_matrix_csr_test_double;
+SparseMatrixCSRTest<Mem::Main, NotSet, float, unsigned long> cpu_sparse_matrix_csr_test_float_ulong;
+SparseMatrixCSRTest<Mem::Main, NotSet, double, unsigned long> cpu_sparse_matrix_csr_test_double_ulong;
+SparseMatrixCSRTest<Mem::Main, NotSet, float, unsigned int> cpu_sparse_matrix_csr_test_float_uint;
+SparseMatrixCSRTest<Mem::Main, NotSet, double, unsigned int> cpu_sparse_matrix_csr_test_double_uint;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixCSRTest<Mem::CUDA, float> cuda_sparse_matrix_csr_test_float;
-SparseMatrixCSRTest<Mem::CUDA, double> cuda_sparse_matrix_csr_test_double;
+SparseMatrixCSRTest<Mem::CUDA, NotSet, float, unsigned long> cuda_sparse_matrix_csr_test_float_ulong;
+SparseMatrixCSRTest<Mem::CUDA, NotSet, double, unsigned long> cuda_sparse_matrix_csr_test_double_ulong;
+SparseMatrixCSRTest<Mem::CUDA, NotSet, float, unsigned int> cuda_sparse_matrix_csr_test_float_uint;
+SparseMatrixCSRTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_matrix_csr_test_double_uint;
 #endif
 
 

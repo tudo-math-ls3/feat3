@@ -86,9 +86,9 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row((Index)atol(srow.c_str()));
+            IT_ row((IT_)atol(srow.c_str()));
             --row;
-            _rows() = std::max(row+1, this->rows());
+            _rows() = std::max(row+1, IT_(this->rows()));
             line.erase(0, end);
 
             begin = line.find_first_not_of(" ");
@@ -116,7 +116,7 @@ namespace FEAST
           IT_ * tcol_ind = new IT_[ue];
           IT_ * trow_ptr = new IT_[rows() + 1];
 
-          Index idx(0);
+          IT_ idx(0);
           Index row_idx(0);
           for (auto row : entries)
           {
@@ -130,7 +130,7 @@ namespace FEAST
             row.second.clear();
             ++row_idx;
           }
-          trow_ptr[rows()] = ue;
+          trow_ptr[rows()] = IT_(ue);
           entries.clear();
 
           this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
@@ -199,7 +199,7 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row((Index)atol(srow.c_str()));
+            IT_ row((IT_)atol(srow.c_str()));
             --row;
             line.erase(0, end);
 
@@ -227,7 +227,7 @@ namespace FEAST
           IT_ * tcol_ind = new IT_[ue];
           IT_ * trow_ptr = new IT_[rows() + 1];
 
-          Index idx(0);
+          IT_ idx(0);
           Index row_idx(0);
           for (auto row : entries)
           {
@@ -241,7 +241,7 @@ namespace FEAST
             row.second.clear();
             ++row_idx;
           }
-          trow_ptr[rows()] = ue;
+          trow_ptr[rows()] = IT_(ue);
           entries.clear();
 
           this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
