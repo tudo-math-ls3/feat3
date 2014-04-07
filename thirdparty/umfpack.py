@@ -1,0 +1,45 @@
+from thirdparty.thirdparty_package import ThirdpartyPackage
+import os
+
+class UMFPACK(ThirdpartyPackage):
+
+  def __init__(self,trunk_dirname):
+    self.name = "umfpack"
+    self.dirname = "UMFPACK"
+    self.filename = "UMFPACK-5.6.2.tar.gz"
+    self.url = "http://www.cise.ufl.edu/research/sparse/umfpack/" + self.filename
+    self.cmake_flags = " -DFEAST_HAVE_UMFPACK:BOOL=ON"
+    self.trunk_dirname = trunk_dirname
+    self.unpacker = "tar xf "
+    self.unpack_target = " -C " + trunk_dirname + os.sep
+
+  def add(self):
+    ThirdpartyPackage.add(self)
+    amd = AMD(self.trunk_dirname)
+    amd.add()
+    suitesparseconfig = SuiteSparse_config(self.trunk_dirname)
+    suitesparseconfig.add()
+
+class AMD(ThirdpartyPackage):
+
+  def __init__(self,trunk_dirname):
+    self.name = "amd"
+    self.dirname = "AMD"
+    self.filename = "AMD-2.3.1.tar.gz"
+    self.url = "http://www.cise.ufl.edu/research/sparse/amd/" + self.filename
+    self.cmake_flags = ""
+    self.trunk_dirname = trunk_dirname
+    self.unpacker = "tar xf "
+    self.unpack_target = " -C " + trunk_dirname + os.sep
+
+class SuiteSparse_config(ThirdpartyPackage):
+
+  def __init__(self,trunk_dirname):
+    self.name = "suitesparse_config"
+    self.dirname = "SuiteSparse_config"
+    self.filename = "SuiteSparse_config-4.2.1.tar.gz"
+    self.url = "http://www.cise.ufl.edu/research/sparse/SuiteSparse_config/" + self.filename
+    self.cmake_flags = ""
+    self.trunk_dirname = trunk_dirname
+    self.unpacker = "tar xf "
+    self.unpack_target = " -C " + trunk_dirname + os.sep
