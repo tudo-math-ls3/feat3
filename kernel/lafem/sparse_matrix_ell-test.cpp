@@ -27,28 +27,30 @@ using namespace FEAST::TestSystem;
 */
 template<
   typename Mem_,
-  typename DT_>
+  typename Algo_,
+  typename DT_,
+  typename IT_>
 class SparseMatrixELLTest
-  : public TaggedTest<Mem_, DT_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
   SparseMatrixELLTest()
-    : TaggedTest<Mem_, DT_>("SparseMatrixELLTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixELLTest")
   {
   }
 
   virtual void run() const
   {
-    SparseMatrixELL<Mem_, DT_> zero1;
-    SparseMatrixELL<Mem::Main, DT_> zero2;
+    SparseMatrixELL<Mem_, DT_, IT_> zero1;
+    SparseMatrixELL<Mem::Main, DT_, IT_> zero2;
     TEST_CHECK_EQUAL(zero1, zero2);
 
-    SparseMatrixCOO<Mem::Main, DT_> a(10, 12);
+    SparseMatrixCOO<Mem::Main, DT_, IT_> a(10, 12);
     a(1,2,7);
     a.format();
     a(1,2,7);
     a(5,5,2);
-    SparseMatrixELL<Mem_, DT_> b(a);
+    SparseMatrixELL<Mem_, DT_, IT_> b(a);
     TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b.rows(), a.rows());
@@ -56,7 +58,7 @@ public:
     TEST_CHECK_EQUAL(b(1, 2), a(1, 2));
     TEST_CHECK_EQUAL(b(5, 5), a(5, 5));
 
-    SparseMatrixELL<Mem_, DT_> bl(b.layout());
+    SparseMatrixELL<Mem_, DT_, IT_> bl(b.layout());
     TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
     TEST_CHECK_EQUAL(bl.size(), b.size());
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
@@ -68,7 +70,7 @@ public:
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
-    SparseMatrixELL<Mem_, DT_> z;
+    SparseMatrixELL<Mem_, DT_, IT_> z;
     z.convert(b);
     TEST_CHECK_EQUAL(z.used_elements(), 2ul);
     TEST_CHECK_EQUAL(z.size(), a.size());
@@ -80,7 +82,7 @@ public:
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
     TEST_CHECK_EQUAL(z(1, 3), a(1, 3));
 
-    SparseMatrixELL<Mem::Main, DT_> e;;
+    SparseMatrixELL<Mem::Main, DT_, IT_> e;;
     e.convert(b);
     TEST_CHECK_EQUAL(e, b);
     e.copy(b);
@@ -93,7 +95,7 @@ public:
     TEST_CHECK_EQUAL((void*)y.Arl(), (void*)b.Arl());
 
 
-    SparseMatrixCOO<Mem::Main, DT_> fcoo(10, 10);
+    SparseMatrixCOO<Mem::Main, DT_, IT_> fcoo(10, 10);
     for (Index row(0) ; row < fcoo.rows() ; ++row)
     {
       for (Index col(0) ; col < fcoo.columns() ; ++col)
@@ -104,29 +106,33 @@ public:
           fcoo(row, col, DT_(-1));
       }
     }
-    SparseMatrixELL<Mem_, DT_> f(fcoo);
+    SparseMatrixELL<Mem_, DT_, IT_> f(fcoo);
 
     BinaryStream bs;
     f.write_out(FileMode::fm_ell, bs);
     bs.seekg(0);
-    SparseMatrixELL<Mem_, DT_> g(FileMode::fm_ell, bs);
+    SparseMatrixELL<Mem_, DT_, IT_> g(FileMode::fm_ell, bs);
     TEST_CHECK_EQUAL(g, f);
 
     std::stringstream ts;
     f.write_out(FileMode::fm_m, ts);
-    SparseMatrixELL<Mem::Main, DT_> i(FileMode::fm_m, ts);
+    SparseMatrixELL<Mem::Main, DT_, IT_> i(FileMode::fm_m, ts);
     TEST_CHECK_EQUAL(i, f);
 
     f.write_out(FileMode::fm_mtx, ts);
-    SparseMatrixELL<Mem::Main, DT_> j(FileMode::fm_mtx, ts);
+    SparseMatrixELL<Mem::Main, DT_, IT_> j(FileMode::fm_mtx, ts);
     TEST_CHECK_EQUAL(j, f);
   }
 };
-SparseMatrixELLTest<Mem::Main, float> cpu_sparse_matrix_ell_test_float;
-SparseMatrixELLTest<Mem::Main, double> cpu_sparse_matrix_ell_test_double;
+SparseMatrixELLTest<Mem::Main, NotSet, float, unsigned long> cpu_sparse_matrix_ell_test_float_ulong;
+SparseMatrixELLTest<Mem::Main, NotSet, double, unsigned long> cpu_sparse_matrix_ell_test_double_ulong;
+SparseMatrixELLTest<Mem::Main, NotSet, float, unsigned int> cpu_sparse_matrix_ell_test_float_uint;
+SparseMatrixELLTest<Mem::Main, NotSet, double, unsigned int> cpu_sparse_matrix_ell_test_double_uint;
 #ifdef FEAST_BACKENDS_CUDA
-SparseMatrixELLTest<Mem::CUDA, float> cuda_sparse_matrix_ell_test_float;
-SparseMatrixELLTest<Mem::CUDA, double> cuda_sparse_matrix_ell_test_double;
+SparseMatrixELLTest<Mem::CUDA, NotSet, float, unsigned long> cuda_sparse_matrix_ell_test_float_ulong;
+SparseMatrixELLTest<Mem::CUDA, NotSet, double, unsigned long> cuda_sparse_matrix_ell_test_double_ulong;
+SparseMatrixELLTest<Mem::CUDA, NotSet, float, unsigned int> cuda_sparse_matrix_ell_test_float_uint;
+SparseMatrixELLTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_matrix_ell_test_double_uint;
 #endif
 
 

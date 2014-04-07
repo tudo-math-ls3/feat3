@@ -93,9 +93,9 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row((Index)atol(srow.c_str()));
+            IT_ row((IT_)atol(srow.c_str()));
             --row;
-            _rows() = std::max(row+1, this->rows());
+            _rows() = std::max(Index(row+1), this->rows());
             line.erase(0, end);
 
             begin = line.find_first_not_of(" ");
@@ -126,7 +126,7 @@ namespace FEAST
           for (auto row : entries)
           {
             tArl[idx] = IT_(row.second.size());
-            _num_cols_per_row() = std::max(_num_cols_per_row(), tArl[idx]);
+            _num_cols_per_row() = std::max(_num_cols_per_row(), Index(tArl[idx]));
             ++idx;
           }
 
@@ -221,7 +221,7 @@ namespace FEAST
             line.erase(0, begin);
             String::size_type end(line.find_first_of(" "));
             String srow(line, 0, end);
-            Index row((Index)atol(srow.c_str()));
+            IT_ row((IT_)atol(srow.c_str()));
             --row;
             line.erase(0, end);
 
@@ -252,7 +252,7 @@ namespace FEAST
           for (auto row : entries)
           {
             tArl[idx] = IT_(row.second.size());
-            _num_cols_per_row() = std::max(_num_cols_per_row(), tArl[idx]);
+            _num_cols_per_row() = std::max(IT_(_num_cols_per_row()), tArl[idx]);
             ++idx;
           }
 
@@ -345,7 +345,7 @@ namespace FEAST
           _used_elements() = 0;
           for (Index row(0) ; row < _rows() ; ++row)
           {
-            Index count(0);
+            IT_ count(0);
             for (Index i(row) ; i < Index(dim) ; i += Index(tstride))
             {
                 if (tAx[i] == DT_(0))
