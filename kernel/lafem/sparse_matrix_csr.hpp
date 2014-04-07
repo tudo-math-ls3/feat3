@@ -403,28 +403,12 @@ namespace FEAST
         /**
          * \brief Constructor
          *
-         * \param[in] other The source matrix in ELL format.
+         * \param[in] other The source matrix.
          *
-         * Creates a CSR matrix based on the ELL source matrix.
+         * Creates a CSR matrix based on the source matrix.
          */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        explicit SparseMatrixCSR(const SparseMatrixELL<Mem2_, DT2_, IT2_> & other) :
-          Container<Mem_, DT_, IT_>(other.size())
-        {
-          CONTEXT("When creating SparseMatrixCSR");
-
-          convert(other);
-        }
-
-        /**
-         * \brief Constructor
-         *
-         * \param[in] other The source matrix in COO format.
-         *
-         * Creates a CSR matrix based on the COO source matrix.
-         */
-        template <typename Mem2_, typename DT2_, typename IT2_>
-        explicit SparseMatrixCSR(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other) :
+      template <typename MT_>
+        explicit SparseMatrixCSR(const MT_ & other) :
           Container<Mem_, DT_, IT_>(other.size())
         {
           CONTEXT("When creating SparseMatrixCSR");
