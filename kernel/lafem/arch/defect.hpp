@@ -90,15 +90,11 @@ namespace FEAST
           }
 
           // iteration over all offsets of the lower triangular matrix
-          for (Index i(k + 1); i > 0;)
+          for (Index i(0); i <= k; ++i)
           {
-            --i;
-
             // iteration over all offsets of the upper triangular matrix
-            for (Index j(num_of_offsets + 1); j > k;)
+            for (Index j(k); j <= num_of_offsets; ++j)
             {
-              --j;
-
               // iteration over all rows which contain the offsets between offset i and offset j
               for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
               {
