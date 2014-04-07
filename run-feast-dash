@@ -270,10 +270,13 @@ if is_found ("nvcc"):
   addition = addition + "-cuda"
 if is_found ("ccache"):
   addition = addition + "-ccache"
-if os.path.isdir(src_dirname+os.sep+"thirdparty"+os.sep+"alglib"):
-  addition = addition + "-alglib"
-if os.path.isdir(src_dirname+os.sep+"thirdparty"+os.sep+"UMFPACK"):
-  addition = addition + "-umfpack"
+#unconditionally add umfpack/alglib and delete it before the first test run to trigger package downloads
+shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"alglib", True)
+shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"UMFPACK", True)
+shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"AMD", True)
+shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse_config", True)
+addition = addition + "-alglib"
+addition = addition + "-umfpack"
 
 #iterate over all branches, that are queued for testing
 branches = BranchQueue.select()
