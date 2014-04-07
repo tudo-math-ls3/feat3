@@ -26,8 +26,10 @@ def run_test(build_id, branch, myDB):
   if dump_filename != "":
     dump_file = open(dump_filename+"-"+hostname+"-"+branch+"-"+build_id, "w")
 
-  os.chdir(src_dirname)
-  build_dirname = src_dirname + os.sep + "build"
+  if scratch != "":
+    build_dirname = scratch + os.sep + "feast-build"+"-"+branch+"-"+build_id
+  else:
+    build_dirname = src_dirname + os.sep + "build"
 
   #create test run in database
   r = Run.create(branch=branch, hostname=hostname, build=build_id, starttime=time.time())
@@ -194,9 +196,12 @@ if len(sys.argv) != 1 and ("help" in " ".join(sys.argv) or "?" in " ".join(sys.a
   print ("  set hostname as server that runs the sql daemon.")
   print ("sqlport=port")
   print ("  setup port of sql server.")
+  print ("scratch=dir")
+  print ("  set scratch directory for build files.")
   sys.exit();
 
 dump_filename = ""
+scratch = ""
 sqlhost = "augias"
 sqlport = 3306
 
@@ -207,6 +212,8 @@ for i in range(1, len(sys.argv)):
     sqlhost = sys.argv[i].replace("sqlhost=", "", 1)
   if sys.argv[i].startswith("sqlport="):
     sqlport = int(sys.argv[i].replace("sqlport=", "", 1))
+  if sys.argv[i].startswith("scratch="):
+    scratch = sys.argv[i].replace("scratch=", "", 1)
 
 src_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 myDB = pw.MySQLDatabase("feastdash", host=sqlhost, port=sqlport, user="feastdash", passwd="feastdash", threadlocals=True)
