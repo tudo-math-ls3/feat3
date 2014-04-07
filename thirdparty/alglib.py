@@ -1,4 +1,7 @@
-from thirdparty.thirdparty_package import *
+# vim: set filetype=python sw=2 sts=2 et nofoldenable :
+__author__ = "Jordi Paul"
+__date__   = "April 2014"
+from thirdparty.thirdparty_package import ThirdpartyPackage
 import os
 
 class ALGLIB(ThirdpartyPackage):

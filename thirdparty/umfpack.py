@@ -1,3 +1,6 @@
+# vim: set filetype=python sw=2 sts=2 et nofoldenable :
+__author__ = "Jordi Paul"
+__date__   = "April 2014"
 from thirdparty.thirdparty_package import ThirdpartyPackage
 import os
 
@@ -13,6 +16,7 @@ class UMFPACK(ThirdpartyPackage):
     self.unpacker = "tar xf "
     self.unpack_target = " -C " + trunk_dirname + os.sep
 
+# Overwrite add function to take care of the dependencies AMD and SuiteSparse_config
   def add(self):
     ThirdpartyPackage.add(self)
     amd = AMD(self.trunk_dirname)

@@ -10,13 +10,22 @@ import glob
 # Baseclass for third party packages
 class ThirdpartyPackage(object):
   def __init__(self,trunk_dirname):
+    # Package name as given in the build id.
     self.name = "NullPackage"
+    # Name of folder where the package is expected to be found.
     self.dirname = "NullDirName"
+    # Url from where to download the file, not including the filename.
     self.url = "NullUrl"
+    # Filename
     self.filename = "NullFilename"
+    # Absolute path of the FEAST2 directory. Crude, but works.
     self.trunk_dirname = trunk_dirname
+    # This is added to the cmake_flags
     self.cmake_flags = "NullCmakeFlags"
+    # Packages come in different formats (.zip, .tar etc., so the unpacker is different each time)
     self.unpacker = "NullUnpacker"
+    # Due to different syntax, the same is true for the target directory
+    self.unpack_target = "NullUnpackTarget"
 
 # How to add a third party package to the build process
   def add(self):
@@ -26,7 +35,7 @@ class ThirdpartyPackage(object):
     if not os.path.isdir(target_dirname):
       print (self.name +" enabled, but could not find a directory with name " + target_dirname+ ", checking for file...")
       if not os.path.isfile(target_filename):
-	print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
+        print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
         dlcmd = "wget " + self.url + " -O " + target_filename
         os.system(dlcmd)
 
@@ -34,6 +43,7 @@ class ThirdpartyPackage(object):
       os.system(unpkcmd)
     return
 
+# Find available third party packages by parsing all .py files in the thirdparty folder
 def available_packages(path,name=''):
   available_files = glob.glob(path+os.sep+'*.py')
   available_packages = []
@@ -43,11 +53,13 @@ def available_packages(path,name=''):
     mod = imp.load_module(filename[:-3],f,p,d)
     members = inspect.getmembers(mod)
     classes = []
+    # For all files, find all the classes defined in them...
     for x in members:
       if type(x) == tuple:
         if len(x) == 2:
           if inspect.isclass(x[1]):
-	    if issubclass(x[1],ThirdpartyPackage) and (x[1] != ThirdpartyPackage):
+            # ... that are subclasses of ThirdpartyPackage but not ThirdpartyPackage itself
+            if issubclass(x[1],ThirdpartyPackage) and (x[1] != ThirdpartyPackage):
                classes.append(x[1])
     for x in classes:
       result = x(path)
