@@ -4,6 +4,7 @@
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/util/binary_stream.hpp>
+#include <kernel/util/random.hpp>
 
 #include <sstream>
 
@@ -401,3 +402,79 @@ SparseMatrixCSRScaleRowColTest<Mem::Main, Algo::Generic, __float128, unsigned lo
 // SparseMatrixCSRScaleRowColTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sm_csr_scale_row_col_test_float_ulong;
 // SparseMatrixCSRScaleRowColTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sm_csr_scale_row_col_test_double_ulong;
 // #endif
+
+/**
+ * \brief Test class for the convertion from SparseMatrixBanded to SparseMatrixCSR
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \author Christoph Lohmann
+ */
+template<
+  typename Mem_,
+  typename DT_>
+class SparseMatrixCSRbandedTest
+  : public TaggedTest<Mem_, DT_>
+{
+public:
+  SparseMatrixCSRbandedTest()
+    : TaggedTest<Mem_, DT_>("SparseMatrixCSRbandedTest")
+  {
+  }
+
+  typedef Algo::Generic Algo_;
+
+  virtual void run() const
+  {
+    Random random;
+    const Index size(9);
+
+    DenseVector<Mem_, Index, Index> offsets(4);
+    DenseVector<Mem_, DT_, Index> val(offsets.size() * size);
+
+    offsets(0, 3);
+    offsets(1, 4);
+    offsets(2, 9);
+    offsets(3, 12);
+
+    for (Index i(0); i < val.size(); ++i)
+    {
+      val(i, random(DT_(0), DT_(10)));
+    }
+
+    SparseMatrixBanded<Mem_, DT_, Index> sys_banded(size, size + 1, val, offsets);
+    SparseMatrixCSR<Mem_, DT_, Index> sys_csr(sys_banded);
+
+    DenseVector<Mem_, DT_, Index> x_banded(sys_banded.columns(), DT_(0.0));
+    DenseVector<Mem_, DT_, Index> y_banded(sys_banded.rows());
+    DenseVector<Mem_, DT_, Index> x_csr(sys_csr.columns(), DT_(0.0));
+    DenseVector<Mem_, DT_, Index> y_csr(sys_csr.rows());
+
+    for (Index i(0); i < sys_banded.columns(); ++i)
+    {
+      x_banded(i, DT_(1.0));
+      x_csr(i, DT_(1.0));
+
+      sys_banded.template apply<Algo_>(y_banded, x_banded);
+      sys_csr.template apply<Algo_>(y_csr, x_csr);
+
+      // check, if the result is correct
+      for (Index j(0) ; j < sys_banded.rows() ; ++j)
+      {
+        TEST_CHECK_EQUAL_WITHIN_EPS(y_banded(j), y_csr(j), 1e-8);
+      }
+
+      x_banded(i, DT_(0.0));
+      x_csr(i, DT_(0.0));
+    }
+  }
+};
+
+SparseMatrixCSRbandedTest<Mem::Main, float> cpu_sparse_matrix_csr_banded_test_float;
+SparseMatrixCSRbandedTest<Mem::Main, double> cpu_sparse_matrix_csr_banded_test_double;

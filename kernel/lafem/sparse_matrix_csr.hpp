@@ -860,7 +860,6 @@ namespace FEAST
               // iteration over all rows which contain the offsets between offset i and offset j
               for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
               {
-                DT_ s(0);
                 for (Index a(i); a < j; ++a)
                 {
                   tval[ue] = cval[a * crows + l];
