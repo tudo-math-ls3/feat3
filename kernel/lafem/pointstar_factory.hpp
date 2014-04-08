@@ -5,6 +5,7 @@
 #include <kernel/util/math.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_banded.hpp>
 
 #include <stack>
 
@@ -669,6 +670,475 @@ namespace FEAST
         return DataType_(8) + DataType_(4)*Math::sqr(Math::cos(Math::pi<DataType_>() / DataType_(this->_m+1)));
       }
     }; // class PointstarFactory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    template <typename Algo_>
+    struct PointstarStructureFE
+    {
+    };
+
+    /**
+     * \brief empty Finite-Elements pointstar matrix creator.
+     *
+     * This class generates the matrix-structure for Finite-Elements on a structured mesh.
+     *
+     * \author Christoph Lohmann
+     */
+    template <>
+    struct PointstarStructureFE<Algo::Generic>
+    {
+      /**
+       * \brief Generates an empty FE-style pointstar banded matrix
+       *
+       * \param[in] FE_order
+       * order of the Finite Element discretisation
+       * \param[in] num_of_subintervalls
+       * The vector with number of subintervalls per dimension.
+       *
+       * \returns
+       * The m^d x m^d FE-stye pointstar matrix.
+       */
+      template<typename DataType_>
+      static SparseMatrixBanded<Mem::Main, DataType_> value(const Index fe_order,
+                                                            const DenseVector<Mem::Main, Index> & num_of_subintervalls)
+      {
+        // get number of dimensions
+        const Index d(num_of_subintervalls.size());
+
+        // save pointer of input-vector
+        const Index * const pnos(num_of_subintervalls.elements());
+
+        // output of errors if wrong input
+        ASSERT(d >= Index(1), "You need at least 1 dimension");
+
+        for (Index i(0); i < d; ++i)
+        {
+          ASSERT(pnos[i] >= Index(3), "You need at least 3 subintervalls per dimension");
+        }
+
+        // calculate size of matrix and number of offsets
+        Index size(1);
+        Index noo(1);
+        for (Index i(0); i < d; ++i)
+        {
+          size *= pnos[i] * fe_order - 1;
+          noo *=  2 * fe_order + 1;
+        }
+
+        // allocate memory for vectors of matrix
+        DenseVector<Mem::Main, Index> vec_offsets(noo);
+        DenseVector<Mem::Main, DataType_> vec_val(noo * size);
+
+        // fill offsets-vector
+        Index * const poffsets(vec_offsets.elements());
+        const Index h_off((noo - 1) / 2);
+
+        // save position of main-diagonal
+        poffsets[h_off] = size - 1;
+
+        for (Index i(0), k(1), m(1); i < d; ++i, k *= 2 * fe_order + 1, m *= pnos[i - 1] * fe_order - 1)
+        {
+          Index k1((k - 1) / 2);
+
+          for (Index j(1); j <= fe_order; ++j)
+          {
+            for (Index l(0); l < k; ++l)
+            {
+              poffsets[h_off - k1 + l + k * j] = poffsets[h_off - k1 + l] + j * m;
+              poffsets[h_off - k1 + l - k * j] = poffsets[h_off - k1 + l] - j * m;
+            }
+          }
+        }
+
+        // return the matrix
+        return SparseMatrixBanded<Mem::Main, DataType_>(size, size, vec_val, vec_offsets);
+      }
+    }; // struct PointstarStructureFE
+
+    template <typename Algo_>
+    struct PointstarStructureFD
+    {
+    };
+
+    /**
+     * \brief empty Finite-Differences pointstar matrix creator.
+     *
+     * This class generates the matrix-structure for Finite-Differences on a structured mesh.
+     *
+     * \author Christoph Lohmann
+     */
+    template <>
+    struct PointstarStructureFD<Algo::Generic>
+    {
+      /**
+       * \brief Generates an empty FD-style pointstar banded matrix
+       *
+       * \param[in] num_of_subintervalls
+       * The vector with number of subintervalls per dimension plus a leading 2.
+       *
+       * \returns
+       * The m^d x m^d FD-stye pointstar matrix.
+       */
+      template<typename DataType_>
+      static SparseMatrixBanded<Mem::Main, DataType_> value(const DenseVector<Mem::Main, Index> & num_of_subintervalls)
+      {
+        const Index d(num_of_subintervalls.size() - 1);
+        const Index * const pnos(num_of_subintervalls.elements());
+
+        // calculate dimension of the matrix
+        Index size(1);
+        for (Index i(1); i <= d; ++i)
+        {
+          size *= pnos[i] - 1;
+        }
+
+        // calculate number of offsets
+        const Index num_of_offsets(2 * d + 1);
+
+        // allocate memory for vectors of matrix
+        DenseVector<Mem::Main, DataType_> vec_val(size * num_of_offsets);
+        DenseVector<Mem::Main, Index> vec_offsets(num_of_offsets);
+
+        // fill vec_offsets
+        Index * const poffsets(vec_offsets.elements());
+
+        poffsets[d] = size - 1;
+
+        Index tmp(1);
+        for (Index i(0); i < d; ++i)
+        {
+          tmp *= pnos[i] - 1;
+          poffsets[d - 1 - i] = size - 1 - tmp;
+          poffsets[d + 1 + i] = size - 1 + tmp;
+        }
+
+        // return the matrix
+        return SparseMatrixBanded<Mem::Main, DataType_>(size, size, vec_val, vec_offsets);
+      }
+    }; // struct PointstarStructureFD
+
+    /**
+     * \brief Pointstar factory base class
+     *
+     * \author Christoph Lohmann
+     */
+    template<typename DataType_>
+    class PointstarFactoryBase2
+    {
+    protected:
+      /// vector with number of subintervalls per dimension (plus a leading 2).
+      const DenseVector<Mem::Main, Index> & _num_of_subintervalls;
+      /// vector with lengths of the n-dimensional hypercube
+      const DenseVector<Mem::Main, DataType_> & _dimensions;
+      /// number of dimensions
+      const Index _d;
+
+      PointstarFactoryBase2(const DenseVector<Mem::Main, Index> & num_of_subintervalls,
+                            const DenseVector<Mem::Main, DataType_> & dimensions) :
+        _num_of_subintervalls(num_of_subintervalls),
+        _dimensions(dimensions),
+        _d(_dimensions.size())
+      {
+        ASSERT(_d >= Index(1), "You need at least 1 dimension");
+        ASSERT(_d + 1 == _num_of_subintervalls.size(), "Vector-sizes do not match (n_1 = n_2 + 1)!");
+
+        for (Index i(1); i <= _d; ++i)
+        {
+          ASSERT(_num_of_subintervalls(i) >= Index(4), "You need at least 4 subintervalls per dimension");
+        }
+      }
+
+    public:
+      /**
+       * \brief Computes the pointstar matrix in banded format.
+       *
+       * \returns
+       * The m^d x m^d pointstar matrix
+       */
+      virtual SparseMatrixBanded<Mem::Main, DataType_, Index> matrix_banded() const = 0;
+
+      /**
+       * \brief Computes the smallest eigenvalue of the pointstar matrix.
+       *
+       * \returns
+       * The smallest eigenvalue of the matrix.
+       */
+      virtual DataType_ lambda_min() const = 0;
+
+      /**
+       * \brief Computes the largest eigenvalue of the pointstar matrix.
+       *
+       * \returns
+       * The largest eigenvalue of the matrix.
+       */
+      virtual DataType_ lambda_max() const = 0;
+
+      /**
+       * \brief Computes the spectral condition number of the pointstar matrix.
+       *
+       * \returns
+       * The spectral condition number of the matrix.
+       */
+      virtual DataType_ spectral_cond() const
+      {
+        return lambda_max() / lambda_min();
+      }
+
+      /**
+       * \brief Computes the eigenvector of the smallest eigenvalue
+       *
+       * This function generates the eigenvector with respect to the smallest eigenvalue
+       * of the corresponding pointstar matrix.
+       *
+       * \returns
+       * The m^d x m^d eigenvector
+       */
+      virtual DenseVector<Mem::Main, DataType_> eigenvector_min() const = 0;
+
+      /**
+       * \brief Computes a Q2-bubble vector.
+       *
+       * This function can be used to generate a useful solution vector for the pointstar matrix.
+       * The corresponding right hand side can be computed by multiplying this vector by the matrix.
+       *
+       * \returns
+       * The m^d x m^d Q2-bubble vector
+       */
+      virtual DenseVector<Mem::Main, DataType_> vector_q2_bubble() const = 0;
+    }; // PointstarFactoryBase2
+
+    /**
+     * \brief Finite-Differences pointstar matrix factory.
+     *
+     * This class generates poinstar matrices in Finite-Differences style.
+     * Moreover, this class can compute the largest and smallest eigenvalue of the
+     * corresponding matrix as well as the eigenvector with respect to the smallest
+     * eigenvalue.
+     *
+     * \author Christoph Lohmann
+     */
+    template<typename DataType_>
+    class PointstarFactoryFD2 :
+      public PointstarFactoryBase2<DataType_>
+    {
+    public:
+      /**
+       * \brief Creates the pointstar factory.
+       *
+       * \param[in] num_of_subintervalls
+       * The vector with number of subintervalls per dimension plus a leading 2.
+       * \param[in] dimensions
+       * The vector with lengths of the n-dimensional hypercube
+       */
+      PointstarFactoryFD2(const DenseVector<Mem::Main, Index> & num_of_subintervalls,
+                          const DenseVector<Mem::Main, DataType_> & dimensions) :
+        PointstarFactoryBase2<DataType_>(num_of_subintervalls, dimensions)
+      {
+      }
+
+      /**
+       * \brief Generates a FD-style pointstar banded matrix
+       *
+       * \returns
+       * The m^d x m^d FD-stye pointstar matrix.
+       */
+      virtual SparseMatrixBanded<Mem::Main, DataType_> matrix_banded() const override
+      {
+        const Index d(this->_d);
+        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const DataType_ * const pdim(this->_dimensions.elements());
+
+        /**
+         * Create matrix-structure
+         */
+        SparseMatrixBanded<Mem::Main, DataType_> matrix(PointstarStructureFD<Algo::Generic>::value<DataType_>(this->_num_of_subintervalls));
+        const Index neq(matrix.rows());
+        DataType_ * const pval(matrix.val());
+
+        /**
+         * Fill matrix
+         */
+        // calculate diagonal entries
+        DataType_ diagonal_entry(0);
+        for (Index i(0); i < d; ++i)
+        {
+          diagonal_entry += DataType_(2.0) * Math::sqr(pdim[i] / DataType_(pnos[i + 1]));
+        }
+
+        // Fill diagonal with entries
+        for (Index i(0); i < neq; ++i)
+        {
+          pval[neq * d + i] = diagonal_entry;
+        }
+
+        // Fill subdiagonals with entries
+        for (Index i(0), k(pnos[0] - 1); i < d; ++i, k *= pnos[i] - 1)
+        {
+          const DataType_ subdiagonal_entry(-Math::sqr(pdim[i] / DataType_(pnos[i + 1])));
+
+          for (Index j(0); j < neq / k / (pnos[i + 1] - 1); ++j)
+          {
+            const Index k1(neq * d + k * (pnos[i + 1] - 1) * j);
+            const Index k2(neq * (i + 1));
+
+            if (j != 0)
+            {
+              for (Index l(pnos[i] - 1); l > 0; --l)
+              {
+                pval[k1 + k2 - l] = DataType_(0);
+                pval[k1 - k2 - l + k] = DataType_(0);
+              }
+            }
+
+            for (Index l(0); l < k * (pnos[i + 1] - 2); ++l)
+            {
+              pval[k1 + l + k2] = subdiagonal_entry;
+              pval[k1 + l - k2 + k] = subdiagonal_entry;
+            }
+          }
+        }
+
+        // return the matrix
+        return matrix;
+      }
+
+      /**
+       * \brief Computes the smallest eigenvalue of the FD-style matrix.
+       *
+       * The smallest eigenvalue of the FD-style matrix wrt the sine-bubble eigenvector is given as
+       *
+       *   \f[ \lambda_{\min} = 2 \cdot \sum^d_{k=1} h_k^2 \big(1 - \cos(\pi h_k) \big) \f]
+       *
+       * \returns
+       * The smallest eigenvalue of the matrix.
+       */
+      virtual DataType_ lambda_min() const override
+      {
+        DataType_ x(DataType_(0.0));
+        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const DataType_ * const pdim(this->_dimensions.elements());
+
+        for (Index i(0); i < this->_d; ++i)
+        {
+          const DataType_ h(pdim[i] / DataType_(pnos[i + 1]));
+          x += Math::sqr(h) * (DataType_(1.0) - Math::cos(Math::pi<DataType_>() * h / pdim[i]));
+        }
+
+        return 2 * x;
+      }
+
+      /**
+       * \brief Computes the largest eigenvalue of the FD-style matrix.
+       *
+       * The largest eigenvalue of the FD-style matrix is given as
+       *
+       * \f[ \lambda_{\max} = 2 \cdot \sum^d_{k=1} h_k^2 \big(1 + \cos(\pi h_k) \big) \f]
+       *
+       * \returns
+       * The largest eigenvalue of the matrix.
+       */
+      virtual DataType_ lambda_max() const override
+      {
+        DataType_ x(DataType_(0.0));
+        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const DataType_ * const pdim(this->_dimensions.elements());
+
+        for (Index i(0); i < this->_d; ++i)
+        {
+          const DataType_ h(pdim[i] / DataType_(pnos[i + 1]));
+          x += Math::sqr(h) * (DataType_(1.0) + Math::cos(Math::pi<DataType_>() * h / pdim[i]));
+        }
+
+        return 2 * x;
+      }
+
+      virtual DenseVector<Mem::Main, DataType_> eigenvector_min() const override
+      {
+        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const Index d(this->_d);
+
+        // compute vector length
+        Index size(1);
+        for (Index i(1); i <= d; ++i)
+        {
+          size *= pnos[i] - 1;
+        }
+
+        // create vector
+        DenseVector<Mem::Main, DataType_> vector(size, DataType_(1));
+        DataType_* v = vector.elements();
+
+        for(Index i(0); i < size; ++i)
+        {
+          for(Index j(0), quo(1); j < d; ++j, quo *= pnos[j] - 1)
+          {
+            // compute x scaling factor
+            const DataType_ xsf(Math::pi<DataType_>() / DataType_(pnos[j + 1]));
+            v[i] *= Math::sin(xsf * DataType_(((i / quo) % (pnos[j + 1] - 1)) + Index(1)));
+          }
+        }
+
+        // return vector
+        return std::move(vector);
+      }
+
+      /**
+       * \brief Computes a Q2-bubble vector.
+       *
+       * This function can be used to generate a useful solution vector for the pointstar matrix.
+       * The corresponding right hand side can be computed by multiplying this vector by the matrix.
+       *
+       * \returns
+       * The m^d x m^d Q2-bubble vector
+       */
+      DenseVector<Mem::Main, DataType_> vector_q2_bubble() const override
+      {
+        const Index d(this->_d);
+        const Index * const pnos(this->_num_of_subintervalls.elements());
+        const DataType_ * const pdim(this->_dimensions.elements());
+
+        // compute vector length
+        Index size(1);
+        for (Index i(1); i <= d; ++i)
+        {
+          size *= pnos[i] - 1;
+        }
+
+        // create vector
+        DenseVector<Mem::Main, DataType_> vector(size, DataType_(1));
+        DataType_* v = vector.elements();
+
+        for(Index i(0); i < size; ++i)
+        {
+          for(Index j(0), quo(1); j < d; ++j, quo *= pnos[j] - 1)
+          {
+            // compute x scaling factor
+            const DataType_ xsf(pdim[j] / DataType_(pnos[j + 1]));
+
+            // compute coordinate x in (0,pdim[j])
+            DataType_ x(xsf * DataType_(((i / quo) % (pnos[j + 1] - 1)) + Index(1)));
+
+            v[i] *= DataType_(4) * x * (DataType_(1) - x);
+          }
+        }
+
+        // return vector
+        return std::move(vector);
+      }
+    }; // class PointstarFactoryFD2
 
   } // namespace LAFEM
 } // namespace FEAST
