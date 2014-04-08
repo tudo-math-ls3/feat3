@@ -45,7 +45,7 @@ namespace FEAST
      *
      * \author Christoph Lohmann
      */
-    template <typename Mem_, typename DT_, typename IT_>
+    template <typename Mem_, typename DT_, typename IT_ = Index>
     class SparseMatrixBanded : public Container<Mem_, DT_, IT_>, public MatrixBase
     {
     private:
