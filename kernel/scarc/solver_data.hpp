@@ -836,11 +836,12 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename,typename> class FilterType_ = UnitFilter>
+             template<typename, typename,typename> class FilterType_ = UnitFilter,
+             typename IT_ = Index>
     struct FilterDataContainer
     {
       public:
-        typedef FilterType_<MemTag_, DataType_, Index> filter_type_;
+        typedef FilterType_<MemTag_, DataType_, IT_> filter_type_;
 
         virtual filter_type_& filter()
         {
@@ -913,7 +914,7 @@ namespace FEAST
              typename IT_ = Index>
     struct SynchronisedPreconditionedFilteredSolverData :
       public SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>,
-      public FilterDataContainer<DataType_, MemTag_, FilterType_>,
+      public FilterDataContainer<DataType_, MemTag_, FilterType_, IT_>,
       public PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>,
       public SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_, IT_>
     {
@@ -932,12 +933,12 @@ namespace FEAST
                                                    PreconContType_<MemTag_, DataType_, IT_>&& P,
                                                    vector_type_&& x,
                                                    vector_type_&& b,
-                                                   FilterType_<MemTag_, DataType_,Index>&& f,
+                                                   FilterType_<MemTag_, DataType_,IT_>&& f,
                                                    IT_ num_temp_vectors = 0,
                                                    IT_ num_temp_scalars = 0,
                                                    IT_ num_temp_indices = 0) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_>(std::move(A), std::move(x), std::move(b), num_temp_vectors, num_temp_scalars, num_temp_indices),
-        FilterDataContainer<DataType_, MemTag_, FilterType_>(std::move(f)),
+        FilterDataContainer<DataType_, MemTag_, FilterType_, IT_>(std::move(f)),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_>(std::move(P)),
         SynchronizationDataContainer<DataType_, MemTag_, VectorType_, VectorMirrorType_, StorageType_>()
       {
@@ -946,7 +947,7 @@ namespace FEAST
       ///move CTOR
       SynchronisedPreconditionedFilteredSolverData(SynchronisedPreconditionedFilteredSolverData&& other) :
         SolverData<DataType_, MemTag_, VectorType_, MatrixType_, StorageType_, IT_>(std::move(other)),
-        FilterDataContainer<DataType_, MemTag_, FilterType_>(std::move(other)),
+        FilterDataContainer<DataType_, MemTag_, FilterType_, IT_>(std::move(other)),
         PreconditionerDataContainer<DataType_, MemTag_, PreconContType_, IT_>(std::move(other)),
         SynchronisedSolverData<DataType_, MemTag_, VectorType_, VectorMirrorType_, MatrixType_, StorageType_, IT_>(std::move(other))
       {
