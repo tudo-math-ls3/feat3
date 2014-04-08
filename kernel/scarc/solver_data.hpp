@@ -836,11 +836,11 @@ namespace FEAST
      */
     template<typename DataType_ = double,
              typename MemTag_ = Mem::Main,
-             template<typename, typename> class FilterType_ = UnitFilter>
+             template<typename, typename,typename> class FilterType_ = UnitFilter>
     struct FilterDataContainer
     {
       public:
-        typedef FilterType_<MemTag_, DataType_> filter_type_;
+        typedef FilterType_<MemTag_, DataType_, Index> filter_type_;
 
         virtual filter_type_& filter()
         {
@@ -908,7 +908,7 @@ namespace FEAST
              template<typename, typename> class VectorMirrorType_ = VectorMirror,
              template<typename, typename, typename> class MatrixType_ = SparseMatrixCSR,
              template<typename, typename, typename> class PreconContType_ = SparseMatrixCSR,
-             template<typename, typename> class FilterType_ = UnitFilter,
+             template<typename, typename, typename> class FilterType_ = UnitFilter,
              template<typename, typename> class StorageType_ = std::vector,
              typename IT_ = Index>
     struct SynchronisedPreconditionedFilteredSolverData :
@@ -932,7 +932,7 @@ namespace FEAST
                                                    PreconContType_<MemTag_, DataType_, IT_>&& P,
                                                    vector_type_&& x,
                                                    vector_type_&& b,
-                                                   FilterType_<MemTag_, DataType_>&& f,
+                                                   FilterType_<MemTag_, DataType_,Index>&& f,
                                                    IT_ num_temp_vectors = 0,
                                                    IT_ num_temp_scalars = 0,
                                                    IT_ num_temp_indices = 0) :

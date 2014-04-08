@@ -101,13 +101,14 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename DataType_>
-    class ScatterAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
+    template<typename DataType_, typename IndexType_>
+    class ScatterAxpy< LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> >
     {
     public:
-      typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+      typedef LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
       typedef Mem::Main MemType;
       typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
 
     private:
       Index _num_entries;
@@ -150,13 +151,14 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename DataType_>
-    class GatherAxpy< LAFEM::DenseVector<Mem::Main, DataType_> >
+    template<typename DataType_, typename IndexType_>
+    class GatherAxpy< LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> >
     {
     public:
-      typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
+      typedef LAFEM::DenseVector<Mem::Main, DataType_, IndexType_> VectorType;
       typedef Mem::Main MemType;
       typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
 
     private:
       Index _num_entries;
@@ -202,29 +204,30 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename DataType_>
-    class ScatterAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
+    template<typename DataType_, typename IndexType_>
+    class ScatterAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_, IndexType_> >
     {
     public:
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_, IndexType_> MatrixType;
       typedef Mem::Main MemType;
       typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
 
     private:
 #ifdef DEBUG
-      Index _deadcode;
+      IndexType_ _deadcode;
 #endif
       Index _num_rows;
       Index _num_cols;
-      Index* _row_ptr;
-      Index* _col_idx;
-      Index* _col_ptr;
+      IndexType_* _row_ptr;
+      IndexType_* _col_idx;
+      IndexType_* _col_ptr;
       DataType_ *_data;
 
     public:
       explicit ScatterAxpy(MatrixType& matrix) :
 #ifdef DEBUG
-        _deadcode(~Index(0)),
+        _deadcode(~IndexType_(0)),
 #endif
         _num_rows(matrix.rows()),
         _num_cols(matrix.columns()),
@@ -234,7 +237,7 @@ namespace FEAST
         _data(matrix.val())
       {
         // allocate column-pointer array
-        _col_ptr = new Index[matrix.columns()];
+        _col_ptr = new IndexType_[matrix.columns()];
 #ifdef DEBUG
         for(Index i(0); i < _num_cols; ++i)
         {
@@ -269,7 +272,7 @@ namespace FEAST
             Index ix = loc_mat.get_row_index(i, ic);
 
             // build column pointer for this row entry contribution
-            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+            for(IndexType_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = k;
             }
@@ -301,7 +304,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+            for(IndexType_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = _deadcode;
             }
@@ -318,29 +321,30 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename DataType_>
-    class GatherAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
+    template<typename DataType_, typename IndexType_>
+    class GatherAxpy< LAFEM::SparseMatrixCSR<Mem::Main, DataType_, IndexType_> >
     {
     public:
-      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+      typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_, IndexType_> MatrixType;
       typedef Mem::Main MemType;
       typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
 
     private:
 #ifdef DEBUG
-      Index _deadcode;
+      IndexType_ _deadcode;
 #endif
       Index _num_rows;
       Index _num_cols;
-      const Index* _row_ptr;
-      const Index* _col_idx;
-      Index* _col_ptr;
+      const IndexType_* _row_ptr;
+      const IndexType_* _col_idx;
+      IndexType_* _col_ptr;
       const DataType_ *_data;
 
     public:
       explicit GatherAxpy(const MatrixType& matrix) :
 #ifdef DEBUG
-        _deadcode(~Index(0)),
+        _deadcode(~IndexType_(0)),
 #endif
         _num_rows(matrix.rows()),
         _num_cols(matrix.columns()),
@@ -350,7 +354,7 @@ namespace FEAST
         _data(matrix.val())
       {
         // allocate column-pointer array
-        _col_ptr = new Index[matrix.columns()];
+        _col_ptr = new IndexType_[matrix.columns()];
 #ifdef DEBUG
         for(Index i(0); i < _num_cols; ++i)
         {
@@ -382,7 +386,7 @@ namespace FEAST
             Index ix = loc_mat.get_row_index(i, ic);
 
             // build column pointer for this row entry contribution
-            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+            for(IndexType_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = k;
             }
@@ -418,7 +422,7 @@ namespace FEAST
 
 #ifdef DEBUG
             // reformat column-pointer array
-            for(Index k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
+            for(IndexType_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
             {
               _col_ptr[_col_idx[k]] = _deadcode;
             }

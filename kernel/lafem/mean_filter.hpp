@@ -16,7 +16,8 @@ namespace FEAST
      */
     template<
       typename Mem_,
-      typename DT_>
+      typename DT_,
+      typename IT_ = Index>
     class MeanFilter
     {
     public:
@@ -24,8 +25,10 @@ namespace FEAST
       typedef Mem_ MemType;
       /// data-type typedef
       typedef DT_ DataType;
+      /// index-type typedef
+      typedef IT_ IndexType;
       /// vector-type typedef
-      typedef DenseVector<Mem_, DT_> VectorType;
+      typedef DenseVector<Mem_, DT_, IT_> VectorType;
 
     protected:
       /// primal weighting vector
@@ -136,7 +139,7 @@ namespace FEAST
        * A reference to the right-hand-side vector to be filtered.
        */
       template<typename Algo_>
-      void filter_rhs(DenseVector<Mem_,DT_> & vector) const
+      void filter_rhs(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // compute dual integral
         DT_ integ = vector.template dot<Algo_>(_vec_prim);
@@ -151,7 +154,7 @@ namespace FEAST
        * A reference to the solution vector to be filtered.
        */
       template<typename Algo_>
-      void filter_sol(DenseVector<Mem_,DT_> & vector) const
+      void filter_sol(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // compute primal integral
         DT_ integ = vector.template dot<Algo_>(_vec_dual);
@@ -166,7 +169,7 @@ namespace FEAST
        * A reference to the defect vector to be filtered.
        */
       template<typename Algo_>
-      void filter_def(DenseVector<Mem_,DT_> & vector) const
+      void filter_def(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // same as rhs
         filter_rhs<Algo_>(vector);
@@ -179,7 +182,7 @@ namespace FEAST
        * A reference to the correction vector to be filtered.
        */
       template<typename Algo_>
-      void filter_cor(DenseVector<Mem_,DT_> & vector) const
+      void filter_cor(DenseVector<Mem_,DT_,IT_> & vector) const
       {
         // same as sol
         filter_sol<Algo_>(vector);

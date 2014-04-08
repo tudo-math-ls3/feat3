@@ -19,14 +19,14 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_>
+template<typename Algo_, typename DataType_, typename IndexType_>
 class MetaMatrixApplyTest
-  : public MetaMatrixTestBase<Algo_, DataType_>
+  : public MetaMatrixTestBase<Algo_, DataType_, IndexType_>
 {
 public:
   typedef Algo_ AlgoType;
   typedef DataType_ DataType;
-  typedef MetaMatrixTestBase<Algo_, DataType_> BaseClass;
+  typedef MetaMatrixTestBase<Algo_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::SystemMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 
@@ -53,13 +53,13 @@ public:
   }
 };
 
-MetaMatrixApplyTest<Algo::Generic, float> meta_matrix_apply_test_generic_float;
-MetaMatrixApplyTest<Algo::Generic, double> meta_matrix_apply_test_generic_double;
+MetaMatrixApplyTest<Algo::Generic, float, Index> meta_matrix_apply_test_generic_float;
+MetaMatrixApplyTest<Algo::Generic, double, Index> meta_matrix_apply_test_generic_double;
 #ifdef FEAST_BACKENDS_MKL
-MetaMatrixApplyTest<Algo::MKL, float> meta_matrix_apply_test_mkl_float;
-MetaMatrixApplyTest<Algo::MKL, double> meta_matrix_apply_test_mkl_double;
+MetaMatrixApplyTest<Algo::MKL, float, Index> meta_matrix_apply_test_mkl_float;
+MetaMatrixApplyTest<Algo::MKL, double, Index> meta_matrix_apply_test_mkl_double;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-MetaMatrixApplyTest<Algo::CUDA, float> meta_matrix_apply_test_cuda_float;
-MetaMatrixApplyTest<Algo::CUDA, double> meta_matrix_apply_test_cuda_double;
+MetaMatrixApplyTest<Algo::CUDA, float, Index> meta_matrix_apply_test_cuda_float;
+MetaMatrixApplyTest<Algo::CUDA, double, Index> meta_matrix_apply_test_cuda_double;
 #endif

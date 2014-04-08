@@ -13,45 +13,46 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
-template<typename Algo_, typename DataType_>
+template<typename Algo_, typename DataType_, typename IndexType_>
 class MetaFilterTest :
-  public TaggedTest<typename Algo_::MemType, DataType_, Algo_>
+  public FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>
 {
 public:
   typedef Algo_ AlgoType;
   typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
+  typedef IndexType_ IndexType;
 
-  typedef DenseVector<MemType, DataType> ScalarVector;
+  typedef DenseVector<MemType, DataType, IndexType> ScalarVector;
   typedef PowerVector<ScalarVector, 2> PowerVector2;
   typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
-  typedef UnitFilter<MemType, DataType> ScalarFilter1;
-  typedef MeanFilter<MemType, DataType> ScalarFilter2;
+  typedef UnitFilter<MemType, DataType, IndexType> ScalarFilter1;
+  typedef MeanFilter<MemType, DataType, IndexType> ScalarFilter2;
   typedef PowerFilter<ScalarFilter1, 2> PowerFilter2;
   typedef TupleFilter<PowerFilter2, ScalarFilter2> MetaFilter;
 
-  MetaFilterTest() : TaggedTest<typename Algo_::MemType, DataType_, Algo_>("MetaFilterTest") {}
+  MetaFilterTest() : FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>("MetaFilterTest") {}
 
   static MetaFilter gen_filter(Index m)
   {
     // create a unit-filter
-    DenseVector<Mem::Main, DataType> fv(2);
+    DenseVector<Mem::Main, DataType, IndexType> fv(2);
     fv(0, DataType(1));
     fv(1, DataType(5));
-    DenseVector<Mem::Main, Index> idx(2);
+    DenseVector<Mem::Main, IndexType, IndexType> idx(2);
     idx(0, 0);
     idx(1, m-1);
-    UnitFilter<Mem::Main, DataType> unit_filter(fv, idx);
+    UnitFilter<Mem::Main, DataType, IndexType> unit_filter(fv, idx);
 
     // create vectors for mean-filter
-    DenseVector<Mem::Main, DataType> mfv(m, DataType(1)), mfw(m, DataType(0));
+    DenseVector<Mem::Main, DataType, IndexType> mfv(m, DataType(1)), mfw(m, DataType(0));
     DataType* fw(mfw.elements());
     for(Index i(0); i < m; ++i)
       fw[i] = DataType(i+1);
 
     // create a mean-filter
-    MeanFilter<Mem::Main, DataType> mean_filter(std::move(mfv), std::move(mfw), DataType(((m+1)*(m+2))/2));
+    MeanFilter<Mem::Main, DataType, IndexType> mean_filter(std::move(mfv), std::move(mfw), DataType(((m+1)*(m+2))/2));
 
     // create a power-filer
     PowerFilter2 power_filter;
@@ -73,9 +74,9 @@ public:
 
   static MetaVector gen_vector_sol(Index m)
   {
-    DenseVector<Mem::Main, DataType> vx(m, DataType(2));
-    DenseVector<Mem::Main, DataType> vy(m, DataType(3));
-    DenseVector<Mem::Main, DataType> vz(m, DataType(2) / DataType(7));
+    DenseVector<Mem::Main, DataType, IndexType> vx(m, DataType(2));
+    DenseVector<Mem::Main, DataType, IndexType> vy(m, DataType(3));
+    DenseVector<Mem::Main, DataType, IndexType> vz(m, DataType(2) / DataType(7));
 
     DataType* fx(vx.elements());
     DataType* fy(vy.elements());
@@ -94,9 +95,9 @@ public:
 
   static MetaVector gen_vector_def(Index m)
   {
-    DenseVector<Mem::Main, DataType> vx(m, DataType(2));
-    DenseVector<Mem::Main, DataType> vy(m, DataType(3));
-    DenseVector<Mem::Main, DataType> vz(m, DataType(0));
+    DenseVector<Mem::Main, DataType, IndexType> vx(m, DataType(2));
+    DenseVector<Mem::Main, DataType, IndexType> vy(m, DataType(3));
+    DenseVector<Mem::Main, DataType, IndexType> vz(m, DataType(0));
 
     DataType* fx(vx.elements());
     DataType* fy(vy.elements());
@@ -147,5 +148,5 @@ public:
   }
 };
 
-MetaFilterTest<Algo::Generic, double> meta_filter_test_generic_double;
-MetaFilterTest<Algo::Generic, float> meta_filter_test_generic_float;
+MetaFilterTest<Algo::Generic, double, Index> meta_filter_test_generic_double;
+MetaFilterTest<Algo::Generic, float, Index> meta_filter_test_generic_float;

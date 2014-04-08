@@ -20,7 +20,8 @@ namespace FEAST
      */
     template<
       typename MemType_,
-      typename DataType_>
+      typename DataType_,
+      typename IndexType_>
     class NoneFilter
     {
     public:
@@ -28,6 +29,8 @@ namespace FEAST
       typedef MemType_ MemType;
       /// data-type typedef
       typedef DataType_ DataType;
+      /// index-type typedef
+      typedef IndexType_ IndexType;
 
       /// Creates and returns a (empty) deep copy of this filter.
       NoneFilter clone() const
@@ -57,7 +60,7 @@ namespace FEAST
        * A reference to the right-hand-side vector to be filtered.
        */
       template<typename Algo_>
-      void filter_rhs(DenseVector<MemType,DataType>&) const
+      void filter_rhs(DenseVector<MemType,DataType,IndexType>&) const
       {
       }
 
@@ -68,7 +71,7 @@ namespace FEAST
        * A reference to the solution vector to be filtered.
        */
       template<typename Algo_>
-      void filter_sol(DenseVector<MemType,DataType>&) const
+      void filter_sol(DenseVector<MemType,DataType,IndexType>&) const
       {
       }
 
@@ -79,7 +82,7 @@ namespace FEAST
        * A reference to the defect vector to be filtered.
        */
       template<typename Algo_>
-      void filter_def(DenseVector<MemType,DataType>&) const
+      void filter_def(DenseVector<MemType,DataType,IndexType>&) const
       {
       }
 
@@ -90,7 +93,7 @@ namespace FEAST
        * A reference to the correction vector to be filtered.
        */
       template<typename Algo_>
-      void filter_cor(DenseVector<MemType,DataType>&) const
+      void filter_cor(DenseVector<MemType,DataType,IndexType>&) const
       {
       }
     }; // class NoneFilter<...>

@@ -12,15 +12,15 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_>
+template<typename Algo_, typename DataType_, typename IndexType_>
 class MetaVectorDotNorm2Test
-  : public MetaVectorTestBase<Algo_, DataType_>
+  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
 {
 public:
   typedef Algo_ AlgoType;
   typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_> BaseClass;
+  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorDotNorm2Test() : BaseClass("MetaVectorDotNorm2Test") {}
@@ -76,13 +76,13 @@ public:
   }
 };
 
-MetaVectorDotNorm2Test<Algo::Generic, float> meta_vector_dot_norm2_test_generic_float;
-MetaVectorDotNorm2Test<Algo::Generic, double> meta_vector_dot_norm2_test_generic_double;
+MetaVectorDotNorm2Test<Algo::Generic, float, Index> meta_vector_dot_norm2_test_generic_float;
+MetaVectorDotNorm2Test<Algo::Generic, double, Index> meta_vector_dot_norm2_test_generic_double;
 #ifdef FEAST_BACKENDS_MKL
-MetaVectorDotNorm2Test<Algo::MKL, float> meta_vector_dot_norm2_test_mkl_float;
-MetaVectorDotNorm2Test<Algo::MKL, double> meta_vector_dot_norm2_test_mkl_double;
+MetaVectorDotNorm2Test<Algo::MKL, float, Index> meta_vector_dot_norm2_test_mkl_float;
+MetaVectorDotNorm2Test<Algo::MKL, double, Index> meta_vector_dot_norm2_test_mkl_double;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-MetaVectorDotNorm2Test<Algo::CUDA, float> meta_vector_dot_norm2_test_cuda_float;
-MetaVectorDotNorm2Test<Algo::CUDA, double> meta_vector_dot_norm2_test_cuda_double;
+MetaVectorDotNorm2Test<Algo::CUDA, float, Index> meta_vector_dot_norm2_test_cuda_float;
+MetaVectorDotNorm2Test<Algo::CUDA, double, Index> meta_vector_dot_norm2_test_cuda_double;
 #endif

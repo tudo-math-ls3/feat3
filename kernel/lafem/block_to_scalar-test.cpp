@@ -26,12 +26,12 @@ using namespace FEAST::TestSystem;
  */
 template<typename Algo_, typename MT_>
 class BlockToScalarTest
-  : public MetaMatrixTestBase<Algo_, typename MT_::DataType>
+  : public MetaMatrixTestBase<Algo_, typename MT_::DataType, Index>
 {
 public:
   typedef Algo_ AlgoType;
   typedef typename MT_::DataType DataType;
-  typedef MetaMatrixTestBase<Algo_, DataType> BaseClass;
+  typedef MetaMatrixTestBase<Algo_, DataType, Index> BaseClass;
   typedef typename BaseClass::SystemMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 
@@ -197,7 +197,7 @@ struct Precon<SparsePreconType::pt_spai>
  */
 template<typename PSF_, SparsePreconType PType_, typename Algo_, typename MT_, typename VT_>
 class BiCGStabSaddlePointTest
-  : public MetaMatrixTestBase<Algo_, typename MT_::DataType>
+  : public MetaMatrixTestBase<Algo_, typename MT_::DataType, Index>
 {
 private:
   const Index _opt;
@@ -205,7 +205,7 @@ private:
 public:
   typedef typename VT_::DataType   DT_;
   typedef typename VT_::MemType    Mem_;
-  typedef MetaMatrixTestBase<Algo_, DT_> BaseClass;
+  typedef MetaMatrixTestBase<Algo_, DT_, Index> BaseClass;
   typedef typename BaseClass::SystemMatrix SystemMatrix;
   typedef typename BaseClass::SystemVector SystemVector;
 

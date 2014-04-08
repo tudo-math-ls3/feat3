@@ -12,15 +12,15 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_>
+template<typename Algo_, typename DataType_, typename IndexType_>
 class MetaVectorAxpyTest
-  : public MetaVectorTestBase<Algo_, DataType_>
+  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
 {
 public:
   typedef Algo_ AlgoType;
   typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_> BaseClass;
+  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorAxpyTest() : BaseClass("MetaVectorAxpyTest") {}
@@ -98,13 +98,13 @@ public:
   }
 };
 
-MetaVectorAxpyTest<Algo::Generic, float> meta_vector_axpy_test_generic_float;
-MetaVectorAxpyTest<Algo::Generic, double> meta_vector_axpy_test_generic_double;
+MetaVectorAxpyTest<Algo::Generic, float, Index> meta_vector_axpy_test_generic_float;
+MetaVectorAxpyTest<Algo::Generic, double, Index> meta_vector_axpy_test_generic_double;
 #ifdef FEAST_BACKENDS_MKL
-MetaVectorAxpyTest<Algo::MKL, float> meta_vector_axpy_test_mkl_float;
-MetaVectorAxpyTest<Algo::MKL, double> meta_vector_axpy_test_mkl_double;
+MetaVectorAxpyTest<Algo::MKL, float, Index> meta_vector_axpy_test_mkl_float;
+MetaVectorAxpyTest<Algo::MKL, double, Index> meta_vector_axpy_test_mkl_double;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-MetaVectorAxpyTest<Algo::CUDA, float> meta_vector_axpy_test_cuda_float;
-MetaVectorAxpyTest<Algo::CUDA, double> meta_vector_axpy_test_cuda_double;
+MetaVectorAxpyTest<Algo::CUDA, float, Index> meta_vector_axpy_test_cuda_float;
+MetaVectorAxpyTest<Algo::CUDA, double, Index> meta_vector_axpy_test_cuda_double;
 #endif

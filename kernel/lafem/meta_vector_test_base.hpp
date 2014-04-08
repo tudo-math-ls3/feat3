@@ -17,21 +17,22 @@ namespace FEAST
      *
      * \author Peter Zajac
      */
-    template<typename Algo_, typename DataType_>
+    template<typename Algo_, typename DataType_, typename IndexType_>
     class MetaVectorTestBase
-      : public FEAST::TestSystem::TaggedTest<typename Algo_::MemType, DataType_, Algo_>
+      : public FEAST::TestSystem::FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>
     {
     public:
       typedef Algo_ AlgoType;
       typedef typename AlgoType::MemType MemType;
       typedef DataType_ DataType;
+      typedef IndexType_ IndexType;
 
-      typedef DenseVector<MemType, DataType> ScalarVector;
+      typedef DenseVector<MemType, DataType, IndexType> ScalarVector;
       typedef PowerVector<ScalarVector, 2> PowerVector2;
       typedef TupleVector<PowerVector2, ScalarVector> MetaVector;
 
       explicit MetaVectorTestBase(const char* name) :
-        FEAST::TestSystem::TaggedTest<typename Algo_::MemType, DataType_, Algo_>(name)
+        FEAST::TestSystem::FullTaggedTest<typename Algo_::MemType, Algo_, DataType_, IndexType_>(name)
       {
       }
 
@@ -69,7 +70,7 @@ namespace FEAST
       static MetaVector gen_vector_x(Index n00, Index n01, Index n1)
       {
         // Mem::Main vectors
-        DenseVector<Mem::Main, DataType> r00(n00), r01(n01), r1(n1);
+        DenseVector<Mem::Main, DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
         for(Index i(0); i < n00; ++i)
@@ -91,7 +92,7 @@ namespace FEAST
       static MetaVector gen_vector_y(Index n00, Index n01, Index n1)
       {
         // Mem::Main vectors
-        DenseVector<Mem::Main, DataType> r00(n00), r01(n01), r1(n1);
+        DenseVector<Mem::Main, DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
         for(Index i(0); i < n00; ++i)

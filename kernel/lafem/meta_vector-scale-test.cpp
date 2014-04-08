@@ -12,15 +12,15 @@ using namespace FEAST::TestSystem;
  *
  * \author Peter Zajac
  */
-template<typename Algo_, typename DataType_>
+template<typename Algo_, typename DataType_, typename IndexType_>
 class MetaVectorScaleTest
-  : public MetaVectorTestBase<Algo_, DataType_>
+  : public MetaVectorTestBase<Algo_, DataType_, IndexType_>
 {
 public:
   typedef Algo_ AlgoType;
   typedef typename AlgoType::MemType MemType;
   typedef DataType_ DataType;
-  typedef MetaVectorTestBase<Algo_, DataType_> BaseClass;
+  typedef MetaVectorTestBase<Algo_, DataType_, IndexType_> BaseClass;
   typedef typename BaseClass::MetaVector MetaVector;
 
   MetaVectorScaleTest() : BaseClass("MetaVectorScaleTest") {}
@@ -82,13 +82,13 @@ public:
   }
 };
 
-MetaVectorScaleTest<Algo::Generic, float> meta_vector_scale_test_generic_float;
-MetaVectorScaleTest<Algo::Generic, double> meta_vector_scale_test_generic_double;
+MetaVectorScaleTest<Algo::Generic, float, Index> meta_vector_scale_test_generic_float;
+MetaVectorScaleTest<Algo::Generic, double, Index> meta_vector_scale_test_generic_double;
 #ifdef FEAST_BACKENDS_MKL
-MetaVectorScaleTest<Algo::MKL, float> meta_vector_scale_test_mkl_float;
-MetaVectorScaleTest<Algo::MKL, double> meta_vector_scale_test_mkl_double;
+MetaVectorScaleTest<Algo::MKL, float, Index> meta_vector_scale_test_mkl_float;
+MetaVectorScaleTest<Algo::MKL, double, Index> meta_vector_scale_test_mkl_double;
 #endif
 #ifdef FEAST_BACKENDS_CUDA
-MetaVectorScaleTest<Algo::CUDA, float> meta_vector_scale_test_cuda_float;
-MetaVectorScaleTest<Algo::CUDA, double> meta_vector_scale_test_cuda_double;
+MetaVectorScaleTest<Algo::CUDA, float, Index> meta_vector_scale_test_cuda_float;
+MetaVectorScaleTest<Algo::CUDA, double, Index> meta_vector_scale_test_cuda_double;
 #endif

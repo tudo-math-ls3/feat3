@@ -19,7 +19,8 @@ namespace FEAST
      */
     template<
       typename Mem_,
-      typename DT_>
+      typename DT_,
+      typename IT_ = Index>
     class UnitFilter
     {
     public:
@@ -27,10 +28,12 @@ namespace FEAST
       typedef Mem_ MemType;
       /// data-type typedef
       typedef DT_ DataType;
+      /// index-type typedef
+      typedef IT_ IndexType;
 
     private:
       /// SparseVector, containing all entries of the unit filter
-      SparseVector<Mem_, DT_> _sv;
+      SparseVector<Mem_, DT_, IT_> _sv;
 
     public:
       /// default constructor
@@ -56,7 +59,7 @@ namespace FEAST
        * \param[in] values DenseVector containing element values
        * \param[in] indices DenseVector containing element indices
        */
-      explicit UnitFilter(DenseVector<Mem_, DT_> & values, DenseVector<Mem_, Index> & indices) :
+      explicit UnitFilter(DenseVector<Mem_, DT_, IT_> & values, DenseVector<Mem_, IT_, IT_> & indices) :
         _sv(values.size(), values, indices)
       {
         if (values.size() != indices.size())
@@ -101,7 +104,7 @@ namespace FEAST
         _sv.clear();
       }
 
-      void add(Index idx, DataType val)
+      void add(IndexType idx, DataType val)
       {
         _sv(idx, val);
       }
@@ -113,13 +116,13 @@ namespace FEAST
       }
 
       /// \returns The index array.
-      Index* get_indices()
+      IT_* get_indices()
       {
         return _sv.indices();
       }
 
       /// \returns The index array.
-      const Index* get_indices() const
+      const IT_* get_indices() const
       {
         return _sv.indices;
       }
@@ -143,7 +146,7 @@ namespace FEAST
        * A reference to the matrix to be filtered.
        */
       template<typename Algo_>
-      void filter_mat(SparseMatrixCSR<Mem_, DT_> & matrix) const
+      void filter_mat(SparseMatrixCSR<Mem_, DT_, IT_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
         const Index* col_idx(matrix.col_ind());
@@ -161,7 +164,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_row_mat(SparseMatrixCSR<Mem_, DT_> & matrix) const
+      void filter_offdiag_row_mat(SparseMatrixCSR<Mem_, DT_, IT_> & matrix) const
       {
         const Index* row_ptr(matrix.row_ptr());
         DT_* v(matrix.val());
@@ -178,7 +181,7 @@ namespace FEAST
       }
 
       template<typename Algo_>
-      void filter_offdiag_col_mat(SparseMatrixCSR<Mem_, DT_> &) const
+      void filter_offdiag_col_mat(SparseMatrixCSR<Mem_, DT_, IT_> &) const
       {
         // nothing to do here
       }
@@ -190,7 +193,7 @@ namespace FEAST
        * A reference to the right-hand-side vector to be filtered.
        */
       template<typename Algo_>
-      void filter_rhs(DenseVector<Mem_, DT_> & vector) const
+      void filter_rhs(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         DT_* v(vector.elements());
         for(Index i(0); i < _sv.used_elements(); ++i)
@@ -206,7 +209,7 @@ namespace FEAST
        * A reference to the solution vector to be filtered.
        */
       template<typename Algo_>
-      void filter_sol(DenseVector<Mem_, DT_> & vector) const
+      void filter_sol(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         // same as rhs
         filter_rhs<Algo_>(vector);
@@ -219,7 +222,7 @@ namespace FEAST
        * A reference to the defect vector to be filtered.
        */
       template<typename Algo_>
-      void filter_def(DenseVector<Mem_, DT_> & vector) const
+      void filter_def(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         DT_* v(vector.elements());
         for(Index i(0); i < _sv.used_elements(); ++i)
@@ -235,7 +238,7 @@ namespace FEAST
        * A reference to the correction vector to be filtered.
        */
       template<typename Algo_>
-      void filter_cor(DenseVector<Mem_, DT_> & vector) const
+      void filter_cor(DenseVector<Mem_, DT_, IT_> & vector) const
       {
         // same as def
         filter_def<Algo_>(vector);

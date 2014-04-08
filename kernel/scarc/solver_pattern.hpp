@@ -88,7 +88,7 @@ namespace FEAST
                template<typename, typename> class VMT_,
                template<typename, typename, typename> class MT_,
                template<typename, typename, typename> class PT_,
-               template<typename, typename> class FT_,
+               template<typename, typename, typename> class FT_,
                template<typename, typename> class StoreT_,
                typename IT_ = Index>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, Index> > > execute(SynchronisedPreconditionedFilteredSolverData<DataType_,
@@ -127,7 +127,7 @@ namespace FEAST
 
         cf.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.def(), data.rhs(), data.def()));
 
-        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
+        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
 
         ///initial norm of defect with global comm
         cf.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm_0(), data.def()));
@@ -154,7 +154,7 @@ namespace FEAST
                                                            data.vector_mirror_recvbufs(),
                                                            data.dest_ranks(),
                                                            data.source_ranks()));
-        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
+        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
         cfiterate.add_functor(new SumFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.sol(), data.sol(), data.def()));
 
         cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.def(), data.sys(), data.sol()));
@@ -170,7 +170,7 @@ namespace FEAST
                                                     data.source_ranks()));
 
         cfiterate.add_functor(new DifferenceFunctor<Algo_, VT_<Tag_, DataType_, IT_> >(data.def(), data.rhs(), data.def()));
-        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_> >(data.def(), data.filter()));
+        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.def(), data.filter()));
 
         cfiterate.add_functor(new NormFunctor2wosqrt<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.norm(), data.def()));
         cfiterate.add_functor(new SynchScalFunctor<Algo_, VT_<Tag_, DataType_, IT_>, DataType_, com_allreduce_sqrtsum>(data.norm(),
@@ -364,7 +364,7 @@ namespace FEAST
                template<typename, typename> class VMT_,
                template<typename, typename, typename> class MT_,
                template<typename, typename, typename> class PT_,
-               template<typename, typename> class FT_,
+               template<typename, typename, typename> class FT_,
                template<typename, typename> class StoreT_,
                typename IT_ = Index>
       static std::shared_ptr<SolverFunctorBase<VT_<Tag_, DataType_, IT_> > > execute(SynchronisedPreconditionedFilteredSolverData<DataType_,
@@ -391,7 +391,7 @@ namespace FEAST
         ///add functors to the solver program:
         //use zero as start
         cf.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(1)));
-        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_> >(data.temp().at(2), data.filter()));
+        cf.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(2), data.filter()));
 
         cf.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars().at(1), data.temp().at(2))); ///NORM_0
         cf.add_functor(new InspectionFunctorSTL<Algo_, VT_<Tag_, DataType_, IT_>, DataType_>(data.scalars(), 1, "inner_norm_0"));
@@ -404,11 +404,11 @@ namespace FEAST
         CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >& cfiterate(*((CompoundSolverFunctor<Algo_, VT_<Tag_, DataType_, IT_> >*)(cfiterateptr.get())));
 
         cfiterate.add_functor(new ProductFunctor<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.precon(), data.temp().at(2)));
-        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_> >(data.temp().at(0), data.filter()));
+        cfiterate.add_functor(new FilterCorrectionFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(0), data.filter()));
         cfiterate.add_functor(new SumFunctorProxyResultLeft<Algo_, VT_<Tag_, DataType_, IT_> >(data.temp().at(3), data.temp().at(3), data.temp().at(0)));
 
         cfiterate.add_functor(new DefectFunctorProxyRight<Algo_, VT_<Tag_, DataType_, IT_>, MT_<Tag_, DataType_, IT_> >(data.temp().at(2), dummy, data.localsys(), data.temp().at(3)));
-        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_> >(data.temp().at(2), data.filter()));
+        cfiterate.add_functor(new FilterDefectFunctor<Algo_, VT_<Tag_, DataType_, IT_>, FT_<Tag_, DataType_, IT_> >(data.temp().at(2), data.filter()));
 
         cfiterate.add_functor(new NormFunctor2<Algo_, VT_<Tag_, DataType_, IT_>, DataType_ >(data.scalars().at(2), data.temp().at(2))); ///NORM_k
 

@@ -127,7 +127,7 @@ namespace FEAST
          *
          * Creates a vector with a given size.
          */
-        explicit SparseVector(Index size_in, DenseVector<Mem_, DT_, IT_> & elements_in, DenseVector<Mem_, Index, IT_> & indices_in) :
+        explicit SparseVector(Index size_in, DenseVector<Mem_, DT_, IT_> & elements_in, DenseVector<Mem_, IT_, IT_> & indices_in) :
           Container<Mem_, DT_, IT_>(size_in)
         {
           CONTEXT("When creating SparseVector");

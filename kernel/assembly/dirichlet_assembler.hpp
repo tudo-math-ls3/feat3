@@ -94,8 +94,8 @@ namespace FEAST
        * \param[in,out] filter
        * A reference to the unit-filter where the entries are to be added.
        */
-      template<typename MemType_, typename DataType_>
-      void assemble(LAFEM::UnitFilter<MemType_, DataType_>& filter) const
+      template<typename MemType_, typename DataType_, typename IndexType_>
+      void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter) const
       {
         // build index set
         std::set<Index> idx_set;
@@ -107,7 +107,7 @@ namespace FEAST
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          filter.add(*it, DataType_(0));
+          filter.add(IndexType_(*it), DataType_(0));
         }
       }
 
@@ -127,8 +127,9 @@ namespace FEAST
       template<
         typename MemType_,
         typename DataType_,
+        typename IndexType_,
         typename Functor_>
-      void assemble(LAFEM::UnitFilter<MemType_, DataType_>& filter, const Functor_& functor) const
+      void assemble(LAFEM::UnitFilter<MemType_, DataType_, IndexType_>& filter, const Functor_& functor) const
       {
         // build index-value map
         std::map<Index, DataType_> idx_map;
@@ -140,7 +141,7 @@ namespace FEAST
         for(Index i(0); it != jt; ++it, ++i)
         {
           // store the dof-index
-          filter.add(it->first, it->second);
+          filter.add(IndexType_(it->first), it->second);
         }
       }
     }; // class DirichletAssembler
