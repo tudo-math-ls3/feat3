@@ -12,6 +12,7 @@ import socket
 import shutil
 import time
 import datetime
+import random
 import peewee as pw
 from cmake_modules.feast_util import is_found
 from cmake_modules.feast_util import get_output
@@ -278,11 +279,24 @@ if is_found ("nvcc"):
   addition = addition + "-cuda"
 if is_found ("ccache"):
   addition = addition + "-ccache"
+
 #unconditionally add umfpack/alglib and delete it before the first test run to trigger package downloads
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"alglib", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"UMFPACK", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"AMD", True)
 shutil.rmtree(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse_config", True)
+#delete downloaded archive files at random
+random.seed()
+if random.choice([True, False]):
+  clean = [ src_dirname+os.sep+"thirdparty"+os.sep+"alglib-3.8.2.cpp.zip"]
+  clean.append(src_dirname+os.sep+"thirdparty"+os.sep+"AMD-2.3.1.tar.gz")
+  clean.append(src_dirname+os.sep+"thirdparty"+os.sep+"SuiteSparse_config-4.2.1.tar.gz")
+  clean.append(src_dirname+os.sep+"thirdparty"+os.sep+"UMFPACK-5.6.2.tar.gz")
+  for i in clean:
+    if os.path.exists(i):
+      shutil.rmtree(i)
+    else:
+      print("Warning: Could not delete thirparty file: " + i)
 addition = addition + "-alglib"
 addition = addition + "-umfpack"
 
