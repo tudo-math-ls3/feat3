@@ -297,7 +297,7 @@ if random.choice([True, False]):
   clean.append(src_dirname+os.sep+"thirdparty"+os.sep+"UMFPACK-5.6.2.tar.gz")
   for i in clean:
     if os.path.exists(i):
-      shutil.rmtree(i)
+      os.unlink(i)
     else:
       print("Warning: Could not delete thirparty file: " + i)
 addition = addition + "-alglib"
