@@ -5,20 +5,11 @@
 // includes, FEAST
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/util/linear_algebra.hpp>
-#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 namespace FEAST
 {
   namespace Assembly
   {
-    /// \cond internal
-    namespace Intern
-    {
-      template<typename Matrix_>
-      class RowScaler;
-    }
-    /// \endcond
-
     /**
      * \brief Grid-Transfer assembly class template
      *
@@ -50,10 +41,18 @@ namespace FEAST
 
     public:
       /**
-       * \brief Assembles a prolongation matrix.
+       * \brief Assembles a prolongation matrix and its corresponding weight vector.
+       *
+       * To obtain the final prolongation matrix, one needs to invert the weight vector
+       * component-wise and scale the matrix rows by the inverted weights afterwards.
+       * This can be accomplished by the \c component_invert and \c scale_rows operations
+       * of the vector and matrix containers, resp.
        *
        * \param[in,out] matrix
        * A reference to the prolongation matrix that is to be assembled.
+       *
+       * \param[in,out] vector
+       * A reference to the weight vector for the prolongation matrix.
        *
        * \param[in] cubature_factory
        * The cubature factory to be used for integration.
@@ -66,11 +65,13 @@ namespace FEAST
        */
       template<
         typename Matrix_,
+        typename Vector_,
         typename FineSpace_,
         typename CoarseSpace_,
         typename CubatureFactory_>
       static void assemble_prolongation(
         Matrix_& matrix,
+        Vector_& vector,
         const FineSpace_& fine_space,
         const CoarseSpace_& coarse_space,
         const CubatureFactory_& cubature_factory)
@@ -116,7 +117,8 @@ namespace FEAST
         typedef typename Intern::CubatureTraits<FineTrafoEvaluator>::RuleType CubatureRuleType;
 
         // create matrix scatter-axpy
-        LAFEM::ScatterAxpy<Matrix_> scatter_axpy(matrix);
+        LAFEM::ScatterAxpy<Matrix_> scatter_maxpy(matrix);
+        LAFEM::ScatterAxpy<Vector_> scatter_vaxpy(vector);
 
         // create DOF-mappings
         FineDofMapping fine_dof_mapping(fine_space);
@@ -150,12 +152,15 @@ namespace FEAST
           FineDofMapping,
           CoarseDofMapping> lmd(fine_dof_mapping, coarse_dof_mapping);
 
+        // allocate local vector data for weight vector
+        LocalVectorData<
+          Tiny::Vector<
+            DataType,
+            FineSpaceEvaluator::max_local_dofs>,
+          FineDofMapping> lvd(fine_dof_mapping);
+
         // pivaot array for factorisation
         Index pivot[FineSpaceEvaluator::max_local_dofs];
-
-        // allocate weight array
-        DataType* weight = new DataType[fine_space.get_num_dofs()];
-        LinAlg::vec_clear(fine_space.get_num_dofs(), weight);
 
         // calculate child count
         const Index num_children = fine_trafo_eval.get_num_cells() / coarse_trafo_eval.get_num_cells();
@@ -193,6 +198,7 @@ namespace FEAST
             // format local matrices
             mass.format();
             lmd.format();
+            lvd.format();
 
             // loop over all cubature points and integrate
             for(Index k(0); k < fine_cubature.get_num_points(); ++k)
@@ -249,16 +255,11 @@ namespace FEAST
             fine_dof_mapping.prepare(fcell);
 
             // incorporate local matrix
-            scatter_axpy(lmd);
+            scatter_maxpy(lmd);
 
             // update weights
-            for(Index i(0); i < fine_dof_mapping.get_num_local_dofs(); ++i)
-            {
-              for(Index ic(0); ic < fine_dof_mapping.get_num_contribs(i); ++ic)
-              {
-                weight[fine_dof_mapping.get_index(i,ic)] += DataType(fine_dof_mapping.get_weight(i,ic));
-              }
-            }
+            lvd.format(DataType(1));
+            scatter_vaxpy(lvd);
 
             // finish fine mesh dof-mapping
             fine_dof_mapping.finish();
@@ -275,46 +276,8 @@ namespace FEAST
 
           // go for next coarse mesh cell
         }
-
-        // finally, scale rows by weights
-        for(Index i(0); i < fine_space.get_num_dofs(); ++i)
-        {
-          if(weight[i] > DataType(0))
-            weight[i] = DataType(1) / weight[i];
-        }
-        Intern::RowScaler<Matrix_>::apply(matrix, weight);
-
-        // delete weights
-        delete [] weight;
       }
     }; // class GridTransfer<...>
-
-    /// \cond internal
-    namespace Intern
-    {
-      template<typename Matrix_>
-      class RowScaler;
-
-      template<typename DataType_>
-      class RowScaler< LAFEM::SparseMatrixCSR<Mem::Main, DataType_> >
-      {
-      public:
-        typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
-
-        static void apply(MatrixType& matrix, const DataType_ x[])
-        {
-          Index* row_ptr(matrix.row_ptr());
-          DataType_* data(matrix.val());
-
-          for(Index i(0); i < matrix.rows(); ++i)
-          {
-            for(Index j(row_ptr[i]); j < row_ptr[i + 1]; ++j)
-              data[j] *= x[i];
-          }
-        }
-      };
-    }
-    /// \endcond
   } // namespace Assembly
 } // namespace FEAST
 

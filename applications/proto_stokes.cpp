@@ -297,19 +297,33 @@ public:
   // assembles prolongation and restriction matrices
   void assemble_prolrest(StokesLevel& coarse)
   {
+    // two temporary weight vectors
+    VectorType weight_v(_space_v.get_num_dofs());
+    VectorType weight_p(_space_p.get_num_dofs());
+
     // assemble matrix structures
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(_prol_v, _space_v, coarse._space_v);
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(_prol_p, _space_p, coarse._space_p);
     _prol_v.format();
     _prol_p.format();
+    weight_v.format();
+    weight_p.format();
 
     // create cubature factories
     Cubature::DynamicFactory cubature_factory_velo("gauss-legendre:3");
     Cubature::DynamicFactory cubature_factory_pres("gauss-legendre:1");
 
     // assemble prolongation matrices
-    Assembly::GridTransfer::assemble_prolongation(_prol_v, _space_v, coarse._space_v, cubature_factory_velo);
-    Assembly::GridTransfer::assemble_prolongation(_prol_p, _space_p, coarse._space_p, cubature_factory_pres);
+    Assembly::GridTransfer::assemble_prolongation(_prol_v, weight_v, _space_v, coarse._space_v, cubature_factory_velo);
+    Assembly::GridTransfer::assemble_prolongation(_prol_p, weight_p, _space_p, coarse._space_p, cubature_factory_pres);
+
+    // invert weight vectors
+    weight_v.component_invert<AlgoType>(weight_v);
+    weight_p.component_invert<AlgoType>(weight_p);
+
+    // scale matrix rows by weights
+    _prol_v.scale_rows<AlgoType>(_prol_v, weight_v);
+    _prol_p.scale_rows<AlgoType>(_prol_p, weight_p);
 
     // transpose to obtain restriction matrices
     _rest_v = LAFEM::Transposition<AlgoType>::value(_prol_v);

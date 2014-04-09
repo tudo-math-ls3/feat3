@@ -16,6 +16,7 @@ class GridTransferTest :
   public TestSystem::TaggedTest<Archs::None, DataType_>
 {
   typedef LAFEM::SparseMatrixCSR<Mem::Main, DataType_> MatrixType;
+  typedef LAFEM::DenseVector<Mem::Main, DataType_> VectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral> QuadMesh;
 
@@ -64,8 +65,8 @@ public:
     QuadSpaceQ1 space_c(trafo_c);
 
     // assemble matrix structure
-    //typedef Space::DofAdjacency<Space::Stencil::StandardRefinement> DofAdjacency;
-    MatrixType prol_matrix;//(DofAdjacency::assemble(space_f, space_c));
+    MatrixType prol_matrix;
+    VectorType weight_vector(space_f.get_num_dofs());
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
 
     // check matrix dimensions
@@ -89,11 +90,16 @@ public:
     TEST_CHECK_EQUAL(row_ptr[9], 36u);
 
     // clear matrix
-    prol_matrix.format(DataType_(0));
+    prol_matrix.format();
+    weight_vector.format();
 
     // assemble prolongation matrix
     Assembly::GridTransfer::
-      assemble_prolongation(prol_matrix, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:2"));
+      assemble_prolongation(prol_matrix, weight_vector, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:2"));
+
+    // invert weight vector and scale matrix rows
+    weight_vector.template component_invert<Algo::Generic>(weight_vector);
+    prol_matrix.template scale_rows<Algo::Generic>(prol_matrix, weight_vector);
 
     // fetch matrix data
     const DataType_* data = prol_matrix.val();
@@ -135,8 +141,8 @@ public:
     QuadSpaceQ1T space_c(trafo_c);
 
     // assemble matrix structure
-    //typedef Space::DofAdjacency<Space::Stencil::StandardRefinement> DofAdjacency;
-    MatrixType prol_matrix;//(DofAdjacency::assemble(space_f, space_c));
+    MatrixType prol_matrix;
+    VectorType weight_vector(space_f.get_num_dofs());
     Assembly::SymbolicMatrixAssembler<Assembly::Stencil::StandardRefinement>::assemble(prol_matrix, space_f, space_c);
 
     // check matrix dimensions
@@ -160,11 +166,16 @@ public:
     TEST_CHECK_EQUAL(row_ptr[12], 48u);
 
     // clear matrix
-    prol_matrix.format(DataType_(0));
+    prol_matrix.format();
+    weight_vector.format();
 
     // assemble prolongation matrix
     Assembly::GridTransfer::
-      assemble_prolongation(prol_matrix, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:3"));
+      assemble_prolongation(prol_matrix, weight_vector, space_f, space_c, Cubature::DynamicFactory("gauss-legendre:3"));
+
+    // invert weight vector and scale matrix rows
+    weight_vector.template component_invert<Algo::Generic>(weight_vector);
+    prol_matrix.template scale_rows<Algo::Generic>(prol_matrix, weight_vector);
 
     // fetch matrix data
     const DataType_* data = prol_matrix.val();
