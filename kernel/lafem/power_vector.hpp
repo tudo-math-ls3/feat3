@@ -272,6 +272,22 @@ namespace FEAST
       }
 
       /**
+       * \brief Performs \f$ this_i \leftarrow \alpha / x_i \f$
+       *
+       * \param[in] x
+       * The vector whose components serve as denominators.
+       *
+       * \param[in] alpha
+       * The nominator.
+       */
+      template<typename Algo_>
+      void component_invert(const PowerVector& x, DataType alpha = DataType(1))
+      {
+        base().template component_invert<Algo_>(x.base(), alpha);
+        last().template component_invert<Algo_>(x.last(), alpha);
+      }
+
+      /**
        * \brief Performs \f$ this \leftarrow \alpha\cdot x \f$
        *
        * \param[in] x
@@ -508,6 +524,12 @@ namespace FEAST
       }
 
       template<typename Algo_>
+      void component_invert(const PowerVector& x, DataType alpha = DataType(1))
+      {
+        last().template component_invert<Algo_>(x.last(), alpha);
+      }
+
+      template<typename Algo_>
       void scale(const PowerVector& x, DataType alpha)
       {
         last().template scale<Algo_>(x.last(), alpha);
@@ -530,8 +552,6 @@ namespace FEAST
       {
         return Math::sqrt(norm2sqr<Algo_>());
       }
-
-
 
       const DataType operator()(Index index) const
       {

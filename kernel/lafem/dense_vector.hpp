@@ -13,6 +13,7 @@
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/edi.hpp>
 #include <kernel/lafem/arch/sum.hpp>
+#include <kernel/lafem/arch/component_invert.hpp>
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/dot_product.hpp>
 #include <kernel/lafem/arch/norm.hpp>
@@ -612,6 +613,24 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
 
           Arch::Axpy<Mem_, Algo_>::dv(this->elements(), x.elements(), y.elements(), z.elements(), this->size());
+        }
+
+        /**
+         * \brief Performs \f$ this_i \leftarrow \alpha / x_i \f$
+         *
+         * \param[in] x
+         * The vector whose components serve as denominators.
+         *
+         * \param[in] alpha
+         * The nominator.
+         */
+        template <typename Algo_>
+        void component_invert(const DenseVector & x, const DT_ alpha = DT_(1))
+        {
+          if (this->size() != x.size())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+
+          Arch::ComponentInvert<Mem_, Algo_>::value(this->elements(), x.elements(), alpha, this->size());
         }
 
         /**

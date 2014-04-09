@@ -44,6 +44,7 @@ SET (test_list
   meta_mirror-test
   meta_vector-axpy-test
   meta_vector-comp_prod-test
+  meta_vector-comp_invert-test
   meta_vector-dot-norm2-test
   meta_vector-scale-test
   pointstar_factory-test
