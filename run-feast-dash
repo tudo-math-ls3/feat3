@@ -59,7 +59,7 @@ def run_test(build_id, branch, myDB):
 
 ######### CONFIGURE #########
   configure_command = src_dirname + os.sep + "configure-feast " + build_id
-  configure_output = get_output(configure_command)
+  configure_output = get_output_utf8(configure_command)
   configure_output = "\n".join(configure_output)
   if "Error" in configure_output:
     m = Message.create(runid=r, stage="configure", status="error", timestamp=time.time(), title="output", body=configure_output)
