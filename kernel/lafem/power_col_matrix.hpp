@@ -4,6 +4,7 @@
 
 // includes, FEAST
 #include <kernel/lafem/power_vector.hpp>
+#include <kernel/lafem/sparse_layout.hpp>
 
 namespace FEAST
 {
@@ -43,6 +44,10 @@ namespace FEAST
       typedef typename SubMatrixType::MemType MemType;
       /// sub-matrix data type
       typedef typename SubMatrixType::DataType DataType;
+      /// sub-matrix index type
+      typedef typename SubMatrixType::IndexType IndexType;
+      /// sub-matrix layout type
+      static constexpr SparseLayoutType LayoutType = SubMatrixType::LayoutType;
       /// Compatible L-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeL, blocks_> VectorTypeL;
       /// Compatible R-vector type
@@ -71,6 +76,13 @@ namespace FEAST
     public:
       /// default ctor
       PowerColMatrix()
+      {
+      }
+
+      /// sub-matrix layout ctor
+      explicit PowerColMatrix(const SparseLayout<MemType, IndexType, LayoutType>& layout) :
+        BaseClass(layout),
+        _sub_matrix(layout)
       {
       }
 
@@ -264,6 +276,9 @@ namespace FEAST
       typedef SubType_ SubMatrixType;
       typedef typename SubMatrixType::MemType MemType;
       typedef typename SubMatrixType::DataType DataType;
+      typedef typename SubMatrixType::IndexType IndexType;
+      /// sub-matrix layout type
+      static constexpr SparseLayoutType LayoutType = SubMatrixType::LayoutType;
       /// Compatible L-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeL, 1> VectorTypeL;
       /// Compatible R-vector type
@@ -287,6 +302,12 @@ namespace FEAST
     public:
       /// default ctor
       PowerColMatrix()
+      {
+      }
+
+      /// sub-matrix layout ctor
+      explicit PowerColMatrix(const SparseLayout<MemType, IndexType, LayoutType>& layout) :
+        _sub_matrix(layout)
       {
       }
 

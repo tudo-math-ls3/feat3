@@ -352,11 +352,11 @@ namespace FEAST
         /// Our memory architecture type
         typedef Mem_ MemType;
         /// Compatible L-vector type
-        typedef DenseVector<MemType, DataType> VectorTypeL;
+        typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
         /// Compatible R-vector type
-        typedef DenseVector<MemType, DataType> VectorTypeR;
+        typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
         /// Our used layout type
-        const static SparseLayoutType LayoutType = SparseLayoutType::lt_csr;
+        static constexpr SparseLayoutType LayoutType = SparseLayoutType::lt_csr;
         /// ImageIterator typedef for Adjactor interface implementation
         typedef const IT_* ImageIterator;
 

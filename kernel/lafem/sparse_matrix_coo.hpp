@@ -446,11 +446,11 @@ namespace FEAST
         /// Our memory architecture type
         typedef Mem_ MemType;
         /// Compatible L-vector type
-        typedef DenseVector<MemType, DT_, IT_> VectorTypeL;
+        typedef DenseVector<Mem_, DT_, IT_> VectorTypeL;
         /// Compatible R-vector type
-        typedef DenseVector<MemType, DataType, IT_> VectorTypeR;
+        typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
         /// Our used layout type
-        const static SparseLayoutType LayoutType = SparseLayoutType::lt_coo;
+        static constexpr SparseLayoutType LayoutType = SparseLayoutType::lt_coo;
 
         /**
          * \brief Constructor
