@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -137,7 +138,7 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Offset out of matrix!");
           }
 
-          tused_elements += columns_in + std::min(rows_in, columns_in + rows_in - toffset - 1) - std::max(columns_in + rows_in - toffset - 1, columns_in);
+          tused_elements += columns_in + Math::min(rows_in, columns_in + rows_in - toffset - 1) - Math::max(columns_in + rows_in - toffset - 1, columns_in);
         }
 
         this->_scalar_index.push_back(tused_elements);

@@ -5,6 +5,7 @@
 // includes, FEAST
 #include <kernel/base_header.hpp>
 #include <kernel/archs.hpp>
+#include <kernel/util/math.hpp>
 
 namespace FEAST
 {
@@ -105,7 +106,7 @@ namespace FEAST
             for (Index j(k); j <= num_of_offsets; ++j)
             {
               // iteration over all rows which contain the offsets between offset i and offset j
-              for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
+              for (Index l(Math::max(START_OFFSET(i), END_OFFSET(j))); l < Math::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
               {
                 DT_ s(0);
                 for (Index a(i); a < j; ++a)
