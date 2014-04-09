@@ -17,6 +17,7 @@ SET (kernel-lafem-arch-list
   norm_generic.cpp
   product_matvec_generic.cpp
   scale_generic.cpp
+  scale_row_col_generic.cpp
   sum_generic.cpp
   )
 
