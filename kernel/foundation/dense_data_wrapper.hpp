@@ -98,6 +98,22 @@ namespace FEAST
           return *this;
         }
 
+        DDVIterator& operator+=(typename DDVIterator<DT_>::difference_type & delta)
+        {
+          if (delta >= 0)
+          {
+            for(typename DDVIterator<DT_>::difference_type i(0) ; i < delta ; ++i)
+              operator++();
+          }
+          else
+          {
+            for(typename DDVIterator<DT_>::difference_type i(0) ; i < -delta ; ++i)
+              operator--();
+          }
+
+          return *this;
+        }
+
         DDVIterator& operator-=(const DDVIterator& r)
         {
           for(Index i(0) ; i < r ; ++i)
