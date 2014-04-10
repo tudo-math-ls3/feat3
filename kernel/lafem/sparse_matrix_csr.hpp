@@ -1232,7 +1232,7 @@ namespace FEAST
          * \param[in] s The vector to the scale the rows by.
          */
         template<typename Algo_>
-        void scale_rows(const SparseMatrixCSR& x, const DenseVector<Mem_,DT_,IT_>& s)
+        void scale_rows(const SparseMatrixCSR & x, const DenseVector<Mem_,DT_,IT_> & s)
         {
           if (x.rows() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
@@ -1254,7 +1254,7 @@ namespace FEAST
          * \param[in] s The vector to the scale the columns by.
          */
         template<typename Algo_>
-        void scale_cols(const SparseMatrixCSR& x, const DenseVector<Mem_,DT_,IT_>& s)
+        void scale_cols(const SparseMatrixCSR & x, const DenseVector<Mem_,DT_,IT_> & s)
         {
           if (x.rows() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");

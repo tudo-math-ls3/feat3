@@ -55,6 +55,7 @@ if (FEAST_BACKENDS_CUDA)
     norm.cu
     product_matvec.cu
     scale.cu
+    scale_row_col.cu
     sum.cu
     STATIC
   )

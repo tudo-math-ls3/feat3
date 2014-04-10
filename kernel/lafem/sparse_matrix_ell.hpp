@@ -13,6 +13,7 @@
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
+#include <kernel/lafem/arch/scale_row_col.hpp>
 #include <kernel/lafem/arch/sum.hpp>
 #include <kernel/lafem/arch/difference.hpp>
 #include <kernel/lafem/arch/scale.hpp>
@@ -1252,6 +1253,50 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
           Arch::Scale<Mem_, Algo_>::value(this->Ax(), x.Ax(), alpha, this->stride() * this->num_cols_per_row());
+        }
+
+        /**
+         * \brief Calculate \f$ this_{ij} \leftarrow x_{ij}\cdot s_i\f$
+         *
+         * \param[in] x The matrix whose rows are to be scaled.
+         * \param[in] s The vector to the scale the rows by.
+         */
+        template<typename Algo_>
+        void scale_rows(const SparseMatrixELL & x, const DenseVector<Mem_,DT_,IT_> & s)
+        {
+          if (x.rows() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
+          if (x.columns() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
+          if (s.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+
+          Arch::ScaleRows<Mem_, Algo_>::ell(this->Ax(), x.Ax(), this->Aj(), this->Arl(),
+            s.elements(), stride(), rows());
+        }
+
+        /**
+         * \brief Calculate \f$ this_{ij} \leftarrow x_{ij}\cdot s_j\f$
+         *
+         * \param[in] x The matrix whose columns are to be scaled.
+         * \param[in] s The vector to the scale the columns by.
+         */
+        template<typename Algo_>
+        void scale_cols(const SparseMatrixELL & x, const DenseVector<Mem_,DT_,IT_> & s)
+        {
+          if (x.rows() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Row count does not match!");
+          if (x.columns() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Column count does not match!");
+          if (x.used_elements() != this->used_elements())
+            throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
+          if (s.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size does not match!");
+
+          Arch::ScaleCols<Mem_, Algo_>::ell(this->Ax(), x.Ax(), this->Aj(), this->Arl(),
+            s.elements(), stride(), rows());
         }
 
         /**
