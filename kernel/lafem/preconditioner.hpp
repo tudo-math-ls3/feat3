@@ -3765,8 +3765,6 @@ namespace FEAST
        */
       virtual void apply(VT_ & out, const VT_ & in) override
       {
-        typedef typename VT_::DataType DT_;
-
         /*
          * preconditioner is given by
          *   \f$ M^-1 = \left(I + (I - \tilde M^{-1}A) + ... + (I - \tilde M^{-1 }A)^m\right) \tilde M^{-1} \f$

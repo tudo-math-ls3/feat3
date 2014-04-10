@@ -11,13 +11,16 @@ using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
-template <SparsePreconType Type_>
+template <typename Algo_, SparsePreconType Type_>
 struct Precon;
 
-template <>
-struct Precon<SparsePreconType::pt_none>
+/**
+ * none preconditioner
+ */
+template <typename Algo_>
+struct Precon<Algo_, SparsePreconType::pt_none>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & /*sys*/, const Index /*opt*/)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new NonePreconditioner<Algo_, MT_, VT_> ();
@@ -25,10 +28,13 @@ struct Precon<SparsePreconType::pt_none>
   }
 };
 
-template <>
-struct Precon<SparsePreconType::pt_jacobi>
+/**
+ * Jacobi preconditioner
+ */
+template <typename Algo_>
+struct Precon<Algo_, SparsePreconType::pt_jacobi>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new JacobiPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
@@ -36,10 +42,13 @@ struct Precon<SparsePreconType::pt_jacobi>
   }
 };
 
-template <>
-struct Precon<SparsePreconType::pt_gauss_seidel>
+/**
+ * Gauss-Seidel preconditioner
+ */
+template <typename Algo_>
+struct Precon<Algo_, SparsePreconType::pt_gauss_seidel>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new GaussSeidelPreconditioner<Algo_, MT_, VT_> (sys, typename VT_::DataType(1));
@@ -47,10 +56,13 @@ struct Precon<SparsePreconType::pt_gauss_seidel>
   }
 };
 
-template <>
-struct Precon<SparsePreconType::pt_ilu>
+/**
+ * ILU preconditioner
+ */
+template <typename Algo_>
+struct Precon<Algo_, SparsePreconType::pt_ilu>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new ILUPreconditioner<Algo_, MT_, VT_> (sys, opt);
@@ -58,10 +70,13 @@ struct Precon<SparsePreconType::pt_ilu>
   }
 };
 
-template <>
-struct Precon<SparsePreconType::pt_sor>
+/**
+ * SOR preconditioner
+ */
+template <typename Algo_>
+struct Precon<Algo_, SparsePreconType::pt_sor>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new SORPreconditioner<Algo_, MT_, VT_> (sys);
@@ -69,10 +84,13 @@ struct Precon<SparsePreconType::pt_sor>
   }
 };
 
-template <>
-struct Precon<SparsePreconType::pt_ssor>
+/**
+ * SSOR preconditioner
+ */
+template <typename Algo_>
+struct Precon<Algo_, SparsePreconType::pt_ssor>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index /*opt*/)
   {
     Preconditioner<Algo_, MT_, VT_> * t = new SSORPreconditioner<Algo_, MT_, VT_> (sys);
@@ -80,10 +98,13 @@ struct Precon<SparsePreconType::pt_ssor>
   }
 };
 
-template <>
-struct Precon<SparsePreconType::pt_spai>
+/**
+ * SPAI preconditioner
+ */
+template <typename Algo_>
+struct Precon<Algo_, SparsePreconType::pt_spai>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
     Preconditioner<Algo_, MT_, VT_> * t;
@@ -104,10 +125,15 @@ struct Precon<SparsePreconType::pt_spai>
   }
 };
 
+/**
+ * Polynomial preconditioner for Algo::Generic
+ */
 template <>
-struct Precon<SparsePreconType::pt_polynomial>
+struct Precon<Algo::Generic, SparsePreconType::pt_polynomial>
 {
-  template <typename Algo_, typename MT_, typename VT_>
+  typedef Algo::Generic Algo_;
+
+  template <typename MT_, typename VT_>
   static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
   {
     const Index iter_poly(2);
@@ -115,39 +141,97 @@ struct Precon<SparsePreconType::pt_polynomial>
 
     if (opt%10 == 0)
     {
-      auto * temp = Precon<SparsePreconType::pt_none>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      auto * temp = Precon<Algo_, SparsePreconType::pt_none>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
       t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 1)
     {
-      auto * temp = Precon<SparsePreconType::pt_jacobi>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      auto * temp = Precon<Algo_, SparsePreconType::pt_jacobi>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
       t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 2)
     {
-      auto * temp = Precon<SparsePreconType::pt_gauss_seidel>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      auto * temp = Precon<Algo_, SparsePreconType::pt_gauss_seidel>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
       t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 3)
     {
-      auto * temp = Precon<SparsePreconType::pt_sor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      auto * temp = Precon<Algo_, SparsePreconType::pt_sor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
       t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 4)
     {
-      auto * temp = Precon<SparsePreconType::pt_ssor>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      auto * temp = Precon<Algo_, SparsePreconType::pt_ssor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
       t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 5)
     {
-      auto * temp = Precon<SparsePreconType::pt_ilu>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      auto * temp = Precon<Algo_, SparsePreconType::pt_ilu>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
       t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
     }
     else if (opt%10 == 6)
     {
-      auto * temp = Precon<SparsePreconType::pt_spai>::template get<Algo_, MT_, VT_>(sys,(opt - opt%10) / 10);
+      auto * temp = Precon<Algo_, SparsePreconType::pt_spai>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
       t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
     }
+    else
+    {
+      throw InternalError(__func__, __FILE__, __LINE__, "Parameter opt not allowed!");
+    }
+
+    return t;
+  }
+};
+
+/**
+ * Polynomial preconditioner for Algo::CUDA
+ */
+template <>
+struct Precon<Algo::CUDA, SparsePreconType::pt_polynomial>
+{
+  typedef Algo::CUDA Algo_;
+
+  template <typename MT_, typename VT_>
+  static Preconditioner<Algo_, MT_, VT_> * get(const MT_ & sys, const Index opt)
+  {
+    const Index iter_poly(2);
+    Preconditioner<Algo_, MT_, VT_> * t;
+
+    if (opt%10 == 0)
+    {
+      auto * temp = Precon<Algo_, SparsePreconType::pt_none>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    else if (opt%10 == 1)
+    {
+      auto * temp = Precon<Algo_, SparsePreconType::pt_jacobi>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+      t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    }
+    // else if (opt%10 == 2)
+    // {
+    //   auto * temp = Precon<Algo_, SparsePreconType::pt_gauss_seidel>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    // }
+    // else if (opt%10 == 3)
+    // {
+    //   auto * temp = Precon<Algo_, SparsePreconType::pt_sor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    // }
+    // else if (opt%10 == 4)
+    // {
+    //   auto * temp = Precon<Algo_, SparsePreconType::pt_ssor>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    // }
+    // else if (opt%10 == 5)
+    // {
+    //   auto * temp = Precon<Algo_, SparsePreconType::pt_ilu>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    // }
+    // else if (opt%10 == 6)
+    // {
+    //   auto * temp = Precon<Algo_, SparsePreconType::pt_spai>::template get<MT_, VT_>(sys,(opt - opt%10) / 10);
+    //   t = new PolynomialPreconditioner<Algo_, MT_, VT_> (sys, iter_poly, temp);
+    // }
     else
     {
       throw InternalError(__func__, __FILE__, __LINE__, "Parameter opt not allowed!");
@@ -202,7 +286,7 @@ public:
     VT_ b(size);
     sys.template apply<Algo_>(b, ref);
 
-    Preconditioner<Algo_, MT_, VT_> * precond(Precon<PType_>::template get<Algo_, MT_, VT_>(sys, _opt));
+    Preconditioner<Algo_, MT_, VT_> * precond(Precon<Algo_, PType_>::template get<MT_, VT_>(sys, _opt));
     BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, 1e-12);
     delete precond;
 
@@ -773,21 +857,43 @@ BiCGStabTest<PointstarFactoryFE<double>,
              Algo::CUDA,
              SparseMatrixCSR<Mem::CUDA, double>,
              DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_csr_poly_double("polynmial");
+bicgstab_test_cuda_csr_poly_double_0("polynmial", 0);
 
 /*BiCGStabTest<PointstarFactoryFE<double>,
-             SparsePreconType::pt_polynomial,
-             Algo::CUDA,
-             SparseMatrixCOO<Mem::CUDA, double>,
-             DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_coo_poly_double("polynmial");*/
+  SparsePreconType::pt_polynomial,
+  Algo::CUDA,
+  SparseMatrixCOO<Mem::CUDA, double>,
+  DenseVector<Mem::CUDA, double> >
+  bicgstab_test_cuda_coo_poly_double_0("polynmial", 0);*/
 
 BiCGStabTest<PointstarFactoryFE<double>,
              SparsePreconType::pt_polynomial,
              Algo::CUDA,
              SparseMatrixELL<Mem::CUDA, double>,
              DenseVector<Mem::CUDA, double> >
-bicgstab_test_cuda_ell_poly_double("polynmial");
+bicgstab_test_cuda_ell_poly_double_0("polynmial", 0);
+
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::CUDA,
+             SparseMatrixCSR<Mem::CUDA, double>,
+             DenseVector<Mem::CUDA, double> >
+bicgstab_test_cuda_csr_poly_double_1("polynmial", 1);
+
+/*BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::CUDA,
+             SparseMatrixCOO<Mem::CUDA, double>,
+             DenseVector<Mem::CUDA, double> >
+bicgstab_test_cuda_coo_poly_double_1("polynmial", 1);*/
+
+BiCGStabTest<PointstarFactoryFE<double>,
+             SparsePreconType::pt_polynomial,
+             Algo::CUDA,
+             SparseMatrixELL<Mem::CUDA, double>,
+             DenseVector<Mem::CUDA, double> >
+bicgstab_test_cuda_ell_poly_double_1("polynmial", 1);
 
 
 /*BiCGStabTest<PointstarFactoryFE<double>,
