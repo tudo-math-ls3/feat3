@@ -48,6 +48,7 @@ endif(FEAST_BACKENDS_MKL)
 if (FEAST_BACKENDS_CUDA)
   CUDA_ADD_LIBRARY(kernel-lafem-arch-cuda
     axpy.cu
+    component_invert.cu
     component_product.cu
     defect.cu
     difference.cu
