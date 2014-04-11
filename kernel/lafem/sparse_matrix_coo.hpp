@@ -450,7 +450,7 @@ namespace FEAST
         /// Compatible R-vector type
         typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
         /// Our used layout type
-        static constexpr SparseLayoutType LayoutType = SparseLayoutType::lt_coo;
+        static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_coo;
 
         /**
          * \brief Constructor
@@ -518,7 +518,7 @@ namespace FEAST
          *
          * Creates an empty matrix with given layout.
          */
-        explicit SparseMatrixCOO(const SparseLayout<Mem_, IT_, LayoutType> & layout_in) :
+        explicit SparseMatrixCOO(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
           Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
         {
           CONTEXT("When creating SparseMatrixCOO");
@@ -1262,11 +1262,11 @@ namespace FEAST
          * This is necessary because coo layouts may change after creation and thus cannot be used by two different SparseMatrix Objects.
          * Nevertheless it is usefull to extract a matrix' layout, to create another matrix with the same matrix (same as 'same' at the moment of creation).
          */
-        SparseLayout<Mem_, IT_, LayoutType> layout() const
+        SparseLayout<Mem_, IT_, layout_id> layout() const
         {
           SparseMatrixCOO t;
           t.clone(*this);
-          return SparseLayout<Mem_, IT_, LayoutType>(t._indices, t._indices_size, t._scalar_index);
+          return SparseLayout<Mem_, IT_, layout_id>(t._indices, t._indices_size, t._scalar_index);
         }
 
         /**

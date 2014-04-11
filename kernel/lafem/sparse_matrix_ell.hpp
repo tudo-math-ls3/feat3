@@ -412,7 +412,7 @@ namespace FEAST
         /// Compatible R-vector type
         typedef DenseVector<Mem_, DT_, IT_> VectorTypeR;
         /// Our used layout type
-        static constexpr SparseLayoutType LayoutType = SparseLayoutType::lt_ell;
+        static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_ell;
 
         /**
          * \brief Constructor
@@ -438,7 +438,7 @@ namespace FEAST
          *
          * Creates an empty matrix with given layout.
          */
-        explicit SparseMatrixELL(const SparseLayout<Mem_, IT_, LayoutType> & layout_in) :
+        explicit SparseMatrixELL(const SparseLayout<Mem_, IT_, layout_id> & layout_in) :
           Container<Mem_, DT_, IT_> (layout_in._scalar_index.at(0))
         {
           CONTEXT("When creating SparseMatrixELL");
@@ -815,7 +815,7 @@ namespace FEAST
          *
          * Assigns a new matrix layout, discarding all old data
          */
-        SparseMatrixELL & operator= (const SparseLayout<Mem_, IT_, LayoutType> & layout_in)
+        SparseMatrixELL & operator= (const SparseLayout<Mem_, IT_, layout_id> & layout_in)
         {
           CONTEXT("When assigning SparseMatrixELL");
 
@@ -1056,9 +1056,9 @@ namespace FEAST
          *
          * \return An object containing the sparse matrix layout.
          */
-        SparseLayout<Mem_, IT_, LayoutType> layout() const
+        SparseLayout<Mem_, IT_, layout_id> layout() const
         {
-          return SparseLayout<Mem_, IT_, LayoutType>(this->_indices, this->_indices_size, this->_scalar_index);
+          return SparseLayout<Mem_, IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
         }
 
         /**

@@ -69,11 +69,11 @@ public:
     TEST_CHECK_EQUAL(bl.rows(), b.rows());
     TEST_CHECK_EQUAL(bl.columns(), b.columns());
 
-    typename SparseLayout<Mem_, IT_, SparseLayoutType::lt_csr>::template MatrixType<DT_> x(b.layout());
+    typename SparseLayout<Mem_, IT_, SparseLayoutId::lt_csr>::template MatrixType<DT_> x(b.layout());
     // icc 14.0.2 does not understand the following line, so we need a typedef hier
     //typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
-    typedef decltype(b.layout()) LayoutType;
-    typename LayoutType::template MatrixType<DT_> y(b.layout());
+    typedef decltype(b.layout()) LayoutId;
+    typename LayoutId::template MatrixType<DT_> y(b.layout());
     TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
     TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
 

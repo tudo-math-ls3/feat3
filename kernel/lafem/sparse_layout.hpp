@@ -15,7 +15,7 @@ namespace FEAST
     /**
      * Supported File modes.
      */
-    enum class SparseLayoutType
+    enum class SparseLayoutId
     {
       lt_csr = 0,
       lt_coo = 1,
@@ -24,25 +24,25 @@ namespace FEAST
 
     namespace Intern
     {
-      template <SparseLayoutType LT_>
-      struct LayoutTyper;
+      template <SparseLayoutId LT_>
+      struct LayoutIdr;
 
       template <>
-      struct LayoutTyper<SparseLayoutType::lt_csr>
+      struct LayoutIdr<SparseLayoutId::lt_csr>
       {
         template<typename Mem_, typename DT_, typename IT_>
         using MatrixType = SparseMatrixCSR<Mem_, DT_, IT_>;
       };
 
       template <>
-      struct LayoutTyper<SparseLayoutType::lt_ell>
+      struct LayoutIdr<SparseLayoutId::lt_ell>
       {
         template<typename Mem_, typename DT_, typename IT_>
         using MatrixType = SparseMatrixELL<Mem_, DT_, IT_>;
       };
 
       template <>
-      struct LayoutTyper<SparseLayoutType::lt_coo>
+      struct LayoutIdr<SparseLayoutId::lt_coo>
       {
         template<typename Mem_, typename DT_, typename IT_>
         using MatrixType = SparseMatrixCOO<Mem_, DT_, IT_>;
@@ -62,7 +62,7 @@ namespace FEAST
      *
      * \author Dirk Ribbrock
      */
-    template <typename Mem_, typename IT_, SparseLayoutType Layout_>
+    template <typename Mem_, typename IT_, SparseLayoutId Layout_>
     class SparseLayout
     {
     public:
@@ -71,7 +71,7 @@ namespace FEAST
       std::vector<Index> _scalar_index;
 
       template<typename DT_>
-      using MatrixType = typename Intern::LayoutTyper<Layout_>::template MatrixType<Mem_, DT_, IT_>;
+      using MatrixType = typename Intern::LayoutIdr<Layout_>::template MatrixType<Mem_, DT_, IT_>;
 
       SparseLayout(const std::vector<IT_ *> & indices, const std::vector<Index> & indices_size, const std::vector<Index> & scalar_index) :
         _indices(indices),

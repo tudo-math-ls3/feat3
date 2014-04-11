@@ -485,20 +485,20 @@ namespace FEAST
 
 
 
-      template<SparseLayoutType LT_, typename MT_>
-      static SparseMatrixCOO<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutType::lt_coo>::type* = 0)
+      template<SparseLayoutId LT_, typename MT_>
+      static SparseMatrixCOO<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutId::lt_coo>::type* = 0)
       {
         return value_coo(a);
       }
 
-      template<SparseLayoutType LT_, typename MT_>
-      static SparseMatrixCSR<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutType::lt_csr>::type* = 0)
+      template<SparseLayoutId LT_, typename MT_>
+      static SparseMatrixCSR<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutId::lt_csr>::type* = 0)
       {
         return value_csr(a);
       }
 
-      template<SparseLayoutType LT_, typename MT_>
-      static SparseMatrixELL<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutType::lt_ell>::type* = 0)
+      template<SparseLayoutId LT_, typename MT_>
+      static SparseMatrixELL<typename MT_::MemType, typename MT_::DataType> value(const MT_ & a, typename std::enable_if<LT_ == SparseLayoutId::lt_ell>::type* = 0)
       {
         return value_ell(a);
       }

@@ -47,7 +47,7 @@ namespace FEAST
       /// sub-matrix index type
       typedef typename SubMatrixType::IndexType IndexType;
       /// sub-matrix layout type
-      static constexpr SparseLayoutType LayoutType = SubMatrixType::LayoutType;
+      static constexpr SparseLayoutId layout_id = SubMatrixType::layout_id;
       /// Compatible L-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeL, blocks_> VectorTypeL;
       /// Compatible R-vector type
@@ -80,7 +80,7 @@ namespace FEAST
       }
 
       /// sub-matrix layout ctor
-      explicit PowerColMatrix(const SparseLayout<MemType, IndexType, LayoutType>& layout) :
+      explicit PowerColMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
         BaseClass(layout),
         _sub_matrix(layout)
       {
@@ -278,7 +278,7 @@ namespace FEAST
       typedef typename SubMatrixType::DataType DataType;
       typedef typename SubMatrixType::IndexType IndexType;
       /// sub-matrix layout type
-      static constexpr SparseLayoutType LayoutType = SubMatrixType::LayoutType;
+      static constexpr SparseLayoutId layout_id = SubMatrixType::layout_id;
       /// Compatible L-vector type
       typedef PowerVector<typename SubMatrixType::VectorTypeL, 1> VectorTypeL;
       /// Compatible R-vector type
@@ -306,7 +306,7 @@ namespace FEAST
       }
 
       /// sub-matrix layout ctor
-      explicit PowerColMatrix(const SparseLayout<MemType, IndexType, LayoutType>& layout) :
+      explicit PowerColMatrix(const SparseLayout<MemType, IndexType, layout_id>& layout) :
         _sub_matrix(layout)
       {
       }
