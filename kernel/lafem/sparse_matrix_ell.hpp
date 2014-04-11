@@ -10,6 +10,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/matrix_base.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
@@ -769,6 +770,144 @@ namespace FEAST
               }
             }
           }
+
+          this->_elements_size.push_back(_num_cols_per_row() * _stride());
+          this->_indices_size.push_back(_num_cols_per_row() * _stride());
+          this->_indices_size.push_back(_rows());
+          if (std::is_same<Mem_, Mem::Main>::value)
+          {
+            this->_elements.push_back(tAx);
+            this->_indices.push_back(tAj);
+            this->_indices.push_back(tArl);
+          }
+          else
+          {
+            this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_num_cols_per_row() * _stride()));
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_num_cols_per_row() * _stride()));
+            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_rows()));
+
+            MemoryPool<Mem_>::template upload<DT_>(this->get_elements().at(0), tAx, _num_cols_per_row() * _stride());
+            MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(0), tAj, _num_cols_per_row() * _stride());
+            MemoryPool<Mem_>::template upload<IT_>(this->get_indices().at(1), tArl, _rows());
+            MemoryPool<Mem::Main>::instance()->release_memory(tAx);
+            MemoryPool<Mem::Main>::instance()->release_memory(tAj);
+            MemoryPool<Mem::Main>::instance()->release_memory(tArl);
+          }
+        }
+
+        /**
+         * \brief Convertion method
+         *
+         * \param[in] other The source Matrix.
+         *
+         * Use source matrix content as content of current matrix
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
+        {
+          CONTEXT("When converting SparseMatrixELL");
+
+          this->clear();
+
+          this->_scalar_index.push_back(other.size());
+          this->_scalar_index.push_back(other.rows());
+          this->_scalar_index.push_back(other.columns());
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(0);
+          this->_scalar_index.push_back(other.used_elements());
+          this->_scalar_dt.push_back(other.zero_element());
+
+          SparseMatrixBanded<Mem::Main, DT_, IT_> cother;
+          cother.convert(other);
+
+          IT_ * tArl = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_rows());
+          MemoryPool<Mem::Main>::instance()->set_memory(tArl, IT_(0), _rows());
+
+          #ifdef START_OFFSET
+            #warning Overwriting definition of START_OFFSET
+            #undef START_OFFSET
+          #endif
+
+          #ifdef END_OFFSET
+            #error Overwriting definition of END_OFFSET
+            #undef END_OFFSET
+          #endif
+
+          #define START_OFFSET(j) ((j == Index(-1)) ? crows : ((j == k) ? 0 : crows - coffsets[j] - 1))
+          #define END_OFFSET(j) ((j + 1 == k) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
+
+          const DT_ * cval(cother.val());
+          const IT2_ * coffsets(cother.offsets());
+          const Index cnum_of_offsets(cother.num_of_offsets());
+          const Index crows(cother.rows());
+          const Index ccolumns(cother.columns());
+
+          // Search first offset of the upper triangular matrix
+          Index k(0);
+          while (k < cnum_of_offsets && coffsets[k] + 1 < crows)
+          {
+            ++k;
+          }
+
+          if (START_OFFSET(0) > END_OFFSET(cnum_of_offsets - 1))
+          {
+            _num_cols_per_row() = cnum_of_offsets;
+          }
+          else
+          {
+            for (Index i(k + 1); i > 0;)
+            {
+              --i;
+
+              // iteration over all offsets of the upper triangular matrix
+              for (Index j(cnum_of_offsets + 1); j > k;)
+              {
+                --j;
+
+                if (j - i > _num_cols_per_row() &&
+                    std::max(START_OFFSET(i), END_OFFSET(j))
+                    < std::min(START_OFFSET(i-1), END_OFFSET(j-1)))
+                {
+                  _num_cols_per_row() = j - i;
+                }
+              }
+            }
+          }
+
+          Index alignment(32);
+          _stride() = alignment * ((_rows() + alignment - 1)/ alignment);
+
+          DT_ * tAx = MemoryPool<Mem::Main>::instance()->template allocate_memory<DT_>(_num_cols_per_row() * _stride());
+          MemoryPool<Mem::Main>::instance()->set_memory(tAx, DT_(0), _num_cols_per_row() * _stride());
+          IT_ * tAj = MemoryPool<Mem::Main>::instance()->template allocate_memory<IT_>(_num_cols_per_row() * _stride());
+          MemoryPool<Mem::Main>::instance()->set_memory(tAj, IT_(0), _num_cols_per_row() * _stride());
+
+
+
+          for (Index i(k + 1); i > 0;)
+          {
+            --i;
+
+            // iteration over all offsets of the upper triangular matrix
+            for (Index j(cnum_of_offsets + 1); j > k;)
+            {
+              --j;
+
+              // iteration over all rows which contain the offsets between offset i and offset j
+              for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
+              {
+                tArl[l] = j - i;
+                for (Index a(i); a < j; ++a)
+                {
+                  tAj[l + (a - i) * _stride()] = l + coffsets[a] + 1 - crows;
+                  tAx[l + (a - i) * _stride()] = cval[a * crows + l];
+                }
+              }
+            }
+          }
+
+          #undef START_OFFSET
+          #undef END_OFFSET
 
           this->_elements_size.push_back(_num_cols_per_row() * _stride());
           this->_indices_size.push_back(_num_cols_per_row() * _stride());
