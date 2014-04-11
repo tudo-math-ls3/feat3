@@ -3,6 +3,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_banded.hpp>
 #include <kernel/lafem/bicgstab.hpp>
 #include <kernel/lafem/preconditioner.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
@@ -1159,6 +1160,84 @@ BiCGStabTest<PointstarFactoryFE<double>,
              DenseVector<Mem::CUDA, double> >
 bicgstab_test_cuda_ell_spai_double_83("spai", 83);*/
 #endif
+
+
+/**
+ * \brief BiCGStabBandedTest
+ *
+ * This class defines the BiCGStabBandedTest with different preconditioners and a banded matrix
+ *
+ * \author Christoph Lohmann
+ */
+template<SparsePreconType PType_, typename Algo_, typename VT_>
+class BiCGStabBandedTest
+  : public TaggedTest<typename VT_::MemType,
+                      typename VT_::DataType,
+                      Algo_>
+{
+private:
+  const Index _opt;
+
+public:
+  typedef typename VT_::DataType   DT_;
+  typedef typename VT_::MemType    Mem_;
+  typedef SparseMatrixBanded<Mem_, DT_, Index> MatrixType;
+
+  BiCGStabBandedTest(String pname, Index opt = 0)
+    : TaggedTest<Mem_, DT_, Algo_> ("bicgstab_banded_test: "
+                                    + pname
+                                    + " opt = "
+                                    + stringify(opt)), _opt(opt)
+  {
+  }
+
+  virtual void run() const
+  {
+    DenseVector<Mem::Main, Index> num_of_nodes(4);
+    DenseVector<Mem::Main, DT_> dimensions(3);
+
+    num_of_nodes(0, 2);
+    num_of_nodes(1, 21);
+    num_of_nodes(2, 12);
+    num_of_nodes(3, 34);
+
+    dimensions(0, DT_(3.0));
+    dimensions(1, DT_(1.5));
+    dimensions(2, DT_(8.3));
+
+    // generate FD matrix
+    PointstarFactoryFD2<DT_> factory(num_of_nodes, dimensions);
+    MatrixType sys;
+    sys.convert(factory.matrix_banded());
+
+    Index size(sys.rows());
+    VT_ x(size, DT_(0));
+    VT_ ref(size, DT_(1));
+    // ref.convert(factory.vector_q2_bubble());
+    VT_ b(size);
+    sys.template apply<Algo_>(b, ref);
+
+    Preconditioner<Algo_, MatrixType, VT_> * precond(Precon<Algo_, PType_>::template get<MatrixType, VT_>(sys, _opt));
+    BiCGStab<Algo_>::value(x, sys, b, *precond, 1000, 1e-12);
+    delete precond;
+
+    // check, if the result is correct
+    for (Index i(0) ; i < size ; ++i)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref(i), 1e-8);
+    }
+  }
+};
+
+BiCGStabBandedTest<SparsePreconType::pt_none,
+                   Algo::Generic,
+                   DenseVector<Mem::Main, double> >
+bicgstabbanded_test_cpu_none_double("none");
+
+BiCGStabBandedTest<SparsePreconType::pt_jacobi,
+             Algo::Generic,
+             DenseVector<Mem::Main, double> >
+bicgstabbanded_test_cpu_jac_double("jacobi");
 
 
 /**
