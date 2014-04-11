@@ -34,7 +34,7 @@ namespace FEAST
 
     protected:
       /// dof-mapping reference
-      Mapping_& _mapping;
+      const Mapping_& _mapping;
 
     public:
       /**
@@ -43,7 +43,7 @@ namespace FEAST
        * \param[in] mapping
        * A reference to the dof-mapping object that is to be used.
        */
-      explicit LocalVectorData(Mapping_& mapping) :
+      explicit LocalVectorData(const Mapping_& mapping) :
         _mapping(mapping)
       {
       }
@@ -134,9 +134,9 @@ namespace FEAST
 
     protected:
       /// row dof-mapping reference
-      RowMapping_& _row_map;
+      const RowMapping_& _row_map;
       /// column dof-mapping reference
-      ColMapping_& _col_map;
+      const ColMapping_& _col_map;
 
     public:
       /**
@@ -145,7 +145,7 @@ namespace FEAST
        * \param[in] row_map, col_map
        * References to the row and column dof-mapping objects that are to be used.
        */
-      explicit LocalMatrixData(RowMapping_& row_map, ColMapping_& col_map) :
+      explicit LocalMatrixData(const RowMapping_& row_map, const ColMapping_& col_map) :
         _row_map(row_map),
         _col_map(col_map)
       {
