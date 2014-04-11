@@ -834,8 +834,8 @@ namespace FEAST
           #define END_OFFSET(j) ((j + 1 == k) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
 
           const DT_ * cval(cother.val());
-          const IT_ * coffsets(cother.offsets());
-          const IT_ cnum_of_offsets(cother.num_of_offsets());
+          const IT2_ * coffsets(cother.offsets());
+          const Index cnum_of_offsets(cother.num_of_offsets());
           const Index crows(cother.rows());
           const Index ccolumns(cother.columns());
 
