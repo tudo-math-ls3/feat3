@@ -303,13 +303,13 @@ namespace FEAST
         UnitCubeFactory() :
           _generator_mesh(nullptr),
           _factory(nullptr)
-      {
-        UnitCubeFactory<GeneratorMeshType> cube_factory;
-        _generator_mesh = new GeneratorMeshType(cube_factory);
-        _factory = new FactoryType(*_generator_mesh);
-      }
+        {
+          UnitCubeFactory<GeneratorMeshType> cube_factory;
+          _generator_mesh = new GeneratorMeshType(cube_factory);
+          _factory = new FactoryType(*_generator_mesh);
+        }
 
-        ~UnitCubeFactory()
+        virtual ~UnitCubeFactory()
         {
           delete _generator_mesh;
           delete _factory;
