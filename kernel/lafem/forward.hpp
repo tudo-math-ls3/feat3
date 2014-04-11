@@ -28,6 +28,9 @@ namespace FEAST
     template <typename Mem_, typename DT_, typename IT_>
     class SparseMatrixELL;
 
+    template <typename Mem_, typename DT_, typename IT_>
+    class SparseMatrixBanded;
+
   } // namespace LAFEM
 } // namespace FEAST
 
