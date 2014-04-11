@@ -176,7 +176,7 @@ struct Precon<Algo::Generic, SparsePreconType::pt_polynomial>
     }
     else
     {
-      throw InternalError(__func__, __FILE__, __LINE__, "Parameter opt not allowed!");
+      throw InternalError(__func__, __FILE__, __LINE__, "Parameter " + stringify(opt) + " not allowed!");
     }
 
     return t;
@@ -234,7 +234,7 @@ struct Precon<Algo::CUDA, SparsePreconType::pt_polynomial>
     // }
     else
     {
-      throw InternalError(__func__, __FILE__, __LINE__, "Parameter opt not allowed!");
+      throw InternalError(__func__, __FILE__, __LINE__, "Parameter " + stringify(opt) + " not allowed!");
     }
 
     return t;
