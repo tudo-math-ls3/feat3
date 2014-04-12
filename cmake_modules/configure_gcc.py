@@ -10,8 +10,8 @@ def configure_gcc(cpu, buildmode):
   minor2 = int(version["__GNUC_PATCHLEVEL__"])
   print ("Detected gcc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
-  if major <= 4 and minor <= 4:
-    print ("GNU Compiler version less then 4.4 is not supported, please update your compiler!")
+  if major < 4  or (major == 4 and minor < 7):
+    print ("GNU Compiler version less then 4.7 is not supported, please update your compiler!")
     sys.exit(1)
 
   cxxflags = "-pipe -std=c++11 -ggdb -gdwarf-4"

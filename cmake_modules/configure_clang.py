@@ -9,6 +9,9 @@ def configure_clang(cpu, buildmode):
   minor2 = int(version["__clang_patchlevel__"])
   print ("Detected clang version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
+  if major < 3  or (major == 3 and minor < 3):
+    print ("Clang Compiler version less then 3.3 is not supported, please update your compiler!")
+    sys.exit(1)
 
   cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64"
   if "debug" in buildmode:

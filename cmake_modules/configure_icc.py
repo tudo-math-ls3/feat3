@@ -9,6 +9,10 @@ def configure_icc(cpu, buildmode):
   minor2 = int(version["__INTEL_COMPILER_UPDATE"])
   print ("Detected icc version: " + str(major) + " " + str(minor) + " " + str(minor2))
 
+  if major < 14  or (major == 14 and minor == 0 and minor2 < 1):
+    print ("Intel Compiler version less then 14.0.2 is not supported, please update your compiler!")
+    sys.exit(1)
+
   cxxflags = "-std=c++11 -g"
 
   # do not use stone old clang libc++ from apple, hopefully any gcc headers are present
