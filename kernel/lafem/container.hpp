@@ -397,9 +397,10 @@ namespace FEAST
          * Become a deep copy of a given container.
          *
          * \param[in] other The source container.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
          *
          */
-        void clone(const Container & other)
+        void clone(const Container & other, bool clone_indices = false)
         {
           CONTEXT("When cloning Container");
 
@@ -410,21 +411,29 @@ namespace FEAST
 
           for (Index i(0) ; i < this->_elements.size() ; ++i)
             MemoryPool<Mem_>::instance()->release_memory(this->_elements.at(i));
-          for (Index i(0) ; i < this->_indices.size() ; ++i)
-            MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
           this->_elements.clear();
-          this->_indices.clear();
-
           for (Index i(0) ; i < other._elements.size() ; ++i)
           {
             this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(this->_elements_size.at(i)));
             MemoryPool<Mem_>::template copy<DT_>(this->_elements.at(i), other._elements.at(i), this->_elements_size.at(i));
           }
 
-          for (Index i(0) ; i < other._indices.size() ; ++i)
+          if (clone_indices)
           {
-            this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
-            MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
+            for (Index i(0) ; i < this->_indices.size() ; ++i)
+              MemoryPool<Mem_>::instance()->release_memory(this->_indices.at(i));
+            this->_indices.clear();
+            for (Index i(0) ; i < other._indices.size() ; ++i)
+            {
+              this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(this->_indices_size.at(i)));
+              MemoryPool<Mem_>::template copy<IT_>(this->_indices.at(i), other._indices.at(i), this->_indices_size.at(i));
+            }
+          }
+          else
+          {
+            this->_indices.assign(other._indices.begin(), other._indices.end());
+            for (Index i(0) ; i < this->_indices.size() ; ++i)
+              MemoryPool<Mem_>::instance()->increase_memory(this->_indices.at(i));
           }
         }
 
@@ -433,15 +442,16 @@ namespace FEAST
          * Become a deep copy of a given container.
          *
          * \param[in] other The source container.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
          *
          */
         template <typename Mem2_, typename DT2_, typename IT2_>
-        void clone(const Container<Mem2_, DT2_, IT2_> & other)
+        void clone(const Container<Mem2_, DT2_, IT2_> & other, bool clone_indices = false)
         {
           CONTEXT("When cloning Container");
           Container t;
           t.assign(other);
-          clone(t);
+          clone(t, clone_indices);
         }
 
         /** \brief Assignment move operation

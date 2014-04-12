@@ -693,16 +693,47 @@ namespace FEAST
         /** \brief Clone operation
          *
          * Create a deep copy of itself.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
          *
          */
-        SparseMatrixCOO clone() const
+        SparseMatrixCOO clone(bool clone_indices = true) const
         {
+          CONTEXT("When cloning SparseMatrixCOO");
           SparseMatrixCOO t;
-          t.clone(*this);
+          t.clone(*this, clone_indices);
           return t;
         }
 
-        using Container<Mem_, DT_, IT_>::clone;
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given matrix.
+         *
+         * \param[in] other The source matrix.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         *
+         */
+        void clone(const SparseMatrixCOO & other, bool clone_indices = true)
+        {
+          CONTEXT("When cloning SparseMatrixCOO");
+          Container<Mem_, DT_, IT_>::clone(other, true);
+        }
+
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given matrix.
+         *
+         * \param[in] other The source matrix.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         *
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void clone(const SparseMatrixCOO<Mem2_, DT2_, IT2_> & other, bool clone_indices = true)
+        {
+          CONTEXT("When cloning SparseMatrixCOO");
+          SparseMatrixCOO t;
+          t.assign(other);
+          Container<Mem_, DT_, IT_>::clone(t, true);
+        }
 
         /**
          * \brief Convertion method
@@ -1249,7 +1280,7 @@ namespace FEAST
           }
           else
           {
-            ((Container<Mem_, DT_, IT_> &)*this).format(value);
+            Container<Mem_, DT_, IT_>::format(value);
           }
         }
 

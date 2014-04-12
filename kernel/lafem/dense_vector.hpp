@@ -315,6 +315,7 @@ namespace FEAST
          */
         DenseVector clone() const
         {
+          CONTEXT("When cloning DenseVector");
           DenseVector t;
           t.clone(*this);
           return t;

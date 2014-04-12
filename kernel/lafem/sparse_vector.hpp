@@ -188,12 +188,42 @@ namespace FEAST
          */
         SparseVector clone() const
         {
+          CONTEXT("When cloning SparseVector");
           SparseVector t;
-          t.clone(*this);
+          t.clone(*this, true);
           return t;
         }
 
-        using Container<Mem_, DT_, IT_>::clone;
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given vector.
+         *
+         * \param[in] other The source container.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         *
+         */
+        void clone(const SparseVector & other, bool clone_indices = true)
+        {
+          CONTEXT("When cloning SparseVector");
+          Container<Mem_, DT_, IT_>::clone(other, clone_indices);
+        }
+
+        /** \brief Clone operation
+         *
+         * Become a deep copy of a given vector.
+         *
+         * \param[in] other The source container.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
+         *
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void clone(const SparseVector<Mem2_, DT2_, IT2_> & other, bool clone_indices = true)
+        {
+          CONTEXT("When cloning SparseVector");
+          SparseVector t;
+          t.assign(other);
+          Container<Mem_, DT_, IT_>::clone(t, clone_indices);
+        }
 
 
         /**

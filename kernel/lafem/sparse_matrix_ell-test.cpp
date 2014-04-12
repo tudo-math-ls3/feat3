@@ -82,14 +82,21 @@ public:
     TEST_CHECK_EQUAL(z(5, 5), a(5, 5));
     TEST_CHECK_EQUAL(z(1, 3), a(1, 3));
 
-    SparseMatrixELL<Mem::Main, DT_, IT_> e;;
+    SparseMatrixELL<Mem::Main, DT_, IT_> e;
     e.convert(b);
     TEST_CHECK_EQUAL(e, b);
     e.copy(b);
     TEST_CHECK_EQUAL(e, b);
-    e.clone(b);
-    TEST_CHECK_EQUAL(e, b);
-    TEST_CHECK_NOT_EQUAL((void*)e.Ax(), (void*)b.Ax());
+
+    SparseMatrixELL<Mem_, DT_, IT_> c;
+    c.clone(b);
+    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_NOT_EQUAL((void*)c.Ax(), (void*)b.Ax());
+    TEST_CHECK_EQUAL((void*)c.Aj(), (void*)b.Aj());
+    c = b.clone(true);
+    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_NOT_EQUAL((void*)c.Ax(), (void*)b.Ax());
+    TEST_CHECK_NOT_EQUAL((void*)c.Aj(), (void*)b.Aj());
 
     decltype(b) y(b.layout());
     TEST_CHECK_EQUAL((void*)y.Arl(), (void*)b.Arl());

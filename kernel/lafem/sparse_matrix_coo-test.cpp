@@ -74,7 +74,8 @@ public:
     TEST_CHECK_EQUAL(a, b);
 
     SparseMatrixCOO<Mem_, DT_> c(b.clone());
-    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
+    TEST_CHECK_NOT_EQUAL((void*)c.row_indices(), (void*)b.row_indices());
     c(1,2,3);
     TEST_CHECK_NOT_EQUAL(c, b);
     c.clone(b);
@@ -84,6 +85,7 @@ public:
 
     c.copy(b);
     TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_NOT_EQUAL((void*)c.row_indices(), (void*)b.row_indices());
     c(1,2,3);
     TEST_CHECK_NOT_EQUAL(c, b);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());

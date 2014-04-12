@@ -75,7 +75,6 @@ public:
     typedef decltype(b.layout()) LayoutId;
     typename LayoutId::template MatrixType<DT_> y(b.layout());
     TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
-    TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
 
 
     SparseMatrixCSR<Mem_, DT_, IT_> z;
@@ -90,6 +89,11 @@ public:
     SparseMatrixCSR<Mem_, DT_, IT_> c;
     c.clone(b);
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
+    TEST_CHECK_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
+    c = b.clone(true);
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
+    TEST_CHECK_NOT_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
+
     DenseVector<Mem_, IT_, IT_> col_ind(c.used_elements(), c.col_ind());
     DenseVector<Mem_, DT_, IT_> val(c.used_elements(), c.val());
     DenseVector<Mem_, IT_, IT_> row_ptr(c.rows() + 1, c.row_ptr());
