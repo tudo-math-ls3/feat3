@@ -124,7 +124,7 @@ def run_test(build_id, branch, myDB):
         idx += 1
 
   if "ninja" in build_id:
-    make_command = "ninja -k 999 all tests"
+    make_command = "ninja -v -k 999 all tests"
   else:
     make_command = "make -j 4 -O -k all tests"
   make_output = get_output_utf8(make_command)
