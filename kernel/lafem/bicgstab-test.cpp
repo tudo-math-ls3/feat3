@@ -1212,8 +1212,8 @@ public:
 
     Index size(sys.rows());
     VT_ x(size, DT_(0));
-    VT_ ref(size, DT_(1));
-    // ref.convert(factory.vector_q2_bubble());
+    VT_ ref;
+    ref.convert(factory.vector_q2_bubble());
     VT_ b(size);
     sys.template apply<Algo_>(b, ref);
 
@@ -1224,7 +1224,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < size ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref(i), 1e-8);
+      TEST_CHECK_EQUAL_WITHIN_EPS(x(i), ref(i), 1e-6);
     }
   }
 };
