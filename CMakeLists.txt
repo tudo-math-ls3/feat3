@@ -48,14 +48,16 @@ ADD_CUSTOM_TARGET (tests)
 # our custom target to wipe out all cmake generated files
 INCLUDE ( ${FEAST_SOURCE_DIR}/cmake_modules/target_distclean.cmake )
 
-# our custom target to build the documentation via doxygen
-# TODO Redirect doxygen output to BINARY_DIR/doc
-ADD_CUSTOM_TARGET ( doc doxygen ${FEAST_SOURCE_DIR}/doxy_in/doxygen_config WORKING_DIRECTORY ${FEAST_SOURCE_DIR} )
-if ( NOT (${FEAST_SOURCE_DIR} STREQUAL ${FEAST_BINARY_DIR}) AND UNIX)
-    ADD_CUSTOM_command( TARGET doc POST_BUILD
-      COMMAND mkdir ${FEAST_BINARY_DIR}/doc
-      COMMAND mv ${FEAST_SOURCE_DIR}/doc/html ${FEAST_BINARY_DIR}/doc)
-endif ( NOT (${FEAST_SOURCE_DIR} STREQUAL ${FEAST_BINARY_DIR}) AND UNIX)
+# add a target to generate API documentation with Doxygen
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  configure_file(${FEAST_SOURCE_DIR}/doxy_in/doxygen_config.in ${FEAST_BINARY_DIR}/doxy_in/doxygen_config @ONLY)
+  add_custom_target(doc
+    ${DOXYGEN_EXECUTABLE} ${FEAST_BINARY_DIR}/doxy_in/doxygen_config
+    WORKING_DIRECTORY ${FEAST_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
+endif(DOXYGEN_FOUND)
 
 
 # directories to scan recursively
