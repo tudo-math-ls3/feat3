@@ -54,6 +54,11 @@ public:
     b.clone(a);
     b(6, DT_(3));
     TEST_CHECK_NOT_EQUAL(a, b);
+    TEST_CHECK_NOT_EQUAL((void*)a.elements(), (void*)b.elements());
+    TEST_CHECK_NOT_EQUAL((void*)a.indices(), (void*)b.indices());
+    b = a.clone();
+    TEST_CHECK_NOT_EQUAL((void*)a.elements(), (void*)b.elements());
+    TEST_CHECK_NOT_EQUAL((void*)a.indices(), (void*)b.indices());
 
     SparseVector<Mem::Main, float, unsigned int> c;
     c.convert(a);

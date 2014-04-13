@@ -715,7 +715,7 @@ namespace FEAST
         void clone(const SparseMatrixCOO & other, bool clone_indices = true)
         {
           CONTEXT("When cloning SparseMatrixCOO");
-          Container<Mem_, DT_, IT_>::clone(other, true);
+          Container<Mem_, DT_, IT_>::clone(other, clone_indices);
         }
 
         /** \brief Clone operation
@@ -732,7 +732,7 @@ namespace FEAST
           CONTEXT("When cloning SparseMatrixCOO");
           SparseMatrixCOO t;
           t.assign(other);
-          Container<Mem_, DT_, IT_>::clone(t, true);
+          Container<Mem_, DT_, IT_>::clone(t, clone_indices);
         }
 
         /**

@@ -184,13 +184,14 @@ namespace FEAST
         /** \brief Clone operation
          *
          * Create a deep copy of itself.
+         * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
          *
          */
-        SparseVector clone() const
+        SparseVector clone(bool clone_indices = true) const
         {
           CONTEXT("When cloning SparseVector");
           SparseVector t;
-          t.clone(*this, true);
+          t.clone(*this, clone_indices);
           return t;
         }
 
