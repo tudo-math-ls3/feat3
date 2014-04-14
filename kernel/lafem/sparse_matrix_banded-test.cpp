@@ -5,59 +5,170 @@
 #include <kernel/util/binary_stream.hpp>
 
 #include <kernel/util/random.hpp>
+#include <kernel/adjacency/permutation.hpp>
 #include <sstream>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
+
 /**
-* \brief Test class for the sparse matrix band class.
-*
-* \test test description missing
-*
-* \tparam Mem_
-* description missing
-*
-* \tparam DT_
-* description missing
-*
-* \author Christoph Lohmann
-*/
+ * \brief Test class for the sparse matrix banded class.
+ *
+ * \test test description missing
+ *
+ * \tparam Mem_
+ * description missing
+ *
+ * \tparam DT_
+ * description missing
+ *
+ * \author Christoph Lohmann
+ */
 template<
   typename Mem_,
-  typename DT_>
+  typename Algo_,
+  typename DT_,
+  typename IT_>
 class SparseMatrixBandedTest
-  : public TaggedTest<Mem_, DT_>
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
 {
 public:
   SparseMatrixBandedTest()
-    : TaggedTest<Mem_, DT_>("SparseMatrixBandedTest")
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedTest")
   {
   }
 
-  typedef SparseMatrixBanded<Mem_, DT_, Index> BM_;
-  typedef Algo::Generic Algo_;
+  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
 
   virtual void run() const
   {
     Random random;
-    const Index size(9);
 
-    DenseVector<Mem_, Index, Index> offsets(4);
-    DenseVector<Mem_, DT_, Index> val(offsets.size() * size);
+    MatrixType zero1;
+    SparseMatrixBanded<Mem::Main, DT_, IT_> zero2;
+    TEST_CHECK_EQUAL(zero1, zero2);
 
-    offsets(0, 3);
-    offsets(1, 4);
-    offsets(2, 9);
-    offsets(3, 12);
+    // create random matrix
+    const Index tsize(100);
+    const Index rows(tsize + random(Index(0), Index(20)));
+    const Index columns(tsize + random(Index(0), Index(20)));
 
-    for (Index i(0); i < val.size(); ++i)
+    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+
+    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
+
+    // create random vector of offsets
+    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    for (Index i(0); i < num_of_offsets; ++i)
     {
-      val(i, random(DT_(0), DT_(10)));
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+    }
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+
+    SparseMatrixBanded<Mem_, DT_, IT_> a(rows, columns, vec_val, vec_offsets);
+
+    // calculate number of used elements
+    Index nnz(0);
+    for (Index i(0); i < a.rows(); ++i)
+    {
+      for (Index j(0); j < a.columns(); ++j)
+      {
+        nnz += Index(a(i, j));
+      }
     }
 
-    BM_ sys(size, size + 1, val, offsets);
+    TEST_CHECK_EQUAL(a.used_elements(), nnz);
+    TEST_CHECK_EQUAL(a.size(), rows * columns);
+    TEST_CHECK_EQUAL(a.rows(), rows);
+    TEST_CHECK_EQUAL(a.columns(), columns);
+
+    SparseMatrixBanded<Mem_, DT_, IT_> z;
+    z.convert(a);
+    TEST_CHECK_EQUAL(a, z);
+
+    SparseMatrixBanded<Mem_, DT_, IT_> c;
+    c.clone(a);
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)a.val());
+    TEST_CHECK_EQUAL((void*)c.offsets(), (void*)a.offsets());
+    c = z.clone(true);
+    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)z.val());
+    TEST_CHECK_NOT_EQUAL((void*)c.offsets(), (void*)z.offsets());
+
+    DenseVector<Mem_, IT_, IT_> offsets_d(c.num_of_offsets(), c.offsets());
+    DenseVector<Mem_, DT_, IT_> val_d(c.num_of_offsets() * c.rows(), c.val());
+    SparseMatrixBanded<Mem_, DT_, IT_> d(c.rows(), c.columns(), val_d, offsets_d);
+    TEST_CHECK_EQUAL(d, c);
+
+    SparseMatrixBanded<Mem::Main, DT_, IT_> e;
+    e.convert(c);
+    TEST_CHECK_EQUAL(e, c);
+    e.copy(c);
+    TEST_CHECK_EQUAL(e, c);
+
+  }
+};
+
+SparseMatrixBandedTest<Mem::Main, NotSet, float, unsigned long> cpu_sparse_matrix_banded_test_float_ulong;
+SparseMatrixBandedTest<Mem::Main, NotSet, double, unsigned long> cpu_sparse_matrix_banded_test_double_ulong;
+SparseMatrixBandedTest<Mem::Main, NotSet, float, unsigned int> cpu_sparse_matrix_banded_test_float_uint;
+SparseMatrixBandedTest<Mem::Main, NotSet, double, unsigned int> cpu_sparse_matrix_banded_test_double_uint;
+#ifdef FEAST_BACKEND_CUDA
+SparseMatrixBandedTest<Mem::CUDA, NotSet, float, unsigned long> cuda_sparse_matrix_banded_test_float_ulong;
+SparseMatrixBandedTest<Mem::CUDA, NotSet, double, unsigned long> cuda_sparse_matrix_banded_test_double_ulong;
+SparseMatrixBandedTest<Mem::CUDA, NotSet, float, unsigned int> cuda_sparse_matrix_banded_test_float_uint;
+SparseMatrixBandedTest<Mem::CUDA, NotSet, double, unsigned int> cuda_sparse_matrix_banded_test_double_uint;
+#endif
+
+
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBandedApplyTest
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+{
+public:
+  SparseMatrixBandedApplyTest()
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedApplyTest")
+  {
+  }
+
+  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
+
+  virtual void run() const
+  {
+    Random random;
+
+    // create random matrix
+    const Index tsize(100);
+    const Index rows(tsize + random(Index(0), Index(20)));
+    const Index columns(tsize + random(Index(0), Index(20)));
+
+    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+
+    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
+
+    // create random vector of offsets
+    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    for (Index i(0); i < num_of_offsets; ++i)
+    {
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+    }
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+
+    // fill data-array
+    for (Index i(0); i < vec_val.size(); ++i)
+    {
+      vec_val(i, random(DT_(0), DT_(10)));
+    }
+
+    // create test-matrix
+    SparseMatrixBanded<Mem_, DT_, IT_> sys(rows, columns, vec_val, vec_offsets);
 
     auto x(sys.create_vector_r());
     auto y1(sys.create_vector_l());
@@ -97,95 +208,110 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
     }
 
-    DenseVector<Mem_, DT_, Index> val2(offsets.size() * size);
-    for (Index i(0); i < val2.size(); ++i)
+    DT_ s(DT_(4.321));
+    for (Index i(0); i < y2.size(); ++i)
     {
-      val2(i, val(i));
+      y1(i, y1(i) * s);
     }
-    BM_ sys2(size, size + 1, val2, offsets);
-    sys2.template scale<Algo_>(sys, DT_(2.0));
-    sys2.template apply<Algo_>(y1, x);
 
-    sys.template apply<Algo_>(y2, x, y1, DT_(-2.0));
+    sys.template apply<Algo_>(y2, x, y1, -s);
 
     // check, if the result is correct
     for (Index i(0) ; i < y1.size() ; ++i)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
     }
-
-    BM_ sys3;
-    sys3.clone(sys);
-    TEST_CHECK_EQUAL(sys3, sys);
-    TEST_CHECK_NOT_EQUAL((void*)sys3.val(), (void*)sys.val());
-    TEST_CHECK_EQUAL((void*)sys3.offsets(), (void*)sys.offsets());
-    sys3 = sys.clone(true);
-    TEST_CHECK_EQUAL(sys3, sys);
-    TEST_CHECK_NOT_EQUAL((void*)sys3.val(), (void*)sys.val());
-    TEST_CHECK_NOT_EQUAL((void*)sys3.offsets(), (void*)sys.offsets());
-  }
+}
 };
-SparseMatrixBandedTest<Mem::Main, float> cpu_sparse_matrix_banded_test_float;
-SparseMatrixBandedTest<Mem::Main, double> cpu_sparse_matrix_banded_test_double;
-// #ifdef FEAST_BACKENDS_CUDA
-// SparseMatrixBandedTest<Mem::CUDA, float> cuda_sparse_matrix_banded_test_float;
-// SparseMatrixBandedTest<Mem::CUDA, double> cuda_sparse_matrix_banded_test_double;
+
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_banded_apply_test_float_ulong;
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_banded_apply_test_double_ulong;
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_banded_apply_test_float_uint;
+SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_banded_apply_test_double_uint;
+// #ifdef FEAST_BACKEND_MKL
+// SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sparse_matrix_banded_apply_test_float_ulong;
+// SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sparse_matrix_banded_apply_test_double_ulong;
+// #endif
+// #ifdef FEAST_BACKEND_CUDA
+// SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sparse_matrix_banded_apply_test_float_ulong;
+// SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sparse_matrix_banded_apply_test_double_ulong;
+// SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sparse_matrix_banded_apply_test_float_uint;
+// SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sparse_matrix_banded_apply_test_double_uint;
 // #endif
 
 
-// template<
-//   typename Mem_,
-//   typename Algo_,
-//   typename DT_>
-// class SparseMatrixBandedApplyTest
-//   : public TaggedTest<Mem_, DT_, Algo_>
-// {
-// public:
-//   SparseMatrixBandedApplyTest()
-//     : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixBandedApplyTest")
-//   {
-//   }
+template<
+  typename Mem_,
+  typename Algo_,
+  typename DT_,
+  typename IT_>
+class SparseMatrixBandedScaleTest
+  : public FullTaggedTest<Mem_, Algo_, DT_, IT_>
+{
+public:
+  SparseMatrixBandedScaleTest()
+    : FullTaggedTest<Mem_, Algo_, DT_, IT_>("SparseMatrixBandedScaleTest")
+  {
+  }
 
-//   virtual void run() const
-//   {
-//   }
-// };
+  typedef SparseMatrixBanded<Mem_, DT_, IT_> MatrixType;
 
-// SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, float> sm_banded_apply_test_float;
-// SparseMatrixBandedApplyTest<Mem::Main, Algo::Generic, double> sm_banded_apply_test_double;
-// // #ifdef HONEI_BACKENDS_MKL
-// // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, float> mkl_sm_banded_apply_test_float;
-// // SparseMatrixBandedApplyTest<Mem::Main, Algo::MKL, double> mkl_sm_banded_apply_test_double;
-// // #endif
-// // #ifdef FEAST_BACKENDS_CUDA
-// // SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_banded_apply_test_float;
-// // SparseMatrixBandedApplyTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_banded_apply_test_double;
-// // #endif
+  virtual void run() const
+  {
+    Random random;
+    DT_ s(DT_(4.321));
 
-// template<
-//   typename Mem_,
-//   typename Algo_,
-//   typename DT_>
-// class SparseMatrixBandedScaleTest
-//   : public TaggedTest<Mem_, DT_, Algo_>
-// {
-// public:
-//   SparseMatrixBandedScaleTest()
-//     : TaggedTest<Mem_, DT_, Algo_>("SparseMatrixBandedScaleTest")
-//   {
-//   }
+    // create random matrix
+    const Index tsize(100);
+    const Index rows(tsize + random(Index(0), Index(20)));
+    const Index columns(tsize + random(Index(0), Index(20)));
 
-//   virtual void run() const
-//   {
-//   }
-// };
-// SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, float> sm_banded_scale_test_float;
-// SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, double> sm_banded_scale_test_double;
-// // #ifdef FEAST_BACKENDS_MKL
-// // SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, float> mkl_sm_banded_scale_test_float;
-// // SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, double> mkl_sm_banded_scale_test_double;
-// // #endif
-// // #ifdef FEAST_BACKENDS_CUDA
-// // SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, float> cuda_sm_banded_scale_test_float;
-// // SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, double> cuda_sm_banded_scale_test_double;
-// // #endif
+    const Index num_of_offsets(5 + random(Index(0), Index(10)));
+
+    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<Mem_, DT_, IT_> vec_val_a(num_of_offsets * rows, DT_(1));
+    DenseVector<Mem_, DT_, IT_> vec_val_b(num_of_offsets * rows, DT_(1));
+
+    // create random vector of offsets
+    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    for (Index i(0); i < num_of_offsets; ++i)
+    {
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+    }
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+
+    // fill data-array
+    for (Index i(0); i < vec_val_a.size(); ++i)
+    {
+      vec_val_a(i, random(DT_(0), DT_(10)));
+      vec_val_b(i, random(DT_(0), DT_(10) * s));
+    }
+
+    // create test-matrix
+    SparseMatrixBanded<Mem_, DT_, IT_> a(rows, columns, vec_val_a, vec_offsets);
+    SparseMatrixBanded<Mem_, DT_, IT_> b(rows, columns, vec_val_b, vec_offsets);
+    SparseMatrixBanded<Mem_, DT_, IT_> c;
+    c.clone(a);
+
+    a.template scale<Algo_>(a, s);
+    TEST_CHECK_EQUAL(b, c);
+
+    c.template scale<Algo_>(c, s);
+    TEST_CHECK_EQUAL(b, c);
+  }
+};
+
+SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, float, unsigned long> cpu_sparse_matrix_banded_scale_test_float_ulong;
+SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, double, unsigned long> cpu_sparse_matrix_banded_scale_test_double_ulong;
+SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, float, unsigned int> cpu_sparse_matrix_banded_scale_test_float_uint;
+SparseMatrixBandedScaleTest<Mem::Main, Algo::Generic, double, unsigned int> cpu_sparse_matrix_banded_scale_test_double_uint;
+#ifdef FEAST_BACKEND_MKL
+SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, float, unsigned long> mkl_sparse_matrix_banded_scale_test_float_ulong;
+SparseMatrixBandedScaleTest<Mem::Main, Algo::MKL, double, unsigned long> mkl_sparse_matrix_banded_scale_test_double_ulong;
+#endif
+#ifdef FEAST_BACKEND_CUDA
+SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned long> cuda_sparse_matrix_banded_scale_test_float_ulong;
+SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned long> cuda_sparse_matrix_banded_scale_test_double_ulong;
+SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, float, unsigned int> cuda_sparse_matrix_banded_scale_test_float_uint;
+SparseMatrixBandedScaleTest<Mem::CUDA, Algo::CUDA, double, unsigned int> cuda_sparse_matrix_banded_scale_test_double_uint;
+#endif
