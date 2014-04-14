@@ -83,9 +83,9 @@ namespace FEAST
       /// Our memory architecture type
       typedef Mem_ MemType;
       /// Compatible L-vector type
-      typedef DenseVector<MemType, DataType> VectorTypeL;
+      typedef DenseVector<MemType, DataType, IT_> VectorTypeL;
       /// Compatible R-vector type
-      typedef DenseVector<MemType, DataType> VectorTypeR;
+      typedef DenseVector<MemType, DataType, IT_> VectorTypeR;
 
       /**
        * \brief Constructor
@@ -506,6 +506,94 @@ namespace FEAST
         return VectorTypeR(this->columns());
       }
     };
+
+    /**
+     * \brief SparseMatrixBanded comparison operator
+     *
+     * \param[in] a A matrix to compare with.
+     * \param[in] b A matrix to compare with.
+     */
+    template <typename Mem_, typename Mem2_, typename DT_, typename IT_> bool operator== (const SparseMatrixBanded<Mem_, DT_, IT_> & a, const SparseMatrixBanded<Mem2_, DT_, IT_> & b)
+    {
+      CONTEXT("When comparing SparseMatrixBandeds");
+
+      if (a.rows() != b.rows())
+        return false;
+      if (a.columns() != b.columns())
+        return false;
+      if (a.num_of_offsets() != b.num_of_offsets())
+        return false;
+      if (a.used_elements() != b.used_elements())
+        return false;
+      if (a.zero_element() != b.zero_element())
+        return false;
+
+      if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
+        return true;
+
+      IT_ * offsets_a;
+      IT_ * offsets_b;
+      DT_ * val_a;
+      DT_ * val_b;
+
+      if(std::is_same<Mem::Main, Mem_>::value)
+      {
+        offsets_a = (IT_*)a.offsets();
+        val_a = (DT_*)a.val();
+      }
+      else
+      {
+        offsets_a = new IT_[a.num_of_offsets()];
+        MemoryPool<Mem_>::instance()->template download<IT_>(offsets_a, a.offsets(), a.num_of_offsets());
+        val_a = new DT_[a.num_of_offsets() * a.rows()];
+        MemoryPool<Mem_>::instance()->template download<DT_>(val_a, a.val(), a.num_of_offsets() * a.rows());
+      }
+      if(std::is_same<Mem::Main, Mem_>::value)
+      {
+        offsets_b = (IT_*)a.offsets();
+        val_b = (DT_*)a.val();
+      }
+      else
+      {
+        offsets_b = new IT_[b.num_of_offsets()];
+        MemoryPool<Mem_>::instance()->template download<IT_>(offsets_b, b.offsets(), b.num_of_offsets());
+        val_b = new DT_[b.num_of_offsets() * b.rows()];
+        MemoryPool<Mem_>::instance()->template download<DT_>(val_b, b.val(), b.num_of_offsets() * b.rows());
+      }
+
+      bool ret(true);
+
+      for (Index i(0); i < a.num_of_offsets(); ++i)
+      {
+        if (offsets_a[i] != offsets_b[i])
+        {
+          ret = false;
+          break;
+        }
+      }
+
+      for (Index i(0) ; i < a.num_of_offsets() * a.rows() ; ++i)
+      {
+        if (val_a[i] != val_b[i])
+        {
+          ret = false;
+          break;
+        }
+      }
+
+      if(! std::is_same<Mem::Main, Mem_>::value)
+      {
+        delete[] offsets_a;
+        delete[] val_a;
+      }
+      if(! std::is_same<Mem::Main, Mem2_>::value)
+      {
+        delete[] offsets_b;
+        delete[] val_b;
+      }
+
+      return ret;
+    }
 
     /**
      * \brief SparseMatrixBanded streaming operator
