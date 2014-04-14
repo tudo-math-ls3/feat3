@@ -113,6 +113,16 @@ public:
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
     }
+
+    BM_ sys3;
+    sys3.clone(sys);
+    TEST_CHECK_EQUAL(sys3, sys);
+    TEST_CHECK_NOT_EQUAL((void*)sys3.val(), (void*)sys.val());
+    TEST_CHECK_EQUAL((void*)sys3.offsets(), (void*)sys.offsets());
+    sys3 = sys.clone(true);
+    TEST_CHECK_EQUAL(sys3, sys);
+    TEST_CHECK_NOT_EQUAL((void*)sys3.val(), (void*)sys.val());
+    TEST_CHECK_NOT_EQUAL((void*)sys3.offsets(), (void*)sys.offsets());
   }
 };
 SparseMatrixBandedTest<Mem::Main, float> cpu_sparse_matrix_banded_test_float;

@@ -188,12 +188,13 @@ namespace FEAST
       /** \brief Clone operation
        *
        * Create a deep copy of itself.
+       * \param[in] clone_indices Should we create a deep copy of the index arrays, too ?
        *
        */
-      SparseMatrixBanded clone() const
+      SparseMatrixBanded clone(bool clone_indices = false) const
       {
         SparseMatrixBanded t;
-        t.clone(*this);
+        t.clone(*this, clone_indices);
         return t;
       }
 
