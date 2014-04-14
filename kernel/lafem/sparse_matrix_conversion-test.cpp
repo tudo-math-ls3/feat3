@@ -278,3 +278,6 @@ SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::Main, double> > sparse_mat
 
 SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::Main, float> > sparse_matrix_banded_ell_conversion_test_float;
 SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::Main, double> > sparse_matrix_banded_ell_conversion_test_double;
+
+SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, float> > sparse_matrix_banded_coo_conversion_test_float;
+SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, double> > sparse_matrix_banded_coo_conversion_test_double;

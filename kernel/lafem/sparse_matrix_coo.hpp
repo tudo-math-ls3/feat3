@@ -889,6 +889,119 @@ namespace FEAST
         }
 
         /**
+         * \brief Convertion method
+         *
+         * \param[in] other The source Matrix.
+         *
+         * Use source matrix content as content of current matrix
+         */
+        template <typename Mem2_, typename DT2_, typename IT2_>
+        void convert(const SparseMatrixBanded<Mem2_, DT2_, IT2_> & other)
+        {
+          CONTEXT("When converting SparseMatrixCOO");
+
+          this->clear();
+
+          this->_scalar_index.push_back(other.size());
+          this->_scalar_index.push_back(other.rows());
+          this->_scalar_index.push_back(other.columns());
+          this->_scalar_index.push_back(other.used_elements());
+          this->_scalar_index.push_back(other.used_elements());
+          this->_scalar_index.push_back(1000);
+          this->_scalar_index.push_back(1);
+          this->_scalar_dt.push_back(DT_(0));
+
+          SparseMatrixELL<Mem::Main, DT_, IT_> cother;
+          cother.convert(other);
+
+          this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
+          this->_elements_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
+          this->_indices.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<IT_>(_used_elements()));
+          this->_indices_size.push_back(_used_elements());
+
+          DT_ * tval(nullptr);
+          IT_ * tcol_ind(nullptr);
+          IT_ * trow_ind(nullptr);
+          if (std::is_same<Mem_, Mem::Main>::value)
+          {
+            tval = this->_elements.at(0);
+            tcol_ind = this->_indices.at(0);
+            trow_ind = this->_indices.at(1);
+          }
+          else
+          {
+            tval = new DT_[other.used_elements()];
+            tcol_ind = new IT_[other.used_elements()];
+            trow_ind = new IT_[other.used_elements()];
+          }
+
+          #ifdef START_OFFSET
+            #warning Overwriting definition of START_OFFSET
+            #undef START_OFFSET
+          #endif
+
+          #ifdef END_OFFSET
+            #error Overwriting definition of END_OFFSET
+            #undef END_OFFSET
+          #endif
+
+          #define START_OFFSET(j) ((j == Index(-1)) ? crows : ((j == k) ? 0 : crows - coffsets[j] - 1))
+          #define END_OFFSET(j) ((j + 1 == k) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
+
+          const DT_ * cval(cother.val());
+          const IT2_ * coffsets(cother.offsets());
+          const Index cnum_of_offsets(cother.num_of_offsets());
+          const Index crows(cother.rows());
+          const Index ccolumns(cother.columns());
+
+          // Search first offset of the upper triangular matrix
+          Index k(0);
+          while (k < cnum_of_offsets && coffsets[k] + 1 < crows)
+          {
+            ++k;
+          }
+
+          // iteration over all offsets of the lower triangular matrix
+          Index ue(0);
+          for (Index i(k + 1); i > 0;)
+          {
+            --i;
+
+            // iteration over all offsets of the upper triangular matrix
+            for (Index j(cnum_of_offsets + 1); j > k;)
+            {
+              --j;
+
+              // iteration over all rows which contain the offsets between offset i and offset j
+              for (Index l(std::max(START_OFFSET(i), END_OFFSET(j))); l < std::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
+              {
+                for (Index a(i); a < j; ++a)
+                {
+                  tval[ue] = cval[a * crows + l];
+                  tcol_ind[ue] = l + coffsets[a] + 1 - crows;
+                  trow_ind[ue] = l;
+                  ++ue;
+                }
+              }
+            }
+          }
+          #undef START_OFFSET
+          #undef END_OFFSET
+
+          if (! std::is_same<Mem_, Mem::Main>::value)
+          {
+            MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ind, _used_elements());
+            delete[] tval;
+            delete[] tcol_ind;
+            delete[] trow_ind;
+          }
+        }
+
+        /**
          * \brief Write out matrix to file.
          *
          * \param[in] mode The used file format.
