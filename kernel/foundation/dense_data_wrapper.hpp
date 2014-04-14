@@ -13,6 +13,8 @@ namespace FEAST
     class DDVIterator : public std::iterator<std::random_access_iterator_tag, DT_>
     {
       public:
+        typedef typename std::iterator<std::random_access_iterator_tag, DT_>::difference_type difference_type;
+
         DDVIterator(typename std::iterator<std::random_access_iterator_tag, DT_>::pointer x) :
           _iter(x)
         {
@@ -98,16 +100,16 @@ namespace FEAST
           return *this;
         }
 
-        DDVIterator& operator+=(typename DDVIterator<DT_>::difference_type & delta)
+        DDVIterator& operator+=(difference_type & delta)
         {
           if (delta >= 0)
           {
-            for(typename DDVIterator<DT_>::difference_type i(0) ; i < delta ; ++i)
+            for(difference_type i(0) ; i < delta ; ++i)
               operator++();
           }
           else
           {
-            for(typename DDVIterator<DT_>::difference_type i(0) ; i < -delta ; ++i)
+            for(difference_type i(0) ; i < -delta ; ++i)
               operator--();
           }
 
