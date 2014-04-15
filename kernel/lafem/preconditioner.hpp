@@ -30,6 +30,9 @@ namespace FEAST
         pt_none
         };
 
+    /**
+     * \brief Preconditioner base class
+     */
     template <typename Algo_, typename MT_, typename VT_>
     class Preconditioner
     {
@@ -149,6 +152,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] damping A damping-parameter
        *
        * Creates a Jacobi preconditioner to the given matrix and damping-parameter
@@ -243,6 +247,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] damping A damping-parameter
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
@@ -350,6 +355,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] damping A damping-parameter
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
@@ -460,6 +466,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] damping A damping-parameter
        *
        * Creates a Gauss-Seidel preconditioner to the given matrix and damping-parameter
@@ -581,6 +588,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] p level of fillin
        *           if p = 0, the layout of A is used for the ILU-decomposition
        *
@@ -632,6 +640,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] layout An external layout for the LU-decomposition
        *
        * Creates a ILU preconditioner to the given matrix and layout
@@ -998,6 +1007,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] p level of fillin
        *           if p = 0, the layout of A is used for the ILU-decomposition
        *
@@ -1050,6 +1060,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] layout An external layout for the LU-decomposition
        *
        * Creates a ILU preconditioner to the given matrix and layout
@@ -1419,6 +1430,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] p level of fillin
        *           if p = 0, the layout of A is used for the ILU-decomposition
        *
@@ -1518,6 +1530,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] omega A parameter of the preconditioner (default omega = 0.7)
        *
        * Creates a SOR preconditioner to the given matrix and parameter
@@ -1624,6 +1637,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] omega A parameter of the preconditioner (default omega = 0.7)
        *
        * Creates a SOR preconditioner to the given matrix and parameter
@@ -1733,6 +1747,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] omega A parameter of the preconditioner (default omega = 0.7)
        *
        * Creates a SOR preconditioner to the given matrix and parameter
@@ -1854,6 +1869,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A The system-matrix
+       *
        * param[in] omega A parameter of the preconditioner (default omega = 1.3)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
@@ -1994,6 +2010,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A The system-matrix
+       *
        * param[in] omega A parameter of the preconditioner (default omega = 1.3)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
@@ -2141,6 +2158,7 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A The system-matrix
+       *
        * param[in] omega A parameter of the preconditioner (default omega = 1.3)
        *
        * Creates a SSOR preconditioner to the given matrix and parameter
@@ -3029,12 +3047,19 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] m full band-matrix with m diagonals on either side as initial layout (\f$2m + 1\f$ bands)
+       *
        * param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
+       *
        * param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
+       *
        * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
+       *
        * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
+       *
        * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
+       *
        * param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
        *
        * Creates a SPAI preconditioner to the given matrix and the initial layout defined by a band-matrix with \f$2m + 1\f$ bands
@@ -3080,12 +3105,19 @@ namespace FEAST
        * \brief Constructor
        *
        * param[in] A system-matrix
+       *
        * param[in] layout the initial layout of the approximate inverse \f$M \approx A^{-1}\f$
+       *
        * param[in] max_iter maximal number of iterations for creating new fill-in (default max_iter = 10)
+       *
        * param[in] eps_res stopping-criterion for new fill-in: norm of residuum (default eps_res = 1e-2)
+       *
        * param[in] fill_in stopping-criterion for new fill-in: maximal number of fill-in per column (default fill_in = 10)
+       *
        * param[in] eps_res_comp criterion for accepting a residual-component (default eps_res_comp = 1e-3)
+       *
        * param[in] max_rho criterion for acceptiong a rho-component (default max_rho = 1e-3)
+       *
        * param[in] transpose If you do only want to calculate _M^T, set transpose = true (default transpose = false)
        *
        * Creates a SPAI preconditioner to the given matrix and given initial layout
