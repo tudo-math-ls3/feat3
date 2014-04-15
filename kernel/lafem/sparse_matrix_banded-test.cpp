@@ -197,7 +197,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < y1.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(y1(i), y2(i), 1e-8);
+      TEST_CHECK_EQUAL_WITHIN_EPS(y1(i), y2(i), 1e-5);
     }
 
     sys.template apply<Algo_>(y2, x, y1, DT_(-1.0));
@@ -205,7 +205,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < y1.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
+      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-5);
     }
 
     DT_ s(DT_(4.321));
@@ -219,7 +219,7 @@ public:
     // check, if the result is correct
     for (Index i(0) ; i < y1.size() ; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-8);
+      TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-5);
     }
 }
 };
