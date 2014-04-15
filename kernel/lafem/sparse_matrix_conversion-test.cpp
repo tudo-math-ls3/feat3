@@ -6,6 +6,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/sparse_matrix_banded.hpp>
 #include <kernel/util/random.hpp>
+#include <kernel/adjacency/permutation.hpp>
 
 #include <cstdio>
 #include <sstream>
@@ -226,49 +227,46 @@ public:
   typedef Algo::Generic Algo_;
   typedef typename MT_::MemType Mem_;
   typedef typename MT_::DataType DT_;
+  typedef typename MT_::IndexType IT_;
 
   virtual void run() const
   {
     Random random;
-    const Index size(9);
 
-    DenseVector<Mem_, Index, Index> offsets(4);
-    DenseVector<Mem_, DT_, Index> val(offsets.size() * size);
+    // create random matrix
+    const Index tsize(100);
+    const Index rows(tsize + random(Index(0), Index(20)));
+    const Index columns(tsize + random(Index(0), Index(20)));
 
-    offsets(0, 3);
-    offsets(1, 4);
-    offsets(2, 9);
-    offsets(3, 12);
+    const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    for (Index i(0); i < val.size(); ++i)
+    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows);
+
+    // create random vector of offsets
+    FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
+    for (Index i(0); i < num_of_offsets; ++i)
     {
-      val(i, random(DT_(0), DT_(10)));
+      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+    }
+    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+
+    // fill data-array
+    for (Index i(0); i < vec_val.size(); ++i)
+    {
+      vec_val(i, random(DT_(0), DT_(10)));
     }
 
-    SparseMatrixBanded<Mem_, DT_, Index> sys_banded(size, size + 1, val, offsets);
-    SparseMatrixCSR<Mem_, DT_, Index> sys_csr(sys_banded);
+    // create test-matrix
+    SparseMatrixBanded<Mem_, DT_, IT_> sys_banded(rows, columns, vec_val, vec_offsets);
+    MT_ sys_other(sys_banded);
 
-    DenseVector<Mem_, DT_, Index> x_banded(sys_banded.columns(), DT_(0.0));
-    DenseVector<Mem_, DT_, Index> y_banded(sys_banded.rows());
-    DenseVector<Mem_, DT_, Index> x_csr(sys_csr.columns(), DT_(0.0));
-    DenseVector<Mem_, DT_, Index> y_csr(sys_csr.rows());
-
-    for (Index i(0); i < sys_banded.columns(); ++i)
+    for (Index i(0); i < sys_banded.rows(); ++i)
     {
-      x_banded(i, DT_(1.0));
-      x_csr(i, DT_(1.0));
-
-      sys_banded.template apply<Algo_>(y_banded, x_banded);
-      sys_csr.template apply<Algo_>(y_csr, x_csr);
-
-      // check, if the result is correct
-      for (Index j(0) ; j < sys_banded.rows() ; ++j)
+      for (Index j(0); j < sys_banded.columns(); ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(y_banded(j), y_csr(j), 1e-8);
+        TEST_CHECK_EQUAL(sys_banded(i, j), sys_other(i, j));
       }
-
-      x_banded(i, DT_(0.0));
-      x_csr(i, DT_(0.0));
     }
   }
 };
@@ -281,3 +279,14 @@ SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::Main, double> > sparse_mat
 
 SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, float> > sparse_matrix_banded_coo_conversion_test_float;
 SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::Main, double> > sparse_matrix_banded_coo_conversion_test_double;
+
+#ifdef FEAST_BACKENDS_CUDA
+SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, float> > cuda_sparse_matrix_banded_csr_conversion_test_float;
+SparseMatrixBandedConversionTest<SparseMatrixCSR<Mem::CUDA, double> > cuda_sparse_matrix_banded_csr_conversion_test_double;
+
+SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::CUDA, float> > cuda_sparse_matrix_banded_ell_conversion_test_float;
+SparseMatrixBandedConversionTest<SparseMatrixELL<Mem::CUDA, double> > cuda_sparse_matrix_banded_ell_conversion_test_double;
+
+SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::CUDA, float> > cuda_sparse_matrix_banded_coo_conversion_test_float;
+SparseMatrixBandedConversionTest<SparseMatrixCOO<Mem::CUDA, double> > cuda_sparse_matrix_banded_coo_conversion_test_double;
+#endif
