@@ -911,7 +911,7 @@ namespace FEAST
           this->_scalar_index.push_back(1);
           this->_scalar_dt.push_back(DT_(0));
 
-          SparseMatrixELL<Mem::Main, DT_, IT_> cother;
+          SparseMatrixBanded<Mem::Main, DT_, IT_> cother;
           cother.convert(other);
 
           this->_elements.push_back(MemoryPool<Mem_>::instance()->template allocate_memory<DT_>(_used_elements()));
@@ -927,14 +927,14 @@ namespace FEAST
           if (std::is_same<Mem_, Mem::Main>::value)
           {
             tval = this->_elements.at(0);
-            tcol_ind = this->_indices.at(0);
-            trow_ind = this->_indices.at(1);
+            trow_ind = this->_indices.at(0);
+            tcol_ind = this->_indices.at(1);
           }
           else
           {
             tval = new DT_[other.used_elements()];
-            tcol_ind = new IT_[other.used_elements()];
             trow_ind = new IT_[other.used_elements()];
+            tcol_ind = new IT_[other.used_elements()];
           }
 
           #ifdef START_OFFSET
