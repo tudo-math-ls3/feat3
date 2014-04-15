@@ -610,7 +610,7 @@ namespace FEAST
         using Container<Mem_, DT_, IT_>::clone;
 
         /**
-         * \brief Convertion method
+         * \brief Conversion method
          *
          * \param[in] other The source Matrix.
          *
@@ -624,7 +624,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Convertion method
+         * \brief Conversion method
          *
          * \param[in] other The source Matrix.
          *
@@ -708,7 +708,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Convertion method
+         * \brief Conversion method
          *
          * \param[in] other The source Matrix.
          *

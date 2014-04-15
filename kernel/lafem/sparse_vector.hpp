@@ -228,7 +228,7 @@ namespace FEAST
 
 
         /**
-         * \brief Convertion method
+         * \brief Conversion method
          *
          * Use source vector content as content of current vector
          *

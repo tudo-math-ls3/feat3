@@ -736,7 +736,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Convertion method
+         * \brief Conversion method
          *
          * Use source matrix content as content of current matrix
          *
@@ -752,7 +752,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Convertion method
+         * \brief Conversion method
          *
          * \param[in] other The source Matrix.
          *
@@ -824,7 +824,7 @@ namespace FEAST
         }
 
         /**
-         * \brief Convertion method
+         * \brief Conversion method
          *
          * \param[in] other The source Matrix.
          *
