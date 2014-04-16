@@ -31,7 +31,7 @@ def run_test(build_id, branch, myDB):
     dump_filename_full = "not set"
 
   if scratch != "":
-    build_dirname = scratch + os.sep + "feast-build"+"-"+branch+"-"+build_id
+    build_dirname = scratch + os.sep + "feast-build"
   else:
     build_dirname = src_dirname + os.sep + "build"
 
