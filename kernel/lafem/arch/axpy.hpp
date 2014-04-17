@@ -205,6 +205,16 @@ namespace FEAST
         template <typename DT_, typename IT_>
         static void banded(DT_ * r, const DT_ * const y, const DT_ alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
         {
+          #ifdef START_OFFSET
+            #warning Overwriting definition of START_OFFSET
+            #undef START_OFFSET
+          #endif
+
+          #ifdef END_OFFSET
+            #error Overwriting definition of END_OFFSET
+            #undef END_OFFSET
+          #endif
+
           #define START_OFFSET(j) ((j == Index(-1)) ? rows : ((j == k) ? 0 : rows - offsets[j] - 1))
           #define END_OFFSET(j) ((j + 1 == k) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
 
@@ -242,6 +252,16 @@ namespace FEAST
         template <typename DT_, typename IT_>
         static void banded(DT_ * r, const DT_ * const y, const DT_ * const alpha, const DT_ * const val, const IT_ * const offsets, const DT_ * const x, const Index num_of_offsets, const Index rows, const Index columns)
         {
+          #ifdef START_OFFSET
+            #warning Overwriting definition of START_OFFSET
+            #undef START_OFFSET
+          #endif
+
+          #ifdef END_OFFSET
+            #error Overwriting definition of END_OFFSET
+            #undef END_OFFSET
+          #endif
+
           #define START_OFFSET(j) ((j == Index(-1)) ? rows : ((j == k) ? 0 : rows - offsets[j] - 1))
           #define END_OFFSET(j) ((j + 1 == k) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
 
