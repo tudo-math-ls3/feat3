@@ -19,38 +19,10 @@ namespace FEAST
       struct ScaleRows<Mem::Main, Algo::Generic>
       {
         template <typename DT_, typename IT_>
-        static void csr(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
-        {
-          for (Index row(0) ; row < rows ; ++row)
-          {
-            const IT_ end(row_ptr[row + 1]);
-            for (IT_ i(row_ptr[row]) ; i < end ; ++i)
-            {
-              r[i] = a[i] * x[row];
-            }
-          }
-        }
+        static void csr(DT_ * r, const DT_ * const a, const IT_ * const /*col_ind*/, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ * const Ax, const IT_ * const /*Aj*/, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
-        {
-          for (Index row(0) ; row < rows ; ++row)
-          {
-            const DT_ * tAx(Ax);
-            DT_ * tr(r);
-            tAx += row;
-            tr += row;
-
-            const IT_ max(Arl[row]);
-            for(IT_ n(0); n < max ; n++)
-            {
-              *tr = *tAx * x[row];
-
-              tAx += stride;
-              tr += stride;
-            }
-          }
-        }
+        static void ell(DT_ * r, const DT_ * const Ax, const IT_ * const /*Aj*/, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows);
       };
 
       extern template void ScaleRows<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
@@ -83,41 +55,10 @@ namespace FEAST
       struct ScaleCols<Mem::Main, Algo::Generic>
       {
         template <typename DT_, typename IT_>
-        static void csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
-        {
-          for (Index row(0) ; row < rows ; ++row)
-          {
-            const IT_ end(row_ptr[row + 1]);
-            for (IT_ i(row_ptr[row]) ; i < end ; ++i)
-            {
-              r[i] = a[i] * x[col_ind[i]];
-            }
-          }
-        }
+        static void csr(DT_ * r, const DT_ * const a, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index);
 
         template <typename DT_, typename IT_>
-        static void ell(DT_ * r, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows)
-        {
-          for (Index row(0) ; row < rows ; ++row)
-          {
-            const IT_ * tAj(Aj);
-            const DT_ * tAx(Ax);
-            DT_ * tr(r);
-            tAj += row;
-            tAx += row;
-            tr += row;
-
-            const IT_ max(Arl[row]);
-            for(IT_ n(0); n < max ; n++)
-            {
-              *tr = *tAx * x[*tAj];
-
-              tAj += stride;
-              tAx += stride;
-              tr += stride;
-            }
-          }
-        }
+        static void ell(DT_ * r, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const DT_ * const x, const Index stride, const Index rows);
       };
 
       extern template void ScaleCols<Mem::Main, Algo::Generic>::csr(float *, const float * const, const unsigned long * const, const unsigned long * const, const float * const, const Index, const Index, const Index);
@@ -144,5 +85,7 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
-
+#ifndef  __CUDACC__
+#include <kernel/lafem/arch/scale_row_col_generic.hpp>
+#endif
 #endif // KERNEL_LAFEM_ARCH_SCALE_ROW_COL_HPP

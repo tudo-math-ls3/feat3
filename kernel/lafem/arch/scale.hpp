@@ -20,23 +20,7 @@ namespace FEAST
       struct Scale<Mem::Main, Algo::Generic>
       {
         template <typename DT_>
-        static void value(DT_ * r, const DT_ * const x, const DT_ s, const Index size)
-        {
-          if (x == r)
-          {
-            for (Index i(0) ; i < size ; ++i)
-            {
-              r[i] *= s;
-            }
-          }
-          else
-          {
-            for (Index i(0) ; i < size ; ++i)
-            {
-              r[i] = x[i] * s;
-            }
-          }
-        }
+        static void value(DT_ * r, const DT_ * const x, const DT_ s, const Index size);
       };
 
       extern template void Scale<Mem::Main, Algo::Generic>::value(float *, const float * const, const float, const Index);
@@ -60,4 +44,7 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
+#ifndef  __CUDACC__
+#include <kernel/lafem/arch/scale_generic.hpp>
+#endif
 #endif // KERNEL_LAFEM_ARCH_SCALE_HPP
