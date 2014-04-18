@@ -301,4 +301,4 @@ print
 print ("============== CMAKE =====================")
 sys.stdout.flush()
 sys.stderr.flush()
-os.system("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, trunk_dirname))
+os.system("cmake  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname))
