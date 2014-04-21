@@ -231,7 +231,9 @@ public:
 
   virtual void run() const
   {
-    Random random;
+    Random::SeedType seed(Random::SeedType(time(NULL)));
+    Random random(seed);
+    std::cout << "seed: " << seed << std::endl;
 
     // create random matrix
     const Index tsize(100);
@@ -240,16 +242,19 @@ public:
 
     const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
     DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows);
 
     // create random vector of offsets
     FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
+
+    DenseVector<Mem_, IT_, IT_> vec_offsets;
+    vec_offsets.convert(tvec_offsets);
 
     // fill data-array
     for (Index i(0); i < vec_val.size(); ++i)

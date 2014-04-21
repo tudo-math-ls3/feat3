@@ -44,11 +44,9 @@ public:
 
   virtual void run() const
   {
-    Random random;
-
-    MatrixType zero1;
-    SparseMatrixBanded<Mem::Main, DT_, IT_> zero2;
-    TEST_CHECK_EQUAL(zero1, zero2);
+    Random::SeedType seed(Random::SeedType(time(NULL)));
+    Random random(seed);
+    std::cout << "seed: " << seed << std::endl;
 
     // create random matrix
     const Index tsize(100);
@@ -57,16 +55,18 @@ public:
 
     const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
+    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
     DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
     FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
+    DenseVector<Mem_, IT_, IT_> vec_offsets;
+    vec_offsets.convert(tvec_offsets);
 
     SparseMatrixBanded<Mem_, DT_, IT_> a(rows, columns, vec_val, vec_offsets);
 
@@ -141,7 +141,11 @@ public:
 
   virtual void run() const
   {
-    Random random;
+    Random::SeedType seed(Random::SeedType(time(NULL)));
+    Random random(seed);
+    std::cout << "seed: " << seed << std::endl;
+
+    DT_ s(DT_(4.321));
 
     // create random matrix
     const Index tsize(100);
@@ -150,16 +154,18 @@ public:
 
     const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
-    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows, DT_(1));
+    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
+    DenseVector<Mem_, DT_, IT_> vec_val(num_of_offsets * rows);
 
     // create random vector of offsets
     FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
+    DenseVector<Mem_, IT_, IT_> vec_offsets;
+    vec_offsets.convert(tvec_offsets);
 
     // fill data-array
     for (Index i(0); i < vec_val.size(); ++i)
@@ -208,7 +214,6 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(DT_(0.0), y2(i), 1e-5);
     }
 
-    DT_ s(DT_(4.321));
     for (Index i(0); i < y2.size(); ++i)
     {
       y1(i, y1(i) * s);
@@ -258,7 +263,10 @@ public:
 
   virtual void run() const
   {
-    Random random;
+    Random::SeedType seed(Random::SeedType(time(NULL)));
+    Random random(seed);
+    std::cout << "seed: " << seed << std::endl;
+
     DT_ s(DT_(4.321));
 
     // create random matrix
@@ -268,36 +276,38 @@ public:
 
     const Index num_of_offsets(5 + random(Index(0), Index(10)));
 
-    DenseVector<Mem_, IT_, IT_> vec_offsets(num_of_offsets);
-    DenseVector<Mem_, DT_, IT_> vec_val_a(num_of_offsets * rows, DT_(1));
-    DenseVector<Mem_, DT_, IT_> vec_val_b(num_of_offsets * rows, DT_(1));
+    DenseVector<Mem::Main, IT_, IT_> tvec_offsets(num_of_offsets);
+    DenseVector<Mem_, DT_, IT_> vec_val_a(num_of_offsets * rows);
+    DenseVector<Mem_, DT_, IT_> vec_val_ref(num_of_offsets * rows, DT_(1));
 
     // create random vector of offsets
     FEAST::Adjacency::Permutation permutation(rows + columns - 1, random);
     for (Index i(0); i < num_of_offsets; ++i)
     {
-      vec_offsets(i, IT_(permutation.get_perm_pos()[i]));
+      tvec_offsets(i, IT_(permutation.get_perm_pos()[i]));
     }
-    std::sort(vec_offsets.elements(), vec_offsets.elements() + num_of_offsets);
+    std::sort(tvec_offsets.elements(), tvec_offsets.elements() + num_of_offsets);
+    DenseVector<Mem_, IT_, IT_> vec_offsets;
+    vec_offsets.convert(tvec_offsets);
 
     // fill data-array
     for (Index i(0); i < vec_val_a.size(); ++i)
     {
       vec_val_a(i, random(DT_(0), DT_(10)));
-      vec_val_b(i, random(DT_(0), DT_(10) * s));
+      vec_val_ref(i, vec_val_a(i) * s);
     }
 
     // create test-matrix
+    SparseMatrixBanded<Mem_, DT_, IT_> ref(rows, columns, vec_val_ref, vec_offsets);
     SparseMatrixBanded<Mem_, DT_, IT_> a(rows, columns, vec_val_a, vec_offsets);
-    SparseMatrixBanded<Mem_, DT_, IT_> b(rows, columns, vec_val_b, vec_offsets);
-    SparseMatrixBanded<Mem_, DT_, IT_> c;
-    c.clone(a);
+    SparseMatrixBanded<Mem_, DT_, IT_> b;
+    b.clone(a);
+
+    b.template scale<Algo_>(a, s);
+    TEST_CHECK_EQUAL(b, ref);
 
     a.template scale<Algo_>(a, s);
-    TEST_CHECK_EQUAL(b, c);
-
-    c.template scale<Algo_>(c, s);
-    TEST_CHECK_EQUAL(b, c);
+    TEST_CHECK_EQUAL(a, ref);
   }
 };
 
