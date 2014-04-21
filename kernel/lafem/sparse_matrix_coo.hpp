@@ -948,7 +948,7 @@ namespace FEAST
           #endif
 
           #define START_OFFSET(j) ((j == Index(-1)) ? crows : ((j == k) ? 0 : crows - coffsets[j] - 1))
-          #define END_OFFSET(j) ((j + 1 == k) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
+          #define END_OFFSET(j) ((j == Index(-1)) ? crows : ((j == cnum_of_offsets) ? 0 : ccolumns + crows - coffsets[j] - 1))
 
           const DT_ * cval(cother.val());
           const IT2_ * coffsets(cother.offsets());
@@ -970,7 +970,7 @@ namespace FEAST
             --i;
 
             // iteration over all offsets of the upper triangular matrix
-            for (Index j(cnum_of_offsets + 1); j > k;)
+            for (Index j(cnum_of_offsets + 1); j > 0;)
             {
               --j;
 

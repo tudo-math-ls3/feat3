@@ -236,7 +236,7 @@ public:
     std::cout << "seed: " << seed << std::endl;
 
     // create random matrix
-    const Index tsize(100);
+    const Index tsize(20);
     const Index rows(tsize + random(Index(0), Index(20)));
     const Index columns(tsize + random(Index(0), Index(20)));
 
@@ -264,6 +264,7 @@ public:
 
     // create test-matrix
     SparseMatrixBanded<Mem_, DT_, IT_> sys_banded(rows, columns, vec_val, vec_offsets);
+
     MT_ sys_other(sys_banded);
 
     for (Index i(0); i < sys_banded.rows(); ++i)

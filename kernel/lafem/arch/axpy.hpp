@@ -216,7 +216,7 @@ namespace FEAST
           #endif
 
           #define START_OFFSET(j) ((j == Index(-1)) ? rows : ((j == k) ? 0 : rows - offsets[j] - 1))
-          #define END_OFFSET(j) ((j + 1 == k) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
+          #define END_OFFSET(j) ((j == Index(-1)) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
 
           // Search first offset of the upper triangular matrix
           Index k(0);
@@ -226,11 +226,15 @@ namespace FEAST
           }
 
           // iteration over all offsets of the lower triangular matrix
-          for (Index i(0); i <= k; ++i)
+          for (Index i(k + 1); i > 0;)
           {
+            --i;
+
             // iteration over all offsets of the upper triangular matrix
-            for (Index j(k); j <= num_of_offsets; ++j)
+            for (Index j(num_of_offsets + 1); j > 0;)
             {
+              --j;
+
               // iteration over all rows which contain the offsets between offset i and offset j
               for (Index l(Math::max(START_OFFSET(i), END_OFFSET(j))); l < Math::min(START_OFFSET(i-1), END_OFFSET(j-1)); ++l)
               {
@@ -263,7 +267,7 @@ namespace FEAST
           #endif
 
           #define START_OFFSET(j) ((j == Index(-1)) ? rows : ((j == k) ? 0 : rows - offsets[j] - 1))
-          #define END_OFFSET(j) ((j + 1 == k) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
+          #define END_OFFSET(j) ((j == Index(-1)) ? rows : ((j == num_of_offsets) ? 0 : columns + rows - offsets[j] - 1))
 
           // Search first offset of the upper triangular matrix
           Index k(0);
@@ -278,7 +282,7 @@ namespace FEAST
             --i;
 
             // iteration over all offsets of the upper triangular matrix
-            for (Index j(num_of_offsets + 1); j > k;)
+            for (Index j(num_of_offsets + 1); j > 0;)
             {
               --j;
 
