@@ -550,8 +550,8 @@ namespace FEAST
       }
       if(std::is_same<Mem::Main, Mem_>::value)
       {
-        offsets_b = (IT_*)a.offsets();
-        val_b = (DT_*)a.val();
+        offsets_b = (IT_*)b.offsets();
+        val_b = (DT_*)b.val();
       }
       else
       {
