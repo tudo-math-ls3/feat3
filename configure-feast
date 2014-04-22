@@ -88,7 +88,7 @@ os.environ["MPICH_CC"] = ""
 # guess a fitting configuration and search for available compilers
 if len(sys.argv) == 1 or "guess" in sys.argv:
   buildid_string = "opt"
-  if is_found("mpic++"):
+  if is_found("mpic++") or is_found("mpicxx"):
     buildid_string += "-mpi"
   else:
     buildid_string += "-serial"
