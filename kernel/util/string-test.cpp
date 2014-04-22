@@ -27,6 +27,17 @@ public:
     std::vector<String> words;
     String s;
 
+    // test trim
+    TEST_CHECK_EQUAL(String("  ab ").trim_front(), "ab ");
+    TEST_CHECK_EQUAL(String("  ab ").trim_back(), "  ab");
+    TEST_CHECK_EQUAL(String("  ab ").trim(), "ab");
+
+    // test pad
+    TEST_CHECK_EQUAL(String("ab").pad_front(3, 'q'), "qab");
+    TEST_CHECK_EQUAL(String("ab").pad_back(4, 'c'), "abcc");
+    TEST_CHECK_EQUAL(String("abcd").pad_front(2), "abcd");
+    TEST_CHECK_EQUAL(String("abcd").pad_back(4), "abcd");
+
     // test bool stringify/parse
     TEST_CHECK(stringify(b = true).parse(b));
     TEST_CHECK(b == true);

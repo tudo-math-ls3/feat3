@@ -298,6 +298,48 @@ namespace FEAST
     }
 
     /**
+     * \briefs Pads the front of the string up to a desired length.
+     *
+     * This function returns a string that is front-padded with a specific character up to a desired minimum length.
+     * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
+     *
+     * \param[in] len
+     * The desired (minimum) length of the string.
+     *
+     * \param[in] c
+     * The character to be used for padding.
+     *
+     * \returns
+     * The padded string.
+     */
+    String pad_front(std::size_t len, const char c = ' ') const
+    {
+      size_type l(length());
+      return (l < len) ? String(len - l, c) + *this : *this;
+    }
+
+    /**
+     * \briefs Pads the back of the string up to a desired length.
+     *
+     * This function returns a string that is back-padded with a specific character up to a desired minimum length.
+     * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
+     *
+     * \param[in] len
+     * The desired (minimum) length of the string.
+     *
+     * \param[in] c
+     * The character to be used for padding.
+     *
+     * \returns
+     * The padded string.
+     */
+    String pad_back(std::size_t len, const char c = ' ') const
+    {
+      size_type l(length());
+      return (l < len) ? *this + String(len - l, c) : *this;
+    }
+
+    /**
      * \brief Splits the string by a delimiter charset.
      *
      * This function separates the string into substrings, where two substrings are separated a delimiter
