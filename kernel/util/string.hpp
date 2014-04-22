@@ -98,6 +98,24 @@ namespace FEAST
     }
 
     /// CTOR
+    inline String(std::string&& str)
+      : std::string(str)
+    {
+    }
+
+    /// copy CTOR
+    inline String(const String& str)
+      : std::string(str)
+    {
+    }
+
+    /// move CTOR
+    inline String(String&& str)
+      : std::string(str)
+    {
+    }
+
+    /// CTOR
     inline String(const std::string& str, size_type offset, size_type count = npos)
       : std::string(str, offset, count)
     {
@@ -109,44 +127,89 @@ namespace FEAST
     {
     }
 
+    /// \cond internal
+    String& operator=(const std::string& str)
+    {
+      std::string::operator=(str);
+      return *this;
+    }
+
+    String& operator=(std::string&& str)
+    {
+      std::string::operator=(str);
+      return *this;
+    }
+
+    String& operator=(const String& str)
+    {
+      std::string::operator=(str);
+      return *this;
+    }
+
+    String& operator=(String&& str)
+    {
+      std::string::operator=(str);
+      return *this;
+    }
+
+    String& operator=(const char* s)
+    {
+      std::string::operator=(s);
+      return *this;
+    }
+
+    String& append(const std::string& str)
+    {
+      std::string::append(str);
+      return *this;
+    }
+
+    String& append(const std::string& str, size_type pos, size_type n)
+    {
+      std::string::append(str, pos, n);
+      return *this;
+    }
+
+    String& append(const char* s, size_type n)
+    {
+      std::string::append(s, n);
+      return *this;
+    }
+
+    String& append(const char* s)
+    {
+      std::string::append(s);
+      return *this;
+    }
+
+    String& append(size_type n, char c)
+    {
+      std::string::append(n, c);
+      return *this;
+    }
+
+    String& operator+=(const std::string& str)
+    {
+      return append(str);
+    }
+
+    String& operator+=(const char* s)
+    {
+      return append(s);
+    }
+
+    String substr(size_type pos = size_type(0), size_type n = npos) const
+    {
+      return String(std::string::substr(pos, n));
+    }
+    /// \endcond
+
     /**
      * \brief Returns a null-terminated char string containing all white-space characters
      */
     static const char* white_spaces()
     {
       return " \a\b\f\n\r\t\v";
-    }
-
-    /**
-     * \brief Returns a reference to the first character in the string.
-     * \returns
-     * A reference to the first character in the string.
-     */
-    reference front()
-    {
-      return at(size_type(0));
-    }
-
-    /** \copydoc front() */
-    const_reference front() const
-    {
-      return at(size_type(0));
-    }
-
-    /**
-     * \brief Returns a reference to the last character in the string.
-     * \returns
-     * A reference to the last character in the string.
-     */
-    reference back()
-    {
-      return at(size() - size_type(1));
-    }
-
-    /** \copydoc back() */
-    const_reference back() const
-    {
-      return at(size() - size_type(1));
     }
 
     /**
@@ -164,12 +227,6 @@ namespace FEAST
     void pop_front()
     {
       erase(size_type(0), size_type(1));
-    }
-
-    /// Removes the last character from the string.
-    void pop_back()
-    {
-      erase(size() - size_type(1), size_type(1));
     }
 
     /**
@@ -303,6 +360,8 @@ namespace FEAST
      * This function returns a string that is front-padded with a specific character up to a desired minimum length.
      * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
      *
+     * \note This function is virtually the counter-part of #trim_front().
+     *
      * \param[in] len
      * The desired (minimum) length of the string.
      *
@@ -312,10 +371,10 @@ namespace FEAST
      * \returns
      * The padded string.
      */
-    String pad_front(std::size_t len, const char c = ' ') const
+    String pad_front(size_type len, char c = ' ') const
     {
       size_type l(length());
-      return (l < len) ? String(String(len - l, c) + *this) : *this;
+      return (l < len) ? String(len - l, c).append(*this) : *this;
     }
 
     /**
@@ -324,6 +383,8 @@ namespace FEAST
      * This function returns a string that is back-padded with a specific character up to a desired minimum length.
      * If the length of \c this already has the desired minimum lengh, this function returns \c *this.
      *
+     * \note This function is virtually the counter-part of #trim_back().
+     *
      * \param[in] len
      * The desired (minimum) length of the string.
      *
@@ -333,10 +394,10 @@ namespace FEAST
      * \returns
      * The padded string.
      */
-    String pad_back(std::size_t len, const char c = ' ') const
+    String pad_back(size_type len, char c = ' ') const
     {
       size_type l(length());
-      return (l < len) ? String(*this + String(len - l, c)) : *this;
+      return (l < len) ? String(*this).append(len - l, c) : *this;
     }
 
     /**
@@ -499,7 +560,7 @@ namespace FEAST
      *
      * \note This function is not successive, i.e. it will \b not replace an occurance of the find-string
      * if this occurance is a result of a previous replacement, e.g. for the combination \c *this = "aaa",
-     * \c find_string = "aa" and \c replace_string = "pa" the resulting string will be "paa" and not "papa".
+     * \c find_string = "aa" and \c replace_string = "pa" the resulting string will be "paa" and not "ppa".
      *
      * \param[in] find_string
      * The substring that is to be searched for. Must not be empty.
@@ -748,6 +809,33 @@ namespace FEAST
     }
 
   }; // class String
+
+  /// \cond internal
+  inline String operator+(const String& a, const String& b)
+  {
+    return String(a).append(b);
+  }
+
+  inline String operator+(const char* a, const String& b)
+  {
+    return String(a).append(b);
+  }
+
+  inline String operator+(const String& a, const char* b)
+  {
+    return String(a).append(b);
+  }
+
+  inline String operator+(const String& a, char c)
+  {
+    return String(a).append(String::size_type(1), c);
+  }
+
+  inline String operator+(char c, const String& b)
+  {
+    return String(String::size_type(1), c).append(b);
+  }
+  /// \endcond
 
   /**
    * \brief Converts an item into a String.

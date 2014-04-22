@@ -27,6 +27,12 @@ public:
     std::vector<String> words;
     String s;
 
+    // test operator+
+    TEST_CHECK_EQUAL(String("ab") + String("cd"), "abcd");
+
+    // test compare_no_case
+    TEST_CHECK_EQUAL(String("g1").compare_no_case("G1"), 0);
+
     // test trim
     TEST_CHECK_EQUAL(String("  ab ").trim_front(), "ab ");
     TEST_CHECK_EQUAL(String("  ab ").trim_back(), "  ab");
