@@ -97,11 +97,13 @@ namespace FEAST
     {
     }
 
+#ifndef __CUDACC__
     /// CTOR
     inline String(std::string&& str)
       : std::string(str)
     {
     }
+#endif
 
     /// copy CTOR
     inline String(const String& str)
@@ -109,11 +111,13 @@ namespace FEAST
     {
     }
 
+#ifndef __CUDACC__
     /// move CTOR
     inline String(String&& str)
       : std::string(str)
     {
     }
+#endif
 
     /// CTOR
     inline String(const std::string& str, size_type offset, size_type count = npos)
@@ -134,11 +138,13 @@ namespace FEAST
       return *this;
     }
 
+#ifndef __CUDACC__
     String& operator=(std::string&& str)
     {
       std::string::operator=(str);
       return *this;
     }
+#endif
 
     String& operator=(const String& str)
     {
@@ -146,11 +152,13 @@ namespace FEAST
       return *this;
     }
 
+#ifndef __CUDACC__
     String& operator=(String&& str)
     {
       std::string::operator=(str);
       return *this;
     }
+#endif
 
     String& operator=(const char* s)
     {
@@ -227,6 +235,12 @@ namespace FEAST
     void pop_front()
     {
       erase(size_type(0), size_type(1));
+    }
+
+    /// Removes the last character from the string.
+    void pop_back()
+    {
+      erase(size() - size_type(1), size_type(1));
     }
 
     /**
