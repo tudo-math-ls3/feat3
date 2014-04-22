@@ -41,12 +41,13 @@ class ThirdpartyPackage(object):
         subprocess.call(dlcmd, shell=True)
 
       unpkcmd = self.unpacker + target_filename + self.unpack_target
+      print("Unpacking :"+ unpkcmd +"...")
       subprocess.call(unpkcmd, shell=True)
     return
 
-# Find available third party packages by parsing all .py files in the thirdparty folder
-def available_packages(path,name=''):
-  available_files = glob.glob(path+os.sep+'*.py')
+# Find available third party packages by parsing all .py files in the cmake_modules folder
+def available_packages(files_path,target_path,name=''):
+  available_files = glob.glob(files_path+os.sep+'*.py')
   available_packages = []
   for name in available_files:
     my_path, filename = os.path.split(name)
@@ -63,6 +64,6 @@ def available_packages(path,name=''):
             if issubclass(x[1],ThirdpartyPackage) and (x[1] != ThirdpartyPackage):
                classes.append(x[1])
     for x in classes:
-      result = x(path)
+      result = x(target_path)
       available_packages.append(result)
   return available_packages

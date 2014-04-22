@@ -15,7 +15,7 @@ from cmake_modules.configure_icc import configure_icc
 from cmake_modules.configure_clang import configure_clang
 from cmake_modules.feast_util import remove_string
 from cmake_modules.feast_util import is_found
-from thirdparty.thirdparty_package import *
+from cmake_modules.thirdparty_package import *
 #TODO help, ? und guess nicht in sys.argv[0] suchen
 #TODO scalasca
 #TODO cpu=string um cpu direkt anzugeben
@@ -246,7 +246,7 @@ if "valgrind" in buildid:
   cmake_flags += " -DFEAST_VALGRIND:BOOL=ON"
 
 # optional third party libraries
-for package in available_packages(trunk_dirname+os.sep+"thirdparty"):
+for package in available_packages(trunk_dirname+os.sep+"cmake_modules",trunk_dirname+os.sep+"thirdparty"):
   if package.name in buildid:
     package.add()
     cmake_flags += package.cmake_flags
