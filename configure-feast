@@ -295,7 +295,7 @@ print ("ldflags: " + os.environ["LDFLAGS"])
 print
 print ("Generator: " + generator)
 print
-print ("cmake  %s -G\"%s\" %s" % (cmake_flags, generator, trunk_dirname))
+print ("cmake  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname))
 print
 #start actual configuration
 print ("============== CMAKE =====================")
