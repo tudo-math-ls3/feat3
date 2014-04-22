@@ -3,6 +3,7 @@ __author__ = "Jordi Paul"
 __date__   = "April 2014"
 
 import os
+import subprocess
 import imp
 import inspect
 import glob
@@ -37,10 +38,10 @@ class ThirdpartyPackage(object):
       if not os.path.isfile(target_filename):
         print(target_filename + " not found, attempting to automatically download it from " + self.url + "...")
         dlcmd = "wget " + self.url + " -O " + target_filename
-        os.system(dlcmd)
+        subprocess.call(dlcmd, shell=True)
 
       unpkcmd = self.unpacker + target_filename + self.unpack_target
-      os.system(unpkcmd)
+      subprocess.call(unpkcmd, shell=True)
     return
 
 # Find available third party packages by parsing all .py files in the thirdparty folder

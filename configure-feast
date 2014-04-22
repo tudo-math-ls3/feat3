@@ -3,6 +3,7 @@
 # This is a python script.
 # If you encounter problemes when executing it on its own, start it with a python interpreter
 import sys
+import subprocess
 import os
 import shutil
 import copy
@@ -301,4 +302,4 @@ print
 print ("============== CMAKE =====================")
 sys.stdout.flush()
 sys.stderr.flush()
-os.system("cmake  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname))
+subprocess.call("cmake  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname), shell=True)
