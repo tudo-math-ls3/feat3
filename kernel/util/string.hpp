@@ -315,7 +315,7 @@ namespace FEAST
     String pad_front(std::size_t len, const char c = ' ') const
     {
       size_type l(length());
-      return (l < len) ? String(len - l, c) + *this : *this;
+      return (l < len) ? String(String(len - l, c) + *this) : *this;
     }
 
     /**
@@ -336,7 +336,7 @@ namespace FEAST
     String pad_back(std::size_t len, const char c = ' ') const
     {
       size_type l(length());
-      return (l < len) ? *this + String(len - l, c) : *this;
+      return (l < len) ? String(*this + String(len - l, c)) : *this;
     }
 
     /**
