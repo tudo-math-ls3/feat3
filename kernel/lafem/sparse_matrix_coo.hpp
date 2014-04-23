@@ -993,8 +993,8 @@ namespace FEAST
           if (! std::is_same<Mem_, Mem::Main>::value)
           {
             MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
-            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
-            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ind, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), trow_ind, _used_elements());
+            MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), tcol_ind, _used_elements());
             delete[] tval;
             delete[] tcol_ind;
             delete[] trow_ind;
