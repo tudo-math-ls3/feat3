@@ -382,9 +382,16 @@ namespace FEAST
         ImgPointType_ _point;
 
       public:
-        explicit DistanceFunction(ImgPointType_ x0_) :
+        /// Constructor
+        explicit DistanceFunction(const ImgPointType_ x0_) :
           _point(x0_)
         {
+        }
+
+        /// Sets _point to x0_
+        void set_point(const ImgPointType_ x0_)
+        {
+          _point = x0_;
         }
       }; // class DistanceFunction
 
