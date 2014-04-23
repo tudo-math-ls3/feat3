@@ -48,7 +48,8 @@ namespace FEAST
 
       template<typename DT_>
       static void _set_line(const SparseMatrixCSR<Mem::Main, DT_> & matrix,
-                            const Index row, DT_ * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, DT_ * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index * prow_ptr(matrix.row_ptr());
         const Index * pcol_ind(matrix.col_ind());
@@ -87,7 +88,8 @@ namespace FEAST
 
       template<typename DT_>
       static void _set_line(const SparseMatrixCOO<Mem::Main, DT_> & matrix,
-                            const Index row, DT_ * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, DT_ * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index * prow(matrix.row_indices());
         const Index * pcol(matrix.column_indices());
@@ -123,7 +125,8 @@ namespace FEAST
 
       template<typename DT_>
       static void _set_line(const SparseMatrixELL<Mem::Main, DT_> & matrix,
-                            const Index row, DT_ * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, DT_ * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index * parl(matrix.Arl());
         const Index * paj(matrix.Aj() + row);
@@ -165,7 +168,8 @@ namespace FEAST
         typename MatrixB_ = MatrixA_,
         typename MatrixD_ = MatrixB_>
       static void _set_line(const SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_> & matrix,
-                            const Index row, typename MatrixA_::DataType * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, typename MatrixA_::DataType * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index arows(matrix.block_a().rows());
 
@@ -193,7 +197,8 @@ namespace FEAST
 
       template<typename Mem_, typename DT_>
       static void _set_line(const DenseMatrix<Mem_, DT_> & matrix,
-                            const Index row, DT_ * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, DT_ * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index acolumns(matrix.columns());
         const Index * pval(matrix.elements() + row * acolumns);
@@ -231,7 +236,8 @@ namespace FEAST
 
       template<typename SubType_, Index blocks_>
       static void _set_line(const PowerColMatrix<SubType_, blocks_> & matrix,
-                            const Index row, typename SubType_::DataType * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, typename SubType_::DataType * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index brows(matrix.base().rows());
 
@@ -247,7 +253,8 @@ namespace FEAST
 
       template<typename SubType_>
       static void _set_line(const PowerColMatrix<SubType_, Index(1)> & matrix,
-                            const Index row, typename SubType_::DataType * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, typename SubType_::DataType * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         _set_line(matrix.last(), row, pval_set, pcol_set, col_start, stride);
       }
@@ -269,7 +276,8 @@ namespace FEAST
 
       template<typename SubType_, Index blocks_>
       static void _set_line(const PowerRowMatrix<SubType_, blocks_> & matrix,
-                            const Index row, typename SubType_::DataType * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, typename SubType_::DataType * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index length_of_base(_get_length_of_line(matrix.base(), row));
 
@@ -279,7 +287,8 @@ namespace FEAST
 
       template<typename SubType_>
       static void _set_line(const PowerRowMatrix<SubType_, Index(1)> & matrix,
-                            const Index row, typename SubType_::DataType * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, typename SubType_::DataType * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         _set_line(matrix.last(), row, pval_set, pcol_set, col_start, stride);
       }
@@ -310,7 +319,8 @@ namespace FEAST
 
       template<typename SubType_, Index blocks_>
       static void _set_line(const PowerDiagMatrix<SubType_, blocks_> & matrix,
-                            const Index row, typename SubType_::DataType * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, typename SubType_::DataType * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         const Index brows(matrix.base().rows());
         const Index bcolumns(matrix.base().columns());
@@ -327,7 +337,8 @@ namespace FEAST
 
       template<typename SubType_>
       static void _set_line(const PowerDiagMatrix<SubType_, Index(1)> & matrix,
-                            const Index row, typename SubType_::DataType * pval_set, Index * pcol_set, const Index col_start, const Index stride = 1)
+                            const Index row, typename SubType_::DataType * const pval_set, Index * const pcol_set,
+                            const Index col_start, const Index stride = 1)
       {
         _set_line(matrix.last(), row, pval_set, pcol_set, col_start, stride);
       }
@@ -524,7 +535,7 @@ namespace FEAST
        * DenseVector
        */
       template<typename DT_>
-      static void _set_vec(const DenseVector<Mem::Main, DT_> & vec, DT_ * pval_set)
+      static void _set_vec(const DenseVector<Mem::Main, DT_> & vec, DT_ * const pval_set)
       {
         const DT_ * pvec(vec.elements());
         const Index n(vec.size());
@@ -546,11 +557,12 @@ namespace FEAST
           pvec[i] = pval_set[i];
         }
       }
+
       /**
        * PowerVector
        */
       template<typename VT_, Index count_>
-      static void _set_vec(const PowerVector<VT_, count_> & vec, typename VT_::DataType * pval_set)
+      static void _set_vec(const PowerVector<VT_, count_> & vec, typename VT_::DataType * const pval_set)
       {
         _set_vec(vec.base(), pval_set);
         _set_vec(vec.last(), pval_set + vec.base().size());
@@ -564,7 +576,7 @@ namespace FEAST
       }
 
       template<typename VT_>
-      static void _set_vec(const PowerVector<VT_, Index(1)> & vec, typename VT_::DataType * pval_set)
+      static void _set_vec(const PowerVector<VT_, Index(1)> & vec, typename VT_::DataType * const pval_set)
       {
         _set_vec(vec.last(), pval_set);
       }
@@ -579,7 +591,7 @@ namespace FEAST
        * TupleVector
        */
       template<typename First_, typename Second_, typename... Rest_>
-      static void _set_vec(const TupleVector<First_, Second_, Rest_...> & vec, typename TupleVector<First_, Second_, Rest_...>::DataType * pval_set)
+      static void _set_vec(const TupleVector<First_, Second_, Rest_...> & vec, typename TupleVector<First_, Second_, Rest_...>::DataType * const pval_set)
       {
         _set_vec(vec.first(), pval_set);
         _set_vec(vec.rest(), pval_set + vec.first().size());
@@ -595,7 +607,7 @@ namespace FEAST
 #ifdef FEAST_COMPILER_MICROSOFT
       // compiler hack...
       template<typename... First_>
-      static void _set_vec(const TupleVector<First_...> & vec, typename TupleVector<First_...>::DataType * pval_set)
+      static void _set_vec(const TupleVector<First_...> & vec, typename TupleVector<First_...>::DataType * const pval_set)
       {
         static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
         _set_vec(vec.first(), pval_set);
@@ -609,7 +621,7 @@ namespace FEAST
       }
 #else // all other compilers
       template<typename First_>
-      static void _set_vec(const TupleVector<First_> & vec, typename TupleVector<First_>::DataType * pval_set)
+      static void _set_vec(const TupleVector<First_> & vec, typename TupleVector<First_>::DataType * const pval_set)
       {
         _set_vec(vec.first(), pval_set);
       }
