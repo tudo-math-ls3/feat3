@@ -73,6 +73,32 @@ public:
 
       vec_sol(i, DT_(0));
     }
+
+    /**
+     * check BlockToScalar and ScalarToBlock
+     */
+    vec_rhs.template scale<Algo_>(vec_rhs, DT_(0));
+
+    for (Index j(0); j < vec_rhs_scalar.size(); ++j)
+    {
+      vec_rhs_scalar(j, DT_(j));
+    }
+
+    VecBlockToScalar<Algo_>::copy(vec_rhs, vec_rhs_scalar);
+
+    for (Index j(0); j < vec_rhs_scalar.size(); ++j)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs_scalar(j), vec_rhs(j), tol);
+    }
+
+    vec_rhs_scalar.template scale<Algo_>(vec_rhs_scalar, DT_(0));
+
+    VecBlockToScalar<Algo_>::copy(vec_rhs_scalar, vec_rhs);
+
+    for (Index j(0); j < vec_rhs_scalar.size(); ++j)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(vec_rhs(j), vec_rhs_scalar(j), tol);
+    }
   }
 };
 

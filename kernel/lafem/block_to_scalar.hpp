@@ -535,6 +535,17 @@ namespace FEAST
         }
       }
 
+      template<typename DT_>
+      static void _set_vec_inv(DenseVector<Mem::Main, DT_> & vec, const DT_ * const pval_set)
+      {
+        DT_ * pvec(vec.elements());
+        const Index n(vec.size());
+
+        for (Index i(0); i < n; ++i)
+        {
+          pvec[i] = pval_set[i];
+        }
+      }
       /**
        * PowerVector
        */
@@ -545,10 +556,23 @@ namespace FEAST
         _set_vec(vec.last(), pval_set + vec.base().size());
       }
 
+      template<typename VT_, Index count_>
+      static void _set_vec_inv(PowerVector<VT_, count_> & vec, const typename VT_::DataType * const pval_set)
+      {
+        _set_vec_inv(vec.base(), pval_set);
+        _set_vec_inv(vec.last(), pval_set + vec.base().size());
+      }
+
       template<typename VT_>
       static void _set_vec(const PowerVector<VT_, Index(1)> & vec, typename VT_::DataType * pval_set)
       {
         _set_vec(vec.last(), pval_set);
+      }
+
+      template<typename VT_>
+      static void _set_vec_inv(PowerVector<VT_, Index(1)> & vec, const typename VT_::DataType * const pval_set)
+      {
+        _set_vec_inv(vec.last(), pval_set);
       }
 
       /**
@@ -561,6 +585,13 @@ namespace FEAST
         _set_vec(vec.rest(), pval_set + vec.first().size());
       }
 
+      template<typename First_, typename Second_, typename... Rest_>
+      static void _set_vec_inv(TupleVector<First_, Second_, Rest_...> & vec, const typename TupleVector<First_, Second_, Rest_...>::DataType * const pval_set)
+      {
+        _set_vec_inv(vec.first(), pval_set);
+        _set_vec_inv(vec.rest(), pval_set + vec.first().size());
+      }
+
 #ifdef FEAST_COMPILER_MICROSOFT
       // compiler hack...
       template<typename... First_>
@@ -569,11 +600,24 @@ namespace FEAST
         static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
         _set_vec(vec.first(), pval_set);
       }
+
+      template<typename... First_>
+      static void _set_vec_inv(TupleVector<First_...> & vec, const typename TupleVector<First_...>::DataType * const pval_set)
+      {
+        static_assert(sizeof...(First_) == std::size_t(1), "invalid TupleVector size");
+        _set_vec_inv(vec.first(), pval_set);
+      }
 #else // all other compilers
       template<typename First_>
       static void _set_vec(const TupleVector<First_> & vec, typename TupleVector<First_>::DataType * pval_set)
       {
         _set_vec(vec.first(), pval_set);
+      }
+
+      template<typename First_>
+      static void _set_vec_inv(TupleVector<First_> & vec, const typename TupleVector<First_>::DataType * const pval_set)
+      {
+        _set_vec_inv(vec.first(), pval_set);
       }
 #endif
 
@@ -610,6 +654,23 @@ namespace FEAST
         auto * pa(a.elements());
 
         _set_vec(b, pa);
+      }
+
+      /**
+       * \brief Copy a DenseVector into an allocated meta-vector
+       *
+       * \param[in] a The output meta-vector
+       * \param[in] b The input vector of type DenseVector
+       */
+      template<typename VT_>
+      static void copy(VT_ & a, const DenseVector<typename VT_::MemType, typename VT_::DataType> & b)
+      {
+        if (a.size() != b.size())
+          throw InternalError(__func__, __FILE__, __LINE__, "Vectors have not the same size!");
+
+        const auto * const pb(b.elements());
+
+        _set_vec_inv(a, pb);
       }
     };
   } // namespace LAFEM
