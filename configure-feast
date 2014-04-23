@@ -116,7 +116,6 @@ buildid = buildid_string.split("-")
 unused_tokens = copy.deepcopy(buildid)
 
 #initialise variables
-build_mode = ""
 cxxflags = ""
 ldflags = ""
 cmake_flags = "-DBUILD_ID:STRING=" + buildid_string
@@ -145,24 +144,20 @@ if "debug" in buildid or "noop" in buildid:
   remove_string(unused_tokens, "debug")
   remove_string(unused_tokens, "noop")
   cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=ON"
-  build_mode = "debug"
 elif "opt" in buildid or "release" in buildid:
   remove_string(unused_tokens, "opt")
   remove_string(unused_tokens, "release")
   cmake_flags += " -DFEAST_DEBUG_MODE:BOOL=OFF"
-  build_mode = "opt"
 else:
   print ("Error: No supported build mode (opt/debug) found in build id:")
   print (buildid_string)
   sys.exit(1)
 if "coverage" in buildid:
   remove_string(unused_tokens, "coverage")
-  build_mode += " coverage"
 if "quadmath" in buildid:
   remove_string(unused_tokens, "quadmath")
   cmake_flags += " -DFEAST_HAVE_QUADMATH:BOOL=ON"
   ldflags += " -lquadmath"
-  build_mode += " quadmath"
 
 # parallelisation selection
 if "serial" in buildid:
@@ -190,7 +185,7 @@ if "gcc" in buildid or "gnu" in buildid:
   remove_string(unused_tokens, "gnu")
   os.environ["CC"] = "gcc"
   os.environ["CXX"] = "g++"
-  cxxflags += " " + configure_gcc (cputype, build_mode)
+  cxxflags += " " + configure_gcc (cputype, buildid)
 elif "icc" in buildid or "intel" in buildid:
   if not is_found("icpc"):
     print ("Error: Choosen compiler binary icpc not found!")
@@ -199,7 +194,7 @@ elif "icc" in buildid or "intel" in buildid:
   remove_string(unused_tokens, "intel")
   os.environ["CC"] = "icc"
   os.environ["CXX"] = "icpc"
-  cxxflags += " " + configure_icc (cputype, build_mode)
+  cxxflags += " " + configure_icc (cputype, buildid)
 elif "clang" in buildid or "llvm" in buildid:
   if not is_found("clang++"):
     print ("Error: Choosen compiler binary clang++ not found!")
@@ -208,7 +203,7 @@ elif "clang" in buildid or "llvm" in buildid:
   remove_string(unused_tokens, "llvm")
   os.environ["CC"] = "clang"
   os.environ["CXX"] = "clang++"
-  cxxflags += " " + configure_clang (cputype, build_mode)
+  cxxflags += " " + configure_clang (cputype, buildid)
 else:
   print ("Error: No supported compiler found in build id:")
   print (buildid_string)

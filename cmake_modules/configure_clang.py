@@ -1,7 +1,7 @@
 import platform
 from cmake_modules.feast_util import get_output
 
-def configure_clang(cpu, buildmode):
+def configure_clang(cpu, buildid):
   version = get_output("clang++ -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__clang_major__"])
@@ -14,9 +14,9 @@ def configure_clang(cpu, buildmode):
     sys.exit(1)
 
   cxxflags = "-pipe  -std=c++11 -ggdb -fcolor-diagnostics -m64"
-  if "debug" in buildmode:
+  if "debug" in buildid:
     cxxflags += " -O0 -Wall -Wextra -Wshadow -Wundef -Wshorten-64-to-32 -Wconversion -Wstrict-aliasing=2 -Wunknown-pragmas -Wundef -Wno-unused-value -Wno-unused-parameter -Wuninitialized -fdiagnostics-show-template-tree -fdiagnostics-show-category=name"
-  elif "opt" in buildmode:
+  elif "opt" in buildid:
     cxxflags += " -O3"
     if cpu == "unknown":
       cxxflags += " -march=native"

@@ -2,7 +2,7 @@ import platform
 import sys
 from cmake_modules.feast_util import get_output
 
-def configure_gcc(cpu, buildmode):
+def configure_gcc(cpu, buildid):
   version = get_output("g++ -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__GNUC__"])
@@ -19,24 +19,24 @@ def configure_gcc(cpu, buildmode):
   if major >= 4  and minor >= 9:
     cxxflags += " -fdiagnostics-color=always"
 
-  if "coverage" in buildmode:
+  if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
 
   # For 'quadmath', we need to enable extended numeric literals, as otherwise the g++ will
   # not recognise the 'q' suffix for __float128 constants when compiling with --std=c++11 starting from gcc version 4.8.
-  if major >= 4 and minor >= 8 and "quadmath" in buildmode:
+  if major >= 4 and minor >= 8 and "quadmath" in buildid:
     cxxflags += " -fext-numeric-literals"
 
-  if "debug" in buildmode:
+  if "debug" in buildid:
     cxxflags += " -O0 -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -fdiagnostics-show-option -fno-omit-frame-pointer"
     #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
     if platform.system() != "Darwin":
       cxxflags += " -D_GLIBCXX_DEBUG"
-    if major >= 4  and minor >= 8:
+    if major >= 4  and minor >= 8 and "serial" in buildid and not "cuda" in buildid:
       cxxflags += " -fsanitize=address"
     if major >= 4  and minor >= 9:
       cxxflags += " -fsanitize=undefined"
-  elif "opt" in buildmode:
+  elif "opt" in buildid:
     cxxflags += " -O3"
     if cpu == "unknown":
       cxxflags += " -march=native"

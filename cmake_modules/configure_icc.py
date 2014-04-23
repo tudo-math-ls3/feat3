@@ -1,7 +1,7 @@
 import platform
 from cmake_modules.feast_util import get_output
 
-def configure_icc(cpu, buildmode):
+def configure_icc(cpu, buildid):
   version = get_output("icpc -dM -E - ")
   version = dict(map(lambda x : (x[1], " ".join(x[2:])), [line.split() for line in version]))
   major = int(version["__INTEL_COMPILER"][0:2])
@@ -19,9 +19,9 @@ def configure_icc(cpu, buildmode):
   if platform.system() == "Darwin":
     cxxflags += " -no-use-clang-env"
 
-  if "debug" in buildmode:
+  if "debug" in buildid:
     cxxflags += "  -O0 -Wall -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -debug all -ftrapuv  -diag-disable 2304 -diag-disable 2305"
-  elif "opt" in buildmode:
+  elif "opt" in buildid:
     cxxflags += " -O3 -no-prec-div -ip -fno-alias"
     if cpu == "unknown":
       # generate code for every simd unit, existing so far
