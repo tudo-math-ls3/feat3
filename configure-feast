@@ -216,8 +216,6 @@ if "ccache" in buildid:
   remove_string(unused_tokens, "ccache")
   os.environ["CC"] = "ccache " + os.environ["CC"]
   os.environ["CXX"] = "ccache " + os.environ["CXX"]
-  if "clang" in buildid or "llvm" in buildid:
-    cxxflags += " -Qunused-arguments"
 
 #additional backends
 if "cuda" in buildid:
