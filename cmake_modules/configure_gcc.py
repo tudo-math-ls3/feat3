@@ -135,7 +135,7 @@ def configure_gcc(cpu, buildid):
       cxxflags += " -m64 -march=barcelona"
 
     else:
-      cxxflags += " -march=native"
-      print ("Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
+      cxxflags += " -mtune=generic"
+      print ("Detected cpu type not supported by configure_gcc.py, using -mtune=generic instead.")
 
   return cxxflags

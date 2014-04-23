@@ -99,6 +99,6 @@ def configure_icc(cpu, buildid):
     elif cpu == "magnycours":
       cxxflags += " -msse3"
     else:
-      print ("Detected cpu type not supported by configure_icc.py, using -march=native instead.")
+      print ("Detected cpu type not supported by configure_icc.py, using generic optimisation instead")
 
   return cxxflags

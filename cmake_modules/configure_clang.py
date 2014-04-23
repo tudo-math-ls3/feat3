@@ -96,7 +96,7 @@ def configure_clang(cpu, buildid):
       cxxflags += " -m64 -march=barcelona"
 
     else:
-      cxxflags += " -march=native"
-      print ("Detected cpu type not supported by configure_clang.py, using -march=native instead.")
+      cxxflags += " -mtune=generic"
+      print ("Detected cpu type not supported by configure_clang.py, using -mtune=generic instead.")
 
   return cxxflags

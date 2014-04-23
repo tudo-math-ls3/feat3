@@ -61,7 +61,7 @@ def detect_cpu():
       elif model < 12:
         cputype = "pentium3"
       elif model == 13:
-        cputype = "pentium4m"
+        cputype = "pentiumm"
       elif model == 14:
         cputype = "coresolo"
       elif model == 15:
@@ -85,9 +85,11 @@ def detect_cpu():
     elif cpu_family == 7:
       cputype ="itanium"
     elif cpu_family == 15:
-      if model < 3:
+      if model == 2:
+        cputype = "pentium4m"
+      elif model < 3:
         cputype = "pentium4"
-      if cpu_family < 5:
+      elif model < 5:
         cputype = "nocona"
     elif cpu_family == 32:
       cputype = "itanium2"
