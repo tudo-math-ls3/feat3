@@ -16,6 +16,9 @@ def configure_gcc(cpu, buildmode):
 
   cxxflags = "-pipe -std=c++11 -ggdb -gdwarf-4"
 
+  if major >= 4  and minor >= 9:
+    cxxflags += " -fdiagnostics-color=always"
+
   if "coverage" in buildmode:
     cxxflags += " -fprofile-arcs -ftest-coverage"
 
@@ -25,10 +28,14 @@ def configure_gcc(cpu, buildmode):
     cxxflags += " -fext-numeric-literals"
 
   if "debug" in buildmode:
-    cxxflags += " -O0 -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -fdiagnostics-show-option"
+    cxxflags += " -O0 -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -fdiagnostics-show-option -fno-omit-frame-pointer"
     #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
     if platform.system() != "Darwin":
       cxxflags += " -D_GLIBCXX_DEBUG"
+    if major >= 4  and minor >= 8:
+      cxxflags += " -fsanitize=address"
+    if major >= 4  and minor >= 9:
+      cxxflags += " -fsanitize=undefined"
   elif "opt" in buildmode:
     cxxflags += " -O3"
     if cpu == "unknown":
