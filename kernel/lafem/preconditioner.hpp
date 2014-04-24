@@ -2307,9 +2307,9 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> layout) :
+                                      SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> && layout) :
           _A(A),
-          _layout(layout),
+          _layout(std::move(layout)),
           _m((Index) -1),
           _a_columnwise(_A.rows())
         {
@@ -2553,9 +2553,9 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> layout) :
+                                      SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> && layout) :
           _A(A),
-          _layout(layout),
+          _layout(std::move(layout)),
           _m((Index) -1),
           _a_columnwise(_A.rows())
         {
@@ -2777,9 +2777,9 @@ namespace FEAST
         }
 
         SPAIPreconditionerMTdepending(const MatrixType & A,
-                                      const SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> layout) :
+                                      SparseLayout<Mem_, typename MatrixType::IndexType, MatrixType::layout_id> && layout) :
           _A(A),
-          _layout(layout),
+          _layout(std::move(layout)),
           _m((Index) -1),
           _a_columnwise(_A.rows())
         {
@@ -3123,14 +3123,14 @@ namespace FEAST
        * Creates a SPAI preconditioner to the given matrix and given initial layout
        */
       SPAIPreconditioner(const MT_ & A,
-                         const SparseLayout<Mem_, typename MT_::IndexType, MT_::layout_id> & layout,
+                         SparseLayout<Mem_, typename MT_::IndexType, MT_::layout_id> && layout,
                          const Index max_iter = 10,
                          const DT_ eps_res = 1e-2,
                          const Index fill_in = 10,
                          const DT_ eps_res_comp = 1e-3,
                          const DT_ max_rho = 1e-3,
                          const bool transpose = false) :
-        Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, layout),
+        Intern::SPAIPreconditionerMTdepending<Algo_, MT_, VT_>(A, std::move(layout)),
         _eps_res(eps_res),
         _fill_in(fill_in),
         _max_iter(max_iter),

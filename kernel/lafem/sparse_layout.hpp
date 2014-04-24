@@ -82,16 +82,6 @@ namespace FEAST
           MemoryPool<Mem_>::instance()->increase_memory(i);
       }
 
-      /// copy constructor
-      SparseLayout(const SparseLayout & other) :
-        _indices(other._indices),
-        _indices_size(other._indices_size),
-        _scalar_index(other._scalar_index)
-      {
-        for(auto i : this->_indices)
-          MemoryPool<Mem_>::instance()->increase_memory(i);
-      }
-
       /// move constructor
       SparseLayout(SparseLayout && other) :
         _indices(std::move(other._indices)),
@@ -105,22 +95,6 @@ namespace FEAST
       {
         for(auto i : this->_indices)
           MemoryPool<Mem_>::instance()->release_memory(i);
-      }
-
-      /// operator=
-      SparseLayout & operator= (const SparseLayout & other)
-      {
-        if(this == &other)
-          return *this;
-
-        _indices = other._indices;
-        _indices_size = other._indices_size;
-        _scalar_index = other._scalar_index;
-
-        for(auto i : this->_indices)
-          MemoryPool<Mem_>::instance()->increase_memory(i);
-
-        return *this;
       }
 
       /// move operator=
