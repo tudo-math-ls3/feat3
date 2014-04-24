@@ -19,6 +19,7 @@ def detect_cpu():
     vendor_id = d["vendor_id"]
     cpu_family = int(d["cpu family"])
     model = int(d["model"])
+
   elif platform.system() == "Darwin":
     # vendor_id
     vendor_id = get_output("sysctl -A machdep.cpu.vendor")
@@ -37,6 +38,13 @@ def detect_cpu():
     model = model[0]
     model = model.split(":")
     model = int(model[1].strip())
+
+  elif platform.system() == "Windows":
+    line = platform.processor()
+    values = line.split(" ")
+    vendor_id = values[7]
+    cpu_family = int(values[2])
+    model = int(values[4])
 
   else:
     print ("detect_cpu: operating system not supported")
