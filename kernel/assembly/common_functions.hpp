@@ -13,89 +13,97 @@ namespace FEAST
     namespace Common
     {
       /**
-       * \brief Sine-Bubble Static function
+       * \brief Sine-Tensor Static function
        *
        * This class implements the StaticFunction interface representing the function
-       *   - 1D: u(x) = sin(pi*x)
-       *   - 2D: u(x) = sin(pi*x) * sin(pi*y)
-       *   - 3D: u(x) = sin(pi*x) * sin(pi*y) * sin(pi*z)
+       *   - 1D: u(x)     = sin(k*pi*x)
+       *   - 2D: u(x,y)   = sin(k*pi*x) * sin(k*pi*y)
+       *   - 3D: u(x,y,z) = sin(k*pi*x) * sin(k*pi*y) * sin(k*pi*z)
+       *
+       * For any positive integral \e k, these functions are eigenfunctions of the Laplace operator.
+       * The corresponding eigenvalue is \f$ \lambda = -d (k\pi)^2 \f$, where \e d is the dimension of the domain.
+       *
+       * Moreover, on any rectangular/rectoid domain [x0,x1]x[y0,y1]x[z0,z1] with integral domain
+       * boundaries xi,yi,zi, this function fulfills homogene Dirichlet boundary conditions.
        *
        * \author Peter Zajac
        */
-      template<typename DataType_>
-      class SineBubbleStatic
+      template<typename DataType_, int k_ = 1>
+      class SineTensorStatic
       {
+        static_assert(k_ > 0, "parameter k_ must be a positive integer");
+
       public:
         /// returns the constant pi
-        static DataType_ pi()
+        static DataType_ kpi()
         {
-          return Math::Limits<DataType_>::pi();
+          return DataType_(k_) * Math::pi<DataType_>();
         }
 
         /// 1D: function value
         static DataType_ eval(DataType_ x)
         {
-          return Math::sin(pi() * x);
+          return Math::sin(kpi() * x);
         }
 
         /// 2D: function value
         static DataType_ eval(DataType_ x, DataType_ y)
         {
-          return Math::sin(pi() * x) * Math::sin(pi() * y);
+          return Math::sin(kpi() * x) * Math::sin(kpi() * y);
         }
 
         /// 3D: function value
         static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
         {
-          return Math::sin(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
+          return Math::sin(kpi() * x) * Math::sin(kpi() * y) * Math::sin(kpi() * z);
         }
 
         /// 1D: X-derivative
         static DataType_ der_x(DataType_ x)
         {
-          return pi() * Math::cos(pi() * x);
+          return kpi() * Math::cos(kpi() * x);
         }
 
         /// 2D: X-derivative
         static DataType_ der_x(DataType_ x, DataType_ y)
         {
-          return pi() * Math::cos(pi() * x) * Math::sin(pi() * y);
+          return kpi() * Math::cos(kpi() * x) * Math::sin(kpi() * y);
         }
 
         /// 2D: Y-derivative
         static DataType_ der_y(DataType_ x, DataType_ y)
         {
-          return pi() * Math::sin(pi() * x) * Math::cos(pi() * y);
+          return kpi() * Math::sin(kpi() * x) * Math::cos(kpi() * y);
         }
 
         /// 3D: X-derivative
         static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
         {
-          return pi() * Math::cos(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
+          return kpi() * Math::cos(kpi() * x) * Math::sin(kpi() * y) * Math::sin(kpi() * z);
         }
 
         /// 3D: Y-derivative
         static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
         {
-          return pi() * Math::sin(pi() * x) * Math::cos(pi() * y) * Math::sin(pi() * z);
+          return kpi() * Math::sin(kpi() * x) * Math::cos(kpi() * y) * Math::sin(kpi() * z);
         }
 
         /// 3D: Z-derivative
         static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
         {
-          return pi() * Math::sin(pi() * x) * Math::sin(pi() * y) * Math::cos(pi() * z);
+          return kpi() * Math::sin(kpi() * x) * Math::sin(kpi() * y) * Math::cos(kpi() * z);
         }
 
         /// 1D: XX-derivative
         static DataType_ der_xx(DataType_ x)
         {
-          return -Math::sqr(pi()) * Math::sin(pi() * x);
+          return -Math::sqr(kpi()) * Math::sin(kpi() * x);
         }
 
         /// 2D: XX-derivative
         static DataType_ der_xx(DataType_ x, DataType_ y)
         {
-          return -Math::sqr(pi()) * Math::sin(pi() * x) * Math::sin(pi() * y);
+          return -Math::sqr(kpi()) * Math::sin(kpi() * x) * Math::sin(kpi() * y);
         }
 
         /// 2D: YY-derivative
@@ -107,7 +115,7 @@ namespace FEAST
         /// 2D: XY-derivative
         static DataType_ der_xy(DataType_ x, DataType_ y)
         {
-          return Math::sqr(pi()) * Math::cos(pi() * x) * Math::cos(pi() * y);
+          return Math::sqr(kpi()) * Math::cos(kpi() * x) * Math::cos(kpi() * y);
         }
 
         /// 2D: YX-derivative
@@ -119,7 +127,7 @@ namespace FEAST
         /// 3D: XX-derivative
         static DataType_ der_xx(DataType_ x, DataType_ y, DataType_ z)
         {
-          return -Math::sqr(pi()) * Math::sin(pi() * x) * Math::sin(pi() * y) * Math::sin(pi() * z);
+          return -Math::sqr(kpi()) * Math::sin(kpi() * x) * Math::sin(kpi() * y) * Math::sin(kpi() * z);
         }
 
         /// 3D: YY-derivative
@@ -137,7 +145,7 @@ namespace FEAST
         /// 3D: XY-derivative
         static DataType_ der_xy(DataType_ x, DataType_ y, DataType_ z)
         {
-          return Math::sqr(pi()) * Math::cos(pi() * x) * Math::cos(pi() * y) * Math::sin(pi() * z);
+          return Math::sqr(kpi()) * Math::cos(kpi() * x) * Math::cos(kpi() * y) * Math::sin(kpi() * z);
         }
 
         /// 3D: YX-derivative
@@ -149,7 +157,7 @@ namespace FEAST
         /// 3D: XZ-derivative
         static DataType_ der_xz(DataType_ x, DataType_ y, DataType_ z)
         {
-          return Math::sqr(pi()) * Math::cos(pi() * x) * Math::sin(pi() * y) * Math::cos(pi() * z);
+          return Math::sqr(kpi()) * Math::cos(kpi() * x) * Math::sin(kpi() * y) * Math::cos(kpi() * z);
         }
 
         /// 3D: ZX-derivative
@@ -161,7 +169,7 @@ namespace FEAST
         /// 3D: YZ-derivative
         static DataType_ der_yz(DataType_ x, DataType_ y, DataType_ z)
         {
-          return Math::sqr(pi()) * Math::sin(pi() * x) * Math::cos(pi() * y) * Math::cos(pi() * z);
+          return Math::sqr(kpi()) * Math::sin(kpi() * x) * Math::cos(kpi() * y) * Math::cos(kpi() * z);
         }
 
         /// 3D: ZY-derivative
@@ -169,21 +177,217 @@ namespace FEAST
         {
           return der_yz(x, y, z);
         }
-      }; // class SineBubbleStatic<...>
+      }; // class SineTensorStatic<...>
+
+      /// \cond internal
+      template<typename DataType_>
+      using SineBubbleStatic = SineTensorStatic<DataType_, 1>;
+      /// \endcond
 
       /**
        * \brief Sine-Bubble Analytic function
        *
        * This class implements the AnalyticFunction interface representing the function
-       *   - 1D: u(x) = sin(pi*x)
-       *   - 2D: u(x) = sin(pi*x) * sin(pi*y)
-       *   - 3D: u(x) = sin(pi*x) * sin(pi*y) * sin(pi*z)
+       *   - 1D: u(x)     = sin(pi*x)
+       *   - 2D: u(x,y)   = sin(pi*x) * sin(pi*y)
+       *   - 3D: u(x,y,z) = sin(pi*x) * sin(pi*y) * sin(pi*z)
        *
        * This class supports function values, gradient and hessians for all dimensions.
+       *
+       * This function fulfills homogene Dirichlet boundary conditions on the unit-cube domain.
        *
        * \author Peter Zajac
        */
       typedef StaticWrapperFunction<SineBubbleStatic, true, true, true> SineBubbleFunction;
+
+      /**
+       * \brief Cosine-Tensor Static function
+       *
+       * This class implements the StaticFunction interface representing the function
+       *   - 1D: u(x)     = cos(k*pi*x)
+       *   - 2D: u(x,y)   = cos(k*pi*x) * cos(k*pi*y)
+       *   - 3D: u(x,y,z) = cos(k*pi*x) * cos(k*pi*y) * cos(k*pi*z)
+       *
+       * For any positive integral \e k, these functions are eigenfunctions of the Laplace operator.
+       * The corresponding eigenvalue is \f$ \lambda = -d (k\pi)^2 \f$, where \e d is the dimension of the domain.
+       *
+       * Moreover, on any rectangular/rectoid domain [x0,x1]x[y0,y1]x[z0,z1] with integral domain
+       * boundaries xi,yi,zi, this function fulfills homogene Neumann boundary conditions including
+       * the integral-mean condition \f$ int_\Omega u = 0 \f$.
+       *
+       * \author Peter Zajac
+       */
+      template<typename DataType_, int k_ = 1>
+      class CosineTensorStatic
+      {
+        static_assert(k_ > 0, "parameter k_ must be a positive integer");
+
+      public:
+        static DataType_ kpi()
+        {
+          return DataType_(k_) * Math::pi<DataType_>();
+        }
+
+        /// 1D: function value
+        static DataType_ eval(DataType_ x)
+        {
+          return Math::cos(kpi() * x);
+        }
+
+        /// 2D: function value
+        static DataType_ eval(DataType_ x, DataType_ y)
+        {
+          return Math::cos(kpi() * x) * Math::cos(kpi() * y);
+        }
+
+        /// 3D: function value
+        static DataType_ eval(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Math::cos(kpi() * x) * Math::cos(kpi() * y) * Math::cos(kpi() * z);
+        }
+
+        /// 1D: X-derivative
+        static DataType_ der_x(DataType_ x)
+        {
+          return -kpi() * Math::sin(kpi() * x);
+        }
+
+        /// 2D: X-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y)
+        {
+          return -kpi() * Math::sin(kpi() * x) * Math::cos(kpi() * y);
+        }
+
+        /// 2D: Y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y)
+        {
+          return -kpi() * Math::cos(kpi() * x) * Math::sin(kpi() * y);
+        }
+
+        /// 3D: X-derivative
+        static DataType_ der_x(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return -kpi() * Math::sin(kpi() * x) * Math::cos(kpi() * y) * Math::cos(kpi() * z);
+        }
+
+        /// 3D: Y-derivative
+        static DataType_ der_y(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return -kpi() * Math::cos(kpi() * x) * Math::sin(kpi() * y) * Math::cos(kpi() * z);
+        }
+
+        /// 3D: Z-derivative
+        static DataType_ der_z(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return -kpi() * Math::cos(kpi() * x) * Math::cos(kpi() * y) * Math::sin(kpi() * z);
+        }
+
+        /// 1D: XX-derivative
+        static DataType_ der_xx(DataType_ x)
+        {
+          return -Math::sqr(kpi()) * Math::cos(kpi() * x);
+        }
+
+        /// 2D: XX-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y)
+        {
+          return -Math::sqr(kpi()) * Math::cos(kpi() * x) * Math::cos(kpi() * y);
+        }
+
+        /// 2D: YY-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y)
+        {
+          return der_xx(x, y);
+        }
+
+        /// 2D: XY-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y)
+        {
+          return Math::sqr(kpi()) * Math::sin(kpi() * x) * Math::sin(kpi() * y);
+        }
+
+        /// 2D: YX-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y)
+        {
+          return der_xy(x, y);
+        }
+
+        /// 3D: XX-derivative
+        static DataType_ der_xx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return -Math::sqr(kpi()) * Math::cos(kpi() * x) * Math::cos(kpi() * y) * Math::cos(kpi() * z);
+        }
+
+        /// 3D: YY-derivative
+        static DataType_ der_yy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_xx(x, y, z);
+        }
+
+        /// 3D: ZZ-derivative
+        static DataType_ der_zz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_xx(x, y, z);
+        }
+
+        /// 3D: XY-derivative
+        static DataType_ der_xy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Math::sqr(kpi()) * Math::sin(kpi() * x) * Math::sin(kpi() * y) * Math::cos(kpi() * z);
+        }
+
+        /// 3D: YX-derivative
+        static DataType_ der_yx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_xy(x, y);
+        }
+
+        /// 3D: XZ-derivative
+        static DataType_ der_xz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Math::sqr(kpi()) * Math::sin(kpi() * x) * Math::cos(kpi() * y) * Math::sin(kpi() * z);
+        }
+
+        /// 3D: ZX-derivative
+        static DataType_ der_zx(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_xz(x, y);
+        }
+
+        /// 3D: YZ-derivative
+        static DataType_ der_yz(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return Math::sqr(kpi()) * Math::cos(kpi() * x) * Math::sin(kpi() * y) * Math::sin(kpi() * z);
+        }
+
+        /// 3D: ZY-derivative
+        static DataType_ der_zy(DataType_ x, DataType_ y, DataType_ z)
+        {
+          return der_yz(x, y);
+        }
+      }; // class CosineTensorStatic<...>
+
+      /// \cond internal
+      template<typename DataType_>
+      using CosineWaveStatic = CosineTensorStatic<DataType_, 1>;
+      /// \endcond
+
+      /**
+       * \brief Cosine-Wave Analytic function
+       *
+       * This class implements the AnalyticFunction interface representing the function
+       *   - 1D: u(x)     = cos(pi*x)
+       *   - 2D: u(x,y)   = cos(pi*x) * cos(pi*y)
+       *   - 3D: u(x,y,z) = cos(pi*x) * cos(pi*y) * cos(pi*z)
+       *
+       * This class supports function values, gradient and hessians for all dimensions.
+       *
+       * This function fulfills homogene Neumann boundary conditions and has vanishing integral
+       * mean on the unit-cube domain.
+       *
+       * \author Peter Zajac
+       */
+      typedef StaticWrapperFunction<CosineWaveStatic, true, true, true> CosineWaveFunction;
 
       /**
        * \brief Constant Analytic function
