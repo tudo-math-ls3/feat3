@@ -66,24 +66,6 @@ void MemoryPool<Mem::Main>::release_memory(void * address)
   }
 }
 
-template <typename DT_>
-void MemoryPool<Mem::Main>::download(DT_ * dest, const DT_ * const src, const Index count)
-{
-  if (dest == src)
-    return;
-
-  ::memcpy(dest, src, count * sizeof(DT_));
-}
-
-template <typename DT_>
-void MemoryPool<Mem::Main>::upload(DT_ * dest, const DT_ * const src, const Index count)
-{
-  if (dest == src)
-    return;
-
-  ::memcpy(dest, src, count * sizeof(DT_));
-}
-
 template float * MemoryPool<Mem::Main>::allocate_memory<float>(const Index);
 template double * MemoryPool<Mem::Main>::allocate_memory<double>(const Index);
 template unsigned int * MemoryPool<Mem::Main>::allocate_memory<unsigned int>(const Index);

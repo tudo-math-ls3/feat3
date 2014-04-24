@@ -68,11 +68,23 @@ namespace FEAST
 
         /// download memory chunk to host memory
         template <typename DT_>
-        static void download(DT_ * dest, const DT_ * const src, const Index count);
+        inline static void download(DT_ * dest, const DT_ * const src, const Index count)
+        {
+          if (dest == src)
+            return;
+
+          ::memcpy(dest, src, count * sizeof(DT_));
+        }
 
         /// upload memory chunk from host memory to device memory
         template <typename DT_>
-        static void upload(DT_ * dest, const DT_ * const src, const Index count);
+        inline static void upload(DT_ * dest, const DT_ * const src, const Index count)
+        {
+          if (dest == src)
+            return;
+
+          ::memcpy(dest, src, count * sizeof(DT_));
+        }
 
         /// recieve element
         template <typename DT_>
@@ -101,7 +113,9 @@ namespace FEAST
           ::memcpy(dest, src, count * sizeof(DT_));
         }
 
-        static void synchronize(){}
+        static void synchronize()
+        {
+        }
     };
 
     template <>
