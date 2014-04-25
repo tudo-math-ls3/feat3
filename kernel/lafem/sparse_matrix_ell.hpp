@@ -21,6 +21,7 @@
 #include <kernel/lafem/arch/axpy.hpp>
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
+#include <kernel/lafem/transposition.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -1378,6 +1379,34 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
           Arch::Scale<Mem_, Algo_>::value(this->Ax(), x.Ax(), alpha, this->stride() * this->num_cols_per_row());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow this^\top \f$
+         */
+        void transpose()
+        {
+          SparseMatrixELL<Mem::Main, DT_, IT_> tx;
+          tx.convert(*this);
+          auto tx_t(Transposition<Algo::Generic>::value(tx));
+          SparseMatrixELL<Mem_, DT_, IT_> x_t;
+          x_t.convert(tx_t);
+          this->assign(x_t);
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow x^\top \f$
+         *
+         * \param[in] x The matrix to be transposed.
+         */
+        void transpose(const SparseMatrixELL & x)
+        {
+          SparseMatrixELL<Mem::Main, DT_, IT_> tx;
+          tx.convert(x);
+          auto tx_t(Transposition<Algo::Generic>::value(tx));
+          SparseMatrixELL<Mem_, DT_, IT_> x_t;
+          x_t.convert(tx_t);
+          this->assign(x_t);
         }
 
         /**

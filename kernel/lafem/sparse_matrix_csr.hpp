@@ -22,6 +22,7 @@
 #include <kernel/lafem/arch/product_matvec.hpp>
 #include <kernel/lafem/arch/defect.hpp>
 #include <kernel/adjacency/graph.hpp>
+#include <kernel/lafem/transposition.hpp>
 
 #include <fstream>
 
@@ -1401,6 +1402,34 @@ namespace FEAST
             throw InternalError(__func__, __FILE__, __LINE__, "Nonzero count does not match!");
 
           Arch::Scale<Mem_, Algo_>::value(this->val(), x.val(), alpha, this->used_elements());
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow this^\top \f$
+         */
+        void transpose()
+        {
+          SparseMatrixCSR<Mem::Main, DT_, IT_> tx;
+          tx.convert(*this);
+          auto tx_t(Transposition<Algo::Generic>::value(tx));
+          SparseMatrixCSR<Mem_, DT_, IT_> x_t;
+          x_t.convert(tx_t);
+          this->assign(x_t);
+        }
+
+        /**
+         * \brief Calculate \f$this \leftarrow x^\top \f$
+         *
+         * \param[in] x The matrix to be transposed.
+         */
+        void transpose(const SparseMatrixCSR & x)
+        {
+          SparseMatrixCSR<Mem::Main, DT_, IT_> tx;
+          tx.convert(x);
+          auto tx_t(Transposition<Algo::Generic>::value(tx));
+          SparseMatrixCSR<Mem_, DT_, IT_> x_t;
+          x_t.convert(tx_t);
+          this->assign(x_t);
         }
 
         /**
