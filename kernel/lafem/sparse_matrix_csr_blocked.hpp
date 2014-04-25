@@ -489,16 +489,16 @@ namespace FEAST
           // check for special cases
           // r <- x + y
           if(Math::abs(alpha - DT_(1)) < Math::eps<DT_>())
-            Arch::Sum<Mem_, Algo_>::value(this->val(), x.val(), y.val(), this->used_elements());
+            Arch::Sum<Mem_, Algo_>::value(this->raw_val(), x.raw_val(), y.raw_val(), this->raw_used_elements());
           // r <- y - x
           else if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
-            Arch::Difference<Mem_, Algo_>::value(this->val(), y.val(), x.val(), this->used_elements());
+            Arch::Difference<Mem_, Algo_>::value(this->raw_val(), y.raw_val(), x.raw_val(), this->raw_used_elements());
           // r <- y
           else if(Math::abs(alpha) < Math::eps<DT_>())
             this->copy(y);
           // r <- y + alpha*x
           else
-            Arch::Axpy<Mem_, Algo_>::dv(this->val(), alpha, x.val(), y.val(), this->used_elements());
+            Arch::Axpy<Mem_, Algo_>::dv(this->raw_val(), alpha, x.raw_val(), y.raw_val(), this->raw_used_elements());
         }
 
         /**
