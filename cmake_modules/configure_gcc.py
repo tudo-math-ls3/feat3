@@ -32,9 +32,9 @@ def configure_gcc(cpu, buildid):
     #do not use stl debug libs under darwin, as these are as buggy as everything else in macos
     if platform.system() != "Darwin":
       cxxflags += " -D_GLIBCXX_DEBUG"
-    if major >= 4  and minor >= 8 and not "mpi" in buildid and not "cuda" in buildid:
+    if major >= 4 and minor >= 8 and not "mpi" in buildid and not "cuda" in buildid and not "valgrind" in buildid:
       cxxflags += " -fsanitize=address"
-    if major >= 4  and minor >= 9:
+    if major >= 4 and minor >= 9:
       cxxflags += " -fsanitize=undefined"
   elif "opt" in buildid:
     cxxflags += " -O3"
