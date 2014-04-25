@@ -10,34 +10,34 @@ using namespace FEAST::LAFEM;
 using namespace FEAST::TestSystem;
 
 template<
-  typename Mem_,
   typename Algo_,
-  typename DT_,
   typename SM_>
 class TranspositionTest
-  : public TaggedTest<Mem_, DT_, Algo_>
+  : public TaggedTest<typename SM_::MemType, typename SM_::DataType, Algo_>
 {
 
 public:
+  typedef typename SM_::MemType MemType;
+  typedef typename SM_::DataType DataType;
 
   TranspositionTest()
-    : TaggedTest<Mem_, DT_, Algo_>("transposition_test" + SM_::name())
+    : TaggedTest<MemType, DataType, Algo_>("transposition_test" + SM_::name())
   {
   }
 
   virtual void run() const
   {
-    for (Index size(2) ; size < 3e2 ; size*=2)
+    for (Index size(2) ; size < 3e2 ; size*=3)
     {
-      SparseMatrixCOO<Mem::Main, DT_> a_local(size, size + 2);
+      SparseMatrixCOO<Mem::Main, DataType> a_local(size, size + 2);
       for (Index row(0) ; row < a_local.rows() ; ++row)
       {
         for (Index col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
-            a_local(row, col, DT_(2));
+            a_local(row, col, DataType(2));
           else if((row == col+1) || (row+1 == col))
-            a_local(row, col, DT_(-1));
+            a_local(row, col, DataType(-1));
         }
       }
       SM_ a;
@@ -56,9 +56,9 @@ public:
     }
   }
 };
-TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixCOO<Mem::Main, float> > coo_cpu_transposition_test_float;
-TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixCOO<Mem::Main, double> > coo_cpu_transposition_test_double;
-TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixCSR<Mem::Main, float> > csr_cpu_transposition_test_float;
-TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixCSR<Mem::Main, double> > csr_cpu_transposition_test_double;
-TranspositionTest<Mem::Main, Algo::Generic, float, SparseMatrixELL<Mem::Main, float> > ell_cpu_transposition_test_float;
-TranspositionTest<Mem::Main, Algo::Generic, double, SparseMatrixELL<Mem::Main, double> > ell_cpu_transposition_test_double;
+TranspositionTest<Algo::Generic, SparseMatrixCOO<Mem::Main, float, Index> > coo_cpu_transposition_test_float;
+TranspositionTest<Algo::Generic, SparseMatrixCOO<Mem::Main, double, Index> > coo_cpu_transposition_test_double;
+TranspositionTest<Algo::Generic, SparseMatrixCSR<Mem::Main, float, Index> > csr_cpu_transposition_test_float;
+TranspositionTest<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index> > csr_cpu_transposition_test_double;
+TranspositionTest<Algo::Generic, SparseMatrixELL<Mem::Main, float, Index> > ell_cpu_transposition_test_float;
+TranspositionTest<Algo::Generic, SparseMatrixELL<Mem::Main, double, Index> > ell_cpu_transposition_test_double;
