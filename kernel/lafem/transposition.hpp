@@ -37,8 +37,8 @@ namespace FEAST
        * \param[in] a The input matrix.
        * \returns The transpose of a.
        */
-      template <typename DT_>
-      static SparseMatrixCOO<Mem::Main, DT_> value(const SparseMatrixCOO<Mem::Main, DT_> & a)
+      template <typename DT_, typename IT_>
+      static SparseMatrixCOO<Mem::Main, DT_, IT_> value(const SparseMatrixCOO<Mem::Main, DT_, IT_> & a)
       {
         typedef Mem::Main Mem_;
 
@@ -46,20 +46,20 @@ namespace FEAST
         const Index acolumns(a.columns());
         const Index used_elements(a.used_elements());
 
-        const Index * parow_ind(a.row_indices());
-        const Index * pacol_ind(a.column_indices());
+        const IT_ * parow_ind(a.row_indices());
+        const IT_ * pacol_ind(a.column_indices());
         const DT_ * paval(a.val());
 
-        DenseVector<Mem_, Index> tcol_ind(used_elements);
-        DenseVector<Mem_, DT_> tval(used_elements);
-        DenseVector<Mem_, Index> trow_ind(used_elements);
+        DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
+        DenseVector<Mem_, DT_, IT_> tval(used_elements);
+        DenseVector<Mem_, IT_, IT_> trow_ind(used_elements);
 
-        Index * ptcol_ind(tcol_ind.elements());
+        IT_ * ptcol_ind(tcol_ind.elements());
         DT_ * ptval(tval.elements());
-        Index * ptrow_ind(trow_ind.elements());
+        IT_ * ptrow_ind(trow_ind.elements());
 
-        DenseVector<Mem_, Index> trow_ptr(acolumns + 1, Index(0));
-        Index * ptrow_ptr(trow_ptr.elements());
+        DenseVector<Mem_, IT_, IT_> trow_ptr(acolumns + 1, Index(0));
+        IT_ * ptrow_ptr(trow_ptr.elements());
 
         for (Index i(0); i < used_elements; ++i)
         {
@@ -83,7 +83,7 @@ namespace FEAST
           ++ptrow_ptr[l];
         }
 
-        SparseMatrixCOO<Mem_, DT_> t(acolumns, arows, trow_ind, tcol_ind, tval);
+        SparseMatrixCOO<Mem_, DT_, IT_> t(acolumns, arows, trow_ind, tcol_ind, tval);
         return t;
       }
 
@@ -93,8 +93,8 @@ namespace FEAST
        * \param[in] a The input matrix.
        * \returns The transpose of a.
        */
-      template <typename DT_>
-      static SparseMatrixCSR<Mem::Main, DT_> value(const SparseMatrixCSR<Mem::Main, DT_> & a)
+      template <typename DT_, typename IT_>
+      static SparseMatrixCSR<Mem::Main, DT_, IT_> value(const SparseMatrixCSR<Mem::Main, DT_, IT_> & a)
       {
         typedef Mem::Main Mem_;
 
@@ -102,17 +102,17 @@ namespace FEAST
         const Index acolumns(a.columns());
         const Index used_elements(a.used_elements());
 
-        const Index * pacol_ind(a.col_ind());
-        const Index * parow_ptr(a.row_ptr());
+        const IT_ * pacol_ind(a.col_ind());
+        const IT_ * parow_ptr(a.row_ptr());
         const DT_ * paval(a.val());
 
-        DenseVector<Mem_, Index> tcol_ind(used_elements);
-        DenseVector<Mem_, DT_> tval(used_elements);
-        DenseVector<Mem_, Index> trow_ptr(acolumns + 1, Index(0));
+        DenseVector<Mem_, IT_, IT_> tcol_ind(used_elements);
+        DenseVector<Mem_, DT_, IT_> tval(used_elements);
+        DenseVector<Mem_, IT_, IT_> trow_ptr(acolumns + 1, Index(0));
 
-        Index * ptcol_ind(tcol_ind.elements());
+        IT_ * ptcol_ind(tcol_ind.elements());
         DT_ * ptval(tval.elements());
-        Index * ptrow_ptr(trow_ptr.elements());
+        IT_ * ptrow_ptr(trow_ptr.elements());
 
         ptrow_ptr[0] = 0;
 
@@ -144,7 +144,7 @@ namespace FEAST
         }
         ptrow_ptr[0] = 0;
 
-        SparseMatrixCSR<Mem_, DT_> t(acolumns, arows, tcol_ind, tval, trow_ptr);
+        SparseMatrixCSR<Mem_, DT_, IT_> t(acolumns, arows, tcol_ind, tval, trow_ptr);
         return t;
       }
 
@@ -154,8 +154,8 @@ namespace FEAST
        * \param[in] a The input matrix.
        * \returns The transpose of a.
        */
-      template <typename DT_>
-      static SparseMatrixELL<Mem::Main, DT_> value(const SparseMatrixELL<Mem::Main, DT_> & a)
+      template <typename DT_, typename IT_>
+      static SparseMatrixELL<Mem::Main, DT_, IT_> value(const SparseMatrixELL<Mem::Main, DT_, IT_> & a)
       {
         typedef Mem::Main Mem_;
 
@@ -165,14 +165,14 @@ namespace FEAST
         const Index astride(a.stride());
 
         const DT_ * pax(a.Ax());
-        const Index * paj(a.Aj());
-        const Index * parl(a.Arl());
+        const IT_ * paj(a.Aj());
+        const IT_ * parl(a.Arl());
 
         const Index alignment(32);
         const Index tstride(alignment * ((acolumns + alignment - 1)/ alignment));
 
-        DenseVector<Mem_, Index> trl(acolumns, Index(0));
-        Index * ptrl(trl.elements());
+        DenseVector<Mem_, IT_, IT_> trl(acolumns, Index(0));
+        IT_ * ptrl(trl.elements());
 
         for (Index i(0); i < arows; ++i)
         {
@@ -192,10 +192,10 @@ namespace FEAST
           ptrl[i] = 0;
         }
 
-        DenseVector<Mem_, Index> tj(tstride * num_cols_per_row);
-        DenseVector<Mem_, DT_> tx(tstride * num_cols_per_row);
+        DenseVector<Mem_, IT_, IT_> tj(tstride * num_cols_per_row);
+        DenseVector<Mem_, DT_, IT_> tx(tstride * num_cols_per_row);
 
-        Index * ptj(tj.elements());
+        IT_ * ptj(tj.elements());
         DT_ * ptx(tx.elements());
 
         for (Index i(0); i < arows; ++i)
@@ -209,7 +209,7 @@ namespace FEAST
           }
         }
 
-        SparseMatrixELL<Mem_, DT_> t(acolumns, arows, tstride, num_cols_per_row, used_elements, tx, tj, trl);
+        SparseMatrixELL<Mem_, DT_, IT_> t(acolumns, arows, tstride, num_cols_per_row, used_elements, tx, tj, trl);
         return t;
       }
     };
