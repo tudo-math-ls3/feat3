@@ -55,7 +55,7 @@ else (FEAST_MPI)
     --build-target foundation_comm_test-app
     --build-nocmake
     --build-noclean
-    --test-command "${FEAST_BINARY_DIR}/applications/foundation_comm_test-app")
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/foundation_comm_test-app)
   SET_PROPERTY(TEST foundation_comm_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_comm_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAST_MPI)
@@ -79,7 +79,7 @@ else (FEAST_MPI)
     --build-target foundation_system_test-app
     --build-nocmake
     --build-noclean
-    --test-systemand "${FEAST_BINARY_DIR}/applications/foundation_system_test-app")
+    --test-systemand ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/foundation_system_test-app)
   SET_PROPERTY(TEST foundation_system_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_system_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAST_MPI)
@@ -103,7 +103,7 @@ else (FEAST_MPI)
     --build-target scarc_test-app
     --build-nocmake
     --build-noclean
-    --test-command "${FEAST_BINARY_DIR}/applications/scarc_test-app")
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/scarc_test-app)
   SET_PROPERTY(TEST scarc_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST scarc_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAST_MPI)
@@ -127,7 +127,7 @@ else (FEAST_MPI)
     --build-target foundation_synch_test-app
     --build-nocmake
     --build-noclean
-    --test-command "${FEAST_BINARY_DIR}/applications/foundation_synch_test-app")
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/foundation_synch_test-app)
   SET_PROPERTY(TEST foundation_synch_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST foundation_synch_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAST_MPI)
@@ -151,7 +151,7 @@ else (FEAST_MPI)
     --build-target poisson_test-app
     --build-nocmake
     --build-noclean
-    --test-command "${FEAST_BINARY_DIR}/applications/poisson_test-app")
+    --test-command ${VALGRIND_EXE} ${FEAST_BINARY_DIR}/applications/poisson_test-app)
   SET_PROPERTY(TEST poisson_test-app_serial PROPERTY LABELS "serial")
   SET_PROPERTY(TEST poisson_test-app_serial PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
 endif (FEAST_MPI)
