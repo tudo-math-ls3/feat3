@@ -3,6 +3,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/sparse_matrix_coo.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_ell.hpp>
 #include <kernel/lafem/transposition.hpp>
 
 using namespace FEAST;
@@ -30,14 +31,17 @@ public:
     for (Index size(2) ; size < 3e2 ; size*=3)
     {
       SparseMatrixCOO<Mem::Main, DataType> a_local(size, size + 2);
+
       for (Index row(0) ; row < a_local.rows() ; ++row)
       {
         for (Index col(0) ; col < a_local.columns() ; ++col)
         {
           if(row == col)
             a_local(row, col, DataType(2));
-          else if((row == col+1) || (row+1 == col))
+          else if(row == col+1)
             a_local(row, col, DataType(-1));
+          else if(row+1 == col)
+            a_local(row, col, DataType(-3));
         }
       }
       SM_ a;
@@ -53,6 +57,20 @@ public:
           TEST_CHECK_EQUAL(b(j, i), a(i, j));
         }
       }
+
+      a.transpose(b);
+
+      for (Index i(0) ; i < a.rows() ; ++i)
+      {
+        for (Index j(0) ; j < a.columns() ; ++j)
+        {
+          TEST_CHECK_EQUAL(b(j, i), a(i, j));
+        }
+      }
+
+      a.transpose();
+
+      TEST_CHECK_EQUAL(a, b);
     }
   }
 };
