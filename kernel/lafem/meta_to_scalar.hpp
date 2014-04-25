@@ -1,6 +1,6 @@
 #pragma once
-#ifndef KERNEL_LAFEM_BLOCK_TO_SCALAR_HPP
-#define KERNEL_LAFEM_BLOCK_TO_SCALAR_HPP 1
+#ifndef KERNEL_LAFEM_META_TO_SCALAR_HPP
+#define KERNEL_LAFEM_META_TO_SCALAR_HPP 1
 
 // includes, FEAST
 #include <kernel/lafem/tuple_vector.hpp>
@@ -21,7 +21,7 @@ namespace FEAST
   namespace LAFEM
   {
     template<typename Algo_>
-    struct MatBlockToScalar;
+    struct MatMetaToScalar;
 
     /**
      * \brief Convert any matrix to scalar matrix
@@ -31,7 +31,7 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template<>
-    struct MatBlockToScalar<Algo::Generic>
+    struct MatMetaToScalar<Algo::Generic>
     {
     private:
       typedef Algo::Generic Algo_;
@@ -516,7 +516,7 @@ namespace FEAST
     };
 
     template<typename Algo_>
-    struct VecBlockToScalar;
+    struct VecMetaToScalar;
 
     /**
      * \brief Convert any vector to scalar vector
@@ -526,7 +526,7 @@ namespace FEAST
      * \author Christoph Lohmann
      */
     template<>
-    struct VecBlockToScalar<Algo::Generic>
+    struct VecMetaToScalar<Algo::Generic>
     {
     private:
       typedef Algo::Generic Algo_;
@@ -688,4 +688,4 @@ namespace FEAST
   } // namespace LAFEM
 } // namespace FEAST
 
-#endif // KERNEL_LAFEM_BLOCK_TO_SCALAR_HPP
+#endif // KERNEL_LAFEM_META_TO_SCALAR_HPP

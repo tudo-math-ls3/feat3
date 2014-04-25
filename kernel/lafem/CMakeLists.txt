@@ -35,7 +35,7 @@ endif(FEAST_BACKENDS_CUDA)
 # list of lafem tests
 SET (test_list
   bicgstab-test
-  block_to_scalar-test
+  meta_to_scalar-test
   dense_matrix-test
   dense_vector-test
   dense_vector_blocked-test
