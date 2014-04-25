@@ -39,7 +39,9 @@ def configure_gcc(cpu, buildid):
   elif "opt" in buildid:
     cxxflags += " -O3"
     if cpu == "unknown":
-      cxxflags += " -march=native"
+      cxxflags += " -mtune=generic"
+      print ("cpu type not detected, using -mtune=generic instead.")
+
     # INTEL
     elif cpu == "i486":
       cxxflags += " -march=i486 -m32"
@@ -135,7 +137,7 @@ def configure_gcc(cpu, buildid):
       cxxflags += " -m64 -march=barcelona"
 
     else:
-      cxxflags += " -mtune=generic"
-      print ("Detected cpu type not supported by configure_gcc.py, using -mtune=generic instead.")
+      cxxflags += " -march=native"
+      print ("Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
 
   return cxxflags

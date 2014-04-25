@@ -23,7 +23,8 @@ def configure_clang(cpu, buildid):
   elif "opt" in buildid:
     cxxflags += " -O3"
     if cpu == "unknown":
-      cxxflags += " -march=native"
+      cxxflags += " -mtune=generic"
+      print ("cpu type not detected, using -mtune=generic instead.")
 
     # INTEL
     elif cpu == "i486":
@@ -96,7 +97,7 @@ def configure_clang(cpu, buildid):
       cxxflags += " -m64 -march=barcelona"
 
     else:
-      cxxflags += " -mtune=generic"
-      print ("Detected cpu type not supported by configure_clang.py, using -mtune=generic instead.")
+      cxxflags += " -march=native"
+      print ("Detected cpu type not supported by configure_clang.py, using -march=native instead.")
 
   return cxxflags
