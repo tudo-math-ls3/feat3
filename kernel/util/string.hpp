@@ -973,12 +973,6 @@ namespace FEAST
     return String(buffer.data());
   }
 
-  inline std::ostream& operator<<(std::ostream& os, __float128 x)
-  {
-    // write to stream
-    return (os << stringify(x));
-  }
-
   inline std::istream& operator>>(std::istream& is, __float128& x)
   {
     String buffer;
@@ -1000,5 +994,20 @@ namespace FEAST
 #endif // FEAST_HAVE_QUADMATH
 #endif // __CUDACC__
 } // namespace FEAST
+
+// operator<<(__float128) must reside in the std namespace because gcc/icc search the namespace of ostream for a fitting op<< first
+// and would otherwise only find op<< with conversions of __float128 to int/double/long etc, which would lead to ambigue overloads, too.
+#ifndef __CUDACC__
+#ifdef FEAST_HAVE_QUADMATH
+namespace std
+{
+  inline std::ostream& operator<<(std::ostream& os, __float128 x)
+  {
+    // write to stream
+    return (os << FEAST::stringify(x));
+  }
+}
+#endif // FEAST_HAVE_QUADMATH
+#endif // __CUDACC__
 
 #endif // KERNEL_UTIL_STRING_HPP
