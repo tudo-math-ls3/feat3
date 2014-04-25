@@ -884,7 +884,7 @@ namespace FEAST
             for(Index n(0); n < max ; n++)
             {
               tval[ue] = *tAx;
-              trow[ue] = row;
+              trow[ue] = IT_(row);
               tcolumn[ue] = *tAj;
 
               tAj += stride;
