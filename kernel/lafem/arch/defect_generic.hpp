@@ -7,6 +7,7 @@
 #endif
 
 #include <kernel/util/math.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 
 using namespace FEAST;
 using namespace FEAST::LAFEM;
@@ -24,6 +25,32 @@ void Defect<Mem::Main, Algo::Generic>::csr(DT_ * r, const DT_ * const rhs, const
       sum += val[i] * x[col_ind[i]];
     }
     r[row] = rhs[row] - sum;
+  }
+}
+
+template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+void Defect<Mem::Main, Algo::Generic>::csrb(DT_ * r, const DT_ * const rhs, const DT_ * const val, const IT_ * const col_ind, const IT_ * const row_ptr, const DT_ * const x, const Index rows, const Index, const Index)
+{
+  Tiny::Vector<DT_, BlockHeight_> * br(reinterpret_cast<Tiny::Vector<DT_, BlockHeight_> *>(r));
+  const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const bval(reinterpret_cast<const Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> * const>(val));
+  const Tiny::Vector<DT_, BlockWidth_> * const bx(reinterpret_cast<const Tiny::Vector<DT_, BlockWidth_> * const>(x));
+  const Tiny::Vector<DT_, BlockHeight_> * const brhs(reinterpret_cast<const Tiny::Vector<DT_, BlockHeight_> * const>(rhs));
+
+  for (Index row(0) ; row < rows ; ++row)
+  {
+    Tiny::Vector<DT_, BlockHeight_> bsum(0);
+    const IT_ end(row_ptr[row + 1]);
+    for (IT_ i(row_ptr[row]) ; i < end ; ++i)
+    {
+      for (Index h(0) ; h < BlockHeight_ ; ++h)
+      {
+        for (Index w(0) ; w < BlockWidth_ ; ++w)
+        {
+          bsum[h] += bval[i][h][w] * bx[col_ind[i]][w];
+        }
+      }
+    }
+    br[row] = brhs[row] - bsum;
   }
 }
 

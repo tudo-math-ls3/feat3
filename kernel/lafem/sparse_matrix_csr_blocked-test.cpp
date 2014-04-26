@@ -118,6 +118,7 @@ public:
     SparseMatrixCSRBlocked<Mem_, DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
     DenseVector<Mem_, DT_, IT_> x(c.raw_columns());
+    DenseVector<Mem_, DT_, IT_> y(c.raw_rows());
     DenseVector<Mem_, DT_, IT_> r(c.raw_rows());
     DenseVector<Mem_, DT_, IT_> ref(c.raw_rows());
     for (Index i(0) ; i < x.size() ; ++i)
@@ -128,8 +129,10 @@ public:
     {
       r(i, DT_(4711));
       ref(i, DT_(4711));
+      y(i, DT_(i % 100));
     }
     DenseVectorBlocked<Mem_, DT_, IT_, 3> xb(x);
+    DenseVectorBlocked<Mem_, DT_, IT_, 2> yb(y);
     DenseVectorBlocked<Mem_, DT_, IT_, 2> rb(r);
 
     SparseMatrixCSR<Mem_, DT_, IT_> csr;
@@ -148,6 +151,38 @@ public:
     TEST_CHECK_EQUAL(r, ref);
 
     c.template apply<Algo_>(rb, xb);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    DT_ alpha(-1);
+    csr.template apply<Algo_>(ref, x, y, alpha);
+    c.template apply<Algo_>(r, x, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.template apply<Algo_>(rb, x, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.template apply<Algo_>(r, xb, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.template apply<Algo_>(rb, xb, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    alpha = DT_(1.234);
+    csr.template apply<Algo_>(ref, x, y, alpha);
+    c.template apply<Algo_>(r, x, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.template apply<Algo_>(rb, x, yb, alpha);
+    r.convert(rb);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.template apply<Algo_>(r, xb, y, alpha);
+    TEST_CHECK_EQUAL(r, ref);
+
+    c.template apply<Algo_>(rb, xb, yb, alpha);
     r.convert(rb);
     TEST_CHECK_EQUAL(r, ref);
   }

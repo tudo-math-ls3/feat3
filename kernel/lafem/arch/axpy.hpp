@@ -32,6 +32,14 @@ namespace FEAST
         static void csr(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
             const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
 
+        template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+        static void csrb(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+            const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
+
+        template <typename DT_, typename IT_, Index BlockHeight_, Index BlockWidth_>
+        static void csrb(DT_ * r, const DT_ * const a, const DT_ * const x, const DT_ * const y, const DT_ * const val,
+            const IT_ * const col_ind, const IT_ * const row_ptr, const Index rows, const Index, const Index);
+
         template <typename DT_, typename IT_>
         static void ell(DT_ * r, const DT_ a, const DT_ * const x, const DT_ * const y, const DT_ * const Ax, const IT_ * const Aj, const IT_ * const Arl, const Index stride, const Index rows);
 

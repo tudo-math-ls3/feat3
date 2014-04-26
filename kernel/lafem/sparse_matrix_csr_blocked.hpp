@@ -529,9 +529,9 @@ namespace FEAST
         template<typename Algo_>
         void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVector<Mem_, DT_, IT_> & x) const
         {
-          if (r.size() != this->rows() * BlockHeight_)
+          if (r.size() != this->raw_rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-          if (x.size() != this->columns() * BlockWidth_)
+          if (x.size() != this->raw_columns())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
           Arch::ProductMatVec<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
@@ -549,7 +549,7 @@ namespace FEAST
         {
           if (r.size() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
-          if (x.size() != this->columns() * BlockWidth_)
+          if (x.size() != this->raw_columns())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
 
           Arch::ProductMatVec<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), this->raw_val(), this->col_ind(), this->row_ptr(),
@@ -565,7 +565,7 @@ namespace FEAST
         template<typename Algo_>
         void apply(DenseVector<Mem_,DT_, IT_> & r, const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x) const
         {
-          if (r.size() != this->rows() * BlockHeight_)
+          if (r.size() != this->raw_rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
           if (x.size() != this->columns())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
@@ -607,6 +607,128 @@ namespace FEAST
           const DenseVector<Mem_, DT_, IT_> & y,
           const DT_ alpha = DT_(1)) const
         {
+          if (r.size() != this->raw_rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->raw_columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->raw_rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+          // check for special cases
+          // r <- y - A*x
+          if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+          {
+            Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
+              this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
+          }
+          //r <- y
+          else if(Math::abs(alpha) < Math::eps<DT_>())
+            r.copy(y);
+          // r <- y + alpha*x
+          else
+          {
+            Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.elements(), y.elements(),
+              this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+          }
+        }
+
+        /**
+         * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         * \param[in] y The summand vector.
+         * \param[in] alpha A scalar to scale the product with.
+         */
+        template<typename Algo_>
+        void apply(
+          DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
+          const DenseVector<Mem_, DT_, IT_> & x,
+          const DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight_> & y,
+          const DT_ alpha = DT_(1)) const
+        {
+          if (r.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->raw_columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+          // check for special cases
+          // r <- y - A*x
+          if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+          {
+            Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+              this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
+          }
+          //r <- y
+          else if(Math::abs(alpha) < Math::eps<DT_>())
+            //r.copy(y);
+            r.convert(y);
+          // r <- y + alpha*x
+          else
+          {
+            Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.elements(), y.raw_elements(),
+              this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+          }
+        }
+
+        /**
+         * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         * \param[in] y The summand vector.
+         * \param[in] alpha A scalar to scale the product with.
+         */
+        template<typename Algo_>
+        void apply(
+          DenseVector<Mem_,DT_, IT_> & r,
+          const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
+          const DenseVector<Mem_, DT_, IT_> & y,
+          const DT_ alpha = DT_(1)) const
+        {
+          if (r.size() != this->raw_rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
+          if (x.size() != this->columns())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of x does not match!");
+          if (y.size() != this->raw_rows())
+            throw InternalError(__func__, __FILE__, __LINE__, "Vector size of y does not match!");
+
+          // check for special cases
+          // r <- y - A*x
+          if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
+          {
+            Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), y.elements(), this->raw_val(), this->col_ind(),
+              this->row_ptr(), x.raw_elements(), this->rows(), this->columns(), this->used_elements());
+          }
+          //r <- y
+          else if(Math::abs(alpha) < Math::eps<DT_>())
+            //r.copy(y);
+            r.convert(y);
+          // r <- y + alpha*x
+          else
+          {
+            Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.elements(), alpha, x.raw_elements(), y.elements(),
+              this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+          }
+        }
+
+        /**
+         * \brief Calculate \f$ r \leftarrow y + \alpha this\cdot x \f$
+         *
+         * \param[out] r The vector that recieves the result.
+         * \param[in] x The vector to be multiplied by this matrix.
+         * \param[in] y The summand vector.
+         * \param[in] alpha A scalar to scale the product with.
+         */
+        template<typename Algo_>
+        void apply(
+          DenseVectorBlocked<Mem_,DT_, IT_, BlockHeight_> & r,
+          const DenseVectorBlocked<Mem_, DT_, IT_, BlockWidth_> & x,
+          const DenseVectorBlocked<Mem_, DT_, IT_, BlockHeight_> & y,
+          const DT_ alpha = DT_(1)) const
+        {
           if (r.size() != this->rows())
             throw InternalError(__func__, __FILE__, __LINE__, "Vector size of r does not match!");
           if (x.size() != this->columns())
@@ -618,8 +740,8 @@ namespace FEAST
           // r <- y - A*x
           if(Math::abs(alpha + DT_(1)) < Math::eps<DT_>())
           {
-            Arch::Defect<Mem_, Algo_>::csr(r.elements(), y.elements(), this->val(), this->col_ind(),
-              this->row_ptr(), x.elements(), this->rows(), this->columns(), this->used_elements());
+            Arch::Defect<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), y.raw_elements(), this->raw_val(), this->col_ind(),
+              this->row_ptr(), x.raw_elements(), this->rows(), this->columns(), this->used_elements());
           }
           //r <- y
           else if(Math::abs(alpha) < Math::eps<DT_>())
@@ -627,8 +749,8 @@ namespace FEAST
           // r <- y + alpha*x
           else
           {
-            Arch::Axpy<Mem_, Algo_>::csr(r.elements(), alpha, x.elements(), y.elements(),
-              this->val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
+            Arch::Axpy<Mem_, Algo_>::template csrb<DT_, IT_, BlockHeight_, BlockWidth_>(r.raw_elements(), alpha, x.raw_elements(), y.raw_elements(),
+              this->raw_val(), this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
           }
         }
     };
